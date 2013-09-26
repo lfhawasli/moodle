@@ -105,6 +105,10 @@
     $completion->set_module_viewed($cm);
 
 /// Print header.
+     // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
+     require_once($CFG->dirroot . '/local/ucla/lib.php');
+     setup_js_tablesorter('forumheaderlist'); 
+     // END UCLA MOD: CCLE-4003/SSC-1805
 
     $PAGE->set_title(format_string($forum->name));
     $PAGE->add_body_class('forumtype-'.$forum->type);

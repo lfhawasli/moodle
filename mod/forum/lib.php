@@ -3741,9 +3741,14 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     $postuser->picture = $post->picture;
     $postuser->email = $post->email;
 
+    // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
+    // Remove picture column from table.
+    /*
     echo '<td class="picture">';
     echo $OUTPUT->user_picture($postuser, array('courseid'=>$forum->course));
     echo "</td>\n";
+    */
+    // END UCLA MOD: CCLE-4003/SSC-1805
 
     // User name
     $fullname = fullname($postuser, has_capability('moodle/site:viewfullnames', $modcontext));
@@ -3805,10 +3810,20 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     $usermodified->id        = $post->usermodified;
     $usermodified->firstname = $post->umfirstname;
     $usermodified->lastname  = $post->umlastname;
+
+    // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
+    // Swapping order of date and name display so that sorting function can sort by date as opposed to name.
+    /*
     echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
          fullname($usermodified).'</a><br />';
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
           userdate($usedate, $datestring).'</a>';
+    */
+    echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
+          userdate($usedate, $datestring).'</a><br />';
+    echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
+         fullname($usermodified).'</a>';
+    // END UCLA MOD: CCLE-4003/SSC-1805
     echo "</td>\n";
 
     echo "</tr>\n\n";
@@ -5646,11 +5661,19 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
     }
 
     if ($displayformat == 'header') {
-        echo '<table cellspacing="0" class="forumheaderlist">';
+        // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
+        // Add an id to sort discussion forum.
+        /* echo '<table cellspacing="0" class="forumheaderlist">'; */
+        echo '<table cellspacing="0" class="forumheaderlist" id="forumheaderlist">';
+        // END UCLA MOD: CCLE-4003/SSC-1805
         echo '<thead>';
         echo '<tr>';
         echo '<th class="header topic" scope="col">'.get_string('discussion', 'forum').'</th>';
-        echo '<th class="header author" colspan="2" scope="col">'.get_string('startedby', 'forum').'</th>';
+        // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
+        // Remove colspan="2" clause from "Started by" header.
+        /* echo '<th class="header author" colspan="2" scope="col">'.get_string('startedby', 'forum').'</th>'; */
+        echo '<th class="header author" scope="col">'.get_string('startedby', 'forum').'</th>';
+        // END UCLA MOD: CCLE-4003/SSC-1805
         if ($groupmode > 0) {
             echo '<th class="header group" scope="col">'.get_string('group').'</th>';
         }
