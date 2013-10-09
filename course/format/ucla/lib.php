@@ -219,7 +219,20 @@ class format_ucla extends format_topics {
      */
     public function course_content_footer() {
         global $PAGE;
+
+        // Load format utilities
+        $PAGE->requires->yui_module('moodle-format_ucla-utils', 
+            'M.format_ucla.utils.init', 
+            array(array()));
         
+        $PAGE->requires->strings_for_js(
+                array(
+                    'collapsedshow', 
+                    'collapsedhide', 
+                    ), 
+                'format_ucla'
+                );
+
         if (ajaxenabled() && $PAGE->user_is_editing()) {
             
             // If user is editing, load public/private plugin

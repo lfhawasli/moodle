@@ -9,53 +9,30 @@ YUI.add('moodle-format_ucla-utils', function(Y) {
     M.format_ucla.utils = {
         init: function(config) {
             
-            var desc = Y.one('.registrar-collapsed .text_to_html');
+            var toggle = Y.one('.registrar-summary .registrar-summary-hidden');
             
-            if(desc) {
-                var height = desc.get('offsetHeight');
-            
-                desc.transition({
-                    easing: 'ease-in',
-                    duration: 1,
-                    height: '0px'
-                }).addClass('collapsed');
-
-                Y.one('.registrar-collapsed .collapse-toggle').on('click', function(e) {
-                    e.preventDefault();
-
-                    if(desc.hasClass('collapsed')) {
-                        desc.removeClass('collapsed');
-                        desc.transition({
-                            easing: 'ease-out',
-                            duration: 0.5,
-                            height: height + 'px'
-
-                        }, function() {
-                            e.target.transition({
-                                easing: 'ease-in',
-                                duration: 0.5,
-                                opacity: 0
-                            }, function() {
-                                e.target.remove();
-                            });
-                        })
-                    } 
-    //                else {
-    //                    desc.addClass('collapsed');
-    //                    desc.transition({
-    //                        easing: 'ease-out',
-    //                        duration: 0.5,
-    //                        height: '0px'
-    //                    });
-    //                }
-                });
+            if (toggle) {
+                // Set the toggle click
+                toggle.one('.collapse-toggle').on('click', this.toggle_reg_desc);
             }
 
+        },
+        toggle_reg_desc: function(e) {
+            e.preventDefault();
+            var target = e.target;
+ 
+            if (target.hasClass('toggle-show')) {
+                target.ancestor('.registrar-summary-hidden').one('.text_to_html').setStyle('display', 'none');
+                target.set('text', M.util.get_string('collapsedshow', 'format_ucla'));
+            } else {
+                target.ancestor('.registrar-summary-hidden').one('.text_to_html').setStyle('display', 'block');
+                target.set('text', M.util.get_string('collapsedhide', 'format_ucla'));
+            }
+            target.toggleClass('toggle-show');
         }
     }
     
-    
 
 }, '@VERSION@', {
-    requires: ['node', 'transition']
+    requires: ['node']
 });
