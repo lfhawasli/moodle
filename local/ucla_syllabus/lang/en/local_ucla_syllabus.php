@@ -150,3 +150,12 @@ be included in your backup.  You will need to re-upload those files manually.';
 $string['icon_public_world_syllabus'] = 'Syllabus (no login required)';
 $string['icon_public_ucla_syllabus'] = 'Syllabus (login required)';
 $string['icon_private_syllabus'] = 'Restricted syllabus (only enrolled students)';
+
+// Strings for handling manually uploaded syllabi.
+$string['manualconvertsyllabus'] = 'Please select the type of syllabus to convert your existing "{$a->name}" {$a->modname}.';
+$string['manualpublicsyllabusadd'] = 'Add "{$a->name}" as a syllabus';
+$string['manualprivatesyllabusadd'] = 'Add "{$a->name}" as a restricted syllabus';
+$string['manualconvertsyllabusreminder'] = 'Please complete the form below to ' .
+        'convert your existing "{$a->name}" {$a->modname} into your official UCLA syllabus.';
+$string['errmanualsyllabusmismatch'] = 'Cannot convert manual syllabus, because it does not belong to current course.';
+$string['manualsuccessfulconversion'] = 'Successfully converted manual syllabus.';

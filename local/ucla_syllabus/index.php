@@ -53,10 +53,13 @@ $PAGE->set_context($coursecontext);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_pagetype('course-view-' . $course->format);
 
-// See if user wants to handle a manually uploaded syllabus.
+// See if user wants to handle a manually uploaded syllabus. If a user has not
+// chosen what to do with a manual syllabus yet, but passing an $action and
+// $type, then prompt them what to do next.
 $manualsyllabusid = optional_param('manualsyllabus', null, PARAM_INT);
+
+// Check if manually uploaded syllabus is valid.
 if (!empty($manualsyllabusid)) {
-    // Check if manually uploaded syllabus is valid.
     $validsyllabus = false;
     if ($canmanagesyllabus && !$syllabusmanager->has_syllabus()) {
         $manualsyllabi = $syllabusmanager->get_all_manual_syllabi();
@@ -67,13 +70,8 @@ if (!empty($manualsyllabusid)) {
             }
         }
     }
-
-    if ($validsyllabus) {
-        $action = UCLA_SYLLABUS_ACTION_ADD;
-        // Only public syllabus can handle a manual syllabus.
-        $type = UCLA_SYLLABUS_TYPE_PUBLIC;
-    } else {
-        // Sliently ignore an invalid manual syllabus.
+    // Sliently ignore an invalid manual syllabus.
+    if (!$validsyllabus) {
         $manualsyllabusid = null;
     }
 }
@@ -117,7 +115,10 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
             $url = new moodle_url('/local/ucla_syllabus/index.php',
                     array('action' => UCLA_SYLLABUS_ACTION_VIEW,
                           'id' => $course->id));
-            if (isset($data->entryid)) {
+            if (isset($data->manualsyllabus)) {
+                // Manual syllabus was converted.
+                $successmessage = get_string('manualsuccessfulconversion', 'local_ucla_syllabus');
+            } else if (isset($data->entryid)) {
                 // Syllabus was updated.
                 $successmessage = get_string('successful_update', 'local_ucla_syllabus');
             } else {

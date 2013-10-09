@@ -51,7 +51,7 @@ class syllabus_form extends moodleform {
     /** @var object The syllabus manager. */
     private $syllabusmanager;
 
-    /** @var object The manually uploaded syllabus (if applicable). */
+    /** @var id|object The manually uploaded syllabus (if applicable). */
     private $manualsyllabus;
 
     /**
@@ -79,6 +79,19 @@ class syllabus_form extends moodleform {
 
         if ($this->action == UCLA_SYLLABUS_ACTION_EDIT ||
                 $this->action == UCLA_SYLLABUS_ACTION_ADD) {
+
+            // If user is converting a manaully syllabus, then give a final
+            // reminder.
+            if ($this->action == UCLA_SYLLABUS_ACTION_ADD) {
+                if ($manualsyllabus = $this->get_manual_syllabus_info()) {
+                    $mform->addElement('html', $OUTPUT->notification(
+                            get_string('manualconvertsyllabusreminder',
+                            'local_ucla_syllabus', $manualsyllabus),
+                            'notifymessage'));
+                }
+            }
+
+
             if ($this->type == UCLA_SYLLABUS_TYPE_PUBLIC) {
                 $this->display_public_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]);
             } else if ($this->type == UCLA_SYLLABUS_TYPE_PRIVATE) {
@@ -95,8 +108,16 @@ class syllabus_form extends moodleform {
             // If viewing, then display both public/private syllabus forums.
             if (empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) &&
                     empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])) {
-                $mform->addElement('html', $OUTPUT->notification(
-                        get_string('no_syllabus', 'local_ucla_syllabus'),
+                // If user has no syllabus, but wants to convert a manually
+                // uploaded file, then prompt them to take the next step.
+                $alertmsg = '';
+                if ($manualsyllabus = $this->get_manual_syllabus_info()) {
+                    $alertmsg = get_string('manualconvertsyllabus',
+                            'local_ucla_syllabus', $manualsyllabus);
+                } else {
+                    $alertmsg = get_string('no_syllabus', 'local_ucla_syllabus');
+                }
+                $mform->addElement('html', $OUTPUT->notification($alertmsg,
                         'notifymessage'));
             }
             $this->display_public_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]);
@@ -159,7 +180,7 @@ class syllabus_form extends moodleform {
         // Make sure we have a real file.  We need to test that an actual file
         // was uploaded since $draftitemid can be unreliable.
         $fs = get_file_storage();
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        $context = context_user::instance($USER->id);
         if (!$files = $fs->get_area_files($context->id, 'user', 'draft', $draftitemid, 'id DESC', false)) {
             $nofile = true;
         }
@@ -167,6 +188,16 @@ class syllabus_form extends moodleform {
         // If we're missing both file & URL, then send warning.
         if ($nourl && $nofile) {
             $err['syllabus_upload_desc'] = get_string('err_file_url_not_uploaded', 'local_ucla_syllabus');
+        }
+
+        // Do some sanity checking on manualsyllabus and make sure it belongs to
+        // course.
+        if (!empty($data['manualsyllabus'])) {
+            $exists = $DB->record_exists('course_modules',
+                    array('course' => $data['id'], 'id' => $data['manualsyllabus']));
+            if (empty($exists)) {
+                $err['display_name'] = get_string('errmanualsyllabusmismatch', 'local_ucla_syllabus');
+            }
         }
 
         return $err;
@@ -234,12 +265,21 @@ class syllabus_form extends moodleform {
                 $mform->addElement('html', $displaysyllabus . $editlinks);
             } else {
                 // No syllabus added, so give a "add syllabus now" link.
-                $url = new moodle_url('/local/ucla_syllabus/index.php',
-                            array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_ADD,
-                                  'type' => UCLA_SYLLABUS_TYPE_PRIVATE));
-                $text = get_string('private_syllabus_add', 'local_ucla_syllabus');
-                $link = html_writer::link($url, $text);
+                $params = array('id' => $this->courseid,
+                                'action' => UCLA_SYLLABUS_ACTION_ADD,
+                                'type' => UCLA_SYLLABUS_TYPE_PRIVATE);
+                $text = '';
+                if ($manualsyllabus = $this->get_manual_syllabus_info()) {
+                    $text = get_string('manualprivatesyllabusadd',
+                            'local_ucla_syllabus', $manualsyllabus);
+                    $params['manualsyllabus'] = $manualsyllabus->id;
+                } else {
+                    $text = get_string('private_syllabus_add', 'local_ucla_syllabus');
+                }
+
+                $url = new moodle_url('/local/ucla_syllabus/index.php', $params);
+                $link = html_writer::link($url, $text, array('class' => 'btn btn-primary'));
+                
                 $mform->addElement('html', $link);
             }
         }
@@ -305,12 +345,20 @@ class syllabus_form extends moodleform {
                 $mform->addElement('html', $displaysyllabus . $editlinks);
             } else {
                 // No syllabus added, so give a "add syllabus now" link.
-                $url = new moodle_url('/local/ucla_syllabus/index.php',
-                            array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_ADD,
-                                  'type' => UCLA_SYLLABUS_TYPE_PUBLIC));
-                $text = get_string('public_syllabus_add', 'local_ucla_syllabus');
-                $link = html_writer::link($url, $text);
+                $params = array('id' => $this->courseid,
+                                'action' => UCLA_SYLLABUS_ACTION_ADD,
+                                'type' => UCLA_SYLLABUS_TYPE_PUBLIC);
+                $text = '';
+                if ($manualsyllabus = $this->get_manual_syllabus_info()) {
+                    $text = get_string('manualpublicsyllabusadd', 
+                            'local_ucla_syllabus', $manualsyllabus);
+                    $params['manualsyllabus'] = $manualsyllabus->id;
+                } else {
+                    $text = get_string('public_syllabus_add', 'local_ucla_syllabus');
+                }
+                
+                $url = new moodle_url('/local/ucla_syllabus/index.php', $params);
+                $link = html_writer::link($url, $text, array('class' => 'btn btn-primary'));
                 $mform->addElement('html', $link);
             }
         }
@@ -342,7 +390,8 @@ class syllabus_form extends moodleform {
                     'required');
         } else {
             // Add a syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc', get_string('syllabus_url_file', 'local_ucla_syllabus').
+            $mform->addElement('static', 'syllabus_upload_desc',
+                    get_string('syllabus_url_file', 'local_ucla_syllabus'),
                     get_string('syllabus_choice', 'local_ucla_syllabus'));
 
             // Perform single file upload.
@@ -372,6 +421,9 @@ class syllabus_form extends moodleform {
         if (empty($existingsyllabus)) {
             $defaults['display_name'] = get_string('display_name_default', 'local_ucla_syllabus');
             $mform->setDefaults($defaults);
+
+            // Check if user is trying to use a manually uploaded syllabus.
+            $this->handle_manual_syllabus();
         } else {
             // Load existing files.
             $draftitemid = file_get_submitted_draft_itemid('syllabus_file');
@@ -419,7 +471,6 @@ class syllabus_form extends moodleform {
                     get_string('err_file_not_uploaded', 'local_ucla_syllabus'),
                     'required');
         } else {
-
             // Add syllabus description.
             $mform->addElement('static', 'syllabus_upload_desc', get_string('syllabus_url_file', 'local_ucla_syllabus'),
                     get_string('syllabus_choice', 'local_ucla_syllabus'));
@@ -466,8 +517,7 @@ class syllabus_form extends moodleform {
             $defaults['display_name'] = get_string('display_name_default', 'local_ucla_syllabus');
             $mform->setDefaults($defaults);
 
-            // Check if user is trying to use an manually uploaded syllabus.
-            // Only public syllabus can handle a manual syllabus.
+            // Check if user is trying to use a manually uploaded syllabus.
             $this->handle_manual_syllabus();
         } else {
             // Load existing files.
@@ -555,6 +605,11 @@ class syllabus_form extends moodleform {
             return null;
         }
 
+        // Check if we have a cached copy.
+        if (is_object($this->manualsyllabus)) {
+            return $this->manualsyllabus;
+        }
+
         $cm = get_coursemodule_from_id(null, $this->manualsyllabus, $this->courseid);
         if (empty($cm)) {
             return null;
@@ -568,7 +623,10 @@ class syllabus_form extends moodleform {
         }
 
         $cm->module = $module;
-        return $cm;
+
+        // Cache copy because we might query this again.
+        $this->manualsyllabus = $cm;
+        return $this->manualsyllabus;
     }
 
     /**
@@ -596,6 +654,11 @@ class syllabus_form extends moodleform {
                 $data['syllabus_file'] = $draftitemid;
             }
             $this->set_data($data);
+            
+            // Want to give a different confirmation message and delete existing
+            // module after it is converted.
+            $this->_form->addElement('hidden', 'manualsyllabus', $manualsyllabus->id);
+            $this->_form->setType('manualsyllabus', PARAM_INT);
         }
     }
 }
