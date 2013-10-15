@@ -208,6 +208,7 @@ class category_forum_usage extends uclastats_base {
             $col = 0;
             $row += 2;
             $worksheet->write_string($row, $col,$coursename, $boldformat);
+            ++$row;
 
             if (empty($course)) {
                 $worksheet->write_string($row, $col,
