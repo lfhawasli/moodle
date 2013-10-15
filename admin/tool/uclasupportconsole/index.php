@@ -1902,70 +1902,119 @@ $sectionhtml = '';
 if ($displayforms) {
     $content = html_writer::tag('p',
             get_string('mediausage_help', 'tool_uclasupportconsole')) .
-            get_term_selector($title) . ' ' .
-            html_writer::tag('label', get_string('sizemb'),
-                    array('for' => 'mediausage-filesize')) .
-            html_writer::empty_tag('input', array(
-                    'type' => 'text',
-                    'size' => 3,
-                    'id' => 'mediausage-filesize',
-                    'name' => 'filesize',
-                    'value' => 5
-                ));
+            get_term_selector($title);
 
     $sectionhtml .= supportconsole_simple_form($title, $content);
 } else if ($consolecommand == "$title") {  # tie-in to link from name lookup
-    $term = required_param('term', PARAM_ALPHANUM);
-    $filesize = required_param('filesize', PARAM_INT);
+    $term = optional_param('term', null, PARAM_ALPHANUM);
+    $courseid = optional_param('courseid', null, PARAM_INT);
 
-    // Get byte size, since parameter is in MB.
-    $filesize = $filesize * 1048576;
+    $params = array('contextlevel' => CONTEXT_MODULE);
+    if (!empty($term)) {
+        $params['term'] = $term;
 
-    // Get all video files over 5 MB.
-    $sql = "SELECT  c.id AS course,
-                c.shortname,
-                f.filename,
-                f.filesize,
-                m.name,
-                cm.id
-        FROM    {course} AS c
-        JOIN    {ucla_request_classes} AS urc ON (urc.courseid=c.id)
-        JOIN    {ucla_reg_classinfo} AS urci ON (urci.term=urc.term AND urci.srs=urc.srs)
-        JOIN    {course_modules} cm ON (cm.course=c.id)
-        JOIN    {context} ct ON (ct.instanceid=cm.id AND ct.contextlevel=:contextlevel)
-        JOIN    {files} f ON (f.contextid=ct.id)
-        JOIN    {modules} m ON (m.id=cm.module)
-        WHERE   urc.term=:term AND
-                f.mimetype LIKE 'video/%' AND
-                f.filesize>=:filesize
-        GROUP BY c.id
-        ORDER BY    urci.term, urci.subj_area, urci.crsidx, urci.secidx";
+        // Get aggregate video totals.
+        $sql = "SELECT  DISTINCT 
+                        c.id AS idx,
+                        urci.division,
+                        c.id AS course,
+                        c.shortname,
+                        COUNT(f.id) AS numvideos,
+                        SUM(f.filesize) AS size
+                FROM    {course} c
+                JOIN    {ucla_request_classes} urc ON (urc.courseid=c.id)
+                JOIN    {ucla_reg_classinfo} urci ON (urci.term=urc.term AND urci.srs=urc.srs)
+                JOIN    {course_modules} cm ON (cm.course=c.id)
+                JOIN    {context} ct ON (ct.instanceid=cm.id AND ct.contextlevel=:contextlevel)
+                JOIN    {files} f ON (f.contextid=ct.id)
+                JOIN    {modules} m ON (m.id=cm.module)
+                WHERE   urc.term=:term AND
+                        f.mimetype LIKE 'video/%'
+                GROUP BY c.id
+                ORDER BY    urci.division, urci.term, urci.subj_area, urci.crsidx, urci.secidx";
+    } else if (!empty($courseid)) {
+        $params['courseid'] = $courseid;
 
-    $results = $DB->get_records_sql($sql, array('term' => $term,
-            'contextlevel' => CONTEXT_MODULE, 'filesize' => $filesize));
-
-    foreach ($results as $k => $course) {
-        // Replace courseid with link to course.
-        $course->course = html_writer::link(new moodle_url(
-                '/course/view.php', array('id' => $course->course)
-            ), $course->shortname, array('target' => '_blank'));
-        unset($course->shortname);
-
-        // Format size to be human readable (although not sortable).
-        $course->filesize = display_size($course->filesize);
-
-        // Add link to module that has file.
-        $course->filename = html_writer::link(new moodle_url(
-                sprintf('/mod/%s/view.php?id=%d', $course->name, $course->id)),
-                $course->filename, array('target' => '_blank'));
-        unset($course->id);
-
-        $results[$k] = $course;
+        // Get videos for specific course.
+        $sql = "SELECT  DISTINCT f.id AS idx,
+                        f.filename,
+                        m.name,
+                        cm.section,
+                        f.filesize AS size,
+                        cm.id
+                FROM    {course} c
+                JOIN    {course_modules} cm ON (cm.course=c.id)
+                JOIN    {context} ct ON (ct.instanceid=cm.id AND ct.contextlevel=:contextlevel)
+                JOIN    {files} f ON (f.contextid=ct.id)
+                JOIN    {modules} m ON (m.id=cm.module)
+                WHERE   c.id=:courseid AND
+                        f.mimetype LIKE 'video/%'
+                ORDER BY    f.filename";
+    } else {
+        print_error('missingparameter');
     }
 
+    $results = $DB->get_records_sql($sql, $params);
+
+    foreach ($results as $key => $result) {
+        // Display both display and sort friendly versions of file size.
+        if (isset($result->size)) {
+            if (isset($result->course)) {
+                $result->displaysize = html_writer::link(new moodle_url(
+                        '/'.$CFG->admin.'/tool/uclasupportconsole/index.php',
+                        array('console' => $consolecommand, 'courseid' => $result->course)),
+                        display_size($result->size));
+            } else {
+                $result->displaysize = display_size($result->size);
+            }
+            $result->sortablsizeinmb = round($result->size / 1048576 * 10) / 10;
+            unset($result->size);
+        }
+
+        // Give link to section where module exists.
+        if (isset($result->section)) {
+            $result->name = html_writer::link(new moodle_url(
+                    '/course/view.php', array('id' => $courseid,
+                        'sectionid' => $result->section)
+                ), $result->name, array('target' => '_blank'));
+            unset($result->section);
+        }
+
+        // Replace courseid with link to course.
+        if (isset($result->course)) {
+            $result->course = html_writer::link(new moodle_url(
+                    '/course/view.php', array('id' => $result->course)
+                ), $result->shortname, array('target' => '_blank'));
+            unset($result->shortname);
+        }
+
+        // Give link to video.
+        if (isset($result->id)) {
+            $result->filename = html_writer::link(new moodle_url(
+                    sprintf('/mod/%s/view.php?id=%d', $result->name, $result->id)),
+                    $result->filename, array('target' => '_blank'));
+            unset($result->id);
+        }
+
+        unset($result->idx);
+
+        $results[$key] = $result;
+    }
+
+    if (!empty($courseid)) {
+        // Display course shortname if viewing a particular course.
+        $course = $DB->get_record('course', array('id' => $courseid));
+
+        $params['courseid'] = html_writer::link(new moodle_url(
+                    '/course/view.php', array('id' => $courseid)),
+                $course->shortname,
+                array('target' => '_blank'));
+    }
+
+
+    unset($params['contextlevel']);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $results,
-        array($term, display_size($filesize)),
-            get_string('mediausage_help', 'tool_uclasupportconsole'));
+        $params, get_string('mediausage_help', 'tool_uclasupportconsole'));
 }
 $consoles->push_console_html('modules', $title, $sectionhtml);
 
