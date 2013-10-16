@@ -99,6 +99,27 @@ function ucla_syllabus_handle_ucla_format_notices($eventdata) {
 
     $alertform = null;
 
+    // User can add syllabus, but course does not have syllabus. Check to see
+    // if someone manually uploaded a syllabus.
+    $manuallysyllabi = $syllabusmanager->get_all_manual_syllabi();
+    if (!empty($manuallysyllabi)) {
+        // There might be multiple manually uploaded syllabus, and user might
+        // choose to ignore some of them.
+        foreach ($manuallysyllabi as $syllabus) {
+            $noprompt = get_user_preferences('ucla_syllabus_noprompt_manual_' .
+                    $syllabus->cmid, null, $eventdata->userid);
+            if (is_null($noprompt)) {
+                // Display form.
+                $alertform = new alert_form(new moodle_url('/local/ucla_syllabus/alert.php',
+                        array('id' => $eventdata->course->id)),
+                        array('manualsyllabus' => $syllabus), 'post', '',
+                        array('class' => 'ucla-syllabus-alert-form'));
+                // Only want one alert to be shown.
+                break;
+            }
+        }
+    }
+
     if (empty($alertform)) {
         // User can add syllabus, but course doesn't have syllabus, give alert.
 

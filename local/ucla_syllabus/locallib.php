@@ -427,6 +427,15 @@ class ucla_syllabus_manager {
     public function save_syllabus($data) {
         global $DB;
 
+        // Do a quick sanity check and make sure mod belongs to course.
+        if (!empty($data->manualsyllabus)) {
+            $exists = $DB->record_exists('course_modules',
+                    array('course' => $data->id, 'id' => $data->manualsyllabus));
+            if (empty($exists)) {
+                print_error(get_string('errmanualsyllabusmismatch', 'local_ucla_syllabus'));
+            }
+        }
+
         // First create a entry in ucla_syllabus.
         $syllabusentry = new stdClass();
         $recordid = null;
@@ -475,6 +484,14 @@ class ucla_syllabus_manager {
 
         // No errors, so trigger events.
         events_trigger($eventname, $recordid);
+
+        // Everything completed, so see if manual syllabus was converted.
+        if (!empty($data->manualsyllabus)) {
+            course_delete_module($data->manualsyllabus);
+            // Log the conversion, since we are deleting a module.
+            add_to_log($data->id, 'ucla_syllabus', 'conversion', '',
+                    'module ' . $data->manualsyllabus, $data->manualsyllabus);
+        }
 
         return $recordid;
     }

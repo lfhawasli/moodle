@@ -16,6 +16,10 @@
     }
 }
 
+.btn-primary {
+    color: white !important;
+}
+
 .btn-cpanel {
     @include button-variant(#0d3286, #fcd226, #fcb126);
     font-weight: bold;

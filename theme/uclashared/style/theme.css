@@ -957,49 +957,48 @@ input {
 .mform .required .error .error {
   margin: 8px;
   display: inline-block !important;
-  text-transform: lowercase;
 }
-/* line 110, ../sass/_form.scss */
+/* line 109, ../sass/_form.scss */
 .mform .required .error + input[type="text"] {
   border-color: #d44950;
   float: left;
 }
-/* line 115, ../sass/_form.scss */
+/* line 114, ../sass/_form.scss */
 .mform .required .error > br {
   display: none;
 }
 
-/* line 126, ../sass/_form.scss */
+/* line 125, ../sass/_form.scss */
 #page-enrol-users .enrol_user_buttons {
   margin: 8px 0;
 }
-/* line 129, ../sass/_form.scss */
+/* line 128, ../sass/_form.scss */
 #page-enrol-users #filterform {
   margin: 8px 0;
 }
-/* line 132, ../sass/_form.scss */
+/* line 131, ../sass/_form.scss */
 #page-enrol-users #filterform fieldset > div {
   float: left;
   width: 100%;
   background-color: white;
 }
-/* line 137, ../sass/_form.scss */
+/* line 136, ../sass/_form.scss */
 #page-enrol-users #filterform .fitem, #page-enrol-users #filterform .fitemtitle, #page-enrol-users #filterform .felement {
   float: left;
   margin-right: 8px;
 }
 
-/* line 144, ../sass/_form.scss */
+/* line 143, ../sass/_form.scss */
 .form-shortname {
   color: #999;
 }
 
-/* line 151, ../sass/_form.scss */
+/* line 150, ../sass/_form.scss */
 #categoryquestions .checkbox input[type="checkbox"] {
   margin-left: 0;
 }
 
-/* line 161, ../sass/_form.scss */
+/* line 160, ../sass/_form.scss */
 #chooseform .instruction,
 #chooseform .typesummary,
 .moodle-dialogue-base .moodle-dialogue .moodle-dialogue-bd {
@@ -1523,6 +1522,14 @@ input[type="button"].btn-block {
 }
 
 /* line 19, ../sass/_buttons.scss */
+.btn-primary, #tool_uclacourserequestor input[type="button"], .uclaconsole input[type="button"], .ucla-search input[type="button"], #tool_uclacourserequestor
+input[type="submit"], .uclaconsole
+input[type="submit"], .ucla-search
+input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type="submit"], .wiki_clear ~ .mform #save {
+  color: white !important;
+}
+
+/* line 23, ../sass/_buttons.scss */
 .btn-cpanel, .control-panel input[type="submit"] {
   color: #0d3286;
   background-color: #fcd226;
@@ -1554,39 +1561,39 @@ input[type="button"].btn-block {
   background-color: #fcd226;
   border-color: #fcb126;
 }
-/* line 23, ../sass/_buttons.scss */
+/* line 27, ../sass/_buttons.scss */
 .btn-cpanel:hover, .control-panel input[type="submit"]:hover {
   color: #0d3286;
 }
 
-/* line 65, ../sass/_buttons.scss */
+/* line 69, ../sass/_buttons.scss */
 .navbutton .wikisearch input[alt="search"],
 .navbutton .forumsearch input[alt="search"] {
   display: inline-block !important;
 }
 
-/* line 83, ../sass/_buttons.scss */
+/* line 87, ../sass/_buttons.scss */
 .pagelayout-redirect {
   text-align: center;
 }
-/* line 86, ../sass/_buttons.scss */
+/* line 90, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton {
   /*@extend .btn-lg;*/
 }
-/* line 91, ../sass/_buttons.scss */
+/* line 95, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton a, .pagelayout-redirect .continuebutton a:link {
   color: white;
 }
-/* line 92, ../sass/_buttons.scss */
+/* line 96, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton a:hover {
   text-decoration: none;
 }
 
-/* line 100, ../sass/_buttons.scss */
+/* line 104, ../sass/_buttons.scss */
 .section-modchooser-link > a, .section-modchooser-link > a:link {
   color: white;
 }
-/* line 102, ../sass/_buttons.scss */
+/* line 106, ../sass/_buttons.scss */
 .section-modchooser-link > a:hover, .section-modchooser-link > a:link:hover {
   text-decoration: none;
 }
