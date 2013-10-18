@@ -312,6 +312,10 @@ echo $OUTPUT->heading($strgradeedit);
 
 echo $OUTPUT->box_start();
 
+// START UCLA MOD: CCLE-4293 - Display a Message when a User Clicks "Turn editing on" 
+echo $OUTPUT->notification(get_string('overridewarning', 'local_ucla'), 'notifymessage');
+// END UCLA MOD: CCLE-4293
+
 // Form if in edit or add modes
 $mform->display();
 
