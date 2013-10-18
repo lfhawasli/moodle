@@ -2855,7 +2855,10 @@ class assign {
         $filter = get_user_preferences('assign_filter', '');
         $controller = $gradingmanager->get_active_controller();
         $showquickgrading = empty($controller);
-        $quickgrading = get_user_preferences('assign_quickgrading', false);
+        // BEGIN UCLA MOD CCLE-4297
+        // $quickgrading = get_user_preferences('assign_quickgrading', false);
+        $quickgrading = get_user_preferences('assign_quickgrading', true);
+        // END UCLA MOD CCLE-4297
 
         // Print options for changing the filter and changing the number of results per page.
         $gradingoptionsformparams = array('cm'=>$cmid,
