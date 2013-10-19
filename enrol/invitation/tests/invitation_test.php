@@ -1,11 +1,28 @@
 <?php
+// This file is part of the UCLA Site Invitation Plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * PHPUnit site invitation tests.
  *
- * @package    local_ucla
- * @category   phpunit
+ * @package    enrol
+ * @subpackage invitation
  * @copyright  2013 UC Regents
-*/
+ * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -66,7 +83,7 @@ class invitation_manager_testcase extends advanced_testcase {
         set_config('enabletempparticipant', 1, 'enrol_invitation');
 
         // Enrol user with an timeend in the past.
-        $invitation->enrol_user($this->invitation_manager->enrol_instance, 
+        $invitation->enrol_user($this->invitation_manager->enrol_instance,
                 $this->testinvitee->id, $roleid, 0, strtotime('yesterday'));
         $hasrole = has_role_in_context('tempparticipant', $context);
         $this->assertTrue($hasrole);
