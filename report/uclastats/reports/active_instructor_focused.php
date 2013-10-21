@@ -254,16 +254,18 @@ class active_instructor_focused extends uclastats_base {
                 /* Find how out many points this course "scored". Scoring is
                  * defined as:
                  *
-                 * 1 point for each visible resource
-                 * 1 point for each block added
+                 * 1 point for each visible resource.
+                 * 1 point for each block added.
                  * 1 points for each visible activity (not including default
-                 * Announcement and Discussion forums)
+                 * Announcement and Discussion forums).
                  * 1 point for each post by the Instructor/TA in either the
                  * default Announcement and Discussion forums.
+                 * 1 point if course comments/description was added.
                  */
                 $points += $this->score_modules($course);
                 $points += $this->score_blocks($course);
                 $points += $this->score_default_forum_activity($course);
+                $points += $this->score_course_comments($course);
 
                 // Update totals for divsion.
                 if ($points >= $threshold) {
@@ -279,6 +281,23 @@ class active_instructor_focused extends uclastats_base {
 
             // Order result by division.
             ksort($retval);
+
+            // Now figure out percentages and system totals.
+            $totalactive = $totalinactive = $totalcourses = 0;
+            foreach ($retval as &$division) {
+                $totalactive += $division['numactive'];
+                $totalinactive += $division['numinactive'];
+                $totalcourses += $division['totalcourses'];
+                $division['percentage'] = round(($division['numactive']/
+                         $division['totalcourses'])*100) . '%';
+            }
+            $retval['SYSTEM']['division'] = 'SYSTEM';
+            $retval['SYSTEM']['numactive'] = $totalactive;
+            $retval['SYSTEM']['numinactive'] = $totalinactive;
+            $retval['SYSTEM']['totalcourses'] = $totalcourses;
+            $retval['SYSTEM']['percentage'] = round(($totalactive/
+                     $totalcourses)*100) . '%';
+
             $retval['courselisting'] = $courselisting;
         }
         
@@ -308,6 +327,45 @@ class active_instructor_focused extends uclastats_base {
             // Do not count the block if it is a default block.
             if (!in_array($record->blockname, $defautlblocks)) {
                 ++$points;
+            }
+        }
+
+        return $points;
+    }
+
+    /**
+     * Returns a point if someone put any information in the course comments,
+     * that is not a copy/paste of Registrar information.
+     *
+     * @param object $course
+     *
+     * return int
+     */
+    private function score_course_comments($course) {
+        $points = 0;
+
+        if (empty($course->summary)) {
+            // Don't bother doing any queries if summary is blank.
+            return $points;
+        }
+
+        // Get all Registrar descriptions for course that might be cross-listed.
+        $classinfos = ucla_get_course_info($course->id);
+
+        if (!empty($classinfos)) {
+            $foundmatch = false;
+
+            // Check if Registrar information matches.
+            foreach ($classinfos as $classinfo) {
+                if ($classinfo->crs_desc == $course->summary || 
+                        $classinfo->crs_desc == $course->summary) {
+                    $foundmatch = true;
+                    break;
+                }
+            }
+
+            if (!$foundmatch) {
+                ++$points;  // Unique text found.
             }
         }
 
@@ -373,13 +431,18 @@ class active_instructor_focused extends uclastats_base {
                 JOIN    {modules} m ON (cm.module=m.id)
                 WHERE   cm.course=:courseid AND
                         cm.visible=1 AND
-                        cm.instance NOT IN (
-                            SELECT  id
-                            FROM    {forum}
-                            WHERE   (type='news' AND name='Announcements') OR
-                                    (type='general' AND name='Discussion forum')
+                        cm.id NOT IN (
+                            SELECT  cm2.id
+                            FROM    {course_modules} cm2
+                            JOIN    {modules} m2 ON (cm2.module=m2.id)
+                            JOIN    {forum} f ON (f.id=cm2.instance)
+                            WHERE   ((f.type='news' AND f.name='Announcements') OR
+                                    (f.type='general' AND f.name='Discussion forum')) AND
+                                    m2.name='forum' AND
+                                    cm2.course=:courseid2
                         )";
-        $mods = $DB->get_records_sql($sql, array('courseid' => $course->id));
+        $mods = $DB->get_records_sql($sql, array('courseid' => $course->id,
+            'courseid2' => $course->id));
 
         if (!empty($mods)) {
             foreach ($mods as $mod) {

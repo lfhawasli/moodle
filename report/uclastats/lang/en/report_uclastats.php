@@ -224,13 +224,14 @@ $string['totalcourses'] = 'Total courses';
 // Strings for Course activity (Instructor focused)
 $string['active_instructor_focused'] = 'Course activity (Instructor focused)';
 $string['active_instructor_focused_help'] = 'A course is active ' . 
-        'if it has visible content added to it beyond the normal course shell. ' .
-        'This includes adding a block, module, or posting in the ' .
-        'default forums. This does not include uploading a syllabus.';
+        'if it has visible content added to it beyond the normal course ' . 
+        'shell. This includes adding a block, module, posting in the default ' .
+        'forums, or adding course comments. This does not include uploading ' .
+        'a syllabus.';
 $string['numactive'] = 'Active';
 $string['numinactive'] = 'Inactive';
-$string['totalcourses'] = 'Total courses';
 $string['inactivecourselisting'] = 'List of inactive courses';
+$string['percentage'] = 'Percentage';
 
 // Strings for Course activity (Student focused)
 $string['active_student_focused'] = 'Course activity (Student focused)';

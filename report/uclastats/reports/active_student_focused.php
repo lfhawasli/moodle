@@ -356,6 +356,23 @@ class active_student_focused extends uclastats_base {
         
             // Order result by division.
             ksort($retval);
+
+            // Now figure out percentages and system totals.
+            $totalactive = $totalinactive = $totalcourses = 0;
+            foreach ($retval as &$division) {
+                $totalactive += $division['numactive'];
+                $totalinactive += $division['numinactive'];
+                $totalcourses += $division['totalcourses'];
+                $division['percentage'] = round(($division['numactive']/
+                         $division['totalcourses'])*100) . '%';
+            }
+            $retval['SYSTEM']['division'] = 'SYSTEM';
+            $retval['SYSTEM']['numactive'] = $totalactive;
+            $retval['SYSTEM']['numinactive'] = $totalinactive;
+            $retval['SYSTEM']['totalcourses'] = $totalcourses;
+            $retval['SYSTEM']['percentage'] = round(($totalactive/
+                     $totalcourses)*100) . '%';
+
             $retval['courselisting'] = $courselisting;
         }
         
