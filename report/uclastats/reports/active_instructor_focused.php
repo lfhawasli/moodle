@@ -1,4 +1,19 @@
 <?php
+// This file is part of the UCLA stats report for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Report to get the number of active and inactive course sites by division.
  *
@@ -10,15 +25,22 @@
  * Courses made visible with content beyond the default course shell should be
  * considered active.
  * 
- * @package    report
- * @subpackage uclastats
+ * @package    report_uclastats
  * @copyright  UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/report/uclastats/locallib.php');
 
+/**
+ * Class to perform instructor focused activity report.
+ *
+ * @package     report_uclastats
+ * @copyright   UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class active_instructor_focused extends uclastats_base {
 
     /**
@@ -43,7 +65,7 @@ class active_instructor_focused extends uclastats_base {
      */
     private function get_default_blocks($format) {
         global $CFG;
-        
+
         static $defaultblockcache = array();
         if (!isset($defaultblockcache[$format])) {
             // Code to get default blocks adapted from
@@ -54,16 +76,14 @@ class active_instructor_focused extends uclastats_base {
 
             } else {
                 $formatconfig = $CFG->dirroot.'/course/format/'.$course->format.'/config.php';
-                $format = array(); // initialize array in external file
+                $format = array();
                 if (is_readable($formatconfig)) {
                     include($formatconfig);
                 }
                 if (!empty($format['defaultblocks'])) {
                     $blocknames = blocks_parse_default_blocks_list($format['defaultblocks']);
-
-                } else if (!empty($CFG->defaultblocks)){
+                } else if (!empty($CFG->defaultblocks)) {
                     $blocknames = blocks_parse_default_blocks_list($CFG->defaultblocks);
-
                 } else {
                     $blocknames = array(
                         BLOCK_POS_LEFT => array(),
@@ -135,7 +155,7 @@ class active_instructor_focused extends uclastats_base {
                     array('target' => '_blank'));
         }
         $listingtable->data = $courselisting;
-        
+
         $retval .= html_writer::table($listingtable);
 
         return $retval;
@@ -166,11 +186,11 @@ class active_instructor_focused extends uclastats_base {
             ++$col;
         }
 
-        // now go through result set
+        // Now go through result set.
         foreach ($results as $result) {
             ++$row; $col = 0;
             foreach ($result as $value) {
-                // values might have HTML in them
+                // Values might have HTML in them.
                 $value = clean_param($value, PARAM_NOTAGS);
                 if (is_numeric($value)) {
                     $worksheet->write_number($row, $col, $value);
@@ -186,7 +206,7 @@ class active_instructor_focused extends uclastats_base {
                 get_string('inactivecourselisting', 'report_uclastats'), $boldformat);
         $row++;
 
-        // Display course listings table header
+        // Display course listings table header.
         $header = array(get_string('division', 'report_uclastats'),
                 get_string('course_shortname', 'report_uclastats'));
         foreach ($header as $name) {
@@ -198,7 +218,7 @@ class active_instructor_focused extends uclastats_base {
         foreach ($courselisting as $course) {
             ++$row; $col = 0;
             foreach ($course as $value) {
-                // values might have HTML in them
+                // Values might have HTML in them.
                 $value = clean_param($value, PARAM_NOTAGS);
                 if (is_numeric($value)) {
                     $worksheet->write_number($row, $col, $value);
@@ -216,7 +236,7 @@ class active_instructor_focused extends uclastats_base {
      * Query get the number of active/inactive course sites by division.
      *
      * @param array $params
-     * @param return array
+     * @return array
      */
     public function query($params) {
         global $DB;
@@ -254,16 +274,18 @@ class active_instructor_focused extends uclastats_base {
                 /* Find how out many points this course "scored". Scoring is
                  * defined as:
                  *
-                 * 1 point for each visible resource
-                 * 1 point for each block added
+                 * 1 point for each visible resource.
+                 * 1 point for each block added.
                  * 1 points for each visible activity (not including default
-                 * Announcement and Discussion forums)
+                 * Announcement and Discussion forums).
                  * 1 point for each post by the Instructor/TA in either the
                  * default Announcement and Discussion forums.
+                 * 1 point if course comments/description was added.
                  */
                 $points += $this->score_modules($course);
                 $points += $this->score_blocks($course);
                 $points += $this->score_default_forum_activity($course);
+                $points += $this->score_course_comments($course);
 
                 // Update totals for divsion.
                 if ($points >= $threshold) {
@@ -279,9 +301,26 @@ class active_instructor_focused extends uclastats_base {
 
             // Order result by division.
             ksort($retval);
+
+            // Now figure out percentages and system totals.
+            $totalactive = $totalinactive = $totalcourses = 0;
+            foreach ($retval as &$division) {
+                $totalactive += $division['numactive'];
+                $totalinactive += $division['numinactive'];
+                $totalcourses += $division['totalcourses'];
+                $division['percentage'] = round(($division['numactive']/
+                         $division['totalcourses'])*100) . '%';
+            }
+            $retval['SYSTEM']['division'] = 'SYSTEM';
+            $retval['SYSTEM']['numactive'] = $totalactive;
+            $retval['SYSTEM']['numinactive'] = $totalinactive;
+            $retval['SYSTEM']['totalcourses'] = $totalcourses;
+            $retval['SYSTEM']['percentage'] = round(($totalactive/
+                     $totalcourses)*100) . '%';
+
             $retval['courselisting'] = $courselisting;
         }
-        
+
         return $retval;
     }
 
@@ -308,6 +347,45 @@ class active_instructor_focused extends uclastats_base {
             // Do not count the block if it is a default block.
             if (!in_array($record->blockname, $defautlblocks)) {
                 ++$points;
+            }
+        }
+
+        return $points;
+    }
+
+    /**
+     * Returns a point if someone put any information in the course comments,
+     * that is not a copy/paste of Registrar information.
+     *
+     * @param object $course
+     *
+     * return int
+     */
+    private function score_course_comments($course) {
+        $points = 0;
+
+        if (empty($course->summary)) {
+            // Don't bother doing any queries if summary is blank.
+            return $points;
+        }
+
+        // Get all Registrar descriptions for course that might be cross-listed.
+        $classinfos = ucla_get_course_info($course->id);
+
+        if (!empty($classinfos)) {
+            $foundmatch = false;
+
+            // Check if Registrar information matches.
+            foreach ($classinfos as $classinfo) {
+                if ($classinfo->crs_desc == $course->summary ||
+                        $classinfo->crs_desc == $course->summary) {
+                    $foundmatch = true;
+                    break;
+                }
+            }
+
+            if (!$foundmatch) {
+                ++$points;  // Unique text found.
             }
         }
 
@@ -373,13 +451,18 @@ class active_instructor_focused extends uclastats_base {
                 JOIN    {modules} m ON (cm.module=m.id)
                 WHERE   cm.course=:courseid AND
                         cm.visible=1 AND
-                        cm.instance NOT IN (
-                            SELECT  id
-                            FROM    {forum}
-                            WHERE   (type='news' AND name='Announcements') OR
-                                    (type='general' AND name='Discussion forum')
+                        cm.id NOT IN (
+                            SELECT  cm2.id
+                            FROM    {course_modules} cm2
+                            JOIN    {modules} m2 ON (cm2.module=m2.id)
+                            JOIN    {forum} f ON (f.id=cm2.instance)
+                            WHERE   ((f.type='news' AND f.name='Announcements') OR
+                                    (f.type='general' AND f.name='Discussion forum')) AND
+                                    m2.name='forum' AND
+                                    cm2.course=:courseid2
                         )";
-        $mods = $DB->get_records_sql($sql, array('courseid' => $course->id));
+        $mods = $DB->get_records_sql($sql, array('courseid' => $course->id,
+            'courseid2' => $course->id));
 
         if (!empty($mods)) {
             foreach ($mods as $mod) {
