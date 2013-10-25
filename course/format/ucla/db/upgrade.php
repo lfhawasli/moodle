@@ -85,5 +85,24 @@ function xmldb_format_ucla_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013081203, 'format', 'ucla'); 
     }
 
+    // Fix bug in which "Landing page" was set for "landing_page" for manually
+    // created courses (see CCLE-4322).
+    if ($oldversion < 2013101600) {
+        $sql = "SELECT  *
+                FROM    {course_format_options}
+                WHERE   format='ucla' AND
+                        name='landing_page' AND
+                        value LIKE 'Landing page'";
+        $records = $DB->get_records_sql($sql);
+        if (!empty($records)) {
+            foreach ($records as $record) {
+                $record->value = 0;
+                $DB->update_record('course_format_options', $record, true);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2013101600, 'format', 'ucla');
+    }
+
     return true;
 }
