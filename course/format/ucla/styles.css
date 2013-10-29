@@ -1,5 +1,5 @@
 /* line 6, sass/_course.scss */
-.ccle-generic-box, .course-content .registrar-collapsed {
+.ccle-generic-box {
   display: block;
   border: 1px solid #dddddd;
   background-color: #fff;
@@ -24,24 +24,45 @@
   line-height: 1.5;
 }
 /* line 25, sass/_course.scss */
-.course-content .registrar-collapsed {
-  overflow: hidden;
+.course-content .registrar-info.registrar-summary-hidden {
+  border-bottom: 0;
+  margin-bottom: 4px;
 }
-/* line 29, sass/_course.scss */
-.course-content .collapse-toggle {
+/* line 31, sass/_course.scss */
+.course-content .registrar-summary-hidden .collapse-toggle-container {
+  border-top: 1px solid #dddddd;
   width: 100%;
+  text-align: center;
   display: inline-block;
-  padding: 2px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  -ms-border-radius: 6px;
-  -o-border-radius: 6px;
-  border-radius: 6px;
 }
-/* line 39, sass/_course.scss */
+/* line 38, sass/_course.scss */
+.course-content .registrar-summary-hidden .collapse-toggle-container .collapse-toggle {
+  font-size: 1.2rem;
+  color: black;
+  position: relative;
+  top: -12px;
+  background-color: white;
+  padding: 2px 12px;
+  font-weight: bold;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+}
+/* line 49, sass/_course.scss */
+.course-content .registrar-summary-hidden .collapse-toggle-container .collapse-toggle:hover {
+  background-color: #efefef;
+  border: 1px solid #dddddd;
+  text-decoration: none;
+}
+/* line 57, sass/_course.scss */
+.course-content .registrar-summary-hidden .text_to_html {
+  display: none;
+  border-top: 1px solid #dddddd;
+  padding-top: 8px;
+}
+/* line 66, sass/_course.scss */
 .course-content > .headingblock {
   font-size: 26px;
   font-size: 2.6rem;
@@ -50,7 +71,7 @@
   color: #394a6e;
   padding: 4px 2px;
 }
-/* line 51, sass/_course.scss */
+/* line 78, sass/_course.scss */
 .course-content > .headingblock > .course-meta {
   color: #6c83b3;
   font-weight: normal;
@@ -59,7 +80,7 @@
   margin-bottom: 4px;
 }
 @media only screen and (max-width: 480px) {
-  /* line 51, sass/_course.scss */
+  /* line 78, sass/_course.scss */
   .course-content > .headingblock > .course-meta {
     overflow: hidden;
     white-space: nowrap;
@@ -67,27 +88,27 @@
     height: 1.5;
   }
 }
-/* line 69, sass/_course.scss */
+/* line 96, sass/_course.scss */
 .course-content > .headingblock > .course-meta > .reg-term {
   text-transform: uppercase;
   font-weight: bold;
   color: #394a6e;
 }
-/* line 74, sass/_course.scss */
+/* line 101, sass/_course.scss */
 .course-content > .headingblock > .course-meta > .reg-courses > .reg-hostcourse {
   font-weight: bold;
   color: #394a6e;
 }
-/* line 82, sass/_course.scss */
+/* line 109, sass/_course.scss */
 .course-content .instr-info {
   margin-top: 10px;
 }
-/* line 87, sass/_course.scss */
+/* line 114, sass/_course.scss */
 .course-content .hidden .content {
   border: 4px dotted #cccccc;
 }
 
-/* line 94, sass/_course.scss */
+/* line 121, sass/_course.scss */
 .summary .highlight {
   border: 1px solid #ebd742;
   background-color: yellow;
@@ -106,7 +127,7 @@
   box-shadow: #aaaaaa 1px 2px 2px;
 }
 
-/* line 112, sass/_course.scss */
+/* line 139, sass/_course.scss */
 li.activity.label .no-overflow,
 li.activity .contentafterlink .no-overflow {
   clear: left;
