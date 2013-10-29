@@ -1,8 +1,26 @@
 /* Remove lefthand padding for checkboxes in "Create TA sites" section  */
+/* line 5, sass/styles.scss */
 #build_header .fcheckbox {
-    margin-left: 0;
-}
-#build_header .fcheckbox input {
-    margin-right: 3pt;
+  margin-left: 0;
 }
 
+/* line 8, sass/styles.scss */
+#build_header .fcheckbox input {
+  margin-right: 3pt;
+}
+
+/* line 18, sass/styles.scss */
+.block_ucla_course_menu ul.tasites li.type_structure {
+  background-color: #fff5cb;
+  border-left-color: #fff5cb;
+  border-top-color: #fffffe;
+  border-bottom-color: #ffeb98;
+}
+/* line 25, sass/styles.scss */
+.block_ucla_course_menu ul.tasites li.type_structure.item_with_icon .leaf:after {
+  color: #d4ccad;
+}
+/* line 29, sass/styles.scss */
+.block_ucla_course_menu ul.tasites li.type_structure:hover {
+  background-color: #fffae5;
+}
