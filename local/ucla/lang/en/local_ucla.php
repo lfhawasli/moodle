@@ -183,3 +183,10 @@ $string['overridecat'] = 'Allow Grade Override';
 $string['overridecat_help'] = 'This option allows users to override the final grade in for category totals. Unchecking this option will make category totals uneditable.';
 $string['repeatheaders'] = 'Repeat Headers';
 $string['repeatheaders_help'] = 'Repeat gradebook headers after this many rows.';
+
+// CCLE-4293 - Display a message when attempting to override grades
+$string['overridewarning'] = 'It is preferable to change this grade within the Activity. <br />
+<br />
+Click on Item name to grade within the Activity.<br />
+<br />
+If you choose to override here, you will no longer be able to change the grade within the Activity.';
