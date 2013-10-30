@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/** Capabilities for invitation enrolment plugin.
+/**
+ * Capabilities for invitation enrolment plugin.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

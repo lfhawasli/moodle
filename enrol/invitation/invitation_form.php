@@ -15,12 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Always include formslib
+ * Form to display invitation.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
- * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,15 +35,19 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
 
 /**
- * The mform class for sending invitation to enrol users in a course.
+ * Class for sending invitation to enrol users in a course.
  *
- * @copyright 2011 Jerome Mouneyrac
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @package enrol
- * @subpackage invitation
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class invitation_form extends moodleform {
-    public static $daysexpire_options = array(3 => 3, 7 => 7, 30 => 30, 90 => 90, 180 => 180);
+    /**
+     * Display options for expiration time for temporary participants.
+     * 
+     * @var array
+     */
+    public static $daysexpire_options = array(3 => 3, 7 => 7, 30 => 30,
+            90 => 90, 180 => 180);
 
     /**
      * The form definition.
@@ -54,8 +56,10 @@ class invitation_form extends moodleform {
         global $CFG, $DB, $USER;
         $mform = & $this->_form;
 
-        // Get rid of "Collapse all".
-        $mform->setDisableShortforms(true);
+        // Get rid of "Collapse all" in Moodle 2.5+.
+        if (method_exists($mform, 'setDisableShortforms')) {
+            $mform->setDisableShortforms(true);
+        }
 
         // Add some hidden fields.
         $course = $this->_customdata['course'];
@@ -231,9 +235,9 @@ class invitation_form extends moodleform {
      * Private class method to return a list of appropiate roles for given
      * course.
      *
-     * @param object $course    Course record
+     * @param object $course    Course record.
      *
-     * @return array            Returns array of roles indexed by role type
+     * @return array            Returns array of roles indexed by role type.
      */
     private function get_appropiate_roles($course) {
         $roles = uclaroles_manager::get_assignable_roles_by_courseid($course);
@@ -241,11 +245,16 @@ class invitation_form extends moodleform {
         return uclaroles_manager::orderby_role_type($roles);
     }
 
-    /*
+    /**
      * Provides custom validation rules.
      *  - Validating the email field here, rather than in definition, to allow
      *    multiple email addresses to be specified.
      *  - Validating that access end date is in the future.
+     *
+     * @param array $data
+     * @param array $files
+     *
+     * @return array
      */
     public function validation($data, $files) {
         $errors = array();

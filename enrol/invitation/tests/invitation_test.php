@@ -17,10 +17,8 @@
 /**
  * PHPUnit site invitation tests.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
- * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,10 +29,39 @@ require_once($CFG->dirroot . '/enrol/invitation/invitation_form.php');
 require_once($CFG->dirroot . '/enrol/invitation/lib.php');
 require_once($CFG->dirroot . '/enrol/invitation/locallib.php');
 
+/**
+ * PHPunit tests for the invitation manager.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class invitation_manager_testcase extends advanced_testcase {
-    private $invitation_manager = null;
+    /**
+     * Invitation manager instance.
+     * 
+     * @var invitation_manager
+     */
+    private $invitationmanager = null;
+
+    /**
+     * Course object.
+     *
+     * @var object
+     */
     private $testcourse = null;
+
+    /**
+     * Invitee user object.
+     *
+     * @var object
+     */
     private $testinvitee = null;
+
+    /**
+     * Inviter user object.
+     *
+     * @var object
+     */
     private $testinviter = null;
 
     /**
@@ -52,13 +79,13 @@ class invitation_manager_testcase extends advanced_testcase {
 
         $invite = $this->create_invite();
         $invite->daysexpire = $daystoexpire;
-        $this->invitation_manager->enroluser($invite);
+        $this->invitationmanager->enroluser($invite);
 
         // Check user_enrolments table and make sure endtime is $daystoexpire
         // days ahead.
         $timeend = $DB->get_field('user_enrolments', 'timeend',
                 array('userid' => $this->testinvitee->id,
-                      'enrolid' => $this->invitation_manager->enrol_instance->id));
+                      'enrolid' => $this->invitationmanager->enrol_instance->id));
         // Do not count today as one of the days.
         $expectedexpiration = strtotime(date('Y-m-d'))+86400*($daystoexpire+1)-1;
         $this->assertEquals($expectedexpiration, intval($timeend));
@@ -83,7 +110,7 @@ class invitation_manager_testcase extends advanced_testcase {
         set_config('enabletempparticipant', 1, 'enrol_invitation');
 
         // Enrol user with an timeend in the past.
-        $invitation->enrol_user($this->invitation_manager->enrol_instance,
+        $invitation->enrol_user($this->invitationmanager->enrol_instance,
                 $this->testinvitee->id, $roleid, 0, strtotime('yesterday'));
         $hasrole = has_role_in_context('tempparticipant', $context);
         $this->assertTrue($hasrole);
@@ -98,7 +125,7 @@ class invitation_manager_testcase extends advanced_testcase {
         $this->assertFalse($isenrolled);
 
         // Now do the opposite, enroll a user with a timeend in the future.
-        $invitation->enrol_user($this->invitation_manager->enrol_instance,
+        $invitation->enrol_user($this->invitationmanager->enrol_instance,
                 $this->testinvitee->id, $roleid, 0, strtotime('tomorrow'));
         $hasrole = has_role_in_context('tempparticipant', $context);
         $this->assertTrue($hasrole);
@@ -115,7 +142,7 @@ class invitation_manager_testcase extends advanced_testcase {
         // Enroll someone with a role other than Temporary Participant and
         // make sure they are not unenrolled.
         $studentroleid = $DB->get_field('role', 'id', array('shortname' => 'student'));
-        $invitation->enrol_user($this->invitation_manager->enrol_instance,
+        $invitation->enrol_user($this->invitationmanager->enrol_instance,
                 $this->testinvitee->id, $studentroleid);
         $hasrole = has_role_in_context('student', $context);
         $this->assertTrue($hasrole);
@@ -160,6 +187,11 @@ class invitation_manager_testcase extends advanced_testcase {
         return $invitation;
     }
 
+    /**
+     * Setup method.
+     *
+     * Create course, inviter, invitee, and invitation manager instances.
+     */
     protected function setUp() {
         $this->resetAfterTest(true);
         // Create new course/users.
@@ -170,6 +202,6 @@ class invitation_manager_testcase extends advanced_testcase {
         $invitation = enrol_get_plugin('invitation');
         $invitation->add_instance($this->testcourse);
         // Create manager that we want to test.
-        $this->invitation_manager = new invitation_manager($this->testcourse->id);
+        $this->invitationmanager = new invitation_manager($this->testcourse->id);
     }
 }

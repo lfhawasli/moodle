@@ -15,11 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adds new instance of enrol_invitation to specified course
- * or edits current instance.
+ * Form to add new instance of enrol_invitation or edit current instance.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,8 +28,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/formslib.php');
 require_once('locallib.php');
 
-class enrol_invitation_edit_form extends moodleform {
+/**
+ * Form page for enrol settings.
+ *
+ * @copyright  2013 UC Regents
+ * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
+ */
+class enrol_invitation_edit_form extends moodleform {
+    /**
+     * Defines what settings a user can modify.
+     */
     public function definition() {
         $mform = $this->_form;
 
@@ -40,13 +48,16 @@ class enrol_invitation_edit_form extends moodleform {
         $mform->addElement('header', 'header', get_string('pluginname', 'enrol_invitation'));
 
         $mform->addElement('text', 'name', get_string('custominstancename', 'enrol'));
+        $mform->setType('name', PARAM_TEXT);
 
         $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
                          ENROL_INSTANCE_DISABLED => get_string('no'));
         $mform->addElement('select', 'status', get_string('status', 'enrol_invitation'), $options);
         $mform->setDefault('status', $plugin->get_config('status'));
         $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
 
         $this->add_action_buttons(true, ($instance->id ? null : get_string('addinstance', 'enrol')));
 

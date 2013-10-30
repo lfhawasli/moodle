@@ -17,10 +17,8 @@
 /**
  * Viewing invitation history script.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
- * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -53,10 +51,10 @@ $PAGE->set_url(new moodle_url('/enrol/invitation/history.php',
         array('courseid' => $courseid)));
 $PAGE->set_pagelayout('course');
 $PAGE->set_course($course);
-$page_title = get_string('invitehistory', 'enrol_invitation');
-$PAGE->set_heading($page_title);
-$PAGE->set_title($page_title);
-$PAGE->navbar->add($page_title);
+$pagetitle = get_string('invitehistory', 'enrol_invitation');
+$PAGE->set_heading($pagetitle);
+$PAGE->set_title($pagetitle);
+$PAGE->navbar->add($pagetitle);
 
 // Do not display the page if we are going to be redirecting the user.
 if ($actionid != invitation_manager::INVITE_RESEND) {
@@ -64,15 +62,14 @@ if ($actionid != invitation_manager::INVITE_RESEND) {
     echo $OUTPUT->header();
 
     // Print out a heading.
-    echo $OUTPUT->heading($page_title, 2, 'headingblock');
+    echo $OUTPUT->heading($pagetitle, 2, 'headingblock');
 
     // OUTPUT page tabs.
     print_page_tabs('history');
 }
 
-$invitationmanager = new invitation_manager($courseid);
 // Course must have invitation plugin installed (will give error if not found).
-$invite_instance = $invitationmanager->get_invitation_instance($courseid, true);
+$invitationmanager = new invitation_manager($courseid, true);
 
 // Get invites and display them.
 $invites = $invitationmanager->get_invites();
@@ -82,7 +79,6 @@ if (empty($invites)) {
             get_string('noinvitehistory', 'enrol_invitation'), 'notifymessage');
 } else {
 
-    // BEGIN UCLA MOD: CCLE-2960-Viewing-history-of-invites-and-status.
     // Update invitation if the user decided to revoke/extend/resend an invite.
     if ($inviteid && $actionid) {
         if (!$curr_invite = $invites[$inviteid]) {
@@ -96,17 +92,13 @@ if (empty($invites)) {
             add_to_log($course->id, 'course', 'invitation revoke',
                             "../enrol/invitation/history.php?courseid=$course->id", $course->fullname);
 
-            echo $OUTPUT->box_start('noticebox');
-            echo html_writer::tag('span', get_string('revoke_invite_sucess', 'enrol_invitation'));
-            echo $OUTPUT->box_end();
+            echo $OUTPUT->notification(get_string('revoke_invite_sucess', 'enrol_invitation'), 'notifysuccess');
 
         } else if ($actionid == invitation_manager::INVITE_EXTEND) {
             // Resend the invite and email.
             $invitationmanager->send_invitations($curr_invite, true);
 
-            echo $OUTPUT->box_start('noticebox');
-            echo html_writer::tag('span', get_string('extend_invite_sucess', 'enrol_invitation'));
-            echo $OUTPUT->box_end();
+            echo $OUTPUT->notification(get_string('extend_invite_sucess', 'enrol_invitation'), 'notifysuccess');
 
         } else if ($actionid == invitation_manager::INVITE_RESEND) {
             // Send the user to the invite form with prefilled data.
@@ -121,7 +113,6 @@ if (empty($invites)) {
         // Get the updated invites.
         $invites = $invitationmanager->get_invites();
     }
-    // END UCLA MOD: CCLE-2960.
 
     // Columns to display.
     $columns = array(
@@ -143,13 +134,13 @@ if (empty($invites)) {
 
     $role_cache = array();
     foreach ($invites as $invite) {
-        /* build display row
+        /* Build display row:
          * [0] - invitee
          * [1] - role
          * [2] - status
          * [3] - dates sent
          * [4] - expiration date
-         * [5] - actions (@todo)
+         * [5] - actions
          */
 
         // Display invitee.
@@ -198,7 +189,6 @@ if (empty($invites)) {
             $row[4] .= ' ' . html_writer::tag('span', '(' . $expires_text . ')', array('expires-text'));
         }
 
-        // BEGIN UCLA MOD: CCLE-2960-Viewing-history-of-invites-and-status.
         // Are there any actions user can do?
         $row[5] = '';
         $url = new moodle_url('/enrol/invitation/history.php',
@@ -217,7 +207,6 @@ if (empty($invites)) {
             $url->param('actionid', invitation_manager::INVITE_RESEND);
             $row[5] .= html_writer::link($url, get_string('action_resend_invite', 'enrol_invitation'));
         }
-        // END UCLA MOD: CCLE-2960.
 
         $table->add_data($row);
     }

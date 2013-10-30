@@ -20,8 +20,7 @@
  * This plugin allows you to send invitation by email. These invitations can be used only once. Users
  * clicking on the email link are automatically enrolled.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,8 +30,10 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Invitation enrolment plugin implementation.
- * @author  Jerome Mouneyrac.
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ *
+ * @copyright  2013 UC Regents
+ * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrol_invitation_plugin extends enrol_plugin {
 
@@ -49,37 +50,36 @@ class enrol_invitation_plugin extends enrol_plugin {
      * @return array of pix_icon.
      */
     public function get_info_icons(array $instances) {
-        return array(new pix_icon('invite', get_string('pluginname', 'enrol_invitation'), 'enrol_invitation'));
+        return array(new pix_icon('invite', get_string('pluginname',
+                'enrol_invitation'), 'enrol_invitation'));
     }
 
-    public function allow_unenrol(stdClass $instance) {
-        // Users with unenrol cap may unenrol other users manually - requires enrol/invitation:unenrol.
+    /**
+     * Users with unenrol cap may unenrol other users manually - requires
+     * enrol/invitation:unenrol.
+     *
+     * @param stdClass $instance
+     * @return boolean              Returns true.
+     */
+    public function allow_unenrol(stdClass $instance) {        
         return true;
     }
 
+    /**
+     * Users with manage cap may tweak period and status - requires
+     * enrol/invitation:manage.
+     *
+     * @param stdClass $instance
+     * @return boolean              Returns true.
+     */
     public function allow_manage(stdClass $instance) {
-        // Users with manage cap may tweak period and status - requires enrol/invitation:manage.
         return true;
     }
 
      /**
-      * Attempt to automatically enrol current user in course without any interaction,
-      * calling code has to make sure the plugin and instance are active.
-      *
-      * This should return either a timestamp in the future or false.
-      *
-      * @param stdClass $instance course enrol instance
-      * @param stdClass $user record
-      * @return bool|int false means not enrolled, integer means timeend
-      */
-    public function try_autoenrol(stdClass $instance) {
-        global $USER;
-
-        return false;
-    }
-
-     /**
-      * Returns link to page which may be used to add new instance of enrolment plugin in course.
+      * Returns link to page which may be used to add new instance of enrolment
+      * plugin in course.
+      * 
       * @param int $courseid
       * @return moodle_url page url
       */
@@ -103,9 +103,10 @@ class enrol_invitation_plugin extends enrol_plugin {
 
     /**
      * Ensures existence instance of enrol plugin.
+     *
      * @param object $course
-     * @param array instance fields
-     * @return int id of instance, null if can not be created
+     * @param array $fields
+     * @return int              Id of instance, null if can not be created.
      */
     public function add_instance($course, array $fields = null) {
         global $DB;
@@ -121,7 +122,8 @@ class enrol_invitation_plugin extends enrol_plugin {
     /**
      * Sets up navigation entries.
      *
-     * @param object $instance
+     * @param navigation_node $instancesnode
+     * @param stdClass $instance
      * @return void
      */
     public function add_course_navigation($instancesnode, stdClass $instance) {
@@ -138,6 +140,7 @@ class enrol_invitation_plugin extends enrol_plugin {
 
     /**
      * Returns edit icons for the page with list of instances
+     *
      * @param stdClass $instance
      * @return array
      */
@@ -237,6 +240,8 @@ class enrol_invitation_plugin extends enrol_plugin {
     /**
      * If site invite is using the Temporary Participant role, then need to
      * periodically check and remove the role if it is expired.
+     *
+     * @return boolean
      */
     public function cron() {
         global $DB;

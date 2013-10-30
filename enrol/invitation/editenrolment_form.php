@@ -15,10 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains the form used to edit invitation enrolments for a user.
+ * Contains the form used to edit invitation enrolment for a user.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,7 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
+/**
+ * Form to edit invitation enrolment for a user.
+ * 
+ * @copyright  2013 UC Regents
+ * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class enrol_invitation_user_enrolment_form extends moodleform {
+    /**
+     * Form definition.
+     */
     public function definition() {
         global $CFG, $DB;
 
@@ -66,6 +75,14 @@ class enrol_invitation_user_enrolment_form extends moodleform {
         ));
     }
 
+    /**
+     * Form validation.
+     * 
+     * @param array $data
+     * @param array $files
+     *
+     * @return array
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

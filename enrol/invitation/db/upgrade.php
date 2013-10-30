@@ -17,8 +17,7 @@
 /**
  * This file keeps track of upgrades to the invitation enrolment plugin
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,6 +40,12 @@
 // Please do not forget to use upgrade_set_timeout()
 // before any action that may take longer time to finish.
 
+/**
+ * Performs any needed database upgrades between version upgrades.
+ *
+ * @param int $oldversion
+ * @return boolean
+ */
 function xmldb_enrol_invitation_upgrade($oldversion) {
     global $CFG, $DB, $OUTPUT;
 
@@ -83,18 +88,10 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2011100303, 'enrol', 'invitation');
     }
 
-    // Add roleid, timeexpiration, added foreign keys and indexes and fixed.
-    // Some default values.
-    if ($oldversion < 2012051901) {
+    // Add roleid, timeexpiration, added foreign keys and indexes and fixed
+    // some default values.
+    if ($oldversion < 2013030100) {
         $table = new xmldb_table('enrol_invitation');
-
-        // Change defaults/null settings.
-        $fields[] = new xmldb_field('timeused', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, 'timeexpiration');
-        $fields[] = new xmldb_field('creatorid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'creatorid');
-        foreach ($fields as $field) {
-            $dbman->change_field_default($table, $field);
-            $dbman->change_field_notnull($table, $field);
-        }
 
         // Add fields.
         $fields[] = new xmldb_field('roleid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'userid');
@@ -104,6 +101,50 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
+        }
+
+        // Since we are adding new columns called roleid and timeexpiration, we
+        // need to convert existing invitations to use these fields.
+        $existinginvitations = $DB->get_recordset('enrol_invitation');
+        if ($existinginvitations->valid()) {
+            require_once($CFG->dirroot . '/enrol/invitation/locallib.php');
+
+            $enrolinstances = array();  // Cache for
+            foreach ($existinginvitations as $existinginvitation) {
+                // Get enrol instance, but look in cache first.
+                $courseid = $existinginvitation->courseid;
+                if (!isset($enrolinstances[$courseid])) {
+                    $invitemanager = new invitation_manager($courseid, false);
+                    $enrolinstance = $invitemanager->get_invitation_instance($courseid);
+                    if (empty($enrolinstance)) {
+                        // Course must have deleted enrolment plugin, skip it.
+                        continue;
+                    } else {
+                        $enrolinstances[$courseid] = $enrolinstance;
+                    }
+                }
+                $enrolinstance = $enrolinstances[$courseid];
+
+                // Now, update roleid and timeexpiration.
+                $existinginvitation->roleid = $enrolinstance->roleid;
+
+                // Default to 2 weeks expiration for active invitations.
+                if (empty($existinginvitation->tokenused)) {
+                    $existinginvitation->timeexpiration = $existinginvitation->timesent + 1209600;
+                }
+
+                $DB->update_record('enrol_invitation', $existinginvitation, true);
+            }
+        }
+
+
+        // Change defaults/null settings.
+        $fields = array();
+        $fields[] = new xmldb_field('timeused', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, 'timeexpiration');
+        $fields[] = new xmldb_field('creatorid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'timeused');
+        foreach ($fields as $field) {
+            $dbman->change_field_default($table, $field);
+            $dbman->change_field_notnull($table, $field);
         }
 
         // Add foreign keys.
@@ -122,12 +163,12 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         }
 
         // Invitation savepoint reached.
-        upgrade_plugin_savepoint(true, 2012051901, 'enrol', 'invitation');
+        upgrade_plugin_savepoint(true, 2013030100, 'enrol', 'invitation');
     }
 
     // Rename creatorid to inviterid & add subject, message, notify_inviter,
-    // how_from_email columns.
-    if ($oldversion < 2012060300) {
+    // show_from_email columns.
+    if ($oldversion < 2013030101) {
         $table = new xmldb_table('enrol_invitation');
 
         // 1) Rename creatorid to inviterid.
@@ -160,12 +201,12 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         }
 
         // Invitation savepoint reached.
-        upgrade_plugin_savepoint(true, 2012060300, 'enrol', 'invitation');
+        upgrade_plugin_savepoint(true, 2013030101, 'enrol', 'invitation');
     }
 
     // Fix role_assignments to include enrol_invitation.
-    if ($oldversion < 2012071303) {
-        /*
+    if ($oldversion < 2013030102) {
+        /**
          * Go through each accepted invite and look for an entry in
          * role_assignments with component set to "" and userid, roleid, and
          * context match given invite's user, role, course context.
@@ -215,7 +256,7 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         }
 
         // Invitation savepoint reached.
-        upgrade_plugin_savepoint(true, 2012071303, 'enrol', 'invitation');
+        upgrade_plugin_savepoint(true, 2013030102, 'enrol', 'invitation');
     }
 
     // Add daysexpire column.

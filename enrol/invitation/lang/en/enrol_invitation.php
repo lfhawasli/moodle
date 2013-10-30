@@ -17,8 +17,7 @@
 /**
  * Strings for component 'enrol_invitation'
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -85,8 +84,8 @@ $string['emailmessageuserenrolled'] = 'Hello,
 
     {$a->userfullname} ({$a->useremail}) has accepted your invitation to access {$a->coursefullname} as a "{$a->rolename}". You can verify the  status of this invitation by viewing either:
 
-        * the participant list for : {$a->courseenrolledusersurl}
-        * your site invitation history: {$a->invitehistoryurl}
+        * Participant list: {$a->courseenrolledusersurl}
+        * Invitation history: {$a->invitehistoryurl}
 
     {$a->sitename}
     -------------
@@ -101,6 +100,8 @@ $string['enrolperiod_help'] = 'Length of time that the enrollment is valid, star
 $string['enrolstartdate'] = 'Start date';
 $string['enrolstartdate_help'] = 'If enabled, users can be enrolled from this date onward only.';
 $string['editenrolment'] = 'Edit enrolment';
+$string['inviteexpiration'] = 'Invitation expiration';
+$string['inviteexpiration_desc'] = 'Length of time that an invitation is valid (in seconds). Default is 2 weeks.';
 
 $string['show_from_email'] = 'Allow invited user to contact me at {$a->email} (your address will be on the "FROM" field. If not selected, the "FROM" field will be {$a->supportemail})';
 $string['inviteusers'] = 'Invite user';

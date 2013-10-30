@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * Sending invitation page script.
+/**
+ * Page to send invitations.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -48,15 +47,15 @@ $PAGE->set_url(new moodle_url('/enrol/invitation/invitation.php',
         array('courseid' => $courseid)));
 $PAGE->set_pagelayout('course');
 $PAGE->set_course($course);
-$page_title = get_string('inviteusers', 'enrol_invitation');
-$PAGE->set_heading($page_title);
-$PAGE->set_title($page_title);
-$PAGE->navbar->add($page_title);
+$pagetitle = get_string('inviteusers', 'enrol_invitation');
+$PAGE->set_heading($pagetitle);
+$PAGE->set_title($pagetitle);
+$PAGE->navbar->add($pagetitle);
 
 echo $OUTPUT->header();
 
 // Print out a heading.
-echo $OUTPUT->heading($page_title, 2, 'headingblock');
+echo $OUTPUT->heading($pagetitle, 2, 'headingblock');
 
 print_page_tabs('invite');  // OUTPUT page tabs.
 
@@ -88,7 +87,6 @@ $mform->set_data($invitationmanager);
 $data = $mform->get_data();
 if ($data and confirm_sesskey()) {
 
-    // BEGIN UCLA MOD: CCLE-2955-Invite-multiple-users.
     // Check for the invitation of multiple users.
     $delimiters = "/[;, \r\n]/";
     $email_list = invitation_form::parse_dsv_emails($data->email, $delimiters);
@@ -98,7 +96,6 @@ if ($data and confirm_sesskey()) {
         $data->email = $email;
         $invitationmanager->send_invitations($data);
     }
-    // END UCLA MOD: CCLE-2955.
 
     $courseurl = new moodle_url('/course/view.php', array('id' => $courseid));
     $courseret = new single_button($courseurl, get_string('returntocourse',

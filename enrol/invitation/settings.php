@@ -17,8 +17,7 @@
 /**
  * Invitation enrolments plugin settings and presets.
  *
- * @package    enrol
- * @subpackage invitation
+ * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,8 +39,8 @@ if ($ADMIN->fulltree) {
         get_string('status', 'enrol_invitation'), get_string('status_desc', 'enrol_invitation'), ENROL_INSTANCE_ENABLED, $options));
 
     // Default to 2 weeks expiration.
-    $settings->add(new admin_setting_configtext('enrol_invitation/enrolperiod',
-        get_string('enrolperiod', 'enrol_invitation'), get_string('enrolperiod_desc', 'enrol_invitation'), 1209600, PARAM_INT));
+    $settings->add(new admin_setting_configtext('enrol_invitation/inviteexpiration',
+        get_string('inviteexpiration', 'enrol_invitation'), get_string('inviteexpiration_desc', 'enrol_invitation'), 1209600, PARAM_INT));
 
     // Enable special case handling for tempparticipant
     // (requires tempparticipant role to exist on system).
