@@ -90,6 +90,12 @@ if ($backup->get_stage() == backup_ui::STAGE_CONFIRMATION) {
 
 // If it's the final stage process the import
 if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
+
+    // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
+    // Determine if sections will be hidden.
+    $hidesections = $backup->get_setting_value('hidesections');
+    // END UCLA MOD: CCLE-3797
+
     // First execute the backup
     $backup->execute();
     $backup->destroy();
@@ -134,6 +140,22 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     if ($restoretarget == backup::TARGET_CURRENT_DELETING || $restoretarget == backup::TARGET_EXISTING_DELETING) {
         restore_dbops::delete_course_content($course->id);
     }
+
+    // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
+    // If the hidesections option was selected during backup,
+    // then add a step to hide sections during course restore.
+    if ($hidesections) {
+        $tasks = $rc->get_plan()->get_tasks();
+        foreach ($tasks as $task) {
+            $tasktype = get_class($task);
+            if ($tasktype == 'Restore_PublicPrivate_Course_Task' || $tasktype == 'restore_course_task') {
+                $task->add_step(new restore_course_hide_sections_step('hidesections'));
+                break;
+            }
+        }          
+    }
+    // END UCLA MOD: CCLE-3797     
+
     // Execute the restore.
     $rc->execute_plan();
 
