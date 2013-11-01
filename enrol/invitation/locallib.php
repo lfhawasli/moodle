@@ -1,57 +1,83 @@
 <?php
-
-// This file is not a part of Moodle - http://moodle.org/
-// This is a none core contributed module.
+// This file is part of the UCLA Site Invitation Plugin for Moodle - http://moodle.org/
 //
-// This is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// This is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// The GNU General Public License
-// can be see at <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Local library file to include classes and functions used.
+ *
+ * @package    enrol_invitation
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Invitation manager that handles the handling of invitation information.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class invitation_manager {
-    /*
-     * The invitation enrol instance of a course
+    /**
+     * Course id.
+     * @var int
      */
-    var $enrol_instance = null;
+    private $courseid = null;
 
-    /*
-     * The course id
+    /**
+     * The invitation enrol instance of a course.
+     *
+     * @var int
      */
-    var $courseid = null;
-    
-    // For revoking an active invite
+    private $enrolinstance = null;
+
+    /**
+     * Constant for revoking an active invitation.
+     */
     const INVITE_REVOKE = 1;
-    
-    // For extending the expiration time of an active invite
+
+    /**
+     * Constant for extending the expiration time of an active invitation.
+     */
     const INVITE_EXTEND = 2;
-    
-    // For resending an expired or revoked invite
+
+    /**
+     * Constant for resending an expired or revoked invite.
+     */
     const INVITE_RESEND = 3;
 
     /**
+     * Constructor.
      *
-     * @param type $courseid 
+     * @param int $courseid
+     * @param boolean $instancemustexist
      */
     public function __construct($courseid, $instancemustexist = true) {
         $this->courseid = $courseid;
-        $this->enrol_instance = $this->get_invitation_instance($courseid, $instancemustexist);
+        $this->enrolinstance = $this->get_invitation_instance($courseid, $instancemustexist);
     }
 
     /**
-     * Return HTML invitation menu link for a given course 
-     * It's mostly useful to add a link in a block menu - by default icon is displayed.
+     * Return HTML invitation menu link for a given course.
+     *
+     * It's mostly useful to add a link in a block menu - by default icon is
+     * displayed.
+     * 
      * @param boolean $withicon - set to false to not display the icon
-     * @return 
+     * @return
      */
     public function get_menu_link($withicon = true) {
         global $OUTPUT;
@@ -61,126 +87,123 @@ class invitation_manager {
 
         if (has_capability('enrol/invitation:enrol', context_course::instance($this->courseid))) {
 
-            //display an icon with requested (css can be changed in stylesheet)
+            // Display an icon with requested (css can be changed in stylesheet).
             if ($withicon) {
-                $inviteicon = html_writer::empty_tag('img', array('alt' => "invitation", 'class' => "enrol_invitation_item_icon", 'title' => "invitation",
-                            'src' => $OUTPUT->pix_url('invite', 'enrol_invitation')));
+                $inviteicon = html_writer::empty_tag('img', array('alt' => "invitation", 'class' => "enrol_invitation_item_icon",
+                    'title' => "invitation", 'src' => $OUTPUT->pix_url('invite', 'enrol_invitation')));
             }
 
             $link = html_writer::link(
                             new moodle_url('/enrol/invitation/invitation.php',
-                                    array('courseid' => $this->courseid)), $inviteicon . get_string('inviteusers', 'enrol_invitation'));
+                                    array('courseid' => $this->courseid)), $inviteicon . get_string('inviteusers',
+                                        'enrol_invitation'));
         }
 
         return $link;
     }
-    
+
     /**
      * Helper function to get privacy notice for project sites.
-     * 
-     * @global type $CFG
-     * 
+     *
      * @param int $courseid
-     * 
-     * @return string       Returns null if there is no privacy notice
+     * @return string       Returns null if there is no privacy notice.
      */
     public static function get_project_privacy_notice($courseid) {
         global $CFG;
         require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.php');
         $ret_val = null;
-        
-        // get current course's site type group
+
+        // Get current course's site type group.
         try {
             $siteindicator_site = new siteindicator_site($courseid);
             $site_type = $siteindicator_site->property->type;
             $siteindicator_manager = new siteindicator_manager();
             $site_type_group = $siteindicator_manager->get_rolegroup_for_type($site_type);
-            
-            // if site type group is project, then return some notice
+
+            // If site type group is project, then return some notice.
             if ($site_type_group == siteindicator_manager::SITE_GROUP_TYPE_PROJECT) {
-                $ret_val = "\n\n" . get_string('project_privacy_notice', 'enrol_invitation');                   
-            }            
+                $ret_val = "\n\n" . get_string('project_privacy_notice', 'enrol_invitation');
+            }
         } catch (Exception $e) {
-            // throws exception if no site type found
+            // Throws exception if no site type found.
         }
-        
+
         return $ret_val;
-    }    
+    }
 
     /**
-     * Send invitation (create a unique token for each of them)
-     * @global type $USER
-     * @global type $DB
-     * @param type $data       data processed from the invite form, or an invite
+     * Send invitation (create a unique token for each of them).
+     *
+     * @param array $data       data processed from the invite form, or an invite
      * @param bool $resend     resend the invite specified by $data
      */
     public function send_invitations($data, $resend = false) {
-        global $DB, $CFG, $COURSE, $SITE, $USER;
+        global $DB, $CFG, $SITE, $USER;
 
         if (has_capability('enrol/invitation:enrol', context_course::instance($data->courseid))) {
 
-            // get course record, to be used later
-            $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);            
-            
+            // Get course record, to be used later.
+            $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
+
             if (!empty($data->email)) {
-                
-                // Create a new token only if we are not resending an active invite
+
+                // Create a new token only if we are not resending an active invite.
                 if ($resend) {
                     $token = $data->token;
                 } else {
-                    //create unique token for invitation
+                    // Create unique token for invitation.
                     do {
                         $token = uniqid();
                         $existingtoken = $DB->get_record('enrol_invitation', array('token' => $token));
                     } while (!empty($existingtoken));
                 }
-                
-                //save token information in config (token value, course id, TODO: role id)
+
+                // Save token information in config (token value, course id, TODO: role id).
                 $invitation = new stdClass();
                 $invitation->email = $data->email;
                 $invitation->courseid = $data->courseid;
                 $invitation->token = $token;
                 $invitation->tokenused = false;
                 $invitation->roleid = $resend ? $data->roleid : $data->role_group['roleid'];
-                
-                // set time
+
+                // Set time.
                 $timesent = time();
                 $invitation->timesent = $timesent;
-                $invitation->timeexpiration = $timesent + 
-                        get_config('enrol_invitation', 'enrolperiod');
-                
-                // update invite to have the proper timesent/timeexpiration
+                $invitation->timeexpiration = $timesent +
+                        get_config('enrol_invitation', 'inviteexpiration');
+
+                // Update invite to have the proper timesent/timeexpiration.
                 if ($resend) {
-                    $DB->set_field('enrol_invitation', 'timeexpiration', $invitation->timeexpiration, 
+                    $DB->set_field('enrol_invitation', 'timeexpiration', $invitation->timeexpiration,
                             array('courseid' => $data->courseid,  'id' => $data->id));
-                    
-                    // Prepend subject heading with a 'Reminder' string
+
+                    // Prepend subject heading with a 'Reminder' string.
                     $invitation->subject = get_string('reminder', 'enrol_invitation');
                 }
-                
+
                 $invitation->subject .= $data->subject;
 
                 $invitation->inviterid = $USER->id;
                 $invitation->notify_inviter = empty($data->notify_inviter) ? 0 : 1;
                 $invitation->show_from_email = empty($data->show_from_email) ? 0 : 1;
-                
-                // construct message: custom (if any) + template
+
+                // Construct message: custom (if any) + template.
                 $message = '';
                 if (!empty($data->message)) {
-                    $message .= get_string('instructormsg', 'enrol_invitation', 
+                    $message .= get_string('instructormsg', 'enrol_invitation',
                             $data->message);
                     $invitation->message = $data->message;
                 }
-                
+
                 $message_params = new stdClass();
-                $message_params->fullname = 
+                $message_params->fullname =
                         sprintf('%s: %s', $course->shortname, $course->fullname);
                 $message_params->expiration = date('M j, Y g:ia', $invitation->timeexpiration);
-                $inviteurl =  new moodle_url('/enrol/invitation/enrol.php', 
+                $inviteurl =  new moodle_url('/enrol/invitation/enrol.php',
                                 array('token' => $token));
                 $inviteurl = $inviteurl->out(false);
-                
-                // append privacy notice, if needed
+
+                // Append privacy notice, if needed.
                 $privacy_notice = $this->get_project_privacy_notice($course->id);
                 if (!empty($privacy_notice)) {
                     $inviteurl .= $privacy_notice;
@@ -213,8 +236,8 @@ class invitation_manager {
                 if (!$resend) {
                     $DB->insert_record('enrol_invitation', $invitation);
                 }
-                
-                // change FROM to be $CFG->supportemail if user has show_from_email off
+
+                // Change FROM to be $CFG->supportemail if user has show_from_email off.
                 $fromuser = $USER;
                 if (empty($invitation->show_from_email)) {
                     $fromuser = new stdClass();
@@ -223,21 +246,21 @@ class invitation_manager {
                     $fromuser->lastname = $SITE->fullname;
                     $fromuser->maildisplay = true;
                 }
-                
-                //send invitation to the user
+
+                // Send invitation to the user.
                 $contactuser = new stdClass();
                 $contactuser->email = $invitation->email;
                 $contactuser->firstname = '';
                 $contactuser->lastname = '';
                 $contactuser->maildisplay = true;
                 email_to_user($contactuser, $fromuser, $invitation->subject, $message);
-                
-                // log activity after sending the email
+
+                // Log activity after sending the email.
                 if ($resend) {
-                    add_to_log($course->id, 'course', 'invitation extend', 
+                    add_to_log($course->id, 'course', 'invitation extend',
                             "../enrol/invitation/history.php?courseid=$course->id", $course->fullname);
                 } else {
-                    add_to_log($course->id, 'course', 'invitation send', 
+                    add_to_log($course->id, 'course', 'invitation send',
                             "../enrol/invitation/history.php?courseid=$course->id", $course->fullname);
                 }
             }
@@ -246,14 +269,14 @@ class invitation_manager {
                     new moodle_url('/course/view.php', array('id' => $data['courseid'])));
         }
     }
-    
+
     /**
      * Checks if user who accepted invite has an access expiration for their
      * enrollment.
-     * 
+     *
      * @param object $invite    Database record
-     * 
-     * @return string           Returns expiration string. Blank if no 
+     *
+     * @return string           Returns expiration string. Blank if no
      *                          restriction.
      */
     public function get_access_expiration($invite) {
@@ -277,10 +300,10 @@ class invitation_manager {
     }
 
     /**
-     * Returns status of given invite. 
-     * 
+     * Returns status of given invite.
+     *
      * @param object $invite    Database record
-     * 
+     *
      * @return string           Returns invite status string.
      */
     public function get_invite_status($invite) {
@@ -289,24 +312,23 @@ class invitation_manager {
         }
 
         if ($invite->tokenused) {
-            // invite was used already
+            // Invite was used already.
             $status = get_string('status_invite_used', 'enrol_invitation');
             return $status;
         } else if ($invite->timeexpiration < time()) {
-            // invite is expired
+            // Invite is expired.
             return get_string('status_invite_expired', 'enrol_invitation');
         } else {
             return get_string('status_invite_active', 'enrol_invitation');
         }
-        // TO DO: add status_invite_revoked and status_invite_resent status
+        // TO DO: add status_invite_revoked and status_invite_resent status.
     }
 
     /**
      * Return all invites for given course.
-     * 
-     * @global type $DB
-     * @param type $courseid
-     * @return type 
+     *
+     * @param int $courseid
+     * @return array
      */
     public function get_invites($courseid = null) {
         global $DB;
@@ -321,21 +343,23 @@ class invitation_manager {
     }
 
     /**
-     * Return the invitation instance for a specific course
-     * Note: as using $PAGE variable, this function can only be called in a Moodle script page
-     * @global object $PAGE
+     * Return the invitation instance for a specific course.
+     *
+     * Note: as using $PAGE variable, this function can only be called in a
+     * Moodle script page.
+     *
      * @param int $courseid
      * @param boolean $mustexist when set, an exception is thrown if no instance is found
-     * @return type 
+     * @return object
      */
     public function get_invitation_instance($courseid, $mustexist = false) {
         global $PAGE, $CFG, $DB;
 
-        if (($courseid == $this->courseid) and !empty($this->enrol_instance)) {
-            return $this->enrol_instance;
+        if (($courseid == $this->courseid) and !empty($this->enrolinstance)) {
+            return $this->enrolinstance;
         }
 
-        //find enrolment instance
+        // Find enrolment instance.
         $instance = null;
         require_once("$CFG->dirroot/enrol/locallib.php");
         $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -356,8 +380,8 @@ class invitation_manager {
     }
 
     /**
-     * Enrol the user following the invitation data
-     * @param object $invitation 
+     * Enrol the user following the invitation data.
+     * @param object $invitation
      */
     public function enroluser($invitation) {
         global $USER;
@@ -377,19 +401,19 @@ class invitation_manager {
         }
 
         $enrol = enrol_get_plugin('invitation');
-        $enrol->enrol_user($this->enrol_instance, $USER->id,
+        $enrol->enrol_user($this->enrolinstance, $USER->id,
                 $invitation->roleid, 0, $timeend);
     }
 
     /**
      * Figures out who used an invite.
-     * 
+     *
      * @param object $invite    Invitation record
-     * 
+     *
      * @return object           Returns an object with following values:
      *                          ['username'] - name of who used invite
      *                          ['useremail'] - email of who used invite
-     *                          ['roles'] - roles the user has for course that 
+     *                          ['roles'] - roles the user has for course that
      *                                      they were invited
      *                          ['timeused'] - formatted string of time used
      *                          Returns false on error or if invite wasn't used.
@@ -397,42 +421,63 @@ class invitation_manager {
     public function who_used_invite($invite) {
         global $DB;
         $ret_val = new stdClass();
-        
-        if (empty($invite->userid) || empty($invite->tokenused) || 
+
+        if (empty($invite->userid) || empty($invite->tokenused) ||
                 empty($invite->courseid) || empty($invite->timeused)) {
-            //debugging('one of required fields empty');
             return false;
         }
-        
-        // find user
-        $user = $DB->get_record('user', array('id' => $invite->userid));        
+
+        // Find user.
+        $user = $DB->get_record('user', array('id' => $invite->userid));
         if (empty($user)) {
-            //debugging('could not find user');
             return false;
         }
         $ret_val->username = sprintf('%s %s', $user->firstname, $user->lastname);
         $ret_val->useremail = $user->email;
-        
-        // find their roles for course
+
+        // Find their roles for course.
         $ret_val->roles = get_user_roles_in_course($invite->userid, $invite->courseid);
         if (empty($ret_val->roles)) {
-            // if no roles, then they must have been booted out later            
-            //debugging('no roles found');
+            // If no roles, then they must have been booted out later.
             return false;
         }
         $ret_val->roles = strip_tags($ret_val->roles);
-        
-        // format string when invite was used
+
+        // Format string when invite was used.
         $ret_val->timeused = date('M j, Y g:ia', $invite->timeused);
-        
+
         return $ret_val;
     }
-    
+
 }
 
 /**
+ * Setups the object used in the notice strings for when a user is accepting
+ * a site invitation.
  *
- * @param type $active_tab  Either 'invite' or 'history'
+ * @param object $invitation
+ * @return object
+ */
+function prepare_notice_object($invitation) {
+    global $CFG, $course, $DB;
+
+    $noticeobject = new stdClass();
+    $noticeobject->email = $invitation->email;
+    $noticeobject->coursefullname = $course->fullname;
+    $noticeobject->supportemail = $CFG->supportemail;
+
+    // Get role name for use in acceptance message.
+    $role = $DB->get_record('role', array('id' => $invitation->roleid));
+    $noticeobject->rolename = $role->name;
+    $noticeobject->roledescription = strip_tags($role->description);
+
+    return $noticeobject;
+}
+
+/**
+ * Prints out tabs and highlights the appropiate current tab.
+ * 
+ * @param string $active_tab  Either 'invite' or 'history'
  */
 function print_page_tabs($active_tab) {
     global $CFG, $COURSE;
@@ -446,6 +491,6 @@ function print_page_tabs($active_tab) {
                             array('courseid' => $COURSE->id)),
                     get_string('inviteusers', 'enrol_invitation'));
 
-    // display tabs here
+    // Display tabs here.
     print_tabs(array($tabs), $active_tab);
 }
