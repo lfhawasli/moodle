@@ -46,11 +46,11 @@ $string['emailmsgtxt'] =
     '{$a->inviteurl}' . "\n\n" .
     'UCLA LOGON:' . "\n" .
     '------------------------------------------------------------' . "\n" .
-    'If you currently do not have a UCLA Logon ID, you can obtain one here: ' .
-    'https://logon.ucla.edu/activate.php. You do not need to be an enrolled ' .
-    'student at UCLA or have a 9 digit UID to create a UCLA Logon. When you are ' .
-    'asked to identify your role in the UCLA system, select the following  ' .
-    'option:' . "\n" .
+    'If you currently do not have a UCLA Logon ID, you can obtain one here:' . "\n" .
+    'https://logon.ucla.edu/activate.php' . "\n" .
+    'You do not need to be an enrolled student at UCLA or have a 9 digit UID ' .
+    'to create a UCLA Logon. When you are asked to identify your role in ' .
+    'the UCLA system, select the following option:' . "\n" .
     '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE."' . "\n\n" .
     'CONTACT CCLE:' . "\n" .
     '------------------------------------------------------------' . "\n" .
@@ -128,10 +128,10 @@ $string['message_help'] =
     'UCLA LOGON:'.
     '<hr />'.
     'If you currently do not have a UCLA Logon ID, you can obtain one here: ' .
-    'https://logon.ucla.edu/activate.php. You do not need to be an enrolled ' .
-    'student at UCLA or have a 9 digit UID to create a UCLA Logon. When you are ' .
-    'asked to identify your role in the UCLA system, select the following  ' .
-    'option: <br />' .
+    'https://logon.ucla.edu/activate.php<br />' .
+    'You do not need to be an enrolled student at UCLA or have a 9 digit UID ' .
+    'to create a UCLA Logon. When you are asked to identify your role in the ' .
+    'UCLA system, select the following option: <br />' .
     '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE."<br /><br />'.
     'CONTACT CCLE:'.
     '<hr />'.
