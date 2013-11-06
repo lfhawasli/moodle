@@ -141,6 +141,9 @@ $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'help@ssc.ucla.edu';
 // Emails should still be sent to users that are logged in.
 $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_loggedin'] = 'popup,email';
 
+// CCLE-4345 - Moodle Authenticated Remote Command Execution (CVE-2013-3630).
+$CFG->preventexecpath = 1;
+
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;

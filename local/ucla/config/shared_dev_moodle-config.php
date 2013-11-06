@@ -202,14 +202,8 @@ $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lis
 // Emails should still be sent to users that are logged in.
 $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_loggedin'] = 'popup,email';
 
-//$string['log_apache_error'] = 'Apache error';
-//$string['log_apache_access'] = 'Apache access';
-//$string['log_apache_ssl_access'] = 'Apache SSL access';
-//$string['log_apache_ssl_error'] = 'Apache SSL error';
-//$string['log_apache_ssl_request'] = 'Apache SSL access';
-//$string['log_shibboleth_shibd'] = 'Shibboleth daemon';
-//$string['log_shibboleth_trans'] = 'Shibboleth transaction';
-//$string['log_moodle_cron'] = 'Moodle cron';
+// CCLE-4345 - Moodle Authenticated Remote Command Execution (CVE-2013-3630).
+$CFG->preventexecpath = 1;
 
 // Site administration > Advanced features
 $CFG->usetags = 0;
