@@ -59,12 +59,7 @@ class mod_assign_grading_options_form extends moodleform {
         if ($instance['showquickgrading']) {
             $mform->addElement('checkbox', 'quickgrading', get_string('quickgrading', 'assign'), '', $dirtyclass);
             $mform->addHelpButton('quickgrading', 'quickgrading', 'assign');
-            // BEGIN UCLA MOD CCLE-4297
-            //$mform->setDefault('quickgrading', $instance['quickgrading']);
-
-            // Have quick grading turned on by default.
-            $mform->setDefault('quickgrading', true);
-            // END UCLA MOD CCLE-4297
+            $mform->setDefault('quickgrading', $instance['quickgrading']);
         }
 
         // Hidden params.
