@@ -200,10 +200,6 @@ class format_ucla_renderer extends format_topics_renderer {
     public function print_header() {
         global $CFG, $OUTPUT, $PAGE;
         
-        $PAGE->requires->yui_module('moodle-format_ucla-utils', 
-                'M.format_ucla.utils.init', 
-                array(array()));
-        
         // Formatting and determining information to display for these courses
         $regcoursetext = '';
         $termtext = '';
@@ -448,7 +444,6 @@ class format_ucla_renderer extends format_topics_renderer {
             $registrar_info .= get_string('reg_finalcd', 'format_ucla');
             $registrar_info .= implode(', ', $regfinalurls);
 
-            $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info'));
         }
 
         $supresscoursesummary = false;
@@ -478,13 +473,17 @@ class format_ucla_renderer extends format_topics_renderer {
                 // If there's a modified course summary, then collapse registrar descriptions.
                 $formattedregsummary = format_text($regsummary);
                 if (!empty($this->course->summary) && $this->course->summary != $courseinfo->crs_desc) {
-                    $regtogglelink = html_writer::link('#',
-                            get_string('collapsedshow', 'format_ucla'),
-                            array('class' => 'collapse-toggle'));
-                    $regsummarycontent .= html_writer::tag('div', $regtogglelink . $formattedregsummary, array('class' => 'registrar-collapsed'));
+                    $toggle = html_writer::span(
+                                html_writer::link('#',
+                                    get_string('collapsedshow', 'format_ucla'),
+                                    array('class' => 'collapse-toggle')),
+                            'collapse-toggle-container');
+                    $regsummarycontent .= html_writer::tag('div', $formattedregsummary . $toggle, array('class' => 'registrar-summary-hidden'));
+                    $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info registrar-summary-hidden'));
                 } else {
-                   $regsummarycontent .= $formattedregsummary;
-                   $supresscoursesummary = true;
+                    $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info'));
+                    $regsummarycontent .= $formattedregsummary;
+                    $supresscoursesummary = true;
                 }
                 $center_content .= html_writer::tag('div', $regsummarycontent, array('class' => 'registrar-summary'));
             }

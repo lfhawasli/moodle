@@ -202,14 +202,8 @@ $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lis
 // Emails should still be sent to users that are logged in.
 $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_loggedin'] = 'popup,email';
 
-//$string['log_apache_error'] = 'Apache error';
-//$string['log_apache_access'] = 'Apache access';
-//$string['log_apache_ssl_access'] = 'Apache SSL access';
-//$string['log_apache_ssl_error'] = 'Apache SSL error';
-//$string['log_apache_ssl_request'] = 'Apache SSL access';
-//$string['log_shibboleth_shibd'] = 'Shibboleth daemon';
-//$string['log_shibboleth_trans'] = 'Shibboleth transaction';
-//$string['log_moodle_cron'] = 'Moodle cron';
+// CCLE-4345 - Moodle Authenticated Remote Command Execution (CVE-2013-3630).
+$CFG->preventexecpath = 1;
 
 // Site administration > Advanced features
 $CFG->usetags = 0;
@@ -241,6 +235,9 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
+// Site administration > Grades > Report Settings > Grader report
+$CFG->grade_report_quickgrading = 0;
+
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
@@ -267,6 +264,9 @@ $CFG->forced_plugin_settings['page']['printheading'] = 1;
 $CFG->forced_plugin_settings['resource']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['resource']['printheading'] = 1;
 $CFG->forced_plugin_settings['resource']['display'] = 4;   // "Force Download"
+
+// Site administration > Plugins > Activity modules > Quiz
+$CFG->forced_plugin_settings['quiz']['overduehandling'] = 'autosubmit';
 
 // Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';

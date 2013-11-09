@@ -152,5 +152,16 @@ class backup_course_task extends backup_task {
 
         // Nothing to add, sections doesn't have common settings (for now)
 
+        // BEGIN UCLA MOD: CCLE-3797 - Add option (setting) during import process
+        // to hide all course sections.
+        if ($this->plan->get_mode() == backup::MODE_IMPORT) {
+            $hidesectionsetting = new backup_generic_setting('hidesections', base_setting::IS_BOOLEAN, false);
+            $hidesectionsetting->set_ui(
+                    new backup_setting_ui_checkbox($hidesectionsetting, get_string('hidesections', 'backup')));
+            $hidesectionsetting->get_ui()->set_label(get_string('hidesections', 'backup'));
+            $hidesectionsetting->set_value(false);
+            $this->add_setting($hidesectionsetting);
+        }
+        // END UCLA MOD: CCLE-3797
     }
 }

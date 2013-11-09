@@ -243,7 +243,7 @@ $string['selectacategory'] = 'Select a category';
 $string['selectacourse'] = 'Select a course';
 $string['setting_overwriteconf'] = 'Overwrite course configuration';
 // BEGIN UCLA MOD: CCLE-3797 - Hide all course sections on course restore option
-$string['hide_crs_sections'] = 'Hide course sections';
+$string['hidesections'] = 'Hide all course sections after import/restore';
 // END UCLA MOD: CCLE-3797
 $string['setting_course_fullname'] = 'Course name';
 $string['setting_course_shortname'] = 'Course short name';
@@ -256,6 +256,9 @@ $string['skipmodifdays'] = 'Skip courses not modified since';
 $string['skipmodifdayshelp'] = 'Choose to skip courses that have not been modified since a number of days';
 $string['skipmodifprev'] = 'Skip courses not modified since previous backup';
 $string['skipmodifprevhelp'] = 'Choose whether or not to skip courses that have not been modified since previous backup';
+$string['title'] = 'Title';
 $string['totalcategorysearchresults'] = 'Total categories: {$a}';
 $string['totalcoursesearchresults'] = 'Total courses: {$a}';
+$string['userinfo'] = 'Userinfo';
+$string['module'] = 'Module';
 $string['morecoursesearchresults'] = 'More than {$a} courses found, showing first {$a} results';

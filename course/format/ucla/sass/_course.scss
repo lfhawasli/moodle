@@ -22,18 +22,45 @@
     font-size: $type-font-size;
     line-height: $type-line-height;
     
-    .registrar-collapsed {
-        @extend .ccle-generic-box;
-        overflow: hidden;
+    .registrar-info.registrar-summary-hidden {
+        border-bottom: 0;
+        margin-bottom: 4px;
     }
-    .collapse-toggle {
-        width: 100%;
-        display: inline-block;
-        padding: 2px;
+    .registrar-summary-hidden {
         
-        @include box-sizing(border-box);
-        @include border-radius(6px);
+        .collapse-toggle-container {
+            border-top: 1px solid #ddd;
+            width: 100%;
+            text-align: center;
+            
+            display: inline-block;
+            
+            .collapse-toggle {
+                font-size: 1.2rem;
+                color: black;
+                position: relative;
+                top: -12px;
+                background-color: white;
+                padding: 2px 12px;
+                font-weight: bold;
+                
+                @include border-radius(2px);
+                
+                &:hover {
+                    background-color: #efefef;
+                    border: 1px solid #ddd;
+                    text-decoration: none;
+                }
+            }
+        }
+        
+        .text_to_html {
+            display: none;
+            border-top: 1px solid #ddd;
+            padding-top: 8px;
+        }
     }
+    
     // Course header
     // Contains title 
     > .headingblock {

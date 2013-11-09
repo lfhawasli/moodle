@@ -12,6 +12,7 @@ class tasites_form extends moodleform {
         extract($this->_customdata);
 
         $mform->addElement('hidden', 'courseid', $courseid);
+        $mform->setType('courseid', PARAM_INT);
 
         $formactions = array(
             'view' => array(),
@@ -73,6 +74,7 @@ class tasites_form extends moodleform {
                     block_ucla_tasites::action_naming($ta),
                     $action
                 );
+                $mform->setType(block_ucla_tasites::action_naming($ta), PARAM_ACTION);
             }
 
             if ($action == 'view') {

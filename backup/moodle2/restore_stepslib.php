@@ -1561,28 +1561,26 @@ class restore_course_legacy_files_step extends restore_execution_step {
 
 // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course restore
 class restore_course_hide_sections_step extends restore_execution_step {
-    
+
     function define_execution() {
         // Nothing to do here.
     }
-    
+
     function launch_after_restore_methods() {
         global $DB;
-        
+
         $courseid = $this->get_courseid();
-        $coursesections = $DB->get_records('course_sections', array('course' => $courseid));
-        foreach ($coursesections as $section) {
-            // Skip special section 0.
-            if ($section->section == 0) {
-                continue;
+        $coursesections = $DB->get_recordset('course_sections', array('course' => $courseid));
+        if ($coursesections->valid()) {
+            foreach ($coursesections as $section) {
+                // Skip special section 0.
+                if ($section->section == 0) {
+                    continue;
+                }
+                set_section_visible($courseid, $section->section, 0);
             }
-            $data = new StdClass();
-            $data->id = $section->id;
-            $data->course = $courseid;
-            $data->section = $section->section;
-            $data->visible = 0;
-            $DB->update_record('course_sections', $data);
         }
+        $coursesections->close();
     }
 }
 // END UCLA MOD: CCLE-3797 

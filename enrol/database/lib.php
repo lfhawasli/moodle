@@ -116,15 +116,6 @@ class enrol_database_plugin extends enrol_plugin {
             return;
         }
 
-        // START UCLA MOD: CCLE-4061 - Reimplement pre-pop enrollment
-        // See if we are using UCLA specific changes to database enrollment.
-        $overrideenroldatabase = get_config('local_ucla', 'overrideenroldatabase');
-        if ($overrideenroldatabase && !isset($this->enrollmenthelper)) {
-            $trace = new null_progress_trace();
-            $this->enrollmenthelper = new local_ucla_enrollment_helper($trace, $this);
-        }
-        // END UCLA MOD: CCLE-4061
-
         $table            = $this->get_config('remoteenroltable');
         $coursefield      = trim($this->get_config('remotecoursefield'));
         $userfield        = trim($this->get_config('remoteuserfield'));
@@ -152,6 +143,19 @@ class enrol_database_plugin extends enrol_plugin {
             debugging('Invalid $user parameter in sync_user_enrolments(), missing '.$localuserfield);
             $user = $DB->get_record('user', array('id'=>$user->id));
         }
+
+        // START UCLA MOD: CCLE-4061 - Reimplement pre-pop enrollment
+        // See if we are using UCLA specific changes to database enrollment.
+        $overrideenroldatabase = get_config('local_ucla', 'overrideenroldatabase');
+        if ($overrideenroldatabase && !isset($this->enrollmenthelper)) {
+            $trace = new null_progress_trace();
+            $this->enrollmenthelper = new local_ucla_enrollment_helper($trace, $this);
+        }
+        // Make sure user has idnumber set.
+        if (empty($user->$localuserfield)) {
+            return;
+        }
+        // END UCLA MOD: CCLE-4061
 
         // Create roles mapping.
         $allroles = get_all_roles();

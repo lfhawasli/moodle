@@ -73,8 +73,8 @@ class restore_course_task extends restore_task {
 
         // BEGIN UCLA MOD: CCLE-3797 - Add additional step in retore procedure 
         // to hide all course sections if the option was selected.
-        if ($this->get_setting_value('hide_crs_sections') == true) {
-            $this->add_step(new restore_course_hide_sections_step('hide_crs_sections'));
+        if ($this->get_setting_value('hidesections') == true) {
+            $this->add_step(new restore_course_hide_sections_step('hidesections'));
         }
         // END UCLA MOD: CCLE-3797
 
@@ -201,11 +201,11 @@ class restore_course_task extends restore_task {
 
         // BEGIN UCLA MOD: CCLE-3797 - Add option (setting) in the restore 
         // process to hide all course sections
-        $hidesectionsetting = new restore_generic_setting('hide_crs_sections', base_setting::IS_BOOLEAN, false);
+        $hidesectionsetting = new restore_generic_setting('hidesections', base_setting::IS_BOOLEAN, false);
         $hidesectionsetting->set_ui(
-                new backup_setting_ui_checkbox($hidesectionsetting, get_string('hide_crs_sections', 'backup')));
-        $hidesectionsetting->get_ui()->set_label(get_string('hide_crs_sections', 'backup'));
-        $hidesectionsetting->set_value(true);
+                new backup_setting_ui_checkbox($hidesectionsetting, get_string('hidesections', 'backup')));
+        $hidesectionsetting->get_ui()->set_label(get_string('hidesections', 'backup'));
+        $hidesectionsetting->set_value(false);
         $this->add_setting($hidesectionsetting);
         // END UCLA MOD: CCLE-3797
     }

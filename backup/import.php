@@ -90,6 +90,12 @@ if ($backup->get_stage() == backup_ui::STAGE_CONFIRMATION) {
 
 // If it's the final stage process the import
 if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
+
+    // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
+    // Determine if sections will be hidden.
+    $hidesections = $backup->get_setting_value('hidesections');
+    // END UCLA MOD: CCLE-3797
+
     // First execute the backup
     $backup->execute();
     $backup->destroy();
@@ -113,31 +119,62 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     // Mark the UI finished.
     $rc->finish_ui();
     // Execute prechecks
+    $warnings = false;
     if (!$rc->execute_precheck()) {
         $precheckresults = $rc->get_precheck_results();
-        if (is_array($precheckresults) && !empty($precheckresults['errors'])) {
-            fulldelete($tempdestination);
+        if (is_array($precheckresults)) {
+            if (!empty($precheckresults['errors'])) { // If errors are found, terminate the import.
+                fulldelete($tempdestination);
 
-            echo $OUTPUT->header();
-            echo $renderer->precheck_notices($precheckresults);
-            echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id'=>$course->id)));
-            echo $OUTPUT->footer();
-            die();
+                echo $OUTPUT->header();
+                echo $renderer->precheck_notices($precheckresults);
+                echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id'=>$course->id)));
+                echo $OUTPUT->footer();
+                die();
+            }
+            if (!empty($precheckresults['warnings'])) { // If warnings are found, go ahead but display warnings later.
+                $warnings = $precheckresults['warnings'];
+            }
         }
-    } else {
-        if ($restoretarget == backup::TARGET_CURRENT_DELETING || $restoretarget == backup::TARGET_EXISTING_DELETING) {
-            restore_dbops::delete_course_content($course->id);
-        }
-        // Execute the restore
-        $rc->execute_plan();
     }
+    if ($restoretarget == backup::TARGET_CURRENT_DELETING || $restoretarget == backup::TARGET_EXISTING_DELETING) {
+        restore_dbops::delete_course_content($course->id);
+    }
+
+    // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
+    // If the hidesections option was selected during backup,
+    // then add a step to hide sections during course restore.
+    if ($hidesections) {
+        $tasks = $rc->get_plan()->get_tasks();
+        foreach ($tasks as $task) {
+            $tasktype = get_class($task);
+            if ($tasktype == 'Restore_PublicPrivate_Course_Task' || $tasktype == 'restore_course_task') {
+                $task->add_step(new restore_course_hide_sections_step('hidesections'));
+                break;
+            }
+        }          
+    }
+    // END UCLA MOD: CCLE-3797     
+
+    // Execute the restore.
+    $rc->execute_plan();
 
     // Delete the temp directory now
     fulldelete($tempdestination);
 
     // Display a notification and a continue button
     echo $OUTPUT->header();
-    echo $OUTPUT->notification(get_string('importsuccess', 'backup'),'notifysuccess');
+    if ($warnings) {
+        echo $OUTPUT->box_start();
+        echo $OUTPUT->notification(get_string('warning'), 'notifywarning');
+        echo html_writer::start_tag('ul', array('class'=>'list'));
+        foreach ($warnings as $warning) {
+            echo html_writer::tag('li', $warning);
+        }
+        echo html_writer::end_tag('ul');
+        echo $OUTPUT->box_end();
+    }
+    echo $OUTPUT->notification(get_string('importsuccess', 'backup'), 'notifysuccess');
     echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id'=>$course->id)));
     echo $OUTPUT->footer();
 
