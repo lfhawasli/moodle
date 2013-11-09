@@ -8,6 +8,11 @@
     overflow: hidden;
 }
 
+.uclashared-course-logo > img {
+    max-width: 225px;
+    max-height: 80px;
+}
+
 .uclashared-course-logo-divider {
     display: inline-block;
     margin-left: 10px;
