@@ -90,7 +90,7 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
 
     // Add roleid, timeexpiration, added foreign keys and indexes and fixed
     // some default values.
-    if ($oldversion < 2013030100) {
+    if ($oldversion < 2012051901) {
         $table = new xmldb_table('enrol_invitation');
 
         // Add fields.
@@ -163,12 +163,12 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         }
 
         // Invitation savepoint reached.
-        upgrade_plugin_savepoint(true, 2013030100, 'enrol', 'invitation');
+        upgrade_plugin_savepoint(true, 2012051901, 'enrol', 'invitation');
     }
 
     // Rename creatorid to inviterid & add subject, message, notify_inviter,
     // show_from_email columns.
-    if ($oldversion < 2013030101) {
+    if ($oldversion < 2012060300) {
         $table = new xmldb_table('enrol_invitation');
 
         // 1) Rename creatorid to inviterid.
@@ -201,11 +201,11 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         }
 
         // Invitation savepoint reached.
-        upgrade_plugin_savepoint(true, 2013030101, 'enrol', 'invitation');
+        upgrade_plugin_savepoint(true, 2012060300, 'enrol', 'invitation');
     }
 
     // Fix role_assignments to include enrol_invitation.
-    if ($oldversion < 2013030102) {
+    if ($oldversion < 2012071303) {
         /**
          * Go through each accepted invite and look for an entry in
          * role_assignments with component set to "" and userid, roleid, and
@@ -256,7 +256,7 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
         }
 
         // Invitation savepoint reached.
-        upgrade_plugin_savepoint(true, 2013030102, 'enrol', 'invitation');
+        upgrade_plugin_savepoint(true, 2012071303, 'enrol', 'invitation');
     }
 
     // Add daysexpire column.
