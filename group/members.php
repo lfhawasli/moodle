@@ -109,38 +109,40 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('adduserstogroup', 'group').": $groupname", 3);
 
-/**
- * Alert that public/private group cannot be edited.
- *
- * @author ebollens
- * @version 20110719
- */
-if($publicprivate_course->is_group($group)) {
-    echo $OUTPUT->notification(get_string('publicprivatecannotremove','local_publicprivate'));
-    echo $OUTPUT->continue_button('index.php?id='.$course->id);
-    echo $OUTPUT->footer();
-    die;
+// Store the rows we want to display in the group info.
+$groupinforow = array();
+
+// Check if there is a picture to display.
+if (!empty($group->picture)) {
+    $picturecell = new html_table_cell();
+    $picturecell->attributes['class'] = 'left side picture';
+    $picturecell->text = print_group_picture($group, $course->id, true, true, false);
+    $groupinforow[] = $picturecell;
 }
 
-/// Print group info -  TODO: remove tables for layout here
-$groupinfotable = new html_table();
-$groupinfotable->attributes['class'] = 'groupinfobox';
-$picturecell = new html_table_cell();
-$picturecell->attributes['class'] = 'left side picture';
-$picturecell->text = print_group_picture($group, $course->id, true, true, false);
-
-$contentcell = new html_table_cell();
-$contentcell->attributes['class'] = 'content';
-
+// Check if there is a description to display.
 $group->description = file_rewrite_pluginfile_urls($group->description, 'pluginfile.php', $context->id, 'group', 'description', $group->id);
-if (!isset($group->descriptionformat)) {
-    $group->descriptionformat = FORMAT_MOODLE;
+if (!empty($group->description)) {
+    if (!isset($group->descriptionformat)) {
+        $group->descriptionformat = FORMAT_MOODLE;
+    }
+
+    $options = new stdClass;
+    $options->overflowdiv = true;
+
+    $contentcell = new html_table_cell();
+    $contentcell->attributes['class'] = 'content';
+    $contentcell->text = format_text($group->description, $group->descriptionformat, $options);
+    $groupinforow[] = $contentcell;
 }
-$options = new stdClass;
-$options->overflowdiv = true;
-$contentcell->text = format_text($group->description, $group->descriptionformat, $options);
-$groupinfotable->data[] = new html_table_row(array($picturecell, $contentcell));
-echo html_writer::table($groupinfotable);
+
+// Check if we have something to show.
+if (!empty($groupinforow)) {
+    $groupinfotable = new html_table();
+    $groupinfotable->attributes['class'] = 'groupinfobox';
+    $groupinfotable->data[] = new html_table_row($groupinforow);
+    echo html_writer::table($groupinfotable);
+}
 
 /// Print the editing form
 ?>
