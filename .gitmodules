@@ -16,3 +16,6 @@
 [submodule "theme/uclashared/package/bootstrap"]
 	path = theme/uclashared/package/bootstrap
 	url = git@github.com:jlong/sass-twitter-bootstrap.git
+[submodule "admin/tool/mergeusers"]
+	path = admin/tool/mergeusers
+	url = https://github.com/ndunand/moodle-mergeusers.git
