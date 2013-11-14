@@ -312,8 +312,10 @@ echo $OUTPUT->heading($strgradeedit);
 
 echo $OUTPUT->box_start();
 
-// START UCLA MOD: CCLE-4293 - Display a Message when a User Clicks "Turn editing on" 
-echo $OUTPUT->notification(get_string('overridewarning', 'local_ucla'), 'notifymessage');
+// START UCLA MOD: CCLE-4293 - Display a Message when a User Clicks "Turn editing on"
+if ($grade_item->itemtype != 'manual') {
+    echo $OUTPUT->notification(get_string('overridewarning', 'local_ucla'), 'notifyproblem');
+}
 // END UCLA MOD: CCLE-4293
 
 // Form if in edit or add modes
