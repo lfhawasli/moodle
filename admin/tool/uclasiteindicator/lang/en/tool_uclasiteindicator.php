@@ -23,7 +23,7 @@ $string['r_test'] = 'Test';
 
 // Site descriptions
 $string['site_instruction'] = 'Instruction (degree-related)';
-$string['site_instruction_desc'] = 'Instructional sites that supplement or support work being done toward the completion of a UCLA degree.';
+$string['site_instruction_desc'] = 'Instructional sites that supplement or support work being done toward the completion of a UCLA degree. Provides syllabus manager.';
 $string['site_instruction_noniei'] = 'Instruction (non-degree-related)';
 $string['site_instruction_noniei_desc'] = 'Instructional sites that do not contribute toward the completion of a UCLA degree.';
 $string['site_non_instruction'] = 'Other';
