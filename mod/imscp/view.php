@@ -63,6 +63,10 @@ $PAGE->requires->string_for_js('show', 'moodle');
 //TODO: find some better way to disable blocks and minimise footer - pagetype just for this does not seem like a good solution
 //$PAGE->set_pagelayout('maxcontent');
 
+// START UCLA MOD: CCLE-4357 - Remove blocks from displaying for IMS CP modules
+$PAGE->set_pagelayout('base');
+// END UCLA MOD: CCLE-4357
+
 $PAGE->set_title($course->shortname.': '.$imscp->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_activity_record($imscp);
