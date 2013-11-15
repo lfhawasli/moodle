@@ -132,12 +132,7 @@ if ($justshowsuccessmessage) {
 }
 
 // Before loading modinfo, make sure section information is correct.
-$retval = local_ucla_course_section_fixer::fix_problems($course);
-if ($retval['added'] > 0 || $retval['deleted'] > 0 || $retval['updated'] > 0) {
-    debugging(sprintf("local_ucla_course_section_fixer::fix_problems: " .
-        "added %d | deleted %d | updated %d", $retval['added'],
-            $retval['deleted'], $retval['updated']));
-}
+local_ucla_course_section_fixer::fix_problems($course);
 
 $modinfo = get_fast_modinfo($course);
 
@@ -555,7 +550,6 @@ $PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery.tablednd_0_5.js');
 $PAGE->requires->js('/blocks/ucla_modify_coursemenu/modify_coursemenu.js');
 
 $PAGE->requires->string_for_js('section0name', $format_compstr);
-$PAGE->requires->string_for_js('section0name', $format_compstr);
 $PAGE->requires->string_for_js('newsection', 'block_ucla_modify_coursemenu');
 $PAGE->requires->string_for_js('new_sectnum', 'block_ucla_modify_coursemenu');
 
@@ -593,20 +587,21 @@ set_editing_mode_button($courseviewurl);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($restr, 2, 'headingblock');
 
-//// Give alert if there are more sections than there are numsections.
-//if (local_ucla_course_section_fixer::detect_numsections($course)) {
-//
-//    $message = get_string('alertnumsections', 'block_ucla_modify_coursemenu');
-//    $redirecturl = $PAGE->url;
-//    $redirecturl->param('adjustnum', true);
-//    $continue = new single_button($redirecturl, get_string('buttonnumsections', 'block_ucla_modify_coursemenu'));
-//
-//    $output = $OUTPUT->box_start('generalbox', 'notice');
-//    $output .= html_writer::tag('p', $message);
-//    $output .= html_writer::tag('div', $OUTPUT->render($continue), array('class' => 'buttons'));
-//    $output .= $OUTPUT->box_end();
-//    echo $output;
-//}
+// Give alert if there are more sections than there are numsections.
+$extrasections = local_ucla_course_section_fixer::detect_numsections($course);
+if ($extrasections !== false) {
+    $sectionlist = html_writer::alist($extrasections);
+    $message = get_string('alertnumsections', 'block_ucla_modify_coursemenu', $sectionlist);
+    $redirecturl = $PAGE->url;
+    $redirecturl->param('adjustnum', true);
+    $continue = new single_button($redirecturl, get_string('buttonnumsections', 'block_ucla_modify_coursemenu'));
+
+    $output = $OUTPUT->box_start('generalbox', 'notice');
+    $output .= html_writer::tag('p', $message);
+    $output .= html_writer::tag('div', $OUTPUT->render($continue), array('class' => 'buttons'));
+    $output .= $OUTPUT->box_end();
+    echo $output;
+}
 
 // Any messages that need displaying?
 flash_display();

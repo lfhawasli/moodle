@@ -66,12 +66,7 @@ foreach ($sections as $section) {
 }
 
 // Before loading modinfo, make sure section information is correct.
-$retval = local_ucla_course_section_fixer::fix_problems($course);
-if ($retval['added'] > 0 || $retval['deleted'] > 0 || $retval['updated'] > 0) {
-    debugging(sprintf("local_ucla_course_section_fixer::fix_problems: " .
-        "added %d | deleted %d | updated %d", $retval['added'],
-            $retval['deleted'], $retval['updated']));
-}
+local_ucla_course_section_fixer::fix_problems($course);
 
 $modinfo = get_fast_modinfo($course);
 $mods = $modinfo->get_cms();

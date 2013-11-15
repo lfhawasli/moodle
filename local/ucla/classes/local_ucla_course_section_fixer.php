@@ -106,10 +106,11 @@ class local_ucla_course_section_fixer {
      *                              numsections value to match the number of
      *                              sections in the database.
      *
-     * @return boolean              If $adjustnum is false, then will return
-     *                              true if numsections is less than the number
-     *                              of sections in the database. Otherwise
-     *                              returns false.
+     * @return boolean|array        If $adjustnum is false and if numsections is
+     *                              less than the number of sections in the
+     *                              database, then will return an array of
+     *                              sections that exist, but are not shown.
+     *                              Otherwise returns false.
      *                              If $adjustnum is true, then will return
      *                              false on an error, otherwise returns true.
      */
@@ -138,8 +139,18 @@ class local_ucla_course_section_fixer {
                 course_get_format($course)->update_course_format_options($data);
                 return true;
             } else {
-                // Just report it.
-                return true;
+                // Return an array of sections that are not being displayed.
+                $retval = array();
+                $sections = $DB->get_records_select('course_sections',
+                        'course=:course AND section>:numsection',
+                        array('course' => $course->id, 'numsection' => $numsections),
+                        'section', 'section,name');                
+                foreach ($sections as $section) {
+                    if ($section->section > $numsections) {
+                        $retval[] = $section->name;
+                    }
+                }
+                return $retval;
             }
         }
 
@@ -205,11 +216,11 @@ class local_ucla_course_section_fixer {
             if ($section->section > $numsections) {
                 if (empty($section->sequence) && empty($section->summary)) {
                     // Make sure section name is also something not user
-                    // modified. "Week" is something the UCLA format adds and
-                    // "New section" is the default name the Modify sections
+                    // modified. "Week <n>" is something the UCLA format adds
+                    // and "New section" is the default name the Modify sections
                     // tool uses.
                     if (empty($section->name) ||
-                            strpos($section->name, 'Week ') === 0 ||
+                            preg_match('/^Week \d+$/', $section->name) === 1 ||
                             $section->name === 'New section') {
                         // Safe to delete.
                         $DB->delete_records('course_sections',
