@@ -43,9 +43,11 @@ if (!empty($unrecognized) && !ucla_validator('term', $unrecognized[0])) {
 }
 
 if (empty($unrecognized)) {
-    // run ucla cron for every term in ucla_request_classes
-    $terms = $DB->get_records_menu('ucla_request_classes', null, '', 'id, term');
-    $terms = array_unique((array) $terms);
+    // Run ucla cron for every term in ucla_request_classes.
+    $sql = "SELECT  DISTINCT term AS id, term
+            FROM    {ucla_request_classes}
+            WHERE   1=1";
+    $terms = $DB->get_records_sql_menu($sql);
 } else {
     $terms = array($unrecognized[0]);
 }
