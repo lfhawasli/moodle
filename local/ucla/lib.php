@@ -11,6 +11,9 @@ require_once($CFG->dirroot.'/lib/accesslib.php');
 // Contains our external-link generator thing
 require_once($CFG->dirroot.'/local/ucla/outputcomponents.php');
 
+// Contains public/private lib
+require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
+
 /**
  *  @deprecated
  *  This will attempt to access this file from the web.
@@ -1653,4 +1656,68 @@ function format_displayname($displayname) {
     }
 
     return $retval;
+}
+
+/**
+ * Print a grouping menu for filtering by grouping in grader report.
+ * 
+ * @category group
+ * @param stdClass $course
+ * @param mixed $urlroot
+ * @param int $activegrouping groupingid that is active (NULL for none)
+ * @return string
+ */
+function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
+    global $OUTPUT, $DB;
+
+    // Check that user has the capability to view all groups.
+    $context = context_course::instance($course->id);
+    if(!has_capability('moodle/site:accessallgroups', $context)) {
+        return '';
+    }
+
+    // Fetch groupings and for select menu.
+    $select = 'courseid = ?';
+    $params = array($course->id);
+    $sort = 'id';
+    $fields = 'id, name';
+    $groupingsmenu = $DB->get_records_select_menu('groupings', $select, $params, $sort, $fields);
+
+    if ($groupingsmenu) {
+
+        // Change the "Private Course Material" grouping to show as "All" if it exists.
+        $publicprivatecourse = new PublicPrivate_Course($course);
+        $pubprivgroupingid = $publicprivatecourse->get_grouping();
+        if($pubprivgroupingid && isset($groupingsmenu[$pubprivgroupingid])) {
+            $groupingsmenu[$pubprivgroupingid] = get_string('all_groupings', 'local_ucla');
+        }
+
+        // Set the active grouping to be the course's default grouping if no 
+        // active grouping was supplied.  
+        if (!isset($activegrouping) && isset($course->defaultgroupingid)
+            && isset($groupingsmenu[$course->defaultgroupingid])) {
+            
+            $activegrouping = $course->defaultgroupingid;
+        }
+    
+        // Build a string with the grouping being viewed,
+        // or a select with all available groupings.
+        $groupinglabel = get_string('view_grouping', 'local_ucla');
+
+        if (count($groupingsmenu) == 1) {
+            $groupingname = reset($groupingsmenu);
+            $output = $groupinglabel.': '.$groupingname;
+        } else {
+            $select = new single_select(new moodle_url($urlroot), 'grouping', $groupingsmenu, $activegrouping, null, 'selectgroup');
+            $select->label = $groupinglabel.': ';
+            $output = $OUTPUT->render($select);
+        }
+
+        $output = '<div class="groupselector">'.$output.'</div>';
+
+        return $output;
+    } else {
+        // Return an empty string if there are no groupings.
+        return '';
+    }
 }

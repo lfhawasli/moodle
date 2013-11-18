@@ -190,3 +190,8 @@ $string['overridewarning'] = 'It is preferable to change this grade within the A
 Click on Item name to grade within the Activity.<br />
 <br />
 If you choose to override here, you will no longer be able to change the grade within the Activity.';
+
+// CCLE-4295 Add groups filter to grader report
+$string['view_grouping'] = 'View grouping';
+$string['all_groupings'] = 'All';
+

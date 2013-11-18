@@ -450,6 +450,9 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_error'] 
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_request'] = '/var/log/httpd/ssl_request_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
 
+// CCLE-4295 - Add Grouping Filter for the Grader Report
+$CFG->grader_report_grouping_filter = 1;
+
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
 
