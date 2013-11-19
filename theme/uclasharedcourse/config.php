@@ -21,5 +21,6 @@ $THEME->sheets = array(
     'responsive',
 );
 
+$THEME->csspostprocess = 'uclashared_process_css';
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->enable_dock = true;

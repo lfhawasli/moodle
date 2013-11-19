@@ -196,4 +196,36 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
         
         return $out;
     }
+
+    /**
+     * Adds the file picker for theme logos to a mform.
+     * 
+     * @param MoodleQuickForm $mform where filepicker will be added
+     * @param int $courseid
+     * @param int $contextid
+     * @return array of items to display in the picker.
+     */
+    public function edit_form_filepicker(&$mform, $courseid, $contextid) {
+        
+        // Add a file manager
+        $mform->addElement('filemanager', 'logo_attachments', get_string('additional_logos', 'theme_uclasharedcourse'),
+                null, $this->course_logo_config());
+
+        // Show logo guide
+        $pix_url = $this->pix_url('guide', 'theme');
+        $img = html_writer::empty_tag('img', array('src' => $pix_url));
+        $mform->addElement('static', 'description', '', $img);
+
+        // Check if we already have images
+        $draftitemid = file_get_submitted_draft_itemid('logo_attachments');
+
+        file_prepare_draft_area($draftitemid,
+                $contextid,
+                'theme_uclasharedcourse', 'course_logos', $courseid,
+                $this->course_logo_config());
+
+        $data['logo_attachments'] = $draftitemid;
+
+        return $data;
+    }
 }
