@@ -179,8 +179,6 @@ function display_copyright_status_contents($courseid, $filter) {
     $PAGE->set_url($url, array('courseid' => $courseid));   // get copyright data
     $PAGE->requires->js('/theme/uclashared/javascript/jquery-1.5.2.min.js');
     $PAGE->requires->js('/blocks/ucla_copyright_status/view.js');
-    $PAGE->requires->string_for_js('changes_saved',
-            'block_ucla_copyright_status');
 
     // get license types
     $licensemanager = new license_manager();
@@ -190,15 +188,6 @@ function display_copyright_status_contents($courseid, $filter) {
     foreach ($licenses as $license) {
         $license_options[$license->shortname] = $license->fullname;
     }
-
-    // start output screen
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('pluginname', 'block_ucla_copyright_status'),
-            2, 'headingblock');
-    // if javascript disabled
-    echo html_writer::tag('noscript',
-            get_string('javascriptdisabled', 'block_ucla_copyright_status'),
-            array('id' => 'block-ucla-copyright-status-noscript'));
 
     // display statistics 
     $all_copyrights = get_files_copyright_status_by_course($courseid);
@@ -311,14 +300,16 @@ function display_copyright_status_contents($courseid, $filter) {
     // end display copyright status list
     // display save changes button, hidden field data and submit form
     if (count($course_copyright_status_list) > 0) {
-        echo html_writer::tag('div',
-                html_writer::empty_tag('input',
-                        array('id' => 'block_ucla_copyright_status_btn1',
+        $savebtn = html_writer::tag('button', get_string('savechanges'),
+                        array('class' => 'btn btn-primary',
                     'name' => 'action_edit',
-                    'value' => get_string('save_button',
-                            'block_ucla_copyright_status'),
-                    'type' => 'submit')),
-                array('class' => 'block-ucla-copyright-status-save-button'));
+                    'type' => 'submit'));
+        $cancelbtn = html_writer::tag('button', get_string('cancel'),
+                        array('class' => 'btn-cancel',
+                    'name' => 'action_cancel',
+                    'type' => 'submit'));
+        echo html_writer::tag('div', $savebtn . $cancelbtn,
+                array('class' => 'mform'));
     }
     // end display save changes button
     echo html_writer::end_tag('form');
