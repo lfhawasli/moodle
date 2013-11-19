@@ -132,7 +132,7 @@ class course_section_fixer_test extends advanced_testcase {
 
         // Make sure sections exists.
         $numsections = course_get_format($course)->get_course()->numsections;
-        course_create_sections_if_missing($course, $numsections);
+        course_create_sections_if_missing($course, range(0, $numsections));
 
         // Course modules with datagenerators.
         $mods = array('mod_assign', 'mod_data', 'mod_forum', 'mod_label',
@@ -143,14 +143,14 @@ class course_section_fixer_test extends advanced_testcase {
             $nummods = rand(1, 5);
             for ($i=1;$i<=$nummods;$i++) {
                 // Choose a random section to add module.
-                $sectionnum = rand(1, $numsections);
+                $sectionnum = rand(0, $numsections);
                 $generator->create_instance(array('course'=>$course->id),
                         array('section' => $sectionnum));
             }
         }
 
         // Warm up the course caches.
-        get_fast_modinfo($course);
+        rebuild_course_cache($course->id);
 
         return $DB->get_record('course', array('id' => $course->id));
     }
@@ -338,10 +338,10 @@ class course_section_fixer_test extends advanced_testcase {
 
         $before = course_get_format($course)->get_course()->numsections;
 
-        // Add a section without increasing numsections
+        // Add a section without increasing numsections.
         $this->add_section($course);
         $result = local_ucla_course_section_fixer::detect_numsections($course);
-        $this->assertTrue($result);
+        $this->assertEquals(1, count($result));
 
         // Now see if it will adjust numsections.
         $result = local_ucla_course_section_fixer::detect_numsections($course, true);
@@ -418,6 +418,14 @@ class course_section_fixer_test extends advanced_testcase {
         $result = local_ucla_course_section_fixer::handle_extra_sections($course);
         $this->assertEquals(0, $result['added']);
         $this->assertGreaterThan(0, $result['deleted']);
+        $this->assertEquals(0, $result['updated']);
+
+        // Add section above numsection with name set to "Week 10 Resources".
+        $section = array('name' => 'Week 10 Resources');
+        $this->add_section($course, $section);
+        $result = local_ucla_course_section_fixer::handle_extra_sections($course);
+        $this->assertEquals(0, $result['added']);
+        $this->assertEquals(0, $result['deleted']);
         $this->assertEquals(0, $result['updated']);
 
         // Add section above numsection with name set to "New section".
