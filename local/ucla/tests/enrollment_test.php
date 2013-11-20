@@ -188,21 +188,6 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
     }
 
     /**
-     * Returns an array to be used in testing createfinduser's updating process.
-     *
-     * @return array    Some combo of firstname, lastname, and email.
-     */
-    public function diff_conditions_provider() {
-        $conditions = array('firstname', 'lastname', 'email');
-        $retval = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')->power_set($conditions, 0);
-        foreach ($retval as $index => $value) {
-            $retval[$index] = array($value);
-        }
-        return $retval;
-    }
-
-    /**
      * Drops the table that was created by create_enroll2_table().
      */
     protected function drop_enroll2_table() {
@@ -250,6 +235,42 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
          *  [storedprocedure] => [term] => [srs] => [array of results]
          */
         @$retval = $this->mockregdata[$sp][$term][$srs];
+        return $retval;
+    }
+
+    /**
+     * Returns an array to be used in testing createfinduser's updating process.
+     *
+     * @return array    Some combo of firstname, lastname, and email.
+     */
+    public function provider_diff_conditions() {
+        $conditions = array('firstname', 'lastname', 'email');
+        $retval = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')->power_set($conditions, 0);
+        foreach ($retval as $index => $value) {
+            $retval[$index] = array($value);
+        }
+        return $retval;
+    }
+
+    /**
+     * Returns an array to be used in testing get_preventfullunenrol()'s test
+     * cases.
+     *
+     * @return array    .
+     */
+    public function provider_preventfullunenrol() {
+        $retval = array();
+        // Array keys: $iscancelled, $enrollment, $singlecourse, $expectedresult.
+        $retval[] = array(false, false, false, true);
+        $retval[] = array(false, true, false, false);
+        $retval[] = array(false, false, true, false);
+        $retval[] = array(false, true, true, false);
+        $retval[] = array(true, false, false, false);
+        $retval[] = array(true, true, false, false);
+        $retval[] = array(true, false, true, false);
+        $retval[] = array(true, true, true, false);
+
         return $retval;
     }
 
@@ -567,7 +588,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
      * information is out of date according to the externaldb and user has not
      * logged in for a while.
      *
-     * @dataProvider diff_conditions_provider
+     * @dataProvider provider_diff_conditions
      */
     public function test_createorfinduser_update_needed(array $diffconditions) {
         global $DB;
@@ -649,7 +670,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
      * Make sure that createorfinduser does not update a user's information
      * even if information is out of date according to the externaldb.
      *
-     * @dataProvider diff_conditions_provider
+     * @dataProvider provider_diff_conditions
      */
     public function test_createorfinduser_update_notneeded(array $diffconditions) {
         // Set user's last access time to some recent time, before
@@ -855,6 +876,96 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
         $enrol->sync_enrolments($this->trace, array('13S'));
         $result = $this->is_username_enrolled($courseid, $instructor->username);
         $this->assertTrue($result);
+    }
+
+
+    /**
+     * Test sync_enrolments does not drop the entire roster if no registrar data
+     * is returned.
+     */
+    public function test_enrol_database_plugin_sync_enrolments_empty_regdata() {
+        global $DB;
+        // Add mocked enrollment helper.
+        $enrol = enrol_get_plugin('database');
+        $enrol->enrollmenthelper = $this->mockenrollmenthelper;
+
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array('term' => '13S',
+                                     'subj_area' => 'MATH',
+                                     'division' => 'PS'));
+        $course = array_pop($class);
+        $term = $course->term;
+        $srs = $course->srs;
+        $courseid = $course->courseid;
+
+        $courseusernames = array();
+
+        // Create enrollment records, first for instructors. Let system find
+        // Instructor, but create the TA.
+        $instructor = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user(array('idnumber' => '123456789',
+                                  'username' => 'instructor@ucla.edu'));
+        $courseusernames[] = $instructor->username;
+        $ta = new stdClass();
+        $ta->firstname = 'Joe';
+        $ta->lastname = 'Bruin';
+        $ta->username = 'ta@ucla.edu';
+        $ta->email = 'ta@ucla.edu';
+        $ta->idnumber = '987654321';
+        $courseusernames[] = $ta->username;
+
+        $reginstructors = array();
+        $reginstructors[] = $this->create_ccle_courseinstructorsget_entry(
+                    $term, $srs, '01', $instructor);
+        $reginstructors[] = $this->create_ccle_courseinstructorsget_entry(
+                    $term, $srs, '02', $ta);
+        $this->set_mockregdata('ccle_courseinstructorsget', $term, $srs, $reginstructors);
+
+        // Create student enrollment records.
+        $students[0] = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')->create_user();
+        $students[1] = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')->create_user();
+        $students[2] = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')->create_user();
+        $regstudents= array();
+        foreach ($students as $index => $student) {
+            $regstudents[$index] = $this->create_ccle_roster_class_entry($term, $srs, 'E', $student);
+            $courseusernames[] = $student->username;
+        }
+        $this->set_mockregdata('ccle_roster_class', $term, $srs, $regstudents);
+
+        // Run sync_enrolments and all users should be enrolled.
+        $enrol->sync_enrolments($this->trace, array('13S'));
+        foreach ($courseusernames as $username) {
+            $result = $this->is_username_enrolled($courseid, $username);
+            $this->assertTrue($result);
+        }
+
+        // Now clear registrar data and rerun sync.
+        $this->set_mockregdata('ccle_courseinstructorsget', $term, $srs, array());
+        $this->set_mockregdata('ccle_roster_class', $term, $srs, array());
+        $enrol->sync_enrolments($this->trace, array('13S'));
+
+        // Make sure there were no enrollments dropped.
+        foreach ($courseusernames as $username) {
+            $result = $this->is_username_enrolled($courseid, $username);
+            $this->assertTrue($result);
+        }
+
+        // Mark the course as cancelled and then make sure that enrollment is
+        // then dropped.
+        $record = $DB->get_record('ucla_reg_classinfo',
+                array('term' => $term, 'srs' => $srs));
+        $record->enrolstat = 'X';
+        $DB->update_record('ucla_reg_classinfo', $record);
+        $enrol->sync_enrolments($this->trace, array('13S'));
+        foreach ($courseusernames as $username) {
+            $result = $this->is_username_enrolled($courseid, $username);
+            $this->assertFalse($result);
+        }
     }
 
     /**
@@ -1080,6 +1191,79 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
                         $enrollment['role']);
                 $this->assertEquals($enrollment['username'], $supervisinginstructor->username);
             }
+        }
+    }
+
+    /**
+     * Make sure that get_preventfullunenrol properly handles the different use
+     * cases.
+     *
+     * @dataProvider provider_preventfullunenrol
+     *
+     * @param boolean $iscancelled
+     * @param boolean $enrollment
+     * @param boolean $singlecourse
+     * @param boolean $expectedresult
+     */
+    public function test_get_preventfullunenrol($iscancelled, $enrollment, $singlecourse, $expectedresult) {
+        global $DB;
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')->create_class(array());
+        $course = array_pop($class);
+        $term = $course->term;
+        $srs = $course->srs;
+        $courseid = $course->courseid;
+
+        if ($iscancelled) {
+            $record = $DB->get_record('ucla_reg_classinfo',
+                    array('term' => $term, 'srs' => $srs));
+            $record->enrolstat = 'X';
+            $DB->update_record('ucla_reg_classinfo', $record);
+        }
+
+        $courseobj = new stdClass();
+        $courseobj->id = $courseid;
+
+        $result = $this->mockenrollmenthelper->get_preventfullunenrol($courseobj, $enrollment, $singlecourse);
+        $this->assertEquals($expectedresult, $result);
+    }
+
+    /**
+     * Make sure that get_preventfullunenrol properly handles the different use
+     * cases for a crosslisted course.
+     */
+    public function test_get_preventfullunenrol_crosslisted() {
+        global $DB;
+
+        // Create crosslisted course with 2 sections.
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')->create_class(array(array(), array()));
+
+        $firstentry = true;
+        $expectedresult = true;
+        foreach ($class as $course) {
+            if ($firstentry) {
+                $firstentry = false;
+            } else {
+                // On second run, all sections will now be marked as cancelled.
+                $expectedresult = false;
+            }
+
+            $term = $course->term;
+            $srs = $course->srs;
+            $courseid = $course->courseid;
+
+            // Cancel given crosslist section.
+            $record = $DB->get_record('ucla_reg_classinfo',
+                    array('term' => $term, 'srs' => $srs));
+            $record->enrolstat = 'X';
+            $DB->update_record('ucla_reg_classinfo', $record);
+
+            $courseobj = new stdClass();
+            $courseobj->id = $courseid;
+
+            $result = $this->mockenrollmenthelper->get_preventfullunenrol($courseobj, false, false);
+            $this->assertEquals($expectedresult, $result);
         }
     }
 

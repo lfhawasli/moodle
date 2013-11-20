@@ -585,6 +585,8 @@ class enrol_database_plugin extends enrol_plugin {
             //if ($rs = $extdb->Execute($sql)) {
             if ($overrideenroldatabase) {
                 $requested_roles = $this->enrollmenthelper->get_requested_roles($course);
+                
+                $preventfullunenrol = $this->enrollmenthelper->get_preventfullunenrol($course, $requested_roles, $onecourse);
             } else if ($rs = $extdb->Execute($sql)) {
             // END UCLA MOD: CCLE-4061
                 if (!$rs->EOF) {

@@ -586,6 +586,41 @@ class local_ucla_enrollment_helper {
     }
 
     /**
+     * Check if it is safe to do a full unenrollment for the course.
+     *
+     * Returns true if course is not cancelled, $requestedroles is empty, and we
+     * are not processing just 1 course.
+     * 
+     * See "CCLE-4354 - All enrollment is dropped if can connect to SRDB, but  
+     * get no data returned".
+     * 
+     * @param object $course        Database record.
+     * @param array $requestedroles Variable from sync_enrolments().
+     * @param null|int $onecourse   Parameter from sync_enrolments().
+     * 
+     * @return boolean
+     */
+    public function get_preventfullunenrol($course, $requestedroles, $onecourse) {
+        global $DB;
+        $retval = false;
+
+        // Check if no registrar data is returned and we are not not processing
+        // a single course.
+        if (empty($requestedroles) && empty($onecourse)) {
+            // Check if course is not cancelled. If only consider a course to be
+            // cancelled if all its sections are cancelled.
+            $sql = "SELECT  urc.id
+                    FROM    {ucla_request_classes} urc
+                    JOIN    {ucla_reg_classinfo} urci ON (urci.term=urc.term AND urci.srs=urc.srs)
+                    WHERE   urc.courseid=:courseid AND
+                            urci.enrolstat!='X'";
+            return $DB->record_exists_sql($sql, array('courseid' => $course->id));
+        }
+
+        return $retval;
+    }
+
+    /**
      * Returns mapping of userid to roleid enrollments for given course.
      *
      * Since returned mapping needs to have a userid, will create users who
