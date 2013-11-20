@@ -19,3 +19,6 @@
 [submodule "admin/tool/mergeusers"]
 	path = admin/tool/mergeusers
 	url = https://github.com/ndunand/moodle-mergeusers.git
+[submodule "report/editdates"]
+	path = report/editdates
+	url = git://github.com/ccle/moodle-report_editdates.git
