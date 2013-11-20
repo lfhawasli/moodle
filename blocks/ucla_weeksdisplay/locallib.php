@@ -6,13 +6,14 @@
 class ucla_session {
     
     private $_session;          // An array of session objects from registrar
-    protected $_quarter;          // Current quarter in single digit code
-    protected $_year;             // Quarter year
-    protected $_today;            // Today's timestamp
+    protected $_quarter;        // Current quarter in single digit code
+    protected $_year;           // Quarter year
+    protected $_today;          // Today's timestamp
     private $_session_len;      // Array of sesion lengths to determine final's week
     private $_summer;           // boolean flag for summer
-    protected $_current_week;     // Current week in session (max of summer sessions)
-    protected $_lookahead;        // Number of terms to look ahead
+    protected $_current_week;   // Current week in session (max of summer sessions)
+    protected $_lookahead;      // Number of terms to look ahead
+    private $_term;             // Current term.
     
     function __construct($session) {
         $this->_session = $this->key_session($session);
@@ -26,6 +27,7 @@ class ucla_session {
         // Other info
         $this->_quarter = substr($session[0]['term'], 2);
         $this->_year = substr($session[0]['term'], 0, -1);
+        $this->_term = $session[0]['term'];
         
         // All session dates are tested against today
         $this->_today = substr(date('c'), 0, 10);
@@ -72,7 +74,7 @@ class ucla_session {
                 $this->update_week_display($weeks_str);
                 
             } else { // Update term when quarter is not in session
-                $next_term = $this->next_term();
+                $next_term = self::next_term($this->_term);
                 $this->update_term($next_term);
                 $this->_current_week = -1;
                 $this->update_week();
@@ -104,7 +106,7 @@ class ucla_session {
             
             // Summer session ended, update term
             if(!$this->in_session($this->_session['6C']->session_end)) {
-                $next_term = $this->next_term();
+                $next_term = self::next_term($this->_term);
                 $this->update_term($next_term);
                 $this->_current_week = -1;
                 $this->update_week();
@@ -260,17 +262,12 @@ class ucla_session {
     /**
      * Gets next term from a term
      * 
-     * @param type $term
+     * @param string $term
      */
-    protected function next_term($term = null) {
+    public static function next_term($term) {
         
-        if($term) {
-            $year = substr($term, 0, 2);
-            $quarter = substr($term, -1);
-        } else {
-            $year = intval($this->_year);
-            $quarter = $this->_quarter;
-        }
+        $year = substr($term, 0, 2);
+        $quarter = substr($term, -1);
 
         switch($quarter) {
             case 'F':
@@ -346,7 +343,7 @@ class ucla_session {
         $ta = array($term);
         
         for($i = 0; $i < $this->_lookahead; $i++) {
-            $term = $this->next_term($term);
+            $term = self::next_term($term);
             $ta[] = $term;           
         }
         
