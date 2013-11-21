@@ -339,6 +339,26 @@ class format_ucla extends format_topics {
             }
         }
     }
+    
+    /**
+     * Extra form validation.
+     * 
+     * @param type $data from form
+     * @param type $files
+     * @param type $errors already accumulated
+     * @return type
+     */
+    public function edit_form_validation($data, $files, $errors) {
+
+        $formaterrors = array();
+        
+        // CCLE-4217 - Check that we have a valid category for site indicator.
+        if (empty($data['category'])) {
+            $formaterrors['category'] = get_string('req_category_error', 'tool_uclasiteindicator');
+        }
+        
+        return $formaterrors;
+    }
 }
 
 /**
