@@ -78,7 +78,7 @@ echo html_writer::end_tag('div');
 // display copyright status list
 $t = new html_table();
 $t->id = 'copyright_status_table';
-$t->head = array(get_string('file_name', 'tool_uclacopyrightstatusreports'), get_string('choosecopyright', 'local_ucla'),
+$t->head = array(get_string('file_name', 'tool_uclacopyrightstatusreports'), get_string('copyrightstatus', 'block_ucla_copyright_status'),
     get_string('updated_dt', 'block_ucla_copyright_status'),
     get_string('author', 'block_ucla_copyright_status'));
 $course_copyright_status_list = get_files_copyright_status_by_course($courseid, $filter_copyright);
