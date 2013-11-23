@@ -111,7 +111,7 @@ echo $OUTPUT->doctype() ?>
             </div>
         </div>
         <div class="system-identification " >
-            <a class="system-name" href="<?php echo get_config('theme_uclashared', 'system_link') ?>"><?php echo get_config('theme_uclashared', 'system_name') ?></a>
+            <a class="system-name" href="<?php echo $OUTPUT->sublogo(); ?></a>
             <?php echo $OUTPUT->weeks_display() ?>
         </div>
     </header>

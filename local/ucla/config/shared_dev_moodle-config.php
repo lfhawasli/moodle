@@ -344,6 +344,11 @@ $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
 $CFG->fullnamedisplay = 'language'; // CCLE-2550 - Lastname, Firstname sorting
 $CFG->cronclionly = true;
+// Make it easier to create accounts on dev instances.
+$CFG->minpasswordlength = 4;
+$CFG->minpassworddigits = 0;
+$CFG->minpasswordupper = 0;
+$CFG->minpasswordnonalphanum = 0;
 
 // Site administration > Security > HTTP security
 $CFG->allowframembedding = 1; // CCLE-3021 - enabled because some collab sites need to be embedded
