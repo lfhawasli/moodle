@@ -244,7 +244,16 @@ function display_copyright_status_contents($courseid, $filter) {
     unset($license_options['all']);
     $t = new html_table();
     $t->id = 'copyright_status_table';
-    $t->head = array(get_string('choosecopyright', 'local_ucla'),
+    $helpicon = html_writer::link(new moodle_url('/help.php',
+                array('component' => 'local_ucla', 'identifier' => 'license',
+                      'lang' => 'en')),
+            html_writer::empty_tag('img', array('class' => 'iconhelp',
+                'alt' => get_string('copyrightstatushelp', 'block_ucla_copyright_status'),
+                'src' => new moodle_url('/theme/image.php', array('theme' => 'uclashared',
+                                        'image' => 'help')))),
+            array('target' => '_blank'));
+    $t->head = array(get_string('copyrightstatus', 'block_ucla_copyright_status')
+        . ' ' . $helpicon,
         get_string('updated_dt', 'block_ucla_copyright_status'),
         get_string('author', 'block_ucla_copyright_status'));
     $t->attributes[] = 'generaltable';

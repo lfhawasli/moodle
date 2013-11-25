@@ -2,6 +2,8 @@
 $string['pluginname'] = 'Manage copyright';
 $string['title'] = 'Manage copyright status';
 $string['statistics'] = 'Statistics';
+$string['copyrightstatus'] = 'Copyright status';
+$string['copyrightstatushelp'] = 'Help with copyright status';
 $string['updated_dt'] = 'Updated date';
 $string['author'] = 'Author';
 $string['permission_not_allow'] = 'You do not have access to this page';
