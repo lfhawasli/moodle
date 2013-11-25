@@ -250,9 +250,13 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
      * Displays the text underneath the UCLA | CCLE logo.
      */
     function sublogo() {
-        $displaytext = $this->get_config('theme_uclashared', 'system_link');
-        $displaytext .= $this->get_config('theme_uclashared', 'system_name');
-
+        $displaytext = '';
+        $url = $this->get_config('theme_uclashared', 'system_link');
+        $text = $this->get_config('theme_uclashared', 'system_name');
+        if (!empty($url) && !empty($text)) {
+            $displaytext = html_writer::link($url, $text,
+                    array('class' => 'system-name'));
+        }
         return $displaytext;
     }
     
