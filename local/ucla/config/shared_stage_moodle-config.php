@@ -180,7 +180,7 @@ $CFG->forcedefaultmymoodle = true;
 $CFG->unittestprefix = 'tst_';
 
 // email address to notify in case of system problems
-$CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ccle.ucla.edu';
+$CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ucla.edu';
 
 // CCLE-3966 - Include self when messaging participants.
 // Emails should still be sent to users that are logged in.
