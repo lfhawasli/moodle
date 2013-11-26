@@ -146,8 +146,11 @@ class ucla_reg_classinfo_cron {
         $where = implode(' OR ', $sqls);
 
         // Get entries from our destination table to check whether to
-        // insert or to update
-        $records = $DB->get_records_select(self::table, $where, $params);
+        // insert or to update.
+        $records = $DB->get_recordset_select(self::table, $where, $params);
+        if (!$records->valid()) {
+            return false;
+        }
 
         /* create array in following format:
          * [<term>-<srs>] => Object (<ucla_reg_classinfo_entry>)

@@ -160,7 +160,7 @@ $CFG->gradebook_send_updates = 1;
 $CFG->forcedefaultmymoodle = true;
 
 // email address to notify in case of system problems
-$CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ccle.ucla.edu';
+$CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ucla.edu';
 
 // CCLE-3966 - Include self when messaging participants.
 // Emails should still be sent to users that are logged in.
@@ -198,9 +198,6 @@ $CFG->recovergradesdefault = 1;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
-
-// Site administration > Grades > Report Settings > Grader report
-$CFG->grade_report_quickgrading = 0;
 
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->assignment_maxbytes = 104857600;   // 100MB
@@ -452,6 +449,9 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_trans'] 
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_moodle_cron'] = '/home/moodle/logs/moodlecron/moodlecron.out';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_prepop'] = '/home/moodle/logs/prepop_logs/';
+
+// CCLE-4295 - Add Grouping Filter for the Grader Report
+$CFG->grader_report_grouping_filter = 1;
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');

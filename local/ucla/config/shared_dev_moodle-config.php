@@ -196,7 +196,7 @@ $CFG->forcedefaultmymoodle = true;
 $CFG->unittestprefix = 'tst_';
 
 // email address to notify in case of system problems
-$CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ccle.ucla.edu';
+$CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ucla.edu';
 
 // CCLE-3966 - Include self when messaging participants.
 // Emails should still be sent to users that are logged in.
@@ -234,9 +234,6 @@ $CFG->recovergradesdefault = 1;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
-
-// Site administration > Grades > Report Settings > Grader report
-$CFG->grade_report_quickgrading = 0;
 
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
@@ -344,6 +341,11 @@ $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
 $CFG->fullnamedisplay = 'language'; // CCLE-2550 - Lastname, Firstname sorting
 $CFG->cronclionly = true;
+// Make it easier to create accounts on dev instances.
+$CFG->minpasswordlength = 4;
+$CFG->minpassworddigits = 0;
+$CFG->minpasswordupper = 0;
+$CFG->minpasswordnonalphanum = 0;
 
 // Site administration > Security > HTTP security
 $CFG->allowframembedding = 1; // CCLE-3021 - enabled because some collab sites need to be embedded
@@ -449,6 +451,9 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_access']
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_error'] = '/var/log/httpd/ssl_error_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_request'] = '/var/log/httpd/ssl_request_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
+
+// CCLE-4295 - Add Grouping Filter for the Grader Report
+$CFG->grader_report_grouping_filter = 1;
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');

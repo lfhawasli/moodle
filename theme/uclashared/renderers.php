@@ -247,15 +247,17 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     }
 
     /**
-     *      Displays the text underneath the UCLA | CCLE logo.
-     *
-     *      Will reach into the settings to see if the hover over should be 
-     *      displayed.
-     **/
+     * Displays the text underneath the UCLA | CCLE logo.
+     */
     function sublogo() {
-        $display_text   = $this->get_config($this->theme, 'logo_sub_text');
-
-        return $display_text;
+        $displaytext = '';
+        $url = $this->get_config('theme_uclashared', 'system_link');
+        $text = $this->get_config('theme_uclashared', 'system_name');
+        if (!empty($url) && !empty($text)) {
+            $displaytext = html_writer::link($url, $text,
+                    array('class' => 'system-name'));
+        }
+        return $displaytext;
     }
     
     // This function will be called only in class sites 

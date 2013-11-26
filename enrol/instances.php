@@ -196,9 +196,13 @@ foreach ($instances as $instance) {
         }
 
         if (enrol_is_enabled($instance->enrol)) {
-            if ($instance->status == ENROL_INSTANCE_ENABLED) {
+            // START UCLA MOD: CCLE-3739 
+            // Preventing UCLA registrar (database) enrollment from being hidden
+            // if ($instance->status == ENROL_INSTANCE_ENABLED) {
+            if ($instance->status == ENROL_INSTANCE_ENABLED && $instance->enrol !== 'database') {
                 $aurl = new moodle_url($url, array('action'=>'disable', 'instance'=>$instance->id));
                 $edit[] = $OUTPUT->action_icon($aurl, new pix_icon('t/hide', $strdisable, 'core', array('class' => 'iconsmall')));
+            // END UCLA MOD: CCLE-3739
             } else if ($instance->status == ENROL_INSTANCE_DISABLED) {
                 $aurl = new moodle_url($url, array('action'=>'enable', 'instance'=>$instance->id));
                 $edit[] = $OUTPUT->action_icon($aurl, new pix_icon('t/show', $strenable, 'core', array('class' => 'iconsmall')));
