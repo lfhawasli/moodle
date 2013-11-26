@@ -17,10 +17,10 @@ Administrators
 
 Moodle Compatibility
 --------------------
-This version of the plug-in works with Moodle 2.1 or newer and supports single sign-on. Users running Moodle v1.8-1.9
+This version of the plug-in is tested with Moodle 2.2 through 2.5 and supports single sign-on. Users running Moodle v1.8-1.9
 without SSO may use the previous version of the plug-in. Installations of Moodle older than version 1.8 are not supported by the i>clicker integrate plug-in.
 
-This plugin will work with Moodle 2.1 or newer. It is developed as a Moodle plugin/block.
+This plugin should work with Moodle 2.1 or newer. It is developed as a Moodle plugin/block.
 
 Download Binary
 ---------------
