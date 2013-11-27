@@ -24,14 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// @todo Include local_ucla generator code, because "getDataGenerator" does not
-// yet work for local plugins. When local plugins are support, please change
-// $generator = new local_ucla_generator();
-// to
-// $generator = $this->getDataGenerator()->get_plugin_generator('local_ucla');
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
-require_once($CFG->dirroot . '/local/ucla/tests/generator/lib.php');
 
 /**
  * PHPUnit data generator testcase
@@ -41,6 +35,44 @@ require_once($CFG->dirroot . '/local/ucla/tests/generator/lib.php');
  * @copyright  2013 UC Regents
  */
 class local_ucla_generator_testcase extends advanced_testcase {
+
+    /**
+     * Helper method for test_crosslist_courses() to make sure that results
+     * returned by ucla_map_courseid_to_termsrses() contain the same term/srs
+     * combos are in the provided $courses parameter.
+     *
+     * @param int $courseid
+     * @param array $courses
+     */
+    private function match_termsrses($courseid, array $courses) {
+        $matched = true;
+        $termsrses = ucla_map_courseid_to_termsrses($courseid);
+        
+        if (count($termsrses) != count($courses)) {
+            $matched = false;
+        } else {
+            foreach ($termsrses as $termsrs) {
+                $found = false;
+                foreach ($courses as $course) {
+                    if ($course->term == $termsrs->term &&
+                            $course->srs == $termsrs->srs) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (empty($found)) {
+                    $matched = false;
+                    break;
+                }
+            }
+        }
+
+        return $matched;
+    }
+
+    protected function setUp() {
+        $this->resetAfterTest(true);
+    }
 
     /**
      * Try to pass an array of two empty arrays to tell the random class creator
@@ -241,7 +273,7 @@ class local_ucla_generator_testcase extends advanced_testcase {
         foreach ($terms as $term) {
             $this->assertEquals('13F', $term);
         }
-    }    
+    }
 
     /**
      * Test creating a user.
@@ -272,7 +304,49 @@ class local_ucla_generator_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('Given idnumber is not 9 digits long');
     }
 
-    protected function setUp() {
-        $this->resetAfterTest(true);
-    } 
+    /**
+     * Tests the crosslist_courses method to make sure that we can crosslist
+     * with every combination of non-crosslist and crosslist courses.
+     */
+    public function test_crosslist_courses() {
+        // Get all possible combinations of non-crosslist and crosslist courses.
+        $combos = array('noncrosslist' => array('noncrosslist', 'crosslist'),
+                        'crosslist'    => array('noncrosslist', 'crosslist'));
+
+        // Make sure we are building courses in the same term.
+        $params = array('noncrosslist' => array(array('term' => '13F')),
+                        'crosslist'    => array(array('term' => '13F'),
+                                                array('term' => '13F')));
+        foreach ($combos as $parentparam => $childrenparams) {
+            foreach ($childrenparams as $childparams) {
+                // Create new parent for each type of child.
+                $parent = $this->getDataGenerator()
+                        ->get_plugin_generator('local_ucla')
+                        ->create_class($params[$parentparam]);
+
+                // Make sure ucla_map_courseid_to_termsrses returns only the
+                // term/srs of the parent.
+                $firstparent = reset($parent);
+                $result = $this->match_termsrses($firstparent->courseid, $parent);
+                $this->assertTrue($result);
+
+                $children = $this->getDataGenerator()
+                        ->get_plugin_generator('local_ucla')
+                        ->create_class($params[$childparams]);
+
+                // Now crosslist the 2 courses
+                $result = $this->getDataGenerator()
+                        ->get_plugin_generator('local_ucla')
+                        ->crosslist_courses($firstparent, $children);
+                $this->assertTrue($result);
+
+                // Make sure that ucla_map_courseid_to_termsrses returns the
+                // term/srs of both parent and children now.
+                $result = $this->match_termsrses($firstparent->courseid,
+                        array_merge($parent, $children));
+
+                $this->assertTrue($result);
+            }
+        }
+    }
 }

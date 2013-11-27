@@ -325,6 +325,7 @@ $CFG->forced_plugin_settings['local_kaltura']['mymedia_application_name'] = 'ccl
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
+$CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus';
 
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true; 
