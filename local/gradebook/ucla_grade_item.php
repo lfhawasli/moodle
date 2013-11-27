@@ -93,6 +93,7 @@ class ucla_grade_item extends grade_item {
             } catch (SoapFault $e) {
                 $log['action'] = get_string('connectionfail', 'local_gradebook');
                 $log['info'] = get_string('itemconnectionfailinfo', 'local_gradebook', $this->id);
+                $log['info'] .= ': ' . $e;  // Append exact SOAP error as well.
 
                 grade_reporter::add_to_log($log);                    
                 return grade_reporter::CONNECTION_ERROR;
