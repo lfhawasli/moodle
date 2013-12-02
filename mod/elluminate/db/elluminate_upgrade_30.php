@@ -77,8 +77,11 @@ $dbman->change_field_precision($preloadTable, $sizeField);
  * This portion of the script can be re-run as many times as required (in the case of SAS connectivity issues),
  * so it is broken out into it's own script.  This may fail, but it will NOT prevent the upgrade from succeeding.
  */
-$retryMode = false;
-include_once('elluminate_upgrade_30_rerun.php');
+// START UCLA MOD CCLE-4117 
+// Preventing upgrade script from running during initial install
+//$retryMode = false;
+//include_once('elluminate_upgrade_30_rerun.php');
+// END UCLA MOD CCLE-4117
 
 //Set Default Log Level to Error
 set_config('elluminate_log_level', '4');
