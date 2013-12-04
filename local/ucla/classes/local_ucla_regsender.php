@@ -28,6 +28,10 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 /**
  * Handles setting/getting data from Registrar tables.
  *
+ * NOTE: Cannot use prepared statements, because the ODBC library that we use to
+ * connect to the Registrar does not support it. So need to carefully construct
+ * raw SQl to communicate to the Registrar.
+ *
  * @package    local_ucla
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -114,15 +118,12 @@ class local_ucla_regsender {
             // First get any existing records.
             $sql = "SELECT  *
                     FROM    $this->syllabustable
-                    WHERE   term_cd=? AND
-                            subj_area_cd=? AND
-                            crs_catlg_no=? AND
-                            sect_no=?";
-            // Order matters and must match ? placeholders.
-            $params = array($courseinfo->term, $courseinfo->subj_area,
-                    $courseinfo->crsidx, $courseinfo->classidx);
+                    WHERE   term_cd='$courseinfo->term' AND
+                            subj_area_cd='$courseinfo->subj_area' AND
+                            crs_catlg_no='$courseinfo->crsidx' AND
+                            sect_no='$courseinfo->classidx'";
             $retval[$courseinfo->term][$courseinfo->srs] =
-                    $adodb->GetRow($sql, $params);
+                    $adodb->GetRow($sql);
         }
 
         return $retval;
@@ -140,7 +141,7 @@ class local_ucla_regsender {
         if (empty($this->adodb)) {            
             $this->adodb = registrar_query::open_registrar_connection();
         }
-        $debug ? $this->adodb->debug = true : $this->adodb->debug = false;
+        $this->adodb->debug = $debug;
         return $this->adodb;
     }
 
@@ -209,14 +210,11 @@ class local_ucla_regsender {
             // First get any existing records.
             $sql = "SELECT  *
                     FROM    $this->syllabustable
-                    WHERE   term_cd=? AND
-                            subj_area_cd=? AND
-                            crs_catlg_no=? AND
-                            sect_no=?";
-            // Order matters and must match ? placeholders.
-            $whereparams = array($courseinfo->term, $courseinfo->subj_area, 
-                    $courseinfo->crsidx, $courseinfo->classidx);
-            $existing = $adodb->GetRow($sql, $whereparams);
+                    WHERE   term_cd='$courseinfo->term' AND
+                            subj_area_cd='$courseinfo->subj_area' AND
+                            crs_catlg_no='$courseinfo->crsidx' AND
+                            sect_no='$courseinfo->classidx'";
+            $existing = $adodb->GetRow($sql);
 
             $result = null;
             if ($existing === false) {
@@ -224,17 +222,20 @@ class local_ucla_regsender {
                 return self::FAILED;
             } else if (empty($existing)) {
                 // Record does not exist, so insert it.
-                $insertparams = array_merge($whereparams, $typevals);
-                $placeholders = implode(',', explode(' ', trim(str_repeat('? ',
-                        count($insertparams)))));
-
-
                 $sql = "INSERT INTO $this->syllabustable
                         (term_cd, subj_area_cd, crs_catlg_no, sect_no, " .
                          implode(',', $typecols) . ")
                         VALUES
-                        ($placeholders)";
-                $result = $adodb->Execute($sql, $insertparams);
+                        ('$courseinfo->term', '$courseinfo->subj_area',
+                         '$courseinfo->crsidx', '$courseinfo->classidx'";
+
+                foreach ($typevals as $typeval) {
+                    $sql .= sprintf(",'%s'", $typeval);
+                }
+
+                $sql .= ')';
+
+                $result = $adodb->Execute($sql);
             } else {
                 // Record exists, so update it.
 
@@ -261,22 +262,21 @@ class local_ucla_regsender {
                     continue;
                 }
 
-                $updateparams = array_merge($typevals, $whereparams);
-
                 $sql = "UPDATE $this->syllabustable
                         SET ";
 
                 $firstentry = true;
-                foreach ($typecols as $typecol) {
+                foreach ($typecols as $index => $typecol) {
                     $firstentry ? $firstentry = false : $sql .= ',';
-                    $sql .= $typecol . ' = ?';
+                    $sql .= sprintf(" %s = '%s' ", $typecol, $typevals[$index]);
                 }
 
-                $sql .= "WHERE  term_cd=? AND
-                                subj_area_cd=? AND
-                                crs_catlg_no=? AND
-                                sect_no=?";
-                $result = $adodb->Execute($sql, $updateparams);
+                $sql .= "WHERE  term_cd='$courseinfo->term' AND
+                                subj_area_cd='$courseinfo->subj_area' AND
+                                crs_catlg_no='$courseinfo->crsidx' AND
+                                sect_no='$courseinfo->classidx'";
+
+                $result = $adodb->Execute($sql);
             }
 
             if ($result === false) {
