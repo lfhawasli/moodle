@@ -114,10 +114,11 @@ function fetch_slidemenu($runtime){
 
 
 //This fetches the admin console for pairwork and screencasting
-function fetch_poodllconsole($runtime, $coursedataurl="",$mename="", $courseid=-1, $embed=false){
+function fetch_poodllconsole($runtime ){
 	global $CFG, $USER, $COURSE;
 	
 	$broadcastkey="1234567";
+	$mename="";
 
 	//Set the camera prefs
 	$capturewidth=$CFG->filter_poodll_capturewidth;
@@ -130,6 +131,9 @@ function fetch_poodllconsole($runtime, $coursedataurl="",$mename="", $courseid=-
 	$cameraprefs= '&capturefps=' . $capturefps . '&captureheight=' . $captureheight . '&picqual=' . $picqual . '&bandwidth=' . $bandwidth . '&capturewidth=' . $capturewidth .   '&prefmic=' . $prefmic . '&prefcam=' . $prefcam;
 	$flvserver = $CFG->poodll_media_server;
 	$teacherpairstreamname="voiceofauthority";
+	
+	//auto try ports
+	$autotryports = $CFG->filter_poodll_autotryports==1 ? "true" : "false" ;
 
 
 	if ($mename=="" && !empty($USER->username)){
@@ -139,15 +143,14 @@ function fetch_poodllconsole($runtime, $coursedataurl="",$mename="", $courseid=-
 	}
 
 	//if courseid not passed in, try to get it from global
-	if ($courseid==-1){
-		$courseid=$COURSE->id;
-	}
+	$courseid=$COURSE->id;
+
 	
 	//We need a moodle serverid
 	$moodleid = fetch_moodleid();
 	
-	//put in a coursedataurl if we need one
-	if ($coursedataurl=="") $coursedataurl= $CFG->wwwroot . '/filter/poodll/poodlllogiclib.php%3F';
+	//put in a coursedataurl
+	$coursedataurl= $CFG->wwwroot . '/filter/poodll/poodlllogiclib.php%3F';
 	
 	
 	//Show the buttons window if we are admin
@@ -164,27 +167,23 @@ function fetch_poodllconsole($runtime, $coursedataurl="",$mename="", $courseid=-
 		$params= '?red5url='.urlencode($flvserver). 
 							'&mename=' . $mename . '&courseid=' . $courseid .  
 							'&moodleid=' . $moodleid .
+							'&autotryports=' . $autotryports .
 							'&teacherpairstreamname=' . $teacherpairstreamname . 
 							$cameraprefs .
 							'&coursedataurl=' . $coursedataurl . '&broadcastkey=' . $broadcastkey .
 							'&lzr=swf9&runtime=swf9';
 
-		//if we are embedding, here we wrap the url and params in the necessary javascript tags
-		//otherwise we just return the url and params.
-		//embed code is called from poodlladminconsole.php
-		if($embed){
-				$partone= '<script type="text/javascript">lzOptions = { ServerRoot: \'\'};</script>';
-				$parttwo = '<script type="text/javascript" src="' . $CFG->wwwroot . '/filter/poodll/flash/embed-compressed.js"></script>';
-				$partthree='<script type="text/javascript">lz.embed.swf({url: \'' . $baseUrl . $params. 
-						'\' , width: \'1000\', height: \'750\', id: \'lzapp_admin_console\', accessible: \'false\'});
-							</script>
-						<noscript>
-							Please enable JavaScript in order to use this application.
-						</noscript>';
-				return $partone . $parttwo . $partthree;
-		}else{
-			return $baseUrl . $params;					
-		}				
+		//create our embed tags
+		$partone= '<script type="text/javascript">lzOptions = { ServerRoot: \'\'};</script>';
+		$parttwo = '<script type="text/javascript" src="' . $CFG->wwwroot . '/filter/poodll/flash/embed-compressed.js"></script>';
+		$partthree='<script type="text/javascript">lz.embed.swf({url: \'' . $baseUrl . $params. 
+				'\' , width: \'1000\', height: \'750\', id: \'lzapp_admin_console\', accessible: \'false\'});
+					</script>
+				<noscript>
+					Please enable JavaScript in order to use this application.
+				</noscript>';
+		return $partone . $parttwo . $partthree;
+		
 
 }
 
@@ -291,6 +290,9 @@ function fetch_pairclient($runtime, $chat=true, $whiteboard=true, $showvideo=fal
 	//Set the servername
 	$flvserver = $CFG->poodll_media_server;
 	
+	//auto try ports
+	$autotryports = $CFG->filter_poodll_autotryports==1 ? "true" : "false" ;
+	
 	//in order that this works effectively on tokyo.poodll.com which services multiple Moodles
 	//we should change courseid (which creates a kind of virtual "room") to use the domainname of Moodle server
 	$courseid = $COURSE->id;
@@ -298,7 +300,7 @@ function fetch_pairclient($runtime, $chat=true, $whiteboard=true, $showvideo=fal
 	
 	$baseUrl = $CFG->wwwroot . '/filter/poodll/flash/newpairclient.lzx.swf9.swf';
 	$params = '?red5url='.urlencode($flvserver) . '&mename=' . $mename . '&mefullname=' . $mefullname .   '&mepictureurl=' . urlencode($mepictureurl) 
-			. '&chat=' . $chat  . '&courseid=' . $courseid . '&moodleid=' . $moodleid .'&useroles=' . $useroles  . '&whiteboard=' . $whiteboard . '&whiteboardback=' . $whiteboardback . '&showvideo=' . $showvideo  .'&teacherallstreamname=voiceofauthority&lzproxied=false';
+			. '&chat=' . $chat  . '&autotryports=' . $autotryports . '&courseid=' . $courseid . '&moodleid=' . $moodleid .'&useroles=' . $useroles  . '&whiteboard=' . $whiteboard . '&whiteboardback=' . $whiteboardback . '&showvideo=' . $showvideo  .'&teacherallstreamname=voiceofauthority&lzproxied=false';
 	return $baseUrl . $params;	
 }
 
@@ -481,12 +483,27 @@ if ($CFG->filter_poodll_usecourseid){
 
 
 
-function fetch_whiteboard($runtime, $boardname, $imageurl="", $slave=false,$rooms="", $width=600,$height=350, $mode='normal',$standalone='false'){
+function fetch_whiteboard($runtime, $boardname, $imageurl="", $slave=false,$rooms="", $width=0,$height=0, $mode='normal',$standalone='false'){
 global $CFG, $USER,$COURSE;
+
+//head off to the correct whiteboard as defined in config
+switch($CFG->filter_poodll_defaultwhiteboard){
+	case 'literallycanvas':
+		$forsubmission = false;
+		return fetchLiterallyCanvas($forsubmission,$width,$height,$imageurl,$updatecontrol, $contextid,$component,$filearea,$itemid);
+		break;
+	case 'drawingboard':
+		$forsubmission = false;
+		return fetchDrawingBoard($forsubmission,$width,$height,$imageurl,$updatecontrol, $contextid,$component,$filearea,$itemid); 
+		break;
+	default:
+}
+//set default size if necessary
+if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
+if($height==0){$height=$CFG->filter_poodll_whiteboardheight;}
 
 //Set the servername 
 $flvserver = $CFG->poodll_media_server;
-
 
 
 //If standalone, then lets standalonify it
@@ -514,12 +531,20 @@ $mename=$USER->username;
 
 		//Are  we merely a slave to the admin whiteboard ?
 		if ($slave){
+			//adjust size for borders and control panel
+			//the board size is the size of the drawing canvas, not the widget
+			$width = $width + 20;
+			$height = $height + 20;
 			$widgetstring=  fetchSWFWidgetCode('scribbleslave.lzx.swf9.swf',
     						$params,$width,$height,'#FFFFFF');
 		}else{
 			//normal mode is a standard scribble with a cpanel
 			//simple mode has a simple double click popup menu
 			if ($mode=='normal'){
+					//adjust size for borders and control panel
+					//the board size is the size of the drawing canvas, not the widget
+					$width = $width + 205;
+					$height = $height + 20;
 					if($runtime=='js'){
 						$widgetstring=  fetchJSWidgetCode('scribbler.lzx.js',
 									$params,$width,$height,'#FFFFFF'); 
@@ -531,6 +556,10 @@ $mename=$USER->username;
     						$params,$width,$height,'#FFFFFF');
 					}
 			}else{
+					//adjust size for borders and control panel
+					//the board size is the size of the drawing canvas, not the widget
+					$width = $width + 20;
+					$height = $height + 20;
 					if($runtime=='js'){
 						$widgetstring=  fetchJSWidgetCode('simplescribble.lzx.js',
 									$params,$width,$height,'#FFFFFF'); 
@@ -787,7 +816,13 @@ global $CFG, $USER, $COURSE;
 
 //get our HTML5 Uploader if we have a mobile device
 if(isMobile($CFG->filter_poodll_html5rec)){
-	return fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio");
+	if(!canDoUpload()){
+		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
+	}else{	
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio");
+	}
+	return $ret;
+
 }
 
 //Set the microphone config params
@@ -851,18 +886,213 @@ $params = array();
 
 }
 
-function fetchWhiteboardForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$width=0,$height=0,$backimage=""){
+/*
+* The literally canvas whiteboard
+*
+*/
+function fetchLiterallyCanvas($forsubmission=true,$width=0,$height=0,$backimage="",$updatecontrol="", $contextid=0,$component="",$filearea="",$itemid=0){
+global $CFG, $USER, $COURSE,$PAGE;
+
+	//javascript upload handler
+	$opts =Array();
+	if($backimage !=''){
+		$opts['bgimage'] = $backimage;
+	}
+	if($CFG->filter_poodll_autosavewhiteboard && $forsubmission){
+		$opts['autosave'] = $CFG->filter_poodll_autosavewhiteboard;
+	}
+	//imageurlprefix, that LC requires
+	$opts['imageurlprefix']= $CFG->httpswwwroot . '/filter/poodll/js/literallycanvas.js/img';
+	$PAGE->requires->js_init_call('M.filter_poodll.loadliterallycanvas', array($opts),false);
+
+	//removed from params to make way for moodle 2 filesystem params Justin 20120213
+	if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
+	if($height==0){$height=$CFG->filter_poodll_whiteboardheight;}
+	$poodllfilelib= $CFG->wwwroot . '/filter/poodll/poodllfilelib.php';
+	
+	//add the height of the control area, so that the user spec dimensions are the canvas size
+	$height=$height + 61;
+
+
+	//the control to put the filename of our picture
+	if ($updatecontrol == "saveflvvoice"){
+		$savecontrol = "<input name='saveflvvoice' type='hidden' value='' id='saveflvvoice' />";
+	}else{
+		$savecontrol = "";
+	}
+	
+	//set media type
+	$mediatype ="image";
+	
+	//include jquery
+	//if($CFG->version < 2013051400){
+	if(true){
+		$PAGE->requires->js("/filter/poodll/js/literallycanvas.js/js/jquery-1.8.2.js");
+	}else{
+		$PAGE->requires->jquery();
+	}
+	
+	//include other needed libraries
+	$PAGE->requires->js("/filter/poodll/js/literallycanvas.js/js/underscore-1.4.2.js");
+	$PAGE->requires->js("/filter/poodll/js/literallycanvas.js/js/literallycanvas.js");
+
+
+	//save button 
+	$savebutton = "<input type=\"hidden\" id=\"p_updatecontrol\" value=\"$updatecontrol\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_contextid\" value=\"$contextid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_component\" value=\"$component\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_mediatype\" value=\"$mediatype\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_filearea\" value=\"$filearea\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_itemid\" value=\"$itemid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_fileliburl\" value=\"$poodllfilelib\" />";
+	$buttonclass="p_btn";
+	$savebutton .= "<button type=\"button\" id=\"p_btn_upload_whiteboard\" class=\"$buttonclass\">" 
+				. get_string('whiteboardsave', 'filter_poodll'). 
+				"</button>";
+	
+	
+	//message container
+	$progresscontrols ="<div id=\"p_messages\"></div>";
+
+		
+	//container of whiteboard and other controls
+	$lcOpen = "<div class='whiteboard-wrapper' style='width:".$width."px; height:" . $height ."px;'>
+		<div class='fs-container' style='width:".$width."px; height:" . $height ."px;'>
+		<div class='literally'><canvas></canvas></div></div>";
+	$lcClose = "</div>";
+
+	//add save control and return string
+	$returnString = $lcOpen;
+	if($forsubmission){
+		$returnString .= $savebutton;	
+		$returnString .= $savecontrol;	
+		$returnString .= $progresscontrols;	
+	}
+	$returnString .= $lcClose;
+	
+    return $returnString ;
+
+}
+
+/*
+* The literally canvas whiteboard
+*
+*/
+function fetchDrawingBoard($forsubmission=true,$width=0,$height=0,$backimage="",$updatecontrol="", $contextid=0,$component="",$filearea="",$itemid=0){
+global $CFG, $USER, $COURSE,$PAGE;
+
+	//javascript upload handler
+	$opts =Array();
+	if($backimage !=''){
+		$opts['bgimage'] = $backimage;
+	}
+	if($CFG->filter_poodll_autosavewhiteboard && $forsubmission){
+		$opts['autosave'] = $CFG->filter_poodll_autosavewhiteboard;
+	}
+	$PAGE->requires->js_init_call('M.filter_poodll.loaddrawingboard', array($opts),false);
+
+	//removed from params to make way for moodle 2 filesystem params Justin 20120213
+	if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
+	if($height==0){$height=$CFG->filter_poodll_whiteboardheight;}
+	$poodllfilelib= $CFG->wwwroot . '/filter/poodll/poodllfilelib.php';
+
+
+	//the control to put the filename of our picture
+	if ($updatecontrol == "saveflvvoice"){
+		$savecontrol = "<input name='saveflvvoice' type='hidden' value='' id='saveflvvoice' />";
+	}else{
+		$savecontrol = "";
+	}
+
+	//set media type
+	$mediatype ="image";
+	
+	//include jquery , should be available in 2.5 but this fails ..?
+	//so we load it
+	//if($CFG->version < 2013051400){
+	if(true){
+		$PAGE->requires->js("/filter/poodll/js/drawingboard.js/dist/jquery-1.8.2.js");
+	}else{
+		$PAGE->requires->jquery();
+	}
+	
+	//include other needed libraries
+	$PAGE->requires->js("/filter/poodll/js/drawingboard.js/dist/drawingboard.min.js");
+
+
+	//save button 
+	$savebutton = "<input type=\"hidden\" id=\"p_updatecontrol\" value=\"$updatecontrol\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_contextid\" value=\"$contextid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_component\" value=\"$component\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_mediatype\" value=\"$mediatype\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_filearea\" value=\"$filearea\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_itemid\" value=\"$itemid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"p_fileliburl\" value=\"$poodllfilelib\" />";
+	if(array_key_exists('autosave',$opts)){
+		$buttonclass="w_btn";
+	}else{
+		$buttonclass="p_btn";
+	}
+	$savebutton .= "<button type=\"button\" id=\"p_btn_upload_whiteboard\" class=\"$buttonclass\">" 
+				. get_string('whiteboardsave', 'filter_poodll'). 
+				"</button>";
+	
+	//message container		
+	$progresscontrols = "<div id=\"p_messages\"></div>";
+
+	//init return string with container of whiteboard	
+	$dbOpen = "<div class='whiteboard-wrapper' style='width:".$width."px; height:" . $height ."px;'>
+		<div class='board drawing-board' id='drawing-board-id' style='width:".$width."px; height:" . $height ."px;'></div>";
+	$dbClose ="</div>";
+		
+	//add save control and return string
+	$returnString = $dbOpen;
+	if($forsubmission){
+		$returnString .= $savecontrol;	
+		$returnString .= $savebutton;	
+		$returnString .= $progresscontrols;	
+	}
+	$returnString .= $dbClose;
+    return $returnString ;
+
+}
+
+
+
+function fetchWhiteboardForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$width=0,$height=0,$backimage="",$prefboard=""){
 global $CFG, $USER, $COURSE;
-   
- //Set the servername 
-///$flvserver = $CFG->poodll_media_server;
+
+//head off to the correct whiteboard as defined in config
+if($prefboard==""){
+	$useboard = $CFG->filter_poodll_defaultwhiteboard;
+}else{
+	$useboard = $prefboard;
+}	
+
+switch($useboard){
+	case 'literallycanvas':
+		$forsubmission = true;
+		return fetchLiterallyCanvas($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid);
+		break;
+	case 'drawingboard':
+		$forsubmission = true;
+		return fetchDrawingBoard($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid); 
+		break;
+	default:
+}
+
 
 //head off to HTML5 logic if mobile
-
 if(isMobile($CFG->filter_poodll_html5widgets)){
-//if(true){
-	return fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
+	if(!canDoUpload()){
+		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
+	}else{	
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
+	}
+	return $ret;
+
 }
+
 
 //If standalone submission will always be standalone ... or will it ...
 //pair submissions could be interesting ..
@@ -872,9 +1102,14 @@ $mode="normal";
 //$mename=$USER->username;		
 
 	//removed from params to make way for moodle 2 filesystem params Justin 20120213
-	if($width==0){ $width="640";}
-	if($height==0){$height="500";}
+	if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
+	if($height==0){$height=$CFG->filter_poodll_whiteboardheight;}
 	$poodllfilelib= $CFG->wwwroot . '/filter/poodll/poodllfilelib.php';
+	
+//adjust size for borders and control panel
+//the board size is the size of the drawing canvas, not the widget
+$width = $width + 205;
+$height = $height + 20;
 
 
 	//the control to put the filename of our picture
@@ -921,7 +1156,13 @@ global $CFG, $USER, $COURSE;
 
 //get our HTML5 Uploader if we have a mobile device
 if(isMobile($CFG->filter_poodll_html5rec)){
-	return fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio");
+	if(!canDoUpload()){
+		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
+	}else{	
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio");
+	}
+	return $ret;
+
 }
 
 
@@ -1418,7 +1659,12 @@ global $CFG, $USER, $COURSE;
 
 //get our HTML5 Uploader if we have a mobile device
 if(isMobile($CFG->filter_poodll_html5widgets)){
-	return fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
+	if(!canDoUpload()){
+		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
+	}else{	
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
+	}
+	return $ret;
 }
 
 //Set the servername and a capture settings from config file
@@ -1620,7 +1866,12 @@ global $CFG, $USER, $COURSE;
 
 //head off to HTML5 logic if mobile
 if (isMobile($CFG->filter_poodll_html5rec)){
-	return fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "video");
+	if(!canDoUpload()){
+		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
+	}else{	
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "video");
+	}
+	return $ret;
 }
 
 //Set the servername and a capture settings from config file
@@ -3054,13 +3305,16 @@ function fetchSWFObjectWidgetCode($widget,$flashvarsArray,$width,$height,$bgcolo
 
 //If we wish to show a styled upload button, here we return true
 //on Firefox on Android doesn't support it currently, so we hard code that to false 
-//(2013/03/05)
+//also for MS Surface
+//(2013/08/19)
 function showFancyButton($browser){
 	global $CFG;
 
 	if($browser->getPlatform() == Browser::PLATFORM_ANDROID &&
 		$browser->getBrowser() == Browser::BROWSER_FIREFOX){
 				return false;
+	}else if($browser->getPlatform() == Browser::PLATFORM_MICROSOFT_SURFACE){
+		return false;
 	}else{
 				return $CFG->filter_poodll_html5fancybutton;
 	}
@@ -3091,6 +3345,8 @@ function canSpecAudio($browser){
 			case Browser::PLATFORM_ANDROID:
 				if($browser->getBrowser() == Browser::BROWSER_FIREFOX){
 					return false;
+				}else if($browser->isNexus7()){
+					return false;
 				}else{
 					return true;
 				}
@@ -3100,6 +3356,46 @@ function canSpecAudio($browser){
 				return false;
 	}//end of switch
 }
+
+//We check if the OS version is too old here,
+//Android 4+ iOS6+
+//(2013/09/26)
+function canDoUpload(){
+	$browser = new Browser();
+	
+	switch($browser->getPlatform()){
+	
+		case Browser::PLATFORM_ANDROID: 
+			$ver = $browser->getAndroidMajorVersion() ;
+			//if parsing failed, just assume they can upload
+				if(!$ver) {
+					return true;
+				}elseif($ver>3){
+					return true;
+				}else{
+					return false;
+				}
+				break;
+		
+		case Browser::PLATFORM_IPHONE:
+		case Browser::PLATFORM_IPOD:
+		case Browser::PLATFORM_IPAD:
+			$ver = $browser->getIOSMajorVersion() ;
+			//if parsing failed, just assume they can upload
+				if(!$ver) {
+					return true;
+				}elseif($ver>5){
+					return true;
+				}else{
+					return false;
+				}
+				break;
+		default:
+			return true;
+		}//end of switch
+		
+				
+	}//end of function
 
 //Here we try to detect if this is a mobile device or not
 //this is used to determine whther to return a JS or SWF widget
@@ -3130,7 +3426,7 @@ function isMobile($profile='mobile'){
 			case Browser::PLATFORM_NOKIA:
 			case Browser::PLATFORM_ANDROID:
 			case Browser::PLATFORM_WINDOWS_CE:
-			case Browser::PLATFORM_MICROSOFT_SURFACE:
+			//case Browser::PLATFORM_MICROSOFT_SURFACE:
 			return true;
 	}//end of switch
 
@@ -3388,67 +3684,72 @@ function fetchVideoSplash($src){
 		global $CFG;
 
 	 $src = urldecode($src);
-	 
+
 	 //if this is not a local file , quit.
 	 $possy = strpos($src,"pluginfile.php");
-	 if(!$possy){return false;}
-	 
+	 if(!$possy){return false;} 
 	 //get relative path
 	 //e.g http://m23.poodll.com/pluginfile.php/59/mod_page/content/20/360332574229687.flv
 	 //should become /59/mod_page/content/20/360332574229687.flv
 	 $relpath = substr($src,$possy + 14);
-	 
 
-//These are two paths from testing, they can be deleted	 
-//$relpath="/22/mod_assignment/submission/1/230358740780502.flv";
-//$relpath="/21/mod_page/content/0/808474302291870.flv";
-
-//like everything file related with questions, it doesn't work
-//it looks in general like getting a hash from a url is dodgey anyway
-//this is the seed of a way we might do it for qs, but really for qs its not v imp.
-//we can come back on it
-/*
-$relarray = explode('/',$relpath);
-$len = $count($relarray);
-$qitemid = $relarray($len-2);
-$qfilename = $relarray($len-1);
-*/
-
-//remove any pesky forcedownload params
-$relpath=str_replace("?forcedownload=1","", $relpath);
+	//remove any pesky forcedownload params
+	$relpath=str_replace("?forcedownload=1","", $relpath);
 
 	 //if something went wrong, and we can't confirm get a handle on the file, 
-	 //set the item id to zero. If it still fails, quit
+	 //muddle with the itemid. Some mods don't bother to use it if it is a certain filearea
+	 //eg assignment intro, others use it strangely,eg mod_page, and we need to set it to 0 
+	 //quiz questions have extra stuff between filearea and itemid
 	 $fs = get_file_storage();
 	 $file = $fs->get_file_by_hash(sha1($relpath));
      if (!$file) {
-			
-			//try again, and set the item id to 0, for mod_page the itemid is stored as 0, but refed as 
-			//something else. Why? The answer is blowing in the wind.....
-			//but we may get weirdness like this in quiz questions too
 			 $relarray = explode('/',$relpath);
-			 $relarray[4]='0';
-			 $relpath = implode('/',$relarray);
-			 $file = $fs->get_file_by_hash(sha1($relpath));
-			 
-			 if(!$file){
+			 //index 1 = contextid, 2 =component,3=filearea
+			 //itemid can change, filename is last
+			
+			switch($relarray[2]){
+				case 'question':
+					$qitemid = $relarray[count($relarray)-2];
+					$qfilename = $relarray[count($relarray)-1];
+					$relpath = '/' . $relarray[1] . '/' . $relarray[2] . '/' . $relarray[3];
+					$relpath .= '/' . $qitemid . '/' . $qfilename;
+					break;
+				
+				case 'mod_page':
+					//1st we set itemid to 0
+					$originalitemid = $relarray[4];
+					$relarray[4]='0';
+					$relpath = implode('/',$relarray);
+					break;
+				
+				case 'mod_assign':
+					array_splice($relarray, 4, 0, '0');
+					$relpath = implode('/',$relarray);
+					break;
+			}
+			
+			
+			//Then hash the path and try to get the file
+			$file = $fs->get_file_by_hash(sha1($relpath));
+
+			//if we still don't have a file, give up
+			if(!$file){
 				return false;
-				//return "no video file found @ " . $relpath;
 			}
 	}
+
 	
 	//check if we really can have/make a splash for this file
 	//if name is too short, we didn't make it, it wont be on our red5 server
 	$filename = $file->get_filename();
 	if(strlen($filename)<5){
 		return false;
-		//return "bad filename ";
 	}
-	
-	//if name is not numeric, it is not a video file we made, it wont be on our red5 server
-	if(!is_numeric(substr($filename,0,strlen($filename)-4))){
+
+	//if we are NOT using FFMPEG, we can only take snaps from Red5, so ...
+	//if name is not numeric, it is not a video file we recorded on red5.it wont be there
+	if(!$CFG->filter_poodll_ffmpeg && !is_numeric(substr($filename,0,strlen($filename)-4))){
 		return false;
-		//return "not nuimeric filename";
 	}
 	
 	//check if we have an image file here already, if so return that URL
@@ -3457,10 +3758,24 @@ $relpath=str_replace("?forcedownload=1","", $relpath);
 	$imagefilename = substr($filename,0,strlen($filename)-3) . 'png';
 	if ($imagefile = $fs->get_file_by_hash(sha1($relimagepath))) {
             return $fullimagepath;
+    }
+
+	//from this point on we will need our file handling functions
+	require_once($CFG->dirroot . '/filter/poodll/poodllfilelib.php');
 	
-	//if we don't have that image lets get it from tokyopoodll and return it
+	//if we are using FFMPEG, try to get the splash image
+	if($CFG->filter_poodll_ffmpeg){
+
+		$imagefile = get_splash_ffmpeg($file, $imagefilename);
+		if($imagefile){
+			return $fullimagepath;
+		}else{
+			return false;
+		}
+	
+	//if not FFMPEG pick it up from Red5 server
 	}else{
-		require_once($CFG->dirroot . '/filter/poodll/poodllfilelib.php');
+
 		$result = instance_remotedownload($file->get_contextid(),
 					$imagefilename, 
 					$file->get_component(),
@@ -3469,18 +3784,14 @@ $relpath=str_replace("?forcedownload=1","", $relpath);
 					"99999",
 					$file->get_filepath()
 					);
-		
+	
 		if(strpos($result,"success")){
 			return $fullimagepath;
 		}else{
 			return false;
 		}
-	}
-	
-	
-	
-	
-}
+	}//end of if ffmpeg
+}//end of fetchVideoSplash
 
 function fetchJSWidgetCode($widget,$paramsArray,$width,$height, $bgcolor="#FFFFFF", $usemastersprite="false"){
 	global $CFG, $PAGE;

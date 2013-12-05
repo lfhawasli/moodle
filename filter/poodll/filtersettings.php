@@ -98,10 +98,15 @@ $items[] = new admin_setting_heading('filter_poodll_transcode_settings', get_str
 $items[] = new admin_setting_configcheckbox('filter_poodll_videotranscode', get_string('videotranscode', 'filter_poodll'), get_string('videotranscodedetails', 'filter_poodll'), 0);
 $items[] = new admin_setting_configcheckbox('filter_poodll_audiotranscode', get_string('audiotranscode', 'filter_poodll'), get_string('audiotranscodedetails', 'filter_poodll'), 0);
 $items[] = new admin_setting_configcheckbox('filter_poodll_ffmpeg', get_string('ffmpeg', 'filter_poodll'), get_string('ffmpeg_details', 'filter_poodll'), 0);
+$items[] = new admin_setting_configtext('filter_poodll_ffmpeg_mp3opts', get_string('mp3opts', 'filter_poodll'), get_string('mp3opts_details', 'filter_poodll'), '');
+$items[] = new admin_setting_configtext('filter_poodll_ffmpeg_mp4opts', get_string('mp4opts', 'filter_poodll'), get_string('mp4opts_details', 'filter_poodll'), '');
 
 
 //PoodLL Whiteboard
 $items[] = new admin_setting_heading('filter_poodll_whiteboard_setting', get_string('filter_poodll_whiteboard_heading', 'filter_poodll'), '');
+$options = array('poodll' => 'PoodLL Whiteboard(Flash)','drawingboard' => 'Drawing Board(js)', 'literallycanvas' => 'Literally Canvas(js)');
+$items[] = new admin_setting_configselect('filter_poodll_defaultwhiteboard', get_string('defaultwhiteboard', 'filter_poodll'), '', 'poodll', $options);
+$items[] = new admin_setting_configcheckbox('filter_poodll_autosavewhiteboard', get_string('autosavewhiteboard', 'filter_poodll'), '', 1);
 $items[] = new admin_setting_configtext('filter_poodll_whiteboardwidth', get_string('wboardwidth', 'filter_poodll'), '', '600', PARAM_INT);
 $items[] = new admin_setting_configtext('filter_poodll_whiteboardheight', get_string('wboardheight', 'filter_poodll'), '', '350', PARAM_INT);
 
