@@ -18,7 +18,7 @@
 /**
  * Library of interface functions and constants for module nanogong
  *
- * All the core Moodle functions, neeeded to allow the module to work
+ * All the core Moodle functions, needed to allow the module to work
  * integrated in Moodle should be placed here.
  * All the nanogong specific functions, needed to implement all the module
  * logic, should go to locallib.php. This will help to save some memory when
@@ -30,7 +30,7 @@
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2.1
+ * @version    4.2.2
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -59,16 +59,10 @@ require_once($CFG->libdir.'/grouplib.php');
  * @return mixed true if the feature is supported, null if unknown
  */
 function nanogong_supports($feature) {
-    switch($feature) {
-        //case FEATURE_GROUPS:                  return true;
-        //case FEATURE_GROUPINGS:               return true;
-        //case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        default:    return null;
-    }
+    if (defined('FEATURE_MOD_INTRO') && $feature == FEATURE_MOD_INTRO) return true;
+    if (defined('FEATURE_GRADE_HAS_GRADE') && $feature == FEATURE_GRADE_HAS_GRADE) return true;
+    if (defined('FEATURE_SHOW_DESCRIPTION') && $feature == FEATURE_SHOW_DESCRIPTION) return true;
+    if (defined('FEATURE_BACKUP_MOODLE2') && $feature == FEATURE_BACKUP_MOODLE2) return true;
 }
 
 /**
@@ -569,35 +563,43 @@ class mod_nanogong_grade_form extends moodleform {
 
         $mform = $this->_form;
 
-        list($data, $editoroptions, $nanogongjs, $isvoice, $maxgrade) = $this->_customdata;
+        list($data, $editoroptions, $url, $maxgrade) = $this->_customdata;
 
+        // Main content
         $gradetitle = get_string('grade', 'nanogong') . get_string('outof', 'nanogong') . $maxgrade;
-        $mform->addElement('text', 'nanogonggrade', $gradetitle, array('maxlength'=>30, 'size'=>25));
-        $mform->setType('nanogonggrade', PARAM_INT);
-        $nangongwronggrade = get_string('wronggrade', 'nanogong') . $maxgrade;
-        $mform->addRule('nanogonggrade', $nangongwronggrade, 'numeric', null, 'client');
+        $mform->addElement('text', 'grade', $gradetitle, array('maxlength'=>30, 'size'=>25));
+        $mform->setType('grade', PARAM_INT);
+        $grademsg = get_string('wronggrade', 'nanogong') . $maxgrade;
+        $mform->addRule('grade', $grademsg, 'numeric', null, 'client');
         $mform->addElement('applet', 'nanogonginstance', get_string('voicerecording', 'nanogong'), array('id'=>'nanogonggradeinstance', 'archive'=>'nanogong.jar', 'code'=>'gong.NanoGong', 'width'=>180, 'height'=>40));
-        if ($isvoice) {
-            $nanogongloadaudio = 'javascript:nanogong_load_audio(\'' . $isvoice . '\')';
-            $mform->addElement('button', 'loadoldvoice', get_string('loadcurrent', 'nanogong'), array('onclick'=>$nanogongloadaudio));
+        if ($url) {
+            $mform->addElement('button', 'nanogong_loadaudio_button', get_string('loadcurrent', 'nanogong'), array('path'=>$url));
         }
-
         $mform->addElement('editor', 'comments_editor', get_string('yourmessage', 'nanogong'), null, $editoroptions);
-        $mform->setType('comments_editor', PARAM_RAW); // to be cleaned before display
+        $mform->setType('comments_editor', PARAM_RAW);
+        $mform->addElement('checkbox', 'locked', get_string('lockstudent', 'nanogong'));
 
-        // hidden params
+        // Hidden params
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'action');
+        $mform->setType('action', PARAM_TEXT);
+        $mform->addElement('hidden', 'catalog');
+        $mform->setType('catalog', PARAM_TEXT);
+        $mform->addElement('hidden', 'topage');
+        $mform->setType('topage', PARAM_INT);
+        $mform->addElement('hidden', 'perpage');
+        $mform->setType('perpage', PARAM_INT);
+        $mform->addElement('hidden', 'student');
+        $mform->setType('student', PARAM_INT);
+        $mform->addElement('hidden', 'maxduration');
+        $mform->setType('maxduration', PARAM_INT);
+        $mform->addElement('hidden', 'url');
+        $mform->setType('url', PARAM_TEXT);
         
-        $mform->addElement('hidden', 'nanogongmaxduration');
-        $mform->setType('nanogongmaxduration', PARAM_INT);
-        
-        $mform->addElement('hidden', 'nanogongcatalog');
-        $mform->setType('nanogongcatalog', PARAM_RAW);
-        
-        // buttons
+        // Buttons
         $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'), array('onclick'=>$nanogongjs));
+        $buttonarray[] = &$mform->createElement('button', 'nanogong_saveaudio_button', get_string('savechanges'));
         $buttonarray[] = &$mform->createElement('cancel', 'cancelbutton', get_string('cancel'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
@@ -611,31 +613,22 @@ class mod_nanogong_supplement_form extends moodleform {
         $mform = $this->_form;
 
         list($data, $editoroptions) = $this->_customdata;
+
+        // Main content
         $mform->addElement('editor', 'supplement_editor', get_string('messagefor', 'nanogong'), null, $editoroptions);
-        $mform->setType('supplement_editor', PARAM_RAW); // to be cleaned before display
+        $mform->setType('supplement_editor', PARAM_RAW);
         
-        // hidden params
+        // Hidden params
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'action');
+        $mform->setType('action', PARAM_TEXT);
+        $mform->addElement('hidden', 'maxduration');
+        $mform->setType('maxduration', PARAM_INT);
         
-        $mform->addElement('hidden', 'nanogongmaxduration');
-        $mform->setType('nanogongmaxduration', PARAM_INT);
-        
-        // buttons
+        // Buttons
         $this->add_action_buttons();
         
         $this->set_data($data);
     }
-}
-
-function nanogong_unicode2utf8($str) {
-    if(!$str) return $str;
-    $decode = json_decode($str);
-    if($decode) return $decode;
-    $str = '["' . $str . '"]';
-    $decode = json_decode($str);
-    if(count($decode) == 1) {
-        return $decode[0];
-    }
-    return $str;
 }

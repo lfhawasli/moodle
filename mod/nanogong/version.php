@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
 * Defines the version of nanogong
 *
@@ -23,16 +21,17 @@
 * /admin/index.php
 *
 * @author     Ning
+* @author     Gibson
 * @package    mod
 * @subpackage nanogong
-* @copyright  2012 The Gong Project
+* @copyright  2013 The Gong Project
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-* @version    4.2.1
+* @version    4.2.3.1
 */
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version   = 2012081001;      // The current module version (Date: YYYYMMDDXX)
+$module->version   = 2013011400;      // The current module version (Date: YYYYMMDDXX)
 $module->requires = 2011033008;       // Requires this Moodle version
 $module->cron     = 0;                // Period for cron to check this module (secs)
 $module->component = 'mod_nanogong';  // To check on upgrade, that module sits in correct place
