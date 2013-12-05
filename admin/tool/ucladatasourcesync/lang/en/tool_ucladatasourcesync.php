@@ -18,9 +18,10 @@ $string['errbcmsgquiet'] = "ERROR: Cannot access configuration option quiet_mode
 $string['errbcinsert'] = "ERROR: Problem writing to the database.";
 $string['errbcinvalidrowlen'] = "ERROR: Invalid row length in provided bruincast data.";
 
-// Notication messages
+// Notification messages
 $string['bcstartnoti'] = "Starting bruincast DB update:";
 $string['bcsuccessnoti'] = '... {$a} records successfully inserted.';
+$string['bcnoentries'] = 'No Bruincast entries found.';
 
 /** Strings for libraryreserves_dbsync **/
 // Error messages

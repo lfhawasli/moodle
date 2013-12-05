@@ -101,6 +101,7 @@ function update_bruincast_db($source_url) {
             $error->data = print_r($d, true);
             echo(get_string('warninvalidfields', 'tool_ucladatasourcesync',
                     $error) . "\n");
+            continue;
         }
 
         foreach ($keymap as $k => $v) {
@@ -115,10 +116,13 @@ function update_bruincast_db($source_url) {
         $clean_data[$obj->term.'-'.$obj->srs][] = $obj;
     }
 
-    // Drop table if we have new data
-    if (!empty($clean_data)) {
-        $DB->delete_records('ucla_bruincast');
+    // Do not process bruincast data if there are no valid entries.
+    if (empty($clean_data)) {
+        die(get_string('bcnoentries', 'tool_ucladatasourcesync'). "\n");
     }
+
+    // Drop table if we are processing new entries.
+    $DB->delete_records('ucla_bruincast');
 
     // Insert records
     try {
