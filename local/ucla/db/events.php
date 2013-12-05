@@ -37,19 +37,13 @@ $handlers = array(
     ),
     'ucla_syllabus_added' => array (
         'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction'  => 'ucla_syllabus_updated',
+        'handlerfunction'  => 'update_srdb_ucla_syllabus',
         'schedule'         => 'cron',
         'internal'         => 0,
     ),
     'ucla_syllabus_deleted' => array (
         'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction'  => 'ucla_syllabus_deleted',
-        'schedule'         => 'cron',
-        'internal'         => 0,
-    ),
-    'ucla_syllabus_updated' => array (
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction'  => 'ucla_syllabus_updated',
+        'handlerfunction'  => 'update_srdb_ucla_syllabus',
         'schedule'         => 'cron',
         'internal'         => 0,
     ),

@@ -25,9 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 // @todo When automatic class loading is available via Moodle 2.6, we no longer
-// need to include this class, so delete it.
+// need to include the local_ucla_regsender class, so delete it.
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
+require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
 /**
  * PHPunit tests for local_ucla_regsender.php. Creation of local test tables is
@@ -209,7 +210,7 @@ class regsender_test extends advanced_testcase {
         $this->preventResetByRollback();
 
         $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
-                ->create_class(array());
+                                           ->create_class(array());
         $this->_class = array_pop($course);
 
         $this->_local_ucla_regsender = new local_ucla_regsender();
@@ -340,5 +341,62 @@ class regsender_test extends advanced_testcase {
                     array($type => $courselink));
             $this->assertEquals($result, local_ucla_regsender::NOUPDATE);
         }
+    }
+
+    /**
+     * Makes sure that the events system is triggering properly whenever a
+     * syllabus is added, updated, and deleted for a course.
+     */
+    public function test_ucla_syllabus_events() {
+        $courseid = $this->_class->courseid;
+        $course = get_course($courseid);
+        $syllabusmanager = new ucla_syllabus_manager($course);
+        $this->setAdminUser();  // Generator requires user to be set.
+
+        // For given course, create a public syllabus.
+        $syllabus = new stdClass();
+        $syllabus->courseid = $courseid;
+        $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
+        $syllabus = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla_syllabus')
+                ->create_instance($syllabus);
+
+        // Sending syllabi links is done via cron, so need to trigger that.
+        events_cron('ucla_syllabus_added');
+
+        // This should have triggered an event and the Registrar table should
+        // now have a record.
+        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
+
+        // Now convert this syllabus to a private syllabus, which will trigger
+        // an delete and add event.
+        $syllabusmanager->convert_syllabus($syllabus, UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE);
+        events_cron('ucla_syllabus_deleted');
+        events_cron('ucla_syllabus_added');
+        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
+        $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+
+        // Now add a syllabus that requires someone to login to view.
+        $syllabus = new stdClass();
+        $syllabus->courseid = $courseid;
+        $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN;
+        $syllabus = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla_syllabus')
+                ->create_instance($syllabus);
+        events_cron('ucla_syllabus_added');
+        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
+        $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
+        $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+
+        // Delete course and make sure that syllabi are wiped out.
+        delete_course($courseid);
+        events_cron('ucla_syllabus_deleted');        
+        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
     }
 }

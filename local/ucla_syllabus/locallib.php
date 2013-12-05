@@ -145,9 +145,10 @@ class ucla_syllabus_manager {
     /**
      * Convert between public or private syllabi.
      * 
-     * @param stdClass $syllabus   Expecting an object that is derived from
-     *                             the ucla_syllabus class
-     * @param int $convertto    UCLA_SYLLABUS_TYPE_PUBLIC | UCLA_SYLLABUS_TYPE_PRIVATE
+     * @param stdClass $syllabus    Expecting an object that is derived from
+     *                              the ucla_syllabus class
+     * @param int $convertto        UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC or
+     *                              UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE
      */
     public function convert_syllabus($syllabus, $convertto) {
         global $DB;

@@ -146,6 +146,81 @@ class local_ucla_regsender {
     }
 
     /**
+     * Looks up the type of syllabi uploaded for a course and sends the 
+     * corresponding links to the Registrar.
+     *
+     * @param int $courseid
+     * @param progress_trace $trace Optional. If passed, will send logging data,
+     *                              else will send messages to null.
+     */
+    public function push_course_links($courseid, $trace=null) {
+        global $DB;
+        $retval = false;
+        if (empty($trace)) {
+            $trace = new null_progress_trace();
+        }
+
+        // Create empty array of syllabus links. Then set them if there is a
+        // syllabus for that type.
+        $links = array();
+        foreach (self::$syllabustypes as $type) {
+            $links[$type] = '';
+        }
+
+        $courselink = (new moodle_url('/local/ucla_syllabus/index.php',
+                    array('id' => $courseid)))->out();
+
+        // Get syllabi for course. Do not use ucla_syllabus_manager, since it
+        // has a lot of overhead.
+        $syllabustypes = $DB->get_fieldset_select('ucla_syllabus', 'access_type',
+                'courseid = ?', array($courseid));
+
+        $setlinks = array();
+        if (!empty($syllabustypes)) {
+            foreach ($syllabustypes as $type) {
+                switch ($type) {
+                    case UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC:
+                        $links['public'] = $courselink;
+                        $setlinks[] = 'public';
+                        break;
+                    case UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN:
+                        $links['protect'] = $courselink;
+                        $setlinks[] = 'protect';
+                        break;
+                    case UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE:
+                        $links['private'] = $courselink;
+                        $setlinks[] = 'private';
+                        break;
+                }
+            }
+        }
+
+        if (empty($setlinks)) {
+            $trace->output("No syllabi found, clearing links", 1);
+        } else {
+            $trace->output(sprintf("Setting links for: %s, clearing others", implode(', ', $setlinks)), 1);
+        }
+
+        $result = $this->set_syllabus_links($courseid, $links);
+        if ($result == local_ucla_regsender::FAILED) {
+            $trace->output("ERROR! Could not set links for course id $courseid; Aborting", 1);
+        } else if ($result == local_ucla_regsender::NOUPDATE) {
+            $trace->output("Syllabi links already set, no changes", 1);
+            $retval = true;
+        } else if ($result == local_ucla_regsender::PARTIALUPDATE) {
+            $trace->output("Some syllabi links already set, some changes", 1);
+            $retval = true;
+        } else if ($result == local_ucla_regsender::SUCCESS) {
+            $trace->output("All syllabi links set successfully", 1);
+            $retval = true;
+        } else {
+            $trace->output("ERROR! Unknown return code; Aborting", 1);
+        }
+
+        return $retval;
+    }
+
+    /**
      * For given courseid, will update the appropiate syllabus entries at the
      * Registrar with the the given url for given syllabus type.
      *
