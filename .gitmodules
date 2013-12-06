@@ -25,3 +25,6 @@
 [submodule "report/editdates"]
 	path = report/editdates
 	url = git://github.com/ccle/moodle-report_editdates.git
+[submodule "mod/questionnaire"]
+	path = mod/questionnaire
+	url = git@github.com:ccle/moodle-mod_questionnaire.git
