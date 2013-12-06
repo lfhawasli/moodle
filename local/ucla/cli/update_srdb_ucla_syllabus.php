@@ -28,7 +28,6 @@ define('CLI_SCRIPT', true);
 require(__DIR__.'/../../../config.php');
 require_once("$CFG->libdir/clilib.php");
 require_once("$CFG->dirroot/local/ucla/classes/local_ucla_regsender.php");
-require_once("$CFG->dirroot/local/ucla_syllabus/locallib.php");
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(array('help' => false), array('h' => 'help'));

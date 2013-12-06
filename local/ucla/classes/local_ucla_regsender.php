@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/ucla/lib.php');
+require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
 /**
  * Handles setting/getting data from Registrar tables.
@@ -95,17 +96,50 @@ class local_ucla_regsender {
     }
 
     /**
+     * Returns an array of entries, with a limit of $limit, from the Registrar
+     * syllabus table.
+     *
+     * @param type $limit   Maximum syllabus entries to return. Default is 10.
+     * @return array        Returns null if cannot connect to the Registrar.
+     */
+    public function get_recent_syllabus_links($limit = 10) {
+        $adodb = $this->open_regconnection();
+        if (empty($adodb)) {
+            return null;
+        }
+
+        // Do some sanity checking.
+        $limit = intval($limit);
+        if ($limit <= 0) {
+            $limit = 10;
+        }
+
+        $sql = "SELECT  *
+                FROM    $this->syllabustable
+                WHERE   1=1
+                ORDER BY    update_timestamp DESC";
+
+        $rs = $adodb->SelectLimit($sql, $limit);
+
+        return $rs->GetAll();
+    }
+
+    /**
      * For given courseid, will return list of syllabus links indexed by
      * term/srs.
      *
      * @param int $courseid
      * @return array            Array of records from the Registrar indexed by
-     *                          term and srs.
+     *                          term and srs. Returns null if cannot connect to
+     *                          the Registrar.
      */
     public function get_syllabus_links($courseid) {
         $retval = array();
 
         $adodb = $this->open_regconnection();
+        if (empty($adodb)) {
+            return null;
+        }
 
         // Get all related fields to build key to query records.
         $courseinfos = ucla_get_course_info($courseid);
@@ -135,13 +169,17 @@ class local_ucla_regsender {
      * @throws registrar_query_exception    If cannot connect to registrar.
      *
      * @param boolean $debug    Optional.
-     * @return ADOConnection
+     * @return ADOConnection    Returns null if connection cannot be opened.
      */
     protected function open_regconnection($debug = false) {
         if (empty($this->adodb)) {            
             $this->adodb = registrar_query::open_registrar_connection();
+        }        
+        if (!$this->adodb->IsConnected()) {
+            $this->adodb = null;
+        } else {
+            $this->adodb->debug = $debug;
         }
-        $this->adodb->debug = $debug;
         return $this->adodb;
     }
 
@@ -276,6 +314,9 @@ class local_ucla_regsender {
         
 
         $adodb = $this->open_regconnection();
+        if (empty($adodb)) {
+            return self::FAILED;
+        }
 
         // Not all courseinfo entries might bee updated. Need to keep track of
         // partial updates so that we can return the right return codes.

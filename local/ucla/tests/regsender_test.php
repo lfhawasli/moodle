@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 // need to include the local_ucla_regsender class, so delete it.
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
-require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
 /**
  * PHPunit tests for local_ucla_regsender.php. Creation of local test tables is
@@ -227,6 +226,53 @@ class regsender_test extends advanced_testcase {
     }
 
     /**
+     * Make sure that get_recent_syllabus_links returns the appropiate number
+     * of rows.
+     */
+    public function test_get_recent_syllabus_links() {
+        $this->setAdminUser();
+
+        // Empty data should return nothing.
+        $results = $this->_local_ucla_regsender->get_recent_syllabus_links();
+        $this->assertEquals(0, count($results));
+
+        // Create 5 courses with syllabi.
+        $numcourses = 5;
+        for ($i=0; $i<$numcourses; $i++) {
+            $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
+                                               ->create_class(array());
+            $class = array_pop($course);
+            $courseid = $class->courseid;
+
+            $syllabus = new stdClass();
+            $syllabus->courseid = $courseid;
+            $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
+            $syllabus = $this->getDataGenerator()
+                    ->get_plugin_generator('local_ucla_syllabus')
+                    ->create_instance($syllabus);
+        }
+
+        // Sending syllabi links is done via cron, so need to trigger that.
+        events_cron('ucla_syllabus_added');
+
+        // Now Registrar table should have all syllabi links, lets get the most
+        // recent ones.
+        $results = $this->_local_ucla_regsender->get_recent_syllabus_links();
+        $this->assertEquals($numcourses, count($results));
+
+        $results = $this->_local_ucla_regsender->get_recent_syllabus_links($numcourses);
+        $this->assertEquals($numcourses, count($results));
+
+        $lesser = $numcourses - rand(1, $numcourses-1);
+        $results = $this->_local_ucla_regsender->get_recent_syllabus_links($lesser);
+        $this->assertEquals($lesser, count($results));
+
+        // Test if set invalid number to method.
+        $results = $this->_local_ucla_regsender->get_recent_syllabus_links(-1);
+        $this->assertEquals($numcourses, count($results));
+    }
+
+    /**
      * Makes sure that the get_syllabus_links method returns empty when there is
      * no data set.
      */
@@ -346,6 +392,8 @@ class regsender_test extends advanced_testcase {
     /**
      * Makes sure that the events system is triggering properly whenever a
      * syllabus is added, updated, and deleted for a course.
+     *
+     * @group totest
      */
     public function test_ucla_syllabus_events() {
         $courseid = $this->_class->courseid;
@@ -368,6 +416,8 @@ class regsender_test extends advanced_testcase {
         // now have a record.
         $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
 
         // Now convert this syllabus to a private syllabus, which will trigger
         // an delete and add event.
@@ -377,6 +427,7 @@ class regsender_test extends advanced_testcase {
         $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
 
         // Now add a syllabus that requires someone to login to view.
         $syllabus = new stdClass();
@@ -388,8 +439,8 @@ class regsender_test extends advanced_testcase {
         events_cron('ucla_syllabus_added');
         $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
-        $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+        $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
 
         // Delete course and make sure that syllabi are wiped out.
         delete_course($courseid);
