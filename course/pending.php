@@ -53,9 +53,12 @@ if (!empty($approve) and confirm_sesskey()) {
 
     if ($courseid !== false) {
         // START UCLAMOD CCLE-2389
+        // Approving site indicator site, and sening 'approved' param
         siteindicator_manager::approve($courseid, $approve);
+//        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid);
+        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid . '&approved=1');
         // END UCLAMOD CCLE-2389
-        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid);
+
     } else {
         print_error('courseapprovedfailed');
     }
