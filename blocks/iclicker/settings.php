@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: settings.php 179 2013-01-25 20:13:56Z azeckoski@gmail.com $ */
+/* $Id: settings.php 189 2013-07-30 02:31:57Z azeckoski@gmail.com $ */
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -61,6 +61,15 @@ if ($ADMIN->fulltree) {
             get_string('config_disable_alternateid', $block_name),
             get_string('config_disable_alternateid_desc', $block_name),
             0
+        )
+    );
+    $settings->add(
+        new admin_setting_configtext(iclicker_service::BLOCK_NAME.'/block_iclicker_max_courses_fetched',
+            get_string('config_max_courses', $block_name),
+            get_string('config_max_courses_desc', $block_name),
+            '100',
+            PARAM_INT,
+            5
         )
     );
     // WS
