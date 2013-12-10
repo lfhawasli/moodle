@@ -16,3 +16,6 @@
 [submodule "theme/uclashared/package/bootstrap"]
 	path = theme/uclashared/package/bootstrap
 	url = git@github.com:jlong/sass-twitter-bootstrap.git
+[submodule "admin/tool/editrolesbycap"]
+	path = admin/tool/editrolesbycap
+	url = git://github.com/moodleou/moodle-tool_editrolesbycap
