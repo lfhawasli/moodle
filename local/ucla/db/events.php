@@ -11,6 +11,11 @@ $handlers = array(
         'handlerfunction' => 'course_restored_enrol_check',
         'schedule'        => 'instant'
     ),
+    'course_restored' => array(
+        'handlerfile'     => '/local/ucla/eventslib.php',
+        'handlerfunction' => 'course_restored_dedup_default_forums',
+        'schedule'        => 'instant'
+    ),
     'ucla_weeksdisplay_changed' => array(
         'handlerfile'     => '/local/ucla/eventslib.php',
         'handlerfunction' => 'hide_past_courses',
