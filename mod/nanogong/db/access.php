@@ -41,16 +41,29 @@
  * The variable name for the capability definitions array is $capabilities
  *
  * @author     Ning
+ * @author     Gibson
  * @package    mod
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2
+ * @version    4.2.3
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$mod_nanogong_capabilities = array(
+$capabilities = array(
+
+    // Insert addinstance - contributed by Kirill Astashov (kirill.astashov@netspot.com.au)
+    'mod/nanogong:addinstance' => array(
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities'
+    ),
 
     'mod/nanogong:view' => array(
         'captype' => 'read',
@@ -82,18 +95,5 @@ $mod_nanogong_capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-    // START UCLA MOD: CCLE-3435-fix-editor-for-Moodle2.3
-    'mod/nanogong:addinstance' => array(
-        'riskbitmask' => RISK_XSS,
-
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-    ),
-    'clonepermissionsfrom' => 'moodle/course:manageactivities'
-    ),
-    // END UCLA MOD: CCLE-3435-fix-editor-for-Moodle2.3
 );
+

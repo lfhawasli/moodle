@@ -14,9 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
-* NanoGong Filter for TinyMCE Plugin
+* NanoGong filter for TinyMCE Plugin
 *
 * @author     Ning
 * @author     Gibson
@@ -24,13 +23,14 @@
 * @subpackage nanogong
 * @copyright  2012 The Gong Project
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-* @version    4.2.1
+* @version    4.2.2
 */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012060100;
-$plugin->requires = 2011033008;       // Requires this Moodle version
+$plugin->version   = 2012061501;
+// Required Moodle version.
+$plugin->requires  = 2013050100;
 $plugin->component = 'filter_nanogong';
 
 ?>

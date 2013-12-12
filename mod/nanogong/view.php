@@ -24,7 +24,7 @@
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2.1
+ * @version    4.2.3
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
@@ -32,54 +32,371 @@ require_once(dirname(__FILE__).'/lib.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n  = optional_param('n', 0, PARAM_INT);  // nanogong instance ID - it should be named as the first character of the module
-
-$tograde = optional_param('tograde', 0, PARAM_INT);
-$toadd = optional_param('toadd', 0, PARAM_BOOL);
-$todelete = optional_param('todelete', 0, PARAM_BOOL);
-$checkdelete = optional_param('checkdelete', 0, PARAM_BOOL);
-$tomessage = optional_param('tomessage', 0, PARAM_BOOL);
-$toreverse = optional_param('toreverse', 0, PARAM_BOOL);
-$tolistall = optional_param('tolistall', 0, PARAM_BOOL);
-
-$topage = optional_param('topage', 0, PARAM_INT);
-$pagenumber = optional_param('pagenumber', 10, PARAM_INT);
+$n  = optional_param('n', 0, PARAM_INT);  // nanogong instance ID
+$action = optional_param('action', '', PARAM_TEXT);
 
 if ($id) {
-    $cm         = get_coursemodule_from_id('nanogong', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $nanogong   = $DB->get_record('nanogong', array('id' => $cm->instance), '*', MUST_EXIST);
-}
-elseif ($n) {
-    $nanogong   = $DB->get_record('nanogong', array('id' => $n), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $nanogong->course), '*', MUST_EXIST);
-    $cm         = get_coursemodule_from_instance('nanogong', $nanogong->id, $course->id, false, MUST_EXIST);
-}
-else {
-    error('You must specify a course_module ID or an instance ID');
+    if (! $cm = get_coursemodule_from_id('nanogong', $id)) {
+        print_error('invalidcoursemodule');
+    }
+    if (! $course = $DB->get_record('course', array('id'=>$cm->course))) {
+        print_error('coursemisconf');
+    }
+    if (! $nanogong = $DB->get_record('nanogong', array('id'=>$cm->instance))) {
+        print_error('invalidid', 'nanogong');
+    }
+} else {
+    if (! $nanogong = $DB->get_record('nanogong', array('id'=>$n))) {
+        print_error('invalidid', 'nanogong');
+    }
+    if (! $course = $DB->get_record('course', array('id'=>$nanogong->course))) {
+        print_error('coursemisconf');
+    }
+    if (! $cm = get_coursemodule_from_instance('nanogong', $nanogong->id, $course->id)) {
+        print_error('invalidcoursemodule');
+    }
 }
 
 require_login($course, true, $cm);
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 require_capability('mod/nanogong:view', $context);
 
-
 add_to_log($course->id, 'nanogong', 'view', "view.php?id={$cm->id}", $nanogong->name, $cm->id);
 
 $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES']['applet'] = array('quickform/applet.php','HTML_QuickForm_applet');
 
-
 /// Print the page header
 
-$PAGE->set_url('/mod/nanogong/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/nanogong/view.php', array('id'=>$cm->id));
 $PAGE->set_title(format_string($nanogong->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-$PAGE->requires->js('/mod/nanogong/nanogongapplet.js');
+
+// Language strings
+$PAGE->requires->strings_for_js(array('show', 'hide'), 'nanogong');
+
+// Initialize the NanoGong JavaScript
+$PAGE->requires->js_init_call('M.mod_nanogong.init', array($PAGE->url->out()));
+
+///
+/// Handle the actions and checkings for student views
+///
+//if (has_capability('mod/nanogong:submit', $context) && is_enrolled($coursecontext, $USER)) {
+if (has_capability('mod/nanogong:submit', $context)) {
+    $time = time();
+    $isavailable = true;
+    if ($nanogong->timeavailable > $time) $isavailable = false;
+    if ($nanogong->timedue && $time > $nanogong->timedue && $nanogong->preventlate != 0) $isavailable = false;
+
+    $submission = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$USER->id));
+    
+    ///
+    /// Insert a deleted message
+    ///
+    if ($action === 'insertmessage') {
+        if (!$isavailable) {
+            print_error('notavailable', 'nanogong', $PAGE->url);
+        }
+
+        if ($submission && $submission->locked) {
+            print_error('studentlocked', 'nanogong', $PAGE->url);
+        }
+
+        $title = optional_param('title', '', PARAM_TEXT);
+        $name = optional_param('name', '', PARAM_TEXT);
+        if ($title && $name) {
+            nanogong_check_content($name, $nanogong->id, $USER->id, 0);    
+            $nanogongimg = '<img title="NanoGongItem" src="pix/speaker.gif" style="vertical-align: middle" alt="' . $name . '" />';
+            $submission->message .= '<p title="NanoGong Title">' . $title . ' ' . $nanogongimg . '</p>';
+            $DB->update_record('nanogong_messages', $submission);
+            
+            add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
+        }
+
+        redirect(new moodle_url($PAGE->url));
+    }
+    
+    ///
+    /// Save a new message
+    ///
+    if ($action === 'savemessage') {
+        if (!$isavailable) {
+            print_error('notavailable', 'nanogong', $PAGE->url);
+        }
+
+        if ($submission && $submission->locked) {
+            print_error('studentlocked', 'nanogong', $PAGE->url);
+        }
+
+        $url = required_param('url', PARAM_TEXT);
+        $title = required_param('title', PARAM_TEXT);
+
+        // Check for empty title
+        $title = preg_replace('/(^\s+)|(\s+$)/us', '', $title); 
+        if ($title == '') {
+            print_error('voicetitle', 'nanogong', $PAGE->url);
+        }
+
+        $nanogongimg = '<img title="NanoGongItem" src="pix/speaker.gif" style="vertical-align: middle" alt="' . $url . '" />';
+        $nanogongform = '<p title="NanoGong Title">' . $title . ' ' . $nanogongimg . '</p>';
+
+        // Create a submission if none exists
+        if (!$submission) {
+            $submission = new stdClass();
+            $submission->nanogongid       = $nanogong->id;
+            $submission->userid           = $USER->id;
+            $submission->message          = '';
+            $submission->supplement       = '';
+            $submission->supplementformat = FORMAT_HTML;
+            $submission->audio            = '';
+            $submission->comments         = '';
+            $submission->commentsformat   = FORMAT_HTML;
+            $submission->commentedby      = 0;
+            $submission->grade            = -1;
+            $submission->timestamp        = time();
+            $submission->locked           = false;
+            $submission->id = $DB->insert_record("nanogong_messages", $submission);
+        }
+
+        // Save the new message in DB
+        if (!strpos($submission->message, $nanogongform)) {
+            $submission->message .= $nanogongform;
+
+            $DB->update_record('nanogong_messages', $submission);
+            add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
+    
+            $nanogongaudio = new stdClass();
+            $nanogongaudio->nanogongid   = $nanogong->id;
+            $nanogongaudio->userid       = $USER->id;
+            $nanogongaudio->type         = 1;
+            $nanogongaudio->title        = $title;
+            $nanogongaudio->name         = $url;
+            $nanogongaudio->timecreated  = time();
+            $nanogongaudio->id = $DB->insert_record("nanogong_audios", $nanogongaudio);
+            $DB->update_record('nanogong_audios', $nanogongaudio);    
+        }
+
+        redirect(new moodle_url($PAGE->url));
+    }
+    
+    ///
+    /// Delete a message
+    ///
+    if ($submission && $action === 'deletemessage') {
+        if ($submission->locked) {
+            print_error('studentlocked', 'nanogong', $PAGE->url);
+        }
+
+        $filename = optional_param('filename', '', PARAM_TEXT);
+
+        if ($filename) {
+            nanogong_check_content($filename, $nanogong->id, $USER->id, 1);
+
+            $nanogongaudios = $DB->get_records('nanogong_audios', array('nanogongid'=>$nanogong->id));
+            foreach ($nanogongaudios as $nanogongaudio) {
+                if (strcmp($nanogongaudio->name, $filename) == 0) {
+                    break;
+                }
+            }
+
+            preg_match('/<img.*?title="NanoGongItem".*?alt="/', $submission->message, $m);
+            $nanogongvoice = $m[0] . $filename . '" />';
+            $nanogongform = '<p title="NanoGong Title">' . $nanogongaudio->title . ' ' . $nanogongvoice . '</p>';
+        
+            $submission->message = str_replace($nanogongform, '', $submission->message);
+            $DB->update_record('nanogong_messages', $submission);
+        
+            add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
+        }
+
+        redirect(new moodle_url($PAGE->url));
+    }
+
+    ///
+    /// Handle the message form
+    ///
+    if ($submission && $action === 'showmessageform') {
+        if (!$isavailable) {
+            print_error('notavailable', 'nanogong', $PAGE->url);
+        }
+
+        if ($submission->locked) {
+            print_error('studentlocked', 'nanogong', $PAGE->url);
+        }
+
+        // Prepare the message form
+        $editoroptions = array(
+            'noclean'   => false,
+            'maxfiles'  => EDITOR_UNLIMITED_FILES,
+            'maxbytes'  => $course->maxbytes,
+            'context'   => $context
+        );
+    
+        $data = new stdClass();
+        $data->action           = 'showmessageform';
+        $data->id               = $cm->id;
+        $data->maxduration      = $nanogong->maxduration;
+        $data->sid              = $submission->id;
+        $data->supplement       = $submission->supplement;
+        $data->supplementformat = $submission->supplementformat;
+        $data = file_prepare_standard_editor($data, 'supplement', $editoroptions, $context, 'mod_nanogong', 'message', $data->sid);
+
+        $supplementform = new mod_nanogong_supplement_form(null, array($data, $editoroptions));
+
+        if ($supplementform->is_cancelled()) {
+            redirect(new moodle_url($PAGE->url));
+        }
+
+        if ($supplementform->is_submitted()) {
+            $data = $supplementform->get_data();
+            $data = file_postupdate_standard_editor($data, 'supplement', $editoroptions, $context, 'mod_nanogong', 'message', $submission->id);
+
+            $submission->supplement = $data->supplement;
+            $submission->supplementformat = $data->supplementformat;
+
+            $DB->update_record('nanogong_messages', $submission);
+        
+            //TODO fix log actions - needs db upgrade
+            add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
+        
+            redirect(new moodle_url($PAGE->url));
+        }
+    }
+}
+
+///
+/// Handle the actions and checkings for teacher views
+///
+if (has_capability('mod/nanogong:grade', $context)) {
+    ///
+    /// Handle the grade form
+    ///
+    if ($action === 'showgradeform') {
+        $catalog = optional_param('catalog', 'submitted', PARAM_TEXT);
+        $topage = optional_param('topage', 0, PARAM_INT);
+        $perpage = optional_param('perpage', 10, PARAM_INT);
+        $student = optional_param('student', 0, PARAM_INT);
+
+        $submission = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$student));
+        if (!$submission) {
+            print_error('The student submission does not exist!', 'nanogong', $PAGE->url);
+        }
+
+        // Prepare the grade form
+        $editoroptions = array(
+            'noclean'   => false,
+            'maxfiles'  => EDITOR_UNLIMITED_FILES,
+            'maxbytes'  => $course->maxbytes,
+            'context'   => $context
+        );
+
+        $data = new stdClass();
+        $data->id             = $cm->id;
+        $data->action         = $action;
+        $data->catalog        = $catalog;
+        $data->topage         = $topage;
+        $data->perpage        = $perpage;
+        $data->student        = $student;
+        $data->maxduration    = $nanogong->maxduration;
+        $data->sid            = $submission->id;
+        $data->grade          = ($submission->grade < 0)? '' : $submission->grade;
+        $data->url            = '';
+        $data->comments       = $submission->comments;
+        $data->commentsformat = $submission->commentsformat;
+        $data->locked         = $submission->locked;
+        $data = file_prepare_standard_editor($data, 'comments', $editoroptions, $context, 'mod_nanogong', 'message', $data->sid);
+
+        $url = '';
+        if ($submission->audio) {
+            $filename = substr($submission->audio, strpos($submission->audio, 'alt="') + strlen('alt="'), 18);
+            $relativepath = '/'.implode('/', array($context->id, 'mod_nanogong', 'audio', $nanogong->id, $filename));
+            $url = $CFG->wwwroot . '/pluginfile.php?file=' . $relativepath;
+        }
+
+        $gradeform = new mod_nanogong_grade_form(null, array($data, $editoroptions, $url, $nanogong->grade));
+
+        if ($gradeform->is_cancelled()) {
+            redirect(new moodle_url($PAGE->url, array('catalog'=>$catalog, 'topage'=>$topage, 'perpage'=>$perpage)));
+        }
+
+        if ($gradeform->is_submitted()) {
+            $data = $gradeform->get_data();
+
+            $data = file_postupdate_standard_editor($data, 'comments', $editoroptions, $context, 'mod_nanogong', 'message', $submission->id);
+            if (!empty($data->url)) {
+                $submission->audio = '<img title="NanoGongItem" src="pix/speaker.gif" style="vertical-align: middle" alt="' . $data->url . '" />';
+            }
+            $submission->comments = $data->comments;
+            $submission->commentsformat = $data->commentsformat;
+        
+            $grade = trim($data->grade);
+            if ($grade && (int) $grade <= $nanogong->grade && (int) $grade >= 0) {
+                $submission->grade = $data->grade;
+            }
+            else {
+                $submission->grade = -1;
+            }
+            $submission->commentedby    = $USER->id;
+            $submission->locked         = empty($data->locked)? 0 : 1;
+            $submission->timestamp      = time();
+
+            $DB->update_record('nanogong_messages', $submission);
+        
+            //TODO fix log actions - needs db upgrade
+            add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
+        
+            nanogong_update_grades($nanogong, $submission->userid);
+        
+            redirect(new moodle_url($PAGE->url, array('catalog'=>$catalog, 'topage'=>$topage, 'perpage'=>$perpage)));
+        }
+    }
+
+    ///
+    /// Delete the recordings
+    ///
+    elseif ($action === 'deleterecordings') {
+        $catalog = optional_param('catalog', '', PARAM_TEXT);
+        $order = optional_param('order', '', PARAM_INT);
+        $topage = optional_param('topage', 0, PARAM_INT);
+        $perpage = optional_param('perpage', 10, PARAM_INT);
+        $deletenames = optional_param('deletenames', array(), PARAM_TEXT);
+
+        if (count($deletenames) > 0) {
+            foreach ($deletenames as $name) {
+                $audios = $DB->get_records('nanogong_audios', array('nanogongid'=>$nanogong->id));
+                $found = false;
+                foreach ($audios as $audio) {
+                    if (strcmp($audio->name, $name) == 0) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    $submission = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$audio->userid));
+                    if ($submission) {
+                        preg_match('/<img.*?title="NanoGongItem".*?alt="/', $submission->message, $m);
+                        $nanogongvoice = $m[0] . $name . '" />';
+                        $nanogongform = '<p title="NanoGong Title">' . $audio->title . ' ' . $nanogongvoice . '</p>';
+                    
+                        $submission->message = str_replace($nanogongform, '', $submission->message);
+
+                        $DB->update_record('nanogong_messages', $submission);
+
+                        add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
+                    }
+                }
+            }
+        }
+
+        if (empty($catalog))
+            redirect(new moodle_url($PAGE->url, array('order'=>$order, 'topage'=>$topage, 'perpage'=>$perpage, 'action'=>'listbyrecordings')));
+        else
+            redirect(new moodle_url($PAGE->url, array('catalog'=>$order, 'topage'=>$topage, 'perpage'=>$perpage)));
+    }
+}
 
 // Output starts here
 echo $OUTPUT->header();
-nanogong_preload_applet();
 
 echo '<table align="center" cellspacing="0" cellpadding="0"><tr><td><b>' . get_string('modulenamefull', 'nanogong') . '</b></td></tr></table>';
 if ($nanogong->intro) {
@@ -117,193 +434,96 @@ if ($nanogong->timeavailable || $nanogong->timedue) {
 echo '</table>';
 echo $OUTPUT->box_end();
 
-$isavailable = false;
-$time = time();
-if ($nanogong->timedue) {
-    $isavailable = ($nanogong->timeavailable <= $time && $time <= $nanogong->timedue);
-}
-else {
-    $isavailable = ($nanogong->timeavailable <= $time);
-}
-if ($nanogong->preventlate == 0) {
-    $isavailable = true;
-}
-
-//Only students can submit
+///
+/// Capabilities of students
+///
+//if (has_capability('mod/nanogong:submit', $context) && is_enrolled($coursecontext, $USER)) {
 if (has_capability('mod/nanogong:submit', $context)) {
-    $isopen = true;
-}
-else {
-    $isopen = false;
-}
-
-//$coursecontext = context_course::instance($course->id);
-//if ($isopen && is_enrolled($coursecontext, $USER)) {
-if  ($isopen) {
-    $submission = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$USER->id));
-    
-    // prepare form and process submitted data
-    $editoroptions = array(
-        'noclean'   => false,
-        'maxfiles'  => EDITOR_UNLIMITED_FILES,
-        'maxbytes'  => $course->maxbytes,
-        'context'   => $context
-    );
-    
-    $data = new stdClass();
-    $data->id = $cm->id;
-    $data->nanogongmaxduration = $nanogong->maxduration;
-    if ($submission) {
-        $data->sid              = $submission->id;
-        $data->supplement       = $submission->supplement;
-        $data->supplementformat = $submission->supplementformat;
-    }
-    else {
-        // A bug in Postgres DB reported by Eric Katchan (2012-05-30)
-        //$data->sid              = '';
-        $data->sid              = 0;
-        $data->supplement       = '';
-        $data->supplementformat = '';
-    }
-    $data = file_prepare_standard_editor($data, 'supplement', $editoroptions, $context, 'mod_nanogong', 'message', $data->sid);
-
-    $supplementform = new mod_nanogong_supplement_form(null, array($data, $editoroptions));
-
-    if($supplementform->is_cancelled()) {
-        redirect(new moodle_url($PAGE->url));
-    }
-    if ($data = $supplementform->get_data()) {
-        $s = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$USER->id));
-        $data = file_postupdate_standard_editor($data, 'supplement', $editoroptions, $context, 'mod_nanogong', 'message', $s->id);
-        $s->supplement = $data->supplement;
-        $s->supplementformat = $data->supplementformat;
-
-        $DB->update_record('nanogong_messages', $s);
-        
-        //TODO fix log actions - needs db upgrade
-        add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
-        
-        //redirect to get updated submission date and word count
-        redirect(new moodle_url($PAGE->url));
-    }
-    
-    // For insert function
-    $nanogongtag = optional_param('nanogongtitle', '', PARAM_TEXT);
-    $nanogongname = optional_param('nanogongname', '', PARAM_TEXT);
-    if ($nanogongtag && $nanogongname) {
-        nanogong_check_content($nanogongname, $nanogong->id, $USER->id, 0);    
-        $nanogongimg = '<img title="NanoGongItem" src="pix/icon.gif" style="vertical-align: middle" alt="' . $nanogongname . '" />';
-        $submission->message .= '<p title="NanoGong Title">' . $nanogongtag . ' ' . $nanogongimg . '</p>';
-        $DB->update_record('nanogong_messages', $submission);
-        
-        add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
-    }
-    
-    if ($toadd) {
-        $nanogongnum = substr_count($submission->message,'NanoGongItem') + 1;
-        echo '<br >';
-        echo $OUTPUT->box_start('generalbox', 'add');
-        nanogong_student_submit_form($nanogongnum, $nanogong->maxduration, $cm->id, 'add');
-        echo $OUTPUT->box_end();
-    }
-    
-    if ($todelete) {
-        $nanogongfilename = optional_param('nanogongfilename', '', PARAM_TEXT);
-        if ($nanogongfilename) {
-            nanogong_check_content($nanogongfilename, $nanogong->id, $USER->id, 1);
-            $nanogongaudios = $DB->get_records('nanogong_audios', array('nanogongid'=>$nanogong->id));
-            foreach ($nanogongaudios as $nanogongaudio) {
-                if (strcmp($nanogongaudio->name, $nanogongfilename) == 0) {
-                    break;
-                }
-            }
-            preg_match('/<img.*?title="NanoGongItem".*?alt="/', $submission->message, $m);
-            $nanogongvoice = $m[0] . $nanogongfilename . '" />';
-            $nanogongform = '<p title="NanoGong Title">' . $nanogongaudio->title . ' ' . $nanogongvoice . '</p>';
-        
-            $submission->message = str_replace($nanogongform, '', $submission->message);
-            $DB->update_record('nanogong_messages', $submission);
-        
-            add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
-        }
-    }
-    
-
-    if (!$submission) {
+    ///
+    /// Message submission form
+    ///
+    if (!$submission || (!$submission->locked && ($submission->message == '' || $action === 'showsubmitform'))) {
         if ($isavailable) {
+            if ($action == 'showsubmitform') {
+                $default = substr_count($submission->message,'NanoGongItem') + 1;
+                $cancel = true;
+            }
+            else {
+                $default = 1;
+                $cancel = false;
+            }
+
             echo '<br >';
             echo $OUTPUT->box_start('generalbox', 'submitform');
-            nanogong_student_submit_form(1, $nanogong->maxduration, $cm->id, 'save');
+            nanogong_student_submit_form($cm->id, $default, $nanogong->maxduration, $cancel);
             echo $OUTPUT->box_end();
         }
         else {
             echo '<p><i>' . get_string('notavailable', 'nanogong') . '</i></p>';
         }
     }
-    else {
-        $nanogongcheckfilename = optional_param('nanogongcheckfilename', '', PARAM_TEXT);
+
+    ///
+    /// List of recordings
+    ///
+    if ($submission && $submission->message <> '') {
+        $filename = optional_param('filename', '', PARAM_TEXT);
+
         echo '<br >';
         echo $OUTPUT->box_start('generalbox', 'submit');
-        echo '<table align="center" cellspacing="0" cellpadding="0" width="100%"><tr><td><b>' . get_string ('tablemessage', 'nanogong') . '</b></td>';
-        if (isset($_COOKIE['submissionarea']) && $_COOKIE['submissionarea'])
-            $display = 'block';
-        else
-            $display = 'none';
+
+        echo '<table align="center" cellspacing="0" cellpadding="0" width="100%"><tr>';
+        echo '<td><b>' . get_string ('tablemessage', 'nanogong') . '</b></td>';
         echo '<td align="right">';
-        echo '<a style="display:' . (($display=='block')?'none':'block') .
-            '" id="submissionicon_view" href="javascript:;" onmousedown="toggleDiv(\'submissionarea\', \'submissionicon\');"><img src="pix/switch_plus.gif" alt="Switch plus" title="' . get_string('view', 'nanogong') . '" /></a>';
-        echo '<a style="display:' . $display .
-            '" id="submissionicon_hide" href="javascript:;" onmousedown="toggleDiv(\'submissionarea\', \'submissionicon\');"><img src="pix/switch_minus.gif" alt="Switch minus" title="' . get_string('hide', 'nanogong') . '" /></a>';
+        echo '<a id="submissionarea_icon" class="nanogong_showhide_icon" href="javascript:;"><img src="pix/switch_minus.gif" alt="" title="" /></a>';
         echo '</td></tr></table>';
-        echo '<div id="submissionarea" style="display:'.$display.'">';
+        echo '<div id="submissionarea">';
+
         echo '<table align="center" cellspacing="0" cellpadding="0">';
-        if ($checkdelete) {
+
+        // Display the delete confirmation
+        if ($action === 'confirmdelete') {
             echo '<tr><td colspan="2" align="center">';
             echo '<font color="red">' . get_string('checkdeletemessage', 'nanogong') . '</font></td><td>';
-            echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('todelete'=>1, 'nanogongfilename'=>$nanogongcheckfilename)), get_string('yes', 'nanogong'));
+            echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('action'=>'deletemessage', 'filename'=>$filename)), get_string('yes', 'nanogong'));
             echo '</td><td>';
-            echo $OUTPUT->single_button(new moodle_url($PAGE->url), get_string('no', 'nanogong'));
+            echo $OUTPUT->single_button(new moodle_url($PAGE->url), get_string('no', 'nanogong'), 'get');
             echo '</td></tr></table><table align="center" cellspacing="0" cellpadding="0">';
         }
+
         echo '<tr><td align="center">' . get_string('instructions', 'nanogong') . '</td></tr>';       
         echo '<tr><td align="center">';
-        echo nanogong_show_in_listbox($submission->message, $nanogongcheckfilename, $context->id, $nanogong->id, 'nanogongstudentlistbox');
+        echo nanogong_print_messages_in_listbox($submission->message, $filename, $context->id, $nanogong->id, 'nanogong_student_list');
         echo '</td></tr></table><table align="center" cellspacing="0" cellpadding="0"><tr><td align="center">';
         $nanogongcount = substr_count($submission->message, "NanoGongItem");
-        if ($isavailable && $toadd == 0) {
+        if ($isavailable && !$submission->locked && $action !== 'showsubmitform' && $action !== 'confirmdelete') {
+            $PAGE->requires->string_for_js('deletealertmessage', 'nanogong');
+
             if ($nanogong->maxnumber == 0 || $nanogongcount < $nanogong->maxnumber) {
-                echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('toadd'=>1)), get_string('add', 'nanogong'));
-            }
-            else {
-                echo get_string('add', 'nanogong');
+                echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('action'=>'showsubmitform')), get_string('add', 'nanogong'));
             }
             echo '</td><td align="left">';
-            if ($checkdelete) {
-                echo get_string('delete', 'nanogong');
-            }
-            else {
-                echo '<input type="button" id="nanogongcheckdelete" value="' . get_string('delete', 'nanogong') . '" onclick="javascript:nanogong_check_delete_item_from_message(\'' . $PAGE->url . '\', \'' . get_string('deletealertmessage', 'nanogong') . '\');" />';
-            }
+            echo '<input id="nanogong_confirmdelete_button" type="button" value="' . get_string('delete', 'nanogong') . '" />';
         }
         echo '</td></tr></table>';
         echo '</div>';
         echo $OUTPUT->box_end();
+    }
 
+    ///
+    /// Message area
+    ///
+    if ($submission) {
         echo '<br >';
         echo $OUTPUT->box_start('generalbox', 'message');
+
         echo '<table align="center" cellspacing="0" cellpadding="0" width="100%"><tr><td><b>' . get_string ('messagearea', 'nanogong') . '</b></td>';
-        if (isset($_COOKIE['messagearea']) && $_COOKIE['messagearea'])
-            $display = 'block';
-        else
-            $display = 'none';
         echo '<td align="right">';
-        echo '<a style="display:' . (($display=='block')?'none':'block') .
-            '" id="messageicon_view" href="javascript:;" onmousedown="toggleDiv(\'messagearea\', \'messageicon\');"><img src="pix/switch_plus.gif" alt="Switch plus" title="' . get_string('view', 'nanogong') . '" /></a>';
-        echo '<a style="display:' . $display .
-            '" id="messageicon_hide" href="javascript:;" onmousedown="toggleDiv(\'messagearea\', \'messageicon\');"><img src="pix/switch_minus.gif" alt="Switch minus" title="' . get_string('hide', 'nanogong') . '" /></a>';
+        echo '<a id="messagearea_icon" class="nanogong_showhide_icon" href="javascript:;"><img src="pix/switch_minus.gif" alt="" title="" /></a>';
         echo '</td></tr></table>';
-        echo '<div id="messagearea" style="display:'.$display.'">';
-        if ($tomessage) {
+        echo '<div id="messagearea">';
+
+        if ($action === 'showmessageform') {
             $supplementform->display();
         }
         else {
@@ -314,9 +534,9 @@ if  ($isopen) {
                 echo format_text($text, $submission->supplementformat);
                 echo '</td></tr>';
             }
-            if ($isavailable) {
+            if ($isavailable && !$submission->locked) {
                 echo '<tr><td align="center">';
-                echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('tomessage'=>1)), get_string('leavemessage', 'nanogong'));
+                echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('action'=>'showmessageform')), get_string('leavemessage', 'nanogong'));
                 echo '</td></tr></table>';
             }
             else {
@@ -328,21 +548,21 @@ if  ($isopen) {
         }
         echo '</div>';
         echo $OUTPUT->box_end();
+    }
 
+    ///
+    /// Comment area
+    ///
+    if ($submission) {
         echo '<br >';
         echo $OUTPUT->box_start('generalbox', 'comment');
+
         echo '<table align="center" cellspacing="0" cellpadding="0" width="100%"><tr><td><b>' . get_string ('feedbacktitle', 'nanogong') . '</b></td>';
-        if (isset($_COOKIE['feedbackarea']) && $_COOKIE['feedbackarea'])
-            $display = 'block';
-        else
-            $display = 'none';
         echo '<td align="right">';
-        echo '<a style="display:' . (($display=='block')?'none':'block') .
-            '" id="feedbackicon_view" href="javascript:;" onmousedown="toggleDiv(\'feedbackarea\', \'feedbackicon\');"><img src="pix/switch_plus.gif" alt="Switch plus" title="' . get_string('view', 'nanogong') . '" /></a>';
-        echo '<a style="display:' . $display .
-            '" id="feedbackicon_hide" href="javascript:;" onmousedown="toggleDiv(\'feedbackarea\', \'feedbackicon\');"><img src="pix/switch_minus.gif" alt="Switch minus" title="' . get_string('hide', 'nanogong') . '" /></a>';
+        echo '<a id="feedbackarea_icon" class="nanogong_showhide_icon" href="javascript:;"><img src="pix/switch_minus.gif" alt="" title="" /></a>';
         echo '</td></tr></table>';
-        echo '<div id="feedbackarea" style="display:'.$display.'">';
+        echo '<div id="feedbackarea">';
+
         echo '<table align="center" border="0" cellspacing="0" cellpadding="0">';       
         if ($submission->grade >= 0 || $submission->comments || $submission->audio) {
             echo '<tr><td align="center"><b>' . get_string('grade', 'nanogong') . '</b></td><td align="center"><b>' . get_string('voicefeedback', 'nanogong') . '</b></td></tr><tr>';
@@ -383,47 +603,43 @@ if  ($isopen) {
         echo $OUTPUT->box_end();
     }
     
+    ///
+    /// Other recordings area
+    ///
     if ($nanogong->permission) {
+        $order = optional_param('order', 0, PARAM_BOOL);
+
         echo '<br >';
         echo $OUTPUT->box_start('generalbox', 'choice');
+
         echo '<table align="center" cellspacing="0" cellpadding="0" width="100%"><tr><td><b>' . get_string ('otherrecording', 'nanogong');
-        if ($toreverse) {
-            echo ' ' . get_string('reverse', 'nanogong');
-        }
-        else {
-            echo ' ' . get_string('chronological', 'nanogong');
-        }
+        echo ' ' . get_string(($order)? 'reverse' : 'chronological', 'nanogong');
         echo '</b></td>';
-        if (isset($_COOKIE['allrecordingsarea']) && $_COOKIE['allrecordingsarea'])
-            $display = 'block';
-        else
-            $display = 'none';
+
         echo '<td align="right">';
-        echo '<a style="display:' . (($display=='block')?'none':'block') .
-            '" id="allrecordingsicon_view" href="javascript:;" onmousedown="toggleDiv(\'allrecordingsarea\', \'allrecordingsicon\');"><img src="pix/switch_plus.gif" alt="Switch plus" title="' . get_string('view', 'nanogong') . '" /></a>';
-        echo '<a style="display:' . $display .
-            '" id="allrecordingsicon_hide" href="javascript:;" onmousedown="toggleDiv(\'allrecordingsarea\', \'allrecordingsicon\');"><img src="pix/switch_minus.gif" alt="Switch minus" title="' . get_string('hide', 'nanogong') . '" /></a>';
+        echo '<a id="allrecordingsarea_icon" class="nanogong_showhide_icon" href="javascript:;"><img src="pix/switch_minus.gif" alt="" title="" /></a>';
         echo '</td></tr></table>';
-        echo '<div id="allrecordingsarea" style="display:'.$display.'">';
-        nanogong_show_chronological_order($context->id, $nanogong->id, $toreverse, $topage, $pagenumber, $tolistall);
+        echo '<div id="allrecordingsarea">';
+
+        nanogong_print_list_by_recordings($context, $nanogong->id, $action);
         echo '</div>';
         echo $OUTPUT->box_end();
     }
-    if ($isavailable && $submission) {
+
+    ///
+    /// History area
+    ///
+    if ($isavailable && $submission && !$submission->locked) {
         echo '<br >';
         echo $OUTPUT->box_start('generalbox', 'history');
+
         echo '<table align="center" cellspacing="0" cellpadding="0" width="100%"><tr><td><b>' . get_string ('voicerecorded', 'nanogong') . '</b></td>';
-        if (isset($_COOKIE['historyarea']) && $_COOKIE['historyarea'])
-            $display = 'block';
-        else
-            $display = 'none';
+
         echo '<td align="right">';
-        echo '<a style="display:' . (($display=='block')?'none':'block') .
-            '" id="historyicon_view" href="javascript:;" onmousedown="toggleDiv(\'historyarea\', \'historyicon\');"><img src="pix/switch_plus.gif" alt="Switch plus" title="' . get_string('view', 'nanogong') . '" /></a>';
-        echo '<a style="display:' . $display .
-            '" id="historyicon_hide" href="javascript:;" onmousedown="toggleDiv(\'historyarea\', \'historyicon\');"><img src="pix/switch_minus.gif" alt="Switch minus" title="' . get_string('hide', 'nanogong') . '" /></a>';
+        echo '<a id="historyarea_icon" class="nanogong_showhide_icon" href="javascript:;"><img src="pix/switch_minus.gif" alt="" title="" /></a>';
         echo '</td></tr></table>';
-        echo '<div id="historyarea" style="display:'.$display.'">';
+        echo '<div id="historyarea">';
+
         echo '<table align="center" cellspacing="0" cellpadding="0">';
         echo nanogong_get_student_audios($context->id, $nanogong->id, $USER->id);
         echo '</table>';
@@ -433,280 +649,68 @@ if  ($isopen) {
     echo '<br >';
 }
 
+///
+/// Capabilities of teachers
+///
 if (has_capability('mod/nanogong:grade', $context)) {
-    $nanogongcatalog = optional_param('catalog', 'submitted', PARAM_TEXT);
-    
-    $s = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$tograde));
-    
-    // prepare form and process submitted data
-    $editoroptions = array(
-        'noclean'   => false,
-        'maxfiles'  => EDITOR_UNLIMITED_FILES,
-        'maxbytes'  => $course->maxbytes,
-        'context'   => $context
-    );
-
-    $data = new stdClass();
-    $data->id = $cm->id;
-    $data->nanogongmaxduration = $nanogong->maxduration;
-    $data->nanogongcatalog     = $nanogongcatalog;
-    if ($s) {
-        $data->sid            = $s->id;
-        if ($s->grade < 0) {
-            $data->nanogonggrade = '';
-        }
-        else {
-            $data->nanogonggrade = $s->grade;
-        }
-        $data->comments       = $s->comments;
-        $data->commentsformat = $s->commentsformat;
-    }
-    else {
-        $data->sid            = 0;
-        $data->nanogonggrade  = '';
-        $data->comments       = '';
-        $data->commentsformat = '';
-    }
-    $data = file_prepare_standard_editor($data, 'comments', $editoroptions, $context, 'mod_nanogong', 'message', $data->sid);
-
-    if ($s) {
-        $nanogongjs = 'javascript:nanogong_save_audio_form(' . $cm->id . ', ' . $s->userid . ');';
-        if ($s->audio) {
-            $isvoice = $CFG->wwwroot . '/mod/nanogong/nanogongfile.php?contextid=' . $context->id . '&modulename=mod_nanogong&filearea=audio&itemid=' . $nanogong->id . '&name=' . substr($s->audio, strpos($s->audio, 'alt="') + strlen('alt="'), 18);
-        }
-        else {
-            $isvoice = '';
-        }
-        $commentform = new mod_nanogong_grade_form(null, array($data, $editoroptions, $nanogongjs, $isvoice, $nanogong->grade));
-    }
-    else {
-        $commentform = new mod_nanogong_grade_form(null, array($data, $editoroptions, '', '', $nanogong->grade));
-    }
-
-    if ($data = $commentform->get_data()) {
-        $s = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'locked'=>false));
-        $data = file_postupdate_standard_editor($data, 'comments', $editoroptions, $context, 'mod_nanogong', 'message', $s->id);
-        $s->comments = $data->comments;
-        $s->commentsformat = $data->commentsformat;
-        
-        $datagrade = trim($data->nanogonggrade);
-        if ($datagrade && (int)$datagrade <= $nanogong->grade && (int)$datagrade >= 0) {
-            $s->grade = $data->nanogonggrade;
-        }
-        else {
-            $s->grade = -1;
-        }
-        $s->commentedby    = $USER->id;
-        $s->timestamp      = time();
-        $s->locked         = true;
-        $DB->update_record('nanogong_messages', $s);
-        
-        //TODO fix log actions - needs db upgrade
-        add_to_log($course->id, 'nanogong', 'update', 'view.php?n='.$nanogong->id, $nanogong->id, $cm->id);
-        
-        nanogong_update_grades($nanogong, $s->userid);
-        
-        //redirect to get updated submission date and word count
-        redirect(new moodle_url($PAGE->url, array('catalog'=>$data->nanogongcatalog)));
-    }
-
-    if ($tograde && $s) {
+    ///
+    /// Handle the grade form
+    ///
+    if ($action === 'showgradeform') {
         echo '<br >';    
         echo $OUTPUT->box_start('generalbox', 'gradeform');
         echo '<table align="center" cellspacing="0" cellpadding="0"><tr><td><b>' . get_string('listof', 'nanogong');
-        $student = $DB->get_record('user', array('id'=>$s->userid));
-        if ($student->firstname) {
-            echo $student->firstname;
-        }
-        if ($student->lastname) {
-            echo ' '.$student->lastname;
-        }
+
+        $student = $DB->get_record('user', array('id'=>$submission->userid));
+        echo get_student_link($student, $course->id);
+
         echo '</b></td></tr></table><table align="center" cellspacing="0" cellpadding="0"><tr><td align="center">';
         echo '<p>' . get_string('instructions', 'nanogong') . '</p>';
-        echo nanogong_show_in_listbox($s->message, '', $context->id, $nanogong->id, 'nanogongteacherlistbox');
+        echo nanogong_print_messages_in_listbox($submission->message, '', $context->id, $nanogong->id, 'nanogong_teacher_list');
         echo '</td>';
         echo '</tr></table>';
-        $s->locked = false;
-        $DB->update_record('nanogong_messages', $s);
+
         echo '<table cellspacing="0" cellpadding="0"><tr><td><b>' . get_string('feedbackfor', 'nanogong') . ' ';
-        if ($student->firstname) {
-            echo $student->firstname;
-        }
-        if ($student->lastname) {
-            echo ' '.$student->lastname;
-        }
+        echo get_student_link($student, $course->id);
         echo '</b></td></tr></table>';
-        $commentform->display();
+
+        $PAGE->requires->strings_for_js(array('emptymessage', 'notavailable', 'submissionlocked', 'servererror', 'voicetitle'), 'nanogong');
+        $gradeform->display();
+
         echo $OUTPUT->box_end();
     }
+
+    ///
+    /// Show all students in chronological order
+    ///
+    elseif ($action === 'listbyrecordings') {
+        $order = optional_param('order', 0, PARAM_INT);
+
+        echo $OUTPUT->single_button(new moodle_url($PAGE->url), get_string('changetostudents', 'nanogong'), 'get');
+
+        echo '<br >';
+        echo $OUTPUT->box_start('generalbox', 'teacherchoice');
+        echo '<table align="center" cellspacing="0" cellpadding="0"><tr><td align="center"><b>' . get_string('otherrecording', 'nanogong');
+        echo ' ' . get_string(($order)? 'reverse' : 'chronological', 'nanogong');
+        echo '</b></td></tr></table>';
+
+        nanogong_print_list_by_recordings($context, $nanogong->id, $action);
+
+        echo $OUTPUT->box_end();
+    }
+
+    ///
+    /// Show recordings of each student
+    ///
     else {
-        if ($tolistall) {
-            echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('tolistall'=>0)), get_string('changetostudents', 'nanogong'));
-            echo '<br >';
-            echo $OUTPUT->box_start('generalbox', 'teacherchoice');
-            echo '<table align="center" cellspacing="0" cellpadding="0"><tr><td align="center"><b>' . get_string('otherrecording', 'nanogong');
-            if ($toreverse) {
-                echo ' ' . get_string('reverse', 'nanogong');
-            }
-            else {
-                echo ' ' . get_string('chronological', 'nanogong');
-            }
-            echo '</b></td></tr></table>';
-            nanogong_show_chronological_order($context->id, $nanogong->id, $toreverse, $topage, $pagenumber, $tolistall);
-            echo $OUTPUT->box_end();
-        }
-        else {
-            echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('tolistall'=>1)), get_string('changetorecordings', 'nanogong'));
-            echo '<br >';
-            $submissions = $DB->get_records('nanogong_messages', array('nanogongid'=>$nanogong->id));
-            $nangogongstudents = nanogong_get_participants($nanogong->id);
-            $studentarray = array();
-            if ($nanogongcatalog == 'graded') {
-                foreach ($nangogongstudents as $nangogongstudent) {
-                    $studentwork = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$nangogongstudent->id));
-                    if ($studentwork->grade >= 0) {
-                        $studentarray[] = $nangogongstudent->id;
-                    }
-                }
-            }
-            else if ($nanogongcatalog == 'ungraded') {
-                foreach ($nangogongstudents as $nangogongstudent) {
-                    $studentwork = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$nangogongstudent->id));
-                    if ($studentwork->grade < 0) {
-                        $studentarray[] = $nangogongstudent->id;
-                    }
-                }
-            }
-            else if ($nanogongcatalog == 'all') {
-                $nangogongstudents = get_users_by_capability($context, 'mod/nanogong:submit');
-                foreach ($nangogongstudents as $nangogongstudent) {
-                    $studentarray[] = $nangogongstudent->id;
-                }
-            }
-            else if ($nanogongcatalog == 'unsubmitted') {
-                $nangogongstudents = get_users_by_capability($context, 'mod/nanogong:submit');
-                $studentworks = $DB->get_records('nanogong_messages', array('nanogongid'=>$nanogong->id));
-                foreach ($nangogongstudents as $nangogongstudent) {
-                    $issubmitted = false;
-                    foreach ($studentworks as $studentwork) {
-                        if ($nangogongstudent->id == $studentwork->userid) {
-                            $issubmitted = true;
-                            break;
-                        }
-                    }
-                    if (!$issubmitted) {
-                        $studentarray[] = $nangogongstudent->id;
-                    }
-                }
-            }
-            else {
-                foreach ($nangogongstudents as $nangogongstudent) {
-                    $studentwork = $DB->get_record('nanogong_messages', array('nanogongid'=>$nanogong->id, 'userid'=>$nangogongstudent->id));
-                    if ($studentwork->message) {
-                        $studentarray[] = $nangogongstudent->id;
-                    }
-                }
-            }
-            $subcategorystring = '';
-            $subcategorystringone = '';
-            echo $OUTPUT->box_start('generalbox', 'studentlist');
-            echo '<table align="center" cellspacing="0" cellpadding="0">';
-            echo '<tr><td align="center" colspan="4"><p><b>' . get_string('studentlist', 'nanogong') . ' ' . get_string('forentering', 'nanogong') . '</b></p></td></tr>';
-            echo '<tr><td align="right">' . get_string('show', 'nanogong') . '</td><td colspan="3">';
-            echo '<select id="nanogongcatalog" onchange="javascript:nanogong_get_catalog(\'' . $PAGE->url . '\', ' . $pagenumber . ');">';
-            if ($nanogongcatalog == 'all') {
-                echo '<option value="all" selected="selected">- ' . get_string('allstudents', 'nanogong') . '</option>';
-                $subcategorystring = get_string('allcategory', 'nanogong');
-                $subcategorystringone = get_string('allcategoryone', 'nanogong');
-            }
-            else {
-                echo '<option value="all"> ' . get_string('allstudents', 'nanogong') . '</option>';
-            }
-            if ($nanogongcatalog == 'submitted') {
-                echo '<option value="submitted" selected="selected">-- ' . get_string('submiitedrecordings', 'nanogong') . '</option>';
-                $subcategorystring = get_string('submittedcategory', 'nanogong');
-                $subcategorystringone = get_string('submittedcategoryone', 'nanogong');
-            }
-            else {
-                echo '<option value="submitted">-- ' . get_string('submiitedrecordings', 'nanogong') . '</option>';
-            }
-            if ($nanogongcatalog == 'graded') {
-                echo '<option value="graded" selected="selected">---- ' . get_string('gradedstudents', 'nanogong') . '</option>';
-                $subcategorystring = get_string('gradedcategory', 'nanogong');
-                $subcategorystringone = get_string('gradedcategoryone', 'nanogong');
-            }
-            else {
-                echo '<option value="graded">---- ' . get_string('gradedstudents', 'nanogong') . '</option>';
-            }
-            if ($nanogongcatalog == 'ungraded') {
-                echo '<option value="ungraded" selected="selected">---- ' . get_string('ungradedstudents', 'nanogong') . '</option>';
-                $subcategorystring = get_string('ungradedcategory', 'nanogong');
-                $subcategorystringone = get_string('ungradedcategoryone', 'nanogong');
-            }
-            else {
-                echo '<option value="ungraded">---- ' . get_string('ungradedstudents', 'nanogong') . '</option>';
-            }
-            if ($nanogongcatalog == 'unsubmitted') {
-                echo '<option value="unsubmitted" selected="selected">-- ' . get_string('studentsnosubmissions', 'nanogong') . '</option>';
-                $subcategorystring = get_string('unsubmittedcategory', 'nanogong');
-                $subcategorystringone = get_string('unsubmittedcategoryone', 'nanogong');
-            }
-            else {
-                echo '<option value="unsubmitted">-- ' . get_string('studentsnosubmissions', 'nanogong') . '</option>';
-            }
-            echo '</select>';
-            echo '</td>';
-            echo nanogong_show_pagnumber_settings($nanogongcatalog, $pagenumber);
-            echo '</tr><tr><td colspan="4"><i>';
-            if (count($studentarray) == 1) {
-               echo get_string('thereis', 'nanogong') . count($studentarray) . ' ' . $subcategorystringone;
-            }
-            else if (count($studentarray) > 1) {
-                echo get_string('thereare', 'nanogong') . count($studentarray) . ' ' . $subcategorystring;
-            }
-            else {
-                echo get_string('thereareno', 'nanogong') . $subcategorystring;
-            }
-            echo '</i></td></tr></table>';
-        
-            if (count($studentarray)) {
-                echo '<table align="center" width="100%" cellspacing="0" cellpadding="0">';
-                if ($pagenumber == 0) {
-                   $pagenumber = count($studentarray);
-                }
-                    for ($i = $topage * $pagenumber; $i < count($studentarray) && $i < ($topage + 1) * $pagenumber; $i++) {
-                   nanogong_show_students_list($nanogongcatalog, $context->id, $nanogong->id, $studentarray[$i]);
-                }
-                echo '</table>';
-                echo '<table align="center" cellspacing="0" cellpadding="0"><tr><td>';
-                if ($topage) {
-                   echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('catalog'=>$nanogongcatalog, 'topage'=>$topage - 1, 'pagenumber'=>$pagenumber)), get_string('previouspage', 'nanogong'));
-                }
-                echo '</td><td>';
-                echo get_string('page', 'nanogong');
-                echo $topage + 1;
-                echo '/';
-                if ($pagenumber) {
-                    $pages = count($studentarray) / $pagenumber;
-                    $pagesint = (int) (count($studentarray) / $pagenumber);
-                    if (abs($pages - $pagesint) == 0) {
-                        echo $pagesint;
-                    }
-                    else {
-                        echo $pagesint + 1;
-                   }
-                }
-                else {
-                   echo '1';
-                }
-                echo '</td><td>';
-                if (($topage + 1) * $pagenumber < count($studentarray)) {
-                    echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('catalog'=>$nanogongcatalog, 'topage'=>$topage + 1, 'pagenumber'=>$pagenumber)), get_string('nextpage', 'nanogong'));
-                }
-                echo '</td></tr></table>';
-            }
-            echo $OUTPUT->box_end();
-         }
+        echo $OUTPUT->single_button(new moodle_url($PAGE->url, array('action'=>'listbyrecordings')), get_string('changetorecordings', 'nanogong'), 'get');
+
+        echo '<br >';
+        echo $OUTPUT->box_start('generalbox', 'studentlist');
+
+        nanogong_print_list_by_students($context, $nanogong->id);
+
+        echo $OUTPUT->box_end();
     }
 }
 

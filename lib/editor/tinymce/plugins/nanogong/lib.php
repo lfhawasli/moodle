@@ -15,18 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language string for filter/nanogong.
+ * The NanoGong TinyMCE plugin
  *
  * @author     Ning
  * @author     Gibson
- * @package    filter
- * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @version    4.2.2
  */
- 
-$string['filtername'] = 'NanoGong';
-$string['imgtitle'] = 'Show/hide the NanoGong player by clicking this icon';
 
-?>
+defined('MOODLE_INTERNAL') || die();
+
+class tinymce_nanogong extends editor_tinymce_plugin {
+    /** @var array list of buttons defined by this plugin */
+    protected $buttons = array('nanogong');
+
+    protected function update_init_params(array &$params, context $context,
+            array $options = null) {
+
+        // Add button after 'unlink' in advancedbuttons3.
+        $this->add_button_after($params, 3, 'nanogong', 'image');
+
+        // Add JS file, which uses default name.
+        $this->add_js_plugin($params);
+    }
+}

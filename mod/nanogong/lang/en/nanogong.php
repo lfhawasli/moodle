@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * English strings for nanogong
  *
  * @author     Ning
+ * @author     Gibson
  * @package    mod
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2
+ * @version    4.2.2
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,6 +37,7 @@ $string['nanogongname'] = 'Name of this NanoGong voice activity';
 $string['nanogong'] = 'NanoGong voice';
 $string['pluginadministration'] = 'NanoGong voice administration';
 $string['pluginname'] = 'NanoGong voice';
+$string['invalidid'] = 'Invalid nanogong ID';
 
 $string['availabledate'] = 'Available from';
 $string['description'] = 'Description';
@@ -58,7 +59,7 @@ $string['edit'] = 'Click here to edit';
 $string['show'] = 'Show';
 $string['submit'] = 'Submit';
 $string['insert'] = 'Deleted, click here to reinsert';
-$string['add'] = 'Add another recording';
+$string['add'] = 'Add a new recording';
 $string['delete'] = 'Delete selected recording';
 $string['leavemessage'] = 'Add / Edit message to teacher';
 $string['cancel'] = 'Cancel';
@@ -92,11 +93,11 @@ $string['nolimitation'] = 'No limitation';
 $string['voicetitle'] = 'What is the subject of your recording?';
 $string['titlemax'] = '(30 letters maximum)';
 $string['voicerecording'] = 'Your voice recording';
-$string['submittedon'] = 'Submitted on';
 $string['submitted'] = 'Submitted';
 $string['gradedon'] = 'Modified on';
 $string['instructions'] = 'Click on a recording below';
 $string['checkdeletemessage'] = 'Are you absolutely sure you want to delete this recording?';
+$string['checkdeletemessages'] = 'Are you absolutely sure you want to delete the selected recording(s)?';
 $string['inonepage'] = 'student(s) in one page';
 $string['recordinginonepage'] = 'recording(s) in one page';
 $string['all'] = 'All';
@@ -156,6 +157,15 @@ $string['voicefeedback'] = 'Voice feedback';
 $string['commentmessage'] = 'Message from your teacher';
 $string['forentering'] = 'for entering feedback';
 $string['messagearea'] = 'Your message for the teacher';
-// START UCLA MOD: CCLE-3435-fix-editor-for-Moodle2.3
+$string['imgtitle'] = 'Show/hide the NanoGong player by clicking this icon';
+$string['servererror'] = 'There is problem sending the recording to the server. Please try again later!';
+$string['showdeleteboxes'] = 'Click here to select the recording you want to delete';
+$string['isdelete'] = 'Delete?';
+$string['deleterecordings'] = 'Delete the selected recordings';
+$string['lockstudent'] = 'Lock this student from further modification';
+$string['submissionlocked'] = 'This submission has been locked from further modifications';
+// START UCLA MOD: CCLE-4156 - Upgrade nanogong to newest version that works with M2.5
 $string['nanogong:addinstance'] = 'Add a new recording';
-// END UCLA MOD: CCLE-3435-fix-editor-for-Moodle2.3
+// END UCLA MOD: CCLE-4156
+
+?>

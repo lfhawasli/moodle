@@ -14,34 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Return files for the NanoGong applet.
+ * The NanoGong TinyMCE plugin
  *
  * @author     Ning
  * @author     Gibson
- * @package    filter
- * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2.1
+ * @version    4.2.2
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->libdir.'/filelib.php');
+$string['pluginname'] = 'Nanogong';
 
-require_login();  // CONTEXT_SYSTEM level
-
-$contextid = required_param('contextid', PARAM_INT);
-$modulename = required_param('modulename', PARAM_RAW);
-$filearea = required_param('filearea', PARAM_RAW);
-$itemid = required_param('itemid', PARAM_INT);
-$name = required_param('filename', PARAM_RAW);
-
-if ($itemid == 0)
-    $relativepath = '/'.implode('/', array($contextid, $modulename, $filearea, $name));
-else
-    $relativepath = '/'.implode('/', array($contextid, $modulename, $filearea, $itemid, $name));
-file_pluginfile($relativepath, false);
-
-?>
+/* All lang strings used from TinyMCE JavaScript code must be named 'pluginname:stringname', no need to create langs/en_dlg.js */
+$string['nanogong:desc'] = 'Nanogong';
+$string['title'] = 'Insert a Nanogong Voice Recording';
