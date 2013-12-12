@@ -77,7 +77,6 @@ $string['unknownstoredprocparam'] = 'This stored procedure has a unknown paramet
 $string['courseregistrardifferences'] = 'Show courses with changed descriptions';
 
 // Module
-$string['nosyllabuscourses'] = 'Show courses with no syllabus';
 $string['assignmentquizzesduesoon'] = 'Show courses with assignments or quizzes due soon';
 $string['modulespercourse'] = 'Count module totals and module types per course';
 $string['syllabusreoport'] = 'Syllabus report';
@@ -106,6 +105,8 @@ $string['syllabusoverviewnotes'] = 'Does not include cancelled or tutorial cours
 $string['syllabusreoportnotes'] = 'Does not include cancelled or tutorial courses. The manual syllabus column counts the number of manual syllabi in a course.';
 $string['mediausage'] = 'Media usage';
 $string['mediausage_help'] = 'Lists course with video content for a given term.';
+$string['syllabusrecentlinks'] = 'Recently updated syllabus links at Registrar';
+$string['syllabuslinkslimit'] = 'Get last {$a} results';
 
 // Course
 $string['collablist'] = 'Show collaboration sites';

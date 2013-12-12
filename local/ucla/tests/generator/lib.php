@@ -288,6 +288,82 @@ class local_ucla_generator extends testing_data_generator {
     }
 
     /**
+     * Crosslists the given children array to the parent course.
+     *
+     * Sometimes in tests we want to do something to a course, combine it with
+     * another course, and then test to see what happens.
+     *
+     * NOTE: This will not merge the contents of the children courses into the
+     * parent. It will only update the UCLA registrar tables and invalidate any
+     * existing caches.
+     *
+     * Procedure:
+     *  1) Update ucla_request_classes table to change courseid for children to
+     *     match parent courseid. Also need to set hostcourse for children to 0.
+     *  2) Delete children courses.
+     *
+     * @param stdClass $parent  Expecting to be ucla_request_classes entry.
+     * @param array $children   Expecting array of ucla_request_classes entries.
+     * @return boolean          False on error, otherwise true.
+     */
+    public function crosslist_courses(stdClass $parent, array $children) {
+        global $DB;
+
+        try {
+            // Will throw an exception if parent course does not exist.
+            get_course($parent->courseid);
+
+            // Might run into problems, so need to be able to rollback.
+            $transaction = $DB->start_delegated_transaction();
+
+            // 1) Update ucla_request_classes table to change courseid for children
+            // to  match parent courseid. Also need to set hostcourse for children
+            // to 0.
+            $courseidstodelete = array();
+            foreach ($children as $child) {
+                // Make sure we are only crosslisting courses for the same term.
+                if ($parent->term != $child->term) {
+                    throw new Exception(sprintf('Cannot crosslist child ' .
+                            'course (%s) with different term than parent (%s)',
+                            $child->term, $parent->term));
+                }
+
+                if (!empty($child->courseid)) {
+                    // No courseid set if course hasn't been built yet.
+                    $courseidstodelete[$child->courseid] = $child->courseid;
+                }
+                $child->courseid = $parent->courseid;
+                $child->hostcourse = 0;
+                $child->action = UCLA_COURSE_BUILT;
+
+                $DB->update_record('ucla_request_classes', $child);
+            }
+
+            // Now delete children courses.
+            if (!empty($courseidstodelete)) {
+                foreach ($courseidstodelete as $courseid) {
+                    $result = delete_course($courseid);
+                    if (!$result) {
+                        throw new Exception('Cannot delete child course: ' .
+                                            $courseid);
+                    }
+                }
+            }
+
+            $transaction->allow_commit();
+        } catch(Exception $e) {
+            $transaction->rollback($e);
+            return false;
+        }
+
+        // Since mappings changed, purge all caches.
+        $cache = cache::make('local_ucla', 'urcmappings');
+        $cache->purge();
+
+        return true;
+    }
+
+    /**
      * Formats Registrar format to display format:
      *     0000SSPP -> PP . int(0000) . SS
      *

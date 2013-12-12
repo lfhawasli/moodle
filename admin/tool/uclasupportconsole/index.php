@@ -1009,6 +1009,37 @@ if ($displayforms) {
 $consoles->push_console_html('modules', $title , $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
+// Recently updated syllabus links at the Registrar's ucla_syllabus table.
+require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
+
+$title = "syllabusrecentlinks";
+$sectionhtml = '';
+
+if ($displayforms) {
+    $input = html_writer::empty_tag('input', array(
+                    'type' => 'text',
+                    'name' => 'syllabuslinkslimit',
+                    'id' => 'syllabuslinkslimit',
+                    'value' => 10,
+                    'size' => 3,
+                    'maxlength' => 3
+                ));
+    $numselector = html_writer::label(
+            get_string('syllabuslinkslimit', 'tool_uclasupportconsole', $input),
+                       'syllabuslinkslimit');
+
+    $sectionhtml .= supportconsole_simple_form($title, $numselector);
+} else if ($consolecommand == "$title") {
+    $limit = optional_param('syllabuslinkslimit', 10, PARAM_INT);
+    $regsender = new local_ucla_regsender();
+    $results = $regsender->get_recent_syllabus_links($limit);
+
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, $limit);
+}
+
+$consoles->push_console_html('modules', $title , $sectionhtml);
+
+////////////////////////////////////////////////////////////////////
 // TODO ghost courses in request classes table
 
 ////////////////////////////////////////////////////////////////////
@@ -1277,39 +1308,6 @@ if ($displayforms) {
 }
 
 $consoles->push_console_html('srdb', $title, $sectionhtml);
-////////////////////////////////////////////////////////////////////
-// START SSC #775 - Adding missing reports from SSC into CommonCode
-/////////////////////////////////////////////////////////////////////////
-///// Moodle 2.0 does not have TA Sites yet thus this code was commented out
-////////////////////////////////////////////////////////////////////
-
-//// Finding courses with no syllabus (temporary until we get a real syllabus tool working) 
-//$title = "nosyllabuscourses";
-//$sectionhtml = '';
-//if ($displayforms) {
-//    $sectionhtml .= supportconsole_simple_form($title, get_term_selector($title));
-//} else if ($consolecommand == $title) {  # tie-in to link from name lookup
-//    $term = required_param('term', PARAM_ALPHANUM);
-//    if (!ucla_validator('term', $term)) {
-//        print_error('invalidterm');
-//    }
-//        
-//    $sql = "SELECT      c.id AS course_id,
-//                        c.shortname AS course_shortname
-//            FROM        {course} c                        
-//            JOIN        {ucla_request_classes} urc ON (urc.courseid=c.id)
-//            LEFT JOIN   {resource} r ON (r.course=c.id)            
-//            WHERE       urc.term=:term AND
-//                        r.name NOT LIKE '%course description%' AND 
-//                        r.name NOT LIKE '%course outline%' AND 
-//                        r.name NOT LIKE '%syllabus%'
-//            ORDER BY c.shortname";    
-//    $result = $DB->get_records_sql($sql, array('term' => $term));
-//
-//    $sectionhtml .= supportconsole_render_section_shortcut($title, $result);
-//}
-//
-//$consoles->push_console_html('modules', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
 $title = "assignmentquizzesduesoon";

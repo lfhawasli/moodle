@@ -2,6 +2,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// @todo When automatic class loading is available via Moodle 2.6, we no longer
+// need to include the local_ucla_regsender class, so delete it.
+require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
+
 require_once($CFG->dirroot . '/backup/util/interfaces/checksumable.class.php');
 require_once($CFG->dirroot . '/backup/backup.class.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
@@ -161,6 +165,34 @@ function hide_past_courses($weeknum) {
     ucla_send_mail($to, $subj, $body);
     
     return true;
+}
+
+/**
+ * Handles the updating "ucla_syllabus" table at SRDB by getting the course
+ * that triggered the event and pushing out links for all the different syllabus
+ * types.
+ *
+ * NOTE: This only responds to the ucla_syllabus_added and ucla_syllabus_deleted
+ * events, because the link stays the same if a syllabus is updated.
+ * 
+ * @param mixed $data   Either syllabus record id or syllabus record object.
+ * @return bool         Returns false on problems, otherwise true.
+ */
+function update_srdb_ucla_syllabus($data) {
+    global $DB;
+    $courseid = null;
+    if (is_object($data)) {
+        $courseid = $data->courseid;
+    } else {
+        $courseid = $DB->get_field('ucla_syllabus', 'courseid', array('id' => $data));
+    }
+    if (is_null($courseid)) {
+        throw new Exception(get_string('invalidcourseid', 'error'));
+    }
+
+    // Get all syllabi for course and then send links.
+    $regsender = new local_ucla_regsender();
+    return $regsender->push_course_links($courseid);
 }
 
 /**
