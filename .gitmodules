@@ -22,3 +22,6 @@
 [submodule "admin/tool/editrolesbycap"]
 	path = admin/tool/editrolesbycap
 	url = git://github.com/moodleou/moodle-tool_editrolesbycap
+[submodule "report/editdates"]
+	path = report/editdates
+	url = git://github.com/ccle/moodle-report_editdates.git
