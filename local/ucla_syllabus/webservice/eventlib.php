@@ -100,6 +100,9 @@ function ucla_syllabus_updated($data) {
         foreach ($courses as $course) {
             // Prepare criteria and payload.
             list($criteria, $payload) = syllabus_ws_manager::setup_transfer($outgoing, $course);
+            if (empty($criteria) || empty($payload)) {
+                continue;
+            }
 
             // Handle event.
             $result &= syllabus_ws_manager::handle(syllabus_ws_manager::ACTION_TRANSFER, $criteria, $payload);

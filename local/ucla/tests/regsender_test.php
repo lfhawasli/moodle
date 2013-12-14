@@ -392,8 +392,6 @@ class regsender_test extends advanced_testcase {
     /**
      * Makes sure that the events system is triggering properly whenever a
      * syllabus is added, updated, and deleted for a course.
-     *
-     * @group totest
      */
     public function test_ucla_syllabus_events() {
         $courseid = $this->_class->courseid;

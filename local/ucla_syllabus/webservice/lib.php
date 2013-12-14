@@ -261,6 +261,10 @@ class syllabus_ws_manager {
         $subjarea = $DB->get_record('ucla_reg_subjectarea',
                 array('subjarea' => $classinfo->subj_area));
 
+        if (empty($subjarea)) {
+            return array(null, null);
+        }
+
         $criteria = array(
             'srs' => $srs,
             'subjectarea' => $subjarea->id,
@@ -288,6 +292,9 @@ class syllabus_ws_manager {
     static public function setup_transfer($syllabus, $course) {
 
         list($criteria, $payload) = self::setup($course);
+        if (empty($criteria) || empty($payload)) {
+            return array(null, null);
+        }
 
         $file = $syllabus->stored_file;
 

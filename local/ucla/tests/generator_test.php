@@ -141,6 +141,31 @@ class local_ucla_generator_testcase extends advanced_testcase {
     }
 
     /**
+     * Make sure that public/private is properly setup for test class.
+     */
+    public function test_create_class_publicprivate() {
+        global $DB;
+
+        $class = $this->getDataGenerator()->
+                get_plugin_generator('local_ucla')->create_class();
+        $course = array_pop($class);
+        $courseid = $course->courseid;
+
+        // Make sure that guest enrollment plugin is enabled.
+        $plugins = enrol_get_instances($courseid, true);
+        foreach ($plugins as $plugin) {
+            if ($plugin->enrol == 'guest') {
+                $this->assertEquals(ENROL_INSTANCE_ENABLED, $plugin->status);
+            }
+        }
+
+        // Make sure groupings are set.
+        $course = get_course($courseid);
+        $pubprivcourse = new PublicPrivate_Course($course);
+        $this->assertTrue($pubprivcourse->is_activated());
+    }
+
+    /**
      * Try to create a randomly created class.
      */
     public function test_create_class_random() {

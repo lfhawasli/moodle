@@ -135,6 +135,10 @@ class local_ucla_generator extends testing_data_generator {
      */
     public function create_class($courses = NULL) {
 
+        // Make sure public/private is enabled at the site level, so that
+        // public/private event handlers work properly.
+        set_config('enablepublicprivate', 1);
+
         $classtocreate = array();
 
         // Whenever we affect ucla_request_classes table, should purge caches.
@@ -164,9 +168,12 @@ class local_ucla_generator extends testing_data_generator {
 
         // Generate any missing fields.
         $giventerm = '';
+        $existingshortnames = array();
         foreach ($classtocreate as &$course) {
             $this->set_termsrs($giventerm, $course);
-            $this->set_shortname($course);
+            $this->set_shortname($course, $existingshortnames);
+
+            $existingshortnames[] = $course['shortname'];
 
             // If enrolstat is not given, then default to open ("O").
             if (empty($course['enrolstat'])) {
@@ -559,8 +566,9 @@ class local_ucla_generator extends testing_data_generator {
      *                          crsidx, secidx. Will modify parameter to set
      *                          coursenum, sectnum, classidx, and shortname. As
      *                          well as set any missing expected values.
+     * @param array $existingshortnames Other cross-lists that we are creating.
      */
-    private function set_shortname(array &$course) {
+    private function set_shortname(array &$course, array $existingshortnames) {
         global $DB;
 
         $autogenfields = array();
@@ -597,9 +605,11 @@ class local_ucla_generator extends testing_data_generator {
 
             // If shortname exists, try to regenerate it again.
             if (!$DB->record_exists('course', array('shortname' => $shortname))) {
-                $course['shortname'] = $shortname;
-                break;
-            } else if (empty($autogenfields)) {
+                if (!in_array($shortname, $existingshortnames)) {
+                    $course['shortname'] = $shortname;
+                    break;
+                }
+            }else if (empty($autogenfields)) {
                 // Cannot autogenerate shortname, since it was hardcoded.
                 throw new dml_exception('duplicatefieldname', $shortname);
             }
