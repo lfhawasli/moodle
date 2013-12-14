@@ -427,7 +427,7 @@ class course_edit_form extends moodleform {
                 $mform->setType('role_'.$role->id, PARAM_TEXT);
             }
         }
-               //END UCLA MOD: CCLE-2939
+
 //--------------------------------------------------------------------------------
         $this->add_action_buttons();
 //--------------------------------------------------------------------------------

@@ -52,12 +52,12 @@ if (!empty($approve) and confirm_sesskey()) {
     $courseid = $course->approve();
 
     if ($courseid !== false) {
-        // START UCLAMOD CCLE-2389
-        // Approving site indicator site, and sening 'approved' param
+        // START UCLA MOD: CCLE-2389
+        // Approving site indicator site, and sending 'approved' param.
         siteindicator_manager::approve($courseid, $approve);
 //        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid);
         redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid . '&approved=1');
-        // END UCLAMOD CCLE-2389
+        // END UCLA MOD: CCLE-2389
 
     } else {
         print_error('courseapprovedfailed');
@@ -115,6 +115,7 @@ if (empty($pending)) {
     echo $OUTPUT->heading(get_string('nopendingcourses', 'tool_uclasiteindicator'));
 } else {
     echo $OUTPUT->heading(get_string('coursespending', 'tool_uclasiteindicator'));
+    echo $OUTPUT->notification(get_string('approvalmessage', 'tool_uclasiteindicator'), 'notifymessage');
 
 /// Build a table of all the requests.
     $table = new html_table();
@@ -143,7 +144,8 @@ if (empty($pending)) {
 //        $row[] = $category->get_formatted_name();
 //        $row[] = format_string($course->reason);
         $row[] = siteindicator_manager::get_categories_list($request->request->categoryid);
-        $row[] = siteindicator_manager::get_types_list($request->request->type) .
+        $row[] = html_writer::tag('strong',  get_string('req_type', 'tool_uclasiteindicator') . ': ') .
+                siteindicator_manager::get_types_list($request->request->type) .
                 html_writer::empty_tag('br') .
                 format_string($course->reason);
         // END UCLA MOD CCLE-2389
