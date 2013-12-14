@@ -97,7 +97,28 @@ class format_ucla extends format_topics {
 
         return $landing_page;
     }
-    
+
+    /**
+     * Make category a required field.
+     *
+     * This function is called from {@link course_edit_form::definition_after_data()}.
+     *
+     * @param MoodleQuickForm $mform form the elements are added to.
+     * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
+     * @return array array of references to the added form elements.
+     */
+    public function create_edit_form_elements(&$mform, $forsection = false) {
+        $elements = parent::create_edit_form_elements($mform, $forsection);
+
+        if (!$forsection) {
+            $category = $mform->getElement('category');
+            if (get_class($category) != 'HTML_QuickForm_Error') {
+                $mform->addRule('category', get_string('req_category_error', 'tool_uclasiteindicator'), 'required', null, 'client');
+            }
+        }
+        return $elements;
+    }
+
    /**
     * Gets and determines if the format should display instructors.
     * 
@@ -339,24 +360,24 @@ class format_ucla extends format_topics {
             }
         }
     }
-    
+
     /**
      * Extra form validation.
-     * 
-     * @param type $data from form
-     * @param type $files
-     * @param type $errors already accumulated
-     * @return type
+     *
+     * Note that we still need to have this method here, even though we declare
+     * the category to be a required field in create_edit_form_element for some
+     * reason.
+     *
+     * @param array $data from form
+     * @param array $files
+     * @param array $errors already accumulated
+     * @return array
      */
     public function edit_form_validation($data, $files, $errors) {
-
         $formaterrors = array();
-        
-        // CCLE-4217 - Check that we have a valid category for site indicator.
         if (empty($data['category'])) {
             $formaterrors['category'] = get_string('req_category_error', 'tool_uclasiteindicator');
         }
-        
         return $formaterrors;
     }
 }
