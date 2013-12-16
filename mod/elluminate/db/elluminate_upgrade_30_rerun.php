@@ -104,14 +104,19 @@ if ($schedulingManagerName == 'SAS') {
          echo $OUTPUT->notification(get_string('upgrade30error', 'elluminate', $errorDetails));
          return false;
       }
-
+      
       foreach ($full_recordings as $full_recording) {
          if ($full_recording->recordingid == $recording->recordingid) {
             $recordingids_array[] = $recording->recordingid;
             $recording->versionmajor = $full_recording->versionmajor;
             $recording->versionminor = $full_recording->versionminor;
             $recording->versionpatch = $full_recording->versionpatch;
-            $DB->update_record('elluminate_recordings', $recording);
+            try {
+               $DB->update_record('elluminate_recordings', $recording);
+            } catch (Exception $updateFailure) {
+               var_dump($recording);
+               $logger->error($updateFailure->getMessage());
+            }
          }
       }
    }
