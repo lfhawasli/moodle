@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Traditional Chinese strings for nanogong
  *
  * @author     Ning
+ * @author     Gibson
  * @package    mod
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2
+ * @version    4.2.2
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -92,11 +92,11 @@ $string['nolimitation'] = '沒有限制';
 $string['voicetitle'] = '你的語音的主題是什麼?';
 $string['titlemax'] = '(最多30個字符)';
 $string['voicerecording'] = '你的語音';
-$string['submittedon'] = '提交於';
-$string['submitted'] = '提交';
+$string['submitted'] = '提交於';
 $string['gradedon'] = '修改於';
 $string['instructions'] = '點擊下列語音';
 $string['checkdeletemessage'] = '你確定你要刪除這份語音嗎?';
+$string['checkdeletemessages'] = '你確定你要刪除所選的語音嗎?';
 $string['inonepage'] = '個學生在一頁';
 $string['recordinginonepage'] = '個語音在一頁';
 $string['all'] = '所有';
@@ -156,3 +156,12 @@ $string['voicefeedback'] = '語音反饋';
 $string['commentmessage'] = '來自你的老師的評語';
 $string['forentering'] = '以輸入反饋';
 $string['messagearea'] = '你給老師的留言';
+$string['imgtitle'] = '點擊此圖示可顯示或隱藏NanoGong語音訊息';
+$string['servererror'] = '未能傳送語音訊息，請稍後再試！';
+$string['showdeleteboxes'] = '點擊這裏選擇你要刪除的語音';
+$string['isdelete'] = '刪除?';
+$string['deleterecordings'] = '刪除所選的語音';
+$string['lockstudent'] = '鎖上這名學生以防止進一步的修改';
+$string['submissionlocked'] = '此提交已被鎖上';
+
+?>

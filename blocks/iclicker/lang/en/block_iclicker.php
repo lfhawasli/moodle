@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: block_iclicker.php 181 2013-04-17 22:02:13Z azeckoski@gmail.com $ */
+/* $Id: block_iclicker.php 189 2013-07-30 02:31:57Z azeckoski@gmail.com $ */
 
 // AZ test and force UTF-8 - 吞下玻璃 - Iñtërnâtiônàlizætiøn
 
@@ -168,6 +168,8 @@ $string['config_shared_key'] = 'SSO Shared Key';
 $string['config_shared_key_desc'] = 'Enable Single Sign On support by setting a shared key (must be at least 10 chars long). Set this to blank to disable SSO support';
 $string['config_enable_shortname'] = 'Enable Course Short Name';
 $string['config_enable_shortname_desc'] = 'Enable use of the course short name as part of the displayed course name in the iclicker app';
+$string['config_max_courses'] = 'Control Maximum Courses Fetched';
+$string['config_max_courses_desc'] = 'Controls the maximum number of courses that are fetched for an instructor by the iclicker app.  WARNING: Increasing this value may result in performance issues';
 
 // Main block
 $string['leaveblanktohide'] = 'leave blank to hide';

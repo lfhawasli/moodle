@@ -51,6 +51,7 @@ $string['req_category_help'] = 'The site category will help determine where your
     site will be placed.  It also helps to determine the appropriate 
     support contact that will be responsible for creating your site.';
 $string['req_category_error'] = 'Please choose a category';
+$string['approvalmessage'] = 'Approving a request here will create the site.';
 
 // Pending
 $string['sitetype'] = 'Site type';

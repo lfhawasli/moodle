@@ -17,7 +17,7 @@ require_once($CFG->dirroot . '/enrol/meta/lib.php');
  * @category   phpunit
  * @copyright  UC Regents
  */
-class block_ucla_tasites_generator extends phpunit_block_generator {
+class block_ucla_tasites_generator extends testing_block_generator {
     public $ta_admin_id = null;
     public $ta_id = null;
 

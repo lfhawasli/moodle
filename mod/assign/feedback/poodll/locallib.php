@@ -190,10 +190,16 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         	$usercontextid = get_context_instance(CONTEXT_USER, $USER->id)->id;
         }
          
-         
          $fs = get_file_storage();
          $browser = get_file_browser();
          $fs->delete_area_files($this->assignment->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT,ASSIGNFEEDBACK_POODLL_FILEAREA , $grade->id);
+		
+		
+		//if filename = -1 we are being told to delete the file
+		//so we have done enough
+		if($filename==-1){
+			return;
+		}
 		
 		//fetch the file info object for our original file
 		$original_context = get_context_instance_by_id($usercontextid);
@@ -261,13 +267,32 @@ class assign_feedback_poodll extends assign_feedback_plugin {
      * @return bool true if elements were added to the form
      */
     public function get_form_elements_for_user($grade, MoodleQuickForm $mform, stdClass $data, $userid) {
-        global $USER;
+        global $USER,$PAGE,$CFG;
+        
+        $PAGE->requires->js(new moodle_url($CFG->httpswwwroot . '/mod/assign/feedback/poodll/module.js'));
 		 
         $gradeid = $grade ? $grade->id : 0;
         
         if ($gradeid > 0 && get_config('assignfeedback_poodll', 'showcurrentfeedback')) {
             $currentfeedback = $this->fetch_responses($gradeid);
-            $mform->addElement('static', 'currentfeedback', '',$currentfeedback);
+            if($currentfeedback != ''){
+            	$deletefeedback = "<a href='javascript:void(0);' onclick='M.assignfeedback_poodll.deletefeedback();'>".
+            						"<img src='" . $CFG->httpswwwroot . '/mod/assign/feedback/poodll/pix/deletebutton.png' . 
+									"' alt='" . get_string('deletefeedback','assignfeedback_poodll') . "'/>" . 
+            						"</a>";
+            	$currentfeedback .= $deletefeedback;
+            }
+            $currentcontainer = 'currentfeedbackwrapper';
+            $currentfeedback = "<div id='" .$currentcontainer. "'>" . $currentfeedback . "</div>";
+             $mform->addElement('static', 'currentfeedback', '',$currentfeedback);
+             
+             $opts = array(
+				"filecontrolid"=> FP_FILENAMECONTROL,
+				"reallydeletefeedback"=> get_string('reallydeletefeedback','assignfeedback_poodll'),
+				"currentcontainer"=> $currentcontainer
+			);
+			//$PAGE->requires->js(new moodle_url($CFG->httpswwwroot . '/mod/assign/feedback/poodll/module.js'));
+			$PAGE->requires->js_init_call('M.assignfeedback_poodll.init',array($opts),false);
         }
 
 		//We prepare our form here and fetch/save data in SAVE method
@@ -309,11 +334,6 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 					case "600x800": $width=600;$height=800;break;
 					case "800x600": $width=800;$height=600;break;
 				}
-				
-				//compensation for borders and control panel
-				//the board size is the size of the drawing canvas, not the widget
-				$width = $width + 205;
-				$height = $height + 20;
 
 				
 				$imageurl="";
@@ -402,8 +422,6 @@ function fetch_responses($gradeid, $embed=false){
         // flowplayers should have splash screens to defer loading anyway
         $embedstring = 'clicktoplay';
         $embed='false';
-
-
 
         //get filename, from the filearea for this submission. 
         //there should be only one.

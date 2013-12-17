@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Show NanoGong applet after clicking the corresponding image
  *
@@ -24,10 +23,13 @@
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2.1
+ * @version    4.2.2
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 class filter_nanogong extends moodle_text_filter {
+
     public function filter($text, array $options = array()) {
         global $CFG, $PAGE, $COURSE, $DB;
 
@@ -39,41 +41,40 @@ class filter_nanogong extends moodle_text_filter {
             $startpos = strpos($text, $img);
             $totallength = strlen($img);
 
+            // Search for the sound file path from the title attribute (version 4.2),
+            // from the longdesc attribute (version 4.2.1) or from the alt attribute (version 4.2.2 onwards)
             $path = "";
-            if (preg_match('/title="(.*?)"/', $img, $title) > 0) {
+            if (preg_match('/title="(.*?)"/', $img, $title) > 0) { // version 4.2
                 if (!empty($title[1])) {
-                    $path = preg_replace("/.*?\.php\//", "", $title[1]);
+                    $path = $title[1];
                 }
             }
-            if (preg_match('/longdesc="(.*?)"/', $img, $longdesc) > 0) {
+            if (preg_match('/longdesc="(.*?)"/', $img, $longdesc) > 0) { // version 4.2.1
                 if (!empty($longdesc[1])) {
-                    $path = preg_replace("/.*?\.php\//", "", $longdesc[1]);
+                    $path = $longdesc[1];
+                }
+            }
+            if (empty($path)) {
+                if (preg_match('/alt="(.*?)"/', $img, $alt) > 0) { // version 4.2.2
+                    if (!empty($alt[1])) {
+                        $path = $alt[1];
+                    }
                 }
             }
             if (empty($path)) continue;
 
-            $params = preg_split("/\//", $path);
+            // Construct the NanoGong icon for sound file location
+            $icon  = "<span style='position:relative'>";
+            $icon .=   "<img class='filter_nanogong_img' src='{$CFG->wwwroot}/filter/nanogong/pix/icon.gif' ";
+            $icon .=        "title='" . get_string('imgtitle', 'filter_nanogong') . "'";
+            $icon .=        "style='vertical-align: middle' path='$path' />";
+            $icon .= "</span>";
 
-            $contextid = $params[0];
-            $modulename = $params[1];
-            $filearea = $params[2];
-            if (count($params) == 4) {
-                $itemid = 0;
-                $nanogongname = $params[3];
-            }
-            else {
-                $itemid = $params[3];
-                $nanogongname = $params[4];
-            }
-            $nanogongid = substr($nanogongname, 0, 14);
-
-            $newimg = '<span id= "' . $nanogongid . '" style="position:relative;" ><img src="' . $CFG->wwwroot . '/filter/nanogong/pix/icon.gif" style="vertical-align: middle" onclick="javascript:nanogong_show_applet(this, ' . $nanogongid . ', ' . $contextid . ', \'' . $modulename . '\', \'' . $filearea . '\', ' . $itemid . ', \'' . $nanogongname . '\', \''. $CFG->wwwroot . '\');" /></span>';
-
-            $text = substr_replace($text, $newimg, $startpos, $totallength); 
+            $text = substr_replace($text, $icon, $startpos, $totallength); 
         }
 
-        $nanogongfiltercount = $contextid . '' . $itemid;
-        return '<script type="text/javascript" src="' . $CFG->wwwroot . '/filter/nanogong/nanogongfilter.js" ></script ><div id="nanogongfilterdiv' . $nanogongfiltercount . '" style="position:absolute;top:-40px;left:-130px;z-index:100;visibility:hidden;"><applet id="nanogongfilter' . $nanogongfiltercount . '" archive="' . $CFG->wwwroot . '/filter/nanogong/nanogong.jar" code="gong.NanoGong" width="130" height="40"><param name="ShowTime" value="true" /><param name="ShowAudioLevel" value="false" /><param name="ShowRecordButton" value="false" /></applet></div>' . $text;
+        // Return the text plus the NanoGong JavaScript for setting up the applet
+        return "<script type='text/javascript' src='{$CFG->wwwroot}/filter/nanogong/nanogong.js'></script>" . $text;
     }
 
 }

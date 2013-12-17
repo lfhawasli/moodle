@@ -627,14 +627,16 @@ class siteindicator_manager {
     static function get_support_contact($categoryid, &$contacts) {
         global $DB;
         
-        // Attempt to find the support contact for category
+        // Attempt to find the support contact for category.
         $category = $DB->get_record('course_categories', 
                 array('id' => $categoryid));
 
-        if(key_exists($category->name, $contacts)) {
-            return $contacts[$category->name];
-        } else if(!empty($category->parent)) {
-            self::get_support_contact($category->parent, $contacts);
+        if (!empty($category)) {
+            if(key_exists($category->name, $contacts)) {
+                return $contacts[$category->name];
+            } else if(!empty($category->parent)) {
+                return self::get_support_contact($category->parent, $contacts);
+            }
         }
         
         return $contacts['System'];

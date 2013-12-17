@@ -14,17 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Language string for filter/nanogong.
  *
  * @author     Ning
+ * @author     Gibson
  * @package    filter
  * @subpackage nanogong
  * @copyright  2012 The Gong Project
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @version    4.2
+ * @version    4.2.2
  */
-
  
 $string['filtername'] = 'NanoGong';
+$string['imgtitle'] = 'Show/hide the NanoGong player by clicking this icon';
+
+?>

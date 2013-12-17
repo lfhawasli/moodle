@@ -197,18 +197,25 @@ function html_table_auto_headers($data) {
 }
 
 /**
- *  Used when you want to display a title and a table.
- **/
+ * Displays given data and inputs in a nice table. Also handles if given data
+ * array is empty.
+ *
+ * @param string $title
+ * @param array $data
+ * @param array $inputs
+ * @param string $moreinfo
+ * @return string
+ */
 function supportconsole_render_section_shortcut($title, $data, 
-                                                $inputs=array(), $moreinfo=NULL) {
+                                                $inputs=array(), $moreinfo=null) {
     global $OUTPUT;
     $size = 0;
     if (!empty($data)) {
-        $size = count($data);        
+        $size = count($data);
     }
-    
+
     if ($size == 0) { 
-       $pretext = 'There are no results';
+        $pretext = 'There are no results';
     } else if ($size == 1) {
         $pretext = 'There is 1 result';
     } else {
@@ -219,24 +226,30 @@ function supportconsole_render_section_shortcut($title, $data,
         if (!is_array($inputs)) {
             $inputs = (array) $inputs;
         }
-        
-        // not every support console tool as input
+
+        // Not every support console tool as input.
         $pretext .= ' for input [' . implode(', ', $inputs) . '].';
     }
-    
-    // only display table if there is data to display
+
+    // Only display table if there is data to display.
     if (empty($data)) {
-        return $OUTPUT->box($pretext);                
-    } else if ($moreinfo != NULL) {
-        return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) . 
-                supportconsole_render_table_shortcut($data, $inputs);        
+        return $OUTPUT->box($pretext);   
+    } else if ($moreinfo != null) {
+        return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) .
+                supportconsole_render_table_shortcut($data);
     } else {
-        return $OUTPUT->box($pretext) . 
-                supportconsole_render_table_shortcut($data, $inputs);        
+        return $OUTPUT->box($pretext) .
+                supportconsole_render_table_shortcut($data);
     }
 }
 
-function supportconsole_render_table_shortcut($data, $inputs) {
+/**
+ * Converts given $data array into a table.
+ * 
+ * @param array $data
+ * @return string
+ */
+function supportconsole_render_table_shortcut($data) {
     $table = html_table_auto_headers($data);
     $table->id = setup_js_tablesorter();
 

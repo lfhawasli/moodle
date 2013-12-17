@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: controller.php 179 2013-01-25 20:13:56Z azeckoski@gmail.com $ */
+/* $Id: controller.php 190 2013-11-07 01:15:45Z azeckoski@gmail.com $ */
 
 /**
  * Handles controller functions related to the views
@@ -421,7 +421,7 @@ class iclicker_controller {
 
             } else {
                 // invalid POST
-                error('WARN: Invalid POST: does not contain remove, purge, or activate, nothing to do');
+                error_log('WARN: Invalid POST: does not contain remove, purge, or activate, nothing to do');
             }
         }
 

@@ -19,3 +19,12 @@
 [submodule "admin/tool/mergeusers"]
 	path = admin/tool/mergeusers
 	url = https://github.com/ndunand/moodle-mergeusers.git
+[submodule "admin/tool/editrolesbycap"]
+	path = admin/tool/editrolesbycap
+	url = git://github.com/moodleou/moodle-tool_editrolesbycap
+[submodule "report/editdates"]
+	path = report/editdates
+	url = git://github.com/ccle/moodle-report_editdates.git
+[submodule "mod/questionnaire"]
+	path = mod/questionnaire
+	url = git@github.com:ccle/moodle-mod_questionnaire.git

@@ -135,6 +135,10 @@ class local_ucla_generator extends testing_data_generator {
      */
     public function create_class($courses = NULL) {
 
+        // Make sure public/private is enabled at the site level, so that
+        // public/private event handlers work properly.
+        set_config('enablepublicprivate', 1);
+
         $classtocreate = array();
 
         // Whenever we affect ucla_request_classes table, should purge caches.
@@ -164,9 +168,12 @@ class local_ucla_generator extends testing_data_generator {
 
         // Generate any missing fields.
         $giventerm = '';
+        $existingshortnames = array();
         foreach ($classtocreate as &$course) {
             $this->set_termsrs($giventerm, $course);
-            $this->set_shortname($course);
+            $this->set_shortname($course, $existingshortnames);
+
+            $existingshortnames[] = $course['shortname'];
 
             // If enrolstat is not given, then default to open ("O").
             if (empty($course['enrolstat'])) {
@@ -285,6 +292,82 @@ class local_ucla_generator extends testing_data_generator {
 
         // Create the user using the regular data generator method.
         return parent::create_user($record, $options);
+    }
+
+    /**
+     * Crosslists the given children array to the parent course.
+     *
+     * Sometimes in tests we want to do something to a course, combine it with
+     * another course, and then test to see what happens.
+     *
+     * NOTE: This will not merge the contents of the children courses into the
+     * parent. It will only update the UCLA registrar tables and invalidate any
+     * existing caches.
+     *
+     * Procedure:
+     *  1) Update ucla_request_classes table to change courseid for children to
+     *     match parent courseid. Also need to set hostcourse for children to 0.
+     *  2) Delete children courses.
+     *
+     * @param stdClass $parent  Expecting to be ucla_request_classes entry.
+     * @param array $children   Expecting array of ucla_request_classes entries.
+     * @return boolean          False on error, otherwise true.
+     */
+    public function crosslist_courses(stdClass $parent, array $children) {
+        global $DB;
+
+        try {
+            // Will throw an exception if parent course does not exist.
+            get_course($parent->courseid);
+
+            // Might run into problems, so need to be able to rollback.
+            $transaction = $DB->start_delegated_transaction();
+
+            // 1) Update ucla_request_classes table to change courseid for children
+            // to  match parent courseid. Also need to set hostcourse for children
+            // to 0.
+            $courseidstodelete = array();
+            foreach ($children as $child) {
+                // Make sure we are only crosslisting courses for the same term.
+                if ($parent->term != $child->term) {
+                    throw new Exception(sprintf('Cannot crosslist child ' .
+                            'course (%s) with different term than parent (%s)',
+                            $child->term, $parent->term));
+                }
+
+                if (!empty($child->courseid)) {
+                    // No courseid set if course hasn't been built yet.
+                    $courseidstodelete[$child->courseid] = $child->courseid;
+                }
+                $child->courseid = $parent->courseid;
+                $child->hostcourse = 0;
+                $child->action = UCLA_COURSE_BUILT;
+
+                $DB->update_record('ucla_request_classes', $child);
+            }
+
+            // Now delete children courses.
+            if (!empty($courseidstodelete)) {
+                foreach ($courseidstodelete as $courseid) {
+                    $result = delete_course($courseid);
+                    if (!$result) {
+                        throw new Exception('Cannot delete child course: ' .
+                                            $courseid);
+                    }
+                }
+            }
+
+            $transaction->allow_commit();
+        } catch(Exception $e) {
+            $transaction->rollback($e);
+            return false;
+        }
+
+        // Since mappings changed, purge all caches.
+        $cache = cache::make('local_ucla', 'urcmappings');
+        $cache->purge();
+
+        return true;
     }
 
     /**
@@ -483,8 +566,9 @@ class local_ucla_generator extends testing_data_generator {
      *                          crsidx, secidx. Will modify parameter to set
      *                          coursenum, sectnum, classidx, and shortname. As
      *                          well as set any missing expected values.
+     * @param array $existingshortnames Other cross-lists that we are creating.
      */
-    private function set_shortname(array &$course) {
+    private function set_shortname(array &$course, array $existingshortnames) {
         global $DB;
 
         $autogenfields = array();
@@ -521,9 +605,11 @@ class local_ucla_generator extends testing_data_generator {
 
             // If shortname exists, try to regenerate it again.
             if (!$DB->record_exists('course', array('shortname' => $shortname))) {
-                $course['shortname'] = $shortname;
-                break;
-            } else if (empty($autogenfields)) {
+                if (!in_array($shortname, $existingshortnames)) {
+                    $course['shortname'] = $shortname;
+                    break;
+                }
+            }else if (empty($autogenfields)) {
                 // Cannot autogenerate shortname, since it was hardcoded.
                 throw new dml_exception('duplicatefieldname', $shortname);
             }
