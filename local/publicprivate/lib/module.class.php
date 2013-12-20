@@ -131,6 +131,7 @@ class PublicPrivate_Module {
             if (empty($groupmembersonly)) {
                 $DB->set_field('course_modules', 'groupmembersonly', 1, $conditions);
             }
+            rebuild_course_cache($this->get_course(), true);
         } catch(DML_Exception $e) {
             throw new PublicPrivate_Module_Exception('Failed to set public/private visibility settings for module.', 300, $e);
         }
@@ -158,6 +159,7 @@ class PublicPrivate_Module {
             if (!empty($groupmembersonly)) {
                 $DB->set_field('course_modules', 'groupmembersonly', 0, $conditions);
             }
+            rebuild_course_cache($this->get_course(), true);
         } catch(DML_Exception $e) {
             throw new PublicPrivate_Module_Exception('Failed to set public/private visibility settings for module.', 400, $e);
         }
