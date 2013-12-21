@@ -26,10 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->admin . '/tool/uclacoursecreator/uclacoursecreator.class.php');
-require_once($CFG->admin . '/tool/uclacourserequestor/lib.php');
-require_once($CFG->dirroot . '/local/ucla/lib.php');
-require_once($CFG->libdir . '/testing/generator/data_generator.php');
+$moodleroot = __DIR__ . '/../../../..';
+require_once($moodleroot . '/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
+require_once($moodleroot . '/admin/tool/uclacourserequestor/lib.php');
+require_once($moodleroot . '/local/ucla/lib.php');
+require_once($moodleroot . '/lib/testing/generator/data_generator.php');
 
 /**
  * local_ucla data generator
@@ -198,7 +199,7 @@ class local_ucla_generator extends testing_data_generator {
         // Finished creating courses, so return array of created course requests.
         return ucla_map_courseid_to_termsrses($courseobj->id);
     }
-
+    
     /**
      * Create the roles needed to do enrollment. Note, that these roles will not
      * have the same capabilities as the real roles, they are just roles with
