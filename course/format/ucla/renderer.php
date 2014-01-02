@@ -486,6 +486,8 @@ class format_ucla_renderer extends format_topics_renderer {
                     $supresscoursesummary = true;
                 }
                 $center_content .= html_writer::tag('div', $regsummarycontent, array('class' => 'registrar-summary'));
+            } else {
+                $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info'));
             }
         }
 
