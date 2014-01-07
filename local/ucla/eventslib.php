@@ -186,8 +186,10 @@ function update_srdb_ucla_syllabus($data) {
     } else {
         $courseid = $DB->get_field('ucla_syllabus', 'courseid', array('id' => $data));
     }
-    if (is_null($courseid)) {
-        throw new Exception(get_string('invalidcourseid', 'error'));
+    if (empty($courseid)) {
+        // Syllabus must have been deleted after it was added, so do not process
+        // entry anymore.
+        return true;
     }
 
     // Get all syllabi for course and then send links.

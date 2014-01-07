@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
- * PHPunit tests for local_ucla_regsender.php.
+ * Test the sending of syllabus information to the Registrar.
  * 
  * @package    local_ucla
  * @category   phpunit
@@ -394,6 +394,8 @@ class regsender_test extends advanced_testcase {
      * syllabus is added, updated, and deleted for a course.
      */
     public function test_ucla_syllabus_events() {
+        global $DB;
+
         $courseid = $this->_class->courseid;
         $course = get_course($courseid);
         $syllabusmanager = new ucla_syllabus_manager($course);
@@ -426,6 +428,31 @@ class regsender_test extends advanced_testcase {
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
+
+        // Add and then delete the same syllabus. Make sure that the event queue
+        // is processed.
+        $syllabus = new stdClass();
+        $syllabus->courseid = $courseid;
+        $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
+        $syllabus = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla_syllabus')
+                ->create_instance($syllabus);
+        $syllabi = $syllabusmanager->get_syllabi();
+        $publicyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
+        $syllabusmanager->delete_syllabus($publicyllabus);
+        // Make sure there are events in the queue.
+        $sql = "SELECT  qh.*
+                FROM    {events_queue_handlers} qh
+                JOIN    {events_handlers} h ON (qh.handlerid = h.id)
+                WHERE   (h.eventname=? OR h.eventname=?)";
+        $params = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
+        $result = $DB->record_exists_sql($sql, $params);
+        $this->assertTrue($result);
+        events_cron('ucla_syllabus_added');
+        events_cron('ucla_syllabus_deleted');
+        // Make sure there are no more events in the queue.
+        $result = $DB->record_exists_sql($sql, $params);
+        $this->assertFalse($result);
 
         // Now add a syllabus that requires someone to login to view.
         $syllabus = new stdClass();
