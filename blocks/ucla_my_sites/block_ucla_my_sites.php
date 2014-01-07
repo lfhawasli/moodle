@@ -564,5 +564,14 @@ class block_ucla_my_sites extends block_base {
      
         return $rolenames;
     }
+
+    /**
+     * Prevent block from being collapsed.
+     *
+     * @return bool
+     */
+    public function instance_can_be_collapsed() {
+        return false;
+    }
 }
 
