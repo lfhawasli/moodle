@@ -41,7 +41,6 @@ if ($public and confirm_sesskey()) {
         throw new PublicPrivate_Module_Exception('Illegal action as public/private is not enabled for the course.', 900);
     }
 
-    rebuild_course_cache($cm->course);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     redirect(course_get_url($course, $cm->sectionnum, array('sr' => $sectionreturn)));
 
@@ -71,7 +70,6 @@ if ($public and confirm_sesskey()) {
         throw new PublicPrivate_Module_Exception('Illegal action as public/private is not enabled for the course.', 900);
     }
 
-    rebuild_course_cache($cm->course);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     redirect(course_get_url($course, $cm->sectionnum, array('sr' => $sectionreturn)));
 } else {
