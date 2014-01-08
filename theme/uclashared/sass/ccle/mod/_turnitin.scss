@@ -1,0 +1,12 @@
+//
+// Turnitin mod
+// --------------------------------------------------
+
+// Clear inherited 'row' style from tables
+.path-mod-turnitintool {
+    tr.row {
+        &:before, &:after {
+            content: none;
+        }
+    }
+ }
