@@ -990,14 +990,14 @@ input {
   margin: 8px;
   display: inline-block !important;
 }
-/* line 109, ../sass/_form.scss */
+/* line 108, ../sass/_form.scss */
+.mform .required .error .error > br {
+  display: none;
+}
+/* line 113, ../sass/_form.scss */
 .mform .required .error + input[type="text"] {
   border-color: #d44950;
   float: left;
-}
-/* line 114, ../sass/_form.scss */
-.mform .required .error > br {
-  display: none;
 }
 
 /* line 125, ../sass/_form.scss */
