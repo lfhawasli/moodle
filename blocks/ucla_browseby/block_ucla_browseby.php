@@ -78,6 +78,15 @@ class block_ucla_browseby extends block_navigation {
         return false;
     }
 
+    /**
+     * Prevent block from being collapsed.
+     *
+     * @return bool
+     */
+    public function instance_can_be_collapsed() {
+        return false;
+    }
+
     function html_attributes() {
         $orig = parent::html_attributes();
         $orig['class'] .= ' block_ucla_course_menu block_navigation';
