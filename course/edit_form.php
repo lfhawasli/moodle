@@ -296,6 +296,12 @@ class course_edit_form extends moodleform {
             $themes=array();
             $themes[''] = get_string('forceno');
             foreach ($themeobjects as $key=>$theme) {
+                // START UCLA MOD: CCLE-2315 - CUSTOM DEPARTMENT THEMES
+                // Only allow UCLA specific themes.
+                if ($key != 'uclashared' && $key != 'uclasharedcourse') {
+                    continue;
+                }
+                // END UCLA MOD CCLE-2315
                 if (empty($theme->hidefromselector)) {
                     $themes[$key] = get_string('pluginname', 'theme_'.$theme->name);
                 }
@@ -494,15 +500,18 @@ class course_edit_form extends moodleform {
             // changed to uclasharedcourse theme, if user has capability.
             $editcoursetheme = false;
             if (!empty($context) && has_capability('local/ucla:editcoursetheme', $context)) {
-                // Only allow private sites to change themes.
+                // Only allow collab sites to change themes.
                 $indicator = siteindicator_site::load($mform->getElementValue('id'));                
-                if ((!empty($indicator) && $indicator->property->type == 'private')) {
+                if ((!empty($indicator))) {
                     $editcoursetheme = true;
                 }
             }
             if (!$editcoursetheme) {
                 $element = $mform->getElement('theme');
                 $element->freeze();
+            } else {
+                $element = $mform->getElement('theme');
+                
             }
         }
         // END UCLA MOD: CCLE-4230
