@@ -1012,9 +1012,8 @@ class course_enrolment_manager {
                     );
                     continue;
                 } else if ($ue->timestart and $ue->timeend) {
-                    //$period = get_string('periodstartend', 'enrol', array('start'=>userdate($ue->timestart), 'end'=>userdate($ue->timeend)));
-                    $period = get_string('periodstartend', 'enrol', array('start'=>userdate($ue->timestart, get_string('strftimedaydate', 'langconfig')), 'end'=>userdate($ue->timeend, get_string('strftimedaydate', 'langconfig'))));
-                    $periodoutside = ($ue->timestart && $ue->timeend && $now < $ue->timestart && $now > $ue->timeend);
+                    $period = get_string('periodstartend', 'enrol', array('start'=>userdate($ue->timestart), 'end'=>userdate($ue->timeend)));
+                    $periodoutside = ($ue->timestart && $ue->timeend && ($now < $ue->timestart || $now > $ue->timeend));
                 } else if ($ue->timestart) {
                     //$period = get_string('periodstart', 'enrol', userdate($ue->timestart));
                     $period = get_string('periodstart', 'enrol', userdate($ue->timestart, get_string('strftimedaydate', 'langconfig')));
