@@ -104,16 +104,16 @@ input[type="color"] {
                 
                 margin: 8px;
                 display: inline-block !important;
+                
+                > br {
+                    display: none;
+                }
             }
             
             & + input[type="text"] {
                 border-color: $ccle-form-error-color;
                 float: left;
-            }
-           
-            > br {
-                display: none;
-            }
+            }           
         }
     }
 }

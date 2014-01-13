@@ -9,6 +9,7 @@ $uccdirr = '/tool/uclacoursecreator/uclacoursecreator.class.php';
 require_once($CFG->dirroot . '/' . $CFG->admin . $uccdirr);
 $thisdir = '/' . $CFG->admin . '/tool/uclacourserequestor/';
 require_once($CFG->dirroot . $thisdir . 'lib.php');
+require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 global $DB, $ME, $USER;
 
@@ -342,7 +343,13 @@ if ($processrequests) {
                             if (!empty($host_course)) {
                                 $host_courseid = $host_course['courseid'];
                                 if ($host_course['nourlupdate'] == 0 && !empty($host_courseid)) {
-                                    $c_url = $CFG->wwwroot . "/course/view.php?id=$host_courseid";
+                                    if (get_config('local_ucla', 'friendly_urls_enabled')) {
+                                        $shortname = $DB->get_field('course', 'shortname', array('id' => $host_courseid));
+                                        $friendly_host_course_url = '/course/view/' . rawurlencode($shortname);
+                                        $c_url = $CFG->wwwroot . "$friendly_host_course_url";
+                                    } else {
+                                        $c_url = $CFG->wwwroot . "/course/view.php?id=$host_courseid";
+                                    }
                                     update_myucla_urls($c_term, $c_srs, $c_url);
                                 }
                             }
