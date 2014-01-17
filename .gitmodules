@@ -28,3 +28,6 @@
 [submodule "mod/questionnaire"]
 	path = mod/questionnaire
 	url = git@github.com:ccle/moodle-mod_questionnaire.git
+[submodule "admin/tool/behatui"]
+	path = admin/tool/behatui
+	url = https://github.com/marinaglancy/moodle-tool_behatui
