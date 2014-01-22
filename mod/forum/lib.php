@@ -3048,6 +3048,18 @@ function forum_get_course_forum($courseid, $type) {
         return false;
     }
     $sectionid = course_add_cm_to_section($courseid, $mod->coursemodule, 0);
+    
+    // START UCLA MOD CCLE-3101 - Auto-generated forums should be private by default.
+    $publicprivatelib = $CFG->dirroot . '/local/publicprivate/lib/module.class.php';
+    if (file_exists($publicprivatelib)) {
+        require_once($publicprivatelib);
+        if (PublicPrivate_Course::build($courseid)->is_activated()) {
+            $mod->id = $mod->coursemodule;
+            PublicPrivate_Module::build($mod->coursemodule)->enable();
+        }
+    }
+    // END UCLA MOD CCLE-3101
+    
     return $DB->get_record("forum", array("id" => "$forum->id"));
 }
 
