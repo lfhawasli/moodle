@@ -180,7 +180,7 @@ $CFG->gradebook_send_updates = 0;
 
 /// CCLE-2810 - My Sites - disallow customized "My Moodle" page
 // Core Behat tests do not expect this.
-//$CFG->forcedefaultmymoodle = true;
+$CFG->forcedefaultmymoodle = true;
 
 // Enable PHPunit/Behat testing
 $CFG->phpunit_prefix = 'phpu_';
@@ -326,7 +326,7 @@ $CFG->cronclionly = true;
 $CFG->allowframembedding = 1; // CCLE-3021 - enabled because some collab sites need to be embedded
 
 // Site administration > Appearance > Themes
-$CFG->theme = 'clean';
+//$CFG->theme = 'clean';
 
 // Site administration > Appearance > Themes > Theme settings
 $CFG->themedesignermode = 0;    // Need to be fast.
@@ -429,12 +429,17 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_request'
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
 
 // Allowed Behat environment configs
+// These are required to get Behat running in our very special environment.
+// 
+// NOTE: These configs are active during Moodle @core tests, so we want to keep this list
+//       as small as possible
 $CFG->behat_extraallowedsettings = array(
-    'forced_plugin_settings',
-    'shib_logged_in_cookie',
-    'instructor_levels_roles',
-    'enablepublicprivate',
-    'theme',
+    'forced_plugin_settings',               // Required for most UCLA based stuff to work
+                                            // @todo: Move to dynamic UCLA environment loader
+    'shib_logged_in_cookie',                // Required for base login, or will crash
+    'instructor_levels_roles',              // Required for 'office hours' block to work
+    'allowcoursethemes',                    // Required for 'course edit' to work
+    'forcedefaultmymoodle',                 // Experimental
 );
 
 
