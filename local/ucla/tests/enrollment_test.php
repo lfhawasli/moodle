@@ -702,6 +702,45 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
     }
 
     /**
+     * Make sure that createorfinduser does not update a user's information
+     * if only the casing is different.
+     *
+     * @dataProvider provider_diff_conditions
+     * @group totest
+     */
+    public function test_createorfinduser_update_notneeded_caseinsensitive(array $diffconditions) {
+        // Set user's last access time to some very far time, after
+        // minuserupdatewaitdays.
+        $mintime = ((int) get_config('local_ucla', 'minuserupdatewaitdays')) * 86401;
+        $lastaccess = max(time() - mt_rand($mintime, mt_getrandmax()), 0);
+        $user = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user(array('lastaccess' => $lastaccess));
+
+        $diffuser = clone($user);
+        if (!empty($diffconditions)) {
+            // The empty case makes no sense for this test.
+            return;
+        }
+        foreach ($diffconditions as $field) {
+            $diffuser->$field = textlib::strtoupper($diffuser->$field);
+        }
+
+        $enrollment = array('uid'       => $diffuser->idnumber,
+                            'firstname' => $diffuser->firstname,
+                            'lastname'  => $diffuser->lastname,
+                            'email'     => $diffuser->email,
+                            'username'  => $diffuser->username);
+
+        $founduser = $this->mockenrollmenthelper->createorfinduser($enrollment);
+
+        // Make sure returned user does not have any info changed.
+        foreach (array('firstname', 'lastname', 'email') as $field) {
+            $this->assertEquals($user->$field, $founduser->$field);
+        }
+    }
+
+    /**
      * Call enrol_database_plugin->sync_enrolments() and make sure that it
      * adds the database enrollment plugin for given set of courses that do
      * not already have it.

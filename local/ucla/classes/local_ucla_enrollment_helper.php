@@ -299,7 +299,7 @@ class local_ucla_enrollment_helper {
                         $needsupdating = false;
                         break;
                     }
-                } else if ($enrollment[$field] !== $user->$field) {
+                } else if (textlib::strtolower($enrollment[$field]) !== textlib::strtolower($user->$field)) {
                     $needsupdating = true;
 
                     if (empty($user->$field) && !empty($enrollment[$field])) {
