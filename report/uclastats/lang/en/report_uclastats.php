@@ -263,6 +263,18 @@ $string['categorylisting'] = 'Category listing';
 $string['courselisting'] = 'Course listing';
 $string['noposts'] = 'No posts found';
 
+// Strings for Collaborate types.
+$string['collab_type'] = 'Collaboration site types';
+$string['collab_type_help'] = 'Collaboration site types broken down by division.';
+$string['total'] = 'Total';
+$string['instruction'] = 'Instruction (degree-related)';
+$string['instruction_noniei'] = 'Instruction (non-degree-related)';
+$string['non_instruction'] = 'Other';
+$string['research'] = 'Research';
+$string['test'] = 'Test';
+$string['private'] = 'Private';
+$string['tasite'] = 'TA site';
+
 // Error strings.
 $string['nocachedresults'] = 'No cached results found';
 $string['invalidterm'] = 'Invalid term';
