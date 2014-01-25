@@ -170,7 +170,16 @@ class Elluminate_Recordings_StatusUpdate{
                    $recordingFile->format != $format){
             continue;
          }else{
-            $this->updateRecordingFile($recordingFile);
+            // START UCLA MOD: CCLE-4401 - Blackboard collaborate cron failing
+            //$this->updateRecordingFile($recordingFile);
+             try {
+                 $this->updateRecordingFile($recordingFile);
+             } catch (Elluminate_Exception $e) {
+                 $this->logger->error(sprintf("Unable to updateRecordingFile " .
+                         "for recordingid %d and format %s",
+                         $recordingFile->recordingid, $recordingFile->format));
+             }
+             // END UCLA MOD: CCLE-4401
          }
       }
    }
