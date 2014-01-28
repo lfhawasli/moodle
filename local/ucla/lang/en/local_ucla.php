@@ -195,3 +195,7 @@ If you choose to override here, you will no longer be able to change the grade w
 $string['view_grouping'] = 'View grouping';
 $string['all_groupings'] = 'All';
 
+// MUC strings.
+$string['cachedef_rolemappings'] = 'UCLA role mapping';
+$string['cachedef_urcmappings'] = 'UCLA ucla_request_classes to Moodle courses';
+$string['cachedef_usermappings'] = 'UCLA user idnumber/username to Moodle users';
