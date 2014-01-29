@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/report/uclastats/locallib.php');
+require_once($CFG->libdir . '/coursecatlib.php');
 
 class collab_type extends uclastats_base {
 
