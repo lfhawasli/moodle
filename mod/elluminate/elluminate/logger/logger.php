@@ -121,12 +121,20 @@ class Elluminate_Logger_Logger {
    // mysitename-20130306-sas.log
    private function setFileName(){
       $today_timestamp = gmdate("Ymd");
-      $this->fileName = $this->logDir. "/"
-            .str_replace(' ','_',$this->siteName) .
+      // START UCLA MOD: CCLE-4401 - Blackboard collaborate cron failing
+//      $this->fileName = $this->logDir. "/"
+//            .str_replace(' ','_',$this->siteName) .
+//            self:: BB_LOG_SUFFIX_SEPARATOR .
+//            $today_timestamp .
+//            self::BB_LOG_SUFFIX_SEPARATOR .
+//            $this->logSuffix . self::BB_LOG_EXT;
+      $this->fileName = $this->logDir .
+            str_replace(' ','_',$this->siteName) .
             self:: BB_LOG_SUFFIX_SEPARATOR .
             $today_timestamp .
             self::BB_LOG_SUFFIX_SEPARATOR .
             $this->logSuffix . self::BB_LOG_EXT;
+      // END UCLA MOD: CCLE-4401
    }
 
    private function checkDirectories(){

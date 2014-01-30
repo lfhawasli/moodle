@@ -64,7 +64,16 @@ function elluminate_cron() {
    require_once($CFG->dirroot . '/mod/elluminate/include/cron-includes.php');
    $cronRunner = $ELLUMINATE_CONTAINER['cronRunner'];
    $cronRunner->loadActions();
-   echo $cronRunner->executeCronActions();
+
+   // START UCLA MOD: CCLE-4401 - Blackboard collaborate cron failing
+   //echo $cronRunner->executeCronActions();
+    try {
+        echo $cronRunner->executeCronActions();
+    } catch (Elluminate_Exception $e) {
+        echo sprintf("Elluminate cron error: " . $e->getExceptionOutput() . "\n");
+        
+    }
+   // END UCLA MOD: CCLE-4401
 }
 
 /**
