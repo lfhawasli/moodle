@@ -440,6 +440,8 @@ $CFG->behat_extraallowedsettings = array(
     'instructor_levels_roles',              // Required for 'office hours' block to work
     'allowcoursethemes',                    // Required for 'course edit' to work
     'forcedefaultmymoodle',                 // Experimental
+    'debug',
+    'debugdisplay'
 );
 
 
