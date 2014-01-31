@@ -73,6 +73,7 @@ function elluminate_cron() {
         echo sprintf("Elluminate cron error: " . $e->getExceptionOutput() . "\n");
         
     }
+    return true;
    // END UCLA MOD: CCLE-4401
 }
 
