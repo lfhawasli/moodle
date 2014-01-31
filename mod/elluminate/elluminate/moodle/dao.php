@@ -56,7 +56,10 @@ class Elluminate_Moodle_DAO{
    public function addConfigRecord($configRecord){
       global $DB;
       try {
-      	$DB->insert_record('config', $configRecord);
+        // START UCLA MOD: CCLE-4401 - Blackboard collaborate cron failing
+      	//$DB->insert_record('config', $configRecord);
+        set_config($configRecord->name, $configRecord->value);
+        // END UCLA MOD: CCLE-4401
       } catch (Exception $e) {
       	throw new Elluminate_Exception($e->getMessage(), $e->getCode(), 'user_error_database');
       }
@@ -65,7 +68,10 @@ class Elluminate_Moodle_DAO{
    public function updateConfigRecord($configRecord){
       global $DB;
       try {
-      	$DB->update_record('config', $configRecord);
+        // START UCLA MOD: CCLE-4401 - Blackboard collaborate cron failing
+      	//$DB->update_record('config', $configRecord);
+        set_config($configRecord->name, $configRecord->value);
+        // END UCLA MOD: CCLE-4401
       } catch (Exception $e) {
       	throw new Elluminate_Exception($e->getMessage(), $e->getCode(), 'user_error_database');
       }
@@ -74,7 +80,14 @@ class Elluminate_Moodle_DAO{
    public function getConfigRecord($configKey = null){
       global $DB;
       try {
-      	return $DB->get_record('config', array('name'=>$configKey));
+        // START UCLA MOD: CCLE-4401 - Blackboard collaborate cron failing
+      	//return $DB->get_record('config', array('name'=>$configKey));
+        $configValue = get_config('', $configKey);
+        $configRecord = new stdClass();
+        $configRecord->name = $configKey;
+        $configRecord->value = $configValue;
+        return $configRecord;
+        // END UCLA MOD: CCLE-4401
       } catch (Exception $e) {
       	throw new Elluminate_Exception($e->getMessage(), $e->getCode(), 'user_error_database');
       }
