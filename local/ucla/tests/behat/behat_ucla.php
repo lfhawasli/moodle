@@ -58,6 +58,7 @@ class behat_ucla extends behat_base {
         // Set term
         set_config('currentterm', '14W');
         set_config('forcedefaultmymoodle', 1);
+        set_config('grader_report_grouping_filter', 1);
         // Add the gradebook report config
         
         // Some settings need to be active immediately.
