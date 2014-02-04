@@ -92,6 +92,7 @@ class behat_ucla extends behat_base {
             case 'enrollments':
             case 'enrolments':
             case 'course enrolments':
+                global $DB;
                 
                 if (empty($this->courses)) {
                     throw new ExpectationException('There are no UCLA sites generated', $this->getSession());
@@ -109,6 +110,13 @@ class behat_ucla extends behat_base {
                 // Forward the work to Moodle's data generators
                 $this->getMainContext()->getSubcontext('behat_data_generators')->
                     the_following_exists('course enrolments', new TableNode($table));
+                
+                // Update role to ucla role, otherwise Office Hours won't show up
+                // @todo: need to generate real UCLA roles
+                $record = $DB->get_record('role', array('shortname' => 'editingteacher'));
+                $record->shortname = 'editinginstructor';
+                $DB->update_record('role', $record);
+
                 break;
         }
     }
