@@ -35,9 +35,12 @@ class behat_ucla extends behat_base {
      */
     public $course;
         
-    // And this term exists: 
-    // And I am on the ucla control panel
-    
+    /**
+     *
+     * @var array of UCLA sites (course objs) generated
+     */
+    public $courses = array();
+
     /**
      * Loads base configs needed for a UCLA environment.  Primarily,
      * this loads the UCLA theme with public/private and a term.
@@ -70,6 +73,129 @@ class behat_ucla extends behat_base {
     public function load_ucla_config_environment(TableNode $table) {
         throw new PendingException();
     }
+    
+    /**
+     * Step to generate UCLA SRS + collab sites, and enrolments.
+     * 
+     * @Given /^the following ucla "([^"]*)" exists:$/
+     */
+    public function the_following_exists($elementname, TableNode $data) {
+        // Need the ucla class generator.
+        require_once(__DIR__ . '/../generator/lib.php');
+        $this->datagenerator = new local_ucla_generator();
+        
+        switch ($elementname) {
+            case 'sites':
+                $this->generate_ucla_sites($data);
+                break;
+            
+            case 'enrollments':
+            case 'enrolments':
+            case 'course enrolments':
+                
+                if (empty($this->courses)) {
+                    throw new ExpectationException('There are no UCLA sites generated', $this->getSession());
+                }
+                
+                // Need to set proper course shortname so that Moodle's generator
+                // knows what to reference.  In this case, I have to regenerate the
+                // table as text because I can't modify the TableNode obj directly.
+                $table = "| user | course | role |";
+                
+                foreach ($data->getHash() as $elementdata) { 
+                    $table .= "\n| {$elementdata['user']} | {$this->courses[$elementdata['course']]->shortname} | {$elementdata['role']} |";
+                }
+
+                // Forward the work to Moodle's data generators
+                $this->getMainContext()->getSubcontext('behat_data_generators')->
+                    the_following_exists('course enrolments', new TableNode($table));
+                break;
+        }
+    }
+    
+    /**
+     * Step to browse directly to a site with a given shortname.
+     * 
+     * @Given /^I browse to site "([^"]*)"$/
+     */
+    public function i_browse_to_site($shortname) {
+        $courseid = $this->courses[$shortname]->id;
+        $this->getSession()->visit($this->locate_path('/course/view.php?id=' . $courseid));
+    }
+
+    
+    /**
+     * Generates UCLA SRS and collab sites and saves course objs in $courses array.
+     * 
+     * @param \Behat\Gherkin\Node\TableNode $data
+     * @throws PendingException
+     */
+    protected function generate_ucla_sites(TableNode $data) {
+        
+        foreach ($data->getHash() as $elementdata) {
+
+            $sitetype = $elementdata['type'];
+            
+            // Need to have a site type.
+            if (empty($sitetype)) {
+                throw new ExpectationException('A site type was not specified', $this->getSession());
+            }
+            
+            switch ($sitetype) {
+                case 'class':
+                case 'srs':
+                    // Create a random UCLA SRS site
+                    $class = $this->datagenerator->create_class(array());
+                    $courseid = array_pop($class)->courseid;
+                    
+                    // Save site
+                    $this->courses[$elementdata['shortname']] = course_get_format($courseid)->get_course();
+                    break;
+
+                case 'instruction':
+                case 'instruction_noniei':
+                case 'non_instruction':
+                case 'research':
+                case 'private':
+                case 'test':
+
+                    $data = "| fullname | shortname | format | numsections |
+                             | {$elementdata['fullname']} | {$elementdata['shortname']} | ucla | 10 |";
+                    $this->getMainContext()->getSubcontext('behat_data_generators')->
+                        the_following_exists('courses', new TableNode($data));
+
+                    $courseid = $this->get_course_id($elementdata['shortname']);
+                    $this->courses[$elementdata['shortname']] = course_get_format($courseid)->get_course();
+
+                    // Make official collab site
+                    $this->create_collab_site($courseid, $sitetype);
+
+                    break;
+                default:
+                    throw new ExpectationException('The site type specified does not exist', $this->getSession());
+            }
+        }
+    }
+    
+    /**
+     * Creates a collab site indicator entry.
+     * 
+     * @todo use actual site_indicator class.
+     * 
+     * @global type $DB
+     * @param type $courseid
+     * @param type $type
+     */
+    protected function create_collab_site($courseid, $type) {
+        global $DB;
+        
+        $indicator = new stdClass();
+        $indicator->courseid = $courseid;
+        $indicator->type = $type;
+
+        $DB->insert_record('ucla_siteindicator', $indicator);
+    }
+
 
     /**
      * Generates a single a UCLA site.  The site will have two enrolled
@@ -187,13 +313,6 @@ class behat_ucla extends behat_base {
      */
     public function i_goto_ucla_srs_site() {
         $this->getSession()->visit($this->locate_path('/course/view.php?id=2'));
-    }
-
-    /**
-     * @Given /^the following ucla srs sites exists:$/
-     */
-    public function the_following_srs_site_exists(TableNode $table) {
-        throw new PendingException();
     }
     
     /**

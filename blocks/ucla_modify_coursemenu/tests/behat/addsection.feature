@@ -6,12 +6,20 @@ Feature: Adding a section
 
   Background: UCLA environment and srs site exists
     Given I am in a ucla environment
-    And A ucla srs site exists
+    And the following "users" exists:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@asd.com |
+    And the following ucla "sites" exists:
+        | fullname | shortname | type |
+        | course 1 | C1 | srs |
+    And the following ucla "enrollments" exists:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
 
   @javascript
   Scenario: Log in and modify section
-    Given I log in as ucla "editinginstructor"
-    And I go to a ucla srs site
+    And I log in as ucla "teacher1"
+    And I browse to site "C1"
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds

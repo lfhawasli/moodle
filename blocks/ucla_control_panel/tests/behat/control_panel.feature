@@ -6,12 +6,20 @@ Feature: Control Panel
 
   Background:
     Given I am in a ucla environment
-    And a ucla srs site exists
+    And the following "users" exists:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@asd.com |
+    And the following ucla "sites" exists:
+        | fullname | shortname | type |
+        | course 1 | C1 | srs |
+    And the following ucla "enrollments" exists:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
 
-  @javascript
+#  @javascript
   Scenario: Control Panel visiblity    
-    And I log in as instructor
-    And I go to a ucla srs site
+    And I log in as ucla "teacher1"
+    And I browse to site "C1"
     When I press "Control Panel"
     Then I should see "Control panel"
     And I should see "Most commonly used"
