@@ -2941,6 +2941,13 @@ class assign {
                       $this->get_course_module()->id .
                       '&action=grading';
 
+        // START UCLA MOD: CCLE-4291 - Moving "Option box" to top of the page
+        $assignform = new assign_form('gradingoptionsform',
+                                      $gradingoptionsform,
+                                      'M.mod_assign.init_grading_options');
+        $o .= $this->get_renderer()->render($assignform);
+        // END UCLA MOD: CCLE-4291
+        
         $o .= groups_print_activity_menu($this->get_course_module(), $currenturl, true);
 
         // Plagiarism update status apearring in the grading book.
@@ -2969,10 +2976,13 @@ class assign {
             $assignform = new assign_form('gradingbatchoperationsform', $gradingbatchoperationsform);
             $o .= $this->get_renderer()->render($assignform);
         }
-        $assignform = new assign_form('gradingoptionsform',
-                                      $gradingoptionsform,
-                                      'M.mod_assign.init_grading_options');
-        $o .= $this->get_renderer()->render($assignform);
+        
+        // START UCLA MOD: CCLE-4291 - Moving "Option box" to top of the page
+        // $assignform = new assign_form('gradingoptionsform',
+        //                              $gradingoptionsform,
+        //                              'M.mod_assign.init_grading_options');
+        // $o .= $this->get_renderer()->render($assignform); 
+        // END UCLA MOD: CCLE-4291 
         return $o;
     }
 
