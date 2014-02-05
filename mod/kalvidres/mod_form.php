@@ -80,9 +80,10 @@ class mod_kalvidres_mod_form extends moodleform_mod {
                         array('upload_successful', 'kalvidres'),
                         array('video_converting', 'kalvidres'),
                         array('previewvideo', 'kalvidres'),
-                        array('javanotenabled', 'kalvidres')
-                        )
-                );
+                        array('javanotenabled', 'kalvidres'),
+                        array('checkingforjava', 'kalvidres')
+                )
+            );
     
             $courseid = get_courseid_from_context($PAGE->context);
     
@@ -170,10 +171,10 @@ class mod_kalvidres_mod_form extends moodleform_mod {
         $slider_border = html_writer::tag('div', $progress_bar, $attr);
 
         $attr          = array('id' => 'loading_text');
-        $loading_text  = html_writer::tag('div', get_string('scr_loading', 'mod_kalvidres'), $attr);
+        $loading_text  = html_writer::tag('div', get_string('checkingforjava', 'mod_kalvidres'), $attr);
 
         $attr   = array('id' => 'progress_bar_container',
-                        'style' => 'width:100px; padding-left:10px; padding-right:10px; visibility: hidden');
+                        'style' => 'width:100%; padding-left:10px; padding-right:10px; visibility: hidden');
         $output = html_writer::tag('span', $slider_border . $loading_text, $attr);
 
         return $output;
