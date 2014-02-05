@@ -34,3 +34,44 @@ Feature: Setting a landing page
     And I log in as ucla "student1"
     And I browse to site "C1"
     And I should see "Syllabus is not available yet"
+
+  @javascript
+  Scenario: Setting landing page and turning editing mode on/off 
+            stays on correct section
+    Given I log in as ucla "teacher1"
+    And I browse to site "C1"
+    And I turn editing mode on
+    And I follow "Modify sections"
+    And I wait "2" seconds
+    # Select Week 4
+    And I select "landing-page-4" radio button
+    And I press "Save changes"
+    And I should see "The sections have been successfully updated."
+    And I press "Return to course"
+    And I log out
+    And I log in as ucla "teacher1"
+    And I browse to site "C1"
+    # Must be redirected to new landing page
+    Then I should be on section "Week 4"
+    And I turn editing mode on
+    Then I should be on section "Week 4"
+    And I turn editing mode off
+    Then I should be on section "Week 4"
+    # Check another week
+    And I follow "Week 7"
+    And I turn editing mode on
+    Then I should be on section "Week 7"
+    And I turn editing mode off
+    Then I should be on section "Week 7"
+    # Check site info
+    And I follow "Site info"
+    And I turn editing mode on
+    Then I should be on section "Site info"
+    And I turn editing mode off
+    Then I should be on section "Site info"
+    # Check Show all
+    And I follow "Show all"
+    And I turn editing mode on
+    Then I should be on section "Show all"
+    And I turn editing mode off
+    Then I should be on section "Show all"
