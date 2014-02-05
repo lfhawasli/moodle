@@ -1,4 +1,4 @@
-@ucla @grader_report_ucla
+@ucla @grader_report_ucla @core_edit @CCLE-4295
 Feature: Grader Report Grouping filter
   In order to input grades more efficiently
   As an instructor
