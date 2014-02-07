@@ -12,6 +12,7 @@ $string['phone'] = 'Phone';
 $string['email'] = 'Email';
 $string['officehours'] = 'Office hours';
 $string['update_icon'] = '';
+$string['update'] = 'Update';
 
 $string['header'] = 'Update office hours and contact info for {$a}';
 

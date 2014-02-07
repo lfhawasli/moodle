@@ -18,7 +18,7 @@ Feature: Update Office Hours Error Message for Long String
     And I log in as ucla "teacher1"
     And I browse to site "C1"
     And I turn editing mode on
-    And I follow "Update"
+    And I update office hours for "1, Teacher"
     Then I should see "Office hours"
 
 #  @javascript
