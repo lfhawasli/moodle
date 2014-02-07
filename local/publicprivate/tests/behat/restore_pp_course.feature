@@ -1,4 +1,4 @@
-@ucla @local_publicprivate @foo
+@ucla @local_publicprivate
 Feature: Restore course backups with public/private content
   In order to continue using my stored course contents with public/private settings
   As a teacher and an admin
@@ -23,7 +23,6 @@ Feature: Restore course backups with public/private content
         And I log in as ucla "admin"
         And I follow "Source"
         Then I follow "Site info"
-        And I put a breakpoint
         And "Private assign" activity should be private
         And "Public assign" activity should be public
         Then I follow "Week 1"
