@@ -77,10 +77,14 @@ class behat_ucla extends behat_base {
     
     /**
      * Step to generate UCLA SRS + collab sites, and enrolments.
-     * 
+     *
+     * NOTE: If you are creating activities, make sure to also set the idnumber
+     * field.
+     *
      * @Given /^the following ucla "([^"]*)" exists:$/
      */
     public function the_following_exists($elementname, TableNode $data) {
+        global $DB;
         // Need the ucla class generator.
         require_once(__DIR__ . '/../generator/lib.php');
         $this->datagenerator = new local_ucla_generator();
@@ -93,7 +97,6 @@ class behat_ucla extends behat_base {
             case 'enrollments':
             case 'enrolments':
             case 'course enrolments':
-                global $DB;
                 
                 if (empty($this->courses)) {
                     throw new ExpectationException('There are no UCLA sites generated', $this->getSession());
@@ -119,6 +122,19 @@ class behat_ucla extends behat_base {
                 $DB->update_record('role', $record);
 
                 break;
+            case 'activities':
+                require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
+                $this->getMainContext()->getSubcontext('behat_data_generators')->
+                    the_following_exists('activities', $data);
+                // Make each activity either public or private (default).
+                foreach ($data->getHash() as $elementdata) {
+                    if (!empty($elementdata['private'])) {
+                        // Find course module.
+                        $cmid = $DB->get_field('course_modules', 'id', array('idnumber' => $elementdata['idnumber']));
+                        $ppmod = PublicPrivate_Module::build($cmid);
+                        $ppmod->enable();
+                    }
+                }
         }
     }
     
