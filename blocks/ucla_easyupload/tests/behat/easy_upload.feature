@@ -1,4 +1,4 @@
-@ucla @block_ucla_easy_upload
+@ucla @block_ucla_easyupload
 Feature: Easy Upload
   As an instructor
   I want to upload files, links, activities, and resources
@@ -29,7 +29,7 @@ Feature: Easy Upload
     When I press "Return to course"
     Then I should see "testupload1" in the "region-main" "region"
 
-  @javascript 
+  @javascript
   Scenario: Upload a file to a specific Week section via Control Panel
     When I follow "Upload a file"
     And I upload "blocks/ucla_easyupload/tests/fixtures/test.txt" file to "Select file" filepicker
@@ -38,7 +38,7 @@ Feature: Easy Upload
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
     When I press "Return to section"
-    Then I should see "Week 5" in the "region-main" "region"
+    Then I should be on section "Week 5"
     And I should see "testupload2" in the "region-main" "region"
     When I follow "Site info"
     Then I should not see "testupload2" in the "region-main" "region"
