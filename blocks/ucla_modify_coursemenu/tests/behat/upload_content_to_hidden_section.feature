@@ -19,8 +19,8 @@ Feature: Uploading content to sections
     | teacher1 | C1 | editingteacher |
     | student1 | C1 | student |
 
-    @javascript
-    Scenario: Add a hidden section and upload content
+  @javascript
+  Scenario: Add a hidden section and upload content
     # add a hidden section
     When I log in as ucla "teacher1"
     And I follow "course1"
@@ -35,7 +35,9 @@ Feature: Uploading content to sections
     And I wait "5" seconds
     Then I should see "The sections have been successfully updated."
     And I press "Return to course"
-    Then I should see "new1"
+    And I follow "Show all"
+    # Verify that "new1" section is hidden
+    Then section "11" should be hidden
 
     # upload content to hidden section
     When I press "Control Panel"
@@ -46,19 +48,19 @@ Feature: Uploading content to sections
     And I select "new1" from "Add to section"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
-    When I press "Return to course"
-    Then I should see "hidden_yin" in the "region-main" "region"
-    Then I follow "Logout"
+    When I press "Return to section"
+    Then "hidden_yin" activity should be hidden
+    And I log out
 
     # student should accessible to visible section, but not hidden section
-    When I log in as ucla "student1"
+    Given I log in as ucla "student1"
     And I follow "course1"
-    Then I should see "Week 1"
-    And I should not see "new1"
-    Then I follow "Logout"
+    When I follow "Show all"
+    Then I should not see "new1"
+    And I log out
 
     # upload content to visible section
-    When I log in as ucla "teacher1"
+    Given I log in as ucla "teacher1"
     And I follow "course1"
     And I press "Control Panel"
     And I follow "Upload a file"
@@ -68,12 +70,16 @@ Feature: Uploading content to sections
     And I select "Week 1" from "Add to section"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
-    When I press "Return to course"
-    Then I should see "visible_dingdang" in the "region-main" "region"
-    Then I follow "Logout"
+    When I press "Return to section"
+    And "visible_dingdang" activity should be visible
+    And I follow "Show all"
+    And I turn editing mode on
+    And I show section "11"
+    And I log out
 
     # student should accessible to visible section, but not hidden section
-    When I log in as ucla "student1"
+    Given I log in as ucla "student1"
     And I follow "course1"
-    Then I should see "Week 1"
-    And I should not see "new1"
+    When I follow "Show all"
+    Then I should see "visible_dingdang"
+    And I should see "hidden_yin"
