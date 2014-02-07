@@ -444,6 +444,17 @@ $CFG->behat_extraallowedsettings = array(
     'debugdisplay'
 );
 
+$CFG->behat_config = array(
+       'default' => array(
+           'formatter' => array(
+               'name' => 'pretty',
+               'parameters' => array(
+                   'decorated' => true,
+                   'verbose' => true
+               )
+           )
+       )
+    );
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
