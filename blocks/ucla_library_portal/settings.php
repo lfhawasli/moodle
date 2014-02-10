@@ -15,21 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English strings for UCLA Library Research Portal
+ * UCLA Library Research Portal block settings
  *
- * @package    block
- * @subpackage ucla_library_portal
- * @copyright  2012 UC Regents
+ * @package    block_ucla_library_portal
+ * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die;
 
-defined('MOODLE_INTERNAL') || die();
-
-$string['maxrecords'] = 'Maximum number of course records to send';
-$string['maxrecordsdesc'] = 'URLs over 2,000 characters will not work in the ' . 
-        'most popular web browser. So we try not to run into that limit by ' .
-        'capping the number of course records sent over the GET parameter.';
-$string['pluginname'] = 'UCLA library research portal';
-// Rename to "Library Research Guide" after Spring 2014.
-$string['portalname'] = 'Lib Research Guide';
-$string['url'] = 'URL to sent course information';
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configtext('block_ucla_library_portal/url',
+            get_string('url', 'block_ucla_library_portal'), '', ''));
+    $settings->add(new admin_setting_configtext('block_ucla_library_portal/maxrecords', new lang_string('maxrecords', 'block_ucla_library_portal'),
+        new lang_string('maxrecordsdesc', 'block_ucla_library_portal'), 10, PARAM_INT));
+}
