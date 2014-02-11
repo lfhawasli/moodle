@@ -21,7 +21,7 @@ class behat_officehours extends behat_base {
      * @Given /^I update office hours for "([^"]*)"$/
      */
     public function i_update_office_hours_for($user) {
-        $exception = new ExpectationException('Unable edit office hours for user: "' . $user . '"', $this->getSession());
+        $exception = new ExpectationException('Unable to edit office hours for user: "' . $user . '"', $this->getSession());
         $updateLink = $this->find('xpath','//td[contains(text(),"'.$user.'")]/preceding-sibling::td//a[@title="'.get_string('update', 'block_ucla_office_hours').'"]', $exception);
         $updateLink->click();
     }
