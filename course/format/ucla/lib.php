@@ -47,6 +47,23 @@ class format_ucla extends format_topics {
     
     const UCLA_FORMAT_DISPLAY_LANDING = -4;
     
+    
+    /**
+     * Returns course obj.  Uses cache when possible.
+     * 
+     * @global type $CFG
+     * @return object representing course
+     */
+    public function get_course() {
+        global $CFG;
+        
+        // In a Behat environment, we don't want course objects cached.
+        if (!empty($CFG->behat_switchcompletely)) {
+            $this->course = false;
+        }
+        
+        return parent::get_course();
+    }
     /**
      *  Figures out the section to display. Specific only to the UCLA course format.
      *  Uses a $_GET or $_POST param to figure out what's going on.
