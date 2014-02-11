@@ -70,6 +70,8 @@ class block_ucla_course_menu extends block_navigation {
         
         if ($this->contentgenerated === true) {
             return $this->content;
+        } else {
+            $this->content->text = '';
         }
 
         // get course preferences and store section user is viewing

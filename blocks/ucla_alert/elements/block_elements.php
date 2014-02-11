@@ -31,6 +31,15 @@ class alert_html_header extends html_element {
 }
 
 /**
+ * A general boxing element with preset 'box-boundary' class
+ */
+class alert_html_box_content extends html_element {
+    public function __construct($content = null, $attributes = array('class' => 'box-boundary')) {
+        parent::__construct('div', $content, $attributes);
+    }
+}
+
+/**
  * Alert block color header renderer.  Creates the header from markup text
  * 
  * The color header is usually made up of a title (BIG text) and
@@ -66,15 +75,6 @@ class alert_html_header_title extends html_element {
 class alert_html_header_subtitle extends html_element {
     public function __construct($content = null) {
         parent::__construct('div', $content, array('class' => 'header-subtitle'));
-    }
-}
-
-/**
- * A general boxing element with preset 'box-boundary' class
- */
-class alert_html_box_content extends html_element {
-    public function __construct($content = null, $attributes = array('class' => 'box-boundary')) {
-        parent::__construct('div', $content, $attributes);
     }
 }
 

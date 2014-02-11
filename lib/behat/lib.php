@@ -156,7 +156,11 @@ function behat_clean_init_config() {
         'dbtype', 'dblibrary', 'dbhost', 'dbname', 'dbuser', 'dbpass', 'prefix', 'dboptions',
         'proxyhost', 'proxyport', 'proxytype', 'proxyuser', 'proxypassword', 'proxybypass'
     ));
+    // Add extra allowed settings.
 
+    if (!empty($CFG->behat_extraallowedsettings)) {
+        $allowed = array_merge($allowed, array_flip($CFG->behat_extraallowedsettings));
+    }
     // Also allowing behat_ prefixed attributes.
     foreach ($CFG as $key => $value) {
         if (!isset($allowed[$key]) && strpos($key, 'behat_') !== 0) {
