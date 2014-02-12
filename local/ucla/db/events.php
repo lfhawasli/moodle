@@ -40,6 +40,12 @@ $handlers = array(
         'handlerfunction' => 'course_restored_dedup_default_forums',
         'schedule'        => 'instant'
     ),
+    'ucla_course_deleted' => array(
+        'handlerfile'     => '/local/ucla/eventslib.php',
+        'handlerfunction' => 'clear_srdb_ucla_syllabus',
+        'schedule'        => 'cron',
+        'internal'         => 0,
+    ),
     'ucla_syllabus_added' => array (
         'handlerfile'     => '/local/ucla/eventslib.php',
         'handlerfunction'  => 'update_srdb_ucla_syllabus',

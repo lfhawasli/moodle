@@ -347,6 +347,10 @@ class local_ucla_generator extends testing_data_generator {
                 $DB->update_record('ucla_request_classes', $child);
             }
 
+            // Since mappings changed, purge all caches.
+            $cache = cache::make('local_ucla', 'urcmappings');
+            $cache->purge();
+
             // Now delete children courses.
             if (!empty($courseidstodelete)) {
                 foreach ($courseidstodelete as $courseid) {
@@ -363,10 +367,6 @@ class local_ucla_generator extends testing_data_generator {
             $transaction->rollback($e);
             return false;
         }
-
-        // Since mappings changed, purge all caches.
-        $cache = cache::make('local_ucla', 'urcmappings');
-        $cache->purge();
 
         return true;
     }
