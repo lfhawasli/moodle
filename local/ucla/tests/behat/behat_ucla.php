@@ -183,18 +183,9 @@ class behat_ucla extends behat_base {
                 case 'research':
                 case 'private':
                 case 'test':
-
-                    $data = "| fullname | shortname | format | numsections |
-                             | {$elementdata['fullname']} | {$elementdata['shortname']} | ucla | 10 |";
-                    $this->getMainContext()->getSubcontext('behat_data_generators')->
-                        the_following_exists('courses', new TableNode($data));
-
-                    $courseid = $this->get_course_id($elementdata['shortname']);
-                    $this->courses[$elementdata['shortname']] = course_get_format($courseid)->get_course();
-
-                    // Make official collab site
-                    $this->create_collab_site($courseid, $sitetype);
-
+                    $elementdata['type'] = $sitetype;
+                    $course = $this->datagenerator->create_collab($elementdata);
+                    $this->courses[$elementdata['shortname']] = $course;
                     break;
                 default:
                     throw new ExpectationException('The site type specified does not exist', $this->getSession());

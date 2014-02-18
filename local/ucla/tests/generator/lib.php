@@ -27,8 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 $moodleroot = __DIR__ . '/../../../..';
-require_once($moodleroot . '/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
-require_once($moodleroot . '/admin/tool/uclacourserequestor/lib.php');
+require_once($moodleroot . '/'.$CFG->admin.'/tool/uclacoursecreator/uclacoursecreator.class.php');
+require_once($moodleroot . '/'.$CFG->admin.'/tool/uclacourserequestor/lib.php');
+require_once($moodleroot . '/'.$CFG->admin.'/tool/uclasiteindicator/lib.php');
 require_once($moodleroot . '/local/ucla/lib.php');
 require_once($moodleroot . '/lib/testing/generator/data_generator.php');
 
@@ -199,7 +200,52 @@ class local_ucla_generator extends testing_data_generator {
         // Finished creating courses, so return array of created course requests.
         return ucla_map_courseid_to_termsrses($courseobj->id);
     }
-    
+
+
+    /**
+     * Creates a given collaboration site.
+     *
+     * @param array $course     To specify a certain site type set 'type'
+     *                          parameter.
+     *
+     * @return array            Returns created course object.
+     */
+    public function create_collab($course) {
+
+        // Make sure public/private is enabled at the site level, so that
+        // public/private event handlers work properly.
+        set_config('enablepublicprivate', 1);
+
+        // Get site type.
+        $sitetype = 'test'; // Default type.
+        if (isset($course['type'])) {
+            $types = siteindicator_manager::get_types_list();
+            if (in_array($course['type'], array_keys($types))) {
+                $sitetype = $course['type'];
+            }
+            unset($course['type']);
+        }
+
+        // Set defaults.
+        if (!isset($course['format'])) {
+            $course['format'] = 'ucla';
+        }
+        if (!isset($course['numsections'])) {
+            $course['numsections'] = 10;
+        }
+
+        // Make shell course first.
+        $courseobj = $this->create_course($course);
+
+        // Add course to the ucla_siteindicator table.
+        $site = new stdClass();
+        $site->courseid = $courseobj->id;
+        $site->type = $sitetype;
+        siteindicator_site::create($site);
+
+        return $courseobj;
+    }
+
     /**
      * Create the roles needed to do enrollment. Note, that these roles will not
      * have the same capabilities as the real roles, they are just roles with

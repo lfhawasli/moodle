@@ -301,6 +301,40 @@ class local_ucla_generator_testcase extends advanced_testcase {
     }
 
     /**
+     * Test creating different types of collaboration sites.
+     */
+    public function test_create_collab() {
+        // Create each type of collaborate site.
+        $types = siteindicator_manager::get_types_list();
+        foreach ($types as $type => $info) {
+            $course = array();
+            $course['type'] = $type;
+            $collab = $this->getDataGenerator()
+                    ->get_plugin_generator('local_ucla')
+                    ->create_collab($course);
+
+            // Verify that site is the given type.
+            $site = new siteindicator_site($collab->id);
+            $this->assertEquals($type, $site->property->type);
+        }
+    }
+
+    /**
+     * Try creating a collaboration site with a nonexistant type.
+     */
+    public function test_create_collab_nonexistant() {
+        $course = array();
+        $course['type'] = 'nonexistant';
+        $collab = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_collab($course);
+
+        // Verify that site is the "test" type.
+        $site = new siteindicator_site($collab->id);
+        $this->assertEquals('test', $site->property->type);
+    }
+
+    /**
      * Test creating a user.
      */
     public function test_create_user() {
