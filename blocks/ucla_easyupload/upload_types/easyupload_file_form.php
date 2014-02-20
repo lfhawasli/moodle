@@ -8,12 +8,21 @@ class easyupload_file_form extends easy_upload_form {
     var $allow_renaming = true;
     var $allow_js_select = true;
 
-    private $draftitem = 0;
-
     function specification() {
         global $CFG;
         $mform =& $this->_form;
 
+        $mform->addElement('static', 'upload' , '',
+                html_writer::span(
+                    html_writer::link(
+                            $CFG->wwwroot . '/help.php?component=block_ucla_easyupload&identifier=bulkupload&lang=en', 
+                            get_string('upload', 'block_ucla_easyupload'), 
+                            array('aria-haspopup' => 'true', 'target' => '_blank', 'title' => 'Help with Bulk upload files')),
+                        'helptooltip'
+                    )
+                );
+        $mform->addHelpButton('upload', 'bulkupload', 'block_ucla_easyupload');
+        
         // important to call this before the file upload
         $maxfilesize = get_max_upload_file_size($CFG->maxbytes, $this->course->maxbytes);
         // CCLE-3833: For some reason, to fix this ticket the value of

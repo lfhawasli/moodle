@@ -62,3 +62,6 @@ $string['redirectimplementationerror'] = 'The implementation for a redirect type
 // Rearrange
 $string['rearrangejsrequired'] = 'The Rearrange Tool requires JavaScript to work.';
 
+$string['upload'] = 'Want to upload more than one file at the same time?';
+$string['bulkupload'] = 'Bulk upload files';
+$string['bulkupload_help'] = 'If you want to upload more than one file at a time, use Drag and Drop instead of Easy File Upload.<br /><br /><a href="https://docs.ccle.ucla.edu/w/Drag_and_drop" target="_blank">Visit the documentation site for more information.</a>';
