@@ -58,24 +58,11 @@ class local_ucla_generator extends testing_data_generator {
                             '0180F   ');
 
     /**
-     * Divisions to use for autogeneration.
+     * Divisions to use for autogeneration. Caches entries from
+     * ucla_reg_division.
      * @var array
      */
-    public $divisions = array('AA' => 'SCHOOL OF THE ARTS AND ARCHITECTURE',
-                              'AR' => 'ARCHITECTURE AND URBAN PLANNING',
-                              'BB' => 'BASIC BIOMEDICAL SCIENCES',
-                              'DN' => 'DENTISTRY',
-                              'ED' => 'EDUCATION',
-                              'GS' => 'LETTERS AND SCIENCE',
-                              'HU' => 'HUMANITIES',
-                              'LF' => 'LIFE SCIENCE',
-                              'LW' => 'LAW',
-                              'MG' => 'MANAGEMENT',
-                              'MN' => 'MEDICINE',
-                              'NS' => 'NURSING',
-                              'PS' => 'PHYSICAL SCIENCE',
-                              'SS' => 'SOCIAL SCIENCE',
-                              'TF' => 'SCHOOL OF THEATER, FILM, AND TELEVISION');
+    public $divisions = array();
 
 
     /**
@@ -577,7 +564,13 @@ class local_ucla_generator extends testing_data_generator {
     private function set_division(array &$course) {
         global $DB;
 
+        // If no division is set, choose a random one from the
+        // ucla_reg_division table.
         if (empty($course['division'])) {
+            if (empty($this->divisions)) {
+                 $this->divisions = $DB->get_records_menu('ucla_reg_division', 
+                         null, 'fullname', 'code, fullname');
+            }
             $codes = array_keys($this->divisions);
             $course['division'] = $codes[array_rand($codes)];
         }
