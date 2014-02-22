@@ -458,6 +458,9 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_prepop'] = '/home/m
 // CCLE-4295 - Add Grouping Filter for the Grader Report
 $CFG->grader_report_grouping_filter = 1;
 
+// CCLE-4299 - Improve Assignment Grading Screen
+$CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
+
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
 
