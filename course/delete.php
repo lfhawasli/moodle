@@ -47,8 +47,21 @@
         $PAGE->set_heading($site->fullname);
         echo $OUTPUT->header();
 
-        $message = "$strdeletecoursecheck<br /><br />" . format_string($course->fullname, true, array('context' => $coursecontext)) .  " (" . $courseshortname . ")";
-
+        // START UCLA MOD: CCLE-4415 - Prompt deletion warning
+        //$message = "$strdeletecoursecheck<br /><br />" . format_string($course->fullname, true, array('context' => $coursecontext)) .  " (" . $courseshortname . ")";
+        require_once($CFG->dirroot . '/report/uclastats/reports/active_instructor_focused.php');
+        $activeinstructorfocused = new active_instructor_focused($USER);
+        if ($activeinstructorfocused->has_additional_course_content($course)) {
+            $warningmsg = get_string('deletecoursewarning', 'local_ucla');
+            $strdeletecoursecheck = html_writer::tag('strong', $warningmsg) .
+                    html_writer::empty_tag('br') . $strdeletecoursecheck;
+        } else {
+            $strdeletecoursecheck = get_string('deletecoursesafe', 'local_ucla') . ' ' .
+                    $strdeletecoursecheck;
+        }
+        $message = $strdeletecoursecheck;
+        // END UCLA MOD: CCLE-4415
+ 
         echo $OUTPUT->confirm($message, "delete.php?id=$course->id&delete=".md5($course->timemodified), "manage.php?categoryid=$course->category");
 
         echo $OUTPUT->footer();
