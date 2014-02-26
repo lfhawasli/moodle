@@ -333,20 +333,21 @@ class uclacoursecreator {
 
     /**
      *  Returns the long name of the target if found.
+     * 
      *  This is used for getting the long name for divisions and
      *  subject areas.
      *
      *  May alter the state of the object.
      *
-     *  @param $table The table to use.
-     *  @param $target The string we are translating.
-     *  @param $from_field The field that we are using to search if the 
-     *      target exists.
-     *  @param $to_field The field that we are going to return if we find
-     *      the target entry.
-     *  @return The long name of the target, or the short name if no long 
-     *      name was found.
-     **/
+     *  @param string $table        The table to use.
+     *  @param string $target       The string we are translating.
+     *  @param string $from_field   The field that we are using to search if the
+     *                              target exists.
+     *  @param string $to_field     The field that we are going to return if we
+     *                              find the target entry.
+     *  @return An array containing both the short and long name of the target.
+     *          If a long name was not found, will return the short name again.
+     */
     function get_registrar_translation($table, $target, $from_field, 
             $to_field) {
         global $DB;
@@ -367,11 +368,12 @@ class uclacoursecreator {
         }
 
         if (!isset($this->reg_trans[$table][$target])) { 
-            return $target;
+            return array($target, $target);
         } 
 
-        // format result nicely, not in all caps
-        return ucla_format_name($this->reg_trans[$table][$target], true);
+        // Format result nicely, not in all caps.
+        return array($target,
+                ucla_format_name($this->reg_trans[$table][$target], true));
     }
 
     /**
@@ -986,7 +988,9 @@ class uclacoursecreator {
                         . ' does not exist.');
                 }
 
-                $trans = $this->$function($field);
+                // The translation method will return the short name that will
+                // be used to populate the idnumber for the category.
+                list($idnumber, $trans) = $this->$function($field);
 
                 // Note that standard is same here #OOOO
                 $namecheck = $trans . '-' . $immediate_parent_catid;
@@ -1002,7 +1006,7 @@ class uclacoursecreator {
                 // Not an existing category
                 if (!isset($name_categories[$namecheck])) {
                     $newcategory = $this->new_category($trans,
-                        $immediate_parent_catid);
+                        $immediate_parent_catid, $idnumber);
 
                     // Figure name for display and debugging purposes
                     $parentname = 
@@ -1032,27 +1036,21 @@ class uclacoursecreator {
         fix_course_sortorder();
     }
 
-    function new_category($name, $parent=0) {
-        global $CFG, $DB;
-
-        // This is how moodle creates categories...
-        $newcategory = new StdClass();
+    /**
+     * Creates given category.
+     *
+     * @param string $name
+     * @param int $parent
+     * @param string $idnumber  Subject area shortname or division code.
+     * @return coursecat
+     */
+    function new_category($name, $parent=0, $idnumber=null) {
+        $newcategory = new stdClass();
         $newcategory->name = $name;
         $newcategory->parent = $parent;
-        $newcategory->sortorder = 999;
+        $newcategory->idnumber = $idnumber;
 
-        // This is because we're not going to add a description.
-        $newcategory->descriptionformat = 0;
-
-        $newcategory->id = $DB->insert_record('course_categories',
-            $newcategory);
-
-        $newcategory->context = get_context_instance(CONTEXT_COURSECAT, 
-            $newcategory->id);
-
-        mark_context_dirty($newcategory->context->path);
-
-        return $newcategory;
+        return  coursecat::create($newcategory);
     }
 
     /**
@@ -1138,7 +1136,7 @@ class uclacoursecreator {
 
             // Get the long version of the subject area (for category)
             $subj = rtrim($rci_object->subj_area);
-            $category_name = $this->get_subj_area_translation($subj);
+            list($idnumber, $category_name) = $this->get_subj_area_translation($subj);
 
             if (isset($this->categories_cache[$category_name])) {
                 $category = $this->categories_cache[$category_name];
@@ -1146,7 +1144,7 @@ class uclacoursecreator {
                 // Default category (miscellaneous), but this may lead to 
                 // the first category displayed in course/category.php
                 $category = get_course_category(1);
-                $this->println('Could not find category: ' . $CATegory_name
+                $this->println('Could not find category: ' . $category_name
                     . ', putting course into ' . $category->name);
             }
 
@@ -1721,9 +1719,10 @@ class uclacoursecreator {
      *  in the current session of course creator.
      **/
     function make_email_course_name($reginfo) {
-        return trim($this->get_subj_area_translation(trim($reginfo->subj_area)) 
-            . ' ' . trim($reginfo->coursenum) . ' ' . $reginfo->acttype 
-            . ' ' . $reginfo->sectnum);
+        list($idnumber, $subjarea) = $this->get_subj_area_translation(
+                trim($reginfo->subj_area));
+        return trim($subjarea) . ' ' . trim($reginfo->coursenum) . ' ' . 
+                $reginfo->acttype . ' ' . $reginfo->sectnum;
     }
 
     /**

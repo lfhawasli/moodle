@@ -27,8 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 $moodleroot = __DIR__ . '/../../../..';
-require_once($moodleroot . '/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
-require_once($moodleroot . '/admin/tool/uclacourserequestor/lib.php');
+require_once($moodleroot . '/'.$CFG->admin.'/tool/uclacoursecreator/uclacoursecreator.class.php');
+require_once($moodleroot . '/'.$CFG->admin.'/tool/uclacourserequestor/lib.php');
+require_once($moodleroot . '/'.$CFG->admin.'/tool/uclasiteindicator/lib.php');
 require_once($moodleroot . '/local/ucla/lib.php');
 require_once($moodleroot . '/lib/testing/generator/data_generator.php');
 
@@ -57,24 +58,11 @@ class local_ucla_generator extends testing_data_generator {
                             '0180F   ');
 
     /**
-     * Divisions to use for autogeneration.
+     * Divisions to use for autogeneration. Caches entries from
+     * ucla_reg_division.
      * @var array
      */
-    public $divisions = array('AA' => 'SCHOOL OF THE ARTS AND ARCHITECTURE',
-                              'AR' => 'ARCHITECTURE AND URBAN PLANNING',
-                              'BB' => 'BASIC BIOMEDICAL SCIENCES',
-                              'DN' => 'DENTISTRY',
-                              'ED' => 'EDUCATION',
-                              'GS' => 'LETTERS AND SCIENCE',
-                              'HU' => 'HUMANITIES',
-                              'LF' => 'LIFE SCIENCE',
-                              'LW' => 'LAW',
-                              'MG' => 'MANAGEMENT',
-                              'MN' => 'MEDICINE',
-                              'NS' => 'NURSING',
-                              'PS' => 'PHYSICAL SCIENCE',
-                              'SS' => 'SOCIAL SCIENCE',
-                              'TF' => 'SCHOOL OF THEATER, FILM, AND TELEVISION');
+    public $divisions = array();
 
 
     /**
@@ -199,7 +187,52 @@ class local_ucla_generator extends testing_data_generator {
         // Finished creating courses, so return array of created course requests.
         return ucla_map_courseid_to_termsrses($courseobj->id);
     }
-    
+
+
+    /**
+     * Creates a given collaboration site.
+     *
+     * @param array $course     To specify a certain site type set 'type'
+     *                          parameter.
+     *
+     * @return array            Returns created course object.
+     */
+    public function create_collab($course) {
+
+        // Make sure public/private is enabled at the site level, so that
+        // public/private event handlers work properly.
+        set_config('enablepublicprivate', 1);
+
+        // Get site type.
+        $sitetype = 'test'; // Default type.
+        if (isset($course['type'])) {
+            $types = siteindicator_manager::get_types_list();
+            if (in_array($course['type'], array_keys($types))) {
+                $sitetype = $course['type'];
+            }
+            unset($course['type']);
+        }
+
+        // Set defaults.
+        if (!isset($course['format'])) {
+            $course['format'] = 'ucla';
+        }
+        if (!isset($course['numsections'])) {
+            $course['numsections'] = 10;
+        }
+
+        // Make shell course first.
+        $courseobj = $this->create_course($course);
+
+        // Add course to the ucla_siteindicator table.
+        $site = new stdClass();
+        $site->courseid = $courseobj->id;
+        $site->type = $sitetype;
+        siteindicator_site::create($site);
+
+        return $courseobj;
+    }
+
     /**
      * Create the roles needed to do enrollment. Note, that these roles will not
      * have the same capabilities as the real roles, they are just roles with
@@ -531,7 +564,13 @@ class local_ucla_generator extends testing_data_generator {
     private function set_division(array &$course) {
         global $DB;
 
+        // If no division is set, choose a random one from the
+        // ucla_reg_division table.
         if (empty($course['division'])) {
+            if (empty($this->divisions)) {
+                 $this->divisions = $DB->get_records_menu('ucla_reg_division', 
+                         null, 'fullname', 'code, fullname');
+            }
             $codes = array_keys($this->divisions);
             $course['division'] = $codes[array_rand($codes)];
         }

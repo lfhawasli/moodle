@@ -36,30 +36,40 @@ class collab_type extends uclastats_base {
      * Given a category id, try to work through the category and its parents
      * trying to find a corresponding name match in the given division list.
      *
-     * NOTE: This is a recursive method.
+     * Method starts look at the root category.
      *
-     * @param int $category     Category ID.
+     * @param int $categoryid     Category ID.
      * @param array $divisions  Array of divisions to match.
      * @return string           Returns matching division name. If there are no
      *                          matches, will return null.
      */
-    private function find_division($category, $divisions) {
-        $category = coursecat::get($category);
+    private function find_division($categoryid, $divisions) {
 
-        // See if current category is a match.
+        $category = coursecat::get($categoryid);
+
+        // First check if category has any parents.
+        $parents = $category->get_parents();
+        if (!empty($parents)) {
+            // Has parents, so check the top most parent and then go down the
+            // list looking for a name match with a division.
+            foreach ($parents as $parentid) {
+                // Top most parent is at the start of the array.
+                $parent = coursecat::get($parentid);
+                // See if parent's name matches.
+                if (in_array($parent->name, $divisions)) {
+                    return $parent->name;
+                }
+            }
+        }
+
+
+        // If here, then either category does not have a parent or its parents
+        // did not match any known division. Check current category name.
         if (in_array($category->name, $divisions)) {
             return $category->name;
         }
 
-        // Else, see if there are any parent categories.
-        $parents = $category->get_parents();
-        if (empty($parents)) {
-            return null;
-        } else {
-            // Intermediate parent is at the end of the list.
-            $parentcategory = array_pop($parents);
-            return $this->find_division($parentcategory, $divisions);
-        }
+        return null;    // No matches found.
     }
 
     /**
@@ -117,9 +127,10 @@ class collab_type extends uclastats_base {
 
         // First get list of divisions.
         $retval = array();
-        $divisions = $DB->get_records_menu('ucla_reg_division', null, 'fullname', 'code, fullname');
+        $divisions = $DB->get_records_menu('ucla_reg_division', null,
+                'fullname', 'code, fullname');
 
-        // Formate names of divisions, so that they match category names.
+        // Format names of divisions, so that they match category names.
         foreach ($divisions as $division) {
             $initializeddiv = $this->init_division($division);
             $retval[$initializeddiv['division']] = $initializeddiv;
