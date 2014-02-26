@@ -125,21 +125,41 @@ class local_ucla_regsender {
     }
 
     /**
+     * For given classinfo, will return a syllabus link.
+     *
+     * @throws registrar_query_exception    If cannot connect to registrar.
+     *
+     * @param string $term
+     * @param string $subjarea
+     * @param string $crsidx    Unformatted catalog number.
+     * @param string $classidx  Unformatted section number.
+     * @return array            Record from the Registrar syllabus table.
+     */
+    public function get_syllabus_link($term, $subjarea, $crsidx, $classidx) {
+        $adodb = $this->open_regconnection();
+
+        $sql = "SELECT  *
+                FROM    $this->syllabustable
+                WHERE   term_cd='$term' AND
+                        subj_area_cd='$subjarea' AND
+                        crs_catlg_no='$crsidx' AND
+                        sect_no='$classidx'";
+        return $adodb->GetRow($sql);
+    }
+
+    /**
      * For given courseid, will return list of syllabus links indexed by
      * term/srs.
      *
+     * @throws registrar_query_exception    If cannot connect to registrar.
+     * 
      * @param int $courseid
      * @return array            Array of records from the Registrar indexed by
-     *                          term and srs. Returns null if cannot connect to
-     *                          the Registrar.
+     *                          term and srs. Returns false if course is not a
+     *                          Registrar course.
      */
     public function get_syllabus_links($courseid) {
         $retval = array();
-
-        $adodb = $this->open_regconnection();
-        if (empty($adodb)) {
-            return null;
-        }
 
         // Get all related fields to build key to query records.
         $courseinfos = ucla_get_course_info($courseid);
@@ -149,15 +169,12 @@ class local_ucla_regsender {
         }
 
         foreach ($courseinfos as $courseinfo) {
-            // First get any existing records.
-            $sql = "SELECT  *
-                    FROM    $this->syllabustable
-                    WHERE   term_cd='$courseinfo->term' AND
-                            subj_area_cd='$courseinfo->subj_area' AND
-                            crs_catlg_no='$courseinfo->crsidx' AND
-                            sect_no='$courseinfo->classidx'";
-            $retval[$courseinfo->term][$courseinfo->srs] =
-                    $adodb->GetRow($sql);
+            $result = $this->get_syllabus_link(
+                            $courseinfo->term,
+                            $courseinfo->subj_area,
+                            $courseinfo->crsidx,
+                            $courseinfo->classidx);
+            $retval[$courseinfo->term][$courseinfo->srs] = $result;
         }
 
         return $retval;
@@ -175,11 +192,7 @@ class local_ucla_regsender {
         if (empty($this->adodb)) {            
             $this->adodb = registrar_query::open_registrar_connection();
         }        
-        if (!$this->adodb->IsConnected()) {
-            $this->adodb = null;
-        } else {
-            $this->adodb->debug = $debug;
-        }
+        $this->adodb->debug = $debug;
         return $this->adodb;
     }
 
@@ -259,6 +272,135 @@ class local_ucla_regsender {
     }
 
     /**
+     * For given classinfo, will set a syllabus link.
+     *
+     * @throws registrar_query_exception    If cannot connect to registrar.
+     *
+     * @param string $term
+     * @param string $subjarea
+     * @param string $crsidx    Unformatted catalog number.
+     * @param string $classidx  Unformatted section number.
+     * @param array $links      An array with the following possible keys:
+     *                          public, private, and protect.
+     * @return int          Return code   | Explaination:
+     *                      FAILED        | Error, either could not connect or
+     *                                      course is not a Registrar course.
+     *                      NOUPDATE      | Entries at Registrar are the same as
+     *                                      being sent or belong to another
+     *                                      server, so no changes made.
+     *                      SUCCESS       | Updated links at Registrar.
+     */
+    public function set_syllabus_link($term, $subjarea, $crsidx, $classidx, $links) {
+        global $CFG;
+        $adodb = $this->open_regconnection();
+
+        // Make sure that $links parameter has at least 1 type of syllabus.
+        $linkparams = array();
+        foreach (self::$syllabustypes as $syllabustype) {
+            if (isset($links[$syllabustype])) {
+                $linkparams[$syllabustype] = $links[$syllabustype];
+            }
+        }
+
+        if (empty($linkparams)) {
+            // Need to send something to the Registrar.
+            return self::FAILED;
+        }
+
+        // Prepare column and value arrays to user later when inserting or
+        // updating.
+        $typecols = array();
+        $typevals = array();
+        foreach ($linkparams as $type => $link) {
+            $typecols[] = $type . '_syllabus_url';
+            $typevals[] = $link;
+        }
+
+        // First get any existing records.
+        $sql = "SELECT  *
+                FROM    $this->syllabustable
+                WHERE   term_cd='$term' AND
+                        subj_area_cd='$subjarea' AND
+                        crs_catlg_no='$crsidx' AND
+                        sect_no='$classidx'";
+        $existing = $adodb->GetRow($sql);
+
+        $result = null;
+        if ($existing === false) {
+            // Could not do query.
+            return self::FAILED;
+        } else if (empty($existing)) {
+            // Record does not exist, so insert it.
+            $sql = "INSERT INTO $this->syllabustable
+                    (term_cd, subj_area_cd, crs_catlg_no, sect_no, " .
+                     implode(',', $typecols) . ")
+                    VALUES
+                    ('$term', '$subjarea',
+                     '$crsidx', '$classidx'";
+
+            foreach ($typevals as $typeval) {
+                $sql .= sprintf(",'%s'", $typeval);
+            }
+
+            $sql .= ')';
+
+            $result = $adodb->Execute($sql);
+        } else {
+            // Record exists, so update it.
+
+            // Add in some sanity checking here. Make sure we are only
+            // updating links on the Registrar if they are from the same
+            // server, the same as we do with the IEI class links.
+            $serverhost = parse_url($CFG->wwwroot, PHP_URL_HOST);
+            foreach ($typecols as $index => $typecol) {
+                if (empty($existing[$typecol])) {
+                    continue;
+                }
+                $reghost = parse_url($existing[$typecol], PHP_URL_HOST);
+                if ($serverhost != $reghost) {
+                    // Registrar link is not the same server, so do not
+                    // overwrite it.
+                    unset($typecols[$index]);
+                    unset($typevals[$index]);
+                }
+            }
+
+            // See if there is anything left to update now.
+            if (empty($typecols)) {
+                return self::NOUPDATE;
+            }
+
+            $sql = "UPDATE $this->syllabustable
+                    SET ";
+
+            $firstentry = true;
+            foreach ($typecols as $index => $typecol) {
+                $firstentry ? $firstentry = false : $sql .= ',';
+                $sql .= sprintf(" %s = '%s' ", $typecol, $typevals[$index]);
+            }
+
+            $sql .= "WHERE  term_cd='$term' AND
+                            subj_area_cd='$subjarea' AND
+                            crs_catlg_no='$crsidx' AND
+                            sect_no='$classidx'";
+
+            $result = $adodb->Execute($sql);
+        }
+
+        if ($result === false) {
+            // Some problem happened.
+            return self::FAILED;
+        }
+
+        if ($adodb->Affected_Rows()) {
+            return self::SUCCESS;
+        } else {
+            // No changed, so must have been an update with no changes.
+            return self::NOUPDATE;
+        }
+    }
+
+    /**
      * For given courseid, will update the appropiate syllabus entries at the
      * Registrar with the the given url for given syllabus type.
      *
@@ -281,40 +423,10 @@ class local_ucla_regsender {
      *                      SUCCESS       | Updated links at Registrar.
      */
     public function set_syllabus_links($courseid, $links) {
-        global $CFG;
-
         // Get all related fields to build key to update records.
         $courseinfos = ucla_get_course_info($courseid);
         if (empty($courseinfos)) {
             // Not a registrar course.
-            return self::FAILED;
-        }
-
-        // Make sure that $links parameter has at least 1 type of syllabus.
-        $linkparams = array();
-        foreach (self::$syllabustypes as $syllabustype) {
-            if (isset($links[$syllabustype])) {
-                $linkparams[$syllabustype] = $links[$syllabustype];
-            }
-        }
-        
-        if (empty($linkparams)) {
-            // Need to send something to the Registrar.
-            return self::FAILED;
-        }
-
-        // Prepare column and value arrays to user later when inserting or
-        // updating.
-        $typecols = array();
-        $typevals = array();
-        foreach ($linkparams as $type => $link) {
-            $typecols[] = $type . '_syllabus_url';
-            $typevals[] = $link;
-        }
-        
-
-        $adodb = $this->open_regconnection();
-        if (empty($adodb)) {
             return self::FAILED;
         }
 
@@ -323,87 +435,19 @@ class local_ucla_regsender {
         $hasaffectedrows = false;
         $noupdateoccurred = false;
         foreach ($courseinfos as $courseinfo) {
-            // First get any existing records.
-            $sql = "SELECT  *
-                    FROM    $this->syllabustable
-                    WHERE   term_cd='$courseinfo->term' AND
-                            subj_area_cd='$courseinfo->subj_area' AND
-                            crs_catlg_no='$courseinfo->crsidx' AND
-                            sect_no='$courseinfo->classidx'";
-            $existing = $adodb->GetRow($sql);
 
-            $result = null;
-            if ($existing === false) {
-                // Could not do query.
+            $result = $this->set_syllabus_link(
+                    $courseinfo->term,
+                    $courseinfo->subj_area,
+                    $courseinfo->crsidx,
+                    $courseinfo->classidx,
+                    $links);
+
+            if ($result == self::FAILED) {
                 return self::FAILED;
-            } else if (empty($existing)) {
-                // Record does not exist, so insert it.
-                $sql = "INSERT INTO $this->syllabustable
-                        (term_cd, subj_area_cd, crs_catlg_no, sect_no, " .
-                         implode(',', $typecols) . ")
-                        VALUES
-                        ('$courseinfo->term', '$courseinfo->subj_area',
-                         '$courseinfo->crsidx', '$courseinfo->classidx'";
-
-                foreach ($typevals as $typeval) {
-                    $sql .= sprintf(",'%s'", $typeval);
-                }
-
-                $sql .= ')';
-
-                $result = $adodb->Execute($sql);
-            } else {
-                // Record exists, so update it.
-
-                // Add in some sanity checking here. Make sure we are only
-                // updating links on the Registrar if they are from the same
-                // server, the same as we do with the IEI class links.
-                $serverhost = parse_url($CFG->wwwroot, PHP_URL_HOST);
-                foreach ($typecols as $index => $typecol) {
-                    if (empty($existing[$typecol])) {
-                        continue;
-                    }
-                    $reghost = parse_url($existing[$typecol], PHP_URL_HOST);
-                    if ($serverhost != $reghost) {
-                        // Registrar link is not the same server, so do not
-                        // overwrite it.
-                        unset($typecols[$index]);
-                        unset($typevals[$index]);
-                    }
-                }
-
-                // See if there is anything left to update now.
-                if (empty($typecols)) {
-                    $noupdateoccurred = true;
-                    continue;
-                }
-
-                $sql = "UPDATE $this->syllabustable
-                        SET ";
-
-                $firstentry = true;
-                foreach ($typecols as $index => $typecol) {
-                    $firstentry ? $firstentry = false : $sql .= ',';
-                    $sql .= sprintf(" %s = '%s' ", $typecol, $typevals[$index]);
-                }
-
-                $sql .= "WHERE  term_cd='$courseinfo->term' AND
-                                subj_area_cd='$courseinfo->subj_area' AND
-                                crs_catlg_no='$courseinfo->crsidx' AND
-                                sect_no='$courseinfo->classidx'";
-
-                $result = $adodb->Execute($sql);
-            }
-
-            if ($result === false) {
-                // Some problem happened.
-                return self::FAILED;
-            }
-
-            if ($adodb->Affected_Rows()) {
+            } else if ($result == self::SUCCESS) {
                 $hasaffectedrows = true;
-            } else {
-                // No changed, so must have been an update with no changes.
+            } else if ($result == self::NOUPDATE) {
                 $noupdateoccurred = true;
             }
         }

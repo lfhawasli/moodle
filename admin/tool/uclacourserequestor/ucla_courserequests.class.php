@@ -685,6 +685,10 @@ class ucla_courserequests {
             $DB->delete_records_select($urc, $sqlwhere, $params);
         }
 
+        // Since mappings changed, purge all caches.
+        $cache = cache::make('local_ucla', 'urcmappings');
+        $cache->purge();
+
         return $results;
     }
     

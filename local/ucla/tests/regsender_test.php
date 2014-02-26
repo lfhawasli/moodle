@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA syllabus plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,6 +45,13 @@ class regsender_test extends advanced_testcase {
      * @var object
      */
     private $_class = null;
+
+    /**
+     * Record from the 'ucla_reg_classinfo' table.
+     *
+     * @var object
+     */
+    private $_classinfo = null;
 
     /**
      * Local copy of local_ucla_regsender to share between tests.
@@ -211,6 +218,9 @@ class regsender_test extends advanced_testcase {
         $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
                                            ->create_class(array());
         $this->_class = array_pop($course);
+
+        $classinfos = ucla_get_course_info($this->_class->courseid);
+        $this->_classinfo = array_pop($classinfos);
 
         $this->_local_ucla_regsender = new local_ucla_regsender();
     }
@@ -441,18 +451,18 @@ class regsender_test extends advanced_testcase {
         $publicyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
         $syllabusmanager->delete_syllabus($publicyllabus);
         // Make sure there are events in the queue.
-        $sql = "SELECT  qh.*
+        $eventsql = "SELECT  qh.*
                 FROM    {events_queue_handlers} qh
                 JOIN    {events_handlers} h ON (qh.handlerid = h.id)
                 WHERE   (h.eventname=? OR h.eventname=?)";
-        $params = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
-        $result = $DB->record_exists_sql($sql, $params);
-        $this->assertTrue($result);
+        $eventparams = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
+        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
+        $this->assertTrue($existingevents);
         events_cron('ucla_syllabus_added');
         events_cron('ucla_syllabus_deleted');
         // Make sure there are no more events in the queue.
-        $result = $DB->record_exists_sql($sql, $params);
-        $this->assertFalse($result);
+        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
+        $this->assertFalse($existingevents);
 
         // Now add a syllabus that requires someone to login to view.
         $syllabus = new stdClass();
@@ -469,10 +479,21 @@ class regsender_test extends advanced_testcase {
 
         // Delete course and make sure that syllabi are wiped out.
         delete_course($courseid);
-        events_cron('ucla_syllabus_deleted');        
-        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
-        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
-        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
-        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+        events_cron('ucla_course_deleted');
+        events_cron('ucla_syllabus_deleted');
+        // Make sure there are no more events in the queue.
+        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
+        $this->assertFalse($existingevents);
+        // Need to get syllabi links via classinfo, because course is deleted.
+        $links = $this->_local_ucla_regsender
+                      ->get_syllabus_link(
+                              $this->_classinfo->term,
+                              $this->_classinfo->subj_area,
+                              $this->_classinfo->crsidx,
+                              $this->_classinfo->classidx);
+        $this->assertNotEmpty($links);
+        $this->assertEmpty($links['public_syllabus_url']);
+        $this->assertEmpty($links['protect_syllabus_url']);
+        $this->assertEmpty($links['private_syllabus_url']);
     }
 }

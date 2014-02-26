@@ -297,6 +297,9 @@ function ucla_get_course_info($courseid) {
     $termsrses = ucla_map_courseid_to_termsrses($courseid);
     foreach ($termsrses as $termsrs) {
         $reginfoobj = ucla_get_reg_classinfo($termsrs->term, $termsrs->srs);
+        if (empty($reginfoobj)) {
+            continue;
+        }
         $reginfoobj->hostcourse = $termsrs->hostcourse;
         $reginfos[] = $reginfoobj;
     }
