@@ -461,8 +461,12 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
             $divcat = coursecat::get($divisioncategoryid);
             $children = $divcat->get_children();
             foreach ($children as $child) {
-                $subjectarea = $DB->get_record('ucla_reg_subjectarea',
-                        array('subj_area_full' => textlib::strtoupper($child->name)));
+                // Some subj_area_full have different subjarea (e.g. EAST ASIAN
+                // STUDIES E A STD vs EA STDS). Choose newest subjarea.
+                $subjectareas = $DB->get_records('ucla_reg_subjectarea',
+                        array('subj_area_full' => textlib::strtoupper($child->name)),
+                        'modified DESC');
+                $subjectarea = reset($subjectareas);
                 if (!empty($subjectarea)) {
                     // Found a match, so let's set the idnumber.
                     $DB->set_field('course_categories', 'idnumber',
