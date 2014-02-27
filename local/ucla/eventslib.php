@@ -255,6 +255,11 @@ function update_srdb_ucla_syllabus($data) {
         return true;
     }
 
+    // If course is a collaboration site, then  don't process syllabus.
+    if (is_collab_site($courseid)) {
+        return true;
+    }
+
     // Get all syllabi for course and then send links.
     $regsender = new local_ucla_regsender();
     return $regsender->push_course_links($courseid);

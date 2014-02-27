@@ -159,6 +159,30 @@ class regsender_test extends advanced_testcase {
     }
 
     /**
+     * Helper method to check if the event queue is clear of UCLA syllabus
+     * events.
+     *
+     * @param boolean $isclear  If true, will assert that queue is clear.
+     *                          If false, will assert otherwise.
+     */
+    private function is_event_queue_clear($isclear) {
+        global $DB;
+        // Make sure there are events in the queue.
+        $eventsql = "SELECT  qh.*
+                FROM    {events_queue_handlers} qh
+                JOIN    {events_handlers} h ON (qh.handlerid = h.id)
+                WHERE   (h.eventname=? OR h.eventname=?)";
+        $eventparams = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
+        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
+
+        if ($isclear) {
+            $this->assertFalse($existingevents);
+        } else {
+            $this->assertTrue($existingevents);
+        }
+    }
+
+    /**
      * Data provider. Returns an array of links usable for regsender's
      * set_syllabus_links method. Will return either a valid URL or empty values
      * for public, private, and protect keys.
@@ -233,6 +257,37 @@ class regsender_test extends advanced_testcase {
         $this->_local_ucla_regsender->close_regconnection();
         unset($this->_class);
         unset($this->_local_ucla_regsender);
+    }
+
+    /**
+     * Make sure that event handler doesn't try to send syllabus links for 
+     * collaboration sites.
+     */
+    public function test_collab_sites() {
+        $collab = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_collab(array('type' => 'instruction'));
+
+        $course = get_course($collab->id);
+        $syllabusmanager = new ucla_syllabus_manager($course);
+        $this->setAdminUser();  // Generator requires user to be set.
+
+        // For given course, create a public syllabus.
+        $syllabus = new stdClass();
+        $syllabus->courseid = $collab->id;
+        $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
+        $syllabus = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla_syllabus')
+                ->create_instance($syllabus);
+
+        // Trigger event and make sure nothing remains in queue.
+        events_cron('ucla_syllabus_added');
+        $this->is_event_queue_clear(true);
+
+        // Delete course and make sure that event queue is clear.
+        delete_course($collab->id);
+        events_cron('ucla_syllabus_deleted');
+        $this->is_event_queue_clear(true);
     }
 
     /**
@@ -451,18 +506,11 @@ class regsender_test extends advanced_testcase {
         $publicyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
         $syllabusmanager->delete_syllabus($publicyllabus);
         // Make sure there are events in the queue.
-        $eventsql = "SELECT  qh.*
-                FROM    {events_queue_handlers} qh
-                JOIN    {events_handlers} h ON (qh.handlerid = h.id)
-                WHERE   (h.eventname=? OR h.eventname=?)";
-        $eventparams = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
-        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
-        $this->assertTrue($existingevents);
+        $this->is_event_queue_clear(false);
         events_cron('ucla_syllabus_added');
         events_cron('ucla_syllabus_deleted');
         // Make sure there are no more events in the queue.
-        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
-        $this->assertFalse($existingevents);
+        $this->is_event_queue_clear(true);
 
         // Now add a syllabus that requires someone to login to view.
         $syllabus = new stdClass();
@@ -482,8 +530,7 @@ class regsender_test extends advanced_testcase {
         events_cron('ucla_course_deleted');
         events_cron('ucla_syllabus_deleted');
         // Make sure there are no more events in the queue.
-        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
-        $this->assertFalse($existingevents);
+        $this->is_event_queue_clear(true);
         // Need to get syllabi links via classinfo, because course is deleted.
         $links = $this->_local_ucla_regsender
                       ->get_syllabus_link(
