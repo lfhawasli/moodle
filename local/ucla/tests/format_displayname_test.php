@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the format_displayname function.
+ * Tests the format_displayname public function.
  *
  * NOTE: Names for this test are notable UCLA alummni:
  * http://en.wikipedia.org/wiki/List_of_University_of_California,_Los_Angeles_people
@@ -24,20 +24,29 @@
  * CCLE-4240 - Revert name formatting to all uppercase
  *
  * @package    local_ucla
- * @category   phpunit
+ * @category   test
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-// Make sure the code being tested is accessible.
 global $CFG;
-require_once($CFG->dirroot . '/local/ucla/lib.php'); // Include the code to test
+require_once($CFG->dirroot . '/local/ucla/lib.php');
 
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
+ */
 class format_displayname_test extends basic_testcase {
 
-    function test_last_name_weirdness() {
+    /**
+     * Handle names with weirdness like "Von Something".
+     */
+    public function test_last_name_weirdness() {
         // Handle "von" names.
         $testcases = array('von Dassanowsky, Robert',
                            'VON Dassanowsky, Robert',
@@ -53,7 +62,7 @@ class format_displayname_test extends basic_testcase {
     /**
      * Make sure names with middle names are formatted properly.
      */
-    function test_middle_name() {
+    public function test_middle_name() {
         $testcases = array('Sharpe, William Forsyth',
                            'Sharpe  , WILLIAM Forsyth  ',
                            ' SHARPE , William Forsyth');
@@ -68,7 +77,7 @@ class format_displayname_test extends basic_testcase {
     /**
      * Make sure names with JR or suffix are formatted properly.
      */
-    function test_suffix() {
+    public function test_suffix() {
         // JR might have period or not.
         $testcases = array('Norton, Ken, Jr.',
                            'NORTON,  Ken,   Jr.  ',

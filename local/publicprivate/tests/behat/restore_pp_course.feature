@@ -6,10 +6,10 @@ Feature: Restore course backups with public/private content
 
     Background:
         Given I am in a ucla environment
-        And the following "courses" exists:
-          | fullname | shortname | format | numsections |
-          | Source | source | ucla | 10 |
-          | Target | target | ucla | 10 |
+        And the following ucla "sites" exists:
+          | fullname | shortname | type |
+          | Source | source | instruction |
+          | Target | target | instruction |
         And the following ucla "activities" exists:
           | activity | course | idnumber | name | intro | section | private |
           | assign | source | assignprivate | Private assign | Private assignment | 0 | 1 |
@@ -21,7 +21,7 @@ Feature: Restore course backups with public/private content
           | resource | source | resourceprivate | Private resource | Private resource | 3 | 1 |
           | resource | source | resourcepublic | Public resource | Public resource | 3 | 0 |
         And I log in as ucla "admin"
-        And I follow "Source"
+        And I browse to site "source"
         Then I follow "Site info"
         And "Private assign" activity should be private
         And "Public assign" activity should be public

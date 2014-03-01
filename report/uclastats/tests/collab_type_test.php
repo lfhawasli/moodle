@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA stats console for Moodle - http://moodle.org/
+// This file is part of the UCLA stats console plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,20 +18,34 @@
  * Unit tests for UCLA stats collab type class.
  *
  * @package    report_uclastats
- * @copyright  UC Regents
+ * @category   test
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/report/uclastats/reports/collab_type.php');
 
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group report_uclastats
+ */
 class collab_types_test extends advanced_testcase {
+
     /**
      * Setup.
      */
     public function setUp() {
+        global $DB;
         $this->resetAfterTest(true);
+
+        // Clear ucla_reg_division table.
+        $DB->delete_records('ucla_reg_division', null);
     }
 
     /**
@@ -63,11 +77,11 @@ class collab_types_test extends advanced_testcase {
         $collab1 = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_collab(array('type' => 'instruction',
-                                      'category' => $parentcategory->id));
+            'category' => $parentcategory->id));
         $collab2 = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_collab(array('type' => 'research',
-                                      'category' => $childcategory->id));
+            'category' => $childcategory->id));
 
         // Now run report.
         $report = new collab_type(get_admin());
@@ -80,4 +94,5 @@ class collab_types_test extends advanced_testcase {
         $this->assertEquals(2, $results[$parentcategory->name]['total']);
         $this->assertFalse(isset($results[$childcategory->name]));
     }
+
 }

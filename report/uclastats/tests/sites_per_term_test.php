@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA stats console plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,17 +17,26 @@
 /**
  * Unit tests for UCLA stats sites_per_term class.
  *
- * @package    report
- * @category   uclastats
- * @copyright  UC Regents
+ * @package    report_uclastats
+ * @category   test
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/report/uclastats/reports/sites_per_term.php');
 
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group report_uclastats
+ */
 class sites_per_term_test extends advanced_testcase {
+
     /**
      * Used to store the courses that were created.
      * @var array
@@ -45,13 +54,14 @@ class sites_per_term_test extends advanced_testcase {
      */
     protected function create_courses() {
         unset($this->courses);
-        
+
         // Non-crosslisted course.
         $param = array('term' => '12F', 'srs' => '262508200',
-                       'subj_area' => 'MATH', 'crsidx' => '0135    ',
-                       'secidx' => ' 001  ', 'division' => 'PS');
-        $this->courses['12F'][] = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+            'subj_area' => 'MATH', 'crsidx' => '0135    ',
+            'secidx' => ' 001  ', 'division' => 'PS');
+        $this->courses['12F'][] = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
 
         // Crosslisted course.
         $param = array(
@@ -65,8 +75,9 @@ class sites_per_term_test extends advanced_testcase {
                 'subj_area' => 'SLAVIC', 'crsidx' => '0020  M ',
                 'secidx' => ' 001  ', 'division' => 'HU'));
 
-        $this->courses['12S'][] = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+        $this->courses['12S'][] = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
     }
 
     /**
@@ -103,8 +114,9 @@ class sites_per_term_test extends advanced_testcase {
             $result = $this->report->get_results($resultid);
             $resultsarray = $result->results;
             $sitecount = reset($resultsarray);
-            
+
             $this->assertEquals(count($courselist), $sitecount['site_count']);
         }
     }
+
 }

@@ -18,16 +18,28 @@
  * Tests the UCLA course creator class.
  *
  * @package    tool_uclacoursecreator
- * @category   phpunit
+ * @category   test
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uclacoursecreator/uclacoursecreator.class.php');
- 
+require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclacoursecreator/uclacoursecreator.class.php');
+
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group tool_uclacoursecreator
+ */
 class uclacoursecreator_test extends advanced_testcase {
+
+    /**
+     * Instance of uclacoursecreator class.
+     * @var uclacoursecreator
+     */
     private $uclacoursecreator;
 
     /**
@@ -48,9 +60,9 @@ class uclacoursecreator_test extends advanced_testcase {
     /**
      * Try to create a new category.
      */
-    function test_new_category() {
+    public function test_new_category() {
         global $DB;
-        
+
         // Create a parent category.
         $this->uclacoursecreator->new_category('Parent');
         // Make sure it exists.
@@ -58,10 +70,10 @@ class uclacoursecreator_test extends advanced_testcase {
         $this->assertFalse(empty($parent));
         $context = context_coursecat::instance($parent->id, true);
         $this->assertFalse(empty($context));
-        
+
         // Create a child category.
         $this->uclacoursecreator->new_category('Child', $parent->id);
-        // make sure it exists
+        // Make sure it exists.
         $child = $DB->get_record('course_categories', array('name' => 'Child'));
         $this->assertFalse(empty($child));
         $context = context_coursecat::instance($child->id, true);
@@ -74,18 +86,21 @@ class uclacoursecreator_test extends advanced_testcase {
         $child = $DB->get_record('course_categories', array('name' => 'Child'));
         $this->assertFalse(empty($child->path));
     }
-    
+
     /**
      * Try parse a valid email template.
      */
-    function test_valid_email_template() {
-        $valid_template_file = dirname(__FILE__) . '/fixtures/valid_email_template.txt';
-        $result = $this->uclacoursecreator->email_parse_file($valid_template_file);
-        
+    public function test_valid_email_template() {
+        $validtemplatefile = dirname(__FILE__) . '/fixtures/valid_email_template.txt';
+        $result = $this->uclacoursecreator->email_parse_file($validtemplatefile);
+
         $this->assertTrue(is_array($result));
         $this->assertEquals($result['from'], 'CCLE <ccle@ucla.edu>');
-        $this->assertEquals($result['bcc'], 'Kearney, Deborah (dkearney@oid.ucla.edu)');
-        $this->assertEquals($result['subject'], '#=nameterm=# #=coursenum-sect=# class site created');
+        $this->assertEquals($result['bcc'],
+                'Kearney, Deborah (dkearney@oid.ucla.edu)');
+        $this->assertEquals($result['subject'],
+                '#=nameterm=# #=coursenum-sect=# class site created');
         $this->assertFalse(empty($result['subject']));
-    } 
+    }
+
 }

@@ -1,98 +1,114 @@
 <?php
-/**
- * PHPUnit data generator tests
- *
- * @package    local_ucla
- * @category   phpunit
- * @copyright  2013 UC Regents
-*/
+// This file is part of the UCLA TA site creator plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Unit tests for the data generator for UCLA TA site creator plugin.
+ *
+ * @package    block_ucla_tasites
+ * @category   test
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 
-// @todo Include local_ucla generator code, because "getDataGenerator" does not
-// yet work for local plugins. When local plugins are support, please change
-// $generator = new local_ucla_generator();
-// to
-// $generator = $this->getDataGenerator()->get_plugin_generator('local_ucla');
 global $CFG;
-require_once($CFG->dirroot . '/local/ucla/tests/generator/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_tasites/tests/generator/lib.php');
 
 /**
  * PHPUnit data generator testcase
  *
- * @package    local_ucla
- * @category   phpunit
  * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group block_ucla_tasites
  */
 class block_ucla_tasites_generator_testcase extends advanced_testcase {
-    private $tasite_generator = null;
-    private $ucla_generator = null;
 
     /**
      * Try to create a tasite using the basic "create_instance" generator method
      * with no parameters.
      */
     public function test_create_instance_basic() {
-        global $DB;
-
-        // try to create tasite with generator creating everything it needs
-        $tasite = $this->tasite_generator->create_instance();
+        // Try to create tasite with generator creating everything it needs.
+        $tasite = $this->getDataGenerator()
+                ->get_plugin_generator('block_ucla_tasites')
+                ->create_instance();
         $this->assertFalse(empty($tasite));
 
-        // make sure that someone has ta_admin role in new course
+        // Make sure that someone has ta_admin role in new course.
         $coursecontext = context_course::instance($tasite->id);
-        $ta_admin_id = $this->tasite_generator->ta_admin_id;
-        $users = get_role_users($ta_admin_id, $coursecontext);
+        $taadminid = $this->getDataGenerator()
+                        ->get_plugin_generator('block_ucla_tasites')
+                ->taadminid;
+        $users = get_role_users($taadminid, $coursecontext);
         $this->assertFalse(empty($users));
 
-        $is_tasite = block_ucla_tasites::is_tasite($tasite->id);
-        $this->assertTrue($is_tasite);
+        $istasite = block_ucla_tasites::is_tasite($tasite->id);
+        $this->assertTrue($istasite);
     }
 
     /**
      * Try to create a tasite using a ta_admin and a UCLA course.
-     *
-     * @global object $DB
      */
     public function test_create_instance_ta_admin() {
         global $DB;
 
-        // create a random UCLA course
+        // Create a random UCLA course.
         $param = array(array(), array());
-        $class = $this->ucla_generator->create_class($param);
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($class));
         $termsrs = array_pop($class);
 
         $courseid = ucla_map_termsrs_to_courseid($termsrs->term, $termsrs->srs);
         $course = $DB->get_record('course', array('id' => $courseid));
 
-        // create a random user
+        // Create a random user.
         $ta = $this->getDataGenerator()->create_user();
         $this->assertFalse(empty($ta));
 
-        // try to create tasite for ta role
-        $tasite = $this->tasite_generator->create_instance_with_role($course,
-                (array) $ta, 'ta_admin');
+        // Try to create tasite for ta role.
+        $tasite = $this->getDataGenerator()
+                ->get_plugin_generator('block_ucla_tasites')
+                ->create_instance_with_role($course, (array) $ta, 'ta_admin');
         $this->assertFalse(empty($tasite));
 
-        // make sure user has proper role in newly created course (ta_admin)
+        // Make sure user has proper role in newly created course (ta_admin).
         $coursecontext = context_course::instance($tasite->id);
-        $ta_admin_id = $this->tasite_generator->ta_admin_id;
-        $users = get_role_users($ta_admin_id, $coursecontext);
+        $taadminid = $this->getDataGenerator()
+                ->get_plugin_generator('block_ucla_tasites')
+                ->taadminid;
+        $users = get_role_users($taadminid, $coursecontext);
         $user = $users[$ta->id];
-        $this->assertEquals($ta_admin_id, $user->roleid);
+        $this->assertEquals($taadminid, $user->roleid);
         $this->assertEquals('Teaching Assistant (admin)', $user->rolename);
 
-        $is_tasite = block_ucla_tasites::is_tasite($tasite->id);
-        $this->assertTrue($is_tasite);
+        $istasite = block_ucla_tasites::is_tasite($tasite->id);
+        $this->assertTrue($istasite);
     }
 
+    /**
+     * Setup the UCLA ta site data generator.
+     */
     protected function setUp() {
         $this->resetAfterTest(true);
-        $this->tasite_generator = $this->getDataGenerator()
-                ->get_plugin_generator('block_ucla_tasites');
-        $this->tasite_generator->setup();
-        $this->ucla_generator = new local_ucla_generator();
-    } 
+        $this->getDataGenerator()
+                ->get_plugin_generator('block_ucla_tasites')
+                ->setup();
+    }
+
 }

@@ -624,7 +624,8 @@ function get_shib_logged_in_cookie() {
 // Check if an Shibboleth cookie exists
 function is_shib_logged_in_cookie_set() {
     global $CFG;
-    return isset($_COOKIE[$CFG->shib_logged_in_cookie]);
+    return isset($CFG->shib_logged_in_cookie) &&
+        isset($_COOKIE[$CFG->shib_logged_in_cookie]);
 }
 
 // If the user is guest but an Shibboleth cookie exists, we "click" 
