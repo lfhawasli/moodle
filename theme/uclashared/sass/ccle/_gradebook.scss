@@ -1,0 +1,298 @@
+//
+// CCLE / frontpage
+// --------------------------------------------------
+
+
+$grade-report-color-overriden-border: #DC691A;
+
+$grade-report-odd-vmarked-bgcolor: #F39A00;
+$grade-report-odd-hmakred-bgcolor: #F5CD00;
+$grade-report-odd-hvmarked-bgcolor: #F1B900;
+
+$grade-report-even-vmarked-bgcolor: #F4A400;
+$grade-report-even-hmakred-bgcolor: #F5CF2C;
+$grade-report-even-hvmarked-bgcolor: #F1BE00;
+
+.path-grade-report-grader {
+    
+    // Make overlay look like our standard 'alerts'
+    .yui3-overlay {
+        @extend .alert;
+        @extend .alert-warning; 
+        
+        width: auto;
+        font-size: 1.2rem;
+        
+        @include box-shadow(#999 2px 2px 10px);
+        
+        .fullname {
+            color: #444;
+        }
+        .itemname {
+            padding-top: 4px;
+            color: #666;
+        }
+    }
+    
+    
+    .grade_icons {
+        float: right;
+        .smallicon {
+            display: none;
+        }
+        .action-icon {
+            font-size: 1.5rem;
+            &:before {
+                // glyphicon-cog
+                @include glyphicon("\e019");
+            }
+        }
+        ~ input {
+            float: left;
+            @extend .form-control;
+        }
+    }
+    
+    // Remove the table overflow
+    .gradeparent {
+        overflow: inherit;
+    }
+}
+
+/*.gradebook-student-column,*/
+table#user-grades {
+    
+    .grade, .item {
+        width: 50px;
+        overflow: hidden;
+    }
+    
+    tr {
+        /*line-height: 1.428;*/
+        
+        th, td, th.cell, th.c1 {
+            border-bottom: 0;
+        }
+        th.c1 {
+            border-top: 0;
+        }
+        
+        .user {
+            // Fix the user cell width
+            width: 150px;
+            padding: 4px;
+                 
+            // Remove picture
+            .userpicture {display: none;}
+            
+            .idnumber {
+                display: block;
+                float: left;
+                font-weight: bold;
+                width: 100%;
+            }
+            .email {
+                display: block;
+                float: left;
+                width: 100%;
+            }
+        }
+        
+        // Remove the email & ID columns
+        .useridnumber, .useremail {
+            display: none;
+        }
+        
+        // ODD rows
+        &.odd {
+            td.grade.vmarked {
+                background-color: $grade-report-odd-vmarked-bgcolor;
+                border-bottom-color: $grade-report-odd-vmarked-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-odd-vmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.hmarked {
+                background-color: $grade-report-odd-hmakred-bgcolor;
+                border-bottom-color: $grade-report-odd-hmakred-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-odd-hmakred-bgcolor;
+                }
+            }
+            td.grade.vmarked.hmarked {
+                background-color: $grade-report-odd-hvmarked-bgcolor;
+                border-bottom-color: $grade-report-odd-hvmarked-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-odd-hvmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.overridden {
+                background-color: #EFEFEF;
+                border: 0;
+                
+                background: url([[pix:theme|corner-fold]]) no-repeat;
+                width: 16px;
+                height: 16px;
+            }
+            .user {
+                /*background-color: #E5F3FF;*/
+                /*border-top: 1px solid #C4E6FF;*/
+                /*border-bottom: 1px solid #C4E6FF;*/
+            }
+        }
+        
+        // EVEN rows
+        &.even {
+            td.grade.vmarked {
+                background-color: $grade-report-even-vmarked-bgcolor;  
+                border-bottom-color: $grade-report-even-vmarked-bgcolor;
+                    &.overridden {
+                    background-color: $grade-report-even-vmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.hmarked {
+                background-color: $grade-report-even-hmakred-bgcolor;
+                border-bottom-color: $grade-report-even-hmakred-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-even-hmakred-bgcolor;
+                }
+            }
+            td.grade.vmarked.hmarked {
+                background-color: $grade-report-even-hvmarked-bgcolor;
+                border-bottom-color: $grade-report-even-hvmarked-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-even-hvmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.overridden {
+                background-color: #fff;
+                /*border: 2px dashed $grade-report-color-overriden-border;*/
+                border: 0;
+                
+                background: url([[pix:theme|corner-fold]]) no-repeat;
+                width: 16px;
+                height: 16px;
+            }
+        }
+        
+        &.odd, &.even {
+            td:hover {
+                background-color: #fcfcfc;
+            }
+            td.grade.vmarked {
+                > .gradevalue {
+                    font-weight: bold;
+                }
+            }
+            td.grade.vmarked, td.grade.hmarked {
+                .action-icon {
+                    color: white;
+                }
+            }
+            
+        }
+        .gradevalue {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    }
+}
+
+.gradebook-header-row {
+    width: 100%;
+    font-size: 1rem;
+    
+    tr {
+        th {
+            padding: 0;
+            /*border-right: 1px solid blue;*/
+            float: left;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            
+            text-align: center;
+            padding: 8px 2px 1px;
+            
+            .itemicon {
+                display: none;
+            }
+            
+            &:hover {
+                border-bottom: 4px solid #ddd;
+            }
+            
+            &:nth-child(2n) {
+                background-color: #fcfcfc;
+            }
+        }
+    }
+}
+
+.gradebook-student-column {
+    font-size: 10px;
+    font-size: 1rem;
+    th {
+        background-color: white;
+        
+        /*height: 29px;*/
+        /*padding: 8px;*/
+        border-right:1px solid #ddd;
+
+        &:hover {
+            border-right: 4px solid #ddd;
+        }
+        &:nth-child(2n+1) {
+            background-color: #fcfcfc;
+        }
+    }
+
+    
+    tr {
+        overflow: hidden;
+        
+        
+    }
+}
+
+// gradebook help
+
+.gradebook-color {
+    @include border-radius(4px);
+    overflow: hidden;
+    width: 30%;
+    height: auto;
+    padding: 2px 4px;
+    text-align: center;
+    height: 25px;
+    float: left;
+    margin-right: 10px;
+    
+    &:after {
+        content: "";
+        float: right;
+        width: 50%;
+        height: 100%;
+    }
+}
+.gradebook-overridden {
+    background: url([[pix:theme|corner-fold]]) no-repeat;
+    height: 30px;
+    background-color: #efefef;
+}
+.gradebook-row-color {
+    background-color: $grade-report-odd-hmakred-bgcolor;
+    &:after {
+        background-color: $grade-report-even-hmakred-bgcolor;
+    }
+}
+.gradebook-column-color {
+    background-color: $grade-report-odd-vmarked-bgcolor;
+    &:after {
+        background-color: $grade-report-even-vmarked-bgcolor;
+    }
+}
+

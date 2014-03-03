@@ -217,7 +217,7 @@ input[type="url"]:-moz-placeholder,
 input[type="search"]:-moz-placeholder,
 input[type="tel"]:-moz-placeholder,
 input[type="color"]:-moz-placeholder, .navbutton .wikisearch input[alt="search"]:-moz-placeholder,
-.navbutton .forumsearch input[alt="search"]:-moz-placeholder {
+.navbutton .forumsearch input[alt="search"]:-moz-placeholder, .path-grade-report-grader .grade_icons ~ input:-moz-placeholder {
   color: #999999;
 }
 /* line 58, ../package/bootstrap/lib/_mixins.scss */
@@ -237,7 +237,7 @@ input[type="url"]::-moz-placeholder,
 input[type="search"]::-moz-placeholder,
 input[type="tel"]::-moz-placeholder,
 input[type="color"]::-moz-placeholder, .navbutton .wikisearch input[alt="search"]::-moz-placeholder,
-.navbutton .forumsearch input[alt="search"]::-moz-placeholder {
+.navbutton .forumsearch input[alt="search"]::-moz-placeholder, .path-grade-report-grader .grade_icons ~ input::-moz-placeholder {
   color: #999999;
 }
 /* line 59, ../package/bootstrap/lib/_mixins.scss */
@@ -257,7 +257,7 @@ input[type="url"]:-ms-input-placeholder,
 input[type="search"]:-ms-input-placeholder,
 input[type="tel"]:-ms-input-placeholder,
 input[type="color"]:-ms-input-placeholder, .navbutton .wikisearch input[alt="search"]:-ms-input-placeholder,
-.navbutton .forumsearch input[alt="search"]:-ms-input-placeholder {
+.navbutton .forumsearch input[alt="search"]:-ms-input-placeholder, .path-grade-report-grader .grade_icons ~ input:-ms-input-placeholder {
   color: #999999;
 }
 /* line 60, ../package/bootstrap/lib/_mixins.scss */
@@ -277,7 +277,7 @@ input[type="url"]::-webkit-input-placeholder,
 input[type="search"]::-webkit-input-placeholder,
 input[type="tel"]::-webkit-input-placeholder,
 input[type="color"]::-webkit-input-placeholder, .navbutton .wikisearch input[alt="search"]::-webkit-input-placeholder,
-.navbutton .forumsearch input[alt="search"]::-webkit-input-placeholder {
+.navbutton .forumsearch input[alt="search"]::-webkit-input-placeholder, .path-grade-report-grader .grade_icons ~ input::-webkit-input-placeholder {
   color: #999999;
 }
 
@@ -298,7 +298,7 @@ input[type="url"],
 input[type="search"],
 input[type="tel"],
 input[type="color"], .navbutton .wikisearch input[alt="search"],
-.navbutton .forumsearch input[alt="search"] {
+.navbutton .forumsearch input[alt="search"], .path-grade-report-grader .grade_icons ~ input {
   display: block;
   width: 100%;
   height: 34px;
@@ -332,7 +332,7 @@ input[type="url"]:focus,
 input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus, .navbutton .wikisearch input[alt="search"]:focus,
-.navbutton .forumsearch input[alt="search"]:focus {
+.navbutton .forumsearch input[alt="search"]:focus, .path-grade-report-grader .grade_icons ~ input:focus {
   border-color: #66afe9;
   outline: 0;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
@@ -355,7 +355,7 @@ input[disabled][type="url"],
 input[disabled][type="search"],
 input[disabled][type="tel"],
 input[disabled][type="color"], .navbutton .wikisearch input[disabled][alt="search"],
-.navbutton .forumsearch input[disabled][alt="search"], .form-control[readonly], select[readonly],
+.navbutton .forumsearch input[disabled][alt="search"], .path-grade-report-grader .grade_icons ~ input[disabled], .form-control[readonly], select[readonly],
 textarea[readonly],
 input[readonly][type="text"],
 input[readonly][type="password"],
@@ -371,7 +371,7 @@ input[readonly][type="url"],
 input[readonly][type="search"],
 input[readonly][type="tel"],
 input[readonly][type="color"], .navbutton .wikisearch input[readonly][alt="search"],
-.navbutton .forumsearch input[readonly][alt="search"], fieldset[disabled] .form-control, fieldset[disabled] select,
+.navbutton .forumsearch input[readonly][alt="search"], .path-grade-report-grader .grade_icons ~ input[readonly], fieldset[disabled] .form-control, fieldset[disabled] select,
 fieldset[disabled] textarea,
 fieldset[disabled] input[type="text"],
 fieldset[disabled] input[type="password"],
@@ -388,7 +388,7 @@ fieldset[disabled] input[type="search"],
 fieldset[disabled] input[type="tel"],
 fieldset[disabled] input[type="color"], fieldset[disabled] .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch fieldset[disabled] input[alt="search"],
 fieldset[disabled] .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch fieldset[disabled] input[alt="search"] {
+.navbutton .forumsearch fieldset[disabled] input[alt="search"], fieldset[disabled] .path-grade-report-grader .grade_icons ~ input, .path-grade-report-grader fieldset[disabled] .grade_icons ~ input {
   cursor: not-allowed;
   background-color: #eeeeee;
 }
@@ -488,7 +488,7 @@ input[type="checkbox"],
 .input-group-sm > input[type="search"],
 .input-group-sm > input[type="tel"],
 .input-group-sm > input[type="color"], .navbutton .wikisearch .input-group-sm > input[alt="search"],
-.navbutton .forumsearch .input-group-sm > input[alt="search"],
+.navbutton .forumsearch .input-group-sm > input[alt="search"], .path-grade-report-grader .input-group-sm > .grade_icons ~ input,
 .input-group-sm > .input-group-addon,
 .input-group-sm > .input-group-btn > .btn,
 .input-group-sm > .input-group-btn > input[type="button"],
@@ -557,7 +557,7 @@ textarea.input-sm, .input-group-sm > textarea.form-control,
 .input-group-lg > input[type="search"],
 .input-group-lg > input[type="tel"],
 .input-group-lg > input[type="color"], .navbutton .wikisearch .input-group-lg > input[alt="search"],
-.navbutton .forumsearch .input-group-lg > input[alt="search"],
+.navbutton .forumsearch .input-group-lg > input[alt="search"], .path-grade-report-grader .input-group-lg > .grade_icons ~ input,
 .input-group-lg > .input-group-addon,
 .input-group-lg > .input-group-btn > .btn,
 .input-group-lg > .input-group-btn > input[type="button"],
@@ -632,7 +632,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
 .has-warning input[type="tel"],
 .has-warning input[type="color"], .has-warning .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .has-warning input[alt="search"],
 .has-warning .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .has-warning input[alt="search"] {
+.navbutton .forumsearch .has-warning input[alt="search"], .has-warning .path-grade-report-grader .grade_icons ~ input, .path-grade-report-grader .has-warning .grade_icons ~ input {
   border-color: #c09853;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -655,7 +655,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
 .has-warning input[type="tel"]:focus,
 .has-warning input[type="color"]:focus, .has-warning .navbutton .wikisearch input[alt="search"]:focus, .navbutton .wikisearch .has-warning input[alt="search"]:focus,
 .has-warning .navbutton .forumsearch input[alt="search"]:focus,
-.navbutton .forumsearch .has-warning input[alt="search"]:focus {
+.navbutton .forumsearch .has-warning input[alt="search"]:focus, .has-warning .path-grade-report-grader .grade_icons ~ input:focus, .path-grade-report-grader .has-warning .grade_icons ~ input:focus {
   border-color: #a47e3c;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e;
@@ -690,7 +690,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
 .has-error input[type="tel"],
 .has-error input[type="color"], .has-error .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .has-error input[alt="search"],
 .has-error .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .has-error input[alt="search"] {
+.navbutton .forumsearch .has-error input[alt="search"], .has-error .path-grade-report-grader .grade_icons ~ input, .path-grade-report-grader .has-error .grade_icons ~ input {
   border-color: #b94a48;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -713,7 +713,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
 .has-error input[type="tel"]:focus,
 .has-error input[type="color"]:focus, .has-error .navbutton .wikisearch input[alt="search"]:focus, .navbutton .wikisearch .has-error input[alt="search"]:focus,
 .has-error .navbutton .forumsearch input[alt="search"]:focus,
-.navbutton .forumsearch .has-error input[alt="search"]:focus {
+.navbutton .forumsearch .has-error input[alt="search"]:focus, .has-error .path-grade-report-grader .grade_icons ~ input:focus, .path-grade-report-grader .has-error .grade_icons ~ input:focus {
   border-color: #953b39;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
@@ -748,7 +748,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
 .has-success input[type="tel"],
 .has-success input[type="color"], .has-success .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .has-success input[alt="search"],
 .has-success .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .has-success input[alt="search"] {
+.navbutton .forumsearch .has-success input[alt="search"], .has-success .path-grade-report-grader .grade_icons ~ input, .path-grade-report-grader .has-success .grade_icons ~ input {
   border-color: #468847;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -771,7 +771,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
 .has-success input[type="tel"]:focus,
 .has-success input[type="color"]:focus, .has-success .navbutton .wikisearch input[alt="search"]:focus, .navbutton .wikisearch .has-success input[alt="search"]:focus,
 .has-success .navbutton .forumsearch input[alt="search"]:focus,
-.navbutton .forumsearch .has-success input[alt="search"]:focus {
+.navbutton .forumsearch .has-success input[alt="search"]:focus, .has-success .path-grade-report-grader .grade_icons ~ input:focus, .path-grade-report-grader .has-success .grade_icons ~ input:focus {
   border-color: #356635;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b;
@@ -822,7 +822,7 @@ textarea.input-lg, .input-group-lg > textarea.form-control,
   .form-inline input[type="tel"],
   .form-inline input[type="color"], .form-inline .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .form-inline input[alt="search"],
   .form-inline .navbutton .forumsearch input[alt="search"],
-  .navbutton .forumsearch .form-inline input[alt="search"] {
+  .navbutton .forumsearch .form-inline input[alt="search"], .form-inline .path-grade-report-grader .grade_icons ~ input, .path-grade-report-grader .form-inline .grade_icons ~ input {
     display: inline-block;
   }
   /* line 306, ../package/bootstrap/lib/_forms.scss */
@@ -891,7 +891,7 @@ input[type="url"],
 input[type="search"],
 input[type="tel"],
 input[type="color"], .navbutton .wikisearch input[alt="search"],
-.navbutton .forumsearch input[alt="search"] {
+.navbutton .forumsearch input[alt="search"], .path-grade-report-grader .grade_icons ~ input {
   width: auto;
   border: 2px solid #ddd;
   display: inline;
@@ -918,7 +918,7 @@ input[type="url"]:focus,
 input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus, .navbutton .wikisearch input[alt="search"]:focus,
-.navbutton .forumsearch input[alt="search"]:focus {
+.navbutton .forumsearch input[alt="search"]:focus, .path-grade-report-grader .grade_icons ~ input:focus {
   -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, 0.075);
   box-shadow: 0 0 0 rgba(0, 0, 0, 0.075);
 }
@@ -4111,7 +4111,7 @@ table.rolecap tr.rolecap th {
 
 /* line 9, ../package/bootstrap/lib/_alerts.scss */
 .alert, #maincontent ~ .noticebox, #maincontent ~ #notice.generalbox:not(.info):not(#intro), .box.errorbox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning, .ucla-format-notice-box {
+.course-content .generalbox, .adminwarning, .ucla-format-notice-box, .path-grade-report-grader .yui3-overlay {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid transparent;
@@ -4119,18 +4119,18 @@ table.rolecap tr.rolecap th {
 }
 /* line 16, ../package/bootstrap/lib/_alerts.scss */
 .alert h4, #maincontent ~ .noticebox h4, #maincontent ~ #notice.generalbox:not(.info):not(#intro) h4, .box.errorbox h4, .box.noticebox h4, .course-content .noticebox h4,
-.course-content .generalbox h4, .adminwarning h4, .ucla-format-notice-box h4 {
+.course-content .generalbox h4, .adminwarning h4, .ucla-format-notice-box h4, .path-grade-report-grader .yui3-overlay h4 {
   margin-top: 0;
   color: inherit;
 }
 /* line 22, ../package/bootstrap/lib/_alerts.scss */
 .alert .alert-link, #maincontent ~ .noticebox .alert-link, #maincontent ~ #notice.generalbox:not(.info):not(#intro) .alert-link, .box.errorbox .alert-link, .box.noticebox .alert-link, .course-content .noticebox .alert-link,
-.course-content .generalbox .alert-link, .adminwarning .alert-link, .ucla-format-notice-box .alert-link {
+.course-content .generalbox .alert-link, .adminwarning .alert-link, .ucla-format-notice-box .alert-link, .path-grade-report-grader .yui3-overlay .alert-link {
   font-weight: bold;
 }
 /* line 28, ../package/bootstrap/lib/_alerts.scss */
 .alert > p, #maincontent ~ .noticebox > p, #maincontent ~ #notice.generalbox:not(.info):not(#intro) > p, .box.errorbox > p, .box.noticebox > p, .course-content .noticebox > p,
-.course-content .generalbox > p, .adminwarning > p, .ucla-format-notice-box > p,
+.course-content .generalbox > p, .adminwarning > p, .ucla-format-notice-box > p, .path-grade-report-grader .yui3-overlay > p,
 .alert > ul,
 #maincontent ~ .noticebox > ul,
 #maincontent ~ #notice.generalbox:not(.info):not(#intro) > ul,
@@ -4139,12 +4139,13 @@ table.rolecap tr.rolecap th {
 .course-content .noticebox > ul,
 .course-content .generalbox > ul,
 .adminwarning > ul,
-.ucla-format-notice-box > ul {
+.ucla-format-notice-box > ul,
+.path-grade-report-grader .yui3-overlay > ul {
   margin-bottom: 0;
 }
 /* line 31, ../package/bootstrap/lib/_alerts.scss */
 .alert > p + p, #maincontent ~ .noticebox > p + p, #maincontent ~ #notice.generalbox:not(.info):not(#intro) > p + p, .box.errorbox > p + p, .box.noticebox > p + p, .course-content .noticebox > p + p,
-.course-content .generalbox > p + p, .adminwarning > p + p, .ucla-format-notice-box > p + p {
+.course-content .generalbox > p + p, .adminwarning > p + p, .ucla-format-notice-box > p + p, .path-grade-report-grader .yui3-overlay > p + p {
   margin-top: 5px;
 }
 
@@ -4192,19 +4193,19 @@ table.rolecap tr.rolecap th {
 
 /* line 62, ../package/bootstrap/lib/_alerts.scss */
 .alert-warning, #maincontent ~ .noticebox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning {
+.course-content .generalbox, .adminwarning, .path-grade-report-grader .yui3-overlay {
   background-color: #fcf8e3;
   border-color: #fbeed5;
   color: #c09853;
 }
 /* line 365, ../package/bootstrap/lib/_mixins.scss */
 .alert-warning hr, #maincontent ~ .noticebox hr, .box.noticebox hr, .course-content .noticebox hr,
-.course-content .generalbox hr, .adminwarning hr {
+.course-content .generalbox hr, .adminwarning hr, .path-grade-report-grader .yui3-overlay hr {
   border-top-color: #f8e5be;
 }
 /* line 368, ../package/bootstrap/lib/_mixins.scss */
 .alert-warning .alert-link, #maincontent ~ .noticebox .alert-link, .box.noticebox .alert-link, .course-content .noticebox .alert-link,
-.course-content .generalbox .alert-link, .adminwarning .alert-link {
+.course-content .generalbox .alert-link, .adminwarning .alert-link, .path-grade-report-grader .yui3-overlay .alert-link {
   color: #a47e3c;
 }
 
@@ -4225,7 +4226,7 @@ table.rolecap tr.rolecap th {
 
 /* line 9, ../sass/_alerts.scss */
 .alert, #maincontent ~ .noticebox, #maincontent ~ #notice.generalbox:not(.info):not(#intro), .box.errorbox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning, .ucla-format-notice-box {
+.course-content .generalbox, .adminwarning, .ucla-format-notice-box, .path-grade-report-grader .yui3-overlay {
   color: #333;
   margin: 16px 0;
   padding: 8px 14px;
@@ -4240,12 +4241,12 @@ table.rolecap tr.rolecap th {
 @media only screen and (min-width: 481px) {
   /* line 9, ../sass/_alerts.scss */
   .alert, #maincontent ~ .noticebox, #maincontent ~ #notice.generalbox:not(.info):not(#intro), .box.errorbox, .box.noticebox, .course-content .noticebox,
-  .course-content .generalbox, .adminwarning, .ucla-format-notice-box {
+  .course-content .generalbox, .adminwarning, .ucla-format-notice-box, .path-grade-report-grader .yui3-overlay {
     margin: 20px 0;
   }
   /* line 24, ../sass/_alerts.scss */
   .alert .mform .felement, #maincontent ~ .noticebox .mform .felement, #maincontent ~ #notice.generalbox:not(.info):not(#intro) .mform .felement, .box.errorbox .mform .felement, .box.noticebox .mform .felement, .course-content .noticebox .mform .felement,
-  .course-content .generalbox .mform .felement, .adminwarning .mform .felement, .ucla-format-notice-box .mform .felement {
+  .course-content .generalbox .mform .felement, .adminwarning .mform .felement, .ucla-format-notice-box .mform .felement, .path-grade-report-grader .yui3-overlay .mform .felement {
     width: 100%;
     margin-top: 5px;
   }
@@ -4258,7 +4259,7 @@ table.rolecap tr.rolecap th {
 
 /* line 36, ../sass/_alerts.scss */
 .alert-warning, #maincontent ~ .noticebox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning {
+.course-content .generalbox, .adminwarning, .path-grade-report-grader .yui3-overlay {
   border-left: 4px solid #F1E7BC;
 }
 
@@ -7628,7 +7629,7 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .input-group input[type="tel"],
 .input-group input[type="color"], .input-group .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .input-group input[alt="search"],
 .input-group .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .input-group input[alt="search"] {
+.navbutton .forumsearch .input-group input[alt="search"], .input-group .path-grade-report-grader .grade_icons ~ input, .path-grade-report-grader .input-group .grade_icons ~ input {
   width: 100%;
   margin-bottom: 0;
 }
@@ -7656,7 +7657,9 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .input-group .navbutton .wikisearch input[alt="search"],
 .navbutton .wikisearch .input-group input[alt="search"],
 .input-group .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .input-group input[alt="search"] {
+.navbutton .forumsearch .input-group input[alt="search"],
+.input-group .path-grade-report-grader .grade_icons ~ input,
+.path-grade-report-grader .input-group .grade_icons ~ input {
   display: table-cell;
 }
 /* line 45, ../package/bootstrap/lib/_input-groups.scss */
@@ -7682,7 +7685,9 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .input-group .navbutton .wikisearch input[alt="search"]:not(:first-child):not(:last-child),
 .navbutton .wikisearch .input-group input[alt="search"]:not(:first-child):not(:last-child),
 .input-group .navbutton .forumsearch input[alt="search"]:not(:first-child):not(:last-child),
-.navbutton .forumsearch .input-group input[alt="search"]:not(:first-child):not(:last-child) {
+.navbutton .forumsearch .input-group input[alt="search"]:not(:first-child):not(:last-child),
+.input-group .path-grade-report-grader .grade_icons ~ input:not(:first-child):not(:last-child),
+.path-grade-report-grader .input-group .grade_icons ~ input:not(:first-child):not(:last-child) {
   border-radius: 0;
 }
 
@@ -7707,7 +7712,7 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 }
 /* line 70, ../package/bootstrap/lib/_input-groups.scss */
 .input-group-addon.input-sm, .navbutton .wikisearch .input-group-sm > input.input-group-addon[alt="search"],
-.navbutton .forumsearch .input-group-sm > input.input-group-addon[alt="search"],
+.navbutton .forumsearch .input-group-sm > input.input-group-addon[alt="search"], .path-grade-report-grader .input-group-sm > .grade_icons ~ input.input-group-addon,
 .input-group-sm > .input-group-addon,
 .input-group-sm > .input-group-btn > .input-group-addon.btn,
 .input-group-sm > .input-group-btn > input.input-group-addon[type="button"],
@@ -7732,7 +7737,7 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 }
 /* line 75, ../package/bootstrap/lib/_input-groups.scss */
 .input-group-addon.input-lg, .navbutton .wikisearch .input-group-lg > input.input-group-addon[alt="search"],
-.navbutton .forumsearch .input-group-lg > input.input-group-addon[alt="search"],
+.navbutton .forumsearch .input-group-lg > input.input-group-addon[alt="search"], .path-grade-report-grader .input-group-lg > .grade_icons ~ input.input-group-addon,
 .input-group-lg > .input-group-addon,
 .input-group-lg > .input-group-btn > .input-group-addon.btn,
 .input-group-lg > .input-group-btn > input.input-group-addon[type="button"],
@@ -7779,7 +7784,7 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .input-group input[type="tel"]:first-child,
 .input-group input[type="color"]:first-child, .input-group .navbutton .wikisearch input[alt="search"]:first-child, .navbutton .wikisearch .input-group input[alt="search"]:first-child,
 .input-group .navbutton .forumsearch input[alt="search"]:first-child,
-.navbutton .forumsearch .input-group input[alt="search"]:first-child,
+.navbutton .forumsearch .input-group input[alt="search"]:first-child, .input-group .path-grade-report-grader .grade_icons ~ input:first-child, .path-grade-report-grader .input-group .grade_icons ~ input:first-child,
 .input-group-addon:first-child,
 .input-group-btn:first-child > .btn,
 .input-group-btn:first-child > input[type="button"],
@@ -7843,7 +7848,7 @@ h2.headingblock.input-group-btn:last-child > a:not(:last-child):not(.dropdown-to
 .input-group input[type="tel"]:last-child,
 .input-group input[type="color"]:last-child, .input-group .navbutton .wikisearch input[alt="search"]:last-child, .navbutton .wikisearch .input-group input[alt="search"]:last-child,
 .input-group .navbutton .forumsearch input[alt="search"]:last-child,
-.navbutton .forumsearch .input-group input[alt="search"]:last-child,
+.navbutton .forumsearch .input-group input[alt="search"]:last-child, .input-group .path-grade-report-grader .grade_icons ~ input:last-child, .path-grade-report-grader .input-group .grade_icons ~ input:last-child,
 .input-group-addon:last-child,
 .input-group-btn:last-child > .btn,
 .input-group-btn:last-child > input[type="button"],
@@ -9825,6 +9830,336 @@ h2.headingblock > a {
   content: "summer 21";
 }
 
+/* line 19, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .yui3-overlay {
+  width: auto;
+  font-size: 1.2rem;
+  -webkit-box-shadow: #999999 2px 2px 10px;
+  -moz-box-shadow: #999999 2px 2px 10px;
+  box-shadow: #999999 2px 2px 10px;
+}
+/* line 28, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .yui3-overlay .fullname {
+  color: #444;
+}
+/* line 31, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .yui3-overlay .itemname {
+  padding-top: 4px;
+  color: #666;
+}
+/* line 38, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .grade_icons {
+  float: right;
+}
+/* line 40, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .grade_icons .smallicon {
+  display: none;
+}
+/* line 43, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .grade_icons .action-icon {
+  font-size: 1.5rem;
+}
+/* line 45, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .grade_icons .action-icon:before {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  content: "\e019";
+}
+/* line 50, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .grade_icons ~ input {
+  float: left;
+}
+/* line 57, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .gradeparent {
+  overflow: inherit;
+}
+
+/*.gradebook-student-column,*/
+/* line 65, ../sass/ccle/_gradebook.scss */
+table#user-grades .grade, table#user-grades .item {
+  width: 50px;
+  overflow: hidden;
+}
+/* line 70, ../sass/ccle/_gradebook.scss */
+table#user-grades tr {
+  /*line-height: 1.428;*/
+}
+/* line 73, ../sass/ccle/_gradebook.scss */
+table#user-grades tr th, table#user-grades tr td, table#user-grades tr th.cell, table#user-grades tr th.c1 {
+  border-bottom: 0;
+}
+/* line 76, ../sass/ccle/_gradebook.scss */
+table#user-grades tr th.c1 {
+  border-top: 0;
+}
+/* line 80, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .user {
+  width: 150px;
+  padding: 4px;
+}
+/* line 86, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .user .userpicture {
+  display: none;
+}
+/* line 88, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .user .idnumber {
+  display: block;
+  float: left;
+  font-weight: bold;
+  width: 100%;
+}
+/* line 94, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .user .email {
+  display: block;
+  float: left;
+  width: 100%;
+}
+/* line 102, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .useridnumber, table#user-grades tr .useremail {
+  display: none;
+}
+/* line 108, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.vmarked {
+  background-color: #f39a00;
+  border-bottom-color: #f39a00;
+}
+/* line 111, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.vmarked.overridden {
+  background-color: #f39a00;
+  border-color: #dc691a;
+}
+/* line 116, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.hmarked {
+  background-color: #f5cd00;
+  border-bottom-color: #f5cd00;
+}
+/* line 119, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.hmarked.overridden {
+  background-color: #f5cd00;
+}
+/* line 123, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.vmarked.hmarked {
+  background-color: #f1b900;
+  border-bottom-color: #f1b900;
+}
+/* line 126, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.vmarked.hmarked.overridden {
+  background-color: #f1b900;
+  border-color: #dc691a;
+}
+/* line 131, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.overridden {
+  background-color: #EFEFEF;
+  border: 0;
+  background: url([[pix:theme|corner-fold]]) no-repeat;
+  width: 16px;
+  height: 16px;
+}
+/* line 139, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd .user {
+  /*background-color: #E5F3FF;*/
+  /*border-top: 1px solid #C4E6FF;*/
+  /*border-bottom: 1px solid #C4E6FF;*/
+}
+/* line 148, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.vmarked {
+  background-color: #f4a400;
+  border-bottom-color: #f4a400;
+}
+/* line 151, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.vmarked.overridden {
+  background-color: #f4a400;
+  border-color: #dc691a;
+}
+/* line 156, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.hmarked {
+  background-color: #f5cf2c;
+  border-bottom-color: #f5cf2c;
+}
+/* line 159, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.hmarked.overridden {
+  background-color: #f5cf2c;
+}
+/* line 163, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.vmarked.hmarked {
+  background-color: #f1be00;
+  border-bottom-color: #f1be00;
+}
+/* line 166, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.vmarked.hmarked.overridden {
+  background-color: #f1be00;
+  border-color: #dc691a;
+}
+/* line 171, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.even td.grade.overridden {
+  background-color: #fff;
+  /*border: 2px dashed $grade-report-color-overriden-border;*/
+  border: 0;
+  background: url([[pix:theme|corner-fold]]) no-repeat;
+  width: 16px;
+  height: 16px;
+}
+/* line 183, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td:hover, table#user-grades tr.even td:hover {
+  background-color: #fcfcfc;
+}
+/* line 187, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.vmarked > .gradevalue, table#user-grades tr.even td.grade.vmarked > .gradevalue {
+  font-weight: bold;
+}
+/* line 192, ../sass/ccle/_gradebook.scss */
+table#user-grades tr.odd td.grade.vmarked .action-icon, table#user-grades tr.odd td.grade.hmarked .action-icon, table#user-grades tr.even td.grade.vmarked .action-icon, table#user-grades tr.even td.grade.hmarked .action-icon {
+  color: white;
+}
+/* line 198, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .gradevalue {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* line 205, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row {
+  width: 100%;
+  font-size: 1rem;
+}
+/* line 210, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row tr th {
+  padding: 0;
+  /*border-right: 1px solid blue;*/
+  float: left;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  padding: 8px 2px 1px;
+}
+/* line 220, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row tr th .itemicon {
+  display: none;
+}
+/* line 224, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row tr th:hover {
+  border-bottom: 4px solid #ddd;
+}
+/* line 228, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row tr th:nth-child(2n) {
+  background-color: #fcfcfc;
+}
+
+/* line 235, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column {
+  font-size: 10px;
+  font-size: 1rem;
+}
+/* line 238, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column th {
+  background-color: white;
+  /*height: 29px;*/
+  /*padding: 8px;*/
+  border-right: 1px solid #ddd;
+}
+/* line 245, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column th:hover {
+  border-right: 4px solid #ddd;
+}
+/* line 248, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column th:nth-child(2n+1) {
+  background-color: #fcfcfc;
+}
+/* line 254, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column tr {
+  overflow: hidden;
+}
+
+/* line 263, ../sass/ccle/_gradebook.scss */
+.gradebook-color {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 30%;
+  height: auto;
+  padding: 2px 4px;
+  text-align: center;
+  height: 25px;
+  float: left;
+  margin-right: 10px;
+}
+/* line 274, ../sass/ccle/_gradebook.scss */
+.gradebook-color:after {
+  content: "";
+  float: right;
+  width: 50%;
+  height: 100%;
+}
+
+/* line 281, ../sass/ccle/_gradebook.scss */
+.gradebook-overridden {
+  background: url([[pix:theme|corner-fold]]) no-repeat;
+  height: 30px;
+  background-color: #efefef;
+}
+
+/* line 286, ../sass/ccle/_gradebook.scss */
+.gradebook-row-color {
+  background-color: #f5cd00;
+}
+/* line 288, ../sass/ccle/_gradebook.scss */
+.gradebook-row-color:after {
+  background-color: #f5cf2c;
+}
+
+/* line 292, ../sass/ccle/_gradebook.scss */
+.gradebook-column-color {
+  background-color: #f39a00;
+}
+/* line 294, ../sass/ccle/_gradebook.scss */
+.gradebook-column-color:after {
+  background-color: #f4a400;
+}
+
+/* line 5, ../sass/ccle/_report.scss */
+.sidebar {
+  background-color: #ecf0f1;
+  padding: 14px;
+  border-right: 1px solid #bdc3c7;
+}
+/* line 9, ../sass/ccle/_report.scss */
+.sidebar.very.thin.active, .sidebar.very.thin.dndupload-progress-outer {
+  box-shadow: none;
+}
+/* line 15, ../sass/ccle/_report.scss */
+.sidebar .block-region {
+  /*padding: 10px;*/
+  /*@include box-shadow(#000, 1px, 1px, 2px, 0, inset);*/
+  /*@include box-shadow(#aaa -2px 2px 5px inset);*/
+}
+
+/* line 23, ../sass/ccle/_report.scss */
+.container-fluid #region-main-box {
+  padding: 20px;
+}
+
+/* line 30, ../sass/ccle/_report.scss */
+.path-grade-report-grader .urlselect {
+  float: right;
+}
+/* line 33, ../sass/ccle/_report.scss */
+.path-grade-report-grader .help {
+  float: left;
+}
+/* line 37, ../sass/ccle/_report.scss */
+.path-grade-report-grader h2.main {
+  clear: right;
+}
+
 /* line 9, ../sass/ccle/mod/_admin.scss */
 .region-content > h2.main {
   border-bottom: 1px solid #ccc;
@@ -10117,4 +10452,62 @@ h2.headingblock > a {
 /* line 8, ../sass/ccle/mod/_turnitin.scss */
 .path-mod-turnitintool tr.row:before, .path-mod-turnitintool tr.row:after {
   content: none;
+}
+
+/* line 7, ../sass/_ui_mods.scss */
+.ui.label {
+  font-size: 1rem !important;
+}
+/* line 10, ../sass/_ui_mods.scss */
+.ui.label.ribbon {
+  left: -2.7rem !important;
+}
+/* line 16, ../sass/_ui_mods.scss */
+.ui.basic.accordion .intro {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+/* line 20, ../sass/_ui_mods.scss */
+.ui.basic.accordion .sidebar-image {
+  margin-left: 0;
+}
+/* line 23, ../sass/_ui_mods.scss */
+.ui.basic.accordion .sidebar-image img {
+  max-width: 275px;
+  width: 100%;
+}
+/* line 28, ../sass/_ui_mods.scss */
+.ui.basic.accordion .title {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+/* line 34, ../sass/_ui_mods.scss */
+.ui.basic.accordion .title:last-child {
+  border-botom: 0;
+}
+/* line 38, ../sass/_ui_mods.scss */
+.ui.basic.accordion .content, .ui.basic.accordion .content li {
+  font-size: 1.2rem;
+}
+/* line 41, ../sass/_ui_mods.scss */
+.ui.basic.accordion ul {
+  margin: 4px;
+  margin-left: 10px;
+}
+/* line 45, ../sass/_ui_mods.scss */
+.ui.basic.accordion .glyphicon {
+  margin-left: 4px;
+}
+/* line 48, ../sass/_ui_mods.scss */
+.ui.basic.accordion .label-bstp, .ui.basic.accordion .mform .required .error .error, .mform .required .error .ui.basic.accordion .error, .ui.basic.accordion .groupinglabel {
+  margin-top: 4px;
+  font-size: 1.2rem;
+  display: inline-block;
+}
+
+/* line 56, ../sass/_ui_mods.scss */
+.navbar {
+  overflow: inherit;
 }
