@@ -47,7 +47,7 @@ class behat_publicprivate extends behat_base {
 
         // Should not have a grouping label.
         try {
-            $this->find('css', 'span.groupinglabel', $exception, $activitynode);
+            $this->find('css', 'span.groupinglabel', false, $activitynode);
             throw new ExpectationException('"' . $activityname . '" is not public', $this->getSession());
         } catch (ElementNotFoundException $e) {
             // All ok.

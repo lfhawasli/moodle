@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,17 +18,25 @@
  * Class local_ucla_course_section_fixer tests.
  *
  * @package    local_ucla
- * @category   phpunit
+ * @category   test
  * @copyright  2013 UC Regents
-*/
-
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_course_section_fixer.php');
 
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
+ */
 class course_section_fixer_test extends advanced_testcase {
-    
+
     /**
      * Add a course module to a given course, but bypassing Moodle's attempts to
      * add that module to the course cache.
@@ -46,8 +54,8 @@ class course_section_fixer_test extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_page');
         $numsections = course_get_format($diffcourse)->get_course()->numsections;
         $sectionnum = rand(1, $numsections);
-        $module = $generator->create_instance(array('course'=>$diffcourse->id),
-                        array('section' => $sectionnum));
+        $module = $generator->create_instance(array('course' => $diffcourse->id),
+                array('section' => $sectionnum));
 
         // Now have reference to a course_modules entry, change course matching
         // that entry to the parameter course.
@@ -56,9 +64,9 @@ class course_section_fixer_test extends advanced_testcase {
 
         // Then insert that course module in one of the sequences for one of the
         // course sections for the parameter course.
-
         // Get a random section.
-        $sections = $DB->get_records('course_sections', array('course' => $course->id));
+        $sections = $DB->get_records('course_sections',
+                array('course' => $course->id));
         shuffle($sections);
         $section = array_pop($sections);
 
@@ -68,8 +76,10 @@ class course_section_fixer_test extends advanced_testcase {
         } else {
             $newsequence = "$section->sequence,$module->id";
         }
-        $DB->set_field('course_sections', 'sequence', $newsequence, array('id' => $section->id));
-        $DB->set_field('course_modules', 'section', $section->id, array('id' => $module->id));
+        $DB->set_field('course_sections', 'sequence', $newsequence,
+                array('id' => $section->id));
+        $DB->set_field('course_modules', 'section', $section->id,
+                array('id' => $module->id));
     }
 
     /**
@@ -81,14 +91,14 @@ class course_section_fixer_test extends advanced_testcase {
      * @param array $section    If passed, then will be used to create new
      *                          section.
      */
-    private function add_section($course, $section=null) {
+    private function add_section($course, $section = null) {
         global $DB;
 
         $defaultsection = array(
             'course' => $course->id,
             'name' => null,
             'summary' => '',
-            'summaryformat' => '1', // FORMAT_HTML, but must be a string
+            'summaryformat' => '1', // FORMAT_HTML, but must be a string.
             'visible' => '1',
             'showavailability' => '0',
             'availablefrom' => '0',
@@ -101,12 +111,11 @@ class course_section_fixer_test extends advanced_testcase {
         } else {
             // If passed in section doesn't have all the columns specified,
             // then use the default value.
-            foreach($defaultsection as $column => $value) {
-                if(!isset($section[$column])) {
+            foreach ($defaultsection as $column => $value) {
+                if (!isset($section[$column])) {
                     $section[$column] = $value;
                 }
             }
-
         }
 
         // If no section specified, just use the next biggest value.
@@ -127,7 +136,7 @@ class course_section_fixer_test extends advanced_testcase {
      */
     private function create_course_with_content() {
         global $DB;
-        
+
         $course = $this->getDataGenerator()->create_course();
 
         // Make sure sections exists.
@@ -136,15 +145,15 @@ class course_section_fixer_test extends advanced_testcase {
 
         // Course modules with datagenerators.
         $mods = array('mod_assign', 'mod_data', 'mod_forum', 'mod_label',
-                'mod_page', 'mod_quiz');
+            'mod_page', 'mod_quiz');
         foreach ($mods as $mod) {
             $generator = $this->getDataGenerator()->get_plugin_generator($mod);
             // Figure out how many modules to add.
             $nummods = rand(1, 5);
-            for ($i=1;$i<=$nummods;$i++) {
+            for ($i = 1; $i <= $nummods; $i++) {
                 // Choose a random section to add module.
                 $sectionnum = rand(0, $numsections);
-                $generator->create_instance(array('course'=>$course->id),
+                $generator->create_instance(array('course' => $course->id),
                         array('section' => $sectionnum));
             }
         }
@@ -170,9 +179,10 @@ class course_section_fixer_test extends advanced_testcase {
         // Get 2 random sections with something set for the sequence column.
         $section1 = $section2 = null;
 
-        $sections = $DB->get_records('course_sections', array('course' => $course->id));
+        $sections = $DB->get_records('course_sections',
+                array('course' => $course->id));
         shuffle($sections);
-        while(1) {
+        while (1) {
             if (empty($sections)) {
                 throw new Exception('Unable to find 2 sections with sequences set');
             }
@@ -209,7 +219,8 @@ class course_section_fixer_test extends advanced_testcase {
         global $DB;
 
         // Get a random section to delete.
-        $sections = $DB->get_records('course_sections', array('course' => $course->id));
+        $sections = $DB->get_records('course_sections',
+                array('course' => $course->id));
         shuffle($sections);
         $section = array_pop($sections);
 
@@ -225,23 +236,24 @@ class course_section_fixer_test extends advanced_testcase {
         global $DB;
 
         // Get a random section to replace.
-        $sections = $DB->get_records('course_sections', array('course' => $course->id));
+        $sections = $DB->get_records('course_sections',
+                array('course' => $course->id));
         shuffle($sections);
         $section = array_pop($sections);
 
         // Change its section to a random number, that is not the original
         // number or an existing number.
-        while(1) {
+        while (1) {
             $newsection = rand(1, 50);
             // Check if is an existing number.
             if ($DB->record_exists('course_sections',
-                    array('course' => $course->id, 'section' => $newsection))) {
+                            array('course' => $course->id, 'section' => $newsection))) {
                 continue;
             }
             $section->section = $newsection;
             break;
         }
-        
+
         $DB->update_record('course_sections', $section);
     }
 
@@ -270,7 +282,7 @@ class course_section_fixer_test extends advanced_testcase {
 
         // Increase numsection.
         $numsections = course_get_format($course)->get_course()->numsections;
-        $data = array('numsections' => $numsections+1);
+        $data = array('numsections' => $numsections + 1);
         course_get_format($course)->update_course_format_options($data);
         $result = local_ucla_course_section_fixer::check_extra_sections($course);
         $this->assertTrue($result);
@@ -305,7 +317,7 @@ class course_section_fixer_test extends advanced_testcase {
         $result = local_ucla_course_section_fixer::check_extra_sections($course);
         $this->assertTrue($result);
 
-        // Add section with non-empty summary
+        // Add section with non-empty summary.
         $section = array('summary' => 'Testing');
         $this->add_section($course, $section);
         $result = local_ucla_course_section_fixer::check_extra_sections($course);
@@ -344,7 +356,8 @@ class course_section_fixer_test extends advanced_testcase {
         $this->assertEquals(1, count($result));
 
         // Now see if it will adjust numsections.
-        $result = local_ucla_course_section_fixer::detect_numsections($course, true);
+        $result = local_ucla_course_section_fixer::detect_numsections($course,
+                        true);
         $this->assertTrue($result);
         $result = local_ucla_course_section_fixer::detect_numsections($course);
         $this->assertFalse($result);
@@ -352,12 +365,12 @@ class course_section_fixer_test extends advanced_testcase {
         $after = course_get_format($course)->get_course()->numsections;
 
         // Make sure we only added 1 more section.
-        $this->assertEquals($before+1, $after);
+        $this->assertEquals($before + 1, $after);
 
         // Make sure that numsections cannot be set to something higher than
         // the max.
         $maxsections = get_config('moodlecourse', 'maxsections');
-        for ($i=0; $i<$maxsections; $i++) {
+        for ($i = 0; $i < $maxsections; $i++) {
             $this->add_section($course);
         }
         local_ucla_course_section_fixer::detect_numsections($course, true);
@@ -372,7 +385,7 @@ class course_section_fixer_test extends advanced_testcase {
         $course = $this->create_course_with_content();
 
         // Let's really mess up this course's sections.
-        for ($i=0; $i<5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $this->add_module($course);
             $this->move_modules($course);
         }
@@ -502,4 +515,5 @@ class course_section_fixer_test extends advanced_testcase {
         $this->assertEquals(0, $result['deleted']);
         $this->assertEquals(0, $result['updated']);
     }
+
 }

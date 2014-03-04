@@ -18,28 +18,41 @@
  * Tests the MyUCLA gradebook webservice integration by using mock objects.
  *
  * @package    local_gradebook
- * @category   phpunit
+ * @category   test
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-//require_once($CFG->dirroot.'/grade/lib.php');
 require_once($CFG->dirroot . '/local/gradebook/locallib.php');
 
 /**
  * PHPunit testcase class.
  *
- * @package    local_gradebook
- * @category   phpunit
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_gradebook
  */
 class gradefeedback_test extends advanced_testcase {
 
+    /**
+     * Course record from the database.
+     * @var object
+     */
     private $course;
+
+    /**
+     * Assignment record from the database.
+     * @var object
+     */
     private $assign;
+
+    /**
+     * User object from the database.
+     * @var object
+     */
     private $student;
 
     /**
@@ -54,11 +67,9 @@ class gradefeedback_test extends advanced_testcase {
      */
     public function has_invalid_characters($string) {
         $length = textlib::strlen($string);
-        for ($i=0; $i<$length; $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $current = ord($string{$i});
-            if (($current == 0x9) ||
-                    ($current == 0xA) ||
-                    ($current == 0xD) ||
+            if (($current == 0x9) || ($current == 0xA) || ($current == 0xD) ||
                     (($current >= 0x20) && ($current <= 0xD7FF)) ||
                     (($current >= 0xE000) && ($current <= 0xFFFD)) ||
                     (($current >= 0x10000) && ($current <= 0x10FFFF))) {
@@ -105,12 +116,12 @@ class gradefeedback_test extends advanced_testcase {
      *                                      (see http://www.asciitable.com/).
      * @return string
      */
-    private function rand_string($length, $includeinvalidchars=false) {
+    private function rand_string($length, $includeinvalidchars = false) {
         $str = '';
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
         if ($includeinvalidchars) {
-            for ($i=1; $i<=20; $i++) {
+            for ($i = 1; $i <= 20; $i++) {
                 if (in_array($i, array(9, 10, 13))) {
                     // Skip horizontal tab, new line, and carriage return.
                     continue;
@@ -158,11 +169,13 @@ class gradefeedback_test extends advanced_testcase {
      * column.
      *
      * @dataProvider invalidfeedback_provider
+     *
+     * @param string $feedback
      */
-    function test_invalid_feedback($feedback) {
+    public function test_invalid_feedback($feedback) {
         // Insert student grade/feedback.
         $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign',
-            'iteminstance' => $this->assign->id, 'courseid' => $this->course->id));
+                    'iteminstance' => $this->assign->id, 'courseid' => $this->course->id));
 
         $grade = new ucla_grade_grade();
         $grade->itemid = $gi->id;
@@ -189,7 +202,7 @@ class gradefeedback_test extends advanced_testcase {
     /**
      * Tests the triming of long feedback in the grade_grades.feedback column.
      */
-    function test_long_feedback() {
+    public function test_long_feedback() {
         // Insert student grade/feedback.
         $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign',
                     'iteminstance' => $this->assign->id, 'courseid' => $this->course->id));
@@ -221,8 +234,10 @@ class gradefeedback_test extends advanced_testcase {
         $commentlength = textlib::strlen($result['mGrade']['comment']);
         $this->assertLessThan($feedbacklength, $commentlength);
         $endswithellipses = textlib::substr($result['mGrade']['comment'],
-                -textlib::strlen(get_string('continue_comments', 'local_gradebook')))
-                == get_string('continue_comments', 'local_gradebook');
+                        -textlib::strlen(get_string('continue_comments',
+                                        'local_gradebook'))) == get_string('continue_comments',
+                        'local_gradebook');
         $this->assertTrue($endswithellipses);
     }
+
 }

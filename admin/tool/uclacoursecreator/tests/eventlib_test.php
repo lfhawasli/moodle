@@ -18,17 +18,25 @@
  * Tests the event handlers for the UCLA course creator plugin.
  *
  * @package    tool_uclacoursecreator
- * @category   phpunit
+ * @category   test
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uclacoursecreator/eventlib.php');
- 
-class eventlib_test extends advanced_testcase {      
+require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclacoursecreator/eventlib.php');
+
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group tool_uclacoursecreator
+ */
+class eventlib_test extends advanced_testcase {
+
     /**
      * Sets up the configuration variables needed to test the MyUCLA url updater.
      */
@@ -43,11 +51,16 @@ class eventlib_test extends advanced_testcase {
             $this->markTestSkipped('To run MyUCLA url updater unit tests you must setup some global variables.');
         }
 
-        set_config('url_service', MYUCLA_URL_UPDATER_TEST_CONFIG_URL, 'tool_myucla_url');
-        set_config('user_name', MYUCLA_URL_UPDATER_TEST_CONFIG_NAME, 'tool_myucla_url');
-        set_config('user_email', MYUCLA_URL_UPDATER_TEST_CONFIG_EMAIL, 'tool_myucla_url');
+        set_config('url_service', MYUCLA_URL_UPDATER_TEST_CONFIG_URL,
+                'tool_myucla_url');
+        set_config('user_name', MYUCLA_URL_UPDATER_TEST_CONFIG_NAME,
+                'tool_myucla_url');
+        set_config('user_email', MYUCLA_URL_UPDATER_TEST_CONFIG_EMAIL,
+                'tool_myucla_url');
         if (defined('MYUCLA_URL_UPDATER_TEST_CONFIG_OVERRIDE_DEBUGGING')) {
-            set_config('override_debugging', MYUCLA_URL_UPDATER_TEST_CONFIG_OVERRIDE_DEBUGGING, 'tool_myucla_url');
+            set_config('override_debugging',
+                    MYUCLA_URL_UPDATER_TEST_CONFIG_OVERRIDE_DEBUGGING,
+                    'tool_myucla_url');
         }
     }
 
@@ -55,7 +68,7 @@ class eventlib_test extends advanced_testcase {
      * See if ucla_request_classes and ucla_reg_classinfo entries are deleted
      * when a crosslisted course is deleted.
      */
-    function test_delete_crosslist_course() {
+    public function test_delete_crosslist_course() {
         global $DB;
 
         // Create crosslisted course and delete it.
@@ -77,12 +90,12 @@ class eventlib_test extends advanced_testcase {
             $this->assertFalse($exists);
         }
     }
-    
+
     /**
      * See if ucla_request_classes and ucla_reg_classinfo entries are deleted
      * when a non-crosslisted course is deleted.
      */
-    function test_delete_noncrosslist_course() {
+    public function test_delete_noncrosslist_course() {
         global $DB;
 
         // Create non-crosslisted course and delete it.
@@ -104,18 +117,17 @@ class eventlib_test extends advanced_testcase {
             $this->assertFalse($exists);
         }
     }
-    
+
     /**
      * Test clearing of an existing MyUCLA url.
      */
-    function test_existing_myuclaurl () {
+    public function test_existing_myuclaurl() {
         global $CFG;
 
         $cc = new uclacoursecreator();
         $myuclarlupdater = $cc->get_myucla_urlupdater();
 
         // URL exist and is for current server, then should clear it.
-
         // First create url for course.
         $class = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
@@ -123,10 +135,11 @@ class eventlib_test extends advanced_testcase {
         $course = reset($class);
 
         $courseurl = array('term' => $course->term,
-                           'srs' => $course->srs,
-                           'url' => $CFG->wwwroot . '/course/view.php?id=' . $course->courseid);
+            'srs' => $course->srs,
+            'url' => $CFG->wwwroot . '/course/view.php?id=' . $course->courseid);
         $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
-        $pos = strpos(array_pop($result), $myuclarlupdater::expected_success_message);
+        $pos = strpos(array_pop($result),
+                $myuclarlupdater::expected_success_message);
         $this->assertTrue($pos !== false);
 
         // Now delete course.
@@ -137,18 +150,17 @@ class eventlib_test extends advanced_testcase {
         $result = array_pop($result);
         $this->assertTrue(empty($result));
     }
-    
+
     /**
      * Test clearing of an existing MyUCLA url for a crosslisted course.
      */
-    function test_existing_myuclaurl_crosslisted () {
+    public function test_existing_myuclaurl_crosslisted() {
         global $CFG;
 
         $cc = new uclacoursecreator();
         $myuclarlupdater = $cc->get_myucla_urlupdater();
 
         // URL exist and is for current server, then should clear it.
-
         // First create urls for course.
         $class = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
@@ -157,10 +169,11 @@ class eventlib_test extends advanced_testcase {
 
         foreach ($class as $crosslist) {
             $courseurl = array('term' => $crosslist->term,
-                               'srs' => $crosslist->srs,
-                               'url' => $CFG->wwwroot . '/course/view.php?id=' . $crosslist->courseid);
+                'srs' => $crosslist->srs,
+                'url' => $CFG->wwwroot . '/course/view.php?id=' . $crosslist->courseid);
             $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
-            $pos = strpos(array_pop($result), $myuclarlupdater::expected_success_message);
+            $pos = strpos(array_pop($result),
+                    $myuclarlupdater::expected_success_message);
             $this->assertTrue($pos !== false);
         }
 
@@ -170,24 +183,23 @@ class eventlib_test extends advanced_testcase {
         // Verify that myucla urls are deleted.
         foreach ($class as $crosslist) {
             $courseurl = array('term' => $crosslist->term,
-                               'srs' => $crosslist->srs);
+                'srs' => $crosslist->srs);
             $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
             $result = array_pop($result);
             $this->assertTrue(empty($result));
         }
     }
-    
+
     /**
      * Test not clearing of an existing MyUCLA url that isn't on current server.
      */
-    function test_existing_nonlocal_myuclaurl () {
+    public function test_existing_nonlocal_myuclaurl() {
         global $CFG;
 
         $cc = new uclacoursecreator();
         $myuclarlupdater = $cc->get_myucla_urlupdater();
 
         // URL exist and is not for current server, then should not clear it.
-
         // First create url for course that points to non-local server.
         $class = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
@@ -195,10 +207,11 @@ class eventlib_test extends advanced_testcase {
         $course = reset($class);
 
         $courseurl = array('term' => $course->term,
-                           'srs' => $course->srs,
-                           'url' => 'http://ucla.edu');
+            'srs' => $course->srs,
+            'url' => 'http://ucla.edu');
         $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
-        $pos = strpos(array_pop($result), $myuclarlupdater::expected_success_message);
+        $pos = strpos(array_pop($result),
+                $myuclarlupdater::expected_success_message);
         $this->assertTrue($pos !== false);
 
         // Now delete course.
@@ -209,4 +222,5 @@ class eventlib_test extends advanced_testcase {
         $result = array_pop($result);
         $this->assertEquals($result, $courseurl['url']);
     }
+
 }
