@@ -1920,7 +1920,7 @@ if ($displayforms) {
                         COUNT(f.id) AS numvideos,
                         SUM(f.filesize) AS size
                 FROM    {course} c
-                JOIN    {ucla_request_classes} urc ON (urc.courseid=c.id)
+                JOIN    {ucla_request_classes} urc ON (urc.courseid=c.id AND urc.hostcourse=1)
                 JOIN    {ucla_reg_classinfo} urci ON (urci.term=urc.term AND urci.srs=urc.srs)
                 JOIN    {course_modules} cm ON (cm.course=c.id)
                 JOIN    {context} ct ON (ct.instanceid=cm.id AND ct.contextlevel=:contextlevel)

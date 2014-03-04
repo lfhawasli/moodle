@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,95 +17,112 @@
 /**
  * Unit tests for role mapping functions.
  *
- * @copyright 2013 UC Regents
- * @package   local_ucla
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_ucla
+ * @category   test
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
 defined('MOODLE_INTERNAL') || die();
- 
-// Make sure the code being tested is accessible.
+
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
+/**
+ * PHPunit testcase class.
+ *
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
+ */
 class rolemapping_test extends advanced_testcase {
+
     /**
      * Mapping of role shortname to roleid.
      * @var array
      */
     private $createdroles = array();
-    
+
     /**
      * Make sure that get_moodlerole is returning the appropiate data from 
      * local/ucla/rolemappings.php.
      */
-    function test_get_moodlerole() {
+    public function test_get_moodlerole() {
         global $CFG, $DB;
         require($CFG->dirroot . '/local/ucla/rolemappings.php');
-        
+
         foreach ($role as $pseudorole => $results) {
-            foreach ($results as $subject_area => $moodle_role) {
+            foreach ($results as $subjectarea => $moodlerole) {
                 // Find the moodle role id for given moodle role.
-                $role_entry = $DB->get_record('role', array('shortname' => $moodle_role));                
-                if (empty($role_entry)) {
-                    $this->assertTrue(false, sprintf('No moodle role "%s" not found', $moodle_role));
+                $roleentry = $DB->get_record('role',
+                        array('shortname' => $moodlerole));
+                if (empty($roleentry)) {
+                    $this->assertTrue(false,
+                            sprintf('No moodle role "%s" not found',
+                                    $moodlerole));
                 } else {
-                    $result = get_moodlerole($pseudorole, $subject_area);                   
-                    $this->assertEquals($role_entry->id, $result, 
-                            sprintf('Failed for pseudorole: %s|subject_area: %s|moodle_role:%s. Expecting: %d. Actual: %d', 
-                                $pseudorole, $subject_area, $moodle_role,
-                                $role_entry->id, $result));                    
+                    $result = get_moodlerole($pseudorole, $subjectarea);
+                    $this->assertEquals($roleentry->id, $result,
+                            sprintf('Failed for pseudorole: %s|subjectarea: %s|moodlerole:%s. Expecting: %d. Actual: %d',
+                                    $pseudorole, $subjectarea, $moodlerole,
+                                    $roleentry->id, $result));
                 }
             }
         }
     }
-    
+
     /**
      * Call get_moodlerole with a subject area not defined in the config file
      * to make sure that it returns the default value.
      */
-    function test_get_moodlerole_with_default() {
+    public function test_get_moodlerole_with_default() {
         global $CFG, $DB;
         require($CFG->dirroot . '/local/ucla/rolemappings.php');
-        
+
         foreach ($role as $pseudorole => $results) {
-            foreach ($results as $subject_area => $moodle_role) {
+            foreach ($results as $subjectarea => $moodlerole) {
                 // Only test *SYSTEM* subject areas.
-                if ($subject_area != '*SYSTEM*') {
+                if ($subjectarea != '*SYSTEM*') {
                     continue;
                 }
-                
+
                 // Find the moodle role id for given moodle role.
-                $role_entry = $DB->get_record('role', array('shortname' => $moodle_role));                
-                if (empty($role_entry)) {
-                    $this->assertTrue(false, sprintf('No moodle role "%s" not found', $moodle_role));
+                $roleentry = $DB->get_record('role',
+                        array('shortname' => $moodlerole));
+                if (empty($roleentry)) {
+                    $this->assertTrue(false,
+                            sprintf('No moodle role "%s" not found',
+                                    $moodlerole));
                 } else {
-                    $default_result = get_moodlerole($pseudorole, $subject_area);    
+                    $defaultresult = get_moodlerole($pseudorole, $subjectarea);
                     // Now get result for a non-defined subject area.
-                    $undefined_result = get_moodlerole($pseudorole, 'NON-EXISTENT SUBJECT AREA');                    
-                    
-                    $this->assertEquals($default_result, $undefined_result);                    
+                    $undefinedresult = get_moodlerole($pseudorole,
+                            'NON-EXISTENT SUBJECT AREA');
+
+                    $this->assertEquals($defaultresult, $undefinedresult);
                 }
             }
         }
-    }        
-    
+    }
+
     /**
      * Make sure that get_pseudorole always returns editingteacher if passing in
      * anyone with a role code of 01.
      * 
      * @dataProvider role_combo_provider
+     *
+     * @param array $rolecombo
      */
-    function test_get_pseudorole_instructor($role_combo) {
+    public function test_get_pseudorole_instructor($rolecombo) {
         $params[] = array('primary' => array('01'));
-        $params[] = array('secondary' => array('01'));    
+        $params[] = array('secondary' => array('01'));
         $params[] = array('primary' => array('01'),
             'secondary' => array('01'));
-        
+
         foreach ($params as $param) {
-            $pseudorole = get_pseudorole($param, $role_combo); 
+            $pseudorole = get_pseudorole($param, $rolecombo);
             $this->assertEquals('editingteacher', $pseudorole);
-        }        
+        }
     }
 
     /**
@@ -113,19 +130,21 @@ class rolemapping_test extends advanced_testcase {
      * passing in anyone with a role code of 03.
      * 
      * @dataProvider role_combo_provider
+     *
+     * @param array $rolecombo
      */
-    function test_get_pseudorole_supervising_instructor($role_combo) {
+    public function test_get_pseudorole_supervising_instructor($rolecombo) {
         $params[] = array('primary' => array('03'));
-        $params[] = array('secondary' => array('03'));    
+        $params[] = array('secondary' => array('03'));
         $params[] = array('primary' => array('03'),
             'secondary' => array('03'));
-        
+
         foreach ($params as $param) {
-            $pseudorole = get_pseudorole($param, $role_combo); 
+            $pseudorole = get_pseudorole($param, $rolecombo);
             $this->assertEquals('supervising_instructor', $pseudorole);
-        }              
+        }
     }
-    
+
     /**
      * Test get_pseudorole to see if the following conditions for the 02 role
      * work:
@@ -135,76 +154,83 @@ class rolemapping_test extends advanced_testcase {
      *  - All other 02 cases, default to ta
      * 
      * @dataProvider role_combo_provider
+     *
+     * @param array $rolecombo
      */
-    function test_get_pseudorole_ta($role_combo) {
+    public function test_get_pseudorole_ta($rolecombo) {
         $params['primary'] = array('primary' => array('02'));
-        $params['secondary'] = array('secondary' => array('02'));    
+        $params['secondary'] = array('secondary' => array('02'));
         $params['both'] = array('primary' => array('02'),
             'secondary' => array('02'));
-        
+
         // Anyone with 02 on a course with an 01 is a ta.
-        if (in_array('01', $role_combo['primary']) || 
-                in_array('01', $role_combo['secondary'])) {
+        if (in_array('01', $rolecombo['primary']) ||
+                in_array('01', $rolecombo['secondary'])) {
             foreach ($params as $param) {
-                $pseudorole = get_pseudorole($param, $role_combo); 
-                $this->assertEquals('ta', $pseudorole);                
+                $pseudorole = get_pseudorole($param, $rolecombo);
+                $this->assertEquals('ta', $pseudorole);
             }
             return; // Exit out from further testing.
         }
-        
-        // If someone is an 02 in the primary section, and there is an 03, they 
+
+        // If someone is an 02 in the primary section, and there is an 03, they
         // are a ta_instructor (assumes no 01, because of first condition).
-        if (in_array('03', $role_combo['primary']) || 
-                in_array('03', $role_combo['secondary'])) {
-            $pseudorole = get_pseudorole($params['primary'], $role_combo); 
-            $this->assertEquals('ta_instructor', $pseudorole);    
-            $pseudorole = get_pseudorole($params['secondary'], $role_combo); 
-            $this->assertEquals('ta', $pseudorole);    
-            $pseudorole = get_pseudorole($params['both'], $role_combo); 
-            $this->assertEquals('ta_instructor', $pseudorole);                
+        if (in_array('03', $rolecombo['primary']) ||
+                in_array('03', $rolecombo['secondary'])) {
+            $pseudorole = get_pseudorole($params['primary'], $rolecombo);
+            $this->assertEquals('ta_instructor', $pseudorole);
+            $pseudorole = get_pseudorole($params['secondary'], $rolecombo);
+            $this->assertEquals('ta', $pseudorole);
+            $pseudorole = get_pseudorole($params['both'], $rolecombo);
+            $this->assertEquals('ta_instructor', $pseudorole);
             return; // Exit out from further testing.
-        }        
-        
+        }
+
         // All other 02 cases, default to ta.
         foreach ($params as $param) {
-            $pseudorole = get_pseudorole($param, $role_combo); 
+            $pseudorole = get_pseudorole($param, $rolecombo);
             $this->assertEquals('ta', $pseudorole);
-        }              
+        }
     }
-    
+
     /**
      * Make sure that get_pseudorole always returns student_instructor if
      * passing in anyone with a role code of 22.
      * 
      * @dataProvider role_combo_provider
+     *
+     * @param array $rolecombo
      */
-    function test_get_pseudorole_student_instructor($role_combo) {
+    public function test_get_pseudorole_student_instructor($rolecombo) {
         $params[] = array('primary' => array('22'));
-        $params[] = array('secondary' => array('22'));    
+        $params[] = array('secondary' => array('22'));
         $params[] = array('primary' => array('22'),
             'secondary' => array('22'));
-        
+
         foreach ($params as $param) {
-            $pseudorole = get_pseudorole($param, $role_combo); 
+            $pseudorole = get_pseudorole($param, $rolecombo);
             $this->assertEquals('student_instructor', $pseudorole);
-        }        
+        }
     }
-    
-    function test_get_student_pseudorole() {
-        $should_return_waitlisted = array('W', 'H', 'P');
-        foreach ($should_return_waitlisted as $code) {
+
+    /**
+     * Make sure that get_student_pseudorole returns the proper results.
+     */
+    public function test_get_student_pseudorole() {
+        $shouldreturnwaitlisted = array('W', 'H', 'P');
+        foreach ($shouldreturnwaitlisted as $code) {
             $result = get_student_pseudorole($code);
             $this->assertEquals('waitlisted', $result);
         }
-        
-        $should_return_student = array('E', 'A');
-        foreach ($should_return_student as $code) {
+
+        $shouldreturnstudent = array('E', 'A');
+        foreach ($shouldreturnstudent as $code) {
             $result = get_student_pseudorole($code);
             $this->assertEquals('student', $result);
         }
 
-        $should_return_false = array('D', 'C');
-        foreach ($should_return_false as $code) {
+        $shouldreturnfalse = array('D', 'C');
+        foreach ($shouldreturnfalse as $code) {
             $result = get_student_pseudorole($code);
             $this->assertFalse($result);
         }
@@ -225,40 +251,44 @@ class rolemapping_test extends advanced_testcase {
 
     /**
      * Add roles used by UCLA.
-     */    
+     */
     protected function setUp() {
         $uclagenerator = $this->getDataGenerator()->get_plugin_generator('local_ucla');
         $this->createdroles = $uclagenerator->create_ucla_roles();
 
         // Very important step to include if modifying db.
-        $this->resetAfterTest(true) ;
+        $this->resetAfterTest(true);
     }
-    
-    /*********  HELPER FUNCTIONS FOR UNIT TESTING  ********/
-    
+
+    /*     * *******  HELPER FUNCTIONS FOR UNIT TESTING  ******* */
+
     /**
      * Provides a multitude of role combinations for primary and secondary 
      * sections with all possible mixes of 01, 02, and 03.
      */
     public function role_combo_provider() {
-        $retval = array();        
+        $retval = array();
         $rolecodes = array('01', '02', '03');
-        
-        // get all the role combos (also include empty sets
+
+        // Get all the role combos (also include empty sets).
         $primaryrolecombos = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')->power_set($rolecodes, 0);
+                ->get_plugin_generator('local_ucla')
+                ->power_set($rolecodes, 0);
         $secondaryrolecombos = $primaryrolecombos;
-        
+
         $index = 0;
         foreach ($primaryrolecombos as $primary) {
             foreach ($secondaryrolecombos as $secondary) {
-                if (empty($primary) && empty($secondary)) continue;                                
+                if (empty($primary) && empty($secondary)) {
+                    continue;
+                }
                 $retval[$index][0]['primary'] = $primary;
                 $retval[$index][0]['secondary'] = $secondary;
                 ++$index;
             }
         }
-        
+
         return $retval;
     }
+
 }

@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,24 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UCLA data generator tests.
+ * Unit tests for the data generator for UCLA local plugin.
  *
  * @package    local_ucla
- * @category   phpunit
+ * @category   test
  * @copyright  2013 UC Regents
-*/
-
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 /**
- * PHPUnit data generator testcase
+ * PHPUnit data generator testcase.
  *
- * @package    local_ucla
- * @category   phpunit
  * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
  */
 class local_ucla_generator_testcase extends advanced_testcase {
 
@@ -47,7 +48,7 @@ class local_ucla_generator_testcase extends advanced_testcase {
     private function match_termsrses($courseid, array $courses) {
         $matched = true;
         $termsrses = ucla_map_courseid_to_termsrses($courseid);
-        
+
         if (count($termsrses) != count($courses)) {
             $matched = false;
         } else {
@@ -70,6 +71,9 @@ class local_ucla_generator_testcase extends advanced_testcase {
         return $matched;
     }
 
+    /**
+     * Clear database after every test.
+     */
     protected function setUp() {
         $this->resetAfterTest(true);
     }
@@ -80,23 +84,24 @@ class local_ucla_generator_testcase extends advanced_testcase {
      */
     public function test_create_class_empty_crosslisted() {
         global $DB;
-        
+
         $beforecourse = $DB->count_records('course');
         $beforerequest = $DB->count_records('ucla_request_classes');
         $beforeclassinfo = $DB->count_records('ucla_reg_classinfo');
 
         $param = array(array(), array());
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($createdclass));
 
         $aftercourse = $DB->count_records('course');
         $afterrequest = $DB->count_records('ucla_request_classes');
         $afterclassinfo = $DB->count_records('ucla_reg_classinfo');
 
-        $this->assertEquals($beforecourse+1, $aftercourse);
-        $this->assertEquals($beforerequest+2, $afterrequest);
-        $this->assertEquals($beforeclassinfo+2, $afterclassinfo);
+        $this->assertEquals($beforecourse + 1, $aftercourse);
+        $this->assertEquals($beforerequest + 2, $afterrequest);
+        $this->assertEquals($beforeclassinfo + 2, $afterclassinfo);
     }
 
     /**
@@ -111,17 +116,18 @@ class local_ucla_generator_testcase extends advanced_testcase {
         $beforeclassinfo = $DB->count_records('ucla_reg_classinfo');
 
         $param = array();
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($createdclass));
 
         $aftercourse = $DB->count_records('course');
         $afterrequest = $DB->count_records('ucla_request_classes');
         $afterclassinfo = $DB->count_records('ucla_reg_classinfo');
 
-        $this->assertEquals($beforecourse+1, $aftercourse);
-        $this->assertEquals($beforerequest+1, $afterrequest);
-        $this->assertEquals($beforeclassinfo+1, $afterclassinfo);
+        $this->assertEquals($beforecourse + 1, $aftercourse);
+        $this->assertEquals($beforerequest + 1, $afterrequest);
+        $this->assertEquals($beforeclassinfo + 1, $afterclassinfo);
     }
 
     /**
@@ -131,12 +137,14 @@ class local_ucla_generator_testcase extends advanced_testcase {
      */
     public function test_create_class_exception_manual() {
         $param = array('term' => '13F', 'srs' => '262508200',
-                       'subj_area' => 'MATH', 'crsidx' => '0135    ',
-                       'secidx' => ' 001  ', 'division' => 'PS');
-        $this->getDataGenerator()->get_plugin_generator('local_ucla')
+            'subj_area' => 'MATH', 'crsidx' => '0135    ',
+            'secidx' => ' 001  ', 'division' => 'PS');
+        $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
                 ->create_class($param);
         // This should raise an exception.
-        $this->getDataGenerator()->get_plugin_generator('local_ucla')
+        $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
                 ->create_class($param);
     }
 
@@ -146,8 +154,9 @@ class local_ucla_generator_testcase extends advanced_testcase {
     public function test_create_class_publicprivate() {
         global $DB;
 
-        $class = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class();
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class();
         $course = array_pop($class);
         $courseid = $course->courseid;
 
@@ -175,8 +184,9 @@ class local_ucla_generator_testcase extends advanced_testcase {
         $beforerequest = $DB->count_records('ucla_request_classes');
         $beforeclassinfo = $DB->count_records('ucla_reg_classinfo');
 
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class();
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class();
         $this->assertFalse(empty($createdclass));
 
         $aftercourse = $DB->count_records('course');
@@ -192,10 +202,12 @@ class local_ucla_generator_testcase extends advanced_testcase {
      * Try to create 2 randomly created classes and make sure they are different.
      */
     public function test_create_class_random_nodup() {
-        $class1 = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class(array());
-        $class2 = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class(array());
+        $class1 = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array());
+        $class2 = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array());
 
         $this->assertNotEquals(array_pop($class1)->srs, array_pop($class2)->srs);
     }
@@ -212,17 +224,18 @@ class local_ucla_generator_testcase extends advanced_testcase {
 
         // Generate a class with all fields defined.
         $param = array('term' => '13F', 'srs' => '262508200',
-                       'subj_area' => 'MATH', 'crsidx' => '0135    ',
-                       'secidx' => ' 001  ', 'division' => 'PS');
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+            'subj_area' => 'MATH', 'crsidx' => '0135    ',
+            'secidx' => ' 001  ', 'division' => 'PS');
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($createdclass));
         $aftercourse = $DB->count_records('course');
         $afterrequest = $DB->count_records('ucla_request_classes');
         $afterclassinfo = $DB->count_records('ucla_reg_classinfo');
-        $this->assertEquals($numcourses+1, $aftercourse);
-        $this->assertEquals($numrequests+1, $afterrequest);
-        $this->assertEquals($numclassinfos+1, $afterclassinfo);
+        $this->assertEquals($numcourses + 1, $aftercourse);
+        $this->assertEquals($numrequests + 1, $afterrequest);
+        $this->assertEquals($numclassinfos + 1, $afterclassinfo);
         $numcourses = $aftercourse;
         $numrequests = $afterrequest;
         $numclassinfos = $afterclassinfo;
@@ -235,68 +248,154 @@ class local_ucla_generator_testcase extends advanced_testcase {
             array('term' => '13F', 'srs' => '257060200',
                 'subj_area' => 'ASIAN', 'crsidx' => '0020  M ',
                 'secidx' => ' 001  ', 'division' => 'HU'));
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($createdclass));
         $aftercourse = $DB->count_records('course');
         $afterrequest = $DB->count_records('ucla_request_classes');
         $afterclassinfo = $DB->count_records('ucla_reg_classinfo');
-        $this->assertEquals($numcourses+1, $aftercourse);
-        $this->assertEquals($numrequests+2, $afterrequest);
-        $this->assertEquals($numclassinfos+2, $afterclassinfo);
+        $this->assertEquals($numcourses + 1, $aftercourse);
+        $this->assertEquals($numrequests + 2, $afterrequest);
+        $this->assertEquals($numclassinfos + 2, $afterclassinfo);
         $numcourses = $aftercourse;
         $numrequests = $afterrequest;
         $numclassinfos = $afterclassinfo;
 
         // Make sure that all created courses belong to 13F.
-        $terms = $DB->get_fieldset_select('ucla_request_classes', 'term',
-                '', array());
+        $terms = $DB->get_fieldset_select('ucla_request_classes', 'term', '',
+                array());
         foreach ($terms as $term) {
             $this->assertEquals('13F', $term);
         }
 
         // Generate a random non-crosslisted class.
         $param = array(array('term' => '13F'));
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($createdclass));
         $aftercourse = $DB->count_records('course');
         $afterrequest = $DB->count_records('ucla_request_classes');
         $afterclassinfo = $DB->count_records('ucla_reg_classinfo');
-        $this->assertEquals($numcourses+1, $aftercourse);
-        $this->assertEquals($numrequests+1, $afterrequest);
-        $this->assertEquals($numclassinfos+1, $afterclassinfo);
+        $this->assertEquals($numcourses + 1, $aftercourse);
+        $this->assertEquals($numrequests + 1, $afterrequest);
+        $this->assertEquals($numclassinfos + 1, $afterclassinfo);
         $numcourses = $aftercourse;
         $numrequests = $afterrequest;
         $numclassinfos = $afterclassinfo;
 
         // Make sure that all created courses belong to 13F.
-        $terms = $DB->get_fieldset_select('ucla_request_classes', 'term',
-                '', array());
+        $terms = $DB->get_fieldset_select('ucla_request_classes', 'term', '',
+                array());
         foreach ($terms as $term) {
             $this->assertEquals('13F', $term);
         }
 
         // Generate a random crosslisted class.
         $param = array(array('term' => '13F'), array('term' => '13F'));
-        $createdclass = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_class($param);
+        $createdclass = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class($param);
         $this->assertFalse(empty($createdclass));
         $aftercourse = $DB->count_records('course');
         $afterrequest = $DB->count_records('ucla_request_classes');
         $afterclassinfo = $DB->count_records('ucla_reg_classinfo');
-        $this->assertEquals($numcourses+1, $aftercourse);
-        $this->assertEquals($numrequests+2, $afterrequest);
-        $this->assertEquals($numclassinfos+2, $afterclassinfo);
+        $this->assertEquals($numcourses + 1, $aftercourse);
+        $this->assertEquals($numrequests + 2, $afterrequest);
+        $this->assertEquals($numclassinfos + 2, $afterclassinfo);
         $numcourses = $aftercourse;
         $numrequests = $afterrequest;
         $numclassinfos = $afterclassinfo;
 
         // Make sure that all created courses belong to 13F.
-        $terms = $DB->get_fieldset_select('ucla_request_classes', 'term',
-                '', array());
+        $terms = $DB->get_fieldset_select('ucla_request_classes', 'term', '',
+                array());
         foreach ($terms as $term) {
             $this->assertEquals('13F', $term);
+        }
+    }
+
+    /**
+     * Test creating different types of collaboration sites.
+     */
+    public function test_create_collab() {
+        // Create each type of collaborate site.
+        $types = siteindicator_manager::get_types_list();
+        foreach ($types as $type => $info) {
+            $course = array();
+            $course['type'] = $type;
+            $collab = $this->getDataGenerator()
+                    ->get_plugin_generator('local_ucla')
+                    ->create_collab($course);
+
+            // Verify that site is the given type.
+            $site = new siteindicator_site($collab->id);
+            $this->assertEquals($type, $site->property->type);
+        }
+    }
+
+    /**
+     * Try creating a collaboration site with a nonexistant type.
+     */
+    public function test_create_collab_nonexistant() {
+        $course = array();
+        $course['type'] = 'nonexistant';
+        $collab = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_collab($course);
+
+        // Verify that site is the "test" type.
+        $site = new siteindicator_site($collab->id);
+        $this->assertEquals('test', $site->property->type);
+    }
+
+    /**
+     * Make sure that UCLA roles are created and their capabilities are copied
+     * from the appropiate archetypes.
+     */
+    public function test_create_ucla_roles() {
+        global $DB;
+
+        $roles = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_ucla_roles();
+
+        // Get role_capabilities entries from the editingteacher and student
+        // roles.
+        $editingteacherid = $DB->get_field('role', 'id',
+                        array('shortname' => 'editingteacher'));
+        $archetypes['editingteacher'] = $DB->get_records_menu('role_capabilities',
+                array('roleid' => $editingteacherid), '', 'capability, permission');
+        $studentid = $DB->get_field('role', 'id',
+                        array('shortname' => 'student'));
+        $archetypes['student'] = $DB->get_records_menu('role_capabilities',
+                array('roleid' => $studentid), '', 'capability, permission');
+
+        // Make sure roles are created and match archetype's role_capabilities
+        // settings.
+        foreach ($roles as $shortname => $roleid) {
+            // Skip student role, since we didn't create it.
+            if ($shortname == 'student') {
+                continue;
+            }
+            // Archetype is 'editingteacher' except for 'ta'
+            $archetype = 'editingteacher';
+            if ($shortname == 'ta') {
+                $archetype = 'student';
+            }
+
+            $capabilities = $DB->get_records('role_capabilities',
+                array('roleid' => $roleid));
+            foreach ($capabilities as $capability) {
+                $expectedpermission = 0;
+                if (isset($archetypes[$archetype][$capability->capability])) {
+                    $expectedpermission = $archetypes[$archetype][$capability->capability];
+                }
+                $this->assertEquals($expectedpermission, $capability->permission, 
+                        "Capability $capability->capability for archetype " .
+                        "$archetype does not match role $shortname");
+            }
         }
     }
 
@@ -304,28 +403,32 @@ class local_ucla_generator_testcase extends advanced_testcase {
      * Test creating a user.
      */
     public function test_create_user() {
-        $user = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_user();
+        $user = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
         $this->assertNotEmpty($user->username);
         $this->assertNotEmpty($user->idnumber);
 
         // Create user with predefined username and idnumbers.
         $presetuser['username'] = 'test@ucla.edu';
         $presetuser['idnumber'] = '123456789';
-        $user = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_user($presetuser);
+        $user = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user($presetuser);
         $this->assertNotEmpty($user->username);
         $this->assertNotEmpty($user->idnumber);
         $this->assertDebuggingNotCalled();
 
         // Create user with improperly predefined username and idnumbers.
         $improperusername['username'] = 'test';
-        $user = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_user($improperusername);
+        $user = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user($improperusername);
         $this->assertDebuggingCalled('Given username does not end with @ucla.edu');
         $improperidnumber['idnumber'] = '12345678';
-        $user = $this->getDataGenerator()->
-                get_plugin_generator('local_ucla')->create_user($improperidnumber);
+        $user = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user($improperidnumber);
         $this->assertDebuggingCalled('Given idnumber is not 9 digits long');
     }
 
@@ -336,12 +439,12 @@ class local_ucla_generator_testcase extends advanced_testcase {
     public function test_crosslist_courses() {
         // Get all possible combinations of non-crosslist and crosslist courses.
         $combos = array('noncrosslist' => array('noncrosslist', 'crosslist'),
-                        'crosslist'    => array('noncrosslist', 'crosslist'));
+            'crosslist' => array('noncrosslist', 'crosslist'));
 
         // Make sure we are building courses in the same term.
         $params = array('noncrosslist' => array(array('term' => '13F')),
-                        'crosslist'    => array(array('term' => '13F'),
-                                                array('term' => '13F')));
+            'crosslist' => array(array('term' => '13F'),
+                array('term' => '13F')));
         foreach ($combos as $parentparam => $childrenparams) {
             foreach ($childrenparams as $childparams) {
                 // Create new parent for each type of child.
@@ -359,7 +462,7 @@ class local_ucla_generator_testcase extends advanced_testcase {
                         ->get_plugin_generator('local_ucla')
                         ->create_class($params[$childparams]);
 
-                // Now crosslist the 2 courses
+                // Now crosslist the 2 courses.
                 $result = $this->getDataGenerator()
                         ->get_plugin_generator('local_ucla')
                         ->crosslist_courses($firstparent, $children);
@@ -374,4 +477,5 @@ class local_ucla_generator_testcase extends advanced_testcase {
             }
         }
     }
+
 }

@@ -15,15 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the event handler course_restored_dedup_default_forums for the
- * course_restored event.
+ * Tests the event handler course_restored_dedup_default_forums.
  *
  * @package    local_ucla
- * @category   phpunit
+ * @category   test
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -32,10 +30,10 @@ require_once($CFG->dirroot . '/local/ucla/eventslib.php');
 /**
  * PHPunit testcase class.
  *
- * @package    local_ucla
- * @category   phpunit
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
  */
 class course_restored_dedup_default_forums_test extends advanced_testcase {
     /**
@@ -106,10 +104,10 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
     /**
      * Make sure that duplicate forums are deleted.
      */
-    function test_duplicate_forum() {
+    public function test_duplicate_forum() {
         $totalforums = 2;   // Two default forums.
         $typecount = 1;     // Start off with 1 of each type.
-        
+
         foreach ($this->_defaultforums as $type => $defaultname) {
             $forums = $this->get_by_forums_type($type);
             $this->assertEquals($totalforums, $forums['totalforums']);
@@ -146,7 +144,7 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
     /**
      * Make sure that forums with the default name changed are not deleted.
      */
-    function test_duplicate_forum_with_defaultname_changed() {
+    public function test_duplicate_forum_with_defaultname_changed() {
         $totalforums = 2;   // Two default forums.
         $typecount = 1;     // Start off with 1 of each type.
 
@@ -188,7 +186,7 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
     /**
      * Make sure that forums with content are not deleted.
      */
-    function test_duplicate_forum_with_posts() {
+    public function test_duplicate_forum_with_posts() {
         global $USER;
         $this->setAdminUser();
         $totalforums = 2;   // Two default forums.
@@ -235,8 +233,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
     /**
      * Make sure nothing happens when we are not doing a course restore.
      */
-    function test_nonrestore() {
-        $totalforums = 2;   // Two default forums.        
+    public function test_nonrestore() {
+        $totalforums = 2;   // Two default forums.
 
         foreach ($this->_defaultforums as $type => $defaultname) {
             $typecount = 1;     // Start off with 1 of each type.

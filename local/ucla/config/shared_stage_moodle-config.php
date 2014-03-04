@@ -245,6 +245,7 @@ $CFG->forced_plugin_settings['resource']['display'] = 4;   // "Force Download"
 
 // Site administration > Plugins > Activity modules > Quiz
 $CFG->forced_plugin_settings['quiz']['overduehandling'] = 'autosubmit';
+$CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 300;
 
 // Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
@@ -301,6 +302,10 @@ $CFG->forced_plugin_settings['tool_ucladatasourcesync']['contact_email']='ccle-o
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] = 'ccle-operations@lists.ucla.edu';
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
+
+// Site administration > Plugins > Blocks > Quickmail
+$CFG->block_quickmail_allowstudents = -1;
+$CFG->block_quickmail_receipt = 1;
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';

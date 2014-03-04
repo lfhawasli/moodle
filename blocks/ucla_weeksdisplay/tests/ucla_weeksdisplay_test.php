@@ -18,15 +18,12 @@
  * Unit tests for the UCLA weeks display block.
  *
  * @package    block_ucla_weeksdisplay
+ * @category   test
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page.
-}
-
-// Make sure the code being tested is accessible.
 global $CFG;
 require_once($CFG->dirroot . '/blocks/ucla_weeksdisplay/block_ucla_weeksdisplay.php'); // Include the code to test.
 
@@ -37,13 +34,14 @@ require_once($CFG->dirroot . '/blocks/ucla_weeksdisplay/block_ucla_weeksdisplay.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ucla_session_ext extends ucla_session {
+
     /**
      * Constructor.
      * 
      * @param array $session    Term information.
      * @param string $today     Date format: YYYY-MM-DD.
      */
-    function __construct($session, $today) {
+    public function __construct($session, $today) {
         parent::__construct($session);
         $this->_today = $today;
     }
@@ -53,16 +51,19 @@ class ucla_session_ext extends ucla_session {
      *
      * @param string $today     Date format: YYYY-MM-DD.
      */
-    function update_today($today) {
+    public function update_today($today) {
         $this->_today = $today;
     }
+
 }
 
 /**
- * PHP unit test class for the UCLA weeks display block.
+ * PHPunit testcase class.
  *
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group block_ucla_weeksdisplay
  */
 class ucla_weeksdisplay_test extends advanced_testcase {
 
@@ -73,53 +74,53 @@ class ucla_weeksdisplay_test extends advanced_testcase {
      *
      * To add more tests, update this data.
      *
-     * @param type $term
+     * @param string $term
      * @return array
      */
     private function registrar_query($term) {
-        // This list was retrieved from the registrar
+        // This list was retrieved from the registrar.
         $terms = array(
             '121' => array(
                 array(
-                'term' => '121',
-                'session' => '8A',
-                'session_start' => '2012-06-25',
-                'session_end' => '2012-08-17',
-                'instruction_start' => '2012-06-25',
+                    'term' => '121',
+                    'session' => '8A',
+                    'session_start' => '2012-06-25',
+                    'session_end' => '2012-08-17',
+                    'instruction_start' => '2012-06-25',
                 ),
                 array(
-                'term' => '121',
-                'session' => '6C',
-                'session_start' => '2012-08-06',
-                'session_end' => '2012-09-14',
-                'instruction_start' => '2012-08-06',
+                    'term' => '121',
+                    'session' => '6C',
+                    'session_start' => '2012-08-06',
+                    'session_end' => '2012-09-14',
+                    'instruction_start' => '2012-08-06',
                 ),
             ),
             '12F' => array(
                 array(
-                'term' => '12F',
-                'session' => 'RG',
-                'session_start' => '2012-09-24',
-                'session_end' => '2012-12-14',
-                'instruction_start' => '2012-09-27',
+                    'term' => '12F',
+                    'session' => 'RG',
+                    'session_start' => '2012-09-24',
+                    'session_end' => '2012-12-14',
+                    'instruction_start' => '2012-09-27',
                 ),
             ),
             '13W' => array(
                 array(
-                'term' => '13W',
-                'session' => 'RG',
-                'session_start' => '2013-01-02',
-                'session_end' => '2013-03-22',
-                'instruction_start' => '2013-01-07',
+                    'term' => '13W',
+                    'session' => 'RG',
+                    'session_start' => '2013-01-02',
+                    'session_end' => '2013-03-22',
+                    'instruction_start' => '2013-01-07',
                 ),
             ),
             '13S' => array(
                 array(
-                'term' => '13S',
-                'session' => 'RG',
-                'session_start' => '2013-03-27',
-                'session_end' => '2013-06-14',
-                'instruction_start' => '2013-04-01',
+                    'term' => '13S',
+                    'session' => 'RG',
+                    'session_start' => '2013-03-27',
+                    'session_end' => '2013-06-14',
+                    'instruction_start' => '2013-04-01',
                 ),
             ),
         );
@@ -137,12 +138,12 @@ class ucla_weeksdisplay_test extends advanced_testcase {
     /**
      * Test Fall 2012 session and rolloever into winter break.
      */
-    function test_fall_2012() {
+    public function test_fall_2012() {
 
         // Fall 2012 session start.
         $today = '2012-09-24';
 
-        /// Test ability to set term.
+        // Test ability to set term.
         block_ucla_weeksdisplay::init_currentterm($today);
         $this->assertEquals('12F', get_config('', 'currentterm'));
 
@@ -155,37 +156,47 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('<div class="weeks-display label-fall">Fall 2012</div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
 
         // At the start of instruction, display week 0.
         $today = date('Y-m-d', strtotime('+3 days', strtotime($today)));
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<div class="weeks-display label-fall"><span class="session ">Fall 2012 - </span><span class="week">Week 0</span></div>',
+        $this->assertEquals('<div class="weeks-display label-fall">' .
+                '<span class="session ">Fall 2012 - </span>' .
+                '<span class="week">Week 0</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('0', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
 
         // Check Week 1.
         $today = date('Y-m-d', strtotime('+4 days', strtotime($today)));
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<div class="weeks-display label-fall"><span class="session ">Fall 2012 - </span><span class="week">Week 1</span></div>',
+        $this->assertEquals('<div class="weeks-display label-fall">' .
+                '<span class="session ">Fall 2012 - </span>' .
+                '<span class="week">Week 1</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
 
         // Check Week 10.
         $today = date('Y-m-d', strtotime('+9 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<div class="weeks-display label-fall"><span class="session ">Fall 2012 - </span><span class="week">Week 10</span></div>',
+        $this->assertEquals('<div class="weeks-display label-fall">' .
+                '<span class="session ">Fall 2012 - </span>' .
+                '<span class="week">Week 10</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('10', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
 
         // Check Finals Week.
         $today = date('Y-m-d', strtotime('+1 week', strtotime($today)));
@@ -193,11 +204,15 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $session->update();
 
         // First make sure we didn't screw up $today.
-        $this->assertEquals('Monday December 10', date('l F j', strtotime($today)));
-        $this->assertEquals('<div class="weeks-display label-fall"><span class="session ">Fall 2012 - </span><span class="week">Finals week</span></div>',
+        $this->assertEquals('Monday December 10',
+                date('l F j', strtotime($today)));
+        $this->assertEquals('<div class="weeks-display label-fall">' .
+                '<span class="session ">Fall 2012 - </span>' .
+                '<span class="week">Finals week</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('11', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
 
         // Check the switch to Winter term.. this happens at session END.
         $today = date('Y-m-d', strtotime('+5 days', strtotime($today)));
@@ -205,10 +220,13 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $session->update();
 
         // Still final's week, haven't changed terms.
-        $this->assertEquals('<div class="weeks-display label-fall"><span class="session ">Fall 2012 - </span><span class="week">Finals week</span></div>',
+        $this->assertEquals('<div class="weeks-display label-fall">' .
+                '<span class="session ">Fall 2012 - </span>' .
+                '<span class="week">Finals week</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('13W', get_config('', 'currentterm'));
 
         unset($session);
@@ -223,23 +241,24 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('<div class="weeks-display label-winter">Winter break</div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('13W,13S,131,13F', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('13W,13S,131,13F',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('13W', get_config('', 'currentterm'));
     }
 
     /**
      * Tests that the next_term() method works properly.
      */
-    function test_next_term() {
+    public function test_next_term() {
         // Setting any session, because it doesn't matter.
         $query = $this->registrar_query('12F');
-        $ucla_session = new ucla_session($query);
+        $uclasession = new ucla_session($query);
 
         // Array with input and expected output.
         $testcases = array('121' => '12F', '99F' => '00W', '11W' => '11S',
-                '13S' => '131', '92F' => '93W');
+            '13S' => '131', '92F' => '93W');
         foreach ($testcases as $term => $expected) {
-            $actual = $ucla_session->next_term($term);
+            $actual = $uclasession->next_term($term);
             $this->assertEquals($expected, $actual);
         }
     }
@@ -248,15 +267,15 @@ class ucla_weeksdisplay_test extends advanced_testcase {
      * Tests the weeks display output for summer 2012 session and rollover
      * into Fall 2012.
      */
-    function test_summer_2012() {
+    public function test_summer_2012() {
 
         // Test summer 12 sessions A & C.
         $today = '2012-06-25';
-        
+
         // Test ability to set term.
         block_ucla_weeksdisplay::init_currentterm($today);
         $this->assertEquals('121', get_config('', 'currentterm'));
-        
+
         // At start of session A.
         $query = $this->registrar_query('121');
         $session = new ucla_session_ext($query, $today);
@@ -264,42 +283,54 @@ class ucla_weeksdisplay_test extends advanced_testcase {
 
         // For this particular summer, instruction starts at same time as
         // session begins.
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, </span><span class="week">Week 1</span>',
+        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+                '</span><span class="week">Week 1</span>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('121,12F,13W,13S', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('121,12F,13W,13S',
+                get_config('local_ucla', 'active_terms'));
 
         // Start session C.
         $today = date('Y-m-d', strtotime('+6 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, </span><span class="week">Week 7</span> | <span class="session ">Summer 2012 - Session C, </span><span class="week">Week 1</span>',
+        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+                '</span><span class="week">Week 7</span> | ' .
+                '<span class="session ">Summer 2012 - Session C, </span>' .
+                '<span class="week">Week 1</span>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('7', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('121,12F,13W,13S', get_config('local_ucla', 'active_terms'));
-        
+        $this->assertEquals('121,12F,13W,13S',
+                get_config('local_ucla', 'active_terms'));
+
         // Next week.
         $today = date('Y-m-d', strtotime('+1 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
-        
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, </span><span class="week">Week 8</span> | <span class="session ">Summer 2012 - Session C, </span><span class="week">Week 2</span>',
+
+        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+                '</span><span class="week">Week 8</span> | ' .
+                '<span class="session ">Summer 2012 - Session C, </span>' .
+                '<span class="week">Week 2</span>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('8', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('121,12F,13W,13S', get_config('local_ucla', 'active_terms'));
-        
-        /// Session A end.
+        $this->assertEquals('121,12F,13W,13S',
+                get_config('local_ucla', 'active_terms'));
+
+        // Session A end.
         $today = date('Y-m-d', strtotime('+1 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
-        
-        $this->assertEquals('<span class="session ">Summer 2012 - Session C, </span><span class="week">Week 3</span>',
+
+        $this->assertEquals('<span class="session ">Summer 2012 - Session C, ' .
+                '</span><span class="week">Week 3</span>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('8', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('121,12F,13W,13S', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('121,12F,13W,13S',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('121', get_config('', 'currentterm'));
-        
+
         // Session C end.
         // This is between sessions, but the term should have been updated to
         // Fall. The updated term will be used to make the next call to the
@@ -307,40 +338,43 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today = date('Y-m-d', strtotime('+4 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
-        
-        $this->assertEquals('Summer 2012', get_config('local_ucla', 'current_week_display'));
+
+        $this->assertEquals('Summer 2012',
+                get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('121,12F,13W,13S', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('121,12F,13W,13S',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('12F', get_config('', 'currentterm'));
-        
+
         // Check that we transition over to Fall correctly an hour later.
         // To do this, we need to make a fresh registrar call.
         unset($session);
-        
+
         $today = date('Y-m-d', strtotime('+1 hour', strtotime($today)));
         $query = $this->registrar_query('12F');
         $session = new ucla_session_ext($query, $today);
         $session->update();
-        
+
         $this->assertEquals('<div class="weeks-display label-fall">Fall 2012</div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('12F,13W,13S,131', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('12F,13W,13S,131',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('12F', get_config('', 'currentterm'));
     }
-        
+
     /**
      * Test Winter 2013 session and rolloever into Spring quarter.
      */
-    function test_winter_2013() {
-        
+    public function test_winter_2013() {
+
         // Winter 2013 session start.
         $today = '2013-01-02';
-        
-        /// Test ability to set term.
+
+        // Test ability to set term.
         block_ucla_weeksdisplay::init_currentterm($today);
         $this->assertEquals('13W', get_config('', 'currentterm'));
-        
+
         // At start of session.
         $query = $this->registrar_query('13W');
         $session = new ucla_session_ext($query, $today);
@@ -350,28 +384,35 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('<div class="weeks-display label-winter">Winter 2013</div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('13W,13S,131,13F', get_config('local_ucla', 'active_terms'));
-        
+        $this->assertEquals('13W,13S,131,13F',
+                get_config('local_ucla', 'active_terms'));
+
         // Winter 2013 instruction start.
         $today = '2013-01-07';
         $session->update_today($today);
         $session->update();
-        
-        $this->assertEquals('<div class="weeks-display label-winter"><span class="session ">Winter 2013 - </span><span class="week">Week 1</span></div>',
+
+        $this->assertEquals('<div class="weeks-display label-winter">' .
+                '<span class="session ">Winter 2013 - </span>' .
+                '<span class="week">Week 1</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('1', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('13W,13S,131,13F', get_config('local_ucla', 'active_terms'));
-        
+        $this->assertEquals('13W,13S,131,13F',
+                get_config('local_ucla', 'active_terms'));
+
         // Check Week 10.
         $today = date('Y-m-d', strtotime('+9 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<div class="weeks-display label-winter"><span class="session ">Winter 2013 - </span><span class="week">Week 10</span></div>',
+        $this->assertEquals('<div class="weeks-display label-winter">' .
+                '<span class="session ">Winter 2013 - </span>' .
+                '<span class="week">Week 10</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('10', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('13W,13S,131,13F', get_config('local_ucla', 'active_terms'));
-        
+        $this->assertEquals('13W,13S,131,13F',
+                get_config('local_ucla', 'active_terms'));
+
         // Check Finals week.
         $today = date('Y-m-d', strtotime('+1 week', strtotime($today)));
         $session->update_today($today);
@@ -379,31 +420,37 @@ class ucla_weeksdisplay_test extends advanced_testcase {
 
         // Sanity check.
         $this->assertEquals('Monday March 18', date('l F j', strtotime($today)));
-        $this->assertEquals('<div class="weeks-display label-winter"><span class="session ">Winter 2013 - </span><span class="week">Finals week</span></div>',
+        $this->assertEquals('<div class="weeks-display label-winter">' .
+                '<span class="session ">Winter 2013 - </span>' .
+                '<span class="week">Finals week</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('11', get_config('local_ucla', 'current_week'));
-        $this->assertEquals('13W,13S,131,13F', get_config('local_ucla', 'active_terms'));
-        
+        $this->assertEquals('13W,13S,131,13F',
+                get_config('local_ucla', 'active_terms'));
+
         // Check Spring rollover.
         $today = date('Y-m-d', strtotime('+1 week', strtotime($today)));
         $session->update_today($today);
         $session->update();
-        
-        $this->assertEquals('13W,13S,131,13F', get_config('local_ucla', 'active_terms'));
+
+        $this->assertEquals('13W,13S,131,13F',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('13S', get_config('', 'currentterm'));
-        
+
         unset($session);
-        
+
         // Make sure Spring happens.
         $today = date('Y-m-d', strtotime('+1 hour', strtotime($today)));
         $query = $this->registrar_query('13S');
         $session = new ucla_session_ext($query, $today);
         $session->update();
-        
+
         $this->assertEquals('<div class="weeks-display label-spring">Spring 2013</div>',
                 get_config('local_ucla', 'current_week_display'));
-        $this->assertEquals('-1', get_config('local_ucla', 'current_week'));        
-        $this->assertEquals('13S,131,13F,14W', get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
+        $this->assertEquals('13S,131,13F,14W',
+                get_config('local_ucla', 'active_terms'));
         $this->assertEquals('13S', get_config('', 'currentterm'));
     }
+
 }

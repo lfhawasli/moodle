@@ -14,14 +14,14 @@ Feature: Update Office Hours Error Message for Long String
         | course 1 | C1 | srs |
     And the following ucla "enrollments" exists:
       | user | course | role |
-      | teacher1 | C1 | editingteacher |
+      | teacher1 | C1 | editinginstructor |
     And I log in as ucla "teacher1"
     And I browse to site "C1"
     And I turn editing mode on
     And I update office hours for "1, Teacher"
     Then I should see "Office hours"
 
-#  @javascript
+  @javascript
   Scenario: Update office hours with valid string
     When I fill in "officehours" with "Tuesday 1:00-2:00pm Wednesday 11:00-11:50am Thursday 2:00-3:00pm"
     And I press "Save changes"
@@ -29,7 +29,7 @@ Feature: Update Office Hours Error Message for Long String
     When I press "Continue"
     Then I should see "Tuesday 1:00-2:00pm Wednesday 11:00-11:50am Thursday 2:00-3:00pm"
 
-#  @javascript
+  @javascript
   Scenario: Attempt to update office hours with invalid string and re-enter valid string
     When I fill in "officehours" with "Tuesday 1:00pm-2:00pm Wednesday 11:00pm-11:50am Thursday 2:00pm-3:00pm"
     And I press "Save changes"

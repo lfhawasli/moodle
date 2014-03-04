@@ -12,6 +12,7 @@ if (!defined('CLI_SCRIPT')) {
 }
 
 require_once(dirname(__FILE__) . '/../../../config.php');
+global $CFG;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 ucla_require_registrar();
@@ -22,7 +23,6 @@ require_once($CFG->dirroot . '/lib/moodlelib.php');
  * Returns an array of raw CSV data from the CSV file at datasource_url.
  * 
  * @param $datasource_url The URL of the CSV data to attempt to retrieve.
- *
  */
 function get_csv_data($datasource_url) {
 

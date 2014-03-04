@@ -105,6 +105,14 @@ abstract class question_edit_form extends question_wizard_form {
 
         $this->editoroptions = array('subdirs' => 1, 'maxfiles' => EDITOR_UNLIMITED_FILES,
                 'context' => $this->context, 'collapsed' => 1);
+
+        // BEGIN UCLA MOD: CCLE-3156
+        global $CFG;
+        if ($CFG->allowobjectembed) {
+            $this->editoroptions['noclean'] = true;
+        }
+        // END UCLA MOD: CCLE-3156
+        
         $this->fileoptions = array('subdirs' => 1, 'maxfiles' => -1, 'maxbytes' => -1);
 
         $this->category = $category;

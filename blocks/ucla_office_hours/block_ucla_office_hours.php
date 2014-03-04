@@ -426,7 +426,7 @@ class block_ucla_office_hours extends block_base {
         $enrolled_or_admin = is_enrolled($context, $USER) 
                 || has_capability('moodle/course:update', $context);
       
-        $streditsummary     = get_string('editcoursetitle', 'format_ucla');
+        $streditsummary     = get_string('update', 'block_ucla_office_hours');
         $link_options = array('title' => get_string('editofficehours',
             'format_ucla'), 'class' => 'editing_instr_info');
 

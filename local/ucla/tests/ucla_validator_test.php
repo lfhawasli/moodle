@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,23 +18,22 @@
  * Unit tests for ucla_validator.
  *
  * @package    local_ucla
- * @subpackage phpunit
+ * @subpackage test
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 /**
- * UCLA validator test cases.
- * 
- * @package    local_ucla
- * @subpackage phpunit
+ * PHPunit testcase class.
+ *
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
  */
 class ucla_validator_test extends basic_testcase {
 

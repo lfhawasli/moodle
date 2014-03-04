@@ -487,4 +487,22 @@ class active_instructor_focused extends uclastats_base {
         return $points;
     }
 
+    /**
+     * Helper function to determine if a course has additional content beyond 
+     * the course shell.
+     * 
+     * @param object $course
+     * 
+     * @return boolean
+     */
+    public function has_additional_course_content($course) {
+        if ($this->score_blocks($course) || $this->score_course_comments($course)
+                || $this->score_default_forum_activity($course)
+                || $this->score_modules($course)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

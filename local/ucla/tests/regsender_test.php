@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA syllabus plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,28 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * Test the sending of syllabus information to the Registrar.
- * 
+ *
  * @package    local_ucla
- * @category   phpunit
+ * @category   test
  * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-// @todo When automatic class loading is available via Moodle 2.6, we no longer
+// TODO: When automatic class loading is available via Moodle 2.6, we no longer
 // need to include the local_ucla_regsender class, so delete it.
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
 
 /**
- * PHPunit tests for local_ucla_regsender.php. Creation of local test tables is
- * modeled after enrol_database unit tests.
+ * PHPunit testcase class.
  *
- * @package    local_ucla
- * @category   phpunit
  * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group ucla
+ * @group local_ucla
  */
 class regsender_test extends advanced_testcase {
 
@@ -45,6 +45,13 @@ class regsender_test extends advanced_testcase {
      * @var object
      */
     private $_class = null;
+
+    /**
+     * Record from the 'ucla_reg_classinfo' table.
+     *
+     * @var object
+     */
+    private $_classinfo = null;
 
     /**
      * Local copy of local_ucla_regsender to share between tests.
@@ -64,7 +71,6 @@ class regsender_test extends advanced_testcase {
         $dbman->drop_table($table);
     }
 
-    
     /**
      * Creates the 'ucla_syllabus_test' table.
      *
@@ -82,7 +88,8 @@ class regsender_test extends advanced_testcase {
         set_config('registrar_dbpass', $CFG->dbpass);
 
         if (!empty($CFG->dboptions['dbport'])) {
-            set_config('registrar_dbhost', $CFG->dbhost.':'.$CFG->dboptions['dbport']);
+            set_config('registrar_dbhost',
+                    $CFG->dbhost . ':' . $CFG->dboptions['dbport']);
         }
 
         switch (get_class($DB)) {
@@ -94,10 +101,17 @@ class regsender_test extends advanced_testcase {
                 set_config('registrar_dbtype', 'mysqli');
                 if (!empty($CFG->dboptions['dbsocket'])) {
                     $dbsocket = $CFG->dboptions['dbsocket'];
-                    if ((strpos($dbsocket, '/') === false and strpos($dbsocket, '\\') === false)) {
+                    if ((strpos($dbsocket, '/') === false and strpos($dbsocket,
+                                    '\\') === false)) {
                         $dbsocket = ini_get('mysqli.default_socket');
                     }
-                    set_config('registrar_dbtype', 'mysqli://'.rawurlencode($CFG->dbuser).':'.rawurlencode($CFG->dbpass).'@'.rawurlencode($CFG->dbhost).'/'.rawurlencode($CFG->dbname).'?socket='.rawurlencode($dbsocket));
+                    set_config('registrar_dbtype',
+                            'mysqli://' .
+                            rawurlencode($CFG->dbuser) . ':' .
+                            rawurlencode($CFG->dbpass) . '@' .
+                            rawurlencode($CFG->dbhost) . '/' .
+                            rawurlencode($CFG->dbname) . '?socket=' .
+                            rawurlencode($dbsocket));
                 }
                 break;
 
@@ -107,11 +121,13 @@ class regsender_test extends advanced_testcase {
 
             case 'pgsql_native_moodle_database':
                 set_config('registrar_dbtype', 'postgres7');
-                if (!empty($CFG->dboptions['dbsocket']) and ($CFG->dbhost === 'localhost' or $CFG->dbhost === '127.0.0.1')) {
+                if (!empty($CFG->dboptions['dbsocket']) and ($CFG->dbhost ===
+                        'localhost' or $CFG->dbhost === '127.0.0.1')) {
                     if (strpos($CFG->dboptions['dbsocket'], '/') !== false) {
-                      set_config('registrar_dbhost', $CFG->dboptions['dbsocket']);
+                        set_config('registrar_dbhost',
+                                $CFG->dboptions['dbsocket']);
                     } else {
-                      set_config('registrar_dbhost', '');
+                        set_config('registrar_dbhost', '');
                     }
                 }
                 break;
@@ -121,7 +137,7 @@ class regsender_test extends advanced_testcase {
                 break;
 
             default:
-                throw new exception('Unknown database driver '.get_class($DB));
+                throw new exception('Unknown database driver ' . get_class($DB));
         }
 
         // NOTE: It is stongly discouraged to create new tables in
@@ -130,17 +146,28 @@ class regsender_test extends advanced_testcase {
         // the tests.
 
         $table = new xmldb_table('ucla_syllabus_test');
-        $table->add_field('term_cd', XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, null, null);
-        $table->add_field('subj_area_cd', XMLDB_TYPE_CHAR, '7', null, XMLDB_NOTNULL, null, null, 'term_cd');
-        $table->add_field('crs_catlg_no', XMLDB_TYPE_CHAR, '8', null, XMLDB_NOTNULL, null, null, 'subj_area_cd');
-        $table->add_field('sect_no', XMLDB_TYPE_CHAR, '6', null, XMLDB_NOTNULL, null, null, 'crs_catlg_no');
-        $table->add_field('term_seq_num', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sect_no');
-        $table->add_field('public_syllabus_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'term_seq_num');
-        $table->add_field('private_syllabus_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'term_seq_num');
-        $table->add_field('protect_syllabus_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'term_seq_num');
-        $table->add_field('update_timestamp', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'protect_syllabus_url');
-        $table->add_field('comments', XMLDB_TYPE_CHAR, '1200', null, null, null, null, 'update_timestamp');
-        $table->add_key('key', XMLDB_KEY_PRIMARY, array('term_cd', 'subj_area_cd', 'crs_catlg_no', 'sect_no'));
+        $table->add_field('term_cd', XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL,
+                null, null, null);
+        $table->add_field('subj_area_cd', XMLDB_TYPE_CHAR, '7', null,
+                XMLDB_NOTNULL, null, null, 'term_cd');
+        $table->add_field('crs_catlg_no', XMLDB_TYPE_CHAR, '8', null,
+                XMLDB_NOTNULL, null, null, 'subj_area_cd');
+        $table->add_field('sect_no', XMLDB_TYPE_CHAR, '6', null, XMLDB_NOTNULL,
+                null, null, 'crs_catlg_no');
+        $table->add_field('term_seq_num', XMLDB_TYPE_INTEGER, '10', null, null,
+                null, null, 'sect_no');
+        $table->add_field('public_syllabus_url', XMLDB_TYPE_CHAR, '255', null,
+                null, null, null, 'term_seq_num');
+        $table->add_field('private_syllabus_url', XMLDB_TYPE_CHAR, '255', null,
+                null, null, null, 'term_seq_num');
+        $table->add_field('protect_syllabus_url', XMLDB_TYPE_CHAR, '255', null,
+                null, null, null, 'term_seq_num');
+        $table->add_field('update_timestamp', XMLDB_TYPE_CHAR, '20', null, null,
+                null, null, 'protect_syllabus_url');
+        $table->add_field('comments', XMLDB_TYPE_CHAR, '1200', null, null, null,
+                null, 'update_timestamp');
+        $table->add_key('key', XMLDB_KEY_PRIMARY,
+                array('term_cd', 'subj_area_cd', 'crs_catlg_no', 'sect_no'));
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
@@ -148,7 +175,32 @@ class regsender_test extends advanced_testcase {
         $this->assertTrue($dbman->table_exists($table));
 
         // Set syllabus table.
-        set_config('regsyllabustable', $CFG->prefix . $table->getName(), 'local_ucla');
+        set_config('regsyllabustable', $CFG->prefix . $table->getName(),
+                'local_ucla');
+    }
+
+    /**
+     * Helper method to check if the event queue is clear of UCLA syllabus
+     * events.
+     *
+     * @param boolean $isclear  If true, will assert that queue is clear.
+     *                          If false, will assert otherwise.
+     */
+    private function is_event_queue_clear($isclear) {
+        global $DB;
+        // Make sure there are events in the queue.
+        $eventsql = "SELECT  qh.*
+                FROM    {events_queue_handlers} qh
+                JOIN    {events_handlers} h ON (qh.handlerid = h.id)
+                WHERE   (h.eventname=? OR h.eventname=?)";
+        $eventparams = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
+        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
+
+        if ($isclear) {
+            $this->assertFalse($existingevents);
+        } else {
+            $this->assertTrue($existingevents);
+        }
     }
 
     /**
@@ -165,13 +217,13 @@ class regsender_test extends advanced_testcase {
         // actually is and we cannot use $this->_class, since it hasn't been
         // created when this method via setUp() is called.
         $link = (new moodle_url('/local/ucla_syllabus/index.php',
-                    array('id' => SITEID)))->out();
+                array('id' => SITEID)))->out();
 
         // Return an array of all the possible combinations of public, private,
         // and protect set or unset.
         $combos = $this->getDataGenerator()
-                       ->get_plugin_generator('local_ucla')
-                       ->power_set(local_ucla_regsender::$syllabustypes, 0);
+                ->get_plugin_generator('local_ucla')
+                ->power_set(local_ucla_regsender::$syllabustypes, 0);
 
         foreach ($combos as $index => $combo) {
             // For each combo set, build the return array consistenting of the
@@ -209,8 +261,11 @@ class regsender_test extends advanced_testcase {
         $this->preventResetByRollback();
 
         $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
-                                           ->create_class(array());
+                ->create_class(array());
         $this->_class = array_pop($course);
+
+        $classinfos = ucla_get_course_info($this->_class->courseid);
+        $this->_classinfo = array_pop($classinfos);
 
         $this->_local_ucla_regsender = new local_ucla_regsender();
     }
@@ -226,6 +281,36 @@ class regsender_test extends advanced_testcase {
     }
 
     /**
+     * Make sure that event handler doesn't try to send syllabus links for 
+     * collaboration sites.
+     */
+    public function test_collab_sites() {
+        $collab = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_collab(array('type' => 'instruction'));
+
+        $course = get_course($collab->id);
+        $syllabusmanager = new ucla_syllabus_manager($course);
+        $this->setAdminUser();  // Generator requires user to be set.
+        // For given course, create a public syllabus.
+        $syllabus = new stdClass();
+        $syllabus->courseid = $collab->id;
+        $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
+        $syllabus = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla_syllabus')
+                ->create_instance($syllabus);
+
+        // Trigger event and make sure nothing remains in queue.
+        events_cron('ucla_syllabus_added');
+        $this->is_event_queue_clear(true);
+
+        // Delete course and make sure that event queue is clear.
+        delete_course($collab->id);
+        events_cron('ucla_syllabus_deleted');
+        $this->is_event_queue_clear(true);
+    }
+
+    /**
      * Make sure that get_recent_syllabus_links returns the appropiate number
      * of rows.
      */
@@ -238,9 +323,9 @@ class regsender_test extends advanced_testcase {
 
         // Create 5 courses with syllabi.
         $numcourses = 5;
-        for ($i=0; $i<$numcourses; $i++) {
+        for ($i = 0; $i < $numcourses; $i++) {
             $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
-                                               ->create_class(array());
+                    ->create_class(array());
             $class = array_pop($course);
             $courseid = $class->courseid;
 
@@ -263,7 +348,7 @@ class regsender_test extends advanced_testcase {
         $results = $this->_local_ucla_regsender->get_recent_syllabus_links($numcourses);
         $this->assertEquals($numcourses, count($results));
 
-        $lesser = $numcourses - rand(1, $numcourses-1);
+        $lesser = $numcourses - rand(1, $numcourses - 1);
         $results = $this->_local_ucla_regsender->get_recent_syllabus_links($lesser);
         $this->assertEquals($lesser, count($results));
 
@@ -296,7 +381,8 @@ class regsender_test extends advanced_testcase {
         $courseid = $this->_class->courseid;
 
         // Call setter.
-        $result = $this->_local_ucla_regsender->set_syllabus_links($courseid, $links);
+        $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+                $links);
         $this->assertEquals(local_ucla_regsender::SUCCESS, $result);
 
         // Make sure the getter matches the input.
@@ -304,7 +390,7 @@ class regsender_test extends advanced_testcase {
 
         foreach ($links as $type => $link) {
             $this->assertEquals($results[$this->_class->term]
-                    [$this->_class->srs][$type.'_syllabus_url'], $link);
+                    [$this->_class->srs][$type . '_syllabus_url'], $link);
         }
     }
 
@@ -317,7 +403,7 @@ class regsender_test extends advanced_testcase {
         $courseid = $this->_class->courseid;
 
         $courselink = (new moodle_url('/local/ucla_syllabus/index.php',
-                    array('id' => $courseid)))->out();
+                array('id' => $courseid)))->out();
 
         // First set public link.
         $links['public'] = $courselink;
@@ -351,9 +437,9 @@ class regsender_test extends advanced_testcase {
 
         // Seed initial value of links to update.
         $sitelink = (new moodle_url('/local/ucla_syllabus/index.php',
-                    array('id' => SITEID)))->out();
+                array('id' => SITEID)))->out();
         $courselink = (new moodle_url('/local/ucla_syllabus/index.php',
-                    array('id' => $courseid)))->out();
+                array('id' => $courseid)))->out();
 
         /* Testing the following scenarios:
          * 1) URL on same server. Should be able to change or erase it.
@@ -400,7 +486,6 @@ class regsender_test extends advanced_testcase {
         $course = get_course($courseid);
         $syllabusmanager = new ucla_syllabus_manager($course);
         $this->setAdminUser();  // Generator requires user to be set.
-
         // For given course, create a public syllabus.
         $syllabus = new stdClass();
         $syllabus->courseid = $courseid;
@@ -421,7 +506,8 @@ class regsender_test extends advanced_testcase {
 
         // Now convert this syllabus to a private syllabus, which will trigger
         // an delete and add event.
-        $syllabusmanager->convert_syllabus($syllabus, UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE);
+        $syllabusmanager->convert_syllabus($syllabus,
+                UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE);
         events_cron('ucla_syllabus_deleted');
         events_cron('ucla_syllabus_added');
         $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
@@ -441,18 +527,11 @@ class regsender_test extends advanced_testcase {
         $publicyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
         $syllabusmanager->delete_syllabus($publicyllabus);
         // Make sure there are events in the queue.
-        $sql = "SELECT  qh.*
-                FROM    {events_queue_handlers} qh
-                JOIN    {events_handlers} h ON (qh.handlerid = h.id)
-                WHERE   (h.eventname=? OR h.eventname=?)";
-        $params = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
-        $result = $DB->record_exists_sql($sql, $params);
-        $this->assertTrue($result);
+        $this->is_event_queue_clear(false);
         events_cron('ucla_syllabus_added');
         events_cron('ucla_syllabus_deleted');
         // Make sure there are no more events in the queue.
-        $result = $DB->record_exists_sql($sql, $params);
-        $this->assertFalse($result);
+        $this->is_event_queue_clear(true);
 
         // Now add a syllabus that requires someone to login to view.
         $syllabus = new stdClass();
@@ -469,10 +548,19 @@ class regsender_test extends advanced_testcase {
 
         // Delete course and make sure that syllabi are wiped out.
         delete_course($courseid);
-        events_cron('ucla_syllabus_deleted');        
-        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
-        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
-        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
-        $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
+        events_cron('ucla_course_deleted');
+        events_cron('ucla_syllabus_deleted');
+        // Make sure there are no more events in the queue.
+        $this->is_event_queue_clear(true);
+        // Need to get syllabi links via classinfo, because course is deleted.
+        $links = $this->_local_ucla_regsender
+                ->get_syllabus_link(
+                $this->_classinfo->term, $this->_classinfo->subj_area,
+                $this->_classinfo->crsidx, $this->_classinfo->classidx);
+        $this->assertNotEmpty($links);
+        $this->assertEmpty($links['public_syllabus_url']);
+        $this->assertEmpty($links['protect_syllabus_url']);
+        $this->assertEmpty($links['private_syllabus_url']);
     }
+
 }

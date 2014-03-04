@@ -1,5 +1,5 @@
 <?php
-
+global $CFG;
 include_once($CFG->dirroot.'/local/publicprivate/lib/module_exception.class.php');
 include_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
 include_once($CFG->dirroot.'/local/publicprivate/lib/site.class.php');
