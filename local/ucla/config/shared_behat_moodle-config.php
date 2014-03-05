@@ -302,7 +302,11 @@ $CFG->forced_plugin_settings['tool_ucladatasourcesync']['contact_email']='ccle-o
 
 // Site administration > Plugins > Blocks > i>clicker Moodle integrate
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] = 'ccle-operations@lists.ucla.edu';
-$CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing 
+$CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
+
+// Site administration > Plugins > Blocks > Respondus LockDown Browser
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = __DIR__."/../../../"."blocks/lockdownbrowser/customscripts";
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
@@ -441,7 +445,8 @@ $CFG->behat_extraallowedsettings = array(
     'allowcoursethemes',                    // Required for 'course edit' to work
     'forcedefaultmymoodle',                 // Experimental
     'debug',
-    'debugdisplay'
+    'debugdisplay',
+    'customscripts'                         // Make sure Respondus doesn't break core quiz.
 );
 
 $CFG->behat_config = array(
