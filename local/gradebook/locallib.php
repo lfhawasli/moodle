@@ -33,8 +33,10 @@ final class grade_reporter {
     public static function get_instance() {
         if (self::$_instance === NULL) {
             global $CFG;
-            $settings = array('exceptions' => true);
-  
+            // Fixing coding issues between UTF8 and Windows encoding.
+            // See http://stackoverflow.com/a/12551101/6001 for more info.
+            $settings = array('exceptions' => true, 'encoding' => 'ISO-8859-1');
+
             //Careful - can raise exceptions
             self::$_instance = new SoapClient($CFG->gradebook_webservice, $settings);
         }
