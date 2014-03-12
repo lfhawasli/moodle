@@ -36,6 +36,13 @@ function qanda_show_entry_qanda($course, $cm, $qanda, $entry, $mode = "", $hook 
 
         echo html_writer::start_tag('div', array('class' => 'user-information'));
         echo get_string("created", "qanda") . ': ' . userdate($entry->timecreated);
+        
+        $context = context_module::instance($cm->id);
+        if(has_capability('moodle/site:viewfullnames', $context)){
+            echo html_writer::empty_tag('br');
+            echo get_string("postby", "qanda") . ': ' .$entry->fullname . ' (' . $entry->useremail.')';
+        }
+        
         echo html_writer::end_tag('div');
 
         echo html_writer::end_tag('div');
