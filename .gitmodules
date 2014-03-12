@@ -31,3 +31,9 @@
 [submodule "admin/tool/behatui"]
 	path = admin/tool/behatui
 	url = https://github.com/marinaglancy/moodle-tool_behatui
+[submodule "mod/hotpot"]
+	path = mod/hotpot
+	url = https://github.com/gbateson/moodle-mod_hotpot.git
+[submodule "question/format/hotpot"]
+	path = question/format/hotpot
+	url = https://github.com/gbateson/moodle-qformat_hotpot.git
