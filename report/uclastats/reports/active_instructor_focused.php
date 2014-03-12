@@ -64,7 +64,7 @@ class active_instructor_focused extends uclastats_base {
      * @return array            Returns an array of default block names.
      */
     private function get_default_blocks($format) {
-        global $CFG;
+        global $CFG, $DB;
 
         static $defaultblockcache = array();
         if (!isset($defaultblockcache[$format])) {
@@ -75,20 +75,18 @@ class active_instructor_focused extends uclastats_base {
                 $blocknames = blocks_parse_default_blocks_list($CFG->$defaultblocks);
 
             } else {
-                $formatconfig = $CFG->dirroot.'/course/format/'.$course->format.'/config.php';
-                $format = array();
-                if (is_readable($formatconfig)) {
-                    include($formatconfig);
-                }
-                if (!empty($format['defaultblocks'])) {
-                    $blocknames = blocks_parse_default_blocks_list($format['defaultblocks']);
-                } else if (!empty($CFG->defaultblocks)) {
-                    $blocknames = blocks_parse_default_blocks_list($CFG->defaultblocks);
-                } else {
-                    $blocknames = array(
-                        BLOCK_POS_LEFT => array(),
-                        BLOCK_POS_RIGHT => array('search_forums', 'news_items', 'calendar_upcoming', 'recent_activity')
-                    );
+                $course = $DB->get_record('course', array('format'=>$format), '*', IGNORE_MULTIPLE);
+                
+                $blocknames = course_get_format($course)->get_default_blocks();
+                if (empty($blocknames)) {
+                    if (!empty($CFG->defaultblocks)) {
+                        $blocknames = blocks_parse_default_blocks_list($CFG->defaultblocks);
+                    } else {
+                        $blocknames = array(
+                            BLOCK_POS_LEFT => array(),
+                            BLOCK_POS_RIGHT => array('search_forums', 'news_items', 'calendar_upcoming', 'recent_activity')
+                        );
+                    }
                 }
             }
 
@@ -378,7 +376,7 @@ class active_instructor_focused extends uclastats_base {
             // Check if Registrar information matches.
             foreach ($classinfos as $classinfo) {
                 if ($classinfo->crs_desc == $course->summary ||
-                        $classinfo->crs_desc == $course->summary) {
+                        $classinfo->crs_desc == $course->summary) {        
                     $foundmatch = true;
                     break;
                 }
@@ -404,8 +402,9 @@ class active_instructor_focused extends uclastats_base {
     private function score_default_forum_activity($course) {
         global $CFG, $DB;
 
+        // Note editingteacher is there only for Behat tests.
         $instructingroles = array('editinginstructor', 'supervising_instructor',
-            'ta_instructor', 'ta_admin', 'ta');
+            'ta_instructor', 'ta_admin', 'ta', 'editingteacher');
         list($insql, $params) = $DB->get_in_or_equal($instructingroles, SQL_PARAMS_NAMED);
         $params['courseid'] = $course->id;
 
@@ -424,6 +423,7 @@ class active_instructor_focused extends uclastats_base {
                         (f.type='general' AND f.name='Discussion forum')) AND
                         fp.userid=ra.userid AND
                         r.shortname " . $insql;
+        
         $points = $DB->count_records_sql($sql, $params);
 
         return $points;
