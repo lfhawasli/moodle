@@ -28,7 +28,7 @@ $string['uclastats:query'] = 'Run UCLA stats console queries';
 $string['uclastats:manage'] = 'Manage UCLA stats console cached queries (delete or lock results)';
 
 $string['parameters'] = 'Parameters: {$a}';
-$string['lastran'] = 'Last ran by {$a->who} on {$a->when}';
+$string['lastrun'] = 'Last run by {$a->who} on {$a->when}';
 
 // Report strings.
 $string['index_welcome'] = 'Please select a report.';
@@ -50,7 +50,7 @@ $string['enddate'] = 'End date';
 $string['cached_results_table'] = 'Cached results';
 $string['header_param'] = 'Parameters';
 $string['header_results'] = 'Results';
-$string['header_lastran'] = 'Last ran';
+$string['header_lastrun'] = 'Last ran';
 $string['header_actions'] = 'Actions';
 $string['view_results'] = 'View results';
 $string['lock_results'] = 'Lock';
@@ -108,6 +108,7 @@ $string['course_hits'] = 'Total student views';
 $string['course_student_percent'] = 'Students visiting site';
 $string['course_files'] = 'Resource files';
 $string['course_size'] = 'Resource file size (MB)';
+$string['course_quizzes'] = 'Quizzes';
 $string['course_syllabus'] = 'Syllabus';
 
 // Strings for system_size_report.
