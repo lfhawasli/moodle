@@ -134,6 +134,41 @@ $system-header-color:   $prod-header-color;
             margin-top: 0;
         }
     }
+    
+    @include respond-to(tablets) {
+        margin-bottom: 8px;
+
+        .login {
+            background-color: #233e6a;
+        }
+        .env-dev & {
+            .login {
+                /*font-size: 1.8rem;*/
+                background-color: #276824;
+            }
+        }
+        .env-test & {
+            .login {
+                /*font-size: 1.8rem;*/
+                background-color: #854d10;
+            }
+        }
+        .env-stage & {
+            .login {
+                /*font-size: 1.8rem;*/
+                background-color: #660f5e;
+            }
+        }
+        
+        .login:hover {
+            color: #4168A1;
+            background-color: white;
+
+            transition-property: background-color, color;
+            transition-duration: 0.25s;
+            transition-timing-function: ease-out;
+        }
+    }
 }
 
 //
