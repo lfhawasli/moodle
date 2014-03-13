@@ -254,6 +254,10 @@ class block_ucla_course_menu extends block_navigation {
             if(!$section->visible) {
                 $elements[$key]->classes = array('block_ucla_course_menu_hidden');
             }
+            // Check that section contains activities
+            if (!empty($section->sequence)) {
+                $elements[$key]->classes = array('activities');
+            }
         }
 
         // Create view-all section link
