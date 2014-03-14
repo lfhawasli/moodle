@@ -5,3 +5,4 @@ Allow: /theme/uclashared/view.php?page=privacy
 Allow: /course/view/aboutccle
 Allow: /course/view.php?id=110
 Allow: /blocks/ucla_browseby/
+Allow: /calendar/export_execute.php
