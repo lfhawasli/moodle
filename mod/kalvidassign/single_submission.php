@@ -16,8 +16,7 @@
 /**
  * Kaltura video assignment single submission page
  *
- * @package    mod
- * @subpackage kalvidassign
+ * @package    mod_kalvidassign
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -49,9 +48,12 @@ $url = new moodle_url('/mod/kalvidassign/single_submission.php');
 $url->params(array('cmid' => $id,
                    'userid' => $userid));
 
+$context = context_module::instance($cm->id);
+
 $PAGE->set_url($url);
 $PAGE->set_title(format_string($kalvidassignobj->name));
 $PAGE->set_heading($course->fullname);
+$PAGE->set_context($context);
 
 $previousurl = new moodle_url('/mod/kalvidassign/grade_submissions.php',
                               array('cmid' => $cm->id,
@@ -60,8 +62,6 @@ $previousurl = new moodle_url('/mod/kalvidassign/grade_submissions.php',
                                     'page' => $page));
 $prevousurlstring = get_string('singlesubmissionheader', 'kalvidassign');
 $PAGE->navbar->add($prevousurlstring, $previousurl);
-
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
 require_capability('mod/kalvidassign:gradesubmission', $context);
 
@@ -251,3 +251,5 @@ echo $OUTPUT->heading($pageheading.': '.fullname($user));
 $submissionform->set_data($formdata);
 
 $submissionform->display();
+
+echo $OUTPUT->footer();

@@ -117,7 +117,12 @@ div.mymedia.video.name {
 
 /* Progress bar */
 #progress_bar_container {
-    float: left;
+    width: 100%;
+    padding-left: 10px;
+    padding-right:10px;
+    visibility: hidden;
+    display: block;
+    padding-top: 10px;
 }
 
 #slider_border {
@@ -148,4 +153,9 @@ div.mymedia.video.name {
 
 .yui3-tabview-panel #metadata, .yui3-tabview-panel #preview {
     height:450px; width:490px;
+}
+
+.mymedia .col_0 .paging {
+    display: inline;
+    margin-left: 2%;
 }

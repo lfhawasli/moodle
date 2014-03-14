@@ -29,6 +29,7 @@ require_login();
 global $SESSION, $USER;
 
 $page          = optional_param('page', 0, PARAM_INT);
+$sort          = optional_param('sort', 'recent', PARAM_TEXT);
 $simple_search = '';
 $videos        = 0;
 
@@ -133,11 +134,13 @@ if ($enabled) {
             $per_page = MYMEDIA_ITEMS_PER_PAGE;
         }
 
+        $SESSION->mymediasort = $sort;
+
         // Check if the sesison data is set
         if (isset($SESSION->mymedia) && !empty($SESSION->mymedia)) {
-            $videos = repository_kaltura_search_mymedia_videos($connection, $SESSION->mymedia, $page + 1, $per_page);
+            $videos = repository_kaltura_search_mymedia_videos($connection, $SESSION->mymedia, $page + 1, $per_page, $sort);
         } else {
-            $videos = repository_kaltura_search_mymedia_videos($connection, '', $page + 1, $per_page);
+            $videos = repository_kaltura_search_mymedia_videos($connection, '', $page + 1, $per_page, $sort);
         }
 
         $total = $videos->totalCount;
@@ -150,7 +153,7 @@ if ($enabled) {
             $page = $OUTPUT->paging_bar($total,
                                         $page,
                                         $per_page,
-                                        new moodle_url('/local/mymedia/mymedia.php'));
+                                        new moodle_url('/local/mymedia/mymedia.php', array('sort' => $sort)));
 
 
             echo $renderer->create_options_table_upper($page, $partner_id, $login_session);
@@ -162,7 +165,7 @@ if ($enabled) {
         } else {
             add_to_log(SITEID, 'local_mymedia', 'View - no videos', '', 'no videos');
 
-            echo $renderer->create_options_table_upper($page);
+            echo $renderer->create_options_table_upper($page, $partner_id, $login_session);
 
             echo '<center>'. get_string('no_videos', 'local_mymedia') . '</center>';
 
