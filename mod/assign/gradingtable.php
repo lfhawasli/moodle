@@ -347,6 +347,37 @@ class assign_grading_table extends table_sql implements renderable {
             $this->no_sorting('teamstatus');
         }
 
+        // START UCLA MOD: CCLE-4292 - Collapse Default Columns for Assignment Grading
+        global $SESSION;
+        $collapse = get_config('local_ucla','collapsedefaultcolumns');
+        
+        if ($collapse){
+            if (!isset($SESSION->flextable)) {
+                $SESSION->flextable = array();
+            }
+            
+            if (!isset($SESSION->flextable[$this->uniqueid])) {
+                $SESSION->flextable[$this->uniqueid] = new stdClass;
+                $SESSION->flextable[$this->uniqueid]->uniqueid = $this->uniqueid;
+                $SESSION->flextable[$this->uniqueid]->collapse = array();
+                $SESSION->flextable[$this->uniqueid]->sortby = array();
+                $SESSION->flextable[$this->uniqueid]->i_first = '';
+                $SESSION->flextable[$this->uniqueid]->i_last = '';
+                $SESSION->flextable[$this->uniqueid]->textsort = array();
+            }
+            
+            $sess = &$SESSION->flextable[$this->uniqueid];
+            $columns = ['idnumber', 'email', 'picture'];
+
+            // collapse id number, email, and picture columns
+            foreach( $columns as &$col ) {
+                if (!isset($sess->collapse[$col])) {
+                    $sess->collapse[$col] = true;
+                }
+            }
+        }
+        // END UCLA MOD: CCLE-4292
+        
         $plugincolumnindex = 0;
         foreach ($this->assignment->get_submission_plugins() as $plugin) {
             if ($plugin->is_visible() && $plugin->is_enabled() && $plugin->has_user_summary()) {
