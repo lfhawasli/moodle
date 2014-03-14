@@ -139,24 +139,21 @@ $system-header-color:   $prod-header-color;
         margin-bottom: 8px;
 
         .login {
-            background-color: #233e6a;
+            background-color: darken($prod-header-color, 15%);
         }
         .env-dev & {
             .login {
-                /*font-size: 1.8rem;*/
-                background-color: #276824;
+                background-color: darken($dev-header-color, 15%);
             }
         }
         .env-test & {
             .login {
-                /*font-size: 1.8rem;*/
-                background-color: #854d10;
+                background-color: darken($test-header-color, 15%);
             }
         }
         .env-stage & {
             .login {
-                /*font-size: 1.8rem;*/
-                background-color: #660f5e;
+                background-color: darken($stage-header-color, 15%);;
             }
         }
         
