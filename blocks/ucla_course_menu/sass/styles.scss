@@ -80,18 +80,17 @@ $site-menu-hover-color:         #fcfcfc;
                     padding:  8px;
                 }
 
-                // Add '>' glyphicon ONLY when section 
-                // contains activities.
-                .activities.leaf:after {
+                // Add '>' glyphicon ONLY when section contains content.
+                .hascontent.leaf:after {
                     @include glyphicon("\e080");
                     float: right;
                     color: #ccc;
                     vertical-align: middle;
                     line-height: 1.2
                 }
-                // Color the '>' icon blue when active
+                // Color the '>' icon blue when active and has content.
                 &.current_branch  {
-                    .leaf:after {
+                    .hascontent.leaf:after {
                         @include glyphicon("\e080");
                         float: right;
                         color: $ccle-blue;
