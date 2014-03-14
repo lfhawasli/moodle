@@ -71,8 +71,10 @@ class behat_ucla extends behat_base {
         // Set term.
         set_config('currentterm', '14W');
         set_config('forcedefaultmymoodle', 1);
-        // Add the gradebook report config.
+        // Additional config variables
         set_config('grader_report_grouping_filter', 1);
+        set_config('collapsesubmissionstatus', 1, 'local_ucla');
+        
         // Some settings need to be active immediately.
         $CFG->enablepublicprivate = 1;
         $CFG->enablegroupmembersonly = true;
