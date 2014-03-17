@@ -71,10 +71,15 @@ class behat_ucla extends behat_base {
         // Set term.
         set_config('currentterm', '14W');
         set_config('forcedefaultmymoodle', 1);
-        // Additional config variables
+
+        // Gradebook config variables.
         set_config('grader_report_grouping_filter', 1);
         set_config('collapsesubmissionstatus', 1, 'local_ucla');
-        
+        set_config('collapsedefaultcolumns', 1, 'local_ucla');
+
+        // Set other configs.
+        set_config('showuseridentity', 'idnumber,email');
+
         // Some settings need to be active immediately.
         $CFG->enablepublicprivate = 1;
         $CFG->enablegroupmembersonly = true;
@@ -358,6 +363,22 @@ class behat_ucla extends behat_base {
             self::$generator = new local_ucla_generator();
         }
         return self::$generator;
+    }
+    
+    /**
+     * Adds an assignment filling the form data with the specified field/value pairs.
+     * 
+     * @Given /^I add an assignment and fill the form with:$/
+     * @param TableNode $data The assignment field/value data
+     */
+    public function i_add_an_assignment_and_fill_the_form_with(TableNode $data) {
+        return array(
+            new Given('I follow "' . get_string('addresourceoractivity') . '"'),
+            new Given ('I select "Assignment" radio button'),
+            new Given('I press "Add"'),
+            new Given('I fill the moodle form with:', $data),
+            new Given('I press "' . get_string('savechangesanddisplay') . '"')
+        );
     }
 
 }

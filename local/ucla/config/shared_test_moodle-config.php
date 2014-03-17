@@ -472,6 +472,9 @@ $CFG->grader_report_grouping_filter = 1;
 // CCLE-4299 - Improve Assignment Grading Screen
 $CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 
+// CCLE-4292 - Collapse Default Columns for Assignment Grading
+$CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = true;
+
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
 
