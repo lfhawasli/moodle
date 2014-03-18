@@ -26,7 +26,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 require_once(__DIR__ . '/../../../../local/ucla/tests/behat/behat_ucla.php');
 
-use Behat\Behat\Context\Step\Given as Given;
+use Behat\Behat\Context\Step\When as When;
 
 /**
  * Behat step class.
@@ -40,13 +40,13 @@ class behat_ucla_course_menu extends behat_base {
     /**
      * Shortcut for clicking links in the UCLA site menu block.
      *
-     * @Given /^I click on the "([^"]*)" section in the ucla site menu$/
+     * @When /^I follow the "([^"]*)" section in the ucla site menu$/
      *
      * @param string $section
      */
-    public function i_click_on_site_menu_section($section) {
+    public function i_follow_site_menu_section($section) {
         return array(
-            new Given('I click on "' . $section . '" "link" in the ".block_ucla_course_menu" "css_element"')
+            new When('I click on "' . $section . '" "link" in the ".block_ucla_course_menu" "css_element"')
         );
     }
 

@@ -7,14 +7,14 @@ Feature: Assignment Grading Submission Status Table Collapse
   @javascript
   Scenario: An instructor grades an assignment and is able to expand and collapse
             fields in the submission status
-    Given I am in a ucla environment
-    Given the following "courses" exists:
+      Given I am in a ucla environment
+      And the following "courses" exists:
         | fullname | shortname | category | groupmode |
         | Course 1 | C1 | 0 | 1 |
       And the following "users" exists:
         | username | firstname | lastname | email |
-        | teacher1 | Teacher | 1 | teacher1@asd.com |
-        | student1 | Student | 1 | student1@asd.com |
+        | teacher1 | Teacher | T1 | teacher1@asd.com |
+        | student1 | Student | S1 | student1@asd.com |
       And the following "course enrolments" exists:
         | user | course | role |
         | teacher1 | C1 | editingteacher |
@@ -46,7 +46,7 @@ Feature: Assignment Grading Submission Status Table Collapse
       And I follow "Course 1"
       And I follow "Test assignment name"
       And I follow "View/grade all submissions"
-      And I click on "Grade 1, Student" "link"
+      And I click on "Grade S1, Student" "link"
       Then I should see "Submission status" in the "submissionsummarytable" "block"
       And I should see "Grading status" in the "submissionsummarytable" "block"
       And I should see "File submissions" in the "submissionsummarytable" "block"

@@ -72,10 +72,11 @@ class behat_ucla extends behat_base {
         set_config('currentterm', '14W');
         set_config('forcedefaultmymoodle', 1);
 
-        // Gradebook config variables.
+        // Grading config variables.
         set_config('grader_report_grouping_filter', 1);
-        set_config('collapsesubmissionstatus', 1, 'local_ucla');
         set_config('collapsedefaultcolumns', 1, 'local_ucla');
+        set_config('collapsesubmissionstatus', 1, 'local_ucla');
+//        set_config('defaultassignquickgrading', 1, 'local_ucla');
 
         // Set other configs.
         set_config('showuseridentity', 'idnumber,email');

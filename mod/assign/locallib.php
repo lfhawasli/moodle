@@ -2887,10 +2887,11 @@ class assign {
         $filter = get_user_preferences('assign_filter', '');
         $controller = $gradingmanager->get_active_controller();
         $showquickgrading = empty($controller);
-        // BEGIN UCLA MOD CCLE-4297
-        // $quickgrading = get_user_preferences('assign_quickgrading', false);
-        $quickgrading = get_user_preferences('assign_quickgrading', true);
-        // END UCLA MOD CCLE-4297
+        // START UCLA MOD: CCLE-4297 - Have "quick grading" turned on by default
+        //$quickgrading = get_user_preferences('assign_quickgrading', false);
+        $defaultquickgrading = get_config('local_ucla', 'defaultassignquickgrading');
+        $quickgrading = get_user_preferences('assign_quickgrading', $defaultquickgrading);
+        // END UCLA MOD: CCLE-4297
 
         // Print options for changing the filter and changing the number of results per page.
         $gradingoptionsformparams = array('cm'=>$cmid,

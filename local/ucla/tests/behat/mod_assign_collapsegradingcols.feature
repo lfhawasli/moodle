@@ -10,29 +10,27 @@ Feature: Collapse some columns for assignment grading
 # element.
 Scenario: View assignment submissions table with collapsed columns
     Given I am in a ucla environment
+    And the following "courses" exists:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
     And the following "users" exists:
-      | username | firstname | lastname | userid | email |
-      | teacher1 | Teacher | 1 | T1 | teacher1@asd.com |
-      | student1 | Student | 1 | S1 | student1@asd.com |
-      | student2 | Student | 2 | S2 | student2@asd.com |
-      | student3 | Student | 3 | S3 | student3@asd.com |
-    And the following ucla "sites" exists:
-      | fullname | shortname | type |
-      | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | T1 | teacher1@asd.com |
+      | student1 | Student | S1 | student1@asd.com |
+      | student2 | Student | S2 | student2@asd.com |
+      | student3 | Student | S3 | student3@asd.com |
+    And the following "course enrolments" exists:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
       | student2 | C1 | student |
       | student3 | C1 | student |
     And I log in as ucla "teacher1"
-    And I browse to site "C1"
+    And I follow "Course 1"
     And I turn editing mode on
-    And I click on the "Show all" section in the ucla site menu
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
-    And I click on the "Week 1" section in the ucla site menu
     And I follow "Test assignment name"
     When I follow "View/grade all submissions"
     Then I should not see "User picture"

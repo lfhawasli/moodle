@@ -22,7 +22,7 @@ Feature: Easy Upload
   @javascript
   Scenario: Upload a file to the Site Info section via Control Panel
     When I follow "Upload a file"
-    And I upload "blocks/ucla_easyupload/tests/fixtures/test.txt" file to "Select file" filepicker
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filepicker
     And I fill in "Name" with "testupload1"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
@@ -32,7 +32,7 @@ Feature: Easy Upload
   @javascript
   Scenario: Upload a file to a specific Week section via Control Panel
     When I follow "Upload a file"
-    And I upload "blocks/ucla_easyupload/tests/fixtures/test.txt" file to "Select file" filepicker
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filepicker
     And I fill in "Name" with "testupload2"
     And I select "Week 5" from "Add to section"
     And I press "Save changes"
