@@ -333,6 +333,16 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
 
+// Grading config variables.
+// CCLE-4295 - Add Grouping Filter for the Grader Report
+$CFG->grader_report_grouping_filter = 1;
+// CCLE-4292 - Collapse Default Columns for Assignment Grading
+$CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
+// CCLE-4299 - Improve Assignment Grading Screen
+$CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
+// CCLE-4297 - Have "quick grading" turned on by default
+$CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
+
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true; 
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
@@ -465,15 +475,6 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_shibd'] 
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_trans'] = '/var/log/shibboleth/transaction.log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_moodle_cron'] = '/home/moodle/logs/moodlecron/moodlecron.out';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
-
-// CCLE-4295 - Add Grouping Filter for the Grader Report
-$CFG->grader_report_grouping_filter = 1;
-
-// CCLE-4299 - Improve Assignment Grading Screen
-$CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
-
-// CCLE-4292 - Collapse Default Columns for Assignment Grading
-$CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = true;
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
