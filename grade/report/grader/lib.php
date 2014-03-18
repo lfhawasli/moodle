@@ -206,6 +206,16 @@ class grade_report_grader extends grade_report {
                     // Was change requested?
                     $oldvalue = $this->grades[$userid][$itemid];
                     if ($datatype === 'grade') {
+
+                        // START UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
+                        // Reference from UMass Amherst.
+                        // Compare the current user's page loading time again the last modified time in DB.
+                        if($data->currenttime < $oldvalue->timemodified) {
+                            $warnings[] = get_string('errorsavegradestaled', 'gradereport_grader');
+                            return $warnings;
+                        }
+                        // END UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
+
                         // If there was no grade and there still isn't
                         if (is_null($oldvalue->finalgrade) && $postedvalue == -1) {
                             // -1 means no grade
