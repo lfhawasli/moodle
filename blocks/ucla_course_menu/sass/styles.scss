@@ -123,7 +123,16 @@ $site-menu-hover-color:         #fcfcfc;
             // Add icon to library research portal
             .library-research-portal.leaf:before {
                 // globe
-                @include node-glyphicon("\e135");
+                //@include node-glyphicon("\e135");
+                // Use "Beta" label until the end of Spring 2014.
+                content: "Beta";
+                font-size: 1.1rem;
+                font-family: "Lato";
+                font-weight: bold;
+                color: white;
+                padding: 2px 4px;
+                @include border-radius(4px);
+                @include label-variant(#4168A1);
             }
             // Add library reserve icon
             .library-reserve-link.leaf:before {
