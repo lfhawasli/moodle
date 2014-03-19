@@ -4,3 +4,7 @@
 }
  
 .errorcode {display:none}
+
+/* CCLE-4289 - Show All View Action Icons */
+.gradestable .action-icon img.smallicon { opacity: 0.5; }
+.gradestable .action-icon.selected img { opacity: 1; }
