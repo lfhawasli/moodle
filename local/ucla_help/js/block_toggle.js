@@ -2,7 +2,7 @@
  * jQuery script to toggle a sidebar containing a block.
  */
 
-$('.help .block-toggle').on('click', function(e) {
+$('.sidebar-buttons .block-toggle').on('click', function(e) {
     $('.pre.block.sidebar').sidebar({
         onChange: function() {
 

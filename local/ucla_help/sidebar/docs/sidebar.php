@@ -22,7 +22,7 @@ class sidebar_docs extends sidebar_html implements sidebar_widget {
     public function __construct($keyword) {
         global $PAGE;
 
-        $PAGE->requires->js('/theme/uclashared/package/sematic-ui/uncompressed/modules/accordion.js');
+        $PAGE->requires->js('/theme/uclashared/package/semantic-ui/build/minified/modules/accordion.min.js');
         $PAGE->requires->yui_module('moodle-local_ucla_help-doc_loader', 'M.local_ucla_help.init', 
                 array(array('help' => '/local/ucla_help/help/gradebook')));
 

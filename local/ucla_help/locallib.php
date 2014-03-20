@@ -35,18 +35,18 @@ spl_autoload_register(function ($class) {
 global $PAGE;
 
 $PAGE->requires->jquery();
-$PAGE->requires->js('/theme/uclashared/package/sematic-ui/uncompressed/modules/sidebar.js');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/modules/sidebar.css');
+$PAGE->requires->js('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.js');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.css');
 
 // Load CSS dependencies
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/modules/accordion.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/views/list.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/elements/segment.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/elements/header.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/elements/label.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/elements/divider.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/elements/button.css');
-$PAGE->requires->css('/theme/uclashared/package/sematic-ui/uncompressed/collections/form.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/modules/accordion.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/views/list.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/segment.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/header.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/label.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/divider.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/button.min.css');
+$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/collections/form.min.css');
 
 class ucla_sidebar {
 

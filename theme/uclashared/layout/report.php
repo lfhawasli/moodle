@@ -22,9 +22,6 @@ $showsidepre = ($hassidepre
     && !$PAGE->blocks->region_completely_docked('side-pre', $OUTPUT));
 $showsidepost = ($hassidepost 
     && !$PAGE->blocks->region_completely_docked('side-post', $OUTPUT));
-    
-$PAGE->requires->js('/local/ucla/yui/gradebook/gradebook.js');
-$PAGE->requires->js('/local/ucla/yui/gradebook/stickytable.js');
 
 $custommenu = $OUTPUT->custom_menu();
 $hascustommenu = (empty($PAGE->layout_options['nocustommenu']) 
@@ -122,31 +119,19 @@ echo $OUTPUT->doctype() ?>
 
 <div class="main container-fluid" >
     <div id="region-main-box">
-        <div class="help">
+        <div class="sidebar-buttons">
             <button class="btn btn-primary btn-sm block-toggle">
                 Settings
             </button>
-            <button class="btn btn-default btn-sm help-toggle">
-                Help
-            </button>
         </div>
-
         <?php echo core_renderer::MAIN_CONTENT_TOKEN ?>        
     </div>
 
 </div>
 
 <?php
-
     // Render a blocks sidebar.
     echo ucla_sidebar::block_pre($OUTPUT->blocks_for_region('side-pre'));
-    
-    // Render a help sidebar.
-    echo ucla_sidebar::help(array(
-        new sidebar_file('/local/ucla_help/topics/gradebook/color_legend.php'),
-        new sidebar_docs('Gradebook'),
-        new sidebar_feedback()
-    ));
 ?>
 
 <!-- START OF FOOTER -->
