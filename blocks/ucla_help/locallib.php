@@ -52,7 +52,7 @@ class ucla_sidebar {
 
     public static function help(array $args) {
         global $PAGE;
-        $PAGE->requires->js('/local/ucla_help/js/help_toggle.js');
+        $PAGE->requires->js('/blocks/ucla_help/js/help_toggle.js');
 
         $content = array_reduce($args, function($carry, $item) {
                 $carry .= $item->render();
@@ -64,7 +64,7 @@ class ucla_sidebar {
 
     public static function block_pre($block) {
         global $PAGE;
-        $PAGE->requires->js('/local/ucla_help/js/block_toggle.js');
+        $PAGE->requires->js('/blocks/ucla_help/js/block_toggle.js');
 
         $blockpre = html_writer::div($block, 'block-region', array('id' => 'region-pre'));
         $sidebar = html_writer::div(

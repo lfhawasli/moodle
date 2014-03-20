@@ -200,7 +200,7 @@ $PAGE->requires->js('/local/ucla/yui/gradebook/stickytable.js');
 
 // Render a help sidebar.
 echo ucla_sidebar::help(array(
-    new sidebar_file('/local/ucla_help/topics/gradebook/color_legend.php'),
+    new sidebar_file('/blocks/ucla_help/topics/gradebook/color_legend.php'),
     new sidebar_docs('Gradebook'),
     new sidebar_feedback()
 ));

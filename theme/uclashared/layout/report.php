@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/../../../local/ucla_help/locallib.php');
+require_once(__DIR__ . '/../../../blocks/ucla_help/locallib.php');
 
 // Process and simplify all the options
 $hasheading = ($PAGE->heading);
