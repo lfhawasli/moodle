@@ -322,6 +322,10 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] =
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
 
+// Site administration > Plugins > Blocks > Respondus LockDown Browser
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = __DIR__."/../../../"."blocks/lockdownbrowser/customscripts";
+
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
