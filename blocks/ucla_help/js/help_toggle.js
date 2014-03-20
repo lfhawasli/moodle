@@ -2,8 +2,7 @@
  * jQuery script to generate the help button + sidebar toggle event.
  */
 
-$('.sidebar-buttons').append('<button class="btn btn-default btn-sm help-toggle">Help</button>');
-$('.sidebar-buttons .help-toggle').sidebar({exclusive: true}).on('click', function(e) {
+var sidebartoggle = function(e) {
 
     $('.main.help.sidebar').sidebar({
         onChange: function() {
@@ -19,4 +18,9 @@ $('.sidebar-buttons .help-toggle').sidebar({exclusive: true}).on('click', functi
             });
         }
     }).sidebar('toggle');
-});
+}
+
+$('.sidebar-buttons').append('<button class="btn btn-default btn-sm help-toggle">Help</button>');
+$('.sidebar-buttons .help-toggle').on('click', sidebartoggle );
+
+$('.help.sidebar .help-toggle').on('click', sidebartoggle);

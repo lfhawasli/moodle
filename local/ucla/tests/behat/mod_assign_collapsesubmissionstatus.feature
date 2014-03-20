@@ -28,6 +28,7 @@ Feature: Assignment Grading Submission Status Table Collapse
       | assignsubmission_onlinetext_enabled | 0 |
       | assignsubmission_file_enabled | 1 |
       | Maximum number of uploaded files | 1 |
+      And I should see "Test assignment name"
       And I log out
       And I log in as ucla "student1"
       And I follow "Course 1"

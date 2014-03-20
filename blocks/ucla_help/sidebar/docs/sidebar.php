@@ -17,19 +17,22 @@
 
 class sidebar_docs extends sidebar_html implements sidebar_widget {
 
-    private $keywordquery = 'https://docs.ccle.ucla.edu/api.php?action=query&titles={title}&prop=links&format=json';
+    private $keywordquery = '/api.php?action=query&titles={title}&prop=links&format=json';
 
     public function __construct($keyword) {
         global $PAGE;
 
         $PAGE->requires->js('/theme/uclashared/package/semantic-ui/build/minified/modules/accordion.min.js');
-        $PAGE->requires->yui_module('moodle-blocks_ucla_help-doc_loader', 'M.local_ucla_help.init', 
+        $PAGE->requires->yui_module('moodle-block_ucla_help-doc_loader', 'M.blocks_ucla_help.init', 
                 array(array('help' => '/blocks/ucla_help/help/gradebook')));
 
         $this->keyword = $keyword;
     }
 
     private function curl($url) {
+        $apiurl = get_config('block_ucla_help', 'docs_wiki_url');
+        $url = $apiurl . $url;
+        
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,

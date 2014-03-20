@@ -121,7 +121,7 @@ echo $OUTPUT->doctype() ?>
     <div id="region-main-box">
         <div class="sidebar-buttons">
             <button class="btn btn-primary btn-sm block-toggle">
-                Settings
+                <?php echo get_string('administration') ?>
             </button>
         </div>
         <?php echo core_renderer::MAIN_CONTENT_TOKEN ?>        

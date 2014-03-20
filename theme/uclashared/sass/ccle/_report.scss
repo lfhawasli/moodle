@@ -38,3 +38,11 @@
         clear: right;
     }
 }
+
+.main.container-fluid {
+    min-height: 1000px;
+    
+    & ~ #page-footer {
+        float: left;
+    }
+}

@@ -196,6 +196,8 @@ if (!empty($studentsperpage) && $studentsperpage >= 20) {
 
 // START UCLA MOD CCLE-4168 
 // Adding sticky table headers and sidebar help support
+require_once($CFG->dirroot . '/blocks/ucla_help/locallib.php');
+
 $PAGE->requires->js('/local/ucla/yui/gradebook/stickytable.js');
 
 // Render a help sidebar.

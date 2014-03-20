@@ -9921,162 +9921,171 @@ table#user-grades tr .user .email {
   width: 100%;
 }
 /* line 102, ../sass/ccle/_gradebook.scss */
-table#user-grades tr .useridnumber, table#user-grades tr .useremail {
-  display: none;
+table#user-grades tr #studentheader .email {
+  float: left;
 }
-/* line 108, ../sass/ccle/_gradebook.scss */
+/* line 104, ../sass/ccle/_gradebook.scss */
+table#user-grades tr #studentheader .email + .sorticon {
+  float: left;
+}
+/* line 112, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked {
   background-color: #f39a00;
   border-bottom-color: #f39a00;
 }
-/* line 111, ../sass/ccle/_gradebook.scss */
+/* line 115, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.overridden {
   background-color: #f39a00;
   border-color: #dc691a;
 }
-/* line 116, ../sass/ccle/_gradebook.scss */
+/* line 120, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked {
   background-color: #f5cd00;
   border-bottom-color: #f5cd00;
 }
-/* line 119, ../sass/ccle/_gradebook.scss */
+/* line 123, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked.overridden {
   background-color: #f5cd00;
 }
-/* line 123, ../sass/ccle/_gradebook.scss */
+/* line 127, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked {
   background-color: #f1b900;
   border-bottom-color: #f1b900;
 }
-/* line 126, ../sass/ccle/_gradebook.scss */
+/* line 130, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked.overridden {
   background-color: #f1b900;
   border-color: #dc691a;
 }
-/* line 131, ../sass/ccle/_gradebook.scss */
+/* line 135, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.overridden {
-  background-color: #EFEFEF;
+  background-color: #fff;
   border: 0;
   background: url([[pix:theme|corner-fold]]) no-repeat;
   width: 16px;
   height: 16px;
 }
-/* line 139, ../sass/ccle/_gradebook.scss */
-table#user-grades tr.odd .user {
-  /*background-color: #E5F3FF;*/
-  /*border-top: 1px solid #C4E6FF;*/
-  /*border-bottom: 1px solid #C4E6FF;*/
-}
-/* line 148, ../sass/ccle/_gradebook.scss */
+/* line 147, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked {
   background-color: #f4a400;
   border-bottom-color: #f4a400;
 }
-/* line 151, ../sass/ccle/_gradebook.scss */
+/* line 150, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.overridden {
   background-color: #f4a400;
   border-color: #dc691a;
 }
-/* line 156, ../sass/ccle/_gradebook.scss */
+/* line 155, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked {
   background-color: #f5cf2c;
   border-bottom-color: #f5cf2c;
 }
-/* line 159, ../sass/ccle/_gradebook.scss */
+/* line 158, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked.overridden {
   background-color: #f5cf2c;
 }
-/* line 163, ../sass/ccle/_gradebook.scss */
+/* line 162, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked {
   background-color: #f1be00;
   border-bottom-color: #f1be00;
 }
-/* line 166, ../sass/ccle/_gradebook.scss */
+/* line 165, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked.overridden {
   background-color: #f1be00;
   border-color: #dc691a;
 }
-/* line 171, ../sass/ccle/_gradebook.scss */
+/* line 170, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.overridden {
-  background-color: #fff;
+  background-color: #efefef;
   /*border: 2px dashed $grade-report-color-overriden-border;*/
   border: 0;
   background: url([[pix:theme|corner-fold]]) no-repeat;
   width: 16px;
   height: 16px;
 }
-/* line 183, ../sass/ccle/_gradebook.scss */
+/* line 182, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td:hover, table#user-grades tr.even td:hover {
   background-color: #fcfcfc;
 }
-/* line 187, ../sass/ccle/_gradebook.scss */
+/* line 186, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked > .gradevalue, table#user-grades tr.even td.grade.vmarked > .gradevalue {
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
-/* line 192, ../sass/ccle/_gradebook.scss */
+/* line 191, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked .action-icon, table#user-grades tr.odd td.grade.hmarked .action-icon, table#user-grades tr.even td.grade.vmarked .action-icon, table#user-grades tr.even td.grade.hmarked .action-icon {
   color: white;
 }
-/* line 198, ../sass/ccle/_gradebook.scss */
+/* line 197, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .gradevalue {
-  font-weight: bold;
-  font-size: 1.2rem;
+  /*font-weight: bold;*/
+  /*font-size: 1.2rem;*/
 }
 
-/* line 205, ../sass/ccle/_gradebook.scss */
+/* line 204, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row {
   width: 100%;
   font-size: 1rem;
 }
-/* line 210, ../sass/ccle/_gradebook.scss */
+/* line 209, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th {
   padding: 0;
-  /*border-right: 1px solid blue;*/
   float: left;
-  border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
+  background-color: white;
   text-align: center;
   padding: 8px 2px 1px;
 }
-/* line 220, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row tr th .itemicon {
-  display: none;
+/* line 218, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row tr th a {
+  margin-left: 4px;
 }
-/* line 224, ../sass/ccle/_gradebook.scss */
+/* line 222, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th:hover {
   border-bottom: 4px solid #ddd;
 }
-/* line 228, ../sass/ccle/_gradebook.scss */
+/* line 226, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th:nth-child(2n) {
   background-color: #fcfcfc;
 }
 
-/* line 235, ../sass/ccle/_gradebook.scss */
+/* line 233, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column {
-  font-size: 10px;
-  font-size: 1rem;
-}
-/* line 238, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column th {
   background-color: white;
-  /*height: 29px;*/
-  /*padding: 8px;*/
+}
+/* line 236, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container {
+  background-color: white;
+  font-size: 1rem;
   border-right: 1px solid #ddd;
+  padding: 8px;
 }
-/* line 245, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column th:hover {
-  border-right: 4px solid #ddd;
+/* line 242, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container span {
+  width: 100%;
+  float: left;
 }
-/* line 248, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column th:nth-child(2n+1) {
+/* line 246, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container .userpicture {
+  display: none;
+}
+/* line 249, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container:nth-child(2n+1) {
   background-color: #fcfcfc;
 }
-/* line 254, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column tr {
-  overflow: hidden;
+/* line 252, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container:hover {
+  border-right: 4px solid #ddd;
+}
+/* line 255, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container:first-child {
+  border-top: #fcfcfc;
+}
+/* line 258, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container:last-child {
+  border-bottom: #fcfcfc;
 }
 
-/* line 263, ../sass/ccle/_gradebook.scss */
+/* line 266, ../sass/ccle/_gradebook.scss */
 .gradebook-color {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -10092,7 +10101,7 @@ table#user-grades tr .gradevalue {
   float: left;
   margin-right: 10px;
 }
-/* line 274, ../sass/ccle/_gradebook.scss */
+/* line 277, ../sass/ccle/_gradebook.scss */
 .gradebook-color:after {
   content: "";
   float: right;
@@ -10100,27 +10109,27 @@ table#user-grades tr .gradevalue {
   height: 100%;
 }
 
-/* line 281, ../sass/ccle/_gradebook.scss */
+/* line 284, ../sass/ccle/_gradebook.scss */
 .gradebook-overridden {
   background: url([[pix:theme|corner-fold]]) no-repeat;
   height: 30px;
   background-color: #efefef;
 }
 
-/* line 286, ../sass/ccle/_gradebook.scss */
+/* line 289, ../sass/ccle/_gradebook.scss */
 .gradebook-row-color {
   background-color: #f5cd00;
 }
-/* line 288, ../sass/ccle/_gradebook.scss */
+/* line 291, ../sass/ccle/_gradebook.scss */
 .gradebook-row-color:after {
   background-color: #f5cf2c;
 }
 
-/* line 292, ../sass/ccle/_gradebook.scss */
+/* line 295, ../sass/ccle/_gradebook.scss */
 .gradebook-column-color {
   background-color: #f39a00;
 }
-/* line 294, ../sass/ccle/_gradebook.scss */
+/* line 297, ../sass/ccle/_gradebook.scss */
 .gradebook-column-color:after {
   background-color: #f4a400;
 }
@@ -10158,6 +10167,15 @@ table#user-grades tr .gradevalue {
 /* line 37, ../sass/ccle/_report.scss */
 .path-grade-report-grader h2.main {
   clear: right;
+}
+
+/* line 42, ../sass/ccle/_report.scss */
+.main.container-fluid {
+  min-height: 1000px;
+}
+/* line 45, ../sass/ccle/_report.scss */
+.main.container-fluid ~ #page-footer {
+  float: left;
 }
 
 /* line 9, ../sass/ccle/mod/_admin.scss */

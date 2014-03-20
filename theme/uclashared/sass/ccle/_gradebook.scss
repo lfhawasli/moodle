@@ -98,9 +98,13 @@ table#user-grades {
             }
         }
         
-        // Remove the email & ID columns
-        .useridnumber, .useremail {
-            display: none;
+        #studentheader {
+            .email {
+                float: left;
+                + .sorticon {
+                    float: left;
+                }
+            }
         }
         
         // ODD rows
@@ -129,17 +133,12 @@ table#user-grades {
                 }
             }
             td.grade.overridden {
-                background-color: #EFEFEF;
+                background-color: #fff;
                 border: 0;
                 
                 background: url([[pix:theme|corner-fold]]) no-repeat;
                 width: 16px;
                 height: 16px;
-            }
-            .user {
-                /*background-color: #E5F3FF;*/
-                /*border-top: 1px solid #C4E6FF;*/
-                /*border-bottom: 1px solid #C4E6FF;*/
             }
         }
         
@@ -169,7 +168,7 @@ table#user-grades {
                 }
             }
             td.grade.overridden {
-                background-color: #fff;
+                background-color: #efefef;
                 /*border: 2px dashed $grade-report-color-overriden-border;*/
                 border: 0;
                 
@@ -185,7 +184,7 @@ table#user-grades {
             }
             td.grade.vmarked {
                 > .gradevalue {
-                    font-weight: bold;
+                    /*font-weight: bold;*/
                 }
             }
             td.grade.vmarked, td.grade.hmarked {
@@ -196,8 +195,8 @@ table#user-grades {
             
         }
         .gradevalue {
-            font-weight: bold;
-            font-size: 1.2rem;
+            /*font-weight: bold;*/
+            /*font-size: 1.2rem;*/
         }
     }
 }
@@ -209,16 +208,15 @@ table#user-grades {
     tr {
         th {
             padding: 0;
-            /*border-right: 1px solid blue;*/
             float: left;
-            border-top: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
+            background-color: white;
             
             text-align: center;
             padding: 8px 2px 1px;
             
-            .itemicon {
-                display: none;
+            a {
+                margin-left: 4px;
             }
             
             &:hover {
@@ -233,28 +231,33 @@ table#user-grades {
 }
 
 .gradebook-student-column {
-    font-size: 10px;
-    font-size: 1rem;
-    th {
+    background-color: white;
+    
+    .gradebook-student-container {
         background-color: white;
-        
-        /*height: 29px;*/
-        /*padding: 8px;*/
+        font-size: 1rem;
         border-right:1px solid #ddd;
+        padding: 8px;
 
-        &:hover {
-            border-right: 4px solid #ddd;
+        span {
+            width: 100%;
+            float: left;
+        }
+        .userpicture {
+            display: none;
         }
         &:nth-child(2n+1) {
             background-color: #fcfcfc;
         }
-    }
-
-    
-    tr {
-        overflow: hidden;
-        
-        
+        &:hover {
+            border-right: 4px solid #ddd;
+        }
+        &:first-child {
+            border-top: #fcfcfc;
+        }
+        &:last-child {
+            border-bottom: #fcfcfc;
+        }
     }
 }
 

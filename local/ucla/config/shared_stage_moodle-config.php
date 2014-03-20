@@ -132,6 +132,7 @@ $CFG->shib_logged_in_cookie = '_ucla_sso';
 $CFG->forced_plugin_settings['block_ucla_help']['send_to'] = 'jira';
 $CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/CreateIssueDetails.jspa';
 $CFG->forced_plugin_settings['block_ucla_help']['jira_default_assignee'] = 'dkearney';
+$CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu';
 $block_ucla_help_support_contacts['System'] = 'dkearney';  // default
 
 // CCLE-2301 - COURSE MENU BLOCK

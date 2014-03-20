@@ -26,10 +26,11 @@ require_once(dirname(__FILE__) . '/../../../../mod/wiki/parser/markups/nwiki.php
 
 class sidebar_wiki_parser extends nwiki_parser {
 
-    private $docsurl = 'https://docs.ccle.ucla.edu/w/';
-    private $urlquery = 'https://docs.ccle.ucla.edu/api.php?action=query&titles={title}&prop=imageinfo&iiprop=url&format=json';
-    private $sectionquery = 'https://docs.ccle.ucla.edu/api.php?action=parse&page={title}&prop=sections&format=json';
-    private $pagesectionquery = 'https://docs.ccle.ucla.edu/api.php?action=query&titles={title}&prop=revisions&rvprop=content&format=json&rvsection={section}';
+    private $docsurl = '/w/';
+    private $urlquery = '/api.php?action=query&titles={title}&prop=imageinfo&iiprop=url&format=json';
+    private $sectionquery = '/api.php?action=parse&page={title}&prop=sections&format=json';
+    private $pagesectionquery = '/api.php?action=query&titles={title}&prop=revisions&rvprop=content&format=json&rvsection={section}';
+
     protected $blockrules = array(
         'nowiki' => array(
             'expression' => "/^<nowiki>(.*?)<\/nowiki>/ims",
@@ -78,6 +79,9 @@ class sidebar_wiki_parser extends nwiki_parser {
      * @return json_obj
      */
     private function query($url) {
+        $apiurl = get_config('block_ucla_help', 'docs_wiki_url');
+        $url = $apiurl . $url;
+        
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,

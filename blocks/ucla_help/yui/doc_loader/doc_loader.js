@@ -4,9 +4,9 @@
  * 
  */
 
-YUI.add('moodle-local_ucla_help-doc_loader', function(Y) {
+YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
 
-    var ModulenameNAME = 'loca_ucla_help_loader';
+    var ModulenameNAME = 'blocks_ucla_help_loader';
     var SIDEBAR = null;
 
     var SIDEBAR_TEMPLATES = {
@@ -50,7 +50,7 @@ YUI.add('moodle-local_ucla_help-doc_loader', function(Y) {
 
                 var target = e.target;
 
-                Y.io(M.cfg.wwwroot + '/local/ucla_help/sidebar/docs/rest.php?title=' + encodeURIComponent(target.getAttribute('data-title')), {
+                Y.io(M.cfg.wwwroot + '/blocks/ucla_help/sidebar/docs/rest.php?title=' + encodeURIComponent(target.getAttribute('data-title')), {
                     on: {
                         success: function(tx, r) {
                             // Get json data
@@ -84,8 +84,8 @@ YUI.add('moodle-local_ucla_help-doc_loader', function(Y) {
         }
     });
 
-    M.local_ucla_help = M.local_ucla_help || {};
-    M.local_ucla_help.init = function(config) {
+    M.blocks_ucla_help = M.blocks_ucla_help || {};
+    M.blocks_ucla_help.init = function(config) {
         return new MODULENAME(config); // 'config' contains the parameter values
     };
 }, '@VERSION@', {
