@@ -8,6 +8,7 @@
  */
 $string['created'] = 'Created';
 $string['updated'] = 'Updated';
+$string['postby'] = 'Posted by';
 
 $string['addcomment'] = 'Add comment';
 $string['addentry'] = 'Ask a question';
