@@ -17,7 +17,7 @@
 /**
  * Forum lib file.
  *
- * @package     gradereport_forumusage
+ * @package     gradereport_uclaforumusage
  * @copyright   2014 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,11 +27,11 @@
  * @global object $CFG, $PAGE, $DB
  * @param int $courseid
  */
-
-function gradereport_forumusage_get_enrolled_user($courseid) {
+function gradereport_uclaforumusage_get_enrolled_user($courseid) {
     global $CFG, $DB, $PAGE;
     require_once("$CFG->dirroot/enrol/locallib.php");
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $courseid), '*',
+            MUST_EXIST);
     $manager = new course_enrolment_manager($PAGE, $course);
     $result = array();
     foreach ($list = $manager->get_users('lastname') as $k => $record) {
@@ -45,13 +45,12 @@ function gradereport_forumusage_get_enrolled_user($courseid) {
  * @global object $CFG, $DB
  * @param int $courseid
  */
-
-function gradereport_forumusage_get_forum($courseid) {
+function gradereport_uclaforumusage_get_forum($courseid) {
     global $CFG, $DB;
     require_once("$CFG->libdir/modinfolib.php");
 
     if ($courseid) {
-        if (! $course = $DB->get_record('course', array('id' => $courseid))) {
+        if (!$course = $DB->get_record('course', array('id' => $courseid))) {
             print_error('invalidcourseid');
         }
     } else {
@@ -59,7 +58,7 @@ function gradereport_forumusage_get_forum($courseid) {
     }
 
     $forums = $DB->get_records('forum', array('course' => $courseid));
-    $generalforums  = array();
+    $generalforums = array();
     $learningforums = array();
     $modinfo = get_fast_modinfo($course);
 
@@ -67,7 +66,7 @@ function gradereport_forumusage_get_forum($courseid) {
         $modinfo->instances['forum'] = array();
     }
     foreach ($modinfo->instances['forum'] as $forumid => $cm) {
-        if (!$cm->uservisible or !isset($forums[$forumid])) {
+        if (!$cm->uservisible or ! isset($forums[$forumid])) {
             continue;
         }
         $forum = $forums[$forumid];
@@ -82,10 +81,8 @@ function gradereport_forumusage_get_forum($courseid) {
 
         if ($forum->type == 'news' or $forum->type == 'social') {
             $generalforums[$forum->id] = $forum;
-
         } else if ($course->id == SITEID or empty($cm->sectionnum)) {
             $generalforums[$forum->id] = $forum;
-
         } else {
             $learningforums[$forum->id] = $forum;
         }
@@ -101,14 +98,14 @@ function gradereport_forumusage_get_forum($courseid) {
 }
 
 /**
- * Return the statistics for the forum usage
- * @global object $PAGE,$CFG, $DB
- * @param int $courseid, array $users, array $tainstr
- * @posts format: posts[userid][forum][parent][]=postid
- * @users format: users[postid] = userid
+ * Return the statistics for the forum usage.
+ *
+ * @param array $posts  Format: posts[userid][forum][parent][]=postid
+ * @param array $users  Format: users[postid] = userid
+ * @param array $tainstr
+ * @return array
  */
-
-function get_stats($posts=null, $users=null, $tainstr=null) {
+function get_stats($posts = null, $users = null, $tainstr = null) {
     if ($posts == null || $tainstr == null) {
         return null;
     } else {
@@ -122,7 +119,7 @@ function get_stats($posts=null, $users=null, $tainstr=null) {
                     foreach ($recordbyforum as $parent => $record) {
                         // TA or Instructor response to this user $users[$parent] by forum.
                         // It is the sum of TA and instructors.
-                        if (isset($users[$parent])&& isset($forum)&&!empty($record)) {
+                        if (isset($users[$parent]) && isset($forum) && !empty($record)) {
                             if (isset($tainstrresp[$forum][$users[$parent]])) {
                                 $tainstrresp[$forum][$users[$parent]] += count($record);
                             } else {
@@ -140,7 +137,7 @@ function get_stats($posts=null, $users=null, $tainstr=null) {
         foreach ($posts as $userid => $recordbyuser) {
             foreach ($recordbyuser as $forum => $record) {
                 // Initial posts.
-                $initialposts = isset($record[0])?count($record[0]):0;
+                $initialposts = isset($record[0]) ? count($record[0]) : 0;
                 $result[$userid][$forum]['initial_posts'] = $initialposts; // Parent is 0.
                 // Responses.
                 $responses = 0;
@@ -151,7 +148,7 @@ function get_stats($posts=null, $users=null, $tainstr=null) {
                 }
                 $result[$userid][$forum]['responses'] = $responses; // All other posts.
                 // TA responses.
-                if (isset($tainstrresp[$forum][$userid])&&isset($result[$userid][$forum])) {
+                if (isset($tainstrresp[$forum][$userid]) && isset($result[$userid][$forum])) {
                     $result[$userid][$forum]['ta_instr_resp'] = $tainstrresp[$forum][$userid];
                 } else {
                     $result[$userid][$forum]['ta_instr_resp'] = 0;
@@ -160,5 +157,4 @@ function get_stats($posts=null, $users=null, $tainstr=null) {
         }
         return $result;
     }
-
 }

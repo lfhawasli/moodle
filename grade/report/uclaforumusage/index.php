@@ -18,7 +18,7 @@
  *
  * Display forum usage report
  *
- * @package     gradereport_forumusage
+ * @package     gradereport_uclaforumusage
  * @copyright   2014 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,16 +26,15 @@
 require_once('../../../config.php');
 require_once($CFG->libdir . '/gradelib.php');
 require_once($CFG->dirroot . '/grade/lib.php');
-require_once($CFG->dirroot . '/grade/report/forumusage/lib.php');
-require_once($CFG->dirroot . '/grade/report/forumusage/lib.php');
-require_once($CFG->dirroot . '/grade/report/forumusage/forumusage_form.php');
+require_once($CFG->dirroot . '/grade/report/uclaforumusage/lib.php');
+require_once($CFG->dirroot . '/grade/report/uclaforumusage/forumusage_form.php');
 
 $courseid = required_param('id', PARAM_INT);
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 $forumtype = optional_param('forumtype', 1, PARAM_INT);
 
 $formsubmitted = optional_param('submitbutton', 0, PARAM_TEXT);
-$PAGE->set_url(new moodle_url('/grade/report/forumusage/index.php', array('id' => $courseid)));
+$PAGE->set_url(new moodle_url('/grade/report/uclaforumusage/index.php', array('id' => $courseid)));
 
 // Basic access checks.
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -44,30 +43,24 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 require_login($course);
 $PAGE->set_pagelayout('report');
 
-$context = get_context_instance(CONTEXT_COURSE, $course->id);
-require_capability('gradereport/forumusage:view', $context);
-
-if (empty($userid)) {
-    require_capability('moodle/grade:viewall', $context);
-} else {
-    if (!$DB->get_record('user', array('id' => $userid, 'deleted' => 0)) or isguestuser($userid)) {
-        print_error('invaliduser');
-    }
-}
+$context = context_course::instance($course->id);
+require_capability('gradereport/uclaforumusage:view', $context);
 
 // Return tracking object.
-$gpr = new grade_plugin_return(array('type' => 'report', 'plugin' => 'forumusage', 'courseid' => $courseid, 'userid' => $userid));
+$gpr = new grade_plugin_return(array('type' => 'report', 'plugin' => 'uclaforumusage', 'courseid' => $courseid));
 
 // Last selected report session tracking.
 if (!isset($USER->grade_last_report)) {
     $USER->grade_last_report = array();
 }
 $USER->grade_last_report[$course->id] = 'forumusage';
-$reportname = get_string('modulename', 'gradereport_forumusage');
+$reportname = get_string('modulename', 'gradereport_uclaforumusage');
 
-print_grade_page_head($COURSE->id, 'report', 'forumusage', $reportname, false);
+print_grade_page_head($COURSE->id, 'report', 'uclaforumusage', $reportname, false);
 
-$enrolledlist = gradereport_forumusage_get_enrolled_user($courseid);
+echo $OUTPUT->box(get_string('description', 'gradereport_uclaforumusage'));
+
+$enrolledlist = gradereport_uclaforumusage_get_enrolled_user($courseid);
 
 $allowed_roles = array();
 while($role = array_shift($CFG->instructor_levels_roles)){
@@ -91,10 +84,10 @@ if ($rs->valid()) {
         array_push($tainstr, $instance->id);
     }
 } else {
-    print_error('invalidcourse');
+    print_error('notainstr', 'gradereport_uclaforumusage');
 }
 
-$forumlist = gradereport_forumusage_get_forum($courseid);
+$forumlist = gradereport_uclaforumusage_get_forum($courseid);
 
 // Add 'All' to student list.
 $enrolledlist[0] = 'All';  // Set as default
@@ -178,18 +171,19 @@ if ($rs->valid()) {
      // Row 1 and Row 2(header).
     $row1 = new html_table_row();
     $cell = new html_table_cell();
-    $cell->text = get_string('labelstudentname', 'gradereport_forumusage');
-    $row1->cells[] = $cell;
-
-    // If not simple type has row 2.
+    $cell->header = true;
+    // If not simple type, then name needs to extend to second row.
     if (!$forumtype) {
         $row2 = new html_table_row();
-        $cell = new html_table_cell();
-        $row2->cells[] = $cell;
+        $cell->rowspan = 2;
     }
+    $cell->text = get_string('labelstudentname', 'gradereport_uclaforumusage');
+    $row1->cells[] = $cell;
+
     foreach ($forums as $v) {
         // Row 1.
         $cell = new html_table_cell();
+        $cell->header = true;
         $cell->colspan = (!$forumtype) * 3;
         $cell->text = $forumlist[$v];
         $row1->cells[] = $cell;
@@ -197,13 +191,16 @@ if ($rs->valid()) {
         if (!$forumtype) {
             // Row 2.
             $cell = new html_table_cell();
-            $cell->text = get_string('labelinitialpost', 'gradereport_forumusage');
+            $cell->header = true;
+            $cell->text = get_string('labelinitialpost', 'gradereport_uclaforumusage');
             $row2->cells[] = $cell;
             $cell = new html_table_cell();
-            $cell->text = get_string('labelresp', 'gradereport_forumusage');
+            $cell->header = true;
+            $cell->text = get_string('labelresp', 'gradereport_uclaforumusage');
             $row2->cells[] = $cell;
             $cell = new html_table_cell();
-            $cell->text = get_string('labelinsttaresp', 'gradereport_forumusage');
+            $cell->header = true;
+            $cell->text = get_string('labelinsttaresp', 'gradereport_uclaforumusage');
             $row2->cells[] = $cell;
         }
     }
@@ -212,13 +209,12 @@ if ($rs->valid()) {
         $table->data[] = $row2;
     }
 
-    $r = 3;
     // Need to create all the rows.
     foreach ($studentdisplay as $userid => $studentname) {
-        ${'row'.$r} = new html_table_row();
+        $row = new html_table_row();
         $cell = new html_table_cell();
         $cell->text = $studentname;
-        ${'row'.$r}->cells[] = $cell;
+        $row->cells[] = $cell;
         foreach ($forums as $v) {
             if (!$forumtype) {
                 // Initial post.
@@ -228,7 +224,7 @@ if ($rs->valid()) {
                 } else {
                     $cell->text = 0;
                 }
-                ${'row'.$r}->cells[] = $cell;
+                $row->cells[] = $cell;
             }
             // Response.
             $cell = new html_table_cell();
@@ -237,7 +233,7 @@ if ($rs->valid()) {
             } else {
                 $cell->text = 0;
             }
-            ${'row'.$r}->cells[] = $cell;
+            $row->cells[] = $cell;
 
             if (!$forumtype) {
                 // TA response.
@@ -247,14 +243,13 @@ if ($rs->valid()) {
                 } else {
                     $cell->text = 0;
                 }
-                ${'row'.$r}->cells[] = $cell;
+                $row->cells[] = $cell;
             }
         }// End forum.
-        $table->data[] = ${'row'.$r};
-        $r++;
+        $table->data[] = $row;
     }
     echo html_writer::tag('div', html_writer::table($table), array('class' => 'flexible-wrap'));
 } else {
-    echo get_string('noforumpost', 'gradereport_forumusage');
+    echo get_string('noforumpost', 'gradereport_uclaforumusage');
 }
 echo $OUTPUT->footer();

@@ -16,25 +16,13 @@
 
 /**
  *
- * Display forum usage report
- *
- * @package     gradereport_forumusage
+ * @package     gradereport_uclaforumusage
  * @copyright   2014 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-
-    'gradereport/forumusage:view' => array(
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    )
-);
+$plugin->version   = 2013110504;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2013040500;        // Requires this Moodle version.
+$plugin->component = 'gradereport_uclaforumusage'; // Full name of the plugin (used for diagnostics).

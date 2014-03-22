@@ -225,6 +225,28 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     }
 
     /**
+     * Displays link to use to login or logout on frontpage.
+     * 
+     * @return string
+     */
+    public function login_link() {
+        $link = null;
+        // Note, the id fields are needed for Behat steps "I log in" and
+        // "I log out" to work.
+        if (!isloggedin()) {
+            $link = html_writer::link(get_login_url(), get_string('login'),
+                    array('class' => 'login', 'id' => 'Login'));
+        } else {
+            $link = html_writer::link(
+                        new moodle_url('/login/logout.php',
+                        array('sesskey' => sesskey())), get_string('logout'),
+                        array('class' => 'login', 'id' => 'Logout')
+            );
+        }
+        return $link;
+    }
+
+    /**
      * Returns the HTML link for the help and feedback.
      *
      * @return string

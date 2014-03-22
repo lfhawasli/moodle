@@ -17,7 +17,7 @@
 /**
  * Forum form layout.
  *
- * @package     gradereport_forumusage
+ * @package     gradereport_uclaforumusage
  * @copyright   2014 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -41,7 +41,7 @@ class forumusage_form extends moodleform {
             $forums = array_flip($forums);
         }
         $courseid = $this->_customdata['courseid'];
-        $mform->addElement('select', 'student', get_string('studentlist', 'gradereport_forumusage'), $studentlist);
+        $mform->addElement('select', 'student', get_string('studentlist', 'gradereport_uclaforumusage'), $studentlist);
         $mform->setDefault('student', 0);
         foreach ($forumlist as $id => $value) {
             $mform->addElement('advcheckbox', 'forum['.$id.']', $value, null, null, $id);
@@ -53,7 +53,7 @@ class forumusage_form extends moodleform {
             }
         }
         // Courseid.
-        $mform->addElement('advcheckbox', 'forumtype', null, get_string('displayforum', 'gradereport_forumusage'), null, $forumtype);
+        $mform->addElement('advcheckbox', 'forumtype', null, get_string('displayforum', 'gradereport_uclaforumusage'), null, $forumtype);
         $mform->setDefault('forumtype', true);
         $mform->addElement('hidden', 'id', $courseid);
         $mform->setType('id', PARAM_INT);

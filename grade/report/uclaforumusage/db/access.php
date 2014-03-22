@@ -15,19 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
+ * Display forum usage report
+ *
  * @package     gradereport_forumusage
  * @copyright   2014 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Forum usage report';
-$string['forumusage:view'] = 'View your own grade report';
-$string['modulename'] = 'Forum usage report';
-$string['studentlist'] = 'List of students';
-$string['forumlist'] = 'List of forums';
-$string['displayforum'] = 'Check here to show Instructor/TA reply counts';
-$string['noforumpost'] = 'No posting from this user for the selected forum.';
-$string['labelstudentname'] = 'Student Name';
-$string['labelinitialpost'] = 'Initial Posts';
-$string['labelresp'] = 'Resp';
-$string['labelinsttaresp'] = 'Inst/TA resp';
+defined('MOODLE_INTERNAL') || die();
+
+$capabilities = array(
+
+    'gradereport/uclaforumusage:view' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    )
+);
