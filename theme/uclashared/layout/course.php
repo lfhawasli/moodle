@@ -96,6 +96,7 @@ echo $OUTPUT->doctype() ?>
             <div class="col-sm-6 header-logo">
                 <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
             </div>
+    <?php if ($PAGE->pagelayout != 'frontpage') { ?>
             <div class="col-sm-6 header-login">
                 <div class="header-links" >
                 <?php
@@ -105,10 +106,12 @@ echo $OUTPUT->doctype() ?>
                 ?>
                 </div>
             </div>
+    <?php } else { ?>
             <div class="header-login-frontpage col-sm-6" >
                 <?php echo $OUTPUT->help_feedback_link() ?>
-                <a class="login" href="<?php echo get_login_url() ?>">Login</a>
+                <?php echo $OUTPUT->login_link() ?>
             </div>
+    <?php } ?>
         </div>
         <div class="system-identification " >
             <?php echo $OUTPUT->sublogo(); ?>
