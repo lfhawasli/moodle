@@ -34,7 +34,7 @@ function gradereport_uclaforumusage_get_enrolled_user($courseid) {
             MUST_EXIST);
     $manager = new course_enrolment_manager($PAGE, $course);
     $result = array();
-    foreach ($list = $manager->get_users('lastname') as $k => $record) {
+    foreach ($list = $manager->get_users('lastname', 'ASC', 0, null) as $k => $record) {
         $result[$record->id] = $record->lastname . ", " . $record->firstname;
     }
     return $result;

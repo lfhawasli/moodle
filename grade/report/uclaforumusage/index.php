@@ -64,7 +64,7 @@ $enrolledlist = gradereport_uclaforumusage_get_enrolled_user($courseid);
 
 $allowed_roles = array();
 while($role = array_shift($CFG->instructor_levels_roles)){
-	$allowed_roles[]= implode("', '", $role);
+    $allowed_roles[]= implode("', '", $role);
 }
 
 // Get instructors and TAs.
