@@ -39,6 +39,18 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 require_login($course, true, $cm);
 $PAGE->set_url($url);
 
+// START UCLA MOD: CCLE-4299 - Improve Assignment Grading Screen
+if (optional_param('action', '', PARAM_TEXT) == 'grade') {
+    $collapsesubmissionstatus = get_config('local_ucla', 'collapsesubmissionstatus');
+    if (!empty($collapsesubmissionstatus)) {
+        $PAGE->requires->yui_module('moodle-local_ucla-submissionstatus',
+                'M.local_ucla.submissionstatus.init');
+        $PAGE->requires->strings_for_js(array('duedate', 'timeremaining',
+                'editingstatus', 'timemodified' ), 'assign');
+    }
+}
+// END UCLA MOD: CCLE-4299
+
 $context = context_module::instance($cm->id);
 
 require_capability('mod/assign:view', $context);

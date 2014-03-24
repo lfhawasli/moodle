@@ -1,1 +1,0 @@
-This is a test file for Easy Upload Suite (CCLE-4071).

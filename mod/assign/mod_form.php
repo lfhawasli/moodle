@@ -222,9 +222,10 @@ class mod_assign_mod_form extends moodleform_mod {
             $mform->insertElementBefore($noscriptwarning, 'grade');
         }
         // START UCLA MOD: CCLE-3511 - Set defaults for new assignment module
-        $mform->setDefault('preventlatesubmissions', 1);
-        $mform->setDefault('submissiondrafts', 1);
-        $mform->setDefault('sendnotifications', 0);        
+        if (get_config('local_ucla', 'defaultassignsettings')) {
+            $mform->setDefault('submissiondrafts', 1);
+            $mform->setDefault('sendnotifications', 0);        
+        }
         // END UCLA MOD: CCLE-3511
     }
 

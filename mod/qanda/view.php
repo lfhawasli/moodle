@@ -513,7 +513,8 @@ if ($allentries) {
 
         /// and finally print the entry.
         $entry->entrycount = $offset + $entriesshown + 1;
-        //echo $entrycount . "<p>";
+        $user = $DB->get_record("user", array("id" => $entry->userid));
+        $entry->fullname=fullname($user);
         qanda_print_entry($course, $cm, $qanda, $entry, $mode, $hook, 1, $displayformat);
         $entriesshown++;
     }

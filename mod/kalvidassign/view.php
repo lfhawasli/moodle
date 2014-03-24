@@ -188,9 +188,10 @@ if (!has_capability('mod/kalvidassign:gradesubmission', $context)) {
                 array('upload_successful', 'local_kaltura'),
                 array('video_converting', 'kalvidassign'),
                 array('previewvideo', 'kalvidassign'),
-                array('javanotenabled', 'kalvidassign')
-                )
-        );
+                array('javanotenabled', 'kalvidassign'),
+                array('checkingforjava', 'kalvidassign')
+        )
+    );
 
     $courseid               = get_courseid_from_context($PAGE->context);
     $conversion_script      = '';

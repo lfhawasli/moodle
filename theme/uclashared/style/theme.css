@@ -1541,6 +1541,80 @@ input[type="button"].btn-block {
 }
 
 /* line 19, ../sass/_buttons.scss */
+.btn-default, input[type="button"],
+input[type="submit"], .navbutton .wikisearch input[type="submit"],
+.navbutton .forumsearch input[type="submit"], .ucla-format-notice-box .mform input[name="laterbutton"], .ucla-format-notice-box .mform input[name="nobutton"] {
+  color: white;
+  background-color: #4d4d4d;
+  border-color: #333333;
+}
+/* line 414, ../package/bootstrap/lib/_mixins.scss */
+.btn-default:hover, input[type="button"]:hover,
+input[type="submit"]:hover, .navbutton .wikisearch input[type="submit"]:hover,
+.navbutton .forumsearch input[type="submit"]:hover, .ucla-format-notice-box .mform input[name="laterbutton"]:hover, .ucla-format-notice-box .mform input[name="nobutton"]:hover, .btn-default:focus, input[type="button"]:focus,
+input[type="submit"]:focus, .navbutton .wikisearch input[type="submit"]:focus,
+.navbutton .forumsearch input[type="submit"]:focus, .ucla-format-notice-box .mform input[name="laterbutton"]:focus, .ucla-format-notice-box .mform input[name="nobutton"]:focus, .btn-default:active, input[type="button"]:active,
+input[type="submit"]:active, .navbutton .wikisearch input[type="submit"]:active,
+.navbutton .forumsearch input[type="submit"]:active, .ucla-format-notice-box .mform input[name="laterbutton"]:active, .ucla-format-notice-box .mform input[name="nobutton"]:active, .btn-default.active, input.active[type="button"], input[type="button"].dndupload-progress-outer,
+input.active[type="submit"],
+input[type="submit"].dndupload-progress-outer, .navbutton .wikisearch input.active[type="submit"], .navbutton .wikisearch input[type="submit"].dndupload-progress-outer,
+.navbutton .forumsearch input.active[type="submit"],
+.navbutton .forumsearch input[type="submit"].dndupload-progress-outer, .ucla-format-notice-box .mform input.active[name="laterbutton"], .ucla-format-notice-box .mform input[name="laterbutton"].dndupload-progress-outer, .ucla-format-notice-box .mform input.active[name="nobutton"], .ucla-format-notice-box .mform input[name="nobutton"].dndupload-progress-outer, .btn-default.dndupload-progress-outer {
+  color: white;
+  background-color: #393939;
+  border-color: #141414;
+}
+/* line 419, ../package/bootstrap/lib/_mixins.scss */
+.open .btn-default.dropdown-toggle, .open input.dropdown-toggle[type="button"],
+.open input.dropdown-toggle[type="submit"], .open .ucla-format-notice-box .mform input.dropdown-toggle[name="laterbutton"], .ucla-format-notice-box .mform .open input.dropdown-toggle[name="laterbutton"], .open .ucla-format-notice-box .mform input.dropdown-toggle[name="nobutton"], .ucla-format-notice-box .mform .open input.dropdown-toggle[name="nobutton"] {
+  color: white;
+  background-color: #393939;
+  border-color: #141414;
+}
+/* line 425, ../package/bootstrap/lib/_mixins.scss */
+.btn-default:active, input[type="button"]:active,
+input[type="submit"]:active, .navbutton .wikisearch input[type="submit"]:active,
+.navbutton .forumsearch input[type="submit"]:active, .ucla-format-notice-box .mform input[name="laterbutton"]:active, .ucla-format-notice-box .mform input[name="nobutton"]:active, .btn-default.active, input.active[type="button"], input[type="button"].dndupload-progress-outer,
+input.active[type="submit"],
+input[type="submit"].dndupload-progress-outer, .navbutton .wikisearch input.active[type="submit"], .navbutton .wikisearch input[type="submit"].dndupload-progress-outer,
+.navbutton .forumsearch input.active[type="submit"],
+.navbutton .forumsearch input[type="submit"].dndupload-progress-outer, .ucla-format-notice-box .mform input.active[name="laterbutton"], .ucla-format-notice-box .mform input[name="laterbutton"].dndupload-progress-outer, .ucla-format-notice-box .mform input.active[name="nobutton"], .ucla-format-notice-box .mform input[name="nobutton"].dndupload-progress-outer, .btn-default.dndupload-progress-outer {
+  background-image: none;
+}
+/* line 428, ../package/bootstrap/lib/_mixins.scss */
+.open .btn-default.dropdown-toggle, .open input.dropdown-toggle[type="button"],
+.open input.dropdown-toggle[type="submit"], .open .ucla-format-notice-box .mform input.dropdown-toggle[name="laterbutton"], .ucla-format-notice-box .mform .open input.dropdown-toggle[name="laterbutton"], .open .ucla-format-notice-box .mform input.dropdown-toggle[name="nobutton"], .ucla-format-notice-box .mform .open input.dropdown-toggle[name="nobutton"] {
+  background-image: none;
+}
+/* line 438, ../package/bootstrap/lib/_mixins.scss */
+.btn-default.disabled, input.disabled[type="button"],
+input.disabled[type="submit"], .navbutton .wikisearch input.disabled[type="submit"],
+.navbutton .forumsearch input.disabled[type="submit"], .ucla-format-notice-box .mform input.disabled[name="laterbutton"], .ucla-format-notice-box .mform input.disabled[name="nobutton"], .btn-default.disabled:hover, input.disabled[type="button"]:hover,
+input.disabled[type="submit"]:hover, .ucla-format-notice-box .mform input.disabled[name="laterbutton"]:hover, .ucla-format-notice-box .mform input.disabled[name="nobutton"]:hover, .btn-default.disabled:focus, input.disabled[type="button"]:focus,
+input.disabled[type="submit"]:focus, .ucla-format-notice-box .mform input.disabled[name="laterbutton"]:focus, .ucla-format-notice-box .mform input.disabled[name="nobutton"]:focus, .btn-default.disabled:active, input.disabled[type="button"]:active,
+input.disabled[type="submit"]:active, .ucla-format-notice-box .mform input.disabled[name="laterbutton"]:active, .ucla-format-notice-box .mform input.disabled[name="nobutton"]:active, .btn-default.disabled.active, input.disabled.active[type="button"], input.disabled[type="button"].dndupload-progress-outer,
+input.disabled.active[type="submit"],
+input.disabled[type="submit"].dndupload-progress-outer, .ucla-format-notice-box .mform input.disabled.active[name="laterbutton"], .ucla-format-notice-box .mform input.disabled[name="laterbutton"].dndupload-progress-outer, .ucla-format-notice-box .mform input.disabled.active[name="nobutton"], .ucla-format-notice-box .mform input.disabled[name="nobutton"].dndupload-progress-outer, .btn-default.disabled.dndupload-progress-outer, .btn-default[disabled], input[disabled][type="button"],
+input[disabled][type="submit"], .navbutton .wikisearch input[disabled][type="submit"],
+.navbutton .forumsearch input[disabled][type="submit"], .ucla-format-notice-box .mform input[disabled][name="laterbutton"], .ucla-format-notice-box .mform input[disabled][name="nobutton"], .btn-default[disabled]:hover, input[disabled][type="button"]:hover,
+input[disabled][type="submit"]:hover, .ucla-format-notice-box .mform input[disabled][name="laterbutton"]:hover, .ucla-format-notice-box .mform input[disabled][name="nobutton"]:hover, .btn-default[disabled]:focus, input[disabled][type="button"]:focus,
+input[disabled][type="submit"]:focus, .ucla-format-notice-box .mform input[disabled][name="laterbutton"]:focus, .ucla-format-notice-box .mform input[disabled][name="nobutton"]:focus, .btn-default[disabled]:active, input[disabled][type="button"]:active,
+input[disabled][type="submit"]:active, .ucla-format-notice-box .mform input[disabled][name="laterbutton"]:active, .ucla-format-notice-box .mform input[disabled][name="nobutton"]:active, .btn-default[disabled].active, input[disabled].active[type="button"], input[disabled][type="button"].dndupload-progress-outer,
+input[disabled].active[type="submit"],
+input[disabled][type="submit"].dndupload-progress-outer, .ucla-format-notice-box .mform input[disabled].active[name="laterbutton"], .ucla-format-notice-box .mform input[disabled][name="laterbutton"].dndupload-progress-outer, .ucla-format-notice-box .mform input[disabled].active[name="nobutton"], .ucla-format-notice-box .mform input[disabled][name="nobutton"].dndupload-progress-outer, .btn-default[disabled].dndupload-progress-outer, fieldset[disabled] .btn-default, fieldset[disabled] input[type="button"],
+fieldset[disabled] input[type="submit"], fieldset[disabled] .navbutton .wikisearch input[type="submit"], .navbutton .wikisearch fieldset[disabled] input[type="submit"],
+fieldset[disabled] .navbutton .forumsearch input[type="submit"],
+.navbutton .forumsearch fieldset[disabled] input[type="submit"], fieldset[disabled] .ucla-format-notice-box .mform input[name="laterbutton"], .ucla-format-notice-box .mform fieldset[disabled] input[name="laterbutton"], fieldset[disabled] .ucla-format-notice-box .mform input[name="nobutton"], .ucla-format-notice-box .mform fieldset[disabled] input[name="nobutton"], fieldset[disabled] .btn-default:hover, fieldset[disabled] input[type="button"]:hover,
+fieldset[disabled] input[type="submit"]:hover, fieldset[disabled] .ucla-format-notice-box .mform input[name="laterbutton"]:hover, .ucla-format-notice-box .mform fieldset[disabled] input[name="laterbutton"]:hover, fieldset[disabled] .ucla-format-notice-box .mform input[name="nobutton"]:hover, .ucla-format-notice-box .mform fieldset[disabled] input[name="nobutton"]:hover, fieldset[disabled] .btn-default:focus, fieldset[disabled] input[type="button"]:focus,
+fieldset[disabled] input[type="submit"]:focus, fieldset[disabled] .ucla-format-notice-box .mform input[name="laterbutton"]:focus, .ucla-format-notice-box .mform fieldset[disabled] input[name="laterbutton"]:focus, fieldset[disabled] .ucla-format-notice-box .mform input[name="nobutton"]:focus, .ucla-format-notice-box .mform fieldset[disabled] input[name="nobutton"]:focus, fieldset[disabled] .btn-default:active, fieldset[disabled] input[type="button"]:active,
+fieldset[disabled] input[type="submit"]:active, fieldset[disabled] .ucla-format-notice-box .mform input[name="laterbutton"]:active, .ucla-format-notice-box .mform fieldset[disabled] input[name="laterbutton"]:active, fieldset[disabled] .ucla-format-notice-box .mform input[name="nobutton"]:active, .ucla-format-notice-box .mform fieldset[disabled] input[name="nobutton"]:active, fieldset[disabled] .btn-default.active, fieldset[disabled] input.active[type="button"], fieldset[disabled] input[type="button"].dndupload-progress-outer,
+fieldset[disabled] input.active[type="submit"],
+fieldset[disabled] input[type="submit"].dndupload-progress-outer, fieldset[disabled] .ucla-format-notice-box .mform input.active[name="laterbutton"], .ucla-format-notice-box .mform fieldset[disabled] input.active[name="laterbutton"], fieldset[disabled] .ucla-format-notice-box .mform input[name="laterbutton"].dndupload-progress-outer, .ucla-format-notice-box .mform fieldset[disabled] input[name="laterbutton"].dndupload-progress-outer, fieldset[disabled] .ucla-format-notice-box .mform input.active[name="nobutton"], .ucla-format-notice-box .mform fieldset[disabled] input.active[name="nobutton"], fieldset[disabled] .ucla-format-notice-box .mform input[name="nobutton"].dndupload-progress-outer, .ucla-format-notice-box .mform fieldset[disabled] input[name="nobutton"].dndupload-progress-outer, fieldset[disabled] .btn-default.dndupload-progress-outer {
+  background-color: #4d4d4d;
+  border-color: #333333;
+}
+
+/* line 23, ../sass/_buttons.scss */
 .btn-primary, #tool_uclacourserequestor input[type="button"], .uclaconsole input[type="button"], .ucla-search input[type="button"], #tool_uclacourserequestor
 input[type="submit"], .uclaconsole
 input[type="submit"], .ucla-search
@@ -1548,7 +1622,7 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   color: white !important;
 }
 
-/* line 23, ../sass/_buttons.scss */
+/* line 27, ../sass/_buttons.scss */
 .btn-cpanel, .control-panel input[type="submit"] {
   color: #0d3286;
   background-color: #fcd226;
@@ -1580,39 +1654,39 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   background-color: #fcd226;
   border-color: #fcb126;
 }
-/* line 27, ../sass/_buttons.scss */
+/* line 31, ../sass/_buttons.scss */
 .btn-cpanel:hover, .control-panel input[type="submit"]:hover {
   color: #0d3286;
 }
 
-/* line 69, ../sass/_buttons.scss */
+/* line 73, ../sass/_buttons.scss */
 .navbutton .wikisearch input[alt="search"],
 .navbutton .forumsearch input[alt="search"] {
   display: inline-block !important;
 }
 
-/* line 87, ../sass/_buttons.scss */
+/* line 91, ../sass/_buttons.scss */
 .pagelayout-redirect {
   text-align: center;
 }
-/* line 90, ../sass/_buttons.scss */
+/* line 94, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton {
   /*@extend .btn-lg;*/
 }
-/* line 95, ../sass/_buttons.scss */
+/* line 99, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton a, .pagelayout-redirect .continuebutton a:link {
   color: white;
 }
-/* line 96, ../sass/_buttons.scss */
+/* line 100, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton a:hover {
   text-decoration: none;
 }
 
-/* line 104, ../sass/_buttons.scss */
+/* line 108, ../sass/_buttons.scss */
 .section-modchooser-link > a, .section-modchooser-link > a:link {
   color: white;
 }
-/* line 106, ../sass/_buttons.scss */
+/* line 110, ../sass/_buttons.scss */
 .section-modchooser-link > a:hover, .section-modchooser-link > a:link:hover {
   text-decoration: none;
 }
@@ -3708,79 +3782,169 @@ table.rolecap tr.rolecap th {
     margin-top: 0;
   }
 }
+@media only screen and (max-width: 480px) {
+  /* line 86, ../sass/_header.scss */
+  .header-login-frontpage {
+    margin-bottom: 8px;
+  }
+  /* line 141, ../sass/_header.scss */
+  .header-login-frontpage .login {
+    background-color: #2b456b;
+  }
+  /* line 145, ../sass/_header.scss */
+  .env-dev .header-login-frontpage .login {
+    background-color: #296d25;
+  }
+  /* line 150, ../sass/_header.scss */
+  .env-test .header-login-frontpage .login {
+    background-color: #8c5111;
+  }
+  /* line 155, ../sass/_header.scss */
+  .env-stage .header-login-frontpage .login {
+    background-color: #4f0c49;
+  }
+  /* line 160, ../sass/_header.scss */
+  .header-login-frontpage .login:hover {
+    color: #4168A1;
+    background-color: white;
+    transition-property: background-color, color;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+  }
+}
+@media only screen and (min-width: 480px) and (max-width: 768px) {
+  /* line 86, ../sass/_header.scss */
+  .header-login-frontpage {
+    margin-bottom: 8px;
+  }
+  /* line 141, ../sass/_header.scss */
+  .header-login-frontpage .login {
+    background-color: #2b456b;
+  }
+  /* line 145, ../sass/_header.scss */
+  .env-dev .header-login-frontpage .login {
+    background-color: #296d25;
+  }
+  /* line 150, ../sass/_header.scss */
+  .env-test .header-login-frontpage .login {
+    background-color: #8c5111;
+  }
+  /* line 155, ../sass/_header.scss */
+  .env-stage .header-login-frontpage .login {
+    background-color: #4f0c49;
+  }
+  /* line 160, ../sass/_header.scss */
+  .header-login-frontpage .login:hover {
+    color: #4168A1;
+    background-color: white;
+    transition-property: background-color, color;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+  /* line 86, ../sass/_header.scss */
+  .header-login-frontpage {
+    margin-bottom: 8px;
+  }
+  /* line 141, ../sass/_header.scss */
+  .header-login-frontpage .login {
+    background-color: #2b456b;
+  }
+  /* line 145, ../sass/_header.scss */
+  .env-dev .header-login-frontpage .login {
+    background-color: #296d25;
+  }
+  /* line 150, ../sass/_header.scss */
+  .env-test .header-login-frontpage .login {
+    background-color: #8c5111;
+  }
+  /* line 155, ../sass/_header.scss */
+  .env-stage .header-login-frontpage .login {
+    background-color: #4f0c49;
+  }
+  /* line 160, ../sass/_header.scss */
+  .header-login-frontpage .login:hover {
+    color: #4168A1;
+    background-color: white;
+    transition-property: background-color, color;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+  }
+}
 
-/* line 143, ../sass/_header.scss */
+/* line 175, ../sass/_header.scss */
 .header-login {
   text-align: center;
 }
-/* line 147, ../sass/_header.scss */
+/* line 179, ../sass/_header.scss */
 .header-login .header-links {
   color: white;
 }
-/* line 149, ../sass/_header.scss */
+/* line 181, ../sass/_header.scss */
 .header-login .header-links a {
   color: white;
 }
 @media only screen and (min-width: 768px) {
-  /* line 143, ../sass/_header.scss */
+  /* line 175, ../sass/_header.scss */
   .header-login {
     text-align: right;
   }
-  /* line 155, ../sass/_header.scss */
+  /* line 187, ../sass/_header.scss */
   .header-login .header-links {
     margin-top: 4px;
   }
 }
 
-/* line 164, ../sass/_header.scss */
+/* line 196, ../sass/_header.scss */
 .header-logo {
   text-align: center;
 }
-/* line 167, ../sass/_header.scss */
+/* line 199, ../sass/_header.scss */
 .header-logo .logo-ucla {
   margin-right: 8px;
   width: 60px;
   display: inline-block;
 }
-/* line 172, ../sass/_header.scss */
+/* line 204, ../sass/_header.scss */
 .header-logo .logo-ucla img {
   display: inline-block;
   max-width: 100%;
 }
 @media only screen and (min-width: 768px) {
-  /* line 167, ../sass/_header.scss */
+  /* line 199, ../sass/_header.scss */
   .header-logo .logo-ucla {
     width: 90px;
   }
 }
-/* line 181, ../sass/_header.scss */
+/* line 213, ../sass/_header.scss */
 .header-logo .logo-ccle {
   color: #FFBC00;
   font-weight: bold;
   font-size: 2.5rem;
   margin-right: 8px;
 }
-/* line 187, ../sass/_header.scss */
+/* line 219, ../sass/_header.scss */
 .header-logo .logo-ccle:hover {
   text-decoration: none;
 }
 @media only screen and (min-width: 768px) {
-  /* line 181, ../sass/_header.scss */
+  /* line 213, ../sass/_header.scss */
   .header-logo .logo-ccle {
     font-size: 3.8rem;
   }
 }
-/* line 191, ../sass/_header.scss */
+/* line 223, ../sass/_header.scss */
 .header-logo .logo-ccle-full {
   display: none;
 }
 @media only screen and (min-width: 768px) {
-  /* line 191, ../sass/_header.scss */
+  /* line 223, ../sass/_header.scss */
   .header-logo .logo-ccle-full {
     display: inline-block;
   }
 }
-/* line 198, ../sass/_header.scss */
+/* line 230, ../sass/_header.scss */
 .header-logo .logo-cc,
 .header-logo .logo-le {
   color: #A1B6D6;
@@ -3790,75 +3954,75 @@ table.rolecap tr.rolecap th {
   width: 100%;
   text-transform: capitalize;
 }
-/* line 206, ../sass/_header.scss */
+/* line 238, ../sass/_header.scss */
 .header-logo .logo-le {
   clear: left;
 }
 @media only screen and (min-width: 768px) {
-  /* line 164, ../sass/_header.scss */
+  /* line 196, ../sass/_header.scss */
   .header-logo {
     text-align: left;
   }
 }
 
-/* line 220, ../sass/_header.scss */
+/* line 252, ../sass/_header.scss */
 .navbar {
   border-bottom: 1px solid #eee;
   background-color: #fefefe;
 }
-/* line 224, ../sass/_header.scss */
+/* line 256, ../sass/_header.scss */
 .navbar .controls {
   margin: 4px 0;
   padding: 0 16px;
   float: right;
 }
 @media only screen and (max-width: 480px) {
-  /* line 224, ../sass/_header.scss */
+  /* line 256, ../sass/_header.scss */
   .navbar .controls {
     width: 100%;
   }
-  /* line 233, ../sass/_header.scss */
+  /* line 265, ../sass/_header.scss */
   .navbar .controls .navbar-control {
     width: 100%;
     clear: both;
     margin-left: 0;
   }
-  /* line 238, ../sass/_header.scss */
+  /* line 270, ../sass/_header.scss */
   .navbar .controls .navbar-control div {
     display: inline !important;
   }
-  /* line 243, ../sass/_header.scss */
+  /* line 275, ../sass/_header.scss */
   .navbar .controls .navbar-control fieldset {
     width: 100%;
   }
-  /* line 248, ../sass/_header.scss */
+  /* line 280, ../sass/_header.scss */
   .navbar .controls .navbar-control input[type="text"] {
     width: 100%;
   }
-  /* line 254, ../sass/_header.scss */
+  /* line 286, ../sass/_header.scss */
   .navbar .controls .navbar-control .helptooltip .iconhelp {
     width: 24px;
     height: 24px;
   }
-  /* line 259, ../sass/_header.scss */
+  /* line 291, ../sass/_header.scss */
   .navbar .controls .navbar-control .helptooltip ~ input[type="text"] {
     width: 90%;
     margin-left: 8px;
   }
 }
-/* line 268, ../sass/_header.scss */
+/* line 300, ../sass/_header.scss */
 .navbar .navbar-control {
   float: left;
   margin-left: 4px;
 }
 
-/* line 279, ../sass/_header.scss */
+/* line 311, ../sass/_header.scss */
 .navbutton .wikisearch,
 .navbutton .forumsearch {
   display: inline-block !important;
 }
 
-/* line 287, ../sass/_header.scss */
+/* line 319, ../sass/_header.scss */
 .system-identification {
   background-color: #ddebfe;
   color: #4168a1;
@@ -3867,7 +4031,7 @@ table.rolecap tr.rolecap th {
   font-size: 1.1rem;
   text-transform: uppercase;
 }
-/* line 295, ../sass/_header.scss */
+/* line 327, ../sass/_header.scss */
 .system-identification .system-name {
   width: 40%;
   display: inline;
@@ -3875,20 +4039,20 @@ table.rolecap tr.rolecap th {
   font-weight: bold;
   line-height: 1.5;
 }
-/* line 302, ../sass/_header.scss */
+/* line 334, ../sass/_header.scss */
 .system-identification .system-name:hover {
   background-color: #4168a1;
   color: white;
   text-decoration: none;
 }
-/* line 308, ../sass/_header.scss */
+/* line 340, ../sass/_header.scss */
 .system-identification .weeks-display {
   float: right;
   text-align: right;
   padding: 0 16px;
   line-height: 1.5;
 }
-/* line 314, ../sass/_header.scss */
+/* line 346, ../sass/_header.scss */
 .system-identification .weeks-display .week {
   font-weight: bold;
 }
@@ -4836,11 +5000,17 @@ table.rolecap tr.rolecap th {
 }
 
 /* line 57, ../sass/_labels.scss */
-.label-danger, .mform .required .error .error, .block.block_calendar_month .today.eventnone > a {
+.label-danger, .mform .required .error .error, .block.block_calendar_month .today.eventnone > a,
+.calendarmonth.calendartable .today.eventnone > a,
+.minicalendar.calendartable .today.eventnone > a {
   background-color: #d9534f;
 }
 /* line 484, ../package/bootstrap/lib/_mixins.scss */
-.label-danger[href]:hover, .mform .required .error [href].error:hover, .block.block_calendar_month .today.eventnone > a[href]:hover, .label-danger[href]:focus, .mform .required .error [href].error:focus, .block.block_calendar_month .today.eventnone > a[href]:focus {
+.label-danger[href]:hover, .mform .required .error [href].error:hover, .block.block_calendar_month .today.eventnone > a[href]:hover,
+.calendarmonth.calendartable .today.eventnone > a[href]:hover,
+.minicalendar.calendartable .today.eventnone > a[href]:hover, .label-danger[href]:focus, .mform .required .error [href].error:focus, .block.block_calendar_month .today.eventnone > a[href]:focus,
+.calendarmonth.calendartable .today.eventnone > a[href]:focus,
+.minicalendar.calendartable .today.eventnone > a[href]:focus {
   background-color: #c9302c;
 }
 
@@ -8062,7 +8232,9 @@ h2.headingblock.input-group-btn > input[type="submit"] + a, #tool_uclacourserequ
 }
 
 /* line 7, ../package/bootstrap/lib/_badges.scss */
-.badge, .block.block_calendar_month .today.eventnone > a {
+.badge, .block.block_calendar_month .today.eventnone > a,
+.calendarmonth.calendartable .today.eventnone > a,
+.minicalendar.calendartable .today.eventnone > a {
   display: inline-block;
   min-width: 10px;
   padding: 3px 7px;
@@ -8077,12 +8249,18 @@ h2.headingblock.input-group-btn > input[type="submit"] + a, #tool_uclacourserequ
   border-radius: 10px;
 }
 /* line 22, ../package/bootstrap/lib/_badges.scss */
-.badge:empty, .block.block_calendar_month .today.eventnone > a:empty {
+.badge:empty, .block.block_calendar_month .today.eventnone > a:empty,
+.calendarmonth.calendartable .today.eventnone > a:empty,
+.minicalendar.calendartable .today.eventnone > a:empty {
   display: none;
 }
 
 /* line 30, ../package/bootstrap/lib/_badges.scss */
-a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover, a.badge:focus, .block.block_calendar_month .today.eventnone > a:focus {
+a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover,
+.calendarmonth.calendartable .today.eventnone > a:hover,
+.minicalendar.calendartable .today.eventnone > a:hover, a.badge:focus, .block.block_calendar_month .today.eventnone > a:focus,
+.calendarmonth.calendartable .today.eventnone > a:focus,
+.minicalendar.calendartable .today.eventnone > a:focus {
   color: white;
   text-decoration: none;
   cursor: pointer;
@@ -8090,29 +8268,174 @@ a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover, a.badge:f
 
 /* line 38, ../package/bootstrap/lib/_badges.scss */
 .btn .badge, input[type="button"] .badge,
-input[type="submit"] .badge, #tool_uclacourserequestor input[type="button"] .badge, #tool_uclacourserequestor
+input[type="submit"] .badge, #tool_uclacourserequestor input[type="button"] .badge, .uclaconsole input[type="button"] .badge, .ucla-search input[type="button"] .badge, #tool_uclacourserequestor
+input[type="submit"] .badge, .uclaconsole
+input[type="submit"] .badge, .ucla-search
 input[type="submit"] .badge, .mform .collapseexpand .badge, .mform input[name="submitbutton"] .badge, .navbutton .wikisearch input[type="submit"] .badge,
-.navbutton .forumsearch input[type="submit"] .badge, .navbutton .singlebutton input[type="submit"] .badge, .pagelayout-redirect .continuebutton .badge, .section-modchooser-link .badge, .ucla-format-notice-box .mform input[name="yesbutton"] .badge, .ucla-format-notice-box .mform input[name="laterbutton"] .badge, .ucla-format-notice-box .mform input[name="nobutton"] .badge, h2.headingblock > a .badge, #addadmisform > h3.main > a .badge, .region-content > h2.main > a .badge, .wiki_clear ~ .mform #save .badge, .wiki_clear ~ .mform #cancel .badge, .btn .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .btn .today.eventnone > a, input[type="button"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month input[type="button"] .today.eventnone > a,
+.navbutton .forumsearch input[type="submit"] .badge, .navbutton .singlebutton input[type="submit"] .badge, .pagelayout-redirect .continuebutton .badge, .section-modchooser-link .badge, .alert-login input[type="submit"] .badge, .control-panel input[type="submit"] .badge, .ucla-format-notice-box .mform input[name="yesbutton"] .badge, .ucla-format-notice-box .mform input[name="laterbutton"] .badge, .ucla-format-notice-box .mform input[name="nobutton"] .badge, h2.headingblock > a .badge, #addadmisform > h3.main > a .badge, .region-content > h2.main > a .badge, .forumaddnew input[type="submit"] .badge,
+.forumnodiscuss input[type="submit"] .badge, .wiki_clear ~ .mform #save .badge, .wiki_clear ~ .mform #cancel .badge, .btn .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .btn .today.eventnone > a, input[type="button"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month input[type="button"] .today.eventnone > a,
 input[type="submit"] .block.block_calendar_month .today.eventnone > a,
-.block.block_calendar_month input[type="submit"] .today.eventnone > a, #tool_uclacourserequestor input[type="button"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month #tool_uclacourserequestor input[type="button"] .today.eventnone > a, #tool_uclacourserequestor
+.block.block_calendar_month input[type="submit"] .today.eventnone > a, #tool_uclacourserequestor input[type="button"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month #tool_uclacourserequestor input[type="button"] .today.eventnone > a, .uclaconsole input[type="button"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .uclaconsole input[type="button"] .today.eventnone > a, .ucla-search input[type="button"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-search input[type="button"] .today.eventnone > a, #tool_uclacourserequestor
 input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month #tool_uclacourserequestor
-input[type="submit"] .today.eventnone > a, .mform .collapseexpand .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .mform .collapseexpand .today.eventnone > a, .mform input[name="submitbutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .mform input[name="submitbutton"] .today.eventnone > a, .pagelayout-redirect .continuebutton .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .pagelayout-redirect .continuebutton .today.eventnone > a, .section-modchooser-link .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .section-modchooser-link .today.eventnone > a, .ucla-format-notice-box .mform input[name="yesbutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-format-notice-box .mform input[name="yesbutton"] .today.eventnone > a, .ucla-format-notice-box .mform input[name="laterbutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-format-notice-box .mform input[name="laterbutton"] .today.eventnone > a, .ucla-format-notice-box .mform input[name="nobutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-format-notice-box .mform input[name="nobutton"] .today.eventnone > a, h2.headingblock > a .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month h2.headingblock > a .today.eventnone > a, #addadmisform > h3.main > a .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month #addadmisform > h3.main > a .today.eventnone > a, .region-content > h2.main > a .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .region-content > h2.main > a .today.eventnone > a, .wiki_clear ~ .mform #save .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .wiki_clear ~ .mform #save .today.eventnone > a, .wiki_clear ~ .mform #cancel .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .wiki_clear ~ .mform #cancel .today.eventnone > a {
+input[type="submit"] .today.eventnone > a, .uclaconsole
+input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .uclaconsole
+input[type="submit"] .today.eventnone > a, .ucla-search
+input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-search
+input[type="submit"] .today.eventnone > a, .mform .collapseexpand .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .mform .collapseexpand .today.eventnone > a, .mform input[name="submitbutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .mform input[name="submitbutton"] .today.eventnone > a, .navbutton .wikisearch input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .navbutton .wikisearch input[type="submit"] .today.eventnone > a,
+.navbutton .forumsearch input[type="submit"] .block.block_calendar_month .today.eventnone > a,
+.block.block_calendar_month .navbutton .forumsearch input[type="submit"] .today.eventnone > a, .navbutton .singlebutton input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .navbutton .singlebutton input[type="submit"] .today.eventnone > a, .pagelayout-redirect .continuebutton .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .pagelayout-redirect .continuebutton .today.eventnone > a, .section-modchooser-link .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .section-modchooser-link .today.eventnone > a, .alert-login input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .alert-login input[type="submit"] .today.eventnone > a, .control-panel input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .control-panel input[type="submit"] .today.eventnone > a, .ucla-format-notice-box .mform input[name="yesbutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-format-notice-box .mform input[name="yesbutton"] .today.eventnone > a, .ucla-format-notice-box .mform input[name="laterbutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-format-notice-box .mform input[name="laterbutton"] .today.eventnone > a, .ucla-format-notice-box .mform input[name="nobutton"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .ucla-format-notice-box .mform input[name="nobutton"] .today.eventnone > a, h2.headingblock > a .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month h2.headingblock > a .today.eventnone > a, #addadmisform > h3.main > a .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month #addadmisform > h3.main > a .today.eventnone > a, .region-content > h2.main > a .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .region-content > h2.main > a .today.eventnone > a, .forumaddnew input[type="submit"] .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .forumaddnew input[type="submit"] .today.eventnone > a,
+.forumnodiscuss input[type="submit"] .block.block_calendar_month .today.eventnone > a,
+.block.block_calendar_month .forumnodiscuss input[type="submit"] .today.eventnone > a, .wiki_clear ~ .mform #save .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .wiki_clear ~ .mform #save .today.eventnone > a, .wiki_clear ~ .mform #cancel .block.block_calendar_month .today.eventnone > a, .block.block_calendar_month .wiki_clear ~ .mform #cancel .today.eventnone > a,
+.btn .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .btn .today.eventnone > a,
+input[type="button"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable input[type="button"] .today.eventnone > a,
+input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable input[type="submit"] .today.eventnone > a,
+#tool_uclacourserequestor input[type="button"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable #tool_uclacourserequestor input[type="button"] .today.eventnone > a,
+.uclaconsole input[type="button"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .uclaconsole input[type="button"] .today.eventnone > a,
+.ucla-search input[type="button"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .ucla-search input[type="button"] .today.eventnone > a,
+#tool_uclacourserequestor
+input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable #tool_uclacourserequestor
+input[type="submit"] .today.eventnone > a,
+.uclaconsole
+input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .uclaconsole
+input[type="submit"] .today.eventnone > a,
+.ucla-search
+input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .ucla-search
+input[type="submit"] .today.eventnone > a,
+.mform .collapseexpand .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .mform .collapseexpand .today.eventnone > a,
+.mform input[name="submitbutton"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .mform input[name="submitbutton"] .today.eventnone > a,
+.navbutton .wikisearch input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .navbutton .wikisearch input[type="submit"] .today.eventnone > a,
+.navbutton .forumsearch input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .navbutton .forumsearch input[type="submit"] .today.eventnone > a,
+.navbutton .singlebutton input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .navbutton .singlebutton input[type="submit"] .today.eventnone > a,
+.pagelayout-redirect .continuebutton .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .pagelayout-redirect .continuebutton .today.eventnone > a,
+.section-modchooser-link .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .section-modchooser-link .today.eventnone > a,
+.alert-login input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .alert-login input[type="submit"] .today.eventnone > a,
+.control-panel input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .control-panel input[type="submit"] .today.eventnone > a,
+.ucla-format-notice-box .mform input[name="yesbutton"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .ucla-format-notice-box .mform input[name="yesbutton"] .today.eventnone > a,
+.ucla-format-notice-box .mform input[name="laterbutton"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .ucla-format-notice-box .mform input[name="laterbutton"] .today.eventnone > a,
+.ucla-format-notice-box .mform input[name="nobutton"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .ucla-format-notice-box .mform input[name="nobutton"] .today.eventnone > a,
+h2.headingblock > a .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable h2.headingblock > a .today.eventnone > a,
+#addadmisform > h3.main > a .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable #addadmisform > h3.main > a .today.eventnone > a,
+.region-content > h2.main > a .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .region-content > h2.main > a .today.eventnone > a,
+.forumaddnew input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .forumaddnew input[type="submit"] .today.eventnone > a,
+.forumnodiscuss input[type="submit"] .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .forumnodiscuss input[type="submit"] .today.eventnone > a,
+.wiki_clear ~ .mform #save .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .wiki_clear ~ .mform #save .today.eventnone > a,
+.wiki_clear ~ .mform #cancel .calendarmonth.calendartable .today.eventnone > a,
+.calendarmonth.calendartable .wiki_clear ~ .mform #cancel .today.eventnone > a,
+.btn .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .btn .today.eventnone > a,
+input[type="button"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable input[type="button"] .today.eventnone > a,
+input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable input[type="submit"] .today.eventnone > a,
+#tool_uclacourserequestor input[type="button"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable #tool_uclacourserequestor input[type="button"] .today.eventnone > a,
+.uclaconsole input[type="button"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .uclaconsole input[type="button"] .today.eventnone > a,
+.ucla-search input[type="button"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .ucla-search input[type="button"] .today.eventnone > a,
+#tool_uclacourserequestor
+input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable #tool_uclacourserequestor
+input[type="submit"] .today.eventnone > a,
+.uclaconsole
+input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .uclaconsole
+input[type="submit"] .today.eventnone > a,
+.ucla-search
+input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .ucla-search
+input[type="submit"] .today.eventnone > a,
+.mform .collapseexpand .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .mform .collapseexpand .today.eventnone > a,
+.mform input[name="submitbutton"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .mform input[name="submitbutton"] .today.eventnone > a,
+.navbutton .wikisearch input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .navbutton .wikisearch input[type="submit"] .today.eventnone > a,
+.navbutton .forumsearch input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .navbutton .forumsearch input[type="submit"] .today.eventnone > a,
+.navbutton .singlebutton input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .navbutton .singlebutton input[type="submit"] .today.eventnone > a,
+.pagelayout-redirect .continuebutton .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .pagelayout-redirect .continuebutton .today.eventnone > a,
+.section-modchooser-link .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .section-modchooser-link .today.eventnone > a,
+.alert-login input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .alert-login input[type="submit"] .today.eventnone > a,
+.control-panel input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .control-panel input[type="submit"] .today.eventnone > a,
+.ucla-format-notice-box .mform input[name="yesbutton"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .ucla-format-notice-box .mform input[name="yesbutton"] .today.eventnone > a,
+.ucla-format-notice-box .mform input[name="laterbutton"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .ucla-format-notice-box .mform input[name="laterbutton"] .today.eventnone > a,
+.ucla-format-notice-box .mform input[name="nobutton"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .ucla-format-notice-box .mform input[name="nobutton"] .today.eventnone > a,
+h2.headingblock > a .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable h2.headingblock > a .today.eventnone > a,
+#addadmisform > h3.main > a .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable #addadmisform > h3.main > a .today.eventnone > a,
+.region-content > h2.main > a .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .region-content > h2.main > a .today.eventnone > a,
+.forumaddnew input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .forumaddnew input[type="submit"] .today.eventnone > a,
+.forumnodiscuss input[type="submit"] .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .forumnodiscuss input[type="submit"] .today.eventnone > a,
+.wiki_clear ~ .mform #save .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .wiki_clear ~ .mform #save .today.eventnone > a,
+.wiki_clear ~ .mform #cancel .minicalendar.calendartable .today.eventnone > a,
+.minicalendar.calendartable .wiki_clear ~ .mform #cancel .today.eventnone > a {
   position: relative;
   top: -1px;
 }
 
 /* line 45, ../package/bootstrap/lib/_badges.scss */
 a.list-group-item.active > .badge, a.list-group-item.dndupload-progress-outer > .badge, .block.block_calendar_month a.today.eventnone.list-group-item.active > a, .block.block_calendar_month a.today.eventnone.list-group-item.dndupload-progress-outer > a,
+.calendarmonth.calendartable a.today.eventnone.list-group-item.active > a,
+.calendarmonth.calendartable a.today.eventnone.list-group-item.dndupload-progress-outer > a,
+.minicalendar.calendartable a.today.eventnone.list-group-item.active > a,
+.minicalendar.calendartable a.today.eventnone.list-group-item.dndupload-progress-outer > a,
 .nav-pills > .active > a > .badge,
 .nav-pills > .dndupload-progress-outer > a > .badge,
 .block.block_calendar_month .nav-pills > .active > a.today.eventnone > a,
-.block.block_calendar_month .nav-pills > .dndupload-progress-outer > a.today.eventnone > a {
+.block.block_calendar_month .nav-pills > .dndupload-progress-outer > a.today.eventnone > a,
+.calendarmonth.calendartable .nav-pills > .active > a.today.eventnone > a,
+.calendarmonth.calendartable .nav-pills > .dndupload-progress-outer > a.today.eventnone > a,
+.minicalendar.calendartable .nav-pills > .active > a.today.eventnone > a,
+.minicalendar.calendartable .nav-pills > .dndupload-progress-outer > a.today.eventnone > a {
   color: #428bca;
   background-color: white;
 }
 
 /* line 49, ../package/bootstrap/lib/_badges.scss */
-.nav-pills > li > a > .badge, .block.block_calendar_month .nav-pills > li > a.today.eventnone > a {
+.nav-pills > li > a > .badge, .block.block_calendar_month .nav-pills > li > a.today.eventnone > a,
+.calendarmonth.calendartable .nav-pills > li > a.today.eventnone > a,
+.minicalendar.calendartable .nav-pills > li > a.today.eventnone > a {
   margin-left: 3px;
 }
 
@@ -9649,99 +9972,146 @@ h2.headingblock > a {
   /*@include border-top-radius(0);*/
 }
 
-/* line 5, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month {
+/* line 7, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month,
+.calendarmonth.calendartable,
+.minicalendar.calendartable {
   background-color: white;
 }
-/* line 8, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month td, .block.block_calendar_month th {
+/* line 10, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month td, .block.block_calendar_month th,
+.calendarmonth.calendartable td,
+.calendarmonth.calendartable th,
+.minicalendar.calendartable td,
+.minicalendar.calendartable th {
   border-width: 0px;
   padding: 1px;
   width: 14%;
   line-height: 18px;
 }
-/* line 14, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month abbr {
+/* line 16, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month abbr,
+.calendarmonth.calendartable abbr,
+.minicalendar.calendartable abbr {
   border-bottom-width: 0px;
 }
-/* line 18, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month > .content {
+/* line 20, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month > .content,
+.calendarmonth.calendartable > .content,
+.minicalendar.calendartable > .content {
   background-color: white;
   padding: 0;
   color: #666;
 }
-/* line 24, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .calendar-controls {
+/* line 26, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .calendar-controls,
+.calendarmonth.calendartable .calendar-controls,
+.minicalendar.calendartable .calendar-controls {
   padding: 12px 4px 8px 4px;
 }
-/* line 27, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .calendar-controls .arrow {
+/* line 29, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .calendar-controls .arrow,
+.calendarmonth.calendartable .calendar-controls .arrow,
+.minicalendar.calendartable .calendar-controls .arrow {
   color: #aaa;
 }
-/* line 30, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .calendar-controls .current > a {
+/* line 32, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .calendar-controls .current > a,
+.calendarmonth.calendartable .calendar-controls .current > a,
+.minicalendar.calendartable .calendar-controls .current > a {
   color: #394a6e;
   font-weight: bold;
   text-transform: uppercase;
 }
-/* line 37, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month table .weekdays {
+/* line 39, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month table .weekdays,
+.calendarmonth.calendartable table .weekdays,
+.minicalendar.calendartable table .weekdays {
   text-transform: uppercase;
   color: #aaa;
   font-size: 1.4rem;
 }
-/* line 42, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month table .weekdays > th {
+/* line 44, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month table .weekdays > th,
+.calendarmonth.calendartable table .weekdays > th,
+.minicalendar.calendartable table .weekdays > th {
   font-weight: normal;
 }
-/* line 47, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .today.eventnone {
+/* line 49, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .today.eventnone,
+.calendarmonth.calendartable .today.eventnone,
+.minicalendar.calendartable .today.eventnone {
   border: 0;
   /*background-color: #eaeaea;*/
 }
-/* line 50, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .today.eventnone > a {
-  background-color: red;
+/* line 52, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .today.eventnone > a,
+.calendarmonth.calendartable .today.eventnone > a,
+.minicalendar.calendartable .today.eventnone > a {
+  background-color: #cd6b69;
   color: white;
   /*line-height: 2.0rem;*/
 }
-/* line 60, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .content h3.eventskey {
+/* line 62, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .content h3.eventskey,
+.calendarmonth.calendartable .content h3.eventskey,
+.minicalendar.calendartable .content h3.eventskey {
   border-top: 1px solid #eee;
   padding: 8px 0;
   margin: 0;
   text-align: center;
 }
-/* line 67, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .content .minicalendar .weekdays th:first-child abbr {
+/* line 69, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .content .minicalendar .weekdays th:first-child abbr,
+.calendarmonth.calendartable .content .minicalendar .weekdays th:first-child abbr,
+.minicalendar.calendartable .content .minicalendar .weekdays th:first-child abbr {
   margin-left: 2px;
 }
-/* line 71, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .content .minicalendar .weekdays th:last-child abbr {
+/* line 73, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .content .minicalendar .weekdays th:last-child abbr,
+.calendarmonth.calendartable .content .minicalendar .weekdays th:last-child abbr,
+.minicalendar.calendartable .content .minicalendar .weekdays th:last-child abbr {
   margin-right: 2px;
 }
-/* line 75, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .minicalendar td.weekend {
-  color: #ccc;
+/* line 77, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .minicalendar td.weekend, .block.block_calendar_month .weekend.day,
+.calendarmonth.calendartable .minicalendar td.weekend,
+.calendarmonth.calendartable .weekend.day,
+.minicalendar.calendartable .minicalendar td.weekend,
+.minicalendar.calendartable .weekend.day {
+  color: #777;
 }
-/* line 79, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month .minicalendar td {
+/* line 81, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month .minicalendar td,
+.calendarmonth.calendartable .minicalendar td,
+.minicalendar.calendartable .minicalendar td {
   font-size: 1.4rem;
   font-weight: normal;
 }
-/* line 85, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month tbody tr:not(.weekdays) {
+/* line 87, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month tbody tr:not(.weekdays),
+.calendarmonth.calendartable tbody tr:not(.weekdays),
+.minicalendar.calendartable tbody tr:not(.weekdays) {
   border-top: 1px solid #efefef;
 }
-/* line 88, ../sass/ccle/mod/_calendar.scss */
-.block.block_calendar_month tbody td {
+/* line 90, ../sass/ccle/mod/_calendar.scss */
+.block.block_calendar_month tbody td,
+.calendarmonth.calendartable tbody td,
+.minicalendar.calendartable tbody td {
   line-height: 2.5rem;
 }
 
-/* line 98, ../sass/ccle/mod/_calendar.scss */
+/* line 100, ../sass/ccle/mod/_calendar.scss */
 .minicalendarblock > .minicalendar {
   background-color: white;
   border: 0;
+}
+
+/* line 107, ../sass/ccle/mod/_calendar.scss */
+.calendarmonth.calendartable .today {
+  border-top: 4px solid #cd6b69;
+  border-bottom: 1px solid #cd6b69;
+  background-color: #fff5f5;
 }
 
 /* line 8, ../sass/ccle/mod/_turnitin.scss */

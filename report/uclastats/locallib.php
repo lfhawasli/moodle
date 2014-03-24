@@ -95,7 +95,7 @@ abstract class uclastats_base implements renderable {
                 'cached-results-table ' . get_class($this));
 
             // get first element and get its array keys to generate header
-            $header = array('header_param', 'header_results', 'header_lastran',
+            $header = array('header_param', 'header_results', 'header_lastrun',
                 'header_actions');
 
             // generate header
@@ -138,11 +138,11 @@ abstract class uclastats_base implements renderable {
                 $row->cells['results'] = $this->format_cached_results($result->results);
 
                 // display information on who ran the query and the timestamp
-                $lastran = new stdClass();
-                $lastran->who = $result->userfullname;
-                $lastran->when = $result->timecreated;
-                $row->cells['lastran'] =
-                        get_string('lastran', 'report_uclastats', $lastran);
+                $lastrun = new stdClass();
+                $lastrun->who = $result->userfullname;
+                $lastrun->when = $result->timecreated;
+                $row->cells['lastrun'] =
+                        get_string('lastrun', 'report_uclastats', $lastrun);
 
                 //view results
                 $row->cells['actions'] = html_writer::link(
@@ -280,8 +280,8 @@ abstract class uclastats_base implements renderable {
         $footer_info = new stdClass();
         $footer_info->who = $uclastats_result->userfullname;
         $footer_info->when = $uclastats_result->timecreated;
-        $footer = get_string('lastran', 'report_uclastats', $footer_info);
-        $ret_val .= html_writer::tag('p', $footer, array('class' => 'lastran'));
+        $footer = get_string('lastrun', 'report_uclastats', $footer_info);
+        $ret_val .= html_writer::tag('p', $footer, array('class' => 'lastrun'));
 
         return $ret_val;
     }
@@ -339,7 +339,7 @@ abstract class uclastats_base implements renderable {
         $footer_info = new stdClass();
         $footer_info->who = $uclastats_result->userfullname;
         $footer_info->when = $uclastats_result->timecreated;
-        $footer = get_string('lastran', 'report_uclastats', $footer_info);
+        $footer = get_string('lastrun', 'report_uclastats', $footer_info);
         $worksheet->write_string($row, 0, $footer);
 
         // close the workbook
@@ -731,23 +731,25 @@ class uclastats_result implements renderable {
      * @return array
      */
     private function decode_results() {
-        if (!isset(self::$_cache['decode_results'][$this->result->id])) {
-            self::$_cache['decode_results']
+        $runningunittests = defined('PHPUNIT_TEST') && PHPUNIT_TEST;
+        if ($runningunittests ||
+                !isset(self::$_cache['decode_results'][$this->result->id])) {
+            self::$_cache['decode_results'][$this->result->id]
                     = json_decode($this->result->results, true);
         }
-        return self::$_cache['decode_results'];
+        return self::$_cache['decode_results'][$this->result->id];
     }
 
     /**
      * Queries for user object and tries to use cached result, if any.
      *
-     * @global object $DB
      * @param int $userid
      */
     private function get_user($userid) {
         global $DB;
-        // cache user object lookups, since there might be many repeats
-        if (empty(self::$_cache['user'][$userid])) {
+        $runningunittests = defined('PHPUNIT_TEST') && PHPUNIT_TEST;
+        // Cache user object lookups, since there might be many repeats.
+        if ($runningunittests || empty(self::$_cache['user'][$userid])) {
             self::$_cache['user'][$userid] =
                     $DB->get_record('user', array('id' => $userid));
         }

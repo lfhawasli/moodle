@@ -36,4 +36,5 @@ $string['media_creation_help'] = 'Select the method of media you would like to a
 $string['scr_loading'] = 'Loading...';
 $string['kalvidpres:screenrecorder'] = 'Screen recorder';
 $string['previewvideo'] = 'Preview';
-$string['javanotenabled'] = 'Browser Java is disabled.  Please enable Java and refresh the page to use the screen recorder.';
+$string['checkingforjava'] = 'Checking for Java';
+$string['javanotenabled'] = 'Failed to detect Java, please make sure you have the latest version of Java installed and enabled and then try again.';

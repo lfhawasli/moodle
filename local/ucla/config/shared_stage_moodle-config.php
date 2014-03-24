@@ -241,7 +241,6 @@ $CFG->forced_plugin_settings['page']['printheading'] = 1;
 // Site administration > Plugins > Activity modules > File
 $CFG->forced_plugin_settings['resource']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['resource']['printheading'] = 1;
-$CFG->forced_plugin_settings['resource']['display'] = 4;   // "Force Download"
 
 // Site administration > Plugins > Activity modules > Quiz
 $CFG->forced_plugin_settings['quiz']['overduehandling'] = 'autosubmit';
@@ -303,6 +302,10 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] =
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
 
+// Site administration > Plugins > Blocks > Respondus LockDown Browser
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = __DIR__."/../../../"."blocks/lockdownbrowser/customscripts";
+
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
@@ -348,6 +351,20 @@ $CFG->forced_plugin_settings['local_kaltura']['mymedia_application_name'] = 'ccl
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
+
+// Grading config variables.
+// CCLE-4295 - Add Grouping Filter for the Grader Report
+$CFG->grader_report_grouping_filter = 1;
+// CCLE-4292 - Collapse Default Columns for Assignment Grading
+$CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
+// CCLE-4299 - Improve Assignment Grading Screen
+$CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
+// CCLE-4297 - Have "quick grading" turned on by default
+$CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
+// CCLE-3511 - Set defaults for new assignment module
+$CFG->forced_plugin_settings['local_ucla']['defaultassignsettings'] = 1;
+// CCLE-4289 - Show All View Action Icons
+$CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true; 
@@ -479,9 +496,6 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_shibd'] 
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_trans'] = '/var/log/shibboleth/transaction.log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_moodle_cron'] = '/home/moodle/logs/moodlecron/moodlecron.out';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
-
-// CCLE-4295 - Add Grouping Filter for the Grader Report
-$CFG->grader_report_grouping_filter = 1;
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');

@@ -206,6 +206,16 @@ class grade_report_grader extends grade_report {
                     // Was change requested?
                     $oldvalue = $this->grades[$userid][$itemid];
                     if ($datatype === 'grade') {
+
+                        // START UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
+                        // Reference from UMass Amherst.
+                        // Compare the current user's page loading time again the last modified time in DB.
+                        if($data->currenttime < $oldvalue->timemodified) {
+                            $warnings[] = get_string('errorsavegradestaled', 'gradereport_grader');
+                            return $warnings;
+                        }
+                        // END UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
+
                         // If there was no grade and there still isn't
                         if (is_null($oldvalue->finalgrade) && $postedvalue == -1) {
                             // -1 means no grade
@@ -1640,6 +1650,8 @@ class grade_report_grader extends grade_report {
 
             $url = new moodle_url($this->gpr->get_return_url(null, array('target'=>$element['eid'], 'sesskey'=>sesskey())));
 
+            // START UCLA MOD: CCLE-4289 - Show All View Action Icons
+            /*
             if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
                 $url->param('action', 'switch_plus');
                 $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
@@ -1652,6 +1664,46 @@ class grade_report_grader extends grade_report {
                 $url->param('action', 'switch_minus');
                 $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
             }
+            */
+            if (get_config('local_ucla', 'showallgraderviewactions')) {
+                if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
+                    $url->param('action', 'switch_plus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
+                    $url->param('action', 'switch_whole');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_whole',$strswitchwhole));
+                    $url->param('action', 'switch_minus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus), null, array('class'=>'action-icon selected'));
+
+                } else if (in_array($element['object']->id, $this->collapsed['gradesonly'])) {
+                    $url->param('action', 'switch_plus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus), null, array('class'=>'action-icon selected'));
+                    $url->param('action', 'switch_whole');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_whole', $strswitchwhole));
+                    $url->param('action', 'switch_minus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
+                } else {
+                    $url->param('action', 'switch_plus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
+                    $url->param('action', 'switch_whole');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_whole', $strswitchwhole), null, array('class'=>'action-icon selected'));
+                    $url->param('action', 'switch_minus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
+                }
+            } else {
+                if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
+                    $url->param('action', 'switch_plus');
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
+
+                } else if (in_array($element['object']->id, $this->collapsed['gradesonly'])) {
+                    $url->param('action', 'switch_whole');
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_whole', $strswitchwhole));
+
+                } else {
+                    $url->param('action', 'switch_minus');
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
+                }
+            }
+            // END UCLA MOD: CCLE-4289
         }
         return $icon;
     }
@@ -1702,6 +1754,14 @@ class grade_report_grader extends grade_report {
                     unset($collapsed['gradesonly'][$key]);
                     set_user_preference('grade_report_grader_collapsed_categories', serialize($collapsed));
                 }
+                
+                // START UCLA MOD: CCLE-4289 - Show All View Action Icons
+                $key = array_search($targetid, $collapsed['aggregatesonly']);
+                if ($key !== false) {
+                    unset($collapsed['aggregatesonly'][$key]);
+                    set_user_preference('grade_report_grader_collapsed_categories', serialize($collapsed));
+                }
+                // END UCLA MOD: CCLE-4289
 
                 break;
             default:

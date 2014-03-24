@@ -115,6 +115,18 @@ $CFG->forced_plugin_settings['tool_myucla_url']['user_name'] = 'CCLE Admin';   /
 $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ccle@ucla.edu';  // email for registering URL with My.UCLA
 $CFG->forced_plugin_settings['tool_myucla_url']['override_debugging'] = true;   // test sending MyUCLA urls
 
+// For MyUCLA url updater phpunit tests.
+define('MYUCLA_URL_UPDATER_TEST_CONFIG_URL',
+        $CFG->forced_plugin_settings['tool_myucla_url']['url_service']);
+define('MYUCLA_URL_UPDATER_TEST_CONFIG_NAME',
+        $CFG->forced_plugin_settings['tool_myucla_url']['user_name']);
+define('MYUCLA_URL_UPDATER_TEST_CONFIG_EMAIL',
+        $CFG->forced_plugin_settings['tool_myucla_url']['user_email']);
+define('MYUCLA_URL_UPDATER_TEST_CONFIG_OVERRIDE_DEBUGGING',
+        $CFG->forced_plugin_settings['tool_myucla_url']['override_debugging']);
+define('MYUCLA_URL_UPDATER_TEST_CONFIG_ACCESSDENIED_URL',
+        'https://test.ccle.ucla.edu/myucla_url_updater/accessdenied.php');
+
 // Pre-pop
 //$CFG->forced_plugin_settings['enrol_database']['terms'] = $terms_to_built;
 
@@ -250,7 +262,6 @@ $CFG->forced_plugin_settings['page']['printheading'] = 1;
 // Site administration > Plugins > Activity modules > File
 $CFG->forced_plugin_settings['resource']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['resource']['printheading'] = 1;
-$CFG->forced_plugin_settings['resource']['display'] = 4;   // "Force Download"
 
 // Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
@@ -302,7 +313,11 @@ $CFG->forced_plugin_settings['tool_ucladatasourcesync']['contact_email']='ccle-o
 
 // Site administration > Plugins > Blocks > i>clicker Moodle integrate
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] = 'ccle-operations@lists.ucla.edu';
-$CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing 
+$CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
+
+// Site administration > Plugins > Blocks > Respondus LockDown Browser
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = __DIR__."/../../../"."blocks/lockdownbrowser/customscripts";
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
@@ -441,7 +456,8 @@ $CFG->behat_extraallowedsettings = array(
     'allowcoursethemes',                    // Required for 'course edit' to work
     'forcedefaultmymoodle',                 // Experimental
     'debug',
-    'debugdisplay'
+    'debugdisplay',
+    'customscripts'                         // Make sure Respondus doesn't break core quiz.
 );
 
 $CFG->behat_config = array(

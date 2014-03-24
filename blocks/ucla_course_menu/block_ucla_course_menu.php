@@ -250,19 +250,24 @@ class block_ucla_course_menu extends block_navigation {
                 )), navigation_node::TYPE_SECTION
             );
             
-            // Indicate that section is hidden
+            // Indicate that section is hidden.
             if(!$section->visible) {
                 $elements[$key]->classes = array('block_ucla_course_menu_hidden');
             }
+            // Check that section contains activities.
+            if (!empty($section->sequence)) {
+                $elements[$key]->classes = array('hascontent');
+            }
         }
 
-        // Create view-all section link
+        // Create view-all section link.
         if (($format->get_format() === 'ucla')) {
             $elements['view-all'] = navigation_node::create(
                 get_string('show_all', 'format_ucla'),
                 new moodle_url('/course/view.php', $showallurlparams), 
                 navigation_node::TYPE_SECTION
             );
+            $elements['view-all']->classes = array('hascontent');
         }
         
         return $elements;

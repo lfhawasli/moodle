@@ -61,6 +61,10 @@ $string['aggregation_help'] = 'The aggregation determines how grades in a catego
 * Highest grade
 * Mode of grades - The grade that occurs the most frequently
 * Sum of grades - The sum of all grade values, with scale grades being ignored';
+// START UCLA MOD: CCLE-4347 - Reduce Aggregation types
+$string['aggregation_help'] .= '<p><a target="_blank" href="https://docs.ccle.ucla.edu/w/Aggregation_types_in_CCLE">'
+        . 'Visit the documentation site for more information</a></p>';
+// END UCLA MOD: CCLE-4347
 $string['aggregation_link'] = 'grade/aggregation';
 $string['aggregationcoef'] = 'Aggregation coefficient';
 $string['aggregationcoefextra'] = 'Extra credit'; // for the header of the table at Edit categories and items page

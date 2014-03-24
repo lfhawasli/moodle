@@ -1,11 +1,25 @@
 <?php
+// This file is part of the UCLA theme plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'UCLA theme';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
 $string['choosereadme'] = 'The theme from University of California, Los Angeles.';
 
-// The footer links
+// The footer links.
 $string['foodis_contact_ccle'] = 'Contact';
 $string['foolin_contact_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=926';
 
@@ -43,14 +57,14 @@ $string['separator__'] = ' | ';
 
 $string['loginas_as'] = ' as ';
 
-// Settings titles, descriptions and defaults
+// Settings titles, descriptions and defaults.
 $string['setting_title_footer_links'] = 'Footer links';
 $string['setting_desc_footer_links'] = 'This text will be displayed to the right of the set of links in the footer. A separator will be automatically added.';
 $string['setting_default_footer_links'] = '';
 
 $string['setting_title_logo_sub_text'] = 'Shared server divisions';
 $string['setting_desc_logo_sub_text'] = 'Divisions that are displayed in the front layout.';
-$string['setting_default_logo_sub_text'] = 
+$string['setting_default_logo_sub_text'] =
 '<ul>
     <li><span>Arts & Architecture</span></li>
     <li><span>Chemistry & Biochemistry</span></li>
@@ -88,20 +102,21 @@ $string['env_stage'] = 'Stage';
 $string['env_test'] = 'Test';
 $string['env_dev'] = 'Development';
 
-// CCLE-3069: Editing icons preference
+// CCLE-3069 - Editing icons preference.
 $string['noeditingicons'] = 'Site editing style';
 $string['useeditingicons'] = 'Use icons';
 $string['donotuseeditingicons'] = 'Use text';
 $string['donotuseeditingicons2'] = 'Use text, except for buttons that move the module';
 
-//BEGIN UCLA MOD: CCLE-2862-Main_site_logo_image_needs_alt_altribute
+// CCLE-2862 - Main_site_logo_image_needs_alt_altribute.
 $string['UCLA_CCLE_text'] = 'UCLA CCLE Common Collaboration and Learning Environment';
-//END UCLA MOD: CCLE-2862
 
-// CCLE-2493 - UCLA Links / CCLE-2827 - Copyright Notice in Footer
+// CCLE-2493 - UCLA Links / CCLE-2827 - Copyright Notice in Footer.
 $string['copyright'] = 'CCLE copyright information';
 $string['privacy'] = 'CCLE privacy policy';
 $string['links'] = 'Useful links for UCLA class sites';
-$string['error'] = 'Error';     
+$string['error'] = 'Error';
 $string['page_notfound'] = 'The page you requested does not exist';
-// EoF
+
+// CCLE-4445 - Allow calendar to be synchronized with Google Calendar.
+$string['calsyncnotice'] = 'Syncing with external calender applications is not necessarily done in real time and may depend on the calendar application you use.';

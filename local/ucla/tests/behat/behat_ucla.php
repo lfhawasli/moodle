@@ -29,6 +29,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 require_once(__DIR__ . '/../../../../lib/tests/behat/behat_data_generators.php');
 
 use Behat\Behat\Context\Step\Given as Given,
+    Behat\Behat\Context\Step\When as When,
     Behat\Gherkin\Node\TableNode as TableNode,
     Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\DriverException as DriverException,
@@ -55,6 +56,12 @@ class behat_ucla extends behat_base {
     public $courses = array();
 
     /**
+     * Lock courses created to be in 14W, unless otherwise stated.
+     * @var string
+     */
+    private $currentterm = '14W';
+
+    /**
      * Loads base configs needed for a UCLA environment.  Primarily,
      * this loads the UCLA theme with public/private and a term.
      * 
@@ -67,17 +74,29 @@ class behat_ucla extends behat_base {
         set_config('theme', 'uclashared');
         // Set public/private.
         set_config('enablepublicprivate', 1);
-        set_config('enablegroupmembersonly', true);
+        set_config('enablegroupmembersonly', 1);
         // Set term.
-        set_config('currentterm', '14W');
+        set_config('currentterm', $this->currentterm);
         set_config('forcedefaultmymoodle', 1);
-        // Add the gradebook report config.
+
+        // Grading config variables.
         set_config('grader_report_grouping_filter', 1);
-        // Some settings need to be active immediately.
-        $CFG->enablepublicprivate = 1;
-        $CFG->enablegroupmembersonly = true;
-        $CFG->forcedefaultmymoodle = 1;
-        $CFG->theme = 'uclashared';
+        set_config('collapsedefaultcolumns', 1, 'local_ucla');
+        set_config('collapsesubmissionstatus', 1, 'local_ucla');
+        set_config('defaultassignquickgrading', 1, 'local_ucla');
+        set_config('defaultassignsettings', 1, 'local_ucla');
+        set_config('showallgraderviewactions', 1, 'local_ucla');
+
+        // Set other configs.
+        set_config('showuseridentity', 'idnumber,email');
+
+        // Purge all caches to force new configs to take effect.
+        purge_all_caches();
+
+//        // Set UCLA theme.
+//        return array(new Given('I log in as administrator'),
+//                     new When('I change theme to UCLA theme'),
+//                     new Given('I log out'));
     }
 
     /**
@@ -181,7 +200,12 @@ class behat_ucla extends behat_base {
                 case 'class':
                 case 'srs':
                     // Create a random UCLA SRS site.
-                    $class = $datagenerator->create_class(array());
+                    // See if term was specified.
+                    $term = $this->currentterm;
+                    if (isset($elementdata['term'])) {
+                        $term = $elementdata['type'];
+                    }
+                    $class = $datagenerator->create_class(array('term' => $term));
                     $courseid = array_pop($class)->courseid;
 
                     // Save site.
@@ -209,15 +233,15 @@ class behat_ucla extends behat_base {
      * Generates a single UCLA site.  The site will have two enrolled
      * users, a student and an editing instructor.
      * 
-     * @Given /^A ucla "([^"]*)" site exists$/
+     * @Given /^a ucla "([^"]*)" site exists$/
      * 
      * @param string $site type for a collab site, or 'class' for an SRS site
      */
     public function ucla_site_exists($site) {
         global $DB;
 
-        $data = "| type |
-                 | $site |";
+        $data = "| shortname | type |
+                 | $site site | $site |";
         $this->generate_ucla_sites(new TableNode($data));
 
         // Call Moodle's own generator to create users and enrollments.
@@ -229,30 +253,21 @@ class behat_ucla extends behat_base {
         $this->getMainContext()->getSubcontext('behat_data_generators')
                 ->the_following_exists('users', new TableNode($data));
 
-        // Now create enrollments
-        $course = reset($this->courses);    // Use newly created course above.
+        // Now create enrollments.
+        $shortnames = array_keys($this->courses);    // Use newly created course above.
+        $shortname = reset($shortnames);
         $data = "| user | course | role |
-                | instructor | {$course->shortname} | editinginstructor |
-                | student | {$course->shortname} | student |";
+                | instructor | {$shortname} | editinginstructor |
+                | student | {$shortname} | student |";
 
-        $this->getMainContext()->getSubcontext('behat_data_generators')
-                ->the_following_exists('course enrolments', new TableNode($data));
+        $this->the_following_exists('course enrolments', new TableNode($data));
     }
 
     /**
-     * Generates a single random UCLA SRS site.  The site will have two enrolled
-     * users, a student and an editing instructor.
+     * Shortcut to navigate to the default UCLA site created by
+     * "a ucla <site type> site exists".
      * 
-     * @Given /^(A|a) ucla srs site exists$/
-     */
-    public function ucla_srs_site_exists() {
-        $this->ucla_site_exists('class');
-    }
-
-    /**
-     * Shortcut to navigate to the default UCLA SRS site.
-     * 
-     * @Given /^I go to a ucla srs site$/
+     * @Given /^I go to the default ucla site$/
      */
     public function i_goto_ucla_srs_site() {
         $this->getSession()->visit($this->locate_path('/course/view.php?id=2'));
@@ -356,6 +371,22 @@ class behat_ucla extends behat_base {
             self::$generator = new local_ucla_generator();
         }
         return self::$generator;
+    }
+    
+    /**
+     * Adds an assignment filling the form data with the specified field/value pairs.
+     * 
+     * @Given /^I add an assignment and fill the form with:$/
+     * @param TableNode $data The assignment field/value data
+     */
+    public function i_add_an_assignment_and_fill_the_form_with(TableNode $data) {
+        return array(
+            new Given('I follow "' . get_string('addresourceoractivity') . '"'),
+            new Given ('I select "Assignment" radio button'),
+            new Given('I press "Add"'),
+            new Given('I fill the moodle form with:', $data),
+            new Given('I press "' . get_string('savechangesanddisplay') . '"')
+        );
     }
 
 }

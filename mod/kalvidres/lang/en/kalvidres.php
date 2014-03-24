@@ -34,5 +34,6 @@ $string['media_creation'] = 'Media Type';
 $string['media_creation_help'] = 'Select the method of media you would like to add.  <b>Record Screen</b> will open a screen recording widget, where you can record the actions you make on your desktop.  <b>Upload Media</b> will open the Kaltura Content Wizard where you can upload media from your computer or select previously uploaded media.';
 $string['scr_loading'] = 'Loading...';
 $string['kalvidres:screenrecorder'] = 'Screen recorder';
-$string['javanotenabled'] = 'Browser Java is disabled.  Please enable Java and refresh the page to use the screen recorder.';
+$string['checkingforjava'] = 'Checking for Java';
+$string['javanotenabled'] = 'Failed to detect Java, please make sure you have the latest version of Java installed and enabled and then try again.';
 $string['previewvideo'] = 'Preview';

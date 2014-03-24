@@ -2,7 +2,9 @@
 // CCLE / COURSE / calendar
 // --------------------------------------------------
 
-.block.block_calendar_month {
+.block.block_calendar_month,
+.calendarmonth.calendartable,
+.minicalendar.calendartable{
     background-color: white;
     
     td, th {
@@ -51,7 +53,7 @@
             @extend .badge;
             @extend .label-danger;
             
-            background-color: red;
+            background-color: #cd6b69;
             color: white;
             /*line-height: 2.0rem;*/
         }
@@ -72,8 +74,8 @@
         margin-right: 2px;
     }
     
-    .minicalendar td.weekend {
-        color: #ccc;
+    .minicalendar td.weekend, .weekend.day {
+        color: #777;
     }
     
     .minicalendar td {
@@ -101,4 +103,10 @@
     }
 }
 
-
+.calendarmonth.calendartable {
+    .today  {
+        border-top: 4px solid #cd6b69;
+        border-bottom: 1px solid #cd6b69;
+        background-color: #fff5f5;
+    }
+}

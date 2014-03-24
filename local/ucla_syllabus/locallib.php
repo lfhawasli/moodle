@@ -304,6 +304,9 @@ class ucla_syllabus_manager {
                     array('id' => $this->courseid));
             $retval = navigation_node::create($nodename, $url,
                     navigation_node::TYPE_SECTION);
+            if ($this->has_syllabus()) {
+                $retval->classes = array('hascontent');
+            }
         }
 
         return $retval;

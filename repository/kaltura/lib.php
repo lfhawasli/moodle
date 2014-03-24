@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,35 +13,44 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura Repository local library
+ * Kaltura Repository library classes
  *
- * @package    Repository
- * @subpackage Kaltura
+ * @package    repository_kaltura
+ * @copyright  2013 onwards Remote-Learner {@link http://www.remote-learner.ca/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/repository/lib.php');
-require_once(dirname(__FILE__) . '/locallib.php');
+require_once($CFG->dirroot.'/repository/lib.php');
+require_once($CFG->dirroot.'/repository/kaltura/locallib.php');
 
 $version = local_kaltura_is_moodle_pre_twothree();
 
 // This condition check is required due to the repository class changes from 2.2 to 2.3
 // If Moodle is pre 2.3 then we need to create a class that doesn't throw a fatal error
-if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////////////////
+if ($version) {
+    /** The block of code below is only executed for MOODLE 2.2 or lower */
     class repository_kaltura extends repository {
-
         var $sort;
-        var $root_path = '';
-        var $root_path_id = '';
 
-        // Search criteria
-        var $search_name          = ''; // Video name
-        var $search_tags          = ''; // Video tags
-        var $search_course_filter = ''; // Filter courses names
-        var $search_course_name   = ''; // Course name
-        var $search_for           = ''; // Search for videos shared with courses or used in courses
+        /** @var string $searchname name of the media file */
+        var $searchname         = '';
+        /** @var string $searchtags tag name used in the media file */
+        var $searchtags         = '';
+        /** @var string $searchcoursefilter course name filter */
+        var $searchcoursefilter = '';
+        /** @var string $searchcoursename name of the course */
+        var $searchcoursename   = '';
+        /** @var string $searchfor search for videos shared or used in course */
+        var $searchfor          = '';
 
-        private static $page_size = 0;
+        /** @var int $pagesize number of items to display on a single page */
+        private static $pagesize        = 0;
+        /** @var string $rootcategory the kaltura root category path */
+        private static $rootcategory    = null;
+        /** @var int $rootcategoryid the kaltura root category id */
+        private static $rootcategoryid  = null;
+        /** @var boot $rootcatexists flag denoting whether the root category exists or not */
+        private static $rootcatexists   = false;
 
         public function __construct($repositoryid, $context = SITEID, $options = array()) {
             global $COURSE, $PAGE;
@@ -51,44 +59,53 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
                 parent::__construct($repositoryid, $context, $options);
 
-                self::$page_size = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'itemsperpage');
+                // Check if the page size has already been initialized, Moodle calls the repository
+                // constructor 3 times for every WYSIWYG editor displayed on the page
+                if (0 == self::$pagesize) {
+                    self::$pagesize = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'itemsperpage');
+                }
 
                 $kaltura = new kaltura_connection();
                 $connection = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
 
-                $rootcategory = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory');
-                $rootcategory_id = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory_id');
+                // Check if the root category is null
+                if (is_null(self::$rootcategory)) {
+                    self::$rootcategory = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory');
+                }
 
-                $this->root_path     = $rootcategory;
-                $this->root_path_id  = $rootcategory_id;
+                // Check if the root category id is null
+                if (is_null(self::$rootcategoryid)) {
+                    self::$rootcategoryid = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory_id');
+                }
 
-                if ($connection && !empty($rootcategory)) {
+                if (empty(self::$rootcatexists)) {
+                    if ($connection && !empty(self::$rootcategory)) {
+                        // First check if root category path already exists.  If the path exists then use it
+                        $existingrootcategory = repository_kaltura_category_path_exists($connection, self::$rootcategory);
 
-                    // First check if root category path already exists.  If the path exists then use it
-                    $existing_root_category = repository_kaltura_category_path_exists($connection, $rootcategory);
+                        if ($existingrootcategory) {
+                            // Set root category id configuration setting if it hasn't been set
+                            if (empty(self::$rootcategoryid)) {
+                                set_config('rootcategory_id', $existingrootcategory->id, REPOSITORY_KALTURA_PLUGIN_NAME);
+                                self::$rootcategoryid = $existingrootcategory->id;
+                            }
+                        } else {
+                            // The category does not exist on the Kaltura server, create the category now and set the static variables
+                            $result = repository_kaltura_create_root_category($connection);
 
-                    if ($existing_root_category) {
-
-                        // Set root category id configuration setting if it hasn't bee set
-                        if (empty($rootcategory_id)) {
-                            set_config('rootcategory_id', $existing_root_category->id, REPOSITORY_KALTURA_PLUGIN_NAME);
+                            if (is_array($result) && array_key_exists($result[0], $result) && array_key_exists($result[1], $result)) {
+                                self::$rootcategory   = $result[0];
+                                self::$rootcategoryid = $result[1];
+                            }
                         }
+
+                        // Set category exists flag
+                        self::$rootcatexists = true;
                     }
-
-                    // If the root category id has not been set, attempt to create the root category
-                    if (empty($rootcategory_id) ) {
-                        $result = repository_kaltura_create_root_category($connection);
-
-                        if (is_array($result)) {
-                            $this->root_path    = $result[0];
-                            $this->root_path_id = $result[1];
-                        }
-                    }
-
                 }
 
                 // Lastly, check to see if the root category and root category id have been initialized
-                if (empty($this->root_path) || empty($this->root_path_id)) {
+                if (empty(self::$rootcategory) || empty(self::$rootcategoryid)) {
                     throw new Exception("Kaltura Repository root cateogry or root category id not set");
                 }
 
@@ -106,7 +123,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
         private function root_category_initialized() {
 
-            if (empty($this->root_path) && empty($this->root_path_id)) {
+            if (empty(self::$rootcategory) && empty(self::$rootcategoryid)) {
                 return false;
             }
 
@@ -228,14 +245,14 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
                     $profile = repository_kaltura_get_metadata_profile_info($connection);
 
                     } else {
-	                    // Check if the metadata profile id exists in the mdl_config_table
-	                    $profile_id = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'metadata_profile_id');
+                        // Check if the metadata profile id exists in the mdl_config_table
+                        $profileid = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'metadata_profile_id');
 
-	                    // If empty then set the profile id
-	                    if (empty($profile_id)) {
-	                        $profile_obj = repository_kaltura_get_metadata_profile($connection);
-	                        set_config('metadata_profile_id', $profile_obj->id, REPOSITORY_KALTURA_PLUGIN_NAME);
-	                    }
+                        // If empty then set the profile id
+                        if (empty($profileid)) {
+                            $profileobj = repository_kaltura_get_metadata_profile($connection);
+                            set_config('metadata_profile_id', $profileobj->id, REPOSITORY_KALTURA_PLUGIN_NAME);
+                        }
                 }
 
                 $mform->addElement('static', 'metadata', get_string('using_metadata_profile', 'repository_kaltura'),
@@ -345,7 +362,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $sql             = '';
             $course_access   = array();
 
-            switch ($this->search_for) {
+            switch ($this->searchfor) {
                 case 'shared':
                     $course_access = repository_kaltura_get_course_access_list('repository/kaltura:sharedvideovisibility');
                     break;
@@ -354,12 +371,12 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
                     break;
                 case 'site_shared':
                     // when searching for videos shared with site, course name filtering is excluded
-                    $this->search_course_name = '';
+                    $this->searchcoursename = '';
                     break;
             }
 
             // If no course name was specified then return the list of all available courses
-            if (empty($this->search_course_name)) {
+            if (empty($this->searchcoursename)) {
                 return $course_access;
             }
 
@@ -367,21 +384,21 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $course_access = implode(',', $course_access);
 
             // Find courses based on filter selection
-            switch ($this->search_course_filter) {
+            switch ($this->searchcoursefilter) {
                 case 'contains':
                     $course_criteria = $DB->sql_like('fullname', ':name', false);
-                    $params = array('name' => '%' .$this->search_course_name. '%');
+                    $params = array('name' => '%'.$this->searchcoursename.'%');
                     break;
                 case 'equals':
-                    $params = array('fullname' => $this->search_course_name);
+                    $params = array('fullname' => $this->searchcoursename);
                     break;
                 case 'startswith':
                     $course_criteria = $DB->sql_like('fullname', ':name', false);
-                    $params = array('name' => $this->search_course_name. '%');
+                    $params = array('name' => $this->searchcoursename.'%');
                     break;
                 case 'endswith':
                     $course_criteria = $DB->sql_like('fullname', ':name', false);
-                    $params = array('name' => '%' .$this->search_course_name);
+                    $params = array('name' => '%'.$this->searchcoursename);
                     break;
             }
 
@@ -464,7 +481,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
         }
 
         /**
-         *
+         * This function will return a boolean value to tell Moodle whether the user has logged in
          * @return bool
          */
         public function check_login() {
@@ -474,21 +491,21 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
         /**
          * Produce results from search
          *
-         * @param string $search_text
-         * @return array
+         * @param string $search_text - search text input by user
+         * @param int $page - page number
+         * @return array - array of options and restults from the search
          */
         public function search($search_text, $page = 0) {
-
             global $USER, $SESSION, $OUTPUT;
 
             // Get search parameters if passed
-            $name_search        = optional_param('s', '', PARAM_NOTAGS);
-            $tag_search         = optional_param('t', '', PARAM_NOTAGS);
-            $course_name_filter = optional_param('course_with', 'contains', PARAM_NOTAGS);
-            $course_name        = optional_param('c', '', PARAM_NOTAGS);
-            $search_own         = optional_param('own', '', PARAM_TEXT);
-            $search_for         = optional_param('shared_used', 'shared', PARAM_TEXT);
-            $page_param         = optional_param('page', 1, PARAM_INT);
+            $namesearch       = optional_param('s', '', PARAM_NOTAGS);
+            $tagsearch        = optional_param('t', '', PARAM_NOTAGS);
+            $coursenamefilter = optional_param('course_with', 'contains', PARAM_NOTAGS);
+            $coursename       = optional_param('c', '', PARAM_NOTAGS);
+            $searchown        = optional_param('own', '', PARAM_TEXT);
+            $searchfor        = optional_param('shared_used', 'shared', PARAM_TEXT);
+            $page_param       = optional_param('page', 1, PARAM_INT);
 
             if (0 == $page_param) {
                 $page_param = 1;
@@ -496,32 +513,32 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
             $search_data = new stdClass();
 
-            if (empty($name_search) &&
-                empty($tag_search) &&
-                empty($course_name) &&
-                empty($search_own) &&
+            if (empty($namesearch) &&
+                empty($tagsearch) &&
+                empty($coursename) &&
+                empty($searchown) &&
                  (array_key_exists('search', $SESSION->kalrepo) &&
                   array_key_exists($USER->id, $SESSION->kalrepo['search']))) {
 
-                $this->search_name          = $SESSION->kalrepo['search'][$USER->id]->search_name;
-                $this->search_tags          = $SESSION->kalrepo['search'][$USER->id]->search_tags;
-                $this->search_course_name   = $SESSION->kalrepo['search'][$USER->id]->search_course_name;
-                $this->search_course_filter = $SESSION->kalrepo['search'][$USER->id]->search_course_filter;
-                $this->search_for           = $SESSION->kalrepo['search'][$USER->id]->search_for;
+                $this->searchname         = $SESSION->kalrepo['search'][$USER->id]->searchname;
+                $this->searchtags         = $SESSION->kalrepo['search'][$USER->id]->searchtags;
+                $this->searchcoursename   = $SESSION->kalrepo['search'][$USER->id]->searchcoursename;
+                $this->searchcoursefilter = $SESSION->kalrepo['search'][$USER->id]->searchcoursefilter;
+                $this->searchfor          = $SESSION->kalrepo['search'][$USER->id]->searchfor;
 
             } else {
 
-                $this->search_name          = trim($name_search);
-                $this->search_tags          = trim($tag_search);
-                $this->search_course_filter = $course_name_filter;
-                $this->search_course_name   = trim($course_name);
-                $this->search_for           = $search_for;
+                $this->searchname         = trim($namesearch);
+                $this->searchtags         = trim($tagsearch);
+                $this->searchcoursefilter = $coursenamefilter;
+                $this->searchcoursename   = trim($coursename);
+                $this->searchfor          = $searchfor;
 
-                $search_data->search_name          = $this->search_name;
-                $search_data->search_tags          = $this->search_tags;
-                $search_data->search_course_filter = $this->search_course_filter;
-                $search_data->search_course_name   = $this->search_course_name;
-                $search_data->search_for           = $this->search_for;
+                $search_data->searchname         = $this->searchname;
+                $search_data->searchtags         = $this->searchtags;
+                $search_data->searchcoursefilter = $this->searchcoursefilter;
+                $search_data->searchcoursename   = $this->searchcoursename;
+                $search_data->searchfor          = $this->searchfor;
 
                 $SESSION->kalrepo['search'][$USER->id] = $search_data;
             }
@@ -529,23 +546,21 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $kaltura = new kaltura_connection();
             $connection = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
 
-            if (0 !== strcmp('own', $this->search_for)) {
-
+            if (0 !== strcmp('own', $this->searchfor)) {
                 // Get a list of courses (system access and shared access) that match the course filter criteria
                 $course_access = $this->get_courses_from_filter();
 
-                $search_results = repository_kaltura_search_videos($connection, $this->search_name, $this->search_tags,
-                                                                   $course_access, $page_param, $this->search_for);
+                $searchresults = repository_kaltura_search_videos($connection, $this->searchname, $this->searchtags,
+                        $course_access, $page_param, $this->searchfor);
 
             } else {
-
-                $search_results = repository_kaltura_search_own_videos($connection, $this->search_name, $this->search_tags, $page_param);
+                $searchresults = repository_kaltura_search_own_videos($connection, $this->searchname, $this->searchtags, $page_param);
 
             }
 
             $ret = array();
 
-            if (empty($search_results)) {
+            if (empty($searchresults)) {
                 $ret['nologin'] = true;
                 $ret['dynload'] = false;
                 $ret['nosearch'] = false; // See print_search() for search form
@@ -559,50 +574,61 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $ret['nosearch'] = false; // See print_search() for search form
 
             $uri         = local_kaltura_get_host();
-            $partner_id  = local_kaltura_get_partner_id();
-            $ui_conf_id  = local_kaltura_get_player_uiconf();
-            $ret['list'] = repository_kaltura_format_data($search_results, $uri, $partner_id, $ui_conf_id);
+            $partnerid   = local_kaltura_get_partner_id();
+            $uiconfid    = local_kaltura_get_player_uiconf();
+            $ret['list'] = repository_kaltura_format_data($searchresults, $uri, $partnerid, $uiconfid);
 
-            if ($search_results->totalCount > self::$page_size) {
-
+            if ($searchresults->totalCount > self::$pagesize) {
                 $ret['page'] = $page_param;
-                $ret['pages'] = ceil($search_results->totalCount / self::$page_size);
-                $ret['total'] = $search_results->totalCount;
-                $ret['perpage'] = (int) self::$page_size;
-
+                $ret['pages'] = ceil($searchresults->totalCount / self::$pagesize);
+                $ret['total'] = $searchresults->totalCount;
+                $ret['perpage'] = (int) self::$pagesize;
             }
 
             return $ret;
         }
 
+        /**
+         * This function simply returns the source locations of the file
+         * @param string $source - the location of the file
+         * @return string - location of the file
+         */
         function get_link($source) {
-            //$context = get_context_by_id();
-            //print_object($this);
             return $source;
         }
 
         /**
          * This is a dummy function created as a workaround for ELIS-8326
-         * @return void
+         * @return array - an empty array
          */
-        function category_tree() {}
+        function category_tree() {
+            return array();
+        }
     }
-} else {                                              ///////////////////////// MOODLE 2.3 OR GREATER ///////////////////////////////
-
+} else {
+    /** The block of code below is only executed for MOODLE 2.3 or higher */
     class repository_kaltura extends repository {
-
         var $sort;
-        var $root_path = '';
-        var $root_path_id = '';
 
-        // Search criteria
-        var $search_name          = ''; // Video name
-        var $search_tags          = ''; // Video tags
-        var $search_course_filter = ''; // Filter courses names
-        var $search_course_name   = ''; // Course name
-        var $search_for           = ''; // Search for videos shared with courses or used in courses
+        /** @var string $searchname name of the media file */
+        var $searchname         = '';
+        /** @var string $searchtags tag name used in the media file */
+        var $searchtags         = '';
+        /** @var string $searchcoursefilter course name filter */
+        var $searchcoursefilter = '';
+        /** @var string $searchcoursename name of the course */
+        var $searchcoursename   = '';
+        /** @var string $searchfor search for videos shared or used in course */
+        var $searchfor          = '';
 
-        private static $page_size = 0;
+        /** @var int $pagesize number of items to display on a single page */
+        private static $pagesize        = 0;
+        /** @var string $rootcategory the kaltura root category path */
+        private static $rootcategory    = null;
+        /** @var int $rootcategoryid the kaltura root category id */
+        private static $rootcategoryid  = null;
+        /** @var boot $rootcatexists flag denoting whether the root category exists or not */
+        private static $rootcatexists   = false;
 
         public function __construct($repositoryid, $context = SITEID, $options = array()) {
             global $PAGE, $DB;
@@ -610,45 +636,56 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             try {
 
                 parent::__construct($repositoryid, $context, $options);
-
-                self::$page_size = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'itemsperpage');
+                $repoconfig = get_config(REPOSITORY_KALTURA_PLUGIN_NAME);
+                // Check if the page size has already been initialized, Moodle calls the repository
+                // constructor 3 times for every WYSIWYG editor displayed on the page
+                if (0 == self::$pagesize) {
+                    self::$pagesize = !empty($repoconfig->rootcategory) ? $repoconfig->itemsperpage : null;
+                }
 
                 $kaltura = new kaltura_connection();
                 $connection = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
+                $rootcategory = null;
+                $rootcategoryid = null;
 
-                $rootcategory    = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory');
-                $rootcategory_id = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory_id');
+                // Check if the root category is null
+                if (is_null(self::$rootcategory)) {
+                    self::$rootcategory = !empty($repoconfig->rootcategory) ? $repoconfig->rootcategory : null;
+                }
 
-                $this->root_path     = $rootcategory;
-                $this->root_path_id  = $rootcategory_id;
+                // Check if the root category id is null
+                if (is_null(self::$rootcategoryid)) {
+                    self::$rootcategoryid = !empty($repoconfig->rootcategory_id) ? $repoconfig->rootcategory_id : null;
+                }
 
-                if ($connection && !empty($rootcategory)) {
+                if (empty(self::$rootcatexists)) {
+                    if ($connection && !empty(self::$rootcategory)) {
+                        // First check if root category path already exists.  If the path exists then use it
+                        $existingrootcategory = repository_kaltura_category_path_exists($connection, self::$rootcategory);
 
-                    // First check if root category path already exists.  If the path exists then use it
-                    $existing_root_category = repository_kaltura_category_path_exists($connection, $rootcategory);
+                        if ($existingrootcategory) {
+                            // Set root category id configuration setting if it hasn't been set
+                            if (empty(self::$rootcategoryid)) {
+                                set_config('rootcategory_id', $existingrootcategory->id, REPOSITORY_KALTURA_PLUGIN_NAME);
+                                self::$rootcategoryid = $existingrootcategory->id;
+                            }
+                        } else {
+                            // The category does not exist on the Kaltura server, create the category now and set the static variables
+                            $result = repository_kaltura_create_root_category($connection);
 
-                    if ($existing_root_category) {
-
-                        // Set root category id configuration setting if it hasn't bee set
-                        if (empty($rootcategory_id)) {
-                            set_config('rootcategory_id', $existing_root_category->id, REPOSITORY_KALTURA_PLUGIN_NAME);
+                            if (is_array($result) && array_key_exists($result[0], $result) && array_key_exists($result[1], $result)) {
+                                self::$rootcategory   = $result[0];
+                                self::$rootcategoryid = $result[1];
+                            }
                         }
+
+                        // Set category exists flag
+                        self::$rootcatexists = true;
                     }
-
-                    // If the root category id has not been set, attempt to create the root category
-                    if (empty($rootcategory_id) ) {
-                        $result = repository_kaltura_create_root_category($connection);
-
-                        if (is_array($result)) {
-                            $this->root_path    = $result[0];
-                            $this->root_path_id = $result[1];
-                        }
-                    }
-
                 }
 
                 // Lastly, check to see if the root category and root category id have been initialized
-                if (empty($this->root_path) || empty($this->root_path_id)) {
+                if (empty(self::$rootcategory) || empty(self::$rootcategoryid)) {
                     throw new Exception("Kaltura Repository root cateogry or root category id not set");
                 }
 
@@ -666,7 +703,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
         private function root_category_initialized() {
 
-            if (empty($this->root_path) && empty($this->root_path_id)) {
+            if (empty(self::$rootcategory) && empty(self::$rootcategoryid)) {
                 return false;
             }
 
@@ -711,8 +748,10 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
             if ($connection) {
 
-                $rootcategory    = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory');
-                $rootcategory_id = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'rootcategory_id');
+                $repoconfig = get_config(REPOSITORY_KALTURA_PLUGIN_NAME);
+
+                $rootcategory    = !empty($repoconfig->rootcategory) ? $repoconfig->rootcategory : null;
+                $rootcategoryid = !empty($repoconfig->rootcategory_id) ? $repoconfig->rootcategory_id : null;
 
                 // If the root category path is empty then remove the rootcategory id
                 if (empty($rootcategory)) {
@@ -720,7 +759,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
                                    'name'   => 'rootcategory_id');
                     $DB->delete_records('config_plugins', $param);
 
-                    $rootcategory_id = '';
+                    $rootcategoryid = '';
                 }
 
                 // Display pager setting
@@ -741,7 +780,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
                 $mform->setDefault('itemsperpage', '10');
                 $mform->addHelpButton('itemsperpage', 'itemsperpage', 'repository_kaltura');
 
-                if (empty($rootcategory_id)) {
+                if (empty($rootcategoryid)) {
 
                     // Display Root category setting
                     $strrequired = get_string('required');
@@ -750,7 +789,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
                     $mform->addHelpButton('rootcategory', 'rootcategory', 'repository_kaltura');
 
                     $status = '';
-                    if (empty($rootcategory_id) && !empty($rootcategory)) {
+                    if (empty($rootcategoryid) && !empty($rootcategory)) {
                         $status = get_string('unable_to_create', 'repository_kaltura', $rootcategory);
                     } else {
                         $status = get_string('rootcategory_create', 'repository_kaltura', $rootcategory);
@@ -788,10 +827,10 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
                 } else {
                     // Check if the metadata profile id exists in the mdl_config_table
-                    $profile_id = get_config(REPOSITORY_KALTURA_PLUGIN_NAME, 'metadata_profile_id');
+                    $profileid = empty($repoconfig->metadata_profile_id) ? $repoconfig->metadata_profile_id : null;
 
                     // If empty then set the profile id
-                    if (empty($profile_id)) {
+                    if (empty($profileid)) {
                         $profile_obj = repository_kaltura_get_metadata_profile($connection);
                         set_config('metadata_profile_id', $profile_obj->id, REPOSITORY_KALTURA_PLUGIN_NAME);
                     }
@@ -907,7 +946,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $sql             = '';
             $course_access   = array();
 
-            switch ($this->search_for) {
+            switch ($this->searchfor) {
                 case 'shared':
                     $course_access = repository_kaltura_get_course_access_list('repository/kaltura:sharedvideovisibility');
                     break;
@@ -916,12 +955,12 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
                     break;
                 case 'site_shared':
                     // when searching for videos shared with site, course name filtering is excluded
-                    $this->search_course_name = '';
+                    $this->searchcoursename = '';
                     break;
             }
 
             // If no course name was specified then return the list of all available courses
-            if (empty($this->search_course_name)) {
+            if (empty($this->searchcoursename)) {
                 return $course_access;
             }
 
@@ -929,21 +968,21 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $course_access = implode(',', $course_access);
 
             // Find courses based on filter selection
-            switch ($this->search_course_filter) {
+            switch ($this->searchcoursefilter) {
                 case 'contains':
                     $course_criteria = $DB->sql_like('fullname', ':name', false);
-                    $params = array('name' => '%' .$this->search_course_name. '%');
+                    $params = array('name' => '%'.$this->searchcoursename.'%');
                     break;
                 case 'equals':
-                    $params = array('fullname' => $this->search_course_name);
+                    $params = array('fullname' => $this->searchcoursename);
                     break;
                 case 'startswith':
                     $course_criteria = $DB->sql_like('fullname', ':name', false);
-                    $params = array('name' => $this->search_course_name. '%');
+                    $params = array('name' => $this->searchcoursename.'%');
                     break;
                 case 'endswith':
                     $course_criteria = $DB->sql_like('fullname', ':name', false);
-                    $params = array('name' => '%' .$this->search_course_name);
+                    $params = array('name' => '%'.$this->searchcoursename);
                     break;
             }
 
@@ -1033,7 +1072,7 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
         }
 
         /**
-         *
+         * This function will return a boolean value to tell Moodle whether the user has logged in
          * @return bool
          */
         public function check_login() {
@@ -1043,21 +1082,21 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
         /**
          * Produce results from search
          *
-         * @param string $search_text
-         * @return array
+         * @param string $search_text - search text input by user
+         * @param int $page - page number
+         * @return array - array of options and restults from the search
          */
         public function search($search_text, $page = 0) {
-
             global $USER, $SESSION, $OUTPUT;
 
             // Get search parameters if passed
-            $name_search        = optional_param('s', '', PARAM_NOTAGS);
-            $tag_search         = optional_param('t', '', PARAM_NOTAGS);
-            $course_name_filter = optional_param('course_with', 'contains', PARAM_NOTAGS);
-            $course_name        = optional_param('c', '', PARAM_NOTAGS);
-            $search_own         = optional_param('own', '', PARAM_TEXT);
-            $search_for         = optional_param('shared_used', 'shared', PARAM_TEXT);
-            $page_param         = optional_param('page', 1, PARAM_INT);
+            $namesearch        = optional_param('s', '', PARAM_NOTAGS);
+            $tagsearch         = optional_param('t', '', PARAM_NOTAGS);
+            $coursenamefilter  = optional_param('course_with', 'contains', PARAM_NOTAGS);
+            $coursename        = optional_param('c', '', PARAM_NOTAGS);
+            $searchown         = optional_param('own', '', PARAM_TEXT);
+            $searchfor         = optional_param('shared_used', 'shared', PARAM_TEXT);
+            $page_param        = optional_param('page', 1, PARAM_INT);
 
             if (0 == $page_param) {
                 $page_param = 1;
@@ -1065,32 +1104,32 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
 
             $search_data = new stdClass();
 
-            if (empty($name_search) &&
-                empty($tag_search) &&
-                empty($course_name) &&
-                empty($search_own) &&
+            if (empty($namesearch) &&
+                empty($tagsearch) &&
+                empty($coursename) &&
+                empty($searchown) &&
                  (array_key_exists('search', $SESSION->kalrepo) &&
                   array_key_exists($USER->id, $SESSION->kalrepo['search']))) {
 
-                $this->search_name          = $SESSION->kalrepo['search'][$USER->id]->search_name;
-                $this->search_tags          = $SESSION->kalrepo['search'][$USER->id]->search_tags;
-                $this->search_course_name   = $SESSION->kalrepo['search'][$USER->id]->search_course_name;
-                $this->search_course_filter = $SESSION->kalrepo['search'][$USER->id]->search_course_filter;
-                $this->search_for           = $SESSION->kalrepo['search'][$USER->id]->search_for;
+                $this->searchname         = $SESSION->kalrepo['search'][$USER->id]->searchname;
+                $this->searchtags         = $SESSION->kalrepo['search'][$USER->id]->searchtags;
+                $this->searchcoursename   = $SESSION->kalrepo['search'][$USER->id]->searchcoursename;
+                $this->searchcoursefilter = $SESSION->kalrepo['search'][$USER->id]->searchcoursefilter;
+                $this->searchfor          = $SESSION->kalrepo['search'][$USER->id]->searchfor;
 
             } else {
 
-                $this->search_name          = trim($name_search);
-                $this->search_tags          = trim($tag_search);
-                $this->search_course_filter = $course_name_filter;
-                $this->search_course_name   = trim($course_name);
-                $this->search_for           = $search_for;
+                $this->searchname         = trim($namesearch);
+                $this->searchtags         = trim($tagsearch);
+                $this->searchcoursefilter = $coursenamefilter;
+                $this->searchcoursename   = trim($coursename);
+                $this->searchfor          = $searchfor;
 
-                $search_data->search_name          = $this->search_name;
-                $search_data->search_tags          = $this->search_tags;
-                $search_data->search_course_filter = $this->search_course_filter;
-                $search_data->search_course_name   = $this->search_course_name;
-                $search_data->search_for           = $this->search_for;
+                $search_data->searchname         = $this->searchname;
+                $search_data->searchtags         = $this->searchtags;
+                $search_data->searchcoursefilter = $this->searchcoursefilter;
+                $search_data->searchcoursename   = $this->searchcoursename;
+                $search_data->searchfor          = $this->searchfor;
 
                 $SESSION->kalrepo['search'][$USER->id] = $search_data;
             }
@@ -1098,27 +1137,23 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $kaltura = new kaltura_connection();
             $connection = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
 
-            if (0 !== strcmp('own', $this->search_for)) {
-
+            if (0 !== strcmp('own', $this->searchfor)) {
                 // Get a list of courses (system access and shared access) that match the course filter criteria
                 $course_access = $this->get_courses_from_filter();
 
                 // Special case for Moodle versions 2.3 and beyond - Passing search name value into name and tags argument to force
                 // the function to use tagsNameMultiLikeOr search filter
-                $search_results = repository_kaltura_search_videos($connection, $this->search_name, $this->search_name,
-                                                                   $course_access, $page, $this->search_for);
-
+                $searchresults = repository_kaltura_search_videos($connection, $this->searchname, $this->searchname,
+                        $course_access, $page, $this->searchfor);
             } else {
-
                 // Special case for Moodle versions 2.3 and beyond - Passing search name value into name and tags argument to force
                 // the function to use tagsNameMultiLikeOr search filter
-                $search_results = repository_kaltura_search_own_videos($connection, $this->search_name, $this->search_name, $page);
-
+                $searchresults = repository_kaltura_search_own_videos($connection, $this->searchname, $this->searchname, $page);
             }
 
             $ret = array();
 
-            if (empty($search_results)) {
+            if (empty($searchresults)) {
                 $ret['nologin'] = true;
                 $ret['dynload'] = false;
                 $ret['nosearch'] = false; // See print_search() for search form
@@ -1132,32 +1167,35 @@ if ($version) { ///////////////////////// MOODLE 2.2 OR LESS ///////////////////
             $ret['nosearch'] = false; // See print_search() for search form
 
             $uri         = local_kaltura_get_host();
-            $partner_id  = local_kaltura_get_partner_id();
-            $ui_conf_id  = local_kaltura_get_player_uiconf();
-            $ret['list'] = repository_kaltura_format_data($search_results, $uri, $partner_id, $ui_conf_id);
+            $partnerid   = local_kaltura_get_partner_id();
+            $uiconfid    = local_kaltura_get_player_uiconf();
+            $ret['list'] = repository_kaltura_format_data($searchresults, $uri, $partnerid, $uiconfid);
 
-            if ($search_results->totalCount > self::$page_size) {
-
+            if ($searchresults->totalCount > self::$pagesize) {
                 $ret['page'] = $page_param;
-                $ret['pages'] = ceil($search_results->totalCount / self::$page_size);
-                $ret['total'] = $search_results->totalCount;
-                $ret['perpage'] = (int) self::$page_size;
-
+                $ret['pages'] = ceil($searchresults->totalCount / self::$pagesize);
+                $ret['total'] = $searchresults->totalCount;
+                $ret['perpage'] = (int) self::$pagesize;
             }
 
             return $ret;
         }
 
+        /**
+         * This function simply returns the source locations of the file
+         * @param string $source - the location of the file
+         * @return string - location of the file
+         */
         function get_link($source) {
-            //$context = get_context_by_id();
-            //print_object($this);
             return $source;
         }
 
         /**
          * This is a dummy function created as a workaround for ELIS-8326
-         * @return void
+         * @return array - an empty array
          */
-        function category_tree() {}
+        function category_tree() {
+            return array();
+        }
     }
 }

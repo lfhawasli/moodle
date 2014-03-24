@@ -80,17 +80,17 @@ $site-menu-hover-color:         #fcfcfc;
                     padding:  8px;
                 }
 
-                // Add '>' glyphicon
-                .leaf:after {
+                // Add '>' glyphicon ONLY when section contains content.
+                .hascontent.leaf:after {
                     @include glyphicon("\e080");
                     float: right;
-                    color: #ddd;
+                    color: #ccc;
                     vertical-align: middle;
                     line-height: 1.2
                 }
-                // Color the '>' icon blue when active
+                // Color the '>' icon blue when active and has content.
                 &.current_branch  {
-                    .leaf:after {
+                    .hascontent.leaf:after {
                         @include glyphicon("\e080");
                         float: right;
                         color: $ccle-blue;
@@ -123,7 +123,16 @@ $site-menu-hover-color:         #fcfcfc;
             // Add icon to library research portal
             .library-research-portal.leaf:before {
                 // globe
-                @include node-glyphicon("\e135");
+                //@include node-glyphicon("\e135");
+                // Use "New" label until the end of Spring 2014.
+                content: "New";
+                font-size: 0.9rem;
+                font-family: "Lato";
+                font-weight: bold;
+                color: white;
+                padding: 2px 2px;
+                @include border-radius(4px);
+                @include label-variant(#4168A1);
             }
             // Add library reserve icon
             .library-reserve-link.leaf:before {

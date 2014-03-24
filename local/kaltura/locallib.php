@@ -16,8 +16,7 @@
 /**
  * Kaltura video assignment grade preferences form
  *
- * @package    local
- * @subpackage kaltura
+ * @package    moodle-local_kaltura
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -696,7 +695,12 @@ function local_kaltura_get_swfdoc_flashvars($client_obj, $entry_id = '', $admin_
     $vars['close'] = 'onContributionWizardClose';
     // START UCLA MOD: CCLE-2842 - Install Kaltura plugin for M2
     //$vars['host']  = str_replace('http://', '', local_kaltura_get_host());
-    $vars['host']  = str_replace('https://', '', local_kaltura_get_host());
+    global $CFG;
+    if ($CFG->loginhttps) {
+        $vars['host']  = str_replace('https://', '', local_kaltura_get_host());
+    } else {
+        $vars['host']  = str_replace('http://', '', local_kaltura_get_host());
+    }
     // END UCLA MOD: CCLE-2842
     $vars['partnerid']  = local_kaltura_get_partner_id();
     $vars['subpid']     = local_kaltura_get_partner_id() * 100; // http://www.kaltura.org/kaltura-terminology#kaltura-sub-partner-id
@@ -1448,7 +1452,12 @@ function local_kaltura_create_swfdoc($document_entry_id, $video_entry_id) {
     if (strpos($url, 'www.kaltura.com')) {
         // START UCLA MOD: CCLE-2842 - Install Kaltura plugin for M2
         //$url = str_replace('www.kaltura.com', 'cdn.kaltura.com', $url);
-        $url = str_replace('www.kaltura.com', 'cdnsecakmi.kaltura.com', $url);
+        global $CFG;
+        if ($CFG->loginhttps) {
+            $url = str_replace('www.kaltura.com', 'cdnsecakmi.kaltura.com', $url);
+        } else {
+            $url = str_replace('www.kaltura.com', 'cdn.kaltura.com', $url);
+        }
         // END UCLA MOD: CCLE-2842
     }
 
@@ -1835,87 +1844,32 @@ class kaltura_connection {
     private static $timeout     = 0;
     private static $timestarted = 0;
 
-    public function __construct($timeout = KALTURA_SESSION_LENGTH) {
-
-        global $SESSION;
-
-        // Retrieve session data about connection
-        if (empty(self::$connection) && isset($SESSION->kaltura_con)) {
-
-            self::$connection   = unserialize($SESSION->kaltura_con);
-            self::$timeout      = $SESSION->kaltura_con_timeout;
-            self::$timestarted  = $SESSION->kaltura_con_timestarted;
-        }
-
-        if (empty(self::$connection)) {
-
-            // Login if connection object is empty
-            self::$connection = local_kaltura_login(true, '', $timeout);
-
-            // Set session data
-            if (!empty(self::$connection)) {
-                self::$timestarted    = time();
-                self::$timeout        = $timeout;
-            }
-        }
-    }
-
     /**
-     * Returns true if the connection is active.  Otherwise fase
+     * Constructor for Kaltura connection class.
      *
-     * @param - none
-     * @return bool - true is active, false if timed out or not active
+     * @param int $timeout Length of timeout for Kaltura session in minutes
      */
-    private function connection_active() {
-
-        // Connection is not active
-        if (empty(self::$connection) ||
-            empty(self::$timestarted) ||
-            empty(self::$timeout)) {
-
-            return false;
+    public function __construct($timeout = KALTURA_SESSION_LENGTH) {
+        self::$connection = local_kaltura_login(true, '', $timeout);
+        if (!empty(self::$connection)) {
+            self::$timestarted = time();
+            self::$timeout = $timeout;
         }
-
-        // Calculate session time remaining
-        $time_left = time() - self::$timestarted;
-
-        // If the session time has expired
-        if ($time_left >= self::$timeout) {
-//            print_object('time started: ' . self::$timestarted);
-//            print_object('session time out: ' . self::$timeout);
-//            print_object('time left '. $time_left);
-
-            return false;
-        }
-
-        return true;
     }
 
     /**
      * Get the connection object.  Pass true to renew the connection
      *
-     * @param bool - true to renew the session if it has expired.  Otherwise
-     * false
-     * @param int - seconds to keep the session alive, if zero is passed the
+     * @param bool $renew true to renew the session if it has expired.  Otherwise
+     * false. (OBSOLETE the connection is always renewed.  TODO: remove this parameter
+     * from the function and areas where this method is referenced in all the plug-ins)
+     * @param int $timeout seconds to keep the session alive, if zero is passed the
      * last time out value will be used
-     * @return mixed - Kaltura connection object, or false if connection failed
+     * @return object A Kaltura KalturaClient object
      */
     public function get_connection($renew = true, $timeout = 0) {
-
-        $connection = false;
-
-        // If connection is active
-        if ($this->connection_active()) {
-            $connection = self::$connection;
-        } else {
-
-            if ($renew) {
-                // Renew connection
-                $connection = $this->renew_connection($timeout);
-            }
-        }
-
-        return $connection;
+        self::$connection = local_kaltura_login(true, '', $timeout);
+        return self::$connection;
     }
 
     /**
@@ -1935,34 +1889,6 @@ class kaltura_connection {
      */
     public function get_timestarted() {
         return self::$timestarted;
-    }
-
-    /**
-     * Renew the connection to Kaltura
-     *
-     * @param int - seconds to keep session alive
-     * @return obj - Kaltura connection object
-     */
-    public function renew_connection($timeout) {
-
-        self::$timeout = (0 == $timeout) ? self::$timeout : $timeout;
-
-        self::$connection = local_kaltura_login(true, '', $timeout);
-
-        /** If connected, set the time the session started.
-         * Otherwise set the start time to zero and the connection object to false
-         */
-        if (!empty(self::$connection)) {
-
-            self::$timestarted  = time();
-
-        } else {
-
-            self::$timestarted = 0;
-            self::$connection = false;
-        }
-
-        return self::$connection;
     }
 
     public function __destruct() {

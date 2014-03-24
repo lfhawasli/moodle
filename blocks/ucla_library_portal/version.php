@@ -11,7 +11,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2012093000;               
+$plugin->version = 2014020600;
 $plugin->dependencies = array(
     'local_ucla' => ANY_VERSION,
 );

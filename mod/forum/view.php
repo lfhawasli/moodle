@@ -110,9 +110,9 @@
      setup_js_tablesorter('forumheaderlist'); 
      // END UCLA MOD: CCLE-4003/SSC-1805
 
-    $PAGE->set_title(format_string($forum->name));
+    $PAGE->set_title($forum->name);
     $PAGE->add_body_class('forumtype-'.$forum->type);
-    $PAGE->set_heading(format_string($course->fullname));
+    $PAGE->set_heading($course->fullname);
 
     echo $OUTPUT->header();
 

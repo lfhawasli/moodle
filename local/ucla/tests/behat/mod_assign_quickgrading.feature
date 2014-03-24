@@ -1,0 +1,35 @@
+@ucla @mod_assign @core_edit @CCLE-4297
+Feature: Have "quick grading" turned on by default
+  As an instructor
+  I want to have "Quick edit" turned on
+  so that I can quickly grade assignment submissions.
+
+Scenario: Check "quick grading" is enabled
+    Given I am in a ucla environment
+    And the following "courses" exists:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
+    And the following "users" exists:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | T1 | teacher1@asd.com |
+      | student1 | Student | S1 | student1@asd.com |
+      | student2 | Student | S2 | student2@asd.com |
+      | student3 | Student | S3 | student3@asd.com |
+    And the following "course enrolments" exists:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
+      | student3 | C1 | student |
+    And I log in as ucla "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I add a "Assignment" to section "1" and I fill the form with:
+      | Assignment name | Test assignment name |
+      | Description | Test assignment description |
+    And I follow "Test assignment name"
+    When I follow "View/grade all submissions"
+    Then the "Quick grading" checkbox should be checked
+    When I uncheck "Quick grading"
+    And I press "Save and update table"
+    Then the "Quick grading" checkbox should not be checked

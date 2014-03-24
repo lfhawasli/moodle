@@ -16,8 +16,8 @@
 /**
  * Kaltura video assignment renderer class
  *
- * @package    mod
- * @subpackage kalvidassign
+ * @package    mod_kalvidassign
+ * @copyright  2013 onwards Remote-Learner {@link http://www.remote-learner.ca/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -816,6 +816,12 @@ class mod_kalvidassign_renderer extends plugin_renderer_base {
         // Get all groups that the user belongs to, check if the user has capability to access all groups
         if (!has_capability('moodle/site:accessallgroups', $context, $USER->id)) {
             $groups    = groups_get_all_groups($COURSE->id, $USER->id);
+
+            if (empty($groups)) {
+                $message = get_string('nosubmissions', 'kalvidassign');
+                echo html_writer::tag('center', $message);
+                return;
+            }
         } else {
             $groups = groups_get_all_groups($COURSE->id);            
         }
@@ -827,7 +833,7 @@ class mod_kalvidassign_renderer extends plugin_renderer_base {
 
         $group_ids = rtrim($group_ids, ',');
 
-        switch ($cm->groupmode) {
+        switch (groups_get_activity_groupmode($cm)) {
             case NOGROUPS:
                 // No groups, do nothing
                 break;
@@ -1191,10 +1197,10 @@ class mod_kalvidassign_renderer extends plugin_renderer_base {
         $slider_border = html_writer::tag('div', $progress_bar, $attr);
 
         $attr          = array('id' => 'loading_text');
-        $loading_text  = html_writer::tag('div', get_string('scr_loading', 'mod_kalvidassign'), $attr);
+        $loading_text  = html_writer::tag('div', get_string('checkingforjava', 'mod_kalvidassign'), $attr);
 
         $attr   = array('id' => 'progress_bar_container',
-                        'style' => 'width:100px; padding-left:10px; padding-right:10px; visibility: hidden');
+                        'style' => 'width:100%; padding-left:10px; padding-right:10px; visibility: hidden');
         $output = '<br /><center>' .html_writer::tag('span', $slider_border . $loading_text, $attr) . '</center>';
 
         return $output;

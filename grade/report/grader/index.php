@@ -172,6 +172,12 @@ $reporthtml = $report->get_grade_table();
 if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') || $report->get_pref('quickgrading'))) {
     echo '<form action="index.php" enctype="application/x-www-form-urlencoded" method="post">'; // Enforce compatibility with our max_input_vars hack.
     echo '<div>';
+
+    // START UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
+    $time = time(); // Mark the page loading time.
+    echo '<input type="hidden" value="'.$time.'" name="currenttime" />';
+    // END UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
+
     echo '<input type="hidden" value="'.s($courseid).'" name="id" />';
     echo '<input type="hidden" value="'.sesskey().'" name="sesskey" />';
     echo '<input type="hidden" value="grader" name="report"/>';
