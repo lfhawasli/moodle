@@ -202,7 +202,7 @@ $string['cachedef_usermappings'] = 'UCLA user idnumber/username to Moodle users'
 
 // CCLE-4415 - Prompt deletion warning
 $string['deletecoursewarning'] = 'WARNING<p>You are deleting a course for which content has been added.</p>';
-$string['deletecoursesafe'] = 'You are deleting for which no content has been added.';
+$string['deletecoursesafe'] = 'You are deleting a course for which no content has been added.';
 
 // CCLE-4298 - Handing multiple people editing the grade report.
 $string['errorsavegradestaled'] = '<h4>Your changes have not been saved</h4>' . 
