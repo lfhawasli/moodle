@@ -30,6 +30,5 @@ $string['maxrecordsdesc'] = 'URLs over 2,000 characters will not work in the ' .
         'most popular web browser. So we try not to run into that limit by ' .
         'capping the number of course records sent over the GET parameter.';
 $string['pluginname'] = 'UCLA library research portal';
-// Rename to "Library Research Guide" after Spring 2014.
-$string['portalname'] = 'Lib Research Guide';
+$string['portalname'] = 'Library Research Guide';
 $string['url'] = 'URL to sent course information';

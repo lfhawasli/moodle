@@ -124,13 +124,13 @@ $site-menu-hover-color:         #fcfcfc;
             .library-research-portal.leaf:before {
                 // globe
                 //@include node-glyphicon("\e135");
-                // Use "Beta" label until the end of Spring 2014.
-                content: "Beta";
-                font-size: 1.1rem;
+                // Use "New" label until the end of Spring 2014.
+                content: "New";
+                font-size: 0.9rem;
                 font-family: "Lato";
                 font-weight: bold;
                 color: white;
-                padding: 2px 4px;
+                padding: 2px 2px;
                 @include border-radius(4px);
                 @include label-variant(#4168A1);
             }

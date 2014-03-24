@@ -194,12 +194,12 @@
 }
 /* line 124, sass/styles.scss */
 .block_ucla_course_menu .block_tree .type_custom .library-research-portal.leaf:before, .block_ucla_course_menu .block .list .type_custom .library-research-portal.leaf:before, .block .block_ucla_course_menu .list .type_custom .library-research-portal.leaf:before {
-  content: "Beta";
-  font-size: 1.1rem;
+  content: "New";
+  font-size: 0.9rem;
   font-family: "Lato";
   font-weight: bold;
   color: white;
-  padding: 2px 4px;
+  padding: 2px 2px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
