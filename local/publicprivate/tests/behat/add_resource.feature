@@ -34,7 +34,7 @@ Feature: Adding a resource
         And I fill the moodle form with:
           | Name | Test file name |
           | Description | Test file description |
-        And I upload "blocks/ucla_easyupload/tests/fixtures/test.txt" file to "Select files" filepicker
+        And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filepicker
         And I press "Save and return to course"
         Then "Test file name" activity should be private
         # Log out and check if student or guest can see activity and resource

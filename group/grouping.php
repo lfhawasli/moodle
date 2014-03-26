@@ -66,6 +66,11 @@ require_login($course);
 $context = context_course::instance($course->id);
 require_capability('moodle/course:managegroups', $context);
 
+// START UCLA MOD: CCLE-2229 - Public/Private for Moodle 2.x
+require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
+$publicprivate_course = new PublicPrivate_Course($course);
+// START UCLA MOD: CCLE-2229
+
 $strgroupings = get_string('groupings', 'group');
 $PAGE->set_title($strgroupings);
 $PAGE->set_heading($course->fullname. ': '.$strgroupings);

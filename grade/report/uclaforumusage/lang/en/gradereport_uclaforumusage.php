@@ -21,7 +21,7 @@
  */
 
 $string['pluginname'] = 'Forum usage report';
-$string['forumusage:view'] = 'View forum usage report';
+$string['uclaforumusage:view'] = 'View forum usage report';
 $string['modulename'] = 'Forum usage report';
 $string['studentlist'] = 'List of students';
 $string['forumlist'] = 'List of forums';
