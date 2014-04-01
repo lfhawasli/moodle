@@ -83,22 +83,59 @@ Feature: Deleting a course with additional course content
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
 
-#  @javascript
-#  Scenario: Deleting a course with a module.
-#    When I follow "Course 4"
-#    And I press "Turn editing on"
-#    # Add a random activity module to the course
-#    And I add a "Quiz" to section "0" and I fill the form with:
-#      | Name | Test Quiz |
-#    Then I should see "Test Quiz" in the "region-main" "region"
-#    When I expand "Site administration" node
-#    And I expand "Courses" node
-#    And I follow "Add/edit courses"
-#    And I follow "Category 2"
-#    And I click on "Delete" "link" in the "Course 4" "table_row"
-#    Then I should see "WARNING" in the "region-main" "region"
-#    And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
-#    And I should not see "You are deleting a course for which no content has been added." in the "region-main" "region"
+  @javascript
+  Scenario: Deleting a course with a module for all 3 formats.
+    # UCLA format.
+    Given I log out
+    And I log in as "teacher"
+    And I follow "Course 1"
+    And I press "Turn editing on"
+    And I add a "Quiz" to section "0" and I fill the form with:
+      | Name | Test Quiz |
+    And I should see "Test Quiz" in the "region-main" "region"
+    And I log out
+    And I log in as administrator
+    Then I expand "Site administration" node
+    And I expand "Courses" node
+    And I follow "Add/edit courses"
+    And I follow "Category 2"
+    And I click on "Delete" "link" in the "Course 1" "table_row"
+    Then I should see "WARNING" in the "region-main" "region"
+    And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
+    # Topics format.
+    Given I log out
+    And I log in as "teacher"
+    And I follow "Course 2"
+    And I press "Turn editing on"
+    And I add a "Quiz" to section "0" and I fill the form with:
+      | Name | Test Quiz |
+    And I should see "Test Quiz" in the "region-main" "region"
+    And I log out
+    And I log in as administrator
+    Then I expand "Site administration" node
+    And I expand "Courses" node
+    And I follow "Add/edit courses"
+    And I follow "Category 2"
+    And I click on "Delete" "link" in the "Course 2" "table_row"
+    Then I should see "WARNING" in the "region-main" "region"
+    And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
+    # Weeks format.
+    Given I log out
+    And I log in as "teacher"
+    And I follow "Course 3"
+    And I press "Turn editing on"
+    And I add a "Quiz" to section "0" and I fill the form with:
+      | Name | Test Quiz |
+    And I should see "Test Quiz" in the "region-main" "region"
+    And I log out
+    And I log in as administrator
+    Then I expand "Site administration" node
+    And I expand "Courses" node
+    And I follow "Add/edit courses"
+    And I follow "Category 2"
+    And I click on "Delete" "link" in the "Course 3" "table_row"
+    Then I should see "WARNING" in the "region-main" "region"
+    And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
 
   @javascript
   Scenario: Deleting a course with no additional course content for all 3 formats.
