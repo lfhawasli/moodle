@@ -4111,7 +4111,7 @@ table.rolecap tr.rolecap th {
 
 /* line 9, ../package/bootstrap/lib/_alerts.scss */
 .alert, #maincontent ~ .noticebox, #maincontent ~ #notice.generalbox:not(.info):not(#intro), .box.errorbox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning, .ucla-format-notice-box, .path-grade-report-grader .yui3-overlay {
+.course-content .generalbox, .adminwarning, .ucla-format-notice-box {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid transparent;
@@ -4119,18 +4119,18 @@ table.rolecap tr.rolecap th {
 }
 /* line 16, ../package/bootstrap/lib/_alerts.scss */
 .alert h4, #maincontent ~ .noticebox h4, #maincontent ~ #notice.generalbox:not(.info):not(#intro) h4, .box.errorbox h4, .box.noticebox h4, .course-content .noticebox h4,
-.course-content .generalbox h4, .adminwarning h4, .ucla-format-notice-box h4, .path-grade-report-grader .yui3-overlay h4 {
+.course-content .generalbox h4, .adminwarning h4, .ucla-format-notice-box h4 {
   margin-top: 0;
   color: inherit;
 }
 /* line 22, ../package/bootstrap/lib/_alerts.scss */
 .alert .alert-link, #maincontent ~ .noticebox .alert-link, #maincontent ~ #notice.generalbox:not(.info):not(#intro) .alert-link, .box.errorbox .alert-link, .box.noticebox .alert-link, .course-content .noticebox .alert-link,
-.course-content .generalbox .alert-link, .adminwarning .alert-link, .ucla-format-notice-box .alert-link, .path-grade-report-grader .yui3-overlay .alert-link {
+.course-content .generalbox .alert-link, .adminwarning .alert-link, .ucla-format-notice-box .alert-link {
   font-weight: bold;
 }
 /* line 28, ../package/bootstrap/lib/_alerts.scss */
 .alert > p, #maincontent ~ .noticebox > p, #maincontent ~ #notice.generalbox:not(.info):not(#intro) > p, .box.errorbox > p, .box.noticebox > p, .course-content .noticebox > p,
-.course-content .generalbox > p, .adminwarning > p, .ucla-format-notice-box > p, .path-grade-report-grader .yui3-overlay > p,
+.course-content .generalbox > p, .adminwarning > p, .ucla-format-notice-box > p,
 .alert > ul,
 #maincontent ~ .noticebox > ul,
 #maincontent ~ #notice.generalbox:not(.info):not(#intro) > ul,
@@ -4139,13 +4139,12 @@ table.rolecap tr.rolecap th {
 .course-content .noticebox > ul,
 .course-content .generalbox > ul,
 .adminwarning > ul,
-.ucla-format-notice-box > ul,
-.path-grade-report-grader .yui3-overlay > ul {
+.ucla-format-notice-box > ul {
   margin-bottom: 0;
 }
 /* line 31, ../package/bootstrap/lib/_alerts.scss */
 .alert > p + p, #maincontent ~ .noticebox > p + p, #maincontent ~ #notice.generalbox:not(.info):not(#intro) > p + p, .box.errorbox > p + p, .box.noticebox > p + p, .course-content .noticebox > p + p,
-.course-content .generalbox > p + p, .adminwarning > p + p, .ucla-format-notice-box > p + p, .path-grade-report-grader .yui3-overlay > p + p {
+.course-content .generalbox > p + p, .adminwarning > p + p, .ucla-format-notice-box > p + p {
   margin-top: 5px;
 }
 
@@ -4193,19 +4192,19 @@ table.rolecap tr.rolecap th {
 
 /* line 62, ../package/bootstrap/lib/_alerts.scss */
 .alert-warning, #maincontent ~ .noticebox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning, .path-grade-report-grader .yui3-overlay {
+.course-content .generalbox, .adminwarning {
   background-color: #fcf8e3;
   border-color: #fbeed5;
   color: #c09853;
 }
 /* line 365, ../package/bootstrap/lib/_mixins.scss */
 .alert-warning hr, #maincontent ~ .noticebox hr, .box.noticebox hr, .course-content .noticebox hr,
-.course-content .generalbox hr, .adminwarning hr, .path-grade-report-grader .yui3-overlay hr {
+.course-content .generalbox hr, .adminwarning hr {
   border-top-color: #f8e5be;
 }
 /* line 368, ../package/bootstrap/lib/_mixins.scss */
 .alert-warning .alert-link, #maincontent ~ .noticebox .alert-link, .box.noticebox .alert-link, .course-content .noticebox .alert-link,
-.course-content .generalbox .alert-link, .adminwarning .alert-link, .path-grade-report-grader .yui3-overlay .alert-link {
+.course-content .generalbox .alert-link, .adminwarning .alert-link {
   color: #a47e3c;
 }
 
@@ -4226,7 +4225,7 @@ table.rolecap tr.rolecap th {
 
 /* line 9, ../sass/_alerts.scss */
 .alert, #maincontent ~ .noticebox, #maincontent ~ #notice.generalbox:not(.info):not(#intro), .box.errorbox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning, .ucla-format-notice-box, .path-grade-report-grader .yui3-overlay {
+.course-content .generalbox, .adminwarning, .ucla-format-notice-box {
   color: #333;
   margin: 16px 0;
   padding: 8px 14px;
@@ -4241,12 +4240,12 @@ table.rolecap tr.rolecap th {
 @media only screen and (min-width: 481px) {
   /* line 9, ../sass/_alerts.scss */
   .alert, #maincontent ~ .noticebox, #maincontent ~ #notice.generalbox:not(.info):not(#intro), .box.errorbox, .box.noticebox, .course-content .noticebox,
-  .course-content .generalbox, .adminwarning, .ucla-format-notice-box, .path-grade-report-grader .yui3-overlay {
+  .course-content .generalbox, .adminwarning, .ucla-format-notice-box {
     margin: 20px 0;
   }
   /* line 24, ../sass/_alerts.scss */
   .alert .mform .felement, #maincontent ~ .noticebox .mform .felement, #maincontent ~ #notice.generalbox:not(.info):not(#intro) .mform .felement, .box.errorbox .mform .felement, .box.noticebox .mform .felement, .course-content .noticebox .mform .felement,
-  .course-content .generalbox .mform .felement, .adminwarning .mform .felement, .ucla-format-notice-box .mform .felement, .path-grade-report-grader .yui3-overlay .mform .felement {
+  .course-content .generalbox .mform .felement, .adminwarning .mform .felement, .ucla-format-notice-box .mform .felement {
     width: 100%;
     margin-top: 5px;
   }
@@ -4259,7 +4258,7 @@ table.rolecap tr.rolecap th {
 
 /* line 36, ../sass/_alerts.scss */
 .alert-warning, #maincontent ~ .noticebox, .box.noticebox, .course-content .noticebox,
-.course-content .generalbox, .adminwarning, .path-grade-report-grader .yui3-overlay {
+.course-content .generalbox, .adminwarning {
   border-left: 4px solid #F1E7BC;
 }
 
@@ -9832,132 +9831,151 @@ h2.headingblock > a {
 
 /* line 19, ../sass/ccle/_gradebook.scss */
 .path-grade-report-grader .yui3-overlay {
-  width: auto;
-  font-size: 1.2rem;
-  -webkit-box-shadow: #999999 2px 2px 10px;
-  -moz-box-shadow: #999999 2px 2px 10px;
-  box-shadow: #999999 2px 2px 10px;
+  border: 0;
+  background: none;
+  background-color: 'initial';
 }
-/* line 28, ../sass/ccle/_gradebook.scss */
-.path-grade-report-grader .yui3-overlay .fullname {
+/* line 25, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .graderreportoverlay {
+  background-color: white;
+  width: auto;
+  padding: 10px;
+  border-color: #ddd;
+  font-size: 1.2rem;
+  -webkit-box-shadow: #999999 2px 2px 3px;
+  -moz-box-shadow: #999999 2px 2px 3px;
+  box-shadow: #999999 2px 2px 3px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+/* line 32, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .graderreportoverlay.overriden {
+  border-top: 6px solid #f1c32a;
+}
+/* line 39, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .graderreportoverlay .overriden {
+  background-color: #f1c32a;
+  width: 100%;
+  text-align: center;
+}
+/* line 44, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .graderreportoverlay .fullname {
   color: #444;
 }
-/* line 31, ../sass/ccle/_gradebook.scss */
-.path-grade-report-grader .yui3-overlay .itemname {
+/* line 47, ../sass/ccle/_gradebook.scss */
+.path-grade-report-grader .graderreportoverlay .itemname {
   padding-top: 4px;
   color: #666;
 }
-/* line 38, ../sass/ccle/_gradebook.scss */
+/* line 54, ../sass/ccle/_gradebook.scss */
 .path-grade-report-grader .grade_icons {
   float: right;
+  /*        .action-icon {
+              font-size: 1.5rem;
+              &:before {
+                  // glyphicon-cog
+                  @include glyphicon("\e019");
+              }
+          }*/
 }
-/* line 40, ../sass/ccle/_gradebook.scss */
+/* line 56, ../sass/ccle/_gradebook.scss */
 .path-grade-report-grader .grade_icons .smallicon {
-  display: none;
+  /*display: none;*/
 }
-/* line 43, ../sass/ccle/_gradebook.scss */
-.path-grade-report-grader .grade_icons .action-icon {
-  font-size: 1.5rem;
-}
-/* line 45, ../sass/ccle/_gradebook.scss */
-.path-grade-report-grader .grade_icons .action-icon:before {
-  position: relative;
-  top: 1px;
-  display: inline-block;
-  font-family: 'Glyphicons Halflings';
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  content: "\e019";
-}
-/* line 50, ../sass/ccle/_gradebook.scss */
+/* line 66, ../sass/ccle/_gradebook.scss */
 .path-grade-report-grader .grade_icons ~ input {
   float: left;
 }
-/* line 57, ../sass/ccle/_gradebook.scss */
+/* line 73, ../sass/ccle/_gradebook.scss */
 .path-grade-report-grader .gradeparent {
   overflow: inherit;
 }
 
 /*.gradebook-student-column,*/
-/* line 65, ../sass/ccle/_gradebook.scss */
+/* line 81, ../sass/ccle/_gradebook.scss */
 table#user-grades .grade, table#user-grades .item {
   width: 50px;
   overflow: hidden;
 }
-/* line 70, ../sass/ccle/_gradebook.scss */
+/* line 86, ../sass/ccle/_gradebook.scss */
+table#user-grades td {
+  /*border: 1px solid #dddddd;*/
+}
+/* line 90, ../sass/ccle/_gradebook.scss */
 table#user-grades tr {
   /*line-height: 1.428;*/
 }
-/* line 73, ../sass/ccle/_gradebook.scss */
+/* line 93, ../sass/ccle/_gradebook.scss */
 table#user-grades tr th, table#user-grades tr td, table#user-grades tr th.cell, table#user-grades tr th.c1 {
-  border-bottom: 0;
+  /*border-bottom: 0;*/
 }
-/* line 76, ../sass/ccle/_gradebook.scss */
+/* line 96, ../sass/ccle/_gradebook.scss */
 table#user-grades tr th.c1 {
-  border-top: 0;
+  /*border-top: 0;*/
 }
-/* line 80, ../sass/ccle/_gradebook.scss */
+/* line 100, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .user {
   width: 150px;
   padding: 4px;
 }
-/* line 86, ../sass/ccle/_gradebook.scss */
+/* line 106, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .user .userpicture {
   display: none;
 }
-/* line 88, ../sass/ccle/_gradebook.scss */
+/* line 108, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .user .idnumber {
   display: block;
   float: left;
   font-weight: bold;
   width: 100%;
 }
-/* line 94, ../sass/ccle/_gradebook.scss */
+/* line 114, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .user .email {
   display: block;
   float: left;
   width: 100%;
 }
-/* line 102, ../sass/ccle/_gradebook.scss */
+/* line 122, ../sass/ccle/_gradebook.scss */
 table#user-grades tr #studentheader .email {
   float: left;
 }
-/* line 104, ../sass/ccle/_gradebook.scss */
+/* line 124, ../sass/ccle/_gradebook.scss */
 table#user-grades tr #studentheader .email + .sorticon {
   float: left;
 }
-/* line 112, ../sass/ccle/_gradebook.scss */
+/* line 132, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked {
   background-color: #f39a00;
   border-bottom-color: #f39a00;
 }
-/* line 115, ../sass/ccle/_gradebook.scss */
+/* line 135, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.overridden {
   background-color: #f39a00;
   border-color: #dc691a;
 }
-/* line 120, ../sass/ccle/_gradebook.scss */
+/* line 140, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked {
   background-color: #f5cd00;
   border-bottom-color: #f5cd00;
 }
-/* line 123, ../sass/ccle/_gradebook.scss */
+/* line 143, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked.overridden {
   background-color: #f5cd00;
 }
-/* line 127, ../sass/ccle/_gradebook.scss */
+/* line 147, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked {
   background-color: #f1b900;
   border-bottom-color: #f1b900;
 }
-/* line 130, ../sass/ccle/_gradebook.scss */
+/* line 150, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked.overridden {
   background-color: #f1b900;
   border-color: #dc691a;
 }
-/* line 135, ../sass/ccle/_gradebook.scss */
+/* line 155, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.overridden {
   background-color: #fff;
   border: 0;
@@ -9965,68 +9983,74 @@ table#user-grades tr.odd td.grade.overridden {
   width: 16px;
   height: 16px;
 }
-/* line 147, ../sass/ccle/_gradebook.scss */
+/* line 167, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked {
   background-color: #f4a400;
   border-bottom-color: #f4a400;
 }
-/* line 150, ../sass/ccle/_gradebook.scss */
+/* line 170, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.overridden {
   background-color: #f4a400;
   border-color: #dc691a;
 }
-/* line 155, ../sass/ccle/_gradebook.scss */
+/* line 175, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked {
   background-color: #f5cf2c;
   border-bottom-color: #f5cf2c;
 }
-/* line 158, ../sass/ccle/_gradebook.scss */
+/* line 178, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked.overridden {
   background-color: #f5cf2c;
 }
-/* line 162, ../sass/ccle/_gradebook.scss */
+/* line 182, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked {
   background-color: #f1be00;
   border-bottom-color: #f1be00;
 }
-/* line 165, ../sass/ccle/_gradebook.scss */
+/* line 185, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked.overridden {
   background-color: #f1be00;
   border-color: #dc691a;
 }
-/* line 170, ../sass/ccle/_gradebook.scss */
+/* line 190, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.overridden {
   background-color: #efefef;
   /*border: 2px dashed $grade-report-color-overriden-border;*/
-  border: 0;
+  /*border: 0;*/
   background: url([[pix:theme|corner-fold]]) no-repeat;
   width: 16px;
   height: 16px;
 }
-/* line 182, ../sass/ccle/_gradebook.scss */
+/* line 202, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td:hover, table#user-grades tr.even td:hover {
-  background-color: #fcfcfc;
+  /*background-color: #fcfcfc;*/
+  /*border: 1px solid gray !important;*/
 }
-/* line 186, ../sass/ccle/_gradebook.scss */
+/* line 207, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked > .gradevalue, table#user-grades tr.even td.grade.vmarked > .gradevalue {
   /*font-weight: bold;*/
 }
-/* line 191, ../sass/ccle/_gradebook.scss */
+/* line 212, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked .action-icon, table#user-grades tr.odd td.grade.hmarked .action-icon, table#user-grades tr.even td.grade.vmarked .action-icon, table#user-grades tr.even td.grade.hmarked .action-icon {
   color: white;
 }
-/* line 197, ../sass/ccle/_gradebook.scss */
+/* line 218, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .gradevalue {
   /*font-weight: bold;*/
   /*font-size: 1.2rem;*/
 }
 
-/* line 204, ../sass/ccle/_gradebook.scss */
+/* line 225, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row {
   width: 100%;
   font-size: 1rem;
 }
-/* line 209, ../sass/ccle/_gradebook.scss */
+/* line 229, ../sass/ccle/_gradebook.scss */
+.gradebook-header-row.gradebook-header-row-sticky tr th {
+  /*border-top: 2px solid gray;*/
+  border-bottom: 2px solid gray;
+}
+/* line 235, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th {
   padding: 0;
   float: left;
@@ -10035,57 +10059,103 @@ table#user-grades tr .gradevalue {
   text-align: center;
   padding: 8px 2px 1px;
 }
-/* line 218, ../sass/ccle/_gradebook.scss */
+/* line 244, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th a {
   margin-left: 4px;
 }
-/* line 222, ../sass/ccle/_gradebook.scss */
+/* line 248, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th:hover {
   border-bottom: 4px solid #ddd;
 }
-/* line 226, ../sass/ccle/_gradebook.scss */
+/* line 252, ../sass/ccle/_gradebook.scss */
 .gradebook-header-row tr th:nth-child(2n) {
   background-color: #fcfcfc;
 }
 
-/* line 233, ../sass/ccle/_gradebook.scss */
+/* line 259, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column {
   background-color: white;
 }
-/* line 236, ../sass/ccle/_gradebook.scss */
+/* line 262, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column.gradebook-student-column-sticky .gradebook-student-container {
+  border-right: 2px solid gray;
+}
+/* line 265, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container {
-  background-color: white;
+  background-color: #f9f9f9;
   font-size: 1rem;
   border-right: 1px solid #ddd;
-  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  padding: 4px;
 }
-/* line 242, ../sass/ccle/_gradebook.scss */
+/* line 272, ../sass/ccle/_gradebook.scss */
+.gradebook-student-column .gradebook-student-container th {
+  padding: 0;
+}
+/* line 275, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container span {
   width: 100%;
   float: left;
 }
-/* line 246, ../sass/ccle/_gradebook.scss */
+/* line 279, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container .userpicture {
   display: none;
 }
-/* line 249, ../sass/ccle/_gradebook.scss */
+/* line 282, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container:nth-child(2n+1) {
-  background-color: #fcfcfc;
+  background-color: #efefef;
 }
-/* line 252, ../sass/ccle/_gradebook.scss */
+/* line 285, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container:hover {
-  border-right: 4px solid #ddd;
+  border-right: 4px solid gray;
 }
-/* line 255, ../sass/ccle/_gradebook.scss */
+/* line 288, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container:first-child {
   border-top: #fcfcfc;
 }
-/* line 258, ../sass/ccle/_gradebook.scss */
+/* line 291, ../sass/ccle/_gradebook.scss */
 .gradebook-student-column .gradebook-student-container:last-child {
   border-bottom: #fcfcfc;
 }
 
-/* line 266, ../sass/ccle/_gradebook.scss */
+/* line 297, ../sass/ccle/_gradebook.scss */
+.gradebook-footer-row {
+  display: none;
+}
+/* line 300, ../sass/ccle/_gradebook.scss */
+.gradebook-footer-row.gradebook-footer-row-sticky {
+  display: block;
+}
+/* line 304, ../sass/ccle/_gradebook.scss */
+.gradebook-footer-row.gradebook-footer-row-sticky .cell {
+  border-top: 2px solid gray;
+}
+/* line 308, ../sass/ccle/_gradebook.scss */
+.gradebook-footer-row .cell {
+  padding: 8px;
+  font-size: 1rem;
+  background-color: #efeffe;
+  color: #00008b;
+  text-align: right;
+  border-right: 1px solid #ccc;
+  border-right: 1px solid #ddd;
+}
+/* line 318, ../sass/ccle/_gradebook.scss */
+.gradebook-footer-row .cell.header {
+  background-color: #f3ead8;
+}
+
+/* line 324, ../sass/ccle/_gradebook.scss */
+.gradebook-floating-header {
+  background-color: #f9f9f9;
+  font-size: 1rem;
+  text-align: center;
+  padding: 4px;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+
+/* line 336, ../sass/ccle/_gradebook.scss */
 .gradebook-color {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -10101,7 +10171,7 @@ table#user-grades tr .gradevalue {
   float: left;
   margin-right: 10px;
 }
-/* line 277, ../sass/ccle/_gradebook.scss */
+/* line 347, ../sass/ccle/_gradebook.scss */
 .gradebook-color:after {
   content: "";
   float: right;
@@ -10109,27 +10179,27 @@ table#user-grades tr .gradevalue {
   height: 100%;
 }
 
-/* line 284, ../sass/ccle/_gradebook.scss */
+/* line 354, ../sass/ccle/_gradebook.scss */
 .gradebook-overridden {
   background: url([[pix:theme|corner-fold]]) no-repeat;
   height: 30px;
   background-color: #efefef;
 }
 
-/* line 289, ../sass/ccle/_gradebook.scss */
+/* line 359, ../sass/ccle/_gradebook.scss */
 .gradebook-row-color {
   background-color: #f5cd00;
 }
-/* line 291, ../sass/ccle/_gradebook.scss */
+/* line 361, ../sass/ccle/_gradebook.scss */
 .gradebook-row-color:after {
   background-color: #f5cf2c;
 }
 
-/* line 295, ../sass/ccle/_gradebook.scss */
+/* line 365, ../sass/ccle/_gradebook.scss */
 .gradebook-column-color {
   background-color: #f39a00;
 }
-/* line 297, ../sass/ccle/_gradebook.scss */
+/* line 367, ../sass/ccle/_gradebook.scss */
 .gradebook-column-color:after {
   background-color: #f4a400;
 }

@@ -17,14 +17,30 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
     
     // Make overlay look like our standard 'alerts'
     .yui3-overlay {
-        @extend .alert;
-        @extend .alert-warning; 
-        
+        border: 0;
+        background: none;
+        background-color: 'initial';
+    }
+    
+    .graderreportoverlay {
+        background-color: white;
         width: auto;
+        padding: 10px;
+        border-color: #ddd;
         font-size: 1.2rem;
         
-        @include box-shadow(#999 2px 2px 10px);
+        &.overriden {
+            border-top: 6px solid #f1c32a;
+        }
         
+        @include box-shadow(#999 2px 2px 3px);
+        @include border-radius(4px);
+        
+        .overriden {
+            background-color: #f1c32a;
+            width: 100%;
+            text-align: center;
+        }
         .fullname {
             color: #444;
         }
@@ -38,15 +54,15 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
     .grade_icons {
         float: right;
         .smallicon {
-            display: none;
+            /*display: none;*/
         }
-        .action-icon {
+/*        .action-icon {
             font-size: 1.5rem;
             &:before {
                 // glyphicon-cog
                 @include glyphicon("\e019");
             }
-        }
+        }*/
         ~ input {
             float: left;
             @extend .form-control;
@@ -67,14 +83,18 @@ table#user-grades {
         overflow: hidden;
     }
     
+    td {
+        /*border: 1px solid #dddddd;*/
+    }
+    
     tr {
         /*line-height: 1.428;*/
         
         th, td, th.cell, th.c1 {
-            border-bottom: 0;
+            /*border-bottom: 0;*/
         }
         th.c1 {
-            border-top: 0;
+            /*border-top: 0;*/
         }
         
         .user {
@@ -170,7 +190,7 @@ table#user-grades {
             td.grade.overridden {
                 background-color: #efefef;
                 /*border: 2px dashed $grade-report-color-overriden-border;*/
-                border: 0;
+                /*border: 0;*/
                 
                 background: url([[pix:theme|corner-fold]]) no-repeat;
                 width: 16px;
@@ -180,7 +200,8 @@ table#user-grades {
         
         &.odd, &.even {
             td:hover {
-                background-color: #fcfcfc;
+                /*background-color: #fcfcfc;*/
+                /*border: 1px solid gray !important;*/
             }
             td.grade.vmarked {
                 > .gradevalue {
@@ -205,6 +226,11 @@ table#user-grades {
     width: 100%;
     font-size: 1rem;
     
+    &.gradebook-header-row-sticky tr th {
+        /*border-top: 2px solid gray;*/
+        border-bottom: 2px solid gray;
+    }
+
     tr {
         th {
             padding: 0;
@@ -233,12 +259,19 @@ table#user-grades {
 .gradebook-student-column {
     background-color: white;
     
+    &.gradebook-student-column-sticky .gradebook-student-container {
+        border-right: 2px solid gray;
+    }
     .gradebook-student-container {
-        background-color: white;
+        background-color: #f9f9f9;
         font-size: 1rem;
         border-right:1px solid #ddd;
-        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        padding: 4px;
 
+        th {
+            padding: 0;
+        }
         span {
             width: 100%;
             float: left;
@@ -247,10 +280,10 @@ table#user-grades {
             display: none;
         }
         &:nth-child(2n+1) {
-            background-color: #fcfcfc;
+            background-color: #efefef;
         }
         &:hover {
-            border-right: 4px solid #ddd;
+            border-right: 4px solid gray;
         }
         &:first-child {
             border-top: #fcfcfc;
@@ -259,6 +292,44 @@ table#user-grades {
             border-bottom: #fcfcfc;
         }
     }
+}
+
+.gradebook-footer-row {
+    
+    display: none;
+    
+    &.gradebook-footer-row-sticky {
+        
+        display: block;
+        
+        .cell {
+            border-top: 2px solid gray;
+        }
+    }
+    .cell {
+        padding: 8px;
+        font-size: 1rem;
+        background-color: #efeffe;
+        color: #00008b;
+        
+        text-align: right;
+        border-right: 1px solid #ccc;
+        border-right: 1px solid #ddd;
+        
+        &.header {
+            background-color: #f3ead8;
+        }
+    }
+}
+
+.gradebook-floating-header {
+    background-color: #f9f9f9;
+    font-size: 1rem;
+    text-align: center;
+    padding: 4px;
+    
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
 }
 
 // gradebook help

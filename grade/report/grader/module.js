@@ -55,8 +55,11 @@ M.gradereport_grader = {
                 if (!properties) {
                     return;
                 }
-
-                var content = '<div class="graderreportoverlay" role="tooltip" aria-describedby="' + properties.id + '">';
+                // START UCLA MOD CCLE-4296 - adding overriden marker to tooltip
+                var overriden = /.*overridden.*/g.test(properties.cell.getAttribute('class')) ? 'overriden' : '';
+                var content = '<div class="graderreportoverlay ' + overriden +  '" role="tooltip" aria-describedby="' + properties.id + '">';
+//                var content = '<div class="graderreportoverlay" role="tooltip" aria-describedby="' + properties.id + '">';
+                // END UCLA MOD CCLE-4296
                 content += '<div class="fullname">'+properties.username+'</div><div class="itemname">'+properties.itemname+'</div>';
                 if (properties.feedback) {
                     content += '<div class="feedback">'+properties.feedback+'</div>';
