@@ -344,7 +344,11 @@ abstract class uclastats_base implements renderable {
 
         // close the workbook
         $workbook->close();
-        exit;
+
+        // If we are in the command line, don't die.
+        if (!defined('CLI_SCRIPT') && !CLI_SCRIPT) {
+            exit;
+        }
     }
 
     /**

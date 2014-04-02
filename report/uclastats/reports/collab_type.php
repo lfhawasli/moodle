@@ -45,7 +45,9 @@ class collab_type extends uclastats_base {
      */
     private function find_division($categoryid, $divisions) {
 
-        $category = coursecat::get($categoryid);
+        // Need to set $alwaysreturnhidden for coursecat::get to true, so this
+        // report can be run from the command line.
+        $category = coursecat::get($categoryid, MUST_EXIST, true);
 
         // First check if category has any parents.
         $parents = $category->get_parents();
@@ -54,7 +56,7 @@ class collab_type extends uclastats_base {
             // list looking for a name match with a division.
             foreach ($parents as $parentid) {
                 // Top most parent is at the start of the array.
-                $parent = coursecat::get($parentid);
+                $parent = coursecat::get($parentid, MUST_EXIST, true);
                 // See if parent's name matches.
                 if (in_array($parent->name, $divisions)) {
                     return $parent->name;
