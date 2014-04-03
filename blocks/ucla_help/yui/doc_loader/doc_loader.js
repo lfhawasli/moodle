@@ -84,8 +84,8 @@ YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
         }
     });
 
-    M.blocks_ucla_help = M.blocks_ucla_help || {};
-    M.blocks_ucla_help.init = function(config) {
+    M.block_ucla_help = M.block_ucla_help || {};
+    M.block_ucla_help.init_doc_loader = function(config) {
         return new MODULENAME(config); // 'config' contains the parameter values
     };
 }, '@VERSION@', {

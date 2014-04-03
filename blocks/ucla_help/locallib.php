@@ -34,6 +34,8 @@ spl_autoload_register(function ($class) {
 
 global $PAGE;
 
+$PAGE->requires->yui_module('moodle-block_ucla_help-sidebar', 'M.block_ucla_help.init_sidebar', array(array()));
+
 $PAGE->requires->jquery();
 $PAGE->requires->js('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.js');
 $PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.css');

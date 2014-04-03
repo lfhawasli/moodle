@@ -30,7 +30,19 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
         font-size: 1.2rem;
         
         &.overriden {
-            border-top: 6px solid #f1c32a;
+            border-top: 22px solid #f1c32a;
+            
+            &:before {
+                content: "Overridden grade";
+                color: black;
+                height: 0px;
+                width: 100%;
+                display: inline-block;
+                text-align: center;
+                top: -28px;
+                float: left;
+                position: relative;
+            }
         }
         
         @include box-shadow(#999 2px 2px 3px);
@@ -311,13 +323,15 @@ table#user-grades {
         font-size: 1rem;
         background-color: #efeffe;
         color: #00008b;
+        font-weight: bold;
         
         text-align: right;
         border-right: 1px solid #ccc;
         border-right: 1px solid #ddd;
         
         &.header {
-            background-color: #f3ead8;
+            background-color: #f9f9f9;
+            color: #444;
         }
     }
 }

@@ -6,13 +6,11 @@ $('.sidebar-buttons .block-toggle').on('click', function(e) {
     $('.pre.block.sidebar').sidebar({
         onChange: function() {
 
-            $('.gradebook-header-row').toggle();
-            $('.gradebook-student-column').toggle();
+            M.block_ucla_help.sidebar.invoke_function('sidebar_toggle_pre', '');
 
             $(window).delay(300).queue(function(next) {
-                $(this).scrollTop($(window).scrollTop() + 1);
-                $('.gradebook-header-row').toggle();
-                $('.gradebook-student-column').toggle();
+                M.block_ucla_help.sidebar.invoke_function('sidebar_toggle', '');
+                M.block_ucla_help.sidebar.invoke_function('sidebar_toggle_post', '');
                 next();
             });
         }
