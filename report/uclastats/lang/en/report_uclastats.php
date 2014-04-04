@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings
+ * Strings for report.
  *
  * @package    report_uclastats
- * @copyright  UC Regents
+ * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -113,8 +113,13 @@ $string['course_syllabus'] = 'Syllabus';
 
 // Strings for system_size_report.
 $string['system_size'] = 'System size (system)';
-$string['system_size_help'] = 'Returns number of files over 1 MB and ' .
-        'size of database';
+$string['system_size_help'] = 'Returns the cumulative file size, size of course ' .
+        'files for a given term, the number of files over 1 MB and ' .
+        'size of database.<p><strong>NOTE: DO NOT RUN THIS REPORT VIA GUI. ' .
+        'Calculating culmulative file size takes over 30 mins on PROD. ' .
+        'Only run this report via command line or view cached results.</strong></p>';
+$string['cumulativefilesize'] = 'Cumulative file size';
+$string['termfilesize'] = 'Term file size';
 $string['file_count'] = 'Number of files over 1 MB';
 $string['database_size'] = 'Size of database';
 
