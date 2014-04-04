@@ -50,4 +50,38 @@ class behat_ucla_course_menu extends behat_base {
         );
     }
 
+    /**
+     * Checks if a site menu section contains the 'hidden' label.
+     *
+     * @Given /^the "([^"]*)" section in the ucla site menu is hidden$/
+     */
+    public function the_site_menu_section_hidden($section) {
+
+        // Find the hidden section containing the section name text.
+        $xpath = "//*[contains(@class, 'block_ucla_course_menu_hidden')]/*[text()[contains(.,'$section')]]";
+
+        $hiddensections = $this->find('xpath', $xpath);
+
+        if (empty($hiddensections)) {
+            throw new ExpectationException('The section "' . $section . '" does not have the "hidden" label.', $this->getSession());
+        }
+    }
+
+    /**
+     * Checks that a site menu section does NOT have a 'hidden' label.
+     *
+     * @Given /^the "([^"]*)" section in the ucla site menu is visible$/
+     */
+    public function the_site_menu_section_visible($section) {
+
+        try {
+            $this->the_site_menu_section_hidden($section);
+        } catch (Exception $e) {
+            // This is good..
+            return;
+        }
+
+        throw new ExpectationException('The section "' . $section . '" has a "hidden" label.', $this->getSession());
+}
+
 }
