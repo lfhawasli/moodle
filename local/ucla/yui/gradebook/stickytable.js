@@ -3,7 +3,7 @@
  */
 
 
-YUI().use('node', 'event', 'anim', 'moodle-block_ucla_help-doc_loader', function(Y) {
+YUI().use('node', 'event', 'node-event-simulate', 'moodle-block_ucla_help-doc_loader', function(Y) {
 
     // Get local_ucla plugin
     M.local_ucla = M.local_ucla || {};
@@ -107,7 +107,7 @@ YUI().use('node', 'event', 'anim', 'moodle-block_ucla_help-doc_loader', function
                 'left': this.node_student_cell.getX() + 'px',
                 'top': this.node_student_cell.getY() + 'px',
                 'width': this.node_student_cell.get('offsetWidth'),
-                'height': '100%',
+//                'height': '100%',
                 'background-color': '#f9f9f9'
             });
         },
@@ -177,7 +177,6 @@ YUI().use('node', 'event', 'anim', 'moodle-block_ucla_help-doc_loader', function
                 this.floating_grade_headers.one('tr').appendChild(newnode);
             }, this);
 
-
             // Position header table
             this.floating_grade_headers.setStyles({
                 'position': 'absolute',
@@ -212,6 +211,17 @@ YUI().use('node', 'event', 'anim', 'moodle-block_ucla_help-doc_loader', function
 
                 this.floating_grade_footers.append(newnode);
             }, this);
+            
+            // Attach 'Update' button
+            var update_button = Y.one('#gradersubmit');
+
+            if (update_button) {
+                var button = Y.Node.create('<button class="btn btn-xs btn-default">' + update_button.getAttribute('value') + '</button>')
+                button.on('click', function(e) {
+                    update_button.simulate('click');
+                });
+                this.floating_grade_footers.one('.header').append(button);
+            }
 
             // Position the row
             this.floating_grade_footers.setStyles({
@@ -252,12 +262,6 @@ YUI().use('node', 'event', 'anim', 'moodle-block_ucla_help-doc_loader', function
             } else {
                 this.floating_user_header_cell.setStyle('top', this.node_student_header_cell.getY() + 'px');
             }
-//            // 
-//            if (window.pageYOffset > this.node_student_header_cell.getY()) {
-//                this.floating_user_header_cell.setStyle('top', window.pageYOffset + 'px');
-//            } else {
-//                this.floating_user_header_cell.setStyle('top', this.node_student_header_cell.getY() + 'px');
-//            }
         },
 
         update_assignment_header_position: function() {

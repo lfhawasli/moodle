@@ -20,8 +20,10 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
         border: 0;
         background: none;
         background-color: 'initial';
+        min-width: 200px;
     }
     
+    // Style tooltip
     .graderreportoverlay {
         background-color: white;
         width: auto;
@@ -62,25 +64,6 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
         }
     }
     
-    
-    .grade_icons {
-        float: right;
-        .smallicon {
-            /*display: none;*/
-        }
-/*        .action-icon {
-            font-size: 1.5rem;
-            &:before {
-                // glyphicon-cog
-                @include glyphicon("\e019");
-            }
-        }*/
-        ~ input {
-            float: left;
-            @extend .form-control;
-        }
-    }
-    
     // Remove the table overflow
     .gradeparent {
         overflow: inherit;
@@ -95,39 +78,14 @@ table#user-grades {
         overflow: hidden;
     }
     
-    td {
-        /*border: 1px solid #dddddd;*/
-    }
-    
     tr {
-        /*line-height: 1.428;*/
-        
-        th, td, th.cell, th.c1 {
-            /*border-bottom: 0;*/
-        }
-        th.c1 {
-            /*border-top: 0;*/
+
+        &.heading .cell {
+            border-bottom: 0;
         }
         
         .user {
-            // Fix the user cell width
-            width: 150px;
-            padding: 4px;
-                 
-            // Remove picture
             .userpicture {display: none;}
-            
-            .idnumber {
-                display: block;
-                float: left;
-                font-weight: bold;
-                width: 100%;
-            }
-            .email {
-                display: block;
-                float: left;
-                width: 100%;
-            }
         }
         
         #studentheader {
@@ -166,11 +124,13 @@ table#user-grades {
             }
             td.grade.overridden {
                 background-color: #fff;
-                border: 0;
+                /*border: 0;*/
                 
                 background: url([[pix:theme|corner-fold]]) no-repeat;
                 width: 16px;
                 height: 16px;
+                background-color: #efefef;
+
             }
         }
         
@@ -207,29 +167,8 @@ table#user-grades {
                 background: url([[pix:theme|corner-fold]]) no-repeat;
                 width: 16px;
                 height: 16px;
+                background-color: #fff;
             }
-        }
-        
-        &.odd, &.even {
-            td:hover {
-                /*background-color: #fcfcfc;*/
-                /*border: 1px solid gray !important;*/
-            }
-            td.grade.vmarked {
-                > .gradevalue {
-                    /*font-weight: bold;*/
-                }
-            }
-            td.grade.vmarked, td.grade.hmarked {
-                .action-icon {
-                    color: white;
-                }
-            }
-            
-        }
-        .gradevalue {
-            /*font-weight: bold;*/
-            /*font-size: 1.2rem;*/
         }
     }
 }
@@ -248,6 +187,7 @@ table#user-grades {
             padding: 0;
             float: left;
             border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
             background-color: white;
             
             text-align: center;
@@ -326,12 +266,15 @@ table#user-grades {
         font-weight: bold;
         
         text-align: right;
-        border-right: 1px solid #ccc;
         border-right: 1px solid #ddd;
         
         &.header {
             background-color: #f9f9f9;
             color: #444;
+        }
+        
+        .btn {
+            float: left;
         }
     }
 }
