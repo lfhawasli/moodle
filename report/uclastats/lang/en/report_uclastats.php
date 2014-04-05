@@ -281,6 +281,19 @@ $string['test'] = 'Test';
 $string['private'] = 'Private';
 $string['tasite'] = 'TA site';
 
+// Strings for Syllabus by division.
+$string['syllabus_by_division'] = 'Syllabus by division';
+$string['syllabus_by_division_help'] = 'Returns the number of syllabi by division, term, ugrad/grad, and type.';
+$string['totalsyllabuscourses'] = 'Syllabus/Courses';
+$string['syllabuspublic'] = 'Public';
+$string['syllabusloggedin'] = 'UCLA community';
+$string['syllabuspreview'] = 'Preview';
+$string['syllabusprivate'] = 'Private';
+$string['syllabusmanual'] = 'Manual';
+$string['syllabuscachedresult'] = 'ugrad: {$a->ugrad} / grad: {$a->grad}';
+$string['ugrad'] = 'Undergraduate courses';
+$string['grad'] = 'Graduate courses';
+
 // Error strings.
 $string['nocachedresults'] = 'No cached results found';
 $string['invalidterm'] = 'Invalid term';

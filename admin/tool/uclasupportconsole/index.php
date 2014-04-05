@@ -588,7 +588,8 @@ if ($displayforms) {
                             urci.term = urc.term AND 
                             urci.srs = urc.srs AND
                             urci.enrolstat != \'X\' AND
-                            urci.acttype != \'TUT\'
+                            urci.acttype != \'TUT\' AND
+                            urc.courseid IS NOT NULL
                 ORDER BY    urs.subjarea';
         $table_colum_name = get_string('syllabus_subjarea', 'tool_uclasupportconsole');
     } else {
@@ -603,7 +604,8 @@ if ($displayforms) {
                             urci.term = urc.term AND 
                             urci.srs = urc.srs AND
                             urci.enrolstat != \'X\' AND
-                            urci.acttype != \'TUT\'
+                            urci.acttype != \'TUT\' AND
+                            urc.courseid IS NOT NULL
                 ORDER BY    urd.fullname';
     }
 
@@ -625,6 +627,7 @@ if ($displayforms) {
          *      [UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN]
          *      [UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE]
          *      [preview]
+         *      [manual]
          */
         $ugrad = array();
         $grad = array();
@@ -662,11 +665,7 @@ if ($displayforms) {
             if (!empty($syllabi)) {
                 // course has a syllabus, let's count it
                 @++$working_bin[$course->fullname]['syllabi_courses'];
-                $is_preview = false;
                 foreach ($syllabi as $syllabus) {
-                    if (!empty($syllabus->is_preview)) {
-                        $is_preview = true;
-                    }
                     switch ($syllabus->access_type) {
                         case UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC:
                             @++$working_bin[$course->fullname][UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC];
@@ -680,14 +679,14 @@ if ($displayforms) {
                         default:
                             break;
                     }
-                    if (!empty($is_preview)) {
+                    if (!empty($syllabus->is_preview)) {
                         @++$working_bin[$course->fullname]['preview'];
                     }
                 }
             }
 
             // Check if there were any manual syllabi.
-            $courserecord = $DB->get_record('course', array('id' =>  $course->courseid));
+            $courserecord = get_course($course->courseid);
             $ucla_syllabus_manager = new ucla_syllabus_manager($courserecord);
             $manualsyllabi = $ucla_syllabus_manager->get_all_manual_syllabi($timestart, $timeend);
             if (!empty($manualsyllabi)) {
