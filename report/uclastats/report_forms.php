@@ -94,11 +94,19 @@ class runreport_form extends moodleform {
                         $mform->addElement('select', 'category', get_string('category'), $displaylist);
                         break;
                     case 'startendmonth':
+                    case 'optionaldatepicker':
+                        $optional = array('optional' => false);
+                        if ($fieldname == 'optionaldatepicker') {
+                            $optional = array('optional' => true);
+                        }
                         // Data picker for start and end months to run report.
-                        $mform->addElement('date_selector', 'startdate', get_string('startdate', 'report_uclastats'));
-                        $mform->addElement('date_selector', 'enddate', get_string('enddate', 'report_uclastats'));
-                        // Default to 6 months ago, rounded to start of month.
-                        $mform->setDefault('startdate', strtotime(date("F 1, Y", strtotime("-6 months"))));
+                        $mform->addElement('date_selector', 'startdate', get_string('startdate', 'report_uclastats'), $optional);
+                        $mform->addElement('date_selector', 'enddate', get_string('enddate', 'report_uclastats'), $optional);
+
+                        if ($fieldname != 'optionaldatepicker') {
+                            // Default to 6 months ago, rounded to start of month.
+                            $mform->setDefault('startdate', strtotime(date("F 1, Y", strtotime("-6 months"))));
+                        }
                 }
             }
         } else {
