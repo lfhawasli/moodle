@@ -24,7 +24,7 @@ $tf_general     = 'course.php';
 $tf_course      = 'course.php';
 $tf_embedded    = 'embedded.php';
 $tf_frontpage   = 'course.php';
-$tf_report      = 'course.php';
+$tf_report      = 'report.php';
 
 $noconfigs = during_initial_install();
 

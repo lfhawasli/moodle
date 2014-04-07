@@ -131,6 +131,7 @@ $block_ucla_help_settings = array('send_to' => 'jira',
 $CFG->forced_plugin_settings['block_ucla_help'] = $block_ucla_help_settings;
 $block_ucla_help_support_contacts['System'] = 'dkearney';  // default
 // End CCLE-2306 */
+$CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu';
 
 // CCLE-2311 - VIEDO FURNACE BLOCK
 $CFG->forced_plugin_settings['block_ucla_video_furnace']['source_url'] = 'http://164.67.141.31/~guest/VF_LINKS.TXT';

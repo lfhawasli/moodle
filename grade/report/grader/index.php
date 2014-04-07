@@ -193,6 +193,21 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
 if (!empty($studentsperpage) && $studentsperpage >= 20) {
     echo $OUTPUT->paging_bar($numusers, $report->page, $studentsperpage, $report->pbarurl);
 }
+
+// START UCLA MOD CCLE-4168 
+// Adding sticky table headers and sidebar help support
+require_once($CFG->dirroot . '/blocks/ucla_help/locallib.php');
+
+$PAGE->requires->js('/local/ucla/yui/gradebook/stickytable.js');
+
+// Render a help sidebar.
+echo ucla_sidebar::help(array(
+    new sidebar_file('/blocks/ucla_help/topics/gradebook/color_legend.php'),
+    new sidebar_docs('Gradebook'),
+    new sidebar_feedback()
+));
+// END UCLA MOD CCLE-4168
+
 echo $OUTPUT->footer();
 
 // START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
