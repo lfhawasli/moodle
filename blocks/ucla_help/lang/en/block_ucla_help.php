@@ -64,3 +64,6 @@ $string['error_sending_message'] = 'Sorry, there was a problem with sending your
 
 // success messages
 $string['success_sending_message'] = 'Thank you for your feedback. If you included your email address someone will respond to your message soon.';
+
+// Side block strings.
+$string['hidehelp'] = 'Hide help/legend';

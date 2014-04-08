@@ -60,7 +60,8 @@ class ucla_sidebar {
                 $carry .= $item->render();
                 return $carry;
         }, '');
-        $hide = html_writer::tag('button', 'Hide help', array('class' => 'btn btn-info help-toggle btn-block'));
+        $hide = html_writer::tag('button', get_string('hidehelp', 'block_ucla_help'),
+                array('class' => 'btn btn-info help-toggle btn-block'));
         return html_writer::div($hide . $content, 'ui main help sidebar');
     }
 
