@@ -421,7 +421,11 @@ function repository_kaltura_category_path_exists($connection, $path) {
     if (isset($SESSION->kalrepo)) {
 
         if (isset($SESSION->kalrepo["$path"]) && !empty($SESSION->kalrepo["$path"])) {
-            return $SESSION->kalrepo["$path"];
+            // Gonen - 2nd change - unserialize the found object before returning.
+            $obj = unserialize($SESSION->kalrepo["$path"]);
+            if($obj !== false) {
+                return $obj;
+            }
         }
     } else {
         $SESSION->kalrepo = array(array());
@@ -436,8 +440,9 @@ function repository_kaltura_category_path_exists($connection, $path) {
         1 <= $result->totalCount) {
 
         if ($result->objects[0] instanceof KalturaCategory) {
-            $SESSION->kalrepo["$path"] = $result->objects[0];
-            return $SESSION->kalrepo["$path"];
+            // Gonen - 1st change - save serialized object to session.
+            $SESSION->kalrepo["$path"] = serialize($result->objects[0]);
+            return $result->objects[0];
         }
     }
 
