@@ -34,6 +34,7 @@ Scenario: View grader report
       | Description | Test assignment description |
     And I should see "Homework 2"
     And I follow "Grades"
+    And I press "Administration"
     And I expand "Categories and items" node
     And I follow "Simple view"
     And I press "Add category"
