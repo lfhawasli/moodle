@@ -233,7 +233,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         $link = null;
         // Note, the id fields are needed for Behat steps "I log in" and
         // "I log out" to work.
-        if (!isloggedin()) {
+        if (!isloggedin() || isguestuser()) {
             $link = html_writer::link(get_login_url(), get_string('login'),
                     array('class' => 'login', 'id' => 'Login'));
         } else {
