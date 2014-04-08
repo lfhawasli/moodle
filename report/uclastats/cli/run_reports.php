@@ -81,7 +81,9 @@ $reportoutputfile = $reportoutputdir . '/' . $term . '_uclastats.zip';
 if (!is_dir($reportoutputdir)) {
     mkdir($reportoutputdir, 0777);
 }
-rrmdir($reportoutputcachedir);
+if (is_dir($reportoutputcachedir)) {
+    rrmdir($reportoutputcachedir);
+}
 mkdir($reportoutputcachedir, 0777);
 
 // List of reports to run.
