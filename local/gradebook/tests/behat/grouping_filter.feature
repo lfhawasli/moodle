@@ -43,7 +43,7 @@ Feature: Grader Report Grouping filter
   @javascript
   Scenario: View different groupings in grader report
     Given I log in as ucla "instructor"
-    When I go to a ucla srs site
+    When I follow "Course 1"
     And I follow "Grades"
     Then I should see "Grader report"
     And I should see "View grouping"
@@ -66,7 +66,7 @@ Feature: Grader Report Grouping filter
   @javascript
   Scenario: Use ordering tools with grouping filter
     Given I log in as ucla "instructor"
-    When I go to a ucla srs site
+    When I follow "Course 1"
     And I follow "Grades"
     And I select "C1Section 1" from "grouping"
     Then "C1user1@asd.com" "table_row" should appear before "C1user2@asd.com" "table_row"
@@ -102,7 +102,7 @@ Feature: Grader Report Grouping filter
       |  user | group |
       | C1user4 | G3 |
     Given I log in as ucla "instructor"
-    When I go to a ucla srs site
+    When I follow "Course 1"
     And I follow "Grades"
     Then I should see "Grader report"
     And I should see "View grouping"

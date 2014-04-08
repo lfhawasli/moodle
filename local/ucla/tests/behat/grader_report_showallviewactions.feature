@@ -28,10 +28,13 @@ Scenario: View grader report
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Homework 1 |
       | Description | Test assignment description |
+    And I should see "Homework 1"
     And I add a "Assignment" to section "2" and I fill the form with:
       | Assignment name | Homework 2 |
       | Description | Test assignment description |
+    And I should see "Homework 2"
     And I follow "Grades"
+    And I press "Administration"
     And I expand "Categories and items" node
     And I follow "Simple view"
     And I press "Add category"

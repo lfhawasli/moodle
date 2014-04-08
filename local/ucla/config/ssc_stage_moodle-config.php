@@ -131,6 +131,7 @@ $block_ucla_help_settings = array('send_to' => 'jira',
 $CFG->forced_plugin_settings['block_ucla_help'] = $block_ucla_help_settings;
 $block_ucla_help_support_contacts['System'] = 'dkearney';  // default
 // End CCLE-2306 */
+$CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu';
 
 // CCLE-2311 - VIEDO FURNACE BLOCK
 $CFG->forced_plugin_settings['block_ucla_video_furnace']['source_url'] = 'http://164.67.141.31/~guest/VF_LINKS.TXT';
@@ -230,6 +231,9 @@ $CFG->forced_plugin_settings['url']['display'] = 5; // RESOURCELIB_DISPLAY_OPEN
 
 // Site administration > Plugins > Enrollments > UCLA registrar
 $CFG->forced_plugin_settings['local_ucla']['overrideenroldatabase'] = 1;
+
+// Site administration > Plugins > Enrollments > Site invitation
+$CFG->forced_plugin_settings['enrol_invitation']['status'] = 0; // ENROL_INSTANCE_ENABLED.
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';

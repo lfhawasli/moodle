@@ -1,0 +1,329 @@
+//
+// CCLE / frontpage
+// --------------------------------------------------
+
+
+$grade-report-color-overriden-border: #DC691A;
+
+$grade-report-odd-vmarked-bgcolor: #F39A00;
+$grade-report-odd-hmakred-bgcolor: #F5CD00;
+$grade-report-odd-hvmarked-bgcolor: #F1B900;
+
+$grade-report-even-vmarked-bgcolor: #F4A400;
+$grade-report-even-hmakred-bgcolor: #F5CF2C;
+$grade-report-even-hvmarked-bgcolor: #F1BE00;
+
+.path-grade-report-grader {
+    
+    // Make overlay look like our standard 'alerts'
+    .yui3-overlay {
+        border: 0;
+        background: none;
+        background-color: 'initial';
+        min-width: 200px;
+    }
+    
+    // Style tooltip
+    .graderreportoverlay {
+        background-color: white;
+        width: auto;
+        padding: 10px;
+        border-color: #ddd;
+        font-size: 1.2rem;
+        
+        &.overriden {
+            border-top: 22px solid #f1c32a;
+            
+            &:before {
+                content: "Overridden grade";
+                color: black;
+                height: 0px;
+                width: 100%;
+                display: inline-block;
+                text-align: center;
+                top: -28px;
+                float: left;
+                position: relative;
+            }
+        }
+        
+        @include box-shadow(#999 2px 2px 3px);
+        @include border-radius(4px);
+        
+        .overriden {
+            background-color: #f1c32a;
+            width: 100%;
+            text-align: center;
+        }
+        .fullname {
+            color: #444;
+        }
+        .itemname {
+            padding-top: 4px;
+            color: #666;
+        }
+    }
+    
+    // Remove the table overflow
+    .gradeparent {
+        overflow: inherit;
+    }
+}
+
+/*.gradebook-student-column,*/
+table#user-grades {
+    
+    .grade, .item {
+        width: 50px;
+        overflow: hidden;
+    }
+    
+    tr {
+
+        &.heading .cell {
+            border-bottom: 0;
+        }
+        
+        .user {
+            .userpicture {display: none;}
+        }
+        
+        #studentheader {
+            .email {
+                float: left;
+                + .sorticon {
+                    float: left;
+                }
+            }
+        }
+        
+        // ODD rows
+        &.odd {
+            td.grade.vmarked {
+                background-color: $grade-report-odd-vmarked-bgcolor;
+                border-bottom-color: $grade-report-odd-vmarked-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-odd-vmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.hmarked {
+                background-color: $grade-report-odd-hmakred-bgcolor;
+                border-bottom-color: $grade-report-odd-hmakred-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-odd-hmakred-bgcolor;
+                }
+            }
+            td.grade.vmarked.hmarked {
+                background-color: $grade-report-odd-hvmarked-bgcolor;
+                border-bottom-color: $grade-report-odd-hvmarked-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-odd-hvmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.overridden {
+                background-color: #fff;
+                /*border: 0;*/
+                
+                background: url([[pix:theme|corner-fold]]) no-repeat;
+                width: 16px;
+                height: 16px;
+                background-color: #efefef;
+
+            }
+        }
+        
+        // EVEN rows
+        &.even {
+            td.grade.vmarked {
+                background-color: $grade-report-even-vmarked-bgcolor;  
+                border-bottom-color: $grade-report-even-vmarked-bgcolor;
+                    &.overridden {
+                    background-color: $grade-report-even-vmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.hmarked {
+                background-color: $grade-report-even-hmakred-bgcolor;
+                border-bottom-color: $grade-report-even-hmakred-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-even-hmakred-bgcolor;
+                }
+            }
+            td.grade.vmarked.hmarked {
+                background-color: $grade-report-even-hvmarked-bgcolor;
+                border-bottom-color: $grade-report-even-hvmarked-bgcolor;
+                &.overridden {
+                    background-color: $grade-report-even-hvmarked-bgcolor;
+                    border-color: $grade-report-color-overriden-border;
+                }
+            }
+            td.grade.overridden {
+                background-color: #efefef;
+                /*border: 2px dashed $grade-report-color-overriden-border;*/
+                /*border: 0;*/
+                
+                background: url([[pix:theme|corner-fold]]) no-repeat;
+                width: 16px;
+                height: 16px;
+                background-color: #fff;
+            }
+        }
+    }
+}
+
+.gradebook-header-row {
+    width: 100%;
+    font-size: 1rem;
+    
+    &.gradebook-header-row-sticky tr th {
+        /*border-top: 2px solid gray;*/
+        border-bottom: 2px solid gray;
+    }
+
+    tr {
+        th {
+            padding: 0;
+            float: left;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            background-color: white;
+            
+            text-align: center;
+            padding: 8px 2px 1px;
+            
+            a {
+                margin-left: 4px;
+            }
+            
+            &:hover {
+                border-bottom: 4px solid #ddd;
+            }
+            
+            &:nth-child(2n) {
+                background-color: #fcfcfc;
+            }
+        }
+    }
+}
+
+.gradebook-student-column {
+    background-color: white;
+    
+    &.gradebook-student-column-sticky .gradebook-student-container {
+        border-right: 2px solid gray;
+    }
+    .gradebook-student-container {
+        background-color: #f9f9f9;
+        font-size: 1rem;
+        border-right:1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        padding: 4px;
+
+        th {
+            padding: 0;
+        }
+        span {
+            width: 100%;
+            float: left;
+        }
+        .userpicture {
+            display: none;
+        }
+        &:nth-child(2n+1) {
+            background-color: #efefef;
+        }
+        &:hover {
+            border-right: 4px solid gray;
+        }
+        &:first-child {
+            border-top: #fcfcfc;
+        }
+        &:last-child {
+            border-bottom: #fcfcfc;
+        }
+    }
+}
+
+.gradebook-footer-row {
+    
+    display: none;
+    
+    &.gradebook-footer-row-sticky {
+        
+        display: block;
+        
+        .cell {
+            border-top: 2px solid gray;
+        }
+    }
+    .cell {
+        padding: 8px;
+        font-size: 1rem;
+        background-color: #efeffe;
+        color: #00008b;
+        font-weight: bold;
+        
+        text-align: right;
+        border-right: 1px solid #ddd;
+        
+        &.header {
+            background-color: #f9f9f9;
+            color: #444;
+        }
+        
+        .btn {
+            float: left;
+        }
+    }
+}
+
+.gradebook-floating-header {
+    background-color: #f9f9f9;
+    font-size: 1rem;
+    text-align: center;
+    padding: 4px;
+    
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+// gradebook help
+
+.gradebook-color {
+    @include border-radius(4px);
+    overflow: hidden;
+    width: 30%;
+    height: auto;
+    padding: 2px 4px;
+    text-align: center;
+    height: 25px;
+    float: left;
+    margin-right: 10px;
+    
+    &:after {
+        content: "";
+        float: right;
+        width: 50%;
+        height: 100%;
+    }
+}
+.gradebook-overridden {
+    background: url([[pix:theme|corner-fold]]) no-repeat;
+    height: 30px;
+    background-color: #efefef;
+}
+.gradebook-row-color {
+    background-color: $grade-report-odd-hmakred-bgcolor;
+    &:after {
+        background-color: $grade-report-even-hmakred-bgcolor;
+    }
+}
+.gradebook-column-color {
+    background-color: $grade-report-odd-vmarked-bgcolor;
+    &:after {
+        background-color: $grade-report-even-vmarked-bgcolor;
+    }
+}
+

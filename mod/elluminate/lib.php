@@ -337,6 +337,9 @@ function elluminate_print_recent_activity($course, $isteacher, $timestart) {
  * @return boolean True if the scale is used by any elluminate
  */
 function elluminate_scale_used_anywhere($scaleid) {
+   // START UCLA MOD: CCLE-4465 - Clicking Scales in Grader screens results in blank page
+   global $ELLUMINATE_CONTAINER;
+   // END UCLA MOD: CCLE-4465
    try {
       $gradesDAO = $ELLUMINATE_CONTAINER['gradesDAO'];
 

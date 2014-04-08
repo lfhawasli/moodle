@@ -25,7 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Automatically add enrollment plugin for newly created courses.
+ * Automatically add enrollment plugin if "enrol_invitation|status" is enabled
+ * by default.
  *
  * @param object $param
  * @return boolean  Returns false on error, otherwise true.
@@ -57,12 +58,18 @@ function add_site_invitation_plugin($param) {
         return false;
     }
 
+    // Check if we need to add this plugin by default.
+    $enable = get_config('enrol_invitation', 'status');
+    if ($enable == ENROL_INSTANCE_DISABLED) {
+        return false;
+    }
+
     // Get course object.
     $course = $DB->get_record('course', array('id' => $courseid));
 
     // Returns instance id, else returns null.
-    $instance_id = $invitation->add_instance($course);
-    if (is_null($instance_id)) {
+    $instanceid = $invitation->add_instance($course);
+    if (is_null($instanceid)) {
         debugging('Cannot add site invitation for course: ' .
                 $course['shortname']." ".$course['fullname']);
         return false;

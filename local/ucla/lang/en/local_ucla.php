@@ -181,8 +181,6 @@ $string['submissionsgrading'] = 'Grading criteria';
 // CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
 $string['overridecat'] = 'Allow Grade Override';
 $string['overridecat_help'] = 'This option allows users to override the final grade in for category totals. Unchecking this option will make category totals uneditable.';
-$string['repeatheaders'] = 'Repeat Headers';
-$string['repeatheaders_help'] = 'Repeat gradebook headers after this many rows.';
 
 // CCLE-4293 - Display a message when attempting to override grades
 $string['overridewarning'] = 'It is preferable to change this grade within the Activity. <br />

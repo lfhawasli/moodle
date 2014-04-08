@@ -256,7 +256,12 @@ class block_ucla_course_menu extends block_navigation {
             }
             // Check that section contains activities.
             if (!empty($section->sequence)) {
-                $elements[$key]->classes = array('hascontent');
+                if (is_array($elements[$key]->classes)) {
+                    $elements[$key]->classes[] = 'hascontent';
+                } else {
+                    $elements[$key]->classes = array('hascontent');
+
+                }
             }
         }
 

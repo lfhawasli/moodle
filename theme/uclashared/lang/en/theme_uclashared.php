@@ -119,4 +119,4 @@ $string['error'] = 'Error';
 $string['page_notfound'] = 'The page you requested does not exist';
 
 // CCLE-4445 - Allow calendar to be synchronized with Google Calendar.
-$string['calsyncnotice'] = 'Syncing with external calender applications is not necessarily done in real time and may depend on the calendar application you use.';
+$string['calsyncnotice'] = 'Syncing with external calendar applications is not necessarily done in real time and may depend on the calendar application you use.';

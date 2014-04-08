@@ -30,7 +30,7 @@ require_once $CFG->dirroot.'/grade/report/grader/lib.php';
 // START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report
 require_once $CFG->dirroot.'/local/ucla/classes/local_ucla_grade_report_grader.php';
 $groupingid       = optional_param('grouping', NULL, PARAM_INT);  // group id
-// END UCLA MOD: CCLE-4295t
+// END UCLA MOD: CCLE-4295
 
 $courseid      = required_param('id', PARAM_INT);        // course id
 $page          = optional_param('page', 0, PARAM_INT);   // active page
@@ -193,6 +193,22 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
 if (!empty($studentsperpage) && $studentsperpage >= 20) {
     echo $OUTPUT->paging_bar($numusers, $report->page, $studentsperpage, $report->pbarurl);
 }
+
+// START UCLA MOD: CCLE-4168
+if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+    // Adding sticky table headers and sidebar help support
+    require_once($CFG->dirroot . '/blocks/ucla_help/locallib.php');
+    $PAGE->requires->js('/local/ucla/yui/gradebook/stickytable.js');
+
+    // Render a help sidebar.
+    echo ucla_sidebar::help(array(
+        new sidebar_file('/blocks/ucla_help/topics/gradebook/color_legend.php'),
+        new sidebar_docs('Gradebook'),
+        new sidebar_feedback()
+    ));
+}
+// END UCLA MOD: CCLE-4168
+
 echo $OUTPUT->footer();
 
 // START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages

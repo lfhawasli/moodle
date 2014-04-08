@@ -14,10 +14,6 @@
 # 
 #   $ compass compile -e production --force 
 
-require 'sass-css-importer'
-add_import_path Sass::CssImporter::Importer.new("theme/bootstrapbase/style")
-
-
 ## UCLA theme directory
 theme_dir = "theme/uclashared"
 

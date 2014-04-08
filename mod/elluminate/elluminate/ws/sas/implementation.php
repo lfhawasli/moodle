@@ -41,7 +41,17 @@ class Elluminate_WS_SAS_Implementation implements Elluminate_WS_SchedulingManage
 
    public function deleteSession($sessionId) {
       $args['sessionId'] = $sessionId;
-      return $this->executeBooleanCommand('RemoveSession',$args);
+      # See MOOD-603 - handle sessions orphaned in moodle
+      try {
+         return $this->executeBooleanCommand('RemoveSession',$args);
+      } catch(Exception $e) {
+         if (strstr($e->getMessage(),"Invalid ApiSession record")) {
+            $this->logger->warn("Invalid ApiSession record! Session ID [" . $sessionId .
+               "] Session will be removed only from the database.");
+            return true;
+         }
+         throw $e;
+      }
    }
 
    public function deleteSessionPresentation($presentationId, $sessionId) {
