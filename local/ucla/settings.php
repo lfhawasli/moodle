@@ -61,10 +61,4 @@ if ($ADMIN->fulltree) {
                 get_string('overridecat', 'local_ucla'),
                 get_string('overridecat_help', 'local_ucla'), 1));
     }
-    $grader = $ADMIN->locate('gradereportgrader');
-    if (!empty($grader)) {
-        $grader->add(new admin_setting_configtext('grade_report_repeatheaders',
-                get_string('repeatheaders', 'local_ucla'),
-                get_string('repeatheaders_help', 'local_ucla'), 10));
-    }
 }

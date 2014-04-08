@@ -709,30 +709,14 @@ class grade_report_grader extends grade_report {
 
         $rows = $this->get_left_icons_row($rows, $colspan);
 
-        // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-        $repeat = $this->get_pref('repeatheaders');
-        $repeatentries = unserialize(serialize($rows));;
-        array_shift($repeatentries);
-        // END UCLA MOD: CCLE-3970
-
         $rowclasses = array('even', 'odd');
 
         $suspendedstring = null;
         foreach ($this->users as $userid => $user) {
-            // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-            if ($this->rowcount > 0 and $this->rowcount % $repeat == 0) {
-                $rows = array_merge($rows, unserialize(serialize($repeatentries)));
-            }
-            $this->rowcount++;
-            // END UCLA MOD: CCLE-3970
-
             $userrow = new html_table_row();
             $userrow->id = 'fixed_user_'.$userid;
-            // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-            //$userrow->attributes['class'] = 'r'.$this->rowcount++.' '.$rowclasses[$this->rowcount % 2];
-            $userrow->attributes['class'] = 'r'.$this->rowcount.' '.$rowclasses[$this->rowcount % 2];
-            // END UCLA MOD: CCLE-3970
-
+            $userrow->attributes['class'] = 'r'.$this->rowcount++.' '.$rowclasses[$this->rowcount % 2];
+            
             $usercell = new html_table_cell();
             $usercell->attributes['class'] = 'user';
 
@@ -933,22 +917,9 @@ class grade_report_grader extends grade_report {
         }
         $jsscales = $scalesarray;
 
-        // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-        $repeat = $this->get_pref('repeatheaders');
-        $repeatentries = unserialize(serialize($rows));
-        array_shift($repeatentries);
-        // END UCLA MOD: CCLE-3970
-        
         $rowclasses = array('even', 'odd');
 
         foreach ($this->users as $userid => $user) {
-
-            // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-            if ($this->rowcount > 0 and $this->rowcount % $repeat == 0) {
-                $rows = array_merge($rows, $repeatentries);
-            }
-            $this->rowcount++;
-            // END UCLA MOD: CCLE-3970
 
             if ($this->canviewhidden) {
                 $altered = array();
