@@ -422,6 +422,9 @@ $CFG->debugdisplay = 1;  // show the debugging messages
 $CFG->perfdebug = 15; // show performance information
 $CFG->debugpageinfo = 1; // show page information
 
+// Log file deletions: CCLE-3843
+$CFG->logfiledeletion = 1;
+
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later
 $_dirroot_ = dirname(realpath(__FILE__)) . '/../../..';
