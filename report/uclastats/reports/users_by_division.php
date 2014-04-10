@@ -44,6 +44,11 @@ class users_by_division extends uclastats_base {
 
         $params['contextlevel'] = CONTEXT_COURSE;
 
+        // Get start and end dates for term.
+        $terminfo = $this->get_term_info($params['term']);
+        $params['start'] = $terminfo['start'];
+        $params['end'] = $terminfo['end'];
+
         // Hits by division per term
         // Users by division per term
         // left join to also count no hits
@@ -65,6 +70,8 @@ class users_by_division extends uclastats_base {
                     l.course = urc.courseid AND
                     l.userid = ra.userid
                 )
+                WHERE l.time >= :start AND
+                      l.time <= :end
                 GROUP BY urci.division
                 ORDER BY urd.fullname";
         $ret = $DB->get_records_sql($sql, $params);
@@ -90,7 +97,9 @@ class users_by_division extends uclastats_base {
                 LEFT JOIN {log} l ON (
                     l.course = urc.courseid AND
                     l.userid = ra.userid
-                )";
+                )
+                WHERE l.time >= :start AND
+                      l.time <= :end";
         $system = $DB->get_record_sql($sql, $params);
 
         $system->ratio_hits_users = (

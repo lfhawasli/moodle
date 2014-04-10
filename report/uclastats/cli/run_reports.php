@@ -67,6 +67,9 @@ if (empty($term)) {
     cli_error('No term passed');
 }
 
+// This will take a while to run.
+set_time_limit(0);
+
 // Object to output process of report generation.
 $trace = new text_progress_trace();
 
@@ -104,6 +107,11 @@ $reports = array('collab_modules_used', 'course_modules_used',
                  'unique_logins_per_term',
                  'users_by_division');
 
+// We are unable to output progress of the reports in realtime, because
+// otherwise the report generation will complain about "headers already been
+// sent".
+$output = array();
+
 // Run each report and save the results in $reportoutputcachedir.
 $admin = get_admin();   // User running report.
 $reportfiles = array();
@@ -123,7 +131,18 @@ foreach ($reports as $reportname) {
 
     // Now export result into Excel file in cache directory.
     ob_start();
-    $report->export_result_xls($reportid);
+    try {
+        $report->export_result_xls($reportid);
+        $output[] = "Generated $reportname report";
+    } catch (Exception $e) {
+        ob_end_clean();
+
+        // Skip a report that has a problem.
+        $output[] = "Problem generating $reportname report";
+        $output[] = $e->getMessage();
+        $output[] = $e->getTraceAsString();
+        continue;
+    }
     $content = ob_get_contents();
     ob_end_clean();
     $reportpath = $reportoutputcachedir . '/'.$reportname.'.xls';
@@ -135,14 +154,16 @@ foreach ($reports as $reportname) {
 $zippacker = get_file_packer('application/zip');
 $result = $zippacker->archive_to_pathname($reportfiles, $reportoutputfile);
 
+// Report what happened.
+foreach ($output as $line) {
+    $trace->output($line);
+}
+
 if ($result) {
     $trace->output("DONE! Report available at:\n" . $reportoutputfile);    
 } else {
     $trace->output("ERROR! Cannot generate zip file.");
 }
-
-// Make sure that $reportoutputfile doesn't exist, if it does, replace it.
-
 
 /**
  * Deletes given folder and all files.
