@@ -169,6 +169,20 @@ if (has_capability('moodle/grade:viewall', $context)) { //Teachers will see all 
     // print the page
     print_grade_page_head($courseid, 'report', 'user', get_string('pluginname', 'gradereport_user'). ' - '.fullname($report->user));
 
+    // START UCLA MOD CCLE-4433
+    // Insert grades link to my.ucla.edu -- this is same link from control panel.
+    $course_info = ucla_get_course_info($courseid);
+    if (!empty($course_info)) {
+        $tmp = array_values($course_info);
+        $first_course = array_shift($tmp);
+        $myuclaurl = new moodle_url('https://be.my.ucla.edu/directLink.aspx?featureID=71&term=' .
+            $first_course->term . '&srs=' . $first_course->srs);
+        // Render message with info alert style
+        echo html_writer::link('','', array('name' => 'grade-view'));
+        echo html_writer::div('View grades reported to ' . html_writer::link($myuclaurl, 'my.ucla.edu'), 'alert alert-info');
+    }
+    // END UCLA MOD CCLE-4433
+
     if ($report->fill_table()) {
         echo '<br />'.$report->print_table(true);
     }
