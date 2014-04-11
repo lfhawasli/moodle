@@ -57,15 +57,6 @@ class system_size extends uclastats_base {
     }
 
     /**
-     * Querying on the mdl_file can take a long time.
-     *
-     * @return boolean
-     */
-    public function is_high_load() {
-        return true;
-    }
-
-    /**
      * Query for number of files over 1 MB
      *
      * @param array $params
@@ -76,9 +67,9 @@ class system_size extends uclastats_base {
 
         $retval = array();
 
-        // Get cumulative file size. Note, this command can take over
-        $cumulativefilesize = shell_exec("du -s --block-size=1 $CFG->dataroot/filedir/");
-        $retval['cumulativefilesize'] = display_size($cumulativefilesize);
+        // Do not run query to get cumulative file size. Command to run via
+        // command-line:
+        //  du -s --block-size=1 $CFG->dataroot/filedir/
 
         // Get term specific file size. We need to do 2 queries. One to get
         // course related files and then another for course module related

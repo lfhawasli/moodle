@@ -113,11 +113,11 @@ $string['course_syllabus'] = 'Syllabus';
 
 // Strings for system_size_report.
 $string['system_size'] = 'System size (system)';
-$string['system_size_help'] = 'Returns the cumulative file size, size of course ' .
-        'files for a given term, the number of files over 1 MB and ' .
-        'size of database.<p><strong>NOTE: DO NOT RUN THIS REPORT VIA GUI. ' .
-        'Calculating culmulative file size takes over 30 mins on PROD. ' .
-        'Only run this report via command line or view cached results.</strong></p>';
+$string['system_size_help'] = 'Returns the size of course files for a given ' .
+        'term, the number of files over 1 MB and size of database.' .
+        '<p><strong>NOTE: To get cumulative file size, run the following ' .
+        'command on the command-line <blockquote>' . 
+        '"du -s --block-size=1 $CFG->dataroot/filedir/"</blockquote></strong></p>';
 $string['cumulativefilesize'] = 'Cumulative file size';
 $string['termfilesize'] = 'Term file size';
 $string['file_count'] = 'Number of files over 1 MB';

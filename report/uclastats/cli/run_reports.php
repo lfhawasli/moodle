@@ -150,6 +150,13 @@ foreach ($reports as $reportname) {
     $reportfiles[$reportname.'.xls'] = $reportpath;
 }
 
+// Now get cumulative file system data.
+$cumulativefilesize = shell_exec("du -s --block-size=1 $CFG->dataroot/filedir/");
+$reportpath = $reportoutputcachedir . '/cumulative_file_size.txt';
+file_put_contents($reportpath, display_size($cumulativefilesize));
+$reportfiles['cumulative_file_size.txt'] = $reportpath;
+$output[] = 'Generated cumulative_file_size report';
+
 // Zip all generated reports and save it in $reportoutputfile.
 $zippacker = get_file_packer('application/zip');
 $result = $zippacker->archive_to_pathname($reportfiles, $reportoutputfile);
