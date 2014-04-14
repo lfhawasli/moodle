@@ -107,6 +107,9 @@ $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ccle@ucla.edu';
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
 
+// CCLE-4479 - Yahoo email problems
+$CFG->emailonlyfromnoreplyaddress = 1;
+
 // CCLE-2590 - Implement Auto-detect Shibboleth Login
 $CFG->shib_logged_in_cookie = '_ucla_sso';
 

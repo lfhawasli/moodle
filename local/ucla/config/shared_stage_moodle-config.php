@@ -124,6 +124,9 @@ $CFG->messaging = false;
 // development/testing environments
 $CFG->divertallemailsto = 'ccle-email-test@lists.ucla.edu';
 
+// CCLE-4479 - Yahoo email problems
+$CFG->emailonlyfromnoreplyaddress = 1;
+
 // CCLE-2590 - Implement Auto-detect Shibboleth Login
 $CFG->shib_logged_in_cookie = '_ucla_sso';
 
