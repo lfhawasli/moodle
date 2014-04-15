@@ -129,6 +129,7 @@ class grade_export_form_myucla extends moodleform {
         $mform->addElement('static', 'expresswarning', '<br />Note: Express only allows '.get_string('coursetotal', 'grades'));
         
         $mform->addElement('hidden', 'id', $COURSE->id);
+        $mform->setType('id', PARAM_INT);
         $this->add_action_buttons(false, get_string('submit'));
 
     }
