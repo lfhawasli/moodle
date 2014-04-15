@@ -1989,7 +1989,19 @@ function turnitintool_view_tiitutors($cm,$turnitintool,$tutors) {
     $table->rows[0]->cells[1] = new stdClass();
     $table->rows[0]->cells[1]->class='cell c1';
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-    $availabletutors=get_users_by_capability($context,'mod/turnitintool:grade','u.id,u.firstname,u.lastname,u.username','','','',0,'',false);
+    // START UCLA MOD: CCLE-4440 - List of users eligible for Turnitin Tutor
+    // includes managers who inherit rights from category and system
+    //$availabletutors=get_users_by_capability($context,'mod/turnitintool:grade','u.id,u.firstname,u.lastname,u.username','','','',0,'',false);
+    // Restrict list returned to only users who are in the course members groups.
+    require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
+    $ppcourse = PublicPrivate_Course::build($cm->course);
+    $groupid = 0;
+    if ($ppcourse->is_activated()) {
+        $groupid = $ppcourse->get_group();
+    }
+    $availabletutors=get_users_by_capability($context,'mod/turnitintool:grade',
+            'u.id,u.firstname,u.lastname,u.username','','','',$groupid,'',false);
+    // END UCLA MOD: CCLE-4440
     $tutorselection=get_string('turnitintutorsallenrolled','turnitintool');
     foreach ($tutors->array as $value) {
         $idarray[]=(string)$value->userid;
