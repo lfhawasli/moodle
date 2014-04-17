@@ -399,6 +399,9 @@ $CFG->updateautocheck = 0;
 // Site administration > Development > Experimental > Experimental settings
 $CFG->dndallowtextandlinks = 1;
 
+// Log file deletions: CCLE-3843
+$CFG->logfiledeletion = 1;
+
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later
 $_dirroot_ = dirname(realpath(__FILE__)) . '/../../..';
