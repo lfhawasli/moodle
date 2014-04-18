@@ -331,9 +331,9 @@ class stored_file {
             // Now delete the file record.
             $DB->delete_records('files', array('id'=>$this->file_record->id));
 
-            // START UCLA MOD CCLE-3843
+            // START UCLA MOD: CCLE-3843 - Single file recovery
             // Log the filename and contenthash of a file that was deleted.
-            $logfiles = get_config('logfiledeletion');
+            $logfiles = get_config('local_ucla', 'logfiledeletion');
             if ((defined('CLI_SCRIPT') && !CLI_SCRIPT) && !empty($logfiles)) {
                 global $COURSE, $USER;
                 add_to_log($COURSE->id, 'course', "delete file",

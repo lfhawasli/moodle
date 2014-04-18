@@ -335,6 +335,7 @@ $CFG->filter_poodll_download_media_ok = '1';
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
 // Site administration > Plugins > Local plugins > UCLA configurations
+$CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
 
@@ -405,9 +406,6 @@ $CFG->debug = 32767;    // DEVELOPER level debugging messages
 $CFG->debugdisplay = 1;  // show the debugging messages
 $CFG->perfdebug = 15; // show performance information
 $CFG->debugpageinfo = 1; // show page information
-
-// Log file deletions: CCLE-3843
-$CFG->logfiledeletion = 1;
 
 /** 
  *  Automatic Shibboleth configurations.
