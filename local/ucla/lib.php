@@ -1725,3 +1725,52 @@ function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
         return '';
     }
 }
+
+/**
+ * For a crosslisted $courseid, find what SRS $userid is enrolled in.
+ * This info is in the ccle_roster_class_cache table.  There should
+ * only be one record, but it's possible to receive more.
+ *
+ * @param int $courseid
+ * @param int $userid
+ * @return array of courses
+ */
+function ucla_get_user_enrolled_course($courseid, $userid) {
+    global $DB;
+
+    // Get crosslisted SRS list.
+    $courses = ucla_get_course_info($courseid);
+
+    if (empty($courses)) {
+        // Course was not a srs course.
+        return array();
+    }
+
+    $srslist = implode(',',
+        array_map(function($o) {
+            return $o->srs;
+        }, $courses));
+    $term = $courses[0]->term;
+
+    if (empty($srslist) || empty($term)) {
+        // Course somehow got here and did not have term/srs.
+        return array();
+    }
+
+    $sql = "SELECT urc.id, urc.term, urc.srs,
+                   urc.subj_area, urc.crsidx, urc.secidx,
+                   u.idnumber as uidstudent
+              FROM {ccle_roster_class_cache} crcc,
+                   {ucla_reg_classinfo} AS urc,
+                   {user} AS u
+             WHERE u.id = :userid AND
+                   u.idnumber = crcc.stu_id AND
+                   urc.term = crcc.param_term AND
+                   urc.srs = crcc.param_srs AND
+                   crcc.param_term = :term AND
+                   crcc.param_srs IN ($srslist)";
+    $enrolledcourses = $DB->get_records_sql($sql,
+            array('userid' => $userid, 'term' => $term));
+
+    return $enrolledcourses;
+}
