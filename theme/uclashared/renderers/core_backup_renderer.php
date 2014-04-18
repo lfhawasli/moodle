@@ -25,7 +25,7 @@
 require_once($CFG->dirroot . '/backup/util/ui/renderer.php');
 
 /**
- * Overriding the core backup renderer (backup/util/ui/renderer.php).
+ * Overriding the core backup render (backup/util/ui/renderer.php).
  *
  * @copyright  UC Regents 2014
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

@@ -209,3 +209,12 @@ $string['errorsavegradestaled'] = '<h4>Your changes have not been saved</h4>' .
         'The gradebook was updated by another user while this page was open. ' .
         'Your changes must be re-entered. You can hit the back button then ' .
         'refresh your page to continue.';
+
+// CCLE-4416 - Prompt overwriting warning
+$string['deleterestoretitle'] = "Delete the contents of the course and then restore";
+$string['deletewarning'] = 'WARNING';
+$string['deleterestorewarning'] = 'You are about to delete a course for which content has been added.<br />';
+$string['deleterestoresafe'] = 'You are about to delete a course for which no content has been added.<br />';
+$string['backuprestore'] = 'If you want back up this course now to ensure your course content is saved, click "Backup."<br />';
+$string['deleterestore'] = 'If you are absolutely sure you want to delete this course and all the data it contains, click "Continue."';
+$string['deletecurrentcourse'] = 'Delete the contents of the course and then restore';

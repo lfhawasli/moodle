@@ -265,8 +265,42 @@ class core_backup_renderer extends plugin_renderer_base {
             // BEGIN UCLA MOD: CCLE-3446-Disable-course-delete-option-from-course-restore
             if (has_capability('local/ucla:deletecoursecontentsandrestore', context_system::instance())) {
                 $html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);
+                // BEGIN UCLA MOD: CCLE-4416-Prompt-overwriting-warning
+                require_once($CFG->dirroot . '/report/uclastats/reports/active_instructor_focused.php');
+                global $USER, $course, $config;
+
+                $activeinstructorfocused = new active_instructor_focused($USER);
+
+                if ($activeinstructorfocused->has_additional_course_content($course)) {
+                    // Display warning message that this is a course for which content has been added
+                    $deleterestoremsg = html_writer::tag('p', get_string('deletewarning', 'local_ucla'), array("style" => "font-size: 20px; font-weight: bold; color: red;")) .
+                                get_string('deleterestorewarning', 'local_ucla') . html_writer::empty_tag('br') . get_string('backuprestore', 'local_ucla');
+                } else {
+                    // Display safe message that this is a course for which no content has been added
+                    $deleterestoremsg = get_string('deleterestoresafe', 'local_ucla') . html_writer::empty_tag('br') .
+                                get_string('backuprestore', 'local_ucla');
+                }
+
+                $message = $deleterestoremsg . html_writer::empty_tag('br') . get_string('deleterestore', 'local_ucla');
+
+                // URL to backup the course
+                $url = new moodle_url('/backup/backup.php', array('id' => $course->id));
+
+                // Config variables for the dialog
+                $config = new stdClass;
+                $config->title = get_string('deleterestoretitle', 'local_ucla');
+                $config->yesLabel = 'Backup';
+                $config->question = $message;
+                $config->noLabel = 'Continue';
+                $config->closeButtonTitle = get_string('close', 'editor');
+
+                // Prompt warning for restoring into the current or existing course
+                $PAGE->requires->yui_module('moodle-local_ucla-restoreoverwritewarning', 'M.core_backup.watch_current_delete_button', array(array('config'=>$config,'url'=>(string)$url)));
+                $PAGE->requires->yui_module('moodle-local_ucla-restoreoverwritewarning', 'M.core_backup.watch_existing_delete_button');
+                // END UCLA MOD: CCLE-4416
             }
             // END UCLA MOD: CCLE-3446
+
             $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
             $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('form');
