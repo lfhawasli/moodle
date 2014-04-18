@@ -36,6 +36,12 @@ if ($hassiteconfig) {
             get_string('student_access_ends_week_description', 'local_ucla'), 0,
             PARAM_INT));
 
+    $settings->add(new admin_setting_configtext(
+            'local_ucla/logfiledeletion',
+            get_string('logfiledeletion', 'local_ucla'),
+            get_string('logfiledeletiondesc', 'local_ucla'), 0,
+            PARAM_INT));
+
     $ADMIN->add('localplugins', $settings);
 
     // Inject setting to turn on UCLA edits for enrol_database into
