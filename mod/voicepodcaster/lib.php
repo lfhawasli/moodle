@@ -489,6 +489,12 @@ function voicepodcaster_scale_used ($voicetoolid,$scaleid) {
     return $return;
 }
 
+// START UCLA MOD: CCLE-4465 - Clicking Scales in Grader screens results in blank page
+function voicepodcaster_scale_used_anywhere ($scaleid)
+{
+    return false;
+}
+// END UCLA MOD: CCLE-4465
 
 function voicepodcaster_store_new_element($voicetool) {
     global $DB;
