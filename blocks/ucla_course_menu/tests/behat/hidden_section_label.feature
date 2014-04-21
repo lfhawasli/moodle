@@ -18,7 +18,7 @@ Feature: Hidden section label
 
   @javascript
   Scenario: Verify visibility of 'hidden' label
-    And I log in as ucla "teacher1"
+    And I log in as "teacher1"
     And I browse to site "C1"
     And I turn editing mode on
     And I follow the "Week 3" section in the ucla site menu
