@@ -34,6 +34,7 @@ Feature: Forum reporting
     When I log in as "instructor"
     And I go to the default ucla site
     And I follow "Grades"
+    And I press "Administration"
     And I follow "Forum usage report"
     # Created forum should be in third column (after Announcements and Discussion).
     Then I should see "1" in the ".r1 .lastcol" "css_element"

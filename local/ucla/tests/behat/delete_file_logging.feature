@@ -25,18 +25,16 @@ Feature: Logging file deletion
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I follow "Add an activity or resource"
-    And I select "File" radio button
-    And I press "Add"
+    And I add a "File" to section "1"
     And I fill the moodle form with:
       | Name | File to delete |
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filepicker
     And I press "Save and return to course"
     And I should see "File to delete"
-    And I delete "File to delete" activity
+    When I delete "File to delete" activity
     And I expand "Reports" node
     And I follow "Logs"
-    When I select "delete" from "modaction"
+    And I select "delete" from "modaction"
     And I press "Get these logs"
     Then I should see "empty.txt | 0fd8a80d18c4531c1d31cc912256d18c080c92cf"
 
@@ -49,18 +47,16 @@ Feature: Logging file deletion
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I follow "Add an activity or resource"
-    And I select "File" radio button
-    And I press "Add"
+    And I add a "File" to section "1"
     And I fill the moodle form with:
       | Name | File to delete |
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filepicker
     And I press "Save and return to course"
     And I should see "File to delete"
-    And I delete "File to delete" activity
+    When I delete "File to delete" activity
     And I expand "Reports" node
     And I follow "Logs"
-    When I select "delete" from "modaction"
+    And I select "delete" from "modaction"
     And I press "Get these logs"
     Then I should not see "empty.txt | 0fd8a80d18c4531c1d31cc912256d18c080c92cf"
 
