@@ -573,16 +573,26 @@ class grade_report_user extends grade_report {
     public function print_table($return=false) {
          $maxspan = $this->maxdepth;
 
+        // START UCLA MOD CCLE-4433 - striping Moodle styles in favor of Bootstrap tables.
         /// Build table structure
+//        $html = "
+//            <table cellspacing='0'
+//                   cellpadding='0'
+//                   summary='" . s($this->get_lang_string('tablesummary', 'gradereport_user')) . "'
+//                   class='boxaligncenter generaltable user-grade'>
+//            <thead>
+//                <tr>
+//                    <th id='".$this->tablecolumns[0]."' class=\"header\" colspan='$maxspan'>".$this->tableheaders[0]."</th>\n";
         $html = "
             <table cellspacing='0'
                    cellpadding='0'
                    summary='" . s($this->get_lang_string('tablesummary', 'gradereport_user')) . "'
-                   class='boxaligncenter generaltable user-grade'>
+                   class='table table-bordered table-striped ccle-responsive-table-collapse'
+                   id='user-report-table'>
             <thead>
                 <tr>
                     <th id='".$this->tablecolumns[0]."' class=\"header\" colspan='$maxspan'>".$this->tableheaders[0]."</th>\n";
-
+        // END UCLA MOD CCLE-4433
         for ($i = 1; $i < count($this->tableheaders); $i++) {
             $html .= "<th id='".$this->tablecolumns[$i]."' class=\"header\">".$this->tableheaders[$i]."</th>\n";
         }
@@ -609,7 +619,10 @@ class grade_report_user extends grade_report {
                 $id = (isset($this->tabledata[$i][$name]['id'])) ? "id='{$this->tabledata[$i][$name]['id']}'" : '';
                 $headers = (isset($this->tabledata[$i][$name]['headers'])) ? "headers='{$this->tabledata[$i][$name]['headers']}'" : '';
                 if (isset($content)) {
-                    $html .= "<$celltype $id $headers class='$class' $colspan>$content</$celltype>\n";
+                    // START UCLA MOD CCLE-4433 - adding a data-content attribute for responsive table
+//                    $html .= "<$celltype $id $headers class='$class' $colspan'>$content</$celltype>\n";
+                    $html .= "<$celltype $id $headers class='$class' $colspan data-content='" . ucfirst($name) . "'>$content</$celltype>\n";
+                    // END UCLA MOD CCLE-4433
                 }
             }
             $html .= "</tr>\n";

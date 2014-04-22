@@ -135,6 +135,8 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
         tr {
             border-left: 1px solid #ccc;
         }
+        td.baggt,
+        td.item,
         td.cell {
             /* Behave  like a "row" */
             border: none;
