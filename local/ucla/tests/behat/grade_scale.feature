@@ -1,4 +1,4 @@
-@ucla @mod_elluminate @core_grade @core_edit @CCLE-4465
+@ucla @mod_elluminate @core_grades @core_edit @CCLE-4465
 Feature: Accessing scales
   In order to use scales in my class
   As an instructor
@@ -23,6 +23,7 @@ Feature: Accessing scales
     And I fill the moodle form with:
         | Name | Poor-Great |
         | Scale | Poor, Average, Good, Great |
+        | Description | Description |
     And I press "Save changes"
     Then I should see "Poor-Great"
 

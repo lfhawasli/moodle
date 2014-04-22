@@ -41,23 +41,23 @@ Scenario: Make sure that only instructors can see posts names/emails
     And I follow "Course 1"
     And I follow "Q&A test"
     And I follow "Questions Pending (1)"
-    Then I should see "Posted by: S1, Student (student1@asd.com)"
+    Then I should see "Posted by: Student S1 (student1@asd.com)"
     And I follow "Answer"
     And I fill the moodle form with:
       | Answer | 42 |
     And I press "Save changes"
-    And I should see "Posted by: S1, Student (student1@asd.com)"
+    And I should see "Posted by: Student S1 (student1@asd.com)"
     And I log out
 
     # Make sure that students cannot see names/emails.
     When I log in as "student1"
     And I follow "Course 1"
     And I follow "Q&A test"
-    Then I should not see "Posted by: S1, Student (student1@asd.com)"
+    Then I should not see "Posted by: Student S1 (student1@asd.com)"
     And I log out
     When I log in as "student2"
     And I follow "Course 1"
     And I follow "Q&A test"
-    Then I should not see "Posted by: S1, Student (student1@asd.com)"
+    Then I should not see "Posted by: Student S1 (student1@asd.com)"
 
 

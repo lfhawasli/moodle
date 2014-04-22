@@ -360,6 +360,13 @@ function voiceemail_scale_used ($voicetoolid,$scaleid) {
     return $return;
 }
 
+// START UCLA MOD: CCLE-4465 - Clicking Scales in Grader screens results in blank page
+function voiceemail_scale_used_anywhere ($scaleid)
+{
+    return false;
+}
+// END UCLA MOD: CCLE-4465
+
 /**
 * List all the informnations(availability,start_date ..)of the board for the rid given
 * @param $rid - the current course rid  of the board

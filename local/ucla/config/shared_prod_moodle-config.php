@@ -334,6 +334,7 @@ $CFG->forced_plugin_settings['local_kaltura']['enable_html5'] = 1;
 $CFG->forced_plugin_settings['local_kaltura']['mymedia_application_name'] = 'ccle-shared-prod';
 
 // Site administration > Plugins > Local plugins > UCLA configurations
+$CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus';
 

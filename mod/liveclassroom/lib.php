@@ -388,6 +388,19 @@ function liveclassroom_scale_used ($liveclassroomid, $scaleid)
     return $return;
 } 
 
+// START UCLA MOD: CCLE-4465 - Clicking Scales in Grader screens results in blank page
+function liveclassroom_scale_used_anywhere ($scaleid)
+{
+    // This function returns if a scale is being used by one liveclassroom
+    // it it has support for grading and scales. Commented code should be
+    // modified if necessary. See forum, glossary or journal modules
+    // as reference.
+    $return = false;
+
+    return $return;
+}
+// END UCLA MOD: CCLE-4465
+
 /**
  * CALENDAR
  */

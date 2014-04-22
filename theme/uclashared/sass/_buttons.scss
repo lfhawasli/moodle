@@ -14,6 +14,9 @@
         width: 100%;
         margin-top: 4px;
     }
+
+    // Make buttons render correctly on iPhone
+    -webkit-appearance: none;
 }
 
 .btn-default {
@@ -123,5 +126,36 @@ input[type="submit"] {
         @extend .btn;
         @extend .btn-cpanel;
         @extend .btn-sm;
+    }
+
+    // Grades button
+    .btn-grades-container {
+        display: none;
+        width: 50%;
+        float: left;
+
+        input[type="submit"] {
+
+            @extend .btn;
+            @extend .btn-primary;
+            @extend .btn-sm;
+
+            @include border-right-radius(0);
+        }
+    }
+
+    // In responsive mode, display grade & control panel buttons
+    // side by side for students.
+    @include respond-to(handhelds) {
+        .btn-grades-container {
+            display: block;
+        }
+        .btn-cpanel-container {
+            width: 50%;
+            float: right;
+            input[type="submit"] {
+                @include border-left-radius(0);
+            }
+        }
     }
 }

@@ -337,7 +337,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
      * @return string
      */
     public function control_panel_button() {
-        global $OUTPUT;
+        global $OUTPUT, $COURSE;
 
         // Hack since contexts and pagelayouts are different things.
         // Hack to fix: display control panel link when updating a plugin.
@@ -355,6 +355,18 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             return '';
         }
 
+        // Show grades button ONLY for students
+        $context = context_course::instance($COURSE->id);
+        if (has_role_in_context('student', $context)) {
+
+            $buttons = $OUTPUT->single_button('/grade/report/index.php?id=' . $COURSE->id .'#grade-view', get_string('grades'),
+                'get', array('class' => 'btn-grades-container'));
+            $buttons .=  $OUTPUT->single_button($cplink, $cptext, 'get', array('class' => 'btn-cpanel-container'));
+
+            return $buttons;
+        }
+
+        // Show regular control panel button
         return $OUTPUT->single_button($cplink, $cptext, 'get');
     }
 

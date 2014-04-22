@@ -321,6 +321,13 @@ function voiceauthoring_scale_used ($voicetoolid,$scaleid) {
     return $return;
 }
 
+// START UCLA MOD: CCLE-4465 - Clicking Scales in Grader screens results in blank page
+function voiceauthoring_scale_used_anywhere ($scaleid)
+{
+    return false;
+}
+// END UCLA MOD: CCLE-4465
+
 function voiceauthoring_getRole($context)
 {
     global $CFG;

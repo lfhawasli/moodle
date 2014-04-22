@@ -26,6 +26,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 require_once(__DIR__ . '/../../../../local/ucla/tests/behat/behat_ucla.php');
 
+use Behat\Behat\Context\Step\Then as Then;
 use Behat\Behat\Context\Step\When as When;
 
 /**
@@ -47,6 +48,52 @@ class behat_ucla_course_menu extends behat_base {
     public function i_follow_site_menu_section($section) {
         return array(
             new When('I click on "' . $section . '" "link" in the ".block_ucla_course_menu" "css_element"')
+        );
+    }
+
+    /**
+     * Checks that section is highlighted in site menu block.
+     *
+     * @Then /^I should see "([^"]*)" highlighted in the ucla site menu$/
+     *
+     * @param string $section
+     * @return array
+     */
+    public function i_should_see_higlighted($section)
+    {
+        return array(
+            new Then('I should see "' . $section . '" in the "//li[contains(@class, \'current_branch\')]/p/a" "xpath_element"')
+        );
+    }
+
+
+    /**
+     * Checks that section exists in site menu block.
+     *
+     * @Then /^I should see "([^"]*)" in the ucla site menu$/
+     *
+     * @param string $section
+     * @return array
+     */
+    public function i_should_see_in_site_menu($section)
+    {
+        return array(
+            new Then('I should see "' . $section . '" in the ".block_ucla_course_menu" "css_element"')
+        );
+    }
+
+    /**
+     * Checks that section does not exist in site menu block.
+     *
+     * @Then /^I should not see "([^"]*)" in the ucla site menu$/
+     *
+     * @param string $section
+     * @return array
+     */
+    public function i_should_not_see_in_site_menu($section)
+    {
+        return array(
+            new Then('I should not see "' . $section . '" in the ".block_ucla_course_menu" "css_element"')
         );
     }
 

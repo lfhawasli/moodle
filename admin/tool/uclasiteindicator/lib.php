@@ -918,7 +918,7 @@ class siteindicator_manager {
         global $DB;
        
         $recs = $DB->get_records_select('ucla_siteindicator', 
-                'type NOT LIKE "test" AND type NOT LIKE "private"', 
+                'type NOT LIKE "test" AND type NOT LIKE "private" AND type NOT LIKE "tasite"', 
                 null, '', 'courseid');
         
         $ids = array();
