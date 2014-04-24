@@ -351,52 +351,27 @@ class local_ucla_generator_testcase extends advanced_testcase {
     }
 
     /**
-     * Make sure that UCLA roles are created and their capabilities are copied
-     * from the appropiate archetypes.
+     * Make sure that all UCLA roles mentioned in the fixtures directory were
+     * created.
      */
     public function test_create_ucla_roles() {
-        global $DB;
+        global $CFG, $DB;
 
-        $roles = $this->getDataGenerator()
+        $createdroles = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_ucla_roles();
 
-        // Get role_capabilities entries from the editingteacher and student
-        // roles.
-        $editingteacherid = $DB->get_field('role', 'id',
-                        array('shortname' => 'editingteacher'));
-        $archetypes['editingteacher'] = $DB->get_records_menu('role_capabilities',
-                array('roleid' => $editingteacherid), '', 'capability, permission');
-        $studentid = $DB->get_field('role', 'id',
-                        array('shortname' => 'student'));
-        $archetypes['student'] = $DB->get_records_menu('role_capabilities',
-                array('roleid' => $studentid), '', 'capability, permission');
-
-        // Make sure roles are created and match archetype's role_capabilities
-        // settings.
-        foreach ($roles as $shortname => $roleid) {
-            // Skip student role, since we didn't create it.
-            if ($shortname == 'student') {
-                continue;
-            }
-            // Archetype is 'editingteacher' except for 'ta'
-            $archetype = 'editingteacher';
-            if ($shortname == 'ta') {
-                $archetype = 'student';
-            }
-
-            $capabilities = $DB->get_records('role_capabilities',
-                array('roleid' => $roleid));
-            foreach ($capabilities as $capability) {
-                $expectedpermission = 0;
-                if (isset($archetypes[$archetype][$capability->capability])) {
-                    $expectedpermission = $archetypes[$archetype][$capability->capability];
-                }
-                $this->assertEquals($expectedpermission, $capability->permission, 
-                        "Capability $capability->capability for archetype " .
-                        "$archetype does not match role $shortname");
-            }
+        // Load fixture of role data from PROD. This will grant access to a
+        // new variable called $roles.
+        include($CFG->dirroot . '/local/ucla/tests/fixtures/mdl_role.php');
+        
+        $createdroleshortnames = array_keys($createdroles);
+        foreach ($roles as $role) {
+            $this->assertTrue(in_array($role['shortname'], $createdroleshortnames));
         }
+
+        // Also make sure that student is returned.
+         $this->assertTrue(isset($createdroles['student']));
     }
 
     /**

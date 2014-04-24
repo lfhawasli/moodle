@@ -230,32 +230,17 @@ class local_ucla_generator extends testing_data_generator {
      * @return array        Returns an array of shortname to roleid.
      */
     public function create_ucla_roles() {
-        global $DB;
+        global $CFG, $DB;
         $retval = array();
 
-        $roles[] = array('name' => 'Instructor',
-            'shortname' => 'editinginstructor',
-            'archetype' => 'editingteacher');
-        $roles[] = array('name' => 'Supervising Instructor',
-            'shortname' => 'supervising_instructor',
-            'archetype' => 'editingteacher');
-        $roles[] = array('name' => 'Teaching Assistant (admin)',
-            'shortname' => 'ta_admin',
-            'archetype' => 'editingteacher');
-        $roles[] = array('name' => 'TA Instructor',
-            'shortname' => 'ta_instructor',
-            'archetype' => 'editingteacher');
-        $roles[] = array('name' => 'Teaching Assistant',
-            'shortname' => 'ta',
-            'archetype' => 'student');
-        $roles[] = array('name' => 'Student Facilitator',
-            'shortname' => 'studentfacilitator',
-            'archetype' => 'editingteacher');
+        // Load fixture of role data from PROD. This will grant access to a
+        // new variable called $roles.
+        include($CFG->dirroot . '/local/ucla/tests/fixtures/mdl_role.php');
 
         $archetypes = array();
         foreach ($roles as $role) {
             $retval[$role['shortname']] = create_role($role['name'],
-                    $role['shortname'], '', $role['archetype']);
+                    $role['shortname'], $role['description'], $role['archetype']);
 
             // Now copy all the capabilities for given role from given
             // archetype. For now, we are just copying capabilities, but later
