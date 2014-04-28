@@ -26,4 +26,3 @@ require_once($CFG->dirroot . '/theme/uclashared/renderers/core_calendar_renderer
 require_once($CFG->dirroot . '/theme/uclashared/renderers/core_course_renderer.php');
 require_once($CFG->dirroot . '/theme/uclashared/renderers/core_enrol_renderer.php');
 require_once($CFG->dirroot . '/theme/uclashared/renderers/core_renderer.php');
-require_once($CFG->dirroot . '/theme/uclashared/renderers/core_backup_renderer.php');
