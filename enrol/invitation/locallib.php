@@ -307,21 +307,36 @@ class invitation_manager {
      * @return string           Returns invite status string.
      */
     public function get_invite_status($invite) {
+        global $DB;
+
         if (!is_object($invite)) {
             return get_string('status_invite_invalid', 'enrol_invitation');
         }
+
+        // If duplicate invites found, at least one invite was resent.
+        $conditions = array($invite->courseid, $invite->email, $invite->roleid);
+
+        $mostrecenttime = $DB->get_field_sql("SELECT MAX(timeexpiration) FROM {enrol_invitation} WHERE
+                                              courseid = ? AND email = ? AND roleid = ?", $conditions);
+
+        // Invites sent before newest were resent.
+        if ($invite->timeexpiration != $mostrecenttime) {
+            return get_string('status_invite_resent', 'enrol_invitation');
+        }    
 
         if ($invite->tokenused) {
             // Invite was used already.
             $status = get_string('status_invite_used', 'enrol_invitation');
             return $status;
+        } else if ($invite->timeexpiration - $invite->timesent < get_config('enrol_invitation', 'inviteexpiration')) {
+            // Invite is revoked if expiration < two weeks from time of invitation.
+            return get_string('status_invite_revoked', 'enrol_invitation');
         } else if ($invite->timeexpiration < time()) {
             // Invite is expired.
             return get_string('status_invite_expired', 'enrol_invitation');
         } else {
             return get_string('status_invite_active', 'enrol_invitation');
         }
-        // TO DO: add status_invite_revoked and status_invite_resent status.
     }
 
     /**
