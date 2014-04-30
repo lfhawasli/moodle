@@ -5,67 +5,71 @@
 
 YUI.add('moodle-local_ucla-restoreoverwritewarning', function(Y) {
 
-// Namespace for the backup
-M.core_backup = M.core_backup || {};
+    // Namespace for the backup
+    M.core_backup = M.core_backup || {};
 
-M.core_backup.watch_current_delete_button = function(param) {
-    var current_delete_button = Y.all('.bcs-current-course input[type="radio"]').item(1);
-    current_delete_button.addClass('restore-current-delete');
+    // Generate a moodle ajax dialog.
+    M.core_backup.course_deletion_warning = function(courseid) {
+        Y.io(M.cfg.wwwroot.concat('/local/ucla/rest_additionalcoursecontent.php'), {
+            method: 'GET',
+            data: 'courseid=' + courseid,
+            on: {
+                success: function(id, result) {
+                    var json = Y.JSON.parse(result.responseText);
 
-    Y.one('.restore-current-delete').on('click', function(e) {
-        // Create the confirm box
-        var confirm = new M.core.confirm(param.config);
-        // If the user clicks "Backup", direct users to backup the course
-        confirm.on('complete-yes', function(e) {
-            window.open(param.url, '_self');
-        }, this);
-        // Show the confirm box
-        confirm.show();
-    });
-};
+                    if (json.status) {
 
-var SITE = M.cfg.wwwroot;
-var PAGE = { COURSECONTENT: '/local/ucla/rest_additionalcoursecontent.php' };
+                        // Create the confirm box
+                        var confirm = new M.core.confirm(json.config);
 
-M.core_backup.watch_existing_delete_button = function() {
-    var existing_delete_button = Y.all('.bcs-existing-course input[type="radio"]').item(1);
-    existing_delete_button.addClass('restore-existing-delete');
+                        // If the user clicks "Backup", direct users to backup the course
+                        confirm.on('complete-yes', function(e) {
+                            window.open(json.config.url, '_self');
+                        }, this);
+    //                            confirm.on('complete-no', function(e) {
+    //                                Y.one('.bcs-existing-course input[value="Continue"]').simulate('click');
+    //                            }, this);
+                        // Show the confirm box
+                        confirm.show();
+                    }
 
-    Y.all('.restore-course-search input[type="radio"]').each(function(node) {
-        node.on('click', function(e) {
-            var radio = e.target;
-            var existingcourseid = radio.getAttribute('value');
+                }
+            },
+            failure: function() { }
+        });
+    };
 
-            var radiodelete = Y.one('.restore-existing-delete[type="radio"]:checked');
-            if (radiodelete) {
-                Y.io(SITE.concat(PAGE.COURSECONTENT), {
-                    method: 'GET',
-                    data: 'courseid=' + existingcourseid,
-                    on: {
-                        success: function(id, result) {
-                            var json = Y.JSON.parse(result.responseText);
+    M.core_backup.course_deletion_check = function(param) {
 
-                            // Create the config object
-                            var config = {
-                                title: json.title, yesLabel: 'Backup', question: json.message,
-                                noLabel: 'Continue', closeButtonTitle: json.closeButtonTitle
-                            };
+        // Attach this to 'Restore into an existing course' radio nodes.
+        Y.one('.bcs-existing-course .generaltable').delegate('click', function(e) {
 
-                            // Create the confirm box
-                            var confirm = new M.core.confirm(config);
-                            // If the user clicks "Backup", direct users to backup the course
-                            confirm.on('complete-yes', function(e) {
-                                window.open(json.url, '_self');
-                            }, this);
-                            // Show the confirm box
-                            confirm.show();
-                        }
-                    },
-                    failure: function() { }
-                });
+            // Make sure radio button has a courseid
+            var courseid = e.target.getAttribute('value');
+            // Make sure that 'delete' radio is checked
+            var radiodelete = Y.one('.bcs-existing-course .detail-pair:nth-of-type(2) [type="radio"]:checked');
+
+            // If both conditions, then check that course has content
+            if (courseid && radiodelete) {
+                M.core_backup.course_deletion_warning(courseid);
+            }
+
+        }, 'input[type=radio]');
+        
+        // It may be the case that user selects a course first, then selects delete radio.
+        Y.one('.bcs-existing-course .detail-pair:nth-of-type(2) [type="radio"]').on('click', function(e) {
+            var selectedradio = Y.one('.bcs-existing-course .generaltable [type="radio"]:checked');
+            if (selectedradio) {
+                var courseid = selectedradio.getAttribute('value');
+                M.core_backup.course_deletion_warning(courseid);
             }
         });
-    });
-};
+
+        // Attach to 'Restore into this course' radio node.
+        Y.one('.bcs-current-course .detail-pair:nth-of-type(2) [type="radio"]').on('click', function(e) {
+            M.core_backup.course_deletion_warning(param.courseid);
+        });
+        
+    };
 
 }, '@VERSION@', {'requires':['io','json','base','node','event','node-event-simulate','moodle-core-notification']});
