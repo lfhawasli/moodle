@@ -3,6 +3,8 @@
  * UCLA Course Download
  */
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/course_content.class.php');
+require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/file.class.php');
 global $CFG, $DB, $PAGE;
 
 $courseid = required_param('courseid', PARAM_INT); // course ID
@@ -11,6 +13,8 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('coursemisconf');
 }
 require_login($course);
+
+$file = new file($courseid, $USER->id);
 
 $PAGE->set_url('/blocks/ucla_course_download/view.php',
             array('courseid' => $courseid));
@@ -32,6 +36,7 @@ echo $OUTPUT->heading(get_string('pluginname', 'block_ucla_course_download'), 2,
 echo $OUTPUT->heading(get_string('files', 'block_ucla_course_download'), 3);
 
 echo html_writer::tag('p', get_string('files_not_requested', 'block_ucla_course_download'));
+// Use $file->has_content(); to see if there are files to be zipped and a request can be made
 echo html_writer::tag('button', get_string('request', 'block_ucla_course_download'), array('class' => 'btn'));
 
 echo $OUTPUT->heading(get_string('forum_posts', 'block_ucla_course_download'), 3);

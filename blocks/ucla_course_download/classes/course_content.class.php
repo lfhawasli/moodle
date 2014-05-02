@@ -4,6 +4,13 @@
  **/
 
 abstract class course_content {
+
+    protected $course;
+    
+    function __construct($courseid) {
+        $this->course = get_course($courseid);
+    }
+
     /** 
      *  
      **/
