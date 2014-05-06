@@ -2,9 +2,11 @@
 /**
  *  Shared UCLA-written for cron-synching functions.
  **/
-class ucla_reg_classinfo_cron {
 
-    const table = 'ucla_reg_classinfo';
+/**
+ * Updates the ucla_reg_classinfo table.
+ */
+class ucla_reg_classinfo_cron {
 
     static function enrolstat_translate($char) {
         $codes = array(
@@ -33,12 +35,12 @@ class ucla_reg_classinfo_cron {
      *  - crs_desc (course description)
      *  - crs_summary (class description)
      *
-     * @param object $old   Database object.
+     * @param stdClass $old Database object.
      * @param array $new    Note, $new comes in as an array, not object.
      * @return boolean      Returns true if records needs to be updated,
      *                      otherwise returns false.
      */
-    function needs_updating($old, $new) {
+    function needs_updating(stdClass $old, array $new) {
         $checkfields = array('acttype', 'coursetitle', 'sectiontitle',
             'enrolstat', 'url', 'crs_desc', 'crs_summary');
 
@@ -52,6 +54,18 @@ class ucla_reg_classinfo_cron {
     }
 
     /**
+     * Queries given stored procedure for given data.
+     *
+     * @param string $sp
+     * @param array $data
+     *
+     * @return array
+     */
+    function query_registrar($sp, $data) {
+        return registrar_query::run_registrar_query($sp, $data);
+    }
+
+    /**
      * Get courses from the ucla_request_classes table for a given term. Query 
      * the registrar for those courses. 
      * 
@@ -61,8 +75,7 @@ class ucla_reg_classinfo_cron {
      * Then for the courses that didn't have any data returned to them from
      * the registrar, then mark those courses as cancelled in the 
      * ucla_reg_classinfo table.
-     * 
-     * @global moodle_database $DB
+     *
      * @param array $terms
      * @return boolean 
      */
@@ -73,33 +86,27 @@ class ucla_reg_classinfo_cron {
             return true;
         }
 
-        echo "\n";
-
-        $reg = registrar_query::get_registrar_query('ccle_getclasses');
-
-        // Get courses from our request table
+        // Get courses from our request table.
         list($sqlin, $params) = $DB->get_in_or_equal($terms);
         $where = 'term ' . $sqlin;
-
-        // TODO use recordset?
-        $records = $DB->get_records_select('ucla_request_classes',
+        $urcrecords = $DB->get_recordset_select('ucla_request_classes',
             $where, $params);
-
-        echo "Got " . count($records) . " requests to update in "
-            . implode(', ', $terms) . ".\n";
-
-        if (empty($records)) {
+        if (!$urcrecords->valid()) {
             return true;
         }
 
-        // Get the data
-        $regs = array();
-        $not_found_at_registrar = array();  // for cancelled courses later
+        // Updated.
+        $uc = 0;
+        // No change needed.
+        $nc = 0;
+        // Inserted.
+        $ic = 0;
+        // For cancelled courses later.
+        $notfoundatregistrar = array();
 
-        $t = microtime(true);
-        foreach ($records as $request) {
-            // We can just put in $req, except it needs to be an array.
-            $reginfo = $reg->retrieve_registrar_info(
+        // Get the data from the Registrar and process it.
+        foreach ($urcrecords as $request) {
+            $reginfo = $this->query_registrar('ccle_getclasses',
                     array(
                         'term' => $request->term,
                         'srs' => $request->srs
@@ -107,96 +114,46 @@ class ucla_reg_classinfo_cron {
                 );
             if (!$reginfo) {
                 echo "No data for {$request->term} {$request->srs}\n";
-                $not_found_at_registrar[] =
+                $notfoundatregistrar[] =
                         array('term' => $request->term, 'srs' => $request->srs);
             } else {
-                $regs[] = reset($reginfo);
-            }
-        }
+                $newclassinfo = reset($reginfo);  // Result is in an array.
 
-        if (empty($regs)) {
-            debugging('ERROR: empty regs for ucla_reg_classinfo_cron');
-            return true;
-        }
-
-        $el = microtime(true) - $t;
-        $tpe = $el / count($records);
-        echo "Took $tpe per element.\n";
-
-        echo "Got " . count($regs) . " requests from Registrar.\n";
-
-        $termsrses = array();
-        $sqls = array();
-        $params = array();
-
-        // We're going to index by the results of make_idnumber
-        $regind = array();
-        foreach ($regs as $rege) {
-            // We're going to see which entries already exist in our
-            // destination table
-            $sql = 'term = ? AND srs = ?';
-            $param = array($rege['term'], $rege['srs']);
-
-            $sqls[] = $sql;
-            $params = array_merge($params, $param);
-
-            $regind[make_idnumber($rege)] = $rege;
-        }
-
-        $where = implode(' OR ', $sqls);
-
-        // Get entries from our destination table to check whether to
-        // insert or to update.
-        $records = $DB->get_recordset_select(self::table, $where, $params);
-        if (!$records->valid()) {
-            return false;
-        }
-
-        /* create array in following format:
-         * [<term>-<srs>] => Object (<ucla_reg_classinfo_entry>)
-         */
-        $reind = array();
-        foreach ($records as $record) {
-            $reind[make_idnumber($record)] = $record;
-        }
-
-        // Updated
-        $uc = 0; 
-        // No change needed
-        $nc = 0;
-        // Inserted
-        $ic = 0;
-
-        // Update/insert our data
-        foreach ($regind as $indk => $rege) {
-            if (isset($reind[$indk])) {
-                // Exists in the get_records_select() we called earlier
-                $rege['id'] = $reind[$indk]->id;
-                if (self::needs_updating($reind[$indk], $rege)) {
-                    $DB->update_record(self::table, $rege);
-                    $uc++;
+                // See if we need to insert/update ucla_reg_classinfo.
+                $existingclassinfo = $DB->get_record('ucla_reg_classinfo',
+                        array('term' => $request->term, 'srs' => $request->srs));
+                if (!empty($existingclassinfo)) {
+                    // Exists, so see if we need to update.
+                    $newclassinfo['id'] = $existingclassinfo->id;
+                    if (self::needs_updating($existingclassinfo, $newclassinfo)) {
+                        $DB->update_record('ucla_reg_classinfo', $newclassinfo);
+                        $uc++;
+                    } else {
+                        $nc++;
+                    }
                 } else {
-                    $nc++;
+                    $DB->insert_record('ucla_reg_classinfo', $newclassinfo);
+                    $ic++;
                 }
-            } else {
-                $DB->insert_record(self::table, $rege);
-                $ic++;
+
+                
+            }
+        }
+        $urcrecords->close();
+        
+        // Mark courses that the registrar didn't have data for as "cancelled".
+        $numnotfound = 0;
+        if (!empty($notfoundatregistrar)) {
+            foreach ($notfoundatregistrar as $termsrs) {
+                // Try to update entry in ucla_reg_classinfo (if exists) and
+                // mark it as cancelled.
+                $DB->set_field('ucla_reg_classinfo', 'enrolstat', 'X', $termsrs);
+                ++$numnotfound;
             }
         }
         
-        // mark courses that the registrar didn't have data for as "cancelled"
-        $num_not_found = 0;
-        if (!empty($not_found_at_registrar)) {
-            foreach ($not_found_at_registrar as $term_srs) {
-                // try to update entry in ucla_reg_classinfo (if exists) and
-                // mark it as cancelled
-                $DB->set_field('ucla_reg_classinfo', 'enrolstat', 'X', $term_srs);
-                ++$num_not_found;
-            }
-        }
-        
-        echo "\nUpdated: $uc . Inserted: $ic . Not found at registrar: "
-            . "$num_not_found . No update needed: $nc\n";
+        echo "Updated: $uc . Inserted: $ic . Not found at registrar: "
+            . "$numnotfound . No update needed: $nc\n";
 
         return true;
     }
