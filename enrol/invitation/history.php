@@ -116,7 +116,7 @@ if (empty($invites)) {
 
     // Columns to display.
     $columns = array(
-            'invitee'           => get_string('historyinvitee', 'enrol_invitation'),
+            'tofrom'            => get_string('historytofrom', 'enrol_invitation'),
             'role'              => get_string('historyrole', 'enrol_invitation'),
             'status'            => get_string('historystatus', 'enrol_invitation'),
             'datesent'          => get_string('historydatesent', 'enrol_invitation'),
@@ -135,7 +135,7 @@ if (empty($invites)) {
     $role_cache = array();
     foreach ($invites as $invite) {
         /* Build display row:
-         * [0] - invitee
+         * [0] - invitee and inviter
          * [1] - role
          * [2] - status
          * [3] - dates sent
@@ -143,8 +143,9 @@ if (empty($invites)) {
          * [5] - actions
          */
 
-        // Display invitee.
-        $row[0] = $invite->email;
+        // Display invitee and inviter.
+        $inviter = $DB->get_field('user', 'email', array( 'id' => $invite->inviterid));
+        $row[0] = $invite->email . " - " . $inviter;
 
         // Figure out invited role.
         if (empty($role_cache[$invite->roleid])) {

@@ -187,7 +187,7 @@ $string['invitationacceptancebutton'] = 'Accept invitation';
 // Invite history strings.
 $string['invitehistory'] = 'Invite history';
 $string['noinvitehistory'] = 'No invites sent out yet';
-$string['historyinvitee'] = 'Invitee';
+$string['historytofrom'] = 'To - From';
 $string['historyrole'] = 'Role';
 $string['historystatus'] = 'Status';
 $string['historydatesent'] = 'Date sent';
