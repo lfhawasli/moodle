@@ -379,6 +379,14 @@ function requestor_ignore_entry($data) {
         return true;
     }
 
+    // CCLE-4511 - Filter certain course numbers for engineering.
+    if (in_array($subj, array('BIOENGR', 'CH ENGR', 'C&EE', 'COM SCI',
+            'EL ENGR', 'ENGR', 'MAT SCI', 'MECH&AE')) &&
+            in_array($rawnum, array('199', '260', '296', '298', '299', '375',
+                '596', '597A', '597B', '597C', '598', '599'))) {
+        return true;
+    }
+
     // CCLE-2894: Custom filtering for courses
     $customfilter = get_config('tool_uclacourserequestor', 'customfilters');
     if ($customfilter) {
