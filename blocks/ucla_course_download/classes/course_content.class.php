@@ -14,7 +14,7 @@ abstract class course_content {
     /** 
      *  
      **/
-    abstract function get_zip();
+    abstract function create_zip($filesforzipping);
     
     /** 
      *  

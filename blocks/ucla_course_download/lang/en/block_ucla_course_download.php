@@ -5,6 +5,18 @@ $string['request'] = 'Request zip';
 $string['request_in_progress'] = 'Request in progress';
 $string['download'] = 'Download zip';
 
+/* database types */
+$string['files'] = "files";
+$string['posts'] = "posts";
+$string['submissions'] = "submissions";
+        
+/* filenames */
+$string['table_of_contents_file'] = "table_of_contents.html";
+$string['files_archive'] = "files-archive";
+$string['posts_archive'] = "posts-archive";
+$string['submissions_archive'] = "submissions-archive";
+
+/* course download page */
 $string['files'] = 'Files';
 $string['files_not_requested'] = 'No zip file of course files has been created yet.';
 $string['files_requested'] = 'You have successfully submitted a request to create a zip file of course files. You will be notified via email when it is available.';

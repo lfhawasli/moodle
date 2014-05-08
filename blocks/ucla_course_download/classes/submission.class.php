@@ -4,7 +4,7 @@ class submission extends course_content {
     /** 
      *  
      **/
-    function get_zip();
+    function create_zip();
     
     /** 
      *  
