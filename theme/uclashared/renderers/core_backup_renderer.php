@@ -31,7 +31,130 @@ require_once($CFG->dirroot . '/backup/util/ui/renderer.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class theme_uclashared_core_backup_renderer extends core_backup_renderer {
-    
+
+    /**
+     * Displays the general information about a backup file with non-standard format
+     *
+     * @param moodle_url $nextstageurl URL to send user to
+     * @param array $details basic info about the file (format, type)
+     * @return string HTML code to display
+     */
+    public function backup_details_nonstandard($nextstageurl, array $details) {
+
+        $html  = html_writer::start_tag('div', array('class' => 'backup-restore nonstandardformat'));
+        $html .= html_writer::start_tag('div', array('class' => 'backup-section'));
+        $html .= $this->output->heading(get_string('backupdetails', 'backup'), 2, 'header');
+        // START UCLA MOD: CCLE-3023 - restore in Moodle2.x site menu block is  not displayed and not default to UCLA format
+        // Friendlier notice to users
+        //$html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup'), 'noticebox');
+        $html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup', get_string('backupformat'.$details['format'], 'backup')), 'noticebox');
+        // END UCLA MOD: CCLE-3023
+        $html .= $this->backup_detail_pair(
+            get_string('backupformat', 'backup'),
+            get_string('backupformat'.$details['format'], 'backup'));
+        $html .= $this->backup_detail_pair(
+            get_string('backuptype', 'backup'),
+            get_string('backuptype'.$details['type'], 'backup'));
+        $html .= html_writer::end_tag('div');
+        $html .= $this->output->single_button($nextstageurl, get_string('continue'), 'post');
+        $html .= html_writer::end_tag('div');
+
+        return $html;
+    }
+
+    /**
+     * Displays a course selector for restore
+     *
+     * @param moodle_url $nextstageurl
+     * @param bool $wholecourse true if we are restoring whole course (as with backup::TYPE_1COURSE), false otherwise
+     * @param restore_category_search $categories
+     * @param restore_course_search $courses
+     * @param int $currentcourse
+     * @return string
+     */
+    public function course_selector(moodle_url $nextstageurl, $wholecourse = true, restore_category_search $categories = null, restore_course_search $courses=null, $currentcourse = null) {
+        global $CFG, $PAGE;
+        require_once($CFG->dirroot.'/course/lib.php');
+
+        $nextstageurl->param('sesskey', sesskey());
+
+        $form = html_writer::start_tag('form', array('method'=>'post', 'action'=>$nextstageurl->out_omit_querystring()));
+        foreach ($nextstageurl->params() as $key=>$value) {
+            $form .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>$key, 'value'=>$value));
+        }
+
+        $hasrestoreoption = false;
+
+        $html  = html_writer::start_tag('div', array('class'=>'backup-course-selector backup-restore'));
+        if ($wholecourse && !empty($categories) && ($categories->get_count() > 0 || $categories->get_search())) {
+            // New course
+            $hasrestoreoption = true;
+            $html .= $form;
+            $html .= html_writer::start_tag('div', array('class'=>'bcs-new-course backup-section'));
+            $html .= $this->output->heading(get_string('restoretonewcourse', 'backup'), 2, array('class'=>'header'));
+            $html .= $this->backup_detail_input(get_string('restoretonewcourse', 'backup'), 'radio', 'target', backup::TARGET_NEW_COURSE, array('checked'=>'checked'));
+            $html .= $this->backup_detail_pair(get_string('selectacategory', 'backup'), $this->render($categories));
+            $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('form');
+        }
+
+        if ($wholecourse && !empty($currentcourse)) {
+            // Current course
+            $hasrestoreoption = true;
+            $html .= $form;
+            $html .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'targetid', 'value'=>$currentcourse));
+            $html .= html_writer::start_tag('div', array('class'=>'bcs-current-course backup-section'));
+            $html .= $this->output->heading(get_string('restoretocurrentcourse', 'backup'), 2, array('class'=>'header'));
+            $html .= $this->backup_detail_input(get_string('restoretocurrentcourseadding', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_ADDING, array('checked'=>'checked'));
+            //$html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);
+            // BEGIN UCLA MOD: CCLE-3446-Disable-course-delete-option-from-course-restore
+            if (has_capability('local/ucla:deletecoursecontentsandrestore', context_system::instance())) {
+                $html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);
+
+                // BEGIN UCLA MOD: CCLE-4416-Prompt-overwriting-warning
+                // Prompt user to back-up course content that will be overriden
+                global $COURSE;
+                $PAGE->requires->yui_module('moodle-local_ucla-restoreoverwritewarning', 'M.core_backup.course_deletion_check', array(array('courseid' => $COURSE->id)));
+                // END UCLA MOD CCLE-4416
+            }
+            // END UCLA MOD: CCLE-3446
+
+            $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('form');
+        }
+
+        if (!empty($courses) && ($courses->get_count() > 0 || $courses->get_search())) {
+            // Existing course
+            $hasrestoreoption = true;
+            $html .= $form;
+            $html .= html_writer::start_tag('div', array('class'=>'bcs-existing-course backup-section'));
+            $html .= $this->output->heading(get_string('restoretoexistingcourse', 'backup'), 2, array('class'=>'header'));
+            if ($wholecourse) {
+                $html .= $this->backup_detail_input(get_string('restoretoexistingcourseadding', 'backup'), 'radio', 'target', backup::TARGET_EXISTING_ADDING, array('checked'=>'checked'));
+                $html .= $this->backup_detail_input(get_string('restoretoexistingcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_EXISTING_DELETING);
+                $html .= $this->backup_detail_pair(get_string('selectacourse', 'backup'), $this->render($courses));
+            } else {
+                // We only allow restore adding to existing for now. Enforce it here.
+                $html .= html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'target', 'value'=>backup::TARGET_EXISTING_ADDING));
+                $courses->invalidate_results(); // Clean list of courses
+                $courses->set_include_currentcourse(); // Show current course in the list
+                $html .= $this->backup_detail_pair(get_string('selectacourse', 'backup'), $this->render($courses));
+            }
+            $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('form');
+        }
+
+        if (!$hasrestoreoption) {
+            echo $this->output->notification(get_string('norestoreoptions','backup'));
+        }
+
+        $html .= html_writer::end_tag('div');
+        return $html;
+    }
+
     /**
      * Displays the import course selector
      *

@@ -213,7 +213,7 @@ $string['errorsavegradestaled'] = '<h4>Your changes have not been saved</h4>' .
 // CCLE-4416 - Prompt overwriting warning
 $string['deletecoursecontenttitle'] = 'Course deletion warning';
 $string['deletecoursecontentyes'] = 'Create backup';
-$string['deletecoursecontentno'] = 'Continue and delete';
+$string['deletecoursecontentno'] = 'Continue';
 
 $string['deletecoursecontentwarning'] = '<p>You are about to delete the content of the site:</p>'
         . '<p>{$a->shortname} ({$a->fullname})</p>'

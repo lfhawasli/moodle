@@ -9,7 +9,7 @@ YUI.add('moodle-local_ucla-restoreoverwritewarning', function(Y) {
     M.core_backup = M.core_backup || {};
 
     // Generate a moodle ajax dialog.
-    M.core_backup.course_deletion_warning = function(courseid) {
+    M.core_backup.course_deletion_warning = function(courseid, section) {
         Y.io(M.cfg.wwwroot.concat('/local/ucla/rest_additionalcoursecontent.php'), {
             method: 'GET',
             data: 'courseid=' + courseid,
@@ -26,9 +26,9 @@ YUI.add('moodle-local_ucla-restoreoverwritewarning', function(Y) {
                         confirm.on('complete-yes', function(e) {
                             window.open(json.config.url, '_self');
                         }, this);
-    //                            confirm.on('complete-no', function(e) {
-    //                                Y.one('.bcs-existing-course input[value="Continue"]').simulate('click');
-    //                            }, this);
+                        confirm.on('complete-no', function(e) {
+                            Y.one('.' + section + ' input[value="Continue"]').simulate('click');
+                        }, this);
                         // Show the confirm box
                         confirm.show();
                     }
@@ -51,7 +51,7 @@ YUI.add('moodle-local_ucla-restoreoverwritewarning', function(Y) {
 
             // If both conditions, then check that course has content
             if (courseid && radiodelete) {
-                M.core_backup.course_deletion_warning(courseid);
+                M.core_backup.course_deletion_warning(courseid, 'bcs-existing-course');
             }
 
         }, 'input[type=radio]');
@@ -61,13 +61,13 @@ YUI.add('moodle-local_ucla-restoreoverwritewarning', function(Y) {
             var selectedradio = Y.one('.bcs-existing-course .generaltable [type="radio"]:checked');
             if (selectedradio) {
                 var courseid = selectedradio.getAttribute('value');
-                M.core_backup.course_deletion_warning(courseid);
+                M.core_backup.course_deletion_warning(courseid, 'bcs-existing-course');
             }
         });
 
         // Attach to 'Restore into this course' radio node.
         Y.one('.bcs-current-course .detail-pair:nth-of-type(2) [type="radio"]').on('click', function(e) {
-            M.core_backup.course_deletion_warning(param.courseid);
+            M.core_backup.course_deletion_warning(param.courseid, 'bcs-current-course');
         });
         
     };

@@ -12,28 +12,31 @@ $obj = new stdClass();
 $obj->status = false;
 
 try {
-    
-    $course = $DB->get_record('course', array('id' => required_param('courseid', PARAM_INT)), '*', MUST_EXIST);
-    $activeinstructorfocused = new active_instructor_focused($USER);
-    
-    if ($activeinstructorfocused->has_additional_course_content($course)) {
+    $courseid = required_param('courseid', PARAM_INT);
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
-        $config = new stdClass;
-        $config->title = get_string('deletecoursecontenttitle', 'local_ucla');
-        $config->yesLabel = get_string('deletecoursecontentyes', 'local_ucla');
-        $config->noLabel = get_string('deletecoursecontentno', 'local_ucla');;
-        $config->closeButtonTitle = get_string('close', 'editor');
-        $config->question = get_string('deletecoursecontentwarning', 'local_ucla',
-                array('shortname' => $course->shortname, 'fullname' => $course->fullname));
+    // Make sure that user can access course. We use restore capability, because
+    // this script is currently only used in the restore page.
+    if (has_capability('moodle/restore:restorecourse', context_course::instance($courseid))) {
+        $activeinstructorfocused = new active_instructor_focused($USER);
+        if ($activeinstructorfocused->has_additional_course_content($course)) {
 
-        $url = new moodle_url('/backup/backup.php', array('id' => $course->id));
-        $config->url = (string) $url;
+            $config = new stdClass;
+            $config->title = get_string('deletecoursecontenttitle', 'local_ucla');
+            $config->yesLabel = get_string('deletecoursecontentyes', 'local_ucla');
+            $config->noLabel = get_string('deletecoursecontentno', 'local_ucla');;
+            $config->closeButtonTitle = get_string('close', 'editor');
+            $config->question = get_string('deletecoursecontentwarning', 'local_ucla',
+                    array('shortname' => $course->shortname, 'fullname' => $course->fullname));
 
-        // Set status
-        $obj->status = true;
-        $obj->config = $config;
-        
-    } 
+            $url = new moodle_url('/backup/backup.php', array('id' => $course->id));
+            $config->url = (string) $url;
+
+            // Set status
+            $obj->status = true;
+            $obj->config = $config;
+        }
+    }
     
 } catch (Exception $e) {
     // Both get_record and required_param will fail with exceptions with an invalid courseid.
