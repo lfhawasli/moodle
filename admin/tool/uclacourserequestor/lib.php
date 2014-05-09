@@ -387,6 +387,12 @@ function requestor_ignore_entry($data) {
         return true;
     }
 
+    // CCLE-4513 - Limit course builds for LS to 192 and below.
+    if (in_array($subj, array('BMD RES', 'EE BIOL', 'MCD BIO', 'PHYSCI', 
+            'NEUROSC', 'MIMG', 'LIFESCI', 'SOC GEN')) && $num > 192) {
+        return true;
+    }
+
     // CCLE-2894: Custom filtering for courses
     $customfilter = get_config('tool_uclacourserequestor', 'customfilters');
     if ($customfilter) {
