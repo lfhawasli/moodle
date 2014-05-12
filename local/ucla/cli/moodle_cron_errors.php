@@ -78,22 +78,32 @@ if ($fp = fopen($logfile, 'r')) { // Make sure it opens the log file.
         exit;
     }
 
-    $matched_lines = "";
+    $matched_lines = array();
     $prev_line = ""; // Used for storing line in previous loop iteration to prepend to a matched line.
 
     while ($line = fgets($fp)) {  // While it can get a line, loop through them looking for matches.
         foreach ($search_items as $value) {
-            if (preg_match("/$value/i", $line) and !preg_match("/errors=0/",
-                            $line) and !preg_match("/Sending post /", $line) and !preg_match("/users were sent post /",
-                            $line)) {
-                $matched_lines .= $prev_line . $line . "</br>";   // Save this matched line as well as the line above it.
+            if (preg_match("/$value/i", $line) and 
+                    !preg_match("/errors=0/", $line) and
+                    !preg_match("/Sending post /", $line) and
+                    !preg_match("/users were sent post /", $line)) {
+                if (preg_match("/SimplePie/", $line)) {
+                    // If we see errors related to SimplePie, it is because of
+                    // a RSS error. We want to ignore RSS errors since they
+                    // happen often and we cannot do anything about it. So,
+                    // unset previous matched line.
+                    array_pop($matched_lines);
+                } else {
+                    // Save this matched line as well as the line above it.
+                    $matched_lines[] = $prev_line . $line;   
+                }
             }
             $prev_line = $line; // Store previous line.
         }
     }
     fclose($fp); // Close the log file.
-    if (strlen($matched_lines) > 0) {
+    if (count($matched_lines) > 0) {
         echo $CFG->wwwroot . " moodle cron monitoring script moodle_cron_errors.php found the following in $logfile:\n";
-        echo "$matched_lines";
+        echo implode('', $matched_lines);
     }
 }
