@@ -31,6 +31,8 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
+require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . '/course/format/lib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/report/uclastats/locallib.php');
 
