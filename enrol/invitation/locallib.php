@@ -497,14 +497,14 @@ function prepare_notice_object($invitation) {
 function print_page_tabs($active_tab) {
     global $CFG, $COURSE;
 
-    $tabs[] = new tabobject('history',
-                    new moodle_url('/enrol/invitation/history.php',
-                            array('courseid' => $COURSE->id)),
-                    get_string('invitehistory', 'enrol_invitation'));
     $tabs[] = new tabobject('invite',
                     new moodle_url('/enrol/invitation/invitation.php',
                             array('courseid' => $COURSE->id)),
                     get_string('inviteusers', 'enrol_invitation'));
+    $tabs[] = new tabobject('history',
+                    new moodle_url('/enrol/invitation/history.php',
+                            array('courseid' => $COURSE->id)),
+                    get_string('invitehistory', 'enrol_invitation'));
 
     // Display tabs here.
     print_tabs(array($tabs), $active_tab);
