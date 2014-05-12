@@ -104,7 +104,7 @@ $string['inviteexpiration'] = 'Invitation expiration';
 $string['inviteexpiration_desc'] = 'Length of time that an invitation is valid (in seconds). Default is 2 weeks.';
 
 $string['show_from_email'] = 'Allow invited user to contact me at {$a->email} (your address will be on the "FROM" field. If not selected, the "FROM" field will be {$a->supportemail})';
-$string['inviteusers'] = 'Invite user';
+$string['inviteusers'] = 'Invite users';
 $string['maxinviteerror'] = 'It must be a number.';
 $string['maxinviteperday'] = 'Maximum invitation per day';
 $string['maxinviteperday_help'] = 'Maximum invitation that can be send per day for a course.';
@@ -187,7 +187,7 @@ $string['invitationacceptancebutton'] = 'Accept invitation';
 // Invite history strings.
 $string['invitehistory'] = 'Invite history';
 $string['noinvitehistory'] = 'No invites sent out yet';
-$string['historyinvitee'] = 'Invitee';
+$string['historytofrom'] = 'To - From';
 $string['historyrole'] = 'Role';
 $string['historystatus'] = 'Status';
 $string['historydatesent'] = 'Date sent';

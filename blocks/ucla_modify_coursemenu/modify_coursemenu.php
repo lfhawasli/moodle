@@ -120,6 +120,10 @@ if ($justshowsuccessmessage) {
         $sectionbutton);
 
     echo $OUTPUT->footer();
+
+    $logurl = new moodle_url('../blocks/ucla_modify_coursemenu/modify_coursemenu.php', array('courseid' => $courseid));
+    add_to_log($courseid, 'course', 'modify sections', $logurl, 'UCLA block Modify sections used');
+
     die();
 } else if ($adjustnum) {
     // Fix problem and redirect back to same page.

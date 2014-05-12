@@ -23,10 +23,10 @@ $string['guest_not_allow'] = 'Guests can not view this page';
 $string['videofurnaceintro'] = 'Please note that this media is intended for on-campus use only. 
     Off-campus use is possible through use of the <a href="http://www.bol.ucla.edu/services/vpn/" target=_blank>BOL VPN</a>, 
     however, you will likely experience hiccups, skips or other problems due to insufficient bandwidth.<br />
-    When launching the application, click "yes" or "always" to allow the applet to run on your computer. 
-    If the file does not run and you do not see the "certificate acceptance" message then you must install 
-    <a href="http://java.sun.com" target="_blank">Java (java.sun.com)</a> in order to use this media. For more help, 
-    go to the <a href="http://www.oid.ucla.edu/units/imlab/faq/vf/index.html" target="_blank">Media Lab Video Furnace FAQ</a>';
+    When launching the application, click "Run" or "Trust" to allow the applet to run on your computer. 
+    If the file does not run and you do not see the player, then you must install 
+    <a href="http://www.java.com/en/" target="_blank">Java (java.com/en)</a> in order to use this media. For more help, 
+    go to the <a href="http://www.oid.ucla.edu/edtech/medialab/faq/vf" target="_blank">Media Lab Video Furnace FAQ</a>';
 
 $string['currentvideo'] = 'Current videos';
 $string['futurevideo'] = 'Future videos';

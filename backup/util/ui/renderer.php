@@ -181,11 +181,7 @@ class core_backup_renderer extends plugin_renderer_base {
         $html  = html_writer::start_tag('div', array('class' => 'backup-restore nonstandardformat'));
         $html .= html_writer::start_tag('div', array('class' => 'backup-section'));
         $html .= $this->output->heading(get_string('backupdetails', 'backup'), 2, 'header');
-        // START UCLA MOD: CCLE-3023 - restore in Moodle2.x site menu block is  not displayed and not default to UCLA format 
-        // Friendlier notice to users  
-        //$html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup'), 'noticebox');
-        $html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup', get_string('backupformat'.$details['format'], 'backup')), 'noticebox');
-        // END UCLA MOD: CCLE-3023
+        $html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup'), 'noticebox');
         $html .= $this->backup_detail_pair(
             get_string('backupformat', 'backup'),
             get_string('backupformat'.$details['format'], 'backup'));
@@ -261,12 +257,8 @@ class core_backup_renderer extends plugin_renderer_base {
             $html .= html_writer::start_tag('div', array('class'=>'bcs-current-course backup-section'));
             $html .= $this->output->heading(get_string('restoretocurrentcourse', 'backup'), 2, array('class'=>'header'));
             $html .= $this->backup_detail_input(get_string('restoretocurrentcourseadding', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_ADDING, array('checked'=>'checked'));
-            //$html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);
-            // BEGIN UCLA MOD: CCLE-3446-Disable-course-delete-option-from-course-restore
-            if (has_capability('local/ucla:deletecoursecontentsandrestore', context_system::instance())) {
-                $html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);
-            }
-            // END UCLA MOD: CCLE-3446
+            $html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);            
+
             $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
             $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('form');

@@ -261,7 +261,6 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($restr, 2, 'headingblock');
 
 if ($data != false) {
-
     // allow user to either return to section they were on or go to course page
     $params = array('id' => $courseid);
     $courseurl = new moodle_url('/course/view.php', $params);
@@ -280,6 +279,9 @@ if ($data != false) {
 
     echo $OUTPUT->confirm(get_string('rearrange_success', 'block_ucla_rearrange'),
             $courseret, $sectret);
+
+    $logurl = new moodle_url('../blocks/ucla_rearrange/rearrange.php', array('courseid' => $courseid));
+    add_to_log($courseid, 'course', 'rearrange materials', $logurl, 'UCLA block Rearrange materials used');
 } else {
     /* for section < 0, the secid doesnt matter because we will expand all
      * However, if will give warning if we use $secid = ($sections[$section_num]->id);
