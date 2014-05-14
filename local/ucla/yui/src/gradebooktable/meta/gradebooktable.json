@@ -1,0 +1,10 @@
+{
+  "moodle-local_ucla-gradebooktable": {
+    "requires": [
+        "node",
+        "event",
+        "node-event-simulate",
+        "moodle-block_ucla_help-doc_loader"
+    ]
+  }
+}

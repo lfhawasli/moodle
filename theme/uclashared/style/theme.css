@@ -1551,7 +1551,7 @@ input[type="submit"], .mform .collapseexpand, .mform input[name="submitbutton"],
   }
 }
 
-/* line 21, ../sass/_buttons.scss */
+/* line 22, ../sass/_buttons.scss */
 .btn-default, input[type="button"],
 input[type="submit"], .navbutton .wikisearch input[type="submit"],
 .navbutton .forumsearch input[type="submit"], .ucla-format-notice-box .mform input[name="laterbutton"], .ucla-format-notice-box .mform input[name="nobutton"] {
@@ -1625,7 +1625,7 @@ fieldset[disabled] input[type="submit"].dndupload-progress-outer, fieldset[disab
   border-color: #333333;
 }
 
-/* line 25, ../sass/_buttons.scss */
+/* line 26, ../sass/_buttons.scss */
 .btn-primary, #tool_uclacourserequestor input[type="button"], .uclaconsole input[type="button"], .ucla-search input[type="button"], #tool_uclacourserequestor
 input[type="submit"], .uclaconsole
 input[type="submit"], .ucla-search
@@ -1633,7 +1633,7 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   color: white !important;
 }
 
-/* line 29, ../sass/_buttons.scss */
+/* line 30, ../sass/_buttons.scss */
 .btn-cpanel, .control-panel input[type="submit"] {
   color: #0d3286;
   background-color: #fcd226;
@@ -1665,65 +1665,65 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   background-color: #fcd226;
   border-color: #fcb126;
 }
-/* line 33, ../sass/_buttons.scss */
+/* line 34, ../sass/_buttons.scss */
 .btn-cpanel:hover, .control-panel input[type="submit"]:hover {
   color: #0d3286;
 }
 
-/* line 75, ../sass/_buttons.scss */
+/* line 76, ../sass/_buttons.scss */
 .navbutton .wikisearch input[alt="search"],
 .navbutton .forumsearch input[alt="search"] {
   display: inline-block !important;
 }
 
-/* line 93, ../sass/_buttons.scss */
+/* line 94, ../sass/_buttons.scss */
 .pagelayout-redirect {
   text-align: center;
 }
-/* line 96, ../sass/_buttons.scss */
+/* line 97, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton {
   /*@extend .btn-lg;*/
 }
-/* line 101, ../sass/_buttons.scss */
+/* line 102, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton a, .pagelayout-redirect .continuebutton a:link {
   color: white;
 }
-/* line 102, ../sass/_buttons.scss */
+/* line 103, ../sass/_buttons.scss */
 .pagelayout-redirect .continuebutton a:hover {
   text-decoration: none;
 }
 
-/* line 110, ../sass/_buttons.scss */
+/* line 111, ../sass/_buttons.scss */
 .section-modchooser-link > a, .section-modchooser-link > a:link {
   color: white;
 }
-/* line 112, ../sass/_buttons.scss */
+/* line 113, ../sass/_buttons.scss */
 .section-modchooser-link > a:hover, .section-modchooser-link > a:link:hover {
   text-decoration: none;
 }
 
-/* line 130, ../sass/_buttons.scss */
+/* line 132, ../sass/_buttons.scss */
 .control-panel .btn-grades-container {
   display: none;
   width: 50%;
   float: left;
 }
-/* line 135, ../sass/_buttons.scss */
+/* line 137, ../sass/_buttons.scss */
 .control-panel .btn-grades-container input[type="submit"] {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
 }
 @media only screen and (max-width: 480px) {
-  /* line 146, ../sass/_buttons.scss */
+  /* line 150, ../sass/_buttons.scss */
   .control-panel .btn-grades-container {
     display: block;
   }
-  /* line 149, ../sass/_buttons.scss */
+  /* line 153, ../sass/_buttons.scss */
   .control-panel .btn-cpanel-container {
     width: 50%;
     float: right;
   }
-  /* line 152, ../sass/_buttons.scss */
+  /* line 156, ../sass/_buttons.scss */
   .control-panel .btn-cpanel-container input[type="submit"] {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
@@ -9994,58 +9994,118 @@ h2.headingblock > a {
   overflow: inherit;
 }
 
-/*.gradebook-student-column,*/
-/* line 76, ../sass/ccle/_gradebook.scss */
-table#user-grades .grade, table#user-grades .item {
-  width: 50px;
-  overflow: hidden;
+/* line 73, ../sass/ccle/_gradebook.scss */
+table#user-grades {
+  font-size: 1.2rem;
+  /*    .r0:not(.odd):not(.even),
+      .r1:not(.odd):not(.even) {
+          td, th {
+              background-color: #333;
+              border: 1px solid #444;
+              color: #eee;
+          }
+      }*/
 }
-/* line 83, ../sass/ccle/_gradebook.scss */
-table#user-grades tr.heading .cell {
-  border-bottom: 0;
+/* line 87, ../sass/ccle/_gradebook.scss */
+table#user-grades .avg th,
+table#user-grades .avg td,
+table#user-grades .heading th {
+  font-weight: bold;
+  background-color: #333;
+  color: #ddd;
+  border-color: #444;
+  white-space: nowrap;
 }
-/* line 88, ../sass/ccle/_gradebook.scss */
+/* line 93, ../sass/ccle/_gradebook.scss */
+table#user-grades .avg th a,
+table#user-grades .avg td a,
+table#user-grades .heading th a {
+  color: white;
+  font-weight: normal;
+}
+/* line 98, ../sass/ccle/_gradebook.scss */
+table#user-grades .avg .cell {
+  font-weight: bold;
+  text-align: center;
+}
+/* line 102, ../sass/ccle/_gradebook.scss */
+table#user-grades .avg .cell.header {
+  text-align: right;
+}
+/* line 104, ../sass/ccle/_gradebook.scss */
+table#user-grades th {
+  font-weight: normal;
+}
+/* line 106, ../sass/ccle/_gradebook.scss */
+table#user-grades th.cell {
+  height: 20px;
+}
+/* line 110, ../sass/ccle/_gradebook.scss */
+table#user-grades .controls {
+  text-align: right;
+  background-color: #eee;
+  height: 20px;
+}
+/* line 115, ../sass/ccle/_gradebook.scss */
+table#user-grades tr {
+  height: 40px;
+}
+/* line 118, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .gradevalue {
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+}
+/* line 123, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .grade:hover {
+  /*border: 2px solid $grade-report-color-overriden-border;*/
+}
+/* line 126, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .user {
+  min-width: 200px;
+  max-width: 200px;
+  width: 200px;
+  background-color: #777777;
+  border-color: #666666;
+}
+/* line 133, ../sass/ccle/_gradebook.scss */
+table#user-grades tr .user a {
+  color: white;
+}
+/* line 134, ../sass/ccle/_gradebook.scss */
 table#user-grades tr .user .userpicture {
   display: none;
 }
-/* line 92, ../sass/ccle/_gradebook.scss */
-table#user-grades tr #studentheader .email {
-  float: left;
-}
-/* line 94, ../sass/ccle/_gradebook.scss */
-table#user-grades tr #studentheader .email + .sorticon {
-  float: left;
-}
-/* line 102, ../sass/ccle/_gradebook.scss */
+/* line 139, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked {
   background-color: #f39a00;
   border-bottom-color: #f39a00;
 }
-/* line 105, ../sass/ccle/_gradebook.scss */
+/* line 142, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.overridden {
   background-color: #f39a00;
   border-color: #dc691a;
 }
-/* line 110, ../sass/ccle/_gradebook.scss */
+/* line 147, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked {
   background-color: #f5cd00;
   border-bottom-color: #f5cd00;
 }
-/* line 113, ../sass/ccle/_gradebook.scss */
+/* line 150, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked.overridden {
   background-color: #f5cd00;
 }
-/* line 117, ../sass/ccle/_gradebook.scss */
+/* line 154, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked {
   background-color: #f1b900;
   border-bottom-color: #f1b900;
 }
-/* line 120, ../sass/ccle/_gradebook.scss */
+/* line 157, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked.overridden {
   background-color: #f1b900;
   border-color: #dc691a;
 }
-/* line 125, ../sass/ccle/_gradebook.scss */
+/* line 162, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.odd td.grade.overridden {
   background-color: #fff;
   /*border: 0;*/
@@ -10054,36 +10114,36 @@ table#user-grades tr.odd td.grade.overridden {
   height: 16px;
   background-color: #efefef;
 }
-/* line 139, ../sass/ccle/_gradebook.scss */
+/* line 176, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked {
   background-color: #f4a400;
   border-bottom-color: #f4a400;
 }
-/* line 142, ../sass/ccle/_gradebook.scss */
+/* line 179, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.overridden {
   background-color: #f4a400;
   border-color: #dc691a;
 }
-/* line 147, ../sass/ccle/_gradebook.scss */
+/* line 184, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked {
   background-color: #f5cf2c;
   border-bottom-color: #f5cf2c;
 }
-/* line 150, ../sass/ccle/_gradebook.scss */
+/* line 187, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked.overridden {
   background-color: #f5cf2c;
 }
-/* line 154, ../sass/ccle/_gradebook.scss */
+/* line 191, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked {
   background-color: #f1be00;
   border-bottom-color: #f1be00;
 }
-/* line 157, ../sass/ccle/_gradebook.scss */
+/* line 194, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked.overridden {
   background-color: #f1be00;
   border-color: #dc691a;
 }
-/* line 162, ../sass/ccle/_gradebook.scss */
+/* line 199, ../sass/ccle/_gradebook.scss */
 table#user-grades tr.even td.grade.overridden {
   background-color: #efefef;
   /*border: 2px dashed $grade-report-color-overriden-border;*/
@@ -10093,130 +10153,147 @@ table#user-grades tr.even td.grade.overridden {
   height: 16px;
   background-color: #fff;
 }
-
-/* line 176, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row {
-  width: 100%;
-  font-size: 1rem;
-}
-/* line 180, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row.gradebook-header-row-sticky tr th {
-  /*border-top: 2px solid gray;*/
-  border-bottom: 2px solid gray;
-}
-/* line 186, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row tr th {
-  padding: 0;
-  float: left;
-  border-bottom: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  background-color: white;
-  text-align: center;
-  padding: 8px 2px 1px;
-}
-/* line 196, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row tr th a {
-  margin-left: 4px;
-}
-/* line 200, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row tr th:hover {
-  border-bottom: 4px solid #ddd;
-}
-/* line 204, ../sass/ccle/_gradebook.scss */
-.gradebook-header-row tr th:nth-child(2n) {
-  background-color: #fcfcfc;
-}
-
-/* line 211, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column {
-  background-color: white;
-}
-/* line 214, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column.gradebook-student-column-sticky .gradebook-student-container {
-  border-right: 2px solid gray;
+/* line 212, ../sass/ccle/_gradebook.scss */
+table#user-grades .overridden .grade_icons {
+  padding-left: 10px;
 }
 /* line 217, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container {
-  background-color: #f9f9f9;
-  font-size: 1rem;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+table#user-grades .catlevel1 .action-icon img {
+  opacity: 0.5;
+}
+/* line 220, ../sass/ccle/_gradebook.scss */
+table#user-grades .catlevel1 .action-icon.selected img {
+  opacity: 1;
+}
+
+/* line 226, ../sass/ccle/_gradebook.scss */
+#gradebook-header-container {
+  font-size: 1.2rem;
+  background-color: #444;
+}
+/* line 230, ../sass/ccle/_gradebook.scss */
+#gradebook-header-container .gradebook-header-cell {
+  background-color: #444;
+  color: white;
   padding: 4px;
-}
-/* line 224, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container th {
-  padding: 0;
-}
-/* line 227, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container span {
-  width: 100%;
-  float: left;
-}
-/* line 231, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container .userpicture {
-  display: none;
-}
-/* line 234, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container:nth-child(2n+1) {
-  background-color: #efefef;
-}
-/* line 237, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container:hover {
-  border-right: 4px solid gray;
+  white-space: nowrap;
+  border: 1px solid #444;
+  border-top: 0;
+  border-right: 0;
+  overflow: hidden;
 }
 /* line 240, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container:first-child {
-  border-top: #fcfcfc;
+#gradebook-header-container .gradebook-header-cell.catlevel1 {
+  background-color: #333;
 }
 /* line 243, ../sass/ccle/_gradebook.scss */
-.gradebook-student-column .gradebook-student-container:last-child {
-  border-bottom: #fcfcfc;
+#gradebook-header-container .gradebook-header-cell.catlevel2 {
+  background-color: #222;
+}
+/* line 246, ../sass/ccle/_gradebook.scss */
+#gradebook-header-container .gradebook-header-cell a {
+  color: white;
+}
+/* line 249, ../sass/ccle/_gradebook.scss */
+#gradebook-header-container .gradebook-header-cell:hover {
+  background-color: #111;
+}
+/* line 252, ../sass/ccle/_gradebook.scss */
+#gradebook-header-container .gradebook-header-cell .icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  border: 0;
+  padding-right: 6px;
 }
 
-/* line 249, ../sass/ccle/_gradebook.scss */
-.gradebook-footer-row {
-  display: none;
+/* line 262, ../sass/ccle/_gradebook.scss */
+#gradebook-user-container {
+  background-color: #777;
 }
-/* line 253, ../sass/ccle/_gradebook.scss */
-.gradebook-footer-row.gradebook-footer-row-sticky {
-  display: block;
-}
-/* line 257, ../sass/ccle/_gradebook.scss */
-.gradebook-footer-row.gradebook-footer-row-sticky .cell {
-  border-top: 2px solid gray;
-}
-/* line 261, ../sass/ccle/_gradebook.scss */
-.gradebook-footer-row .cell {
-  padding: 8px;
-  font-size: 1rem;
-  background-color: #efeffe;
-  color: #00008b;
-  font-weight: bold;
-  text-align: right;
-  border-right: 1px solid #ddd;
+/* line 265, ../sass/ccle/_gradebook.scss */
+#gradebook-user-container .gradebook-user-cell {
+  background-color: #666;
+  font-size: 1.2rem;
+  border: 1px solid #666;
+  border-top: 0;
+  padding: 4px;
 }
 /* line 271, ../sass/ccle/_gradebook.scss */
-.gradebook-footer-row .cell.header {
-  background-color: #f9f9f9;
-  color: #444;
+#gradebook-user-container .gradebook-user-cell .userpicture {
+  display: none;
 }
-/* line 276, ../sass/ccle/_gradebook.scss */
-.gradebook-footer-row .cell .btn, .gradebook-footer-row .cell input[type="button"],
-.gradebook-footer-row .cell input[type="submit"], .gradebook-footer-row .cell #tool_uclacourserequestor input[type="button"], #tool_uclacourserequestor .gradebook-footer-row .cell input[type="button"], .gradebook-footer-row .cell #tool_uclacourserequestor input[type="submit"], #tool_uclacourserequestor .gradebook-footer-row .cell input[type="submit"], .gradebook-footer-row .cell .mform .collapseexpand, .mform .gradebook-footer-row .cell .collapseexpand, .gradebook-footer-row .cell .mform input[name="submitbutton"], .mform .gradebook-footer-row .cell input[name="submitbutton"], .gradebook-footer-row .cell .pagelayout-redirect .continuebutton, .pagelayout-redirect .gradebook-footer-row .cell .continuebutton, .gradebook-footer-row .cell .section-modchooser-link, .gradebook-footer-row .cell .ucla-format-notice-box .mform input[name="yesbutton"], .ucla-format-notice-box .mform .gradebook-footer-row .cell input[name="yesbutton"], .gradebook-footer-row .cell .ucla-format-notice-box .mform input[name="laterbutton"], .ucla-format-notice-box .mform .gradebook-footer-row .cell input[name="laterbutton"], .gradebook-footer-row .cell .ucla-format-notice-box .mform input[name="nobutton"], .ucla-format-notice-box .mform .gradebook-footer-row .cell input[name="nobutton"], .gradebook-footer-row .cell h2.headingblock > a, .gradebook-footer-row .cell #addadmisform > h3.main > a, .gradebook-footer-row .cell .region-content > h2.main > a, .gradebook-footer-row .cell .wiki_clear ~ .mform #save, .wiki_clear ~ .mform .gradebook-footer-row .cell #save, .gradebook-footer-row .cell .wiki_clear ~ .mform #cancel, .wiki_clear ~ .mform .gradebook-footer-row .cell #cancel {
-  float: left;
+/* line 274, ../sass/ccle/_gradebook.scss */
+#gradebook-user-container .gradebook-user-cell a {
+  font-weight: normal;
+  color: #fff;
 }
-
+/* line 278, ../sass/ccle/_gradebook.scss */
+#gradebook-user-container .gradebook-user-cell:nth-child(2n+1) {
+  background-color: #777;
+  border-bottom: 1px solid #777;
+}
 /* line 282, ../sass/ccle/_gradebook.scss */
-.gradebook-floating-header {
-  background-color: #f9f9f9;
-  font-size: 1rem;
-  text-align: center;
-  padding: 4px;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
+#gradebook-user-container .gradebook-user-cell:nth-child(2n):hover {
+  background-color: #5c5c5c;
+}
+/* line 285, ../sass/ccle/_gradebook.scss */
+#gradebook-user-container .gradebook-user-cell:hover {
+  background-color: #6d6d6d;
+}
+/* line 288, ../sass/ccle/_gradebook.scss */
+#gradebook-user-container .gradebook-user-cell:first-child {
+  /*border-top: 1px solid #666;*/
 }
 
 /* line 294, ../sass/ccle/_gradebook.scss */
+#gradebook-footer-container {
+  display: none;
+  font-size: 1.2rem;
+  background-color: #444;
+}
+/* line 300, ../sass/ccle/_gradebook.scss */
+#gradebook-footer-container.gradebook-footer-row-sticky {
+  display: block;
+}
+/* line 303, ../sass/ccle/_gradebook.scss */
+#gradebook-footer-container.gradebook-footer-row-sticky .cell {
+  border-top: 2px solid gray;
+}
+/* line 307, ../sass/ccle/_gradebook.scss */
+#gradebook-footer-container .gradebook-footer-cell {
+  padding: 8px;
+  font-size: 1.2rem;
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid #444;
+  border-right: 0;
+}
+/* line 318, ../sass/ccle/_gradebook.scss */
+#gradebook-footer-container .gradebook-footer-cell:nth-of-type(1) {
+  text-align: right;
+}
+/* line 322, ../sass/ccle/_gradebook.scss */
+#gradebook-footer-container .gradebook-footer-cell .btn, #gradebook-footer-container .gradebook-footer-cell input[type="button"],
+#gradebook-footer-container .gradebook-footer-cell input[type="submit"], #gradebook-footer-container .gradebook-footer-cell .mform .collapseexpand, .mform #gradebook-footer-container .gradebook-footer-cell .collapseexpand, #gradebook-footer-container .gradebook-footer-cell .mform input[name="submitbutton"], .mform #gradebook-footer-container .gradebook-footer-cell input[name="submitbutton"], #gradebook-footer-container .gradebook-footer-cell .pagelayout-redirect .continuebutton, .pagelayout-redirect #gradebook-footer-container .gradebook-footer-cell .continuebutton, #gradebook-footer-container .gradebook-footer-cell .section-modchooser-link, #gradebook-footer-container .gradebook-footer-cell .ucla-format-notice-box .mform input[name="yesbutton"], .ucla-format-notice-box .mform #gradebook-footer-container .gradebook-footer-cell input[name="yesbutton"], #gradebook-footer-container .gradebook-footer-cell .ucla-format-notice-box .mform input[name="laterbutton"], .ucla-format-notice-box .mform #gradebook-footer-container .gradebook-footer-cell input[name="laterbutton"], #gradebook-footer-container .gradebook-footer-cell .ucla-format-notice-box .mform input[name="nobutton"], .ucla-format-notice-box .mform #gradebook-footer-container .gradebook-footer-cell input[name="nobutton"], #gradebook-footer-container .gradebook-footer-cell h2.headingblock > a, #gradebook-footer-container .gradebook-footer-cell #addadmisform > h3.main > a, #gradebook-footer-container .gradebook-footer-cell .region-content > h2.main > a, #gradebook-footer-container .gradebook-footer-cell .wiki_clear ~ .mform #save, .wiki_clear ~ .mform #gradebook-footer-container .gradebook-footer-cell #save, #gradebook-footer-container .gradebook-footer-cell .wiki_clear ~ .mform #cancel, .wiki_clear ~ .mform #gradebook-footer-container .gradebook-footer-cell #cancel {
+  float: left;
+}
+
+/* line 328, ../sass/ccle/_gradebook.scss */
+#gradebook-user-header-container {
+  background-color: #333;
+  font-size: 1.2rem;
+  text-align: left;
+  padding: 8px;
+}
+/* line 334, ../sass/ccle/_gradebook.scss */
+#gradebook-user-header-container a {
+  color: white;
+}
+
+/* line 339, ../sass/ccle/_gradebook.scss */
 .gradebook-color {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -10232,7 +10309,7 @@ table#user-grades tr.even td.grade.overridden {
   float: left;
   margin-right: 10px;
 }
-/* line 305, ../sass/ccle/_gradebook.scss */
+/* line 350, ../sass/ccle/_gradebook.scss */
 .gradebook-color:after {
   content: "";
   float: right;
@@ -10240,36 +10317,162 @@ table#user-grades tr.even td.grade.overridden {
   height: 100%;
 }
 
-/* line 312, ../sass/ccle/_gradebook.scss */
+/* line 357, ../sass/ccle/_gradebook.scss */
 .gradebook-overridden {
   background: url([[pix:theme|corner-fold]]) no-repeat;
   height: 30px;
   background-color: #efefef;
 }
 
-/* line 317, ../sass/ccle/_gradebook.scss */
+/* line 362, ../sass/ccle/_gradebook.scss */
 .gradebook-row-color {
   background-color: #f5cd00;
 }
-/* line 319, ../sass/ccle/_gradebook.scss */
+/* line 364, ../sass/ccle/_gradebook.scss */
 .gradebook-row-color:after {
   background-color: #f5cf2c;
 }
 
-/* line 323, ../sass/ccle/_gradebook.scss */
+/* line 368, ../sass/ccle/_gradebook.scss */
 .gradebook-column-color {
   background-color: #f39a00;
 }
-/* line 325, ../sass/ccle/_gradebook.scss */
+/* line 370, ../sass/ccle/_gradebook.scss */
 .gradebook-column-color:after {
   background-color: #f4a400;
 }
 
-/* line 330, ../sass/ccle/_gradebook.scss */
+/* line 375, ../sass/ccle/_gradebook.scss */
 #user-report-table {
   clear: both;
   margin-top: 20px;
   font-size: 1.2rem;
+}
+
+/* line 383, ../sass/ccle/_gradebook.scss */
+.gradebook-loading-screen {
+  width: 100%;
+  height: 40px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background-color: black;
+  z-index: 99999;
+  opacity: 0.8;
+  padding: 10px;
+  text-align: center;
+}
+/* line 395, ../sass/ccle/_gradebook.scss */
+.gradebook-loading-screen .gradebook-loading {
+  /*margin: auto;*/
+  padding-right: 40px;
+  /*position: fixed;*/
+  text-align: center;
+  width: 100%;
+}
+
+/* line 404, ../sass/ccle/_gradebook.scss */
+.gradebook-loading i {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #00b3d5;
+}
+
+/* line 411, ../sass/ccle/_gradebook.scss */
+.gradebook-loading i:first-child {
+  -webkit-animation: gradebook-loading-ani2 0.5s linear infinite;
+  animation: gradebook-loading-ani2 0.5s linear infinite;
+  opacity: 0;
+  -webkit-transform: translate(-20px);
+  -moz-transform: translate(-20px);
+  -ms-transform: translate(-20px);
+  -o-transform: translate(-20px);
+  transform: translate(-20px);
+}
+
+/* line 418, ../sass/ccle/_gradebook.scss */
+.gradebook-loading i:nth-child(2),
+.gradebook-loading i:nth-child(3) {
+  -webkit-animation: gradebook-loading-ani3 0.5s linear infinite;
+  animation: gradebook-loading-ani3 0.5s linear infinite;
+}
+
+/* line 422, ../sass/ccle/_gradebook.scss */
+.gradebook-loading i:last-child {
+  -webkit-animation: gradebook-loading-ani1 0.5s linear infinite;
+  animation: gradebook-loading-ani1 0.5s linear infinite;
+}
+
+@-webkit-keyframes gradebook-loading-ani1 {
+  /* line 427, ../sass/ccle/_gradebook.scss */
+  100% {
+    -webkit-transform: translate(40px);
+    -moz-transform: translate(40px);
+    -ms-transform: translate(40px);
+    -o-transform: translate(40px);
+    transform: translate(40px);
+    opacity: 0;
+  }
+}
+
+@keyframes gradebook-loading-ani1 {
+  /* line 433, ../sass/ccle/_gradebook.scss */
+  100% {
+    -webkit-transform: translate(40px);
+    -moz-transform: translate(40px);
+    -ms-transform: translate(40px);
+    -o-transform: translate(40px);
+    transform: translate(40px);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes gradebook-loading-ani2 {
+  /* line 439, ../sass/ccle/_gradebook.scss */
+  100% {
+    -webkit-transform: translate(20px);
+    -moz-transform: translate(20px);
+    -ms-transform: translate(20px);
+    -o-transform: translate(20px);
+    transform: translate(20px);
+    opacity: 1;
+  }
+}
+
+@keyframes gradebook-loading-ani2 {
+  /* line 445, ../sass/ccle/_gradebook.scss */
+  100% {
+    -webkit-transform: translate(20px);
+    -moz-transform: translate(20px);
+    -ms-transform: translate(20px);
+    -o-transform: translate(20px);
+    transform: translate(20px);
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes gradebook-loading-ani3 {
+  /* line 451, ../sass/ccle/_gradebook.scss */
+  100% {
+    -webkit-transform: translate(20px);
+    -moz-transform: translate(20px);
+    -ms-transform: translate(20px);
+    -o-transform: translate(20px);
+    transform: translate(20px);
+  }
+}
+
+@keyframes gradebook-loading-ani3 {
+  /* line 456, ../sass/ccle/_gradebook.scss */
+  100% {
+    -webkit-transform: translate(20px);
+    -moz-transform: translate(20px);
+    -ms-transform: translate(20px);
+    -o-transform: translate(20px);
+    transform: translate(20px);
+  }
 }
 
 /* line 5, ../sass/ccle/_report.scss */

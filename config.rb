@@ -14,6 +14,9 @@
 # 
 #   $ compass compile -e production --force 
 
+require 'sass-css-importer'
+add_import_path Sass::CssImporter::Importer.new("theme/uclashared/package")
+
 ## UCLA theme directory
 theme_dir = "theme/uclashared"
 
@@ -49,7 +52,7 @@ watch "**/sass/styles.scss" do |project_dir, relative_path|
   if File.exists?(File.join(project_dir, relative_path))
     
     ## Compile compass inside compass, whoa!
-    cmd = "compass compile --sass-dir #{relative_path.gsub(/\/styles.scss/, '')} --css-dir #{relative_path.gsub(/\/sass\/styles.scss/, '')} -I #{sass_dir}"
+    cmd = "compass compile --sass-dir #{relative_path.gsub(/\/styles.scss/, '')} --css-dir #{relative_path.gsub(/\/sass\/styles.scss/, '')} -I #{sass_dir} -e production"
     puts cmd
     
     ## Do system call
