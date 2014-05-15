@@ -1474,6 +1474,7 @@ class uclacoursecreator {
             $course_text = implode(' / ', $course_d);
 
             $course_dept = $rci_course->subj_area;
+            $coursedivision = $rci_course->division;
 
             unset($rci_course);
 
@@ -1550,6 +1551,7 @@ class uclacoursecreator {
 
                 // These are not parsed
                 $email_ref['subjarea'] = $course_dept;
+                $email_ref['division'] = $coursedivision;
                 $email_ref['userid'] = $uid;
                 $email_ref['srs'] = $csrs;
                 $email_ref['block'] = $retain_emails;
@@ -1632,8 +1634,9 @@ class uclacoursecreator {
 
             // Parse the email
             $subj = $emailing['subjarea'];
+            $division = $emailing['division'];
 
-            // Figure out which email template to use
+            // Figure out which email template to use.
             if ($this->send_mails() && !isset($this->parsed_param[$subj])) {
                 if (!isset($this->email_prefix)) {
                     $this->figure_email_vars();
@@ -1647,7 +1650,15 @@ class uclacoursecreator {
                     
                     $file = $deptfile;
                 } else {
-                    $file = $this->default_email_file;
+                    // Else search for a division template.
+                    $divisionfile = $this->email_prefix . $division . $this->email_suffix;
+                    if (file_exists($divisionfile)) {
+                        $this->debugln('Using special template for division ' . $division);
+                        $file = $divisionfile;
+                    } else {
+                        // Then use default template.
+                        $file = $this->default_email_file;
+                    }
                 }
 
                 $this->parsed_param[$subj] = $this->email_parse_file($file);
