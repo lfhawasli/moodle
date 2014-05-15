@@ -317,6 +317,9 @@ $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['quiet_mode'] = 1;
 
+// Site administration > Plugins > Blocks > UCLA course download
+$CFG->forced_plugin_settings['block_ucla_course_download']['student_access_begins_week'] = 9;
+
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 

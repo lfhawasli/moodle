@@ -49,4 +49,6 @@ function xmldb_block_ucla_course_download_upgrade($oldversion) {
         // Ucla_course_download savepoint reached.
         upgrade_block_savepoint(true, 2014050713, 'ucla_course_download');
     }
+
+    return true;
 }

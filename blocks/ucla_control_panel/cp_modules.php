@@ -12,6 +12,7 @@ require_once(dirname(__FILE__) . '/modules/ucla_cp_myucla_row_module.php');
 global $CFG, $DB, $USER;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
+require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
 // Please note that we should have
 // $course - the course that we are currently on
 // $context - the context of the course
@@ -175,6 +176,11 @@ if ($syllabus_manager->can_host_syllabi()) {
             $temp_tag, 'local/ucla_syllabus:managesyllabus');
 }
 
+// Course Content Download
+$modules[] = new ucla_cp_module('course_download', new moodle_url(
+        '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
+        $temp_tag, 'block/ucla_course_download:requestzip');
+
 /******************************** Advanced Functions *********************/
 $modules[] = new ucla_cp_module('ucla_cp_mod_advanced', null, null, 'moodle/course:manageactivities');
 
@@ -284,6 +290,11 @@ if (has_role_in_context('student', $context) || $is_role_switched_student) {
     $modules[] = new ucla_cp_module('student_grades', new moodle_url(
             $CFG->wwwroot . '/grade/index.php?id=' . $course->id), $temp_tag, $temp_cap);
 
+    if (student_zip_requestable()) {
+        $modules[] = new ucla_cp_module('course_download', new moodle_url(
+            '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
+            $temp_tag, 'block/ucla_course_download:requestzip');
+    }
 
     if ($USER->auth != "shibboleth") {
         $modules[] = new ucla_cp_module('student_change_password', 

@@ -1,6 +1,6 @@
 <?php
 
-$string['pluginname'] = 'Download course content';
+$string['pluginname'] = 'UCLA course download';
 $string['request'] = 'Request zip';
 $string['request_in_progress'] = 'Request in progress';
 $string['download'] = 'Download zip';

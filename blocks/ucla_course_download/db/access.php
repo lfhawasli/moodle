@@ -23,4 +23,14 @@
  
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
+
+    'block/ucla_course_download:requestzip' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'student' => CAP_ALLOW
+        )
+    ),
 );
