@@ -12,14 +12,16 @@ $string['submissions'] = "submissions";
         
 /* filenames */
 $string['table_of_contents_file'] = "table_of_contents.html";
-$string['files_archive'] = "files-archive";
-$string['posts_archive'] = "posts-archive";
-$string['submissions_archive'] = "submissions-archive";
+$string['files_archive'] = "files";
+$string['posts_archive'] = "posts";
+$string['submissions_archive'] = "submissions";
 
 /* course download page */
 $string['files'] = 'Files';
 $string['files_not_requested'] = 'No zip file of course files has been created yet.';
 $string['files_requested'] = 'You have successfully submitted a request to create a zip file of course files. You will be notified via email when it is available.';
+$string['files_request_completed'] = 'A zip file of your files has been created. Any new content will be added to the zip automatically';
+$string['files_request_unavailable'] = 'Course has no file content available for download.';
 
 $string['forum_posts'] = 'Forum posts';
 $string['forum_posts_not_requested'] = 'No zip file of forum posts has been created yet.';
