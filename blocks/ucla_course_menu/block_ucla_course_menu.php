@@ -120,6 +120,7 @@ class block_ucla_course_menu extends block_navigation {
         // Separate out non-section nodes so that we can have a different style
         // to them.
         $block_elements = $this->create_block_elements();
+        ksort($block_elements);
         
         $module_elements = array();
         $format_options = $format->get_format_options();
@@ -316,8 +317,10 @@ class block_ucla_course_menu extends block_navigation {
             }
 
             if ($block_elements) {
-                if ($fn == self::BLOCK_EDITORS_FN) {
-                    // add arrays instead of using array_merge to keep keys
+                // Check if key for block element is non-zero. If so, then we
+                // want to add arrays instead of using array_merge to keep keys
+                // order.
+                if (key($block_elements) != 0) {
                     $elements = $elements + $block_elements;
                 } else {
                     $elements = array_merge($elements, $block_elements);
