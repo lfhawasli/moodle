@@ -112,7 +112,10 @@ M.local_mymedia.init_config = function (Y, panel_markup, dialog, conversion_scri
                                                ); 
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+    //loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="' + M.cfg.wwwroot.concat('/local/kaltura/pix/loading.gif') + '" />');
+    // END UCLA MOD: CCLE-4471
     loading_panel.render();
 
     // Create preview panel

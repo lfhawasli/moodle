@@ -36,6 +36,10 @@ class kalvidassign_singlesubmission_form extends moodleform {
 
         $mform =& $this->_form;
 
+        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+        $mform->setDisableShortforms(true);
+        // END UCLA MOD: CCLE-4471
+
         $cm = $this->_customdata->cm;
         $userid = $this->_customdata->userid;
 
@@ -62,7 +66,7 @@ class kalvidassign_singlesubmission_form extends moodleform {
 
         $submission     = $this->_customdata->submission;
         $grading_info   = $this->_customdata->grading_info;
-        $entry_object   = '';
+        $entryobject   = '';
         $timemodified   = '';
 
         if (!empty($submission->entry_id)) {
@@ -71,32 +75,31 @@ class kalvidassign_singlesubmission_form extends moodleform {
             $connection     = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
             
             if ($connection) {
-                $entry_object = local_kaltura_get_ready_entry_object($this->_customdata->submission->entry_id);
+                $entryobject = local_kaltura_get_ready_entry_object($this->_customdata->submission->entry_id);
     
                 // Determine the type of video (See KALDEV-28)
-                if (!local_kaltura_video_type_valid($entry_object)) {
-                    $entry_object = local_kaltura_get_ready_entry_object($entry_object->id, false);
+                if (!local_kaltura_video_type_valid($entryobject)) {
+                    $entryobject = local_kaltura_get_ready_entry_object($entryobject->id, false);
                 }
             }
 
         }
 
-        if (!empty($entry_object)) {
-
-            // Force the video to be embedded as large
-            $entry_object->height = '365';
-            $entry_object->width = '400';
-
+        if (!empty($entryobject)) {
+            list($entryobject->width, $entryobject->height) = kalvidassign_get_player_dimensions();
             $courseid = get_courseid_from_context($this->_customdata->context);
 
             // Set the session
-            $session = local_kaltura_generate_kaltura_session(array($entry_object->id));
+            $session = local_kaltura_generate_kaltura_session(array($entryobject->id));
 
-
+            // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+//            $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
+//                    local_kaltura_get_kdp_code($entryobject, 0, $courseid));
             $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-                               local_kaltura_get_kdp_code($entry_object, 0, $courseid));
+                    local_kaltura_get_kdp_code($entryobject, 0, $courseid, $session));
+            // END UCLA MOD: CCLE-4471
 
-        } elseif (empty($entry_object) && isset($submission->timemodified) && !empty($submission->timemodified)) {
+        } else if (empty($entryobject) && isset($submission->timemodified) && !empty($submission->timemodified)) {
 
             if ($connection) {
                 // an empty entry object and a time modified timestamp means the video is still converting

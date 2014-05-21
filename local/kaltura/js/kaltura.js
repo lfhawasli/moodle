@@ -13,7 +13,10 @@ M.local_kaltura.show_loading = function () {
                                                    });
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+    //loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="' + M.cfg.wwwroot.concat('/local/kaltura/pix/loading.gif') + '" />');
+    // END UCLA MOD: CCLE-4471
     loading_panel.render();
 
     loading_panel.show();
@@ -501,7 +504,7 @@ M.local_kaltura.init_config = function (Y, test_script) {
 
 M.local_kaltura.video_assignment = function (Y, conversion_script, panel_markup,
                                              video_properties, kcw_code, kaltura_session,
-                                             kaltura_partner_id, script_location) {
+                                             kaltura_partner_id, script_location, modalwidth, modalheight) {
 
     // Adding makup to the body of the page for the kalvidassign
     if (null !== Y.one("#page-mod-kalvidassign-view")) { // Body tag for kalvidassign
@@ -626,23 +629,25 @@ M.local_kaltura.video_assignment = function (Y, conversion_script, panel_markup,
                                                              }
                                                    );
 
-        loading_panel.setHeader("Loading, please wait..."); 
-        loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+        loading_panel.setHeader("Loading, please wait...");
+        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+        //loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+        loading_panel.setBody('<img src="' + M.cfg.wwwroot.concat('/local/kaltura/pix/loading.gif') + '" />');
+        // END UCLA MOD: CCLE-4471
         loading_panel.render();
 
         
         // Create preview panel
-        var preview_panel  = new Y.YUI2.widget.Panel("id_video_preview",
-                                        { width: "450px",
-                                          height: "430px",
-                                          fixedcenter: false,
-                                          constraintoviewport: true,
-                                          dragable: false,
-                                          visible: false,
-                                          close: true,
-                                          modal: true,
-                                          context: ["region-main", "tl", "tl", ["beforeShow", "windowResize"]]
-                                        });
+        var preview_panel  = new Y.YUI2.widget.Panel("id_video_preview", {
+                width: modalwidth+"px",
+                height: modalheight+"px",
+                fixedcenter: false,
+                constraintoviewport: true,
+                dragable: false,
+                visible: false,
+                close: true,
+                modal: true,
+                context: ["region-main", "tl", "tl", ["beforeShow", "windowResize"]]});
 
         preview_panel.render();
 
@@ -739,7 +744,7 @@ M.local_kaltura.video_assignment = function (Y, conversion_script, panel_markup,
     
 };
 
-M.local_kaltura.video_asignment_submission_view = function (Y, conversion_script, panel_markup, uiconf_id) {
+M.local_kaltura.video_asignment_submission_view = function (Y, conversion_script, panel_markup, uiconf_id, modalwidth, modalheight, videowidth, videoheight) {
 
     // Adding makup to the body of the page for the video assignment - grade submissions page
     if (null !== Y.one("#page-mod-kalvidassign-grade_submissions")) { // Body tag for grade submissions page
@@ -762,21 +767,23 @@ M.local_kaltura.video_asignment_submission_view = function (Y, conversion_script
                                                );
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+    //loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="' + M.cfg.wwwroot.concat('/local/kaltura/pix/loading.gif') + '" />');
+    // END UCLA MOD: CCLE-4471
     loading_panel.render();
 
 
     // Create preview panel
-    var preview_panel  = new Y.YUI2.widget.Panel("id_video_preview",
-                                    { width: "410px",
-                                      height: "450px",
-                                      fixedcenter: false,
-                                      visible: false,
-                                      constraintoviewport: true,
-                                      close: true,
-                                      modal: true,
-                                      context: ["region-main", "tl", "tl", ["beforeShow", "windowResize"]]
-                                    });
+    var preview_panel  = new Y.YUI2.widget.Panel("id_video_preview", {
+            width: modalwidth+"px",
+            height: modalheight+"px",
+            fixedcenter: false,
+            visible: false,
+            constraintoviewport: true,
+            close: true,
+            modal: true,
+            context: ["region-main", "tl", "tl", ["beforeShow", "windowResize"]]});
 
     preview_panel.render();
 
@@ -838,7 +845,7 @@ M.local_kaltura.video_asignment_submission_view = function (Y, conversion_script
 
         Y.io(conversion_script + entry_id  + "&" +
                 "uiconf_id=" + uiconf_id + "&" +
-                "height=400&width=365"/*, vid_assign_preview_cfg*/);
+                "height="+videoheight+"&width="+videowidth/*, vid_assign_preview_cfg*/);
 
     }
     
@@ -1229,7 +1236,10 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
                                                );
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+    //loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="' + M.cfg.wwwroot.concat('/local/kaltura/pix/loading.gif') + '" />');
+    // END UCLA MOD: CCLE-4471
     loading_panel.render();
 
     // Create preview panel
@@ -1497,7 +1507,10 @@ M.local_kaltura.video_presentation = function (Y, conversion_script,
                                                );
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+    //loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="' + M.cfg.wwwroot.concat('/local/kaltura/pix/loading.gif') + '" />');
+    // END UCLA MOD: CCLE-4471
     loading_panel.render();
 
     // YUI IO context and callbacks.  Also create preview panel

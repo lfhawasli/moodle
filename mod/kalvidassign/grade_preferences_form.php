@@ -93,7 +93,10 @@ class kalvidassign_gradepreferences_form extends moodleform {
         $mform->addHelpButton('perpage', 'pagesize', 'kalvidassign');
 
         $mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'kalvidassign'));
-        $mform->setDefault('quickgrade', '');
+        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+        //$mform->setDefault('quickgrade', '');
+        $mform->setDefault('quickgrade', 1);
+        // START UCLA MOD: CCLE-4471
         $mform->addHelpButton('quickgrade', 'quickgrade', 'kalvidassign');
 
         $savepref = get_string('savepref', 'kalvidassign');
