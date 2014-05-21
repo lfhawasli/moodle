@@ -4,6 +4,34 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasupportconsole/manager.class.php');
 
 /**
+ * Generates HTML output for display of export options for given support console
+ * output.
+ *
+ * @param array $params Params for to generate report. Will append 'export=xls'.
+ * @return string
+ */
+function display_export_options($params) {
+    global $CFG, $OUTPUT;
+    $exportoptions = html_writer::start_tag('div',
+            array('class' => 'export-options'));
+    $exportoptions .= get_string('exportoptions', 'tool_uclasupportconsole');
+
+    // Right now, only supporting xls.
+    $xlsstring = get_string('application/vnd.ms-excel', 'mimetypes');
+    $icon = html_writer::empty_tag('img',
+            array('src' => $OUTPUT->pix_url('f/spreadsheet'),
+                  'alt' => $xlsstring,
+                  'title' => $xlsstring));
+    $params['export'] = 'xls';
+    $exportoptions .= html_writer::link(
+            new moodle_url('/'.$CFG->admin.'/tool/uclasupportconsole/index.php',
+                    $params), $icon);
+
+    $exportoptions .= html_writer::end_tag('div');
+    return $exportoptions;
+}
+
+/**
  * Returns all available registrar queries
  * 
  * @return array        Array of registrar queries avialble 
@@ -209,37 +237,143 @@ function html_table_auto_headers($data) {
 function supportconsole_render_section_shortcut($title, $data, 
                                                 $inputs=array(), $moreinfo=null) {
     global $OUTPUT;
+
+    // Check if user wanted an Excel download instead.
+    $export = optional_param('export', null, PARAM_ALPHA);
+    if ($export == 'xls') {
+        supportconsole_render_section_xls($title, $data, $inputs, $moreinfo);
+    }
+
     $size = 0;
     if (!empty($data)) {
         $size = count($data);
     }
 
-    if ($size == 0) { 
-        $pretext = 'There are no results';
+    // Display number of results.
+    if ($size == 0) {
+        $pretext = get_string('noresults', 'tool_uclasupportconsole');
     } else if ($size == 1) {
-        $pretext = 'There is 1 result';
+        $pretext = get_string('oneresult', 'tool_uclasupportconsole');
     } else {
-        $pretext = 'There are ' . $size . ' results';
+        $pretext = get_string('xresults', 'tool_uclasupportconsole', $size);
     }
 
+    // Display input.
     if (!empty($inputs)) {
+        // Not every support console tool as input.
         if (!is_array($inputs)) {
             $inputs = (array) $inputs;
-        }
-
-        // Not every support console tool as input.
-        $pretext .= ' for input [' . implode(', ', $inputs) . '].';
+        }        
+        $pretext .= get_string('forinput', 'tool_uclasupportconsole',
+                implode(', ', $inputs));
     }
+
+    // Export options.
+    $params = $inputs;
+    $params['console'] = $title;
+    $export = display_export_options($params);
 
     // Only display table if there is data to display.
     if (empty($data)) {
-        return $OUTPUT->box($pretext);   
+        return $OUTPUT->box($pretext) . $export;
     } else if ($moreinfo != null) {
         return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) .
-                supportconsole_render_table_shortcut($data);
+                supportconsole_render_table_shortcut($data) . $export;
     } else {
         return $OUTPUT->box($pretext) .
-                supportconsole_render_table_shortcut($data);
+                supportconsole_render_table_shortcut($data) . $export;
+    }
+}
+
+/**
+ * Outputs given data and inputs in an Excel file.
+ *
+ * @param string $title
+ * @param array $data
+ * @param array $inputs
+ * @param string $moreinfo
+ * @return string
+ */
+function supportconsole_render_section_xls($title, $data, $inputs=array(), $moreinfo=null) {
+    global $CFG;
+    require_once($CFG->dirroot.'/lib/excellib.class.php');
+
+    // Might have HTML.
+    $fulltitle = clean_param(get_string($title, 'tool_uclasupportconsole'), PARAM_NOTAGS);
+    $filename = clean_filename($title . '.xls');
+
+    // Creating a workbook (use "-" for writing to stdout).
+    $workbook = new MoodleExcelWorkbook("-");
+    // Sending HTTP headers.
+    $workbook->send($filename);
+    // Adding the worksheet.
+    $worksheet = $workbook->add_worksheet($fulltitle);
+    $boldformat = $workbook->add_format();
+    $boldformat->set_bold(true);
+    $row = $col = 0;
+
+    // Add title.
+    $worksheet->write_string($row, $col, $fulltitle, $boldformat);
+    ++$row;
+
+    // Check if there is moreinfo needed.
+    $moreinfo = clean_param($moreinfo, PARAM_NOTAGS);  // Might have HTML.
+    $worksheet->write_string($row, $col, $moreinfo);
+    ++$row;
+
+    // Display number of results.
+    $size = count($data);
+    if ($size == 0) {
+        $pretext = get_string('noresults', 'tool_uclasupportconsole');
+    } else if ($size == 1) {
+        $pretext = get_string('oneresult', 'tool_uclasupportconsole');
+    } else {
+        $pretext = get_string('xresults', 'tool_uclasupportconsole', $size);
+    }
+
+    // Display input.
+    if (!empty($inputs)) {
+        // Not every support console tool has input.
+        if (!is_array($inputs)) {
+            $inputs = (array) $inputs;
+        }
+        $pretext .= get_string('forinput', 'tool_uclasupportconsole',
+                implode(', ', $inputs));
+    }
+    $worksheet->write_string($row, $col, $pretext);
+    ++$row;
+
+    $table = html_table_auto_headers($data);
+
+    // Display table header.
+    $header = $table->head;
+    foreach ($header as $name) {
+        $worksheet->write_string($row, $col, $name, $boldformat);
+        ++$col;
+    }
+
+    // Now go through the data set.
+    $results = $table->data;
+    foreach ($results as $result) {
+        ++$row; $col = 0;
+        foreach ($result as $value) {
+            // Values might have HTML in them.
+            $value = clean_param($value, PARAM_NOTAGS);
+            if (is_numeric($value)) {
+                $worksheet->write_number($row, $col, $value);
+            } else {
+                $worksheet->write_string($row, $col, $value);
+            }
+            ++$col;
+        }
+    }
+
+    // Close the workbook.
+    $workbook->close();
+
+    // If we are in the command line, don't die.
+    if (!defined('CLI_SCRIPT') || !CLI_SCRIPT) {
+        exit;
     }
 }
 

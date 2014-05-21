@@ -48,6 +48,7 @@ $string['roleassignments'] = 'View role assignments';
 $string['userswithrole'] = 'Users with the given role assignment';
 $string['viewrole'] = 'View 1 role assignment';
 $string['viewroles'] = 'View {$a} role assignments';
+$string['exportroles'] = 'Export';
 $string['countnewusers'] = 'Show most recently created users';
 $string['pushgrades'] = 'Manually push grades to MyUCLA';
 $string['noenrollments'] = 'There are no enrollments';
@@ -78,6 +79,7 @@ $string['courseregistrardifferences'] = 'Show courses with changed descriptions'
 
 // Module
 $string['assignmentquizzesduesoon'] = 'Show courses with assignments or quizzes due soon';
+$string['assignmentquizzesduesoonmoreinfo'] = 'From {$a->start} to {$a->end} ({$a->days} days)';
 $string['modulespercourse'] = 'Count module totals and module types per course';
 $string['syllabusreoport'] = 'Syllabus report';
 $string['syllabus_header_course'] = '{$a->term} Course ({$a->num_courses})';
@@ -121,10 +123,13 @@ $string['srs'] = 'SRS';
 $string['subject_area'] = 'Subject area';
 $string['choose_subject_area'] = 'Choose subject area...';
 $string['uid'] = 'UID';
-
 $string['srslookup'] = "SRS number lookup (Registrar)";
-
 $string['goback'] = 'Go back';
+$string['noresults'] = 'There are no results';
+$string['oneresult'] = 'There is 1 result';
+$string['xresults'] = 'There are {$a} results';
+$string['forinput'] = ' for input [{$a}]';
+$string['exportoptions'] = 'Export: ';
 
 // capability strings
 $string['uclasupportconsole:view'] = 'Use UCLA support console';
