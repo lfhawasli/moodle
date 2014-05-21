@@ -107,6 +107,10 @@ class mod_kalvidres_mod_form extends moodleform_mod {
 
         $mform =& $this->_form;
 
+        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+        $mform->setDisableShortforms(true);
+        // END UCLA MOD: CCLE-4471
+
         /* Hidden fields */
         $attr = array('id' => 'entry_id');
         $mform->addElement('hidden', 'entry_id', '', $attr);

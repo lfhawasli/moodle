@@ -36,6 +36,10 @@ class kalvidassign_singlesubmission_form extends moodleform {
 
         $mform =& $this->_form;
 
+        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+        $mform->setDisableShortforms(true);
+        // END UCLA MOD: CCLE-4471
+
         $cm = $this->_customdata->cm;
         $userid = $this->_customdata->userid;
 
@@ -88,9 +92,12 @@ class kalvidassign_singlesubmission_form extends moodleform {
             // Set the session
             $session = local_kaltura_generate_kaltura_session(array($entryobject->id));
 
-
+            // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
+//            $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
+//                    local_kaltura_get_kdp_code($entryobject, 0, $courseid));
             $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-                    local_kaltura_get_kdp_code($entryobject, 0, $courseid));
+                    local_kaltura_get_kdp_code($entryobject, 0, $courseid, $session));
+            // END UCLA MOD: CCLE-4471
 
         } else if (empty($entryobject) && isset($submission->timemodified) && !empty($submission->timemodified)) {
 
