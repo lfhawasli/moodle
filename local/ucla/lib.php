@@ -290,8 +290,12 @@ function ucla_get_reg_classinfo($term, $srs) {
 }
 
 /**
- *  Convenience function to get registrar information for classes.
- **/
+ * Convenience function to get registrar information for classes.
+ *
+ * @param int $courseid
+ * @return array            Array of entries from ucla_reg_classinfo table with
+ *                          hostcourse value added.
+ */
 function ucla_get_course_info($courseid) {
     $reginfos = array();
     $termsrses = ucla_map_courseid_to_termsrses($courseid);
@@ -1187,6 +1191,27 @@ function is_collab_site($course) {
         $course = $course->id;
     }
     return !$DB->record_exists('ucla_request_classes', array('courseid' => $course));
+}
+
+/**
+ * Returns true if given course is an Engineering course, otherwise false.
+ *
+ * Only queries for the division of the hostcourse.
+ *
+ * @param int $courseid
+ * @return boolean 
+ */
+function is_engineering($courseid) {
+    global $DB;
+
+    // We only care about the hostcourse.
+    $sql = "SELECT urci.id
+              FROM {ucla_request_classes} urc
+              JOIN {ucla_reg_classinfo} urci ON (urc.term=urci.term AND urc.srs=urci.srs)
+             WHERE urc.courseid=:courseid AND
+                   urc.hostcourse=1 AND
+                   urci.division='EN'";
+    return $DB->record_exists_sql($sql, array('courseid' => $courseid));
 }
 
 /**

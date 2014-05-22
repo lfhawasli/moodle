@@ -174,7 +174,7 @@ class local_ucla_generator extends testing_data_generator {
         $this->insert_ucla_reg_classinfo($classtocreate);
         $this->insert_ucla_request_classes($courseobj->id, $classtocreate);
 
-        // Finished creating courses, so return array of created course requests.
+        // Finished creating classes, so return array of created course requests.
         return ucla_map_courseid_to_termsrses($courseobj->id);
     }
 

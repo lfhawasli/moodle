@@ -152,6 +152,10 @@ $site-menu-hover-color:         #fcfcfc;
             .video-furnace-link.leaf:before {
                 @include node-glyphicon("\e009");
             }
+            // Add myengineer link icon 
+            .myengineer-link.leaf:before {
+                @include node-glyphicon("\e021");
+            }
         }
         
         .type_activity {

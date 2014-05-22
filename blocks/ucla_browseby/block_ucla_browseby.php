@@ -149,6 +149,12 @@ class block_ucla_browseby extends block_navigation {
     }
 
     function sync($terms, $subjareas=null) {
+        // Don't run during unit tests. Can be triggered via
+        // course_creator_finished event.
+        if (defined('PHPUNIT_TEST') and PHPUNIT_TEST) {
+            return true;
+        }
+
         self::ucla_require_registrar();
 
         if (empty($terms)) {
