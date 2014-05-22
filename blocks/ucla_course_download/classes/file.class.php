@@ -27,7 +27,7 @@ class file extends course_content {
         global $DB;
 
         if ($request = $DB->get_record('ucla_archives', array("courseid" => $this->course->id, "userid" => $this->userid,
-                                              "type" => get_string('files_archive', 'block_ucla_course_download')))) {
+                                              "type" => 'files'))) {
             if (isset($request->timeupdated)) {
                 return 'request_completed';
             }
@@ -52,7 +52,7 @@ class file extends course_content {
 
         $request->courseid = $this->course->id;
         $request->userid = $this->userid;
-        $request->type = get_string('files_archive', 'block_ucla_course_download');
+        $request->type = 'files';
         $request->content = json_encode($this->build_zip_array());
         $request->contexthash = sha1($request->content);
         $request->timerequested = time();
@@ -75,7 +75,7 @@ class file extends course_content {
             foreach ($resourcemods as $resourcemod) {
                 $context = context_module::instance($resourcemod->id);
                 $fsfiles = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
-                
+
                 if (count($fsfiles) >= 1) {
                     $mainfile = reset($fsfiles);
                     if ($mainfile->get_filesize() < 524288000) { // TODO: MAKE THIS A CONFIG VARIABLE
@@ -92,7 +92,7 @@ class file extends course_content {
      * Checks if there are files in the course that are visible to the user.
      * @return bool
      */
-   function has_content() {
+    function has_content() {
         if(!empty($this->files)) {
             return TRUE;
         } else {
@@ -129,11 +129,11 @@ class file extends course_content {
 
         // Add new file.
         $fs = get_file_storage();
-            
+
         $context = context_course::instance($this->course->id);
         $requestid = $DB->get_field('ucla_archives', 'id', array("courseid" => $this->course->id, "userid" => $this->userid,
-                                              "type" => get_string('files_archive', 'block_ucla_course_download')));
-            
+                                              "type" => 'files'));
+
          $filerecord = array(
             'contextid'   => $context->id,
             'component'   => 'block_ucla_course_download',
@@ -160,27 +160,7 @@ class file extends course_content {
 
         return $newfile;       
     }
-    
-    /** 
-     *  Check if similar zip file exists.
-     *  @return existing similar zip or NULL.
-     **/
-    function has_zip($contexthash) {
-        global $DB;
 
-        if ($requests = $DB->get_records('ucla_archives', array('contexthash' => $contexthash))) {
-            // Find request that has already been processed.
-            foreach ($requests as $request) {
-                if( isset($request->fileid)) {
-                    return $request;
-                }
-            }
-        }
-        else {
-            return NULL;
-        }
-    }
-    
     function build_zip_array() {
         global $DB;
 
@@ -200,21 +180,19 @@ class file extends course_content {
 
         return $filesforzipping;
     }
-    
+
     /** 
      *  Check for new class content by comparing context hash values.
      **/
     function has_new_content(&$filesforzipping, &$newcontexthash) {
         global $DB;
 
-     // $this->files = $this->get_content();
-
         $filesforzipping = $this->build_zip_array();
 
         $newcontexthash = sha1(json_encode($filesforzipping));
 
         $oldcontexthash = $DB->get_field('ucla_archives', 'contexthash', array("courseid" => $this->course->id, "userid" => $this->userid,
-                                                 "type" => get_string('files_archive', 'block_ucla_course_download')));
+                                                 "type" => 'files'));
 
         if( $oldcontexthash != $newcontexthash ) {
             return true;
@@ -224,25 +202,11 @@ class file extends course_content {
         }
     }
 
-    /** 
-     *  
-     **/
-    function download_zip() {
-
-    }
-
-    /** 
-     *  Use local/ucla/ucla_send_mail
-     **/
-    function email_request() {
-
-    }
-
     static function process_requests() {
         global $DB;
 
         // generalize for all three types?
-        $requests = $DB->get_records('ucla_archives', array("type" => get_string('files', 'block_ucla_course_download')));
+        $requests = $DB->get_records('ucla_archives', array("type" => 'files'));
 
         foreach ($requests as $request) {
             // Delete zip if old request.
@@ -278,16 +242,22 @@ class file extends course_content {
                         }
                     }
                     else {
-                       echo "similar zip found  ";
-                       $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
-                       $newfile = $filerequest->add_new_file_record($filename, NULL,$similarrequest->fileid);
+                        echo "similar zip found  ";
+                        $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
+                        $newfile = $filerequest->add_new_file_record($filename, NULL,$similarrequest->fileid);
 
-                       // TODO: error check $newfile
-                       $request->fileid = $newfile->get_id();
-                       $request->contexthash = $similarrequest->contexthash;
-                       $request->content = $similarrequest->content;
-                       $request->timeupdated = $similarrequest->timeupdated;
+                        if ($newfile) {
+                            $request->fileid = $newfile->get_id();
+                            $request->contexthash = $similarrequest->contexthash;
+                            $request->content = $similarrequest->content;
+                            $request->timeupdated = $similarrequest->timeupdated;
+                        }
+                        else {
+                            // Error creating zip file.
+                        }
                     }
+                    // Send update email.
+                    $filerequest->email_request($request);
                 }
                 else {
                     echo "no new content  ";
@@ -319,17 +289,20 @@ class file extends course_content {
                     $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
                     $newfile = $filerequest->add_new_file_record($filename, NULL,$similarrequest->fileid);
 
-                    // TODO: error check $newfile
-                    $request->fileid = $newfile->get_id();
-                    $request->contexthash = $similarrequest->contexthash;
-                    $request->content = $similarrequest->content;
-                    $request->timeupdated = $similarrequest->timeupdated;
+                    if ($newfile) {
+                        $request->fileid = $newfile->get_id();
+                        $request->contexthash = $similarrequest->contexthash;
+                        $request->content = $similarrequest->content;
+                        $request->timeupdated = $similarrequest->timeupdated;
+                    }
+                    else {
+                        // Error creating zip file.
+                    }
                 }
+                // Send update email.
+                $filerequest->email_request($request);
             }
             $DB->update_record('ucla_archives', $request);
-
-            // Send update email.
-            $filerequest->email_request();
         }
     }
 }

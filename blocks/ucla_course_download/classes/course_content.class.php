@@ -21,18 +21,26 @@ abstract class course_content {
     /** 
      *  
      **/
-    abstract function has_zip($contexthash);
+    function download_zip() {
+
+    }
 
     /** 
-     *  
+     *  Email requestor once zip file is created or updated.
      **/
-    abstract function download_zip();
+    function email_request($request) {
+        global $DB;
+        
+        $user = $DB->get_record('user', array('id' => $request->userid));
+        $admin = get_admin(); // Change to "SYSTEM"?
+        $subject = get_string('email_subject', 'block_ucla_course_download', 'Files');
+        
+        // TODO: Add time updated and other information.
+        $message = get_string('email_message', 'block_ucla_course_download');
+        
+        return email_to_user($user, $admin, $subject, $message);
+    }
 
-    /** 
-     *  
-     **/
-    abstract function email_request();
-    
     /** 
      *  Check if request is over 30 days old.
      **/
@@ -46,25 +54,36 @@ abstract class course_content {
             return false;
         }
     }
-    
+
     /** 
-     *  Delete request and possibly file entry.
+     *  Delete request and corresponding file entry.
      **/
     static function delete_zip($request) {
         global $DB;
 
         $zipfileid = $DB->get_field('ucla_archives', 'fileid', array('id' => $request->id));
-        
+
         $DB->delete_records('ucla_archives', array('id' => $request->id));
-        
-        // Delete file if deleted request was last one. TODO: Check
-        if (!$DB->record_exists('ucla_archives', array("courseid" => $request->courseid, "type" => $request->type))) {
-            $DB->delete_records('files', array("id" => $zipfileid));
-        }
+        $DB->delete_records('files', array("id" => $zipfileid));
     }
 
     /** 
-     *  Check if existing similar zip file exists by comparing file hash values.
+     *  Check if similar zip file exists.
+     *  @return existing similar zip or NULL.
      **/
-    function similar_zips() {}
+    function has_zip($contexthash) {
+        global $DB;
+
+        if ($requests = $DB->get_records('ucla_archives', array('contexthash' => $contexthash))) {
+            // Find request that has already been processed.
+            foreach ($requests as $request) {
+                if( isset($request->fileid)) {
+                    return $request;
+                }
+            }
+        }
+        else {
+            return NULL;
+        }
+    }
 }
