@@ -181,9 +181,19 @@ class repository_upload extends repository {
         if ($this->mimetypes != '*') {
             // check filetype
             $filemimetype = file_storage::mimetype($_FILES[$elname]['tmp_name'], $record->filename);
-            if (!in_array($filemimetype, $this->mimetypes)) {
-                throw new moodle_exception('invalidfiletype', 'repository', '', get_mimetype_description(array('filename' => $_FILES[$elname]['name'])));
+
+            // START UCLA MOD: CCLE-4413 assignment file submission file type validation
+            $a = new stdClass();
+            $a->notaccepted = get_mimetype_description(array('filename' => $_FILES[$elname]['name']));
+            $accepted = array();
+            foreach(array_unique($this->mimetypes) as $k => $v){
+                array_push($accepted, get_mimetype_description($v));
             }
+            $a->accepted = implode(',', $accepted);
+            if (!in_array($filemimetype, $this->mimetypes)) {
+                throw new moodle_exception('invalidfiletype', 'repository', '', $a);
+            }
+            // END UCLA MOD: CCLE-4413
         }
 
         if (empty($record->itemid)) {

@@ -142,7 +142,9 @@ $string['instancesforcourses'] = '{$a} Course-wide common instance(s)';
 $string['instancesforusers'] = '{$a} User private instance(s)';
 $string['invalidjson'] = 'Invalid JSON string';
 $string['invalidplugin'] = 'Invalid repository {$a} plug-in';
-$string['invalidfiletype'] = '{$a} filetype cannot be accepted.';
+// START UCLA MOD: CCLE-4413 assignment file submission file type validation
+$string['invalidfiletype'] = '{$a->notaccepted} filetype cannot be accepted.<br>Acceptable file type(s): {$a->accepted}';
+// END UCLA MOD: CCLE-4413
 $string['invalidrepositoryid'] = 'Invalid repository ID';
 $string['invalidparams'] = 'Invalid parameters';
 $string['isactive'] = 'Active?';
