@@ -23,11 +23,14 @@ class file extends course_content {
      * Get button status.. place elsewhere?
      * @return string
      */
-    function get_request_status() {
+    function get_request_status(&$timerequested, &$timeupdated) {
         global $DB;
 
         if ($request = $DB->get_record('ucla_archives', array("courseid" => $this->course->id, "userid" => $this->userid,
                                               "type" => 'files'))) {
+            $timerequested = $request->timerequested;
+            $timeupdated = $request->timeupdated;
+
             if (isset($request->timeupdated)) {
                 return 'request_completed';
             }
@@ -57,7 +60,11 @@ class file extends course_content {
         $request->contexthash = sha1($request->content);
         $request->timerequested = time();
 
-        $DB->insert_record('ucla_archives', $request);
+        $conditions = array('courseid' => $request->courseid, 'userid' =>$request->userid, 'type' => 'files');
+
+        if(!$DB->record_exists('ucla_archives', $conditions)) {
+            $DB->insert_record('ucla_archives', $request);
+        }
     }
 
     /**
@@ -193,7 +200,6 @@ class file extends course_content {
 
         $oldcontexthash = $DB->get_field('ucla_archives', 'contexthash', array("courseid" => $this->course->id, "userid" => $this->userid,
                                                  "type" => 'files'));
-
         if( $oldcontexthash != $newcontexthash ) {
             return true;
         }
@@ -202,107 +208,93 @@ class file extends course_content {
         }
     }
 
-    static function process_requests() {
+    function process_request($request) {
         global $DB;
 
-        // generalize for all three types?
-        $requests = $DB->get_records('ucla_archives', array("type" => 'files'));
+        // Check update zip for existing archive.
+        if (isset($request->fileid)) {
 
-        foreach ($requests as $request) {
-            // Delete zip if old request.
-            if( parent::is_old($request) ) {
-                parent::delete_zip($request);
-                continue;
-            }
+            echo "existing archive  ";
 
-            $filerequest = new file($request->courseid, $request->userid);
+            // Check for new content.
+            // TODO: handle case when course no longer has files.
+            if ($this->has_new_content($filesforzipping, $contexthash)) {
+                echo "has new content  ";
 
-            echo $msg ="processing request " . $request->id ."  ";
-
-            // Check update zip for existing archive.
-            if (isset($request->fileid)) {
-
-                echo "existing archive  ";
-
-                // Check for new content.
-                if ($filerequest->has_new_content($filesforzipping, $contexthash)) {
-                    echo "has new content  ";
-
-                    if (!$similarrequest = $filerequest->has_zip($contexthash)) {
-                        echo "creating new zip  \n";
-                        $newfile = $filerequest->create_zip($filesforzipping);
-
-                        if ($newfile) {
-                            $request->fileid = $newfile->get_id();
-                            $request->contexthash = $contexthash;
-                            $request->content = json_encode($filesforzipping);
-                            $request->timeupdated = time();
-                        } else {
-                            // Error creating zip file.
-                        }
-                    }
-                    else {
-                        echo "similar zip found  ";
-                        $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
-                        $newfile = $filerequest->add_new_file_record($filename, NULL,$similarrequest->fileid);
-
-                        if ($newfile) {
-                            $request->fileid = $newfile->get_id();
-                            $request->contexthash = $similarrequest->contexthash;
-                            $request->content = $similarrequest->content;
-                            $request->timeupdated = $similarrequest->timeupdated;
-                        }
-                        else {
-                            // Error creating zip file.
-                        }
-                    }
-                    // Send update email.
-                    $filerequest->email_request($request);
-                }
-                else {
-                    echo "no new content  ";
-                }
-            }
-            // Process new request.
-            else {
-                echo "process new request  ";
-                $filesforzipping = $filerequest->build_zip_array();
-
-                if (!$similarrequest = $filerequest->has_zip(sha1(json_encode($filesforzipping)))) {
-                    echo "no similar zip  ";
-
-                    $newfile = $filerequest->create_zip($filesforzipping);
+                if (!$similarrequest = $this->has_zip($contexthash)) {
+                    echo "creating new zip  \n";
+                    $newfile = $this->create_zip($filesforzipping);
 
                     if ($newfile) {
-                        echo "new file  ";
                         $request->fileid = $newfile->get_id();
+                        $request->contexthash = $contexthash;
                         $request->content = json_encode($filesforzipping);
-                        $request->contexthash = sha1($request->content);
                         $request->timeupdated = time();
                     } else {
                         // Error creating zip file.
                     }
+                 }
+                 else {
+                     echo "similar zip found  ";
+                     $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
+                     $newfile = $this->add_new_file_record($filename, NULL,$similarrequest->fileid);
+
+                     if ($newfile) {
+                         $request->fileid = $newfile->get_id();
+                         $request->contexthash = $similarrequest->contexthash;
+                         $request->content = $similarrequest->content;
+                         $request->timeupdated = $similarrequest->timeupdated;
+                     }
+                     else {
+                         // Error creating zip file.
+                     }
+                 }
+                 // Send update email.
+                 $this->email_request($request);
+             }
+             else {
+                echo "no new content  ";
+             }
+         }
+         // Process new request.
+         else {
+            echo "process new request  ";
+            $filesforzipping = $this->build_zip_array();
+
+            if (!$similarrequest = $this->has_zip(sha1(json_encode($filesforzipping)))) {
+                echo "no similar zip  ";
+
+                $newfile = $this->create_zip($filesforzipping);
+
+                if ($newfile) {
+                    echo "new file  ";
+                    $request->fileid = $newfile->get_id();
+                    $request->content = json_encode($filesforzipping);
+                    $request->contexthash = sha1($request->content);
+                    $request->timeupdated = time();
+                } else {
+                     // Error creating zip file.
+                }
+             }
+             else {
+                echo "similar zip found  ";
+
+                $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
+                $newfile = $this->add_new_file_record($filename, NULL,$similarrequest->fileid);
+
+                if ($newfile) {
+                    $request->fileid = $newfile->get_id();
+                    $request->contexthash = $similarrequest->contexthash;
+                    $request->content = $similarrequest->content;
+                    $request->timeupdated = $similarrequest->timeupdated;
                 }
                 else {
-                    echo "similar zip found  ";
-
-                    $filename = $DB->get_field('files', 'filename', array('id'=>$similarrequest->fileid));
-                    $newfile = $filerequest->add_new_file_record($filename, NULL,$similarrequest->fileid);
-
-                    if ($newfile) {
-                        $request->fileid = $newfile->get_id();
-                        $request->contexthash = $similarrequest->contexthash;
-                        $request->content = $similarrequest->content;
-                        $request->timeupdated = $similarrequest->timeupdated;
-                    }
-                    else {
-                        // Error creating zip file.
-                    }
+                   // Error creating zip file.
                 }
-                // Send update email.
-                $filerequest->email_request($request);
             }
-            $DB->update_record('ucla_archives', $request);
+            // Send update email.
+            $this->email_request($request);
         }
+        $DB->update_record('ucla_archives', $request);       
     }
 }

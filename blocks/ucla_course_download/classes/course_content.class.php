@@ -32,13 +32,13 @@ abstract class course_content {
         global $DB;
         
         $user = $DB->get_record('user', array('id' => $request->userid));
-        $admin = get_admin(); // Change to "SYSTEM"?
+        $from = get_string('email_sender', 'block_ucla_course_download');
         $subject = get_string('email_subject', 'block_ucla_course_download', 'Files');
         
         // TODO: Add time updated and other information.
         $message = get_string('email_message', 'block_ucla_course_download');
         
-        return email_to_user($user, $admin, $subject, $message);
+        return email_to_user($user, $from, $subject, $message);
     }
 
     /** 

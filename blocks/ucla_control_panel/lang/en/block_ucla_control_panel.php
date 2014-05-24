@@ -79,7 +79,7 @@ $string['invitation_post'] = 'Invite a user into your site by email.';
 $string['manage_syllabus'] = 'Manage syllabus';
 $string['manage_syllabus_post'] = 'View and edit your course syllabus.';
 
-$string['course_download'] = 'Download Course Content';
+$string['course_download'] = 'Download course content';
 $string['course_download_post'] = 'Request a zip file of your course content.';
 
 /** Stuff for advanced **/
