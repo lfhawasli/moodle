@@ -25,7 +25,7 @@
 // NOTE: No MOODLE_INTERNAL test here, this file may be required by behat before
 // including /config.php.
 
-require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
+require_once(__DIR__ . '/../../../../lib/behat/behat_files.php');
 require_once(__DIR__ . '/../../../../lib/tests/behat/behat_data_generators.php');
 
 use Behat\Behat\Context\Step\Given as Given,
@@ -41,7 +41,7 @@ use Behat\Behat\Context\Step\Given as Given,
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class behat_ucla extends behat_base {
+class behat_ucla extends behat_files {
 
     /**
      * UCLA data generator.
@@ -342,6 +342,62 @@ class behat_ucla extends behat_base {
 
         fwrite(STDOUT, "\033[u");
         return;
+    }
+
+    /**
+     * Based off core step i_upload_file_to_filepicker, but it doesn't wait for
+     * the file picker to return successfully.
+     *
+     * Future steps are expected to look for certain messages.
+     *
+     * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filepicker_field_string>(?:[^"]|\\")*)" filepicker and it fails$/
+     * @throws ExpectationException Thrown by behat_base::find
+     * @param string $filepath
+     * @param string $filepickerelement
+     */
+    public function i_upload_file_to_filepicker_exception($filepath, $filepickerelement) {
+        global $CFG;
+
+        $filepickernode = $this->get_filepicker_node($filepickerelement);
+
+        // Wait until file manager is completely loaded.
+        $this->wait_until_contents_are_updated($filepickernode);
+
+        // Opening the select repository window and selecting the upload repository.
+        $this->open_add_file_window($filepickernode, get_string('pluginname', 'repository_upload'));
+
+        // Ensure all the form is ready.
+        $this->getSession()->wait(2 * 1000, false);
+        $noformexception = new ExpectationException('The upload file form is not ready', $this->getSession());
+        $this->find(
+            'xpath',
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
+                "[contains(concat(' ', normalize-space(@class), ' '), ' repository_upload ')]" .
+                "/descendant::div[@class='fp-content']" .
+                "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-upload-form ')]" .
+                "/descendant::form",
+            $noformexception
+        );
+        // After this we have the elements we want to interact with.
+
+        // Form elements to interact with.
+        $file = $this->find_file('repo_upload_file');
+        $submit = $this->find_button(get_string('upload', 'repository'));
+
+        // Attaching specified file to the node.
+        // Replace 'admin/' if it is in start of path with $CFG->admin .
+        $pos = strpos($filepath, 'admin/');
+        if ($pos === 0) {
+            $filepath = $CFG->admin . DIRECTORY_SEPARATOR . substr($filepath, 6);
+        }
+        $filepath = str_replace('/', DIRECTORY_SEPARATOR, $filepath);
+        $fileabsolutepath = $CFG->dirroot . DIRECTORY_SEPARATOR . $filepath;
+        $file->attachFile($fileabsolutepath);
+
+        // Submit the file.
+        $submit->press();
+
+        // Now look for exception message.
     }
 
     /**
