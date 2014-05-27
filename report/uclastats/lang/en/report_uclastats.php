@@ -271,7 +271,7 @@ $string['noposts'] = 'No posts found';
 
 // Strings for Collaborate types.
 $string['collab_type'] = 'Collaboration site types';
-$string['collab_type_help'] = 'Collaboration site types broken down by division.';
+$string['collab_type_help'] = 'Collaboration site types broken down by division. If date is selected, will only return those collaborate sites created within the time frame specified.';
 $string['total'] = 'Total';
 $string['instruction'] = 'Instruction (degree-related)';
 $string['instruction_noniei'] = 'Instruction (non-degree-related)';

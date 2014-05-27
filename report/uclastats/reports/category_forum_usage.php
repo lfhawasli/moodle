@@ -50,9 +50,9 @@ class category_forum_usage extends uclastats_base {
             }
             // Other parameters are timestamps.
             $paramlist[] = get_string($name, 'report_uclastats') . ' = ' .
-                    date('M j, Y', $value);
+                    userdate($value, get_string('strftimedate', 'langconfig'));
         }
-        return implode(', ', $paramlist);
+        return implode('<br />', $paramlist);
     }
 
     /**
