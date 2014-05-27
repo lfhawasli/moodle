@@ -260,3 +260,7 @@ Turning off style, but leaving it here in case we need to reenable it in the fut
     color: black;
     font-weight: bold;
 }
+
+.moodle-dialogue-exception .moodle-dialogue-focused {
+  z-index: 9999;
+}
