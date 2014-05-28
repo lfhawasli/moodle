@@ -17,13 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: block_iclicker.php 181 2013-04-17 22:02:13Z azeckoski@gmail.com $ */
+/* $Id: block_iclicker.php 198 2014-02-10 03:10:50Z azeckoski@gmail.com $ */
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG,$USER,$COURSE;
+global $CFG, $USER, $COURSE;
 // link in external libraries
-require_once ($CFG->dirroot.'/blocks/iclicker/iclicker_service.php');
+/** @noinspection PhpIncludeInspection */
+require_once($CFG->dirroot . '/blocks/iclicker/iclicker_service.php');
 
 class block_iclicker extends block_base {
 
@@ -101,35 +102,35 @@ class block_iclicker extends block_base {
 
         if (iclicker_service::get_current_user_id()) {
             $this->content->text = "<div class='iclicker_nav_items'>\n";
-            $reg_link = '<a href="'.iclicker_service::block_url('registration.php').'">'.iclicker_service::msg('reg.title').'</a><br/>';
-            $this->content->text .= "  ".$reg_link."\n";
+            $reg_link = '<a href="' . iclicker_service::block_url('registration.php') . '">' . iclicker_service::msg('reg.title') . '</a><br/>';
+            $this->content->text .= "  " . $reg_link . "\n";
             // also show the list of currently registered clickers
             $clicker_list_html = '';
             if ($clickers = iclicker_service::get_registrations_by_user(null, true)) {
-                $clicker_list_html .= "  <ul class='iclicker_clickerids'>".PHP_EOL;
+                $clicker_list_html .= "  <ul class='iclicker_clickerids'>" . PHP_EOL;
                 foreach ($clickers as $clicker) {
-                    $clicker_list_html .= "    <li class='iclicker_clickerid'>$clicker->clicker_id</li>".PHP_EOL;
+                    $clicker_list_html .= "    <li class='iclicker_clickerid'>$clicker->clicker_id</li>" . PHP_EOL;
                 }
                 $clicker_list_html .= "  </ul>\n";
             }
             $this->content->text .= $clicker_list_html;
             // the other links
             if (iclicker_service::is_admin()) {
-                $link = '<a href="'.iclicker_service::block_url('admin.php').'">'.iclicker_service::msg('admin.title').'</a><br/>'.PHP_EOL;
-                $this->content->text .= "  ".$link."\n";
+                $link = '<a href="' . iclicker_service::block_url('admin.php') . '">' . iclicker_service::msg('admin.title') . '</a><br/>' . PHP_EOL;
+                $this->content->text .= "  " . $link . "\n";
                 // remove inst link after testing complete
                 //$link = '<b><i>remove inst link</i></b> <a href="'.iclicker_service::block_url('instructor.php').'">'.iclicker_service::msg('inst.title').'</a>';
                 //$this->content->text .= "  ".$link."\n";
             } else if (iclicker_service::is_instructor()) {
-                $link = '<a href="'.iclicker_service::block_url('instructor.php').'">'.iclicker_service::msg('inst.title').'</a><br/>'.PHP_EOL;
+                $link = '<a href="' . iclicker_service::block_url('instructor.php') . '">' . iclicker_service::msg('inst.title') . '</a><br/>' . PHP_EOL;
                 $sso_link = '';
                 if (iclicker_service::$block_iclicker_sso_enabled) {
-                    $sso_link = '<a class="nav_link" href="'.iclicker_service::block_url('instructor_sso.php').'">'.iclicker_service::msg('inst.sso.title').'</a><br/>'.PHP_EOL;
+                    $sso_link = '<a class="nav_link" href="' . iclicker_service::block_url('instructor_sso.php') . '">' . iclicker_service::msg('inst.sso.title') . '</a><br/>' . PHP_EOL;
                 }
-                $this->content->text .= ' '.$link.$sso_link;
+                $this->content->text .= ' ' . $link . $sso_link;
             }
             // close out the html
-            $this->content->text .= "</div>".PHP_EOL;
+            $this->content->text .= "</div>" . PHP_EOL;
         }
 
         // FOOTER
@@ -145,21 +146,22 @@ class block_iclicker extends block_base {
 
     /**
      * Execute this method when the cron runs
+     *
      * @return bool
      */
     function cron() {
         $results = iclicker_service::ws_sync_all();
-        mtrace(' National WS sync...','');
+        mtrace(' National WS sync...', '');
         if (!$results) {
             mtrace(' DISABLED. ');
         } else {
             $error_num = count($results['errors']);
-            mtrace(' completed syncing '.$results['total'].' registrations ('.$results['national'].' national, '.$results['local'].' local) with '.$error_num.' errors. ');
+            mtrace(' completed syncing ' . $results['total'] . ' registrations (' . $results['national'] . ' national, ' . $results['local'] . ' local) with ' . $error_num . ' errors. ');
             if ($error_num > 0) {
                 $count = 0;
                 foreach ($results['errors'] as $error) {
                     $count++;
-                    mtrace('    '.$count.': '.$error);
+                    mtrace('    ' . $count . ': ' . $error);
                 }
             }
         }
@@ -178,15 +180,15 @@ class block_iclicker extends block_base {
         return false;
     }
 
-/* DEFAULT instance config save
-    function instance_config_save($data) {
-        global $DB;
-        $data = stripslashes_recursive($data);
-        $this->config = $data;
-        return $DB->set_field('block_instance', 'configdata',
-			base64_encode(serialize($data)), 'id', $this->instance->id);
-    }
-*/
+    /* DEFAULT instance config save
+        function instance_config_save($data) {
+            global $DB;
+            $data = stripslashes_recursive($data);
+            $this->config = $data;
+            return $DB->set_field('block_instance', 'configdata',
+                base64_encode(serialize($data)), 'id', $this->instance->id);
+        }
+    */
 
     /**
      * Cleanup of the block instance data when the instance is removed
@@ -212,20 +214,20 @@ class block_iclicker extends block_base {
         return true;
     }
 
-/* DEFAULT config save
-    function config_save($data) {
-        // Default behavior: save all variables as $CFG properties
-        foreach ($data as $name=>$value) {
-            set_config($name, $value);
+    /* DEFAULT config save
+        function config_save($data) {
+            // Default behavior: save all variables as $CFG properties
+            foreach ($data as $name=>$value) {
+                set_config($name, $value);
+            }
+            return true;
         }
-        return true;
-    }
-*/
+    */
     function config_save($data) {
         // store the values in the plugin config instead of global
-        foreach ($data as $name=>$value) {
+        foreach ($data as $name => $value) {
             if (empty($value)) {
-                $value = NULL;
+                $value = null;
             }
             set_config($name, $value, iclicker_service::BLOCK_NAME);
         }
@@ -245,24 +247,24 @@ class block_iclicker extends block_base {
         return false;
     }
 
-/* Control the width of the block
-    function preferred_width() {
-        // The preferred value is in pixels - default 200
-        return 200;
-    }
-*/
-/* Control the html attributes on the block container
-    function html_attributes() {
-        $attrs = parent::html_attributes();
-    	// an array of html attributes to add to the container which holds the block
-        $myAttrs = array(
-        	'id' => 'inst'.$this->instance->id,
-            'class' => 'sideblock block_'.$this->name(),
-			'onmouseover' => "alert('Mouseover on our block!');"
-        );
-        return array_merge($myAttrs, $attrs);
-    }
-*/
+    /* Control the width of the block
+        function preferred_width() {
+            // The preferred value is in pixels - default 200
+            return 200;
+        }
+    */
+    /* Control the html attributes on the block container
+        function html_attributes() {
+            $attrs = parent::html_attributes();
+            // an array of html attributes to add to the container which holds the block
+            $myAttrs = array(
+                'id' => 'inst'.$this->instance->id,
+                'class' => 'sideblock block_'.$this->name(),
+                'onmouseover' => "alert('Mouseover on our block!');"
+            );
+            return array_merge($myAttrs, $attrs);
+        }
+    */
     /**
      * Valid format names are:
      * site-index - The format name for the front page of Moodle
@@ -274,7 +276,7 @@ class block_iclicker extends block_base {
      */
     function applicable_formats() {
         return array(
-            'all' => true
+                'all' => true
         );
     }
 

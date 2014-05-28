@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: registration.php 165 2012-08-23 01:12:09Z azeckoski@gmail.com $ */
+/* $Id: registration.php 212 2014-02-17 01:08:20Z azeckoski@gmail.com $ */
 
 /**
  * Handles rendering the form for creating new pages and the submission of the form as well
@@ -43,12 +43,9 @@ $PAGE->navbar->add(iclicker_service::msg('reg.title'));
 $PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(false);
 // NOTE: switching over to locally hosted JS and CSS files
-$PAGE->requires->js(iclicker_service::BLOCK_PATH.'/js/jquery-1.5.2.min.js', true);
-$PAGE->requires->js(iclicker_service::BLOCK_PATH.'/js/jquery-ui-1.8.min.js', true);
-//$PAGE->requires->js( new moodle_url('https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'), true);
-//$PAGE->requires->js( new moodle_url('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js'), true);
-$PAGE->requires->css(iclicker_service::BLOCK_PATH.'/css/jquery-ui-1.8.css');
-//$PAGE->requires->css( new moodle_url('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css'), true);
+$PAGE->requires->js(iclicker_service::BLOCK_PATH.'/js/jquery-1.11.0.min.js', true);
+$PAGE->requires->js(iclicker_service::BLOCK_PATH.'/js/jquery-ui-1.10.4.custom.min.js', true);
+$PAGE->requires->css(iclicker_service::BLOCK_PATH.'/css/jquery-ui-1.10.4.custom.min.css');
 $PAGE->requires->css(iclicker_service::BLOCK_PATH.'/css/iclicker.css');
 $PAGE->set_url(iclicker_service::BLOCK_PATH.'/registration.php');
 //$PAGE->requires->js('mod/mymod/styles.css');
@@ -70,7 +67,8 @@ echo $OUTPUT->header();
                     <input type="hidden" name="register" value="true" />
                     <p class="highlighted">
                         <strong><?php echo iclicker_service::msg('reg.remote.id.enter') ?>:</strong>
-                        <input name="clickerId" type="text" size="10" maxlength="8" value="<?php echo $clicker_id_val ?>" />
+                        <input name="clickerId" type="text" size="12" maxlength="12"
+                               value="<?php echo $clicker_id_val ?>"/>
                         <input type="submit" class="registerButton" value="<?php echo iclicker_service::msg('app.register') ?>"
                                alt="<?php echo iclicker_service::msg('reg.register.submit.alt') ?>" />
                     </p>
@@ -117,13 +115,14 @@ echo $OUTPUT->header();
             </div>
 
             <div class="right_column">
-                <h3><?php echo iclicker_service::msg('reg.remote.faqs') ?></h3>
+                <h2><?php echo iclicker_service::msg('reg.remote.faqs') ?></h2>
 
                 <div id="accordion">
                     <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq1.question') ?></a></h3>
                     <div>
                         <?php echo iclicker_service::msg('reg.remote.faq1.answer') ?>
-                        <img src="img/clickers.png" alt="<?php echo iclicker_service::msg('reg.iclicker.image.alt') ?>" />
+                        <img src="img/clickers.png"
+                             alt="<?php echo iclicker_service::msg('reg.remote.faq1.image.alt') ?>"/>
                     </div>
 
                     <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq2.question') ?></a></h3>
@@ -136,7 +135,12 @@ echo $OUTPUT->header();
                     <div><?php echo iclicker_service::msg('reg.remote.faq4.answer') ?></div>
 
                     <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq5.question') ?></a></h3>
-                    <div><?php echo iclicker_service::msg('reg.remote.faq5.answer') ?></div>
+
+                    <div>
+                        <?php echo iclicker_service::msg('reg.remote.faq5.answer') ?>
+                        <img src="img/iclicker_go.png"
+                             alt="<?php echo iclicker_service::msg('reg.remote.faq5.image.alt') ?>"/>
+                    </div>
 
                     <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq6.question') ?></a></h3>
                     <div><?php echo iclicker_service::msg('reg.remote.faq6.answer') ?></div>
@@ -147,6 +151,17 @@ echo $OUTPUT->header();
                     <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq8.question') ?></a></h3>
                     <div><?php echo iclicker_service::msg('reg.remote.faq8.answer') ?></div>
 
+                    <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq9.question') ?></a></h3>
+
+                    <div><?php echo iclicker_service::msg('reg.remote.faq9.answer') ?></div>
+
+                    <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq10.question') ?></a></h3>
+
+                    <div><?php echo iclicker_service::msg('reg.remote.faq10.answer') ?></div>
+
+                    <h3><a href="#"><?php echo iclicker_service::msg('reg.remote.faq11.question') ?></a></h3>
+
+                    <div><?php echo iclicker_service::msg('reg.remote.faq11.answer') ?></div>
                 </div>
 
             </div>
@@ -180,7 +195,9 @@ echo $OUTPUT->header();
             alwaysOpen: false,
             animated: false,
             autoHeight: false,
-            collapsible: true });
+            collapsible: true,
+            heightStyle: "content"
+        });
     });
 </script>
 
