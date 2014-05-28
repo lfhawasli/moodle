@@ -347,9 +347,9 @@ function set_engineering_default($edata) {
         $page->blocks->add_block('recent_activity', BLOCK_POS_RIGHT, -10, 0, 'course-view-*');
         $page->blocks->add_block('calendar_upcoming', BLOCK_POS_RIGHT, -9, 0, 'course-view-*');
 
-        // Set course theme to allow custom logo.
-        $DB->set_field('course', 'theme', 'uclasharedcourse',
-                array('id' => $request->courseid));
+//        // Set course theme to allow custom logo.
+//        $DB->set_field('course', 'theme', 'uclasharedcourse',
+//                array('id' => $request->courseid));
     }
     return true;
 }
