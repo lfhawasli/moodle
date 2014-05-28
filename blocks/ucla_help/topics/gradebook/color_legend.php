@@ -63,6 +63,9 @@ $buffer = <<<END
                 <div class="item">
                     <img alt="Full view" class="smallicon" title="Full view" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_whole"> Full view
                 </div>
+                <div class="item">
+                    <img alt="Full view" class="smallicon" title="Quick edit" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit
+                </div>
             </div>
         </div>
         

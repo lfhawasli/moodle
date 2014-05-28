@@ -47,6 +47,10 @@ class sidebar_docs extends sidebar_html implements sidebar_widget {
         $url = preg_replace('/{title}/', $this->keyword, $this->keywordquery);
         $response = $this->curl($url);
 
+        if (empty($response)) {
+            return array();
+        }
+
         $keys = array_keys((array) $response->{'query'}->{'pages'});
         $pageid = array_pop($keys);
         $links = $response->{'query'}->{'pages'}->{"$pageid"}->links;

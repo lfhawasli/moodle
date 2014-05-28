@@ -1,0 +1,29 @@
+//
+// Bring in semantic UI dependencies
+@import "semantic-ui";
+
+// Styles for Help block
+#block_ucla_help {
+    padding: 1.0em;
+}
+
+#block_ucla_help_boxtext, #block_ucla_help_formbox  {
+    padding: 0 1.0em;
+    float: left;
+    min-width:320px;    /* min iphone width resolution */    
+}
+
+#block_ucla_help_boxtext {
+    width: 40%;    
+    margin-right: 1.0em;    
+    /* in case window gets so small that #block_ucla_help_formbox goes underneath */    
+    margin-bottom: 1.0em;
+}
+
+#block_ucla_help_formbox {
+    width: 50%;
+}
+
+#id_ucla_help_name, #id_ucla_help_email, #id_ucla_help_description {
+    width: 100%;
+}

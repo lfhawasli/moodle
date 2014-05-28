@@ -70,31 +70,68 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
     }
 }
 
-/*.gradebook-student-column,*/
 table#user-grades {
     
-    .grade, .item {
-        width: 50px;
-        overflow: hidden;
-    }
-    
-    tr {
+    font-size: 1.2rem;
 
-        &.heading .cell {
-            border-bottom: 0;
+/*    .r0:not(.odd):not(.even),
+    .r1:not(.odd):not(.even) {
+        td, th {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #eee;
         }
+    }*/
+    .avg th,
+    .avg td,
+    .heading th {
+        font-weight: bold;
+        background-color: #333;
+        color: #ddd;
+        border-color: #444;
+        white-space: nowrap;
+        a {
+            color: white;
+            font-weight: normal;
+        }
+    }
+    .avg .cell {
+        font-weight: bold;
+        text-align: center;
         
+        &.header { text-align: right;}
+    }
+    th {
+        font-weight: normal;
+        &.cell {
+            height: 20px;
+        }
+    }
+    .controls {
+        text-align: right;
+        background-color: #eee;
+        height: 20px;
+    }
+    tr {
+        height: 40px;
+        
+        .gradevalue {
+            width: 100%;
+            text-align: center;
+            display: inline-block;
+        }
+        .grade:hover {
+            /*border: 2px solid $grade-report-color-overriden-border;*/
+        }
         .user {
+            min-width: 200px;
+            max-width: 200px;
+            width: 200px;
+            background-color: #777777;
+            border-color: #666666;
+            
+            a {color: white}
             .userpicture {display: none;}
-        }
-        
-        #studentheader {
-            .email {
-                float: left;
-                + .sorticon {
-                    float: left;
-                }
-            }
         }
         
         // ODD rows
@@ -171,106 +208,115 @@ table#user-grades {
             }
         }
     }
-}
 
-.gradebook-header-row {
-    width: 100%;
-    font-size: 1rem;
-    
-    &.gradebook-header-row-sticky tr th {
-        /*border-top: 2px solid gray;*/
-        border-bottom: 2px solid gray;
+    .overridden .grade_icons {
+        padding-left: 10px;
     }
-
-    tr {
-        th {
-            padding: 0;
-            float: left;
-            border-bottom: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            background-color: white;
-            
-            text-align: center;
-            padding: 8px 2px 1px;
-            
-            a {
-                margin-left: 4px;
-            }
-            
-            &:hover {
-                border-bottom: 4px solid #ddd;
-            }
-            
-            &:nth-child(2n) {
-                background-color: #fcfcfc;
-            }
+    // Icon highlight
+    .catlevel1 .action-icon {
+        img {
+            opacity: 0.5;
+        }
+        &.selected img {
+            opacity: 1;
         }
     }
 }
 
-.gradebook-student-column {
-    background-color: white;
-    
-    &.gradebook-student-column-sticky .gradebook-student-container {
-        border-right: 2px solid gray;
+#gradebook-header-container {
+    font-size: 1.2rem;
+    background-color: #444;
+
+    .gradebook-header-cell {
+        background-color: #444;
+        color: white;
+        padding: 4px; 
+        white-space: nowrap;
+        border: 1px solid #444;
+        border-top: 0;
+        border-right: 0;
+        overflow: hidden;
+
+        &.catlevel1 {
+            background-color: #333;
+        }
+        &.catlevel2 {
+            background-color: #222;
+        }
+        a {
+            color: white;
+        }
+        &:hover {
+            background-color: #111;
+        }
+        .icon {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            border: 0;
+            padding-right: 6px;
+        }
     }
-    .gradebook-student-container {
-        background-color: #f9f9f9;
-        font-size: 1rem;
-        border-right:1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+}
+
+#gradebook-user-container {
+    background-color: #777;
+    
+    .gradebook-user-cell {
+        background-color: #666;
+        font-size: 1.2rem;
+        border: 1px solid #666;
+        border-top: 0;
         padding: 4px;
-
-        th {
-            padding: 0;
-        }
-        span {
-            width: 100%;
-            float: left;
-        }
         .userpicture {
             display: none;
         }
+        a {
+            font-weight: normal;
+            color: #fff;
+        }
         &:nth-child(2n+1) {
-            background-color: #efefef;
+            background-color: #777;
+            border-bottom: 1px solid #777;
+        }
+        &:nth-child(2n):hover {
+            background-color: #5c5c5c;
         }
         &:hover {
-            border-right: 4px solid gray;
+            background-color: #6d6d6d;
         }
         &:first-child {
-            border-top: #fcfcfc;
-        }
-        &:last-child {
-            border-bottom: #fcfcfc;
+            /*border-top: 1px solid #666;*/
         }
     }
 }
 
-.gradebook-footer-row {
+#gradebook-footer-container {
     
     display: none;
+    font-size: 1.2rem;
+    background-color: #444;
     
     &.gradebook-footer-row-sticky {
         
         display: block;
-        
         .cell {
             border-top: 2px solid gray;
         }
     }
-    .cell {
+    .gradebook-footer-cell {
         padding: 8px;
-        font-size: 1rem;
-        background-color: #efeffe;
-        color: #00008b;
+        font-size: 1.2rem;
+        background-color: #333;
+        color: white;
         font-weight: bold;
         
-        text-align: right;
-        border-right: 1px solid #ddd;
+        text-align: center;
+        border: 1px solid #444;
+        border-right: 0;
         
-        &.header {
-            background-color: #f9f9f9;
-            color: #444;
+        &:nth-of-type(1) {
+            text-align: right;
         }
         
         .btn {
@@ -279,14 +325,13 @@ table#user-grades {
     }
 }
 
-.gradebook-floating-header {
-    background-color: #f9f9f9;
-    font-size: 1rem;
-    text-align: center;
-    padding: 4px;
+#gradebook-user-header-container {
+    background-color: #333;
+    font-size: 1.2rem;
+    text-align: left;
+    padding: 8px;
     
-    border-bottom: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+    a {color: white;}
 }
 
 // gradebook help
@@ -333,6 +378,82 @@ table#user-grades {
     font-size: 1.2rem;
 }
 
-.path-grade-report-user {
+// Grader report loading screen
 
+.gradebook-loading-screen {
+    width: 100%;
+    height: 40px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background-color: black;
+    z-index: 99999;
+    opacity: 0.8;
+    padding: 10px;
+    text-align: center;
+    
+    .gradebook-loading {
+        /*margin: auto;*/
+        padding-right: 40px;
+        /*position: fixed;*/
+        text-align: center;
+        width: 100%;
+    }
+}
+
+.gradebook-loading i{
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 50%;
+    background: #00b3d5;
+}
+.gradebook-loading i:first-child{
+    -webkit-animation:gradebook-loading-ani2 0.5s linear infinite;
+    animation:gradebook-loading-ani2 0.5s linear infinite;
+    opacity: 0;
+    @include transform(translate(-20px));
+}
+.gradebook-loading i:nth-child(2),
+.gradebook-loading i:nth-child(3){
+    -webkit-animation:gradebook-loading-ani3 0.5s linear infinite;
+    animation:gradebook-loading-ani3 0.5s linear infinite;
+}
+.gradebook-loading i:last-child{
+    -webkit-animation:gradebook-loading-ani1 0.5s linear infinite;
+    animation:gradebook-loading-ani1 0.5s linear infinite;
+}
+@-webkit-keyframes gradebook-loading-ani1{
+    100%{
+        @include transform(translate(40px));
+        opacity: 0;
+    }
+}
+@keyframes gradebook-loading-ani1{
+    100%{
+        @include transform(translate(40px));
+        opacity: 0;
+    }
+}
+@-webkit-keyframes gradebook-loading-ani2{
+    100%{
+        @include transform(translate(20px));
+        opacity: 1;
+    }
+}
+@keyframes gradebook-loading-ani2{
+    100%{
+        @include transform(translate(20px));
+        opacity: 1;
+    }
+}
+@-webkit-keyframes gradebook-loading-ani3{
+    100%{
+        @include transform(translate(20px));
+    }
+}
+@keyframes gradebook-loading-ani3{
+    100%{
+        @include transform(translate(20px));
+    }
 }

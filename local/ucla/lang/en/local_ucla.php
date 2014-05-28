@@ -185,11 +185,11 @@ $string['overridecat'] = 'Allow Grade Override';
 $string['overridecat_help'] = 'This option allows users to override the final grade in for category totals. Unchecking this option will make category totals uneditable.';
 
 // CCLE-4293 - Display a message when attempting to override grades
-$string['overridewarning'] = 'It is preferable to change this grade within the Activity. <br />
-<br />
-Click on Item name to grade within the Activity.<br />
-<br />
-If you choose to override here, you will no longer be able to change the grade within the Activity.';
+$string['overridewarning'] = 'If you override a grade
+    you will lose the ability to make any additional changes to the grade from
+    within the activity itself. To change the grade from within the activity,
+    simply click on the item name in the Grader report or click on the activity
+    from the course homepage.';
 
 // CCLE-4295 Add groups filter to grader report
 $string['view_grouping'] = 'View grouping';

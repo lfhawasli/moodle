@@ -25,6 +25,11 @@
 require_once($CFG->dirroot . '/grade/report/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
+// START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
+require_once($CFG->dirroot . '/grade/report/quick_edit/classes/lib.php');
+require_once($CFG->dirroot . '/grade/report/quick_edit/screens/grade/lib.php');
+// END UCLA MOD: CCLE-3970
+
 /**
  * Class providing an API for the grader report building and displaying.
  * @uses grade_report
@@ -726,6 +731,11 @@ class grade_report_grader extends grade_report {
             if ($showuserimage) {
                 $usercell->text = $OUTPUT->user_picture($user);
             }
+            
+            // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
+            // Add link to Quick Edit.
+            $usercell->text .= html_writer::link(new moodle_url('/grade/report/quick_edit/index.php', array('id' => $this->course->id, 'item' => 'user','itemid' => $user->id, )), ' <span class="glyphicon glyphicon-pencil"></span>', array('class' => 'btn btn-link btn-xs', 'title' => get_string('pluginname', 'gradereport_quick_edit')));
+            // END UCLA MOD: CCLE-3970
 
             $usercell->text .= html_writer::link(new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $this->course->id)), fullname($user));
 
@@ -883,6 +893,20 @@ class grade_report_grader extends grade_report {
 
                     $itemcell->colspan = $colspan;
                     $itemcell->text = shorten_text($headerlink) . $arrow;
+
+                    // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
+                    // Add link to Quick Edit.
+                    if (!quick_edit_grade::filter($element['object'])) {
+                        // We do not allow quick editing of categories.
+                    } else {
+                        $itemcell->text .= html_writer::empty_tag('br') .
+                                html_writer::link(new moodle_url('/grade/report/quick_edit/index.php',
+                                        array('id' => $this->course->id, 'item' => 'grade','itemid' => $element['object']->id)),
+                                        '<span class="glyphicon glyphicon-pencil"></span> ' . get_string('pluginname', 'gradereport_quick_edit'),
+                                        array('class' => 'btn btn-link btn-xs', 'title' => get_string('pluginname', 'gradereport_quick_edit')));
+                    }
+                    // END UCLA MOD: CCLE-3970
+
                     $itemcell->header = true;
                     $itemcell->scope = 'col';
 
@@ -1187,7 +1211,10 @@ class grade_report_grader extends grade_report {
             $html .= $OUTPUT->container(html_writer::table($righttable), 'right_scroller');
         } else {
             $fulltable = new html_table();
-            $fulltable->attributes['class'] = 'gradestable flexible boxaligncenter generaltable';
+            // START UCLA MOD CCLE-4472 - Removing moodle styles in favor of Boostrap styles.
+//            $fulltable->attributes['class'] = 'gradestable flexible boxaligncenter generaltable';
+            $fulltable->attributes['class'] = 'table table-bordered table-striped table-condensed';
+            // END UCLA MOD CCLE-4472
             $fulltable->id = 'user-grades';
 
             // Extract rows from each side (left and right) and collate them into one row each
