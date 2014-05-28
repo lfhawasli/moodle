@@ -329,6 +329,9 @@ $CFG->filter_poodll_download_media_ok = '1';
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
+// Site administration > Plugins > Local plugins > Google Analytics
+$CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
+
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['conn_server'] = 'ce';
 $CFG->forced_plugin_settings['local_kaltura']['uri'] = 'https://www.kaltura.com';
