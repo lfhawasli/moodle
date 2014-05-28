@@ -34,21 +34,10 @@ spl_autoload_register(function ($class) {
 
 global $PAGE;
 
+// Load JS
 $PAGE->requires->yui_module('moodle-block_ucla_help-sidebar', 'M.block_ucla_help.init_sidebar', array(array()));
-
 $PAGE->requires->jquery();
 $PAGE->requires->js('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.js');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.css');
-
-// Load CSS dependencies
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/modules/accordion.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/views/list.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/segment.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/header.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/label.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/divider.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/elements/button.min.css');
-$PAGE->requires->css('/theme/uclashared/package/semantic-ui/build/minified/collections/form.min.css');
 
 class ucla_sidebar {
 

@@ -45,4 +45,7 @@
 	url = https://github.com/moodlerooms/moodle-local_mr.git
 [submodule "local/googleanalytics"]
 	path = local/googleanalytics
-	url = https://github.com/bmbrands/moodle-local_googleanalytics.git
+	url = https://github.com/ccle/moodle-local_googleanalytics.git
+[submodule "grade/report/quick_edit"]
+	path = grade/report/quick_edit
+	url = git@github.com:ccle/quick_edit.git

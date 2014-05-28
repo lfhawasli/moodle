@@ -16,6 +16,7 @@ error_reporting(E_ALL);
 ini_set( 'display_errors','1');
 
 $consolecommand = optional_param('console', null, PARAM_ALPHAEXT);
+$exportoption = optional_param('export', null, PARAM_ALPHA);
 $displayforms = empty($consolecommand);
 $alldata = data_submitted();
 
@@ -1033,7 +1034,7 @@ if ($displayforms) {
     $regsender = new local_ucla_regsender();
     $results = $regsender->get_recent_syllabus_links($limit);
 
-    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, $limit);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, array('syllabuslinkslimit' => $limit));
 }
 
 $consoles->push_console_html('modules', $title , $sectionhtml);
@@ -1054,7 +1055,7 @@ if ($displayforms) {
                     'id' => 'name-lookup'
                 )));
 } else if ($consolecommand == "$title") { 
-    $fullname = optional_param('fullname', false, PARAM_TEXT);
+    $fullname = required_param('fullname', PARAM_TEXT);
     $users = get_users(true, $fullname, false, null, 'lastname, firstname ASC',
         '', '', '', 100, 
         'id AS userid, auth, username, firstname, lastname, idnumber, email, FROM_UNIXTIME(lastaccess) AS last_access, lastip');
@@ -1070,7 +1071,7 @@ if ($displayforms) {
         }
     }
 
-    $sectionhtml .= supportconsole_render_section_shortcut($title, $users); 
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $users, array('fullname' => $fullname));
 } 
 
 $consoles->push_console_html('users', $title, $sectionhtml);
@@ -1093,13 +1094,14 @@ if ($displayforms) {
             . ' ORDER BY term_int DESC, subj_area, catlg_no, sect_no');
 
         $usercourses = array();
-        if (!$recset->EOF) {
+        if (!empty($recset) && !$recset->EOF) {
             while($fields = $recset->FetchRow()) {
                 $usercourses[] = $fields;
             }
         }
 
-        $sectionhtml .= supportconsole_render_section_shortcut($title, $usercourses, $uid);
+        $sectionhtml .= supportconsole_render_section_shortcut($title,
+                $usercourses, array('uid' => $uid));
     } else {
         $sectionhtml .= $OUTPUT->box($OUTPUT->heading($title, 3));
         $sectionhtml .= 'Invalid UID: [' . $uid . ']';
@@ -1172,7 +1174,7 @@ foreach ($qs as $query) {
         }        
         $results = array_merge($good_data, $results[registrar_query::failed_outputs]);
         
-        $sectionhtml .= supportconsole_render_section_shortcut($title, 
+        $sectionhtml .= supportconsole_render_section_shortcut($query,
             $results, $params);
     }
 
@@ -1289,7 +1291,9 @@ if ($displayforms) {
                     reqc.term=regc.term AND
                     reqc.hostcourse=1 AND
                     reqc.srs=regc.srs AND
-                    STRCMP(c.summary, regc.crs_desc)!=0";
+                    STRCMP(c.summary, regc.crs_desc)!=0 AND
+                    (c.summary!='' AND
+                     c.summary IS NOT NULL)";
     $result = $DB->get_records_sql($sql, array('term' => $term));
 
     foreach ($result as $k => $course) {
@@ -1303,7 +1307,7 @@ if ($displayforms) {
     }
 
     $sectionhtml .= supportconsole_render_section_shortcut($title, $result,
-        $term);
+        array('term' => $term));
 }
 
 $consoles->push_console_html('srdb', $title, $sectionhtml);
@@ -1379,8 +1383,13 @@ if ($displayforms) {
         }
     }
 
+    $a = new stdClass();
+    $a->start = $timefromstr;
+    $a->end = date('m/d/Y', $timeto);
+    $a->days = $days;
     $sectionhtml .= supportconsole_render_section_shortcut($title, $results,
-        array("From $timefromstr to " . date('m/d/Y', $timeto), "$days days"));
+            array('startdate' => $timefromstr, 'datedays' => $days),
+            get_string('assignmentquizzesduesoonmoreinfo', 'tool_uclasupportconsole', $a));
 }
 
 $consoles->push_console_html('modules', $title, $sectionhtml);
@@ -1545,28 +1554,32 @@ if ($displayforms) {
     $results = $DB->get_records_sql($sql);
     
     foreach ($results as $result) {
-        $result->count = supportconsole_simple_form("userswithrole", 
-            html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'role',
-                'value' => $result->name,
-            ))
-            .html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'contextlevel',
-                'value' => $result->contextlevel,
-            ))
-            .html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'count',
-                'value' => $result->count,
-            ))
-            . html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'component',
-                'value' => $result->component,
-            )), ($result->count==1) ? get_string('viewrole', 'tool_uclasupportconsole') :
-        get_string('viewroles', 'tool_uclasupportconsole', $result->count));
+        // If exporting to Excel, then don't create form.
+        if (empty($exportoption)) {
+            // Link to view results.
+            $result->count = supportconsole_simple_form("userswithrole",
+                html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'role',
+                    'value' => $result->name,
+                ))
+                .html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'contextlevel',
+                    'value' => $result->contextlevel,
+                ))
+                .html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'count',
+                    'value' => $result->count,
+                ))
+                . html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'component',
+                    'value' => $result->component,
+                )), ($result->count==1) ? get_string('viewrole', 'tool_uclasupportconsole') :
+            get_string('viewroles', 'tool_uclasupportconsole', $result->count));
+        }
     }
 
     $admin_result = get_config(null, 'siteadmins');
@@ -1579,28 +1592,34 @@ if ($displayforms) {
         $adminrow->name = 'Site administrators';
         $adminrow->contextlevel = CONTEXT_SYSTEM;
         $adminrow->component = 'admin';
-        $adminrow->count = supportconsole_simple_form("userswithrole", 
-            html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'role',
-                'value' => get_string('siteadministrators', 'role'),
-            ))
-            .html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'contextlevel',
-                'value' => CONTEXT_SYSTEM,
-            ))
-            .html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'count',
-                'value' => $admin_cnt,
-            ))
-            . html_writer::empty_tag('input', array(
-                'type' => 'hidden',
-                'name' => 'component',
-                'value' => 'admin',
-            )), ($admin_cnt==1) ? get_string('viewrole', 'tool_uclasupportconsole') :
-            get_string('viewroles', 'tool_uclasupportconsole', $admin_cnt));
+
+        // If exporting to Excel, then don't create form.
+        if (!empty($exportoption)) {
+            $adminrow->count = $admin_cnt;
+        } else {
+            $adminrow->count = supportconsole_simple_form("userswithrole",
+                html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'role',
+                    'value' => get_string('siteadministrators', 'role'),
+                ))
+                .html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'contextlevel',
+                    'value' => CONTEXT_SYSTEM,
+                ))
+                .html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'count',
+                    'value' => $admin_cnt,
+                ))
+                . html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'component',
+                    'value' => 'admin',
+                )), ($admin_cnt==1) ? get_string('viewrole', 'tool_uclasupportconsole') :
+                get_string('viewroles', 'tool_uclasupportconsole', $admin_cnt));            
+        }
         $results[] = $adminrow;
 
         foreach ($results as $key => $result) {
@@ -1626,7 +1645,7 @@ if ($consolecommand == "$title") {
     $contextlevelparam = optional_param('contextlevel', null, PARAM_INT);
     $countparam = optional_param('count', null, PARAM_INT);
     $pageparam = optional_param('page', null, PARAM_INT);
-    
+
     if (!isset($pageparam)) {
         $pageparam = 0;
     }
@@ -1645,9 +1664,15 @@ if ($consolecommand == "$title") {
                             CONCAT (lastname, ', ', firstname) AS name
                     FROM   {user}
                     WHERE  id = :admin
-                    ORDER BY name
-                    LIMIT   $limitstart, " . RESULTS_PER_PAGE;
-            $modifiedresults = array_merge($modifiedresults, $DB->get_records_sql($sql, array('admin' => $admin)));
+                    ORDER BY name";
+            $params = array('admin' => $admin);
+            if (!empty($exportoption)) {
+                // Do not limit Excel download results.
+                $results = $DB->get_records_sql($sql, $params);
+            } else {
+                $results = $DB->get_records_sql($sql, $params, $limitstart, RESULTS_PER_PAGE);
+            }
+            $modifiedresults = array_merge($modifiedresults, $results);
         }
         foreach ($modifiedresults as $result) {
             $userurl = new moodle_url("/user/profile.php", array('id' => $result->id));
@@ -1685,8 +1710,7 @@ if ($consolecommand == "$title") {
                             CONCAT(u.lastname, ', ', u.firstname) AS name,
                             ra.modifierid,
                             ra.timemodified " . $middlesql .
-                   "ORDER BY name
-                    LIMIT   $limitstart, " . RESULTS_PER_PAGE;
+                   "ORDER BY name";
         } else {
             $sql = "SELECT  ra.id,
                             u.id AS uid, 
@@ -1696,11 +1720,16 @@ if ($consolecommand == "$title") {
                             ra.modifierid,
                             ra.timemodified " . $middlesql . 
                    "JOIN    $contexttablename clevel ON (clevel.id=c.instanceid)
-                    ORDER BY name
-                    LIMIT   $limitstart, " . RESULTS_PER_PAGE;
+                    ORDER BY name";
         }
-        $results = $DB->get_records_sql($sql, array('role_param' => $roleparam, 
-            'component_param'=>$componentparam, 'contextlevel_param'=>$contextlevelparam));
+        $params = array('role_param' => $roleparam, 'component_param'=>$componentparam,
+                        'contextlevel_param'=>$contextlevelparam);
+        if (!empty($exportoption)) {
+            // Do not limit Excel download results.
+            $results = $DB->get_records_sql($sql, $params);
+        } else {
+            $results = $DB->get_records_sql($sql, $params, $limitstart, RESULTS_PER_PAGE);
+        }
 
         foreach ($results as $result) {
             $modifiedrow = new object();
@@ -1730,10 +1759,11 @@ if ($consolecommand == "$title") {
     if ($componentparam == "") {
         $componentparam = "manual";
     }
-    
-    $sectionhtml .= supportconsole_render_section_shortcut($title, $modifiedresults, array(), 
-            get_string('usersdescription', 'tool_uclasupportconsole', (object) array('role' => $roleparam, 
-                'contextlevel' => $contextlevelparam, 'component' => $componentparam)));
+
+    $inputs = array('role' => $roleparam, 'contextlevel' => $contextlevelparam,
+                    'component' => $componentparam);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $modifiedresults, $inputs,
+            get_string('usersdescription', 'tool_uclasupportconsole', (object) $inputs));
     $pageurl = new moodle_url( $PAGE->url, array('role' => $roleparam, 'component' => $componentparam, 
         'contextlevel' => $contextlevelparam, 'count' => $countparam, 'console' => $title));
     
@@ -1796,7 +1826,7 @@ if ($displayforms) {
         $results[$k] = $result;
     }
 
-    $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, array('count' => $count));
 }
 
 $consoles->push_console_html('users', $title, $sectionhtml);
@@ -1858,7 +1888,8 @@ if ($displayforms) {
         $results[$k] = $result;
     }
 
-    $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
+    $inputs = array('term' => $term, 'subjarea' => $subjarea);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, $inputs);
 }
 
 $consoles->push_console_html('logs', $title, $sectionhtml);

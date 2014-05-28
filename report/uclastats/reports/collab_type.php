@@ -64,7 +64,6 @@ class collab_type extends uclastats_base {
             }
         }
 
-
         // If here, then either category does not have a parent or its parents
         // did not match any known division. Check current category name.
         if (in_array($category->name, $divisions)) {
@@ -75,12 +74,30 @@ class collab_type extends uclastats_base {
     }
 
     /**
+     * Convert timestamps to user friendly dates.
+     *
+     * @param array $params
+     * @return string
+     */
+    public function format_cached_params($params) {
+        $param_list = array();
+        foreach ($params as $name => $value) {
+            if (empty($value)) {
+                continue;
+            }
+            $param_list[] = get_string($name, 'report_uclastats') . ' = ' .
+                    userdate($value, get_string('strftimedate', 'langconfig'));
+        }
+        return implode('<br />', $param_list);
+    }
+
+    /**
      * Instead of counting results, return a summarized result.
      *
      * @param array $results
      * @return string
      */
-    public function format_cached_results($results) {
+    public function format_cached_results($results) {        
         if (!empty($results)) {
             return $results['Total']['total'];
         }
@@ -91,7 +108,7 @@ class collab_type extends uclastats_base {
      * Returns an array of form elements used to run report.
      */
     public function get_parameters() {
-        return array();
+        return array('optionaldatepicker');
     }
 
     /**
@@ -155,7 +172,16 @@ class collab_type extends uclastats_base {
                 FROM    {course} AS c,
                         {ucla_siteindicator} AS s
                 WHERE   s.courseid = c.id";
-        $sites = $DB->get_recordset_sql($sql);
+
+        // Check if start and/or end time is specified.
+        if (!empty($params['startdate'])) {
+            $sql .= " AND c.timecreated>=:startdate";
+        }
+        if (!empty($params['enddate'])) {
+            $sql .= " AND c.timecreated<=:enddate";
+        }
+
+        $sites = $DB->get_recordset_sql($sql, $params);
         if ($sites->valid()) {
             foreach ($sites as $site) {
                 $division = $this->find_division($site->category, $divisions);

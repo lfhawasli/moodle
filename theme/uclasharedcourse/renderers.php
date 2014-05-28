@@ -214,7 +214,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
         // Show logo guide
         $pix_url = $this->pix_url('guide', 'theme');
         $img = html_writer::empty_tag('img', array('src' => $pix_url));
-        $mform->addElement('static', 'description', '', $img);
+        $mform->addElement('static', 'logo_description', '', $img);
 
         // Check if we already have images
         $draftitemid = file_get_submitted_draft_itemid('logo_attachments');

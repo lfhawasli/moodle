@@ -16,8 +16,7 @@
 /**
  * Kaltura video assignment locallib
  *
- * @package    mod
- * @subpackage kalvidassign
+ * @package    mod_kalvidassign
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,6 +34,7 @@ define('KALASSIGN_SUBMITTED', 2);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/lib/gradelib.php');
 require_once($CFG->dirroot.'/mod/kalvidassign/renderable.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/local/kaltura/locallib.php');
 
 /**
  * Check if the assignment submission end date has passed or if late submissions
@@ -365,4 +365,20 @@ function kalvidassign_get_assignment_students($cm) {
     $users = get_enrolled_users($context, 'mod/kalvidassign:submit', 0, 'u.id');
     
     return $users;
+}
+
+/**
+ * This functions returns an array with the height and width used in the configiruation for displaying a video.
+ * @return array An array whose first value is the width and second value is the height.
+ */
+function kalvidassign_get_player_dimensions() {
+    $kalturaconfig = get_config(KALTURA_PLUGIN_NAME);
+
+    $width = (isset($kalturaconfig->kalvidassign_player_width) && !empty($kalturaconfig->kalvidassign_player_width)) ?
+            $kalturaconfig->kalvidassign_player_width : KALTURA_ASSIGN_VIDEO_WIDTH;
+
+    $height = (isset($kalturaconfig->kalvidassign_player_height) && !empty($kalturaconfig->kalvidassign_player_height)) ?
+            $kalturaconfig->kalvidassign_player_height : KALTURA_ASSIGN_VIDEO_HEIGHT;
+
+    return array($width, $height);
 }

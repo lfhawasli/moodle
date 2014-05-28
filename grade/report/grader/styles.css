@@ -1,4 +1,4 @@
-.path-grade-report-grader .flexible th {
+/*.path-grade-report-grader .flexible th {
 white-space:normal;
 }
 
@@ -466,10 +466,10 @@ white-space:nowrap;
 .path-grade-report-grader .heading_name_row th {
 white-space:nowrap;
 width:2000px;
-}
+}*/
 
-/*MDL-21088 - IE 7 ignores nowraps on tds or ths so we put a span within it with a nowrap on it*/
-.path-grade-report-grader heading_name_row th span {
+/* MDL-21088 - IE 7 ignores nowraps on tds or ths so we put a span within it with a nowrap on it */
+/*.path-grade-report-grader heading_name_row th span {
     white-space:nowrap;
 }
 
@@ -614,10 +614,10 @@ background-color:#f3ead8;
 }
 .path-grade-report-grader .yui3-overlay .feedback {
     color: #5F595E;
-}
-/* table#user-grades td */
-/* .grader-report-grader table#user-grades td .yui-panel div.hd { */
-.path-grade-report-grader #tooltipPanel {
+}*/
+ /*table#user-grades td */
+ /*.grader-report-grader table#user-grades td .yui-panel div.hd { */
+/*.path-grade-report-grader #tooltipPanel {
   text-align: left;
 }
 
@@ -653,4 +653,4 @@ position:absolute;
 
 .path-grade-report-grader.ie6 .excludedfloater {
 font-size:7px;
-}
+}*/

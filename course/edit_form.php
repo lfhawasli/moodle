@@ -510,9 +510,14 @@ class course_edit_form extends moodleform {
             if (!$editcoursetheme) {
                 $element = $mform->getElement('theme');
                 $element->freeze();
+                if ($mform->elementExists('logo_attachments')) {
+                    $mform->removeElement('logo_attachments');
+                }
+                if ($mform->elementExists('logo_description')) {
+                    $mform->removeElement('logo_description');
+                }
             } else {
-                $element = $mform->getElement('theme');
-                
+                $element = $mform->getElement('theme');                
             }
         }
         // END UCLA MOD: CCLE-4230

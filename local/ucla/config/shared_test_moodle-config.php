@@ -236,6 +236,11 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
+// Site administration > Grades > Report settings > Grader report
+$CFG->grade_report_showeyecons = 0;
+$CFG->grade_report_showanalysisicon = 0;
+$CFG->grade_report_showuserimage = 0;
+
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->assignment_maxbytes = 104857600;   // 100MB
 
@@ -336,6 +341,9 @@ $CFG->filter_poodll_download_media_ok = '1';
 
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
+
+// Site administration > Plugins > Local plugins > Google Analytics
+$CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.

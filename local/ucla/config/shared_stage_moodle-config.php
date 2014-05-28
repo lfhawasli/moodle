@@ -223,6 +223,11 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
+// Site administration > Grades > Report settings > Grader report
+$CFG->grade_report_showeyecons = 0;
+$CFG->grade_report_showanalysisicon = 0;
+$CFG->grade_report_showuserimage = 0;
+
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->assignment_maxbytes = 104857600;   // 100MB
 
@@ -324,6 +329,9 @@ $CFG->filter_poodll_download_media_ok = '1';
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
+// Site administration > Plugins > Local plugins > Google Analytics
+$CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
+
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['conn_server'] = 'ce';
 $CFG->forced_plugin_settings['local_kaltura']['uri'] = 'https://www.kaltura.com';
@@ -334,7 +342,7 @@ $CFG->forced_plugin_settings['local_kaltura']['assign_uploader'] = 0;
 $CFG->forced_plugin_settings['local_kaltura']['assign_uploader_custom'] = 15205342;
 $CFG->forced_plugin_settings['local_kaltura']['player_resource'] = 0;
 $CFG->forced_plugin_settings['local_kaltura']['player_resource_custom'] = 19816362;
-$CFG->forced_plugin_settings['local_kaltura']['assign_uploader_custom'] = 15205332;
+$CFG->forced_plugin_settings['local_kaltura']['assign_uploader_custom'] = 15205342;
 $CFG->forced_plugin_settings['local_kaltura']['player_resource_override'] = 1;
 $CFG->forced_plugin_settings['local_kaltura']['res_uploader'] = 0;
 $CFG->forced_plugin_settings['local_kaltura']['res_uploader_custom'] = 15205342;

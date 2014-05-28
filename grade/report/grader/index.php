@@ -198,7 +198,7 @@ if (!empty($studentsperpage) && $studentsperpage >= 20) {
 if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
     // Adding sticky table headers and sidebar help support
     require_once($CFG->dirroot . '/blocks/ucla_help/locallib.php');
-    $PAGE->requires->js('/local/ucla/yui/gradebook/stickytable.js');
+    $PAGE->requires->yui_module('moodle-local_ucla-gradebooktable', 'M.local_ucla.gradebook.init', array());
 
     // Render a help sidebar.
     echo ucla_sidebar::help(array(
@@ -206,6 +206,13 @@ if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
         new sidebar_docs('Gradebook'),
         new sidebar_feedback()
     ));
+
+    // Render a loading screen.
+    echo html_writer::div(
+            html_writer::div(
+                '<i></i><i></i><i></i><i></i>', 'gradebook-loading'
+            ), 'gradebook-loading-screen', array('aria-hidden' => 'true')
+        );
 }
 // END UCLA MOD: CCLE-4168
 

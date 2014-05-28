@@ -239,6 +239,11 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
+// Site administration > Grades > Report settings > Grader report
+$CFG->grade_report_showeyecons = 0;
+$CFG->grade_report_showanalysisicon = 0;
+$CFG->grade_report_showuserimage = 0;
+
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
