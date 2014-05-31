@@ -1,6 +1,6 @@
 <?php
 
-class file extends course_content {
+class block_ucla_course_download_files extends block_ucla_course_download_base {
 
     private $files;
 
@@ -26,26 +26,31 @@ class file extends course_content {
     function get_request_status(&$timerequested, &$timeupdated) {
         global $DB;
 
-        if ($request = $DB->get_record('ucla_archives', array("courseid" => $this->course->id, "userid" => $this->userid,
-                                              "type" => 'files'))) {
+        if ($request = $this->get_request()) {
             $timerequested = $request->timerequested;
             $timeupdated = $request->timeupdated;
 
             if (isset($request->timeupdated)) {
                 return 'request_completed';
-            }
-            else {
+            } else {
                 return 'request_in_progress';
             }
-        }
-        else {
+        } else {
             if ($this->has_content()) {
                 return 'request_available';
-            }
-            else {
+            } else {
                 return 'request_unavailable';
             }
         }
+    }
+
+    /**
+     * Returns that this handles files for the course content download.
+     *
+     * @return string
+     */
+    public function get_type() {
+        return 'files';
     }
 
     function add_request() {
@@ -55,12 +60,12 @@ class file extends course_content {
 
         $request->courseid = $this->course->id;
         $request->userid = $this->userid;
-        $request->type = 'files';
+        $request->type = $this->get_type();
         $request->content = json_encode($this->build_zip_array());
         $request->contexthash = sha1($request->content);
         $request->timerequested = time();
 
-        $conditions = array('courseid' => $request->courseid, 'userid' =>$request->userid, 'type' => 'files');
+        $conditions = array('courseid' => $request->courseid, 'userid' =>$request->userid, 'type' => $this->get_type());
 
         if(!$DB->record_exists('ucla_archives', $conditions)) {
             $DB->insert_record('ucla_archives', $request);
@@ -139,12 +144,12 @@ class file extends course_content {
 
         $context = context_course::instance($this->course->id);
         $requestid = $DB->get_field('ucla_archives', 'id', array("courseid" => $this->course->id, "userid" => $this->userid,
-                                              "type" => 'files'));
+                                              "type" => $this->get_type()));
 
          $filerecord = array(
             'contextid'   => $context->id,
             'component'   => 'block_ucla_course_download',
-            'filearea'    => 'files',
+            'filearea'    => $this->get_type(),
             'itemid'      => $requestid,
             'filepath'    => '/',
             'filename'    => $filename,
@@ -199,11 +204,10 @@ class file extends course_content {
         $newcontexthash = sha1(json_encode($filesforzipping));
 
         $oldcontexthash = $DB->get_field('ucla_archives', 'contexthash', array("courseid" => $this->course->id, "userid" => $this->userid,
-                                                 "type" => 'files'));
+                                                 "type" => $this->get_type()));
         if( $oldcontexthash != $newcontexthash ) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

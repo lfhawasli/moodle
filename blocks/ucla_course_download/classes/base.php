@@ -3,7 +3,8 @@
  *  Base class for UCLA download course content.
  **/
 
-abstract class course_content {
+abstract class block_ucla_course_download_base {
+
 
     protected $course;
     protected $userid;
@@ -19,11 +20,49 @@ abstract class course_content {
     abstract function create_zip($filesforzipping);
 
     /** 
-     *  
-     **/
+     * Sends file associate with course and request for user.
+     *
+     * Will send file or file not found error if no file requests. Dies after
+     * sending file.
+     */
     function download_zip() {
+        global $DB;
+        
+        // Get file record for given request.
+        $request = $this->get_request();
+        $fileid = $request->fileid;
+        if (empty($fileid)) {
+            debugging('here1');
+            send_file_not_found();
+        }
 
+        $fs = get_file_storage();
+        $file = $fs->get_file_by_id($fileid);
+        if (empty($file)) {
+            debugging('here2');
+            send_file_not_found();
+        }
+
+        send_stored_file($file, 86400, 0, true);
     }
+
+    /**
+     * Returns record from ucla_archives table.
+     *
+     * @return object
+     */
+    public function get_request() {
+        global $DB;
+        return $DB->get_record('ucla_archives',
+                array('courseid' => $this->course->id,
+                      'userid'   => $this->userid,
+                      'type'     => $this->get_type()));
+    }
+
+    /**
+     * Need to define what type of course content class will be obtaining.
+     */
+    abstract public function get_type();
 
     /** 
      *  Email requestor once zip file is created or updated.
@@ -56,15 +95,18 @@ abstract class course_content {
     }
 
     /** 
-     *  Delete request and corresponding file entry.
-     **/
+     * Delete request and corresponding file entry.
+     *
+     * @param object $request   Entry from ucla_archives table.
+     */
     static function delete_zip($request) {
         global $DB;
-
-        $zipfileid = $DB->get_field('ucla_archives', 'fileid', array('id' => $request->id));
-
+        if (!empty($request->fileid)) {
+            $fs = get_file_storage();
+            $file = $fs->get_file_by_id($request->fileid);
+            $file->delete();
+        }
         $DB->delete_records('ucla_archives', array('id' => $request->id));
-        $DB->delete_records('files', array("id" => $zipfileid));
     }
 
     /** 

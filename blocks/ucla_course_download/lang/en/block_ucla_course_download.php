@@ -15,8 +15,8 @@ $string['submissions_archive'] = "submissions";
 
 /* course download page */
 $string['files'] = 'Files';
-$string['forum_posts'] = 'Forum posts';
-$string['assignment_submissions'] = 'Assignment submissions';
+$string['forums'] = 'Forum posts';
+$string['submissions'] = 'Assignment submissions';
 
 $string['not_requested'] = 'No zip file of {$a} has been created yet.';
 $string['request_submitted'] = 'You have successfully submitted a request to create a zip file of {$a}. You will be notified via email when it is available.';
@@ -25,6 +25,8 @@ $string['request_completed'] = 'A zip file of {$a} has been created.';
 $string['request_completed_updated'] = 'It was last updated {$a}. Any new content will be added to the zip automatically.';
 $string['request_completed_deletion'] = 'This zip file will be deleted on {$a}.';
 $string['request_unavailable'] = 'No {$a} available for download.';
+
+$string['noaccess'] = 'You do not have access to view this page';
 
 /* alert notice */
 $string['alert_msg'] = 'For copyright compliance you will no longer have access to this course site 2 weeks into the next term. Starting 9th week, you can visit the Control Panel or click "Download course content" below to download your course content.';

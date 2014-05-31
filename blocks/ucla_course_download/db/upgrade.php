@@ -46,8 +46,25 @@ function xmldb_block_ucla_course_download_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // Ucla_course_download savepoint reached.
+        // Savepoint reached.
         upgrade_block_savepoint(true, 2014050713, 'ucla_course_download');
+    }
+
+    // Rename and adjust unique index courseid_userid => course_user_type.
+    if ($oldversion < 2014053000) {
+        // Drop old key courseid_userid.
+        $table = new xmldb_table('ucla_archives');
+        $key = new xmldb_key('courseid_userid', XMLDB_KEY_UNIQUE,
+                array('courseid', 'userid'));
+        $dbman->drop_key($table, $key);
+
+        // Add new key course_user_type.
+        $key = new xmldb_key('course_user_type', XMLDB_KEY_UNIQUE,
+                array('courseid', 'userid', 'type'));
+        $dbman->add_key($table, $key);
+
+        // Savepoint reached.
+        upgrade_block_savepoint(true, 2014053000, 'ucla_course_download');
     }
 
     return true;
