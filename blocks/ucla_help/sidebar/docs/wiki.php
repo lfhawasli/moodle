@@ -26,10 +26,9 @@ require_once(dirname(__FILE__) . '/../../../../mod/wiki/parser/markups/nwiki.php
 
 class sidebar_wiki_parser extends nwiki_parser {
 
-    private $docsurl = '/w/';
-    private $urlquery = '/api.php?action=query&titles={title}&prop=imageinfo&iiprop=url&format=json';
-    private $sectionquery = '/api.php?action=parse&page={title}&prop=sections&format=json';
-    private $pagesectionquery = '/api.php?action=query&titles={title}&prop=revisions&rvprop=content&format=json&rvsection={section}';
+    private $urlquery = '?action=query&titles={title}&prop=imageinfo&iiprop=url&format=json';
+    private $sectionquery = '?action=parse&page={title}&prop=sections&format=json';
+    private $pagesectionquery = '?action=query&titles={title}&prop=revisions&rvprop=content&format=json&rvsection={section}';
 
     protected $blockrules = array(
         'nowiki' => array(
@@ -79,7 +78,7 @@ class sidebar_wiki_parser extends nwiki_parser {
      * @return json_obj
      */
     private function query($url) {
-        $apiurl = get_config('block_ucla_help', 'docs_wiki_url');
+        $apiurl = get_config('block_ucla_help', 'docs_wiki_api');
         $url = $apiurl . $url;
         
         $curl = curl_init();
@@ -242,7 +241,6 @@ class sidebar_wiki_parser extends nwiki_parser {
     protected function format_link($text) {
 
         $docsurl = get_config('block_ucla_help', 'docs_wiki_url');
-        $docsurl .= '/w/';
 
         // Render images inline.
         if (preg_match('/.*\.jpg|.*\.jpeg/', $text)) {

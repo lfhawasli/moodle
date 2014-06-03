@@ -134,6 +134,7 @@ $CFG->shib_logged_in_cookie = '_ucla_sso';
 
 // CCLE-2306 - HELP SYSTEM BLOCK
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://moodle2.sscnet.ucla.edu/docs/';
+$CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://moodle2.sscnet.ucla.edu/wiki/api.php';
 $CFG->forced_plugin_settings['block_ucla_help']['fromemail'] = 'help@ssc.ucla.edu';
 $block_ucla_help_support_contacts['System'] = 'new@tickets.sscnet.ucla.edu';  // default
 

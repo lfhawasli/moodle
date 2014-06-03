@@ -17,7 +17,7 @@
 
 class sidebar_docs extends sidebar_html implements sidebar_widget {
 
-    private $keywordquery = '/api.php?action=query&titles={title}&prop=links&format=json';
+    private $keywordquery = '?action=query&titles={title}&prop=links&format=json';
 
     public function __construct($keyword) {
         global $PAGE;
@@ -30,7 +30,7 @@ class sidebar_docs extends sidebar_html implements sidebar_widget {
     }
 
     private function curl($url) {
-        $apiurl = get_config('block_ucla_help', 'docs_wiki_url');
+        $apiurl = get_config('block_ucla_help', 'docs_wiki_api');
         $url = $apiurl . $url;
         
         $curl = curl_init();

@@ -22,7 +22,9 @@ class sidebar_feedback extends sidebar_html implements sidebar_widget {
 //        require_once($CFG->dirroot . '/local/ucla/jira.php');
 //        require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 //        require_once($CFG->dirroot . '/blocks/ucla_help/help_form.php' );
-        
+
+        $docsurl = get_config('block_ucla_help', 'docs_wiki_url');
+
         // Link to help & feedback
         // @todo: eventually make this RESTful
         $link = $help_locale = $OUTPUT->call_separate_block_function(
@@ -38,7 +40,7 @@ class sidebar_feedback extends sidebar_html implements sidebar_widget {
                        Don\'t see your question?
                     </div>
                     <div class="item">
-                        Find FAQs, tutorials and a large database of help documentation at <a href="https://docs.ccle.ucla.edu">CCLE Help</a>
+                        Find FAQs, tutorials and a large database of help documentation at our <a href="' . $docsurl .'">Help site</a>
                         <div class="ui horizontal divider">
                             Or
                         </div>
