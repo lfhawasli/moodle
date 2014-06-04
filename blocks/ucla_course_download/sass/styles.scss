@@ -1,0 +1,22 @@
+
+.course-download {
+    border-left: 1px solid #ddd;
+
+    li {
+        list-style: none;
+        margin-left: 20px;
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+    .disabled {
+        color: #aaa;
+        background-color: #f5f5f5;
+    }
+
+}
+
+.arrow_box { position: relative; background: #EFEFEF; border: 1px solid #CCCCC; } 
+.arrow_box:after, 
+.arrow_box:before { right: 100%; top: 50%; border: solid transparent; content: " "; height: 0; width: 0; position: absolute; pointer-events: none; } 
+.arrow_box:after { border-color: rgba(239, 239, 239, 0); border-right-color: #EFEFEF; border-width: 8px; margin-top: -8px; } 
+.arrow_box:before { border-color: rgba(0, 0, 0, 0); border-right-color: #CCCCC; border-width: 6px; margin-top: -6px; }

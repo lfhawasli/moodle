@@ -43,6 +43,12 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
             }
         }
     }
+    
+    function get_request_update_time() {
+        if ($request = $this->get_request()) {
+            return array($request->timerequested, $request->timeupdated);
+        }
+    }
 
     /**
      * Returns that this handles files for the course content download.
