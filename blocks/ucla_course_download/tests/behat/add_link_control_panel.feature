@@ -18,7 +18,6 @@ Feature: Add link to Control Panel
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
 
-  @javascript
   Scenario: Control Panel link for students
     And I log in as ucla "student1"
     And I browse to site "C1"
@@ -27,7 +26,6 @@ Feature: Add link to Control Panel
     And I follow "Download course content"
     Then I should see "UCLA course download" in the "region-main" "region"
 
-  @javascript
   Scenario: Control Panel link for instructors
     And I log in as ucla "teacher1"
     And I browse to site "C1"

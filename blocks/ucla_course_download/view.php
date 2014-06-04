@@ -43,12 +43,12 @@ if (isset($_GET['action']) && $action = $_GET['action']) {
 
             foreach ($requests as $request) {
                 // Delete zip if old request.
-                if( block_ucla_course_download_file::is_old($request) ) {
-                    block_ucla_course_download_file::delete_zip($request);
+                if( block_ucla_course_download_files::is_old($request) ) {
+                    block_ucla_course_download_files::delete_zip($request);
                     continue;
                 }
 
-                $coursecontentrequest = new block_ucla_course_download_file($request->courseid, $request->userid);
+                $coursecontentrequest = new block_ucla_course_download_files($request->courseid, $request->userid);
 
                 $msg ="processing request " . $request->id ."  ";
                 print_object($msg);

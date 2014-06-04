@@ -4,16 +4,13 @@ class block_ucla_course_download extends block_base {
         $this->title = get_string('pluginname', 'block_ucla_course_download');
     }
     
-    public function get_content() {
-        if ($this->content !== null) {
-            return $this->content;
-        }
- 
-        $this->content         =  new stdClass;
-        $this->content->text   = 'The content of our SimpleHTML block!';
-        $this->content->footer = 'Footer here...';
- 
-        return $this->content;
+    /**
+     * Returns true because block has a settings.php file.
+     *
+     * @return boolean
+     */
+    public function has_config() {
+        return true;
     }
 }
     

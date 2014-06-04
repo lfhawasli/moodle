@@ -39,3 +39,15 @@ $string['alert_dismiss_message'] = 'You will no longer be prompted to download c
 $string['email_subject'] = 'Course Download of {$a} Updated';
 $string['email_sender'] = 'CCLE';
 $string['email_message'] = '';
+
+// Settings.
+$string['settingsdisable'] = 'Disable feature for students';
+$string['allowstudentaccess'] = 'Allow students';
+$string['allowstudentaccess_desc'] = 'If enabled, will display alert and give ' .
+        'students a link to "Course content download" page in their Control ' .
+        'Panel. They will get access starting the week before the end of the ' . 
+        'term. For example, for regular terms, it will start 9th week (since ' .
+        'classes end 10th week). For summer sessions, if a course is a 6 week ' .
+        'class, it will display on 5th week. Students will continue to have ' .
+        'access to the "Course content download" page until the course is ' .
+        'hidden or they lose access to the course site.';

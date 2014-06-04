@@ -83,9 +83,9 @@ class ucla_weeksdisplay_test extends advanced_testcase {
             '121' => array(
                 array(
                     'term' => '121',
-                    'session' => '8A',
+                    'session' => '1A',
                     'session_start' => '2012-06-25',
-                    'session_end' => '2012-08-17',
+                    'session_end' => '2012-08-31',
                     'instruction_start' => '2012-06-25',
                 ),
                 array(
@@ -289,6 +289,7 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('1', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
                 get_config('local_ucla', 'active_terms'));
+        $this->assertEquals('1', get_config('local_ucla', 'current_week_summera'));
 
         // Start session C.
         $today = date('Y-m-d', strtotime('+6 weeks', strtotime($today)));
@@ -303,6 +304,9 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('7', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
                 get_config('local_ucla', 'active_terms'));
+        // Check that the appropiate weeks are set for summer sessions.        
+        $this->assertEquals('7', get_config('local_ucla', 'current_week_summera'));
+        $this->assertEquals('1', get_config('local_ucla', 'current_week_summerc'));
 
         // Next week.
         $today = date('Y-m-d', strtotime('+1 weeks', strtotime($today)));
@@ -317,19 +321,24 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('8', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
                 get_config('local_ucla', 'active_terms'));
+        // Check that the appropiate weeks are set for summer sessions.
+        $this->assertEquals('8', get_config('local_ucla', 'current_week_summera'));
+        $this->assertEquals('2', get_config('local_ucla', 'current_week_summerc'));
 
         // Session A end.
         $today = date('Y-m-d', strtotime('+1 weeks', strtotime($today)));
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<span class="session ">Summer 2012 - Session C, ' .
-                '</span><span class="week">Week 3</span>',
+        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+                '</span><span class="week">Week 9</span> | <span class="session ' .
+                '">Summer 2012 - Session C, </span><span class="week">Week 3</span>',
                 get_config('local_ucla', 'current_week_display'));
-        $this->assertEquals('8', get_config('local_ucla', 'current_week'));
+        $this->assertEquals('9', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
                 get_config('local_ucla', 'active_terms'));
         $this->assertEquals('121', get_config('', 'currentterm'));
+        $this->assertEquals('3', get_config('local_ucla', 'current_week_summerc'));
 
         // Session C end.
         // This is between sessions, but the term should have been updated to
@@ -361,6 +370,9 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $this->assertEquals('12F,13W,13S,131',
                 get_config('local_ucla', 'active_terms'));
         $this->assertEquals('12F', get_config('', 'currentterm'));
+        // Check summer session weeks are erased.
+        $this->assertEmpty(get_config('local_ucla', 'current_week_summera'));
+        $this->assertEmpty(get_config('local_ucla', 'current_week_summerc'));
     }
 
     /**

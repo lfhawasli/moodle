@@ -14,15 +14,25 @@ require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
 /**
  * Alert students that course content archives are available for download.
  * 
- * @param type $eventdata
+ * @param object $eventdata
+ * @return boolean              Returns early if we don't want to show alert
+ *                              to user, else modifies the eventdata parameter.
  */
 function ucla_course_download_ucla_format_notices($eventdata) {
+
+    // Make sure this is a course site.
+    if (is_collab_site($eventdata->course)) {
+        return true;
+    }
 
     // Check if this is a student that can download the archive.
     $coursecontext = context_course::instance($eventdata->course->id);
     $isinstructor = has_capability('moodle/course:manageactivities', $coursecontext);
     $canrequest = has_capability('block/ucla_course_download:requestzip', $coursecontext);
-    if ($isinstructor || !$canrequest || !student_zip_requestable()) {
+
+    // Don't show alert if user is an course admin, cannot get download archives,
+    // or it isn't time to show alert for students.
+    if ($isinstructor || !$canrequest || !student_zip_requestable($eventdata->course)) {
         return true;
     }
 

@@ -290,7 +290,7 @@ if (has_role_in_context('student', $context) || $is_role_switched_student) {
     $modules[] = new ucla_cp_module('student_grades', new moodle_url(
             $CFG->wwwroot . '/grade/index.php?id=' . $course->id), $temp_tag, $temp_cap);
 
-    if (student_zip_requestable()) {
+    if (student_zip_requestable($course)) {
         $modules[] = new ucla_cp_module('course_download', new moodle_url(
             '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
             $temp_tag, 'block/ucla_course_download:requestzip');
