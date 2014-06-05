@@ -18,10 +18,10 @@ $string['files'] = 'Files';
 $string['forums'] = 'Forum posts';
 $string['submissions'] = 'Assignment submissions';
 
-$string['not_requested'] = 'No zip file of {$a} has been created yet.';
+$string['not_requested'] = 'A zip file of <strong>{$a}</strong> has not yet been created.';
 $string['request_submitted'] = 'You have successfully submitted a request to create a zip file of {$a}. You will be notified via email when it is available.';
-$string['request_in_progress'] = 'A zip file of {$a} has been requested. You will be notified via email when it is available.';
-$string['request_completed'] = 'A zip file of {$a} has been created.';
+$string['request_in_progress'] = 'A zip file of <strong>{$a}</strong> has been requested. You will be notified via email when it is available.';
+$string['request_completed'] = 'A zip file of your <strong>{$a}</strong> has been created.';
 $string['request_completed_updated'] = 'It was last updated {$a}. Any new content will be added to the zip automatically.';
 $string['request_completed_deletion'] = 'This zip file will be deleted on {$a}.';
 $string['request_unavailable'] = 'No {$a} available for download.';
@@ -51,3 +51,9 @@ $string['allowstudentaccess_desc'] = 'If enabled, will display alert and give ' 
         'class, it will display on 5th week. Students will continue to have ' .
         'access to the "Course content download" page until the course is ' .
         'hidden or they lose access to the course site.';
+
+$string['instructorfilewarning'] = 'Files included are ones that are already visible ' .
+        'to students on your site.  Files that are part of conditional activities or ' .
+        'groupings will only be available to students that match that criteria.' .
+        'When you update the availability of a file, it will be reflected in an' .
+        'updated zip file.';

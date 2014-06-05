@@ -97,5 +97,9 @@ echo $output->title_heading(get_string('files', 'block_ucla_course_download'));
 // Forward calls to renderer.
 echo call_user_func(array($output, $coursecontentstatus), $coursecontent);
 
+if (has_capability('moodle/course:update', $context)) {
+    echo $output->print_contents();
+
+}
 
 echo $OUTPUT->footer();

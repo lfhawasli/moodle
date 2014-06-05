@@ -18,35 +18,29 @@ class block_ucla_course_download_renderer extends plugin_renderer_base {
         
         if ($method === 'request_unavailable') {
             $buffer = html_writer::start_tag('ul', array('class' => 'course-download'));
-            $buffer .= html_writer::tag('li', $this->render_request_unavailable());
+            $buffer .= html_writer::tag('li', $this->render_request_unavailable(), array('class' => 'arrow_box'));
             $buffer .= html_writer::end_tag('ul');
             
             return $buffer;
         } else if ($method === 'request_available') {
             $buffer = html_writer::start_tag('ul', array('class' => 'course-download'));
-            $buffer .= html_writer::tag('li', $this->render_request_unavailable(), array('class' => 'disabled arrow_box'));
-            $buffer .= html_writer::tag('li', $this->render_equest_available(), array('class' => 'arrow_box'));
-            $buffer .= $this->output->single_button(
+            $button = $this->output->single_button(
                 new moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $COURSE->id, 'action' => 'files_request')), 
                 get_string('request', 'block_ucla_course_download'), 
                 'post'
             );
+            $buffer .= html_writer::tag('li', $this->render_equest_available() . $button, array('class' => 'arrow_box'));
             $buffer .= html_writer::end_tag('ul');
             
             return $buffer;
         } else if ($method === 'request_in_progress') {
             $buffer = html_writer::start_tag('ul', array('class' => 'course-download'));
-            $buffer .= html_writer::tag('li', $this->render_request_unavailable(), array('class' => 'disabled arrow_box'));
-            $buffer .= html_writer::tag('li', $this->render_equest_available(), array('class' => 'disabled arrow_box'));
             $buffer .= html_writer::tag('li', $this->render_request_in_progress(), array('class' => 'arrow_box'));
             $buffer .= html_writer::end_tag('ul');
             
             return $buffer;
         } else if ($method == 'request_completed') {
             $buffer = html_writer::start_tag('ul', array('class' => 'course-download'));
-            $buffer .= html_writer::tag('li', $this->render_request_unavailable(), array('class' => 'disabled arrow_box'));
-            $buffer .= html_writer::tag('li', $this->render_equest_available(), array('class' => 'disabled arrow_box'));
-            $buffer .= html_writer::tag('li', $this->render_request_in_progress(), array('class' => 'disabled arrow_box'));
             $buffer .= html_writer::tag('li', $this->render_request_completed(reset($arguments)), array('class' => 'arrow_box'));
             $buffer .= html_writer::end_tag('ul');
             
@@ -57,7 +51,60 @@ class block_ucla_course_download_renderer extends plugin_renderer_base {
     }
     
 
+    public function print_contents() {
+        global $COURSE;
+        
+        $format = course_get_format($COURSE);
+        $sections = $format->get_sections();
 
+        $modinfo = get_fast_modinfo($COURSE);
+        $resources = $modinfo->get_instances_of('resource');
+
+        $alert = html_writer::div(get_string('instructorfilewarning', 'block_ucla_course_download'), 'alert alert-warning');
+        
+        $legend = html_writer::span(
+            html_writer::span('', 'glyphicon glyphicon-ok') .
+            'File may be included'
+        );
+        $legend .= html_writer::span(
+            html_writer::span('', 'glyphicon glyphicon-remove') .
+            'File will be omitted'
+        );
+        
+        $buffer = $alert;
+        
+        $buffer .= html_writer::div($legend, 'zip-contents-legend');
+        
+        // Print out file contents
+        $buffer .= html_writer::start_div('zip-contents');
+
+        foreach ($sections as $section) {
+            $cmids = explode(',', $section->sequence);
+
+            $classes = empty($section->visible) ? 'omitted' : '';
+            $classes .= ' section';
+
+            $buffer .= html_writer::tag('div', $section->name, array('class' => $classes));
+
+            $buffer .= html_writer::start_tag('ul');
+            foreach ($cmids as $modid) {
+                foreach ($resources as $resource) {
+                    if ($resource->id == $modid) {
+                        $classes = empty($resource->visible) ? 'omitted' : '';
+                        $glyph = empty($resource->visible) ? 'glyphicon glyphicon-remove' : 'glyphicon glyphicon-ok';
+                        $icon = html_writer::span('', $glyph);
+                        $buffer .= html_writer::tag('li', $icon . $resource->name, array('class' => $classes));
+                    }
+                }
+            }
+            $buffer .= html_writer::end_tag('ul');
+
+        }
+
+        $buffer .= html_writer::end_div();
+
+        return $buffer;
+    }
 
     /**
      * Request state 'unavailable'.  When there are no files to download in a course.
@@ -78,7 +125,7 @@ class block_ucla_course_download_renderer extends plugin_renderer_base {
     public function render_equest_available() {
         global $COURSE;
         
-        $buffer = html_writer::tag('span', get_string('not_requested', 'block_ucla_course_download', 'course files'));
+        $buffer = html_writer::tag('p', get_string('not_requested', 'block_ucla_course_download', 'course files'));
         
         
         return $buffer;
