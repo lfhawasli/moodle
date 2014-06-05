@@ -405,6 +405,34 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
     }
 
     /**
+     * Make sure createorfinduser can find an existing user, even though the
+     * enrollment record is missing the bolid field.
+     */
+    public function test_createorfinduser_existing_missing_bolid() {
+        // Don't include username.
+        $fieldmappings = array('uid' => 'idnumber',
+            'firstname' => 'firstname',
+            'lastname' => 'lastname',
+            'email' => 'email');
+
+        // Find a UCLA user with only idnumber set.
+        $uclauser = $this->getDataGenerator()
+                        ->get_plugin_generator('local_ucla')->create_user();
+        $enrollment = array();
+        foreach ($fieldmappings as $key => $value) {
+            $enrollment[$key] = $uclauser->$value;
+        }
+        $enrollment['username'] = '';
+
+        // Make sure exact user is found.
+        $founduser = $this->mockenrollmenthelper->createorfinduser($enrollment);
+        $this->assertNotNull($founduser);
+        foreach ($fieldmappings as $key => $value) {
+            $this->assertEquals($uclauser->$value, $founduser->$value);
+        }
+    }
+
+    /**
      * Make sure createorfinduser returns null for several cases of an invalid
      * enrollment record.
      */
