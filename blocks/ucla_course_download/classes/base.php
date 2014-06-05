@@ -9,6 +9,12 @@ abstract class block_ucla_course_download_base {
     protected $course;
     protected $userid;
 
+    /**
+     * Constructor.
+     *
+     * @param int $courseid
+     * @param int $userid
+     */
     function __construct($courseid, $userid) {
         $this->course = get_course($courseid);
         $this->userid = $userid;

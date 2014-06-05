@@ -84,7 +84,7 @@ echo html_writer::tag('button', 'Process requests', array('class' => 'btn', 'typ
 echo html_writer::end_tag('form');
 /* END TESTING */
 
-$coursecontentstatus = $coursecontent->get_request_status($timerequested, $timeupdated);
+$coursecontentstatus = $coursecontent->get_request_status();
 
 // Get plugin renderer.
 
