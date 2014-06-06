@@ -324,7 +324,8 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
         // Check update zip for existing archive.
         if (isset($request->fileid)) {
             // Check for changed content.
-            if (empty($this->has_content())) {
+            $hascontent = $this->has_content();
+            if (empty($hascontent)) {
                 // Course no longer has files, so delete file and request.
                 self::delete_zip($request);
                 return null;
@@ -358,7 +359,8 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
             }
         } else {
             // Make sure we have files to zip.
-            if (empty($this->has_content())) {
+            $hascontent = $this->has_content();
+            if (empty($hascontent)) {
                 self::delete_zip($request); // Delete request.
                 return null;
             }

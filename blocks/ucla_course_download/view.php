@@ -91,15 +91,19 @@ $coursecontentstatus = $coursecontent->get_request_status();
 /** var $output block_ucla_course_download_renderer */
 $output = $PAGE->get_renderer('block_ucla_course_download');
 
+// Download files
 // Print title.
 echo $output->title_heading(get_string('files', 'block_ucla_course_download'));
 
 // Forward calls to renderer.
-echo call_user_func(array($output, $coursecontentstatus), $coursecontent);
+//echo call_user_func(array($output, $coursecontentstatus), $coursecontent);
+echo $output->course_download_status($coursecontentstatus, 'course files', $coursecontent);
 
 if (has_capability('moodle/course:update', $context)) {
-    echo $output->print_contents();
-
+    echo $output->instructor_file_contents_view();
 }
+
+// Download forums
+// @todo
 
 echo $OUTPUT->footer();
