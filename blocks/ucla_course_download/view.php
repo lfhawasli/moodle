@@ -54,7 +54,7 @@ switch ($action) {
             $msg ="processing request " . $request->id ."  ";
             print_object($msg);
 
-            $coursecontentrequest->process_request($request);
+            $coursecontentrequest->process_request();
         }
 
         break;

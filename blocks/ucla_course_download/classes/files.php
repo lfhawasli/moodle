@@ -47,9 +47,9 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
      */
     public function __construct($courseid, $userid) {
         global $CFG;
-        require_once("$CFG->libdir/filelib.php");
         require_once("$CFG->dirroot/mod/resource/locallib.php");
-        require_once($CFG->libdir . '/completionlib.php');
+        require_once("$CFG->libdir/completionlib.php");
+        require_once("$CFG->libdir/filelib.php");
 
         parent::__construct($courseid, $userid);
 
@@ -143,6 +143,11 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
             // Fetch file info and add to files array if they are under the limit.
             $fs = get_file_storage();
             foreach ($resourcemods as $resourcemod) {
+                // Do not include hidden or inaccessible files.
+                if (!$resourcemod->uservisible) {
+                    continue;
+                }
+
                 $context = context_module::instance($resourcemod->id);
                 $fsfiles = $fs->get_area_files($context->id, 'mod_resource',
                         'content', 0, 'sortorder DESC, id ASC', false);
@@ -302,93 +307,93 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
     }
 
     /**
-     * Processes given request record.
+     * Processes request for object's course and user request record.
      *
-     * @param object $request   Record from ucla_archives with type="files".
+     * @return mixed      Returns processed $request record. Returns false on
+     *                    error. Returns null if request was deleted, because
+     *                    there is no content or request is old.
      */
-    public function process_request($request) {
+    public function process_request() {
         global $DB;
+
+        $request = $this->get_request();
+        if (empty($request)) {
+            return false;
+        }
 
         // Check update zip for existing archive.
         if (isset($request->fileid)) {
-
-            echo "existing archive  ";
-
-            // Check for new content.
-            // TODO: handle case when course no longer has files.
-            if ($this->has_new_content($filesforzipping, $contexthash)) {
-                echo "has new content  ";
-
+            // Check for changed content.
+            if (empty($this->has_content())) {
+                // Course no longer has files, so delete file and request.
+                self::delete_zip($request);
+                return null;
+            } else if ($this->has_new_content($filesforzipping, $contexthash)) {
                 if (!$similarrequest = $this->has_zip($contexthash)) {
-                    echo "creating new zip  \n";
                     $newfile = $this->create_zip($filesforzipping);
-
                     if ($newfile) {
                         $request->fileid = $newfile->get_id();
                         $request->contexthash = $contexthash;
                         $request->content = json_encode($filesforzipping);
                         $request->timeupdated = time();
+                    } else {
+                        return false;
                     }
-                    // Else error creating zip file.
-
                 } else {
-                    echo "similar zip found  ";
                     $filename = $DB->get_field('files', 'filename',
                             array('id' => $similarrequest->fileid));
                     $newfile = $this->add_new_file_record($filename, null,
                             $similarrequest->fileid);
-
                     if ($newfile) {
                         $request->fileid = $newfile->get_id();
                         $request->contexthash = $similarrequest->contexthash;
                         $request->content = $similarrequest->content;
                         $request->timeupdated = $similarrequest->timeupdated;
+                    } else {
+                        return false;
                     }
-                    // Else error creating zip file.
                 }
                 // Send update email.
                 $this->email_request($request);
-            } else {
-                echo "no new content  ";
             }
         } else {
+            // Make sure we have files to zip.
+            if (empty($this->has_content())) {
+                self::delete_zip($request); // Delete request.
+                return null;
+            }
+
             // Process new request.
-            echo "process new request  ";
             $filesforzipping = $this->build_zip_array();
-
             if (!$similarrequest = $this->has_zip(sha1(json_encode($filesforzipping)))) {
-                echo "no similar zip  ";
-
                 $newfile = $this->create_zip($filesforzipping);
-
                 if ($newfile) {
-                    echo "new file  ";
                     $request->fileid = $newfile->get_id();
                     $request->content = json_encode($filesforzipping);
                     $request->contexthash = sha1($request->content);
                     $request->timeupdated = time();
+                } else {
+                    return false;
                 }
-                // Else error creating zip file.
             } else {
-                echo "similar zip found  ";
-
                 $filename = $DB->get_field('files', 'filename',
                         array('id' => $similarrequest->fileid));
                 $newfile = $this->add_new_file_record($filename, null,
                         $similarrequest->fileid);
-
                 if ($newfile) {
                     $request->fileid = $newfile->get_id();
                     $request->contexthash = $similarrequest->contexthash;
                     $request->content = $similarrequest->content;
                     $request->timeupdated = $similarrequest->timeupdated;
+                } else {
+                    return false;
                 }
-                // Else error creating zip file.
             }
             // Send update email.
             $this->email_request($request);
         }
         $DB->update_record('ucla_archives', $request);
+        return $request;
     }
 
 }
