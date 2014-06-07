@@ -24,13 +24,32 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-if($ADMIN->fulltree) {
+if($hassiteconfig && $ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox(
                 'block_ucla_course_download/allowstudentaccess',
-                get_string('allowstudentaccess','block_ucla_course_download'),
-                get_string('allowstudentaccess_desc','block_ucla_course_download'),
+                new lang_string('allowstudentaccess','block_ucla_course_download'),
+                new lang_string('allowstudentaccess_desc','block_ucla_course_download'),
                 1
+            ));
+
+    $days = array(
+        1   => new lang_string('numdays', '', 1),
+        2   => new lang_string('numdays', '', 2),
+        3   => new lang_string('numdays', '', 3),
+        5   => new lang_string('numdays', '', 5),
+        7   => new lang_string('numdays', '', 7),
+        10  => new lang_string('numdays', '', 10),
+        14  => new lang_string('numdays', '', 14),
+        20  => new lang_string('numdays', '', 20),
+        30  => new lang_string('numdays', '', 30)
+    );
+    $settings->add(new admin_setting_configselect(
+                'block_ucla_course_download/ziplifetime',
+                new lang_string('ziplifetime','block_ucla_course_download'),
+                new lang_string('ziplifetime_desc','block_ucla_course_download'),
+                7,
+                $days
             ));
 
 }

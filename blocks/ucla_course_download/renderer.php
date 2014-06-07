@@ -44,7 +44,8 @@ class block_ucla_course_download_renderer extends plugin_renderer_base {
             list($timerequested, $timeupdated) = $coursecontent->get_request_update_time();
             // 
             $timeupdatedstring = userdate($timeupdated);
-            $timedeletedstring = userdate($timerequested + 2592000); // TODO: Make config.
+            $expiration = $coursecontent->get_request_expiration();
+            $timedeletedstring = userdate($expiration);
             $a = array(
                 'area' => $area,
                 'timeupdated' => $timeupdatedstring,

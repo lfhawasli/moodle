@@ -144,6 +144,37 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     }
 
     /**
+     * Tests that old requests are deleted.
+     * @group totest
+     */
+    public function test_delete_old_requests() {
+        global $DB;
+        
+        // Set ziplifetime to a known value (7 days).
+        set_config('ziplifetime', 7, 'block_ucla_course_download');
+
+        // Add content and create initial zip.
+        $contenttocreate[] = array('section' => 1);
+        $this->populate_course($contenttocreate);
+        $coursefiles = new block_ucla_course_download_files(
+                $this->course->id, $this->teacher->id);
+        $coursefiles->add_request();
+        $request = $coursefiles->process_request();
+        $this->assertNotEmpty($request->fileid);
+        $this->assertEquals('request_completed', $coursefiles->get_request_status());
+
+        // Now, make request really old (7 days + 1 second).
+        $request->timerequested = $request->timerequested - 7*DAYSECS - 1;
+        $DB->update_record('ucla_archives', $request);
+        $coursefiles->refresh();
+
+        // Process request again, file should be deleted.
+        $request = $coursefiles->process_request();
+        $this->assertNull($request);
+        $this->assertEquals('request_available', $coursefiles->get_request_status());
+    }
+
+    /**
      * Test that an empty course will not generate a zip file.
      */
     public function test_empty_course() {
@@ -161,15 +192,16 @@ class block_ucla_course_download_files_test extends advanced_testcase {
             $this->assertTrue($result);
 
             $request = $coursefiles->get_request();
+            $this->assertNotEmpty($request);
+
+            // Request should then be deleted.
             $processedrequest = $coursefiles->process_request();
+            $this->assertNull($processedrequest);
+            $request = $coursefiles->get_request();
+            $this->assertEmpty($request);
 
             // TODO: When Moodle 2.6+ is integrated, make sure that email is not
             // sent out (http://docs.moodle.org/dev/Writing_PHPUnit_tests#Testing_sending_of_emails).
-
-            // There shouldn't be any changes.
-            foreach (array('fileid', 'contexthash', 'content', 'timeupdated') as $column) {
-                $this->assertEquals($request->$column, $processedrequest->$column);
-            }
         }
     }
 
@@ -194,7 +226,9 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         
         $result = $coursefiles->add_request();
         $this->assertTrue($result);
-        $initialrequest = $coursefiles->get_request();
+        $request = $coursefiles->get_request();
+        // Clone, since process requests modifies the request variable.
+        $initialrequest = clone $request;
         $processedrequest = $coursefiles->process_request();
 
         // Newly processed request should have proper fields set.
@@ -204,15 +238,13 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         }
 
         // Make sure that created zip has proper content in it.
-        $ziparray = $coursefiles->build_zip_array();
+        $ziparray = $coursefiles->get_content();
         $this->compare_content($expectedfiles, $ziparray);
     }
 
     /**
      * Test that if a course suddenly has all its content gone, that we delete
      * the file for any requests that had content.
-     *
-     * @group totest
      */
     public function test_filled_then_emptied_course() {
         // Add content to section 0.
@@ -255,7 +287,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         foreach (array('teacher', 'student') as $user) {
             $coursedownload = new block_ucla_course_download_files(
                     $this->course->id, $this->$user->id);
-            $ziparray = $coursedownload->build_zip_array();
+            $ziparray = $coursedownload->get_content();
             $expectedfiles = ${'expected'.$user.'files'};
             $this->compare_content($expectedfiles, $ziparray);
         }
@@ -274,7 +306,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
         $request = $coursedownload->process_request();
-        $ziparray = $coursedownload->build_zip_array();
+        $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
 
         $orignaltimestamp = $request->timeupdated;
@@ -305,7 +337,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $this->assertNotEquals($orignalfileid, $request->fileid);
 
         // Zip should have updated files.
-        $ziparray = $coursedownload->build_zip_array();
+        $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
     }
 
@@ -324,7 +356,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
         $request = $coursedownload->process_request();
-        $ziparray = $coursedownload->build_zip_array();
+        $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
 
         $orignaltimestamp = $request->timeupdated;
@@ -355,13 +387,15 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $this->assertNotEquals($orignalfileid, $request->fileid);
 
         // Zip should have updated files.
-        $ziparray = $coursedownload->build_zip_array();
+        $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
     }
 
     /**
      * Tests that a course with the same content for 2 users will share the same
      * zip file.
+     *
+     * @group totest
      */
     public function test_same_content() {
         // Create content for course. Just add 1 file per section.
@@ -381,6 +415,15 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $studentdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $studentdownload->add_request();
+
+        // Before request is processed, check sure that if it is processed that
+        // it will reuse an existing zip file.
+        $request = $studentdownload->get_request();
+        $existingrequest = $studentdownload->has_zip($request->contexthash);
+        $this->assertNotEmpty($existingrequest);
+        $this->assertNotEmpty($existingrequest->fileid);
+
+        // Now, process request.
         $studentrequest = $studentdownload->process_request();
 
         // Make sure that both requests share the same content.

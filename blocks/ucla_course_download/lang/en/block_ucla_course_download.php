@@ -9,9 +9,6 @@ $string['download'] = 'Download {$a} zip';
         
 /* filenames */
 $string['table_of_contents_file'] = "table_of_contents.html";
-$string['files_archive'] = "files";
-$string['posts_archive'] = "posts";
-$string['submissions_archive'] = "submissions";
 
 /* course download page */
 $string['files'] = 'Files';
@@ -53,6 +50,10 @@ $string['allowstudentaccess_desc'] = 'If enabled, will display alert and give ' 
         'class, it will display on 5th week. Students will continue to have ' .
         'access to the "Course content downloa`d" page until the course is ' .
         'hidden or they lose access to the course site.';
+$string['ziplifetime'] = 'Keep zips for';
+$string['ziplifetime_desc'] = 'This specifies how long to keep zip files ' . 
+        'after they have been requested. After the specified number of days, ' .
+        'the zip file and request will be deleted.';
 
 // Instructor view of files
 $string['instructorfilewarning'] = 'Files included are ones that are already visible ' .
