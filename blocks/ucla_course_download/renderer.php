@@ -123,6 +123,10 @@ END;
         $modinfo = get_fast_modinfo($COURSE);
         $resources = $modinfo->get_instances_of('resource');
 
+        if (empty($resources)) {
+            return '';
+        }
+
         // Alert message
         $alert = html_writer::div(get_string('instructorfilewarning', 'block_ucla_course_download'), 'alert alert-warning');
         

@@ -235,19 +235,32 @@ abstract class block_ucla_course_download_base {
     /**
      * Email requestor once zip file is created or updated.
      *
-     * @param object $request
      * @return boolean
      */
-    public function email_request($request) {
-        global $DB;
+    public function email_request() {
+        global $CFG, $DB;
 
+        $request = $this->get_request();        
         $user = $DB->get_record('user', array('id' => $request->userid));
-        $from = get_string('email_sender', 'block_ucla_course_download');
-        $subject = get_string('email_subject', 'block_ucla_course_download',
-                'Files');
 
-        // TODO: Add time updated and other information.
-        $message = get_string('email_message', 'block_ucla_course_download');
+        // Prepare email variables.
+        $a = new stdClass();
+        $a->shortname = $this->course->shortname;
+        $a->type = $this->get_type();
+        $a->ziplifetime = get_config('block_ucla_course_download', 'ziplifetime');
+        $a->url = new moodle_url('/blocks/ucla_course_download/view.php', 
+                array('id' => $request->courseid));
+
+        $from = get_string('emailsender', 'block_ucla_course_download');
+        $subject = get_string('emailsubject', 'block_ucla_course_download', $a);
+        $message = get_string('emailmessage', 'block_ucla_course_download',$a);
+
+        $coursecontext = context_course::instance($request->courseid);
+        if (!has_capability('moodle/course:manageactivities', $coursecontext, $user)) {
+            // User does not have ability to manage course, so append copyright
+            // statment.
+            $message .= "\n\n" . get_string('emailcopyright', 'block_ucla_course_download');
+        }
 
         return email_to_user($user, $from, $subject, $message);
     }
@@ -339,7 +352,8 @@ abstract class block_ucla_course_download_base {
      * @return bool
      */
     public function has_content() {
-        return !empty($this->get_content());
+        $content = $this->get_content();
+        return !empty($content);
     }
 
     /**
@@ -449,7 +463,7 @@ abstract class block_ucla_course_download_base {
                     }
                 }
                 // Send update email.
-                $this->email_request($request);
+                $this->email_request();
             }
         } else {
             // Make sure we have files to zip.
@@ -488,7 +502,7 @@ abstract class block_ucla_course_download_base {
                 }
             }
             // Send update email.
-            $this->email_request($request);
+            $this->email_request();
         }
         $DB->update_record('ucla_archives', $request);
         $this->refresh();

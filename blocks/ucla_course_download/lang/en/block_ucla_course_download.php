@@ -34,10 +34,19 @@ $string['alert_dismiss'] = 'Dismiss';
 $string['alert_dismiss_message'] = 'You will no longer be prompted to download course material. ' .
         'Use the Download Course Content link in the Control Panel to request content later.';
 
-/* TODO: email strings */
-$string['email_subject'] = 'Course Download of {$a} Updated';
-$string['email_sender'] = 'CCLE';
-$string['email_message'] = '';
+/* Email strings */
+$string['emailsubject'] = 'Your {$a->shortname} {$a->type} are ready';
+$string['emailsender'] = 'CCLE';
+$string['emailmessage'] = 'CCLE has created a zip file from {$a->shortname}. '
+        . 'You can download it here by going to {$a->url}' . "\n\n" .
+        'The zip file will only be available for a limited time. Please '
+        . 'download it in the next {$a->ziplifetime} days to ensure that you '
+        . 'receive it before it is removed.';
+$string['emailcopyright'] = 'This zip file may contain copyrighted material. '
+        . 'Such material is meant for your personal educational use, and '
+        . 'should not be shared with others outside this course, posted '
+        . 'online, or otherwise distributed without permission from the '
+        . 'copyright owner.';
 
 // Settings.
 $string['settingsdisable'] = 'Disable feature for students';

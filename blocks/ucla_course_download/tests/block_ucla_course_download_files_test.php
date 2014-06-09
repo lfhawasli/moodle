@@ -145,7 +145,6 @@ class block_ucla_course_download_files_test extends advanced_testcase {
 
     /**
      * Tests that old requests are deleted.
-     * @group totest
      */
     public function test_delete_old_requests() {
         global $DB;
@@ -172,6 +171,15 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $request = $coursefiles->process_request();
         $this->assertNull($request);
         $this->assertEquals('request_available', $coursefiles->get_request_status());
+    }
+
+    /**
+     * Tests that emails are formatted properly.
+     * 
+     * TODO: Implement once Moodle 2.6+ is integrated.
+     * http://docs.moodle.org/dev/Writing_PHPUnit_tests#Testing_sending_of_emails
+     */
+    public function test_email() {
     }
 
     /**
@@ -394,8 +402,6 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     /**
      * Tests that a course with the same content for 2 users will share the same
      * zip file.
-     *
-     * @group totest
      */
     public function test_same_content() {
         // Create content for course. Just add 1 file per section.

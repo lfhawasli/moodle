@@ -43,17 +43,7 @@ switch ($action) {
         $requests = $DB->get_records('ucla_archives', array("type" => 'files'));
 
         foreach ($requests as $request) {
-            // Delete zip if old request.
-            if( block_ucla_course_download_files::is_old($request) ) {
-                block_ucla_course_download_files::delete_zip($request);
-                continue;
-            }
-
             $coursecontentrequest = new block_ucla_course_download_files($request->courseid, $request->userid);
-
-            $msg ="processing request " . $request->id ."  ";
-            print_object($msg);
-
             $coursecontentrequest->process_request();
         }
 
