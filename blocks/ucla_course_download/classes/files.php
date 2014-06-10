@@ -86,10 +86,8 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
             if (count($fsfiles) >= 1) {
                 $mainfile = reset($fsfiles);
                 if ($mainfile->get_filesize() < 524288000) { // TODO: MAKE THIS A CONFIG VARIABLE.
-                    // Saving section and contenthash, because this will be
-                    // used in creating the zip as well as checking if the
-                    // contents of the zipped changed.
-                    $mainfile->section = $resourcemod->section;
+                    // Saving contenthash, because it will be used in checking
+                    // if the contents of the zip changed.
                     $mainfile->contenthash = $mainfile->get_contenthash();
                     $index = $sectionnames[$resourcemod->section].'/'.$mainfile->get_filename();
                     $this->content[$index] = $mainfile;

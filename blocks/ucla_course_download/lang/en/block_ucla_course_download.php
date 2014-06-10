@@ -37,7 +37,7 @@ $string['alert_dismiss_message'] = 'You will no longer be prompted to download c
 /* Email strings */
 $string['emailsubject'] = 'Your {$a->shortname} {$a->type} are ready';
 $string['emailsender'] = 'CCLE';
-$string['emailmessage'] = 'CCLE has created a zip file from {$a->shortname}. '
+$string['emailmessage'] = 'CCLE has created a zip file for {$a->shortname}. '
         . 'You can download it here by going to {$a->url}' . "\n\n" .
         'The zip file will only be available for a limited time. Please '
         . 'download it in the next {$a->ziplifetime} days to ensure that you '

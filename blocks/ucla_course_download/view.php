@@ -24,76 +24,49 @@ $PAGE->set_url('/blocks/ucla_course_download/view.php',
 $page_title = $course->shortname . ': ' . get_string('pluginname',
                     'block_ucla_course_download');
 
-$PAGE->set_context(context_course::instance($courseid));
+$PAGE->set_context($context);
 $PAGE->set_title($page_title);
-$PAGE->set_heading($course->fullname);
+$PAGE->set_heading($page_title);
 $PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);
 
-$coursecontent = new block_ucla_course_download_files($courseid, $USER->id);
+// Get plugin renderer.
+/** var $output block_ucla_course_download_renderer */
+$output = $PAGE->get_renderer('block_ucla_course_download');
 
-$action = optional_param('action', '', PARAM_ALPHAEXT);
+// List of available classes that handle the downloading of course content.
+// Edit this array if adding in additional classes.
+$downloadoptions = array('files');
+$body = '';
+foreach ($downloadoptions as $downloadoption) {
+    // Load class.
+    $classname = 'block_ucla_course_download_' . $downloadoption;
+    $coursecontent = new $classname($courseid, $USER->id);
 
-switch ($action) {
-
-    /* FOR TESTING CRON */
-    case 'process_requests':
-        global $DB;
-
-        $requests = $DB->get_records('ucla_archives', array("type" => 'files'));
-
-        foreach ($requests as $request) {
-            $coursecontentrequest = new block_ucla_course_download_files($request->courseid, $request->userid);
-            $coursecontentrequest->process_request();
-        }
-
-        break;
-    /* END TESTING */
-
-    case 'files_request':
+    // Do we need to repond to any new requests?
+    $action = optional_param('action', null, PARAM_ALPHANUMEXT);
+    if (!empty($action) && $action == $downloadoption.'_request') {
         $coursecontent->add_request();
-        break;
-    case 'files_download':
-        $coursecontent->download_zip();
-        break;
-    case 'posts_request':
-    case 'posts_download':
-    case 'submissions_request':
-    case 'submissions_download':
-}
+        // Need to redirect to success message.
+        redirect($PAGE->url);
+    }
 
+    // Print title.
+    $body .= $output->title_heading(get_string($downloadoption, 'block_ucla_course_download'));
+
+    $coursecontentstatus = $coursecontent->get_request_status();
+    // Forward calls to renderer.
+    $body .= $output->course_download_status($coursecontentstatus, $downloadoption, $coursecontent);
+
+    // Files have a special display for instructors to show listing.
+    if ($downloadoption == 'files' &&
+            has_capability('moodle/course:manageactivities', $context)) {
+        $body .= $output->instructor_file_contents_view();
+    }
+}
 
 // Start output screen.
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'block_ucla_course_download'), 2, 'headingblock');
-
-/* FOR TESTING CRON */
-echo html_writer::start_tag('form', array('action' => new moodle_url('/blocks/ucla_course_download/view.php',array('courseid' => $courseid)), 'method' => 'get'));
-echo html_writer::tag('input', '',array('type'=> 'hidden', 'name' => 'courseid','value' =>$courseid));
-echo html_writer::tag('button', 'Process requests', array('class' => 'btn', 'type'=>'submit', 'name' => 'action', 'value' =>'process_requests'));
-echo html_writer::end_tag('form');
-/* END TESTING */
-
-$coursecontentstatus = $coursecontent->get_request_status();
-
-// Get plugin renderer.
-
-/** var $output block_ucla_course_download_renderer */
-$output = $PAGE->get_renderer('block_ucla_course_download');
-
-// Download files
-// Print title.
-echo $output->title_heading(get_string('files', 'block_ucla_course_download'));
-
-// Forward calls to renderer.
-//echo call_user_func(array($output, $coursecontentstatus), $coursecontent);
-echo $output->course_download_status($coursecontentstatus, 'course files', $coursecontent);
-
-if (has_capability('moodle/course:update', $context)) {
-    echo $output->instructor_file_contents_view();
-}
-
-// Download forums
-// @todo
-
+echo $body;
 echo $OUTPUT->footer();
