@@ -124,7 +124,7 @@ function xmldb_scorm_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2013050102, 'scorm');
     }
 
-    if ($oldversion < 2013050104) {
+    if ($oldversion < 2013050105) {
         // Fix invalid $scorm->launch records that launch an org sco instead of a real sco.
         $sql = "SELECT s.*, c.identifier
                  FROM {scorm} s
@@ -171,7 +171,7 @@ function xmldb_scorm_upgrade($oldversion) {
         }
         $scorms->close();
 
-        upgrade_mod_savepoint(true, 2013050104, 'scorm');
+        upgrade_mod_savepoint(true, 2013050105, 'scorm');
     }
     return true;
 }
