@@ -99,14 +99,6 @@ class set_engineering_default_test extends advanced_testcase {
                 $this->assertFalse($installed);
             }
         }
-
-        // Make sure that theme is set.
-        $theme = $DB->get_field('course', 'theme', array('id' => $courseid));
-        if ($assertchanged) {
-            $this->assertEquals('uclasharedcourse', $theme);
-        } else {
-            $this->assertEmpty($theme);
-        }
     }
 
     /**
