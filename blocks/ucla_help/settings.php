@@ -19,21 +19,14 @@ if ($ADMIN->fulltree) {
     // left-hand side box HTML
     $settings->add(new admin_setting_confightmleditor('block_ucla_help/boxtext', 
             get_string('settings_boxtext', 'block_ucla_help'), 
-            get_string('settings_boxtext_description', 'block_ucla_help'), ''));   
-    
-    // option to send form messages to email or JIRA 
-    $options = array('email'=>get_string('settings_send_to_email_option', 'block_ucla_help'), 
-            'jira'=>get_string('settings_send_to_jira_option', 'block_ucla_help'));
-    $settings->add(new admin_setting_configselect('block_ucla_help/send_to', 
-            get_string('settings_send_to', 'block_ucla_help'), 
-            get_string('settings_send_to_description', 'block_ucla_help'), 'email', $options));    
+            get_string('settings_boxtext_description', 'block_ucla_help'), ''));       
     
     // mail settings
     $settings->add(new admin_setting_heading('block_ucla_help/email_header', 
-            get_string('settings_email_header', 'block_ucla_help'), 
-            get_string('settings_email_description', 'block_ucla_help')));    
-    $settings->add(new admin_setting_configtext('block_ucla_help/email', 
-            get_string('settings_email', 'block_ucla_help'), '', ''));
+            get_string('settings_email_header', 'block_ucla_help'), ''));
+    $settings->add(new admin_setting_configtext('block_ucla_help/fromemail',
+            get_string('settings_fromemail', 'block_ucla_help'),
+            get_string('settings_fromemail_description', 'block_ucla_help'), ''));
     
     // jira settings
     $settings->add(new admin_setting_heading('block_ucla_help/jira_header', 
@@ -46,9 +39,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configpasswordunmask('block_ucla_help/jira_password', 
             get_string('settings_jira_password', 'block_ucla_help'), '', ''));
     $settings->add(new admin_setting_configtext('block_ucla_help/jira_pid', 
-            get_string('settings_jira_pid', 'block_ucla_help'), '', ''));        
-    $settings->add(new admin_setting_configtext('block_ucla_help/jira_default_assignee', 
-            get_string('settings_jira_default_assignee', 'block_ucla_help'), '', ''));        
+            get_string('settings_jira_pid', 'block_ucla_help'), '', ''));    
     
     // point of contact table
     $settings->add(new admin_setting_heading('block_ucla_help/support_contacts_header', 

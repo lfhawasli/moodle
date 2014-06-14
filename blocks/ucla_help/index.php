@@ -82,17 +82,19 @@ echo html_writer::tag('legend', get_string('helpform_header', 'block_ucla_help')
         array('id' => 'block_ucla_help_formbox_header'));
 
 // CCLE-3562 - Get the list of the user's courses for selection
-$sql = 'SELECT  DISTINCT crs.id, crs.fullname, crs.shortname, ctx.instanceid
-        FROM    mdl_context AS ctx 
-                JOIN mdl_course AS crs ON crs.id = ctx.instanceid
-                JOIN mdl_role_assignments AS ra ON ra.contextid = ctx.id
-        WHERE   ra.userid=:userid
-        ORDER BY ra.timemodified DESC';
+$sql = 'SELECT DISTINCT crs.id, crs.fullname, crs.shortname
+          FROM {context} AS ctx
+          JOIN {course} AS crs ON crs.id = ctx.instanceid
+          JOIN {role_assignments} AS ra ON ra.contextid = ctx.id
+         WHERE ra.userid=:userid AND
+               ctx.contextlevel=:contextlevel
+      ORDER BY ra.timemodified DESC';
 $params['userid'] = $USER->id;
+$params['contextlevel'] = CONTEXT_COURSE;
 
 $user_courses = $DB->get_records_sql($sql, $params);
 if ($courseid != 0) {
-    $user_courses[] = $course;
+    $user_courses[] = $course;  // Include course user was viewing, if any.
 }
 $courses = array();
 $courses[$SITE->id] = get_string('no_course', 'block_ucla_help');
@@ -102,6 +104,7 @@ foreach ($user_courses as $crs) {
     $courses[$crs->id] = textlib::strlen($course_name) < $maxlength ? 
             $course_name : textlib::substr($course_name, 0, $maxlength);
 }
+$user_courses[] = $SITE;    // Include the site default.
 
 // create form object for page
 $mform = new help_form(NULL, array('courses' => $courses));
@@ -129,31 +132,37 @@ if ($fromform = $mform->get_data()) {
     foreach ($user_courses as $c) {
         if ($c->id == $fromform->ucla_help_course) {
             $fromform->course_name = $c->shortname;
-            $instanceid = $c->instanceid;
+            $instanceid = $c->id;
             break;
         }
     }
-    $context = context_course::instance($instanceid, false) ? : $context;
-    
+    debugging('$instanceid = ' . $instanceid);
+    if (!empty($instanceid)) {
+        $context = context_course::instance($instanceid, false) ? : $context;
+    }
+
+    print_object($context);
+
     // get message body
     $body = create_help_message($fromform);
     
     // get support contact
     $support_contact = get_support_contact($context);
-    
-    $send_to = get_config('block_ucla_help', 'send_to');    
-    if ('email' == $send_to) {
+
+    // Now, is the support contact an email address?
+    if (validateEmailSyntax($support_contact)) {
         // send message via email        
         $mail = get_mailer();
-        
-        $mail->From = $from_address;          
-       
-        // always add configured email address
-        // @todo: log error if AddAddress returns false  
-        $mail->AddAddress(get_config('block_ucla_help', 'email'));      
-        
-        // add support contact email address (if nill, phpmailer will ignore it)
-        // @todo: log error if AddAddress returns false        
+
+        // Check if we want the from email to be something else.
+        $altfrom = get_config('block_ucla_help', 'fromemail');
+        if (!empty($altfrom)) {
+            $mail->From = $altfrom;
+        } else {
+            $mail->From = $from_address;
+        }
+            
+        // Add support contact email address.
         $mail->AddAddress($support_contact);
         
         $mail->Subject = $header;
@@ -164,14 +173,9 @@ if ($fromform = $mform->get_data()) {
         // database to exist
         $result = $mail->Send();
         
-    } elseif ('jira' == $send_to) {
-        // send message via JIRA
-        
-        // if no support contact is assigned, then send to default jira assignee
-        if (empty($support_contact)) {
-            $support_contact = get_config('block_ucla_help', 'jira_default_assignee');
-        }
-        
+    } else if (!empty($support_contact)) {
+        // Send message via JIRA.
+                
         $params = array(
             'pid' => get_config('block_ucla_help', 'jira_pid'),
             'issuetype' => 1,
