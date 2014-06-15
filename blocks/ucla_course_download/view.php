@@ -61,7 +61,8 @@ foreach ($downloadoptions as $downloadoption) {
     // Files have a special display for instructors to show listing.
     if ($downloadoption == 'files' &&
             has_capability('moodle/course:manageactivities', $context)) {
-        $body .= $output->instructor_file_contents_view();
+        $content = $coursecontent->renderable_content();
+        $body .= $output->instructor_file_contents_view($content);
     }
 }
 

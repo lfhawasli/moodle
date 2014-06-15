@@ -51,5 +51,12 @@ if($hassiteconfig && $ADMIN->fulltree) {
                 7,
                 $days
             ));
-
+    $settings->add(new admin_setting_configtext(
+                'block_ucla_course_download/maxfilesize',
+                new lang_string('maxfilesize','block_ucla_course_download'),
+                new lang_string('maxfilesize_desc','block_ucla_course_download'),
+                500,
+                PARAM_INT,
+                4
+            ));
 }

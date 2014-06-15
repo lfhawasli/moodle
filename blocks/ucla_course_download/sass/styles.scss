@@ -56,7 +56,15 @@
             }
         }
     }
-    
+    .filesize {
+        &:after {
+            content: ")";
+        }
+        &:before {
+            content: "(";
+        }
+        margin-left: 12px;
+    }
     li {
         list-style: none;
         border-bottom: 1px solid #ddd;

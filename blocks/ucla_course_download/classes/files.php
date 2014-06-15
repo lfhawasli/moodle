@@ -64,6 +64,11 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
             return $this->content;
         }
 
+        // Max file size to exclude to from zip.
+        $maxsize = get_config('block_ucla_course_download', 'maxfilesize');
+        // Convert bytes to MB
+        $maxsize = $maxsize * pow(1024,2);
+
         // Fetch file info and add to content array if they are under the limit.
         $fs = get_file_storage();
         $sectionnames = array();    // Cache indexed by sectionid => name
@@ -85,7 +90,8 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
 
             if (count($fsfiles) >= 1) {
                 $mainfile = reset($fsfiles);
-                if ($mainfile->get_filesize() < 524288000) { // TODO: MAKE THIS A CONFIG VARIABLE.
+                
+                if ($mainfile->get_filesize() < $maxsize) { // TODO: MAKE THIS A CONFIG VARIABLE.
                     // Saving contenthash, because it will be used in checking
                     // if the contents of the zip changed.
                     $mainfile->contenthash = $mainfile->get_contenthash();
@@ -96,6 +102,62 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
         }
 
         return $this->content;
+    }
+    
+    /**
+     * Generates renderble representation of the contents of a zip file.
+     * 
+     * @return array of renderable content.
+     */
+    public function renderable_content() {
+        
+        $format = course_get_format($this->course);
+        $sections = $format->get_sections();
+        
+        // Get files (resources)
+        $modinfo = get_fast_modinfo($this->course);
+        $resources = $modinfo->get_instances_of('resource');
+        
+        // Need file storage to get file size.
+        $fs = get_file_storage();
+                
+        // Iterate sections
+        foreach ($sections as $section) {
+
+            $files = array();
+
+            // Get files for section
+            foreach ($resources as $resource) {
+                // Report filesize.
+                $filesize = 0;
+
+                $context = context_module::instance($resource->id);
+                $fsfiles = $fs->get_area_files($context->id, 'mod_resource',
+                        'content', 0, 'sortorder DESC, id ASC', false);
+                if (count($fsfiles) >= 1) {
+                    $mainfile = reset($fsfiles);
+                    $filesize = $mainfile->get_filesize();
+                }
+
+                // Save file info when file belongs to section.
+                if ($section->id == $resource->section) {
+                    $files[] = array(
+                        'name' => $resource->name,
+                        'visible' => $resource->visible,
+                        'size' => $filesize,
+                    );
+                }
+            }
+
+            $out[$section->id] = array(
+                'name' => $section->name,
+                'visible' => $section->visible,
+                'files' => $files,
+            );
+            
+        }
+        
+        return $out;
     }
 
 }

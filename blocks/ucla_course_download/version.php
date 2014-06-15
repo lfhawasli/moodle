@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2014060900;  // YYYYMMDDXX.
+$plugin->version = 2014061302;  // YYYYMMDDXX.
 $plugin->requires = 2010112400; // YYYYMMDDHH (This is the release version for Moodle 2.0)
 $plugin->cron = 86400;          // Run cron once a day.

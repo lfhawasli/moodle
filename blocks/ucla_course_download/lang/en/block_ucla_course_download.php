@@ -63,6 +63,8 @@ $string['ziplifetime'] = 'Keep zips for';
 $string['ziplifetime_desc'] = 'This specifies how long to keep zip files ' . 
         'after they have been requested. After the specified number of days, ' .
         'the zip file and request will be deleted.';
+$string['maxfilesize'] = 'Maximum file size in MB';
+$string['maxfilesize_desc'] = 'Files over this size will be excluded from the zip file.';
 
 // Instructor view of files
 $string['instructorfilewarning'] = 'Files included are ones that are already visible ' .
@@ -70,5 +72,6 @@ $string['instructorfilewarning'] = 'Files included are ones that are already vis
         'groupings will only be available to students that match that criteria. ' .
         'When you update the availability of a file, it will be reflected in an ' .
         'updated zip file.';
-$string['filewillbeexcluded'] = 'File will be excluded';
-$string['filemaybeincluded'] = 'File may be included';
+$string['filewillbeexcluded'] = 'File will be excluded.';
+$string['filemaybeincluded'] = 'File may be included.';
+$string['fileoversizeexclusion'] = 'Files over <strong>{$a}</strong> will be excluded.';

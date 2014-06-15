@@ -72,12 +72,14 @@ class block_ucla_course_download_renderer extends plugin_renderer_base {
             );
             $buffer .= html_writer::link($url, get_string('download', 'block_ucla_course_download', $a['area']), array('class' => 'btn btn-primary btn-copyright-check'));
 
-            // YUI script to enable/disable 'download' button on copyright check.
-            // Script assumes ONLY files for now.  
-            $yui = <<<END
+            if ($area === 'files') {
+
+                // YUI script to enable/disable 'download' button on copyright check.
+                // Script assumes ONLY files for now.  
+                $yui = <<<END
 Y.use('node','event', function(Y) {
 
-    var copyrightbutton = Y.one('.btn-copyright-check');
+    var copyrightbutton = Y.one('.files .btn-copyright-check');
     copyrightbutton.setAttribute('disabled', 'disabled');
     
     Y.one('.course-download-copyright').on('change', function(e) {
@@ -91,7 +93,9 @@ Y.use('node','event', function(Y) {
 }); 
 END;
 
-            $buffer .= html_writer::script($yui);
+                $buffer .= html_writer::script($yui);
+            }
+
         }
         
         // Send back any printable html we've generated.
@@ -105,27 +109,14 @@ END;
     
     public function course_download_status($status, $area, $coursecontent) {
         
-        $buffer = html_writer::start_tag('ul', array('class' => 'course-download'));
+        $buffer = html_writer::start_tag('ul', array('class' => 'course-download ' . $area));
         $buffer .= html_writer::tag('li', call_user_func(array($this, $status), $area, $coursecontent), array('class' => 'arrow_box'));
         $buffer .= html_writer::end_tag('ul');
      
         return $buffer;
     }
 
-    public function instructor_file_contents_view() {
-        global $COURSE;
-        
-        // Get sections
-        $format = course_get_format($COURSE);
-        $sections = $format->get_sections();
-
-        // Get files (resources)
-        $modinfo = get_fast_modinfo($COURSE);
-        $resources = $modinfo->get_instances_of('resource');
-
-        if (empty($resources)) {
-            return '';
-        }
+    public function instructor_file_contents_view($content) {
 
         // Alert message
         $alert = html_writer::div(get_string('instructorfilewarning', 'block_ucla_course_download'), 'alert alert-warning');
@@ -139,8 +130,16 @@ END;
             html_writer::span('', 'glyphicon glyphicon-remove') .
                 get_string('filewillbeexcluded', 'block_ucla_course_download')
         );
+
+        $maxsize = get_config('block_ucla_course_download', 'maxfilesize');
+        // Convert bytes to MB
+        $maxsize = $maxsize * pow(1024,2);
+
+        $legend .= html_writer::span(
+              get_string('fileoversizeexclusion', 'block_ucla_course_download', display_size($maxsize))
+        );
         
-        // Print contents
+        // Print content.  Start with alert.
         $buffer = $alert;
         $buffer .= html_writer::div($legend, 'zip-contents-legend');
         
@@ -149,29 +148,39 @@ END;
 
         // Iterate through sections, and for each section print out
         // all the files (resources) with a visibility indicator.
-        foreach ($sections as $section) {
-            $cmids = explode(',', $section->sequence);
-
-            $classes = empty($section->visible) ? 'omitted' : '';
+        foreach ($content as $section) {
+            
+            // List of files in section.
+            $files = $section['files'];
+            
+            // Only print sections with content.
+            if (empty($files)) {
+                continue;
+            }
+            
+            $classes = empty($section['visible']) ? 'omitted' : '';
             $classes .= ' section';
 
             // Section name
-            $buffer .= html_writer::tag('div', $section->name, array('class' => $classes));
+            $buffer .= html_writer::tag('div', $section['name'], array('class' => $classes));
 
-            // List of files
+            // Start file list.
             $buffer .= html_writer::start_tag('ul');
-            foreach ($cmids as $modid) {
-                foreach ($resources as $resource) {
-                    if ($resource->id == $modid) {
-                        $classes = empty($resource->visible) ? 'omitted' : '';
-                        $glyph = empty($resource->visible) ? 'glyphicon glyphicon-remove' : 'glyphicon glyphicon-ok';
-                        $icon = html_writer::span('', $glyph);
-                        $buffer .= html_writer::tag('li', $icon . $resource->name, array('class' => $classes));
-                    }
-                }
+            foreach ($files as $file) {
+                
+                // File will be excluded when it's hidden, or larger than allowed max size.
+                $visible = empty($file['visible']) || $file['size'] > $maxsize;
+                $classes = $visible ? 'omitted' : '';
+                $glyph = $visible ? 'glyphicon glyphicon-remove' : 'glyphicon glyphicon-ok';
+                $icon = html_writer::span('', $glyph);
+                $size = html_writer::span(display_size($file['size']), 'filesize');
+                
+                $buffer .= html_writer::tag('li', $icon . $file['name'] . $size, array('class' => $classes));
+
             }
             $buffer .= html_writer::end_tag('ul');
         }
+
         $buffer .= html_writer::end_div();
 
         // Output.
