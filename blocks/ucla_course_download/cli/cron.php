@@ -29,8 +29,6 @@ require(__DIR__.'/../../../config.php');
 // Required Moodle libraries.
 require_once("$CFG->libdir/clilib.php");
 require_once("$CFG->dirroot/blocks/moodleblock.class.php");
-require_once("$CFG->dirroot/course/lib.php");
-require_once("$CFG->dirroot/course/format/lib.php");
 
 // Required UCLA libraries.
 require_once("$CFG->dirroot/local/ucla/lib.php");

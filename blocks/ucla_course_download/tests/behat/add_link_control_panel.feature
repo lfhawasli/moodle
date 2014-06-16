@@ -19,19 +19,20 @@ Feature: Add link to Control Panel
       | student1 | C1 | student |
 
   Scenario: Control Panel link for students
+    Given it is "9th" week
     And I log in as ucla "student1"
     And I browse to site "C1"
-    And I press "Control Panel"
-    And I should see "Download course content" in the "region-main" "region"
-    And I follow "Download course content"
+    When I press "Control Panel"
+    Then I should see "Download course materials" in the "region-main" "region"
+    When I follow "Download course materials"
     Then I should see "UCLA course download" in the "region-main" "region"
 
   Scenario: Control Panel link for instructors
-    And I log in as ucla "teacher1"
+    Given I log in as ucla "teacher1"
     And I browse to site "C1"
-    And I press "Control Panel"
-    And I should see "Download course content" in the "region-main" "region"
-    And I follow "Download course content"
+    When I press "Control Panel"
+    Then I should see "Download course materials" in the "region-main" "region"
+    When I follow "Download course materials"
     Then I should see "UCLA course download" in the "region-main" "region"
 
 

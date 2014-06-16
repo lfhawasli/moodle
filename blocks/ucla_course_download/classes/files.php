@@ -90,8 +90,7 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
 
             if (count($fsfiles) >= 1) {
                 $mainfile = reset($fsfiles);
-                
-                if ($mainfile->get_filesize() < $maxsize) { // TODO: MAKE THIS A CONFIG VARIABLE.
+                if ($mainfile->get_filesize() <= $maxsize) {
                     // Saving contenthash, because it will be used in checking
                     // if the contents of the zip changed.
                     $mainfile->contenthash = $mainfile->get_contenthash();

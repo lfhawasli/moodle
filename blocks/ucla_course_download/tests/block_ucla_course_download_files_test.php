@@ -443,4 +443,58 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $studentfile = $fs->get_file_by_id($studentrequest->fileid);
         $this->assertEquals($teacherfile->get_contenthash(), $studentfile->get_contenthash());
     }
+
+    /**
+     * Make sure that the maxfilesize config setting works as expected.
+     */
+    public function test_size_limit() {
+        // Add content to section 1 and 2.
+        $contenttocreate[0] = array('section' => 1);
+        $contenttocreate[1] = array('section' => 2);
+        $expectedfiles = $this->populate_course($contenttocreate);
+
+        // Make request. Nothing should change.
+        $teacherdownload = new block_ucla_course_download_files(
+                $this->course->id, $this->teacher->id);
+        $teacherdownload->add_request();
+        $request1 = $teacherdownload->process_request();
+        
+        $ziparray = $teacherdownload->get_content();
+        $this->compare_content($expectedfiles, $ziparray);
+
+        // Now set filesize limit to a know, low amount.
+        set_config('maxfilesize', 10, 'block_ucla_course_download'); // 10 MB.
+
+        // Set file size for file in section 1 to something over 10 MB.
+        $modinfo = new course_modinfo($this->course, $this->teacher->id);
+        $resourcemods = $modinfo->get_instances_of('resource');
+
+        // Assuming first mod is in section 1.
+        $resourcemod = reset($resourcemods);
+        $modcontext = context_module::instance($resourcemod->id);
+        $fs = get_file_storage();
+        $fsfiles = $fs->get_area_files($modcontext->id, 'mod_resource',
+                'content', 0, 'sortorder DESC, id ASC', false);
+        $mainfile = reset($fsfiles);
+        $mainfile->set_filesize(11 * pow(1024,2));  // Set to 11 MB.
+
+        // Redo request.
+        $teacherdownload->refresh();
+        $request2 = $teacherdownload->process_request();
+        $this->assertNotEquals($request1->fileid, $request2->fileid);
+
+        // Make sure that file is not included.
+        $ziparray = $teacherdownload->get_content();
+        $smallerexpectedfiles = $expectedfiles;
+        unset($smallerexpectedfiles[0]);
+        $this->compare_content($smallerexpectedfiles, $ziparray);
+
+        // Now increase limit and make sure file is included.
+        set_config('maxfilesize', 15, 'block_ucla_course_download'); // 15 MB.
+        $teacherdownload->refresh();
+        $request2 = $teacherdownload->process_request();
+        $this->assertNotEquals($request1->fileid, $request2->fileid);
+        $ziparray = $teacherdownload->get_content();
+        $this->compare_content($expectedfiles, $ziparray);        
+    }
 }

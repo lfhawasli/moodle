@@ -5,17 +5,24 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/base.php');
 require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/files.php');
-global $CFG, $DB, $PAGE;
+require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
 
 $courseid = required_param('courseid', PARAM_INT); // course ID
-
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+if (!$course = get_course($courseid)) {
     print_error('coursemisconf');
 }
 require_login($course);
 $context = context_course::instance($course->id);
+// Make sure user has capability to request/download zips.
 if (!has_capability('block/ucla_course_download:requestzip', $context)) {
     print_error('noaccess', 'block_ucla_course_download');
+}
+
+// If user is a student, then make sure they are allowed to download.
+if (!has_capability('moodle/course:manageactivities', $context)) {
+    if (!student_zip_requestable($course)) {
+        print_error('noaccess', 'block_ucla_course_download');
+    }
 }
 
 $PAGE->set_url('/blocks/ucla_course_download/view.php',
@@ -59,7 +66,8 @@ foreach ($downloadoptions as $downloadoption) {
     $body .= $output->course_download_status($coursecontentstatus, $downloadoption, $coursecontent);
 
     // Files have a special display for instructors to show listing.
-    if ($downloadoption == 'files' &&
+    if ($coursecontentstatus != 'request_unavailable' &&
+            $downloadoption == 'files' &&
             has_capability('moodle/course:manageactivities', $context)) {
         $content = $coursecontent->renderable_content();
         $body .= $output->instructor_file_contents_view($content);
@@ -71,3 +79,8 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'block_ucla_course_download'), 2, 'headingblock');
 echo $body;
 echo $OUTPUT->footer();
+
+// Log views.
+$params = array('courseid' => $courseid);
+$logurl = new moodle_url('../blocks/ucla_course_download/view.php', $params);
+add_to_log($courseid, 'course', 'ucla archive view', $logurl);

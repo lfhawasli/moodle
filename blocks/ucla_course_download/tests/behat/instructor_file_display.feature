@@ -20,7 +20,7 @@ Feature: Show files that may be included in zip
 
   @javascript
   Scenario: Adding multiple files into sections. hidding individual files and sections, then verifying instructor can see the visibility markers.
-    And I log in as ucla "teacher1"
+    Given I log in as ucla "teacher1"
     And I browse to site "C1"
     And I turn editing mode on
     And I follow the "Week 1" section in the ucla site menu
@@ -33,9 +33,9 @@ Feature: Show files that may be included in zip
     And I upload the "lib/tests/fixtures/empty.txt" file as "Empty file" to section "3"
     And I hide section "3"
     And I press "Control Panel"
-    And I follow "Download course content"
+    When I follow "Download course materials"
     # Small file should be marked visible 
-    And I should see "Small file9.8KB" in the ".zip-contents ul:nth-of-type(1) li" "css_element"
+    Then I should see "Small file9.8KB" in the ".zip-contents ul:nth-of-type(1) li" "css_element"
     # Medium file should be marked hidden
     And I should see "Medium file97.7KB" in the ".zip-contents ul:nth-of-type(1) li.omitted" "css_element"
     # Large file should be marked visible
@@ -51,8 +51,9 @@ Feature: Show files that may be included in zip
     
     # Check that student cannot view file list.
     And I log out
+    Given it is "9th" week
     And I log in as ucla "student1"
     And I browse to site "C1"
     And I press "Control Panel"
-    And I follow "Download course content"
-    And I should not see "Files included are ones that are already visible to students on your site." 
+    When I follow "Download course materials"
+    Then I should not see "Files included are ones that are already visible to students on your site."

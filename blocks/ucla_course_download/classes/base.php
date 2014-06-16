@@ -148,6 +148,11 @@ abstract class block_ucla_course_download_base {
 
         if (!$DB->record_exists('ucla_archives', $conditions)) {
             $DB->insert_record('ucla_archives', $request);
+
+            // Log requests.
+            $params = array('courseid' => $request->courseid);
+            $logurl = new moodle_url('../blocks/ucla_course_download/view.php', $params);
+            add_to_log($request->courseid, 'course', 'ucla archive request', $logurl);
             return true;
         }
         return false;
@@ -228,6 +233,10 @@ abstract class block_ucla_course_download_base {
         // Record download.
         $request->timedownloaded = time();
         $DB->update_record('ucla_archives', $request);
+
+        $params = array('courseid' => $request->courseid);
+        $logurl = new moodle_url('../blocks/ucla_course_download/view.php', $params);
+        add_to_log($request->courseid, 'course', 'ucla archive download', $logurl);
 
         send_stored_file($file, 86400, 0, true);
     }
@@ -328,16 +337,6 @@ abstract class block_ucla_course_download_base {
             } else {
                 return 'request_unavailable';
             }
-        }
-    }
-
-    /**
-     * Returns the timerequested and timeupdated for course/user request.
-     * @return array
-     */
-    public function get_request_update_time() {
-        if ($request = $this->get_request()) {
-            return array($request->timerequested, $request->timeupdated);
         }
     }
 
@@ -501,8 +500,6 @@ abstract class block_ucla_course_download_base {
                     return false;
                 }
             }
-            // Send update email.
-            $this->email_request();
         }
         $DB->update_record('ucla_archives', $request);
         $this->refresh();

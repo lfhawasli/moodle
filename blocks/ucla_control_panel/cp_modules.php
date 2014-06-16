@@ -179,7 +179,7 @@ if ($syllabus_manager->can_host_syllabi()) {
 // Course Content Download
 $modules[] = new ucla_cp_module('course_download', new moodle_url(
         '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
-        $temp_tag, 'block/ucla_course_download:requestzip');
+        $temp_tag, 'moodle/course:manageactivities');
 
 /******************************** Advanced Functions *********************/
 $modules[] = new ucla_cp_module('ucla_cp_mod_advanced', null, null, 'moodle/course:manageactivities');

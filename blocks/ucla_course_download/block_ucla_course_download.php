@@ -40,6 +40,8 @@ class block_ucla_course_download extends block_base {
      */
     function cron(progress_trace $trace = null) {
         global $CFG, $DB;
+        require_once($CFG->dirroot . '/course/lib.php');
+        require_once($CFG->dirroot . '/course/format/lib.php');
         require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/base.php');
 
         if (empty($trace)) {
@@ -68,6 +70,7 @@ class block_ucla_course_download extends block_base {
             unset($archive);
         }
         $requests->close();
+        return true;
     }
 
     public function init() {
