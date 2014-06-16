@@ -71,7 +71,7 @@ $string['instructorfilewarning'] = 'Files included are ones that are already vis
         'to students on your site.  Files that are part of conditional activities or ' .
         'groupings will only be available to students that match that criteria. ' .
         'When you update the availability of a file, it will be reflected in an ' .
-        'updated zip file.';
+        'updated zip file.  This zip file will not include course materials posted subsequent to this download.';
 $string['filewillbeexcluded'] = 'File will be excluded.';
 $string['filemaybeincluded'] = 'File may be included.';
 $string['fileoversizeexclusion'] = 'Files over <strong>{$a}</strong> will be excluded.';

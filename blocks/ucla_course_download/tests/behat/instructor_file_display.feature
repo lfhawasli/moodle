@@ -1,4 +1,4 @@
-@ucla @block_ucla_course_download @test
+@ucla @block_ucla_course_download
 Feature: Show files that may be included in zip
   As a instructor
   I want to see what files are available for download

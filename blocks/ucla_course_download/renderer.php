@@ -61,18 +61,24 @@ class block_ucla_course_download_renderer extends plugin_renderer_base {
             $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
 
             $buffer = html_writer::tag('p', $requestmessage);
-            $buffer .= html_writer::div(
-                html_writer::div(
-                        html_writer::tag('label', 
-                                html_writer::tag('input', '', array('type' => 'checkbox', 'class' => 'course-download-copyright')) . get_string('copyrightagreement', 'block_ucla_course_download')
-                        ), 
-                    'checkbox'
-                ),
-                'form-group'
-            );
-            $buffer .= html_writer::link($url, get_string('download', 'block_ucla_course_download', $a['area']), array('class' => 'btn btn-primary btn-copyright-check'));
 
-            if ($area === 'files') {
+            global $COURSE;
+            $context = context_course::instance($COURSE->id);
+
+            // Only display copyright notice for students.
+            $script = '';
+
+            if ($area === 'files' && !has_capability('moodle/course:manageactivities', $context)) {
+                // Print checkbox
+                $buffer .= html_writer::div(
+                    html_writer::div(
+                            html_writer::tag('label', 
+                                    html_writer::tag('input', '', array('type' => 'checkbox', 'class' => 'course-download-copyright')) . get_string('copyrightagreement', 'block_ucla_course_download')
+                            ), 
+                        'checkbox'
+                    ),
+                    'form-group'
+                );
 
                 // YUI script to enable/disable 'download' button on copyright check.
                 // Script assumes ONLY files for now.  
@@ -93,9 +99,12 @@ Y.use('node','event', function(Y) {
 }); 
 END;
 
-                $buffer .= html_writer::script($yui);
+                $script = html_writer::script($yui);
             }
 
+            // Print download button
+            $buffer .= html_writer::link($url, get_string('download', 'block_ucla_course_download', $a['area']), array('class' => 'btn btn-primary btn-copyright-check'));
+            $buffer .= $script;
         }
         
         // Send back any printable html we've generated.
