@@ -177,7 +177,9 @@ abstract class block_ucla_course_download_base {
             $tempzip = tempnam($CFG->tempdir . '/', $filename);
             $zipper = new zip_packer();
             if ($zipper->archive_to_pathname($content, $tempzip)) {
-                return $this->add_new_file_record($filename, $tempzip);
+                $zipfilerecord = $this->add_new_file_record($filename, $tempzip);
+                @unlink($tempzip);  // Cleanup after ourselves.
+                return $zipfilerecord;
             }
         }
 

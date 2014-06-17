@@ -144,6 +144,30 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     }
 
     /**
+     * Make sure that temporary zip files in temp folder are deleted.
+     *
+     * @group totest
+     */
+    public function test_cleanup() {
+        global $CFG;
+
+        // Make sure there is nothing in the temp directory.
+        $this->assertEquals(2, count(scandir($CFG->tempdir)));
+
+        // Add content to section 5.
+        $contenttocreate[] = array('section' => 5);
+        $expectedfiles = $this->populate_course($contenttocreate);
+
+        $coursedownload = new block_ucla_course_download_files(
+                $this->course->id, $this->student->id);
+        $coursedownload->add_request();
+        $request = $coursedownload->process_request();
+
+        // Make sure there is still nothing in the temp directory.
+        $this->assertEquals(2, count(scandir($CFG->tempdir)));
+    }
+
+    /**
      * Tests that old requests are deleted.
      */
     public function test_delete_old_requests() {
