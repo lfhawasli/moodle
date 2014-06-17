@@ -32,7 +32,23 @@ class block_ucla_weeksdisplay extends block_base {
         self::set_current_week_display(date('c'));
         return true;    // crons need to return true or they run all the time
     }
-    
+
+    /**
+     * Returns the current week number.
+     *
+     * Handles summer sessions.
+     *
+     * @param char $summersession   Either "a" or "c".
+     * @return int $week
+     */
+    public static function get_current_week($summersession = null) {
+        $configname = 'current_week';
+        if (!empty($summersession)) {
+            $configname .= '_summer' . $summersession;
+        }
+        return get_config('local_ucla', $configname);
+    }
+
     /**
      * Returns the current week's display string
      */    
@@ -47,9 +63,22 @@ class block_ucla_weeksdisplay extends block_base {
     public static function set_week_display($str) {
         set_config('current_week_display', $str, 'local_ucla');
     }
-    
-    public static function set_current_week($week) {
-        set_config('current_week', $week, 'local_ucla');
+
+    /**
+     * Sets week config.
+     *
+     * Handles summer sessions.
+     *
+     * @param int $week
+     * @param char $summersession   Either "a" or "c". If set, then will set
+     *                              set week value for that session.
+     */
+    public static function set_current_week($week, $summersession = null) {
+        $configname = 'current_week';
+        if (!empty($summersession)) {
+            $configname .= '_summer' . $summersession;
+        }
+        set_config($configname, $week, 'local_ucla');
     }
     
     public static function set_active_terms($terms) {
