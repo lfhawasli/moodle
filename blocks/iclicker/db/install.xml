@@ -9,8 +9,9 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="timecreated"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="date this was created (unix timestamp)" PREVIOUS="id" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="date this record was last changed (unix timestamp)" PREVIOUS="timecreated" NEXT="clicker_id"/>
-        <FIELD NAME="clicker_id" TYPE="char" LENGTH="8" NOTNULL="true" SEQUENCE="false" PREVIOUS="timemodified" NEXT="owner_id"/>
-        <FIELD NAME="owner_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="this is probably the user_id" PREVIOUS="clicker_id" NEXT="location_id"/>
+          <FIELD NAME="clicker_id" TYPE="char" LENGTH="16" NOTNULL="true" SEQUENCE="false" PREVIOUS="timemodified"
+                 NEXT="owner_id"/>
+          <FIELD NAME="owner_id" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="this is probably the user_id" PREVIOUS="clicker_id" NEXT="location_id"/>
         <FIELD NAME="location_id" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="optional location (course id)" PREVIOUS="owner_id" NEXT="activated"/>
         <FIELD NAME="activated" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="location_id" NEXT="from_national"/>
         <FIELD NAME="from_national" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="indicated if this was loaded from the national webservices or not" PREVIOUS="activated"/>

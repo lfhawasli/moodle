@@ -17,29 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: settings.php 189 2013-07-30 02:31:57Z azeckoski@gmail.com $ */
+/* $Id: settings.php 198 2014-02-10 03:10:50Z azeckoski@gmail.com $ */
 
 defined('MOODLE_INTERNAL') || die;
 
 // control the config settings for this plugin
-require_once ('iclicker_service.php');
+require_once('iclicker_service.php');
 $block_name = iclicker_service::BLOCK_NAME;
 if ($ADMIN->fulltree) {
     // general
     $settings->add(
-        new admin_setting_heading('block_iclicker_general_heading',
-            get_string('config_general', $block_name),
-            null
-        )
+            new admin_setting_heading('block_iclicker_general_heading',
+                    get_string('config_general', $block_name),
+                    null
+            )
     );
     $settings->add(
-        new admin_setting_configtext(iclicker_service::BLOCK_NAME.'/block_iclicker_notify_emails',
-            get_string('config_notify_emails', $block_name),
-            get_string('config_notify_emails_desc', $block_name),
-            '', //50,200
-            PARAM_TEXT,
-            50
-        )
+            new admin_setting_configtext(iclicker_service::BLOCK_NAME . '/block_iclicker_notify_emails',
+                    get_string('config_notify_emails', $block_name),
+                    get_string('config_notify_emails_desc', $block_name),
+                    '', //50,200
+                    PARAM_TEXT,
+                    50
+            )
     );
     /*
     $settings->add(
@@ -50,102 +50,102 @@ if ($ADMIN->fulltree) {
         )
     );*/
     $settings->add(
-        new admin_setting_configcheckbox(iclicker_service::BLOCK_NAME.'/block_iclicker_enable_shortname',
-            get_string('config_enable_shortname', $block_name),
-            get_string('config_enable_shortname_desc', $block_name),
-            0
-        )
+            new admin_setting_configcheckbox(iclicker_service::BLOCK_NAME . '/block_iclicker_enable_shortname',
+                    get_string('config_enable_shortname', $block_name),
+                    get_string('config_enable_shortname_desc', $block_name),
+                    0
+            )
     );
     $settings->add(
-        new admin_setting_configcheckbox(iclicker_service::BLOCK_NAME.'/block_iclicker_disable_alternateid',
-            get_string('config_disable_alternateid', $block_name),
-            get_string('config_disable_alternateid_desc', $block_name),
-            0
-        )
+            new admin_setting_configcheckbox(iclicker_service::BLOCK_NAME . '/block_iclicker_disable_alternateid',
+                    get_string('config_disable_alternateid', $block_name),
+                    get_string('config_disable_alternateid_desc', $block_name),
+                    0
+            )
     );
     $settings->add(
-        new admin_setting_configtext(iclicker_service::BLOCK_NAME.'/block_iclicker_max_courses_fetched',
-            get_string('config_max_courses', $block_name),
-            get_string('config_max_courses_desc', $block_name),
-            '100',
-            PARAM_INT,
-            5
-        )
+            new admin_setting_configtext(iclicker_service::BLOCK_NAME . '/block_iclicker_max_courses_fetched',
+                    get_string('config_max_courses', $block_name),
+                    get_string('config_max_courses_desc', $block_name),
+                    '100',
+                    PARAM_INT,
+                    5
+            )
     );
     // WS
-/** webservices code is currently disabled ********************
-    $settings->add(
-        new admin_setting_heading('block_iclicker_ws_heading',
-            get_string('config_webservices', $block_name),
-            null
-        )
-    );
-    $settings->add(
-        new admin_setting_configcheckbox('block_iclicker_use_national_ws',
-            get_string('config_use_national_ws', $block_name),
-            get_string('config_use_national_ws_desc', $block_name),
-            0
-        )
-    );
-    $settings->add(
-        new admin_setting_configtext('block_iclicker_domain_url',
-            get_string('config_domain_url', $block_name),
-            get_string('config_domain_url_desc', $block_name),
-            '', //50,200
-            PARAM_TEXT,
-            50
-        )
-    );
-    $settings->add(
-        new admin_setting_configtext('block_iclicker_webservices_url',
-            get_string('config_webservices_url', $block_name),
-            get_string('config_webservices_url_desc', $block_name),
-            '', //iclicker_service::NATIONAL_WS_URL, //50,200
-            PARAM_TEXT,
-            75
-        )
-    );
-    $settings->add(
-        new admin_setting_configtext('block_iclicker_webservices_username',
-            get_string('config_webservices_username', $block_name),
-            get_string('config_webservices_username_desc', $block_name),
-            '', //iclicker_service::NATIONAL_WS_URL, //50,200
-            PARAM_TEXT,
-            30
-        )
-    );
-    $settings->add(
-        new admin_setting_configtext('block_iclicker_webservices_password',
-            get_string('config_webservices_password', $block_name),
-            get_string('config_webservices_password_desc', $block_name),
-            '', //iclicker_service::NATIONAL_WS_URL, //50,200
-            PARAM_TEXT,
-            30
-        )
-    );
- *******************************************/
+    /** webservices code is currently disabled ********************
+     * $settings->add(
+     * new admin_setting_heading('block_iclicker_ws_heading',
+     * get_string('config_webservices', $block_name),
+     * null
+     * )
+     * );
+     * $settings->add(
+     * new admin_setting_configcheckbox('block_iclicker_use_national_ws',
+     * get_string('config_use_national_ws', $block_name),
+     * get_string('config_use_national_ws_desc', $block_name),
+     * 0
+     * )
+     * );
+     * $settings->add(
+     * new admin_setting_configtext('block_iclicker_domain_url',
+     * get_string('config_domain_url', $block_name),
+     * get_string('config_domain_url_desc', $block_name),
+     * '', //50,200
+     * PARAM_TEXT,
+     * 50
+     * )
+     * );
+     * $settings->add(
+     * new admin_setting_configtext('block_iclicker_webservices_url',
+     * get_string('config_webservices_url', $block_name),
+     * get_string('config_webservices_url_desc', $block_name),
+     * '', //iclicker_service::NATIONAL_WS_URL, //50,200
+     * PARAM_TEXT,
+     * 75
+     * )
+     * );
+     * $settings->add(
+     * new admin_setting_configtext('block_iclicker_webservices_username',
+     * get_string('config_webservices_username', $block_name),
+     * get_string('config_webservices_username_desc', $block_name),
+     * '', //iclicker_service::NATIONAL_WS_URL, //50,200
+     * PARAM_TEXT,
+     * 30
+     * )
+     * );
+     * $settings->add(
+     * new admin_setting_configtext('block_iclicker_webservices_password',
+     * get_string('config_webservices_password', $block_name),
+     * get_string('config_webservices_password_desc', $block_name),
+     * '', //iclicker_service::NATIONAL_WS_URL, //50,200
+     * PARAM_TEXT,
+     * 30
+     * )
+     * );
+     *******************************************/
     // SSO
     $headerDesc = get_string('config_sso_disabled', $block_name);
     $currentSSOkey = get_config($block_name, 'block_iclicker_sso_shared_key');
     if (!empty($currentSSOkey)) {
         $headerDesc = get_string('config_sso_enabled', $block_name);
         $timestamp = time();
-        $headerDesc .= ' [Sample encoded key: '.iclicker_service::makeEncodedKey($timestamp).'|'.$timestamp.']';
+        $headerDesc .= ' [Sample encoded key: ' . iclicker_service::makeEncodedKey($timestamp) . '|' . $timestamp . ']';
     }
     $settings->add(
-        new admin_setting_heading('block_iclicker_sso_heading',
-            get_string('config_sso', $block_name),
-            $headerDesc
-        )
+            new admin_setting_heading('block_iclicker_sso_heading',
+                    get_string('config_sso', $block_name),
+                    $headerDesc
+            )
     );
     $settings->add(
-        new admin_setting_configtext(iclicker_service::BLOCK_NAME.'/block_iclicker_sso_shared_key',
-            get_string('config_shared_key', $block_name),
-            get_string('config_shared_key_desc', $block_name),
-            '', //50,200
-            PARAM_TEXT,
-            50
-        )
+            new admin_setting_configtext(iclicker_service::BLOCK_NAME . '/block_iclicker_sso_shared_key',
+                    get_string('config_shared_key', $block_name),
+                    get_string('config_shared_key_desc', $block_name),
+                    '', //50,200
+                    PARAM_TEXT,
+                    50
+            )
     );
 }
-?>
+

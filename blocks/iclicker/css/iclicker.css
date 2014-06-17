@@ -19,10 +19,7 @@
 
 /** OVERALL page styles **/
 .iclicker {
-    margin-left: 0;
-    margin-top: 0;
-    margin-right: 0;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .iclicker FORM {
@@ -114,7 +111,7 @@
     display: inline-block;
 }
 
-.iclicker .actionToolBar A,.actionToolBar A:link {
+.iclicker .actionToolBar A, .actionToolBar A:link {
     margin-right: 0.5em;
     text-decoration: underline;
     white-space: nowrap;
@@ -149,7 +146,8 @@
     background-color: #EEE;
 }
 
-.iclicker .sso_shared_key {}
+.iclicker .sso_shared_key {
+}
 
 .iclicker .sso_control_message {
     font-weight: bold;
@@ -185,99 +183,91 @@
     margin-left: 1em
 }
 
-
 /** ICLICKER styles from iclicker html **/
-.iclicker .columns_container
-{
-    width:100%;
-    display:table;
+.iclicker .columns_container {
+    width: 100%;
+    display: table;
 }
 
-.iclicker .left_column
-{
-    width:48%;
-    float:left;
-    display:inline;
+.iclicker .left_column {
+    width: 48%;
+    float: left;
+    display: inline;
 
 }
 
-.iclicker .right_column
-{
-    width:48%;
-    float:right;
-    display:inline;
-    border-left:1px solid #A2A2A2;
-    padding-left:2%;
+.iclicker .right_column {
+    width: 48%;
+    float: right;
+    display: inline;
+    border-left: 1px solid #A2A2A2;
+    padding-left: 2%;
 }
 
-.iclicker img
-{
-    margin:10px 0;
-    display:block;
-    clear:both;
+.iclicker img {
+    margin: 10px 0;
+    display: block;
+    clear: both;
 }
 
-.iclicker h1
-{
-    font-size:16px;
-    color:#5D5552;
+.iclicker h1 {
+    text-align: left;
+    font-size: 16px;
+    color: #5D5552;
 }
 
-.iclicker h3
-{
-    font-size:13px;
-    color:#000000;
+.iclicker h2 {
+    text-align: left;
 }
 
-.iclicker p
-{
-    width:96%;
+.iclicker h3 {
+    text-align: left;
+    font-size: 13px;
+    color: #000000;
 }
 
-.iclicker p.highlighted
-{
-    background-color:#f2f2f2;
-    padding:2%;
-    width:94%;
+.iclicker p {
+    width: 96%;
 }
 
-.iclicker table.remotes
-{
-    width:98%;
-    text-align:center;
-    border-spacing:0;
-    border:1px solid #777777;
-    border-left:0;
+.iclicker p.highlighted {
+    background-color: #f2f2f2;
+    padding: 2%;
+    width: 94%;
 }
 
-.iclicker table.remotes td
-{
-    border-left:1px solid #777777;
-    border-top:1px solid #777777;
-    padding:4px;
+.iclicker table.remotes {
+    width: 98%;
+    text-align: center;
+    border-spacing: 0;
+    border: 1px solid #777777;
+    border-left: 0;
 }
 
-.iclicker table.remotes th
-{
-    background-color:#666666;
-    color:#ffffff;
-    font-weight:normal;
-    padding:4px;
+.iclicker table.remotes td {
+    border-left: 1px solid #777777;
+    border-top: 1px solid #777777;
+    padding: 4px;
+}
+
+.iclicker table.remotes th {
+    background-color: #666666;
+    color: #ffffff;
+    font-weight: normal;
+    padding: 4px;
 }
 
 /*jQUERY OVERRIDES*/
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default ,
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, .ui-widget-content
-{
-    border:0!important;
-    background:none!important;
+#accordion .ui-state-default, #accordion .ui-widget-content .ui-state-default, #accordion .ui-widget-header .ui-state-default,
+#accordion .ui-state-active, #accordion .ui-widget-content .ui-state-active, #accordion .ui-widget-header .ui-state-active, #accordion .ui-widget-content {
+    border: 0 !important;
+    background: none !important;
 }
 
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited,
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited
-{
-    text-decoration:underline;
-    color:#0F197B;
+#accordion .ui-state-active a, #accordion .ui-state-active a:link, #accordion .ui-state-active a:visited,
+#accordion .ui-state-default a, #accordion .ui-state-default a:link, #accordion .ui-state-default a:visited {
+    text-decoration: underline;
+    color: #0F197B;
 }
 
 .ui-datepicker-calendar {
