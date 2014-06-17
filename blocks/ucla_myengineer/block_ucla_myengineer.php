@@ -50,7 +50,7 @@ class block_ucla_myengineer extends block_base {
     public static function get_navigation_nodes($course) {
         $nodes = array();
         if (is_engineering($course['course']->id)) {
-            $myengineerurl = 'https://my.engineer.ucla.edu';
+            $myengineerurl = 'https://my.engineering.ucla.edu';
             $urlobj = new moodle_url($myengineerurl);
             $node = navigation_node::create(get_string('title', 'block_ucla_myengineer'), $urlobj);
 
