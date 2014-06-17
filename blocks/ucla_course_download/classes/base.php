@@ -257,8 +257,9 @@ abstract class block_ucla_course_download_base {
         $a->shortname = $this->course->shortname;
         $a->type = $this->get_type();
         $a->ziplifetime = get_config('block_ucla_course_download', 'ziplifetime');
-        $a->url = new moodle_url('/blocks/ucla_course_download/view.php', 
+        $url = new moodle_url('/blocks/ucla_course_download/view.php', 
                 array('id' => $request->courseid));
+        $a->url = $url->out();
 
         $from = get_string('emailsender', 'block_ucla_course_download');
         $subject = get_string('emailsubject', 'block_ucla_course_download', $a);
@@ -392,7 +393,7 @@ abstract class block_ucla_course_download_base {
                 $DB->sql_isnotempty('ucla_archives', 'fileid', true, false);
         return $DB->get_record_select('ucla_archives', $where,
                         array('contexthash' => $contexthash,
-                    'type' => $this->get_type()));
+                    'type' => $this->get_type()), '*', IGNORE_MULTIPLE);
     }
 
     /**
@@ -461,8 +462,6 @@ abstract class block_ucla_course_download_base {
                         return false;
                     }
                 }
-                // Send update email.
-                $this->email_request();
             }
         } else {
             // Make sure we have files to zip.
@@ -500,6 +499,9 @@ abstract class block_ucla_course_download_base {
                     return false;
                 }
             }
+
+            // Send update email for new requests.
+            $this->email_request();
         }
         $DB->update_record('ucla_archives', $request);
         $this->refresh();
