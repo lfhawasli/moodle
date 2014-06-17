@@ -136,12 +136,10 @@ if ($fromform = $mform->get_data()) {
             break;
         }
     }
-    debugging('$instanceid = ' . $instanceid);
+
     if (!empty($instanceid)) {
         $context = context_course::instance($instanceid, false) ? : $context;
     }
-
-    print_object($context);
 
     // get message body
     $body = create_help_message($fromform);
