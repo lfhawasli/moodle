@@ -321,8 +321,6 @@ function ucla_sync_built_courses($edata) {
  * @return boolean
  */
 function set_engineering_default($edata) {
-    global $DB;
-
     $page = new moodle_page();
     foreach ($edata->completed_requests as $request) {
         // Only work on hostcourses.
@@ -343,13 +341,9 @@ function set_engineering_default($edata) {
         // place them above the "Administration" block.
         $coursecontext = context_course::instance($request->courseid);
         $page->set_context($coursecontext);
-        $page->blocks->add_regions(array(BLOCK_POS_RIGHT));
+        $page->blocks->add_regions(array(BLOCK_POS_RIGHT), false);
         $page->blocks->add_block('recent_activity', BLOCK_POS_RIGHT, -10, 0, 'course-view-*');
         $page->blocks->add_block('calendar_upcoming', BLOCK_POS_RIGHT, -9, 0, 'course-view-*');
-
-//        // Set course theme to allow custom logo.
-//        $DB->set_field('course', 'theme', 'uclasharedcourse',
-//                array('id' => $request->courseid));
     }
     return true;
 }

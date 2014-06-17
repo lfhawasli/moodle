@@ -28,6 +28,7 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once (dirname(__FILE__).'/../../../config.php');
 global $CFG,$USER,$COURSE;
 // link in external libraries
+/** @noinspection PhpIncludeInspection */
 require_once ($CFG->libdir.'/gradelib.php');
 //require_once ($CFG->dirroot.'/blocks/simplehtml/lib.php');
 // grade perm: moodle/grade:manage

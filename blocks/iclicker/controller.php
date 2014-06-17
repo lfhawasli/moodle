@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with i>clicker Moodle integrate.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* $Id: controller.php 190 2013-11-07 01:15:45Z azeckoski@gmail.com $ */
+/* $Id: controller.php 216 2014-02-21 02:40:05Z azeckoski@gmail.com $ */
 
 /**
  * Handles controller functions related to the views
@@ -207,10 +207,19 @@ class iclicker_controller {
                         } else {
                             $this->addMessage(self::KEY_BELOW, 'reg.registered.below.duplicate.noshare', $clicker_id);
                         }
-                    }
-                    catch (ClickerIdInvalidException $e) {
+                    } catch (ClickerWebservicesException $e) {
+                        $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.failure', $clicker_id, $e);
+                    } catch (ClickerIdInvalidException $e) {
                         if (ClickerIdInvalidException::F_EMPTY == $e->type) {
                             $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.empty');
+                        } else if (ClickerIdInvalidException::F_LENGTH == $e->type) {
+                            $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.wrong.length');
+                        } else if (ClickerIdInvalidException::GO_NO_USER == $e->type) {
+                            $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.failure', $clicker_id, $e);
+                        } else if (ClickerIdInvalidException::GO_LASTNAME == $e->type) {
+                            $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.go.wrong.lastname', $e);
+                        } else if (ClickerIdInvalidException::GO_NO_MATCH == $e->type) {
+                            $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.go.invalid', $clicker_id);
                         } else {
                             $this->addMessage(self::KEY_ERROR, 'reg.registered.clickerId.invalid', $clicker_id);
                         }
@@ -366,6 +375,11 @@ class iclicker_controller {
             $endDate = required_param('end_date', PARAM_ALPHANUMEXT);
             $endDate = strtotime($endDate);
             if ($endDate) {
+                // need to make this the end of the day
+                $endDT = new DateTime('@' . $endDate);
+                $endDT->setTimezone(new DateTimeZone(date_default_timezone_get()));
+                $endDT->setTime(23, 59, 59);
+                $endDate = $endDT->getTimestamp();
                 $endDateText = date('Y-m-d', $endDate);
             } else {
                 $endDate = null;
@@ -428,7 +442,9 @@ class iclicker_controller {
         // put search and sort data into the page
         $this->results['search'] = $search;
         $this->results['startDate'] = $startDate;
+        $this->results['startDateText'] = $startDateText;
         $this->results['endDate'] = $endDate;
+        $this->results['endDateText'] = $endDateText;
         $this->results['page'] = $pageNum;
         $this->results['perPage'] = $perPageNum;
         $this->results['sort'] = $sort;
@@ -437,7 +453,7 @@ class iclicker_controller {
         $this->results['sso_enabled'] = iclicker_service::$block_iclicker_sso_enabled;
         $this->results['sso_shared_key'] = iclicker_service::$block_iclicker_sso_shared_key;
         $this->results['domainURL'] = iclicker_service::$domain_URL;
-        $this->results['adminEmailAddress'] = $CFG->block_iclicker_notify_emails;
+        $this->results['adminEmailAddress'] = empty($CFG->block_iclicker_notify_emails) ? '' : $CFG->block_iclicker_notify_emails;
 
         // put error data into page
         $this->results['recent_failures'] = iclicker_service::get_failures();
@@ -455,7 +471,7 @@ class iclicker_controller {
             $timestamp = microtime();
             for ($i = 0; $i < $pageCount; $i++) {
                 $currentPage = $i + 1;
-                $currentStart = $currentPage + ($i * $perPageNum);
+                $currentStart = ($i * $perPageNum) + 1;
                 $currentEnd = $currentStart + $perPageNum - 1;
                 if ($currentEnd > $totalCount) {
                     $currentEnd = $totalCount;
@@ -466,7 +482,7 @@ class iclicker_controller {
                     $pagerHTML .= '<span class="paging_current paging_item">'.$marker.'</span>'."\n";
                 } else {
                     // make it a link
-                    $pagingURL = $adminPath.'&page='.$currentPage.'&sort='.$sort;
+                    $pagingURL = $adminPath.'?page='.$currentPage.'&sort='.$sort;
                     if (isset($search)) {
                         $pagingURL .= '&search='.urlencode($search);
                     }
@@ -485,7 +501,7 @@ class iclicker_controller {
     }
 
     public function processAdminCSV() {
-        global $CFG;
+        //global $CFG;
         // admin check
         if (!iclicker_service::is_admin()) {
             throw new ClickerSecurityException("Current user is not an admin and cannot make CSV of all regs");
@@ -507,9 +523,10 @@ class iclicker_controller {
      *
      * @param string $key the KEY const
      * @param string $message the message to add
+     * @param string $extra [OPTIONAL] extra string to include hidden on the page with the message
      * @throws Exception if the key is invalid
      */
-    public function addMessageStr($key, $message) {
+    public function addMessageStr($key, $message, $extra = null) {
         if ($key == null) {
             throw new Exception("key (".$key.") must not be null");
         }
@@ -518,7 +535,15 @@ class iclicker_controller {
                 $this->messages[$key] = array(
                 );
             }
-            $this->messages[$key][] = $message;
+            if (isset($extra)) {
+                if (!is_string($extra)) {
+                    $extra = var_export($extra, true);
+                }
+                $extra = PHP_EOL . '<div style="display:none;">' . $extra . '</div>' . PHP_EOL;
+            } else {
+                $extra = '';
+            }
+            $this->messages[$key][] = $message . $extra;
         }
     }
 
@@ -527,16 +552,17 @@ class iclicker_controller {
      *
      * @param string $key the KEY const
      * @param string $messageKey the i18n message key
-     * @param object $args [optional] args to include
+     * @param object $args [OPTIONAL] args to include
+     * @param string $extra [OPTIONAL] extra string to include hidden on the page with the message
      * @throws Exception if the key is invalid
      */
-    public function addMessage($key, $messageKey, $args = null) {
+    public function addMessage($key, $messageKey, $args = null, $extra = null) {
         if ($key == null) {
             throw new Exception("key (".$key.") must not be null");
         }
         if ($messageKey) {
             $message = iclicker_service::msg($messageKey, $args);
-            $this->addMessageStr($key, $message);
+            $this->addMessageStr($key, $message, $extra);
         }
     }
 

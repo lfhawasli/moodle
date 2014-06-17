@@ -19,20 +19,23 @@
  *
  * @package iclicker
  */
-/* $Id: test_gradebook.php 148 2012-06-19 00:25:08Z azeckoski@gmail.com $ */
+/* $Id: test_gradebook.php 198 2014-02-10 03:10:50Z azeckoski@gmail.com $ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
 }
 
-require_once (dirname(__FILE__).'/../../../config.php');
-global $CFG,$USER,$COURSE;
+require_once(dirname(__FILE__) . '/../../../config.php');
+global $CFG, $USER, $COURSE;
 // link in external libraries
-require_once ($CFG->libdir.'/gradelib.php');
+/** @noinspection PhpIncludeInspection */
+require_once($CFG->libdir . '/gradelib.php');
 //require_once ($CFG->dirroot.'/blocks/simplehtml/lib.php');
 // grade perm: moodle/grade:manage
 
 /** This class contains the test cases for the functions in iclicker_service.php. */
+
+/** @noinspection PhpDeprecationInspection */
 class iclicker_gradebook_test extends UnitTestCase {
 
     var $courseid = 1;
@@ -47,23 +50,23 @@ class iclicker_gradebook_test extends UnitTestCase {
     public function setUp() {
         // cleanup the cats and gradeitems and grades if any exist
         $grade_cats = grade_category::fetch_all(array(
-            'courseid'=>$this->courseid,
-            'fullname'=>$this->cat_name
-            )
+                        'courseid' => $this->courseid,
+                        'fullname' => $this->cat_name
+                )
         );
         if ($grade_cats) {
             foreach ($grade_cats as $cat) {
                 $grade_items = grade_item::fetch_all(array(
-                    'courseid'=>$this->courseid,
-                    'categoryid'=>$cat->id,
-                    'itemname'=>$this->item_name
-                    )
+                                'courseid' => $this->courseid,
+                                'categoryid' => $cat->id,
+                                'itemname' => $this->item_name
+                        )
                 );
                 if ($grade_items) {
                     foreach ($grade_items as $item) {
                         $grades = grade_grade::fetch_all(array(
-                            'itemid'=>$item->id
-                            )
+                                        'itemid' => $item->id
+                                )
                         );
                         if ($grades) {
                             foreach ($grades as $grade) {
@@ -90,9 +93,9 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // try to get category
         $grade_category = grade_category::fetch(array(
-            'courseid'=>$this->courseid,
-            'fullname'=>$this->cat_name
-            )
+                        'courseid' => $this->courseid,
+                        'fullname' => $this->cat_name
+                )
         );
         // NOTE: grade category will not be null but it will be empty
         $this->assertFalse($grade_category);
@@ -108,9 +111,9 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // now we will really get the category that we just made
         $grade_category_fetched = grade_category::fetch(array(
-            'courseid'=>$this->courseid,
-            'fullname'=>$this->cat_name
-            )
+                        'courseid' => $this->courseid,
+                        'fullname' => $this->cat_name
+                )
         );
         $this->assertTrue($grade_category_fetched);
         $this->assertEqual($grade_category->id, $grade_category_fetched->id);
@@ -121,10 +124,10 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // try to get grade item
         $grade_item = grade_item::fetch(array(
-            'courseid'=>$this->courseid,
-            'categoryid'=>$grade_category->id,
-            'itemname'=>$this->item_name
-            )
+                        'courseid' => $this->courseid,
+                        'categoryid' => $grade_category->id,
+                        'itemname' => $this->item_name
+                )
         );
         // NOTE: grade category will not be null but it will be empty
         $this->assertFalse($grade_item);
@@ -147,10 +150,10 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // now we will really get the new item
         $grade_item_fetched = grade_item::fetch(array(
-            'courseid'=>$this->courseid,
-            'categoryid'=>$grade_category->id,
-            'itemname'=>$this->item_name
-            )
+                        'courseid' => $this->courseid,
+                        'categoryid' => $grade_category->id,
+                        'itemname' => $this->item_name
+                )
         );
         $this->assertTrue($grade_item_fetched);
         $this->assertEqual($grade_item->id, $grade_item_fetched->id);
@@ -160,8 +163,8 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // get empty grades list
         $all_grades = grade_grade::fetch_all(array(
-            'itemid'=>$grade_item->id
-            )
+                        'itemid' => $grade_item->id
+                )
         );
         $this->assertFalse($all_grades);
 
@@ -175,9 +178,9 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // get new grade
         $grade_grade_fetched = grade_grade::fetch(array(
-            'itemid'=>$grade_item->id,
-            'userid'=>$this->studentid1
-            )
+                        'itemid' => $grade_item->id,
+                        'userid' => $this->studentid1
+                )
         );
         $this->assertTrue($grade_grade_fetched);
         $this->assertEqual($grade_grade->id, $grade_grade_fetched->id);
@@ -190,8 +193,8 @@ class iclicker_gradebook_test extends UnitTestCase {
         $result = $grade_grade->update($location_str);
         $this->assertTrue($result);
         $grade_grade_fetched = grade_grade::fetch(array(
-            'id'=>$grade_grade->id
-            )
+                        'id' => $grade_grade->id
+                )
         );
         $this->assertTrue($grade_grade_fetched);
         $this->assertEqual($grade_grade->id, $grade_grade_fetched->id);
@@ -200,8 +203,8 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // get grades
         $all_grades = grade_grade::fetch_all(array(
-            'itemid'=>$grade_item->id
-            )
+                        'itemid' => $grade_item->id
+                )
         );
         $this->assertTrue($all_grades);
         $this->assertEqual(1, sizeof($all_grades));
@@ -215,8 +218,8 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // get grades
         $all_grades = grade_grade::fetch_all(array(
-            'itemid'=>$grade_item->id
-            )
+                        'itemid' => $grade_item->id
+                )
         );
         $this->assertTrue($all_grades);
         $this->assertEqual(2, sizeof($all_grades));
@@ -234,8 +237,8 @@ class iclicker_gradebook_test extends UnitTestCase {
 
         // check no grades left
         $all_grades = grade_grade::fetch_all(array(
-            'itemid'=>$grade_item->id
-            )
+                        'itemid' => $grade_item->id
+                )
         );
         $this->assertFalse($all_grades);
 

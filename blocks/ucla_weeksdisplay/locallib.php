@@ -9,9 +9,10 @@ class ucla_session {
     protected $_quarter;        // Current quarter in single digit code
     protected $_year;           // Quarter year
     protected $_today;          // Today's timestamp
-    private $_session_len;      // Array of sesion lengths to determine final's week
     private $_summer;           // boolean flag for summer
     protected $_current_week;   // Current week in session (max of summer sessions)
+    protected $_current_week_summera = null; // Current week in summer session A.
+    protected $_current_week_summerc = null; // Current week in summer session C.
     protected $_lookahead;      // Number of terms to look ahead
     private $_term;             // Current term.
     
@@ -19,10 +20,7 @@ class ucla_session {
         $this->_session = $this->key_session($session);
 
         // Summer contains more than 1 session
-        $this->_summer = count($this->_session) > 1 ? true : false;
-        
-        // Session lengths -- to display finals week string
-        $this->_session_len = array('8A' => 8, '6C' => 6, 'RG' => 10);
+        $this->_summer = count($this->_session) > 1 ? true : false;        
 
         // Other info
         $this->_quarter = substr($session[0]['term'], 2);
@@ -86,9 +84,9 @@ class ucla_session {
             $separator = '';
             
             // Check if summer session A has started
-            if($this->in_session_summer($this->_session['8A']->session_start,
-                    $this->_session['8A']->session_end)) {
-                $quarter_week .= $this->get_week_str($this->_session['8A']);
+            if($this->in_session_summer($this->_session['1A']->session_start,
+                    $this->_session['1A']->session_end)) {
+                $quarter_week .= $this->get_week_str($this->_session['1A']);
                 $separator = ' | ';
             }
             
@@ -133,7 +131,7 @@ class ucla_session {
         $k = array();
         
         foreach($session as $s) {
-            if($s['session'] == 'RG' || $s['session'] == '8A' || $s['session'] == '6C') {
+            if($s['session'] == 'RG' || $s['session'] == '1A' || $s['session'] == '6C') {
                 $k[$s['session']] = (object)$s;
            }
         }
@@ -153,7 +151,7 @@ class ucla_session {
         
         // Append session for summer
         if($this->_summer) {
-            $summersession = get_string('session', 'block_ucla_weeksdisplay') . ' ' . substr($session->session, -1) . ', ';
+            $summersession = get_string('session', 'block_ucla_weeksdisplay', substr($session->session, -1)) . ', ';
         }
 
         $weekstr = html_writer::span($quarter_year . ' - ' . $summersession, 'session ') .
@@ -193,13 +191,22 @@ class ucla_session {
             $weeks--;
         }
          
-        // Check if we need to display 'finals week'
-        if($weeks > $this->_session_len[$session->session]) {
+        // Check if we need to display 'finals week'. There are only finals
+        // weeks for "RG" (regular session) terms.
+        if ($session->session == "RG" && $weeks > 10) {
             $week_str = get_string('finals_week', 'block_ucla_weeksdisplay');
         } else {
-            $week_str = get_string('week', 'block_ucla_weeksdisplay') . ' ' . $weeks;
+            $week_str = get_string('week', 'block_ucla_weeksdisplay', $weeks);
         }
-        
+
+        // Update summer sessions, if needed.
+        // See if we are in Session A.
+        if (in_array($session->session, array('6A', '8A', '9A', '1A'))) {
+            $this->_current_week_summera = $weeks;
+        } else if ($session->session == '6C') {
+            $this->_current_week_summerc = $weeks;
+        }
+
         // Update current week
         if($weeks > $this->_current_week) {
             $this->_current_week = $weeks;
@@ -331,6 +338,10 @@ class ucla_session {
      *  
      */
     protected function update_week() {
+        // Update summer sessions. If not in summer, then will set config to null.
+        block_ucla_weeksdisplay::set_current_week($this->_current_week_summera, 'a');
+        block_ucla_weeksdisplay::set_current_week($this->_current_week_summerc, 'c');
+
         block_ucla_weeksdisplay::set_current_week($this->_current_week);
     }
     

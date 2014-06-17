@@ -23,44 +23,45 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
 }
 
-require_once (dirname(__FILE__).'/../../../config.php');
-global $CFG,$USER,$COURSE;
+require_once(dirname(__FILE__) . '/../../../config.php');
+global $CFG, $USER, $COURSE;
 // link in external libraries
-require_once ($CFG->dirroot.'/blocks/iclicker/iclicker_service.php');
+/** @noinspection PhpIncludeInspection */
+require_once($CFG->dirroot . '/blocks/iclicker/iclicker_service.php');
 
 /**
  * Unit tests for the iclicker services
  *
  * http://docs.moodle.org/dev/PHPUnit_integration
  *
-resetAfterTest(bool)
-true means reset automatically after test, false means keep changes to next test method, default null means detect changes
-resetAllData()
-reset global state in the middle of a test
-setAdminUser()
-set current $USER as admin
-setGuestUser()
-set current $USER as guest
-setUser()
-set current $USER to a specific user - use getDataGenerator() to create one
-getDataGenerator()
-returns data generator instance - use if you need to add new courses, users, etc.
-preventResetByRollback()
-terminates active transactions, useful only when test contains own database transaction handling
-createXXXDataSet()
-creates in memory structure of database table contents, used in loadDataSet() (eg: createXMLDataSet(), createCsvDataSet(), createFlatXMLDataSet())
-loadDataSet()
-bulk loading of table contents
-getDebuggingMessages()
-Return debugging messages from the current test. (Moodle 2.4 and upwards)
-resetDebugging()
-Clear all previous debugging messages in current test. (Moodle 2.4 and upwards)
-assertDebuggingCalled()
-Assert that exactly debugging was just called once. (Moodle 2.4 and upwards)
-assertDebuggingNotCalled()
-Assert no debugging happened. (Moodle 2.4 and upwards)
-redirectMessages()
-Captures ongoing messages for later testing (Moodle 2.4 and upwards)
+ * resetAfterTest(bool)
+ * true means reset automatically after test, false means keep changes to next test method, default null means detect changes
+ * resetAllData()
+ * reset global state in the middle of a test
+ * setAdminUser()
+ * set current $USER as admin
+ * setGuestUser()
+ * set current $USER as guest
+ * setUser()
+ * set current $USER to a specific user - use getDataGenerator() to create one
+ * getDataGenerator()
+ * returns data generator instance - use if you need to add new courses, users, etc.
+ * preventResetByRollback()
+ * terminates active transactions, useful only when test contains own database transaction handling
+ * createXXXDataSet()
+ * creates in memory structure of database table contents, used in loadDataSet() (eg: createXMLDataSet(), createCsvDataSet(), createFlatXMLDataSet())
+ * loadDataSet()
+ * bulk loading of table contents
+ * getDebuggingMessages()
+ * Return debugging messages from the current test. (Moodle 2.4 and upwards)
+ * resetDebugging()
+ * Clear all previous debugging messages in current test. (Moodle 2.4 and upwards)
+ * assertDebuggingCalled()
+ * Assert that exactly debugging was just called once. (Moodle 2.4 and upwards)
+ * assertDebuggingNotCalled()
+ * Assert no debugging happened. (Moodle 2.4 and upwards)
+ * redirectMessages()
+ * Captures ongoing messages for later testing (Moodle 2.4 and upwards)
  *
  * NOTE: it is not possible to modify database structure such as create new table or drop columns from advanced_testcase.
  *
@@ -82,14 +83,14 @@ class iclicker_services_test extends advanced_testcase {
 
     public function setUp() {
         // setup the test data (users and course)
-        $student1 = $this->getDataGenerator()->create_user(array('email'=>'user1@iclicker.com', 'username'=>'iuser1'));
+        $student1 = $this->getDataGenerator()->create_user(array('email' => 'user1@iclicker.com', 'username' => 'iuser1'));
         $this->studentid1 = $student1->id;
-        $student2 = $this->getDataGenerator()->create_user(array('email'=>'user2@iclicker.com', 'username'=>'iuser2'));
+        $student2 = $this->getDataGenerator()->create_user(array('email' => 'user2@iclicker.com', 'username' => 'iuser2'));
         $this->studentid2 = $student2->id;
-        $instructor = $this->getDataGenerator()->create_user(array('email'=>'inst1@iclicker.com', 'username'=>'iinst1'));
+        $instructor = $this->getDataGenerator()->create_user(array('email' => 'inst1@iclicker.com', 'username' => 'iinst1'));
         $this->instructorid = $instructor->id;
         $category1 = $this->getDataGenerator()->create_category();
-        $course1 = $this->getDataGenerator()->create_course(array('shortname'=>'ic_1', 'fullname'=>'iclicker course', 'summary'=>'iclicker course desc', 'category'=>$category1->id));
+        $course1 = $this->getDataGenerator()->create_course(array('shortname' => 'ic_1', 'fullname' => 'iclicker course', 'summary' => 'iclicker course desc', 'category' => $category1->id));
         $this->courseid = $course1->id;
         $this->getDataGenerator()->enrol_user($this->studentid1, $this->courseid);
         $this->getDataGenerator()->enrol_user($this->studentid1, $this->courseid);
@@ -106,8 +107,8 @@ class iclicker_services_test extends advanced_testcase {
         $this->resetAfterTest(true); // reset all changes automatically after this test
 
         // array_diff and array_diff_key are the same as a subtract when used with 2 arrays -- array_diff(A1, A2) => A1 - A2
-        $a1 = array(1,2,3,4,5);
-        $a2 = array(3,4,5,6,7);
+        $a1 = array(1, 2, 3, 4, 5);
+        $a2 = array(3, 4, 5, 6, 7);
 
         $result = array_values(array_diff($a1, $a2));
         $this->assertEquals(2, count($result));
@@ -238,7 +239,7 @@ class iclicker_services_test extends advanced_testcase {
     function test_alternate_clickerid() {
         $this->resetAfterTest(true); // reset all changes automatically after this test
 
-        $result = NULL;
+        $result = null;
 
         $result = iclicker_service::translate_clicker_id(null);
         $this->assertEquals(null, $result);
@@ -288,12 +289,12 @@ class iclicker_services_test extends advanced_testcase {
         $reg1 = new stdClass;
         $reg1->clicker_id = '11111111';
         $reg1->owner_id = 'aaronz';
-        $reg1->timecreated = time()-1000;
+        $reg1->timecreated = time() - 1000;
         $reg2 = new stdClass;
         $reg2->clicker_id = '22222222';
         $reg2->owner_id = 'beckyz';
-        $reg2->timecreated = time()-100;
-        $result = NULL;
+        $reg2->timecreated = time() - 100;
+        $result = null;
 
         $clickers = array($reg1);
         $result = iclicker_service::make_clicker_ids_and_dates($clickers);
@@ -756,11 +757,11 @@ XML;
         $this->assertEquals($result->items[0]->scores[1]->rawgrade, 50);
         $this->assertNotNull($result->items[0]->scores[2]);
         $this->assertEquals($result->items[0]->scores[2]->rawgrade, 0);
-/*
-echo "<pre>";
-var_export($result->items[0]);
-echo "</pre>";
-*/
+        /*
+        echo "<pre>";
+        var_export($result->items[0]);
+        echo "</pre>";
+        */
         $xml = iclicker_service::encode_gradebook_results($result);
         $this->assertNull($xml); // no errors
 
@@ -771,7 +772,7 @@ echo "</pre>";
         $grade_item1 = new stdClass();
         $grade_item1->name = $test_item_name2;
         $grade_item1->points_possible = 100;
-        $grade_item1->type = NULL; // default
+        $grade_item1->type = null; // default
         $grade_item1->scores = array();
         $gradebook->items[] = $grade_item1;
 

@@ -24,5 +24,5 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'UCLA MyEngineer';
-$string['title'] = 'MyEngineer';
+$string['pluginname'] = 'UCLA MyEngineering';
+$string['title'] = 'MyEngineering';
