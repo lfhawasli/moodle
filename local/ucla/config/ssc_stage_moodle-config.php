@@ -133,12 +133,8 @@ $CFG->emailonlyfromnoreplyaddress = 1;
 $CFG->shib_logged_in_cookie = '_ucla_sso';
 
 // CCLE-2306 - HELP SYSTEM BLOCK
-// if using JIRA, jira_user, jira_password, jira_pid should be defined in config_private.php
-//$CFG->forced_plugin_settings['block_ucla_help']['send_to'] = 'jira';
-//$CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/CreateIssueDetails.jspa';
-//$CFG->forced_plugin_settings['block_ucla_help']['jira_default_assignee'] = 'dkearney';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://moodle2.sscnet.ucla.edu/docs/';
-$CFG->forced_plugin_settings['block_ucla_help']['email'] = 'help@ssc.ucla.edu';
+$CFG->forced_plugin_settings['block_ucla_help']['fromemail'] = 'help@ssc.ucla.edu';
 $block_ucla_help_support_contacts['System'] = 'new@tickets.sscnet.ucla.edu';  // default
 
 // CCLE-2301 - COURSE MENU BLOCK

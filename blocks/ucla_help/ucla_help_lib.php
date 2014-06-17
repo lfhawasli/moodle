@@ -227,12 +227,12 @@ function get_support_contacts_manager() {
 class support_contacts_manager {
 
     /**
-     * Returns the current support_contacts
+     * Returns the current support_contacts.
      *
-     * @return array of support_contacts
+     * @return array    Array of support_contacts indexed by context => contact.
      */
     public function get_support_contacts() {
-        global $block_ucla_help_support_contacts;
+        global $block_ucla_help_support_contacts, $CFG;
         
         $support_contacts = get_config('block_ucla_help', 'support_contacts');
         $support_contacts = $this->decode_stored_config((string) $support_contacts);
@@ -240,7 +240,12 @@ class support_contacts_manager {
         // now merge with values from config file to overwrite user set ones
         $support_contacts = array_merge((array) $support_contacts, 
                 (array) $block_ucla_help_support_contacts);        
-        
+
+        // If there is no one listed at 'System' context, then try to guess it.
+        if (!isset($support_contacts['System'])) {
+            $support_contacts['System'] = $CFG->supportemail;
+        }
+
         return $support_contacts;
     }
 
@@ -297,8 +302,6 @@ function create_help_message(&$fromform)
     $description['htmleditor'][1] = '1 - '.get_string('htmleditor');
     $description['trackforums'][0] = '0 - '.get_string('trackforumsno');
     $description['trackforums'][1] = '1 - '.get_string('trackforumsyes');
-    $description['screenreader'][0] = '0 - '.get_string('screenreaderno');
-    $description['screenreader'][1] = '1 - '.get_string('screenreaderyes');
     
     if (isset($USER->currentcourseaccess[$COURSE->id])) {
         $accesstime = date('r' , $USER->currentcourseaccess[$COURSE->id]);
@@ -335,8 +338,7 @@ function create_help_message(&$fromform)
     USER_htmleditor          = " . @$description['htmleditor'][$USER->htmleditor] . "
     USER_autosubscribe       = " . @$description['autosubscribe'][$USER->autosubscribe] . "
     USER_trackforums         = " . @$description['trackforums'][$USER->trackforums] . "
-    USER_timemodified        = " . @date('r' , $USER->timemodified) . "
-    USER_screenreader        = " . @$description['screenreader'][$USER->screenreader];
+    USER_timemodified        = " . @date('r' , $USER->timemodified);
     $body .= "\n";
     
     // Get logging records. If the user is logged in as a guest (user ID 1), or
@@ -370,7 +372,8 @@ function create_help_message(&$fromform)
  * @param object $context_id        Current context object
  * 
  * @return string                   Returns support contact matching most 
- *                                  specific context first, else returns null. 
+ *                                  specific context first until it reaches the
+ *                                  "System" context.
  */
 function get_support_contact($cur_context)
 {
@@ -394,7 +397,12 @@ function get_support_contact($cur_context)
             break;
         }        
     }       
-    
+
+    if (empty($ret_val)) {
+        // There should be a "System" contact.
+        $ret_val = $support_contacts['System'];
+    }
+
     return $ret_val;
 }
 
