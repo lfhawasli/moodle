@@ -17,7 +17,7 @@ if (!$course = get_course($courseid)) {
 }
 // Make sure user is logged in and if not, prompt them to login.
 require_login($course);
-if (isloggedin() || isguestuser()) {
+if (!isloggedin() || isguestuser()) {
     prompt_login($PAGE, $OUTPUT, $CFG, $course);
     die();
 }
