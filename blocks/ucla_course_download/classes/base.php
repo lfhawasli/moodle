@@ -260,7 +260,7 @@ abstract class block_ucla_course_download_base {
         $a->type = $this->get_type();
         $a->ziplifetime = get_config('block_ucla_course_download', 'ziplifetime');
         $url = new moodle_url('/blocks/ucla_course_download/view.php', 
-                array('id' => $request->courseid));
+                array('courseid' => $request->courseid));
         $a->url = $url->out();
 
         $from = get_string('emailsender', 'block_ucla_course_download');

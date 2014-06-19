@@ -7,11 +7,21 @@ require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/base.php');
 require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/files.php');
 require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
 
-$courseid = required_param('courseid', PARAM_INT); // course ID
+// Maybe courseid is passed as just "id".
+$courseid = optional_param('id', null, PARAM_INT);
+if (empty($courseid)) {
+    $courseid = required_param('courseid', PARAM_INT); // course ID
+}
 if (!$course = get_course($courseid)) {
     print_error('coursemisconf');
 }
+// Make sure user is logged in and if not, prompt them to login.
 require_login($course);
+if (isloggedin() || isguestuser()) {
+    prompt_login($PAGE, $OUTPUT, $CFG, $course);
+    die();
+}
+
 $context = context_course::instance($course->id);
 // Make sure user has capability to request/download zips.
 if (!has_capability('block/ucla_course_download:requestzip', $context)) {
