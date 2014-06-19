@@ -104,6 +104,11 @@ table#user-grades {
         font-weight: normal;
         &.cell {
             height: 20px;
+            white-space: nowrap;
+            // Fix header for grade history plugin
+            .path-grade-report-history & {
+                white-space: normal;
+            }
         }
     }
     .controls {
