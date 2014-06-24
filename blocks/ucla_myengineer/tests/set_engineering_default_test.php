@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA MyEngineer plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 /**
  * Unit tests for event handler set_engineering_default.
  *
- * @package    local_ucla
+ * @package    block_ucla_myengineer
  * @category   test
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
