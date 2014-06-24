@@ -29,15 +29,20 @@ function student_zip_requestable($course) {
         return false;
     }
 
+    // See if course is a UCLA course.
+    $courseinfos = ucla_get_course_info($course->id);
+    if (empty($courseinfos)) {
+        return false;
+    }
+    $courseinfo = reset($courseinfos);  // Just care about first item.
+
     // If this course belongs to the past, then allow access.
     if (is_past_course($course)) {
         return true;
     }
 
-    // Else see if course belongs to current term.
-    $courseinfos = ucla_get_course_info($course->id);
-    $courseinfo = reset($courseinfos);  // Just care about first item.
-    if ($courseinfo->term != $CFG->currentterm) {
+    // Does this course belong to the current term?
+    if (empty($CFG->currentterm) || $courseinfo->term != $CFG->currentterm) {
         return false;
     }
 
