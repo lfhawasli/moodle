@@ -53,7 +53,7 @@ $string['countnewusers'] = 'Show most recently created users';
 $string['pushgrades'] = 'Manually push grades to MyUCLA';
 $string['noenrollments'] = 'There are no enrollments';
 $string['usersdescription'] ='Users with role: {$a->role}, Context: {$a->contextlevel} and Component: {$a->component}';
-
+$string['listdupusers'] = "Show duplicate users";
 // The SRDB
 $string['enrollview'] = 'Get courses for view enrollment (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3318">enroll2</a>)';
 
