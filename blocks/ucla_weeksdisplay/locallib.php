@@ -50,7 +50,7 @@ class ucla_session {
      * the next term if that's needed
      */
     function update() {
-        
+
         if(!$this->_summer) {   // Regular term in session
             
             // Check if quarter is in session
@@ -68,7 +68,7 @@ class ucla_session {
                         $weeks_str = $this->get_quarter_and_year();
                     }
                 }
-                
+
                 $weeks_str = html_writer::div($weeks_str, 'weeks-display label-' . strtolower($this->quarter_name($this->_quarter)));
                 // Update weeks display
                 $this->update_week_display($weeks_str);
@@ -111,7 +111,7 @@ class ucla_session {
                 $this->_current_week = -1;
                 $this->update_week();
             }
-            
+            $quarter_week = html_writer::div($quarter_week, 'weeks-display label-summer');
             // Update quarter string
             $this->update_week_display($quarter_week);
         }
