@@ -107,7 +107,7 @@ echo $OUTPUT->doctype() ?>
                 </div>
             </div>
     <?php } else { ?>
-            <div class="header-login-frontpage col-sm-6" >
+            <div class="header-login-frontpage col-sm-6 logininfo" >
                 <?php echo $OUTPUT->help_feedback_link() ?>
                 <?php echo $OUTPUT->login_link() ?>
             </div>

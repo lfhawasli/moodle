@@ -17,7 +17,7 @@ Background:
        | user | course | role |
        | teacher1 | C1 | editingteacher |
        | student1 | C1 | student |
-   And I log in as ucla "teacher1"
+   And I log in as "teacher1"
    And I browse to site "C1"
    And I turn editing mode on
    And I follow the "Syllabus (empty)" section in the ucla site menu
@@ -29,7 +29,7 @@ Background:
 
 @javascript
 Scenario: Link in site menu block as student
-    Given I log in as ucla "student1"
+    Given I log in as "student1"
     When I browse to site "C1"
     Then I should see "Test Syllabus" in the ucla site menu
     When I follow the "Test Syllabus" section in the ucla site menu
@@ -38,7 +38,7 @@ Scenario: Link in site menu block as student
 
 @javascript
 Scenario: Link in site menu block as instructor
-    Given I log in as ucla "teacher1"
+    Given I log in as "teacher1"
     When I browse to site "C1"
     Then I should see "Test Syllabus" in the ucla site menu
     When I follow the "Test Syllabus" section in the ucla site menu
