@@ -190,11 +190,14 @@ class local_publicprivate_renderer extends core_course_renderer {
             if ($ppmod->is_public()) {
                 $mod->groupingid = null;
             }
-
-            // Labels resources are not printed, so add the grouping name manually.
-            if (strtolower($mod->modfullname) === 'label' && $ppmod->is_private()) {
-                $pptext = html_writer::span('(' . get_string('publicprivategroupingname',
-                                        'local_publicprivate') . ')',
+            
+            // Get the context from this course module, used to identify if user is in managegroup
+            $context = context_module::instance($mod->id);
+            
+            // Labels resources are not printed, so add the grouping name manually. Only instructors see the label
+            if (strtolower($mod->modfullname) === 'label' && !empty($mod->groupingid) && has_capability('moodle/course:managegroups', $context)) {
+                $groupings = groups_get_all_groupings($mod->course);
+                $pptext = html_writer::span('(' . $groupings[$mod->groupingid]->name . ')',
                                 'groupinglabel');
                 $mod->set_after_link($pptext);
             }
