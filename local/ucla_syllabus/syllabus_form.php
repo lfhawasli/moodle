@@ -258,7 +258,8 @@ class syllabus_form extends moodleform {
                                   'action' => UCLA_SYLLABUS_ACTION_DELETE,
                                   'type' => UCLA_SYLLABUS_TYPE_PRIVATE)),
                         get_string('delete'),
-                        array('onclick' => 'return confirm("'.get_string('confirm_deletion', 'local_ucla_syllabus').'")'));
+                        array('id' => 'delete-private-syllabus',
+                              'onclick' => 'return confirm("'.get_string('confirm_deletion', 'local_ucla_syllabus').'")'));
 
                 $editlinks = html_writer::tag('span', $editlink . $makepubliclink . $deletelink,
                         array('class' => 'editing_links'));
@@ -338,7 +339,8 @@ class syllabus_form extends moodleform {
                                   'action' => UCLA_SYLLABUS_ACTION_DELETE,
                                   'type' => UCLA_SYLLABUS_TYPE_PUBLIC)),
                         get_string('delete'),
-                        array('onclick' => 'return confirm("'.get_string('confirm_deletion', 'local_ucla_syllabus').'")'));
+                        array('id' => 'delete-public-syllabus',
+                              'onclick' => 'return confirm("'.get_string('confirm_deletion', 'local_ucla_syllabus').'")'));
 
                 $editlinks = html_writer::tag('span', $editlink . $makeprivatelink . $deletelink,
                         array('class' => 'editing_links'));

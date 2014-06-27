@@ -57,28 +57,22 @@ class behat_ucla_syllabus extends behat_base {
     }
 
     /**
-     * Step to delete a public syllabus.  Assumes you are in syllabus editing mode.
+     * Step to delete a public syllabus. Assumes you are in syllabus editing mode.
      *
-     * @Given /^I delete a public syllabus$/
+     * @When /^I delete a public syllabus$/
      */
     public function i_delete_a_public_syllabus()  {
 
-        if ($this->running_javascript()) {
-            // Click on the delete link
-            $linknode = $this->find_link('Delete');
-            $linknode->click();
+        // Click on the delete link.
+        $linknode = $this->find_link('delete-public-syllabus');
+        $linknode->click();
 
+        if ($this->running_javascript()) {
             // Click YES on the javascript alert
             $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
             // Wait..
             $this->getSession()->wait(2 * 1000, false);
 
-        } else {
-            return new Given('I follow "Delete"');
         }
-
-
     }
-
-
 }
