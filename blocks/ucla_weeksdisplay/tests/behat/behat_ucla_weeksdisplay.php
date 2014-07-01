@@ -97,6 +97,8 @@ class behat_ucla_weeksdisplay extends behat_base {
      *                              pass "-1" week.
      */
     public function it_is_term_week($termstring, $weekstring) {
+        require_once(__DIR__ . '/../../block_ucla_weeksdisplay.php');
+
         // Convert term string "Term YYYY" into "YYT" (Year and term letter).
         list($termname, $year) = explode(' ', $termstring);
         if (empty($termname) || empty($year)) {
