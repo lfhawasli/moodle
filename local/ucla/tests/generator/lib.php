@@ -269,7 +269,11 @@ class local_ucla_generator extends testing_data_generator {
 
         // Although we didn't create it, we need the roleid for student.        
         $retval['student'] = $archetypes['student'];
-
+        
+        // Adding required capability for TA.
+        assign_capability('moodle/course:viewparticipants', CAP_ALLOW, 
+                $retval['ta'], context_system::instance());
+        
         return $retval;
     }
 
