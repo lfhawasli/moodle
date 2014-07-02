@@ -33,7 +33,7 @@ Feature: Alert students about course download feature
      Given it is "6th" week
      And I log in as ucla "student1"
      When I browse to site "C1"
-     Then I should not see "For copyright compliance you will no longer have access to this course site 2 weeks into the next term" in the "region-main" "region"
+     Then I should not see "Download course materials" in the "region-main" "region"
 
    Scenario: Alert students for an old course.
      # Default term that a course is built for is 14W.
