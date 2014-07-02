@@ -181,6 +181,8 @@
     $PAGE->set_title("$course->shortname: ".format_string($discussion->name));
     $PAGE->set_heading($course->fullname);
     $PAGE->set_button($searchform);
+    $renderer = $PAGE->get_renderer('mod_forum');
+
     echo $OUTPUT->header();
     echo $OUTPUT->heading(format_string($forum->name), 2);
 
@@ -199,6 +201,10 @@
             $canreply = enrol_selfenrol_available($course->id);
         }
     }
+
+    // Output the links to neighbour discussions.
+    $neighbours = forum_get_discussion_neighbours($cm, $discussion);
+    echo $renderer->neighbouring_discussion_navigation($neighbours['prev'], $neighbours['next']);
 
 /// Print the controls across the top
     echo '<div class="discussioncontrols clearfix">';

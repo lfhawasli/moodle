@@ -311,6 +311,7 @@ $string['namenews_help'] = 'The announcements forum is a special forum that is a
 // END UCLA MOD: CCLE-2944
 $string['namesocial'] = 'Social forum';
 $string['nameteacher'] = 'Teacher forum';
+$string['nextdiscussiona'] = 'Next discussion: {$a}';
 $string['newforumposts'] = 'New forum posts';
 $string['noattachments'] = 'There are no attachments to this post';
 $string['nodiscussions'] = 'There are no discussion topics yet in this forum';
@@ -356,6 +357,7 @@ $string['page-mod-forum-view'] = 'Forum module main page';
 $string['page-mod-forum-discuss'] = 'Forum module discussion thread page';
 $string['parent'] = 'Show parent';
 $string['parentofthispost'] = 'Parent of this post';
+$string['prevdiscussiona'] = 'Previous discussion: {$a}';
 $string['pluginadministration'] = 'Forum administration';
 $string['pluginname'] = 'Forum';
 $string['postadded'] = '<p>Your post was successfully added.</p> <p>You have {$a} to edit it if you want to make any changes.</p>';
