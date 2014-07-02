@@ -146,61 +146,62 @@ if ($fromform = $mform->get_data()) {
     $body = create_help_message($fromform);
     
     // get support contact
-    $support_contact = get_support_contact($context);
+    $support_contact_array = explode(',', get_support_contact($context));
 
-    // Now, is the support contact an email address?
-    if (validateEmailSyntax($support_contact)) {
-        // send message via email        
-        $mail = get_mailer();
+    foreach ($support_contact_array as $support_contact) {
+        // Now, is the support contact an email address?
+        if (validateEmailSyntax($support_contact)) {
+            // send message via email        
+            $mail = get_mailer();
 
-        // Check if we want the from email to be something else.
-        $altfrom = get_config('block_ucla_help', 'fromemail');
-        if (!empty($altfrom)) {
-            $mail->From = $altfrom;
-        } else {
-            $mail->From = $from_address;
-        }
+            // Check if we want the from email to be something else.
+            $altfrom = get_config('block_ucla_help', 'fromemail');
+            if (!empty($altfrom)) {
+                $mail->From = $altfrom;
+            } else {
+                $mail->From = $from_address;
+            }
 
-        if (!empty($fromform->ucla_help_name)) {
-            $mail->FromName = $fromform->ucla_help_name;
-        }
+            if (!empty($fromform->ucla_help_name)) {
+                $mail->FromName = $fromform->ucla_help_name;
+            }
+                
+            // Add support contact email address.
+            $mail->AddAddress($support_contact);
             
-        // Add support contact email address.
-        $mail->AddAddress($support_contact);
-        
-        $mail->Subject = $header;
-        $mail->Body = $body;
-        
-        // just going to use php's built-in email functionality. Moodle provides
-        // a function called "email_to_user", but it requires a user in the 
-        // database to exist
-        $result = $mail->Send();
-        
-    } else if (!empty($support_contact)) {
-        // Send message via JIRA.
-                
-        $params = array(
-            'pid' => get_config('block_ucla_help', 'jira_pid'),
-            'issuetype' => 1,
-            'os_username' => get_config('block_ucla_help', 'jira_user'),
-            'os_password' => get_config('block_ucla_help', 'jira_password'),
-            'summary' => $header,
-            'assignee' => $support_contact,
-            'reporter' => $support_contact,
-            'description' => $body,
-        );        
+            $mail->Subject = $header;
+            $mail->Body = $body;
+            
+            // just going to use php's built-in email functionality. Moodle provides
+            // a function called "email_to_user", but it requires a user in the 
+            // database to exist
+            $result = $mail->Send();
+            
+        } else if (!empty($support_contact)) {
+            // Send message via JIRA.
+                    
+            $params = array(
+                'pid' => get_config('block_ucla_help', 'jira_pid'),
+                'issuetype' => 1,
+                'os_username' => get_config('block_ucla_help', 'jira_user'),
+                'os_password' => get_config('block_ucla_help', 'jira_password'),
+                'summary' => $header,
+                'assignee' => $support_contact,
+                'reporter' => $support_contact,
+                'description' => $body,
+            );        
 
-        // try to create the issue
-        // returns null if unable to send request
-        // @todo: throw or log error
-        $result = do_request(get_config('block_ucla_help', 'jira_endpoint'), $params, 'POST');        
-                
-    } else {
-        // block has been misconfigured, so give error
-        // @todo: throw or log error
-        $result = false;
+            // try to create the issue
+            // returns null if unable to send request
+            // @todo: throw or log error
+            $result = do_request(get_config('block_ucla_help', 'jira_endpoint'), $params, 'POST');
+            
+        } else {
+            // block has been misconfigured, so give error
+            // @todo: throw or log error
+            $result = false;
+        }
     }
-
     if (!empty($result)) {
         echo $OUTPUT->notification(get_string('success_sending_message', 'block_ucla_help'), 'notifysuccess');
     } else {
