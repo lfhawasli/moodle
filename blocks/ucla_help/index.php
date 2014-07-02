@@ -159,6 +159,10 @@ if ($fromform = $mform->get_data()) {
         } else {
             $mail->From = $from_address;
         }
+
+        if (!empty($fromform->ucla_help_name)) {
+            $mail->FromName = $fromform->ucla_help_name;
+        }
             
         // Add support contact email address.
         $mail->AddAddress($support_contact);

@@ -75,6 +75,7 @@ class behat_ucla extends behat_files {
         // Set public/private.
         set_config('enablepublicprivate', 1);
         set_config('enablegroupmembersonly', 1);
+        set_config('autologinguests', 1);
         // Set term.
         set_config('currentterm', $this->currentterm);
         set_config('forcedefaultmymoodle', 1);
@@ -92,11 +93,6 @@ class behat_ucla extends behat_files {
 
         // Purge all caches to force new configs to take effect.
         purge_all_caches();
-
-//        // Set UCLA theme.
-//        return array(new Given('I log in as administrator'),
-//                     new When('I change theme to UCLA theme'),
-//                     new Given('I log out'));
     }
 
     /**
@@ -170,6 +166,8 @@ class behat_ucla extends behat_files {
      * @Given /^I browse to site "([^"]*)"$/
      *
      * @param string $shortname
+     * @deprecated Since we can now specify fullname of a course in the UCLA
+     * data generator, we can use the regular 'I follow "course fullname"' step.
      */
     public function i_browse_to_site($shortname) {
         $courseid = $this->courses[$shortname]->id;
@@ -203,9 +201,13 @@ class behat_ucla extends behat_files {
                     // See if term was specified.
                     $term = $this->currentterm;
                     if (isset($elementdata['term'])) {
-                        $term = $elementdata['type'];
+                        $term = $elementdata['term'];
                     }
-                    $class = $datagenerator->create_class(array('term' => $term));
+                    $param = array('term' => $term);
+                    if (isset($elementdata['fullname'])) {
+                        $param['fullname'] = $elementdata['fullname'];
+                    }
+                    $class = $datagenerator->create_class($param);
                     $courseid = array_pop($class)->courseid;
 
                     // Save site.
