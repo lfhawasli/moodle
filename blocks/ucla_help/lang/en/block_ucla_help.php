@@ -21,7 +21,7 @@ $string['helpform_text'] = 'Use the form below to report a problem or error. Inc
 $string['helpform_login'] = 'Please {$a} if requesting help with a particular course.';
 
 // used by message being sent
-$string['message_header'] = 'Feedback: {$a}';
+$string['message_header'] = 'CCLE Help: {$a}';
 
 // settings page text
 $string['settings_set_in_config'] = 'WARNING: Value set in config.php. Any value set here will be ignored by the system. Check block\'s config.php to edit or view true value.';
