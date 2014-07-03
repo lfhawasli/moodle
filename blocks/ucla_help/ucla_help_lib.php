@@ -277,6 +277,38 @@ class support_contacts_manager {
 /*** FUNCTIONS ***/
 
 /**
+ * Constructs description for the subject of email to speed the routing of the ticket
+ * 
+ * @param mixed $fromform   Form data submitted by user. Passed by reference. 
+ * 
+ * @return string           Returns 
+ */
+function create_description(&$fromform) {
+    // Set the maximum number of characters.
+    $summarylength = 40;
+    // Get the body of the message.
+    $headersummary = stripslashes($fromform->ucla_help_description); 
+    // Remove unnecessary spaces.
+    $headersummary = preg_replace('!\s+!', ' ', $headersummary);
+    
+    // Limit the summary into 40 characters and stop at the last complete word.
+    // Source: http://stackoverflow.com/questions/79960/how-to-truncate-a-string-in-php-to-the-word-closest-to-a-certain-number-of-chara
+    $parts = preg_split('/([\s\n\r]+)/', $headersummary, null, PREG_SPLIT_DELIM_CAPTURE);
+    $partscount = count($parts);
+    $length = 0;
+    $lastpart = 0;
+    for (; $lastpart < $partscount; ++$lastpart) {
+      $length += strlen($parts[$lastpart]);
+      if ($length > $summarylength) { 
+          break; 
+      }
+    }
+    $headersummary = implode(array_slice($parts, 0, $lastpart));
+    
+    return trim($headersummary);
+}
+
+/**
  * Constructs body of email that will be sent when user submits help form.
  * 
  * @param mixed $fromform   Form data submitted by user. Passed by reference. 

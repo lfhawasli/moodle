@@ -17,6 +17,7 @@ require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 
 // form to process help request
 require_once($CFG->dirroot . '/blocks/ucla_help/help_form.php' );
+require_once($CFG->dirroot . '/lib/validateurlsyntax.php');
 
 // set context
 $courseid = optional_param('course', 0, PARAM_INTEGER);
@@ -124,8 +125,8 @@ if ($fromform = $mform->get_data()) {
     }             
         
     // get message header
-    $header = get_string('message_header', 'block_ucla_help', $from_address);
-    
+    $header = get_string('message_header', 'block_ucla_help',create_description($fromform));
+
     // Set context to the selected course
     $instanceid = 0;
     $fromform->course_name = $SITE->shortname;
