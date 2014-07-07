@@ -136,7 +136,7 @@ $CFG->shib_logged_in_cookie = '_ucla_sso';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://moodle2.sscnet.ucla.edu/docs/';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://moodle2.sscnet.ucla.edu/wiki/api.php';
 $CFG->forced_plugin_settings['block_ucla_help']['fromemail'] = 'help@ssc.ucla.edu';
-$block_ucla_help_support_contacts['System'] = 'new@tickets.sscnet.ucla.edu';  // default
+$block_ucla_help_support_contacts['System'] = 'new@tickets.sscnet.ucla.edu,help@ssc.ucla.edu';  // default
 
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
