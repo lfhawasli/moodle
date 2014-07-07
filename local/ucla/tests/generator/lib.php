@@ -164,11 +164,15 @@ class local_ucla_generator extends testing_data_generator {
         $this->set_division($classtocreate[0]);
 
         // Make shell course first.
-        $courseobj = $this->create_course(
-                array('shortname' => $classtocreate[0]['shortname'],
-                    'category' => $classtocreate[0]['category'],
-                    'format' => 'ucla',
-                    'numsections' => 10));
+        $param = array('shortname' => $classtocreate[0]['shortname'],
+                       'category' => $classtocreate[0]['category'],
+                       'format' => 'ucla',
+                       'numsections' => 10);
+        if (!empty($classtocreate[0]['fullname'])) {
+            // We sometimes need to specify the fullname in behat tests.
+            $param['fullname'] = $classtocreate[0]['fullname'];
+        }
+        $courseobj = $this->create_course($param);
 
         // Add course to appropiate ucla tables.
         $this->insert_ucla_reg_classinfo($classtocreate);
@@ -265,7 +269,11 @@ class local_ucla_generator extends testing_data_generator {
 
         // Although we didn't create it, we need the roleid for student.        
         $retval['student'] = $archetypes['student'];
-
+        
+        // Adding required capability for TA.
+        assign_capability('moodle/course:viewparticipants', CAP_ALLOW, 
+                $retval['ta'], context_system::instance());
+        
         return $retval;
     }
 

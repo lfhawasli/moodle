@@ -21,7 +21,7 @@ $string['helpform_text'] = 'Use the form below to report a problem or error. Inc
 $string['helpform_login'] = 'Please {$a} if requesting help with a particular course.';
 
 // used by message being sent
-$string['message_header'] = 'Moodle feedback from {$a}';
+$string['message_header'] = 'CCLE Help: {$a}';
 
 // settings page text
 $string['settings_set_in_config'] = 'WARNING: Value set in config.php. Any value set here will be ignored by the system. Check block\'s config.php to edit or view true value.';
@@ -47,7 +47,9 @@ $string['settings_support_contacts_description'] = '<p>If a user clicks on a "He
         'be contacted. Else if an admin setup a support contact for the context "English", then that person will be contacted. ' . 
         'Else the contact specified at the "System" context will be contacted' .
         '<p><strong>Must have someone listed for "System" context.</strong></p>' .
-        '</p><p>A point of contact can be either an email address or JIRA user. A context can be a category or shortname.</p>';
+        '</p><p>A point of contact can be either an email address or JIRA user. ' .
+        'You can enter multiple email addresses by separating them with a comma. ' .
+        'A context can be a category or shortname.</p>';
 $string['settings_support_contacts'] = 'Support contacts';
 $string['settings_support_contacts_table_context'] = 'Context';
 $string['settings_support_contacts_table_contact'] = 'Contact';

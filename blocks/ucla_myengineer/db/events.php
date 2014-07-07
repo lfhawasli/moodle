@@ -15,15 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of UCLA MyEngineer.
- *
- * @package    block_ucla_myengineer
- * @copyright  2014 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Event handlers.
+ * 
+ * This file contains the event handlers for the Moodle event API.
+ * 
+ * @package block_ucla_myengineer
+ * @copyright 2013 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2014062300;  // YYYYMMDDHH (year, month, day, 24-hr time).
-$plugin->requires = 2011120500; // YYYYMMDDHH (This is the release version for Moodle 2.0).
-
-$plugin->dependencies = array('local_ucla' => 2014052000);
-$plugin->component = 'block_ucla_myengineer';
+$handlers = array(
+    'course_creator_finished' => array(
+        'handlerfile'     => '/blocks/ucla_myengineer/eventslib.php',
+        'handlerfunction' => 'set_engineering_default',
+        'schedule'        => 'instant'
+    ),
+);

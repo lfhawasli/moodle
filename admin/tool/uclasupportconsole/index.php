@@ -1831,6 +1831,97 @@ if ($displayforms) {
 
 $consoles->push_console_html('users', $title, $sectionhtml);
 
+
+////////////////////////////////////////////////////////////////////
+$title = "listdupusers";
+$sectionhtml = '';
+
+if ($displayforms) {
+    $sectionhtml .= supportconsole_simple_form($title);
+} else if ($consolecommand == "$title") {
+    
+    //This SQL query gets all rows that have at least 1 other duplicate email.       
+    $dupemails = $DB->get_records_sql("SELECT a.id AS userid, a.username, a.email,
+                                              a.idnumber
+                                         FROM {user} a
+                                         JOIN (SELECT id, email
+                                                 FROM {user}
+                                             GROUP BY email
+                                               HAVING count(*) > 1) b ON a.email = b.email
+                                     ORDER BY a.email");
+    
+    //This gets all rows that have at least 1 other duplicate idnumber.
+    $dupids = $DB->get_records_sql("SELECT a.id AS userid, a.username, a.email,
+                                           a.idnumber
+                                      FROM {user} a
+                                      JOIN (SELECT id, idnumber
+                                              FROM {user}
+                                          GROUP BY idnumber
+                                            HAVING count(*) > 1) b ON a.idnumber = b.idnumber
+                                  ORDER BY a.idnumber");
+    
+    //The following blocks of code iterate through the duplicates and populate the
+    //result table with row objects, which might have multiple usernames or userids,
+    //in which case it will put them all in the same cell.
+    $results = array();
+ 
+    $row = new stdClass();
+    $row->email = null;
+    //Iterate through the duplicate emails and start a new row object whenever the
+    //email changes.
+    foreach ($dupemails as $k => $dupemail) {
+        if(strtolower($row->email) != strtolower($dupemail->email)) {
+            if($row->email != null) {
+                $results[] = $row;                
+            }
+            $row = new stdClass();
+            //The userid and username must be initialized before email so that the
+            //result columns are in the correct order.
+            $row->userid = null;
+            $row->username = null;
+            $row->email = $dupemail->email;
+        }
+        //If the email is the same, keep appending user information to that row.
+        $row->userid .= $dupemail->userid . html_writer::empty_tag('br');
+        $row->username .= html_writer::link(new moodle_url('/user/view.php',
+                array('id' => $dupemail->userid)), $dupemail->username)
+                . html_writer::empty_tag('br');
+        if($dupemail->idnumber == null) {
+            $row->idnumber .= html_writer::tag('i', 'n/a') . html_writer::empty_tag('br');
+        }
+        else {
+            $row->idnumber .= $dupemail->idnumber . html_writer::empty_tag('br');
+        }
+    }
+    if(isset($row->email)) {
+        $results[] = $row;
+    }
+
+    $row = new stdClass();
+    $row->idnumber = null;
+    foreach ($dupids as $k => $dupid) {
+        if($row->idnumber != $dupid->idnumber) {
+            if($row->idnumber != null) {
+                $results[] = $row;                
+            }
+            $row = new stdClass();
+            $row->idnumber = $dupid->idnumber;
+        }
+        $row->userid .= $dupid->userid . html_writer::empty_tag('br');
+        $row->username .= html_writer::link(new moodle_url('/user/view.php',
+                array('id' => $dupid->userid)), $dupid->username)
+                . html_writer::empty_tag('br');
+        $row->email .= $dupid->email . html_writer::empty_tag('br');
+    }
+    if(isset($row->idnumber)) {
+        $results[] = $row;
+    }
+
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
+}
+
+$consoles->push_console_html('users', $title, $sectionhtml);
+
 ////////////////////////////////////////////////////////////////////
 $title = "recentlysentgrades";
 $sectionhtml = '';
@@ -2043,6 +2134,67 @@ if ($displayforms) {
     unset($params['contextlevel']);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $results,
         $params, get_string('mediausage_help', 'tool_uclasupportconsole'));
+}
+$consoles->push_console_html('modules', $title, $sectionhtml);
+///////////////////////////////////////////////////////////////
+$title = "visiblecontentlist";
+$sectionhtml = '';
+if ($displayforms) {
+    $content = get_term_selector($title);
+    $sectionhtml .= supportconsole_simple_form($title, $content);
+} else if ($consolecommand == "$title") {
+    $term = required_param('term', PARAM_ALPHANUM);
+    $params = array('contextlevel' => CONTEXT_MODULE);
+    if(!empty($term)) {
+        $params['term'] = $term;
+        // Table of relevant courses and their srs.
+        $classsql = "SELECT m.id, rc.term, regd.fullname AS division, c.shortname,
+                            count(m.course) AS count, c.id as instructors
+                       FROM {course_modules} m
+                       JOIN {course_sections} s ON m.section = s.id AND m.course = s.course
+                       JOIN {course} c ON s.course = c.id                       
+                       JOIN {ucla_request_classes} rc ON (c.id = rc.courseid AND
+                                                          rc.hostcourse=1)
+                       JOIN {ucla_reg_classinfo} regc ON (rc.srs = regc.srs AND
+                                                          rc.term = regc.term)
+                       JOIN {ucla_reg_division} regd ON regc.division = regd.code
+                      WHERE m.visible = 1 AND s.visible = 0 AND rc.term = :term
+                   GROUP BY m.course";
+
+        // Table of instructors and contact info.
+        $instrsql = "SELECT ra.id, c.id AS courseid, u.firstname, u.lastname, u.email
+                       FROM {role_assignments} ra
+                       JOIN {user} u ON ra.userid = u.id
+                       JOIN {role} r ON ra.roleid = r.id
+                       JOIN {context} co ON ra.contextid = co.id
+                       JOIN {course} c ON co.instanceid = c.id
+                      WHERE r.shortname = :shortname";
+    }
+
+    $results = $DB->get_records_sql($classsql, $params);
+    $instrs = $DB->get_records_sql($instrsql, array('shortname' => 'editinginstructor'));
+
+    foreach($results as $key => $result) {
+        $result->shortname = html_writer::link(new moodle_url('/course/view.php',
+                array('id' => $result->instructors)), $result->shortname);
+
+        // For each of the instructor rows, if the srs matches that of $result,
+        // append to instr string with their contact info. The srs of $result is 
+        // stored in the instructors variable so that instructor info can 
+        // replace the srs once it is used.
+        $instrstr = "";
+        foreach($instrs as $ikey => $instr) {
+            if($instr->courseid == $result->instructors) {
+                // Reach here if $instr teaches this course.
+                $instrstr .= html_writer::link("mailto:" . $instr->email,
+                        fullname($instr)) . html_writer::empty_tag('br');
+            }
+        }
+        $result->instructors = $instrstr;
+        $results[$key] = $result;
+    }
+    unset($params['contextlevel']);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
 }
 $consoles->push_console_html('modules', $title, $sectionhtml);
 

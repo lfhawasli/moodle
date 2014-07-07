@@ -183,8 +183,8 @@ class uclaroles_manager {
         $site_types = self::get_site_types();
         $assignable_roles = array();
         foreach ($site_types as $site_type => $type_text) {
-            $roles = self::get_assignable_roles($site_type);
-            foreach ($roles as $role) {
+            $all_roles = self::get_assignable_roles($site_type);
+            foreach ($all_roles as $role) {
                 $assignable_roles[$site_type][$role->shortname] = $role->name;
             }
         }            

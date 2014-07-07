@@ -63,9 +63,4 @@ $handlers = array(
         'handlerfunction' => 'hide_past_courses',
         'schedule'        => 'instant'
     ),
-    'course_creator_finished' => array(
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction' => 'set_engineering_default',
-        'schedule'        => 'instant'
-    ),
 );

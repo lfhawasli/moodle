@@ -53,7 +53,7 @@ $string['countnewusers'] = 'Show most recently created users';
 $string['pushgrades'] = 'Manually push grades to MyUCLA';
 $string['noenrollments'] = 'There are no enrollments';
 $string['usersdescription'] ='Users with role: {$a->role}, Context: {$a->contextlevel} and Component: {$a->component}';
-
+$string['listdupusers'] = "Show duplicate users";
 // The SRDB
 $string['enrollview'] = 'Get courses for view enrollment (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3318">enroll2</a>)';
 
@@ -109,6 +109,7 @@ $string['mediausage'] = 'Media usage';
 $string['mediausage_help'] = 'Lists course with video content for a given term.';
 $string['syllabusrecentlinks'] = 'Recently updated syllabus links at Registrar';
 $string['syllabuslinkslimit'] = 'Get last {$a} results';
+$string['visiblecontentlist'] = 'List courses with visible content in hidden sections';
 
 // Course
 $string['collablist'] = 'Show collaboration sites';
