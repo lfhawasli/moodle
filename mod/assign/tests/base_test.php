@@ -46,6 +46,8 @@ class mod_assign_base_testcase extends advanced_testcase {
     const DEFAULT_EDITING_TEACHER_COUNT = 2;
     /** @const Optional extra number of students to create */
     const EXTRA_STUDENT_COUNT = 40;
+    /** @const Optional number of suspended students */
+    const EXTRA_SUSPENDED_COUNT = 10;
     /** @const Optional extra number of teachers to create */
     const EXTRA_TEACHER_COUNT = 5;
     /** @const Optional extra number of editing teachers to create */
@@ -73,6 +75,9 @@ class mod_assign_base_testcase extends advanced_testcase {
 
     /** @var array $extrastudents List of EXTRA_STUDENT_COUNT students in the course*/
     protected $extrastudents = null;
+
+    /** @var array $extrasuspendedstudents List of EXTRA_SUSPENDED_COUNT students in the course*/
+    protected $extrasuspendedstudents = null;
 
     /** @var array $groups List of 10 groups in the course */
     protected $groups = null;
@@ -151,6 +156,11 @@ class mod_assign_base_testcase extends advanced_testcase {
             array_push($this->extrastudents, $this->getDataGenerator()->create_user());
         }
 
+        $this->extrasuspendedstudents = array();
+        for ($i = 0; $i < self::EXTRA_SUSPENDED_COUNT; $i++) {
+            array_push($this->extrasuspendedstudents, $this->getDataGenerator()->create_user());
+        }
+
         $teacherrole = $DB->get_record('role', array('shortname'=>'teacher'));
         foreach ($this->extrateachers as $i => $teacher) {
             $this->getDataGenerator()->enrol_user($teacher->id,
@@ -177,6 +187,14 @@ class mod_assign_base_testcase extends advanced_testcase {
             }
         }
 
+        foreach ($this->extrasuspendedstudents as $i => $suspendedstudent) {
+            $this->getDataGenerator()->enrol_user($suspendedstudent->id,
+                                                  $this->course->id,
+                                                  $studentrole->id, 'manual', 0, 0, ENROL_USER_SUSPENDED);
+            if ($i < (self::EXTRA_SUSPENDED_COUNT / 2)) {
+                groups_add_member($this->groups[$i % self::GROUP_COUNT], $suspendedstudent);
+            }
+        }
     }
 
     /**
@@ -205,10 +223,6 @@ class mod_assign_base_testcase extends advanced_testcase {
  */
 class testable_assign extends assign {
 
-    public function testable_process_reveal_identities() {
-        return parent::process_reveal_identities();
-    }
-
     public function testable_show_intro() {
         return parent::show_intro();
     }
@@ -219,6 +233,10 @@ class testable_assign extends assign {
 
     public function testable_apply_grade_to_user($formdata, $userid, $attemptnumber) {
         return parent::apply_grade_to_user($formdata, $userid, $attemptnumber);
+    }
+
+    public function testable_format_submission_for_log(stdClass $submission) {
+        return parent::format_submission_for_log($submission);
     }
 
     public function testable_get_grading_userid_list() {
@@ -237,6 +255,29 @@ class testable_assign extends assign {
         return parent::process_add_attempt($userid);
     }
 
+    public function testable_process_save_quick_grades($postdata) {
+        // Ugly hack to get something into the method.
+        global $_POST;
+        $_POST = $postdata;
+        return parent::process_save_quick_grades();
+    }
+
+    public function testable_process_set_batch_marking_allocation($selectedusers, $markerid) {
+        // Ugly hack to get something into the method.
+        global $_POST;
+        $_POST['selectedusers'] = $selectedusers;
+        $_POST['allocatedmarker'] = $markerid;
+        return parent::process_set_batch_marking_allocation();
+    }
+
+    public function testable_process_set_batch_marking_workflow_state($selectedusers, $state) {
+        // Ugly hack to get something into the method.
+        global $_POST;
+        $_POST['selectedusers'] = $selectedusers;
+        $_POST['markingworkflowstate'] = $state;
+        return parent::process_set_batch_marking_workflow_state();
+    }
+
     public function testable_submissions_open($userid = 0) {
         return parent::submissions_open($userid);
     }
@@ -248,5 +289,49 @@ class testable_assign extends assign {
     public function testable_get_graders($userid) {
         // Changed method from protected to public.
         return parent::get_graders($userid);
+    }
+
+    public function testable_view_batch_set_workflow_state() {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/mod/assign/batchsetmarkingworkflowstateform.php');
+
+        // Mock submit data.
+        $data = array();
+        $data['selectedusers'] = '1';
+        mod_assign_batch_set_marking_workflow_state_form::mock_submit($data);
+
+        // Set required variables in the form - not valid just allows us to continue.
+        $formparams = array();
+        $formparams['users'] = array(1);
+        $formparams['usershtml'] = 1;
+        $formparams['cm'] = $this->get_course_module()->id;
+        $formparams['context'] = $this->get_context();
+        $formparams['markingworkflowstates'] = 1;
+        $mform = new mod_assign_batch_set_marking_workflow_state_form('', $formparams);
+
+        return parent::view_batch_set_workflow_state($mform);
+    }
+
+    public function testable_view_batch_markingallocation() {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/mod/assign/batchsetallocatedmarkerform.php');
+
+        // Mock submit data.
+        $data = array();
+        $data['selectedusers'] = '1';
+        mod_assign_batch_set_allocatedmarker_form::mock_submit($data);
+
+        // Set required variables in the form - not valid just allows us to continue.
+        $formparams = array();
+        $formparams['users'] = array(1);
+        $formparams['usershtml'] = 1;
+        $formparams['cm'] = $this->get_course_module()->id;
+        $formparams['context'] = $this->get_context();
+        $formparams['markers'] = 1;
+        $mform = new mod_assign_batch_set_allocatedmarker_form('', $formparams);
+
+        return parent::view_batch_markingallocation($mform);
     }
 }

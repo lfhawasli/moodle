@@ -124,14 +124,23 @@ class mod_assign_renderer extends plugin_renderer_base {
      */
     public function render_assign_user_summary(assign_user_summary $summary) {
         $o = '';
+        $supendedclass = '';
+        $suspendedicon = '';
 
         if (!$summary->user) {
             return;
         }
+
+        if ($summary->suspendeduser) {
+            $supendedclass = ' usersuspended';
+            $suspendedstring = get_string('userenrolmentsuspended', 'grades');
+            $suspendedicon = ' ' . html_writer::empty_tag('img', array('src' => $this->pix_url('i/enrolmentsuspended'),
+                'title' => $suspendedstring, 'alt' => $suspendedstring, 'class' => 'usersuspendedicon'));
+        }
         $o .= $this->output->container_start('usersummary');
-        $o .= $this->output->box_start('boxaligncenter usersummarysection');
+        $o .= $this->output->box_start('boxaligncenter usersummarysection'.$supendedclass);
         if ($summary->blindmarking) {
-            $o .= get_string('hiddenuser', 'assign') . $summary->uniqueidforuser;
+            $o .= get_string('hiddenuser', 'assign') . $summary->uniqueidforuser.$suspendedicon;
         } else {
             $o .= $this->output->user_picture($summary->user);
             $o .= $this->output->spacer(array('width'=>30));
@@ -145,6 +154,7 @@ class mod_assign_renderer extends plugin_renderer_base {
             if (count($extrainfo)) {
                 $fullname .= ' (' . implode(', ', $extrainfo) . ')';
             }
+            $fullname .= $suspendedicon;
             $o .= $this->output->action_link($url, $fullname);
         }
         $o .= $this->output->box_end();
@@ -211,14 +221,14 @@ class mod_assign_renderer extends plugin_renderer_base {
         }
 
         $this->page->set_title(get_string('pluginname', 'assign'));
-        $this->page->set_heading($header->assign->name);
+        $this->page->set_heading($this->page->course->fullname);
 
         $o .= $this->output->header();
+        $heading = format_string($header->assign->name, false, array('context' => $header->context));
+        $o .= $this->output->heading($heading);
         if ($header->preface) {
             $o .= $header->preface;
         }
-        $heading = format_string($header->assign->name, false, array('context' => $header->context));
-        $o .= $this->output->heading($heading);
 
         if ($header->showintro) {
             $o .= $this->output->box_start('generalbox boxaligncenter', 'intro');
@@ -226,6 +236,17 @@ class mod_assign_renderer extends plugin_renderer_base {
             $o .= $this->output->box_end();
         }
 
+        return $o;
+    }
+
+    /**
+     * Render the header for an individual plugin.
+     *
+     * @param assign_plugin_header $header
+     * @return string
+     */
+    public function render_assign_plugin_header(assign_plugin_header $header) {
+        $o = $header->plugin->view_header();
         return $o;
     }
 
@@ -694,7 +715,9 @@ class mod_assign_renderer extends plugin_renderer_base {
                     $o .= $this->output->box_end();
                 } else if ($submission->status == ASSIGN_SUBMISSION_STATUS_REOPENED) {
                     $o .= $this->output->box_start('generalbox submissionaction');
-                    $urlparams = array('id' => $status->coursemoduleid, 'action' => 'editprevioussubmission');
+                    $urlparams = array('id' => $status->coursemoduleid,
+                                       'action' => 'editprevioussubmission',
+                                       'sesskey'=>sesskey());
                     $o .= $this->output->single_button(new moodle_url('/mod/assign/view.php', $urlparams),
                                                        get_string('addnewattemptfromprevious', 'assign'), 'get');
                     $o .= $this->output->box_start('boxaligncenter submithelp');
@@ -976,6 +999,8 @@ class mod_assign_renderer extends plugin_renderer_base {
         $this->page->requires->string_for_js('batchoperationconfirmreverttodraft', 'assign');
         $this->page->requires->string_for_js('batchoperationconfirmunlock', 'assign');
         $this->page->requires->string_for_js('batchoperationconfirmaddattempt', 'assign');
+        $this->page->requires->string_for_js('batchoperationconfirmsetmarkingworkflowstate', 'assign');
+        $this->page->requires->string_for_js('batchoperationconfirmsetmarkingallocation', 'assign');
         $this->page->requires->string_for_js('editaction', 'assign');
         foreach ($table->plugingradingbatchoperations as $plugin => $operations) {
             foreach ($operations as $operation => $description) {

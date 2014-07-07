@@ -360,16 +360,16 @@ class grade_report_user extends grade_report {
                     ($this->showhiddenitems == GRADE_REPORT_USER_HIDE_UNTIL && !$grade_grade->is_hiddenuntil()))) {
                 $hide = true;
             } else if (!empty($grade_object->itemmodule) && !empty($grade_object->iteminstance)) {
-                // The grade object can be marked visible but still be hidden if...
-                //  1) "enablegroupmembersonly" is on and the activity is assigned to a grouping the user is not in.
-                //  2) the student cannot see the activity due to conditional access and its set to be hidden entirely.
+                // The grade object can be marked visible but still be hidden if
+                // the student cannot see the activity due to conditional access
+                // and it's set to be hidden entirely.
                 $instances = $this->gtree->modinfo->get_instances_of($grade_object->itemmodule);
                 if (!empty($instances[$grade_object->iteminstance])) {
                     $cm = $instances[$grade_object->iteminstance];
                     if (!$cm->uservisible) {
-                        // Further checks are required to determine whether the activity is entirely hidden or just greyed out.
-                        if ($cm->is_user_access_restricted_by_group() || $cm->is_user_access_restricted_by_conditional_access() ||
-                                $cm->is_user_access_restricted_by_capability()) {
+                        // If there is 'availableinfo' text then it is only greyed
+                        // out and not entirely hidden.
+                        if (!$cm->availableinfo) {
                             $hide = true;
                         }
                     }
@@ -587,12 +587,11 @@ class grade_report_user extends grade_report {
             <table cellspacing='0'
                    cellpadding='0'
                    summary='" . s($this->get_lang_string('tablesummary', 'gradereport_user')) . "'
-                   class='table table-bordered table-striped ccle-responsive-table-collapse'
-                   id='user-report-table'>
+                   class='boxaligncenter generaltable user-grade'>
             <thead>
                 <tr>
                     <th id='".$this->tablecolumns[0]."' class=\"header\" colspan='$maxspan'>".$this->tableheaders[0]."</th>\n";
-        // END UCLA MOD CCLE-4433
+
         for ($i = 1; $i < count($this->tableheaders); $i++) {
             $html .= "<th id='".$this->tablecolumns[$i]."' class=\"header\">".$this->tableheaders[$i]."</th>\n";
         }
@@ -619,10 +618,7 @@ class grade_report_user extends grade_report {
                 $id = (isset($this->tabledata[$i][$name]['id'])) ? "id='{$this->tabledata[$i][$name]['id']}'" : '';
                 $headers = (isset($this->tabledata[$i][$name]['headers'])) ? "headers='{$this->tabledata[$i][$name]['headers']}'" : '';
                 if (isset($content)) {
-                    // START UCLA MOD CCLE-4433 - adding a data-content attribute for responsive table
-//                    $html .= "<$celltype $id $headers class='$class' $colspan'>$content</$celltype>\n";
-                    $html .= "<$celltype $id $headers class='$class' $colspan data-content='" . ucfirst($name) . "'>$content</$celltype>\n";
-                    // END UCLA MOD CCLE-4433
+                    $html .= "<$celltype $id $headers class='$class' $colspan>$content</$celltype>\n";
                 }
             }
             $html .= "</tr>\n";
@@ -649,42 +645,34 @@ class grade_report_user extends grade_report {
 
     /**
      * Builds the grade item averages.
-     *
      */
     function calculate_averages() {
         global $USER, $DB;
 
         if ($this->showaverage) {
-            // this settings are actually grader report settings (not user report)
+            // This settings are actually grader report settings (not user report)
             // however we're using them as having two separate but identical settings the
-            // user would have to keep in sync would be annoying
+            // user would have to keep in sync would be annoying.
             $averagesdisplaytype   = $this->get_pref('averagesdisplaytype');
             $averagesdecimalpoints = $this->get_pref('averagesdecimalpoints');
             $meanselection         = $this->get_pref('meanselection');
             $shownumberofgrades    = $this->get_pref('shownumberofgrades');
 
             $avghtml = '';
-            $avgcssclass = 'avg';
-
-            $straverage = get_string('overallaverage', 'grades');
-
             $groupsql = $this->groupsql;
             $groupwheresql = $this->groupwheresql;
-            //$groupwheresqlparams = ;
-
-            if ($shownumberofgrades) {
-                $straverage .= ' (' . get_string('submissions', 'grades') . ') ';
-            }
-
             $totalcount = $this->get_numusers(false);
 
-            //limit to users with a gradeable role ie students
+            // We want to query both the current context and parent contexts.
+            list($relatedctxsql, $relatedctxparams) = $DB->get_in_or_equal($this->context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relatedctx');
+
+            // Limit to users with a gradeable role ie students.
             list($gradebookrolessql, $gradebookrolesparams) = $DB->get_in_or_equal(explode(',', $this->gradebookroles), SQL_PARAMS_NAMED, 'grbr0');
 
-            //limit to users with an active enrolment
+            // Limit to users with an active enrolment.
             list($enrolledsql, $enrolledparams) = get_enrolled_sql($this->context);
 
-            $params = array_merge($this->groupwheresql_params, $gradebookrolesparams, $enrolledparams);
+            $params = array_merge($this->groupwheresql_params, $gradebookrolesparams, $enrolledparams, $relatedctxparams);
             $params['courseid'] = $this->courseid;
 
             // find sums of all grade items in course
@@ -697,7 +685,7 @@ class grade_report_user extends grade_report {
                                    SELECT DISTINCT ra.userid
                                      FROM {role_assignments} ra
                                     WHERE ra.roleid $gradebookrolessql
-                                      AND ra.contextid " . get_related_contexts_string($this->context) . "
+                                      AND ra.contextid $relatedctxsql
                            ) rainner ON rainner.userid = u.id
                       $groupsql
                      WHERE gi.courseid = :courseid
@@ -728,7 +716,7 @@ class grade_report_user extends grade_report {
                                SELECT DISTINCT ra.userid
                                  FROM {role_assignments} ra
                                 WHERE ra.roleid $gradebookrolessql
-                                  AND ra.contextid " . get_related_contexts_string($this->context) . "
+                                  AND ra.contextid $relatedctxsql
                            ) rainner ON rainner.userid = u.id
                       LEFT JOIN {grade_grades} gg
                              ON (gg.itemid = gi.id AND gg.userid = u.id AND gg.finalgrade IS NOT NULL AND gg.hidden = 0)
@@ -769,8 +757,6 @@ class grade_report_user extends grade_report {
                     $mean_count = $totalcount;
                 }
 
-                $decimalpoints = $item->get_decimals();
-
                 // Determine which display type to use for this average
                 if (!empty($USER->gradeediting) && $USER->gradeediting[$this->courseid]) {
                     $displaytype = GRADE_DISPLAY_TYPE_REAL;
@@ -785,7 +771,6 @@ class grade_report_user extends grade_report {
                 // Override grade_item setting if a display preference (not inherit) was set for the averages
                 if ($averagesdecimalpoints == GRADE_REPORT_PREFERENCE_INHERIT) {
                     $decimalpoints = $item->get_decimals();
-
                 } else {
                     $decimalpoints = $averagesdecimalpoints;
                 }

@@ -777,19 +777,14 @@ class grade_grade extends grade_object {
      *
      * @param bool $deleted True if grade was actually deleted
      */
-    function notify_changed($deleted) {
-        global $USER, $SESSION, $CFG,$COURSE, $DB;
+    protected function notify_changed($deleted) {
+        global $CFG;
 
-        // START UCLA MOD CCLE-2362
-        // Saving object to rebuild when sending via webservice
-        $this->deleted = $deleted;
-        $this->_user = $USER;
-        events_trigger('ucla_grade_grade_updated', $this);
-        // END UCLA MOD CCLE-2362
-
-        // Grades may be cached in user session
-        if ($USER->id == $this->userid) {
-            unset($SESSION->gradescorecache[$this->itemid]);
+        // Condition code may cache the grades for conditional availability of
+        // modules or sections. (This code should use a hook for communication
+        // with plugin, but hooks are not implemented at time of writing.)
+        if (!empty($CFG->enableavailability) && class_exists('\availability_grade\callbacks')) {
+            \availability_grade\callbacks::grade_changed($this->userid);
         }
 
         require_once($CFG->libdir.'/completionlib.php');
@@ -816,11 +811,7 @@ class grade_grade extends grade_object {
         }
 
         // Use $COURSE if available otherwise get it via item fields
-        if(!empty($COURSE) && $COURSE->id == $this->grade_item->courseid) {
-            $course = $COURSE;
-        } else {
-            $course = $DB->get_record('course', array('id'=>$this->grade_item->courseid));
-        }
+        $course = get_course($this->grade_item->courseid, false);
 
         // Bail out if completion is not enabled for course
         $completion = new completion_info($course);

@@ -17,10 +17,9 @@
 /**
  * Classes to enforce the various access rules that can apply to a quiz.
  *
- * @package    mod
- * @subpackage quiz
- * @copyright  2009 Tim Hunt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_quiz
+ * @copyright 2009 Tim Hunt
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
@@ -90,7 +89,7 @@ class quiz_access_manager {
      * @return array of all the installed rule class names.
      */
     protected static function get_rule_classes() {
-        return get_plugin_list_with_class('quizaccess', '', 'rule.php');
+        return core_component::get_plugin_list_with_class('quizaccess', '', 'rule.php');
     }
 
     /**

@@ -21,9 +21,9 @@
  * It contains the great majority of functions defined by Moodle
  * that are mandatory to develop a module.
  *
- * @package mod-wiki-2.0
- * @copyrigth 2009 Marc Alier, Jordi Piguillem marc.alier@upc.edu
- * @copyrigth 2009 Universitat Politecnica de Catalunya http://www.upc.edu
+ * @package mod_wiki
+ * @copyright 2009 Marc Alier, Jordi Piguillem marc.alier@upc.edu
+ * @copyright 2009 Universitat Politecnica de Catalunya http://www.upc.edu
  *
  * @author Jordi Piguillem
  * @author Marc Alier
@@ -192,32 +192,6 @@ function wiki_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'wikiheader', get_string('modulenameplural', 'wiki'));
     $mform->addElement('advcheckbox', 'reset_wiki_tags', get_string('removeallwikitags', 'wiki'));
     $mform->addElement('advcheckbox', 'reset_wiki_comments', get_string('deleteallcomments'));
-}
-
-/**
- * Return a small object with summary information about what a
- * user has done with a given particular instance of this module
- * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description
- *
- * @return null
- * @todo Finish documenting this function
- **/
-function wiki_user_outline($course, $user, $mod, $wiki) {
-    $return = NULL;
-    return $return;
-}
-
-/**
- * Print a detailed representation of what a user has done with
- * a given particular instance of this module, for user activity reports.
- *
- * @return boolean
- * @todo Finish documenting this function
- **/
-function wiki_user_complete($course, $user, $mod, $wiki) {
-    return true;
 }
 
 /**
@@ -439,9 +413,7 @@ function wiki_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
             return false;
         }
 
-        $lifetime = isset($CFG->filelifetime) ? $CFG->filelifetime : 86400;
-
-        send_stored_file($file, $lifetime, 0, $options);
+        send_stored_file($file, null, 0, $options);
     }
 }
 

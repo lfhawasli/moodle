@@ -107,21 +107,17 @@ $mform = new edit_grade_form(null, array('grade_item'=>$grade_item, 'gpr'=>$gpr)
 if ($grade = $DB->get_record('grade_grades', array('itemid' => $grade_item->id, 'userid' => $userid))) {
 
     // always clean existing feedback - grading should not have XSS risk
-    if (can_use_html_editor()) {
-        if (empty($grade->feedback)) {
-            $grade->feedback  = '';
-        } else {
-            $options = new stdClass();
-            $options->smiley  = false;
-            $options->filter  = false;
-            $options->noclean = false;
-            $options->para    = false;
-            $grade->feedback  = format_text($grade->feedback, $grade->feedbackformat, $options);
-        }
-        $grade->feedbackformat = FORMAT_HTML;
+    if (empty($grade->feedback)) {
+        $grade->feedback  = '';
     } else {
-        $grade->feedback       = clean_text($grade->feedback, $grade->feedbackformat);
+        $options = new stdClass();
+        $options->smiley  = false;
+        $options->filter  = false;
+        $options->noclean = false;
+        $options->para    = false;
+        $grade->feedback  = format_text($grade->feedback, $grade->feedbackformat, $options);
     }
+    $grade->feedbackformat = FORMAT_HTML;
 
     $grade->locked      = $grade->locked     > 0 ? 1:0;
     $grade->overridden  = $grade->overridden > 0 ? 1:0;
@@ -199,17 +195,6 @@ if ($mform->is_cancelled()) {
     if (!property_exists($data, 'feedback') or $data->feedback == $data->oldfeedback) {
         $data->feedback       = $old_grade_grade->feedback;
         $data->feedbackformat = $old_grade_grade->feedbackformat;
-    }
-
-    // Only log a grade override if they actually changed the student grade.
-    if ($data->finalgrade != $old_grade_grade->finalgrade) {
-        $url = '/report/grader/index.php?id=' . $course->id;
-
-        $user = $DB->get_record('user', array('id'=>$data->userid), '*', MUST_EXIST);
-        $fullname = fullname($user);
-
-        $info = "{$grade_item->itemname}: $fullname";
-        add_to_log($course->id, 'grade', 'update', $url, $info);
     }
 
     // update final grade or feedback
@@ -291,6 +276,14 @@ if ($mform->is_cancelled()) {
 
     } else if ($old_grade_grade->locktime != $grade_grade->locktime) {
         $grade_item->force_regrading();
+    }
+
+    $grade_grade = new grade_grade(array('userid'=>$data->userid, 'itemid'=>$grade_item->id), true);
+    if ($old_grade_grade->finalgrade != $grade_grade->finalgrade
+        or empty($old_grade_grade->overridden) != empty($grade_grade->overridden)
+    ) {
+        $grade_grade->grade_item = $grade_item;
+        \core\event\user_graded::create_from_grade($grade_grade)->trigger();
     }
 
     redirect($returnurl);

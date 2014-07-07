@@ -11,12 +11,18 @@ require_once($CFG->dirroot.'/local/publicprivate/lib/site.class.php');
 require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 // END UCLA MOD
 
+/**
+ * The form for handling editing a course.
+ */
 class course_edit_form extends moodleform {
     protected $course;
     protected $context;
 
+    /**
+     * Form definition.
+     */
     function definition() {
-        global $USER, $CFG, $DB, $PAGE;
+        global $CFG, $PAGE;
 
         $mform    = $this->_form;
         $PAGE->requires->yui_module('moodle-course-formatchooser', 'M.course.init_formatchooser',
@@ -110,31 +116,7 @@ class course_edit_form extends moodleform {
                             $indicator_type);                    
                 }
 
-                $types = siteindicator_manager::get_types_list();
-                $radioarray = array();
-                foreach($types as $type) {
-                    // don't allow tasite type to be selected
-                    if (siteindicator_manager::SITE_TYPE_TASITE == $type['shortname']) {
-                        continue;
-                    }
-                    $descstring = '<strong>' . $type['fullname'] . '</strong> - ' . $type['description'];
-                    $attributes = array(
-                        'class' => 'indicator-form',
-                        'value' => $type['shortname']
-                    );
-                    $radioarray[] = $mform->createElement('radio', 'indicator_change', '', $descstring, $type['shortname'], $attributes);
-                }
-                $mform->addGroup($radioarray, 'indicator_type_radios', get_string('change', 'tool_uclasiteindicator'), array('<br/>'), false);
-                $mform->addGroupRule('indicator_type_radios', get_string('required'), 'required');
-                
-                if (!empty($indicator)) {
-                    $mform->setDefault('indicator_change', $indicator->property->type);
-                }
-            }            
-        }
-        // END UCLA MOD CCLE-2389
-/// form definition with new course defaults
-//--------------------------------------------------------------------------------
+        // Form definition with new course defaults.
         $mform->addElement('header','general', get_string('general', 'form'));
 
         $mform->addElement('hidden', 'returnto', null);
@@ -194,11 +176,14 @@ class course_edit_form extends moodleform {
         $mform->addElement('select', 'visible', get_string('visible'), $choices);
         $mform->addHelpButton('visible', 'visible');
         $mform->setDefault('visible', $courseconfig->visible);
-        if (!has_capability('moodle/course:visibility', $context)) {
-            $mform->hardFreeze('visible');
-            if (!empty($course->id)) {
+        if (!empty($course->id)) {
+            if (!has_capability('moodle/course:visibility', $coursecontext)) {
+                $mform->hardFreeze('visible');
                 $mform->setConstant('visible', $course->visible);
-            } else {
+            }
+        } else {
+            if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
+                $mform->hardFreeze('visible');
                 $mform->setConstant('visible', $courseconfig->visible);
             }
         }
@@ -325,6 +310,16 @@ class course_edit_form extends moodleform {
         $mform->addElement('select', 'lang', get_string('forcelanguage'), $languages);
         $mform->setDefault('lang', $courseconfig->lang);
 
+        // Multi-Calendar Support - see MDL-18375.
+        $calendartypes = \core_calendar\type_factory::get_list_of_calendar_types();
+        // We do not want to show this option unless there is more than one calendar type to display.
+        if (count($calendartypes) > 1) {
+            $calendars = array();
+            $calendars[''] = get_string('forceno');
+            $calendars += $calendartypes;
+            $mform->addElement('select', 'calendartype', get_string('forcecalendartype', 'calendar'), $calendars);
+        }
+
         $options = range(0, 10);
         $mform->addElement('select', 'newsitems', get_string('newsitemsnumber'), $options);
         $mform->addHelpButton('newsitems', 'newsitemsnumber');
@@ -377,29 +372,10 @@ class course_edit_form extends moodleform {
             $mform->setType('enablecompletion', PARAM_INT);
             $mform->setDefault('enablecompletion', 0);
         }
-        
-//--------------------------------------------------------------------------------
+
         enrol_course_edit_form($mform, $course, $context);
 
-//--------------------------------------------------------------------------------
         $mform->addElement('header','groups', get_string('groupsettingsheader', 'group'));
-
-        /**
-         * Flag to enable or disable public/private if it is enabled for the
-         * site or if it is activated for the course.
-         *
-         * @author ebollens
-         * @version 20110719
-         */
-        if(PublicPrivate_Site::is_enabled() || (PublicPrivate_Course::is_publicprivate_capable($course) 
-                && PublicPrivate_Course::build($course)->is_activated())) {
-            $choices = array();
-            $choices[0] = get_string('disable');
-            $choices[1] = get_string('enable');
-            $mform->addElement('select', 'enablepublicprivate', get_string('publicprivate','local_publicprivate'), $choices);
-            $mform->addHelpButton('enablepublicprivate', 'publicprivateenable', 'local_publicprivate');
-            $mform->setDefault('enablepublicprivate', empty($course->enablepublicprivate) ? 1 : $course->enablepublicprivate);
-        }
 
         $choices = array();
         $choices[NOGROUPS] = get_string('groupsnone', 'group');
@@ -418,10 +394,7 @@ class course_edit_form extends moodleform {
         $options[0] = get_string('none');
         $mform->addElement('select', 'defaultgroupingid', get_string('defaultgrouping', 'group'), $options);
 
-//--------------------------------------------------------------------------------
-
-/// customizable role names in this course
-//--------------------------------------------------------------------------------
+        // Customizable role names in this course.
         $mform->addElement('header','rolerenaming', get_string('rolerenaming'));
         $mform->addHelpButton('rolerenaming', 'rolerenaming');
 
@@ -434,17 +407,18 @@ class course_edit_form extends moodleform {
             }
         }
 
-//--------------------------------------------------------------------------------
         $this->add_action_buttons();
-//--------------------------------------------------------------------------------
+
         $mform->addElement('hidden', 'id', null);
         $mform->setType('id', PARAM_INT);
 
-/// finally set the current form data
-//--------------------------------------------------------------------------------
+        // Finally set the current form data
         $this->set_data($course);
     }
 
+    /**
+     * Fill in the current page data for this course.
+     */
     function definition_after_data() {
         global $DB;
 
@@ -458,7 +432,7 @@ class course_edit_form extends moodleform {
                     $options[$grouping->id] = format_string($grouping->name);
                 }
             }
-            collatorlib::asort($options);
+            core_collator::asort($options);
             $gr_el =& $mform->getElement('defaultgroupingid');
             $gr_el->load($options);
         }
@@ -518,7 +492,13 @@ class course_edit_form extends moodleform {
         // END UCLA MOD: CCLE-4230
     }
 
-/// perform some extra moodle validation
+    /**
+     * Validation.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array the errors that were found
+     */
     function validation($data, $files) {
         global $DB;
 
@@ -535,7 +515,7 @@ class course_edit_form extends moodleform {
         if (!empty($data['idnumber']) && (empty($data['id']) || $this->course->idnumber != $data['idnumber'])) {
             if ($course = $DB->get_record('course', array('idnumber' => $data['idnumber']), '*', IGNORE_MULTIPLE)) {
                 if (empty($data['id']) || $course->id != $data['id']) {
-                    $errors['idnumber'] = get_string('idnumbertaken', 'error');
+                    $errors['idnumber'] = get_string('courseidnumbertaken', 'error', $course->fullname);
                 }
             }
         }

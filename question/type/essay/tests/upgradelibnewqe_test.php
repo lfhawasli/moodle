@@ -64,7 +64,6 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'questionsperpage' => '1',
             'shufflequestions' => '0',
             'shuffleanswers' => '1',
-            'questions' => '90042,0,90043,0,90045,0,90052,0,90053,0,90054,0,90055,0,90056,0,90057,0,90058,0,90059,0,90046,0,90044,0,90047,0,90048,0,90049,0',
             'sumgrades' => '100',
             'grade' => '100',
             'timecreated' => '0',
@@ -88,7 +87,6 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'timemodified' => '1273069013',
             'layout' => '90042,0,90043,0,90045,0,90052,0,90053,0,90054,0,90055,0,90056,0,90057,0,90058,0,90059,0,90046,0,90044,0,90047,0,90048,0,90049,0',
             'preview' => '0',
-            'needsupgradetonewqe' => '1',
         );
         $question = (object) array(
             'id' => '90056',
@@ -218,6 +216,7 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'variant' => 1,
             'maxmark' => 2,
             'minfraction' => 0,
+            'maxfraction' => 1,
             'flagged' => 0,
             'questionsummary' => "* Give two examples of facilities within XML schemas that cannot be found in Document Type Definitions (DTDs).\n_(2 marks)_",
             'rightanswer' => '',
@@ -295,7 +294,6 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'questionsperpage' => '1',
             'shufflequestions' => '0',
             'shuffleanswers' => '0',
-            'questions' => '3664,3716,0,3663,3717,0,3718,3719,0,3720,0,3733,3727,0,3728,3730,0,3731,3732,0,3726,3729,0',
             'sumgrades' => '0',
             'grade' => '0',
             'timecreated' => '0',
@@ -319,7 +317,6 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'timemodified' => '1179134869',
             'layout' => '3664,3716,0,3663,3717,0,3718,3719,0,3720,0,3733,3727,0,3728,3730,0,3731,3732,0,3726,3729,0',
             'preview' => '0',
-            'needsupgradetonewqe' => '1',
         );
         $question = (object) array(
             'id' => '3729',
@@ -417,6 +414,7 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'variant' => 1,
             'maxmark' => 0,
             'minfraction' => 0,
+            'maxfraction' => 1,
             'flagged' => 0,
             'questionsummary' => "If you answered ‘No’ to the previous question please expand on your problem here.",
             'rightanswer' => '',
@@ -475,7 +473,6 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'questionsperpage' => '1',
             'shufflequestions' => '0',
             'shuffleanswers' => '0',
-            'questions' => '3664,3716,0,3663,3717,0,3718,3719,0,3720,0,3733,3727,0,3728,3730,0,3731,3732,0,3726,3729,0',
             'sumgrades' => '0',
             'grade' => '0',
             'timecreated' => '0',
@@ -499,7 +496,6 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'timemodified' => '1179134869',
             'layout' => '3664,3716,0,3663,3717,0,3718,3719,0,3720,0,3733,3727,0,3728,3730,0,3731,3732,0,3726,3729,0',
             'preview' => '0',
-            'needsupgradetonewqe' => '1',
         );
         $question = (object) array(
             'id' => '3729',
@@ -545,6 +541,7 @@ class qtype_essay_attempt_upgrader_test extends question_attempt_upgrader_test_b
             'variant' => 1,
             'maxmark' => 0,
             'minfraction' => 0,
+            'maxfraction' => 1,
             'flagged' => 0,
             'questionsummary' => "If you answered ‘No’ to the previous question please expand on your problem here.",
             'rightanswer' => '',

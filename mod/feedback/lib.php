@@ -18,7 +18,7 @@
  * Library of functions and constants for module feedback
  * includes the main-part of feedback-functions
  *
- * @package mod-feedback
+ * @package mod_feedback
  * @copyright Andreas Grabs
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,6 +27,8 @@
 require_once($CFG->libdir.'/eventslib.php');
 /** Include calendar/lib.php */
 require_once($CFG->dirroot.'/calendar/lib.php');
+// Include forms lib.
+require_once($CFG->libdir.'/formslib.php');
 
 define('FEEDBACK_ANONYMOUS_YES', 1);
 define('FEEDBACK_ANONYMOUS_NO', 2);
@@ -570,6 +572,13 @@ function feedback_scale_used_anywhere($scaleid) {
 }
 
 /**
+ * List the actions that correspond to a view of this module.
+ * This is used by the participation report.
+ *
+ * Note: This is not used by new logging system. Event with
+ *       crud = 'r' and edulevel = LEVEL_PARTICIPATING will
+ *       be considered as view action.
+ *
  * @return array
  */
 function feedback_get_view_actions() {
@@ -577,6 +586,13 @@ function feedback_get_view_actions() {
 }
 
 /**
+ * List the actions that correspond to a post of this module.
+ * This is used by the participation report.
+ *
+ * Note: This is not used by new logging system. Event with
+ *       crud = ('c' || 'u' || 'd') and edulevel = LEVEL_PARTICIPATING
+ *       will be considered as post action.
+ *
  * @return array
  */
 function feedback_get_post_actions() {
@@ -1110,7 +1126,7 @@ function feedback_save_as_template($feedback, $name, $ispublic = 0) {
     //if the template is public the files are in the system context
     //files in the feedback_item are in the feedback_context of the feedback
     if ($ispublic) {
-        $s_context = get_system_context();
+        $s_context = context_system::instance();
     } else {
         $s_context = context_course::instance($newtempl->course);
     }
@@ -1215,7 +1231,7 @@ function feedback_items_from_template($feedback, $templateid, $deleteold = false
     //files in the template_item are in the context of the current course
     //files in the feedback_item are in the feedback_context of the feedback
     if ($template->ispublic) {
-        $s_context = get_system_context();
+        $s_context = context_system::instance();
     } else {
         $s_context = context_course::instance($feedback->course);
     }
@@ -1518,7 +1534,7 @@ function feedback_delete_item($itemid, $renumber = true, $template = false) {
 
     if ($template) {
         if ($template->ispublic) {
-            $context = get_system_context();
+            $context = context_system::instance();
         } else {
             $context = context_course::instance($template->course);
         }
@@ -1889,6 +1905,24 @@ function feedback_save_tmp_values($feedbackcompletedtmp, $feedbackcompleted, $us
     //drop all the tmpvalues
     $DB->delete_records('feedback_valuetmp', array('completed'=>$tmpcplid));
     $DB->delete_records('feedback_completedtmp', array('id'=>$tmpcplid));
+
+    // Trigger event for the delete action we performed.
+    $cm = get_coursemodule_from_instance('feedback', $feedbackcompleted->feedback);
+    $event = \mod_feedback\event\response_submitted::create(array(
+        'relateduserid' => $userid,
+        'objectid' => $feedbackcompleted->id,
+        'context' => context_module::instance($cm->id),
+        'anonymous' => ($feedbackcompleted->anonymous_response == FEEDBACK_ANONYMOUS_YES),
+        'other' => array(
+            'cmid' => $cm->id,
+            'instanceid' => $feedbackcompleted->feedback,
+            'anonymous' => $feedbackcompleted->anonymous_response // Deprecated.
+        )
+    ));
+
+    $event->add_record_snapshot('feedback_completed', $feedbackcompleted);
+
+    $event->trigger();
     return $feedbackcompleted->id;
 
 }
@@ -2650,8 +2684,29 @@ function feedback_delete_completed($completedid) {
     if ($completion->is_enabled($cm) && $feedback->completionsubmit) {
         $completion->update_state($cm, COMPLETION_INCOMPLETE, $completed->userid);
     }
-    //last we delete the completed-record
-    return $DB->delete_records('feedback_completed', array('id'=>$completed->id));
+    // Last we delete the completed-record.
+    $return = $DB->delete_records('feedback_completed', array('id'=>$completed->id));
+
+    // Trigger event for the delete action we performed.
+    $event = \mod_feedback\event\response_deleted::create(array(
+        'relateduserid' => $completed->userid,
+        'objectid' => $completedid,
+        'courseid' => $course->id,
+        'context' => context_module::instance($cm->id),
+        'anonymous' => ($completed->anonymous_response == FEEDBACK_ANONYMOUS_YES),
+        'other' => array(
+            'cmid' => $cm->id,
+            'instanceid' => $feedback->id,
+            'anonymous' => $completed->anonymous_response) // Deprecated.
+    ));
+
+    $event->add_record_snapshot('feedback_completed', $completed);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('feedback', $feedback);
+
+    $event->trigger();
+
+    return $return;
 }
 
 ////////////////////////////////////////////////

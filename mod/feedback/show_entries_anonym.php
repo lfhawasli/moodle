@@ -19,7 +19,7 @@
  *
  * @author Andreas Grabs
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package feedback
+ * @package mod_feedback
  */
 
 require_once("../../config.php");
@@ -65,14 +65,13 @@ $strfeedback  = get_string("modulename", "feedback");
 $PAGE->set_heading($course->fullname);
 $PAGE->set_title($feedback->name);
 echo $OUTPUT->header();
+echo $OUTPUT->heading(format_string($feedback->name));
 
 /// Print the main part of the page
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 require('tabs.php');
-
-echo $OUTPUT->heading(format_text($feedback->name));
 
 //print the list with anonymous completeds
 if (!$showcompleted) {

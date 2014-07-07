@@ -6,6 +6,7 @@
 .block .header .commands { text-align: right; clear: both;}
 .block .header .commands > a { margin:0 3px; }
 .block .header .commands .icon img {width:12px;height:12px;}
+.block .header .commands img.actionmenu {width:auto;}
 .block .content {padding:4px;}
 .jsenabled .block.hidden .content {display: none;}
 .block .content .userpicture {width:16px;height:16px;margin-right:6px;}
@@ -33,6 +34,11 @@
 
 .block_completionstatus .generaltable { border: 0px; }
 .block_completionstatus .generaltable .cell { border: 0px; }
+
+.block-region {
+    min-height: 400px;
+    overflow: hidden;
+}
 
 /** Overide for RTL layout **/
 .dir-rtl .block .header,

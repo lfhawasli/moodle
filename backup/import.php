@@ -25,11 +25,9 @@ require_login($course);
 // Must hold restoretargetimport in the current course
 require_capability('moodle/restore:restoretargetimport', $context);
 
-$heading = get_string('import');
-
 // Set up the page
-$PAGE->set_title($heading);
-$PAGE->set_heading($heading);
+$PAGE->set_title($course->shortname . ': ' . get_string('import'));
+$PAGE->set_heading($course->fullname);
 $PAGE->set_url(new moodle_url('/backup/import.php', array('id'=>$courseid)));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
@@ -90,16 +88,28 @@ if ($backup->get_stage() == backup_ui::STAGE_CONFIRMATION) {
 
 // If it's the final stage process the import
 if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
+    echo $OUTPUT->header();
 
-    // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
-    // Determine if sections will be hidden.
-    $hidesections = $backup->get_setting_value('hidesections');
-    // END UCLA MOD: CCLE-3797
+    // Display an extra progress bar so that we can show the current stage.
+    echo html_writer::start_div('', array('id' => 'executionprogress'));
+    echo $renderer->progress_bar($backup->get_progress_bar());
+
+    // Start the progress display - we split into 2 chunks for backup and restore.
+    $progress = new \core\progress\display();
+    $progress->start_progress('', 2);
+    $backup->get_controller()->set_progress($progress);
+
+    // Prepare logger for backup.
+    $logger = new core_backup_html_logger($CFG->debugdeveloper ? backup::LOG_DEBUG : backup::LOG_INFO);
+    $backup->get_controller()->add_logger($logger);
 
     // First execute the backup
     $backup->execute();
     $backup->destroy();
     unset($backup);
+
+    // Note that we've done that progress.
+    $progress->progress(1);
 
     // Check whether the backup directory still exists. If missing, something
     // went really wrong in backup, throw error. Note that backup::MODE_IMPORT
@@ -112,6 +122,15 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     // Prepare the restore controller. We don't need a UI here as we will just use what
     // ever the restore has (the user has just chosen).
     $rc = new restore_controller($backupid, $course->id, backup::INTERACTIVE_YES, backup::MODE_IMPORT, $USER->id, $restoretarget);
+
+    // Start a progress section for the restore, which will consist of 2 steps
+    // (the precheck and then the actual restore).
+    $progress->start_progress('Restore process', 2);
+    $rc->set_progress($progress);
+
+    // Set logger for restore.
+    $rc->add_logger($logger);
+
     // Convert the backup if required.... it should NEVER happed
     if ($rc->get_status() == backup::STATUS_REQUIRE_CONV) {
         $rc->convert();
@@ -140,6 +159,8 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     if ($restoretarget == backup::TARGET_CURRENT_DELETING || $restoretarget == backup::TARGET_EXISTING_DELETING) {
         restore_dbops::delete_course_content($course->id);
     }
+    // Execute the restore.
+    $rc->execute_plan();
 
     // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
     // If the hidesections option was selected during backup,
@@ -162,8 +183,15 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     // Delete the temp directory now
     fulldelete($tempdestination);
 
+    // End restore section of progress tracking (restore/precheck).
+    $progress->end_progress();
+
+    // All progress complete. Hide progress area.
+    $progress->end_progress();
+    echo html_writer::end_div();
+    echo html_writer::script('document.getElementById("executionprogress").style.display = "none";');
+
     // Display a notification and a continue button
-    echo $OUTPUT->header();
     if ($warnings) {
         echo $OUTPUT->box_start();
         echo $OUTPUT->notification(get_string('warning'), 'notifyproblem');
@@ -176,6 +204,13 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     }
     echo $OUTPUT->notification(get_string('importsuccess', 'backup'), 'notifysuccess');
     echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id'=>$course->id)));
+
+    // Get and display log data if there was any.
+    $loghtml = $logger->get_html();
+    if ($loghtml != '') {
+        echo $renderer->log_display($loghtml);
+    }
+
     echo $OUTPUT->footer();
 
     die();
@@ -184,11 +219,6 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     // Otherwise save the controller and progress
     $backup->save_controller();
 }
-
-// Adjust the page for the stage
-$PAGE->set_title($heading.': '.$backup->get_stage_name());
-$PAGE->set_heading($heading.': '.$backup->get_stage_name());
-$PAGE->navbar->add($backup->get_stage_name());
 
 // Display the current stage
 echo $OUTPUT->header();

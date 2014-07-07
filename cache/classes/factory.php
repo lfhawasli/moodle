@@ -183,7 +183,7 @@ class cache_factory {
      */
     public function create_cache_from_definition($component, $area, array $identifiers = array(), $aggregate = null) {
         $definitionname = $component.'/'.$area;
-        if (array_key_exists($definitionname, $this->cachesfromdefinitions)) {
+        if (isset($this->cachesfromdefinitions[$definitionname])) {
             $cache = $this->cachesfromdefinitions[$definitionname];
             $cache->set_identifiers($identifiers);
             return $cache;
@@ -274,6 +274,7 @@ class cache_factory {
         }
         /* @var cache_store $store */
         $store = $this->stores[$name];
+        // We check are_requirements_met although we expect is_ready is going to check as well.
         if (!$store::are_requirements_met() || !$store->is_ready() || !$store->is_supported_mode($definition->get_mode())) {
             return false;
         }
@@ -308,7 +309,7 @@ class cache_factory {
 
     /**
      * Returns the cache instances that have been used within this request.
-     * @since 2.5.3
+     * @since 2.6
      * @return array
      */
     public function get_caches_in_use() {
@@ -386,7 +387,7 @@ class cache_factory {
         if ($aggregate) {
             $id .= '::'.$aggregate;
         }
-        if (!array_key_exists($id, $this->definitions)) {
+        if (!isset($this->definitions[$id])) {
             // This is the first time this definition has been requested.
             if ($this->is_initialising()) {
                 // We're initialising the cache right now. Don't try to create another config instance.

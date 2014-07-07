@@ -48,68 +48,32 @@ class behat_form_editor extends behat_form_textarea {
      */
     public function set_value($value) {
 
-        // Get tinyMCE editor id if it exists.
-        if ($editorid = $this->get_editor_id()) {
-
-            // Set the value to the iframe and save it to the textarea.
-            $value = str_replace('"', '\"', $value);
-            $this->session->executeScript('
-                tinyMCE.get("'.$editorid.'").setContent("' . $value . '");
-                tinyMCE.get("'.$editorid.'").save();
-            ');
-
+        $editorid = $this->field->getAttribute('id');
+        if ($this->running_javascript()) {
+            $value = addslashes($value);
+            $js = '
+var editor = Y.one(document.getElementById("'.$editorid.'editable"));
+if (editor) {
+    editor.setHTML("' . $value . '");
+}
+editor = Y.one(document.getElementById("'.$editorid.'"));
+editor.set("value", "' . $value . '");
+';
+            $this->session->executeScript($js);
         } else {
-            // Set the value to a textarea otherwise.
             parent::set_value($value);
         }
     }
 
     /**
-     * Returns the field value.
+     * Matches the provided value against the current field value.
      *
-     * @return string
+     * @param string $expectedvalue
+     * @return bool The provided value matches the field value?
      */
-    public function get_value() {
-
-        // Get tinyMCE editor id if it exists.
-        if ($editorid = $this->get_editor_id()) {
-
-            // Save the current iframe value in case default value has been edited.
-            $this->session->executeScript('tinyMCE.get("'.$editorid.'").save();');
-        }
-
-        return $this->field->getValue();
-    }
-
-    /**
-     * Returns the tinyMCE editor id or false if it is not available.
-     *
-     * The editor availability depends on the driver running the tests; Goutte
-     * can not execute Javascript, also some Moodle settings disables the HTML
-     * editor.
-     *
-     * @return mixed The id of the editor of false if is not available
-     */
-    protected function get_editor_id() {
-
-        // Non-JS drivers throws exceptions when running JS.
-        try {
-            $available = $this->session->evaluateScript('return (typeof tinyMCE != "undefined")');
-
-            // Also checking that it exist a tinyMCE editor for the requested field.
-            $editorid = $this->field->getAttribute('id');
-            $available = $this->session->evaluateScript('return (typeof tinyMCE.get("'.$editorid.'") != "undefined")');
-
-        } catch (Exception $e) {
-            return false;
-        }
-
-        // No available if JS drivers returned false.
-        if ($available == false) {
-            return false;
-        }
-
-        return $editorid;
+    public function matches($expectedvalue) {
+        // A text editor may silently wrap the content in p tags (or not). Neither is an error.
+        return $this->text_matches($expectedvalue) || $this->text_matches('<p>' . $expectedvalue . '</p>');
     }
 }
 

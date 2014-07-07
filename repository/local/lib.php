@@ -82,7 +82,7 @@ class repository_local extends repository {
             if (!is_array($extensions)) {
                 $extensions = array($extensions);
             }
-            $extensions = array_map('textlib::strtolower', $extensions);
+            $extensions = array_map('core_text::strtolower', $extensions);
         }
 
         // build file tree
@@ -124,17 +124,6 @@ class repository_local extends repository {
      */
     public function has_moodle_files() {
         return true;
-    }
-
-    /**
-     * Return reference file life time
-     *
-     * @param string $ref
-     * @return int
-     */
-    public function get_reference_file_lifetime($ref) {
-        // this should be realtime
-        return 0;
     }
 
     /**

@@ -74,7 +74,7 @@ if ($groupings = $DB->get_records('groupings', array('courseid'=>$course->id), '
     foreach ($groupings as $gid => $grouping) {
         $groupings[$gid]->formattedname = format_string($grouping->name, true, array('context' => $context));
     }
-    collatorlib::asort_objects_by_property($groupings, 'formattedname');
+    core_collator::asort_objects_by_property($groupings, 'formattedname');
     foreach($groupings as $grouping) {
         $line = array();
         $line[0] = $grouping->formattedname;

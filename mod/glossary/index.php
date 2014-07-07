@@ -20,8 +20,11 @@ require_course_login($course);
 $PAGE->set_pagelayout('incourse');
 $context = context_course::instance($course->id);
 
-add_to_log($course->id, "glossary", "view all", "index.php?id=$course->id", "");
-
+$event = \mod_glossary\event\course_module_instance_list_viewed::create(array(
+    'context' => $context
+));
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 /// Get all required strings
 
@@ -35,6 +38,7 @@ $PAGE->navbar->add($strglossarys, "index.php?id=$course->id");
 $PAGE->set_title($strglossarys);
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
+echo $OUTPUT->heading(format_string($strglossarys), 2);
 
 /// Get all the appropriate data
 

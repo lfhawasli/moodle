@@ -397,7 +397,7 @@ class repository_flickr_public extends repository {
         $str .= '<input type="hidden" name="repo_id" value="'.$this->id.'" />';
         $str .= '<input type="hidden" name="ctx_id" value="'.$this->context->id.'" />';
         $str .= '<input type="hidden" name="seekey" value="'.sesskey().'" />';
-        $str .= '<label>'.get_string('fulltext', 'repository_flickr_public').': </label><br/><input name="s" value="" /><br/>';
+        $str .= '<label>'.get_string('fulltext', 'repository_flickr_public').'</label><br/><input name="s" value="" /><br/>';
         $str .= '<label>'.get_string('tag', 'repository_flickr_public').'</label><br /><input type="text" name="flickr_tag" /><br />';
         return $str;
     }
@@ -529,7 +529,7 @@ class repository_flickr_public extends repository {
     public static function plugin_init() {
         //here we create a default instance for this type
 
-        $id = repository::static_function('flickr_public','create', 'flickr_public', 0, get_system_context(), array('name'=>'', 'email_address' => null, 'usewatermarks' => false), 0);
+        $id = repository::static_function('flickr_public','create', 'flickr_public', 0, context_system::instance(), array('name'=>'', 'email_address' => null, 'usewatermarks' => false), 0);
         if (empty($id)) {
             return false;
         } else {

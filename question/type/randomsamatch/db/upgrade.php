@@ -44,7 +44,7 @@ function xmldb_qtype_randomsamatch_upgrade($oldversion) {
     // Moodle v2.4.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2013050101) {
+    if ($oldversion < 2013110501) {
 
         // Define table question_randomsamatch to be renamed to qtype_randomsamatch_options.
         $table = new xmldb_table('question_randomsamatch');
@@ -55,10 +55,10 @@ function xmldb_qtype_randomsamatch_upgrade($oldversion) {
         }
 
         // Record that qtype_randomsamatch savepoint was reached.
-        upgrade_plugin_savepoint(true, 2013050101, 'qtype', 'randomsamatch');
+        upgrade_plugin_savepoint(true, 2013110501, 'qtype', 'randomsamatch');
     }
 
-    if ($oldversion < 2013050102) {
+    if ($oldversion < 2013110502) {
 
         // Define key question (foreign) to be dropped form qtype_randomsamatch_options.
         $table = new xmldb_table('qtype_randomsamatch_options');
@@ -78,10 +78,11 @@ function xmldb_qtype_randomsamatch_upgrade($oldversion) {
         }
 
         // Record that qtype_randomsamatch savepoint was reached.
-        upgrade_plugin_savepoint(true, 2013050102, 'qtype', 'randomsamatch');
+        upgrade_plugin_savepoint(true, 2013110502, 'qtype', 'randomsamatch');
     }
 
-    if ($oldversion < 2013050103) {
+    if ($oldversion < 2013110503) {
+
         // Add subcats field.
         $table = new xmldb_table('qtype_randomsamatch_options');
 
@@ -183,7 +184,7 @@ function xmldb_qtype_randomsamatch_upgrade($oldversion) {
         }
 
         // Record that qtype_randomsamatch savepoint was reached.
-        upgrade_plugin_savepoint(true, 2013050103, 'qtype', 'randomsamatch');
+        upgrade_plugin_savepoint(true, 2013110503, 'qtype', 'randomsamatch');
     }
     return true;
 }

@@ -21,7 +21,7 @@ Feature: In a book, create chapters and sub chapters
       | Name | Test book |
       | Description | A book about dreams! |
     And I follow "Test book"
-    Then I should see "Editing chapter"
+    Then I should see "Add new chapter"
     And I set the following fields to these values:
       | Chapter title | Dummy first chapter |
       | Content | Dream is the start of a journey |

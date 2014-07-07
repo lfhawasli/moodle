@@ -282,24 +282,24 @@ class core_badges_renderer extends plugin_renderer_base {
         global $USER, $CFG, $DB, $SITE;
         $issued = $ibadge->issued;
         $userinfo = $ibadge->recipient;
+        $badgeclass = $ibadge->badgeclass;
         $badge = new badge($ibadge->badgeid);
-        $today_date = date('Y-m-d');
-        $today = strtotime($today_date);
+        $now = time();
 
         $table = new html_table();
         $table->id = 'issued-badge-table';
 
         $imagetable = new html_table();
         $imagetable->attributes = array('class' => 'clearfix badgeissuedimage');
-        $imagetable->data[] = array(html_writer::empty_tag('img', array('src' => $issued['badge']['image'])));
+        $imagetable->data[] = array(html_writer::empty_tag('img', array('src' => $badgeclass['image'])));
         if ($USER->id == $userinfo->id && !empty($CFG->enablebadges)) {
             $imagetable->data[] = array($this->output->single_button(
-                        new moodle_url('/badges/badge.php', array('hash' => $ibadge->hash, 'bake' => true)),
+                        new moodle_url('/badges/badge.php', array('hash' => $issued['uid'], 'bake' => true)),
                         get_string('download'),
                         'POST'));
-            $expiration = isset($issued['expires']) ? strtotime($issued['expires']) : $today + 1;
-            if (!empty($CFG->badges_allowexternalbackpack) && ($expiration > $today) && badges_user_has_backpack($USER->id)) {
-                $assertion = new moodle_url('/badges/assertion.php', array('b' => $ibadge->hash));
+            $expiration = isset($issued['expires']) ? $issued['expires'] : $now + 86400;
+            if (!empty($CFG->badges_allowexternalbackpack) && ($expiration > $now) && badges_user_has_backpack($USER->id)) {
+                $assertion = new moodle_url('/badges/assertion.php', array('b' => $issued['uid']));
                 $action = new component_action('click', 'addtobackpack', array('assertion' => $assertion->out(false)));
                 $attributes = array(
                         'type'  => 'button',
@@ -341,24 +341,23 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $datatable->data[] = array(get_string('bcriteria', 'badges'), self::print_badge_criteria($badge));
         $datatable->data[] = array($this->output->heading(get_string('issuancedetails', 'badges'), 3), '');
-        $datatable->data[] = array(get_string('dateawarded', 'badges'), $issued['issued_on']);
+        $datatable->data[] = array(get_string('dateawarded', 'badges'), userdate($issued['issuedOn']));
         if (isset($issued['expires'])) {
-            $expiration = strtotime($issued['expires']);
-            if ($expiration < $today) {
-                $cell = new html_table_cell($issued['expires'] . get_string('warnexpired', 'badges'));
+            if ($issued['expires'] < $now) {
+                $cell = new html_table_cell(userdate($issued['expires']) . get_string('warnexpired', 'badges'));
                 $cell->attributes = array('class' => 'notifyproblem warning');
                 $datatable->data[] = array(get_string('expirydate', 'badges'), $cell);
 
                 $image = html_writer::start_tag('div', array('class' => 'badge'));
-                $image .= html_writer::empty_tag('img', array('src' => $issued['badge']['image']));
+                $image .= html_writer::empty_tag('img', array('src' => $badgeclass['image']));
                 $image .= $this->output->pix_icon('i/expired',
-                                get_string('expireddate', 'badges', $issued['expires']),
+                                get_string('expireddate', 'badges', userdate($issued['expires'])),
                                 'moodle',
                                 array('class' => 'expireimage'));
                 $image .= html_writer::end_tag('div');
                 $imagetable->data[0] = array($image);
             } else {
-                $datatable->data[] = array(get_string('expirydate', 'badges'), $issued['expires']);
+                $datatable->data[] = array(get_string('expirydate', 'badges'), userdate($issued['expires']));
             }
         }
 
@@ -414,7 +413,7 @@ class core_badges_renderer extends plugin_renderer_base {
             if (!$ibadge->valid) {
                 $notify = $this->output->notification(get_string('recipientvalidationproblem', 'badges'), 'notifynotice');
             }
-            $datatable->data[] = array(get_string('name'), fullname($userinfo) . $notify);
+            $datatable->data[] = array(get_string('name'), fullname($userinfo). $notify);
         } else {
             $notify = $this->output->notification(get_string('recipientidentificationproblem', 'badges'), 'notifynotice');
             $datatable->data[] = array(get_string('name'), $notify);
@@ -561,7 +560,7 @@ class core_badges_renderer extends plugin_renderer_base {
             $description = $badge->description;
             $criteria = self::print_badge_criteria($badge);
             if ($badge->dateissued) {
-                $icon = new pix_icon('i/tick_green_big',
+                $icon = new pix_icon('i/valid',
                             get_string('dateearned', 'badges',
                                 userdate($badge->dateissued, get_string('strftimedatefullshort', 'core_langconfig'))));
                 $badgeurl = new moodle_url('/badges/badge.php', array('hash' => $badge->uniquehash));
@@ -665,8 +664,8 @@ class core_badges_renderer extends plugin_renderer_base {
 
         if (has_capability('moodle/badges:viewawarded', $context)) {
             $awarded = $DB->count_records_sql('SELECT COUNT(b.userid)
-                                                FROM {badge_issued} b INNER JOIN {user} u ON b.userid = u.id
-                                                WHERE b.badgeid = :badgeid AND u.deleted = 0', array('badgeid' => $badgeid));
+                                               FROM {badge_issued} b INNER JOIN {user} u ON b.userid = u.id
+                                               WHERE b.badgeid = :badgeid AND u.deleted = 0', array('badgeid' => $badgeid));
             $row[] = new tabobject('awards',
                         new moodle_url('/badges/recipients.php', array('id' => $badgeid)),
                         get_string('bawards', 'badges', $awarded)
@@ -911,14 +910,14 @@ class issued_badge implements renderable {
     /** @var badge recipient */
     public $recipient;
 
+    /** @var badge class */
+    public $badgeclass;
+
     /** @var badge visibility to others */
     public $visible = 0;
 
     /** @var badge class */
     public $badgeid = 0;
-
-    /** @var issued badge unique hash */
-    public $hash = "";
 
     /**
      * Initializes the badge to display
@@ -927,8 +926,10 @@ class issued_badge implements renderable {
      */
     public function __construct($hash) {
         global $DB;
-        $this->issued = badges_get_issued_badge_info($hash);
-        $this->hash = $hash;
+
+        $assertion = new core_badges_assertion($hash);
+        $this->issued = $assertion->get_badge_assertion();
+        $this->badgeclass = $assertion->get_badge_class();
 
         $rec = $DB->get_record_sql('SELECT userid, visible, badgeid
                 FROM {badge_issued}
@@ -936,8 +937,9 @@ class issued_badge implements renderable {
                 array('hash' => $hash), IGNORE_MISSING);
         if ($rec) {
             // Get a recipient from database.
-            $user = $DB->get_record_sql('SELECT u.id, u.lastname, u.firstname, u.deleted, u.email
-                        FROM {user} u WHERE u.id = :userid', array('userid' => $rec->userid));
+            $namefields = get_all_user_name_fields(true, 'u');
+            $user = $DB->get_record_sql("SELECT u.id, $namefields, u.deleted, u.email
+                        FROM {user} u WHERE u.id = :userid", array('userid' => $rec->userid));
             $this->recipient = $user;
             $this->visible = $rec->visible;
             $this->badgeid = $rec->badgeid;

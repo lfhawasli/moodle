@@ -58,8 +58,8 @@ class auth_plugin_db extends auth_plugin_base {
     function user_login($username, $password) {
         global $CFG, $DB;
 
-        $extusername = textlib::convert($username, 'utf-8', $this->config->extencoding);
-        $extpassword = textlib::convert($password, 'utf-8', $this->config->extencoding);
+        $extusername = core_text::convert($username, 'utf-8', $this->config->extencoding);
+        $extpassword = core_text::convert($password, 'utf-8', $this->config->extencoding);
 
         if ($this->is_internal()) {
             // Lookup username externally, but resolve
@@ -134,6 +134,11 @@ class auth_plugin_db extends auth_plugin_base {
         }
     }
 
+    /**
+     * Connect to external database.
+     *
+     * @return ADOConnection
+     */
     function db_init() {
         // Connect to the external database (forcing new connection).
         $authdb = ADONewConnection($this->config->type);
@@ -176,7 +181,7 @@ class auth_plugin_db extends auth_plugin_base {
     function get_userinfo($username) {
         global $CFG;
 
-        $extusername = textlib::convert($username, 'utf-8', $this->config->extencoding);
+        $extusername = core_text::convert($username, 'utf-8', $this->config->extencoding);
 
         $authdb = $this->db_init();
 
@@ -199,7 +204,7 @@ class auth_plugin_db extends auth_plugin_base {
                     $fields_obj = $rs->FetchObj();
                     $fields_obj = (object)array_change_key_case((array)$fields_obj , CASE_LOWER);
                     foreach ($selectfields as $localname=>$externalname) {
-                        $result[$localname] = textlib::convert($fields_obj->{$localname}, $this->config->extencoding, 'utf-8');
+                        $result[$localname] = core_text::convert($fields_obj->{$localname}, $this->config->extencoding, 'utf-8');
                      }
                  }
                  $rs->Close();
@@ -284,6 +289,7 @@ class auth_plugin_db extends auth_plugin_base {
             $remove_users = $DB->get_records_sql($sql, $params);
 
             if (!empty($remove_users)) {
+                require_once($CFG->dirroot.'/user/lib.php');
                 $trace->output(get_string('auth_dbuserstoremove','auth_db', count($remove_users)));
 
                 foreach ($remove_users as $user) {
@@ -294,8 +300,7 @@ class auth_plugin_db extends auth_plugin_base {
                         $updateuser = new stdClass();
                         $updateuser->id   = $user->id;
                         $updateuser->suspended = 1;
-                        $updateuser->timemodified = time();
-                        $DB->update_record('user', $updateuser);
+                        user_update_user($updateuser, false);
                         $trace->output(get_string('auth_dbsuspenduser', 'auth_db', array('name'=>$user->username, 'id'=>$user->id)), 1);
                     }
                 }
@@ -394,6 +399,9 @@ class auth_plugin_db extends auth_plugin_base {
                 if (empty($user->lang)) {
                     $user->lang = $CFG->lang;
                 }
+                if (empty($user->calendartype)) {
+                    $user->calendartype = $CFG->calendartype;
+                }
                 $user->timecreated = time();
                 $user->timemodified = $user->timecreated;
                 if ($collision = $DB->get_record_select('user', "username = :username AND mnethostid = :mnethostid AND auth <> :auth", array('username'=>$user->username, 'mnethostid'=>$CFG->mnet_localhost_id, 'auth'=>$this->authtype), 'id,username,auth')) {
@@ -426,7 +434,7 @@ class auth_plugin_db extends auth_plugin_base {
         // Init result value.
         $result = false;
 
-        $extusername = textlib::convert($username, 'utf-8', $this->config->extencoding);
+        $extusername = core_text::convert($username, 'utf-8', $this->config->extencoding);
 
         $authdb = $this->db_init();
 
@@ -501,7 +509,7 @@ class auth_plugin_db extends auth_plugin_base {
         global $CFG, $DB;
 
         //just in case check text case
-        $username = trim(textlib::strtolower($username));
+        $username = trim(core_text::strtolower($username));
 
         // get the current user record
         $user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id));
@@ -569,7 +577,7 @@ class auth_plugin_db extends auth_plugin_base {
             return false;
         }
 
-        $extusername = textlib::convert($olduser->username, 'utf-8', $this->config->extencoding);
+        $extusername = core_text::convert($olduser->username, 'utf-8', $this->config->extencoding);
 
         $authdb = $this->db_init();
 
@@ -586,7 +594,7 @@ class auth_plugin_db extends auth_plugin_base {
             }
             $nuvalue = $newuser->$key;
             if ($nuvalue != $value) {
-                $update[] = $this->config->{"field_map_$key"}."='".$this->ext_addslashes(textlib::convert($nuvalue, 'utf-8', $this->config->extencoding))."'";
+                $update[] = $this->config->{"field_map_$key"}."='".$this->ext_addslashes(core_text::convert($nuvalue, 'utf-8', $this->config->extencoding))."'";
             }
         }
         if (!empty($update)) {
@@ -659,7 +667,7 @@ class auth_plugin_db extends auth_plugin_base {
      * @return moodle_url
      */
     function change_password_url() {
-        if ($this->is_internal()) {
+        if ($this->is_internal() || empty($this->config->changepasswordurl)) {
             // Standard form.
             return null;
         } else {
@@ -780,6 +788,76 @@ class auth_plugin_db extends auth_plugin_base {
             $text = str_replace("'", "''", $text);
         }
         return $text;
+    }
+
+    /**
+     * Test if settings are ok, print info to output.
+     * @private
+     */
+    public function test_settings() {
+        global $CFG, $OUTPUT;
+
+        // NOTE: this is not localised intentionally, admins are supposed to understand English at least a bit...
+
+        raise_memory_limit(MEMORY_HUGE);
+
+        if (empty($this->config->table)) {
+            echo $OUTPUT->notification('External table not specified.', 'notifyproblem');
+            return;
+        }
+
+        if (empty($this->config->fielduser)) {
+            echo $OUTPUT->notification('External user field not specified.', 'notifyproblem');
+            return;
+        }
+
+        $olddebug = $CFG->debug;
+        $olddisplay = ini_get('display_errors');
+        ini_set('display_errors', '1');
+        $CFG->debug = DEBUG_DEVELOPER;
+        $olddebugauthdb = $this->config->debugauthdb;
+        $this->config->debugauthdb = 1;
+        error_reporting($CFG->debug);
+
+        $adodb = $this->db_init();
+
+        if (!$adodb or !$adodb->IsConnected()) {
+            $this->config->debugauthdb = $olddebugauthdb;
+            $CFG->debug = $olddebug;
+            ini_set('display_errors', $olddisplay);
+            error_reporting($CFG->debug);
+            ob_end_flush();
+
+            echo $OUTPUT->notification('Cannot connect the database.', 'notifyproblem');
+            return;
+        }
+
+        $rs = $adodb->Execute("SELECT *
+                                 FROM {$this->config->table}
+                                WHERE {$this->config->fielduser} <> 'random_unlikely_username'"); // Any unlikely name is ok here.
+
+        if (!$rs) {
+            echo $OUTPUT->notification('Can not read external table.', 'notifyproblem');
+
+        } else if ($rs->EOF) {
+            echo $OUTPUT->notification('External table is empty.', 'notifyproblem');
+            $rs->close();
+
+        } else {
+            $fields_obj = $rs->FetchObj();
+            $columns = array_keys((array)$fields_obj);
+
+            echo $OUTPUT->notification('External table contains following columns:<br />'.implode(', ', $columns), 'notifysuccess');
+            $rs->close();
+        }
+
+        $adodb->Close();
+
+        $this->config->debugauthdb = $olddebugauthdb;
+        $CFG->debug = $olddebug;
+        ini_set('display_errors', $olddisplay);
+        error_reporting($CFG->debug);
+        ob_end_flush();
     }
 }
 

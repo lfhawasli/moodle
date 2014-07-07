@@ -42,6 +42,7 @@ class assign_submit_for_grading_page implements renderable {
      * Constructor
      * @param string $notifications - Any mesages to display
      * @param int $coursemoduleid
+     * @param moodleform $confirmform
      */
     public function __construct($notifications, $coursemoduleid, $confirmform) {
         $this->notifications = $notifications;
@@ -69,6 +70,7 @@ class assign_gradingmessage implements renderable {
      * Constructor
      * @param string $heading This is the heading to display
      * @param string $message This is the message to display
+     * @param int $coursemoduleid
      */
     public function __construct($heading, $message, $coursemoduleid) {
         $this->heading = $heading;
@@ -125,6 +127,8 @@ class assign_user_summary implements renderable {
     public $uniqueidforuser;
     /** @var array $extrauserfields */
     public $extrauserfields;
+    /** @var bool $suspendeduser */
+    public $suspendeduser;
 
     /**
      * Constructor
@@ -134,19 +138,22 @@ class assign_user_summary implements renderable {
      * @param bool $blindmarking
      * @param int $uniqueidforuser
      * @param array $extrauserfields
+     * @param bool $suspendeduser
      */
     public function __construct(stdClass $user,
                                 $courseid,
                                 $viewfullnames,
                                 $blindmarking,
                                 $uniqueidforuser,
-                                $extrauserfields) {
+                                $extrauserfields,
+                                $suspendeduser = false) {
         $this->user = $user;
         $this->courseid = $courseid;
         $this->viewfullnames = $viewfullnames;
         $this->blindmarking = $blindmarking;
         $this->uniqueidforuser = $uniqueidforuser;
         $this->extrauserfields = $extrauserfields;
+        $this->suspendeduser = $suspendeduser;
     }
 }
 
@@ -399,6 +406,7 @@ class assign_submission_status implements renderable {
      * @param int $extensionduedate - Any extension to the due date granted for this user
      * @param context $context - Any extension to the due date granted for this user
      * @param bool $blindmarking - Should we hide student identities from graders?
+     * @param string $gradingcontrollerpreview
      * @param string $attemptreopenmethod - The method of reopening student attempts.
      * @param int $maxattempts - How many attempts can a student make?
      */
@@ -572,6 +580,26 @@ class assign_header implements renderable {
 }
 
 /**
+ * Renderable header related to an individual subplugin
+ * @package   mod_assign
+ * @copyright 2014 Henning Bostelmann
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class assign_plugin_header implements renderable {
+    /** @var assign_plugin $plugin */
+    public $plugin = null;
+
+    /**
+     * Header for a single plugin
+     *
+     * @param assign_plugin $plugin
+     */
+    public function __construct(assign_plugin $plugin) {
+        $this->plugin = $plugin;
+    }
+}
+
+/**
  * Renderable grading summary
  * @package   mod_assign
  * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
@@ -653,8 +681,8 @@ class assign_course_index_summary implements renderable {
     /**
      * constructor
      *
-     * @param $usesections boolean - True if this course format uses sections
-     * @param $courseformatname string - The id of this course format
+     * @param boolean $usesections - True if this course format uses sections
+     * @param string $courseformatname - The id of this course format
      */
     public function __construct($usesections, $courseformatname) {
         $this->usesections = $usesections;

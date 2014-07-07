@@ -343,6 +343,7 @@ class qtype_randomsamatch_attempt_upgrader_test extends question_attempt_upgrade
             'variant' => 1,
             'maxmark' => 1.0000000,
             'minfraction' => 0,
+            'maxfraction' => 1,
             'flagged' => 0,
             'questionsummary' => 'For each of the following questions, select the matching answer from the menu.{Dog;Frog;Toad}->{Mammal;Amphibian}',
             'rightanswer' => 'Dog -> Mammal; Frog -> Amphibian; Toad -> Amphibian',

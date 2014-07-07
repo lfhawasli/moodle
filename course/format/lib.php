@@ -134,7 +134,7 @@ abstract class format_base {
         global $CFG;
         static $classnames = array('site' => 'format_site');
         if (!isset($classnames[$format])) {
-            $plugins = get_plugin_list('format');
+            $plugins = core_component::get_plugin_list('format');
             $usedformat = self::get_format_or_default($format);
             if (file_exists($plugins[$usedformat].'/lib.php')) {
                 require_once($plugins[$usedformat].'/lib.php');
@@ -258,6 +258,24 @@ abstract class format_base {
     }
 
     /**
+     * Returns true if the course has a front page.
+     *
+     * This function is called to determine if the course has a view page, whether or not
+     * it contains a listing of activities. It can be useful to set this to false when the course
+     * format has only one activity and ignores the course page. Or if there are multiple
+     * activities but no page to see the centralised information.
+     *
+     * Initially this was created to know if forms should add a button to return to the course page.
+     * So if 'Return to course' does not make sense in your format your should probably return false.
+     *
+     * @return boolean
+     * @since 2.6
+     */
+    public function has_view_page() {
+        return true;
+    }
+
+    /**
      * Returns true if this course format uses sections
      *
      * This function may be called without specifying the course id
@@ -335,7 +353,6 @@ abstract class format_base {
      *
      * The returned object's property (boolean)capable indicates that
      * the course format supports Moodle course ajax features.
-     * The property (array)testedbrowsers can be used as a parameter for {@link ajaxenabled()}.
      *
      * @return stdClass
      */
@@ -343,7 +360,6 @@ abstract class format_base {
         // no support by default
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = false;
-        $ajaxsupport->testedbrowsers = array();
         return $ajaxsupport;
     }
 

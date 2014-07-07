@@ -27,14 +27,19 @@ require_once(dirname(__FILE__) . '/../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/course/request_form.php');
 
-$PAGE->set_url('/course/request.php');
+// Where we came from. Used in a number of redirects.
+$url = new moodle_url('/course/request.php');
+$return = optional_param('return', null, PARAM_ALPHANUMEXT);
+if ($return === 'management') {
+    $url->param('return', $return);
+    $returnurl = new moodle_url('/course/management.php', array('categoryid' => $CFG->defaultrequestcategory));
+} else {
+    $returnurl = new moodle_url('/course/index.php');
+}
 
-/// Where we came from. Used in a number of redirects.
-// START UCLA MOD CCLE-2389 - redirecting to my-sites instead
-$returnurl = $CFG->wwwroot . '/my/';
-// END UCLA MOD CCLE-2389
+$PAGE->set_url($url);
 
-/// Check permissions.
+// Check permissions.
 require_login();
 if (isguestuser()) {
     print_error('guestsarenotallowed', '', $returnurl);
@@ -46,9 +51,9 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 require_capability('moodle/course:request', $context);
 
-/// Set up the form.
+// Set up the form.
 $data = course_request::prepare();
-$requestform = new course_request_form($CFG->wwwroot . '/course/request.php', compact('editoroptions'));
+$requestform = new course_request_form($url, compact('editoroptions'));
 $requestform->set_data($data);
 
 // START UCLAMOD CCLE-2389 - override string
@@ -57,7 +62,7 @@ $strtitle = get_string('courserequest', 'tool_uclasiteindicator');
 $PAGE->set_title($strtitle);
 $PAGE->set_heading($strtitle);
 
-/// Standard form processing if statement.
+// Standard form processing if statement.
 if ($requestform->is_cancelled()){
     redirect($returnurl);
 
@@ -65,11 +70,9 @@ if ($requestform->is_cancelled()){
     // START UCLAMOD CCLE-2389 - clean shortname, add request to table, display message
     siteindicator_manager::clean_shortname($data);
     $request = course_request::create($data);
-    siteindicator_manager::create_request($data);
-    
-    // and redirect back to the course listing.
-    notice(get_string('courserequestsuccess', 'tool_uclasiteindicator'), $returnurl);
-    // END UCLAMOD CCLE-2389
+
+    // And redirect back to the course listing.
+    notice(get_string('courserequestsuccess'), $returnurl);
 }
 
 $PAGE->navbar->add($strtitle);

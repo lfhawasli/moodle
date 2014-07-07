@@ -5,40 +5,40 @@ Feature: View structural changes in recent activity block
   In need to see the structural changes in recent activity block
 
   Background:
-    Given the following "courses" exists:
+    Given the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
-    And the following "users" exists:
+    And the following "users" exist:
       | username    | firstname | lastname | email            |
       | teacher1    | Terry1    | Teacher1 | teacher1@asd.com |
       | assistant1  | Terry2    | Teacher2 | teacher2@asd.com |
       | student1    | Sam1      | Student1 | student1@asd.com |
       | student2    | Sam2      | Student2 | student2@asd.com |
       | student3    | Sam3      | Student3 | student3@asd.com |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user        | course | role           |
       | teacher1    | C1     | editingteacher |
       | assistant1  | C1     | teacher        |
       | student1    | C1     | student        |
       | student2    | C1     | student        |
       | student3    | C1     | student        |
-    And the following "groups" exists:
+    And the following "groups" exist:
       | name | course | idnumber |
       | Group 1 | C1 | G1 |
       | Group 2 | C1 | G2 |
-    And the following "groupings" exists:
+    And the following "groupings" exist:
       | name        | course | idnumber |
       | Grouping 1  | C1     | GG1      |
       | Grouping 2  | C1     | GG2      |
       | Grouping 3  | C1     | GG3      |
-    And the following "group members" exists:
+    And the following "group members" exist:
       | user        | group |
       | student1    | G1    |
       | student2    | G2    |
       | student3    | G1    |
       | student3    | G2    |
       | assistant1  | G1    |
-    And the following "grouping groups" exists:
+    And the following "grouping groups" exist:
       | grouping | group |
       | GG1      | G1    |
       | GG2      | G2    |
@@ -165,7 +165,7 @@ Feature: View structural changes in recent activity block
     And I follow "Course 1"
     And I follow "ForumNew"
     And I click on "Edit settings" "link" in the "Administration" "block"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | name | ForumUpdated |
     And I press "Save and return to course"
     And I log out

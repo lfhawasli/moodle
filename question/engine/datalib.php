@@ -106,11 +106,12 @@ class question_engine_data_mapper {
         $record->variant = $qa->get_variant();
         $record->maxmark = $qa->get_max_mark();
         $record->minfraction = $qa->get_min_fraction();
+        $record->maxfraction = $qa->get_max_fraction();
         $record->flagged = $qa->is_flagged();
         $record->questionsummary = $qa->get_question_summary();
-        if (textlib::strlen($record->questionsummary) > question_bank::MAX_SUMMARY_LENGTH) {
+        if (core_text::strlen($record->questionsummary) > question_bank::MAX_SUMMARY_LENGTH) {
             // It seems some people write very long quesions! MDL-30760
-            $record->questionsummary = textlib::substr($record->questionsummary,
+            $record->questionsummary = core_text::substr($record->questionsummary,
                     0, question_bank::MAX_SUMMARY_LENGTH - 3) . '...';
         }
         $record->rightanswer = $qa->get_right_answer_summary();
@@ -259,6 +260,7 @@ SELECT
     qa.variant,
     qa.maxmark,
     qa.minfraction,
+    qa.maxfraction,
     qa.flagged,
     qa.questionsummary,
     qa.rightanswer,
@@ -318,6 +320,7 @@ SELECT
     qa.variant,
     qa.maxmark,
     qa.minfraction,
+    qa.maxfraction,
     qa.flagged,
     qa.questionsummary,
     qa.rightanswer,
@@ -356,19 +359,18 @@ ORDER BY
     }
 
     /**
-     * Load information about the latest state of each question from the database.
-     *
-     * @param qubaid_condition $qubaids used to restrict which usages are included
-     *                                  in the query. See {@link qubaid_condition}.
-     * @param array            $slots   A list of slots for the questions you want to know about.
-     * @return array of records. See the SQL in this function to see the fields available.
+     * Load all {@link question_usage_by_activity} from the database for one qubaid_condition
+     * Include all its {@link question_attempt}s and all their steps.
+     * @param qubaid_condition $qubaids the condition that tells us which usages to load.
+     * @return question_usage_by_activity[] the usages that were loaded.
      */
-    public function load_questions_usages_latest_steps(qubaid_condition $qubaids, $slots) {
-        list($slottest, $params) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot');
-
-        $records = $this->db->get_records_sql("
+    public function load_questions_usages_by_activity($qubaids) {
+        $records = $this->db->get_recordset_sql("
 SELECT
-    qas.id,
+    quba.id AS qubaid,
+    quba.contextid,
+    quba.component,
+    quba.preferredbehaviour,
     qa.id AS questionattemptid,
     qa.questionusageid,
     qa.slot,
@@ -377,6 +379,7 @@ SELECT
     qa.variant,
     qa.maxmark,
     qa.minfraction,
+    qa.maxfraction,
     qa.flagged,
     qa.questionsummary,
     qa.rightanswer,
@@ -387,7 +390,79 @@ SELECT
     qas.state,
     qas.fraction,
     qas.timecreated,
-    qas.userid
+    qas.userid,
+    qasd.name,
+    qasd.value
+
+FROM      {question_usages}            quba
+LEFT JOIN {question_attempts}          qa   ON qa.questionusageid    = quba.id
+LEFT JOIN {question_attempt_steps}     qas  ON qas.questionattemptid = qa.id
+LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid    = qas.id
+
+WHERE
+    quba.id {$qubaids->usage_id_in()}
+
+ORDER BY
+    quba.id,
+    qa.slot,
+    qas.sequencenumber
+    ", $qubaids->usage_id_in_params());
+
+        if (!$records->valid()) {
+            throw new coding_exception('Failed to load questions_usages_by_activity for qubaid_condition :' . $qubaids);
+        }
+
+        $qubas = array();
+        do {
+            $record = $records->current();
+            $qubas[$record->qubaid] = question_usage_by_activity::load_from_records($records, $record->qubaid);
+        } while ($records->valid());
+
+        $records->close();
+
+        return $qubas;
+    }
+
+    /**
+     * Load information about the latest state of each question from the database.
+     *
+     * @param qubaid_condition $qubaids used to restrict which usages are included
+     *                                  in the query. See {@link qubaid_condition}.
+     * @param array            $slots   A list of slots for the questions you want to know about.
+     * @param string|null      $fields
+     * @return array of records. See the SQL in this function to see the fields available.
+     */
+    public function load_questions_usages_latest_steps(qubaid_condition $qubaids, $slots, $fields = null) {
+        list($slottest, $params) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot');
+
+        if ($fields === null) {
+            $fields = "qas.id,
+    qa.id AS questionattemptid,
+    qa.questionusageid,
+    qa.slot,
+    qa.behaviour,
+    qa.questionid,
+    qa.variant,
+    qa.maxmark,
+    qa.minfraction,
+    qa.maxfraction,
+    qa.flagged,
+    qa.questionsummary,
+    qa.rightanswer,
+    qa.responsesummary,
+    qa.timemodified,
+    qas.id AS attemptstepid,
+    qas.sequencenumber,
+    qas.state,
+    qas.fraction,
+    qas.timecreated,
+    qas.userid";
+
+        }
+
+        $records = $this->db->get_records_sql("
+SELECT
+    {$fields}
 
 FROM {$qubaids->from_question_attempts('qa')}
 JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id
@@ -616,16 +691,14 @@ ORDER BY qa.slot
     /**
      * Load a {@link question_attempt} from the database, including all its
      * steps.
+     *
      * @param int $questionid the question to load all the attempts fors.
      * @param qubaid_condition $qubaids used to restrict which usages are included
      * in the query. See {@link qubaid_condition}.
-     * @return array of question_attempts.
+     * @return question_attempt[] array of question_attempts that were loaded.
      */
     public function load_attempts_at_question($questionid, qubaid_condition $qubaids) {
-        $params = $qubaids->from_where_params();
-        $params['questionid'] = $questionid;
-
-        $records = $this->db->get_recordset_sql("
+        $sql = "
 SELECT
     quba.contextid,
     quba.preferredbehaviour,
@@ -637,6 +710,7 @@ SELECT
     qa.variant,
     qa.maxmark,
     qa.minfraction,
+    qa.maxfraction,
     qa.flagged,
     qa.questionsummary,
     qa.rightanswer,
@@ -663,8 +737,13 @@ WHERE
 ORDER BY
     quba.id,
     qa.id,
-    qas.sequencenumber
-        ", $params);
+    qas.sequencenumber";
+
+        // For qubaid_list must call this after calling methods that generate sql.
+        $params = $qubaids->from_where_params();
+        $params['questionid'] = $questionid;
+
+        $records = $this->db->get_recordset_sql($sql, $params);
 
         $questionattempts = array();
         while ($records->valid()) {
@@ -704,6 +783,7 @@ ORDER BY
         $record->id = $qa->get_database_id();
         $record->maxmark = $qa->get_max_mark();
         $record->minfraction = $qa->get_min_fraction();
+        $record->maxfraction = $qa->get_max_fraction();
         $record->flagged = $qa->is_flagged();
         $record->questionsummary = $qa->get_question_summary();
         $record->rightanswer = $qa->get_right_answer_summary();
@@ -946,6 +1026,7 @@ ORDER BY
                        {$alias}qa.variant,
                        {$alias}qa.maxmark,
                        {$alias}qa.minfraction,
+                       {$alias}qa.maxfraction,
                        {$alias}qa.flagged,
                        {$alias}qa.questionsummary,
                        {$alias}qa.rightanswer,
@@ -1463,6 +1544,14 @@ abstract class qubaid_condition {
      * @return the params needed by a query that uses {@link usage_id_in()}.
      */
     public abstract function usage_id_in_params();
+
+    /**
+     * @return string 40-character hash code that uniquely identifies the combination of properties and class name of this qubaid
+     *                  condition.
+     */
+    public function get_hash_code() {
+        return sha1(serialize($this));
+    }
 }
 
 

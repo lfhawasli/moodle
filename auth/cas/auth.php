@@ -61,7 +61,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
      */
     function user_login ($username, $password) {
         $this->connectCAS();
-        return phpCAS::isAuthenticated() && (trim(textlib::strtolower(phpCAS::getUser())) == $username);
+        return phpCAS::isAuthenticated() && (trim(core_text::strtolower(phpCAS::getUser())) == $username);
     }
 
     /**
@@ -96,6 +96,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
         $site = get_site();
         $CASform = get_string('CASform', 'auth_cas');
         $username = optional_param('username', '', PARAM_RAW);
+        $courseid = optional_param('courseid', 0, PARAM_INT);
 
         if (!empty($username)) {
             if (isset($SESSION->wantsurl) && (strstr($SESSION->wantsurl, 'ticket') ||
@@ -117,6 +118,12 @@ class auth_plugin_cas extends auth_plugin_ldap {
             $frm = new stdClass();
             $frm->username = phpCAS::getUser();
             $frm->password = 'passwdCas';
+
+            // Redirect to a course if multi-auth is activated, authCAS is set to CAS and the courseid is specified.
+            if ($this->config->multiauth && !empty($courseid)) {
+                redirect(new moodle_url('/course/view.php', array('id'=>$courseid)));
+            }
+
             return;
         }
 
@@ -174,15 +181,17 @@ class auth_plugin_cas extends auth_plugin_ldap {
      *
      */
     function connectCAS() {
-        global $CFG, $PHPCAS_CLIENT;
+        global $CFG;
+        static $connected = false;
 
-        if (!is_object($PHPCAS_CLIENT)) {
+        if (!$connected) {
             // Make sure phpCAS doesn't try to start a new PHP session when connecting to the CAS server.
             if ($this->config->proxycas) {
                 phpCAS::proxy($this->config->casversion, $this->config->hostname, (int) $this->config->port, $this->config->baseuri, false);
             } else {
                 phpCAS::client($this->config->casversion, $this->config->hostname, (int) $this->config->port, $this->config->baseuri, false);
             }
+            $connected = true;
         }
 
         // If Moodle is configured to use a proxy, phpCAS needs some curl options set.
@@ -206,9 +215,9 @@ class auth_plugin_cas extends auth_plugin_ldap {
             }
         }
 
-        if($this->config->certificate_check && $this->config->certificate_path){
+        if ($this->config->certificate_check && $this->config->certificate_path){
             phpCAS::setCasServerCACert($this->config->certificate_path);
-        }else{
+        } else {
             // Don't try to validate the server SSL credentials
             phpCAS::setNoCasServerValidation();
         }
@@ -235,7 +244,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
                 define ('LDAP_DEREF_NEVER', 0);
             }
             if (!defined('LDAP_DEREF_ALWAYS')) {
-            define ('LDAP_DEREF_ALWAYS', 3);
+                define ('LDAP_DEREF_ALWAYS', 3);
             }
         }
 
@@ -381,15 +390,15 @@ class auth_plugin_cas extends auth_plugin_ldap {
         set_config('ldapencoding', trim($config->ldapencoding), $this->pluginconfig);
         set_config('pagesize', (int)trim($config->pagesize), $this->pluginconfig);
         set_config('contexts', trim($config->contexts), $this->pluginconfig);
-        set_config('user_type', textlib::strtolower(trim($config->user_type)), $this->pluginconfig);
-        set_config('user_attribute', textlib::strtolower(trim($config->user_attribute)), $this->pluginconfig);
+        set_config('user_type', core_text::strtolower(trim($config->user_type)), $this->pluginconfig);
+        set_config('user_attribute', core_text::strtolower(trim($config->user_attribute)), $this->pluginconfig);
         set_config('search_sub', $config->search_sub, $this->pluginconfig);
         set_config('opt_deref', $config->opt_deref, $this->pluginconfig);
         set_config('bind_dn', trim($config->bind_dn), $this->pluginconfig);
         set_config('bind_pw', $config->bind_pw, $this->pluginconfig);
         set_config('ldap_version', $config->ldap_version, $this->pluginconfig);
         set_config('objectclass', trim($config->objectclass), $this->pluginconfig);
-        set_config('memberattribute', textlib::strtolower(trim($config->memberattribute)), $this->pluginconfig);
+        set_config('memberattribute', core_text::strtolower(trim($config->memberattribute)), $this->pluginconfig);
         set_config('memberattribute_isdn', $config->memberattribute_isdn, $this->pluginconfig);
         set_config('attrcreators', trim($config->attrcreators), $this->pluginconfig);
         set_config('groupecreators', trim($config->groupecreators), $this->pluginconfig);
@@ -409,7 +418,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
             return false;
         }
 
-        $extusername = textlib::convert($username, 'utf-8', $this->config->ldapencoding);
+        $extusername = core_text::convert($username, 'utf-8', $this->config->ldapencoding);
 
         // Test for group creator
         if (!empty($this->config->groupecreators)) {
@@ -491,6 +500,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
     */
     function logoutpage_hook() {
         global $USER, $redirect;
+
         // Only do this if the user is actually logged in via CAS
         if ($USER->auth === $this->authtype) {
             // Check if there is an alternative logout return url defined
