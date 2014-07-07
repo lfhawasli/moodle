@@ -606,43 +606,6 @@ class siteindicator_manager {
     }
     
     /**
-     * Get list of available support contacts
-     * 
-     * @return type 
-     */
-    static function get_support_contacts_list() {
-        $manager = get_support_contacts_manager();
-        $support_contacts = $manager->get_support_contacts();
-        return $support_contacts;
-    }
-    
-    /**
-     * Get a specific support contact for a given category.  If the contact
-     * is not found, the parent category will be searched.
-     * 
-     * @param type $categoryid
-     * @param type $contacts
-     * @return type 
-     */
-    static function get_support_contact($categoryid, &$contacts) {
-        global $DB;
-        
-        // Attempt to find the support contact for category.
-        $category = $DB->get_record('course_categories', 
-                array('id' => $categoryid));
-
-        if (!empty($category)) {
-            if(key_exists($category->name, $contacts)) {
-                return $contacts[$category->name];
-            } else if(!empty($category->parent)) {
-                return self::get_support_contact($category->parent, $contacts);
-            }
-        }
-        
-        return $contacts['System'];
-    }
-    
-    /**
      * Given a category ID, retrieve the user assigned a category manager. 
      * This will eventually be used to filter the 'pending request' list 
      * so that only the category manager is able to see coruses requested 
@@ -671,9 +634,9 @@ class siteindicator_manager {
     }
     
     /**
-     * Create an indicator request
+     * Create an indicator request and notify support contact(s).
      * 
-     * @param type $data 
+     * @param object $data
      */
     static function create_request($data) {
         global $DB;
@@ -691,49 +654,47 @@ class siteindicator_manager {
         
         // Create actual request
         siteindicator_request::create($request);
-        
+
         // Create JIRA ticket
         $request->meta = $course_request;
 
-        self::post_jira_ticket($request);
-    }
-    
-    static function post_jira_ticket(&$request) {
-        global $CFG;
-        
-        // Determine support contact for JIRA ticket. 
-        $contacts = self::get_support_contacts_list();
-        $contact = self::get_support_contact($request->categoryid, $contacts);
+        // Format the title/message to send to support contact(s).
+        $ticketinfo = self::format_course_request_message($request);
+        $title = get_string('jira_title', 'tool_uclasiteindicator', $ticketinfo);
+        $message = get_string('jira_msg', 'tool_uclasiteindicator', $ticketinfo);
 
-        // Set ticket info
+        // Determine support contact(s).
+        $categorycontext = context_coursecat::instance($request->categoryid);
+        $supportcontacts = get_support_contact($categorycontext);
+
+        // Either send email or create a JIRA ticket.
+        foreach ($supportcontacts as $supportcontact) {
+            message_support_contact($supportcontact, null, null, $title, $message);
+        }
+    }
+
+    /**
+     * Returns ticketinfo object that can be used to format title and message
+     * for support contact.
+     *
+     * @param object $request
+     * @return object
+     */
+    static function format_course_request_message($request) {
+        global $CFG;
+
+        // Set ticket info.
         $ticketinfo = $request->meta;
-        
+
         $ticketinfo->type = self::get_types_list($request->type);
         $ticketinfo->user = self::get_username($request->requester);
         $ticketinfo->category = self::get_categories_list($request->categoryid);
         $ticketinfo->summary = self::format_message($request->meta->summary);
-       
-        // Attach the pending course links
+
+        // Attach the pending course links.
         $ticketinfo->action = $CFG->wwwroot . '/course/pending.php?request=' . $request->requestid;
-        
-        // Prepare JIRA params
-        $title = get_string('jira_title', 'tool_uclasiteindicator', $ticketinfo);
-        $message = get_string('jira_msg', 'tool_uclasiteindicator', $ticketinfo);
-        
-        // Jira params
-        $params = array(
-            'pid' => get_config('block_ucla_help', 'jira_pid'),
-            'issuetype' => 1,
-            'os_username' => get_config('block_ucla_help', 'jira_user'),
-            'os_password' => get_config('block_ucla_help', 'jira_password'),
-            'summary' => $title,
-            'assignee' => $contact,
-            'reporter' => $contact,
-            'description' => $message,
-        );
-        
-        // Create ticket
-        do_request(get_config('block_ucla_help', 'jira_endpoint'), $params, 'POST');      
+
+        return $ticketinfo;
     }
     
     /**

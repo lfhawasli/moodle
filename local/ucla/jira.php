@@ -17,9 +17,9 @@
  *                          request.
  * @param string $post      "GET" or "POST
  *
- * @return string containing the result of the query
+ * @return string           Returns false on error, otherwise true.
  */
-function do_request($sQuery, $data, $post) {
+function send_jira_request($sQuery, $data, $post) {
     $data = http_build_query($data, '', '&');
 
     if (strtoupper($post) == 'POST') { //do post
@@ -41,7 +41,7 @@ function do_request($sQuery, $data, $post) {
     $result = @stream_get_contents($sock);
     if ($result === false) {
         //throw new Exception("Problem with $sQuery, $php_errormsg");
-        return;
+        return false;
     }
-    return $result;
+    return true;
 }

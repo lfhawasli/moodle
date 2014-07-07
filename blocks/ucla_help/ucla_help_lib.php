@@ -11,9 +11,10 @@
  * @author     Rex Lorenzo <rex@seas.ucla.edu>                                      
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
  */
-require_once(dirname(__FILE__) . '/../../lib/adminlib.php');
-
 defined('MOODLE_INTERNAL') || die();
+
+require_once(dirname(__FILE__) . '/../../lib/adminlib.php');
+require_once($CFG->dirroot . '/lib/validateurlsyntax.php');
 
 /*** CLASSES ***/
 
@@ -396,46 +397,131 @@ function create_help_message(&$fromform)
 }
 
 /**
+ * Given the support contact, it will either message the support contact via
+ * email or create a JIRA ticket.
+ * 
+ * Note, this will send real email, because we need to be able to test email
+ * integration with 3rd-party support systems. But we will honor the 
+ * $CFG->noemailever setting. The $CFG->noemailever setting will also prevent
+ * JIRA tickets from being created.
+ *
+ * @param string $supportcontact    Can be email or JIRA account.
+ * @param string $from              Optional. Requestor email.
+ * @param string $fromname          Optional. Requestor name.
+ * @param string $subject
+ * @param string $body
+ *
+ * @return boolean                  Returns false on error, otherwise true.
+ */
+function message_support_contact($supportcontact, $from=null, $fromname=null,
+                                 $subject, $body) {
+    global $CFG;
+
+    $result = false;
+    if (!empty($CFG->noemailever)) {
+        // We don't want any messages sent.
+        return true;
+    }
+
+    if (defined('BEHAT_SITE_RUNNING')) {
+        // Fake email sending in behat.
+        return true;
+    }
+
+    // Now, is the support contact an email address?
+    if (validateEmailSyntax($supportcontact)) {
+        // send message via email
+        $mail = get_mailer();
+
+        // Check if we want the from email to be something else.
+        $altfrom = get_config('block_ucla_help', 'fromemail');
+        if (!empty($altfrom)) {
+            $mail->From = $altfrom;
+        } else if (!empty($from)) {
+            $mail->From = $from;
+        } else {
+            $mail->From = $CFG->noreplyaddress;
+        }
+
+        if (!empty($fromname)) {
+            $mail->FromName = $fromname;
+        }
+
+        // Add support contact email address.
+        $mail->AddAddress($supportcontact);
+
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+
+        $result = $mail->Send();
+
+    } else if (!empty($supportcontact)) {
+        // Send message via JIRA.
+        $params = array(
+            'pid' => get_config('block_ucla_help', 'jira_pid'),
+            'issuetype' => 1,
+            'os_username' => get_config('block_ucla_help', 'jira_user'),
+            'os_password' => get_config('block_ucla_help', 'jira_password'),
+            'summary' => $subject,
+            'assignee' => $supportcontact,
+            'reporter' => $supportcontact,
+            'description' => $body,
+        );
+
+        // Try to create the issue.
+        $result = send_jira_request(get_config('block_ucla_help', 'jira_endpoint'),
+                $params, 'POST');
+    } else {
+        // No $supportcontact specified, so return false.
+        return $result;
+    }
+
+    return $result;
+}
+
+/**
  * Returns the jira user or email address to provide support given a context
  * level. Uses support_contacts_manager to get list of support contacts.
  * 
  * @see support_contacts_manager
  * 
- * @param object $context_id        Current context object
+ * @param object $curcontext    Current context object
  * 
- * @return string                   Returns support contact matching most 
- *                                  specific context first until it reaches the
- *                                  "System" context.
+ * @return array                Returns an array of support contacts matching
+ *                              most specific context first until it reaches the
+ *                              "System" context. Can be a mix of email or JIRA
+ *                              users.
  */
-function get_support_contact($cur_context)
-{
-    $ret_val = null;
+function get_support_contact($curcontext) {
+    $retval = null;
 
     // get support contacts
-    $manager = get_support_contacts_manager();        
-    $support_contacts = $manager->get_support_contacts();    
+    $manager = get_support_contacts_manager();
+    $supportcontacts = $manager->get_support_contacts();
 
    // get list of contexts to check
-    $context_ids = array_merge((array) $cur_context->id, 
-            (array) get_parent_contexts($cur_context));     
-    
-    foreach ((array) $context_ids as $context_id) {
-        $context = get_context_instance_by_id($context_id);
-        $context_name = print_context_name($context, false, true);
+    $contextids = array_merge((array) $curcontext->id,
+            (array) get_parent_contexts($curcontext));
+
+    foreach ((array) $contextids as $contextid) {
+        $context = get_context_instance_by_id($contextid);
+        $contextname = print_context_name($context, false, true);
         
         // see if context matches something in support_contacts list
-        if (!empty($support_contacts[$context_name])) {
-            $ret_val = $support_contacts[$context_name];
+        if (!empty($supportcontacts[$contextname])) {
+            $retval = $supportcontacts[$contextname];
             break;
-        }        
-    }       
-
-    if (empty($ret_val)) {
-        // There should be a "System" contact.
-        $ret_val = $support_contacts['System'];
+        }
     }
 
-    return $ret_val;
+    if (empty($retval)) {
+        // There should be a "System" contact.
+        $retval = $supportcontacts['System'];
+    }
+
+    $retval = explode(',', $retval);
+
+    return $retval;
 }
 
 /**
