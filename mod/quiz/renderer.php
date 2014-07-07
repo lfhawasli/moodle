@@ -1176,18 +1176,6 @@ class mod_quiz_renderer extends plugin_renderer_base {
         return html_writer::tag('div', $warning, array('id' => 'connection-error', 'style' => 'display: none;', 'role' => 'alert')) .
                 html_writer::tag('div', $ok, array('id' => 'connection-ok', 'style' => 'display: none;', 'role' => 'alert'));
     }
-
-    /**
-     * Output the connection warning messages, which are initially hidden, and
-     * only revealed by JavaScript if necessary.
-     */
-    public function connection_warning() {
-        $options = array('filter' => false, 'newlines' => false);
-        $warning = format_text(get_string('connectionerror', 'quiz'), FORMAT_MARKDOWN, $options);
-        $ok = format_text(get_string('connectionok', 'quiz'), FORMAT_MARKDOWN, $options);
-        return html_writer::tag('div', $warning, array('id' => 'connection-error', 'style' => 'display: none;', 'role' => 'alert')) .
-                html_writer::tag('div', $ok, array('id' => 'connection-ok', 'style' => 'display: none;', 'role' => 'alert'));
-    }
 }
 
 class mod_quiz_links_to_other_attempts implements renderable {

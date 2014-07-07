@@ -3089,7 +3089,7 @@ function forum_get_course_forum($courseid, $type) {
         return false;
     }
     $sectionid = course_add_cm_to_section($courseid, $mod->coursemodule, 0);
-    
+
     // START UCLA MOD CCLE-3101 - Auto-generated forums should be private by default.
     $publicprivatelib = $CFG->dirroot . '/local/publicprivate/lib/module.class.php';
     if (file_exists($publicprivatelib)) {
@@ -3100,7 +3100,7 @@ function forum_get_course_forum($courseid, $type) {
         }
     }
     // END UCLA MOD CCLE-3101
-    
+
     return $DB->get_record("forum", array("id" => "$forum->id"));
 }
 
@@ -3804,8 +3804,6 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     echo '<td class="picture">';
     echo $OUTPUT->user_picture($postuser, array('courseid'=>$forum->course));
     echo "</td>\n";
-    */
-    // END UCLA MOD: CCLE-4003/SSC-1805
 
     // User name
     $fullname = fullname($postuser, has_capability('moodle/site:viewfullnames', $modcontext));
@@ -3870,12 +3868,6 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
          fullname($usermodified).'</a><br />';
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
           userdate($usedate, $datestring).'</a>';
-    */
-    echo '<p hidden="hidden">' . $usedate . '</p><a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
-          userdate($usedate, $datestring).'</a><br />';
-    echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
-         fullname($usermodified).'</a>';
-    // END UCLA MOD: CCLE-4003/SSC-1805
     echo "</td>\n";
 
     echo "</tr>\n\n";
@@ -5720,19 +5712,11 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
     }
 
     if ($displayformat == 'header') {
-        // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
-        // Add an id to sort discussion forum.
-        /* echo '<table cellspacing="0" class="forumheaderlist">'; */
-        echo '<table cellspacing="0" class="forumheaderlist" id="forumheaderlist">';
-        // END UCLA MOD: CCLE-4003/SSC-1805
+        echo '<table cellspacing="0" class="forumheaderlist">';
         echo '<thead>';
         echo '<tr>';
         echo '<th class="header topic" scope="col">'.get_string('discussion', 'forum').'</th>';
-        // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
-        // Remove colspan="2" clause from "Started by" header.
-        /* echo '<th class="header author" colspan="2" scope="col">'.get_string('startedby', 'forum').'</th>'; */
-        echo '<th class="header author" scope="col">'.get_string('startedby', 'forum').'</th>';
-        // END UCLA MOD: CCLE-4003/SSC-1805
+        echo '<th class="header author" colspan="2" scope="col">'.get_string('startedby', 'forum').'</th>';
         if ($groupmode > 0) {
             echo '<th class="header group" scope="col">'.get_string('group').'</th>';
         }

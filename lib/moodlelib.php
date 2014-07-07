@@ -683,15 +683,7 @@ function optional_param_array($parname, $default, $type) {
             debugging('Invalid key name in optional_param_array() detected: '.$key.', parameter: '.$parname);
             continue;
         }
-        // START UCLA MODIFICATION CCLE-2662 - Roles Migration Local Plugin
-        // Implementing patch provided by plugin creator to make tool work for
-        // Moodle 2.2: http://tracker.moodle.org/browse/MDL-31793
-        if (is_array($value)) {
-            $result[$key] = clean_param_array($value, $type);
-        } else {
-            $result[$key] = clean_param($value, $type);
-        }
-        // END UCLA MODIFICATION CCLE-2662        
+        $result[$key] = clean_param($value, $type);
     }
 
     return $result;
@@ -3152,19 +3144,42 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         }
     }
 
-    // Check visibility of activity to current user; includes visible flag, groupmembersonly, conditional availability, etc.
+    // START UCLA MOD: CCLE-3028 - Fix nonlogged users redirect on hidden content
+    // If a user who is not logged in tries to access private course information
+    //
+    // Check visibility of activity to current user; includes visible flag, groupmembersonly,
+    // conditional availability, etc
+    if ($cm && !$cm->uservisible) {
+        if ($preventredirect) {
+            throw new require_login_exception('Activity is hidden');
+        }
+
+        // If a guest user tries to access private course information
+        if (isloggedin() && isguestuser()) {
+            require_once($CFG->dirroot . '/local/ucla/lib.php');
+            prompt_login($PAGE, $OUTPUT, $CFG, $course);
+        } else {
+            redirect($CFG->wwwroot, get_string('activityiscurrentlyhidden'));
+        }
+    }
+    // END UCLA MOD: CCLE-3028
+
+    /*
+     * Replaced by CCLE-3028 Mod
+    // Check visibility of activity to current user; includes visible flag, groupmembersonly,
+    // conditional availability, etc
     if ($cm && !$cm->uservisible) {
         if ($preventredirect) {
             throw new require_login_exception('Activity is hidden');
         }
         if ($course->id != SITEID) {
-            $url = new moodle_url('/course/view.php', array('id' => $course->id));
+            $url = new moodle_url('/course/view.php', array('id'=>$course->id));
         } else {
             $url = new moodle_url('/');
         }
         redirect($url, get_string('activityiscurrentlyhidden'));
     }
-     * 
+     *
      */
 
     // Finally access granted, update lastaccess times.
@@ -5829,20 +5844,8 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         $mail->From     = $CFG->noreplyaddress;
         $mail->FromName = $from;
     } else if ($usetrueaddress and $from->maildisplay) {
-        // START UCLA MOD: CCLE-4479 - Yahoo email problems
-//        $mail->From     = $from->email;
-//        $mail->FromName = fullname($from);
-        if (empty($CFG->emailonlyfromnoreplyaddress)) {
-            $mail->From     = $from->email;
-            $mail->FromName = fullname($from);
-        } else {
-            $mail->From     = $CFG->noreplyaddress;
-            $mail->FromName = fullname($from);
-            if (empty($replyto)) {
-                $tempreplyto[] = array($from->email, fullname($from));
-            }
-        }
-        // END UCLA MOD: CCLE-4479
+        $mail->From     = $from->email;
+        $mail->FromName = fullname($from);
     } else {
         $mail->From     = $CFG->noreplyaddress;
         $mail->FromName = fullname($from);
@@ -6020,11 +6023,6 @@ function setnew_password_and_mail($user, $fasthash = false) {
     ));
     $event->add_record_snapshot('user', $user);
     $event->trigger();
-
-    $user->password = $hashedpassword;
-
-    // Trigger user updated event
-    events_trigger('user_updated', $user);
 
     $a = new stdClass();
     $a->firstname   = fullname($user, true);
@@ -8851,18 +8849,6 @@ function message_popup_window() {
 
         $strgomessage = get_string('gotomessages', 'message');
         $strstaymessage = get_string('ignore', 'admin');
-
-        $notificationsound = null;
-        $beep = get_user_preferences('message_beepnewmessage', '');
-        if (!empty($beep)) {
-            // Browsers will work down this list until they find something they support.
-            $sourcetags =  html_writer::empty_tag('source', array('src' => $CFG->wwwroot.'/message/bell.wav', 'type' => 'audio/wav'));
-            $sourcetags .= html_writer::empty_tag('source', array('src' => $CFG->wwwroot.'/message/bell.ogg', 'type' => 'audio/ogg'));
-            $sourcetags .= html_writer::empty_tag('source', array('src' => $CFG->wwwroot.'/message/bell.mp3', 'type' => 'audio/mpeg'));
-            $sourcetags .= html_writer::empty_tag('embed',  array('src' => $CFG->wwwroot.'/message/bell.wav', 'autostart' => 'true', 'hidden' => 'true'));
-
-            $notificationsound = html_writer::tag('audio', $sourcetags, array('preload' => 'auto', 'autoplay' => 'autoplay'));
-        }
 
         $notificationsound = null;
         $beep = get_user_preferences('message_beepnewmessage', '');

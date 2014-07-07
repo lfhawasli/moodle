@@ -163,23 +163,6 @@ $THEME->layouts = array(
             'nocustommenu' => true
         ),
     ),
-    // Used during upgrade and install, and for the 'This site is 
-    // undergoing maintenance' message.
-    // This must not have any blocks, and it is good idea if it does not 
-    // have links to
-    // other places - for example there should not be a home link 
-    // in the footer...
-    'maintenance' => array(
-        'file' => $tf_general,
-        'regions' => array(),
-        'options' => array(
-            'noblocks' => true, 
-            'nofooter' => true, 
-            'nonavbar' => true, 
-            'nocustommenu' => true,
-            'nologininfo' => true
-        ),
-    ),
     // Should display the content and basic headers only.
     'print' => array(
         'file' => $tf_general,

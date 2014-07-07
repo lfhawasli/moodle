@@ -244,7 +244,7 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
         $data->courseid = $this->course->id;
         $data->timeshift = 24*60*60;
         $this->setUser($this->editingteachers[0]);
-        assign_reset_userdata($data);
+        $assign->reset_userdata($data);
         $this->assertEquals(false, $assign->has_submissions_or_grades());
 
         // Reload the instance data.
@@ -1039,7 +1039,6 @@ class mod_assign_locallib_testcase extends mod_assign_base_testcase {
 
         $grades = $assign->get_user_grades_for_gradebook($this->students[0]->id);
         $this->assertEquals(50, (int)$grades[$this->students[0]->id]->rawgrade);
-    }
 
     }
 

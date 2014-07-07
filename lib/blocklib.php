@@ -448,20 +448,6 @@ class block_manager {
     }
 
     /**
-     * Finds custom block regions associated with a page type and registers them with this block manager.
-     *
-     * @param string $pagetype
-     */
-    public function add_custom_regions_for_pagetype($pagetype) {
-        global $SESSION;
-        if (isset($SESSION->custom_block_regions[$pagetype])) {
-            foreach ($SESSION->custom_block_regions[$pagetype] as $customregion) {
-                $this->add_region($customregion, false);
-            }
-          }
-      }
-
-    /**
      * Set the default region for new blocks on the page
      *
      * @param string $defaultregion the internal names of the region where new

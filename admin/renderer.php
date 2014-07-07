@@ -644,24 +644,6 @@ class core_admin_renderer extends plugin_renderer_base {
         return $this->warning($warning, 'error');
     }
 
-    /*
-     * If necessary, displays a warning about upgrading a test site.
-     *
-     * @param string $testsite
-     * @return string HTML
-     */
-    protected function test_site_warning($testsite) {
-
-        if (!$testsite) {
-            return '';
-        }
-
-        return $this->box(
-            $this->container(get_string('testsiteupgradewarning', 'admin', $testsite)),
-            'generalbox testsitewarning'
-        );
-    }
-
     /**
      * Output the copyright notice.
      * @return string HTML to output.

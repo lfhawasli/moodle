@@ -71,10 +71,6 @@ class format_ucla_renderer extends format_topics_renderer {
      */
     public function __construct(moodle_page $page, $target) {
         parent::__construct($page, $target);
-
-        // Build required forums for the UCLA format
-        $forum_new = forum_get_course_forum($page->course->id, 'news');
-        $forum_gen = forum_get_course_forum($page->course->id, 'general');       
         
         // get reg info, if any
         $this->courseinfo = ucla_get_course_info($page->course->id);
