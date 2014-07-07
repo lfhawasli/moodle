@@ -91,6 +91,11 @@ class behat_ucla extends behat_files {
         // Set other configs.
         set_config('showuseridentity', 'idnumber,email');
 
+        // Enable course metalink plugin
+        $enabled = array_keys(enrol_get_plugins(true));
+        $enabled[] = 'meta';
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+
         // Purge all caches to force new configs to take effect.
         purge_all_caches();
     }
