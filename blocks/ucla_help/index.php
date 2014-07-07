@@ -17,7 +17,6 @@ require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 
 // form to process help request
 require_once($CFG->dirroot . '/blocks/ucla_help/help_form.php' );
-require_once($CFG->dirroot . '/lib/validateurlsyntax.php');
 
 // set context
 $courseid = optional_param('course', 0, PARAM_INTEGER);
@@ -115,19 +114,20 @@ if ($fromform = $mform->get_data()) {
 
     echo $OUTPUT->box_start('generalbox', 'notice');
     
-    // get email address from form submitter (if any)
+    // Get email address from form submitter (if any).
+    $fromaddress = null;
     if(!empty($fromform->ucla_help_email)) {
-        $from_address = $fromform->ucla_help_email;
+        $fromaddress = $fromform->ucla_help_email;
     } else if (!empty($USER->email)) {
-        $from_address = $USER->email;
+        $fromaddress = $USER->email;
     } else {
-        $from_address = $CFG->noreplyaddress;
+        $fromaddress = $CFG->noreplyaddress;
     }             
         
-    // get message header
-    $header = get_string('message_header', 'block_ucla_help',create_description($fromform));
-
-    // Set context to the selected course
+    // Get message header.
+    $header = get_string('message_header', 'block_ucla_help', create_description($fromform));
+    
+    // Set context to the selected course.
     $instanceid = 0;
     $fromform->course_name = $SITE->shortname;
     foreach ($user_courses as $c) {
@@ -138,67 +138,24 @@ if ($fromform = $mform->get_data()) {
         }
     }
 
+    // Use system context if no other context was found.
     if (!empty($instanceid)) {
         $context = context_course::instance($instanceid, false) ? : $context;
     }
 
-    // get message body
+    // Get message body.
     $body = create_help_message($fromform);
     
-    // get support contact
-    $support_contact = get_support_contact($context);
+    // Get support contact(s).
+    $supportcontacts = get_support_contact($context);
 
-    // Now, is the support contact an email address?
-    if (validateEmailSyntax($support_contact)) {
-        // send message via email        
-        $mail = get_mailer();
-
-        // Check if we want the from email to be something else.
-        $altfrom = get_config('block_ucla_help', 'fromemail');
-        if (!empty($altfrom)) {
-            $mail->From = $altfrom;
-        } else {
-            $mail->From = $from_address;
+    $result = true;
+    foreach ($supportcontacts as $supportcontact) {
+        if (!message_support_contact($supportcontact, $fromaddress,
+                $fromform->ucla_help_name, $header, $body)) {
+            $result = false;
+            break;
         }
-
-        if (!empty($fromform->ucla_help_name)) {
-            $mail->FromName = $fromform->ucla_help_name;
-        }
-            
-        // Add support contact email address.
-        $mail->AddAddress($support_contact);
-        
-        $mail->Subject = $header;
-        $mail->Body = $body;
-        
-        // just going to use php's built-in email functionality. Moodle provides
-        // a function called "email_to_user", but it requires a user in the 
-        // database to exist
-        $result = $mail->Send();
-        
-    } else if (!empty($support_contact)) {
-        // Send message via JIRA.
-                
-        $params = array(
-            'pid' => get_config('block_ucla_help', 'jira_pid'),
-            'issuetype' => 1,
-            'os_username' => get_config('block_ucla_help', 'jira_user'),
-            'os_password' => get_config('block_ucla_help', 'jira_password'),
-            'summary' => $header,
-            'assignee' => $support_contact,
-            'reporter' => $support_contact,
-            'description' => $body,
-        );        
-
-        // try to create the issue
-        // returns null if unable to send request
-        // @todo: throw or log error
-        $result = do_request(get_config('block_ucla_help', 'jira_endpoint'), $params, 'POST');        
-                
-    } else {
-        // block has been misconfigured, so give error
-        // @todo: throw or log error
-        $result = false;
     }
 
     if (!empty($result)) {
