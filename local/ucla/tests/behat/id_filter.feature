@@ -19,7 +19,7 @@ Feature: Filter users by idnumber
     And I expand "Accounts" node
     When I follow "Browse list of users"
 
-  @javascript @testme
+  @javascript
   Scenario: Filtering id numbers - with case "is empty"
     # We should see see admin on the user list, the following e-mail is admin's e-mail.
     Then I should see "moodle@moodlemoodle.com" in the "users" "table"

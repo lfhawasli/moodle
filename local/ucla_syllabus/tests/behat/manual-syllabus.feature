@@ -20,7 +20,7 @@ Background:
     And I turn editing mode on
     And I follow the "Show all" section in the ucla site menu
 
-@javascript @testme
+@javascript
 Scenario: Converting files called "Syllabus"
     When I add a "File" to section "1" and I fill the form with:
         | Name | Syllabus |

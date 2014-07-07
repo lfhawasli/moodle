@@ -37,11 +37,11 @@ class user_filtering {
             $fieldnames = array('realname'=>0, 'lastname'=>1, 'firstname'=>1, 'email'=>1, 'city'=>1, 'country'=>1,
                                 'confirmed'=>1, 'suspended'=>1, 'profile'=>1, 'courserole'=>1, 'systemrole'=>1, 'cohort'=>1,
                                 'firstaccess'=>1, 'lastaccess'=>1, 'neveraccessed'=>1, 'timemodified'=>1,
-                                // START CORE EDIT UCLA MOD CCLE-4534 - add-id-filter
+                                // START UCLA MOD CCLE-4534
                                 // Allow the user to filter out users according to their registered ID number.
                                 // 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1);
                                 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1, 'idnumber'=>1);
-                                // END UCLA MOD CCLE-4534-add-id-filter
+                                // END UCLA MOD CCLE-4534
         }
 
         $this->_fields  = array();
@@ -124,10 +124,10 @@ class user_filtering {
             case 'timemodified': return new user_filter_date('timemodified', get_string('lastmodified'), $advanced, 'timemodified');
             case 'nevermodified': return new user_filter_checkbox('nevermodified', get_string('nevermodified', 'filters'), $advanced, array('timemodified', 'timecreated'), array('timemodified_sck', 'timemodified_eck'));
             case 'cohort':      return new user_filter_cohort($advanced);
-            // START CORE EDIT UCLA MOD CCLE-4534 - add-id-filter
+            // START UCLA MOD CCLE-4534
             // Allow the user to filter out users according to their registered ID number.
             case 'idnumber': return new user_filter_text('idnumber', get_string('idnumber'), $advanced, 'idnumber');
-            // END UCLA MOD CCLE-4534-add-id-filter
+            // END UCLA MOD CCLE-4534
             case 'auth':
                 $plugins = get_plugin_list('auth');
                 $choices = array();
