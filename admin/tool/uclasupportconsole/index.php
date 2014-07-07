@@ -2136,6 +2136,67 @@ if ($displayforms) {
         $params, get_string('mediausage_help', 'tool_uclasupportconsole'));
 }
 $consoles->push_console_html('modules', $title, $sectionhtml);
+///////////////////////////////////////////////////////////////
+$title = "visiblecontentlist";
+$sectionhtml = '';
+if ($displayforms) {
+    $content = get_term_selector($title);
+    $sectionhtml .= supportconsole_simple_form($title, $content);
+} else if ($consolecommand == "$title") {
+    $term = required_param('term', PARAM_ALPHANUM);
+    $params = array('contextlevel' => CONTEXT_MODULE);
+    if(!empty($term)) {
+        $params['term'] = $term;
+        // Table of relevant courses and their srs.
+        $classsql = "SELECT m.id, rc.term, regd.fullname AS division, c.shortname,
+                            count(m.course) AS count, c.id as instructors
+                       FROM {course_modules} m
+                       JOIN {course_sections} s ON m.section = s.id AND m.course = s.course
+                       JOIN {course} c ON s.course = c.id                       
+                       JOIN {ucla_request_classes} rc ON (c.id = rc.courseid AND
+                                                          rc.hostcourse=1)
+                       JOIN {ucla_reg_classinfo} regc ON (rc.srs = regc.srs AND
+                                                          rc.term = regc.term)
+                       JOIN {ucla_reg_division} regd ON regc.division = regd.code
+                      WHERE m.visible = 1 AND s.visible = 0 AND rc.term = :term
+                   GROUP BY m.course";
+
+        // Table of instructors and contact info.
+        $instrsql = "SELECT ra.id, c.id AS courseid, u.firstname, u.lastname, u.email
+                       FROM {role_assignments} ra
+                       JOIN {user} u ON ra.userid = u.id
+                       JOIN {role} r ON ra.roleid = r.id
+                       JOIN {context} co ON ra.contextid = co.id
+                       JOIN {course} c ON co.instanceid = c.id
+                      WHERE r.shortname = :shortname";
+    }
+
+    $results = $DB->get_records_sql($classsql, $params);
+    $instrs = $DB->get_records_sql($instrsql, array('shortname' => 'editinginstructor'));
+
+    foreach($results as $key => $result) {
+        $result->shortname = html_writer::link(new moodle_url('/course/view.php',
+                array('id' => $result->instructors)), $result->shortname);
+
+        // For each of the instructor rows, if the srs matches that of $result,
+        // append to instr string with their contact info. The srs of $result is 
+        // stored in the instructors variable so that instructor info can 
+        // replace the srs once it is used.
+        $instrstr = "";
+        foreach($instrs as $ikey => $instr) {
+            if($instr->courseid == $result->instructors) {
+                // Reach here if $instr teaches this course.
+                $instrstr .= html_writer::link("mailto:" . $instr->email,
+                        fullname($instr)) . html_writer::empty_tag('br');
+            }
+        }
+        $result->instructors = $instrstr;
+        $results[$key] = $result;
+    }
+    unset($params['contextlevel']);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
+}
+$consoles->push_console_html('modules', $title, $sectionhtml);
 
 // see if user came from a specific page, if so, then direct them back there
 $gobackurl = $PAGE->url;
