@@ -144,14 +144,14 @@ class behat_ucla extends behat_files {
 
                 // Forward the work to Moodle's data generators.
                 $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exists('course enrolments',
+                        ->the_following_exist('course enrolments',
                                 new TableNode($table));
 
                 break;
             case 'activities':
                 require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
                 $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exists('activities', $data);
+                        ->the_following_exist('activities', $data);
                 // Make each activity either public or private (default).
                 foreach ($data->getHash() as $elementdata) {
                     if (!empty($elementdata['private'])) {
