@@ -459,6 +459,11 @@ class behat_hooks extends behat_base {
      */
     public function i_look_for_exceptions() {
 
+        // START UCLA MOD: CCLE-4435 - Upgrade to Moodle 2.7
+        // @TODO: Temporarily disable this step until we are further along our upgrade.
+        return;
+        // END UCLA MOD: CCLE-4435
+
         // If the step already failed in a hook throw the exception.
         if (!is_null(self::$currentstepexception)) {
             throw self::$currentstepexception;
