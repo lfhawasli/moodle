@@ -116,6 +116,30 @@ class course_edit_form extends moodleform {
                             $indicator_type);                    
                 }
 
+                $types = siteindicator_manager::get_types_list();
+                $radioarray = array();
+                foreach($types as $type) {
+                    // don't allow tasite type to be selected
+                    if (siteindicator_manager::SITE_TYPE_TASITE == $type['shortname']) {
+                        continue;
+                    }
+                    $descstring = '<strong>' . $type['fullname'] . '</strong> - ' . $type['description'];
+                    $attributes = array(
+                        'class' => 'indicator-form',
+                        'value' => $type['shortname']
+                    );
+                    $radioarray[] = $mform->createElement('radio', 'indicator_change', '', $descstring, $type['shortname'], $attributes);
+                }
+                $mform->addGroup($radioarray, 'indicator_type_radios', get_string('change', 'tool_uclasiteindicator'), array('<br/>'), false);
+                $mform->addGroupRule('indicator_type_radios', get_string('required'), 'required');
+                
+                if (!empty($indicator)) {
+                    $mform->setDefault('indicator_change', $indicator->property->type);
+                }
+            }            
+        }
+        // END UCLA MOD CCLE-2389
+
         // Form definition with new course defaults.
         $mform->addElement('header','general', get_string('general', 'form'));
 
@@ -222,6 +246,7 @@ class course_edit_form extends moodleform {
             }
             $course->idnumber = $idnumber;     
         }
+        // END UCLA MOD CCLE-2940
 
         // Description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
@@ -376,6 +401,25 @@ class course_edit_form extends moodleform {
         enrol_course_edit_form($mform, $course, $context);
 
         $mform->addElement('header','groups', get_string('groupsettingsheader', 'group'));
+
+        // START UCLA MOD
+        /**
+         * Flag to enable or disable public/private if it is enabled for the
+         * site or if it is activated for the course.
+         *
+         * @author ebollens
+         * @version 20110719
+         */
+        if(PublicPrivate_Site::is_enabled() || (PublicPrivate_Course::is_publicprivate_capable($course) 
+                && PublicPrivate_Course::build($course)->is_activated())) {
+            $choices = array();
+            $choices[0] = get_string('disable');
+            $choices[1] = get_string('enable');
+            $mform->addElement('select', 'enablepublicprivate', get_string('publicprivate','local_publicprivate'), $choices);
+            $mform->addHelpButton('enablepublicprivate', 'publicprivateenable', 'local_publicprivate');
+            $mform->setDefault('enablepublicprivate', empty($course->enablepublicprivate) ? 1 : $course->enablepublicprivate);
+        }
+        // END UCLA MOD
 
         $choices = array();
         $choices[NOGROUPS] = get_string('groupsnone', 'group');

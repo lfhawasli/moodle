@@ -148,6 +148,11 @@ class local_publicprivate_renderer extends core_course_renderer {
                 $editactions = array_merge($editactions, $ppeditaction);
             }
 
+            // Remove "Assign roles" from edit menu
+            if (isset($editactions['assign'])) {
+                unset($editactions['assign']);
+            }
+            
             //  Move delete to the end.
             if (isset($editactions['delete'])) {
                 $deledtionaction = $editactions['delete'];
