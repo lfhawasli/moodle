@@ -119,7 +119,7 @@ class local_publicprivate_renderer extends core_course_renderer {
         $output .= $this->course_section_cm_name($mod, $displayoptions);
 
         // Module can put text after the link (e.g. forum unread).
-        $output .= $mod->get_after_link();
+        $output .= $mod->afterlink;
 
         // Closing the tag which contains everything but edit icons. Content
         // part of the module should not be part of this.
@@ -131,7 +131,7 @@ class local_publicprivate_renderer extends core_course_renderer {
         // it should work similarly (at least in terms of ordering) to an
         // activity.
         $contentpart = $this->course_section_cm_text($mod, $displayoptions);
-        $url = $mod->get_url();
+        $url = $mod->url;
         if (empty($url)) {
             $output .= $contentpart;
         }
@@ -155,8 +155,8 @@ class local_publicprivate_renderer extends core_course_renderer {
                 $editactions = array_merge($editactions, array($deledtionaction));
             }
 
-            $output .= ' ' . $this->course_section_cm_edit_actions($editactions);
-            $output .= $mod->get_after_edit_icons();
+            $output .= ' ' . $this->course_section_cm_edit_actions($editactions, $mod);
+            $output .= $mod->afterediticons;
         }
 
         $output .= $this->course_section_cm_completion($course, $completioninfo,

@@ -329,18 +329,16 @@ function get_private_public($mod, $sr = null) {
          * is public, then show a toggle to make it private.
          */
         if($publicprivate_module->is_private()) {
-            $actions[] = new action_link(
+            $actions[] = new action_menu_link_secondary(
                 new moodle_url($baseurl, array('public' => $mod->id)),
                 new pix_icon('t/locked', $public, 'moodle', array('class' => 'iconsmall')),
-                null,
-                array('class' => 'editing_makepublic publicprivate', 'title' => $public)
+                $public
             );                
         } else {
-            $actions[] = new action_link(
+            $actions[] = new action_menu_link_secondary(
                 new moodle_url($baseurl, array('private' => $mod->id)),
                 new pix_icon('t/lock', $private, 'moodle', array('class' => 'iconsmall')),
-                null,
-                array('class' => 'editing_makeprivate publicprivate', 'title' => $private)
+                $private
             );                    
         }
     }
