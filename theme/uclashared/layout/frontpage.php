@@ -25,13 +25,16 @@ $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.in
                 <h4 class="server-link hidden-md hidden-lg">
                     <span class="glyphicon glyphicon-chevron-up"></span>
                     <?php echo get_config('theme_uclashared', 'system_name') ?>
-                </h4>
-                <div class="shared-server-list">
-                <?php echo get_string('setting_default_logo_sub_text', 'theme_uclashared'); ?>
-                </div>
+                </h4>                                                      
+                <?php
+                $subtextstring = get_config('theme_uclashared', 'logo_sub_text');
+                if (!empty($subtextstring)) { ?>
+                    <div class="shared-server-list">
+                        <?php echo get_string('setting_default_logo_sub_text', 'theme_uclashared'); ?>
+                    </div>
+                <?php } ?>
             </div>
         </div>
-        
     </div>
     
     <!--front page content-->
