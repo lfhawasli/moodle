@@ -270,9 +270,7 @@ class format_ucla extends format_topics {
                     ), 
                 'format_ucla'
                 );
-
-        if (ajaxenabled() && $PAGE->user_is_editing()) {
-            
+        if ($PAGE->user_is_editing()){    
             // If user is editing, load public/private plugin
             $PAGE->requires->yui_module('moodle-local_publicprivate-util', 'M.local_publicprivate.init',
                     array(array('courseid' => $this->get_courseid())));
