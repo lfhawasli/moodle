@@ -19,7 +19,7 @@ if (! $course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('coursemisconf');
 }
 
-$context = get_context_instance(CONTEXT_COURSE, $courseid);
+$context = context_course::instance($courseid);
 
 // Initialize $PAGE
 $PAGE->set_url('/blocks/ucla_subject_links/view.php', 

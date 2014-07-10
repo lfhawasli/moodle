@@ -13,7 +13,7 @@ require_once(dirname(__FILE__) . '/lib.php');
 require_login();
 
 // Set up $PAGE
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_heading(get_string('pluginname', 'tool_uclabulkcoursereset'));
 $PAGE->set_pagetype('admin-*');
 $PAGE->set_pagelayout('admin');

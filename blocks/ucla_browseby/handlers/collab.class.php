@@ -110,8 +110,7 @@ class collab_handler extends browseby_handler {
                         continue;
                     }
                     
-                    $context = $this->get_context_instance(CONTEXT_COURSE,
-                        $course->id);
+                    $context = context_course::instance($course->id);
 
                     $viewroles = $this->get_role_users($roleids, $context,
                         false, 'u.id, u.firstname, u.lastname, r.shortname');
@@ -289,10 +288,6 @@ class collab_handler extends browseby_handler {
 
     protected function get_category_tree() {
         return get_course_category_tree();
-    }
-
-    protected function get_context_instance($ct, $id) {
-        return get_context_instance($ct, $id);
     }
 
     protected function heading($heading, $level=1) {

@@ -21,7 +21,7 @@ $courseid = required_param('courseid', PARAM_INT);
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
 require_login($course, true);
-$context = get_context_instance(CONTEXT_COURSE, $courseid);
+$context = context_course::instance($courseid);
 
 // Make sure you can view this page.
 require_capability('moodle/course:update', $context);

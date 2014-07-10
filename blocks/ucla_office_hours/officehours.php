@@ -22,7 +22,7 @@ require_login($course, true);
 $edit_user = $DB->get_record('user', array('id' => $editid), '*', MUST_EXIST);
 $edit_user_name = $edit_user->firstname . ' ' . $edit_user->lastname;
 
-$context = get_context_instance(CONTEXT_COURSE, $courseid);
+$context = context_course::instance($courseid);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);

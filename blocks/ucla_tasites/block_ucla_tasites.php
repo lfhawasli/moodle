@@ -222,9 +222,9 @@ class block_ucla_tasites extends block_base {
 
         return self::can_have_tasite($user, $courseid)
             || has_capability('moodle/course:update', 
-                    get_context_instance(CONTEXT_COURSE, $courseid), $user)
+                    context_course::instance($courseid), $user)
             || require_capability('moodle/site:config', 
-                    get_context_instance(CONTEXT_SYSTEM), $user);
+                    context_system::instance(), $user);
     }
   
     /**
@@ -265,7 +265,7 @@ class block_ucla_tasites extends block_base {
             // Reference admin/enrol.php
             try {
                 require_capability('moodle/site:config', 
-                    get_context_instance(CONTEXT_SYSTEM));
+                    context_system::instance());
             } catch (moodle_exception $e) {
                 throw new block_ucla_tasites_exception('setupenrol');
             }

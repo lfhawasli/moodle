@@ -22,7 +22,7 @@ $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
 $format = course_get_format($course_id);
 
 require_login($course, true);
-$context = get_context_instance(CONTEXT_COURSE, $course_id);
+$context = context_course::instance($course_id);
 
 
 // Make sure you can view this page.
