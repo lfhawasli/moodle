@@ -6,7 +6,7 @@ Feature: Setting a landing page
 
   Background: UCLA environment and srs site exists
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
       | student1 | Student | 1 | student1@asd.com |
@@ -25,7 +25,7 @@ Feature: Setting a landing page
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds
-    And I select "landing-page-syllabus" radio button
+    And I set the field "landing-page-syllabus" to "1"
     And I press "Save changes"
     And I should see "The sections have been successfully updated."
     When I press "Return to course"
@@ -44,7 +44,7 @@ Feature: Setting a landing page
     And I follow "Modify sections"
     And I wait "2" seconds
     # Select Week 4
-    And I select "landing-page-4" radio button
+    And I set the field "landing-page-4" to "1
     And I press "Save changes"
     And I should see "The sections have been successfully updated."
     And I press "Return to course"
