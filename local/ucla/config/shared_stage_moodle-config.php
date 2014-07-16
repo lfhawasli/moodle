@@ -514,6 +514,31 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_trans'] 
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_moodle_cron'] = '/home/moodle/logs/moodlecron/moodlecron.out';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
 
+//CCLE-4587 - Set up new MathJax filter
+$CFG->forced_plugin_settings['filter_mathjaxloader']['texfiltercompatibility'] = 1;
+$CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [[\'$\',\'$\'], [\'\\\(\',\'\\\)\']],
+            processEscapes: true
+        },
+        config: ["MMLorHTML.js", "Safe.js"],
+        jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
+        extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+        TeX: {
+            extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+        },
+        menuSettings: {
+            zoom: "Double-Click",
+            mpContext: true,
+            mpMouse: true
+        },
+        errorSettings: { message: ["!"] },
+        skipStartupTypeset: true,
+        messageStyle: "none"
+    });';
+$CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
+
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
 

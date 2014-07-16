@@ -490,7 +490,7 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['texfiltercompatibility'] =
 $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
     MathJax.Hub.Config({
         tex2jax: {
-            inlineMath: [[\'$\',\'$\'], [\'\\(\',\'\\)\']],
+            inlineMath: [[\'$\',\'$\'], [\'\\\(\',\'\\\)\']],
             processEscapes: true
         },
         config: ["MMLorHTML.js", "Safe.js"],
