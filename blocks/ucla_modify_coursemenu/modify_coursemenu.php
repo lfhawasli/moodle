@@ -44,7 +44,7 @@ $format = course_get_format($course);
 $format_compstr = 'format_' . $format->get_format();
 
 require_login($course, true);
-$context = get_context_instance(CONTEXT_COURSE, $courseid);
+$context = context_course::instance($courseid);
 
 // Make sure you can view this page.
 require_capability('moodle/course:update', $context);

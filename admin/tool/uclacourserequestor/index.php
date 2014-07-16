@@ -16,7 +16,7 @@ global $DB, $ME, $USER;
 ucla_require_registrar();
 require_login();
 
-$syscontext = get_context_instance(CONTEXT_SYSTEM);
+$syscontext = context_system::instance();
 $rucr = 'tool_uclacourserequestor';
 
 // Adding 'Support Admin' capability to course requestor

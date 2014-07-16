@@ -35,7 +35,10 @@ $itemid = optional_param('itemid', '', PARAM_TEXT);
 <div style="text-align: center;">
 <?php
 echo "<script type=\"text/javascript\" src=\"{$CFG->wwwroot}/filter/poodll/flash/embed-compressed.js\"></script> ";
-$usercontextid=get_context_instance(CONTEXT_USER, $USER->id)->id;
+$usercontextid = NULL;
+if (isloggedin()) {
+    $usercontextid = context_user::instance($USER->id)->id;
+}
 // load the recorder        
 echo fetchMP3RecorderForSubmission('myfilename', $usercontextid ,'user','draft',$itemid);
 

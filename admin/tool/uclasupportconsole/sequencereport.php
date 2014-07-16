@@ -6,7 +6,7 @@ admin_externalpage_setup('reportsupportconsole');
 admin_externalpage_print_header();
 
 require_login();
-require_capability('tool/uclasupportconsole:view', get_context_instance(CONTEXT_SYSTEM));
+require_capability('tool/uclasupportconsole:view', context_system::instance());
 
 $badsections = array();
     //look up all course sections

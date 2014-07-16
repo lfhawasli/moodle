@@ -80,7 +80,7 @@ class ucla_cp_module_email_students extends ucla_cp_module {
             confirm_sesskey();
 
             require_capability('moodle/course:activityvisibility',
-                get_context_instance(CONTEXT_MODULE, $course_module->id));
+                context_module::instance($course_module->id));
 
             set_coursemodule_visible($course_module->id, true);
             rebuild_course_cache($course->id);
@@ -146,8 +146,7 @@ class ucla_cp_module_email_students extends ucla_cp_module {
             return false;
         }
 
-        $context = get_context_instance(CONTEXT_MODULE,
-            $this->course_module->id);
+        $context = context_module::instance($this->course_module->id);
 
         return has_capability($this->autocap(), $context);
     }

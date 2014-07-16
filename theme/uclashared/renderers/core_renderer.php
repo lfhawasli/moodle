@@ -151,7 +151,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                 $userlink = get_string('loggedinasguest');
                 $addloginurl = true;
             } else if (is_role_switched($course->id)) {
-                $context = get_context_instance(CONTEXT_COURSE, $course->id);
+                $context = context_course::instance($course->id);
 
                 $role = $DB->get_record('role',
                         array(
@@ -185,7 +185,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                     }
 
                     if (has_capability('coursereport/log:view',
-                                    get_context_instance(CONTEXT_SYSTEM))) {
+                                    context_system::instance())) {
                         $loginstr .= ' (' . html_writer::link(new moodle_url(
                                         '/course/report/log/index.php',
                                         array(

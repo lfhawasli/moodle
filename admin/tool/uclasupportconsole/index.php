@@ -23,7 +23,7 @@ $alldata = data_submitted();
 admin_externalpage_setup('reportsupportconsole');
 
 require_login();
-require_capability('tool/uclasupportconsole:view', get_context_instance(CONTEXT_SYSTEM));
+require_capability('tool/uclasupportconsole:view', context_system::instance());
 
 // The primary goal is to keep as much as possible in one script
 $consoles = new tool_supportconsole_manager();

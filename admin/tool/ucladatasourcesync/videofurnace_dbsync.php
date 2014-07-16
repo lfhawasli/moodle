@@ -218,7 +218,7 @@ function create_mail_object($row_data, $courseid, $course_info) {
       . $row_data[0] . '): '
       . 'VideoFurnace movies added to your class website.';
       // find and store the instructors' emails for the course for later
-      $context = get_context_instance(CONTEXT_COURSE, $courseid);
+      $context = context_course::instance($courseid);
       $get_emails_stmt->bindParam(1, $context->id);
       $get_emails_stmt->execute();
 
@@ -227,7 +227,7 @@ function create_mail_object($row_data, $courseid, $course_info) {
       ///    $get_emails_stmt = $dbh->prepare("SELECT DISTINCT $usertable.email FROM $roleassntable
       ///                                  JOIN $usertable ON $roleassntable.userid = $usertable.id
       ///                                  WHERE $roleassntable.roleid IN $roles_to_email AND $roleassntable.contextid=?");
-      ///                $context = get_context_instance(CONTEXT_COURSE, $courseid);
+      ///                $context = context_course::instance($courseid);
       ///                $get_emails_stmt->bindParam(1, $context->id);
       /// ? should be $context->id
       ///    $roles_to_email = $CFG->videofurnace_roles_to_email;

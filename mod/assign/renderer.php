@@ -685,7 +685,7 @@ class mod_assign_renderer extends plugin_renderer_base {
         // BEGIN UCLA MOD: CCLE-3652 - Students unable to see "Submission Grading" link on Assignment module
         // Show submissions grading link.
         if($status->alwaysshowdescription) {
-            $modcontext = get_context_instance(CONTEXT_MODULE, $status->coursemoduleid);
+            $modcontext = context_module::instance($status->coursemoduleid);
             $gradingmanager = get_grading_manager($modcontext, 'mod_assign', 'submissions');
             $gradingmethod = $gradingmanager->get_active_method();
             // If there is an active grading method, display link to it.

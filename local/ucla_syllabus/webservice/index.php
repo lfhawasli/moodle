@@ -38,7 +38,7 @@ $baseurl = $CFG->wwwroot . '/local/ucla_syllabus/webservice/index.php';
 
 require_login();
 
-$syscontext = get_context_instance(CONTEXT_SYSTEM);
+$syscontext = context_system::instance();
 
 $thisfile = $thisdir . 'index.php';
 

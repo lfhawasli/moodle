@@ -18,7 +18,7 @@ $baseurl = $CFG->wwwroot . '/' . $CFG->admin . '/tool/uclasiteindicator';
 
 require_login();
 
-$syscontext = get_context_instance(CONTEXT_SYSTEM);
+$syscontext = context_system::instance();
 require_capability('tool/uclasiteindicator:view', $syscontext);
 
 // Initialize $PAGE
