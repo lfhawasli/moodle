@@ -129,7 +129,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             }
 
             $realuserinfo = '';
-            if (session_is_loggedinas()) {
+            if (\core\session\manager::is_loggedinas()) {
                 $realuser = session_get_realuser();
                 $realfullname = fullname($realuser, true);
                 $dest = new moodle_url('/course/loginas.php',
