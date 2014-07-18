@@ -97,7 +97,7 @@ class tool_supportconsole_manager {
                             'class' => 'uclaconsole'
                         ));
                 $innercontent .= $OUTPUT->box($sectioncontent, 
-                    'generalbox supportconsole');
+                    'generalbox supportconsole', $titleid);
 
             }
 

@@ -76,6 +76,7 @@ $string['ccle_get_primary_srs'] = 'Get primary course srs for given discussion s
 $string['unknownstoredprocparam'] = 'This stored procedure has a unknown parameter type. This needs to be changed in code.';
 
 $string['courseregistrardifferences'] = 'Show courses with changed descriptions';
+$string['showreopenedclasses'] = "Show reopened classes";
 
 // Module
 $string['assignmentquizzesduesoon'] = 'Show courses with assignments or quizzes due soon';

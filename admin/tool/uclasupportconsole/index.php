@@ -1313,6 +1313,74 @@ if ($displayforms) {
 $consoles->push_console_html('srdb', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
+$title = "showreopenedclasses";
+$sectionhtml = '';
+
+if ($displayforms) {
+    $sectionhtml .= supportconsole_simple_form($title, get_term_selector($title));
+} else if ($consolecommand == "$title") {  # tie-in to link from name lookup
+    $term = required_param('term', PARAM_ALPHANUM);
+    $currentterm = $CFG->currentterm;
+    if (term_cmp_fn($currentterm, $term) == 1){
+        # We use a dummy row as the first column since get_records_sql will replace
+        # duplicate results with the same values in the first column
+        $sql = "SELECT  (@cnt := @cnt + 1) AS rownumber,
+                        c.id AS courseid,
+                        regc.term AS term,
+                        regc.srs AS srs,
+                        regc.subj_area AS subject_area,
+                        regc.coursenum AS course_num,
+                        regc.sectnum AS section,
+                        c.shortname AS course,
+                        regc.coursetitle AS coursetitle,
+                        regc.sectiontitle AS sectiontitle,
+                        u.lastname AS inst_lastname,
+                        u.firstname AS inst_firstname
+                FROM    {ucla_request_classes} AS reqc,
+                        {ucla_reg_classinfo} AS regc,
+                        ({role_assignments} ra
+                            JOIN {user} u ON u.id = ra.userid
+                            JOIN {role} r ON r.id = ra.roleid AND r.name = 'Instructor'
+                            JOIN {context} co ON co.id = ra.contextid
+                            RIGHT JOIN {course} c ON c.id = co.instanceid)
+                        CROSS JOIN (SELECT @cnt := 0) AS dummy
+                WHERE   reqc.term=:term AND
+                        reqc.courseid=c.id AND
+                        reqc.term=regc.term AND
+                        reqc.hostcourse=1 AND
+                        reqc.srs=regc.srs AND
+                        c.visible=1
+                ORDER BY subject_area, course_num, section";
+        $result = $DB->get_records_sql($sql, array('term' => $term));
+
+        foreach ($result as $k => $course) {
+            if (isset($course->courseid)) {
+                $course->courselink = html_writer::link(new moodle_url(
+                        '/course/view.php', array('id' => $course->courseid)
+                    ), $course->course);
+                unset($course->course);
+                $output[$k] = (object) array('courseid' => $course->courseid, 'srs' => $course->srs,
+                    'courselink' => $course->courselink, 'subject_area' => $course->subject_area, 'course_num' => $course->course_num,
+                    'section' => $course->section, 'coursetitle' => $course->coursetitle, 'sectiontitle' => $course->sectiontitle,
+                    'inst_lastname' => $course->inst_lastname, 'inst_firstname' => $course->inst_firstname);
+            }
+        }
+
+        if ($result == null){
+            $output = null;
+        }
+
+    } else {
+        $output = null;
+    }
+
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $output,
+        array('term' => $term));
+}
+
+$consoles->push_console_html('srdb', $title, $sectionhtml);
+
+////////////////////////////////////////////////////////////////////
 $title = "assignmentquizzesduesoon";
 $sectionhtml = '';
 
