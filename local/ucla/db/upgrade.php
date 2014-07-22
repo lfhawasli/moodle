@@ -478,6 +478,21 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         // Savepoint reached.
         upgrade_plugin_savepoint(true, 2014021900, 'local', 'ucla');
     }
+    
+    // CCLE-4481 - Remove Role Migration Tool
+    if ($oldversion < 2014071601) {
+        // Get role migration info.
+        $pluginman = core_plugin_manager::instance();
+        $pluginfo = $pluginman->get_plugin_info('local_rolesmigration');
+
+        // Attempt to uninstall if possible.
+        if (!is_null($pluginfo) && $pluginman->can_uninstall_plugin($pluginfo->component)) {
+            $progress = new progress_trace_buffer(new text_progress_trace(), false);
+            $pluginman->uninstall_plugin($pluginfo->component, $progress);
+            $progress->finished();
+        }
+        upgrade_plugin_savepoint(true, 2014071601, 'local', 'ucla');
+    }
 
     return $result;
 }
