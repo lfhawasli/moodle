@@ -36,7 +36,7 @@ function local_mymedia_extends_navigation($navigation) {
 
     // START UCLA MOD: CCLE-4584 - Fix get_context_instance() is deprecated
     //$context = get_context_instance(CONTEXT_USER, $USER->id);
-    $context = context_user::instance($USER->id);
+    $context = context_user::instance($USER->id, IGNORE_MISSING);
     // END UCLA MOD: CCLE-4584
 
     if ($node_home && has_capability('local/mymedia:view', $context, $USER)) {
