@@ -67,7 +67,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         $out = parent::standard_head_html();
 
         // Add mobile support with option to switch.
-        if (get_user_device_type() != 'default') {
+        if (core_useragent::get_user_device_type() != 'default') {
             $out .= '<meta name="viewport" content="width=device-width; ' .
                     'initial-scale=1.0; maximum-scale=2.0; user-scalable=1;" />' . "\n";
         }
