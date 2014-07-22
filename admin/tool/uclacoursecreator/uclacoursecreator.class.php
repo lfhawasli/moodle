@@ -26,7 +26,7 @@ require_once($CFG->dirroot  . '/' . $CFG->admin
 require_once($CFG->dirroot . '/course/lib.php');
 
 // Required for categories
-require_once($CFG->dirroot . '/course/editcategory_form.php');
+require_once($CFG->dirroot . '/course/classes/editcategory_form.php');
 
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 

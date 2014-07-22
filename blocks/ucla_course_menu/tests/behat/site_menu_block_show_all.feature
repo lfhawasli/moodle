@@ -6,7 +6,7 @@ Feature: "Show all" displays all the sections.
 
 Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
     | username | firstname | lastname | email |
     | teacher1 | Teacher | 1 | teacher1@abc.com |
     And the following ucla "sites" exists:

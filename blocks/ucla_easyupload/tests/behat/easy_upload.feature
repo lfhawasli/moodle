@@ -6,7 +6,7 @@ Feature: Easy Upload
 
   Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
     And the following ucla "sites" exists:
@@ -22,8 +22,8 @@ Feature: Easy Upload
   @javascript
   Scenario: Upload a file to the Site Info section via Control Panel
     When I follow "Upload a file"
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filepicker
-    And I fill in "Name" with "testupload1"
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
+    And I set the field "Name" to "testupload1"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
     When I press "Return to course"
@@ -32,9 +32,9 @@ Feature: Easy Upload
   @javascript
   Scenario: Upload a file to a specific Week section via Control Panel
     When I follow "Upload a file"
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filepicker
-    And I fill in "Name" with "testupload2"
-    And I select "Week 5" from "Add to section"
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
+    And I set the field "Name" to "testupload2"
+    And I set the field "Add to section" to "Week 5"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
     When I press "Return to section"
@@ -46,8 +46,8 @@ Feature: Easy Upload
   @javascript
   Scenario: Add a link via Control Panel
     When I follow "Add a link"
-    And I fill in "Enter link URL" with "www.ucla.edu"
-    And I fill in "Name" with "UCLA homepage"
+    And I set the field "Enter link URL" to "www.ucla.edu"
+    And I set the field "Name" to "UCLA homepage"
     And I press "Save changes"
     Then I should see "Successfully added link to section." in the "region-main" "region"
     When I press "Return to course"
@@ -57,12 +57,12 @@ Feature: Easy Upload
 
   Scenario: Add an activity via Control Panel
     When I follow "Add an activity"
-    And I select "Wiki" from "Activity"
+    And I set the field "Activity" to "Wiki"
     And I press "Save changes"
     Then I should see "Adding a new Wiki" in the "region-main" "region"
 
   Scenario: Add a resource via Control Panel
     When I follow "Add a resource"
-    And I select "File" from "Resource"
+    And I set the field "Resource" to "File"
     And I press "Save changes"
     Then I should see "Adding a new File" in the "region-main" "region"

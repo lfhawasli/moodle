@@ -6,7 +6,7 @@ Feature: Uploading public, preview, and private syllabi
 
 Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
     And the following ucla "sites" exists:
@@ -23,9 +23,9 @@ Background:
   @javascript
   Scenario: Uploading a UCLA public syllabus
     Given I follow "Add syllabus"
-    And I upload "lib/tests/fixtures/empty.txt" file to "File" filepicker
-    And I fill in "Display name" with "Test Syllabus"
-    And I select "UCLA community (login required)" radio button
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I set the field "Display name" to "Test Syllabus"
+    And I set the field "UCLA community (login required)" to "1"
     And I press "Save changes"
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     When I follow "Site info"
@@ -36,9 +36,9 @@ Background:
   @javascript
   Scenario: Uploading a world public syllabus
     Given I follow "Add syllabus"
-    And I upload "lib/tests/fixtures/empty.txt" file to "File" filepicker
-    And I fill in "Display name" with "Test Syllabus"
-    And I select "General public (no login required)" radio button
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I set the field "Display name" to "Test Syllabus"
+    And I set the field "UCLA community (login required)" to "1"
     And I press "Save changes"
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     When I follow "Site info"
@@ -50,10 +50,10 @@ Background:
   @javascript
   Scenario: Uploading a preview syllabus
     Given I follow "Add syllabus"
-    And I upload "lib/tests/fixtures/empty.txt" file to "File" filepicker
-    And I fill in "Display name" with "Test Syllabus"
-    And I select "UCLA community (login required)" radio button
-    And I check "This is a preview syllabus and is subject to change."
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I set the field "Display name" to "Test Syllabus"
+    And I set the field "UCLA community (login required)" to "1"
+    And I set the field "This is a preview syllabus and is subject to change." to "1"
     And I press "Save changes"
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     When I follow "Site info"
@@ -65,8 +65,8 @@ Background:
   @javascript
   Scenario: Uploading a private syllabus
     Given I follow "Add restricted syllabus"
-    And I upload "lib/tests/fixtures/empty.txt" file to "File" filepicker
-    And I fill in "Display name" with "Test Syllabus"
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I set the field "Display name" to "Test Syllabus"
     And I press "Save changes"
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     When I follow "Site info"

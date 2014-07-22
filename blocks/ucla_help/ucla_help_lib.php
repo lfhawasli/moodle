@@ -504,7 +504,7 @@ function get_support_contact($curcontext) {
             (array) get_parent_contexts($curcontext));
 
     foreach ((array) $contextids as $contextid) {
-        $context = get_context_instance_by_id($contextid);
+        $context = context::instance_by_id($contextid);
         $contextname = print_context_name($context, false, true);
         
         // see if context matches something in support_contacts list

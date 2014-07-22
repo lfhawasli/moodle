@@ -258,7 +258,7 @@ class behat_ucla extends behat_files {
                 | student | Stu | Dent | student1@asd.com |';
 
         $this->getMainContext()->getSubcontext('behat_data_generators')
-                ->the_following_exists('users', new TableNode($data));
+                ->the_following_exist('users', new TableNode($data));
 
         // Now create enrollments.
         $shortnames = array_keys($this->courses);    // Use newly created course above.

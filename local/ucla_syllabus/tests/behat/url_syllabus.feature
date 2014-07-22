@@ -6,7 +6,7 @@ Feature: Use an URL as a syllabus
 
 Background: Specifying URL as a syllabus
    Given I am in a ucla environment
-   And the following "users" exists:
+   And the following "users" exist:
        | username | firstname | lastname | email |
        | teacher1 | Teacher | 1 | teacher1@asd.com |
        | student1 | Student | 1 | student1@asd.com |
@@ -22,7 +22,7 @@ Background: Specifying URL as a syllabus
    And I turn editing mode on
    And I follow the "Syllabus (empty)" section in the ucla site menu
    When I follow "Add syllabus"
-   And I fill in "URL" with "http://ucla.edu"
+   And I set the field "URL" to "http://ucla.edu"
    And I press "Save changes"
    And I log out
 
