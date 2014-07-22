@@ -6,7 +6,7 @@ Feature: Hidden section label
 
   Background: UCLA environment and srs site exists
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
     And the following ucla "sites" exists:
