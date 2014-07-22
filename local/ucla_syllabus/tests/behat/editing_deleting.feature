@@ -6,7 +6,7 @@ Feature: Editing and deleting a syllabus
 
 Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
         | username | firstname | lastname | email |
         | teacher1 | Teacher | 1 | teacher1@asd.com |
         | student1 | Student | 1 | student1@asd.com |
@@ -22,15 +22,15 @@ Background:
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
-    And I fill in "URL" with "http://ucla.edu"
+    And I set the field "URL" to "http://ucla.edu"
     And I press "Save changes"
 
 Scenario: Editing syllabus information
     Given I should see "http://ucla.edu"
     And I should see "Syllabus"
     When I follow "Edit"
-    And I fill in "URL" with "http://www.uclabruins.com/"
-    And I fill in "Display name" with "Course outline"
+    And I set the field "URL" to "http://www.uclabruins.com/"
+    And I set the field "Display name" to "Course outline"
     And I press "Save changes"
     Then I should see "http://www.uclabruins.com/"
     And I should see "Course outline"

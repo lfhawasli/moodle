@@ -6,7 +6,7 @@ Feature: Links in site menu block
 
 Background:
    Given I am in a ucla environment
-   And the following "users" exists:
+   And the following "users" exist:
        | username | firstname | lastname | email |
        | teacher1 | Teacher | 1 | teacher1@asd.com |
        | student1 | Student | 1 | student1@asd.com |
@@ -22,8 +22,8 @@ Background:
    And I turn editing mode on
    And I follow the "Syllabus (empty)" section in the ucla site menu
    And I follow "Add syllabus"
-   And I upload "lib/tests/fixtures/empty.txt" file to "File" filepicker
-   And I fill in "Display name" with "Test Syllabus"
+   And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+   And I set the field "Display name" to "Test Syllabus"
    And I press "Save changes"
    And I log out
 
