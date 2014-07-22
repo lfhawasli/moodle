@@ -109,9 +109,6 @@ class behat_repository_upload extends behat_files {
 
         $filemanagernode = $this->get_filepicker_node($filemanagerelement);
 
-        // Wait until file manager is completely loaded.
-        $this->wait_until_contents_are_updated($filepickernode);
-
         // Opening the select repository window and selecting the upload repository.
         $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
 
@@ -130,24 +127,6 @@ class behat_repository_upload extends behat_files {
 
         // Form elements to interact with.
         $file = $this->find_file('repo_upload_file');
-
-        // Ensure all the form is ready.
-        $this->getSession()->wait(2 * 1000, false);
-        $noformexception = new ExpectationException('The upload file form is not ready', $this->getSession());
-        $this->find(
-            'xpath',
-            "//div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
-                "[contains(concat(' ', normalize-space(@class), ' '), ' repository_upload ')]" .
-                "/descendant::div[@class='fp-content']" .
-                "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-upload-form ')]" .
-                "/descendant::form",
-            $noformexception
-        );
-        // After this we have the elements we want to interact with.
-
-        // Form elements to interact with.
-        $file = $this->find_file('repo_upload_file');
-        $submit = $this->find_button(get_string('upload', 'repository'));
 
         // Attaching specified file to the node.
         // Replace 'admin/' if it is in start of path with $CFG->admin .
