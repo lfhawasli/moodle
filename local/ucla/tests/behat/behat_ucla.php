@@ -326,8 +326,8 @@ class behat_ucla extends behat_files {
         $this->getSession()->visit($this->locate_path('/login/ucla_login.php'));
 
         return array(
-            new Given('I fill in "' . get_string('username') . '" with "' . $user . '"'),
-            new Given('I fill in "' . get_string('password') . '" with "' . $user . '"'),
+            new Given('I set the field "' . get_string('username') . '" to "' . $user . '"'),
+            new Given('I set the field "' . get_string('password') . '" to "' . $user . '"'),
             new Given('I press "' . get_string('login') . '"')
         );
     }

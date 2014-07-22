@@ -4,9 +4,9 @@ Feature: Adding a section
   I need to be able to add new sections
   So that I can organize my context
 
-  Background: UCLA environment and srs site exists
+  Background: UCLA environment and srs site exist
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
     And the following ucla "sites" exists:
