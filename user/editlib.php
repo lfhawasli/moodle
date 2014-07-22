@@ -304,8 +304,7 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
     $mform->addElement('select', 'country', get_string('selectacountry'), $choices);
     if (!empty($CFG->country)) {
         $mform->setDefault('country', $CFG->country);
-    }
-    // END UCLA MOD: CCLE-2997    
+    }  
 
     $choices = get_list_of_timezones();
     $choices['99'] = get_string('serverlocaltime');
@@ -381,9 +380,6 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
 
     // Moodle optional fields.
     $mform->addElement('header', 'moodle_optional', get_string('optional', 'form'));
-    // BEGIN UCLA MOD: CCLE-3079 - User profile "Optional" section should be hidden behind "Show advanced" like in M19
-    $mform->setAdvanced('moodle_optional');
-    // END UCLA MOD: CCLE-3079
     
     $mform->addElement('text', 'url', get_string('webpage'), 'maxlength="255" size="50"');
     $mform->setType('url', PARAM_URL);
