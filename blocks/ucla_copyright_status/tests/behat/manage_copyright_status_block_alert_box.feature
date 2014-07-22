@@ -1,4 +1,4 @@
-@ucla @block_ucla_copyright_status @testme
+@ucla @block_ucla_copyright_status
 Feature: Course display alert for course content that has no copyright status yet.
     As an instructor
     when I go to a course or when I upload a file to the course, it will alert me if I have not assign copyright status to the file(s).
