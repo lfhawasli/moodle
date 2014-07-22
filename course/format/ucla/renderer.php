@@ -151,7 +151,7 @@ class format_ucla_renderer extends format_topics_renderer {
         
         $eventdata->notices = array();  // populated by external sources
 
-        events_trigger('ucla_format_notices', $eventdata);
+        events_trigger_legacy('ucla_format_notices', $eventdata);
 
         if (!empty($eventdata->notices)) {
             // until we can get a better, more compact notice display, we are
