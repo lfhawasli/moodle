@@ -103,6 +103,11 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     $logger = new core_backup_html_logger($CFG->debugdeveloper ? backup::LOG_DEBUG : backup::LOG_INFO);
     $backup->get_controller()->add_logger($logger);
 
+    // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
+    // Determine if sections will be hidden.
+    $hidesections = $backup->get_setting_value('hidesections');
+    // END UCLA MOD: CCLE-3797
+
     // First execute the backup
     $backup->execute();
     $backup->destroy();
@@ -159,8 +164,6 @@ if ($backup->get_stage() == backup_ui::STAGE_FINAL) {
     if ($restoretarget == backup::TARGET_CURRENT_DELETING || $restoretarget == backup::TARGET_EXISTING_DELETING) {
         restore_dbops::delete_course_content($course->id);
     }
-    // Execute the restore.
-    $rc->execute_plan();
 
     // BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course import.
     // If the hidesections option was selected during backup,
