@@ -66,7 +66,11 @@ class user_filtering {
             $fieldnames = array('realname' => 0, 'lastname' => 1, 'firstname' => 1, 'email' => 1, 'city' => 1, 'country' => 1,
                                 'confirmed' => 1, 'suspended' => 1, 'profile' => 1, 'courserole' => 1, 'systemrole' => 1,
                                 'cohort' => 1, 'firstaccess' => 1, 'lastaccess' => 1, 'neveraccessed' => 1, 'timemodified' => 1,
-                                'nevermodified' => 1, 'username' => 1, 'auth' => 1, 'mnethostid' => 1);
+                                // START CORE EDIT UCLA MOD CCLE-4534 - add-id-filter
+                                // Allow the user to filter out users according to their registered ID number.
+                                // 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1);
+                                'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1, 'idnumber'=>1);
+                                // END UCLA MOD CCLE-4534-add-id-filter
         }
 
         $this->_fields  = array();
