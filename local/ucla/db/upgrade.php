@@ -494,6 +494,45 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2014071601, 'local', 'ucla');
     }
 
+    //CCLE-4587 - Set up new MathJax filter
+    //Turn new MathJax on to replace old equation filters, then uninstall old MathJax.
+    if ($oldversion < 2014071500) {
+        $DB->set_field('filter_active', 'sortorder', 0, array('filter' => 'mathjaxloader'));
+        filter_set_global_state('mathjaxloader', TEXTFILTER_ON);
+
+        $courses = get_courses('all', 'c.sortorder ASC', 'c.id');
+        foreach($courses as $course) {
+            $context = context_course::instance($course->id);
+            $activefilters = filter_get_active_in_context($context);
+            //If past courses had an equation editor on, turn them off and replace 
+            //with new MathJax.
+            if(isset($activefilters['tex']) || isset($activefilters['mathjax'])) {
+                filter_set_local_state('tex', $context->id, TEXTFILTER_OFF);
+                filter_set_local_state('mathjax', $context->id, TEXTFILTER_OFF);
+                filter_set_local_state('mathjaxloader', $context->id, TEXTFILTER_ON);
+            } else {
+                //If past course didn't use an equation editor, leave new MathJax
+                //off.
+                filter_set_local_state('mathjaxloader', $context->id, TEXTFILTER_OFF);
+            }
+        }
+
+        filter_set_global_state('tex', TEXTFILTER_DISABLED);
+
+        //Get MathJax info so we can uninstall.
+        $pluginman = core_plugin_manager::instance();
+        $pluginfo = $pluginman->get_plugin_info('filter_mathjax');
+
+        // Attempt to uninstall if possible.
+        if (!is_null($pluginfo) && $pluginman->can_uninstall_plugin($pluginfo->component)) {
+            filter_set_global_state('mathjax', TEXTFILTER_DISABLED);
+            $progress = new progress_trace_buffer(new text_progress_trace(), false);
+            $pluginman->uninstall_plugin($pluginfo->component, $progress);
+            $progress->finished();
+        }
+        upgrade_plugin_savepoint(true, 2014071500, 'local', 'ucla');
+    }
+
     return $result;
 }
 
