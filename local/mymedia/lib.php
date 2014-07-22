@@ -34,7 +34,10 @@ function local_mymedia_extends_navigation($navigation) {
 
     $node_home = $navigation->get('home');
 
-    $context = get_context_instance(CONTEXT_USER, $USER->id);
+    // START UCLA MOD: CCLE-4584 - Fix get_context_instance() is deprecated
+    //$context = get_context_instance(CONTEXT_USER, $USER->id);
+    $context = context_user::instance($USER->id);
+    // END UCLA MOD: CCLE-4584
 
     if ($node_home && has_capability('local/mymedia:view', $context, $USER)) {
         $node_mymedia = $node_home->add($mymedia, new moodle_url('/local/mymedia/mymedia.php'),
