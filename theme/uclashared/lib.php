@@ -13,7 +13,7 @@
  */
 function uclashared_process_css($css, $theme) {
     global $CFG;
-    $tag = '[[font:glyphicons-halflings-regular]]';
+    $tag = '[[uclashared:font|glyphicons-halflings-regular]]';
     $replacement = $CFG->wwwroot . '/theme/uclashared/package/bootstrap/fonts/glyphicons-halflings-regular';
     $css = str_replace($tag, $replacement, $css);
     $tag = 'frontpage-image';

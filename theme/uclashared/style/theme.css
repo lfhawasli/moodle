@@ -5112,8 +5112,8 @@ a + .groupinglabel {
 
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url("[[font:glyphicons-halflings-regular]].eot");
-  src: url("[[font:glyphicons-halflings-regular]].eot?#iefix") format("embedded-opentype"), url("[[font:glyphicons-halflings-regular]].woff") format("woff"), url("[[font:glyphicons-halflings-regular]].ttf") format("truetype"), url("[[font:glyphicons-halflings-regular]].svg#glyphicons-halflingsregular") format("svg");
+  src: url("[[uclashared:font|glyphicons-halflings-regular]].eot");
+  src: url("[[uclashared:font|glyphicons-halflings-regular]].eot?#iefix") format("embedded-opentype"), url("[[uclashared:font|glyphicons-halflings-regular]].woff") format("woff"), url("[[uclashared:font|glyphicons-halflings-regular]].ttf") format("truetype"), url("[[uclashared:font|glyphicons-halflings-regular]].svg#glyphicons-halflingsregular") format("svg");
 }
 
 /* line 21, ../package/bootstrap/lib/_glyphicons.scss */

@@ -9,7 +9,7 @@
 
 
 // Mangle these vars to load fonts the Moodlerific way
-$icon-font-path:    "[[" + "font:";
+$icon-font-path:    "[[uclashared:font|";
 $icon-font-name: $icon-font-name + "]]";
 
 // After we override the vars, load from Bootstrap
