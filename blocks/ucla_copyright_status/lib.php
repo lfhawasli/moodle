@@ -247,10 +247,9 @@ function display_copyright_status_contents($courseid, $filter) {
     $helpicon = html_writer::link(new moodle_url('/help.php',
                 array('component' => 'local_ucla', 'identifier' => 'license',
                       'lang' => 'en')),
-            html_writer::empty_tag('img', array('class' => 'iconhelp',
-                'alt' => get_string('copyrightstatushelp', 'block_ucla_copyright_status'),
-                'src' => new moodle_url('/theme/image.php', array('theme' => 'uclashared',
-                                        'image' => 'help')))),
+            html_writer::img(new moodle_url('/theme/image.php', array('theme' => 'uclashared', 'image' => 'help')),
+                    get_string('copyrightstatushelp', 'block_ucla_copyright_status'),
+                    array('class' => 'iconhelp')),
             array('target' => '_blank'));
     $t->head = array(get_string('copyrightstatus', 'block_ucla_copyright_status')
         . ' ' . $helpicon,

@@ -639,13 +639,10 @@ class format_ucla_renderer extends format_topics_renderer {
         $url = new moodle_url('/course/editsection.php', 
                 array('id'=> $section->id, 'sr' => $section->section));
         
-        $controls[0] = html_writer::link($url, html_writer::empty_tag('img', 
-                    array('src' => $this->output->pix_url('t/edit'),
-                        'class' => 'icon edit', 
-                        'alt' => get_string('editsectiontitle', 'format_ucla'))
-                        ),
-                    array('title' => get_string('editsectiontitle', 'format_ucla'), 
-                        'class' => 'editing_section'));
+        $controls[0] = html_writer::link($url, html_writer::img($this->output->pix_url('t/edit'),
+                get_string('editsectiontitle', 'format_ucla'), array('class' => 'icon edit')),
+                array('title' => get_string('editsectiontitle', 'format_ucla'), 
+                      'class' => 'editing_section'));
 
         return $controls;
     }

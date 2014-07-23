@@ -300,8 +300,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         // Get UCLA logo image.
         $pixurl = $this->pix_url($pix, $pixloc);
         $logoalt = get_string('UCLA_CCLE_text', 'theme_uclashared');
-        $logoimg = html_writer::empty_tag('img',
-                        array('src' => $pixurl, 'alt' => $logoalt));
+        $logoimg = html_writer::img($pixurl, $logoalt);
 
         // Build new logo in a single link.
         $link = html_writer::link($address,

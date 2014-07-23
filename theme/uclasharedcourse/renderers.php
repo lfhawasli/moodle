@@ -38,7 +38,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
             
             $pix_url = $this->pix_url($pix, $this->theme);
             $logo_alt = $COURSE->fullname; //get_string('UCLA_CCLE_text', 'theme_uclashared');
-            $logo_img = html_writer::empty_tag('img', array('src' => $pix_url, 'alt' => $logo_alt));
+            $logo_img = html_writer::img($pix_url, $logo_alt);
             $alternative_logo = html_writer::link($address, $logo_img);
         }
 
@@ -162,7 +162,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
         $out = '';
         if(!empty($logos)) {
             $pix_url = $this->pix_url('logo_divider', $this->theme);
-            $img = html_writer::empty_tag('img', array('src' => $pix_url));
+            $img = html_writer::img($pix_url, null);
             $divider = html_writer::tag('div', $img, array('class' => 'uclashared-course-logo-divider'));
             $out .= $divider;
             
@@ -184,9 +184,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
                 $url = "{$CFG->wwwroot}/pluginfile.php/{$logo->get_contextid()}/{$this->component}/{$this->filearea}";
                 $fileurl = $url . $logo->get_filepath() . $logo->get_itemid() . '/' . $logo->get_filename();
                 
-                $img = html_writer::empty_tag('img', array(
-                    'src' => $fileurl,
-                ));
+                $img = html_writer::img($fileurl, null);
                 
                 $div = html_writer::tag('div', $img, array('class' => 'uclashared-course-logo'));
                 $out .= $div;
@@ -213,7 +211,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         // Show logo guide
         $pix_url = $this->pix_url('guide', 'theme');
-        $img = html_writer::empty_tag('img', array('src' => $pix_url));
+        $img = html_writer::img($pix_url, null);
         $mform->addElement('static', 'description', '', $img);
 
         // Check if we already have images
