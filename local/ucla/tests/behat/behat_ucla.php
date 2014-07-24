@@ -106,7 +106,7 @@ class behat_ucla extends behat_files {
      * NOTE: If you are creating activities, make sure to also set the idnumber
      * field.
      *
-     * @Given /^the following ucla "([^"]*)" exists:$/
+     * @Given /^the following ucla "([^"]*)" exist:$/
      *
      * @param string $elementname
      * @param TableNode $data
@@ -167,16 +167,18 @@ class behat_ucla extends behat_files {
 
     /**
      * Step to browse directly to a site with a given shortname.
-     * 
-     * @Given /^I browse to site "([^"]*)"$/
      *
+     * @deprecated since 2.7
+     * @see behat_ucla::i_browse_to_site()
+     *
+     * @Given /^I browse to site "([^"]*)"$/
+     * @throws ElementNotFoundException
      * @param string $shortname
-     * @deprecated Since we can now specify fullname of a course in the UCLA
-     * data generator, we can use the regular 'I follow "course fullname"' step.
      */
-    public function i_browse_to_site($shortname) {
-        $courseid = $this->courses[$shortname]->id;
-        $this->getSession()->visit($this->locate_path('/course/view.php?id=' . $courseid));
+    public function i_browse_to_site($elementname) {
+        $alternative = 'I follow "course 1"';
+        $this->deprecated_message($alternative);
+        return new Given($alternative);
     }
 
     /**
@@ -240,11 +242,11 @@ class behat_ucla extends behat_files {
      * Generates a single UCLA site.  The site will have two enrolled
      * users, a student and an editing instructor.
      * 
-     * @Given /^a ucla "([^"]*)" site exists$/
+     * @Given /^a ucla "([^"]*)" site exist$/
      * 
      * @param string $site type for a collab site, or 'class' for an SRS site
      */
-    public function ucla_site_exists($site) {
+    public function ucla_site_exist($site) {
         global $DB;
 
         $data = "| shortname | type |
@@ -316,20 +318,17 @@ class behat_ucla extends behat_files {
     /**
      * A log-in step that uses the UCLA special case login page.
      * 
-     * @Given /^I log in as ucla "([^"]*)"$/
+     * @deprecated since 2.7
+     * @see behat_ucla::i_login_as_ucla_user()
      *
+     * @Given /^I log in as ucla "([^"]*)"$/
+     * @throws ElementNotFoundException
      * @param string $user
-     * @return array
      */
     public function i_login_as_ucla_user($user) {
-        // Use UCLA special case login page.
-        $this->getSession()->visit($this->locate_path('/login/ucla_login.php'));
-
-        return array(
-            new Given('I set the field "' . get_string('username') . '" to "' . $user . '"'),
-            new Given('I set the field "' . get_string('password') . '" to "' . $user . '"'),
-            new Given('I press "' . get_string('login') . '"')
-        );
+        $alternative = 'I log in as "' . $this->escape($user) . '"';
+        $this->deprecated_message($alternative);
+        return new Given($alternative);
     }
 
     /**
@@ -445,11 +444,73 @@ class behat_ucla extends behat_files {
     public function i_add_an_assignment_and_fill_the_form_with(TableNode $data) {
         return array(
             new Given('I follow "' . get_string('addresourceoractivity') . '"'),
-            new Given ('I select "Assignment" radio button'),
+            new Given ('I set the field "Assignment" to "1"'),
             new Given('I press "Add"'),
-            new Given('I fill the moodle form with:', $data),
+            new Given('I set the following fields to these values:', $data),
             new Given('I press "' . get_string('savechangesanddisplay') . '"')
         );
+    }
+
+    /**
+     * Throws an exception if $CFG->behat_usedeprecated is not allowed.
+     *
+     * @throws Exception
+     * @param string|array $alternatives Alternative/s to the requested step
+     * @return void
+     */
+    protected function deprecated_message($alternatives) {
+        global $CFG;
+
+        // We do nothing if it is enabled.
+        if (!empty($CFG->behat_usedeprecated)) {
+            return;
+        }
+
+        if (is_scalar($alternatives)) {
+            $alternatives = array($alternatives);
+        }
+
+        $message = 'Deprecated step, rather than using this step you can use:';
+        foreach ($alternatives as $alternative) {
+            $message .= PHP_EOL . '- ' . $alternative;
+        }
+        $message .= PHP_EOL . '- Set $CFG->behat_usedeprecated in config.php to allow the use of deprecated steps if you don\'t have any other option';
+        throw new Exception($message);
+    }
+
+    /**
+     * Step to generate UCLA SRS + collab sites, and enrolments.
+     *
+     * @deprecated since 2.7
+     * @see behat_ucla::the_following_exists()
+     *
+     * @Given /^the following ucla "([^"]*)" exists:$/
+     * @throws Exception
+     * @throws PendingException
+     * @param string $elementname
+     * @param TableNode $data
+     */
+    public function the_following_ucla_exists($elementname, TableNode $data) {
+        $alternative = 'the following ucla "' . $this->escape($elementname) . '" exist:';
+        $this->deprecated_message($alternative);
+        return new Given($alternative, $data);
+    }
+
+    /**
+     * Generates a single UCLA site.  The site will have two enrolled
+     * users, a student and an editing instructor.
+     * 
+     * @deprecated since 2.7
+     * @see behat_ucla::ucla_site_exist()
+     *
+     * @Given /^a ucla "([^"]*)" site exists$/
+     * @throws ElementNotFoundException
+     * @param string $site type for a collab site, or 'class' for an SRS site
+     */
+    public function ucla_site_exists($site) {
+        $alternative = 'a ucla "' . $this->escape($site) . '" site exist';
+        $this->deprecated_message($alternative);
+        return new Given($alternative);
     }
 
 }
