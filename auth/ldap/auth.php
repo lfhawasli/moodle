@@ -834,8 +834,6 @@ class auth_plugin_ldap extends auth_plugin_base {
                     $updateuser->suspended = 0;
                     user_update_user($updateuser, false);
                     echo "\t"; print_string('auth_dbreviveduser', 'auth_db', array('name'=>$user->username, 'id'=>$user->id)); echo "\n";
-                    $euser = $DB->get_record('user', array('id' => $user->id));
-                    events_trigger('user_updated', $euser);
                 }
             } else {
                 print_string('nouserentriestorevive', 'auth_ldap');
@@ -1030,10 +1028,6 @@ class auth_plugin_ldap extends auth_plugin_base {
                     }
                 }
                 user_update_user($newuser, false);
-            }
-            if (!empty($updatekeys)) {
-                $euser = $DB->get_record('user', array('id' => $userid));
-                events_trigger('user_updated', $euser);
             }
         } else {
             return false;
