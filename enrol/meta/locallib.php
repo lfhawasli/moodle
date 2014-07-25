@@ -180,7 +180,7 @@ class enrol_meta_handler {
         }
 
         // START UCLA MOD: CCLE-2386 - TA Site Creator
-        // see if we need to promote a role (but do so only for TA sites)
+        // See if we need to promote a role. (but do so only for TA sites)
         $is_tasite = block_ucla_tasites::is_tasite_enrol_meta_instance($instance);
         if ($is_tasite) {
             $promoroleid = isset($instance->customint2)
@@ -482,7 +482,7 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $ra) {
         // START UCLA MOD: CCLE-2386 - TA Site Creator
-        // check if working with meta enrollment plugin for tasites
+        // Check if working with meta enrollment plugin for tasites.
         $enrol = new stdClass();
         $enrol->id = $ra->enrolid;
         $enrol->customint2 = $ra->promoroleid;
@@ -542,6 +542,29 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
     if ($unenrolaction != ENROL_EXT_REMOVED_SUSPEND) {
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach($rs as $ra) {
+            // START UCLA MOD: CCLE-2386 - TA Site Creator
+            // Check if working with meta enrollment plugin for tasites.
+            $enrol = new stdClass();
+            $enrol->id = $ra->enrolid;
+            $enrol->customint2 = $ra->promoroleid;
+            $enrol->customint3 = $ra->promotoroleid;
+            $enrol->customint4 = $ra->promouserid;
+            $is_tasite = block_ucla_tasites::is_tasite_enrol_meta_instance($enrol);
+            // Check to make sure the role was NOT a promoted role.
+            if ($is_tasite && isset($ra->unpromoroleid)) {
+                $checkra = clone($ra);
+                $checkra->roleid = $ra->unpromoroleid;
+                if ($ra->roleid == enrol_meta_plugin::get_role_promotion($checkra)) {
+                    $skip = true;
+                }
+                unset($check);
+                if (isset($skip)) {
+                    unset($skip);
+                    continue;
+                }
+            }
+            // END UCLA MOD: CCLE-2386
+
             role_unassign($ra->roleid, $ra->userid, $ra->contextid, 'enrol_meta', $ra->itemid);
             if ($verbose) {
                 mtrace("  unassigning role: $ra->userid ==> $ra->courseid as ".$allroles[$ra->roleid]->shortname);
