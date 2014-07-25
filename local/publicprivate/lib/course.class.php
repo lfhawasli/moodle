@@ -450,7 +450,7 @@ class PublicPrivate_Course {
             throw new PublicPrivate_Course_Exception('Illegal action trying to add enrolled where public/private is not active.', 400);
         }
 
-        $context = get_context_instance(CONTEXT_COURSE, $this->_course->id);
+        $context = context_course::instance($this->_course->id);
 
         /*
          * Add users with an explicit assignment to public/private group.

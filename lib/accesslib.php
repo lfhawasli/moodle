@@ -1956,7 +1956,7 @@ function role_unassign_all(array $params, $subcontexts = false, $includemanual =
     }
 
     if(!isset($context)) {
-        $context = get_context_instance_by_id($params['contextid']);
+        $context = context::instance_by_id($params['contextid']);
     }
     
     if($context->contextlevel == CONTEXT_COURSE && !$DB->record_exists('role_assignments', array('userid'=>$params['userid'], 'contextid'=>$params['contextid']))) {
