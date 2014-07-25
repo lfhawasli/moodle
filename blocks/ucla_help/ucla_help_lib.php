@@ -501,11 +501,11 @@ function get_support_contact($curcontext) {
 
    // get list of contexts to check
     $contextids = array_merge((array) $curcontext->id,
-            (array) get_parent_contexts($curcontext));
+            (array) $curcontext->get_parent_context_ids());
 
     foreach ((array) $contextids as $contextid) {
         $context = context::instance_by_id($contextid);
-        $contextname = print_context_name($context, false, true);
+        $contextname = $context->get_context_name(false, true);
         
         // see if context matches something in support_contacts list
         if (!empty($supportcontacts[$contextname])) {
