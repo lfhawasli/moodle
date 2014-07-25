@@ -7,7 +7,7 @@ Feature: Return after creation
 @javascript
 Scenario: Adding a resource
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
        | username | firstname | lastname | email |
        | teacher1 | Teacher | 1 | teacher1@asd.com |
     And the following ucla "sites" exists:
@@ -21,9 +21,9 @@ Scenario: Adding a resource
     And I turn editing mode on
     When I follow the "Week 1" section in the ucla site menu
     And I follow "Add an activity or resource"
-    And I select "Page" radio button
+    And I set the field "Page" to "1"
     And I press "Add"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
        | Name | newpage |
        | Page content | lorem ipsum |
     And I press "Save and return to course"
