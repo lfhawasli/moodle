@@ -216,7 +216,7 @@ class grade_report_grader extends grade_report {
                         // START UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
                         // Reference from UMass Amherst.
                         // Compare the current user's page loading time again the last modified time in DB.
-                        if($data->currenttime < $oldvalue->timemodified) {
+                        if(isset($data->currenttime) && $data->currenttime < $oldvalue->timemodified) {
                             $warnings[] = get_string('errorsavegradestaled', 'gradereport_grader');
                             return $warnings;
                         }
