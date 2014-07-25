@@ -527,7 +527,14 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
     } else {
         $notignored = "";
     }
-
+    // START UCLA MOD: CCLE-2386 - TA Site Creator
+//    $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid, e.courseid
+//              FROM {role_assignments} ra
+//              JOIN {enrol} e ON (e.id = ra.itemid AND ra.component = 'enrol_meta' AND e.enrol = 'meta' $onecourse)
+//              JOIN {context} pc ON (pc.instanceid = e.customint1 AND pc.contextlevel = :coursecontext)
+//         LEFT JOIN {role_assignments} pra ON (pra.contextid = pc.id AND pra.userid = ra.userid AND pra.roleid = ra.roleid AND pra.component <> 'enrol_meta' $notignored)
+//         LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = ra.userid AND ue.status = :activeuser)
+//             WHERE pra.id IS NULL OR ue.id IS NULL OR e.status <> :enabledinstance";
     $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid, e.courseid
         , e.id AS enrolid, e.customint2 AS promoroleid, e.customint3 AS promotoroleid, e.customint4 AS promouserid, spra.roleid AS unpromoroleid
               FROM {role_assignments} ra
