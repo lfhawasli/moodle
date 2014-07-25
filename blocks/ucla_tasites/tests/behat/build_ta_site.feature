@@ -6,16 +6,16 @@ Feature: Build TA Site
 
 Background:
    Given I am in a ucla environment
-   And the following "users" exists:
+   And the following "users" exist:
       | username | firstname | lastname | email |
       | student1 | Student | 1 | student1@asd.com |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
       | ta2 | TA | 2 | ta2@asd.com |
       | ta1 | TA | 1 | ta1@asd.com |
-   And the following ucla "sites" exists:
+   And the following ucla "sites" exist:
       | fullname | shortname | type |
       | Test course 1 | C1 | srs |
-   And the following ucla "enrollments" exists:
+   And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | ta2 | C1 | ta_admin |

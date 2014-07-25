@@ -5,6 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . '/enrol/meta/locallib.php');
 
 /**
  *  Class that contains the library of function calls that control logic
@@ -388,8 +389,7 @@ class block_ucla_tasites extends block_base {
             'customint4' => $tainfo->id
         ));
 
-        $meta->course_updated(false, $course, null);
-
+        enrol_meta_sync($course->id);
         return $newcourse;
     }
 
