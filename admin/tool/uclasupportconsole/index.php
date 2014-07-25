@@ -1694,7 +1694,7 @@ if ($displayforms) {
             if ($result->component == '') {
                 $result->component = 'manual';
             }
-            $result->contextlevel = get_contextlevel_name($result->contextlevel);
+            $result->contextlevel = context_helper::get_level_name($result->contextlevel);
         }
 
         $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
