@@ -139,7 +139,7 @@ class ucla_syllabus_manager {
         $data->access_type = $syllabus->access_type;
 
         // Trigger necessary events.
-        events_trigger('ucla_syllabus_deleted', $data);
+        events_trigger_legacy('ucla_syllabus_deleted', $data);
     }
 
     /**
@@ -188,8 +188,8 @@ class ucla_syllabus_manager {
         $olddata->access_type = $syllabus->access_type;
 
         // Trigger events.
-        events_trigger('ucla_syllabus_deleted', $olddata);
-        events_trigger('ucla_syllabus_added', $data);
+        events_trigger_legacy('ucla_syllabus_deleted', $olddata);
+        events_trigger_legacy('ucla_syllabus_added', $data);
     }
 
     /**
@@ -487,7 +487,7 @@ class ucla_syllabus_manager {
                 $recordid, $this->filemanagerconfig);
 
         // No errors, so trigger events.
-        events_trigger($eventname, $recordid);
+        events_trigger_legacy($eventname, $recordid);
 
         // Everything completed, so see if manual syllabus was converted.
         if (!empty($data->manualsyllabus)) {

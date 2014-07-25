@@ -433,7 +433,7 @@ if ($processrequests) {
         }
 
         $termlist = array_unique($termlist);
-        events_trigger('build_courses_now', $termlist);
+        events_trigger_legacy('build_courses_now', $termlist);
     }
    
     $tabledata = prepare_requests_for_display($requeststodisplay, $groupid);

@@ -387,7 +387,7 @@ if ($uploadform->is_cancelled()) {
     $eventdata->cmid       = $data->coursemodule;
     $eventdata->courseid   = $data->course_id;
     $eventdata->userid     = $USER->id;
-    events_trigger('mod_created', $eventdata);    
+    events_trigger_legacy('mod_created', $eventdata);    
     
     rebuild_course_cache($course_id);
 }
