@@ -2230,7 +2230,14 @@ if ($displayforms) {
                    GROUP BY m.course";
 
         // Table of instructors and contact info.
-        $instrsql = "SELECT ra.id, c.id AS courseid, u.firstname, u.lastname, u.email
+        $instrsql = "SELECT ra.id, c.id AS courseid, 
+                            u.firstname,
+                            u.lastname,
+                            u.email,
+                            u.firstnamephonetic,
+                            u.lastnamephonetic,
+                            u.middlename,
+                            u.alternatename
                        FROM {role_assignments} ra
                        JOIN {user} u ON ra.userid = u.id
                        JOIN {role} r ON ra.roleid = r.id
