@@ -72,6 +72,8 @@ class behat_ucla extends behat_files {
 
         // Set the UCLA theme.
         set_config('theme', 'uclashared');
+        // Restrict UCLA theme.
+        set_config('themelist', 'uclashared,uclasharedcourse');
         // Set public/private.
         set_config('enablepublicprivate', 1);
         set_config('enablegroupmembersonly', 1);

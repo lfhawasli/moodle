@@ -300,24 +300,16 @@ class course_edit_form extends moodleform {
 
         // Appearance.
         $mform->addElement('header', 'appearancehdr', get_string('appearance'));
-
         if (!empty($CFG->allowcoursethemes)) {
             $themeobjects = get_list_of_themes();
             $themes=array();
             $themes[''] = get_string('forceno');
             foreach ($themeobjects as $key=>$theme) {
-                // START UCLA MOD: CCLE-2315 - CUSTOM DEPARTMENT THEMES
-                // Only allow UCLA specific themes.
-                if ($key != 'uclashared' && $key != 'uclasharedcourse') {
-                    continue;
-                }
-                // END UCLA MOD CCLE-2315
                 if (empty($theme->hidefromselector)) {
                     $themes[$key] = get_string('pluginname', 'theme_'.$theme->name);
                 }
             }
             $mform->addElement('select', 'theme', get_string('forcetheme'), $themes);
-
             // START UCLA MOD: CCLE-2315 - CUSTOM DEPARTMENT THEMES
             // If we're using the uclasharedcourse theme, we want to allow a course
             // to upload extra logos.
@@ -520,7 +512,7 @@ class course_edit_form extends moodleform {
             $editcoursetheme = false;
             if (!empty($context) && has_capability('local/ucla:editcoursetheme', $context)) {
                 // Only allow collab sites to change themes.
-                $indicator = siteindicator_site::load($mform->getElementValue('id'));                
+                $indicator = siteindicator_site::load($mform->getElementValue('id'));
                 if ((!empty($indicator))) {
                     $editcoursetheme = true;
                 }
