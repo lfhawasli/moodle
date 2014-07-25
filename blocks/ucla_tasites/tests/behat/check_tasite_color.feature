@@ -25,7 +25,7 @@ Scenario: Check color for menu block is different
     And I follow "Test course 1"
     And I press "Control Panel"
     When I follow "TA sites"
-    And I select "Create TA site for 1, TA" radio button
+    And I set the field "Create TA site for 1, TA" to "1"
     And I press "Save changes"
     And I press "Yes"
     And I should see "was successfully built"
