@@ -128,6 +128,11 @@ if ($editform->is_cancelled()) {
         // In creating the course.
         $course = create_course($data, $editoroptions);
 
+        // START UCLA MOD CCLE-2389 - update site indicator
+        $data->id = $course->id; // new course was created
+        siteindicator_manager::update_site($data);
+        // END UCLA MOD CCLE-2389 
+
         // Get the context of the newly created course.
         $context = context_course::instance($course->id, MUST_EXIST);
 

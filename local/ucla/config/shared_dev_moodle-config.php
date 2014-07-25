@@ -387,6 +387,7 @@ $CFG->minpasswordnonalphanum = 0;
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
+$CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->themedesignermode = 1;
 $CFG->allowcoursethemes = 1;
 

@@ -376,6 +376,7 @@ $CFG->clamfailureonupload = 'donothing';
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
+$CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
 
 // Site administration > Appearance > Navigation
