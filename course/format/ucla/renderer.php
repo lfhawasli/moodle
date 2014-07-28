@@ -56,9 +56,6 @@ class format_ucla_renderer extends format_topics_renderer {
     
     // strings to generate jit links
     private $jit_links = array();
-    
-    // edit icons style preference
-    private $noeditingicons;
 
     // How many crosslists to limit for display
     const MAX_CROSSLIST_SHOWN = 5;
@@ -92,8 +89,6 @@ class format_ucla_renderer extends format_topics_renderer {
                                  'link' => get_string('link', 'format_ucla'),
                                  'text' => get_string('text', 'format_ucla'),
                                  'subheading' => get_string('subheading', 'format_ucla'));     
-        
-        $this->noeditingicons = get_user_preferences('noeditingicons', 1);
         
         // Use the public/private renderer.  This will permit us to override the
         // way we render course modules
@@ -680,11 +675,6 @@ class format_ucla_renderer extends format_topics_renderer {
             }
         }
         
-        // Apply section edit style
-        if($this->noeditingicons) {
-            $sectionstyle .= ' text-icons';
-        }
-
         $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
             'class' => 'section main clearfix'.$sectionstyle));
 
@@ -734,8 +724,7 @@ class format_ucla_renderer extends format_topics_renderer {
      * @return html
      */
     protected function start_section_list() {
-        $noeditingicons = get_user_preferences('noeditingicons', 1);
-        $classes = $noeditingicons ? 'ucla-format text-icons' : 'ucla-format';
+        $classes = 'ucla-format';
         return html_writer::start_tag('ul', array('class' => $classes));
     } 
 

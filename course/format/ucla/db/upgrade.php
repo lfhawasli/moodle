@@ -104,5 +104,13 @@ function xmldb_format_ucla_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013101600, 'format', 'ucla');
     }
 
+    // Delete noeditingicons preference for the user.
+    // CCLE-4604
+    if ($oldversion < 2014073100) {
+        $DB->delete_records('user_preferences', array('name' => 'noeditingicons'));
+
+        upgrade_plugin_savepoint(true, 2014073100, 'format', 'ucla');
+    }
+
     return true;
 }
