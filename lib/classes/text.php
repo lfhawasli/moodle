@@ -256,7 +256,7 @@ class core_text {
      * @param string $needle The string to find in haystack.
      * @param boolean $part If true, returns the portion before needle, else return the portion after (including needle).
      * @return string|false False when not found.
-     * @since 2.4.6, 2.5.2, 2.6
+     * @since Moodle 2.4.6, 2.5.2, 2.6
      */
     public static function strrchr($haystack, $needle, $part = false) {
 
@@ -376,6 +376,18 @@ class core_text {
         } else {
             return iconv_strrpos($haystack, $needle, 'UTF-8');
         }
+    }
+
+    /**
+     * Reverse UTF-8 multibytes character sets (used for RTL languages)
+     * (We only do this because there is no mb_strrev or iconv_strrev)
+     *
+     * @param string $str the multibyte string to reverse
+     * @return string the reversed multi byte string
+     */
+    public static function strrev($str) {
+        preg_match_all('/./us', $str, $ar);
+        return join('', array_reverse($ar[0]));
     }
 
     /**
