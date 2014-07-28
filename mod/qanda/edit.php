@@ -136,7 +136,19 @@ if ($mform->is_cancelled()) {
             $completion->update_state($cm, COMPLETION_COMPLETE);
         }
 
-        add_to_log($course->id, "qanda", "add entry", "view.php?id=$cm->id&amp;mode=entry&amp;hook=$entry->id", $entry->id, $cm->id);
+        // Create the event, trigger it.
+        $event = \mod_qanda\event\entry_added::create(array(
+            'courseid' => $course->id,
+            'context'  => context_module::instance($cm->id),
+            'objectid' => $entry->id,
+            'other'    => array(
+                'modulename' => $cm->modname,
+                'name'       => $cm->name,
+                'instanceid' => $cm->id
+            )
+        ));
+        $event->trigger();
+
     } else {
         //existing entry
         $DB->update_record('qanda_entries', $entry);
