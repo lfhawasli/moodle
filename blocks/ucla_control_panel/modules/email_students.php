@@ -19,10 +19,10 @@ defined('MOODLE_INTERNAL') || die();
 class ucla_cp_module_email_students extends ucla_cp_module {
     function __construct($course) {
         global $CFG, $DB;
-        
+
         // See if we want to do stuff
         $unhide = optional_param('unhide', false, PARAM_INT);
-      
+
         // Get all the forums
         $course_forums = $DB->get_records('forum', 
             array('course' => $course->id, 'type' => 'news'));
@@ -70,27 +70,24 @@ class ucla_cp_module_email_students extends ucla_cp_module {
                 }
             }
         } 
-        
+
         if (is_null($course_module)) {
             debugging('could not find one news forum');
             return false;
         }
 
-        if ($unhide !== false) {
-            confirm_sesskey();
-
-            require_capability('moodle/course:activityvisibility',
-                context_module::instance($course_module->id));
-
+        if ($unhide !== false && confirm_sesskey()) {
+            $modcontext = context_module::instance($course_module->id);
+            require_capability('moodle/course:activityvisibility', $modcontext);
             set_coursemodule_visible($course_module->id, true);
-            rebuild_course_cache($course->id);
-
-            $course_module->visible = '1';
+            \core\event\course_module_updated::create_from_cm($course_module, $modcontext)->trigger();
+            // Get updated version of course module.
+            $course_module = get_fast_modinfo($course->id)->get_cm($course_module->id);
         }
-                
+
         if ($course_module->visible == '1') {
             // This means that the forum is fine
-            $init_action = new moodle_url($CFG->wwwroot 
+            $init_action = new moodle_url($CFG->wwwroot
                 . '/mod/forum/post.php',
                 array('forum' => $target_forum->id));
         } else {
