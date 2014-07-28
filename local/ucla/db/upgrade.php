@@ -479,23 +479,8 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2014021900, 'local', 'ucla');
     }
     
-    // CCLE-4481 - Remove Role Migration Tool
-    if ($oldversion < 2014071601) {
-        // Get role migration info.
-        $pluginman = core_plugin_manager::instance();
-        $pluginfo = $pluginman->get_plugin_info('local_rolesmigration');
-
-        // Attempt to uninstall if possible.
-        if (!is_null($pluginfo) && $pluginman->can_uninstall_plugin($pluginfo->component)) {
-            $progress = new progress_trace_buffer(new text_progress_trace(), false);
-            $pluginman->uninstall_plugin($pluginfo->component, $progress);
-            $progress->finished();
-        }
-        upgrade_plugin_savepoint(true, 2014071601, 'local', 'ucla');
-    }
-
-    //CCLE-4587 - Set up new MathJax filter
-    //Turn new MathJax on to replace old equation filters, then uninstall old MathJax.
+    // CCLE-4587 - Set up new MathJax filter
+    // Turn new MathJax on to replace old equation filters, then uninstall old MathJax.
     if ($oldversion < 2014071500) {
         $DB->set_field('filter_active', 'sortorder', 0, array('filter' => 'mathjaxloader'));
         filter_set_global_state('mathjaxloader', TEXTFILTER_ON);
@@ -504,8 +489,8 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         foreach($courses as $course) {
             $context = context_course::instance($course->id);
             $activefilters = filter_get_active_in_context($context);
-            //If past courses had an equation editor on, turn them off and replace 
-            //with new MathJax.
+            // If past courses had an equation editor on, turn them off and
+            // replace with new MathJax.
             if(isset($activefilters['tex']) || isset($activefilters['mathjax'])) {
                 filter_set_local_state('tex', $context->id, TEXTFILTER_OFF);
                 filter_set_local_state('mathjax', $context->id, TEXTFILTER_OFF);
@@ -519,7 +504,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
 
         filter_set_global_state('tex', TEXTFILTER_DISABLED);
 
-        //Get MathJax info so we can uninstall.
+        // Get MathJax info so we can uninstall.
         $pluginman = core_plugin_manager::instance();
         $pluginfo = $pluginman->get_plugin_info('filter_mathjax');
 
@@ -531,6 +516,21 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
             $progress->finished();
         }
         upgrade_plugin_savepoint(true, 2014071500, 'local', 'ucla');
+    }
+
+    // CCLE-4481 - Remove Role Migration Tool
+    if ($oldversion < 2014071601) {
+        // Get role migration info.
+        $pluginman = core_plugin_manager::instance();
+        $pluginfo = $pluginman->get_plugin_info('local_rolesmigration');
+
+        // Attempt to uninstall if possible.
+        if (!is_null($pluginfo) && $pluginman->can_uninstall_plugin($pluginfo->component)) {
+            $progress = new progress_trace_buffer(new text_progress_trace(), false);
+            $pluginman->uninstall_plugin($pluginfo->component, $progress);
+            $progress->finished();
+        }
+        upgrade_plugin_savepoint(true, 2014071601, 'local', 'ucla');
     }
 
     return $result;
