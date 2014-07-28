@@ -645,7 +645,7 @@ class core_renderer extends renderer_base {
                 $loggedinas = get_string('loggedinas', 'moodle', $username).$rolename;
                 if ($withlinks) {
                     $url = new moodle_url('/course/switchrole.php', array('id'=>$course->id,'sesskey'=>sesskey(), 'switchrole'=>0, 'returnurl'=>$this->page->url->out_as_local_url(false)));
-                    $loggedinas .= '('.html_writer::tag('a', get_string('switchrolereturn'), array('href'=>$url)).')';
+                    $loggedinas .= ' ('.html_writer::tag('a', get_string('switchrolereturn'), array('href' => $url)).')';
                 }
             } else {
                 $loggedinas = $realuserinfo.get_string('loggedinas', 'moodle', $username);
@@ -674,8 +674,8 @@ class core_renderer extends renderer_base {
                         $a->attempts = $count;
                         $loggedinas .= get_string('failedloginattempts', '', $a);
                         if (file_exists("$CFG->dirroot/report/log/index.php") and has_capability('report/log:view', context_system::instance())) {
-                            $loggedinas .= html_writer::link(new moodle_url('/report/log/index.php', array('chooselog' => 1,
-                                    'id' => 0 , 'modid' => 'site_errors')), '(' . get_string('logs') . ')');
+                            $loggedinas .= ' ('.html_writer::link(new moodle_url('/report/log/index.php', array('chooselog' => 1,
+                                    'id' => 0 , 'modid' => 'site_errors')), get_string('logs')).')';
                         }
                         $loggedinas .= '</div>';
                     }
@@ -2896,7 +2896,7 @@ EOD;
 
         //accessibility: heading for navbar list  (MDL-20446)
         $navbarcontent = html_writer::tag('span', get_string('pagepath'), array('class'=>'accesshide'));
-        $navbarcontent .= html_writer::tag('ul', join('', $htmlblocks), array('role'=>'navigation'));
+        $navbarcontent .= html_writer::tag('nav', html_writer::tag('ul', join('', $htmlblocks)));
         // XHTML
         return $navbarcontent;
     }
@@ -3235,7 +3235,7 @@ EOD;
     /**
      * Get the HTML for blocks in the given region.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @param string $region The region to get HTML for.
      * @return string HTML.
      */
@@ -3282,7 +3282,7 @@ EOD;
     /**
      * Returns the CSS classes to apply to the body tag.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @param array $additionalclasses Any additional classes to apply.
      * @return string
      */
@@ -3312,7 +3312,7 @@ EOD;
     /**
      * The ID attribute to apply to the body tag.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @return string
      */
     public function body_id() {
@@ -3322,7 +3322,7 @@ EOD;
     /**
      * Returns HTML attributes to use within the body tag. This includes an ID and classes.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @param string|array $additionalclasses Any additional classes to give the body tag,
      * @return string
      */
@@ -3336,7 +3336,7 @@ EOD;
     /**
      * Gets HTML for the page heading.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @param string $tag The tag to encase the heading in. h1 by default.
      * @return string HTML.
      */
@@ -3347,7 +3347,7 @@ EOD;
     /**
      * Gets the HTML for the page heading button.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @return string HTML.
      */
     public function page_heading_button() {
@@ -3357,7 +3357,7 @@ EOD;
     /**
      * Returns the Moodle docs link to use for this page.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @param string $text
      * @return string
      */
@@ -3375,7 +3375,7 @@ EOD;
     /**
      * Returns the page heading menu.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @return string HTML.
      */
     public function page_heading_menu() {
@@ -3385,7 +3385,7 @@ EOD;
     /**
      * Returns the title to use on the page.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @return string
      */
     public function page_title() {
@@ -3395,7 +3395,7 @@ EOD;
     /**
      * Returns the URL for the favicon.
      *
-     * @since 2.5.1 2.6
+     * @since Moodle 2.5.1 2.6
      * @return string The favicon URL
      */
     public function favicon() {
@@ -3868,7 +3868,7 @@ class core_media_renderer extends plugin_renderer_base {
  * is running a maintenance related task.
  * It must always extend the core_renderer as we switch from the core_renderer to this renderer in a couple of places.
  *
- * @since 2.6
+ * @since Moodle 2.6
  * @package core
  * @category output
  * @copyright 2013 Sam Hemelryk

@@ -370,6 +370,9 @@ $CFG->forced_plugin_settings['local_ucla']['defaultassignsettings'] = 1;
 // CCLE-4289 - Show All View Action Icons
 $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
+// Site administration > Plugins > Message outputs > Email
+$CFG->emailonlyfromnoreplyaddress = 1;
+
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true; 
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done

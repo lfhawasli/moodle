@@ -425,12 +425,8 @@ abstract class quiz_attempts_report_table extends table_sql {
         $params = array('quizid' => $this->quiz->id);
 
         if ($this->qmsubselect && $this->options->onlygraded) {
-            // BEGIN UCLA MOD: CCLE-3771 - Do not include quiz attempts that 
-            // do not have grades (which may be the case if there are manual 
-            // grading elements)
-            $from .= " AND quiza.sumgrades IS NOT NULL";
-            // END UCLA MOD: CCLE-3771
-            $from .= " AND $this->qmsubselect";
+            $from .= " AND (quiza.state <> :finishedstate OR $this->qmsubselect)";
+            $params['finishedstate'] = quiz_attempt::FINISHED;
         }
 
         switch ($this->options->attempts) {
