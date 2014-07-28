@@ -129,6 +129,7 @@ $string['entbypage'] = 'Entries shown per page';
 $string['entries'] = 'Entries';
 $string['entrieswithoutcategory'] = 'Entries without category';
 $string['entry'] = 'Entry';
+$string['evententryadded'] = 'Added entry';
 $string['entryalreadyexist'] = 'Entry already exists';
 $string['entryapproved'] = 'This entry has been approved';
 $string['entrydeleted'] = 'Entry deleted';
