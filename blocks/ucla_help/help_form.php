@@ -19,9 +19,9 @@ class help_form extends moodleform {
         global $CFG, $COURSE, $USER;
 
         // if on a real course, be sure to include courseid as GET variable
-        if($COURSE->id > 1) {
+        if ($COURSE->id > 1) {
             $this->_form->_attributes['action'] .= '?course='. $COURSE->id;
-        } 
+        }
         
         $this->_form->_attributes['id'] = 'help_form';
         
@@ -30,11 +30,11 @@ class help_form extends moodleform {
         $mform =& $this->_form;
         
         // css should be used to define widths of input/textarea fields
-        $mform->addElement('text', 'ucla_help_name', 
+        $mform->addElement('text', 'ucla_help_name',
                 get_string('name_field', 'block_ucla_help'));
-        $mform->addElement('text', 'ucla_help_email', 
-                get_string('email_field', 'block_ucla_help')); 
-        $mform->addElement('select', 'ucla_help_course', 
+        $mform->addElement('text', 'ucla_help_email',
+                get_string('email_field', 'block_ucla_help'));
+        $mform->addElement('select', 'ucla_help_course',
                 get_string('course_field', 'block_ucla_help'), $courses);
 
         if (!isloggedin()) {
@@ -42,18 +42,16 @@ class help_form extends moodleform {
                     html_writer::link($CFG->wwwroot . '/login/index.php', 'login')));
         }
 
-        $mform->addElement('textarea', 'ucla_help_description', 
-                get_string("description_field", "block_ucla_help"), 
-                'wrap="virtual" rows="6"');        
-        
-        $mform->setDefault('ucla_help_course', $COURSE->id);
+        $mform->addElement('textarea', 'ucla_help_description',
+                get_string("description_field", "block_ucla_help"),
+                'wrap="virtual" rows="6"');
         
         // no point in having a cancel option
         $this->add_action_buttons(false, get_string('submit_button', 'block_ucla_help'));
         
         // set proper types for each element
         $mform->setType('ucla_help_name', PARAM_TEXT);
-        $mform->setType('ucla_help_email', PARAM_EMAIL);        
+        $mform->setType('ucla_help_email', PARAM_EMAIL);
         $mform->setType('ucla_help_description', PARAM_TEXT);
         
         // trim all input
@@ -61,17 +59,30 @@ class help_form extends moodleform {
         $mform->applyFilter('ucla_help_email', 'trim');
         $mform->applyFilter('ucla_help_description', 'trim');
         
+        // make name field a required field 
+        $mform->addRule('ucla_help_name', get_string('requiredelement', 'form'), 'required');
+        
+        // make email field a required field 
+        $mform->addRule('ucla_help_email', get_string('requiredelement', 'form'), 'required');
         // if email is present, make sure it is a valid email address
         $mform->addRule('ucla_help_email', get_string('err_email', 'form'), 'email');
         
         // make description field a required field 
         $mform->addRule('ucla_help_description', get_string('requiredelement', 'form'), 'required');        
         
-        // set defaults for name/email
-        if(isloggedin() && !isguestuser()) {
+        // set and freeze defaults for name/email
+        if (isloggedin() && !isguestuser()) {
             $mform->setDefault('ucla_help_name', "$USER->firstname $USER->lastname");
             $mform->setDefault('ucla_help_email', $USER->email);
-        }        
+            $mform->hardFreeze('ucla_help_name');
+            $mform->hardFreeze('ucla_help_email');
+        }
+        
+        // set and freeze default for course
+        $mform->setDefault('ucla_help_course', $COURSE->id);
+        if ($COURSE->id > 1) {
+            $mform->hardFreeze('ucla_help_course');
+        }
     }                           
 }          
 ?>
