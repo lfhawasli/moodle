@@ -6,14 +6,14 @@ Feature: Adding a resource
 
     Background: UCLA environment and srs site exists
         Given I am in a ucla environment
-        And the following "users" exists:
+        And the following "users" exist:
           | username | firstname | lastname | email |
           | teacher1 | Teacher | 1 | teacher1@asd.com |
           | student1 | Student | 1 | student1@asd.com |
           | student2 | Student | 2 | student2@asd.com |
         And the following ucla "sites" exists:
-            | fullname | shortname | type |
-            | course 1 | C1 | srs |
+          | fullname | shortname | type |
+          | course 1 | C1 | srs |
         And the following ucla "enrollments" exists:
           | user | course | role |
           | teacher1 | C1 | editingteacher |
@@ -31,10 +31,10 @@ Feature: Adding a resource
           | Description | Test glossary description |
         Then "Test glossary name" activity should be private
         And I add a "File" to section "1"
-        And I fill the moodle form with:
+        And I set the following fields to these values:
           | Name | Test file name |
           | Description | Test file description |
-        And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filepicker
+        And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
         And I press "Save and return to course"
         Then "Test file name" activity should be private
         # Log out and check if student or guest can see activity and resource
@@ -45,14 +45,18 @@ Feature: Adding a resource
         Then "Test glossary name" activity should be public
         And "Test file name" activity should be public
         And I log out
-        # Check that other users cannot see private material
+        # Check that other users or public cannot see private material
         Given I log in as ucla "student2"
         And I browse to site "C1"
         And I follow "Week 1"
         Then I should not see "Test glossary name"
         And I should not see "Test file name"
         And I log out
-        # Make material private
+        And I browse to site "C1"
+        And I follow "Week 1"
+        Then I should not see "Test glossary name"
+        And I should not see "Test file name"
+        # Make material public
         Given I log in as ucla "teacher1"
         And I browse to site "C1"
         And I follow "Week 1"
@@ -65,4 +69,25 @@ Feature: Adding a resource
         And I follow "Week 1"
         Then "Test glossary name" activity should be public
         And "Test file name" activity should be public
-        
+        Given I log out
+        And I browse to site "C1"
+        And I follow "Week 1"
+        Then "Test glossary name" activity should be public
+        And "Test file name" activity should be public
+
+    @javascript
+    Scenario Outline: Add an activity or resource and verify it is private
+                      Try with various activity/resources
+        And I follow "Week 1"
+        And I add a "<Activity>" to section "1" and I fill the form with:
+          | <Name field> | Test <Activity> name |
+          | <Description field> | Test description |
+        Then "Test <Activity> name" activity should be private
+
+        Examples:
+          | Activity            | Name field               | Description field |
+          | Assignment          | Assignment name          | Description       |
+          | Chat                | Name of this chat room   | Description       |
+          | Page                | Name                     | Page content      |
+          | Forum               | Forum name               | Description       |
+          | Quiz                | Name                     | Description       |
