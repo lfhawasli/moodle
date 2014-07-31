@@ -22,8 +22,8 @@ class behat_course_download extends behat_base {
                         | Description | '.$name.' description |');
         return array(
             new Given('I add a "File" to section "' . $section . '"'),
-            new Given('I fill the moodle form with:', $table),
-            new Given('I upload "'.$filepath.'" file to "Select files" filepicker'),
+            new Given('I set the following fields to these values:', $table),
+            new Given('I upload "'.$filepath.'" file to "Select files" filemanager'),
             new Given('I press "Save and return to course"')
         );
     }

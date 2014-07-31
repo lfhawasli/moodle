@@ -56,7 +56,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
      * @var object
      */
     private $teacher = null;
-    
+
     /**
      * Helper method to compare the results from test method populate_course and
      * the results from block_ucla_course_download_files method build_zip_array.
@@ -152,7 +152,9 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         global $CFG;
 
         // Make sure there is nothing in the temp directory.
-        $this->assertEquals(2, count(scandir($CFG->tempdir)));
+        if (file_exists($CFG->tempdir.'/coursedownloaddir')) {
+            $this->assertEquals(2, count(scandir($CFG->tempdir.'/coursedownloaddir')));
+        }
 
         // Add content to section 5.
         $contenttocreate[] = array('section' => 5);
@@ -161,10 +163,12 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
 
         // Make sure there is still nothing in the temp directory.
-        $this->assertEquals(2, count(scandir($CFG->tempdir)));
+        $this->assertEquals(2, count(scandir($CFG->tempdir.'/coursedownloaddir')));
     }
 
     /**
@@ -182,6 +186,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursefiles = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $coursefiles->add_request();
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $request = $coursefiles->process_request();
         $this->assertNotEmpty($request->fileid);
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
@@ -227,6 +233,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
             $this->assertNotEmpty($request);
 
             // Request should then be deleted.
+            unset_config('noemailever');
+            $sink = $this->redirectEmails();
             $processedrequest = $coursefiles->process_request();
             $this->assertNull($processedrequest);
             $request = $coursefiles->get_request();
@@ -261,6 +269,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $request = $coursefiles->get_request();
         // Clone, since process requests modifies the request variable.
         $initialrequest = clone $request;
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $processedrequest = $coursefiles->process_request();
 
         // Newly processed request should have proper fields set.
@@ -288,11 +298,13 @@ class block_ucla_course_download_files_test extends advanced_testcase {
                 $this->course->id, $this->teacher->id);
         $result = $coursefiles->add_request();
         $this->assertTrue($result);
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $coursefiles->process_request();
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
 
         // Now delete added file.
-        $resources = get_all_instances_in_course('resource', $this->course, $this->teacher);
+        $resources = get_all_instances_in_course('resource', $this->course, $this->teacher->id);
         $todelete = reset($resources);
         course_delete_module($todelete->coursemodule);
 
@@ -337,6 +349,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
         $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
@@ -387,6 +401,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
         $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
@@ -395,7 +411,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $orignalfileid = $request->fileid;
 
         // Now delete file in section 2.
-        $resources = get_all_instances_in_course('resource', $this->course, $this->student);
+        $resources = get_all_instances_in_course('resource', $this->course, $this->student->id);
         // Resources are returned by section order, so get first resource.
         $todelete = $resources[0];
         course_delete_module($todelete->coursemodule);
@@ -439,6 +455,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $teacherdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $teacherdownload->add_request();
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $teacherrequest = $teacherdownload->process_request();
 
         // Create request for student.
@@ -481,6 +499,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $teacherdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $teacherdownload->add_request();
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
         $request1 = $teacherdownload->process_request();
         
         $ziparray = $teacherdownload->get_content();
@@ -500,7 +520,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $fsfiles = $fs->get_area_files($modcontext->id, 'mod_resource',
                 'content', 0, 'sortorder DESC, id ASC', false);
         $mainfile = reset($fsfiles);
-        $mainfile->set_filesize(11 * pow(1024,2));  // Set to 11 MB.
+        $mainfile->set_filesize(11 * pow(1024, 2));  // Set to 11 MB.
+        $this->assertDebuggingCalled();
 
         // Redo request.
         $teacherdownload->refresh();
@@ -519,6 +540,6 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $request2 = $teacherdownload->process_request();
         $this->assertNotEquals($request1->fileid, $request2->fileid);
         $ziparray = $teacherdownload->get_content();
-        $this->compare_content($expectedfiles, $ziparray);        
+        $this->compare_content($expectedfiles, $ziparray);
     }
 }

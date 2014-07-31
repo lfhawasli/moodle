@@ -79,3 +79,12 @@ $string['instructorfilewarning'] = 'Files included are ones that are already vis
 $string['filewillbeexcluded'] = 'File will be excluded.';
 $string['filemaybeincluded'] = 'File may be included.';
 $string['fileoversizeexclusion'] = 'Files over <strong>{$a}</strong> will be excluded.';
+
+// Events.
+$string['eventrequestcreated'] = 'Course download request created';
+$string['eventzipdownloaded'] = 'Course content zip downloaded';
+
+// Capability descriptions.
+$string['ucla_course_download:addinstance'] = 'Add a new UCLA course download block';
+$string['ucla_course_download:myaddinstance'] = 'Add a new UCLA course download block to My home';
+$string['ucla_course_download:requestzip'] = 'Request/download a course download zip file';

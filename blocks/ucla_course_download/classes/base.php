@@ -147,12 +147,14 @@ abstract class block_ucla_course_download_base {
         );
 
         if (!$DB->record_exists('ucla_archives', $conditions)) {
-            $DB->insert_record('ucla_archives', $request);
+            $objid = $DB->insert_record('ucla_archives', $request);
 
             // Log requests.
-            $params = array('courseid' => $request->courseid);
-            $logurl = new moodle_url('../blocks/ucla_course_download/view.php', $params);
-            add_to_log($request->courseid, 'course', 'ucla archive request', $logurl);
+            $event = \block_ucla_course_download\event\request_created::create(array(
+                'context' => context_course::instance($this->course->id),
+                'objectid' => $objid
+            ));
+            $event->trigger();
             return true;
         }
         return false;
@@ -174,7 +176,10 @@ abstract class block_ucla_course_download_base {
         if (!empty($content)) {
             $filename = clean_filename($this->course->shortname . '-' .
                     $this->get_type() . '.zip');
-            $tempzip = tempnam($CFG->tempdir . '/', $filename);
+            if (!file_exists($CFG->tempdir.'/coursedownloaddir')) {
+                mkdir($CFG->tempdir.'/coursedownloaddir');
+            }
+            $tempzip = tempnam($CFG->tempdir.'/coursedownloaddir' . '/', $filename);
             $zipper = new zip_packer();
             if ($zipper->archive_to_pathname($content, $tempzip)) {
                 $zipfilerecord = $this->add_new_file_record($filename, $tempzip);
@@ -234,11 +239,13 @@ abstract class block_ucla_course_download_base {
 
         // Record download.
         $request->timedownloaded = time();
-        $DB->update_record('ucla_archives', $request);
+        $objid = $DB->update_record('ucla_archives', $request);
 
-        $params = array('courseid' => $request->courseid);
-        $logurl = new moodle_url('../blocks/ucla_course_download/view.php', $params);
-        add_to_log($request->courseid, 'course', 'ucla archive download', $logurl);
+        $event = \block_ucla_course_download\event\zip_downloaded::create(array(
+            'context' => context_course::instance($this->course->id),
+            'objectid' => $objid
+        ));
+        $event->trigger();
 
         send_stored_file($file, 86400, 0, true);
     }

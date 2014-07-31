@@ -6,26 +6,27 @@ Feature: Show files that may be included in zip
 
   Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
       | student1 | Student | 1 | student1@asd.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
         | fullname | shortname | type |
         | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+    And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
 
   @javascript
   Scenario: Adding multiple files into sections. hidding individual files and sections, then verifying instructor can see the visibility markers.
-    Given I log in as ucla "teacher1"
-    And I browse to site "C1"
+    Given I log in as "teacher1"
+    And I follow "course 1"
     And I turn editing mode on
     And I follow the "Week 1" section in the ucla site menu
     And I upload the "blocks/ucla_course_download/tests/fixtures/smallfile.file" file as "Small file" to section "1"
     And I upload the "blocks/ucla_course_download/tests/fixtures/mediumfile.file" file as "Medium file" to section "1"
+    And I open "Medium" actions menu
     And I click on "Hide" "link" in the "Medium" activity
     And I follow the "Week 2" section in the ucla site menu
     And I upload the "blocks/ucla_course_download/tests/fixtures/largefile.file" file as "Large file" to section "2"
@@ -52,8 +53,8 @@ Feature: Show files that may be included in zip
     # Check that student cannot view file list.
     And I log out
     Given it is "9th" week
-    And I log in as ucla "student1"
-    And I browse to site "C1"
+    And I log in as "student1"
+    And I follow "course 1"
     And I press "Control Panel"
     When I follow "Download course materials"
     Then I should not see "Files included are ones that are already visible to students on your site."
