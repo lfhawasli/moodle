@@ -70,6 +70,8 @@ class behat_ucla extends behat_files {
     public function load_default_ucla_environment() {
         global $CFG;
 
+        // Set the name display
+        set_config('fullnamedisplay', 'lastname' . ", " . 'firstname');
         // Set the UCLA theme.
         set_config('theme', 'uclashared');
         // Restrict UCLA theme.
