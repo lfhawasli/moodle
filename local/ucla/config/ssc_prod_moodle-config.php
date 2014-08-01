@@ -404,6 +404,7 @@ $CFG->updateautocheck = 0;
 
 // Site administration > Development > Experimental > Experimental settings
 $CFG->dndallowtextandlinks = 1;
+$CFG->enabletgzbackups = 1;
 
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later

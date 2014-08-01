@@ -406,6 +406,7 @@ $CFG->dbsessions = false;
 
 // Site administration > Development > Experimental > Experimental settings
 $CFG->dndallowtextandlinks = 1;
+$CFG->enabletgzbackups = 1;
 
 // Site administration > Development > Debugging
 $CFG->debug = 32767;    // DEVELOPER level debugging messages
