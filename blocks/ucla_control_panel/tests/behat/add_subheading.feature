@@ -6,28 +6,28 @@ Feature: Add subheading
   
 Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
        | username | firstname | lastname | email |
        | teacher1 | Teacher | 1 | teacher1@asd.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
        | fullname | shortname | type |
        | Test course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+    And the following ucla "enrollments" exist:
        | user | course | role |
        | teacher1 | C1 | editingteacher |
 
 Scenario: Add subheading    
-    And I log in as ucla "teacher1"
+    And I log in as "teacher1"
     And I follow "Test course 1"
     And I press "Control Panel"
     And I follow "Add a subheading"
-    Given I fill the moodle form with:
+    And I set the following fields to these values:   
        | Subheading you want displayed in section | subheading |
     And I press "Save changes"
     Then I should see "Successfully added subheading to section."
 
 Scenario: Make sure subheading require text
-    Given I log in as ucla "teacher1"
+    Given I log in as "teacher1"
     And I follow "Test course 1"
     And I press "Control Panel"
     And I follow "Add a subheading"

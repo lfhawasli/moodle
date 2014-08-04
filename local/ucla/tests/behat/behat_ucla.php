@@ -115,7 +115,7 @@ class behat_ucla extends behat_files {
      * @param string $elementname
      * @param TableNode $data
      */
-    public function the_following_exists($elementname, TableNode $data) {
+    public function the_following_exist($elementname, TableNode $data) {
         global $DB;
 
         switch ($elementname) {
@@ -172,17 +172,18 @@ class behat_ucla extends behat_files {
     /**
      * Step to browse directly to a site with a given shortname.
      *
-     * @deprecated since 2.7
-     * @see behat_ucla::i_browse_to_site()
+     * Since we can now specify fullname of a course in the UCLA data generator,
+     * we can use the regular 'I follow "course fullname"' step for the most
+     * part. But sometimes the only way to get to the course homepage easily is
+     * to use this step.
      *
      * @Given /^I browse to site "([^"]*)"$/
-     * @throws ElementNotFoundException
+     *
      * @param string $shortname
      */
-    public function i_browse_to_site($elementname) {
-        $alternative = 'I follow "course 1"';
-        $this->deprecated_message($alternative);
-        return new Given($alternative);
+    public function i_browse_to_site($shortname) {
+        $courseid = $this->courses[$shortname]->id;
+        $this->getSession()->visit($this->locate_path('/course/view.php?id=' . $courseid));
     }
 
     /**
@@ -273,7 +274,7 @@ class behat_ucla extends behat_files {
                 | instructor | {$shortname} | editinginstructor |
                 | student | {$shortname} | student |";
 
-        $this->the_following_exists('course enrolments', new TableNode($data));
+        $this->the_following_exist('course enrolments', new TableNode($data));
     }
 
     /**
@@ -486,7 +487,7 @@ class behat_ucla extends behat_files {
      * Step to generate UCLA SRS + collab sites, and enrolments.
      *
      * @deprecated since 2.7
-     * @see behat_ucla::the_following_exists()
+     * @see behat_ucla::the_following_exist()
      *
      * @Given /^the following ucla "([^"]*)" exists:$/
      * @throws Exception
