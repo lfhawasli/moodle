@@ -335,7 +335,7 @@ $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP 
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
 // Core Behat tests depend on default setting.
-//$CFG->fullnamedisplay = 'language'; // CCLE-2550 - Lastname, Firstname sorting
+//$CFG->fullnamedisplay = 'lastname, firstname';
 $CFG->cronclionly = true;
 
 // Site administration > Security > HTTP security

@@ -195,7 +195,12 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
     // Add the necessary names.
     foreach (useredit_get_required_name_fields() as $fullname) {
         $mform->addElement('text', $fullname,  get_string($fullname),  'maxlength="100" size="30"');
-        $mform->addRule($fullname, $strrequired, 'required', null, 'client');
+        //$mform->addRule($fullname, $strrequired, 'required', null, 'client');
+        // START UCLA MOD CCLE-4437: Make first name a non-required field
+        if($fullname == 'lastname'){
+            $mform->addRule($fullname, $strrequired, 'required', null, 'client');
+        }
+        // END UCLA MOD CCLE-4437
         $mform->setType($fullname, PARAM_NOTAGS);
     }
 
