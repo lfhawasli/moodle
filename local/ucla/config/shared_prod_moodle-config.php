@@ -493,9 +493,6 @@ $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localuserfield'] = 'idnumber';
 $CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
 
-// CCLE-2802 - Frontpage banner layout include
-$CFG->customfrontpageinclude = $_dirroot_ . '/theme/uclashared/layout/frontpage.php';
-
 // CCLE-2364 - SUPPORT CONSOLE (put after $_dirroot_, because needs $CFG->dataroot to be set)
 $log_date = date('Y-m-d') . '-00_00';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_error'] = '/var/log/httpd/error_log.' . $log_date;

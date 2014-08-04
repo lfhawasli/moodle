@@ -2,7 +2,7 @@
 // Buttons
 // --------------------------------------------------
 
-@import "bootstrap/lib/buttons";
+@import "bootstrap/buttons";
 
 ////
 // Button overrides
@@ -68,28 +68,7 @@ input[type="submit"] {
     }
 }
 
-// Navbar buttons and inputs
-.navbutton {
-    .wikisearch,
-    .forumsearch {
 
-        input[alt="search"] {
-            @extend .form-control; 
-            @extend .input-xs;
-            display: inline-block !important;
-        }
-        input[type="submit"] {
-            @extend .btn;
-            @extend .btn-default;
-            @extend .btn-sm;
-        }
-    }
-    .singlebutton input[type="submit"] {
-        @extend .btn;
-        @extend .btn-warning;
-        @extend .btn-sm;
-    }
-}
 
 .pagelayout-redirect {
     text-align: center;
@@ -122,11 +101,11 @@ input[type="submit"] {
 }
 
 .control-panel {
-    input[type="submit"] {
+/*    input[type="submit"] {
         @extend .btn;
         @extend .btn-cpanel;
         @extend .btn-sm;
-    }
+    }*/
 
     // Grades button
     .btn-grades-container {

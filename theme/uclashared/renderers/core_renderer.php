@@ -143,12 +143,12 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             }
 
             $fullname = fullname($USER, true);
-            $userlink = html_writer::link($usermurl, $fullname);
+            $userlink = html_writer::link($usermurl, $fullname, array('class' => 'btn-header'));
 
             $rolename = '';
             // I guess only guests cannot switch roles.
             if (isguestuser()) {
-                $userlink = get_string('loggedinasguest');
+                $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text');
                 $addloginurl = true;
             } else if (is_role_switched($course->id)) {
                 $context = context_course::instance($course->id);
@@ -165,7 +165,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
             $loginstr = $realuserinfo . $rolename . $userlink;
         } else {
-            $loginstr = get_string('loggedinnot', 'moodle');
+            $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text');
         }
 
         if (isset($SESSION->justloggedin)) {
@@ -199,27 +199,26 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                 }
             }
         }
-
-        $logininfo[] = $loginstr;
-
         // The help and feedback link.
         $fbl = $this->help_feedback_link();
         if ($fbl) {
             $logininfo[] = $fbl;
         }
+        $logininfo[] = $loginstr;
 
         // The actual login link.
         if ($addloginurl) {
-            $logininfo[] = html_writer::link($loginurl, get_string('login'));
+            $logininfo[] = html_writer::link($loginurl, html_writer::span('', 'arrow-right') . get_string('login'), array('class' => 'btn-header btn-login'));
         } else if ($addlogouturl) {
             $logininfo[] = html_writer::link(
-                            new moodle_url('/login/logout.php',
-                            array('sesskey' => sesskey())), get_string('logout')
+                new moodle_url('/login/logout.php', array('sesskey' => sesskey())), 
+                get_string('logout'), 
+                array('class' => 'btn-header')
             );
         }
 
         $separator = $this->separator();
-        $loginstring = implode($separator, $logininfo);
+        $loginstring = implode('', $logininfo);
 
         return $loginstring;
     }
@@ -262,7 +261,8 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         $hflink = get_string('help_n_feedback', $this->theme);
 
-        return html_writer::link($helplocale, $hflink);
+        $icon = '<i class="fa fa-question-circle fa-fw "></i> ';
+        return html_writer::link($helplocale, $icon . $hflink, array('class' => 'btn-header btn-help-feedback'));
     }
 
     /**
@@ -300,11 +300,11 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         // Get UCLA logo image.
         $pixurl = $this->pix_url($pix, $pixloc);
         $logoalt = get_string('UCLA_CCLE_text', 'theme_uclashared');
-        $logoimg = html_writer::img($pixurl, $logoalt);
+        $logoimg = html_writer::img($pixurl, $logoalt, array('class' => 'logo-ucla'));
 
         // Build new logo in a single link.
         $link = html_writer::link($address,
-                        html_writer::span($logoimg, 'logo-ucla') .
+                        $logoimg .
                         html_writer::span('CCLE', 'logo-ccle') .
                         html_writer::span(
                                 html_writer::span('common collaboration',
@@ -325,7 +325,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         $text = $this->get_config('theme_uclashared', 'system_name');
         if (!empty($url) && !empty($text)) {
             $displaytext = html_writer::link($url, $text,
-                            array('class' => 'system-name'));
+                            array('class' => 'header-system-name'));
         }
         return $displaytext;
     }

@@ -19,6 +19,7 @@
 @import "CSS:base/style/pagelayout";*/
 
 // Core variables and mixins
+@import "ucla/variables";
 @import "variables";
 @import "mixins";
 
@@ -29,14 +30,21 @@
 // -------------------
 @import "type";
 @import "form";
+
+// @todo: Deprecate 'buttons.scss'
 @import "buttons";
+@import "ucla/buttons";
+@import "ucla/buttons_adapter";
+
 @import "tables";
-@import "bootstrap/lib/grid";
+@import "bootstrap/grid";
 
 
 // Components
 // -------------------
-@import "header";
+@import "ucla/header";
+
+@import "ucla/fontawesome";
 @import "footer";
 @import "alerts";
 @import "navs";
@@ -47,11 +55,11 @@
 
 @import "dock";
 
-@import "bootstrap/lib/button-groups";
-@import "bootstrap/lib/input-groups";
+@import "bootstrap/button-groups";
+@import "bootstrap/input-groups";
 @import "breadcrumbs";
-@import "bootstrap/lib/wells";
-@import "bootstrap/lib/badges";
+@import "bootstrap/wells";
+@import "bootstrap/badges";
 
 // Media queries
 // -------------------

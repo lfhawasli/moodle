@@ -33,7 +33,7 @@ images_dir = "#{theme_dir}/pix"
 javascripts_dir = "#{theme_dir}/javascript"
 
 ## Import boostrap package
-additional_import_paths = ["#{theme_dir}/package", sass_dir]
+additional_import_paths = ["vendor/twbs/bootstrap-sass/assets/stylesheets", "vendor/fortawesome", sass_dir]
 
 ## For production environment, use compressed CSS
 output_style = (environment == :production) ? :compressed : :expanded

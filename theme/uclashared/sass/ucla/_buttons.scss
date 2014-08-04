@@ -1,0 +1,121 @@
+
+
+$btn-color-editing:         #ef7c1f;
+$btn-color-control-panel:   #ffcf48;
+$btn-color-forum-search:    #4d4d4d;
+
+.btn-header {
+    background-color: $header-color-prod;
+    padding: 10px 12px; 
+    color: white !important;
+    display: inline-block;
+    font-weight: 300;
+    /*border-bottom: 2px solid darken($header-color-prod, 10%);*/
+    height: $header-height;
+    
+    &:hover {
+        background-color: lighten($header-color-prod, 5%);
+        text-decoration: none;
+        border-bottom: 2px solid darken($header-color-prod, 2%);
+    }
+}
+
+.btn-header-text {
+    background-color: $header-color-prod;
+    padding: 10px 12px; 
+    color: white !important;
+    display: inline-block;
+    font-weight: 300;
+    height: $header-height;
+    
+    
+}
+
+.btn-help-feedback {
+    background-color: #295493;
+    border-bottom: 2px solid darken(#295493, 10%);
+    
+    &:hover {
+        background-color: lighten($header-color-prod, 2%);
+        border-bottom: 2px solid lighten(#295493, 1%);
+    }
+}
+
+.btn-login {
+    background-color: #4cae4c;
+    border-bottom: 2px solid darken(#4cae4c, 10%);
+
+    &:hover {
+        background-color: lighten(#4cae4c, 10%);
+        border-bottom: 2px solid darken(#4cae4c, 1%);
+    }
+    
+    .arrow-right {
+        display: inline-block;
+        float: left;
+        border-left-color: $header-color-prod;
+        margin-left: -12px;
+        margin-right: 8px;
+        position: relative;
+        top: 4px;
+    }
+}
+.arrow-right {
+    width: 0; 
+    height: 0; 
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent; 
+    border-left: 5px solid black; 
+}
+
+.header-btn-group {
+    float: right;
+}
+
+//
+// These declarations don't produce classes, instead they are meant to be used
+// as traits with @extend -- primarily in adapter-like declarations.
+//
+%btn-editing-mode {
+    font-size: 1.4rem;
+    background-color: $btn-color-editing;
+    padding: 4px  8px;
+    color: white;
+    border: 0;
+    font-weight: 300;
+    border: 1px solid darken($btn-color-editing, 5%);
+    border-bottom-width: 2px;
+
+    @include border-radius(0);
+    
+    &:hover {
+        background-color: darken($btn-color-editing, 5%);
+    }
+}
+
+%btn-control-panel {
+    @extend %btn-editing-mode;
+    
+    background-color: $btn-color-control-panel;
+    color: #222;
+    border-color: darken($btn-color-control-panel, 10%);
+    
+    &:hover {
+        background-color: darken($btn-color-control-panel, 10%);
+    }
+}
+
+%btn-forum-search {
+    
+    @extend %btn-editing-mode;
+    
+    background-color: $btn-color-forum-search;
+    color: white;
+    border-color: darken($btn-color-forum-search, 5%);
+    
+    &:hover {
+        background-color: darken($btn-color-forum-search, 10%);
+    }
+}
+
+

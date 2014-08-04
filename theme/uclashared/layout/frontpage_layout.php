@@ -10,7 +10,6 @@ $hassidepre = (empty($PAGE->layout_options['noblocks'])
 $hassidepost = (empty($PAGE->layout_options['noblocks']) 
     && $PAGE->blocks->region_has_content('side-post', $OUTPUT));
 $haslogininfo = (empty($PAGE->layout_options['nologininfo']));
-$hasintrobanner = (!empty($PAGE->layout_options['introbanner']));
 
 // START UCLA MODIFICATION CCLE-2452
 // Hide Control Panel button if user is not logged in
@@ -36,9 +35,6 @@ if ($showsidepre && !$showsidepost) {
     $bodyclasses[] = 'content-only';
 }
 
-if ($hasintrobanner) {
-    $bodyclasses[] = 'front-page';
-}
 
 if ($hascustommenu) {
     $bodyclasses[] = 'has_custom_menu';
@@ -46,18 +42,6 @@ if ($hascustommenu) {
 
 $envflag = $OUTPUT->get_environment();
 
-// Attach login check
-// This prevents forms from being submitted when the user is not logged into site
-$PAGE->requires->yui_module('moodle-local_ucla-logincheck', 
-        'M.local_ucla.logincheck.init', 
-        array(array('userid' => $USER->id)));
-$PAGE->requires->strings_for_js(
-        array(
-            'logincheck_success', 
-            'longincheck_login', 
-            'logincheck_idfail', 
-            'logincheck_networkfail'), 
-        'local_ucla');
 
 // Detect OS via user agent
 $agent = $_SERVER['HTTP_USER_AGENT'];
@@ -90,14 +74,15 @@ echo $OUTPUT->doctype() ?>
 </head>
 <body id="<?php echo $PAGE->bodyid ?>" class="<?php echo $PAGE->bodyclasses.' '.join(' ', $bodyclasses) ?>">
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
-
 <div id="page" class="env-<?php echo $envflag ?>">
 
 <?php if ($hasheading || $hasnavbar) { ?>
     <header id="page-header" class="container-fluid">
         <div class="header-main row">
-            <div class="col-sm-6 col-xs-3 header-logo">
-                <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
+            <div class="col-sm-6 col-xs-3">
+                <div class="header-logo" >
+                    <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
+                </div>
             </div>
             <div class="col-sm-6 col-xs-9 header-login">
                 <div class="header-btn-group" >
@@ -110,35 +95,19 @@ echo $OUTPUT->doctype() ?>
             </div>            
         </div>
         <div class="header-system row" >
-            <div class="col-sm-6">
-                <?php echo $OUTPUT->sublogo(); ?>
+            <div class="col-sm-2">
+                <div class="header-shared-server-list">
+                <?php 
+                    echo $OUTPUT->sublogo();
+                ?>
+                </div>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-10">
                 <?php echo $OUTPUT->weeks_display() ?>
             </div>
         </div>
+        
     </header>
-<?php } ?>
-
-<?php if ($hasnavbar && !$hasintrobanner) { ?>
-<div class="navbar container-fluid">
-    <div class="row">
-        <div class="breadcrumb col-xs-8">
-            <?php echo $OUTPUT->navbar(); ?>
-        </div>
-        <div class="controls col-xs-4" >
-            <div class="navbutton navbar-control">
-                <?php echo $PAGE->button; ?>
-            </div>
-            <?php if ($showcontrolpanel) { ?>
-            <div class="control-panel navbar-control pull-right">
-                <?php echo $OUTPUT->control_panel_button() ?>
-            </div>
-            <?php } ?>
-        </div>
-    </div>
-    
-</div>
 <?php } ?>
 <!-- END OF HEADER -->
 
@@ -162,18 +131,12 @@ echo $OUTPUT->doctype() ?>
         ?>
         <div id="region-main-box">
             <div id="region-post-box">
-            
                 <div id="region-main-wrap" >
                     <div id="region-main">
                         <div class="region-content">
-                            <?php
-                                // Alert banner display for courses
-                                // @todo: finish implementing
-//                                if($banner = ucla_alert_banner::load($COURSE->id)) {
-//                                    echo $banner->alert();
-//                                }
-                            ?>
+                            
                             <?php echo core_renderer::MAIN_CONTENT_TOKEN ?>
+                            <?php echo $OUTPUT->blocks_for_region('side-post') ?>
                         </div>
                     </div>
                 </div>
@@ -189,7 +152,7 @@ echo $OUTPUT->doctype() ?>
                 <?php if ($hassidepost) { ?>
                 <div id="region-post" class="block-region">
                     <div class="region-content">
-                        <?php echo $OUTPUT->blocks_for_region('side-post') ?>
+                        
                     </div>
                 </div>
                 <?php } ?>

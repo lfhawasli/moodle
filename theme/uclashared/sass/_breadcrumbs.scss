@@ -1,4 +1,7 @@
-@import "bootstrap/lib/breadcrumbs";
+@import "bootstrap/breadcrumbs";
+
+$breadcrumbs-color: #666;
+$breadcrumbs-highlight-color: #444;
 
 ///
 // Modify default breadcrumb
@@ -10,9 +13,36 @@
         display: none;
     }
     
+    li {
+        color: $breadcrumbs-color;
+        a {
+            color: $breadcrumbs-color;
+            &:hover {
+                color: $breadcrumbs-highlight-color;
+            }
+        }
+        
+        &:last-child > a {
+            color: $breadcrumbs-highlight-color;
+            font-weight: bold;
+        }
+        &:first-child > a {
+            height: 16px;
+            width: 16px;
+            display: block;
+            overflow: hidden;
+
+            &:before{
+                @include glyphicon("\e021");
+                color: $breadcrumbs-highlight-color;
+            }
+        }
+    }
+
+    
     // Add a HOME glyphicon to breadcrumbs.
     // Also removes text.
-    li:first-child > a {
+/*    li:first-child > a {
         height: 16px;
         width: 16px;
         display: block;
@@ -21,6 +51,6 @@
         &:before{
             @include glyphicon("\e021");
         }
-    }
+    }*/
 
 }
