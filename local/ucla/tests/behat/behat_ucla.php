@@ -251,8 +251,8 @@ class behat_ucla extends behat_files {
     public function ucla_site_exist($site) {
         global $DB;
 
-        $data = "| shortname | type |
-                 | $site site | $site |";
+        $data = "| fullname | shortname | type |
+                 | $site site | $site site | $site |";
         $this->generate_ucla_sites(new TableNode($data));
 
         // Call Moodle's own generator to create users and enrollments.
