@@ -286,9 +286,7 @@ if ($uploadform->is_cancelled()) {
 
     // Observe course/modedit.php
     if (!empty($CFG->enableavailability)) {
-        $newcm->availablefrom = $data->availablefrom;
-        $newcm->availableuntil = $data->availableuntil;
-        $newcm->showavailability = $data->showavailability;
+        $newcm->availability = $data->availabilityconditionsjson;
     }
    
     // Make course content the same visibility as parent section
