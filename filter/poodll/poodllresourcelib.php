@@ -155,7 +155,7 @@ function fetch_poodllconsole($runtime ){
 	
 	//Show the buttons window if we are admin
 	//Also won't receive messages intended for students if we are admin. Be aware.
-	if (has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if (has_capability('mod/quiz:preview', context_course::instance($courseid))){		
 		$am="admin";
 	}else{
 		$am="0";
@@ -211,7 +211,7 @@ function fetch_poodllheader($runtime){
 	
 	//Show the buttons window if we are admin
 	//Also won't receive messages intended for students if we are admin. Be aware.
-	if (has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if (has_capability('mod/quiz:preview', context_course::instance($COURSE->id))){		
 		$am="admin";
 	}else{
 		$am="0";
@@ -487,17 +487,20 @@ function fetch_whiteboard($runtime, $boardname, $imageurl="", $slave=false,$room
 global $CFG, $USER,$COURSE;
 
 //head off to the correct whiteboard as defined in config
-switch($CFG->filter_poodll_defaultwhiteboard){
-	case 'literallycanvas':
-		$forsubmission = false;
-		return fetchLiterallyCanvas($forsubmission,$width,$height,$imageurl,$updatecontrol, $contextid,$component,$filearea,$itemid);
-		break;
-	case 'drawingboard':
-		$forsubmission = false;
-		return fetchDrawingBoard($forsubmission,$width,$height,$imageurl,$updatecontrol, $contextid,$component,$filearea,$itemid); 
-		break;
-	default:
+if(!isOldIE()){
+	switch($CFG->filter_poodll_defaultwhiteboard){
+		case 'literallycanvas':
+			$forsubmission = false;
+			return fetchLiterallyCanvas($forsubmission,$width,$height,$imageurl);
+			break;
+		case 'drawingboard':
+			$forsubmission = false;
+			return fetchDrawingBoard($forsubmission,$width,$height,$imageurl); 
+			break;
+		default:
+	}
 }
+
 //set default size if necessary
 if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
 if($height==0){$height=$CFG->filter_poodll_whiteboardheight;}
@@ -513,7 +516,7 @@ if($standalone == 'true'){
 
 
 //Determine if we are admin, if necessary , for slave/master mode
-	if ($slave && has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if ($slave && has_capability('mod/quiz:preview', context_course::instance($COURSE->id))){		
 		$slave=false;
 	}
 
@@ -811,7 +814,7 @@ $params = array();
 
 }
 */
-function fetchMP3RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$timelimit="0"){
+function fetchMP3RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$timelimit="0",$callbackjs=false){
 global $CFG, $USER, $COURSE;
 
 //get our HTML5 Uploader if we have a mobile device
@@ -819,7 +822,7 @@ if(isMobile($CFG->filter_poodll_html5rec)){
 	if(!canDoUpload()){
 		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
 	}else{	
-		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio");
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio",false,$callbackjs);
 	}
 	return $ret;
 
@@ -850,6 +853,12 @@ if ($CFG->filter_poodll_usecourseid){
 	$courseid = -1;
 } 
 
+//can we pause or not
+if ($CFG->filter_poodll_miccanpause == 1){
+	$canpause = 'true';
+}else{
+	$canpause = 'false';
+} 
 
 if ($updatecontrol == "saveflvvoice"){
 	$savecontrol = "<input name='saveflvvoice' type='hidden' value='' id='saveflvvoice' />";
@@ -876,6 +885,12 @@ $params = array();
 		$params['itemid'] = $itemid;
 		$params['autosubmit'] = $autosubmit;
 		$params['timelimit'] = $timelimit;
+		$params['canpause'] = $canpause;
+		
+		//callbackjs
+		if($callbackjs){
+			$params['callbackjs'] = $callbackjs;
+		}
 	
     	$returnString=  fetchSWFWidgetCode('PoodLLMP3Recorder.lzx.swf10.swf',
     						$params,$width,$height,'#CFCFCF');
@@ -890,20 +905,43 @@ $params = array();
 * The literally canvas whiteboard
 *
 */
-function fetchLiterallyCanvas($forsubmission=true,$width=0,$height=0,$backimage="",$updatecontrol="", $contextid=0,$component="",$filearea="",$itemid=0){
+function fetchLiterallyCanvas($forsubmission=true,$width=0,$height=0,$backimage="",
+	$updatecontrol="", $contextid=0,$component="",$filearea="",$itemid=0,
+	$callbackjs=false,$vectorcontrol="",$vectordata=""){
+	
 global $CFG, $USER, $COURSE,$PAGE;
 
 	//javascript upload handler
 	$opts =Array();
 	if($backimage !=''){
 		$opts['bgimage'] = $backimage;
+		$opts['backgroundcolor'] = 'transparent';
+	}else{
+		$opts['backgroundcolor'] = 'whiteSmoke';
 	}
+	
 	if($CFG->filter_poodll_autosavewhiteboard && $forsubmission){
 		$opts['autosave'] = $CFG->filter_poodll_autosavewhiteboard;
 	}
 	//imageurlprefix, that LC requires
 	$opts['imageurlprefix']= $CFG->httpswwwroot . '/filter/poodll/js/literallycanvas.js/img';
-	$PAGE->requires->js_init_call('M.filter_poodll.loadliterallycanvas', array($opts),false);
+	$opts['recorderid']= 'literallycanvas_' . time() .  rand(10000,999999);
+	$opts['callbackjs']= $callbackjs;
+	$opts['updatecontrol']= $updatecontrol;
+	$opts['vectorcontrol'] = $vectorcontrol;
+	$opts['base64control'] = '';//do this later
+	$opts['vectordata'] = $vectordata;
+	
+	//We need this so that we can require the JSON , for json stringify
+	$jsmodule = array(
+		'name'     => 'filter_poodll',
+		'fullpath' => '/filter/poodll/module.js',
+		'requires' => array('json')
+	);
+		
+	//setup our JS call
+	$PAGE->requires->js_init_call('M.filter_poodll.loadliterallycanvas', array($opts),false,$jsmodule);
+	//$PAGE->requires->js_init_call('M.filter_poodll.loadliterallycanvas', array($opts),false);
 
 	//removed from params to make way for moodle 2 filesystem params Justin 20120213
 	if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
@@ -911,7 +949,9 @@ global $CFG, $USER, $COURSE,$PAGE;
 	$poodllfilelib= $CFG->wwwroot . '/filter/poodll/poodllfilelib.php';
 	
 	//add the height of the control area, so that the user spec dimensions are the canvas size
+	$canvasheight = $height;
 	$height=$height + 61;
+	
 
 
 	//the control to put the filename of our picture
@@ -933,32 +973,50 @@ global $CFG, $USER, $COURSE,$PAGE;
 	}
 	
 	//include other needed libraries
-	$PAGE->requires->js("/filter/poodll/js/literallycanvas.js/js/underscore-1.4.2.js");
-	$PAGE->requires->js("/filter/poodll/js/literallycanvas.js/js/literallycanvas.js");
+	$PAGE->requires->js("/filter/poodll/js/literallycanvas.js/js/literallycanvas.jquery.js");
+	//this won't work in a quiz, and throws an error about trying to add to page head, 
+	//when page head has already been output. So copy contents of this file to styles.css in poodllfilter
+	//$PAGE->requires->css(new moodle_url($CFG->wwwroot . '/filter/poodll/js/literallycanvas.js/css/literally.css'));
+	
 
 
 	//save button 
-	$savebutton = "<input type=\"hidden\" id=\"p_updatecontrol\" value=\"$updatecontrol\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_contextid\" value=\"$contextid\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_component\" value=\"$component\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_mediatype\" value=\"$mediatype\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_filearea\" value=\"$filearea\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_itemid\" value=\"$itemid\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_fileliburl\" value=\"$poodllfilelib\" />";
-	$buttonclass="p_btn";
-	$savebutton .= "<button type=\"button\" id=\"p_btn_upload_whiteboard\" class=\"$buttonclass\">" 
+	$savebutton = "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_updatecontrol\" value=\"$updatecontrol\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_contextid\" value=\"$contextid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_component\" value=\"$component\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_mediatype\" value=\"$mediatype\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_filearea\" value=\"$filearea\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_itemid\" value=\"$itemid\" />";
+	
+	//justin 20140521 vectordata
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_vectorcontrol\" value=\"$vectorcontrol\" />";
+	
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_fileliburl\" value=\"$poodllfilelib\" />";
+	if(array_key_exists('autosave',$opts)){
+		$buttonclass="w_btn";
+	}else{
+		$buttonclass="p_btn";
+	}
+	$savebutton .= "<button type=\"button\" id=\"". $opts['recorderid'] . "_btn_upload_whiteboard\" class=\"$buttonclass\">" 
 				. get_string('whiteboardsave', 'filter_poodll'). 
 				"</button>";
 	
 	
 	//message container
-	$progresscontrols ="<div id=\"p_messages\"></div>";
+	$progresscontrols ="<div id=\"". $opts['recorderid'] . "_messages\"></div>";
 
 		
-	//container of whiteboard and other controls
-	$lcOpen = "<div class='whiteboard-wrapper' style='width:".$width."px; height:" . $height ."px;'>
-		<div class='fs-container' style='width:".$width."px; height:" . $height ."px;'>
-		<div class='literally'><canvas></canvas></div></div>";
+	//container of whiteboard, bgimage and other bits and pieces.
+	if($backimage !=''){
+		$lcOpen = "<div class='whiteboard-wrapper' style='width:".$width."px; height:" . $height ."px;'>
+			<div class='fs-container separate-backgrounds' style='width:".$width."px; height:" . $height ."px;'>
+			<img id='" . $opts['recorderid']  . "_separate-background-image' class='separate-background-image' src='" . $opts['bgimage'] . "'/>
+			<div id='" . $opts['recorderid']  . "_literally' class='literally separate-backgrounds'><canvas></canvas></div></div>";
+	}else{
+		$lcOpen = "<div class='whiteboard-wrapper' style='width:".$width."px; height:" . $height ."px;'>
+			<div class='fs-container' style='width:".$width."px; height:" . $height ."px;'>
+			<div id='" . $opts['recorderid']  . "_literally' class='literally'><canvas></canvas></div></div>";
+	}
 	$lcClose = "</div>";
 
 	//add save control and return string
@@ -975,21 +1033,40 @@ global $CFG, $USER, $COURSE,$PAGE;
 }
 
 /*
-* The literally canvas whiteboard
+* The Drawingboard whiteboard
 *
 */
-function fetchDrawingBoard($forsubmission=true,$width=0,$height=0,$backimage="",$updatecontrol="", $contextid=0,$component="",$filearea="",$itemid=0){
+function fetchDrawingBoard($forsubmission=true,$width=0,$height=0,$backimage="",$updatecontrol="", $contextid=0,$component="",$filearea="",$itemid=0,$callbackjs=false,$vectorcontrol='',$vectordata=''){
 global $CFG, $USER, $COURSE,$PAGE;
 
 	//javascript upload handler
 	$opts =Array();
-	if($backimage !=''){
+	$opts['recorderid']= 'drawingboard_' . time() .  rand(10000,999999);
+	$opts['callbackjs']= $callbackjs;
+	$opts['updatecontrol']= $updatecontrol;
+	$opts['vectorcontrol'] = $vectorcontrol;
+	$opts['vectordata'] = $vectordata;
+	
+	//be careful here, only set the background IF
+	//(a) we have an image and (b) we have no vectordata
+	//if we have vector data, it will contain the image
+	if($backimage !='' && $vectordata==''){
 		$opts['bgimage'] = $backimage;
 	}
 	if($CFG->filter_poodll_autosavewhiteboard && $forsubmission){
 		$opts['autosave'] = $CFG->filter_poodll_autosavewhiteboard;
 	}
-	$PAGE->requires->js_init_call('M.filter_poodll.loaddrawingboard', array($opts),false);
+	
+	//We need this so that we can require the JSON , for json stringify
+	$jsmodule = array(
+		'name'     => 'filter_poodll',
+		'fullpath' => '/filter/poodll/module.js',
+		'requires' => array('json')
+	);
+		
+	//setup our JS call
+	$PAGE->requires->js_init_call('M.filter_poodll.loaddrawingboard', array($opts),false,$jsmodule);
+	//$PAGE->requires->js_init_call('M.filter_poodll.loaddrawingboard', array($opts),false);
 
 	//removed from params to make way for moodle 2 filesystem params Justin 20120213
 	if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
@@ -1021,28 +1098,28 @@ global $CFG, $USER, $COURSE,$PAGE;
 
 
 	//save button 
-	$savebutton = "<input type=\"hidden\" id=\"p_updatecontrol\" value=\"$updatecontrol\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_contextid\" value=\"$contextid\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_component\" value=\"$component\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_mediatype\" value=\"$mediatype\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_filearea\" value=\"$filearea\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_itemid\" value=\"$itemid\" />";
-	$savebutton .= "<input type=\"hidden\" id=\"p_fileliburl\" value=\"$poodllfilelib\" />";
+	$savebutton = "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_updatecontrol\" value=\"$updatecontrol\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_contextid\" value=\"$contextid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_component\" value=\"$component\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_mediatype\" value=\"$mediatype\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_filearea\" value=\"$filearea\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_itemid\" value=\"$itemid\" />";
+	$savebutton .= "<input type=\"hidden\" id=\"". $opts['recorderid'] . "_fileliburl\" value=\"$poodllfilelib\" />";
 	if(array_key_exists('autosave',$opts)){
 		$buttonclass="w_btn";
 	}else{
 		$buttonclass="p_btn";
 	}
-	$savebutton .= "<button type=\"button\" id=\"p_btn_upload_whiteboard\" class=\"$buttonclass\">" 
+	$savebutton .= "<button type=\"button\" id=\"". $opts['recorderid'] . "_btn_upload_whiteboard\" class=\"$buttonclass\">" 
 				. get_string('whiteboardsave', 'filter_poodll'). 
 				"</button>";
 	
 	//message container		
-	$progresscontrols = "<div id=\"p_messages\"></div>";
+	$progresscontrols = "<div id=\"". $opts['recorderid'] . "_messages\"></div>";
 
 	//init return string with container of whiteboard	
 	$dbOpen = "<div class='whiteboard-wrapper' style='width:".$width."px; height:" . $height ."px;'>
-		<div class='board drawing-board' id='drawing-board-id' style='width:".$width."px; height:" . $height ."px;'></div>";
+		<div class='board drawing-board' id='". $opts['recorderid'] . "_drawing-board-id' style='width:".$width."px; height:" . $height ."px;'></div>";	
 	$dbClose ="</div>";
 		
 	//add save control and return string
@@ -1059,10 +1136,12 @@ global $CFG, $USER, $COURSE,$PAGE;
 
 
 
-function fetchWhiteboardForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$width=0,$height=0,$backimage="",$prefboard=""){
+function fetchWhiteboardForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$width=0,$height=0,$backimage="",$prefboard="",$callbackjs=false, $vectorcontrol="",$vectordata=""){
 global $CFG, $USER, $COURSE;
 
 //head off to the correct whiteboard as defined in config
+//we override prefboard if they couldn't use it anyway(ie old IE)
+if(isOldIE()){$prefboard='poodll';}
 if($prefboard==""){
 	$useboard = $CFG->filter_poodll_defaultwhiteboard;
 }else{
@@ -1072,24 +1151,32 @@ if($prefboard==""){
 switch($useboard){
 	case 'literallycanvas':
 		$forsubmission = true;
-		return fetchLiterallyCanvas($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid);
+		return fetchLiterallyCanvas($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid,$callbackjs,$vectorcontrol,$vectordata);
 		break;
 	case 'drawingboard':
 		$forsubmission = true;
-		return fetchDrawingBoard($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid); 
+		return fetchDrawingBoard($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid,$callbackjs,$vectorcontrol,$vectordata);
 		break;
 	default:
 }
 
 
+
 //head off to HTML5 logic if mobile
 if(isMobile($CFG->filter_poodll_html5widgets)){
+	
+	$forsubmission = true;
+	return fetchDrawingBoard($forsubmission,$width,$height,$backimage,$updatecontrol, $contextid,$component,$filearea,$itemid,$callbackjs,$vectorcontrol,$vectordata);
+	//the old logic follows but using drawingboard.js is probably better.
+	//if the sky falls in, we will revert though. Justin 20131202
+	/*	
 	if(!canDoUpload()){
 		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
 	}else{	
 		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
 	}
 	return $ret;
+	*/
 
 }
 
@@ -1098,8 +1185,7 @@ if(isMobile($CFG->filter_poodll_html5widgets)){
 //pair submissions could be interesting ..
 $boardname="solo";
 $mode="normal";
-//whats my name...? my name goddamit, I can't remember  N A mm eeeE
-//$mename=$USER->username;		
+	
 
 	//removed from params to make way for moodle 2 filesystem params Justin 20120213
 	if($width==0){ $width=$CFG->filter_poodll_whiteboardwidth;}
@@ -1132,9 +1218,20 @@ $height = $height + 20;
 		$params['component'] = $component;
 		$params['filearea'] = $filearea;
 		$params['itemid'] = $itemid;
+		$params['vectordata'] = $vectordata;
+		$params['vectorcontrol'] = $vectorcontrol;
+		$params['recorderid'] ='pwboard_' . time() .  rand(10000,999999);
+		
+		if($callbackjs){
+			$params['callbackjs'] = $callbackjs;
+		}
+		if($CFG->filter_poodll_autosavewhiteboard ){
+			$params['autosave'] = $CFG->filter_poodll_autosavewhiteboard;
+		}
 		
 		//normal mode is a standard scribble with a cpanel
-		//simple mode has a simple double click popup menu
+		//simple mode has a simple double click popup menu, but not submit feature
+		//all submit is via normal mode, for now.
 		if ($mode=='normal'){
 			$returnString =  fetchSWFWidgetCode('scribblesubmit.lzx.swf9.swf',
 				$params,$width,$height,'#FFFFFF');	
@@ -1151,7 +1248,7 @@ $height = $height + 20;
 
 }
 
-function fetchAudioRecorderForSubmission($runtime, $assigname, $updatecontrol="saveflvvoice", $contextid,$component,$filearea,$itemid,$timelimit="0"){
+function fetchAudioRecorderForSubmission($runtime, $assigname, $updatecontrol="saveflvvoice", $contextid,$component,$filearea,$itemid,$timelimit="0",$callbackjs=false){
 global $CFG, $USER, $COURSE;
 
 //get our HTML5 Uploader if we have a mobile device
@@ -1159,7 +1256,7 @@ if(isMobile($CFG->filter_poodll_html5rec)){
 	if(!canDoUpload()){
 		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
 	}else{	
-		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio");
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "audio",false,$callbackjs);
 	}
 	return $ret;
 
@@ -1239,6 +1336,9 @@ $params = array();
 		$params['itemid'] = $itemid;
 		$params['timelimit'] = $timelimit;
 		$params['autotryports'] = $autotryports;
+		if($callbackjs){
+			$params['callbackjs']=$callbackjs;
+		}
 	
     	$returnString=  fetchSWFWidgetCode('PoodLLAudioRecorder.lzx.swf9.swf',
     						$params,$width,$height,'#CFCFCF');
@@ -1271,7 +1371,7 @@ $userid = $USER->username;
 
 	
 	//Determine if we are admin, if necessary , for slave/master mode
-	if (has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if (has_capability('mod/quiz:preview', context_course::instance($COURSE->id))){		
 		$isadmin=true;
 	}else{
 		$isadmin=false;
@@ -1389,7 +1489,7 @@ if($start){
 	
 	//the clickable "start" button
   	$returnString .= "<div class='p_scroll_btn_wrapper'>";
-	$returnString .= "<button type='button' onclick='ScrollBoxStart($uniqueid)' id='p_scrollstartbutton" . $uniqueid .  "' class='p_btn'>Start</button>";
+	$returnString .= "<button type='button' onclick='M.filter_poodll.ScrollBoxStart($uniqueid)' id='p_scrollstartbutton" . $uniqueid .  "' class='p_btn'>Start</button>";
 	$returnString .= "</div>";
 	
 	
@@ -1461,7 +1561,7 @@ $userid = $USER->username;
 
 	
 	//Determine if we are admin, if necessary , for slave/master mode
-	if (has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if (has_capability('mod/quiz:preview', context_course::instance($COURSE->id))){		
 		$isadmin=true;
 	}else{
 		$isadmin=false;
@@ -1654,7 +1754,7 @@ $params = array();
 
 }
 
-function fetchSnapshotCameraForSubmission($updatecontrol="filename", $filename="apic.jpg", $width="350",$height="400",$contextid,$component,$filearea,$itemid){
+function fetchSnapshotCameraForSubmission($updatecontrol="filename", $filename="apic.jpg", $width="350",$height="400",$contextid,$component,$filearea,$itemid,$callbackjs=false){
 global $CFG, $USER, $COURSE;
 
 //get our HTML5 Uploader if we have a mobile device
@@ -1662,7 +1762,7 @@ if(isMobile($CFG->filter_poodll_html5widgets)){
 	if(!canDoUpload()){
 		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
 	}else{	
-		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image",false,$callbackjs);
 	}
 	return $ret;
 }
@@ -1698,8 +1798,17 @@ $params = array();
 		$params['filearea'] = $filearea;
 		$params['itemid'] = $itemid;
 		
+		//recorder id
+		$params['recorderid'] = "sshot_" . time() .  rand(10000,999999);
+		
 		//set to auto submit
 		$params['autosubmit'] = 'true';
+		
+		//callbackjs
+		if($callbackjs){
+			$params['callbackjs'] = $callbackjs;
+		}
+	
 	
     	$returnString=  fetchSWFWidgetCode('PoodLLSnapshot.lzx.swf9.swf',
     						$params,$width,$height,'#FFFFFF');
@@ -1861,7 +1970,7 @@ $params = array();
 
 }
 
-function fetchVideoRecorderForSubmission($runtime, $assigname, $updatecontrol="saveflvvoice", $contextid,$component,$filearea,$itemid,$timelimit="0"){
+function fetchVideoRecorderForSubmission($runtime, $assigname, $updatecontrol="saveflvvoice", $contextid,$component,$filearea,$itemid,$timelimit="0",$callbackjs=false){
 global $CFG, $USER, $COURSE;
 
 //head off to HTML5 logic if mobile
@@ -1869,7 +1978,7 @@ if (isMobile($CFG->filter_poodll_html5rec)){
 	if(!canDoUpload()){
 		$ret ="<div class='mobile_os_version_warning'>" . get_string('mobile_os_version_warning', 'filter_poodll') . "</div>";
 	}else{	
-		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "video");
+		$ret = fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "video",false,$callbackjs);
 	}
 	return $ret;
 }
@@ -1900,10 +2009,17 @@ $micloopback = $CFG->filter_poodll_micloopback;
 
 //removed from params to make way for moodle 2 filesystem params Justin 20120213
 $userid="dummy";
-$width="350";
-$height="400";
 $filename="12345"; 
 $poodllfilelib= $CFG->wwwroot . '/filter/poodll/poodllfilelib.php';
+switch($assigname){
+	case 'poodllrepository':
+		$width="298";
+		$height="340";
+		break;
+	default:
+		$width="350";
+		$height="400";
+}
 
 //If we are using course ids then lets do that
 //else send -1 to widget (ignore flag)
@@ -1959,6 +2075,11 @@ $params = array();
 		$params['itemid'] = $itemid;
 		$params['timelimit'] = $timelimit;
 		$params['autotryports'] = $autotryports;
+		
+		//callbackjs
+		if($callbackjs){
+			$params['callbackjs'] = $callbackjs;
+		}
 	
     	$returnString=  fetchSWFWidgetCode('PoodLLVideoRecorder.lzx.swf9.swf',
     						$params,$width,$height,'#FFFFFF');
@@ -1970,7 +2091,7 @@ $params = array();
 
 }
 
-function fetch_HTML5RecorderForSubmission($updatecontrol="saveflvvoice", $contextid,$component,$filearea,$itemid, $mediatype="image",$fromrepo=false){
+function fetch_HTML5RecorderForSubmission($updatecontrol="saveflvvoice", $contextid,$component,$filearea,$itemid, $mediatype="image",$fromrepo=false, $callbackjs=false){
 global $CFG,$PAGE;
 
 	//Get our browser object for determining HTML5 options
@@ -1979,6 +2100,9 @@ global $CFG,$PAGE;
 	//configure our options array for the JS Call
 	$fileliburl = $CFG->wwwroot . '/filter/poodll/poodllfilelib.php';
 	$opts = array();
+	$opts['recorderid']=$mediatype .'recorder_' . time() .  rand(10000,999999);
+	$opts['callbackjs']=$callbackjs;
+	$opts['updatecontrol']=$updatecontrol;
 		
 	//setup our JS call
 	if(!$fromrepo){
@@ -2015,21 +2139,21 @@ global $CFG,$PAGE;
 	if($fancybutton){ $returnString .= "<div class=\"p_btn_wrapper\">";}
 	$returnString .="
 			$savecontrol
-			<input type=\"hidden\" id=\"p_updatecontrol\" value=\"$updatecontrol\" />
-			<input type=\"hidden\" id=\"p_contextid\" value=\"$contextid\" />
-			<input type=\"hidden\" id=\"p_component\" value=\"$component\" />
-			<input type=\"hidden\" id=\"p_filearea\" value=\"$filearea\" />
-			<input type=\"hidden\" id=\"p_itemid\" value=\"$itemid\" />
-			<input type=\"hidden\" id=\"p_mediatype\" value=\"$mediatype\" />
-			<input type=\"hidden\" id=\"p_fileliburl\" value=\"$fileliburl\" />
-			<input type=\"file\" id=\"poodllfileselect\" name=\"poodllfileselect[]\" $acceptmedia />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_updatecontrol\" value=\"$updatecontrol\" />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_contextid\" value=\"$contextid\" />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_component\" value=\"$component\" />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_filearea\" value=\"$filearea\" />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_itemid\" value=\"$itemid\" />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_mediatype\" value=\"$mediatype\" />
+			<input type=\"hidden\" id=\"" . $opts['recorderid'] . "_fileliburl\" value=\"$fileliburl\" />
+			<input type=\"file\" id=\"" . $opts['recorderid'] . "_poodllfileselect\" name=\"poodllfileselect[]\" $acceptmedia />
 			";
 	if($fancybutton){ $returnString .= 
 			"<button type=\"button\" class=\"p_btn\">Record or Choose a File</button>
 		</div>";}
 	$returnString .= 
-		"<div id=\"p_progress\"><p></p></div>
-		<div id=\"p_messages\"></div>";
+		"<div id=\"" . $opts['recorderid'] . "_progress\" class=\"p_progress\"><p></p></div>
+		<div id=\"" . $opts['recorderid'] . "_messages\" class=\"p_messages\"></div>";
 
 	return $returnString;
 }
@@ -2202,7 +2326,7 @@ global  $CFG, $COURSE;
 }
 
 //Audio playlisttest player with defaults, for use with directories of audio files
-function fetchAudioTestPlayer($runtime, $playlist,$protocol="", $width="400",$height="150",$filearea="content"){
+function fetchAudioTestPlayer($runtime, $playlist,$protocol="", $width="400",$height="150",$filearea="content",$usepoodlldata=true){
 global $CFG, $USER, $COURSE;
 
 $moduleid = optional_param('id', 0, PARAM_INT);    // The ID of the current module (eg moodleurl/view.php?id=X )
@@ -2210,6 +2334,8 @@ $moduleid = optional_param('id', 0, PARAM_INT);    // The ID of the current modu
 //Set our servername .
 $flvserver = $CFG->poodll_media_server;
 
+////if usepoodlldata, then set that to filearea
+if($usepoodlldata){$filearea="poodlldata";}
 
 
 //determine which of, automated or manual playlists to use
@@ -2238,8 +2364,6 @@ if(strlen($playlist) > 4 && substr($playlist,-4)==".xml"){
     						
     	return $returnString;
 
-
-	
 }
 
 //Audio playlist player with defaults, for use with directories of audio files
@@ -2515,7 +2639,7 @@ $useplayer=$CFG->filter_poodll_defaultplayer;
 				}
 				
 				//regardless of swf player, add a download icon if appropriate
-				$context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+				$context = context_course::instance($COURSE->id);
 				$has_permission = has_capability('filter/poodll:candownloadmedia', $context);
 				if($CFG->filter_poodll_download_media_ok && $has_permission){
 					$returnString .=  "<a href='" . urldecode($rtmp_file) . "'>" 
@@ -2552,10 +2676,12 @@ $ismobile=isMobile($CFG->filter_poodll_html5play);
 
 	//Massage the media file name if we have a username variable passed in.	
 	//This allows us to show different video to each student
-	$rtmp_file = str_replace( "@@username@@",$USER->username,$rtmp_file);
+	if(isset($USER->username)){
+		$rtmp_file = str_replace( "@@username@@",$USER->username,$rtmp_file);
+	}
 	
 	//Determine if we are admin, admins can always fullscreen
-	if (has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if (has_capability('mod/quiz:preview', context_course::instance($COURSE->id))){		
 		$permitfullscreen='true';
 	}
 
@@ -2725,7 +2851,7 @@ $ismobile=isMobile($CFG->filter_poodll_html5play);
 								$params,$width,$height,'#FFFFFF');
 				}
 				
-				$context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+				$context = context_course::instance($COURSE->id);
 				$has_permission = has_capability('filter/poodll:candownloadmedia', $context);
 				if($CFG->filter_poodll_download_media_ok && $has_permission){
 					$returnString .=  "<a href='" . urldecode($rtmp_file) . "'>" 
@@ -2760,7 +2886,7 @@ if ($width==''){$width=$CFG->filter_poodll_smallgallwidth;}
 if ($height==''){$height=$CFG->filter_poodll_smallgallheight;}
 
 //Determine if we are admin, admins can always fullscreen
-	if (has_capability('mod/quiz:preview', get_context_instance(CONTEXT_COURSE, $COURSE->id))){		
+	if (has_capability('mod/quiz:preview', context_course::instance($COURSE->id))){		
 		$permitfullscreen='true';
 	}
 
@@ -2952,10 +3078,7 @@ global $CFG, $DB, $COURSE;
 	//FIlter could submit submission/draft/content/intro as options here
 	if($filearea == "") {$filearea ="content";}
 	
-	//fetch info and ids about the module calling this data
-	$course = $DB->get_record('course', array('id'=>$courseid));
-	$modinfo = get_fast_modinfo($course);
-	$cm = $modinfo->get_cm($moduleid);
+
 	
 	//make sure we have a trailing slash
 	if(strlen($path)>0){
@@ -3024,6 +3147,11 @@ global $CFG, $DB, $COURSE;
 	//end of PoodLL Data Dir
 	}else{
 	
+	//fetch info and ids about the module calling this data
+	$course = $DB->get_record('course', array('id'=>$courseid));
+	$modinfo = get_fast_modinfo($course);
+	$cm = $modinfo->get_cm($moduleid);
+	
 	//If we are using Moodle 2 file handling, we build a list of files here:
 	//=============================================
 	//get filehandling objects
@@ -3031,7 +3159,7 @@ global $CFG, $DB, $COURSE;
 	$fs = get_file_storage();
 
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid);
 	$contextid = $thiscontext->id;
 	
 	//fetch a list of files in this area, and sort them alphabetically
@@ -3128,38 +3256,24 @@ global $CFG, $PAGE;
 //embed a quizlet iframe
 function fetch_quizlet($quizletid, $quizlettitle="", $mode="flashcards", $width="100%",$height=""){
 
-//massage mode, other options are as is "learn" or "scatter"	
-if($mode=="flashcards")$mode="familiarize";
+	//massage mode, other options are as is "learn" or "scatter"	
+	if($mode=="")$mode="flashcards";
 
-//set default heights
-$fa="310";
-$sc="410";
-$le="315";
-
-//height changes depending on mode
-	switch($mode){
-		case 'familiarize': if($height==''){$height=$fa;}else{$fa=$height;} break;
-		case 'scatter': if($height==''){$height=$sc;}else{$sc=$height;} break;
-		case 'learn': if($height==''){$height=$le;}else{$le=$height;} break;
+	//set default heights
+	$dh = "410";
+	if($height==''){$height=$dh;}
+	
+	//only do scrolling for test
+	if ($mode == "test"){
+		$scroll="yes";
+	}else{
+		$scroll="no";
 	}
 
-		
-$ret=	"<div style=\"background:#fff;padding:3px\">
-		<iframe src=\"http://quizlet.com/$quizletid/$mode/embed/?hideLinks\" height=\"$height\" width=\"$width\" style=\"border:0;\" scrolling=\"no\"></iframe>
-		<select style=\"float:right;margin-right:3px\" onchange=\"var quizlet_s=this.options[this.selectedIndex].value;var quizlet_f=this;while(quizlet_f.nodeName.toLowerCase()!='iframe')quizlet_f=quizlet_f.previousSibling;quizlet_f.src=quizlet_s.slice(0,-3);quizlet_f.height=quizlet_s.slice(-3);this.value=0\">
-			<option value=\"0\" selected=\"selected\">Choose a Study Mode</option>
-			<option value=\"http://quizlet.com/$quizletid/scatter/embed/?hideLinks&height=$sc\">Scatter</option>
-			<option value=\"http://quizlet.com/$quizletid/learn/embed/?hideLinks&height=$le\">Learn</option>
-			<option value=\"http://quizlet.com/$quizletid/familiarize/embed/?hideLinks&height=$fa\">Flashcards</option>
-		</select>
-		<div style=\"float:left;font-size:11px;padding-top:2px\">
-			<a style=\"float: left;margin: -2px 6px 0pt 2px;\" href=\"http://quizlet.com/\">
-				<img src=\"http://quizlet.com/a/i/quizlet-embed-logo.PQQ2.png\" border=\"0\" title=\"Quizlet.com, home of free online educational games\" alt=\"Quizlet.com, home of free online educational games\" /></a>
-			<a href=\"http://quizlet.com/$quizletid/$quizlettitle/\">Study these flash cards</a>
-		</div>
-		<div style=\"clear:both\"></div>
-	</div>";
-
+	//return iframe	
+	$ret=	"<div style=\"background:#fff;padding:3px\">
+			<iframe src=\"//quizlet.com/$quizletid/$mode/embedv2/?hideLinks\" height=\"$height\" width=\"$width\" style=\"border:0;\" scrolling=\"$scroll\"></iframe>
+			</div>";
 	return $ret;
 
 }
@@ -3396,6 +3510,16 @@ function canDoUpload(){
 		
 				
 	}//end of function
+	
+function isOldIE(){
+	$browser = new Browser();
+
+	 if($browser->getBrowser() == Browser::BROWSER_IE && $browser->getVersion() < 10){
+		return true;
+	}else{
+		return false;
+	}
+}
 
 //Here we try to detect if this is a mobile device or not
 //this is used to determine whther to return a JS or SWF widget
@@ -3726,6 +3850,13 @@ function fetchVideoSplash($src){
 					array_splice($relarray, 4, 0, '0');
 					$relpath = implode('/',$relarray);
 					break;
+					
+				default:
+					//if we have no itemid, zero is assumed
+					if(count($relarray)==5){
+						$relpath = '/' . $relarray[1] . '/' . $relarray[2] . '/' . $relarray[3];
+						$relpath .= '/0/' . $relarray[4];
+					 }
 			}
 			
 			
@@ -3754,7 +3885,8 @@ function fetchVideoSplash($src){
 	
 	//check if we have an image file here already, if so return that URL
 	$relimagepath = substr($relpath,0,strlen($relpath)-3) . 'png';
-	$fullimagepath = substr($src,0,strlen($src)-3) . 'png';
+	$trimsrc = str_replace("?forcedownload=1","", $src);
+	$fullimagepath = substr($trimsrc,0,strlen($trimsrc)-3) . 'png';
 	$imagefilename = substr($filename,0,strlen($filename)-3) . 'png';
 	if ($imagefile = $fs->get_file_by_hash(sha1($relimagepath))) {
             return $fullimagepath;

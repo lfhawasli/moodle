@@ -189,7 +189,8 @@ function filter_poodll_callback(array $link){
 				!empty($filterprops['protocol']) ? $filterprops['protocol'] : 'rtmp',
 				!empty($filterprops['width']) ? $filterprops['width'] : 400,
 				!empty($filterprops['height']) ? $filterprops['height'] : 50,
-				!empty($filterprops['filearea']) ? $filterprops['filearea'] : 'content');
+				!empty($filterprops['filearea']) ? $filterprops['filearea'] : 'content',
+				!empty($filterprops['usepoodlldata']) ? $filterprops['usepoodlldata']=='true' : false);
 			break;	
 			
 		case 'talkback':
@@ -468,7 +469,8 @@ function filter_poodll_pdl_callback($link) {
 global $CFG;
 	//strip the .pdl extension
 	$len = strlen($link[2]);
-	$key=substr($link[2],0,$len-4);
+	$trimpoint = strpos($link[2], ".pdl");
+	$key=substr($link[2],0,$trimpoint);
 	
 	//see if there is a parameter to this widget
 	$pos = strpos($key, "_");
