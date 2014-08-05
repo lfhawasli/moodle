@@ -10679,6 +10679,22 @@ table#user-grades .catlevel1 .action-icon.selected img {
   margin-bottom: 10px;
 }
 
+/* line 47, ../sass/ccle/mod/_admin.scss */
+#page-course-management .course-being-dragged {
+  border: 1px solid #ddd;
+  background-color: #EFEFEF;
+}
+/* line 51, ../sass/ccle/mod/_admin.scss */
+#page-course-management .course-being-dragged a {
+  color: #aaa;
+}
+/* line 56, ../sass/ccle/mod/_admin.scss */
+#page-course-management .course-being-dragged-proxy {
+  background-color: #fff;
+  opacity: 0.7;
+  border: 1px solid #aaa;
+}
+
 /* line 7, ../sass/ccle/mod/_forum.scss */
 .forumaddnew,
 .forumnodiscuss {

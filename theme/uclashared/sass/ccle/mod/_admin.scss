@@ -37,3 +37,25 @@
         // @todo: implement
     }
 }
+
+
+// CCLE-4625
+// Adds a better visual hint to courses drag & drop.
+//
+#page-course-management {
+    
+    .course-being-dragged {
+        border: 1px solid #ddd;
+        background-color: #EFEFEF;
+        
+        a {
+            color: #aaa;
+        }
+    }
+    
+    .course-being-dragged-proxy {
+        background-color: #fff;
+        opacity: 0.7;
+        border: 1px solid #aaa;
+    }
+}
