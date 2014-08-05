@@ -366,10 +366,15 @@ class stored_file {
             // Log the filename and contenthash of a file that was deleted.
             $logfiles = get_config('local_ucla', 'logfiledeletion');
             if ((defined('CLI_SCRIPT') && !CLI_SCRIPT) && !empty($logfiles)) {
-                global $COURSE, $USER;
-                add_to_log($COURSE->id, 'course', "delete file",
-                    "view.php?id=$COURSE->id",
-                    "{$this->file_record->filename} | {$this->file_record->contenthash}", 0, $USER->id);
+                $event = \local_ucla\event\file_deleted::create(array(
+                    'context'   => context::instance_by_id($this->file_record->contextid),
+                    'objectid'  => $this->file_record->id,
+                    'other'     => array(
+                        'filename' => $this->file_record->filename,
+                        'contenthash' => $this->file_record->contenthash
+                    )
+                ));
+                $event->trigger();
             }
             // END UCLA MOD CCLE-3843
 
