@@ -299,7 +299,11 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
     echo $OUTPUT->container($body, 'ucla_syllabus-container');
 
     // Log for statistics later.
-    add_to_log($course->id, 'ucla_syllabus', 'view', 'index.php?id='.$course->id, '');
+    $event = \local_ucla_syllabus\event\syllabus_viewed::create(array(
+        'objectid' => $syllabustodisplay->id,
+        'context' => $coursecontext
+    ));
+    $event->trigger();
 }
 
 echo $OUTPUT->footer();

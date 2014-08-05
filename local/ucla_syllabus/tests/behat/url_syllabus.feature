@@ -10,15 +10,15 @@ Background: Specifying URL as a syllabus
        | username | firstname | lastname | email |
        | teacher1 | Teacher | 1 | teacher1@asd.com |
        | student1 | Student | 1 | student1@asd.com |
-   And the following ucla "sites" exists:
+   And the following ucla "sites" exist:
        | fullname | shortname | type |
-       | course 1 | C1 | srs |
-   And the following ucla "enrollments" exists:
+       | Course 1 | C1 | srs |
+   And the following ucla "enrollments" exist:
        | user | course | role |
        | teacher1 | C1 | editingteacher |
        | student1 | C1 | student |
    And I log in as "teacher1"
-   And I browse to site "C1"
+   And I follow "Course 1"
    And I turn editing mode on
    And I follow the "Syllabus (empty)" section in the ucla site menu
    When I follow "Add syllabus"
@@ -28,14 +28,14 @@ Background: Specifying URL as a syllabus
 
 Scenario: Viewing URL as a student
     Given I log in as "student1"
-    When I browse to site "C1"
+    When I follow "Course 1"
     And  I follow the "Syllabus" section in the ucla site menu
     Then I should see "Syllabus" in the "region-main" "region"
     And I should see "http://ucla.edu" in the "region-main" "region"
 
 Scenario: Viewing URL as an instructor
     Given I log in as "teacher1"
-    When I browse to site "C1"
+    When I follow "Course 1"
     And  I follow the "Syllabus" section in the ucla site menu
     Then I should see "Syllabus" in the "region-main" "region"
     And I should see "http://ucla.edu" in the "region-main" "region"

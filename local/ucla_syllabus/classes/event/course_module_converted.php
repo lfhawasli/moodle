@@ -1,5 +1,5 @@
 <?php
-// This file is part of UCLA local plugin for Moodle - http://moodle.org/
+// This file is part of UCLA syllabus plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,33 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains the event class for when files are deleted.
+ * Contains the event class for when a course module is converted into a
+ * syllabus.
  *
- * @package    local_ucla
+ * @package    local_ucla_syllabus
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_ucla\event;
+namespace local_ucla_syllabus\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Records the file hash before a file is deleted from the file system.
+ * Records when a course module is converted.
  *
- * @package    local_ucla
+ * @package    local_ucla_syllabus
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class file_deleted extends \core\event\base {
+class course_module_converted extends \core\event\base {
 
     /**
      * Creates the event.
      */
     protected function init() {
-        $this->data['crud'] = 'd';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'files';
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
+        $this->data['objecttable'] = 'ucla_syllabus';
     }
 
     /**
@@ -50,26 +51,31 @@ class file_deleted extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('logfiledeleted', 'local_ucla');
+        return get_string('eventcoursemoduleconverted', 'local_ucla_syllabus');
     }
 
     /**
-     * Returns a short description for the event that includes filename and
-     * contenthash.
+     * Returns a short description for the event that includes the course module
+     * that was converted and the resulting syllabus id.
+     *
+     * NOTE: Must be non-localized string.
      *
      * @return string
      */
     public function get_description() {
-        return "{$this->other['filename']} | {$this->other['contenthash']}";
+        $manualsyllabus = $this->other['manualsyllabus'];
+        return "The user with id '$this->userid' converted course module " . 
+                "'$manualsyllabus' into syllabus with id '$this->objectid'";
     }
 
     /**
-     * Returns URL to the course page.
+     * Returns URL to the syllabus page.
      *
      * @return moodle_url
      */
     public function get_url() {
-        return new \moodle_url('course/view.php', array('id' => $this->courseid));
+        return new \moodle_url('/local/ucla_syllabus/index.php',
+                array('id' => $this->courseid));
     }
 
     /**
@@ -78,7 +84,7 @@ class file_deleted extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'delete file', $this->get_url(),
-            $this->get_description(), 0, $this->userid);
+        return array($this->courseid, 'ucla_syllabus', 'view', $this->get_url(),
+            $this->get_description());
     }
 }
