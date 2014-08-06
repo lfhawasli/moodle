@@ -121,8 +121,10 @@ if ($justshowsuccessmessage) {
 
     echo $OUTPUT->footer();
 
-    $logurl = new moodle_url('../blocks/ucla_modify_coursemenu/modify_coursemenu.php', array('courseid' => $courseid));
-    add_to_log($courseid, 'course', 'modify sections', $logurl, 'UCLA block Modify sections used');
+    $event = \block_ucla_modify_coursemenu\event\course_menu_modified::create(array(
+        'context' => $context
+    ));
+    $event->trigger();
 
     die();
 } else if ($adjustnum) {
