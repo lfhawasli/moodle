@@ -235,44 +235,47 @@ class local_ucla_generator extends testing_data_generator {
      */
     public function create_ucla_roles() {
         global $CFG, $DB;
+        $systemcontext = context_system::instance();
         $retval = array();
+        // Preset options.
+        $options = array(
+            'shortname'     => 1,
+            'name'          => 1,
+            'description'   => 1,
+            'permissions'   => 1,
+            'archetype'     => 1,
+            'contextlevels' => 1,
+            'allowassign'   => 1,
+            'allowoverride' => 1,
+            'allowswitch'   => 1);
 
-        // Load fixture of role data from PROD. This will grant access to a
-        // new variable called $roles.
-        include($CFG->dirroot . '/local/ucla/tests/fixtures/mdl_role.php');
-
-        $archetypes = array();
-        foreach ($roles as $role) {
-            $retval[$role['shortname']] = create_role($role['name'],
-                    $role['shortname'], $role['description'], $role['archetype']);
-
-            // Now copy all the capabilities for given role from given
-            // archetype. For now, we are just copying capabilities, but later
-            // on we should import the role definitions from our PROD servers.
-
-            // Get roleid for archetype.
-            if (!isset($archetypes[$role['archetype']])) {
-                $archetypes[$role['archetype']] = $DB->get_field('role', 'id',
-                        array('shortname' => $role['archetype']));
+        // Process each file with the *.xml extension and create dummy roles.
+        $xmlfiles = glob($CFG->dirroot . '/local/ucla/tests/fixtures/roles/*.xml', GLOB_NOSORT);
+        foreach ($xmlfiles as $file) {
+            $xml = file_get_contents($file);
+            if (core_role_preset::is_valid_preset($xml)) {
+                $info = core_role_preset::parse_preset($xml);
+                if (!$DB->get_record('role', array('shortname' => $info['shortname']))) {
+                    create_role($info['name'], $info['shortname'], $info['description'], $info['archetype']);
+                }
             }
-
-            // Do copying all in one query so this is as fast as possible.
-            $sql = "INSERT INTO {role_capabilities}
-                    (contextid, roleid, capability, permission)
-                    SELECT  contextid, :targetroleid, capability, permission
-                    FROM    {role_capabilities}
-                    WHERE   roleid=:sourceroleid";
-
-            $DB->execute($sql, array('targetroleid' => $retval[$role['shortname']],
-                                     'sourceroleid' => $archetypes[$role['archetype']]));
         }
 
-        // Although we didn't create it, we need the roleid for student.        
-        $retval['student'] = $archetypes['student'];
-        
-        // Adding required capability for TA.
-        assign_capability('moodle/course:viewparticipants', CAP_ALLOW, 
-                $retval['ta'], context_system::instance());
+        // Process each file with the *.xml extension and update each role.
+        foreach ($xmlfiles as $file) {
+            $xml = file_get_contents($file);
+            if (core_role_preset::is_valid_preset($xml)) {
+                $shortname = basename($file, '.xml');
+                // Check to see that the role is added or already existed.
+                if ($role = $DB->get_record('role', array('shortname' => $shortname))) {
+                    $definitiontable = new tool_uclarolesmigration_import_table($systemcontext, $role->id);
+                    $definitiontable->force_preset($xml, $options);
+                    $definitiontable->save_changes();
+                    $retval[$role->shortname] = $role->id;
+                }
+                unset($definitiontable);
+            }
+        }
         
         return $retval;
     }
