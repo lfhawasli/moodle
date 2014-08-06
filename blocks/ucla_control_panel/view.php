@@ -144,11 +144,15 @@ if ($noelements) {
 }
 
 // Log the tab the user is viewing.
-$params = array('course_id' => $courseid, 'section' => $sectionid,
-                'module' => $moduleview);
-$logurl = new moodle_url('../blocks/ucla_control_panel/view.php', $params);
-add_to_log($courseid, 'course', "control panel view", $logurl,
-        get_string($moduleview, 'block_ucla_control_panel'));
+$event = \block_ucla_control_panel\event\control_panel_viewed::create(array(
+    'context' => $context,
+    'other' => array(
+        'module' => $moduleview,
+        'module_name' => get_string($moduleview, 'block_ucla_control_panel'),
+        'section' => $sectionid
+    )
+));
+$event->trigger();
 
 // This is temporary fix for the bottom border.
 echo html_writer::end_tag('div');
