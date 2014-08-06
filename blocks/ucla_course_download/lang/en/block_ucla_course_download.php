@@ -83,6 +83,7 @@ $string['fileoversizeexclusion'] = 'Files over <strong>{$a}</strong> will be exc
 // Events.
 $string['eventrequestcreated'] = 'Course download request created';
 $string['eventzipdownloaded'] = 'Course content zip downloaded';
+$string['eventfilelistviewed'] = 'Course download status page viewed';
 
 // Capability descriptions.
 $string['ucla_course_download:addinstance'] = 'Add a new UCLA course download block';

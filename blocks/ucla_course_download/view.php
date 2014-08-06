@@ -91,6 +91,7 @@ echo $body;
 echo $OUTPUT->footer();
 
 // Log views.
-$params = array('courseid' => $courseid);
-$logurl = new moodle_url('../blocks/ucla_course_download/view.php', $params);
-add_to_log($courseid, 'course', 'ucla archive view', $logurl);
+$event = \block_ucla_course_download\event\filelist_viewed::create(array(
+    'context' => $context
+));
+$event->trigger();
