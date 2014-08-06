@@ -533,6 +533,12 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2014071601, 'local', 'ucla');
     }
 
+    // CCLE-4648 - Turn off 'Restriction by profile'.
+    if ($oldversion < 2014080600) {
+        set_config('disabled', 1, 'availability_profile');
+        upgrade_plugin_savepoint(true, 2014080600, 'local', 'ucla');
+    }
+
     return $result;
 }
 
