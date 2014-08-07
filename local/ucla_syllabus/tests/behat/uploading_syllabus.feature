@@ -9,14 +9,14 @@ Background:
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
       | fullname | shortname | type |
-      | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+      | Course 1 | C1 | srs |
+    And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
-    And I log in as ucla "teacher1"
-    And I browse to site "C1"
+    And I log in as "teacher1"
+    And I follow "Course 1"
     And I turn editing mode on
     And I follow "Syllabus (empty)"
 

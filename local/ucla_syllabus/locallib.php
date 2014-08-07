@@ -493,8 +493,12 @@ class ucla_syllabus_manager {
         if (!empty($data->manualsyllabus)) {
             course_delete_module($data->manualsyllabus);
             // Log the conversion, since we are deleting a module.
-            add_to_log($data->id, 'ucla_syllabus', 'conversion', '',
-                    'module ' . $data->manualsyllabus, $data->manualsyllabus);
+            $event = \local_ucla_syllabus\event\course_module_converted::create(array(
+                'objectid'  => $recordid,
+                'context'   => $coursecontext,
+                'other'     => array('manualsyllabus' => $data->manualsyllabus)
+            ));
+            $event->trigger();
         }
 
         return $recordid;

@@ -10,18 +10,18 @@ Feature: Setting a landing page
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
       | student1 | Student | 1 | student1@asd.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
         | fullname | shortname | type |
-        | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+        | Course 1 | C1 | srs |
+    And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
 
   @javascript @local_ucla_syllabus
   Scenario: Set syllabus as a landing page
-    Given I log in as ucla "teacher1"
-    And I browse to site "C1"
+    Given I log in as "teacher1"
+    And I follow "Course 1"
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds
@@ -31,15 +31,15 @@ Feature: Setting a landing page
     When I press "Return to course"
     Then I should see "Syllabus manager"
     And I log out
-    And I log in as ucla "student1"
-    And I browse to site "C1"
+    And I log in as "student1"
+    And I follow "Course 1"
     And I should see "Syllabus is not available yet"
 
   @javascript
   Scenario: Setting landing page and turning editing mode on/off 
             stays on correct section
-    Given I log in as ucla "teacher1"
-    And I browse to site "C1"
+    Given I log in as "teacher1"
+    And I follow "Course 1"
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds
@@ -49,8 +49,8 @@ Feature: Setting a landing page
     And I should see "The sections have been successfully updated."
     And I press "Return to course"
     And I log out
-    And I log in as ucla "teacher1"
-    And I browse to site "C1"
+    And I log in as "teacher1"
+    And I follow "Course 1"
     # Must be redirected to new landing page
     Then I should be on section "Week 4"
     And I turn editing mode on
