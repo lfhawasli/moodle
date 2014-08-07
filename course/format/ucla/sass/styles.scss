@@ -5,22 +5,6 @@
 @import "course";
 @import "editing";
 
-// Define how a section should look
-.section {
-    .sectionheader {
-        border-bottom: 1px solid #ccc;
-        .sectionname {
-            color: $ucla-blue;
-        }
-        
-        .hidden {
-            padding-left: 10px;
-            color: #ddd;
-            //
-            display: block !important;
-        }
-    }
-}
   
 // UCLA format namespace
 .ucla-format {
@@ -30,8 +14,22 @@
     a:link {
         color: $ucla-blue;
     }
-    
-    margin: auto 0px;
+    // The section name.
+    h3.sectionname {
+        color: $ucla-blue;
+        text-align: left !important;
+    }
+    .sectionheader {
+        border-bottom: 1px solid #ccc;
+    }
+    // Hidden means visible NOT hidden!
+    .hidden {
+        padding-left: 10px;
+        color: #ddd;
+
+        display: block !important;
+        visibility: visible !important;
+    }
     
     // ucla format sections
     .section {
@@ -42,6 +40,10 @@
             .content {
                 padding: 4px;
                 border: 2px dashed #ddd;
+                
+                .single-section & {
+                    border: 0;
+                }
             }
             .sectionname:after {
                 @include hidden-label(1.8rem);
