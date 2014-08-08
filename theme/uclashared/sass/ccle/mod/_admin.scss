@@ -37,3 +37,34 @@
         // @todo: implement
     }
 }
+
+
+// CCLE-4625
+// Adds a better visual hint to courses drag & drop.
+//
+#page-course-management {
+    
+    // Adds a tranlucent overlay.
+    .course-being-dragged {
+        border: 1px solid #ddd;
+        background-color: #EFEFEF;
+        
+        a {
+            color: #aaa;
+        }
+    }
+    
+    // Adds a grayed out shadow.
+    .course-being-dragged-proxy {
+        background-color: #fff;
+        opacity: 0.7;
+        border: 1px solid #aaa;
+    }
+    
+    // Makes 'gear' dropdown menu icons display correctly.
+    .menu {
+        .smallicon {
+            @include box-sizing(content-box);
+        }
+    }
+}
