@@ -45,7 +45,7 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
 
 // CCLE-4258: add visual cue to indicate term on categories course lists.
 // This will handle terms until 2022!
-.admin {
+#page-course-management {
     
     // Terms we want to cover, with term code
     $terms: (
