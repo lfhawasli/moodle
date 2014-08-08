@@ -280,8 +280,11 @@ if ($data != false) {
     echo $OUTPUT->confirm(get_string('rearrange_success', 'block_ucla_rearrange'),
             $courseret, $sectret);
 
-    $logurl = new moodle_url('../blocks/ucla_rearrange/rearrange.php', array('courseid' => $courseid));
-    add_to_log($courseid, 'course', 'rearrange materials', $logurl, 'UCLA block Rearrange materials used');
+    $event = \block_ucla_rearrange\event\module_rearranged::create(array(
+        'context' => $context
+    ));
+    $event->trigger();
+
 } else {
     /* for section < 0, the secid doesnt matter because we will expand all
      * However, if will give warning if we use $secid = ($sections[$section_num]->id);
