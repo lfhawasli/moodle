@@ -126,6 +126,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     public function setUp() {
         global $DB;
         $this->resetAfterTest(true);
+        unset_config('noemailever');
 
         // Create test course and users.
         $this->course = $this->getDataGenerator()->create_course();
@@ -134,7 +135,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
 
         // Get student and teacher roleids.
         $studentroleid = $DB->get_field('role', 'id', array('shortname' => 'student'));
-        $teacherroleid = $DB->get_field('role', 'id', array('shortname' => 'teacher'));
+        $teacherroleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
 
         // Enroll users.
         $this->getDataGenerator()->enrol_user($this->student->id,
@@ -163,9 +164,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
 
         // Make sure there is still nothing in the temp directory.
         $this->assertEquals(2, count(scandir($CFG->tempdir.'/coursedownloaddir')));
@@ -186,9 +188,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursefiles = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $coursefiles->add_request();
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $request = $coursefiles->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
         $this->assertNotEmpty($request->fileid);
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
 
@@ -205,11 +208,45 @@ class block_ucla_course_download_files_test extends advanced_testcase {
 
     /**
      * Tests that emails are formatted properly.
-     * 
-     * TODO: Implement once Moodle 2.6+ is integrated.
-     * http://docs.moodle.org/dev/Writing_PHPUnit_tests#Testing_sending_of_emails
      */
     public function test_email() {
+        // Add content to section 5.
+        $contenttocreate[] = array('section' => 5);
+        $this->populate_course($contenttocreate);
+
+        // Declare variables for email strings.
+        $sink = $this->redirectEmails();
+        $a = new StdClass();
+        $a->shortname = $this->course->shortname;
+        $a->ziplifetime = get_config('block_ucla_course_download', 'ziplifetime');
+        $url = new moodle_url('/blocks/ucla_course_download/view.php',
+                array('courseid' => $this->course->id));
+        $a->url = $url->out();
+
+        // Check email format for both student and teacher roles.
+        foreach (array('student', 'teacher') as $user) {
+            $coursedownload = new block_ucla_course_download_files(
+                    $this->course->id, $this->$user->id);
+            $coursedownload->add_request();
+            $coursedownload->process_request();
+            $a->type = $coursedownload->get_type();
+            // Get email.
+            $emails = $sink->get_messages();
+            $this->assertCount(1, $emails);
+            $sink->clear();
+
+            // Verify email contents - subject and body.
+            $this->assertEquals(get_string('emailsubject', 'block_ucla_course_download', $a), $emails[0]->subject);
+            $expectedbody = get_string('emailmessage', 'block_ucla_course_download', $a);
+            // A teacher should not recieve a copyright warning, but a student should.
+            if ($user != 'teacher') {
+                $expectedbody .= "\n\n" . get_string('emailcopyright', 'block_ucla_course_download');
+            }
+            // Compare email body, accounting for formatting added when it's sent.
+            $this->assertEquals(preg_replace('/\n/', ' ', $expectedbody),
+                    trim(preg_replace('/\n/', ' ', $emails[0]->body)));
+        }
+        $sink->close();
     }
 
     /**
@@ -233,15 +270,13 @@ class block_ucla_course_download_files_test extends advanced_testcase {
             $this->assertNotEmpty($request);
 
             // Request should then be deleted.
-            unset_config('noemailever');
             $sink = $this->redirectEmails();
             $processedrequest = $coursefiles->process_request();
+            $this->assertCount(0, $sink->get_messages());
+            $sink->close();
             $this->assertNull($processedrequest);
             $request = $coursefiles->get_request();
             $this->assertEmpty($request);
-
-            // TODO: When Moodle 2.6+ is integrated, make sure that email is not
-            // sent out (http://docs.moodle.org/dev/Writing_PHPUnit_tests#Testing_sending_of_emails).
         }
     }
 
@@ -269,9 +304,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $request = $coursefiles->get_request();
         // Clone, since process requests modifies the request variable.
         $initialrequest = clone $request;
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $processedrequest = $coursefiles->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
 
         // Newly processed request should have proper fields set.
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
@@ -298,9 +334,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
                 $this->course->id, $this->teacher->id);
         $result = $coursefiles->add_request();
         $this->assertTrue($result);
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $coursefiles->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
 
         // Now delete added file.
@@ -349,9 +386,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
         $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
 
@@ -401,9 +439,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
         $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
 
@@ -455,9 +494,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $teacherdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $teacherdownload->add_request();
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $teacherrequest = $teacherdownload->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->clear();
 
         // Create request for student.
         $studentdownload = new block_ucla_course_download_files(
@@ -473,6 +513,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
 
         // Now, process request.
         $studentrequest = $studentdownload->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
 
         // Make sure that both requests share the same content.
         foreach (array('contexthash', 'content') as $column) {
@@ -499,9 +541,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $teacherdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $teacherdownload->add_request();
-        unset_config('noemailever');
         $sink = $this->redirectEmails();
         $request1 = $teacherdownload->process_request();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
         
         $ziparray = $teacherdownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
