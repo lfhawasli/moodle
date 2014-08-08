@@ -65,119 +65,51 @@ class local_publicprivate_renderer extends core_course_renderer {
     }
 
     /**
-     * Override the visibility of a module link to display if 'public'
+     * Display menu with public/private using moodle code
      * 
-     * @param type $course
-     * @param type $completioninfo
+     * @param type $actions
      * @param cm_info $mod
-     * @param type $sectionreturn
      * @param type $displayoptions
      * @return type
      */
-    public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
+    public function course_section_cm_edit_actions($actions, cm_info $mod = null, $displayoptions = array()) {
 
-        if ($this->ppcourse->is_activated()) {
-            // Check if mod is public.
-            $ppmod = new PublicPrivate_Module($mod->id);
-            if ($ppmod->is_public()) {
-                $mod->uservisible = true;
-            }
+        // Add public private.
+        $ppeditaction = get_private_public($mod);
+        if (!empty($ppeditaction)) {
+            $actions = array_merge($actions, $ppeditaction);
         }
 
-        $output = '';
-        // We return empty string (because course module will not be displayed at all)
-        // if:
-        // 1) The activity is not visible to users
-        // and
-        // 2a) The 'showavailability' option is not set (if that is set,
-        //     we need to display the activity so we can show
-        //     availability info)
-        // or
-        // 2b) The 'availableinfo' is empty, i.e. the activity was
-        //     hidden in a way that leaves no info, such as using the
-        //     eye icon.
-        if (!$mod->uservisible &&
-                (empty($mod->showavailability) || empty($mod->availableinfo))) {
-            return $output;
+        // Remove "Assign roles" from edit menu.
+        if (isset($actions['assign'])) {
+            unset($actions['assign']);
         }
 
-        $indentclasses = 'mod-indent';
-        if (!empty($mod->indent)) {
-            $indentclasses .= ' mod-indent-' . $mod->indent;
-            if ($mod->indent > 15) {
-                $indentclasses .= ' mod-indent-huge';
-            }
-        }
-        $output .= html_writer::start_tag('div',
-                        array('class' => $indentclasses));
-
-        // Start the div for the activity title, excluding the edit icons.
-        $output .= html_writer::start_tag('div',
-                        array('class' => 'activityinstance'));
-
-        // Display the link to the module (or do nothing if module has no url).
-        $output .= $this->course_section_cm_name($mod, $displayoptions);
-
-        // Module can put text after the link (e.g. forum unread).
-        $output .= $mod->afterlink;
-
-        // Closing the tag which contains everything but edit icons. Content
-        // part of the module should not be part of this.
-        $output .= html_writer::end_tag('div'); // .activityinstance
-        // If there is content but NO link (eg label), then display the
-        // content here (BEFORE any icons). In this case cons must be
-        // displayed after the content so that it makes more sense visually
-        // and for accessibility reasons, e.g. if you have a one-line label
-        // it should work similarly (at least in terms of ordering) to an
-        // activity.
-        $contentpart = $this->course_section_cm_text($mod, $displayoptions);
-        $url = $mod->url;
-        if (empty($url)) {
-            $output .= $contentpart;
+        // Remove "Groupmodes" from menu.
+        if (isset($actions['groupsnone'])) {
+            unset($actions['groupsnone']);
         }
 
-        // If editing, then add the edit links.
-        if ($this->page->user_is_editing()) {
-
-            $editactions = course_get_cm_edit_actions($mod, $mod->indent,
-                    $sectionreturn);
-
-            // Add public private.
-            $ppeditaction = get_private_public($mod, $sectionreturn);
-            if (!empty($ppeditaction)) {
-                $editactions = array_merge($editactions, $ppeditaction);
-            }
-
-            // Remove "Assign roles" from edit menu
-            if (isset($editactions['assign'])) {
-                unset($editactions['assign']);
-            }
-            
-            //  Move delete to the end.
-            if (isset($editactions['delete'])) {
-                $deledtionaction = $editactions['delete'];
-                unset($editactions['delete']);
-                $editactions = array_merge($editactions, array($deledtionaction));
-            }
-
-            $output .= ' ' . $this->course_section_cm_edit_actions($editactions, $mod);
-            $output .= $mod->afterediticons;
+        if (isset($actions['groupsvisible'])) {
+            unset($actions['groupsvisible']);
         }
 
-        $output .= $this->course_section_cm_completion($course, $completioninfo,
-                $mod, $displayoptions);
-
-        // If there is content AND a link, then display the content here
-        // (AFTER any icons). Otherwise it was displayed before.
-        if (!empty($url)) {
-            $output .= $contentpart;
+        if (isset($actions['groupsseparate'])) {
+            unset($actions['groupsseparate']);
         }
 
-        // Show availability info (if module is not available).
-        $output .= $this->course_section_cm_availability($mod, $displayoptions);
+        if (isset($actions['nogroupsupport'])) {
+            unset($actions['nogroupsupport']);
+        }
 
-        $output .= html_writer::end_tag('div'); // Close $indentclasses.
-        return $output;
+        //  Move delete to the end.
+        if (isset($actions['delete'])) {
+            $deledtionaction = $actions['delete'];
+            unset($actions['delete']);
+            $actions = array_merge($actions, array($deledtionaction));
+        }
+
+        return parent::course_section_cm_edit_actions($actions, $mod, $displayoptions);
     }
 
     /**
@@ -196,7 +128,7 @@ class local_publicprivate_renderer extends core_course_renderer {
                 $mod->groupingid = null;
             }
             
-            // Get the context from this course module, used to identify if user is in managegroup
+            // Get the context from this course module, used to identify if user is in managegroup.
             $context = context_module::instance($mod->id);
             
             // Labels resources are not printed, so add the grouping name manually. Only instructors see the label

@@ -332,13 +332,15 @@ function get_private_public($mod, $sr = null) {
             $actions[] = new action_menu_link_secondary(
                 new moodle_url($baseurl, array('public' => $mod->id)),
                 new pix_icon('t/locked', $public, 'moodle', array('class' => 'iconsmall')),
-                $public
+                $public,
+                array('class' => 'editing_makepublic publicprivate')
             );                
         } else {
             $actions[] = new action_menu_link_secondary(
                 new moodle_url($baseurl, array('private' => $mod->id)),
                 new pix_icon('t/lock', $private, 'moodle', array('class' => 'iconsmall')),
-                $private
+                $private,
+                array('class' => 'editing_makeprivate publicprivate')
             );                    
         }
     }

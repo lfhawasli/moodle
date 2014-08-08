@@ -5,24 +5,8 @@
 @import "course";
 @import "editing";
 
-// Define how a section should look
-.section {
-    .sectionheader {
-        border-bottom: 1px solid #ccc;
-        .sectionname {
-            color: $ucla-blue;
-        }
-        
-        .hidden {
-            padding-left: 10px;
-            color: #ddd;
-            //
-            display: block !important;
-        }
-    }
-}
-
-// UCLA format course
+  
+// UCLA format namespace
 .ucla-format {
     
     // Color links UCLA blue
@@ -30,11 +14,21 @@
     a:link {
         color: $ucla-blue;
     }
-    
-    margin: auto 0px;
-    
-    .registrar-summary {
-        
+    // The section name.
+    h3.sectionname {
+        color: $ucla-blue;
+        text-align: left !important;
+    }
+    .sectionheader {
+        border-bottom: 1px solid #ccc;
+    }
+    // Hidden means visible NOT hidden!
+    .hidden {
+        padding-left: 10px;
+        color: #ddd;
+
+        display: block !important;
+        visibility: visible !important;
     }
     
     // ucla format sections
@@ -46,20 +40,15 @@
             .content {
                 padding: 4px;
                 border: 2px dashed #ddd;
+                
+                .single-section & {
+                    border: 0;
+                }
             }
             .sectionname:after {
                 @include hidden-label(1.8rem);
             }
         }
-        
-        .largeicon {
-            width: 20px;
-            height: 20px;
-        }
-        .activityicon {
-            vertical-align: text-top !important;
-        }
-
         
         // contains the 'move section' icon
         .left {
@@ -80,18 +69,37 @@
                 }
             }
         }
-        .sectionname {
-            display: inline;
-        }
         
         .right {
             float: right; 
             
             > br {display: none;}
         }
-        
-        .content {
-            margin: 0;
+    }
+    
+    // This is an editable activity list.  This is where the we add
+    // zebra stripes + hover effect to the list.
+    li.activity {
+
+        padding: 5px 10px;
+        border-top: 1px solid #F5F5F5;
+
+        // Make 'label' resources always display white background
+        &:not(.label) {
+            &:nth-child(2n) {
+                background-color: #F9F9F9;
+            }
+            &:hover {
+                background-color: #F5F5F5;
+            }
+        }
+        &.label:hover {
+            background-color: white !important;
+        }
+
+        // Add a dashed line to indicate where target will drop
+        &.yui3-dd-draggable + &.yui3-dd-drop-active-valid {
+            border-top: 2px dashed orangered;
         }
     }
 }

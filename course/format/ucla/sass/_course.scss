@@ -2,19 +2,6 @@
 // CCLE / COURSE / course site
 // --------------------------------------------------
 
-// Generic CCLE box with drop shadow and rounded coreners
-.ccle-generic-box {
-    display: block;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    padding: 4px 8px;
-    width: 100%;
-    margin-bottom: 8px;
-    
-    @include box-sizing(border-box);
-    @include box-shadow(#ddd 1px 1px 1px);
-    @include border-radius(6px);
-}
 
 // These are contents of a course
 .course-content {
@@ -117,6 +104,7 @@
 }
 
 // Course search highlight -- yellowish osx-like color used
+// @todo: move to our theme.
 .summary {
     .highlight {
         border: 1px solid #EBD742;
@@ -126,18 +114,5 @@
         @include background-image(linear-gradient(top, yellow, #EBD742));
         @include border-radius(4px);
         @include box-shadow(#aaa 1px 2px 2px);
-    }
-}
-
-// Clear labels -- this occurs because the .groupinglabel rule is set to 'inline-block'
-// inside labels.
-//
-// ref: TESTINGCCLE-725
-li.activity {
-    &.label, 
-    .contentafterlink {
-        & .no-overflow {
-            clear: left;
-        }
     }
 }

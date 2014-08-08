@@ -2,14 +2,16 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
 
     var CSS = {
         ACTIVITYLI : 'li.activity',
-        COMMANDSPAN : 'span.commands',
+        COMMANDDIV : 'div.commands',
         GROUPINGSPAN : 'span.groupinglabel',
         MODINDENTDIV : 'div.mod-indent',
         PAGECONTENT : 'div#page-content',
         PUBLICPRIVATE_PRIVATE : 'a.editing_makeprivate',
         PUBLICPRIVATE_PUBLIC : 'a.editing_makepublic',
-        SPINNERCOMMANDSPAN : 'span.commands',
+        SPINNERCOMMANDDIV : 'div.commands',
         MODULEIDPREFIX : 'module-',
+        PUBLICPRIVATEIMG : 'a.publicprivate img',
+        PUBLICPRIVATETEXT : 'a.publicprivate span.menu-action-text'
     };
     
     var PUBLICPRIVATE = function() {
@@ -19,7 +21,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
     Y.extend(PUBLICPRIVATE, Y.Base, {
         initializer : function(config) {
             // Set event listeners
-            Y.delegate('click', this.toggle, CSS.PAGECONTENT, CSS.COMMANDSPAN + ' a.publicprivate', this);
+            Y.delegate('click', this.toggle, CSS.PAGECONTENT, CSS.COMMANDDIV + ' a.publicprivate', this);
 
             // Let moodle know we exist
             M.course.coursebase.register_module(this);
@@ -37,13 +39,14 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
                 field = 'public';
 
                 // Swap icon
-                mod.one('.publicprivate').setAttrs({
-                    'title' : M.util.get_string('publicprivatemakeprivate', 'local_publicprivate'),
-                }).one('img').setAttrs({
+                mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({
                     'src' : M.util.image_url(this.get('publicpix'), this.get('component')),
                     'alt' : M.util.get_string('publicprivatemakeprivate', 'local_publicprivate')
                 })
-                
+                // Change text
+                if(mod.one(CSS.PUBLICPRIVATETEXT)) {
+                    mod.one(CSS.PUBLICPRIVATETEXT).set('text', M.util.get_string('publicprivatemakeprivate', 'local_publicprivate'));
+                }
             } else {
                 // Add label
                 mod.one('.activityinstance').insert(
@@ -51,13 +54,14 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
                 );
                 
                 // Swap icon
-                mod.one('.publicprivate').setAttrs({
-                    'title' : M.util.get_string('publicprivatemakepublic', 'local_publicprivate'),
-                }).one('img').setAttrs({
+                mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({
                     'src' : M.util.image_url(this.get('privatepix'), this.get('component')),
                     'alt' : M.util.get_string('publicprivatemakepublic', 'local_publicprivate')
                 });
-                
+                // Change text
+                if(mod.one(CSS.PUBLICPRIVATETEXT)) {
+                    mod.one(CSS.PUBLICPRIVATETEXT).set('text', M.util.get_string('publicprivatemakepublic', 'local_publicprivate'));
+                }
                 field = 'private'; 
             }
             
@@ -69,8 +73,8 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             };
             
             // Get spinner
-            var spinner = M.util.add_spinner(Y, mod.one(CSS.SPINNERCOMMANDSPAN));
-            
+            var spinner = M.util.add_spinner(Y, mod.one(CSS.SPINNERCOMMANDDIV));
+
             // Send request
             this.send_request(data, spinner);
         },
@@ -132,7 +136,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             
             // Generate pp icon node
             // NOTE: because we delegate events, we don't need to attach a handler
-            Y.one(baseselector + ' ' + CSS.COMMANDSPAN).insert(
+            Y.one(baseselector + ' ' + CSS.COMMANDDIV).insert(
                 Y.Node.create(
                     '<a class="editing_makepublic publicprivate" ' +
                         'href="' + href + '"' +
