@@ -138,13 +138,11 @@ if ($mform->is_cancelled()) {
 
         // Create the event, trigger it.
         $event = \mod_qanda\event\entry_added::create(array(
-            'courseid' => $course->id,
-            'context'  => context_module::instance($cm->id),
+            'context'  => $context,
             'objectid' => $entry->id,
             'other'    => array(
                 'modulename' => $cm->modname,
-                'name'       => $cm->name,
-                'instanceid' => $cm->id
+                'name'       => $cm->name
             )
         ));
         $event->trigger();
@@ -152,7 +150,12 @@ if ($mform->is_cancelled()) {
     } else {
         //existing entry
         $DB->update_record('qanda_entries', $entry);
-        add_to_log($course->id, "qanda", "update entry", "view.php?id=$cm->id&amp;mode=entry&amp;hook=$entry->id", $entry->id, $cm->id);
+        $event = \mod_qanda\event\entry_updated::create(array(
+            'context'  => $context,
+            'objectid' => $entry->id
+        ));
+        $event->trigger();
+        
     }
 
     // save and relink embedded images and save attachments

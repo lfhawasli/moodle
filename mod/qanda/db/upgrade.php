@@ -21,7 +21,7 @@
 // before any action that may take longer time to finish.
 
 function xmldb_qanda_upgrade($oldversion) {
-
+    return true;
 }
 
 

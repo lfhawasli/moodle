@@ -20,8 +20,10 @@ require_course_login($course);
 $PAGE->set_pagelayout('incourse');
 $context = context_course::instance($course->id);
 
-add_to_log($course->id, "qanda", "view all", "index.php?id=$course->id", "");
-
+$event = \mod_qanda\event\view_all::create(array(
+    'context' => $context
+));
+$event->trigger();
 
 /// Get all required strings
 

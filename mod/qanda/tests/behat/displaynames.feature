@@ -7,15 +7,15 @@ Feature: Display name and email of student who posted a question
 # Note, cannot run this test with javascript, because the step to answer the
 # question fails, since this is not a standard Moodle form.
 Scenario: Make sure that only instructors can see posts names/emails
-    Given the following "courses" exists:
+    Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | T1 | teacher1@asd.com |
       | student1 | Student | S1 | student1@asd.com |
       | student2 | Student | S2 | student2@asd.com |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
@@ -31,7 +31,7 @@ Scenario: Make sure that only instructors can see posts names/emails
     And I follow "Course 1"
     And I follow "Q&A test"
     And I press "Ask a question"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | Question | What is the answer to life, the universe, and everything? |
     And I press "Save changes"
     And I log out
@@ -43,7 +43,7 @@ Scenario: Make sure that only instructors can see posts names/emails
     And I follow "Questions Pending (1)"
     Then I should see "Posted by: Student S1 (student1@asd.com)"
     And I follow "Answer"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | Answer | 42 |
     And I press "Save changes"
     And I should see "Posted by: Student S1 (student1@asd.com)"

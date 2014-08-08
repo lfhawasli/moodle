@@ -125,7 +125,14 @@ if (!$cm->visible and !has_capability('moodle/course:viewhiddenactivities', $con
     echo $OUTPUT->header();
     notice(get_string("activityiscurrentlyhidden"));
 }
-add_to_log($course->id, "qanda", "view", "view.php?id=$cm->id&amp;tab=$tab", $qanda->id, $cm->id);
+$event = \mod_qanda\event\qanda_viewed::create(array(
+    'context'  => $context,
+    'objectid' => $qanda->id,
+    'other'    => array(
+        'tab' => $tab
+    )
+));
+$event->trigger();
 
 // Mark as viewed
 $completion = new completion_info($course);
