@@ -20,6 +20,12 @@ $THEME->sheets = array(
     'theme'
 );
 
+$THEME->parents_exclude_sheets = array(
+    'base' => array(
+        'blocks'
+    )
+);
+
 $tf_general     = 'course.php';
 $tf_course      = 'course.php';
 $tf_embedded    = 'embedded.php';
@@ -198,3 +204,4 @@ $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->enable_dock = false;
 $THEME->csspostprocess = 'uclashared_process_css';
 $THEME->javascripts[] = 'shared_server_dropdown';
+$THEME->javascripts[] = 'help_feedback';

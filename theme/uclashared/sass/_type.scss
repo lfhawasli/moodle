@@ -64,6 +64,9 @@ a {
 .mform .ffilemanager * {
     @include box-sizing(content-box);
 }
+.iconsmall.actionmenu {
+    @include box-sizing(content-box);
+}
 
 
 /// Fix YUI typography

@@ -31,10 +31,8 @@
 @import "type";
 @import "form";
 
-// @todo: Deprecate 'buttons.scss'
-@import "buttons";
 @import "ucla/buttons";
-@import "ucla/buttons_adapter";
+@import "moodle/adapter/buttons";
 
 @import "tables";
 @import "bootstrap/grid";
@@ -57,7 +55,7 @@
 
 @import "bootstrap/button-groups";
 @import "bootstrap/input-groups";
-@import "breadcrumbs";
+@import "ucla/breadcrumbs";
 @import "bootstrap/wells";
 @import "bootstrap/badges";
 
@@ -73,7 +71,16 @@
 // --------------------------------------------------
 @import "ccle/required";
 
-// Moodle LESS
-@import "moodle_undo";
+@import "ucla/utilities";
+@import "ucla/ui_mods";
 
-@import "ui_mods";
+// Moodle
+@import "moodle/blocks";
+@import "moodle/gradebook";
+@import "moodle/report";
+@import "moodle/admin";
+@import "moodle/forum";
+@import "moodle/calendar";
+@import "moodle/wiki";
+@import "moodle/turnitin";
+@import "moodle/action_menu";

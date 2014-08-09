@@ -1,19 +1,38 @@
-// @deprecated
 
-/*.btn-cpanel {
-    @include button-variant(#0d3286, #fcd226, #fcb126);
-    font-weight: bold;
-    
-    &:hover {
-        color: #0d3286;
+// This is the area where the 'editing button sits'
+
+.navbutton {
+    // The editing button
+    .singlebutton input[type="submit"] {
+        @extend %btn-editing-mode;
     }
-}*/
+    
+    // Forum and Wiki search button
+    .wikisearch,
+    .forumsearch {
 
+        input[alt="search"] {
+            @extend .form-control; 
+            @extend .input-xs;
+            display: inline-block !important;
+        }
+        input[type="submit"] {
+            @extend %btn-forum-search;
+        }
+    }
+}
+
+// The control panel is rendered as a single-button.
+.control-panel {
+    input[type="submit"] {
+        @extend %btn-control-panel;
+    }
+}
 
 ///
 // Moodle overrides
 // --------------------------------------------------
-/*
+
 input[type="button"],
 input[type="submit"] {
     @extend .btn;
@@ -74,11 +93,11 @@ input[type="submit"] {
 }
 
 .control-panel {
-    input[type="submit"] {
+/*    input[type="submit"] {
         @extend .btn;
         @extend .btn-cpanel;
         @extend .btn-sm;
-    }
+    }*/
 
     // Grades button
     .btn-grades-container {
@@ -98,7 +117,7 @@ input[type="submit"] {
 
     // In responsive mode, display grade & control panel buttons
     // side by side for students.
-    @include respond-to(handhelds) {
+/*    @include respond-to(handhelds) {
         .btn-grades-container {
             display: block;
         }
@@ -109,5 +128,5 @@ input[type="submit"] {
                 @include border-left-radius(0);
             }
         }
-    }
-}*/
+    }*/
+}

@@ -68,3 +68,36 @@
         }
     }
 }
+
+
+//
+// Admin / Course / Category browser
+//
+
+// CCLE-4258: add visual cue to indicate term on categories course lists.
+// This will handle terms until 2022!
+#page-course-management {
+    
+    // Terms we want to cover, with term code
+    $terms: (
+        fall F,
+        winter W,
+        spring S,
+        summer 1
+    );
+    
+    // Iterate through terms
+    @each $term in $terms {
+        $name: nth($term, 1);
+        $code: nth($term, 2);
+        
+        // Generate values for 10 years after 2012
+        @for $i from 12 to 22 {
+            a[data-name^="#{$i}#{$code}"]:before {
+                @extend .label-term;
+                @extend .label-#{$name};
+                content: "#{$name} #{$i}";
+            }
+        }
+    }
+}

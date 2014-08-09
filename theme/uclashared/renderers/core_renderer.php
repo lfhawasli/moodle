@@ -210,14 +210,15 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         if ($addloginurl) {
             $logininfo[] = html_writer::link($loginurl, html_writer::span('', 'arrow-right') . get_string('login'), array('class' => 'btn-header btn-login'));
         } else if ($addlogouturl) {
+            $icon = html_writer::tag('i', '', array('class' => 'fa fa-sign-out fa-fw visible-xs-inline'));
+            $text = html_writer::span(get_string('logout'), 'hidden-xs');
             $logininfo[] = html_writer::link(
                 new moodle_url('/login/logout.php', array('sesskey' => sesskey())), 
-                get_string('logout'), 
+                $icon . $text,
                 array('class' => 'btn-header')
             );
         }
 
-        $separator = $this->separator();
         $loginstring = implode('', $logininfo);
 
         return $loginstring;
@@ -259,10 +260,33 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             return false;
         }
 
-        $hflink = get_string('help_n_feedback', $this->theme);
+        // Main Help & Feedback link.
+        $hflink = html_writer::span(get_string('help_n_feedback', $this->theme), 'hidden-xs');
+        $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
+        $outlink = html_writer::link($helplocale, $icon . $hflink, array('class' => 'btn-header btn-help-feedback'));
 
-        $icon = '<i class="fa fa-question-circle fa-fw "></i> ';
-        return html_writer::link($helplocale, $icon . $hflink, array('class' => 'btn-header btn-help-feedback'));
+        // Arrow right above toggle menu
+        $arrow = html_writer::span('', 'arrow-up');
+
+        // Render the menu
+        // @todo: Need to make these SSC configs?
+        $items = array(
+            html_writer::tag('li', 
+                html_writer::link($helplocale, $arrow . get_string('dropdownsubmit', $this->theme))
+            ),
+            html_writer::tag('li', 
+                html_writer::link('https://docs.ccle.ucla.edu', get_string('dropdownview', $this->theme))
+            ),
+            html_writer::tag('li', 
+                html_writer::link('https://docs.ccle.ucla.edu/w/Tips_and_Updates', get_string('dropdownread', $this->theme))
+            )
+        );
+        $menu = html_writer::tag('ul', implode('', $items), 
+            array('class' => 'help-dropdown-menu hidden', 'role' => 'menu')
+        );
+
+        // Return full menu with link
+        return html_writer::span($outlink . $menu, 'help-dropdown');
     }
 
     /**
@@ -310,7 +334,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                                 html_writer::span('common collaboration',
                                         'logo-cc') .
                                 html_writer::span('& learning environment',
-                                        'logo-le'), 'logo-ccle-full')
+                                        'logo-le'), 'logo-ccle-sub hidden-xs')
         );
 
         return $link;

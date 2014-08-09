@@ -77,7 +77,6 @@ echo $OUTPUT->doctype() ?>
     // IE does have font-smoothing, so load font for IE 8 and above
     if(!$windowsos) { ?>
         <link href='https://fonts.googleapis.com/css?family=Lato:300,400,400italic,700,900' rel='stylesheet' type='text/css'>
-        <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,400italic,600,700' rel='stylesheet' type='text/css'>-->
     <?php } ?>
     <?php echo $OUTPUT->standard_head_html() ?>
     <!--[if lte IE 8]>
@@ -123,10 +122,10 @@ echo $OUTPUT->doctype() ?>
 <?php if ($hasnavbar && !$hasintrobanner) { ?>
 <div class="navbar container-fluid">
     <div class="row">
-        <div class="breadcrumb col-xs-8">
+        <div class="navbar-breadcrumb col-sm-5 col-md-6">
             <?php echo $OUTPUT->navbar(); ?>
         </div>
-        <div class="controls col-xs-4" >
+        <div class="navbar-controls col-sm-7 col-md-6" >
             <div class="navbutton navbar-control">
                 <?php echo $PAGE->button; ?>
             </div>
@@ -137,7 +136,6 @@ echo $OUTPUT->doctype() ?>
             <?php } ?>
         </div>
     </div>
-    
 </div>
 <?php } ?>
 <!-- END OF HEADER -->

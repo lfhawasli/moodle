@@ -1,0 +1,14 @@
+
+// Makes the 'edit' action menu look more like our theme.
+
+.section .activity .moodle-actionmenu[data-enhanced] .menu {
+    @include border-radius(0);
+    
+    li > a {
+        @include border-radius(0);
+        
+        &:hover {
+            background-color: #444;
+        }
+    }
+}

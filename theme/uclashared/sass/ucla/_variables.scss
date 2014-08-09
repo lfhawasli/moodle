@@ -4,6 +4,12 @@
 // Define variables here when they are used in more than one file.
 //
 
+// UCLA colors
+$ucla-color-blue:   #3283be !default;
+$ucla-color-gold:   #f5bc40 !default;
+
+// CCLE legacy colors
+$ccle-color-blue:   #4168A1 !default;
 
 // Session colors
 // --------------------------------------------------
@@ -28,7 +34,7 @@ $session-summer-color: black;
  * @type Color
  * @group header
  */
-$header-color-prod:     #4168A1 !default;
+$header-color-prod:     $ucla-color-blue !default;
 
 /**
  * Header color for TEST header

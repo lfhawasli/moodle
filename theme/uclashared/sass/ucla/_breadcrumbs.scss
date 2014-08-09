@@ -7,7 +7,10 @@ $breadcrumbs-highlight-color: #444;
 // Modify default breadcrumb
 .breadcrumb {
     background-color: white;
-    margin-bottom: 0;
+    margin: 0;
+    margin-left: -15px;
+    // Override CORE -- this will break responsive breakpoints
+    float: none;
     
     .divider {
         display: none;
@@ -32,25 +35,12 @@ $breadcrumbs-highlight-color: #444;
             display: block;
             overflow: hidden;
 
+            // Adds the 'Home' glyph
             &:before{
                 @include glyphicon("\e021");
                 color: $breadcrumbs-highlight-color;
             }
         }
     }
-
-    
-    // Add a HOME glyphicon to breadcrumbs.
-    // Also removes text.
-/*    li:first-child > a {
-        height: 16px;
-        width: 16px;
-        display: block;
-        overflow: hidden;
-        
-        &:before{
-            @include glyphicon("\e021");
-        }
-    }*/
 
 }

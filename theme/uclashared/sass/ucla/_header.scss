@@ -2,6 +2,8 @@
 // UCLA / Header
 //
 
+$ccle-color-logo:       #FFBC00;
+$ccle-color-sublogo:    #c8dbf7;
 
 //
 // Header styles for CCLE banner.
@@ -21,7 +23,7 @@ header {
         z-index: 9999;
         height: $header-height;
         
-        @include background-image(linear-gradient(left top, #4269a2, #3d6196));
+        @include background-image(linear-gradient(left top, $header-color-prod, #3d6196));
         
         // System environment colors
         .env-dev & {
@@ -64,6 +66,55 @@ header {
             font-weight: bold;
         }
     }
+
+    .help-dropdown-menu {
+        background-color: white;
+        margin: 0;
+        min-width: 143px;
+        opacity: 0.97;
+        position: absolute;
+        top: 40px;
+        
+        @include box-shadow(#999 0px 1px 2px);
+
+        &.hidden {
+            display: none;
+            visibility: hidden;
+        }
+        li {
+            list-style: none;
+            
+            .arrow-up {
+                position: absolute;
+                left: 46%;
+                top: -5px;
+                border-bottom-color: white;
+            }
+            
+            a {
+                font-size: 1.2rem;
+                display: inline-block;
+                padding: 8px 10px;
+                width: 100%;
+                color: #333;
+                
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+            
+            &:nth-child(2n) {
+                background-color: #efefef;
+            }
+            &:hover {
+                background-color: #444;
+
+                a {
+                    color: #eee;
+                }
+            }
+        }
+    }
 }
 
 // Defines how header logo area looks
@@ -81,7 +132,7 @@ header {
 
     // CCLE text
     .logo-ccle {
-        color: #FFBC00;
+        color: $ccle-color-logo;
         font-weight: bold;
 
         font-size: 2.9rem;
@@ -95,10 +146,10 @@ header {
     }
 
     // Full CCLE text 
-    .logo-ccle-full {
+    .logo-ccle-sub {
         display: inline-block;
         font-size: 1.1rem;
-        color: #A1B6D6;
+        color: $ccle-color-sublogo;
 
         // Split the text in two
         .logo-cc,
@@ -117,10 +168,24 @@ header {
     }
 }
 
+// Responsive 
+@media (max-width: $screen-xs-max) {
+    .header-logo .logo-ucla {
+        width: 44px;
+        float: left;
+        margin-top: 2px;
+    }
+    .header-logo .logo-ccle {
+        font-size: 1.8rem;
+        float: left;
+        clear: both;
+        margin-left: 0
+    }
+}
 
 // Controls that are right above the breadcrumb and below the header
 
-.controls {
+.navbar-controls {
     text-align: right;
     .navbutton {
         float: none;
