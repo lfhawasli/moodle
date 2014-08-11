@@ -78,7 +78,8 @@ class file_deleted extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'delete file', $this->get_url(),
+        return array($this->courseid, 'course', 'delete file', 
+            'view.php?id=' . $this->courseid,
             $this->get_description(), 0, $this->userid);
     }
 }
