@@ -81,7 +81,8 @@ class filelist_viewed extends \core\event\base {
      * to the old add_to_log function.
      * */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'ucla archive view', $this->get_url());
+        return array($this->courseid, 'course', 'ucla archive view',
+            '../blocks/ucla_course_download/view.php?id=' . $this->courseid);
     }
 
 }
