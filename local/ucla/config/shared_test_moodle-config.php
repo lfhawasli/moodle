@@ -345,6 +345,21 @@ $CFG->filter_poodll_download_media_ok = '1';
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
+// Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
+$CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
+    collapse = collapse
+    style1 = title, bold, italic, backcolor, fontcolor
+    list = unorderedlist, orderedlist
+    links = link
+    files = image, media, managefiles, poodll
+    style2 = underline, strike, subscript, superscript
+    align = align
+    indent = indent
+    insert = equation, charmap, table, clear
+    undo = undo
+    accessibility = accessibilitychecker, accessibilityhelper
+    other = html';
+
 // Site administration > Plugins > Local plugins > Google Analytics
 $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 

@@ -13,5 +13,7 @@ Feature: Atto title
     When I click on "Heading 1" "link"
     And I press "Update profile"
     And I follow "Edit profile"
-    Then I should see "<h3>How The Rock"
-
+    // START UCLA MOD: CCLE-4612 Improve Attos
+    # Then I should see "<h3>How The Rock"
+    Then I should see "<h1>How The Rock"
+    // END UCLA MOD: CCLE-4612 Improve Attos

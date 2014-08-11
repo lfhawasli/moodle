@@ -22,9 +22,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['h3'] = 'Heading 1';
-$string['h4'] = 'Heading 2';
-$string['h5'] = 'Heading 3';
+// START UCLA MOD: CCLE-4612 Improve Attos
+// $string['h3'] = 'Heading 1';
+// $string['h4'] = 'Heading 2';
+// $string['h5'] = 'Heading 3';
+$string['h1'] = 'Heading 1';
+$string['h2'] = 'Heading 2';
+$string['h3'] = 'Heading 3';
+$string['h4'] = 'Heading 4';
+$string['h5'] = 'Heading 5';
+$string['h6'] = 'Heading 6';
+// END UCLA MOD: CCLE-4612 Improve Attos
 $string['p'] = 'Paragraph';
 $string['pluginname'] = 'Paragraph styles';
 $string['pre'] = 'Pre-formatted';
