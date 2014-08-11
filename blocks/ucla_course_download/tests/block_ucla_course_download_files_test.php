@@ -564,6 +564,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
                 'content', 0, 'sortorder DESC, id ASC', false);
         $mainfile = reset($fsfiles);
         $mainfile->set_filesize(11 * pow(1024, 2));  // Set to 11 MB.
+        // Calling the deprecated method set_filesize above, but we are ignoring
+        // it for now.
         $this->assertDebuggingCalled();
 
         // Redo request.

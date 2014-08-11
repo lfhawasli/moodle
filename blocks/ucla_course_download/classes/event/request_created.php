@@ -81,7 +81,6 @@ class request_created extends \core\event\base {
      * to the old add_to_log function.
      * */
     public function get_legacy_logdata() {
-        $logurl = new \moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $this->courseid));
-        return array($this->courseid, 'course', 'ucla archive request', $logurl);
+        return array($this->courseid, 'course', 'ucla archive request', $this->get_url());
     }
 }

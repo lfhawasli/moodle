@@ -82,8 +82,7 @@ class zip_downloaded extends \core\event\base {
      * to the old add_to_log function.
      * */
     public function get_legacy_logdata() {
-        $logurl = new \moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $this->courseid));
-        return array($this->courseid, 'course', 'ucla archive download', $logurl);
+        return array($this->courseid, 'course', 'ucla archive download', $this->get_url());
     }
 
 }

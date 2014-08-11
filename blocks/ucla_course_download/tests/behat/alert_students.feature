@@ -1,4 +1,4 @@
-@ucla @block_ucla_course_download
+@ucla @block_ucla_course_download @runme
 Feature: Alert students about course download feature
   As a student
   I want to be alerted that I can use the course download feature
@@ -37,7 +37,7 @@ Feature: Alert students about course download feature
 
    Scenario: Alert students for an old course.
      # Default term that a course is built for is 14W.
-     Given it is "Spring 2014" term "1th" week
+     Given it is "Spring 2014" term "1st" week
      And I log in as "student1"
      When I follow "course 1"
      Then I should see "Download course materials" in the "region-main" "region"
