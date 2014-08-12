@@ -81,7 +81,7 @@ class syllabus_viewed extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'ucla_syllabus', 'view', $this->get_url(),
-            $this->get_description());
+        return array($this->courseid, 'course', 'syllabus view',
+            '../local/ucla_syllabus/index.php?id=' . $this->courseid, '');
     }
 }
