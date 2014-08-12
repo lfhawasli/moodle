@@ -235,7 +235,7 @@ class invitation_manager {
                 $message .= get_string('emailmsgtxt', 'enrol_invitation', $message_params);
 
                 if (!$resend) {
-                    $DB->insert_record('enrol_invitation', $invitation);
+                    $objid = $DB->insert_record('enrol_invitation', $invitation);
                 }
 
                 // Change FROM to be $CFG->supportemail if user has show_from_email off.
@@ -246,23 +246,43 @@ class invitation_manager {
                     $fromuser->firstname = '';
                     $fromuser->lastname = $SITE->fullname;
                     $fromuser->maildisplay = true;
+                    // Moodle 2.7 introduced new username fields.
+                    $fromuser->alternatename = '';
+                    $fromuser->firstnamephonetic = '';
+                    $fromuser->lastnamephonetic = '';
+                    $fromuser->middlename = '';
                 }
 
                 // Send invitation to the user.
                 $contactuser = new stdClass();
                 $contactuser->email = $invitation->email;
-                $contactuser->firstname = '';
-                $contactuser->lastname = '';
+                $contactuser->firstname = ''; 
+                $contactuser->lastname = ''; 
                 $contactuser->maildisplay = true;
+                $contactuser->id = $this->get_invitee_id();
+                // Moodle 2.7 introduced new username fields.
+                $contactuser->alternatename = '';
+                $contactuser->firstnamephonetic = '';
+                $contactuser->lastnamephonetic = '';
+                $contactuser->middlename = '';
+
                 email_to_user($contactuser, $fromuser, $invitation->subject, $message);
 
                 // Log activity after sending the email.
                 if ($resend) {
-                    add_to_log($course->id, 'course', 'invitation extend',
-                            "../enrol/invitation/history.php?courseid=$course->id", $course->fullname);
+                    $event = \enrol_invitation\event\invitation_extended::create(array(
+                            'objectid' => $data->id,
+                            'context' => context_course::instance($course->id),
+                            'other' => $course->fullname
+                        ));
+                    $event->trigger();
                 } else {
-                    add_to_log($course->id, 'course', 'invitation send',
-                            "../enrol/invitation/history.php?courseid=$course->id", $course->fullname);
+                    $event = \enrol_invitation\event\invitation_sent::create(array(
+                            'objectid' => $objid,
+                            'context' => context_course::instance($course->id),
+                            'other' => $course->fullname
+                        ));
+                    $event->trigger();
                 }
             }
         } else {
@@ -463,6 +483,23 @@ class invitation_manager {
         $ret_val->timeused = date('M j, Y g:ia', $invite->timeused);
 
         return $ret_val;
+    }
+
+    /**
+     * Set temporary id for invitee.  Use Moodle guest id.
+     */
+    public function get_invitee_id(){
+        global $CFG;
+        if (empty($CFG->siteguest)) {
+            $guestid = $DB->get_field('user', 'id', array('username'=>'guest', 'mnethostid'=>$CFG->mnet_localhost_id));
+            if (!$guestid) {
+                return 0; // If no Id, still need to assign one.
+            } else{
+                set_config('siteguest', $guestid);
+                return $guestid;
+            }
+        } 
+        return $CFG->siteguest;
     }
 
 }
