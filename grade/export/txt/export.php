@@ -45,10 +45,13 @@ if (groups_get_course_groupmode($COURSE) == SEPARATEGROUPS and !has_capability('
     }
 }
 
-// START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$url = '/export/txt/export.php?id=' . $course->id;
-add_to_log($course->id, 'grade', 'export txt', $url);
-// END UCLA MOD: CCLE-3980
+// START UCLA MOD: CCLE-4659 - Migrate add to log calls for grade export
+$event = \local_gradebook\event\grades_exported_txt::create(array(
+    'context' => $context,
+    'other' => array('type' => 'txt')    
+));
+$event->trigger();
+// END UCLA MOD: CCLE-4659
 
 // print all the exported data here
 $export = new grade_export_txt($course, $groupid, $itemids, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $separator, $onlyactive, true);

@@ -1,6 +1,6 @@
 <?php
 
-$string['pluginname'] = 'MyUCLA gradebook webservice';
+$string['pluginname'] = 'UCLA gradebook customizations';
 
 $string['continue_comments'] = '... [See full comments on the class website]';
 
@@ -9,6 +9,12 @@ $string['nousers'] = 'WARNING: User in course but could not find matching role a
 $string['badenrol'] = 'WARNING: User enrolled in more than one child course of a cross-listed course.';
 
 // Log
+$string['eventgradesexported'] = 'Grades exported';
+$string['eventgradesexportedmyucla'] = 'Grades exported (myucla)';
+$string['eventgradesexportedods'] = 'Grades exported (ods)';
+$string['eventgradesexportedtxt'] = 'Grades exported (txt)';
+$string['eventgradesexportedxls'] = 'Grades exported (xls)';
+$string['eventgradesexportedxml'] = 'Grades exported (xml)';
 $string['gradesuccess'] = 'grade sent to MyUCLA';
 $string['gradefail'] = 'failed to send grade to MyUCLA';
 $string['gradefailinfo'] = 'General error: GradeID [{$a}]';

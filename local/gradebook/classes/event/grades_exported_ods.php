@@ -1,6 +1,6 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of UCLA gradebook customizations local plugin for 
+// Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,13 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Strings for component 'gradeexport_xls', language 'en', branch 'MOODLE_20_STABLE'
- *
- * @package   gradeexport_xls
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-$string['pluginname'] = 'Excel spreadsheet';
-$string['xls:publish'] = 'Publish XLS grade export';
-$string['xls:view'] = 'Use Excel grade export';
+namespace local_gradebook\event;
+
+defined('MOODLE_INTERNAL') || die();
+
+class grades_exported_ods extends grades_exported {
+
+    /**
+     * Returns the name of the event.
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('eventgradesexportedods', 'local_gradebook');
+    }
+}
