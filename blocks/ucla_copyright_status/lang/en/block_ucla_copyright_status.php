@@ -29,3 +29,6 @@ $string['alert_later_redirect'] = 'Assign copyright status reminder set.';
 
 // aria strings
 $string['aria_copyright_badge'] = ' items without copyright status.';
+
+// Strings for events.
+$string['eventcopyright_status_updated'] = 'Updated copyright status';
