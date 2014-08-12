@@ -47,8 +47,8 @@ class control_panel_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' has viewed the control panel "
-            . "module '{$this->other['module_name']}'.";
+        return "The user with id '{$this->userid}' viewed the control panel "
+            . "tab '{$this->other['module_name']}'.";
     }
  
     /**
@@ -57,7 +57,7 @@ class control_panel_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('blocks/ucla_control_panel/view.php', array(
+        return new \moodle_url('/blocks/ucla_control_panel/view.php', array(
                     'course_id' => $this->courseid, 
                     'section' => $this->other['section'], 
                     'module' => $this->other['module']
@@ -71,6 +71,8 @@ class control_panel_viewed extends \core\event\base {
      */
     public function get_legacy_logdata() {
         return array($this->courseid, 'course', 'control panel view',
-            $this->get_url(), $this->other['module_name']);
+            '../blocks/ucla_control_panel/view.php?course_id='.$this->courseid.
+            '&section='.$this->other['section'].'&module='.$this->other['module'],
+            $this->other['module_name']);
     }
 }
