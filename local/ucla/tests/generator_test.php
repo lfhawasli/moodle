@@ -355,23 +355,28 @@ class local_ucla_generator_testcase extends advanced_testcase {
      * created.
      */
     public function test_create_ucla_roles() {
-        global $CFG, $DB;
+        global $CFG;
 
         $createdroles = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_ucla_roles();
+        $shortnames = array();
 
-        // Load fixture of role data from PROD. This will grant access to a
-        // new variable called $roles.
-        include($CFG->dirroot . '/local/ucla/tests/fixtures/mdl_role.php');
-        
-        $createdroleshortnames = array_keys($createdroles);
-        foreach ($roles as $role) {
-            $this->assertTrue(in_array($role['shortname'], $createdroleshortnames));
+        // Go through each xml file in the fixtures folder, creating a $shortnames
+        // array for us to check with $createdroles.
+        foreach (glob($CFG->dirroot. '/local/ucla/tests/fixtures/roles/*.xml') as $file) {
+            $xml = file_get_contents($file);
+            if ($this->assertTrue(core_role_preset::is_valid_preset($xml))) {
+                $info = core_role_preset::parse_preset($xml);
+                $shortnames[] = $info['shortname'];
+            }
         }
 
-        // Also make sure that student is returned.
-         $this->assertTrue(isset($createdroles['student']));
+        // Check if each role in $shortnames is in $createdroles.
+        $createdroleshortnames = array_keys($createdroles);
+        foreach ($shortnames as $shortname) {
+            $this->assertTrue(in_array($shortname, $createdroleshortnames));
+        }
     }
 
     /**
