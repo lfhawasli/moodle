@@ -142,7 +142,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                         . get_string('loginas_as', 'theme_uclashared');
             }
 
-            $fullname = fullname($USER, true);
+            $fullname = fullname($USER);
             $userlink = html_writer::link($usermurl, $fullname, array('class' => 'btn-header'));
 
             $rolename = '';

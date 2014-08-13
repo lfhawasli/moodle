@@ -14,9 +14,6 @@
 // put all overrides in there.  If we don't modify Bootstrap, we just 
 // pull the file directly.
 
-/*@import "CSS:editor";*/
-/*@import "CSS:base/style/core";
-@import "CSS:base/style/pagelayout";*/
 
 // Core variables and mixins
 @import "ucla/variables";
@@ -45,13 +42,11 @@
 @import "ucla/fontawesome";
 @import "footer";
 @import "alerts";
-@import "navs";
+@import "bootstrap/navs";
 @import "progress-bars";
 @import "panels";
 @import "labels";
-@import "glyphicons";
-
-@import "dock";
+@import "ucla/glyphicons";
 
 @import "bootstrap/button-groups";
 @import "bootstrap/input-groups";
@@ -69,8 +64,6 @@
 // Load CCLE Moodle specific elements
 // This course, and plugin styles
 // --------------------------------------------------
-@import "ccle/required";
-
 @import "ucla/utilities";
 @import "ucla/ui_mods";
 
@@ -84,3 +77,4 @@
 @import "moodle/wiki";
 @import "moodle/turnitin";
 @import "moodle/action_menu";
+@import "moodle/undo";

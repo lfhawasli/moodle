@@ -22,7 +22,8 @@ $THEME->sheets = array(
 
 $THEME->parents_exclude_sheets = array(
     'base' => array(
-        'blocks'
+        'blocks',
+        'dock'
     )
 );
 

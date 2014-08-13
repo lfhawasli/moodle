@@ -9,10 +9,5 @@
         "phpunit/phpunit": "3.7.*",
         "phpunit/dbUnit": "1.2.*",
         "moodlehq/behat-extension": "1.27.11"
-    },
-    "require": {
-        "fortawesome/font-awesome": "4.1.0",
-        "twbs/bootstrap-sass": "3.2.0",
-        "semantic/ui": "dev-master"
     }
 }

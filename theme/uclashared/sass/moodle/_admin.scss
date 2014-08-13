@@ -101,3 +101,42 @@
         }
     }
 }
+
+
+///
+
+// Normalize all admin page headers 
+h2.headingblock {
+    @include ccle-admin-header;
+}
+
+#addadmisform > h3.main {
+    @include ccle-admin-header;
+    margin-bottom: 8px;
+}
+
+
+// Modifies the course admin menu to be a little more clickable...
+// @todo: this could be better...
+@media only screen and (max-width: $breakpoint-xsmall),
+only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medium-small) {
+    .block_tree li ul li.type_setting {
+        border-bottom: 1px solid $ccle-light-blue;
+        height: 34px;
+        padding-top: 5px;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .block_tree li ul li.type_setting > p > a {
+        width: 100%;
+        display: inline-block;
+    }
+}
+
+
+.external-link {
+    padding-right: 15px;
+    padding-bottom: -2px;
+    background: transparent url([[pix:theme|external]]) no-repeat center right;
+}

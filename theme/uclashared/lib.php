@@ -15,12 +15,12 @@ function uclashared_process_css($css, $theme) {
     global $CFG;
     // Load Boostrap glyphicon fonts.
     $tag = '[[uclashared:font|glyphicons-halflings-regular]]';
-    $replacement = $CFG->wwwroot . '/vendor/twbs/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular';
+    $replacement = $CFG->wwwroot . '/theme/uclashared/vendor/twbs/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular';
     $css = str_replace($tag, $replacement, $css);
     
     // Load font-awesome fonts.
     $tag = '[[uclashared:font|fontawesome]]';
-    $replacement = $CFG->wwwroot . '/vendor/fortawesome/font-awesome/fonts';
+    $replacement = $CFG->wwwroot . '/theme/uclashared/vendor/fortawesome/font-awesome/fonts';
     $css = str_replace($tag, $replacement, $css);
     
     $tag = 'frontpage-image';
