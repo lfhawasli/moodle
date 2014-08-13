@@ -22,6 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2014073100;
+$plugin->version  = 2014081900;
 $plugin->requires = 2010090501;
 $plugin->component = 'tool_uclarolesmigration';

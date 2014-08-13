@@ -38,10 +38,10 @@ $string['importing']                = 'Importing';
 $string['link_to_define_roles']     = 'Now that your role is imported, you will need to visit the <a href="{$a}">Define Roles</a> page to set it up.';
 $string['name']                     = 'Display Name';
 $string['next_step']                = 'Next step';
-$string['new_role_created']         = 'New role created: {$a->newname} ({$a->newshort}), ID: {$a->newid} - Was originally: {$a->oldname} ({$a->oldshort}), ID: {$a->oldid}';
+$string['new_role_created']         = 'New role created: {$a->newname} ({$a->newshort}), ID: {$a->newid} - Was originally: {$a->oldname} ({$a->oldshort})';
 $string['no_roles_in_import']       = 'No roles found in import file.';
 $string['pluginname']               = 'UCLA Roles Migration';
-$string['role_ignored']             = 'Role ignored: {$a->shortname}';
+$string['role_ignored']             = 'Role ignored: {$a}';
 $string['role_replaced']            = 'Role updated: The {$a->new} role has been overwritten with capabilities from the imported {$a->replaced} role.';
 $string['selectrolestoexport']      = 'Select all roles you wish to export';
 $string['shortname']                = 'Short name';
@@ -51,9 +51,9 @@ $string['unknown_import_action']    = 'Unknown import action ({$a->action}) for 
 // Error strings.
 $string['error_noselect']           = 'Please select at least one role to export';
 $string['error_nofile']             = 'Please select a valid ZIP file with XML definitions';
-$string['error_emptyfile']          = 'Please select a non-empty XML file';
-$string['error_badxml']             = 'The selected file does not have a valid XML';
+$string['error_invalidzip']         = 'The selected file is not a valid zip file';
+$string['error_invalidxml']         = 'One or more XML contents are not valid role XML definitions';
 $string['error_noaction']           = 'No import actions specified (Debug message)';
-$string['error_update_role']           = 'Unable to update role information';
+$string['error_update_role']        = 'Unable to update role information';
 
 $string['rolesmigration:view'] = 'Ability to use role migration tool';
