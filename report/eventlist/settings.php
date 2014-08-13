@@ -24,10 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $url = $CFG->wwwroot . '/report/eventlist/index.php';
-    $ADMIN->add('reports', new admin_externalpage('reporteventlists', get_string('pluginname', 'report_eventlist'), $url));
+// START UCLA MOD: CCLE-4671 - Add an additional capability to view the 'Events list' page.
+//if ($hassiteconfig) {
+$url = $CFG->wwwroot . '/report/eventlist/index.php';
+$ADMIN->add('reports', new admin_externalpage('reporteventlists', get_string('pluginname', 'report_eventlist'), $url, 'local/ucla:vieweventlist'));
 
-    // No report settings.
-    $settings = null;
-}
+// No report settings.
+$settings = null;
+//}
+// END UCLA MOD: CCLE-4671.

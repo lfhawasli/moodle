@@ -24,6 +24,10 @@
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+// START UCLA MOD: CCLE-4671 - Add an additional capability to view the 'Events list' page.
+require_capability('local/ucla:vieweventlist', context_system::instance());
+// END UCLA MOD: CCLE-4671.
+
 admin_externalpage_setup('reporteventlists');
 
 // Retrieve all events in a list.
