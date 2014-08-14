@@ -38,6 +38,22 @@
             height: 24px;
         }
     }
+    
+    // Dock hide/show
+    .block-hider-show, 
+    .block-hider-hide {
+        cursor: pointer;
+    }
+    .block-hider-show {
+        display: none;
+    }
+    
+    // Dock hidden conditions
+    &.hidden {
+        .content, 
+        .block-hider-hide {display: none}
+        .block-hider-show {display: inline}
+    }
 }
 
 /// 

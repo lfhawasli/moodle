@@ -1,12 +1,19 @@
 
 // Makes the 'edit' action menu look more like our theme.
+//
+//  * Removes the heavy back shadow on the menu
+//  * Removes the rounded edges.
+//  * Darkens hover state
+//
+.moodle-actionmenu.show[data-enhanced] .menu {
 
-.section .activity .moodle-actionmenu[data-enhanced] .menu {
     @include border-radius(0);
-    
+    @include box-shadow(#999 0px 1px 2px);
+
     li > a {
-        @include border-radius(0);
-        
+        &:first-child, &:last-child {
+            @include border-radius(0);
+        }
         &:hover {
             background-color: #444;
         }

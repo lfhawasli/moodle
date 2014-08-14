@@ -12742,33 +12742,51 @@ a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover,
   width: 24px;
   height: 24px;
 }
+/* line 44, ../sass/moodle/_blocks.scss */
+.block .block-hider-show,
+.block .block-hider-hide {
+  cursor: pointer;
+}
+/* line 47, ../sass/moodle/_blocks.scss */
+.block .block-hider-show {
+  display: none;
+}
+/* line 54, ../sass/moodle/_blocks.scss */
+.block.hidden .content,
+.block.hidden .block-hider-hide {
+  display: none;
+}
+/* line 55, ../sass/moodle/_blocks.scss */
+.block.hidden .block-hider-show {
+  display: inline;
+}
 
-/* line 46, ../sass/moodle/_blocks.scss */
+/* line 62, ../sass/moodle/_blocks.scss */
 .block_adminblock .select {
   width: 100%;
 }
 
-/* line 57, ../sass/moodle/_blocks.scss */
+/* line 73, ../sass/moodle/_blocks.scss */
 .block_settings .adminsearchform {
   text-align: center;
 }
-/* line 60, ../sass/moodle/_blocks.scss */
+/* line 76, ../sass/moodle/_blocks.scss */
 .block_settings #adminsearchquery {
   width: 100%;
   margin-bottom: 8px;
 }
-/* line 64, ../sass/moodle/_blocks.scss */
+/* line 80, ../sass/moodle/_blocks.scss */
 .block_settings #settingsnav hr {
   margin: 10px 0;
   border: 1px solid #ddd;
   border-bottom: 1px solid #fff;
 }
 
-/* line 74, ../sass/moodle/_blocks.scss */
+/* line 90, ../sass/moodle/_blocks.scss */
 .block_recent_activity .activityhead {
   font-size: 1.1rem;
 }
-/* line 84, ../sass/moodle/_blocks.scss */
+/* line 100, ../sass/moodle/_blocks.scss */
 .block_recent_activity .main {
   font-size: 1.4rem;
   font-weight: 500;
@@ -12779,25 +12797,25 @@ a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover,
   padding: 4px;
   border-bottom: 2px solid #ddd;
 }
-/* line 91, ../sass/moodle/_blocks.scss */
+/* line 107, ../sass/moodle/_blocks.scss */
 .block_recent_activity .activity {
   padding: 4px;
   margin-bottom: 0.25em;
 }
-/* line 95, ../sass/moodle/_blocks.scss */
+/* line 111, ../sass/moodle/_blocks.scss */
 .block_recent_activity .activity:nth-child(2n+1) {
   background-color: #f5f5f5;
 }
-/* line 100, ../sass/moodle/_blocks.scss */
+/* line 116, ../sass/moodle/_blocks.scss */
 .block_recent_activity .head {
   font-size: 1.1rem;
 }
-/* line 105, ../sass/moodle/_blocks.scss */
+/* line 121, ../sass/moodle/_blocks.scss */
 .block_recent_activity .unlist li {
   padding: 4px;
   margin-bottom: 0.25em;
 }
-/* line 109, ../sass/moodle/_blocks.scss */
+/* line 125, ../sass/moodle/_blocks.scss */
 .block_recent_activity .unlist li:nth-child(2n) {
   background-color: #f5f5f5;
 }
@@ -13916,24 +13934,26 @@ h2.headingblock > a {
   content: none;
 }
 
-/* line 4, ../sass/moodle/_action_menu.scss */
-.section .activity .moodle-actionmenu[data-enhanced] .menu {
+/* line 8, ../sass/moodle/_action_menu.scss */
+.moodle-actionmenu.show[data-enhanced] .menu {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: #999999 0px 1px 2px;
+  box-shadow: #999999 0px 1px 2px;
+}
+/* line 14, ../sass/moodle/_action_menu.scss */
+.moodle-actionmenu.show[data-enhanced] .menu li > a:first-child, .moodle-actionmenu.show[data-enhanced] .menu li > a:last-child {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
-/* line 7, ../sass/moodle/_action_menu.scss */
-.section .activity .moodle-actionmenu[data-enhanced] .menu li > a {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
-}
-/* line 10, ../sass/moodle/_action_menu.scss */
-.section .activity .moodle-actionmenu[data-enhanced] .menu li > a:hover {
+/* line 17, ../sass/moodle/_action_menu.scss */
+.moodle-actionmenu.show[data-enhanced] .menu li > a:hover {
   background-color: #444;
 }
 
