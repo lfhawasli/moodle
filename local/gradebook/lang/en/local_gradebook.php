@@ -8,6 +8,7 @@ $string['continuecomments'] = '... [See full text on class website]';
 $string['nousers'] = 'WARNING: User in course but could not find matching role assignments in child courses: userid - {$a->userid}, courseid - {$a->courseid}';
 $string['badenrol'] = 'WARNING: User enrolled in more than one child course of a cross-listed course.';
 
+$string['deleted'] = 'Deleted'; // Used when we indicate to MyUCLA that a grade is deleted.
 // Log
 $string['eventgradesexported'] = 'Grades exported ({$a})';
 $string['eventgradesexportviewed'] = 'Grade {$a} export viewed';
