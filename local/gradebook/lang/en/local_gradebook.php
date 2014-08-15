@@ -2,7 +2,7 @@
 
 $string['pluginname'] = 'UCLA gradebook customizations';
 
-$string['continue_comments'] = '... [See full comments on the class website]';
+$string['continuecomments'] = '... [See full text on class website]';
 
 // Errors
 $string['nousers'] = 'WARNING: User in course but could not find matching role assignments in child courses: userid - {$a->userid}, courseid - {$a->courseid}';
