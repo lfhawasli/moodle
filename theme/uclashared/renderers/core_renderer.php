@@ -57,14 +57,46 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     }
 
     /**
-     * Attaches the meta tag needed for mobile display support.
+     * Attaches custom theme head html.
      *
      * @return string
      */
     public function standard_head_html() {
         global $CFG;
 
+        // Get base theme output.
         $out = parent::standard_head_html();
+
+        // Apple touch icons.
+        $out .= '<link rel="shortcut icon" href="' . $this->pix_url('favicon', 'theme') . '" /> ' . "\n"
+                . '<link rel="apple-touch-icon" href="' . $this->pix_url('apple-touch-icon', 'theme') . '" />' . "\n";
+
+        // Need to know what OS we have to determine font rendering.
+        // On Windows OSes Chrome and Firefox don't have proper font-smoothing.
+        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $iswindowsos = strpos($agent, 'Windows') ? true : false;
+
+        $fontlink = html_writer::empty_tag('link',
+                array(
+                    'href' => 'https://fonts.googleapis.com/css?family=Lato:300,400,400italic,700,900',
+                    'rel' => 'stylesheet',
+                    'type' => 'text/css'
+                    )
+                );
+        if (!$iswindowsos) {
+            $out .= $fontlink . "\n";
+        }
+        // IE does have font-smoothing, so load font for IE 8 and above.
+        $out .= "<!--[if gt IE 8]>\n" . $fontlink . "\n" . "<![endif]-->\n";
+
+        // Show an unsupported browser message for IE 8 and lower.
+        $unsupportedbrowser = html_writer::tag('script', '',
+                array(
+                    'type' => 'text/javascript',
+                    'src' => $CFG->wwwroot . '/theme/uclashared/javascript/unsupported-browser.js'
+                    )
+                );
+        $out .= "<!--[if lte IE 8]>\n" . $unsupportedbrowser . "\n" . "<![endif]-->\n";
 
         // Add mobile support with option to switch.
         if (core_useragent::get_user_device_type() != 'default') {
@@ -109,37 +141,34 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             $addlogouturl = true;
             $addloginurl = false;
 
-            $usermurl = new moodle_url('/user/profile.php',
-                    array(
+            $usermurl = new moodle_url('/user/profile.php', array(
                 'id' => $USER->id
             ));
 
             // In case of mnet login.
             $mnetfrom = '';
             if (is_mnet_remote_user($USER)) {
-                $idprovider = $DB->get_record('mnet_host',
-                        array(
+                $idprovider = $DB->get_record('mnet_host', array(
                     'id' => $USER->mnethostid
                 ));
 
                 if ($idprovider) {
-                    $mnetfrom = html_writer::link($idprovider->wwwroot,
-                                    $idprovider->name);
+                    $mnetfrom = html_writer::link($idprovider->wwwroot, $idprovider->name);
                 }
             }
 
             $realuserinfo = '';
             if (\core\session\manager::is_loggedinas()) {
                 $realuser = \core\session\manager::get_realuser();
-                $realfullname = fullname($realuser, true);
-                $dest = new moodle_url('/course/loginas.php',
-                        array(
+                $realfullname = fullname($realuser);
+                $dest = new moodle_url('/course/loginas.php', array(
                     'id' => $course->id,
                     'sesskey' => sesskey()
                 ));
 
-                $realuserinfo = '[' . html_writer::link($dest, $realfullname) . ']'
-                        . get_string('loginas_as', 'theme_uclashared');
+                $realuserlink = html_writer::link($dest, $realfullname, array('class' => 'btn-header real-user'));
+                $loginas = html_writer::span(get_string('loginas_as', 'theme_uclashared'), 'login-as');
+                $realuserinfo = $realuserlink . $loginas;
             }
 
             $fullname = fullname($USER);
@@ -153,13 +182,12 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             } else if (is_role_switched($course->id)) {
                 $context = context_course::instance($course->id);
 
-                $role = $DB->get_record('role',
-                        array(
+                $role = $DB->get_record('role', array(
                     'id' => $USER->access['rsw'][$context->path]
                 ));
 
                 if ($role) {
-                    $rolename = ' (' . format_string($role->name) . ') ';
+                    $rolename = html_writer::span(format_string($role->name), 'role-name');
                 }
             }
 
@@ -177,18 +205,14 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                     $loginstr .= '&nbsp;<div class="loginfailures">';
 
                     if (empty($count->accounts)) {
-                        $loginstr .= get_string('failedloginattempts', '',
-                                $count);
+                        $loginstr .= get_string('failedloginattempts', '', $count);
                     } else {
-                        $loginstr .= get_string('failedloginattemptsall', '',
-                                $count);
+                        $loginstr .= get_string('failedloginattemptsall', '', $count);
                     }
 
-                    if (has_capability('coursereport/log:view',
-                                    context_system::instance())) {
+                    if (has_capability('coursereport/log:view', context_system::instance())) {
                         $loginstr .= ' (' . html_writer::link(new moodle_url(
-                                        '/course/report/log/index.php',
-                                        array(
+                                        '/course/report/log/index.php', array(
                                     'chooselog' => 1,
                                     'id' => 1,
                                     'modid' => 'site_errors'
@@ -208,14 +232,17 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         // The actual login link.
         if ($addloginurl) {
-            $logininfo[] = html_writer::link($loginurl, html_writer::span('', 'arrow-right') . get_string('login'), array('class' => 'btn-header btn-login'));
+            $logininfo[] = html_writer::link($loginurl,
+                    html_writer::span('', 'arrow-right') . get_string('login'),
+                    array('class' => 'btn-header btn-login')
+            );
         } else if ($addlogouturl) {
             $icon = html_writer::tag('i', '', array('class' => 'fa fa-sign-out fa-fw visible-xs-inline'));
             $text = html_writer::span(get_string('logout'), 'hidden-xs');
             $logininfo[] = html_writer::link(
-                new moodle_url('/login/logout.php', array('sesskey' => sesskey())), 
-                $icon . $text,
-                array('class' => 'btn-header')
+                    new moodle_url('/login/logout.php', array('sesskey' => sesskey())),
+                    $icon . $text,
+                    array('class' => 'btn-header')
             );
         }
 
@@ -247,7 +274,8 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     }
 
     /**
-     * Returns the HTML link for the help and feedback.
+     * Returns the HTML button for the help and feedback with a
+     * dropdown menu when available.
      *
      * @return string
      */
@@ -265,28 +293,41 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
         $outlink = html_writer::link($helplocale, $icon . $hflink, array('class' => 'btn-header btn-help-feedback'));
 
-        // Arrow right above toggle menu
-        $arrow = html_writer::span('', 'arrow-up');
+        // Show dropdown menu.
+        $menu = $this->custom_menu();
 
-        // Render the menu
-        // @todo: Need to make these SSC configs?
-        $items = array(
-            html_writer::tag('li', 
-                html_writer::link($helplocale, $arrow . get_string('dropdownsubmit', $this->theme))
-            ),
-            html_writer::tag('li', 
-                html_writer::link('https://docs.ccle.ucla.edu', get_string('dropdownview', $this->theme))
-            ),
-            html_writer::tag('li', 
-                html_writer::link('https://docs.ccle.ucla.edu/w/Tips_and_Updates', get_string('dropdownread', $this->theme))
-            )
-        );
-        $menu = html_writer::tag('ul', implode('', $items), 
+        // Return full menu with link.
+        return html_writer::span($outlink . $menu, 'help-dropdown');
+    }
+
+    /**
+     * Renders the Help & Feedback dropdown menu using Moodle's own config.
+     * The menu items can be modified in Appearance > Themes > Theme settings.
+     * 
+     * @see $CFG->custommenuitems
+     * @param custom_menu $menu
+     * @return string HTML output
+     */
+    protected function render_custom_menu(custom_menu $menu) {
+        if (!$menu->has_children()) {
+            return '';
+        }
+
+        $items = array();
+        foreach ($menu->get_children() as $k => $child) {
+
+            // Show an arrow above first item.
+            $arrow = $k === 0 ? html_writer::span('', 'arrow-up') : '';
+            $items[] = html_writer::tag('li',
+                html_writer::link($child->get_url(), $arrow . $child->get_text())
+            );
+        }
+
+        $menu = html_writer::tag('ul', implode('', $items),
             array('class' => 'help-dropdown-menu hidden', 'role' => 'menu')
         );
 
-        // Return full menu with link
-        return html_writer::span($outlink . $menu, 'help-dropdown');
+        return $menu;
     }
 
     /**
@@ -378,18 +419,18 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             return '';
         }
 
-        // Show grades button ONLY for students
+        // Show grades button ONLY for students.
         $context = context_course::instance($COURSE->id);
         if (has_role_in_context('student', $context)) {
 
             $buttons = $OUTPUT->single_button('/grade/report/index.php?id=' . $COURSE->id .'#grade-view', get_string('grades'),
                 'get', array('class' => 'btn-grades-container'));
-            $buttons .=  $OUTPUT->single_button($cplink, $cptext, 'get', array('class' => 'btn-cpanel-container'));
+            $buttons .= $OUTPUT->single_button($cplink, $cptext, 'get', array('class' => 'btn-cpanel-container'));
 
             return $buttons;
         }
 
-        // Show regular control panel button
+        // Show regular control panel button.
         return $OUTPUT->single_button($cplink, $cptext, 'get');
     }
 
@@ -499,6 +540,33 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         }
 
         return false;
+    }
+
+    /**
+     * Shows sitewide 'alert' banner.
+     * 
+     * @todo: right now it only works for 'red' alerts.
+     * 
+     * @return string HTML
+     */
+    public function alert_banner() {
+        global $CFG;
+
+        $out = '';
+
+        if (!during_initial_install() && get_config('block_ucla_alert', 'alert_sitewide')) {
+
+            if (!class_exists('ucla_alert_banner_site')) {
+                $file = $CFG->dirroot . '/blocks/ucla_alert/locallib.php';
+                require_once($file);
+            }
+
+            // Display banner.
+            $banner = new ucla_alert_banner(SITEID);
+            $out = $banner->render();
+        }
+
+        return $out;
     }
 
     /**

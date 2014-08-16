@@ -22,12 +22,18 @@
         }
     }
     
+    // Defines the + - icons that toggle block visibility.
     .block_action {
         float: right;
         padding: 4px;
         
         > img {
             margin-left: 4px;
+        }
+        
+        // Some blocks can request action icons to be hidden.
+        &.notitle {
+            display: none;
         }
     }
 
@@ -39,7 +45,7 @@
         }
     }
     
-    // Dock hide/show
+    // Block hide/show
     .block-hider-show, 
     .block-hider-hide {
         cursor: pointer;
@@ -48,7 +54,7 @@
         display: none;
     }
     
-    // Dock hidden conditions
+    // Block hidden conditions
     &.hidden {
         .content, 
         .block-hider-hide {display: none}

@@ -46,6 +46,20 @@ $btn-color-forum-search:    #4d4d4d;
         text-decoration: none;
         /*border-bottom: 2px solid darken($ccle-color-blue, 2%);*/
     }
+    
+    // Add braces for 'real user' for 'login-as'
+    &.real-user {
+        padding-right: 24px;
+        
+        &:after {
+            content: "]";
+        }
+        &:before {
+            content: "[";
+        }
+    }
+    
+
 }
 
 .btn-header-text {
@@ -89,6 +103,23 @@ $btn-color-forum-search:    #4d4d4d;
 
 .header-btn-group {
     float: right;
+    color: white;
+    
+    .role-name {
+        padding-left: 8px;
+        font-size: 1.1rem;
+        
+        &:after {
+            content: ")";
+        }
+        &:before {
+            content: "(";
+        }
+    }
+    .login-as {
+        font-size: 1.1rem;    
+        margin-left: -20px;
+    }
 }
 
 //
@@ -96,6 +127,9 @@ $btn-color-forum-search:    #4d4d4d;
 // as traits with @extend -- primarily in adapter-like declarations.
 //
 
+/**
+    Default navigation bar button color.
+*/
 $btn-color-navbar:   #666;
 
 %btn-navbar {

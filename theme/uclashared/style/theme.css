@@ -2374,8 +2374,20 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   text-decoration: none;
   /*border-bottom: 2px solid darken($ccle-color-blue, 2%);*/
 }
-
 /* line 51, ../sass/ucla/_buttons.scss */
+.btn-header.real-user {
+  padding-right: 24px;
+}
+/* line 54, ../sass/ucla/_buttons.scss */
+.btn-header.real-user:after {
+  content: "]";
+}
+/* line 57, ../sass/ucla/_buttons.scss */
+.btn-header.real-user:before {
+  content: "[";
+}
+
+/* line 65, ../sass/ucla/_buttons.scss */
 .btn-header-text {
   background-color: #4168a1;
   padding: 10px 12px;
@@ -2385,28 +2397,28 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   height: 40px;
 }
 
-/* line 60, ../sass/ucla/_buttons.scss */
+/* line 74, ../sass/ucla/_buttons.scss */
 .btn-help-feedback {
   background-color: #5b9cd9;
   /*border-bottom: 2px solid darken(#295493, 10%);*/
 }
-/* line 64, ../sass/ucla/_buttons.scss */
+/* line 78, ../sass/ucla/_buttons.scss */
 .btn-help-feedback:hover {
   background-color: #3489c6;
   /*border-bottom: 2px solid lighten(#295493, 1%);*/
 }
 
-/* line 70, ../sass/ucla/_buttons.scss */
+/* line 84, ../sass/ucla/_buttons.scss */
 .btn-login {
   background-color: #4cae4c;
   /*border-bottom: 2px solid darken(#4cae4c, 10%);*/
 }
-/* line 74, ../sass/ucla/_buttons.scss */
+/* line 88, ../sass/ucla/_buttons.scss */
 .btn-login:hover {
   background-color: #6ebf6e;
   /*border-bottom: 2px solid darken(#4cae4c, 1%);*/
 }
-/* line 79, ../sass/ucla/_buttons.scss */
+/* line 93, ../sass/ucla/_buttons.scss */
 .btn-login .arrow-right {
   display: inline-block;
   float: left;
@@ -2417,12 +2429,34 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   top: 4px;
 }
 
-/* line 90, ../sass/ucla/_buttons.scss */
+/* line 104, ../sass/ucla/_buttons.scss */
 .header-btn-group {
   float: right;
+  color: white;
+}
+/* line 108, ../sass/ucla/_buttons.scss */
+.header-btn-group .role-name {
+  padding-left: 8px;
+  font-size: 1.1rem;
+}
+/* line 112, ../sass/ucla/_buttons.scss */
+.header-btn-group .role-name:after {
+  content: ")";
+}
+/* line 115, ../sass/ucla/_buttons.scss */
+.header-btn-group .role-name:before {
+  content: "(";
+}
+/* line 119, ../sass/ucla/_buttons.scss */
+.header-btn-group .login-as {
+  font-size: 1.1rem;
+  margin-left: -20px;
 }
 
-/* line 101, ../sass/ucla/_buttons.scss */
+/**
+    Default navigation bar button color.
+*/
+/* line 135, ../sass/ucla/_buttons.scss */
 .navbutton .singlebutton input[type="submit"], .control-panel input[type="submit"], .navbutton .wikisearch input[type="submit"],
 .navbutton .forumsearch input[type="submit"] {
   font-size: 1.4rem;
@@ -2439,37 +2473,37 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   border-radius: 0;
   -webkit-appearance: none;
 }
-/* line 112, ../sass/ucla/_buttons.scss */
+/* line 146, ../sass/ucla/_buttons.scss */
 .navbutton .singlebutton input[type="submit"]:hover, .control-panel input[type="submit"]:hover, .navbutton .wikisearch input[type="submit"]:hover,
 .navbutton .forumsearch input[type="submit"]:hover {
   background-color: #e46f10;
 }
 
-/* line 120, ../sass/ucla/_buttons.scss */
+/* line 154, ../sass/ucla/_buttons.scss */
 .navbutton .singlebutton input[type="submit"] {
   background-color: #ef7c1f;
   color: white;
   border-color: #ef7c1f;
   border-bottom-color: #d6680f;
 }
-/* line 129, ../sass/ucla/_buttons.scss */
+/* line 163, ../sass/ucla/_buttons.scss */
 .navbutton .singlebutton input[type="submit"]:hover {
   background-color: #e46f10;
 }
 
-/* line 134, ../sass/ucla/_buttons.scss */
+/* line 168, ../sass/ucla/_buttons.scss */
 .control-panel input[type="submit"] {
   background-color: #ffcf48;
   color: #222;
   border-color: #ffc82e;
   border-bottom-color: #ffbf0b;
 }
-/* line 142, ../sass/ucla/_buttons.scss */
+/* line 176, ../sass/ucla/_buttons.scss */
 .control-panel input[type="submit"]:hover {
   background-color: #ffc215;
 }
 
-/* line 147, ../sass/ucla/_buttons.scss */
+/* line 181, ../sass/ucla/_buttons.scss */
 .navbutton .wikisearch input[type="submit"],
 .navbutton .forumsearch input[type="submit"] {
   background-color: #4d4d4d;
@@ -2477,7 +2511,7 @@ input[type="submit"], .mform input[name="submitbutton"], .alert-login input[type
   border-color: #404040;
   border-bottom-color: #343434;
 }
-/* line 156, ../sass/ucla/_buttons.scss */
+/* line 190, ../sass/ucla/_buttons.scss */
 .navbutton .wikisearch input[type="submit"]:hover,
 .navbutton .forumsearch input[type="submit"]:hover {
   background-color: #343434;
@@ -12724,69 +12758,73 @@ a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover,
   padding: 4px 8px;
   /*font-weight: bold;*/
 }
-/* line 25, ../sass/moodle/_blocks.scss */
+/* line 26, ../sass/moodle/_blocks.scss */
 .block .block_action {
   float: right;
   padding: 4px;
 }
-/* line 29, ../sass/moodle/_blocks.scss */
+/* line 30, ../sass/moodle/_blocks.scss */
 .block .block_action > img {
   margin-left: 4px;
 }
-/* line 34, ../sass/moodle/_blocks.scss */
+/* line 35, ../sass/moodle/_blocks.scss */
+.block .block_action.notitle {
+  display: none;
+}
+/* line 40, ../sass/moodle/_blocks.scss */
 .block .block-control-actions {
   clear: both;
 }
-/* line 36, ../sass/moodle/_blocks.scss */
+/* line 42, ../sass/moodle/_blocks.scss */
 .block .block-control-actions .iconsmall.actionmenu {
   width: 24px;
   height: 24px;
 }
-/* line 44, ../sass/moodle/_blocks.scss */
+/* line 50, ../sass/moodle/_blocks.scss */
 .block .block-hider-show,
 .block .block-hider-hide {
   cursor: pointer;
 }
-/* line 47, ../sass/moodle/_blocks.scss */
+/* line 53, ../sass/moodle/_blocks.scss */
 .block .block-hider-show {
   display: none;
 }
-/* line 54, ../sass/moodle/_blocks.scss */
+/* line 60, ../sass/moodle/_blocks.scss */
 .block.hidden .content,
 .block.hidden .block-hider-hide {
   display: none;
 }
-/* line 55, ../sass/moodle/_blocks.scss */
+/* line 61, ../sass/moodle/_blocks.scss */
 .block.hidden .block-hider-show {
   display: inline;
 }
 
-/* line 62, ../sass/moodle/_blocks.scss */
+/* line 68, ../sass/moodle/_blocks.scss */
 .block_adminblock .select {
   width: 100%;
 }
 
-/* line 73, ../sass/moodle/_blocks.scss */
+/* line 79, ../sass/moodle/_blocks.scss */
 .block_settings .adminsearchform {
   text-align: center;
 }
-/* line 76, ../sass/moodle/_blocks.scss */
+/* line 82, ../sass/moodle/_blocks.scss */
 .block_settings #adminsearchquery {
   width: 100%;
   margin-bottom: 8px;
 }
-/* line 80, ../sass/moodle/_blocks.scss */
+/* line 86, ../sass/moodle/_blocks.scss */
 .block_settings #settingsnav hr {
   margin: 10px 0;
   border: 1px solid #ddd;
   border-bottom: 1px solid #fff;
 }
 
-/* line 90, ../sass/moodle/_blocks.scss */
+/* line 96, ../sass/moodle/_blocks.scss */
 .block_recent_activity .activityhead {
   font-size: 1.1rem;
 }
-/* line 100, ../sass/moodle/_blocks.scss */
+/* line 106, ../sass/moodle/_blocks.scss */
 .block_recent_activity .main {
   font-size: 1.4rem;
   font-weight: 500;
@@ -12797,25 +12835,25 @@ a.badge:hover, .block.block_calendar_month .today.eventnone > a:hover,
   padding: 4px;
   border-bottom: 2px solid #ddd;
 }
-/* line 107, ../sass/moodle/_blocks.scss */
+/* line 113, ../sass/moodle/_blocks.scss */
 .block_recent_activity .activity {
   padding: 4px;
   margin-bottom: 0.25em;
 }
-/* line 111, ../sass/moodle/_blocks.scss */
+/* line 117, ../sass/moodle/_blocks.scss */
 .block_recent_activity .activity:nth-child(2n+1) {
   background-color: #f5f5f5;
 }
-/* line 116, ../sass/moodle/_blocks.scss */
+/* line 122, ../sass/moodle/_blocks.scss */
 .block_recent_activity .head {
   font-size: 1.1rem;
 }
-/* line 121, ../sass/moodle/_blocks.scss */
+/* line 127, ../sass/moodle/_blocks.scss */
 .block_recent_activity .unlist li {
   padding: 4px;
   margin-bottom: 0.25em;
 }
-/* line 125, ../sass/moodle/_blocks.scss */
+/* line 131, ../sass/moodle/_blocks.scss */
 .block_recent_activity .unlist li:nth-child(2n) {
   background-color: #f5f5f5;
 }

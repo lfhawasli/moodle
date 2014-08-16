@@ -30,7 +30,7 @@ $THEME->parents_exclude_sheets = array(
 $tf_general     = 'course.php';
 $tf_course      = 'course.php';
 $tf_embedded    = 'embedded.php';
-$tf_frontpage   = 'frontpage_layout.php';
+$tf_frontpage   = 'frontpage.php';
 $tf_report      = 'report.php';
 
 $noconfigs = during_initial_install();
