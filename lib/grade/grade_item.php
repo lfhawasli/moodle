@@ -2155,5 +2155,14 @@ class grade_item extends grade_object {
         if (!empty($CFG->enableavailability) && class_exists('\availability_grade\callbacks')) {
             \availability_grade\callbacks::grade_item_changed($this->courseid);
         }
+
+        // START UCLA MOD: CCLE-4466 - Convert MyUCLA grade transfer into scheduled task
+        $sendmyuclaitem = new \local_gradebook\task\send_myucla_grade_item();
+        $this->deleted = $deleted;  // Important to pass along.
+        $valid = $sendmyuclaitem->set_gradeinfo($this);
+        if ($valid) {
+            \core\task\manager::queue_adhoc_task($sendmyuclaitem);
+        }
+        // END UCLA MOD: CCLE-4466
     }
 }
