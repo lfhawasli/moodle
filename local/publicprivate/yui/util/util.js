@@ -8,6 +8,9 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
         PAGECONTENT : 'div#page-content',
         PUBLICPRIVATE_PRIVATE : 'a.editing_makeprivate',
         PUBLICPRIVATE_PUBLIC : 'a.editing_makepublic',
+        DUPLICATE : 'a.editing_duplicate',
+        ASSIGNROLES : 'a.editing_assign',
+        GROUPMODEFILLER : 'span.filler',
         SPINNERCOMMANDDIV : 'div.commands',
         MODULEIDPREFIX : 'module-',
         PUBLICPRIVATEIMG : 'a.publicprivate img',
@@ -127,27 +130,37 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             Y.io(uri, config);
             return responsetext;
         },
-        setup_for_resource : function(baseselector) {
-            // Insert the PP icon node after a file is dragged + dropped
+        setup_for_resource : function(newnode) {
+            // Get the module number.
+            var modnumber = (newnode.getAttribute('id')).replace(CSS.MODULEIDPREFIX,'');
+            // Create href for the new node.
             var href = M.cfg.wwwroot + 
                     '/local/publicprivate/mod.php?' + 
                     M.cfg.sesskey + '&public=' + 
-                    baseselector.replace(CSS.MODULEIDPREFIX, '');
-            
-            // Generate pp icon node
-            // NOTE: because we delegate events, we don't need to attach a handler
-            Y.one(baseselector + ' ' + CSS.COMMANDDIV).insert(
-                Y.Node.create(
-                    '<a class="editing_makepublic publicprivate" ' +
-                        'href="' + href + '"' +
-                        'title="' + M.util.get_string('publicprivatemakepublic', 'local_publicprivate') + '">' +
-                        '<img class="iconsmall" ' +
-                            'src="' + M.util.image_url(this.get('privatepix'), this.get('component')) + '"' +
-                            'alt="' + M.util.get_string('publicprivatemakepublic', 'local_publicprivate') + '"/>' +
-                    '</a>'
-                )
-            );
+                    modnumber;
 
+            // Generate publicprivate icon node after duplicate node.
+            // NOTE: because we delegate events, we don't need to attach a handler.
+            newnode.one('.menu ' + CSS.DUPLICATE).insert(
+                Y.Node.create(
+                    '<li role="presentation"> ' +
+                        '<a class="editing_makepublic publicprivate menu-action cm-edit-action" ' +
+                            'href="' + href + '"' +
+                            'role="menuitem">' +
+                            '<img class="iconsmall" ' +
+                                'src="' + M.util.image_url(this.get('privatepix'), this.get('component')) + '"' +
+                                'alt="' + M.util.get_string('publicprivatemakepublic', 'local_publicprivate') + '"/>' +
+                            '<span class="menu-action-text">' +
+                                M.util.get_string('publicprivatemakepublic', 'local_publicprivate') +
+                            '</span>' +
+                        '</a>' +
+                    '</li>'
+                ), 'after'
+            );
+            // Remove Assign roles.
+            newnode.one(".menu " + CSS.ASSIGNROLES).remove();
+            // Remove filler node for groupmode.
+            newnode.one(CSS.GROUPMODEFILLER).remove();
         }
     }, {
         NAME : 'course-publicprivate-toolbox',
