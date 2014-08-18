@@ -289,9 +289,6 @@ $CFG->forced_plugin_settings['enrol_guest']['defaultenrol'] = 1;
 // Core Behat tests depend on default setting.
 //$CFG->forced_plugin_settings['enrol_guest']['status'] = 0;  // 0 is yes, 1 is no
 
-// Site administration > Plugins > Enrollments > Site invitation
-$CFG->forced_plugin_settings['enrol_invitation']['enabletempparticipant'] = 1;
-
 // Site administration > Plugins > Enrollments > Self enrolment
 // Core Behat tests depend on default setting.
 //$CFG->forced_plugin_settings['enrol_self']['defaultenrol'] = 0;

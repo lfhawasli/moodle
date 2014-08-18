@@ -100,6 +100,10 @@ class behat_ucla extends behat_files {
         $enabled[] = 'meta';
         set_config('enrol_plugins_enabled', implode(',', $enabled));
 
+        // Enable guest and site invitation plugin.
+        set_config('status', ENROL_INSTANCE_ENABLED, 'enrol_guest');
+        set_config('status', ENROL_INSTANCE_ENABLED, 'enrol_invitation');
+
         // Purge all caches to force new configs to take effect.
         purge_all_caches();
     }
