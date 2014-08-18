@@ -22,18 +22,19 @@ table {
     font-size: $type-font-size;
 }
 
-img.icon {
+/*img.icon {
     width: 24px;
     height: 24px;
-}
+}*/
 
-#intro.generalbox {
-    /*@extend .well;*/
-    /*@extend .well-small;*/
+/*#intro.generalbox {
+    @extend .well;
+    @extend .well-small;
     
     margin-top: 0;
-}
+}*/
 
+// Define how links will look like
 a {
     &:link {
         text-decoration: none;
@@ -64,10 +65,17 @@ a {
 .mform .ffilemanager * {
     @include box-sizing(content-box);
 }
-.iconsmall.actionmenu {
+.iconsmall {
     @include box-sizing(content-box);
 }
-
+// Moodle dialogs need content-box
+.moodle-dialogue-base * {
+    @include box-sizing(content-box);
+}
+// Moodle text editors need content-box
+.feditor * {
+    @include box-sizing(content-box);
+}
 
 /// Fix YUI typography
 h1 {

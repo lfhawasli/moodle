@@ -34,14 +34,7 @@ $editing-link-color: orangered;
             color: $editing-link-color;
         }
     }
-    
-    // Dropdown menu icons don't display correctly with our global border-box.
-    .menu {
-        .iconsmall {
-            @include box-sizing(content-box);
-        }
-    }
-    
+
     // Give the 'pencil' icon some room.
     .groupinglabel {
         margin-right: 4px;

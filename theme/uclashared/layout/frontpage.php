@@ -124,7 +124,7 @@ echo $OUTPUT->doctype() ?>
 
 <?php
     // Include shared footer.
-    require_once(__DIR__ . '/includes/header.php');
+    require_once(__DIR__ . '/includes/footer.php');
 ?>
 <?php echo $OUTPUT->standard_end_of_body_html() ?>
 </body>

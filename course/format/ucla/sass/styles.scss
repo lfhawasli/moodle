@@ -22,14 +22,6 @@
     .sectionheader {
         border-bottom: 1px solid #ccc;
     }
-    // Hidden means visible NOT hidden!
-    .hidden {
-        padding-left: 10px;
-        color: #ddd;
-
-        display: block !important;
-        visibility: visible !important;
-    }
     
     // ucla format sections
     .section {
@@ -37,6 +29,13 @@
 
         // Style hidden sections
         &.hidden {
+            padding-left: 10px;
+            color: #ddd;
+
+            // Hidden means visible NOT hidden!
+            display: block !important;
+            visibility: visible !important;
+            
             .content {
                 padding: 4px;
                 border: 2px dashed #ddd;
