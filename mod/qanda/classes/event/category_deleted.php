@@ -15,9 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UCLA events.
- *
- * Contains the event class for entry added.
+ * The mod_qanda category deleted event.
  *
  * @package    mod_qanda
  * @copyright  2014 UC Regents
@@ -28,60 +26,57 @@ namespace mod_qanda\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The class for the event entry_added in qanda.
+ * The mod_qanda category deleted event class.
  *
  * @package    mod_qanda
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry_added extends \core\event\base {
+class category_deleted extends \core\event\base {
     /**
-     * init()
-     * Creates the event.
-     **/
+    * Creates the event.
+    */
     protected function init() {
-        $this->data['crud'] = 'c';
+        $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'qanda_entries';
+        $this->data['objecttable'] = 'qanda_categories';
     }
-
     /**
-     * get_name()
-     * @return the name of the event.
-     **/
+    * Returns the name of the event.
+    *
+    * @return string
+    */
     public static function get_name() {
-        return get_string('evententryadded', 'qanda');
+        return get_string('eventcategorydeleted', 'qanda');
     }
-
     /**
-     * get_description()
-     * @return a short description for the event log.
-     **/
+    * Returns a short description for the event.
+    *
+    * NOTE: Must be non-localized string.
+    *
+    * @return string
+    */
     public function get_description() {
-        return "User {$this->userid} has added an entry with id {$this->objectid}.";
+        return "The user with id '$this->userid' has deleted the category with id '$this->objectid' in qanda activity.";
     }
-
     /**
-     * get_url()
-     * @return the URL of the event.
-     **/
+    * Returns URL to the course page.
+    *
+    * @return moodle_url
+    */
     public function get_url() {
-        return new \moodle_url('/mod/'. 'qanda' . '/view.php',
-                array('id' => $this->contextinstanceid, 'mode' => 'entry',
-                    'hook' => $this->objectid) );
+        return new \moodle_url('/mod/qanda/editcategories.php',
+            array('id' => $this->contextinstanceid)
+        );
     }
-
     /**
-     * get_legacy_logdata()
-     * Used to add log data to legacy log, this is only called if legacy logging
-     * is enabled through the legacy logging plugin.
-     * 
-     * @return an array that imitates the arguments that are used to be passed
-     * to the old add_to_log function.
-     **/
+    * Add data to legacy log.
+    *
+    * @return array
+    */
     public function get_legacy_logdata() {
-        return array($this->courseid, "qanda", "add entry", "view.php?id=" .
-            $this->contextinstanceid . "&amp;mode=entry&amp;hook=$this->objectid",
+        return array($this->courseid, 'qanda', 'delete category', 
+            "editcategories.php?id={$this->contextinstanceid}",
             $this->objectid, $this->contextinstanceid);
     }
 }

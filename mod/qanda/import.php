@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/lib.php');
 require_once("$CFG->dirroot/course/lib.php");
+require_once("$CFG->dirroot/course/modlib.php");
 require_once('import_form.php');
 
 $id = required_param('id', PARAM_INT);    // Course Module ID
@@ -88,8 +89,9 @@ if ($xml = qanda_read_imported_file($result)) {
 
         if ($xmlqanda['NAME'][0]['#']) {
             $qanda = new stdClass();
+            $qanda->modulename = 'qanda';
+            $qanda->module = $cm->module;
             $qanda->name = ($xmlqanda['NAME'][0]['#']);
-            $qanda->course = $course->id;
             $qanda->globalqanda = ($xmlqanda['GLOBALQANDA'][0]['#']);
 
             $qanda->intro = ($xmlqanda['INTRO'][0]['#']);
@@ -97,9 +99,7 @@ if ($xml = qanda_read_imported_file($result)) {
             $qanda->showspecial = ($xmlqanda['SHOWSPECIAL'][0]['#']);
             $qanda->showalphabet = ($xmlqanda['SHOWALPHABET'][0]['#']);
             $qanda->showall = ($xmlqanda['SHOWALL'][0]['#']);
-            $qanda->timecreated = time();
-            $qanda->timemodified = time();
-            $qanda->cmidnumber = $cm->idnumber;
+            $qanda->cmidnumber = null;
 
             // Setting the default values if no values were passed
             if (isset($xmlqanda['ENTBYPAGE'][0]['#'])) {
@@ -139,54 +139,12 @@ if ($xml = qanda_read_imported_file($result)) {
             }
 
             // Include new qanda and return the new ID
-            if (!$qanda->id = qanda_add_instance($qanda)) {
+            if (!($glossary = add_moduleinfo($qanda, $course))) {
                 echo $OUTPUT->notification("Error while trying to create the new qanda.");
                 qanda_print_tabbed_table_end();
                 echo $OUTPUT->footer();
                 exit;
             } else {
-                //The instance has been created, so lets do course_modules
-                //and course_sections
-                $mod = new stdClass();
-                if (isset($course->groupmode)) {
-                    $mod->groupmode = $course->groupmode;  /// Default groupmode the same as course
-                }
-                if (isset($qanda->id)) {
-                    $mod->instance = $qanda->id;
-                }
-
-                // course_modules and course_sections each contain a reference
-                // to each other, so we have to update one of them twice.
-
-                if (!$currmodule = $DB->get_record("modules", array("name" => 'qanda'))) {
-                    print_error('modulenotexist', 'debug', '', 'qanda');
-                }
-                $mod->module = $currmodule->id;
-                $mod->course = $course->id;
-                $mod->modulename = 'qanda';
-                $mod->section = 0;
-
-                if (!$mod->coursemodule = add_course_module($mod)) {
-                    print_error('cannotaddcoursemodule');
-                }
-                // After Moodle 2.3 the add_mod_to_section() function was deprecated.
-                $sectionid = course_add_cm_to_section($course, $mod->coursemodule, 0);
-                
-                //We get the section's visible field status
-                $visible = $DB->get_field("course_sections", "visible", array("id" => $sectionid));
-
-                $DB->set_field("course_modules", "visible", $visible, array("id" => $mod->coursemodule));
-
-
-                // mdl_course_modules.section was set to 0, instead of the index of mdl_course_sections.section=0
-                //Set the proper course_modules.section with the retrieved $sectionid (the index of the 0 section from  mdl_course_sections for that course)
-                $DB->set_field("course_modules", "section", $sectionid, array("id" => $mod->coursemodule));
-
-                add_to_log($course->id, "course", "add mod", "../mod/$mod->modulename/view.php?id=$mod->coursemodule", "$mod->modulename $mod->instance");
-                add_to_log($course->id, $mod->modulename, "add", "view.php?id=$mod->coursemodule", "$mod->instance", $mod->coursemodule);
-
-                rebuild_course_cache($course->id);
-
                 echo $OUTPUT->box(get_string("newqandacreated", "qanda"), 'generalbox box-align-center boxwidthnormal');
             }
         } else {
