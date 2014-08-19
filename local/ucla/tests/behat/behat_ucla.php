@@ -156,6 +156,16 @@ class behat_ucla extends behat_files {
                                 new TableNode($table));
 
                 break;
+
+            case 'role assigns':
+                // Import UCLA roles.
+                $this->get_data_generator()->create_ucla_roles();
+
+                // Forward the data to Moodle's data generators.
+                $this->getMainContext()->getSubcontext('behat_data_generators')
+                    ->the_following_exist('role assigns', new TableNode($data));
+                break;
+
             case 'activities':
                 require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
                 $this->getMainContext()->getSubcontext('behat_data_generators')

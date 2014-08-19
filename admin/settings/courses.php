@@ -22,19 +22,35 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// START UCLA MOD: CCLE-3773 - Manager Limited should be able to delete courses for their own categories
+//$capabilities = array(
+//    'moodle/backup:backupcourse',
+//    'moodle/category:manage',
+//    'moodle/course:create',
+//    'moodle/site:approvecourse',
+//    'moodle/restore:restorecourse'
+//);
 $capabilities = array(
     'moodle/backup:backupcourse',
     'moodle/category:manage',
     'moodle/course:create',
     'moodle/site:approvecourse',
-    'moodle/restore:restorecourse'
+    'moodle/restore:restorecourse',
+    'local/ucla:browsecourses'
 );
+// END UCLA MOD: CCLE-3773
+
 if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     // Speedup for non-admins, add all caps used on this page.
     $ADMIN->add('courses',
+        // START UCLA MOD: CCLE-3773 - Manager Limited should be able to delete courses for their own categories
+//        new admin_externalpage('coursemgmt', new lang_string('coursemgmt', 'admin'),
+//            $CFG->wwwroot . '/course/management.php',
+//            array('moodle/category:manage', 'moodle/course:create')
         new admin_externalpage('coursemgmt', new lang_string('coursemgmt', 'admin'),
             $CFG->wwwroot . '/course/management.php',
-            array('moodle/category:manage', 'moodle/course:create')
+            array('moodle/category:manage', 'moodle/course:create', 'local/ucla:browsecourses')
+        // END UCLA MOD: CCLE-3773
         )
     );
     $ADMIN->add('courses',
