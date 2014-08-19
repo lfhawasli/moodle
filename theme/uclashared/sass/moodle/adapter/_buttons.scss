@@ -1,41 +1,33 @@
-//
-// Buttons
-// --------------------------------------------------
 
-@import "bootstrap/lib/buttons";
+// This is the area where the 'editing button sits'
 
-////
-// Button overrides
-// --------------------------------------------------
-
-.btn {
-
-    @include respond-at(xs) {
-        width: 100%;
-        margin-top: 4px;
+.navbutton {
+    // The editing button
+    .singlebutton input[type="submit"] {
+        @extend %btn-editing-mode;
     }
-
-    // Make buttons render correctly on iPhone
-    -webkit-appearance: none;
-}
-
-.btn-default {
-    @include button-variant(#ffffff, #4d4d4d, #333);
-}
-
-.btn-primary {
-    color: white !important;
-}
-
-.btn-cpanel {
-    @include button-variant(#0d3286, #fcd226, #fcb126);
-    font-weight: bold;
     
-    &:hover {
-        color: #0d3286;
+    // Forum and Wiki search button
+    .wikisearch,
+    .forumsearch {
+
+        input[alt="search"] {
+            @extend .form-control; 
+            @extend .input-xs;
+            display: inline-block !important;
+        }
+        input[type="submit"] {
+            @extend %btn-forum-search;
+        }
     }
 }
 
+// The control panel is rendered as a single-button.
+.control-panel {
+    input[type="submit"] {
+        @extend %btn-control-panel;
+    }
+}
 
 ///
 // Moodle overrides
@@ -68,28 +60,7 @@ input[type="submit"] {
     }
 }
 
-// Navbar buttons and inputs
-.navbutton {
-    .wikisearch,
-    .forumsearch {
 
-        input[alt="search"] {
-            @extend .form-control; 
-            @extend .input-xs;
-            display: inline-block !important;
-        }
-        input[type="submit"] {
-            @extend .btn;
-            @extend .btn-default;
-            @extend .btn-sm;
-        }
-    }
-    .singlebutton input[type="submit"] {
-        @extend .btn;
-        @extend .btn-warning;
-        @extend .btn-sm;
-    }
-}
 
 .pagelayout-redirect {
     text-align: center;
@@ -97,7 +68,7 @@ input[type="submit"] {
     .continuebutton {
         @extend .btn;
         @extend .btn-success;
-        /*@extend .btn-lg;*/
+        @extend .btn-lg;
         
         a, a:link {color: white}
         a:hover {text-decoration: none}
@@ -122,11 +93,11 @@ input[type="submit"] {
 }
 
 .control-panel {
-    input[type="submit"] {
+/*    input[type="submit"] {
         @extend .btn;
         @extend .btn-cpanel;
         @extend .btn-sm;
-    }
+    }*/
 
     // Grades button
     .btn-grades-container {
@@ -146,7 +117,7 @@ input[type="submit"] {
 
     // In responsive mode, display grade & control panel buttons
     // side by side for students.
-    @include respond-to(handhelds) {
+/*    @include respond-to(handhelds) {
         .btn-grades-container {
             display: block;
         }
@@ -157,5 +128,5 @@ input[type="submit"] {
                 @include border-left-radius(0);
             }
         }
-    }
+    }*/
 }

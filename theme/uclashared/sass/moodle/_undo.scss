@@ -97,8 +97,8 @@ li.section.hidden,
  */
 
 fieldset.hidden {
-    display: block !important;
-    visibility: visible !important;
+    display: inherit;
+    visibility: inherit;
 }
 
 

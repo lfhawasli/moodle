@@ -13,4 +13,4 @@ $icon-font-path:    "[[uclashared:font|";
 $icon-font-name: $icon-font-name + "]]";
 
 // After we override the vars, load from Bootstrap
-@import "bootstrap/lib/glyphicons";
+@import "bootstrap/glyphicons";

@@ -434,6 +434,9 @@ $CFG->theme = 'uclashared';
 // Site administration > Appearance > Themes > Theme settings
 $CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
+$CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
+    View self help articles|https://docs.ccle.ucla.edu/
+    Read tips & updates|https://docs.ccle.ucla.edu/w/Instructors#Tips_and_Updates";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
@@ -520,9 +523,6 @@ $CFG->forced_plugin_settings['enrol_database']['localcoursefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localuserfield'] = 'idnumber';
 $CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
-
-// CCLE-2802 - Frontpage banner layout include
-$CFG->customfrontpageinclude = $_dirroot_ . '/theme/uclashared/layout/frontpage.php';
 
 // CCLE-2364 - SUPPORT CONSOLE (put after $_dirroot_, because needs $CFG->dataroot to be set)
 $log_date = date('Y-m-d') . '-00_00';

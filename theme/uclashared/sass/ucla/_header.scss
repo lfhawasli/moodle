@@ -1,0 +1,226 @@
+//
+// UCLA / Header
+//
+
+$ccle-color-logo:       #FFBC00;
+$ccle-color-sublogo:    #c8dbf7;
+
+//
+// Header styles for CCLE banner.
+//
+// This defines a two part header.  
+//  1. Logo + user buttons
+//  2. System + weeks display
+header {
+
+    width: 100%;
+    margin-bottom: 8px;
+    
+    .header-main {
+        background-color: $header-color-prod;
+        position: fixed;
+        width: 100%;
+        z-index: 9999;
+        height: $header-height;
+        
+        @include background-image(linear-gradient(left top, $header-color-prod, #3d6196));
+        
+        // System environment colors
+        .env-dev & {
+            background-image: none;
+            background-color: $header-color-dev;
+        }
+        .env-test & {
+            background-image: none;
+            background-color: $header-color-test;
+        }
+        .env-stage & {
+            background-image: none;
+            background-color: $header-color-stage;
+        }
+    }
+    
+    .header-system {
+        background-color: $header-color-system-background;
+        
+        font-size: 1.2rem;
+        font-weight: 300;
+        margin-top: $header-height + 8px;
+    }
+    
+    .header-system-name {
+        float: left;
+        color: $header-color-system-text;
+        display: inline-block;
+        padding: 2px 0;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .weeks-display {
+        float: right;
+        display: inline-block;
+        padding: 2px 16px;
+        
+        .week {
+            font-weight: bold;
+        }
+    }
+
+    .help-dropdown-menu {
+        background-color: white;
+        margin: 0;
+        min-width: 143px;
+        opacity: 0.97;
+        position: absolute;
+        top: 40px;
+        
+        @include box-shadow(#999 0px 1px 2px);
+
+        &.hidden {
+            display: none;
+            visibility: hidden;
+        }
+        li {
+            list-style: none;
+            
+            .arrow-up {
+                position: absolute;
+                left: 46%;
+                top: -5px;
+                border-bottom-color: white;
+            }
+            
+            a {
+                font-size: 1.2rem;
+                display: inline-block;
+                padding: 8px 10px;
+                width: 100%;
+                color: #333;
+                
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+            
+            &:nth-child(2n) {
+                background-color: #efefef;
+            }
+            &:hover {
+                background-color: #444;
+
+                a {
+                    color: #eee;
+                }
+            }
+        }
+    }
+}
+
+// Defines how header logo area looks
+.header-logo {
+    
+    a, a:hover {
+        text-decoration: none;
+    }
+    
+    // UCLA Logo
+    .logo-ucla {
+        width: 70px;
+        display: inline;
+    }
+
+    // CCLE text
+    .logo-ccle {
+        color: $ccle-color-logo;
+        font-weight: bold;
+
+        font-size: 2.9rem;
+        margin-right: 8px;
+        margin-left: 4px;
+        &:hover {text-decoration: none;}
+
+        .env-dev &, .env-test &, .env-stage & {
+            color: white;
+        }
+    }
+
+    // Full CCLE text 
+    .logo-ccle-sub {
+        display: inline-block;
+        font-size: 1.1rem;
+        color: $ccle-color-sublogo;
+
+        // Split the text in two
+        .logo-cc,
+        .logo-le {
+
+            margin-right: 8px;
+            display: block;
+
+            width: 100%;
+            text-transform: capitalize;
+        }
+        
+        .env-dev &, .env-test &, .env-stage & {
+            color: white;
+        }
+    }
+}
+
+// Responsive 
+@media (max-width: $screen-xs-max) {
+    .header-logo .logo-ucla {
+        width: 44px;
+        float: left;
+        margin-top: 2px;
+    }
+    .header-logo .logo-ccle {
+        font-size: 1.8rem;
+        float: left;
+        clear: both;
+        margin-left: 0
+    }
+}
+
+// Controls that are right above the breadcrumb and below the header
+
+.navbar-controls {
+    text-align: right;
+    .navbutton {
+        float: none;
+        display: inline-block;
+    }
+    .control-panel {
+        display: inline-block;
+    }
+}
+
+// Frontpage layout updates the header
+.pagelayout-frontpage {
+    
+    header {
+        background: url([[pix:theme|ccle-frontpage-2]]) no-repeat;
+        background-position: 50% 50%;
+        height: 500px;
+        margin-bottom: 0;
+        
+        .header-main {
+            position: relative;
+            width: auto;
+            opacity: 0.9;
+        }
+        .header-system {
+            margin-top: 8px;
+        }
+        .header-system {
+            background: none;
+        }
+        .header-system-name {
+            color: white !important;
+            /*font-weight: bold;*/
+            padding-top: 8px;
+        }
+    }
+        
+}

@@ -2,7 +2,7 @@
 // FORM
 // --------------------------------------------------
 
-@import "bootstrap/lib/forms";
+@import "bootstrap/forms";
 
 // 
 // Boostrap love
@@ -45,24 +45,27 @@ input {
     font-family: $type-font-family;
 }
 
-// Make everything look like Bootstrap forms!!
-select,
-textarea,
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"] {
-    @extend .form-control;
+// Make everything inside a Moodle mform look like Bootstrap forms!!
+// We need to have .mform as a parent because some moodle widgets violate conventions
+.mform {
+    select,
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"] {
+        @extend .form-control;
+    }
 }
 
 /// Moodle forms love
@@ -151,13 +154,4 @@ input[type="color"] {
             margin-left: 0;
         }
     }
-}
-
-/// hackey way to fix the add resource modal
-
-#chooseform .instruction,
-#chooseform .typesummary,
-.moodle-dialogue-base .moodle-dialogue .moodle-dialogue-bd {
-    font-size: $type-font-size;
-    line-height: 2rem;
 }

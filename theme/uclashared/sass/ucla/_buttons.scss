@@ -1,0 +1,195 @@
+//
+// Buttons
+// --------------------------------------------------
+
+@import "bootstrap/buttons";
+
+
+$btn-color-editing:         #ef7c1f;
+$btn-color-control-panel:   #ffcf48;
+$btn-color-forum-search:    #4d4d4d;
+
+
+////
+// Button overrides
+// --------------------------------------------------
+
+.btn {
+
+    @include respond-at(xs) {
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    // Make buttons render correctly on iPhone
+    -webkit-appearance: none;
+}
+
+.btn-default {
+    @include button-variant(#ffffff, #4d4d4d, #333);
+}
+
+.btn-primary {
+    color: white !important;
+}
+.btn-header {
+    background-color: none;
+    padding: 10px 12px; 
+    color: white !important;
+    display: inline-block;
+    font-weight: 300;
+    /*border-bottom: 2px solid darken($header-color-prod, 10%);*/
+    height: $header-height;
+    
+    &:hover {
+        background-color: lighten($ccle-color-blue, 5%);
+        text-decoration: none;
+        /*border-bottom: 2px solid darken($ccle-color-blue, 2%);*/
+    }
+    
+    // Add braces for 'real user' for 'login-as'
+    &.real-user {
+        padding-right: 24px;
+        
+        &:after {
+            content: "]";
+        }
+        &:before {
+            content: "[";
+        }
+    }
+    
+
+}
+
+.btn-header-text {
+    background-color: $ccle-color-blue;
+    padding: 10px 12px; 
+    color: white !important;
+    display: inline-block;
+    font-weight: 300;
+    height: $header-height;
+}
+
+.btn-help-feedback {
+    background-color: #5b9cd9;
+    /*border-bottom: 2px solid darken(#295493, 10%);*/
+    
+    &:hover {
+        background-color: lighten($header-color-prod, 2%);
+        /*border-bottom: 2px solid lighten(#295493, 1%);*/
+    }
+}
+
+.btn-login {
+    background-color: #4cae4c;
+    /*border-bottom: 2px solid darken(#4cae4c, 10%);*/
+
+    &:hover {
+        background-color: lighten(#4cae4c, 10%);
+        /*border-bottom: 2px solid darken(#4cae4c, 1%);*/
+    }
+    
+    .arrow-right {
+        display: inline-block;
+        float: left;
+        border-left-color: $header-color-prod;
+        margin-left: -12px;
+        margin-right: 8px;
+        position: relative;
+        top: 4px;
+    }
+}
+
+.header-btn-group {
+    float: right;
+    color: white;
+    
+    .role-name {
+        padding-left: 8px;
+        font-size: 1.1rem;
+        
+        &:after {
+            content: ")";
+        }
+        &:before {
+            content: "(";
+        }
+    }
+    .login-as {
+        font-size: 1.1rem;    
+        margin-left: -20px;
+    }
+}
+
+//
+// These declarations don't produce classes, instead they are meant to be used
+// as traits with @extend -- primarily in adapter-like declarations.
+//
+
+/**
+    Default navigation bar button color.
+*/
+$btn-color-navbar:   #666;
+
+%btn-navbar {
+    font-size: 1.4rem;
+    background-color: $btn-color-navbar;
+    padding: 4px  8px;
+    color: white;
+    font-weight: 300;
+    border: 1px solid $btn-color-navbar;
+    border-bottom: 2px solid darken($btn-color-navbar, 8%);
+
+    @include border-radius(0);
+
+    &:hover {
+        background-color: darken($btn-color-editing, 5%);
+    }
+    
+    // Make buttons render correctly on iPhone
+    -webkit-appearance: none;
+}
+
+%btn-editing-mode {
+    
+    @extend %btn-navbar;
+
+    background-color: $btn-color-editing;
+    color: white;
+    border-color: $btn-color-editing;
+    border-bottom-color: darken($btn-color-editing, 8%);
+    
+    &:hover {
+        background-color: darken($btn-color-editing, 5%);
+    }
+}
+
+%btn-control-panel {
+    @extend %btn-navbar;
+    
+    background-color: $btn-color-control-panel;
+    color: #222;
+    border-color: darken($btn-color-control-panel, 5%);
+    border-bottom-color: darken($btn-color-control-panel, 12%);
+
+    &:hover {
+        background-color: darken($btn-color-control-panel, 10%);
+    }
+}
+
+%btn-forum-search {
+    
+    @extend %btn-navbar;
+    
+    background-color: $btn-color-forum-search;
+    color: white;
+    border-color: darken($btn-color-forum-search, 5%);
+    border-bottom-color: darken($btn-color-forum-search, 10%);
+    
+    &:hover {
+        background-color: darken($btn-color-forum-search, 10%);
+    }
+}
+
+

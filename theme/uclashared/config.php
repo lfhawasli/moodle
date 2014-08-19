@@ -20,10 +20,17 @@ $THEME->sheets = array(
     'theme'
 );
 
+$THEME->parents_exclude_sheets = array(
+    'base' => array(
+        'blocks',
+        'dock'
+    )
+);
+
 $tf_general     = 'course.php';
 $tf_course      = 'course.php';
 $tf_embedded    = 'embedded.php';
-$tf_frontpage   = 'course.php';
+$tf_frontpage   = 'frontpage.php';
 $tf_report      = 'report.php';
 
 $noconfigs = during_initial_install();
@@ -102,7 +109,7 @@ $THEME->layouts = array(
         'regions' => array('side-pre', 'side-post'),
         'defaultregion' => $defaultregion,
         'options' => array(
-            'introbanner' => true,
+            'controlpanel' => false,
         ),
     ),
     // Server administration scripts.
@@ -198,3 +205,4 @@ $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->enable_dock = false;
 $THEME->csspostprocess = 'uclashared_process_css';
 $THEME->javascripts[] = 'shared_server_dropdown';
+$THEME->javascripts[] = 'help_feedback';

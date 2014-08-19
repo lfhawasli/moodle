@@ -1,66 +1,23 @@
 
-img.icon,
-img.iconhelp {vertical-align:middle;}
 
-html, body {background-color:#FFF; height:100%;}
-#page {height:100%;background-color:transparent;margin:0 auto;}
-/*#page #page-content {background-color:#FFF; height:auto;}*/
-
-
-#dock {
-    background: url([[pix:theme|dock_bg]]);
-}
-
-
-/** General **/
-/*.generalbox {border: 1px solid #DDDDDD;}*/
-/*.generaltable td {border-width:0;}
-.sitetopic {border-width:0;}*/
-/*.headingblock,*/
-/*h2.main {
-    margin-bottom:10px;
-    border-bottom:1px solid #AFC5F0;    
-    border-top:1px solid #AFC5F0;
-    background-color:#D1DBEF;
-    padding:5px;
-    color:#394A6E;
-    font-size:18px;
-    text-align: left;
-}*/
-/*.headingblock div {
-    font-size:0.8em;
-    font-weight:normal;
-    color:#494949
-}*/
-
-/*
-.coursebox {width:100%;margin:10px 0px;border-bottom:1px solid #E3E3E3;overflow:hidden;padding-bottom:10px;}
-.coursebox .info {width:35%;float:left;}
-.coursebox .summary {width:60%;float:right;}
-
-#course-user .section {border:1px solid #DDD;margin:0 5% 1.5em 5%;}
-
-#course-user .section h2,
-#course-user .section .content {margin:5px 1em;}
-#course-user .section table td {border:0;}*/
 
 /** Error **/
-.box.errorbox {
+/*.box.errorbox {
     background-color: #C00;
     color: white;
     border-top: 1px solid #c99;
     border-bottom: 1px solid #c99;    
     padding: 10px;
-    margin: 1em 15%;
-}
-.errorbox a {  /* make error link text with enough contrast */
+    margin: 1em 15%;*/
+/*}
+.errorbox a {   make error link text with enough contrast 
     color: white;
     text-decoration: underline;
-}
-
+}*/
+/*
 .generalbox {
     border: 1px solid #ccc;
-}
+}*/
 
 /** Notice **/
 /*.box.noticebox, #notice.generalbox {
@@ -85,7 +42,7 @@ html, body {background-color:#FFF; height:100%;}
 }*/
 
 /** Success **/
-.box.successbox, .notifysuccess {
+/*.box.successbox, .notifysuccess {
     background-color: #E2F9E3;
     border-bottom: 1px solid #9C9;
     border-top: 1px solid #9C9;
@@ -93,14 +50,14 @@ html, body {background-color:#FFF; height:100%;}
     padding: 10px;
     margin: 1em 15%;
 }
-.successbox a, .notifysuccess a {  /* make success link with enough contrast */
+.successbox a, .notifysuccess a {   make success link with enough contrast 
     color: black;
     text-decoration: underline;
 }
 
 .continuebutton {
     text-align: center;
-}
+}*/
 
 /** Login **/
 .loginbox {margin-top:15px;margin-bottom:15px;}

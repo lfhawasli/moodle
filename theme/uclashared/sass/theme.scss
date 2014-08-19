@@ -14,11 +14,9 @@
 // put all overrides in there.  If we don't modify Bootstrap, we just 
 // pull the file directly.
 
-/*@import "CSS:editor";*/
-/*@import "CSS:base/style/core";
-@import "CSS:base/style/pagelayout";*/
 
 // Core variables and mixins
+@import "ucla/variables";
 @import "variables";
 @import "mixins";
 
@@ -29,29 +27,32 @@
 // -------------------
 @import "type";
 @import "form";
-@import "buttons";
+
+@import "ucla/buttons";
+@import "moodle/adapter/buttons";
+
 @import "tables";
-@import "bootstrap/lib/grid";
+@import "bootstrap/grid";
 
 
 // Components
 // -------------------
-@import "header";
+@import "ucla/header";
+
+@import "ucla/fontawesome";
 @import "footer";
 @import "alerts";
-@import "navs";
+@import "bootstrap/navs";
 @import "progress-bars";
 @import "panels";
 @import "labels";
-@import "glyphicons";
+@import "ucla/glyphicons";
 
-@import "dock";
-
-@import "bootstrap/lib/button-groups";
-@import "bootstrap/lib/input-groups";
-@import "breadcrumbs";
-@import "bootstrap/lib/wells";
-@import "bootstrap/lib/badges";
+@import "bootstrap/button-groups";
+@import "bootstrap/input-groups";
+@import "ucla/breadcrumbs";
+@import "bootstrap/wells";
+@import "bootstrap/badges";
 
 // Media queries
 // -------------------
@@ -63,9 +64,17 @@
 // Load CCLE Moodle specific elements
 // This course, and plugin styles
 // --------------------------------------------------
-@import "ccle/required";
+@import "ucla/utilities";
+@import "ucla/ui_mods";
 
-// Moodle LESS
-@import "moodle_undo";
-
-@import "ui_mods";
+// Moodle
+@import "moodle/undo";
+@import "moodle/blocks";
+@import "moodle/gradebook";
+@import "moodle/report";
+@import "moodle/admin";
+@import "moodle/forum";
+@import "moodle/calendar";
+@import "moodle/wiki";
+@import "moodle/turnitin";
+@import "moodle/action_menu";

@@ -1,0 +1,142 @@
+//
+// CCLE / course specific admin
+// --------------------------------------------------
+
+// Admin headers
+// --------------------------------------------------
+
+// Normalize all course administration headers
+.region-content > h2.main {
+    @include ccle-admin-header;
+}
+
+
+// Admin actions
+// --------------------------------------------------
+
+// Create horizontal bars to hold different actions
+// This is similar to how Github divides their actions
+.region-content {
+    & > .urlselect {
+        float: right;
+    }
+    & > .singleselect {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        height: 30px;
+    }
+    & > .loginfo {
+        float: right;
+        margin-bottom: 10px;
+    }
+}
+
+.enrol_user_buttons {
+    @include respond-to(handhelds) {
+        // @todo: implement
+    }
+}
+
+
+// CCLE-4625
+// Adds a better visual hint to courses drag & drop.
+//
+#page-course-management {
+    
+    // Adds a tranlucent overlay.
+    .course-being-dragged {
+        border: 1px solid #ddd;
+        background-color: #EFEFEF;
+        
+        a {
+            color: #aaa;
+        }
+    }
+    
+    // Adds a grayed out shadow.
+    .course-being-dragged-proxy {
+        background-color: #fff;
+        opacity: 0.7;
+        border: 1px solid #aaa;
+    }
+    
+    // Makes 'gear' dropdown menu icons display correctly.
+    .menu {
+        .smallicon {
+            @include box-sizing(content-box);
+        }
+    }
+}
+
+
+//
+// Admin / Course / Category browser
+//
+
+// CCLE-4258: add visual cue to indicate term on categories course lists.
+// This will handle terms until 2022!
+#page-course-management {
+    
+    // Terms we want to cover, with term code
+    $terms: (
+        fall F,
+        winter W,
+        spring S,
+        summer 1
+    );
+    
+    // Iterate through terms
+    @each $term in $terms {
+        $name: nth($term, 1);
+        $code: nth($term, 2);
+        
+        // Generate values for 10 years after 2012
+        @for $i from 12 to 22 {
+            a[data-name^="#{$i}#{$code}"]:before {
+                @extend .label-term;
+                @extend .label-#{$name};
+                content: "#{$name} #{$i}";
+            }
+        }
+    }
+}
+
+
+///
+
+// Normalize all admin page headers 
+h2.headingblock {
+    @include ccle-admin-header;
+}
+
+#addadmisform > h3.main {
+    @include ccle-admin-header;
+    margin-bottom: 8px;
+}
+
+
+// Modifies the course admin menu to be a little more clickable...
+// @todo: this could be better...
+@media only screen and (max-width: $breakpoint-xsmall),
+only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medium-small) {
+    .block_tree li ul li.type_setting {
+        border-bottom: 1px solid $ccle-light-blue;
+        height: 34px;
+        padding-top: 5px;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .block_tree li ul li.type_setting > p > a {
+        width: 100%;
+        display: inline-block;
+    }
+}
+
+
+.external-link {
+    padding-right: 15px;
+    padding-bottom: -2px;
+    background: transparent url([[pix:theme|external]]) no-repeat center right;
+}
