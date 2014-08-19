@@ -512,9 +512,6 @@ $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localuserfield'] = 'idnumber';
 $CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
 
-// CCLE-2802 - Frontpage banner layout include
-$CFG->customfrontpageinclude = $_dirroot_ . '/theme/uclashared/layout/frontpage.php';
-
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
 
