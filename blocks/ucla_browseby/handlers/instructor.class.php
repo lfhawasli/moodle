@@ -20,6 +20,10 @@ class instructor_handler extends browseby_handler {
                 us.idnumber AS idnumber,
                 us.firstname,
                 us.lastname,
+                us.alternatename,
+                us.firstnamephonetic,
+                us.lastnamephonetic,
+                us.middlename,
                 term,
                 srs,
                 profcode
@@ -107,6 +111,10 @@ class instructor_handler extends browseby_handler {
                 ubi.srs,
                 ubi.firstname,
                 ubi.lastname,
+                ubi.alternatename,
+                ubi.firstnamephonetic,
+                ubi.lastnamephonetic,
+                ubi.middlename,
                 ubci.catlg_no AS course_code,
                 ubci.activitytype,
                 ubci.subjarea
