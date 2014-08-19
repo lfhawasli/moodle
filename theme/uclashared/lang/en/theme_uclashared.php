@@ -88,7 +88,7 @@ $string['setting_desc_system_name'] = 'The system name that will be displayed in
 $string['setting_default_system_name'] = 'Shared system';
 
 $string['setting_title_system_link'] = 'System link';
-$string['setting_desc_system_link'] = 'The link associated witht he system name.';
+$string['setting_desc_system_link'] = 'The link associated with the system name.';
 $string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=924';
 
 $string['setting_title_disable_post_blocks'] = 'Disable blocks on right';

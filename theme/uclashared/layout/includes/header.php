@@ -65,7 +65,7 @@ if ($hasnavbar) { ?>
                 <?php echo $PAGE->button; ?>
             </div>
             <?php if ($showcontrolpanel) { ?>
-            <div class="control-panel navbar-control pull-right">
+            <div class="control-panel navbar-control">
                 <?php echo $OUTPUT->control_panel_button() ?>
             </div>
             <?php } ?>

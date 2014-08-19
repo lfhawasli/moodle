@@ -408,6 +408,9 @@ $CFG->theme = 'uclashared';
 $CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->themedesignermode = 1;
 $CFG->allowcoursethemes = 1;
+$CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
+    View self help articles|https://docs.ccle.ucla.edu/
+    Read tips & updates|https://docs.ccle.ucla.edu/w/Instructors#Tips_and_Updates";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
