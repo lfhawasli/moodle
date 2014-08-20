@@ -32,5 +32,14 @@ $exportobject = new admin_externalpage(
     'moodle/role:manage'
 );
 
+// Build new admin page object for IMPORT ROLES.
+$importobject = new admin_externalpage(
+    'importroles',
+    get_string('importroles', 'tool_uclarolesmigration'),
+    new moodle_url('/admin/tool/uclarolesmigration/importroles.php'),
+    'moodle/role:manage'
+    );
+
 // Register new admin page object under User -> Roles.
 $ADMIN->add('roles', $exportobject);
+$ADMIN->add('roles', $importobject);

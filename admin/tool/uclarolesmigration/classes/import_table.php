@@ -90,9 +90,37 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
             foreach ($this->permissions as $k => $v) {
                 if (isset($info['permissions'][$k])) {
                     $this->permissions[$k] = $info['permissions'][$k];
+                } else {
+                    // Set the blanks to CAP_INHERIT so that on updates
+                    // we can clear permissions that no longer exist.
+                    $this->permissions[$k] = CAP_INHERIT;
                 }
             }
         }
+    }
+
+    /**
+     * Modifies the stored role name variable.
+     * @param string $newname the new role name
+     */
+    public function set_name($newname) {
+        $this->role->name = $newname;
+    }
+
+    /**
+     * Modifies the stored role shortname variable.
+     * @param string $newshortname the new shortrole name
+     */
+    public function set_shortname($newshortname) {
+        $this->role->shortname = $newshortname;
+    }
+
+    /**
+     * Returns the current roleid.
+     * @return int $this->roleid
+     */
+    public function get_roleid() {
+        return $this->roleid;
     }
 
     /**
@@ -125,7 +153,7 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
         foreach ($this->permissions as $capability => $permission) {
             assign_capability($capability, $permission, $this->roleid, $this->context->id, true);
         }
-        
+
         // Force accessinfo refresh for users visiting this context.
         $this->context->mark_dirty();
     }
