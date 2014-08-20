@@ -49,4 +49,14 @@ $string['errinvalidtitle'] = 'ERROR: Title has invalid characters in parsed line
 $string['vfstartnoti'] = "Starting video furnace DB update:";
 $string['vfsuccessnoti'] = "records successfully inserted.";
 
+// Event messages.
+$string['eventbcread'] = "Bruincast read error.";
+$string['eventbcparsing'] = "Bruincast parsing data error.";
+$string['eventvfparsing'] = "Video furnace parsing data error.";
+$string['eventvfread'] = "Video furnace read error.";
+$string['eventvfwrite'] = "Video furnace write error.";
+$string['eventvfupdate'] = "Video furnace update error.";
+$string['eventlrread'] = "Library reserves read error.";
+$string['eventlrwrite'] = "Library reserves write error.";
+$string['eventlrupdate'] = "Library reserves update error.";
 // EOF
