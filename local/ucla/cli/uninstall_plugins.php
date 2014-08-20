@@ -48,11 +48,19 @@ Example:
     cli_error($help);
 }
 
+// Need to be able to support Moodle 2.5 and 2.7.
+$pluginman = null;
+if (!class_exists('core_plugin_manager')) {
+    require_once($CFG->libdir . '/pluginlib.php');
+    $pluginman = plugin_manager::instance();
+} else {
+    $pluginman = core_plugin_manager::instance();
+}
+
 // Get list of plugins and make sure they all exist.
 $pluginscsv = reset($unrecognized);
 $pluginnames = explode(',', $pluginscsv);
 $plugins = array();
-$pluginman = core_plugin_manager::instance();
 foreach ($pluginnames as $pluginname) {
     // Make sure that plugins exists and we can uninstall.
     $pluginfo = $pluginman->get_plugin_info($pluginname);
