@@ -37,7 +37,7 @@ global $PAGE;
 // Load JS
 $PAGE->requires->yui_module('moodle-block_ucla_help-sidebar', 'M.block_ucla_help.init_sidebar', array(array()));
 $PAGE->requires->jquery();
-$PAGE->requires->js('/theme/uclashared/package/semantic-ui/build/minified/modules/sidebar.min.js');
+$PAGE->requires->js('/theme/uclashared/vendor/semantic/ui//build/minified/modules/sidebar.min.js');
 
 class ucla_sidebar {
 
