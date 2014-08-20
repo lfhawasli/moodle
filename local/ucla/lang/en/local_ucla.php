@@ -124,7 +124,6 @@ $string['ucla:assign_all'] = 'CCLE-2530: Can see the entire user database when a
 $string['ucla:editadvancedcoursesettings'] = 'CCLE-3278: Can edit the course settings for category, format, maximum upload size, or language defaults';
 $string['ucla:deletecoursecontentsandrestore'] = 'CCLE-3446: Can delete course contents when restoring a course';
 $string['ucla:editcoursetheme'] = 'CCLE-2315: Can edit the theme a course uses';
-$string['ucla:viewotherusers'] = 'CCLE-3584: Can view other users when viewing a course';
 $string['ucla:bulk_users'] = 'CCLE-2970: Can perform bulk user actions';
 $string['ucla:browsecourses'] = 'CCLE-3773: Gives users link to "Add/edit courses"';
 $string['ucla:vieweventlist'] = 'CCLE-4671: Can view event list page';
