@@ -194,6 +194,9 @@ $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_
 // CCLE-4345 - Moodle Authenticated Remote Command Execution (CVE-2013-3630).
 $CFG->preventexecpath = 1;
 
+// CCLE-4686 - Enable Apache's X-sendfile.
+$CFG->xsendfile = 'X-Sendfile';
+
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
