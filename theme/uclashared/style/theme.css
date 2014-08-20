@@ -120,28 +120,30 @@ a:hover {
   box-sizing: content-box;
 }
 
-/* line 68, ../sass/_type.scss */
+/* line 69, ../sass/_type.scss */
+.iconhelp,
 .iconsmall {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 
-/* line 72, ../sass/_type.scss */
+/* line 73, ../sass/_type.scss */
 .moodle-dialogue-base * {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 
-/* line 76, ../sass/_type.scss */
+/* line 78, ../sass/_type.scss */
+.mceEditor *,
 .feditor * {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 
-/* line 81, ../sass/_type.scss */
+/* line 83, ../sass/_type.scss */
 h1 {
   font-size: 3.2rem;
   font-weight: 900;
@@ -149,20 +151,20 @@ h1 {
   margin: 0;
 }
 
-/* line 85, ../sass/_type.scss */
+/* line 87, ../sass/_type.scss */
 h2 {
   font-size: 2.8rem;
   font-weight: 700;
   line-height: 3.9rem;
   margin: 0;
 }
-/* line 88, ../sass/_type.scss */
+/* line 90, ../sass/_type.scss */
 h2.main {
   border-bottom: 1px solid #ddd;
   margin-bottom: 8px;
 }
 
-/* line 94, ../sass/_type.scss */
+/* line 96, ../sass/_type.scss */
 h3 {
   font-size: 2.3rem;
   font-weight: 700;
@@ -170,7 +172,7 @@ h3 {
   margin: 0;
 }
 
-/* line 98, ../sass/_type.scss */
+/* line 100, ../sass/_type.scss */
 h4 {
   font-size: 1.8rem;
   font-weight: 500;
@@ -178,7 +180,7 @@ h4 {
   margin: 0;
 }
 
-/* line 102, ../sass/_type.scss */
+/* line 104, ../sass/_type.scss */
 h5 {
   font-size: 1.4rem;
   font-weight: 500;
@@ -187,7 +189,7 @@ h5 {
   margin: 0;
 }
 
-/* line 106, ../sass/_type.scss */
+/* line 108, ../sass/_type.scss */
 h6 {
   font-size: 1.3rem;
   font-weight: 500;
@@ -276,9 +278,8 @@ output {
 }
 
 /* line 115, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-.form-control, .mform select,
-.mform textarea,
-.mform input[type="text"],
+.form-control, select,
+textarea, .mform input[type="text"],
 .mform input[type="password"],
 .mform input[type="datetime"],
 .mform input[type="datetime-local"],
@@ -311,9 +312,8 @@ output {
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 /* line 53, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.form-control:focus, .mform select:focus,
-.mform textarea:focus,
-.mform input[type="text"]:focus,
+.form-control:focus, select:focus,
+textarea:focus, .mform input[type="text"]:focus,
 .mform input[type="password"]:focus,
 .mform input[type="datetime"]:focus,
 .mform input[type="datetime-local"]:focus,
@@ -334,9 +334,8 @@ output {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 /* line 102, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_vendor-prefixes.scss */
-.form-control::-moz-placeholder, .mform select::-moz-placeholder,
-.mform textarea::-moz-placeholder,
-.mform input[type="text"]::-moz-placeholder,
+.form-control::-moz-placeholder, select::-moz-placeholder,
+textarea::-moz-placeholder, .mform input[type="text"]::-moz-placeholder,
 .mform input[type="password"]::-moz-placeholder,
 .mform input[type="datetime"]::-moz-placeholder,
 .mform input[type="datetime-local"]::-moz-placeholder,
@@ -355,9 +354,8 @@ output {
   opacity: 1;
 }
 /* line 104, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_vendor-prefixes.scss */
-.form-control:-ms-input-placeholder, .mform select:-ms-input-placeholder,
-.mform textarea:-ms-input-placeholder,
-.mform input[type="text"]:-ms-input-placeholder,
+.form-control:-ms-input-placeholder, select:-ms-input-placeholder,
+textarea:-ms-input-placeholder, .mform input[type="text"]:-ms-input-placeholder,
 .mform input[type="password"]:-ms-input-placeholder,
 .mform input[type="datetime"]:-ms-input-placeholder,
 .mform input[type="datetime-local"]:-ms-input-placeholder,
@@ -375,9 +373,8 @@ output {
   color: #777777;
 }
 /* line 105, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_vendor-prefixes.scss */
-.form-control::-webkit-input-placeholder, .mform select::-webkit-input-placeholder,
-.mform textarea::-webkit-input-placeholder,
-.mform input[type="text"]::-webkit-input-placeholder,
+.form-control::-webkit-input-placeholder, select::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder, .mform input[type="text"]::-webkit-input-placeholder,
 .mform input[type="password"]::-webkit-input-placeholder,
 .mform input[type="datetime"]::-webkit-input-placeholder,
 .mform input[type="datetime-local"]::-webkit-input-placeholder,
@@ -395,9 +392,8 @@ output {
   color: #777777;
 }
 /* line 143, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-.form-control[disabled], .mform select[disabled],
-.mform textarea[disabled],
-.mform input[disabled][type="text"],
+.form-control[disabled], select[disabled],
+textarea[disabled], .mform input[disabled][type="text"],
 .mform input[disabled][type="password"],
 .mform input[disabled][type="datetime"],
 .mform input[disabled][type="datetime-local"],
@@ -411,9 +407,8 @@ output {
 .mform input[disabled][type="search"],
 .mform input[disabled][type="tel"],
 .mform input[disabled][type="color"], .navbutton .wikisearch input[disabled][alt="search"],
-.navbutton .forumsearch input[disabled][alt="search"], .form-control[readonly], .mform select[readonly],
-.mform textarea[readonly],
-.mform input[readonly][type="text"],
+.navbutton .forumsearch input[disabled][alt="search"], .form-control[readonly], select[readonly],
+textarea[readonly], .mform input[readonly][type="text"],
 .mform input[readonly][type="password"],
 .mform input[readonly][type="datetime"],
 .mform input[readonly][type="datetime-local"],
@@ -427,11 +422,8 @@ output {
 .mform input[readonly][type="search"],
 .mform input[readonly][type="tel"],
 .mform input[readonly][type="color"], .navbutton .wikisearch input[readonly][alt="search"],
-.navbutton .forumsearch input[readonly][alt="search"], fieldset[disabled] .form-control, fieldset[disabled] .mform select, .mform fieldset[disabled] select,
-fieldset[disabled] .mform textarea,
-.mform fieldset[disabled] textarea,
-fieldset[disabled] .mform input[type="text"],
-.mform fieldset[disabled] input[type="text"],
+.navbutton .forumsearch input[readonly][alt="search"], fieldset[disabled] .form-control, fieldset[disabled] select,
+fieldset[disabled] textarea, fieldset[disabled] .mform input[type="text"], .mform fieldset[disabled] input[type="text"],
 fieldset[disabled] .mform input[type="password"],
 .mform fieldset[disabled] input[type="password"],
 fieldset[disabled] .mform input[type="datetime"],
@@ -467,7 +459,7 @@ fieldset[disabled] .navbutton .forumsearch input[alt="search"],
 
 /* line 153, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
 textarea.form-control,
-.mform textarea {
+textarea {
   height: auto;
 }
 
@@ -743,11 +735,8 @@ input[type="checkbox"] {
   margin-bottom: 0;
 }
 /* line 299, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-.form-control-static.input-lg, .form-horizontal .form-group-lg .form-control-static.form-control, .form-horizontal .form-group-lg .mform select.form-control-static, .mform .form-horizontal .form-group-lg select.form-control-static,
-.form-horizontal .form-group-lg .mform textarea.form-control-static,
-.mform .form-horizontal .form-group-lg textarea.form-control-static,
-.form-horizontal .form-group-lg .mform input.form-control-static[type="text"],
-.mform .form-horizontal .form-group-lg input.form-control-static[type="text"],
+.form-control-static.input-lg, .form-horizontal .form-group-lg .form-control-static.form-control, .form-horizontal .form-group-lg select.form-control-static,
+.form-horizontal .form-group-lg textarea.form-control-static, .form-horizontal .form-group-lg .mform input.form-control-static[type="text"], .mform .form-horizontal .form-group-lg input.form-control-static[type="text"],
 .form-horizontal .form-group-lg .mform input.form-control-static[type="password"],
 .mform .form-horizontal .form-group-lg input.form-control-static[type="password"],
 .form-horizontal .form-group-lg .mform input.form-control-static[type="datetime"],
@@ -775,9 +764,8 @@ input[type="checkbox"] {
 .form-horizontal .form-group-lg .mform input.form-control-static[type="color"],
 .mform .form-horizontal .form-group-lg input.form-control-static[type="color"], .form-horizontal .form-group-lg .navbutton .wikisearch input.form-control-static[alt="search"], .navbutton .wikisearch .form-horizontal .form-group-lg input.form-control-static[alt="search"],
 .form-horizontal .form-group-lg .navbutton .forumsearch input.form-control-static[alt="search"],
-.navbutton .forumsearch .form-horizontal .form-group-lg input.form-control-static[alt="search"], .input-group-lg > .form-control-static.form-control, .mform .input-group-lg > select.form-control-static,
-.mform .input-group-lg > textarea.form-control-static,
-.mform .input-group-lg > input.form-control-static[type="text"],
+.navbutton .forumsearch .form-horizontal .form-group-lg input.form-control-static[alt="search"], .input-group-lg > .form-control-static.form-control, .input-group-lg > select.form-control-static,
+.input-group-lg > textarea.form-control-static, .mform .input-group-lg > input.form-control-static[type="text"],
 .mform .input-group-lg > input.form-control-static[type="password"],
 .mform .input-group-lg > input.form-control-static[type="datetime"],
 .mform .input-group-lg > input.form-control-static[type="datetime-local"],
@@ -810,11 +798,8 @@ input[type="checkbox"] {
 .input-group-lg > h2.headingblock.input-group-btn > a.form-control-static,
 #addadmisform.input-group-lg > h3.main.input-group-btn > a.form-control-static,
 .wiki_clear ~ .mform .input-group-lg > .input-group-btn > .form-control-static#save,
-.wiki_clear ~ .mform .input-group-lg > .input-group-btn > .form-control-static#cancel, .form-control-static.input-sm, .form-horizontal .form-group-sm .form-control-static.form-control, .form-horizontal .form-group-sm .mform select.form-control-static, .mform .form-horizontal .form-group-sm select.form-control-static,
-.form-horizontal .form-group-sm .mform textarea.form-control-static,
-.mform .form-horizontal .form-group-sm textarea.form-control-static,
-.form-horizontal .form-group-sm .mform input.form-control-static[type="text"],
-.mform .form-horizontal .form-group-sm input.form-control-static[type="text"],
+.wiki_clear ~ .mform .input-group-lg > .input-group-btn > .form-control-static#cancel, .form-control-static.input-sm, .form-horizontal .form-group-sm .form-control-static.form-control, .form-horizontal .form-group-sm select.form-control-static,
+.form-horizontal .form-group-sm textarea.form-control-static, .form-horizontal .form-group-sm .mform input.form-control-static[type="text"], .mform .form-horizontal .form-group-sm input.form-control-static[type="text"],
 .form-horizontal .form-group-sm .mform input.form-control-static[type="password"],
 .mform .form-horizontal .form-group-sm input.form-control-static[type="password"],
 .form-horizontal .form-group-sm .mform input.form-control-static[type="datetime"],
@@ -842,9 +827,8 @@ input[type="checkbox"] {
 .form-horizontal .form-group-sm .mform input.form-control-static[type="color"],
 .mform .form-horizontal .form-group-sm input.form-control-static[type="color"], .form-horizontal .form-group-sm .navbutton .wikisearch input.form-control-static[alt="search"], .navbutton .wikisearch .form-horizontal .form-group-sm input.form-control-static[alt="search"],
 .form-horizontal .form-group-sm .navbutton .forumsearch input.form-control-static[alt="search"],
-.navbutton .forumsearch .form-horizontal .form-group-sm input.form-control-static[alt="search"], .input-group-sm > .form-control-static.form-control, .mform .input-group-sm > select.form-control-static,
-.mform .input-group-sm > textarea.form-control-static,
-.mform .input-group-sm > input.form-control-static[type="text"],
+.navbutton .forumsearch .form-horizontal .form-group-sm input.form-control-static[alt="search"], .input-group-sm > .form-control-static.form-control, .input-group-sm > select.form-control-static,
+.input-group-sm > textarea.form-control-static, .mform .input-group-sm > input.form-control-static[type="text"],
 .mform .input-group-sm > input.form-control-static[type="password"],
 .mform .input-group-sm > input.form-control-static[type="datetime"],
 .mform .input-group-sm > input.form-control-static[type="datetime-local"],
@@ -883,11 +867,8 @@ input[type="checkbox"] {
 }
 
 /* line 67, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.input-sm, .form-horizontal .form-group-sm .form-control, .form-horizontal .form-group-sm .mform select, .mform .form-horizontal .form-group-sm select,
-.form-horizontal .form-group-sm .mform textarea,
-.mform .form-horizontal .form-group-sm textarea,
-.form-horizontal .form-group-sm .mform input[type="text"],
-.mform .form-horizontal .form-group-sm input[type="text"],
+.input-sm, .form-horizontal .form-group-sm .form-control, .form-horizontal .form-group-sm select,
+.form-horizontal .form-group-sm textarea, .form-horizontal .form-group-sm .mform input[type="text"], .mform .form-horizontal .form-group-sm input[type="text"],
 .form-horizontal .form-group-sm .mform input[type="password"],
 .mform .form-horizontal .form-group-sm input[type="password"],
 .form-horizontal .form-group-sm .mform input[type="datetime"],
@@ -915,9 +896,8 @@ input[type="checkbox"] {
 .form-horizontal .form-group-sm .mform input[type="color"],
 .mform .form-horizontal .form-group-sm input[type="color"], .form-horizontal .form-group-sm .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .form-horizontal .form-group-sm input[alt="search"],
 .form-horizontal .form-group-sm .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .form-horizontal .form-group-sm input[alt="search"], .input-group-sm > .form-control, .mform .input-group-sm > select,
-.mform .input-group-sm > textarea,
-.mform .input-group-sm > input[type="text"],
+.navbutton .forumsearch .form-horizontal .form-group-sm input[alt="search"], .input-group-sm > .form-control, .input-group-sm > select,
+.input-group-sm > textarea, .mform .input-group-sm > input[type="text"],
 .mform .input-group-sm > input[type="password"],
 .mform .input-group-sm > input[type="datetime"],
 .mform .input-group-sm > input[type="datetime-local"],
@@ -959,7 +939,7 @@ input[type="checkbox"] {
 }
 
 /* line 75, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-select.input-sm, .form-horizontal .form-group-sm select.form-control, .form-horizontal .form-group-sm .mform select, .mform .form-horizontal .form-group-sm select, .input-group-sm > select.form-control, .mform .input-group-sm > select,
+select.input-sm, .form-horizontal .form-group-sm select, .input-group-sm > select,
 .input-group-sm > select.input-group-addon,
 .input-group-sm > .input-group-btn > select.btn,
 .mform .input-group-sm > .input-group-btn > select.collapseexpand,
@@ -973,9 +953,8 @@ select.input-sm, .form-horizontal .form-group-sm select.form-control, .form-hori
 
 /* line 81, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
 textarea.input-sm, .form-horizontal .form-group-sm textarea.form-control,
-.form-horizontal .form-group-sm .mform textarea,
-.mform .form-horizontal .form-group-sm textarea, .input-group-sm > textarea.form-control,
-.mform .input-group-sm > textarea,
+.form-horizontal .form-group-sm textarea, .input-group-sm > textarea.form-control,
+.input-group-sm > textarea,
 .input-group-sm > textarea.input-group-addon,
 .input-group-sm > .input-group-btn > textarea.btn,
 .mform .input-group-sm > .input-group-btn > textarea.collapseexpand,
@@ -984,13 +963,10 @@ textarea.input-sm, .form-horizontal .form-group-sm textarea.form-control,
 .wiki_clear ~ .mform .input-group-sm > .input-group-btn > textarea#save,
 .wiki_clear ~ .mform .input-group-sm > .input-group-btn > textarea#cancel,
 select[multiple].input-sm,
-.form-horizontal .form-group-sm select[multiple].form-control,
-.form-horizontal .form-group-sm .mform select[multiple],
-.mform .form-horizontal .form-group-sm select[multiple],
-.input-group-sm > select[multiple].form-control,
-.mform .input-group-sm > select[multiple],
-.input-group-sm > select[multiple].input-group-addon,
+.form-horizontal .form-group-sm select[multiple],
+.input-group-sm > select[multiple],
 .input-group-sm > .input-group-btn > select[multiple].btn,
+.mform .input-group-sm > .input-group-btn > select[multiple].collapseexpand,
 .pagelayout-redirect .input-group-sm > .input-group-btn > select[multiple].continuebutton,
 .input-group-sm > .input-group-btn > select[multiple].section-modchooser-link,
 .wiki_clear ~ .mform .input-group-sm > .input-group-btn > select[multiple]#save,
@@ -999,11 +975,8 @@ select[multiple].input-sm,
 }
 
 /* line 67, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.input-lg, .form-horizontal .form-group-lg .form-control, .form-horizontal .form-group-lg .mform select, .mform .form-horizontal .form-group-lg select,
-.form-horizontal .form-group-lg .mform textarea,
-.mform .form-horizontal .form-group-lg textarea,
-.form-horizontal .form-group-lg .mform input[type="text"],
-.mform .form-horizontal .form-group-lg input[type="text"],
+.input-lg, .form-horizontal .form-group-lg .form-control, .form-horizontal .form-group-lg select,
+.form-horizontal .form-group-lg textarea, .form-horizontal .form-group-lg .mform input[type="text"], .mform .form-horizontal .form-group-lg input[type="text"],
 .form-horizontal .form-group-lg .mform input[type="password"],
 .mform .form-horizontal .form-group-lg input[type="password"],
 .form-horizontal .form-group-lg .mform input[type="datetime"],
@@ -1031,9 +1004,8 @@ select[multiple].input-sm,
 .form-horizontal .form-group-lg .mform input[type="color"],
 .mform .form-horizontal .form-group-lg input[type="color"], .form-horizontal .form-group-lg .navbutton .wikisearch input[alt="search"], .navbutton .wikisearch .form-horizontal .form-group-lg input[alt="search"],
 .form-horizontal .form-group-lg .navbutton .forumsearch input[alt="search"],
-.navbutton .forumsearch .form-horizontal .form-group-lg input[alt="search"], .input-group-lg > .form-control, .mform .input-group-lg > select,
-.mform .input-group-lg > textarea,
-.mform .input-group-lg > input[type="text"],
+.navbutton .forumsearch .form-horizontal .form-group-lg input[alt="search"], .input-group-lg > .form-control, .input-group-lg > select,
+.input-group-lg > textarea, .mform .input-group-lg > input[type="text"],
 .mform .input-group-lg > input[type="password"],
 .mform .input-group-lg > input[type="datetime"],
 .mform .input-group-lg > input[type="datetime-local"],
@@ -1075,7 +1047,7 @@ select[multiple].input-sm,
 }
 
 /* line 75, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-select.input-lg, .form-horizontal .form-group-lg select.form-control, .form-horizontal .form-group-lg .mform select, .mform .form-horizontal .form-group-lg select, .input-group-lg > select.form-control, .mform .input-group-lg > select,
+select.input-lg, .form-horizontal .form-group-lg select, .input-group-lg > select,
 .input-group-lg > select.input-group-addon,
 .input-group-lg > .input-group-btn > select.btn,
 .mform .input-group-lg > .input-group-btn > select.collapseexpand,
@@ -1089,9 +1061,8 @@ select.input-lg, .form-horizontal .form-group-lg select.form-control, .form-hori
 
 /* line 81, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
 textarea.input-lg, .form-horizontal .form-group-lg textarea.form-control,
-.form-horizontal .form-group-lg .mform textarea,
-.mform .form-horizontal .form-group-lg textarea, .input-group-lg > textarea.form-control,
-.mform .input-group-lg > textarea,
+.form-horizontal .form-group-lg textarea, .input-group-lg > textarea.form-control,
+.input-group-lg > textarea,
 .input-group-lg > textarea.input-group-addon,
 .input-group-lg > .input-group-btn > textarea.btn,
 .mform .input-group-lg > .input-group-btn > textarea.collapseexpand,
@@ -1100,13 +1071,10 @@ textarea.input-lg, .form-horizontal .form-group-lg textarea.form-control,
 .wiki_clear ~ .mform .input-group-lg > .input-group-btn > textarea#save,
 .wiki_clear ~ .mform .input-group-lg > .input-group-btn > textarea#cancel,
 select[multiple].input-lg,
-.form-horizontal .form-group-lg select[multiple].form-control,
-.form-horizontal .form-group-lg .mform select[multiple],
-.mform .form-horizontal .form-group-lg select[multiple],
-.input-group-lg > select[multiple].form-control,
-.mform .input-group-lg > select[multiple],
-.input-group-lg > select[multiple].input-group-addon,
+.form-horizontal .form-group-lg select[multiple],
+.input-group-lg > select[multiple],
 .input-group-lg > .input-group-btn > select[multiple].btn,
+.mform .input-group-lg > .input-group-btn > select[multiple].collapseexpand,
 .pagelayout-redirect .input-group-lg > .input-group-btn > select[multiple].continuebutton,
 .input-group-lg > .input-group-btn > select[multiple].section-modchooser-link,
 .wiki_clear ~ .mform .input-group-lg > .input-group-btn > select[multiple]#save,
@@ -1119,11 +1087,8 @@ select[multiple].input-lg,
   position: relative;
 }
 /* line 325, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-.has-feedback .form-control, .has-feedback .mform select, .mform .has-feedback select,
-.has-feedback .mform textarea,
-.mform .has-feedback textarea,
-.has-feedback .mform input[type="text"],
-.mform .has-feedback input[type="text"],
+.has-feedback .form-control, .has-feedback select,
+.has-feedback textarea, .has-feedback .mform input[type="text"], .mform .has-feedback input[type="text"],
 .has-feedback .mform input[type="password"],
 .mform .has-feedback input[type="password"],
 .has-feedback .mform input[type="datetime"],
@@ -1169,11 +1134,8 @@ select[multiple].input-lg,
 }
 
 /* line 341, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-.input-lg + .form-control-feedback, .form-horizontal .form-group-lg .form-control + .form-control-feedback, .form-horizontal .form-group-lg .mform select + .form-control-feedback, .mform .form-horizontal .form-group-lg select + .form-control-feedback,
-.form-horizontal .form-group-lg .mform textarea + .form-control-feedback,
-.mform .form-horizontal .form-group-lg textarea + .form-control-feedback,
-.form-horizontal .form-group-lg .mform input[type="text"] + .form-control-feedback,
-.mform .form-horizontal .form-group-lg input[type="text"] + .form-control-feedback,
+.input-lg + .form-control-feedback, .form-horizontal .form-group-lg .form-control + .form-control-feedback, .form-horizontal .form-group-lg select + .form-control-feedback,
+.form-horizontal .form-group-lg textarea + .form-control-feedback, .form-horizontal .form-group-lg .mform input[type="text"] + .form-control-feedback, .mform .form-horizontal .form-group-lg input[type="text"] + .form-control-feedback,
 .form-horizontal .form-group-lg .mform input[type="password"] + .form-control-feedback,
 .mform .form-horizontal .form-group-lg input[type="password"] + .form-control-feedback,
 .form-horizontal .form-group-lg .mform input[type="datetime"] + .form-control-feedback,
@@ -1201,9 +1163,8 @@ select[multiple].input-lg,
 .form-horizontal .form-group-lg .mform input[type="color"] + .form-control-feedback,
 .mform .form-horizontal .form-group-lg input[type="color"] + .form-control-feedback, .form-horizontal .form-group-lg .navbutton .wikisearch input[alt="search"] + .form-control-feedback, .navbutton .wikisearch .form-horizontal .form-group-lg input[alt="search"] + .form-control-feedback,
 .form-horizontal .form-group-lg .navbutton .forumsearch input[alt="search"] + .form-control-feedback,
-.navbutton .forumsearch .form-horizontal .form-group-lg input[alt="search"] + .form-control-feedback, .input-group-lg > .form-control + .form-control-feedback, .mform .input-group-lg > select + .form-control-feedback,
-.mform .input-group-lg > textarea + .form-control-feedback,
-.mform .input-group-lg > input[type="text"] + .form-control-feedback,
+.navbutton .forumsearch .form-horizontal .form-group-lg input[alt="search"] + .form-control-feedback, .input-group-lg > .form-control + .form-control-feedback, .input-group-lg > select + .form-control-feedback,
+.input-group-lg > textarea + .form-control-feedback, .mform .input-group-lg > input[type="text"] + .form-control-feedback,
 .mform .input-group-lg > input[type="password"] + .form-control-feedback,
 .mform .input-group-lg > input[type="datetime"] + .form-control-feedback,
 .mform .input-group-lg > input[type="datetime-local"] + .form-control-feedback,
@@ -1243,11 +1204,8 @@ select[multiple].input-lg,
 }
 
 /* line 346, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-.input-sm + .form-control-feedback, .form-horizontal .form-group-sm .form-control + .form-control-feedback, .form-horizontal .form-group-sm .mform select + .form-control-feedback, .mform .form-horizontal .form-group-sm select + .form-control-feedback,
-.form-horizontal .form-group-sm .mform textarea + .form-control-feedback,
-.mform .form-horizontal .form-group-sm textarea + .form-control-feedback,
-.form-horizontal .form-group-sm .mform input[type="text"] + .form-control-feedback,
-.mform .form-horizontal .form-group-sm input[type="text"] + .form-control-feedback,
+.input-sm + .form-control-feedback, .form-horizontal .form-group-sm .form-control + .form-control-feedback, .form-horizontal .form-group-sm select + .form-control-feedback,
+.form-horizontal .form-group-sm textarea + .form-control-feedback, .form-horizontal .form-group-sm .mform input[type="text"] + .form-control-feedback, .mform .form-horizontal .form-group-sm input[type="text"] + .form-control-feedback,
 .form-horizontal .form-group-sm .mform input[type="password"] + .form-control-feedback,
 .mform .form-horizontal .form-group-sm input[type="password"] + .form-control-feedback,
 .form-horizontal .form-group-sm .mform input[type="datetime"] + .form-control-feedback,
@@ -1275,9 +1233,8 @@ select[multiple].input-lg,
 .form-horizontal .form-group-sm .mform input[type="color"] + .form-control-feedback,
 .mform .form-horizontal .form-group-sm input[type="color"] + .form-control-feedback, .form-horizontal .form-group-sm .navbutton .wikisearch input[alt="search"] + .form-control-feedback, .navbutton .wikisearch .form-horizontal .form-group-sm input[alt="search"] + .form-control-feedback,
 .form-horizontal .form-group-sm .navbutton .forumsearch input[alt="search"] + .form-control-feedback,
-.navbutton .forumsearch .form-horizontal .form-group-sm input[alt="search"] + .form-control-feedback, .input-group-sm > .form-control + .form-control-feedback, .mform .input-group-sm > select + .form-control-feedback,
-.mform .input-group-sm > textarea + .form-control-feedback,
-.mform .input-group-sm > input[type="text"] + .form-control-feedback,
+.navbutton .forumsearch .form-horizontal .form-group-sm input[alt="search"] + .form-control-feedback, .input-group-sm > .form-control + .form-control-feedback, .input-group-sm > select + .form-control-feedback,
+.input-group-sm > textarea + .form-control-feedback, .mform .input-group-sm > input[type="text"] + .form-control-feedback,
 .mform .input-group-sm > input[type="password"] + .form-control-feedback,
 .mform .input-group-sm > input[type="datetime"] + .form-control-feedback,
 .mform .input-group-sm > input[type="datetime-local"] + .form-control-feedback,
@@ -1326,11 +1283,8 @@ select[multiple].input-lg,
   color: #3c763d;
 }
 /* line 17, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.has-success .form-control, .has-success .mform select, .mform .has-success select,
-.has-success .mform textarea,
-.mform .has-success textarea,
-.has-success .mform input[type="text"],
-.mform .has-success input[type="text"],
+.has-success .form-control, .has-success select,
+.has-success textarea, .has-success .mform input[type="text"], .mform .has-success input[type="text"],
 .has-success .mform input[type="password"],
 .mform .has-success input[type="password"],
 .has-success .mform input[type="datetime"],
@@ -1364,11 +1318,8 @@ select[multiple].input-lg,
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 /* line 20, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.has-success .form-control:focus, .has-success .mform select:focus, .mform .has-success select:focus,
-.has-success .mform textarea:focus,
-.mform .has-success textarea:focus,
-.has-success .mform input[type="text"]:focus,
-.mform .has-success input[type="text"]:focus,
+.has-success .form-control:focus, .has-success select:focus,
+.has-success textarea:focus, .has-success .mform input[type="text"]:focus, .mform .has-success input[type="text"]:focus,
 .has-success .mform input[type="password"]:focus,
 .mform .has-success input[type="password"]:focus,
 .has-success .mform input[type="datetime"]:focus,
@@ -1422,11 +1373,8 @@ select[multiple].input-lg,
   color: #8a6d3b;
 }
 /* line 17, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.has-warning .form-control, .has-warning .mform select, .mform .has-warning select,
-.has-warning .mform textarea,
-.mform .has-warning textarea,
-.has-warning .mform input[type="text"],
-.mform .has-warning input[type="text"],
+.has-warning .form-control, .has-warning select,
+.has-warning textarea, .has-warning .mform input[type="text"], .mform .has-warning input[type="text"],
 .has-warning .mform input[type="password"],
 .mform .has-warning input[type="password"],
 .has-warning .mform input[type="datetime"],
@@ -1460,11 +1408,8 @@ select[multiple].input-lg,
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 /* line 20, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.has-warning .form-control:focus, .has-warning .mform select:focus, .mform .has-warning select:focus,
-.has-warning .mform textarea:focus,
-.mform .has-warning textarea:focus,
-.has-warning .mform input[type="text"]:focus,
-.mform .has-warning input[type="text"]:focus,
+.has-warning .form-control:focus, .has-warning select:focus,
+.has-warning textarea:focus, .has-warning .mform input[type="text"]:focus, .mform .has-warning input[type="text"]:focus,
 .has-warning .mform input[type="password"]:focus,
 .mform .has-warning input[type="password"]:focus,
 .has-warning .mform input[type="datetime"]:focus,
@@ -1518,11 +1463,8 @@ select[multiple].input-lg,
   color: #a94442;
 }
 /* line 17, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.has-error .form-control, .has-error .mform select, .mform .has-error select,
-.has-error .mform textarea,
-.mform .has-error textarea,
-.has-error .mform input[type="text"],
-.mform .has-error input[type="text"],
+.has-error .form-control, .has-error select,
+.has-error textarea, .has-error .mform input[type="text"], .mform .has-error input[type="text"],
 .has-error .mform input[type="password"],
 .mform .has-error input[type="password"],
 .has-error .mform input[type="datetime"],
@@ -1556,11 +1498,8 @@ select[multiple].input-lg,
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 /* line 20, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_forms.scss */
-.has-error .form-control:focus, .has-error .mform select:focus, .mform .has-error select:focus,
-.has-error .mform textarea:focus,
-.mform .has-error textarea:focus,
-.has-error .mform input[type="text"]:focus,
-.mform .has-error input[type="text"]:focus,
+.has-error .form-control:focus, .has-error select:focus,
+.has-error textarea:focus, .has-error .mform input[type="text"]:focus, .mform .has-error input[type="text"]:focus,
 .has-error .mform input[type="password"]:focus,
 .mform .has-error input[type="password"]:focus,
 .has-error .mform input[type="datetime"]:focus,
@@ -1625,11 +1564,8 @@ select[multiple].input-lg,
     vertical-align: middle;
   }
   /* line 407, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-  .form-inline .form-control, .form-inline .mform select, .mform .form-inline select,
-  .form-inline .mform textarea,
-  .mform .form-inline textarea,
-  .form-inline .mform input[type="text"],
-  .mform .form-inline input[type="text"],
+  .form-inline .form-control, .form-inline select,
+  .form-inline textarea, .form-inline .mform input[type="text"], .mform .form-inline input[type="text"],
   .form-inline .mform input[type="password"],
   .mform .form-inline input[type="password"],
   .form-inline .mform input[type="datetime"],
@@ -1671,10 +1607,8 @@ select[multiple].input-lg,
   .form-inline .input-group .input-group-addon,
   .form-inline .input-group .input-group-btn,
   .form-inline .input-group .form-control,
-  .form-inline .input-group .mform select,
-  .mform .form-inline .input-group select,
-  .form-inline .input-group .mform textarea,
-  .mform .form-inline .input-group textarea,
+  .form-inline .input-group select,
+  .form-inline .input-group textarea,
   .form-inline .input-group .mform input[type="text"],
   .mform .form-inline .input-group input[type="text"],
   .form-inline .input-group .mform input[type="password"],
@@ -1710,11 +1644,8 @@ select[multiple].input-lg,
     width: auto;
   }
   /* line 425, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss */
-  .form-inline .input-group > .form-control, .form-inline .mform .input-group > select, .mform .form-inline .input-group > select,
-  .form-inline .mform .input-group > textarea,
-  .mform .form-inline .input-group > textarea,
-  .form-inline .mform .input-group > input[type="text"],
-  .mform .form-inline .input-group > input[type="text"],
+  .form-inline .input-group > .form-control, .form-inline .input-group > select,
+  .form-inline .input-group > textarea, .form-inline .mform .input-group > input[type="text"], .mform .form-inline .input-group > input[type="text"],
   .form-inline .mform .input-group > input[type="password"],
   .mform .form-inline .input-group > input[type="password"],
   .form-inline .mform .input-group > input[type="datetime"],
@@ -1830,9 +1761,8 @@ select[multiple].input-lg,
 }
 
 /* line 15, ../sass/_form.scss */
-.form-control, .mform select,
-.mform textarea,
-.mform input[type="text"],
+.form-control, select,
+textarea, .mform input[type="text"],
 .mform input[type="password"],
 .mform input[type="datetime"],
 .mform input[type="datetime-local"],
@@ -1858,9 +1788,8 @@ select[multiple].input-lg,
   transition: border-color ease-in-out 0.15s;
 }
 /* line 24, ../sass/_form.scss */
-.form-control:focus, .mform select:focus,
-.mform textarea:focus,
-.mform input[type="text"]:focus,
+.form-control:focus, select:focus,
+textarea:focus, .mform input[type="text"]:focus,
 .mform input[type="password"]:focus,
 .mform input[type="datetime"]:focus,
 .mform input[type="datetime-local"]:focus,
@@ -1895,69 +1824,69 @@ input {
   font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/* line 74, ../sass/_form.scss */
+/* line 77, ../sass/_form.scss */
 .mform legend {
   font-weight: normal;
 }
-/* line 77, ../sass/_form.scss */
+/* line 80, ../sass/_form.scss */
 .mform legend a, .mform legend a:link, .mform legend a:hover {
   color: #444444;
   text-decoration: none;
   font-weight: normal;
 }
-/* line 89, ../sass/_form.scss */
+/* line 92, ../sass/_form.scss */
 .mform fieldset.fdate_selector > select {
   display: inline;
 }
-/* line 94, ../sass/_form.scss */
+/* line 97, ../sass/_form.scss */
 .mform .btn-cancel {
   border: 0;
 }
-/* line 100, ../sass/_form.scss */
+/* line 103, ../sass/_form.scss */
 .mform .required label {
   color: #D44950;
 }
-/* line 104, ../sass/_form.scss */
+/* line 107, ../sass/_form.scss */
 .mform .required .error .error {
   margin: 8px;
   display: inline-block !important;
 }
-/* line 111, ../sass/_form.scss */
+/* line 114, ../sass/_form.scss */
 .mform .required .error .error > br {
   display: none;
 }
-/* line 116, ../sass/_form.scss */
+/* line 119, ../sass/_form.scss */
 .mform .required .error + input[type="text"] {
   border-color: #d44950;
   float: left;
 }
 
-/* line 128, ../sass/_form.scss */
+/* line 131, ../sass/_form.scss */
 #page-enrol-users .enrol_user_buttons {
   margin: 8px 0;
 }
-/* line 131, ../sass/_form.scss */
+/* line 134, ../sass/_form.scss */
 #page-enrol-users #filterform {
   margin: 8px 0;
 }
-/* line 134, ../sass/_form.scss */
+/* line 137, ../sass/_form.scss */
 #page-enrol-users #filterform fieldset > div {
   float: left;
   width: 100%;
   background-color: white;
 }
-/* line 139, ../sass/_form.scss */
+/* line 142, ../sass/_form.scss */
 #page-enrol-users #filterform .fitem, #page-enrol-users #filterform .fitemtitle, #page-enrol-users #filterform .felement {
   float: left;
   margin-right: 8px;
 }
 
-/* line 146, ../sass/_form.scss */
+/* line 149, ../sass/_form.scss */
 .form-shortname {
   color: #999;
 }
 
-/* line 153, ../sass/_form.scss */
+/* line 156, ../sass/_form.scss */
 #categoryquestions .checkbox input[type="checkbox"] {
   margin-left: 0;
 }
@@ -11657,11 +11586,8 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
   padding-right: 0;
 }
 /* line 19, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_input-groups.scss */
-.input-group .form-control, .input-group .mform select, .mform .input-group select,
-.input-group .mform textarea,
-.mform .input-group textarea,
-.input-group .mform input[type="text"],
-.mform .input-group input[type="text"],
+.input-group .form-control, .input-group select,
+.input-group textarea, .input-group .mform input[type="text"], .mform .input-group input[type="text"],
 .input-group .mform input[type="password"],
 .mform .input-group input[type="password"],
 .input-group .mform input[type="datetime"],
@@ -11701,10 +11627,8 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .input-group-addon,
 .input-group-btn,
 .input-group .form-control,
-.input-group .mform select,
-.mform .input-group select,
-.input-group .mform textarea,
-.mform .input-group textarea,
+.input-group select,
+.input-group textarea,
 .input-group .mform input[type="text"],
 .mform .input-group input[type="text"],
 .input-group .mform input[type="password"],
@@ -11743,10 +11667,8 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .input-group-addon:not(:first-child):not(:last-child),
 .input-group-btn:not(:first-child):not(:last-child),
 .input-group .form-control:not(:first-child):not(:last-child),
-.input-group .mform select:not(:first-child):not(:last-child),
-.mform .input-group select:not(:first-child):not(:last-child),
-.input-group .mform textarea:not(:first-child):not(:last-child),
-.mform .input-group textarea:not(:first-child):not(:last-child),
+.input-group select:not(:first-child):not(:last-child),
+.input-group textarea:not(:first-child):not(:last-child),
 .input-group .mform input[type="text"]:not(:first-child):not(:last-child),
 .mform .input-group input[type="text"]:not(:first-child):not(:last-child),
 .input-group .mform input[type="password"]:not(:first-child):not(:last-child),
@@ -11803,11 +11725,8 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
   border-radius: 4px;
 }
 /* line 85, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_input-groups.scss */
-.input-group-addon.input-sm, .form-horizontal .form-group-sm .input-group-addon.form-control, .form-horizontal .form-group-sm .mform select.input-group-addon, .mform .form-horizontal .form-group-sm select.input-group-addon,
-.form-horizontal .form-group-sm .mform textarea.input-group-addon,
-.mform .form-horizontal .form-group-sm textarea.input-group-addon,
-.form-horizontal .form-group-sm .mform input.input-group-addon[type="text"],
-.mform .form-horizontal .form-group-sm input.input-group-addon[type="text"],
+.input-group-addon.input-sm, .form-horizontal .form-group-sm .input-group-addon.form-control, .form-horizontal .form-group-sm select.input-group-addon,
+.form-horizontal .form-group-sm textarea.input-group-addon, .form-horizontal .form-group-sm .mform input.input-group-addon[type="text"], .mform .form-horizontal .form-group-sm input.input-group-addon[type="text"],
 .form-horizontal .form-group-sm .mform input.input-group-addon[type="password"],
 .mform .form-horizontal .form-group-sm input.input-group-addon[type="password"],
 .form-horizontal .form-group-sm .mform input.input-group-addon[type="datetime"],
@@ -11835,8 +11754,7 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .form-horizontal .form-group-sm .mform input.input-group-addon[type="color"],
 .mform .form-horizontal .form-group-sm input.input-group-addon[type="color"], .form-horizontal .form-group-sm .navbutton .wikisearch input.input-group-addon[alt="search"], .navbutton .wikisearch .form-horizontal .form-group-sm input.input-group-addon[alt="search"],
 .form-horizontal .form-group-sm .navbutton .forumsearch input.input-group-addon[alt="search"],
-.navbutton .forumsearch .form-horizontal .form-group-sm input.input-group-addon[alt="search"],
-.mform .input-group-sm > input.input-group-addon[type="text"],
+.navbutton .forumsearch .form-horizontal .form-group-sm input.input-group-addon[alt="search"], .mform .input-group-sm > input.input-group-addon[type="text"],
 .mform .input-group-sm > input.input-group-addon[type="password"],
 .mform .input-group-sm > input.input-group-addon[type="datetime"],
 .mform .input-group-sm > input.input-group-addon[type="datetime-local"],
@@ -11875,11 +11793,8 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
   border-radius: 3px;
 }
 /* line 90, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_input-groups.scss */
-.input-group-addon.input-lg, .form-horizontal .form-group-lg .input-group-addon.form-control, .form-horizontal .form-group-lg .mform select.input-group-addon, .mform .form-horizontal .form-group-lg select.input-group-addon,
-.form-horizontal .form-group-lg .mform textarea.input-group-addon,
-.mform .form-horizontal .form-group-lg textarea.input-group-addon,
-.form-horizontal .form-group-lg .mform input.input-group-addon[type="text"],
-.mform .form-horizontal .form-group-lg input.input-group-addon[type="text"],
+.input-group-addon.input-lg, .form-horizontal .form-group-lg .input-group-addon.form-control, .form-horizontal .form-group-lg select.input-group-addon,
+.form-horizontal .form-group-lg textarea.input-group-addon, .form-horizontal .form-group-lg .mform input.input-group-addon[type="text"], .mform .form-horizontal .form-group-lg input.input-group-addon[type="text"],
 .form-horizontal .form-group-lg .mform input.input-group-addon[type="password"],
 .mform .form-horizontal .form-group-lg input.input-group-addon[type="password"],
 .form-horizontal .form-group-lg .mform input.input-group-addon[type="datetime"],
@@ -11907,8 +11822,7 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 .form-horizontal .form-group-lg .mform input.input-group-addon[type="color"],
 .mform .form-horizontal .form-group-lg input.input-group-addon[type="color"], .form-horizontal .form-group-lg .navbutton .wikisearch input.input-group-addon[alt="search"], .navbutton .wikisearch .form-horizontal .form-group-lg input.input-group-addon[alt="search"],
 .form-horizontal .form-group-lg .navbutton .forumsearch input.input-group-addon[alt="search"],
-.navbutton .forumsearch .form-horizontal .form-group-lg input.input-group-addon[alt="search"],
-.mform .input-group-lg > input.input-group-addon[type="text"],
+.navbutton .forumsearch .form-horizontal .form-group-lg input.input-group-addon[alt="search"], .mform .input-group-lg > input.input-group-addon[type="text"],
 .mform .input-group-lg > input.input-group-addon[type="password"],
 .mform .input-group-lg > input.input-group-addon[type="datetime"],
 .mform .input-group-lg > input.input-group-addon[type="datetime-local"],
@@ -11953,11 +11867,8 @@ h2.headingblock[data-toggle="buttons"] > a > input[type="checkbox"],
 }
 
 /* line 110, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_input-groups.scss */
-.input-group .form-control:first-child, .input-group .mform select:first-child, .mform .input-group select:first-child,
-.input-group .mform textarea:first-child,
-.mform .input-group textarea:first-child,
-.input-group .mform input[type="text"]:first-child,
-.mform .input-group input[type="text"]:first-child,
+.input-group .form-control:first-child, .input-group select:first-child,
+.input-group textarea:first-child, .input-group .mform input[type="text"]:first-child, .mform .input-group input[type="text"]:first-child,
 .input-group .mform input[type="password"]:first-child,
 .mform .input-group input[type="password"]:first-child,
 .input-group .mform input[type="datetime"]:first-child,
@@ -12070,11 +11981,8 @@ h2.headingblock.input-group-btn:last-child > a:not(:last-child):not(.dropdown-to
 }
 
 /* line 122, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_input-groups.scss */
-.input-group .form-control:last-child, .input-group .mform select:last-child, .mform .input-group select:last-child,
-.input-group .mform textarea:last-child,
-.mform .input-group textarea:last-child,
-.input-group .mform input[type="text"]:last-child,
-.mform .input-group input[type="text"]:last-child,
+.input-group .form-control:last-child, .input-group select:last-child,
+.input-group textarea:last-child, .input-group .mform input[type="text"]:last-child, .mform .input-group input[type="text"]:last-child,
 .input-group .mform input[type="password"]:last-child,
 .mform .input-group input[type="password"]:last-child,
 .input-group .mform input[type="datetime"]:last-child,
@@ -13341,6 +13249,11 @@ body:not(.jsenabled) .langmenu:hover > .dropdown-menu,
   display: block;
   max-height: 150px;
   overflow-y: auto;
+}
+
+/* line 5, ../sass/moodle/_core.scss */
+.generalbox {
+  border: 0;
 }
 
 /* line 6, ../sass/moodle/_blocks.scss */

@@ -47,9 +47,12 @@ input {
 
 // Make everything inside a Moodle mform look like Bootstrap forms!!
 // We need to have .mform as a parent because some moodle widgets violate conventions
+
+select,
+textarea {
+    @extend .form-control;
+}
 .mform {
-    select,
-    textarea,
     input[type="text"],
     input[type="password"],
     input[type="datetime"],
