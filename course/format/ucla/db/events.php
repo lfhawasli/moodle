@@ -15,16 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * UCLA format course event observer definition.
  *
- * @package    format
- * @subpackage ucla
- * @copyright 2012 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   format_ucla
+ * @category  event
+ * @copyright 2014 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014081900;       // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2013050100;       // Requires this Moodle version.
-$plugin->component = 'format_ucla';    // Full name of the plugin (used for diagnostics).
+$observers = array (
+
+    array (
+        'eventname'     => '\core\event\course_created',
+        'callback'      => 'format_ucla_observer::course_created',
+    ),
+
+);

@@ -15,16 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Local stuff file for UCLA course format event observers.
  *
- * @package    format
- * @subpackage ucla
- * @copyright 2012 UC Regents
+ * @package    format_ucla
+ * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014081900;       // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2013050100;       // Requires this Moodle version.
-$plugin->component = 'format_ucla';    // Full name of the plugin (used for diagnostics).
+
+/**
+ * Event observer class for UCLA course format.
+ * 
+ * @copyright   2014 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class format_ucla_observer {
+    /**
+     * Triggered when a new course is created
+     *
+     * @param \core\event\course_created $event
+     */
+    public static function course_created(\core\event\course_created $event) {
+        global $CFG;
+
+        // Auto-generate required forums on course creation.
+        require_once($CFG->dirroot.'/mod/forum/lib.php');
+        $courseid = $event->objectid;
+        forum_get_course_forum($courseid, 'news');
+        forum_get_course_forum($courseid, 'general');
+    }
+}

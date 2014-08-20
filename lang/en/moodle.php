@@ -475,8 +475,12 @@ $string['deletedactivity'] = 'Deleted {$a}';
 $string['deletedcourse'] = '{$a} has been completely deleted';
 $string['deletednot'] = 'Could not delete {$a} !';
 $string['deletecheck'] = 'Delete {$a} ?';
-$string['deletechecktype'] = 'Are you sure that you want to delete this {$a->type}?';
-$string['deletechecktypename'] = 'Are you sure that you want to delete the {$a->type} "{$a->name}"?';
+// START UCLA MOD: CCLE-4649 - Better handling for auto-gen Announcement/Discussion forums
+//$string['deletechecktype'] = 'Are you sure that you want to delete this {$a->type}?';
+//$string['deletechecktypename'] = 'Are you sure that you want to delete the {$a->type} "{$a->name}"?';
+$string['deletechecktype'] = 'Are you absolutely sure you want to completely delete this {$a->type} and all the data it contains?';
+$string['deletechecktypename'] = 'Are you absolutely sure you want to completely delete the {$a->type} "{$a->name}" and all the data it contains?';
+// END UCLA MOD: CCLE-4649
 $string['deletecheckfiles'] = 'Are you absolutely sure you want to delete these files?';
 $string['deletecheckfull'] = 'Are you absolutely sure you want to completely delete {$a} ?';
 $string['deletecheckwarning'] = 'You are about to delete these files';

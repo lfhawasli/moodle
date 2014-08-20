@@ -40,9 +40,12 @@ if ($topic = optional_param('topic', 0, PARAM_INT)) {
 }
 // End backwards-compatible aliasing..
 
-// Build our required forums
-$forum_new = forum_get_course_forum($course->id, 'news');
-$forum_gen = forum_get_course_forum($course->id, 'general');
+// Build our required forums.
+// Only auto-generate for SRS courses.
+if (!is_collab_site($course)) {
+    forum_get_course_forum($course->id, 'news');
+    forum_get_course_forum($course->id, 'general');
+}
 
 $context = context_course::instance($course->id);
 
