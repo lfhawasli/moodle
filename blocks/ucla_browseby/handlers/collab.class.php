@@ -286,8 +286,73 @@ class collab_handler extends browseby_handler {
         return get_role_users($roles, $context, $parent, $fields);
     }
 
-    protected function get_category_tree() {
-        return get_course_category_tree();
+    /**
+     * This function generates a structured array of courses and categories.
+     *
+     * Copied from deprecated get_course_category_tree function.
+     *
+     * @param int $id
+     * @param int $depth
+     */
+    protected function get_category_tree($id = 0, $depth = 0) {
+        global $DB, $CFG;
+
+        $categories = array();
+        $categoryids = array();
+        $sql = context_helper::get_preload_record_columns_sql('ctx');
+        $records = $DB->get_records_sql("SELECT c.*, $sql FROM {course_categories} c ".
+                "JOIN {context} ctx on ctx.instanceid = c.id AND ctx.contextlevel = ? WHERE c.parent = ? ORDER BY c.sortorder",
+                array(CONTEXT_COURSECAT, $id));
+        foreach ($records as $category) {
+            context_helper::preload_from_record($category);
+            if (!$category->visible && !has_capability('moodle/category:viewhiddencategories', context_coursecat::instance($category->id))) {
+                continue;
+            }
+            $categories[] = $category;
+            $categoryids[$category->id] = $category;
+            if (empty($CFG->maxcategorydepth) || $depth <= $CFG->maxcategorydepth) {
+                list($category->categories, $subcategories) = $this->get_category_tree($category->id, $depth+1);
+                foreach ($subcategories as $subid=>$subcat) {
+                    $categoryids[$subid] = $subcat;
+                }
+                $category->courses = array();
+            }
+        }
+
+        if ($depth > 0) {
+            // This is a recursive call so return the required array
+            return array($categories, $categoryids);
+        }
+
+        if (empty($categoryids)) {
+            // No categories available (probably all hidden).
+            return array();
+        }
+
+        // The depth is 0 this function has just been called so we can finish it off
+
+        $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
+        $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . ")";
+        list($catsql, $catparams) = $DB->get_in_or_equal(array_keys($categoryids));
+        $sql = "SELECT
+                c.id,c.sortorder,c.visible,c.fullname,c.shortname,c.summary,c.category
+                $ccselect
+                FROM {course} c
+                $ccjoin
+                WHERE c.category $catsql ORDER BY c.sortorder ASC";
+        if ($courses = $DB->get_records_sql($sql, $catparams)) {
+            // loop through them
+            foreach ($courses as $course) {
+                if ($course->id == SITEID) {
+                    continue;
+                }
+                context_helper::preload_from_record($course);
+                if (!empty($course->visible) || has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
+                    $categoryids[$course->category]->courses[$course->id] = $course;
+                }
+            }
+        }
+        return $categories;
     }
 
     protected function heading($heading, $level=1) {
