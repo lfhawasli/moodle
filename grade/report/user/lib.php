@@ -619,7 +619,10 @@ class grade_report_user extends grade_report {
                 $id = (isset($this->tabledata[$i][$name]['id'])) ? "id='{$this->tabledata[$i][$name]['id']}'" : '';
                 $headers = (isset($this->tabledata[$i][$name]['headers'])) ? "headers='{$this->tabledata[$i][$name]['headers']}'" : '';
                 if (isset($content)) {
-                    $html .= "<$celltype $id $headers class='$class' $colspan>$content</$celltype>\n";
+                    // START UCLA MOD CCLE-4433 - adding a data-content attribute for responsive table
+                    // $html .= "<$celltype $id $headers class='$class' $colspan>$content</$celltype>\n";
+                    $html .= "<$celltype $id $headers class='$class' $colspan data-content='" . ucfirst($name) . "'>$content</$celltype>\n";
+                    // END UCLA MOD CCLE-4433
                 }
             }
             $html .= "</tr>\n";
