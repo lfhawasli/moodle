@@ -234,6 +234,9 @@ if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
 echo $OUTPUT->footer();
 
 // START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$url = '/report/grader/index.php?id=' . $course->id;
-add_to_log($course->id, 'grade', 'view grader', $url);
+$event = \local_gradebook\event\grader_grades_viewed::create(array(
+    'context' => $context,
+    'other' => array('option' => 'grader')
+));
+$event->trigger();
 // END UCLA MOD: CCLE-3980

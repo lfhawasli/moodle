@@ -15,6 +15,7 @@ $string['eventgradesexportedods'] = 'Grades exported (ods)';
 $string['eventgradesexportedtxt'] = 'Grades exported (txt)';
 $string['eventgradesexportedxls'] = 'Grades exported (xls)';
 $string['eventgradesexportedxml'] = 'Grades exported (xml)';
+$string['eventgradesviewed'] = 'Gradebook {$a} report viewed';
 $string['gradesuccess'] = 'grade sent to MyUCLA';
 $string['gradefail'] = 'failed to send grade to MyUCLA';
 $string['gradefailinfo'] = 'General error: GradeID [{$a}]';

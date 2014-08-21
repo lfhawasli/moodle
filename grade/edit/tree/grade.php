@@ -210,19 +210,6 @@ if ($mform->is_cancelled()) {
             $data->overridden = 0; // checkbox unticked
         }
         $grade_grade->set_overridden($data->overridden);
-
-        if ($data->overridden == 0 && $data->overridden != $old_grade_grade->overridden) {
-            // Log removing an override.
-            // The addition of an override is logged above.
-            // One or the other will happen but never both.
-            $url = '/report/grader/index.php?id=' . $course->id;
-
-            $user = $DB->get_record('user', array('id'=>$data->userid), '*', MUST_EXIST);
-            $fullname = fullname($user);
-
-            $info = "{$grade_item->itemname}: $fullname";
-            add_to_log($course->id, 'grade', 'update', $url, $info);
-        }
     }
 
     if (has_capability('moodle/grade:manage', $context) or has_capability('moodle/grade:hide', $context)) {
