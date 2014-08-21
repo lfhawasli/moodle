@@ -495,10 +495,6 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
                 filter_set_local_state('tex', $context->id, TEXTFILTER_OFF);
                 filter_set_local_state('mathjax', $context->id, TEXTFILTER_OFF);
                 filter_set_local_state('mathjaxloader', $context->id, TEXTFILTER_ON);
-            } else {
-                //If past course didn't use an equation editor, leave new MathJax
-                //off.
-                filter_set_local_state('mathjaxloader', $context->id, TEXTFILTER_OFF);
             }
         }
 
