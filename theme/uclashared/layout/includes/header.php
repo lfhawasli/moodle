@@ -33,7 +33,7 @@
                 <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
             </div>
             <div class="col-sm-6 col-xs-9 header-login">
-                <div class="header-btn-group" >
+                <div class="header-btn-group logininfo" >
                     <?php
                     if ($haslogininfo) {
                         echo $OUTPUT->login_info();
