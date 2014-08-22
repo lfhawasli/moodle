@@ -233,7 +233,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         // The actual login link.
         if ($addloginurl) {
             $logininfo[] = html_writer::link($loginurl,
-                    html_writer::span('', 'arrow-right') . get_string('login'),
+                    get_string('login'),
                     array('class' => 'btn-header btn-login')
             );
         } else if ($addlogouturl) {

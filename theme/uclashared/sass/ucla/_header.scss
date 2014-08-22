@@ -117,6 +117,12 @@ header {
     }
 }
 
+// When the page displays debug output, keep the header relative so that
+// it doesn't float in the middle of the page.
+.debuggingmessage ~ #page .header-main {
+    position: relative;
+}
+
 // Defines how header logo area looks
 .header-logo {
     

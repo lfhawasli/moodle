@@ -9,6 +9,8 @@
 // UCLA format namespace
 .ucla-format {
     
+    margin: auto 0;
+    
     // Color links UCLA blue
     a,
     a:link {
@@ -103,29 +105,49 @@
     }
 }
 
-.site-title {
-    color: $ccle-blue;
-}
-.site-meta {
-    font-size: 1.2rem;
-    color: #444;
-}
-.site-title-divider {
-    width: 100%;
-    display: inline-block;
-    height: 4px;
-    background-color: $ccle-blue;
-    float: left;
-    margin-top: 4px;
-    margin-bottom: 4px;
-}
+// format_ucla namespace
 
-// Registrar info in the 'site info' summary
-.registrar-info {
-    color: #878787;
-    line-height: 1.2;
-    border-bottom: 1px solid #ccc;
-    padding: 4px 0;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+.format-ucla {
+    // Course header
+    .site-title {
+        color: #444;
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-weight: 300;
+        
+        padding-bottom: 4px;
+        border-bottom: 2px solid #ccc;
+    }
+    .site-meta {
+        font-size: 1.2rem;
+        color: #444;
+        font-weight: 300;
+    }
+    .site-title-divider {
+        width: 100%;
+        display: inline-block;
+        height: 4px;
+        background-color: $ccle-blue;
+        float: left;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        display: none;
+    }
+
+    // Registrar info in the 'site info' summary
+    .registrar-info {
+        color: #878787;
+        line-height: 1.2;
+        font-weight: 300;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .course-content {
+        .single-section {
+            margin-top: 8px;
+        }
+    }
+    
 }

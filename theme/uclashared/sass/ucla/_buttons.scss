@@ -8,6 +8,7 @@
 $btn-color-editing:         #ef7c1f;
 $btn-color-control-panel:   #ffcf48;
 $btn-color-forum-search:    #4d4d4d;
+$btn-color-login:           #f9c739;
 
 
 ////
@@ -35,7 +36,7 @@ $btn-color-forum-search:    #4d4d4d;
 .btn-header {
     background-color: none;
     padding: 10px 12px; 
-    color: white !important;
+    color: white;
     display: inline-block;
     font-weight: 300;
     /*border-bottom: 2px solid darken($header-color-prod, 10%);*/
@@ -58,12 +59,15 @@ $btn-color-forum-search:    #4d4d4d;
             content: "[";
         }
     }
-    
+}
 
+a.btn-header {
+    color: white;
 }
 
 .btn-header-text {
-    background-color: $ccle-color-blue;
+    /*background-color: $ccle-color-blue;*/
+    font-size: 1.2rem;
     padding: 10px 12px; 
     color: white !important;
     display: inline-block;
@@ -82,22 +86,13 @@ $btn-color-forum-search:    #4d4d4d;
 }
 
 .btn-login {
-    background-color: #4cae4c;
+    background-color: $btn-color-login;
+    color: black !important;
     /*border-bottom: 2px solid darken(#4cae4c, 10%);*/
 
     &:hover {
-        background-color: lighten(#4cae4c, 10%);
+        background-color: lighten($btn-color-login, 10%);
         /*border-bottom: 2px solid darken(#4cae4c, 1%);*/
-    }
-    
-    .arrow-right {
-        display: inline-block;
-        float: left;
-        border-left-color: $header-color-prod;
-        margin-left: -12px;
-        margin-right: 8px;
-        position: relative;
-        top: 4px;
     }
 }
 

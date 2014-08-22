@@ -7,16 +7,6 @@
 // General tables
 // --------------------------------------------------
 
-// Propagate bootstrap table styles
-.generaltable,
-.admintable,
-.path-mod-forum .forumheaderlist,
-.userenrolment {
-    @extend .table;
-    @extend .table-striped;
-    @extend .table-bordered;
-    
-}
 
 // Use darker headers to match current CCLE style
 table {

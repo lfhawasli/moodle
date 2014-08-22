@@ -27,11 +27,13 @@
 // -------------------
 @import "type";
 @import "form";
+@import "moodle/adapter/form";
 
 @import "ucla/buttons";
 @import "moodle/adapter/buttons";
 
 @import "tables";
+@import "moodle/adapter/table";
 @import "bootstrap/grid";
 
 
@@ -41,14 +43,20 @@
 
 @import "ucla/fontawesome";
 @import "footer";
-@import "alerts";
+@import "ucla/alerts";
+@import "moodle/adapter/alerts";
 @import "bootstrap/navs";
 @import "progress-bars";
-@import "panels";
+@import "bootstrap/panels";
+@import "moodle/adapter/panels";
 @import "labels";
 @import "ucla/glyphicons";
 
 @import "bootstrap/button-groups";
+
+@import "bootstrap/pagination";
+@import "moodle/adapter/pagination";
+
 @import "bootstrap/input-groups";
 @import "ucla/breadcrumbs";
 @import "bootstrap/wells";
@@ -64,15 +72,18 @@
 // Load CCLE Moodle specific elements
 // This course, and plugin styles
 // --------------------------------------------------
+@import "ucla/login";
 @import "ucla/utilities";
 @import "ucla/ui_mods";
 
 // Moodle
 @import "moodle/undo";
+@import "moodle/core";
 @import "moodle/blocks";
 @import "moodle/gradebook";
 @import "moodle/report";
 @import "moodle/admin";
+@import "moodle/category_management";
 @import "moodle/forum";
 @import "moodle/calendar";
 @import "moodle/wiki";

@@ -1,0 +1,11 @@
+
+// Propagate bootstrap table styles
+.generaltable,
+.admintable,
+.path-mod-forum .forumheaderlist,
+.userenrolment {
+    @extend .table;
+    @extend .table-striped;
+    @extend .table-bordered;
+    
+}

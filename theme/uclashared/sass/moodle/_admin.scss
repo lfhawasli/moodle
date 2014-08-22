@@ -2,13 +2,75 @@
 // CCLE / course specific admin
 // --------------------------------------------------
 
+%admin-h2 {
+    margin-top: 0;
+    font-size: 24px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 16px;
+}
+
+%admin-h3 {
+    font-size: 20px;
+    margin-top: 0;
+}
+
+.pagelayout-admin {
+
+    // Only for the admin page content
+    #region-main {
+
+        h2 {
+            @extend %admin-h2;
+        }
+        
+        h3 {
+            @extend %admin-h3;
+        }
+
+        .paging {
+            margin-bottom: 16px;
+        }
+    }
+}
+
+$admin-form-item-width: 240px;
+
+// Defines how the settings pages look
+#adminsettings {
+    
+    // Need to have this for override
+    .form-item {
+        .form-setting,
+        .form-description {
+            margin-left: $admin-form-item-width + 10px;
+        }
+        .form-label {
+            width: $admin-form-item-width;
+        }
+
+        .form-overridden {
+            padding: 2px 8px;
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+        .form-shortname {
+            font-size: 1.2rem;
+        }
+        .form-defaultinfo {
+            color: #aaa;
+        }
+    }
+    
+}
+
 // Admin headers
 // --------------------------------------------------
 
 // Normalize all course administration headers
-.region-content > h2.main {
+/*.region-content > h2.main {
     @include ccle-admin-header;
-}
+}*/
 
 
 // Admin actions
@@ -16,7 +78,7 @@
 
 // Create horizontal bars to hold different actions
 // This is similar to how Github divides their actions
-.region-content {
+/*.region-content {
     & > .urlselect {
         float: right;
     }
@@ -36,84 +98,21 @@
     @include respond-to(handhelds) {
         // @todo: implement
     }
-}
+}*/
 
-
-// CCLE-4625
-// Adds a better visual hint to courses drag & drop.
-//
-#page-course-management {
-    
-    // Adds a tranlucent overlay.
-    .course-being-dragged {
-        border: 1px solid #ddd;
-        background-color: #EFEFEF;
-        
-        a {
-            color: #aaa;
-        }
-    }
-    
-    // Adds a grayed out shadow.
-    .course-being-dragged-proxy {
-        background-color: #fff;
-        opacity: 0.7;
-        border: 1px solid #aaa;
-    }
-    
-    // Makes 'gear' dropdown menu icons display correctly.
-    .menu {
-        .smallicon {
-            @include box-sizing(content-box);
-        }
-    }
-}
-
-
-//
-// Admin / Course / Category browser
-//
-
-// CCLE-4258: add visual cue to indicate term on categories course lists.
-// This will handle terms until 2022!
-#page-course-management {
-    
-    // Terms we want to cover, with term code
-    $terms: (
-        fall F,
-        winter W,
-        spring S,
-        summer 1
-    );
-    
-    // Iterate through terms
-    @each $term in $terms {
-        $name: nth($term, 1);
-        $code: nth($term, 2);
-        
-        // Generate values for 10 years after 2012
-        @for $i from 12 to 22 {
-            a[data-name^="#{$i}#{$code}"]:before {
-                @extend .label-term;
-                @extend .label-#{$name};
-                content: "#{$name} #{$i}";
-            }
-        }
-    }
-}
 
 
 ///
 
 // Normalize all admin page headers 
-h2.headingblock {
+/*h2.headingblock {
     @include ccle-admin-header;
-}
+}*/
 
-#addadmisform > h3.main {
+/*#addadmisform > h3.main {
     @include ccle-admin-header;
     margin-bottom: 8px;
-}
+}*/
 
 
 // Modifies the course admin menu to be a little more clickable...

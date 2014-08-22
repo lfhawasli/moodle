@@ -90,4 +90,32 @@ class theme_uclashared_core_course_management_renderer extends core_course_manag
         return $html;
     }
 
+    /**
+     * Re-renders the pagination list as a boostrap pagination list.
+     * 
+     * @param coursecat $category The category to produce pagination for.
+     * @param int $page The current page.
+     * @param int $perpage The number of courses to display per page.
+     * @param bool $showtotals Set to true to show the total number of courses and what is being displayed.
+     * @return string
+     */
+    protected function listing_pagination(coursecat $category, $page, $perpage, $showtotals = false) {
+        $out = parent::listing_pagination($category, $page, $perpage, $showtotals);
+        
+        // Remove the original class in favor of bootstrap class.
+        $out = str_replace('listing-pagination', 'pagination', $out);
+
+        // Remove the yui3-button class.
+        $out = str_replace('yui3-button', '', $out);
+        
+        // Remove ...
+        $out = str_replace('...', '', $out);
+        
+        // Wrap the <a> inslide <li>
+        $out = str_replace('<a', '<li><a', $out);
+        $out = str_replace('</a>', '</a></li>', $out);
+        
+        // Return wrapped in a 'center' div
+        return html_writer::div($out, 'center');
+    }
 }

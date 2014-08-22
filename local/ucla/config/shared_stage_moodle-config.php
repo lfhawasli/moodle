@@ -145,6 +145,9 @@ $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'stage
 $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 
+// Prevent blocks from docking
+$CFG->allowblockstodock = false;
+
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 

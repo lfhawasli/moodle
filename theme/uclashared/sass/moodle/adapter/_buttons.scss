@@ -48,20 +48,6 @@ input[type="submit"] {
     }
 }
 
-// Form buttons
-.mform {
-    .collapseexpand {
-        @extend .btn;
-        @extend .btn-link;
-    }
-    input[name="submitbutton"] {
-        @extend .btn;
-        @extend .btn-primary;
-    }
-}
-
-
-
 .pagelayout-redirect {
     text-align: center;
     
