@@ -226,57 +226,126 @@ class local_ucla_generator extends testing_data_generator {
         return $courseobj;
     }
 
+
+    /**
+     * Helper function for create_ucla_roles function.  Creates a dummy role
+     * based off of XML information.
+     *
+     * @param string $xml
+     */
+    protected function create_dummy_role($xml) {
+        global $DB;
+        if (core_role_preset::is_valid_preset($xml)) {
+            $info = core_role_preset::parse_preset($xml);
+            if (!$DB->get_record('role', array('shortname' => $info['shortname']))) {
+                create_role($info['name'], $info['shortname'], $info['description'], $info['archetype']);
+            }
+        }
+    }
+
+    /**
+     * Helper function for create_ucla_roles function.  Fully defines
+     * a role from an xml file.  $shortname is used to retrieve dummy roles
+     * for updating.
+     *
+     * @param string $xml role xml definition
+     * @param string $shortname role shortname
+     * @return array $role role definition
+     */
+    protected function define_role_from_xml($xml, $shortname) {
+        global $DB;
+        // Preset options.
+        if ($role = $DB->get_record('role', array('shortname' => $shortname))) {
+            $options = array(
+                'shortname'     => 1,
+                'name'          => 1,
+                'description'   => 1,
+                'permissions'   => 1,
+                'archetype'     => 1,
+                'contextlevels' => 1,
+                'allowassign'   => 1,
+                'allowoverride' => 1,
+                'allowswitch'   => 1);
+            $definitiontable = new tool_uclarolesmigration_import_table(context_system::instance(), $role->id);
+            $definitiontable->force_preset($xml, $options);
+            $definitiontable->save_changes();
+            unset($definitiontable);
+            return $role;
+        }
+    }
+
+    /**
+     * Helper function for create_ucla_roles function.
+     * Checks $filepath to see if a file exists there, and
+     * returns its contents if it exists.
+     *
+     * @param string $filepath
+     * @return string file contents
+     */
+    protected function check_and_get_file($filepath) {
+        if (is_file($filepath)) {
+            return file_get_contents($filepath);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Create the roles needed to do enrollment. Note, that these roles will not
      * have the same capabilities as the real roles, they are just roles with
      * the same name as needed.
      *
-     * @return array        Returns an array of shortname to roleid.
+     * @param array $rolestocreate
+     * @return array Returns an array of shortname to roleid.
      */
-    public function create_ucla_roles() {
+    public function create_ucla_roles($rolestocreate = null) {
         global $CFG, $DB;
-        $systemcontext = context_system::instance();
         $retval = array();
-        // Preset options.
-        $options = array(
-            'shortname'     => 1,
-            'name'          => 1,
-            'description'   => 1,
-            'permissions'   => 1,
-            'archetype'     => 1,
-            'contextlevels' => 1,
-            'allowassign'   => 1,
-            'allowoverride' => 1,
-            'allowswitch'   => 1);
 
-        // Process each file with the *.xml extension and create dummy roles.
-        $xmlfiles = glob($CFG->dirroot . '/local/ucla/tests/fixtures/roles/*.xml', GLOB_NOSORT);
-        foreach ($xmlfiles as $file) {
-            $xml = file_get_contents($file);
-            if (core_role_preset::is_valid_preset($xml)) {
-                $info = core_role_preset::parse_preset($xml);
-                if (!$DB->get_record('role', array('shortname' => $info['shortname']))) {
-                    create_role($info['name'], $info['shortname'], $info['description'], $info['archetype']);
-                }
+        // If rolestocreate is undefined, we assume that every role should be made from the fixtures.
+        if (empty($rolestocreate)) {
+            // Process each file with the *.xml extension and create dummy roles.
+            $xmlfiles = glob($CFG->dirroot . '/local/ucla/tests/fixtures/roles/*.xml', GLOB_NOSORT);
+            foreach ($xmlfiles as $file) {
+                $xml = file_get_contents($file);
+                $this->create_dummy_role($xml);
             }
-        }
 
-        // Process each file with the *.xml extension and update each role.
-        foreach ($xmlfiles as $file) {
-            $xml = file_get_contents($file);
-            if (core_role_preset::is_valid_preset($xml)) {
-                $shortname = basename($file, '.xml');
-                // Check to see that the role is added or already existed.
-                if ($role = $DB->get_record('role', array('shortname' => $shortname))) {
-                    $definitiontable = new tool_uclarolesmigration_import_table($systemcontext, $role->id);
-                    $definitiontable->force_preset($xml, $options);
-                    $definitiontable->save_changes();
+            // Process each file with the *.xml extension and update/define each role.
+            foreach ($xmlfiles as $file) {
+                $xml = file_get_contents($file);
+                if (core_role_preset::is_valid_preset($xml)) {
+                    $shortname = basename($file, '.xml');
+                    $role = $this->define_role_from_xml($xml, $shortname);
                     $retval[$role->shortname] = $role->id;
                 }
-                unset($definitiontable);
+            }
+
+        } else {
+            // Create dummy variable for each role.
+            foreach ($rolestocreate as $roletocreate) {
+                $filepath = $CFG->dirroot . '/local/ucla/tests/fixtures/roles/' . $roletocreate . '.xml';
+                $xml = $this->check_and_get_file($filepath);
+                if (is_null($xml)) {
+                    continue;
+                }
+                $this->create_dummy_role($xml);
+            }
+
+            // Process and update/define each role.
+            foreach ($rolestocreate as $roletocreate) {
+                $filepath = $CFG->dirroot . '/local/ucla/tests/fixtures/roles/' . $roletocreate . '.xml';
+                $xml = $this->check_and_get_file($filepath);
+                if (is_null($xml)) {
+                    continue;
+                } else if (core_role_preset::is_valid_preset($xml)) {
+                    $shortname = $roletocreate;
+                    $role = $this->define_role_from_xml($xml, $shortname);
+                    $retval[$role->shortname] = $role->id;
+                }
             }
         }
-        
+
         return $retval;
     }
 

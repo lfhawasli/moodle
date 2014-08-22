@@ -129,13 +129,13 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
      * @see core_role_define_role_table_advanced::save_changes()
      */
     public function save_changes() {
-        global $DB;
+        global $DB, $USER;
 
         if (!$this->roleid) {
             // Creating role.
             $this->role->id = create_role($this->role->name, $this->role->shortname,
                     $this->role->description, $this->role->archetype);
-            $this->roleid = $this->role->id; // Needed to make the parent::save_changes(); call work.
+            $this->roleid = $this->role->id;
         } else {
             // Updating role.
             $DB->update_record('role', $this->role);
@@ -150,9 +150,39 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
         $this->save_allow('switch');
 
         // Permissions.
+        $capabilitiestoupdate = array();
+        $capabilitiestoinsert = array();
+        // The following permission and capability handling is modified from
+        // assign_capability() for performance.
         foreach ($this->permissions as $capability => $permission) {
-            assign_capability($capability, $permission, $this->roleid, $this->context->id, true);
+            if (empty($permission) || $permission == CAP_INHERIT) {
+                unassign_capability($capability, $this->roleid, $this->context->id);
+                continue;
+            }
+
+            $existing = $DB->get_record('role_capabilities', array('contextid' => $this->context->id,
+                'roleid' => $this->roleid, 'capability' => $capability));
+
+            $cap = new stdClass();
+            $cap->contextid    = $this->context->id;
+            $cap->roleid       = $this->roleid;
+            $cap->capability   = $capability;
+            $cap->permission   = $permission;
+            $cap->timemodified = time();
+            $cap->modifierid   = empty($USER->id) ? 0 : $USER->id;
+
+            if ($existing) {
+                $cap->id = $existing->id;
+                $capabilitiestoupdate[] = $cap;
+            } else {
+                $capabilitiestoinsert[] = $cap;
+            }
         }
+        // Update database with proper permissions.
+        foreach ($capabilitiestoupdate as $cap) {
+            $DB->update_record('role_capabilities', $cap);
+        }
+        $DB->insert_records('role_capabilities', $capabilitiestoinsert);
 
         // Force accessinfo refresh for users visiting this context.
         $this->context->mark_dirty();
