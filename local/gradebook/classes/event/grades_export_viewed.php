@@ -1,5 +1,5 @@
 <?php
-// This file is part of UCLA gradebook customizations local plugin for 
+// This file is part of UCLA gradebook customizations local plugin for
 // Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,15 +27,15 @@ namespace local_gradebook\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Abstract grades_exported event class.
+ * Abstract grades_export_viewed event class.
  *
- * Extended by events logging grade exports.
+ * Extended by events logging grade export views.
  *
  * @since     Moodle 2.7
  * @copyright 2014 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class grades_exported extends \core\event\base {
+abstract class grades_export_viewed extends \core\event\base {
 
     /**
      * Creates the event.
@@ -50,19 +50,18 @@ abstract class grades_exported extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventgradesexported', 'local_gradebook', '');
+        return get_string('eventgradesexportviewed', 'local_gradebook', '');
     }
 
     /**
-     * Returns a short description for the event that includes filename and
-     * contenthash.
+     * Returns a short description for the event.
      * @return string
      */
     public function get_description() {
         $user = $this->userid;
         $type = $this->other['type'];
         $course = $this->courseid;
-        return "The user with id '{$user}' has exported '{$type}' grades from course with id '{$course}'.";
+        return "The user with id '{$user}' viewed '{$type}' grade export for course with id '{$course}'.";
     }
 
     /**
@@ -70,7 +69,8 @@ abstract class grades_exported extends \core\event\base {
      * @return moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/grade/export/'.$this->other['type'].'/index.php', array('id' => $this->courseid));
+        return new \moodle_url('/grade/export/'.$this->other['type'].'/index.php',
+                array('id' => $this->courseid));
     }
 
     /**
@@ -79,7 +79,7 @@ abstract class grades_exported extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'grade', "export {$this->other['type']}",
+        return array($this->courseid, 'grade', "view {$this->other['type']}",
                 '/export/'.$this->other['type'].'/index.php?id='.$this->courseid);
     }
 }

@@ -15,5 +15,5 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // Version         YYYYMMDDVV
-$plugin->version = 2014082200;
+$plugin->version = 2014082900;
 $plugin->component = 'local_gradebook';
