@@ -307,3 +307,8 @@ $string['result1'] = 'Result 1';
 $string['result2'] = 'Result 2';
 $string['uclastats_base_mock'] = 'UCLA stats base class';
 $string['uclastats_base_mock_help'] = 'Text explaining what report does.';
+
+// Strings for events.
+$string['eventuclastats_deleted'] = 'Cached result deleted';
+$string['eventuclastats_locked'] = 'Cached result locked';
+$string['eventuclastats_unlocked'] = 'Cached result unlocked';
