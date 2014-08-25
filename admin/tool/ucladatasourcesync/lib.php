@@ -433,11 +433,23 @@ function get_reserve_data($table) {
 
 function log_ucla_data($func, $action, $notice, $error = '') {
     global $SITE;
-    
+
     $log_message = empty($error) ? $notice : $notice . PHP_EOL . $error;
     $log_message = textlib::substr($log_message, 0, 252) . '...';
-    add_to_log($SITE->id, $func, $action, '', $log_message);
-    
+    $func = str_replace(' ', '', $func);
+    $action = str_replace(' ', '', $action);
+    $datasourceevent = \tool_ucladatasourcesync\event\ucladatasourcesync_event::datasource($func, $action);
+    $event = $datasourceevent::create(array(
+        'context' => context_system::instance(),
+        'other'    => array(
+            'func' => $func,
+            'message' => $log_message,
+            'action' => $action,
+            'siteid' => $SITE->id
+        )
+    ));
+    $event->trigger();
+
     // If an error was reported, then send an email to ccle support
     if (!empty($error)) {
         $contact_email = get_config('contact_email', 'tool_ucladatasourcesync');
