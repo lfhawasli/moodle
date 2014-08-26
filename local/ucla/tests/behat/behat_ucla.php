@@ -136,19 +136,21 @@ class behat_ucla extends behat_files {
                     $this->getSession());
                 }
 
-                // Make sure that the proper UCLA roles exists.
-                $this->get_data_generator()->create_ucla_roles();
-
                 // Need to set proper course shortname so that Moodle's generator
                 // knows what to reference.  In this case, I have to regenerate the
                 // table as text because I can't modify the TableNode obj directly.
                 $table = "| user | course | role |";
 
+                $roles = array();
                 foreach ($data->getHash() as $elementdata) {
+                    $roles[] = $elementdata['role'];
                     $table .= "\n| {$elementdata['user']} | " .
                             "{$this->courses[$elementdata['course']]->shortname} | " .
                             "{$elementdata['role']} |";
                 }
+
+                // Make sure that the proper UCLA roles exists.
+                $this->get_data_generator()->create_ucla_roles($roles);
 
                 // Forward the work to Moodle's data generators.
                 $this->getMainContext()->getSubcontext('behat_data_generators')
@@ -159,7 +161,11 @@ class behat_ucla extends behat_files {
 
             case 'role assigns':
                 // Import UCLA roles.
-                $this->get_data_generator()->create_ucla_roles();
+                $roles = array();
+                foreach ($data->getHash() as $elementdata) {
+                    $roles[] = $elementdata['role'];
+                }
+                $this->get_data_generator()->create_ucla_roles($roles);
 
                 // Forward the data to Moodle's data generators.
                 $this->getMainContext()->getSubcontext('behat_data_generators')
