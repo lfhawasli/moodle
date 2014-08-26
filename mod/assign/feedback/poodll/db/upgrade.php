@@ -29,12 +29,17 @@
  */
 function xmldb_assignfeedback_poodll_upgrade($oldversion) {
     // do the upgrades
-    // Moodle v2.3.0 release upgrade line
-    // Put any upgrade step following this
+	//add filename field
+    if ($oldversion < 2013120500) {
+    	$table = new xmldb_table('assignfeedback_poodll');	
+		$table->add_field('filename', XMLDB_TYPE_TEXT, 'small', null,
+                null, null, null);
 
-
-    // Moodle v2.4.0 release upgrade line
-    // Put any upgrade step following this
+		
+		 // online PoodLL savepoint reached
+        upgrade_plugin_savepoint(true, 2013120500, 'assignfeedback', 'poodll');
+    
+    }
 
 
     return true;

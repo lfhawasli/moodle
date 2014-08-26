@@ -182,12 +182,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		//Don't do anything in this case
 		//possibly the user is just updating something else on the page(eg grade)
 		//if we overwrite here, we might trash their existing poodllfeedback file
-		if($filename==''){return;}
+		if($filename=='' || $filename==null){return false;}
         
         //if this should fail, we get regular user context, is it the same anyway?
         $usercontextid = optional_param('usercontextid', '', PARAM_RAW);
         if ($usercontextid == ''){
-        	$usercontextid = get_context_instance(CONTEXT_USER, $USER->id)->id;
+        	$usercontextid = context_user::instance($USER->id)->id;
         }
          
          $fs = get_file_storage();
@@ -198,11 +198,11 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		//if filename = -1 we are being told to delete the file
 		//so we have done enough
 		if($filename==-1){
-			return;
+			return '';
 		}
 		
 		//fetch the file info object for our original file
-		$original_context = get_context_instance_by_id($usercontextid);
+		$original_context = context::instance_by_id($usercontextid);
 		$draft_fileinfo = $browser->get_file_info($original_context, 'user','draft', $draftitemid, '/', $filename);
 
  		//perform the copy	
@@ -223,6 +223,8 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 			);
 			$ret = $draft_fileinfo->copy_to_storage($file_record);
 		}//end of if $draft_fileinfo
+		
+		return $filename;
 
 	}//end of shift_draft_file
     
@@ -270,6 +272,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         global $USER,$PAGE,$CFG;
         
         $PAGE->requires->js(new moodle_url($CFG->httpswwwroot . '/mod/assign/feedback/poodll/module.js'));
+        $displayname = $this->get_name();
 		 
         $gradeid = $grade ? $grade->id : 0;
         
@@ -284,7 +287,9 @@ class assign_feedback_poodll extends assign_feedback_plugin {
             }
             $currentcontainer = 'currentfeedbackwrapper';
             $currentfeedback = "<div id='" .$currentcontainer. "'>" . $currentfeedback . "</div>";
-             $mform->addElement('static', 'currentfeedback', '',$currentfeedback);
+             $mform->addElement('static', 'currentfeedback', $displayname,$currentfeedback);
+             //reset the display name so it doesn't show with the recorder
+             $displayname="";
              
              $opts = array(
 				"filecontrolid"=> FP_FILENAMECONTROL,
@@ -296,7 +301,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         }
 
 		//We prepare our form here and fetch/save data in SAVE method
-		$usercontextid=get_context_instance(CONTEXT_USER, $USER->id)->id;
+		$usercontextid=context_user::instance($USER->id)->id;
 		$draftitemid = file_get_submitted_draft_itemid(FP_FILENAMECONTROL);
 		$contextid=$this->assignment->get_context()->id;
 		file_prepare_draft_area($draftitemid, $contextid, ASSIGNFEEDBACK_POODLL_COMPONENT, ASSIGNFEEDBACK_POODLL_FILEAREA, $gradeid, null,null);
@@ -316,12 +321,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 			case FP_REPLYVOICE:
 				$mediadata= fetchAudioRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL, 
 						$usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 				
 			case FP_REPLYMP3VOICE:
 				$mediadata= fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 				
 			case FP_REPLYWHITEBOARD:
@@ -339,19 +344,19 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 				$imageurl="";
 				$mediadata= fetchWhiteboardForSubmission(FP_FILENAMECONTROL, 
 						$usercontextid ,'user','draft',$draftitemid, $width, $height, $imageurl);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 			
 			case FP_REPLYSNAPSHOT:
 				$mediadata= fetchSnapshotCameraForSubmission(FP_FILENAMECONTROL,
 						"snap.jpg" ,350,400,$usercontextid ,'user','draft',$draftitemid);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 
 			case FP_REPLYVIDEO:
 				$mediadata= fetchVideoRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL, 
 						$usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description', '',$mediadata);			
+				$mform->addElement('static', 'description',$displayname,$mediadata);			
 									
 				break;
 					
@@ -377,14 +382,19 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         global $DB;
         
         //Move recorded files from draft to the correct area
-	$this->shift_draft_file($grade);
+        //if shift_draft_file is false, no change, so do nothing
+        //if it is an empty string, user has deleted file, so we clear it too
+		$filename = $this->shift_draft_file($grade);
+		if($filename === false){return true;}
         
         $feedbackpoodll = $this->get_feedback_poodll($grade->id);
         if ($feedbackpoodll) {
+        	$feedbackpoodll->filename = $filename;
             return $DB->update_record('assignfeedback_poodll', $feedbackpoodll);
         } else {
             $feedbackpoodll = new stdClass();
             $feedbackpoodll->grade = $grade->id;
+            $feedbackpoodll->filename = $filename;
             $feedbackpoodll->assignment = $this->assignment->get_instance()->id;
             return $DB->insert_record('assignfeedback_poodll', $feedbackpoodll) > 0;
         }
@@ -430,10 +440,18 @@ function fetch_responses($gradeid, $embed=false){
         $files = $fs->get_area_files($this->assignment->get_context()->id, 
 				ASSIGNFEEDBACK_POODLL_COMPONENT, ASSIGNFEEDBACK_POODLL_FILEAREA, $gradeid, "id", false);
         if (!empty($files)) {
-            foreach ($files as $file) {
-                $filename = $file->get_filename();
-				break;
-            }
+           //if the filename property exists, and is filled, use that to fetch the file
+			$poodllfeedback= $this->get_feedback_poodll($gradeid);
+			if(isset($poodllfeedback->filename) && !empty($poodllfeedback->filename)){
+				$filename =  $poodllfeedback->filename;
+				
+			//if no filename property just take the first file. That is how we used to do it	
+			}else{
+				foreach ($files as $file) {
+					$filename = $file->get_filename();
+					break;
+				}
+			}
 	}
 		
         //if this is a playback area, for teacher, show a string if no file
