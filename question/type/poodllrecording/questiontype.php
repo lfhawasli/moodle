@@ -60,27 +60,34 @@ class qtype_poodllrecording extends question_type {
             $options->id = $DB->insert_record('qtype_poodllrecording_opts', $options);
         }
 
-	//"import_or_save_files" won't work, because it expects output from an editor which is an array with member itemid
-	//the filemanager doesn't produce this, so need to use file save draft area directly
-	//$options->backimage = $this->import_or_save_files($formdata->backimage,
-	// $context, 'qtype_poodllrecording', 'backimage', $formdata->id);
-	if (isset($formdata->backimage)){
-		file_save_draft_area_files($formdata->backimage, $context->id, 'qtype_poodllrecording',
-		'backimage', $formdata->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+		//"import_or_save_files" won't work, because it expects output from an editor which is an array with member itemid
+		//the filemanager doesn't produce this, so need to use file save draft area directly
+		//$options->backimage = $this->import_or_save_files($formdata->backimage,
+		// $context, 'qtype_poodllrecording', 'backimage', $formdata->id);
+		if (isset($formdata->backimage)){
+			file_save_draft_area_files($formdata->backimage, $context->id, 'qtype_poodllrecording',
+			'backimage', $formdata->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+			
+			//save the itemid of the backimage filearea
+			$options->backimage = $formdata->backimage;
+		}else{
+			$options->backimage = null;
+		}
 		
-		//save the itemid of the backimage filearea
-		$options->backimage = $formdata->backimage;
-	}else{
-		$options->backimage = null;
-	}
-	
 
-	//save the selected board size
-	if (isset($formdata->boardsize)){
-		$options->boardsize=$formdata->boardsize;
-    }else{
-		$options->boardsize="320x320";
-	}
+		//save the selected board size
+		if (isset($formdata->boardsize)){
+			$options->boardsize=$formdata->boardsize;
+		}else{
+			$options->boardsize="320x320";
+		}
+		
+		//if we have a recording time limit
+		if (isset($formdata->timelimit)){
+			$options->timelimit=$formdata->timelimit;
+		}else{
+			$options->timelimit=0;
+		}
 	
         $options->responseformat = $formdata->responseformat;
 		$options->graderinfo = $this->import_or_save_files($formdata->graderinfo,
@@ -94,8 +101,9 @@ class qtype_poodllrecording extends question_type {
         $question->responseformat = $questiondata->options->responseformat;
 		$question->graderinfo = $questiondata->options->graderinfo;
         $question->graderinfoformat = $questiondata->options->graderinfoformat;
-	$question->backimage=$questiondata->options->backimage;
-$question->boardsize=$questiondata->options->boardsize;
+		$question->backimage=$questiondata->options->backimage;
+		$question->boardsize=$questiondata->options->boardsize;
+		$question->timelimit=$questiondata->options->timelimit;
     }
 
     /**
@@ -183,7 +191,7 @@ $question->boardsize=$questiondata->options->boardsize;
     		"responseformat",
     		"responsefieldlines","attachments",
     		"graderinfo","graderinfoformat",
-    		"backimage","boardsize");
+    		"backimage","boardsize", "timelimit");
     		
         return $tableinfo;
     }
@@ -194,32 +202,7 @@ $question->boardsize=$questiondata->options->boardsize;
      * Export question using information from extra_question_fields function
      * We override this because we need to export file fields as base 64 strings, not ids
      */
-    public function xexport_to_xml($question, qformat_xml $format, $extra=null) {
-        $extraquestionfields = $this->extra_question_fields();
-        if (!is_array($extraquestionfields)) {
-            return false;
-        }
-
-		//get file storage
-		$fs = get_file_storage();
-		
-        //omit table name
-        array_shift($extraquestionfields);
-        $expout='';
-        foreach ($extraquestionfields as $field) {
-        	if($field=='backimage'){
-        		$exportedvalue = $format->write_files($fs->get_area_files($question->contextid, 'qtype_poodllrecording',
-                        'backimage', $question->id));
-        	}else{
-            	$exportedvalue = $format->xml_escape($question->options->$field);
-            }
-            $expout .= "    <$field>{$exportedvalue}</$field>\n";
-        }
-        return $expout;
-    }
-    
     public function export_to_xml($question, qformat_xml $format, $extra=null) {
-       
 
 		//get file storage
 		$fs = get_file_storage();
@@ -242,12 +225,11 @@ $question->boardsize=$questiondata->options->boardsize;
 				"</backimage>\n";
 		$expout .= "    <boardsize>" . $question->options->boardsize .
 				"</boardsize>\n";
+		$expout .= "    <timelimit>" . $question->options->timelimit .
+				"</timelimit>\n";
         
         return $expout;
-        
-        
-        
-        
+   
     }
     
         /*
@@ -257,6 +239,8 @@ $question->boardsize=$questiondata->options->boardsize;
      * If some of you fields contains id's you'll need to reimplement this
      */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+    global $CFG;
+    
         $question_type = "poodllrecording";
         
         //omit table name
@@ -270,56 +254,36 @@ $question->boardsize=$questiondata->options->boardsize;
                 array('#', 'responsefieldlines', 0, '#'), 15);
         $qo->attachments = $format->getpath($q,
                 array('#', 'attachments', 0, '#'), 0);
-        $qo->graderinfo['text'] = $format->getpath($q,
+        //older versions handled files diff. SeeM DL-39-57        
+    	if($CFG->version < 2013051400){
+    		$qo->graderinfo['text'] = $format->getpath($q,
                 array('#', 'graderinfo', 0, '#', 'text', 0, '#'), '', true);
-        $qo->graderinfo['format'] = $format->trans_format($format->getpath($q,
+        	$qo->graderinfo['format'] = $format->trans_format($format->getpath($q,
                 array('#', 'graderinfo', 0, '@', 'format'), $format->get_format($qo->questiontextformat)));
-        $qo->graderinfo['files'] = $format->import_files($format->getpath($q,
+        	$qo->graderinfo['files'] = $format->import_files($format->getpath($q,
                 array('#', 'graderinfo', '0', '#', 'file'), array()));
-        $qo->backimage['files'] = $format->import_files($format->getpath($q,
+                
+            $qo->backimage = $format->import_files($format->getpath($q,
                 array('#', 'backimage', '0', '#', 'file'), array()));
+    	
+    	}else{
+    		$qo->graderinfo =  $format->import_text_with_files($q, array('#', 'graderinfo', 0), '', $qo->questiontextformat);
+    		$qo->backimage  = $format->import_files_as_draft($format->getpath($q,
+                array('#', 'backimage', '0', '#', 'file'), array()));
+    		
+    	}                     
+        
         $qo->boardsize = $format->getpath($q,
                 array('#', 'boardsize', 0, '#'), '320x320');
+		$qo->timelimit = $format->getpath($q,
+                array('#', 'timelimit', 0, '#'), 0);
         
 
         return $qo;
 
     }//end of import from xml
 	
-    
-        /*
-     * Imports question from the Moodle XML format
-     *
-     * Imports question using information from extra_question_fields function
-     * If some of you fields contains id's you'll need to reimplement this
-     */
-    public function ximport_from_xml($data, $question, qformat_xml $format, $extra=null) {
-        $question_type = "poodllrecording";
-       
 
-        $extraquestionfields = $this->extra_question_fields();
-        if (!is_array($extraquestionfields)) {
-            return false;
-        }
-
-        //omit table name
-        array_shift($extraquestionfields);
-        $qo = $format->import_headers($data);
-        $qo->qtype = $question_type;
-
-        foreach ($extraquestionfields as $field) {
-        	if($field=='backimage'){
-        		//this probably wont work, it might save the file, but the id will not get stored in the backimage field
-        		//maybe do as we do in save_question_options above, see base 64 decode logic in questiontypebase.php import_file
-        		$qo->backimage['files'] = $format->import_files($format->getpath($question,
-                array('#', 'backimage', '0', '#', 'file'), array()));
-        	}else{
-            	$qo->$field = $format->getpath($data, array('#', $field, 0, '#'), '');
-            
-            } //end of if back image           
-        }//end of for each
-        return $qo;
-    }//end of import from xml
 	
 
 }
