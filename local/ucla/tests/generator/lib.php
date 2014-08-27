@@ -479,6 +479,81 @@ class local_ucla_generator extends testing_data_generator {
     }
 
     /**
+     * Enrolls the given user for a given course as if they were assigned via
+     * the Registrar (enrol_database).
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param int $roleid       If given user is a student, will also add their
+     *                          record to the ccle_roster_class_cache table.
+     * @param string $enrolsrs  If given, will make sure that user is associated
+     *                          with that cross-listed srs in the
+     *                          ccle_roster_class_cache table.
+     *
+     * @return boolean
+     */
+    public function enrol_reg_user($userid, $courseid, $roleid, $enrolsrs = null) {
+        global $DB;
+        // This function assumes that we are adding user to a Registrar course.
+        if (is_collab_site($courseid)) {
+            return false;
+        }
+
+        // Add database enrollment plugin, if needed.
+        if (!$DB->record_exists('enrol', 
+                array('courseid' => $courseid, 'enrol' => 'database'))) {
+            $enrol = enrol_get_plugin('database');
+            if (!$enrol->add_instance(get_course($courseid))) {
+                return false;
+            }
+        }
+
+        // Enroll user.
+        if (!parent::enrol_user($userid, $courseid, $roleid, 'database')) {
+            return false;
+        }
+
+        // Check if user is a student, if so, add record to
+        // ccle_roster_class_cache.
+        if ($DB->record_exists('role',
+                array('id' => $roleid, 'shortname' => 'student'))) {
+            $termsrses = ucla_map_courseid_to_termsrses($courseid);
+            // Find which record to associate with user. If $enrolsrs is not
+            // given, then just give them the hostcourse.
+            $regcourse = null;
+            foreach ($termsrses as $termsrs) {
+                if (!empty($enrolsrs) && $termsrs->srs == $enrolsrs) {
+                    $regcourse = $termsrs;
+                    break;
+                } else if (empty($enrolsrs) && $termsrs->hostcourse) {
+                    $regcourse = $termsrs;
+                    break;
+                }
+            }
+
+            if (empty($regcourse)) {
+                // Could not find matching srs.
+                return false;
+            }
+
+            // Now add record to ccle_roster_class_cache table.
+            $user = $DB->get_record('user', array('id' => $userid));
+            $DB->insert_record('ccle_roster_class_cache',
+                    array('param_term'          => $regcourse->term,
+                          'param_srs'           => $regcourse->srs,
+                          'expires_on'          => time()+get_config('local_ucla', 'registrar_cache_ttl'),
+                          'term_cd'             => $regcourse->term,
+                          'stu_id'              => $user->idnumber,
+                          'full_name_person'    => textlib::strtoupper(fullname($user)),
+                          'enrl_stat_cd'        => 'E',
+                          'ss_email_addr'       => $user->email,
+                          'bolid'               => str_replace('@ucla.edu', '', $user->username)));
+        }
+
+        return true;
+    }
+
+    /**
      * Formats Registrar format to display format:
      *     0000SSPP -> PP . int(0000) . SS
      *

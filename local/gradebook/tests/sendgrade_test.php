@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the MyUCLA gradebook webservice task for sending grade items by using
+ * Tests the MyUCLA gradebook webservice task for sending grades by using
  * mock objects.
  *
  * @package    local_gradebook
@@ -25,6 +25,10 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/grade/lib.php');
+require_once($CFG->dirroot . '/grade/report/grader/lib.php');
+
 /**
  * PHPunit testcase class.
  *
@@ -33,7 +37,12 @@ defined('MOODLE_INTERNAL') || die();
  * @group ucla
  * @group local_gradebook
  */
-class sendgradeitem_test extends advanced_testcase {
+class sendgrade_test extends advanced_testcase {
+
+    /**
+     * @var assign  Assignment module.
+     */
+    private $assign;
 
     /**
      * @var stdClass  Course record from the database.
@@ -51,25 +60,30 @@ class sendgradeitem_test extends advanced_testcase {
     private $mockwebservice;
 
     /**
+     * @var stdClass  User object from the database.
+     */
+    private $student;
+
+    /**
      * Returns a version of send_myucla_grade_item that has its
      * get_webservice_client() remapped to the mocked_get_webservice_client()
      * method of the current class.
      *
-     * @return \local_gradebook\task\send_myucla_grade_item
+     * @return \local_gradebook\task\send_myucla_grade
      */
     private function get_mock_myucla_task() {
-        // Only stub the query_registrar method.
-        $mockgradeitemtask = $this->getMockBuilder('\local_gradebook\task\send_myucla_grade_item')
+        // Only stub the get_webservice_client method.
+        $mockgradetask = $this->getMockBuilder('\local_gradebook\task\send_myucla_grade')
                 ->setMethods(array('get_webservice_client'))
                 ->getMock();
 
         // Method $this->mocked_get_webservice_client will be called instead of
         // send_myucla_grade_item->get_webservice_client().
-        $mockgradeitemtask->expects($this->any())
+        $mockgradetask->expects($this->any())
                 ->method('get_webservice_client')
                 ->will($this->returnCallback(array($this, 'mocked_get_webservice_client')));
 
-        return $mockgradeitemtask;
+        return $mockgradetask;
     }
 
     /**
@@ -86,7 +100,43 @@ class sendgradeitem_test extends advanced_testcase {
     }
 
     /**
-     * Creates test course and instructor.
+     * Sets given grade for precreated assignment and student.
+     *
+     * @return grade_grade  Returns grade_grade object that should be created.
+     */
+    protected function set_grade($grade) {
+        // We are saving grades via the grader report, since the code for it is
+        // more straightforward. See /grade/tests/report_graderlib_test.php.
+        $gpr = new grade_plugin_return(array('type' => 'report',
+            'plugin'=>'grader', 'courseid' => $this->course->id));
+        $report = new grade_report_grader($this->course->id, $gpr,
+                context_course::instance($this->course->id));
+
+        $gradeitem  = grade_item::fetch(array('itemtype'     => 'mod',
+                                              'itemmodule'   => 'assign',
+                                              'iteminstance' => $this->assign->id,
+                                              'courseid'     => $this->course->id));
+
+        $data = new stdClass();
+        $data->id = $this->course->id;
+        $data->report = 'grader';
+        $data->grade = array();
+        $data->grade[$this->student->id] = array();
+        $data->grade[$this->student->id][$gradeitem->id] = $grade;
+
+        $warnings = $report->process_data($data);
+        $this->assertEquals(count($warnings), 0);
+
+        $gradeobj = grade_grade::fetch(array('itemid' => $gradeitem->id,
+                                             'userid' => $this->student->id));
+        $this->assertNotEmpty($gradeobj);
+        $gradeobj->load_grade_item();  // Will need grade item info later.
+
+        return $gradeobj;
+    }
+
+    /**
+     * Creates test course, instructor, and student.
      */
     protected function setUp() {
         $this->resetAfterTest(true);
@@ -98,20 +148,34 @@ class sendgradeitem_test extends advanced_testcase {
         $course = array_pop($class);
         $this->course = get_course($course->courseid);
 
-        // Create instructor.
+        // Create instructor and student.
         $roles = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
-                ->create_ucla_roles(array('editinginstructor'));
+                ->create_ucla_roles(array('editinginstructor', 'student'));
         $this->instructor = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_user();
         $this->getDataGenerator()
-                ->enrol_user($this->instructor->id,
+                ->get_plugin_generator('local_ucla')
+                ->enrol_reg_user($this->instructor->id,
+                                 $this->course->id,
+                                 $roles['editinginstructor']);
+        $this->student = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+        $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->enrol_reg_user($this->student->id,
                              $this->course->id,
-                             $roles['editinginstructor']);
+                             $roles['student']);
 
-        // Set instructor as the person modifying grade items.
+        // Set instructor as the person modifying grades.
         $this->setUser($this->instructor);
+
+        // Create graded activity, no adhoc tasks should be created, because
+        // $CFG->gradebook_send_updates is not set yet.
+        $this->assign = $this->getDataGenerator()
+                ->create_module('assign', array('course' => $this->course->id));
 
         // Set MyUCLA gradebook settings.
         set_config('gradebook_id', 99);
@@ -126,17 +190,11 @@ class sendgradeitem_test extends advanced_testcase {
      * @expectedExceptionMessage    Message from MyUCLA
      */
     public function test_execute_myucla_errors() {
-        // Create graded activity and get grade item.
-        $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id));
-        $gradeitem = grade_item::fetch(array('itemtype'     => 'mod',
-                                             'itemmodule'   => 'assign',
-                                             'iteminstance' => $assign->id,
-                                             'courseid'     => $this->course->id));
+        $grade = $this->set_grade(89.99);
 
         // Create task.
         $task = $this->get_mock_myucla_task();
-        $result = $task->set_gradeinfo($gradeitem);
+        $result = $task->set_gradeinfo($grade);
         $this->assertTrue($result);
 
         // Make webservice return MyUCLA status message with error.
@@ -145,7 +203,7 @@ class sendgradeitem_test extends advanced_testcase {
         $returnresult->message = 'Message from MyUCLA';
         $this->mocked_get_webservice_client()
                 ->returnresult
-                ->moodleItemModifyResult = $returnresult;
+                ->moodleGradeModifyResult = $returnresult;
 
         // Execute task, should throw an exception.
         $task->execute();
@@ -157,17 +215,11 @@ class sendgradeitem_test extends advanced_testcase {
      * @expectedException SoapFault
      */
     public function test_execute_soapfault() {
-        // Create graded activity and get grade item.
-        $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id));
-        $gradeitem = grade_item::fetch(array('itemtype'     => 'mod',
-                                             'itemmodule'   => 'assign',
-                                             'iteminstance' => $assign->id,
-                                             'courseid'     => $this->course->id));
+        $grade = $this->set_grade(89.99);
 
         // Create task.
         $task = $this->get_mock_myucla_task();
-        $result = $task->set_gradeinfo($gradeitem);
+        $result = $task->set_gradeinfo($grade);
         $this->assertTrue($result);
 
         // Make webservice throw an exception.
@@ -182,17 +234,11 @@ class sendgradeitem_test extends advanced_testcase {
      * Do a simple test to make sure that parameters were sent.
      */
     public function test_execute_success() {
-        // Create graded activity and get grade item.
-        $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id));
-        $gradeitem = grade_item::fetch(array('itemtype'     => 'mod',
-                                             'itemmodule'   => 'assign',
-                                             'iteminstance' => $assign->id,
-                                             'courseid'     => $this->course->id));
+        $grade = $this->set_grade(89.99);
 
         // Create task.
         $task = $this->get_mock_myucla_task();
-        $result = $task->set_gradeinfo($gradeitem);
+        $result = $task->set_gradeinfo($grade);
         $this->assertTrue($result);
 
         // Execute task.
@@ -208,15 +254,18 @@ class sendgradeitem_test extends advanced_testcase {
     public function test_format_myucla_parameters() {
         global $CFG;
 
-        // Create graded activity.
-        $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id));
+        // Should start with nothing to do.
+        $task = \core\task\manager::get_next_adhoc_task(time());
+        $this->assertNull($task);
 
-        // A grade item should have been automatically generated and an adhoc
-        // task of type send_myucla_grade_item should have been created.
+        // Now give student a grade.
+        $grade = $this->set_grade(100.00);
+
+        // A grade_grade object should have been generated and an adhoc
+        // task of type send_myucla_grade should have been created.
         $task = \core\task\manager::get_next_adhoc_task(time());
         $this->assertNotNull($task);
-        $this->assertEquals('local_gradebook\task\send_myucla_grade_item',
+        $this->assertEquals('local_gradebook\task\send_myucla_grade',
                 get_class($task));
         // Important to call this to release the cron lock.
         \core\task\manager::adhoc_task_complete($task);
@@ -229,35 +278,23 @@ class sendgradeitem_test extends advanced_testcase {
 
         // Make sure the task has the proper elements set.
         $myuclaparams = $task->format_myucla_parameters($course);
-        $gradeitem = grade_item::fetch(array('itemtype'     => 'mod',
-                                             'itemmodule'   => 'assign',
-                                             'iteminstance' => $assign->id,
-                                             'courseid'     => $this->course->id));
 
         // Verify that mInstance is the same.
         $this->assertEquals($CFG->gradebook_id, $myuclaparams['mInstance']['miID']);
         $this->assertEquals($CFG->gradebook_password, $myuclaparams['mInstance']['miPassword']);
 
-        // Verify that mItem is the same.
-        $this->assertEquals($gradeitem->id, $myuclaparams['mItem']['itemID']);
-        $this->assertEquals($gradeitem->itemname, $myuclaparams['mItem']['itemName']);
-        $this->assertEquals($gradeitem->categoryid, $myuclaparams['mItem']['categoryID']);
-
-        $parentcategory = $gradeitem->get_parent_category();
-        $categoryname = empty($parentcategory) ? '' : $parentcategory->fullname;
-        $this->assertEquals($categoryname, $myuclaparams['mItem']['categoryName']);
-
-        $this->assertEquals(!($gradeitem->hidden), $myuclaparams['mItem']['itemReleaseScores']);
-        $result = validateUrlSyntax($myuclaparams['mItem']['itemURL']);
-        $this->assertTrue($result);
-        $this->assertEmpty($myuclaparams['mItem']['itemComment']);
-
-        // Verify that the mClassList info is the same.
-        $this->assertEquals($course->term, $myuclaparams['mClassList'][0]['term']);
-        $this->assertEquals($course->subj_area, $myuclaparams['mClassList'][0]['subjectArea']);
-        $this->assertEquals($course->crsidx, $myuclaparams['mClassList'][0]['catalogNumber']);
-        $this->assertEquals($course->secidx, $myuclaparams['mClassList'][0]['sectionNumber']);
-        $this->assertEquals($course->srs, $myuclaparams['mClassList'][0]['srs']);
+        // Verify that mGrade is the same.
+        $this->assertEquals($grade->id, $myuclaparams['mGrade']['gradeID']);
+        $this->assertEquals($grade->grade_item->id, $myuclaparams['mGrade']['itemID']);
+        $this->assertEquals($course->term, $myuclaparams['mGrade']['term']);
+        $this->assertEquals($course->subj_area, $myuclaparams['mGrade']['subjectArea']);
+        $this->assertEquals($course->crsidx, $myuclaparams['mGrade']['catalogNumber']);
+        $this->assertEquals($course->secidx, $myuclaparams['mGrade']['sectionNumber']);
+        $this->assertEquals($course->srs, $myuclaparams['mGrade']['srs']);
+        $this->assertEquals($course->uidstudent, $myuclaparams['mGrade']['uidStudent']);
+        $this->assertEquals($grade->finalgrade, $myuclaparams['mGrade']['viewableGrade']);
+        $this->assertEmpty($myuclaparams['mGrade']['comment']);
+        $this->assertFalse($myuclaparams['mGrade']['excused']);
 
         // Verify that the mTransaction info is the same.
         $this->assertEquals($this->instructor->idnumber, $myuclaparams['mTransaction']['userUID']);
@@ -272,31 +309,29 @@ class sendgradeitem_test extends advanced_testcase {
         $task = \core\task\manager::get_next_adhoc_task(time());
         $this->assertNull($task);
 
-        // Create graded activity.
-        $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id));
+        // Now give student a grade.
+        $grade = $this->set_grade(100.00);
 
-        // A grade item should have been automatically generated and an adhoc
-        // task of type send_myucla_grade_item should have been created.
+        // A grade_grade object should have been generated and an adhoc
+        // task of type send_myucla_grade should have been created.
         $task = \core\task\manager::get_next_adhoc_task(time());
         $this->assertNotNull($task);
-        $this->assertEquals('local_gradebook\task\send_myucla_grade_item',
+        $this->assertEquals('local_gradebook\task\send_myucla_grade',
                 get_class($task));
         // Important to call this to release the cron lock.
         \core\task\manager::adhoc_task_complete($task);
 
         // Make sure the task has the proper elements set.
-        $gradeinfo = $task->get_custom_data();
-        $gradeitem = grade_item::fetch(array('itemtype'     => 'mod',
-                                             'itemmodule'   => 'assign',
-                                             'iteminstance' => $assign->id,
-                                             'courseid'     => $this->course->id));
+        $gradeinfo  = $task->get_custom_data();
 
         // Verify that grade item info is the same.
-        $this->assertEquals($gradeitem->id, $gradeinfo->id);
-        $this->assertEquals($gradeitem->itemname, $gradeinfo->itemname);
-        $this->assertEquals($gradeitem->categoryid, $gradeinfo->categoryid);
-        $this->assertEquals($gradeitem->hidden, $gradeinfo->hidden);
+        $this->assertEquals($grade->id, $gradeinfo->id);
+        $this->assertEquals($grade->grade_item->courseid, $gradeinfo->courseid);
+        $this->assertEquals($grade->grade_item->id, $gradeinfo->itemid);
+        $this->assertEquals($grade->grade_item->itemtype, $gradeinfo->itemtype);
+        $this->assertEquals(100.00, $gradeinfo->finalgrade);    // We set this earlier.
+        $this->assertEquals($grade->excluded, $gradeinfo->excluded);
+        $this->assertEquals($grade->feedback, $gradeinfo->comment);
 
         // Verify that the transaction user is the same.
         $transactioninfo = $gradeinfo->transactioninfo;

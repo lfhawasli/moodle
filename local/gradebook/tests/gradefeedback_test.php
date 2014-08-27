@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the MyUCLA gradebook webservice integration by using mock objects.
+ * Tests the filtering of text before it is sent to MyUCLA.
  *
  * @package    local_gradebook
  * @category   test
@@ -23,9 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/gradebook/locallib.php');
 
 /**
  * PHPunit testcase class.
@@ -35,26 +32,7 @@ require_once($CFG->dirroot . '/local/gradebook/locallib.php');
  * @group ucla
  * @group local_gradebook
  */
-class gradefeedback_test extends advanced_testcase {
-
-    /**
-     * Course record from the database.
-     * @var object
-     */
-    private $course;
-
-    /**
-     * Assignment record from the database.
-     * @var object
-     */
-    private $assign;
-
-    /**
-     * User object from the database.
-     * @var object
-     */
-    private $student;
-
+class gradefeedback_test extends basic_testcase {
     /**
      * Given a string, return true or false if it contains invalid characters,
      * which arecharacters that have a demical value of 20 or less on the ASCII
@@ -97,7 +75,6 @@ class gradefeedback_test extends advanced_testcase {
                 $retval[] = array($string);
             }
         }
-
         return $retval;
     }
 
@@ -139,104 +116,48 @@ class gradefeedback_test extends advanced_testcase {
     }
 
     /**
-     * Creates test course, student, and assignment to grade.
+     * Tests that HTML is filtered out.
      */
-    protected function setUp() {
-        $this->resetAfterTest(true);
-
-        // Create course.
-        $class = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array());
-        $course = array_pop($class);
-        $this->course = get_course($course->courseid);
-
-        // Create graded activity.
-        $this->assign = $this->getDataGenerator()->create_module('assign',
-                array('course' => $this->course->id));
-
-        $this->student = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_user();
-
-        // Set fake MyUCLA gradebook settings.
-        set_config('gradebook_id', 99);
-        set_config('gradebook_password', 'test');
+    public function test_html_filtering() {
+        $html = "<h1>Hello World!</h1>\n<p>Newline.";
+        $task = new \local_gradebook\task\send_myucla_grade();
+        $filtered = $task->trim_and_strip($html);
+        $this->assertEquals("Hello World!\nNewline.", $filtered);
     }
 
     /**
-     * Tests the filtering of invalid characters in the grade_grades.feedback
-     * column.
+     * Tests the filtering of invalid characters.
      *
      * @dataProvider invalidfeedback_provider
      *
      * @param string $feedback
      */
     public function test_invalid_feedback($feedback) {
-        // Insert student grade/feedback.
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign',
-                    'iteminstance' => $this->assign->id, 'courseid' => $this->course->id));
-
-        $grade = new ucla_grade_grade();
-        $grade->itemid = $gi->id;
-        $grade->userid = $this->student->id;
-        $grade->rawgrade = 80;
-        $grade->finalgrade = 80;
-        $grade->rawgrademax = 100;
-        $grade->rawgrademin = 0;
-        $grade->feedback = $feedback;
-        $grade->timecreated = time();
-        $grade->timemodified = time();
-        $grade->insert();
-
-        // Now create the MyUCLA parameters and make sure feedback is filtered.
-        $courseinfo = ucla_get_course_info($this->course->id);
-        $courseinfo = reset($courseinfo);
-        $courseinfo->uidstudent = $this->student->idnumber;
-        $result = $grade->make_myucla_parameters($courseinfo, 1);
-
-        $isinvalid = $this->has_invalid_characters($result['mGrade']['comment']);
+        $task = new \local_gradebook\task\send_myucla_grade();
+        $feedback = $task->trim_and_strip($feedback);
+        $isinvalid = $this->has_invalid_characters($feedback);
         $this->assertFalse($isinvalid);
     }
 
     /**
-     * Tests the triming of long feedback in the grade_grades.feedback column.
+     * Tests the triming of long feedback.
      */
     public function test_long_feedback() {
-        // Insert student grade/feedback.
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign',
-                    'iteminstance' => $this->assign->id, 'courseid' => $this->course->id));
-
-        $grade = new ucla_grade_grade();
-        $grade->itemid = $gi->id;
-        $grade->userid = $this->student->id;
-        $grade->rawgrade = 80;
-        $grade->finalgrade = 80;
-        $grade->rawgrademax = 100;
-        $grade->rawgrademin = 0;
-        $grade->timemodified = time();
-        $grade->timecreated = time();
-
         // Create super long feedback, over grade_reporter::MAX_COMMENT_LENGTH.
-        $feedback = trim($this->rand_string(grade_reporter::MAX_COMMENT_LENGTH + 100));
+        $maxtextlength = \local_gradebook\task\send_myucla_grade::MAXTEXTLENGTH;
+        $feedback = $this->rand_string($maxtextlength + 100);
         $feedbacklength = textlib::strlen($feedback);
-        $this->assertTrue($feedbacklength > grade_reporter::MAX_COMMENT_LENGTH);
-        $grade->feedback = $feedback;
+        $this->assertTrue($feedbacklength > $maxtextlength);
 
-        $grade->insert();
+        // Make sure feedback is trimed.
+        $task = new \local_gradebook\task\send_myucla_grade();
+        $processedfeedback = $task->trim_and_strip($feedback);
 
-        // Now create the MyUCLA parameters and make sure feedback is trimed.
-        $courseinfo = ucla_get_course_info($this->course->id);
-        $courseinfo = reset($courseinfo);
-        $courseinfo->uidstudent = $this->student->idnumber;
-        $result = $grade->make_myucla_parameters($courseinfo, 1);
-
-        $commentlength = textlib::strlen($result['mGrade']['comment']);
-        $this->assertLessThan($feedbacklength, $commentlength);
-        $endswithellipses = textlib::substr($result['mGrade']['comment'],
-                        -textlib::strlen(get_string('continue_comments',
-                                        'local_gradebook'))) == get_string('continue_comments',
-                        'local_gradebook');
+        $processedlength = textlib::strlen($processedfeedback);
+        $this->assertLessThan($feedbacklength, $processedlength);
+        $endswithellipses = textlib::substr($processedfeedback,
+                -textlib::strlen(get_string('continuecomments', 'local_gradebook')))
+                == get_string('continuecomments', 'local_gradebook');
         $this->assertTrue($endswithellipses);
     }
 
