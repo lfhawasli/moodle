@@ -204,13 +204,15 @@ class sendgradeitem_test extends advanced_testcase {
 
     /**
      * Ensures that format_myucla_parameters() returns the proper parameters.
+     * @group testmenow
      */
     public function test_format_myucla_parameters() {
         global $CFG;
 
-        // Create graded activity.
+        // Create graded activity due 1 week from now.
         $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id));
+                ->create_module('assign', array('course' => $this->course->id, 
+                    'duedate' => strtotime("+1 week")));
 
         // A grade item should have been automatically generated and an adhoc
         // task of type send_myucla_grade_item should have been created.
@@ -248,10 +250,16 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEquals($categoryname, $myuclaparams['mItem']['categoryName']);
 
         $this->assertEquals(!($gradeitem->hidden), $myuclaparams['mItem']['itemReleaseScores']);
-        $result = validateUrlSyntax($myuclaparams['mItem']['itemURL']);
-        $this->assertTrue($result);
+        $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['itemURL']));
+        $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['editItemURL']));
         $this->assertEmpty($myuclaparams['mItem']['itemComment']);
+        $this->assertEquals($gradeitem->grademax, $myuclaparams['mItem']['itemMaxScore']);
 
+        // Need to make sure that itemDue is send in yyyy-mm-dd hh:mm:ss.fff, 
+        // where fff stands for milliseconds, format.
+        $expecteddatetime = date('Y-m-d H:i:s.000', $assign->duedate);
+        $this->assertEquals($expecteddatetime, $myuclaparams['mItem']['itemDue']);
+        
         // Verify that the mClassList info is the same.
         $this->assertEquals($course->term, $myuclaparams['mClassList'][0]['term']);
         $this->assertEquals($course->subj_area, $myuclaparams['mClassList'][0]['subjectArea']);
@@ -272,7 +280,7 @@ class sendgradeitem_test extends advanced_testcase {
         $task = \core\task\manager::get_next_adhoc_task(time());
         $this->assertNull($task);
 
-        // Create graded activity.
+        // Create graded activity due 1 week from now.
         $assign = $this->getDataGenerator()
                 ->create_module('assign', array('course' => $this->course->id));
 
@@ -296,7 +304,8 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEquals($gradeitem->id, $gradeinfo->id);
         $this->assertEquals($gradeitem->itemname, $gradeinfo->itemname);
         $this->assertEquals($gradeitem->categoryid, $gradeinfo->categoryid);
-        $this->assertEquals($gradeitem->hidden, $gradeinfo->hidden);
+        $this->assertEquals($gradeitem->hidden, $gradeinfo->hidden);        
+        $this->assertEquals($gradeitem->grademax, $gradeinfo->grademax);
 
         // Verify that the transaction user is the same.
         $transactioninfo = $gradeinfo->transactioninfo;

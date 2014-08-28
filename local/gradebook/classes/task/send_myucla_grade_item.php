@@ -25,6 +25,9 @@
 namespace local_gradebook\task;
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->libdir . '/grade/grade_item.php');
+
 /**
  * Processes information from the grade_item object and produces data that can
  * be used to communication with the MyUCLA gradebook webservice.
@@ -49,13 +52,68 @@ class send_myucla_grade_item extends send_myucla_base {
      *                  be sent to MyUCLA
      */
     public function format_myucla_parameters($courseinfo) {
-        global $CFG;
+        global $CFG, $DB;
 
         $gradeinfo = $this->get_custom_data();
 
         // Person who made/changed grade.
         $transactioninfo = $gradeinfo->transactioninfo;
 
+        // Some data we cannot afford to get during set_gradeinfo(), because
+        // if involves database lookups, so we do them here. But the downside
+        // is that the grade item/course module might have been deleted since
+        // this task was issued.
+        $deleted = $gradeinfo->deleted;
+
+        // Get grade item so that we can query for the parent category.
+        $gradeitem = \grade_item::fetch(array('id' => $gradeinfo->id));
+        if (empty($gradeitem)) {
+            $deleted = true;
+        } else {
+            // Set category name.
+            $parentcategory = $gradeitem->get_parent_category();
+            $gradeinfo->categoryname = empty($parentcategory) ? '' : $parentcategory->fullname;       
+        }
+        
+        // Get course module info from the module table, so that we can look up
+        // the itemdue value.
+        $gradeinfo->itemdue = '';
+        if (!empty($gradeitem) && $gradeitem->itemtype == 'mod') {
+            // Need to get actualy db record for module.
+            $record = $DB->get_record($gradeitem->itemmodule,
+                    array('id' => $gradeitem->iteminstance));
+            if (!empty($record)) {
+                $gradeinfo->itemdue = $this->get_itemdue($gradeitem->itemmodule, $record);
+            }
+        }
+
+        // Create link to view grade item. Course modules have a special way to 
+        // get their view url.
+        $gradeinfo->url = '';
+        if (!empty($gradeitem)) {
+            $modinfo = get_fast_modinfo($gradeitem->courseid);
+            if (isset($modinfo->instances[$gradeitem->itemmodule][$gradeitem->iteminstance])) {
+                $cminfo = $modinfo->instances[$gradeitem->itemmodule][$gradeitem->iteminstance];
+                $gradeinfo->url = $cminfo->url;
+            }
+        }
+
+        // Create link to edit grade item. We will link directly to QuickEdit.
+        $gradeinfo->editurl = '';
+        if (!empty($gradeitem)) {
+            $gradeinfo->editurl = new \moodle_url('/grade/report/quick_edit/index.php',
+                    array('id'      => $gradeitem->courseid,
+                          'itemid'  => $gradeitem->id,
+                          'item'    => 'grade'));
+            echo 'editurl = ' . $gradeinfo->editurl;
+        }
+        
+        // Set variables to notify deletion.
+        if (!empty($deleted)) {
+            $gradeinfo->comment    = get_string('deleted', 'local_gradebook');
+            $gradeinfo->hidden      = 1;
+        }        
+        
         return array(
             'mInstance' => array(
                 'miID'          => $CFG->gradebook_id,
@@ -67,11 +125,11 @@ class send_myucla_grade_item extends send_myucla_base {
                 'categoryID'        => $gradeinfo->categoryid,
                 'categoryName'      => $gradeinfo->categoryname,
                 'itemReleaseScores' => !($gradeinfo->hidden),
-                // The itemDue field shouldn't be sent right now, but in the
-                // future change this to be the real due date for an activity.
-                //'itemDue'           => $gradeinfo->itemdue,
                 'itemURL'           => $gradeinfo->url,
+                'itemEditURL'       => '',
                 'itemComment'       => $gradeinfo->comment,
+                'itemMaxScore'      => $gradeinfo->grademax,
+                'itemDue'           => $gradeinfo->itemdue 
             ),
             'mClassList' => array(
                 array(
@@ -104,8 +162,64 @@ class send_myucla_grade_item extends send_myucla_base {
     }
 
     /**
-     * Given a grade object (grade_item or grade_grade) get the necessary
-     * data to later sent the information to MyUCLA and store it.
+     * Get due date. There isn't a standard due date field, so we have to hard 
+     * code special case handling for certain modules.
+     *
+     * @param string $modname       Name of course module.
+     * @param stdClass $coursemod   Record from the course module's data table.
+     * @return string   Returns datetime formatted in ISO8601 format. Returns
+     *                  empty string if no due date was found.
+     */
+    private function get_itemdue($modname, $coursemod) {
+        $itemduefield = null;
+        $itemdue = '';
+
+        switch ($modname) {
+            case 'assign':                
+                $itemduefield = 'duedate';
+                break;
+            case 'assignment':
+            case 'nanogong':
+                $itemduefield = 'timedue';
+                break;
+            case 'choice':
+            case 'feedback':
+            case 'quiz':                
+            case 'scorm':
+                $itemduefield = 'timeclose';
+                break;
+            case 'data':
+            case 'forum':
+            case 'glossary':            
+                $itemduefield = 'assesstimefinish';
+                break;
+            case 'elluminate':                    
+                $itemduefield = 'timeend';
+                break;
+            case 'lesson':
+                $itemduefield = 'deadline';
+                break;          
+            case 'questionnaire':
+                $itemduefield = 'closedate';
+                break;          
+            case 'workshop':
+                $itemduefield = 'assessmentend';
+                break;              
+            default:
+                // Not a course module we can handle.
+        }
+        if (!empty($itemduefield) && isset($coursemod->$itemduefield) && 
+                !empty($coursemod->$itemduefield)) {
+            // MyUCLA is expecting the datetime to be in the following format:
+            // yyyy-mm-dd hh:mm:ss.fff, where fff stands for milliseconds.
+            $itemdue = date('Y-m-d H:i:s.000', $coursemod->$itemduefield);
+        }
+        return $itemdue;
+    }
+    
+    /**
+     * Given a grade_item object get the necessary data to later sent the 
+     * information to MyUCLA and store it.
      *
      * @param grade_item $gradeitem
      * @return boolean  Returns false if item should not be sent to MyUCLA,
@@ -116,7 +230,7 @@ class send_myucla_grade_item extends send_myucla_base {
         global $CFG;
 
         if (get_class($gradeitem) != 'grade_item') {
-            throw new \Exception(get_class($gradeitem).' must a grade_item.');
+            throw new \Exception(get_class($gradeitem).' must be a grade_item.');
         }
 
         if (!$this->should_send_to_myucla($gradeitem->courseid, $gradeitem->itemtype)) {
@@ -127,23 +241,12 @@ class send_myucla_grade_item extends send_myucla_base {
         $gradeinfo              = new \stdClass();
         $gradeinfo->categoryid  = $gradeitem->categoryid;
         $gradeinfo->courseid    = $gradeitem->courseid;
+        $gradeinfo->deleted     = isset($gradeitem->deleted) ? $gradeitem->deleted : false;
+        $gradeinfo->grademax    = $gradeitem->grademax;
         $gradeinfo->hidden      = $gradeitem->hidden;
         $gradeinfo->id          = $gradeitem->id;
         $gradeinfo->itemname    = $gradeitem->itemname;
         $gradeinfo->itemtype    = $gradeitem->itemtype;
-
-        // Set category name.
-        $parentcategory = $gradeitem->get_parent_category();
-        $gradeinfo->categoryname = empty($parentcategory) ? '' : $parentcategory->fullname;
-
-        // Create link to grade item.
-        $url = new \moodle_url('/grade/edit/tree/item.php',
-                array('courseid'        => $gradeitem->courseid,
-                      'id'              => $gradeitem->id,
-                      'gpr_type'        => 'edit',
-                      'gpr_plugin'      => 'tree',
-                      'gpr_courseid'    => $gradeitem->courseid));
-        $gradeinfo->url = $url->out();
 
         // Get any comments for the item.
         if (isset($this->iteminfo)) {
@@ -151,12 +254,6 @@ class send_myucla_grade_item extends send_myucla_base {
                     $this->trim_and_strip($this->iteminfo);
         } else {
             $gradeinfo->comment = '';
-        }
-
-        // Set variables to notify deletion.
-        if (!empty($gradeitem->deleted)) {
-            $gradeinfo->comment    = get_string('deleted', 'local_gradebook');
-            $gradeinfo->hidden      = 1;
         }
 
         // Now store info on who made changes.
