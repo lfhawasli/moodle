@@ -9,12 +9,8 @@ $string['nousers'] = 'WARNING: User in course but could not find matching role a
 $string['badenrol'] = 'WARNING: User enrolled in more than one child course of a cross-listed course.';
 
 // Log
-$string['eventgradesexported'] = 'Grades exported';
-$string['eventgradesexportedmyucla'] = 'Grades exported (myucla)';
-$string['eventgradesexportedods'] = 'Grades exported (ods)';
-$string['eventgradesexportedtxt'] = 'Grades exported (txt)';
-$string['eventgradesexportedxls'] = 'Grades exported (xls)';
-$string['eventgradesexportedxml'] = 'Grades exported (xml)';
+$string['eventgradesexported'] = 'Grades exported ({$a})';
+$string['eventgradesexportviewed'] = 'Grade {$a} export viewed';
 $string['eventgradesviewed'] = 'Gradebook {$a} report viewed';
 $string['gradesuccess'] = 'grade sent to MyUCLA';
 $string['gradefail'] = 'failed to send grade to MyUCLA';

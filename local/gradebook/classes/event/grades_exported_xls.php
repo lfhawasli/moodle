@@ -15,10 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The Grade export event class.
+ *
+ * @package    local_gradebook
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace local_gradebook\event;
-
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event class for exporting grades in XLS format.
+ *
+ * @since     Moodle 2.7
+ * @copyright 2014 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class grades_exported_xls extends grades_exported {
 
     /**
@@ -26,6 +39,6 @@ class grades_exported_xls extends grades_exported {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventgradesexportedxls', 'local_gradebook');
+        return get_string('eventgradesexported', 'local_gradebook', 'xls');
     }
 }

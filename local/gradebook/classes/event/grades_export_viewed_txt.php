@@ -16,29 +16,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The Grade export event class.
+ * The Grade export view event class.
  *
  * @package    local_gradebook
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace local_gradebook\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Event class for exporting grades in MyUCLA format.
+ * Event class for viewing TXT grade export page.
  *
  * @since     Moodle 2.7
  * @copyright 2014 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grades_exported_myucla extends grades_exported {
+
+class grades_export_viewed_txt extends grades_export_viewed {
 
     /**
      * Returns the name of the event.
      * @return string
      */
     public static function get_name() {
-        return get_string('eventgradesexported', 'local_gradebook', 'myucla');
+        return get_string('eventgradesexportviewed', 'local_gradebook', 'txt');
     }
 }
