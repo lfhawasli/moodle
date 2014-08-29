@@ -38,7 +38,7 @@ $string['pluginname_help'] = 'In response to a question (that may include an ima
 $string['pluginname_link'] = 'question/type/poodllrecording';
 $string['pluginnameadding'] = 'Adding a PoodLL recording question';
 $string['pluginnameediting'] = 'Editing a PoodLL recording question';
-$string['pluginnamesummary'] = 'Allows a recorded audio or video response. This must then be graded manually.';
+$string['pluginnamesummary'] = 'Allows an audio recording, video recording, webcam snapshot or whiteboard drawing response. This must then be graded manually.';
 $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
 $string['backimage'] = 'Whiteboard background image';
@@ -51,4 +51,5 @@ $string['x800x600'] = '800 x 600';
 $string['x600x800'] = '600 x 800';
 $string['norecording'] = 'no recording found';
 $string['currentresponse'] = 'Current Response:<br />';
+$string['timelimit'] = 'Recording time limit';
 
