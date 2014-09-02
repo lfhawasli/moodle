@@ -135,7 +135,16 @@ print_grade_page_head($COURSE->id, 'report', 'grader', $reportname, false, $butt
 
 //Initialise the grader report object that produces the table
 //the class grade_report_grader_ajax was removed as part of MDL-21562
-$report = new grade_report_grader($courseid, $gpr, $context, $page, $sortitemid);
+
+// START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report
+// Use the local grader report if config is set.
+// $report = new grade_report_grader($courseid, $gpr, $context, $page, $sortitemid);
+if (isset($CFG->grader_report_grouping_filter)) {
+    $report = new local_ucla_grade_report_grader($courseid, $gpr, $context, $page, $sortitemid, $groupingid);
+} else {
+    $report = new grade_report_grader($courseid, $gpr, $context, $page, $sortitemid);
+}
+// END UCLA MOD: CCLE-4295
 $numusers = $report->get_numusers(true, true);
 
 // make sure separate group does not prevent view
@@ -161,7 +170,11 @@ echo $report->group_selector;
 $url = new moodle_url('/grade/report/grader/index.php', array('id' => $course->id));
 $firstinitial = isset($SESSION->gradereport['filterfirstname']) ? $SESSION->gradereport['filterfirstname'] : '';
 $lastinitial  = isset($SESSION->gradereport['filtersurname']) ? $SESSION->gradereport['filtersurname'] : '';
-$totalusers = $report->get_numusers(true, false);
+// START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report
+// Keep the total number of participants constant as you switch groups.
+// $totalusers = $report->get_numusers(true, false);
+$totalusers = $report->get_numusers(false, true);
+// END UCLA MOD: CCLE-4295
 $renderer = $PAGE->get_renderer('core_user');
 echo $renderer->user_search($url, $firstinitial, $lastinitial, $numusers, $totalusers, $report->currentgroupname);
 
