@@ -101,7 +101,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $retval = array();  // Used to assert files are queried properly.
         $fs = get_file_storage();
         foreach ($contents as $index => $options) {
-            $cm = $generator->create_instance(array('course' => $this->course->id), $options);
+            $resource = $generator->create_instance(array('course' => $this->course->id), $options);
+            $cm = get_coursemodule_from_instance('resource', $resource->id);
             // Generator creates files named like this.
             $sectionnum = 0;
             if (isset($options['section'])) {
