@@ -73,7 +73,20 @@ if ($delete === md5($course->timemodified)) {
 
 $strdeletecheck = get_string("deletecheck", "", $courseshortname);
 $strdeletecoursecheck = get_string("deletecoursecheck");
-$message = "{$strdeletecoursecheck}<br /><br />{$coursefullname} ({$courseshortname})";
+// START UCLA MOD: CCLE-4415 - Prompt deletion warning.
+//$message = "{$strdeletecoursecheck}<br /><br />{$coursefullname} ({$courseshortname})";
+require_once($CFG->dirroot . '/report/uclastats/reports/active_instructor_focused.php');
+$activeinstructorfocused = new active_instructor_focused($USER);
+if ($activeinstructorfocused->has_additional_course_content($course)) {
+    $warningmsg = get_string('deletecoursewarning', 'local_ucla');
+    $strdeletecoursecheck = html_writer::tag('strong', $warningmsg) .
+            html_writer::empty_tag('br') . $strdeletecoursecheck;
+} else {
+    $strdeletecoursecheck = get_string('deletecoursesafe', 'local_ucla') . ' ' .
+            $strdeletecoursecheck;
+}
+$message = $strdeletecoursecheck;
+// END UCLA MOD: CCLE-4415.
 
 $continueurl = new moodle_url('/course/delete.php', array('id' => $course->id, 'delete' => md5($course->timemodified)));
 
