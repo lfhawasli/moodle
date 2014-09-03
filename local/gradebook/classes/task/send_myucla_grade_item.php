@@ -67,12 +67,15 @@ class send_myucla_grade_item extends send_myucla_base {
 
         // Get grade item so that we can query for the parent category.
         $gradeitem = \grade_item::fetch(array('id' => $gradeinfo->id));
+        $gradeinfo->categoryname = '';
         if (empty($gradeitem)) {
             $deleted = true;
         } else {
             // Set category name.
             $parentcategory = $gradeitem->get_parent_category();
-            $gradeinfo->categoryname = empty($parentcategory) ? '' : $parentcategory->fullname;       
+            if (!empty($parentcategory) && $parentcategory->fullname != '?') {
+                $gradeinfo->categoryname = $parentcategory->fullname;
+            }
         }
         
         // Get course module info from the module table, so that we can look up

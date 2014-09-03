@@ -51,6 +51,11 @@ class sendgradeitem_test extends advanced_testcase {
     private $mockwebservice;
 
     /**
+     * @var resource    Temporary file created to track error_log calls.
+     */
+    private $tmplogfile;
+
+    /**
      * Returns a version of send_myucla_grade_item that has its
      * get_webservice_client() remapped to the mocked_get_webservice_client()
      * method of the current class.
@@ -83,6 +88,22 @@ class sendgradeitem_test extends advanced_testcase {
             $this->mockwebservice = new \local_gradebook\task\mock_webservice();
         }
         return $this->mockwebservice;
+    }
+
+    /**
+     * Provides the actual error codes that the MUCLA moodleItemModify
+     * webservice returns in the moodleItemModifyResult object.
+     *
+     * @return array
+     */
+    public function provider_myucla_webservice_error() {
+        return array(
+            array('Moodle Instance Verify failed'),
+            array('Class list is empty'),
+            array('Failed to process itemID'),
+            array('Failed to process the following class id(s)'),
+            array(' Failed to process the request')
+        );
     }
 
     /**
@@ -120,12 +141,37 @@ class sendgradeitem_test extends advanced_testcase {
     }
 
     /**
+     * Sets the error_log output to be a temporary file.
+     *
+     * @return string
+     */
+    private function set_error_log() {
+        $this->tmplogfile = tmpfile();
+        $metadata = stream_get_meta_data($this->tmplogfile);
+        $tmplogfilename = $metadata['uri'];
+        ini_set('error_log', $tmplogfilename);
+
+        return $tmplogfilename;
+    }
+
+    /**
+     * Clean up temporary php files after each test.
+     */
+    public function tearDown() {
+        if (is_resource($this->tmplogfile)) {
+            // Closing this file handler will delete temporary file.
+            fclose($this->tmplogfile);
+            unset($this->tmplogfile);
+        }
+    }
+
+    /**
      * Test that MyUCLA error codes are handled properly.
      *
-     * @expectedException           Exception
-     * @expectedExceptionMessage    Message from MyUCLA
+     * @dataProvider provider_myucla_webservice_error
+     * @param string $errormsg
      */
-    public function test_execute_myucla_errors() {
+    public function test_execute_myucla_errors($errormsg) {
         // Create graded activity and get grade item.
         $assign = $this->getDataGenerator()
                 ->create_module('assign', array('course' => $this->course->id));
@@ -142,19 +188,32 @@ class sendgradeitem_test extends advanced_testcase {
         // Make webservice return MyUCLA status message with error.
         $returnresult = new \stdClass();
         $returnresult->status = 0;
-        $returnresult->message = 'Message from MyUCLA';
+        $returnresult->message = $errormsg;
         $this->mocked_get_webservice_client()
                 ->returnresult
                 ->moodleItemModifyResult = $returnresult;
 
+        // Make sure that errors are logged.
+        $outputfilename = $this->set_error_log();
+
         // Execute task, should throw an exception.
-        $task->execute();
+        $exceptionthrown = false;
+        try {
+            $task->execute();
+        } catch(\Exception $e) {
+            $exceptionthrown = true;
+        }
+        $this->assertTrue($exceptionthrown);
+
+        // Now read from the file and make sure it contains a error message.
+        $output = file_get_contents($outputfilename);
+        $this->assertNotEmpty(strpos($output,
+                'ERROR: Exception sending data to moodleItemModify webservice: '
+                . $errormsg));
     }
 
     /**
      * Test that SoapFault exceptions are handled properly.
-     *
-     * @expectedException SoapFault
      */
     public function test_execute_soapfault() {
         // Create graded activity and get grade item.
@@ -174,14 +233,30 @@ class sendgradeitem_test extends advanced_testcase {
         $this->mocked_get_webservice_client()->thrownexception =
                 new \SoapFault('code', 'message');
 
+        // Make sure that errors are logged.
+        $outputfilename = $this->set_error_log();
+
         // Execute task, should throw an exception.
-        $task->execute();
+        $exceptionthrown = false;
+        try {
+            $task->execute();
+        } catch(\SoapFault $e) {
+            $exceptionthrown = true;
+        }
+        $this->assertTrue($exceptionthrown);
+
+        // Now read from the file and make sure it contains a error message.
+        $output = file_get_contents($outputfilename);
+        $this->assertNotEmpty(strpos($output,
+                'ERROR: SoapFault sending data to moodleItemModify webservice: [code] message'));
     }
 
     /**
      * Do a simple test to make sure that parameters were sent.
      */
     public function test_execute_success() {
+        global $CFG;
+
         // Create graded activity and get grade item.
         $assign = $this->getDataGenerator()
                 ->create_module('assign', array('course' => $this->course->id));
@@ -195,8 +270,17 @@ class sendgradeitem_test extends advanced_testcase {
         $result = $task->set_gradeinfo($gradeitem);
         $this->assertTrue($result);
 
-        // Execute task.
+        // Make sure success was logged.
+        $CFG->gradebook_log_success = 1;
+        $outputfilename = $this->set_error_log();
+
+        // Execute task. Use output buffering to capture output.
         $task->execute();
+
+        // Now read from the file and make sure it contains a success message.
+        $output = file_get_contents($outputfilename);
+        $this->assertNotEmpty(strpos($output,
+                'SUCCESS: Send data to moodleItemModify webservice'));
 
         // Make sure that parameters were sent.
         $this->assertNotEmpty($this->mockwebservice->lastparams);
@@ -244,11 +328,7 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEquals($gradeitem->id, $myuclaparams['mItem']['itemID']);
         $this->assertEquals($gradeitem->itemname, $myuclaparams['mItem']['itemName']);
         $this->assertEquals($gradeitem->categoryid, $myuclaparams['mItem']['categoryID']);
-
-        $parentcategory = $gradeitem->get_parent_category();
-        $categoryname = empty($parentcategory) ? '' : $parentcategory->fullname;
-        $this->assertEquals($categoryname, $myuclaparams['mItem']['categoryName']);
-
+        $this->assertEmpty($myuclaparams['mItem']['categoryName']);
         $this->assertEquals(!($gradeitem->hidden), $myuclaparams['mItem']['itemReleaseScores']);
         $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['itemURL']));
         $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['editItemURL']));

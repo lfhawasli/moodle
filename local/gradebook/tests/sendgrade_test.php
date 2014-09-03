@@ -65,6 +65,11 @@ class sendgrade_test extends advanced_testcase {
     private $student;
 
     /**
+     * @var resource    Temporary file created to track error_log calls.
+     */
+    private $tmplogfile;
+
+    /**
      * Returns a version of send_myucla_grade_item that has its
      * get_webservice_client() remapped to the mocked_get_webservice_client()
      * method of the current class.
@@ -97,6 +102,37 @@ class sendgrade_test extends advanced_testcase {
             $this->mockwebservice = new \local_gradebook\task\mock_webservice();
         }
         return $this->mockwebservice;
+    }
+
+    /**
+     * Provides the actual error codes that the MUCLA moodleGradeModify
+     * webservice returns in the moodleGradeModifyResult object.
+     *
+     * Note that we will need to replace the placeholder variables in the string
+     * with the actual id.
+     *
+     * @return array
+     */
+    public function provider_myucla_webservice_error() {
+        return array(
+            array('Moodle Instance Verify failed'),
+            array('ItemID <itemid> does not exist'),
+            array('GradeID <gradeid> failed to be processed')
+        );
+    }
+
+    /**
+     * Sets the error_log output to be a temporary file.
+     *
+     * @return string
+     */
+    private function set_error_log() {
+        $this->tmplogfile = tmpfile();
+        $metadata = stream_get_meta_data($this->tmplogfile);
+        $tmplogfilename = $metadata['uri'];
+        ini_set('error_log', $tmplogfilename);
+
+        return $tmplogfilename;
     }
 
     /**
@@ -184,13 +220,28 @@ class sendgrade_test extends advanced_testcase {
     }
 
     /**
+     * Clean up temporary php files after each test.
+     */
+    public function tearDown() {
+        if (is_resource($this->tmplogfile)) {
+            // Closing this file handler will delete temporary file.
+            fclose($this->tmplogfile);
+            unset($this->tmplogfile);
+        }
+    }
+
+    /**
      * Test that MyUCLA error codes are handled properly.
      *
-     * @expectedException           Exception
-     * @expectedExceptionMessage    Message from MyUCLA
+     * @dataProvider provider_myucla_webservice_error
+     * @param string $errormsg
      */
-    public function test_execute_myucla_errors() {
+    public function test_execute_myucla_errors($errormsg) {
         $grade = $this->set_grade(89.99);
+
+        // Need to replace placeholders in error message.
+        $errormsg = str_replace('<itemid>', $grade->grade_item->id, $errormsg);
+        $errormsg = str_replace('<gradeid>', $grade->id, $errormsg);
 
         // Create task.
         $task = $this->get_mock_myucla_task();
@@ -200,19 +251,32 @@ class sendgrade_test extends advanced_testcase {
         // Make webservice return MyUCLA status message with error.
         $returnresult = new \stdClass();
         $returnresult->status = 0;
-        $returnresult->message = 'Message from MyUCLA';
+        $returnresult->message = $errormsg;
         $this->mocked_get_webservice_client()
                 ->returnresult
                 ->moodleGradeModifyResult = $returnresult;
 
+        // Make sure that errors are logged.
+        $outputfilename = $this->set_error_log();
+
         // Execute task, should throw an exception.
-        $task->execute();
+        $exceptionthrown = false;
+        try {
+            $task->execute();
+        } catch(\Exception $e) {
+            $exceptionthrown = true;
+        }
+        $this->assertTrue($exceptionthrown);
+
+        // Now read from the file and make sure it contains a error message.
+        $output = file_get_contents($outputfilename);
+        $this->assertNotEmpty(strpos($output,
+                'ERROR: Exception sending data to moodleGradeModify webservice: '
+                . $errormsg));
     }
 
     /**
      * Test that SoapFault exceptions are handled properly.
-     *
-     * @expectedException SoapFault
      */
     public function test_execute_soapfault() {
         $grade = $this->set_grade(89.99);
@@ -226,8 +290,23 @@ class sendgrade_test extends advanced_testcase {
         $this->mocked_get_webservice_client()->thrownexception =
                 new \SoapFault('code', 'message');
 
+        // Make sure that errors are logged.
+        $outputfilename = $this->set_error_log();
+
         // Execute task, should throw an exception.
-        $task->execute();
+        $exceptionthrown = false;
+        try {
+            $task->execute();
+        } catch(\SoapFault $e) {
+            $exceptionthrown = true;
+        }
+        $this->assertTrue($exceptionthrown);
+
+        // Now read from the file and make sure it contains a error message.
+        $output = file_get_contents($outputfilename);
+        $this->assertNotEmpty(strpos($output,
+                'ERROR: SoapFault sending data to moodleGradeModify webservice: [code] message'));
+
     }
 
     /**

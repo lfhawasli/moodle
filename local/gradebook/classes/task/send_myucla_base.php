@@ -109,13 +109,18 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
 
                 // Success is logged conditionally.
                 if (!empty($CFG->gradebook_log_success)) {
-                    // TODO: Add logging.
+                    // Include only selective information from $parameters.
+                    $message = $this->myucla_parameters_to_string($parameters);
+                    error_log(sprintf('SUCCESS: Send data to %s webservice: %s',
+                            static::WEBSERVICECALL, $message));
                 }
-            } catch (SoapFault $e) {
-                // TODO: Add logging.
+            } catch (\SoapFault $e) {
+                error_log(sprintf('ERROR: SoapFault sending data to %s webservice: [%s] %s',
+                        static::WEBSERVICECALL, $e->faultcode, $e->getMessage()));
                 throw $e;
-            } catch (Exception $e) {
-                // TODO: Add logging.
+            } catch (\Exception $e) {
+                error_log(sprintf('ERROR: Exception sending data to %s webservice: %s',
+                        static::WEBSERVICECALL, $e->getMessage()));
                 throw $e;
             }
         }
@@ -219,6 +224,31 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
             self::$webserviceclient = new \SoapClient($CFG->gradebook_webservice, $settings);
         }
         return self::$webserviceclient;
+    }
+
+    /**
+     * Convert MyUCLA parameters array to a single line string for logging
+     * purposes.
+     *
+     * @param array $parameters
+     */
+    public function myucla_parameters_to_string($parameters) {
+        $retval = '';
+
+        // Remove unnecessary data.
+        unset($parameters['mInstance']);
+        unset($parameters['mTransaction']);
+
+        // Next, squash array into a string.
+        foreach ($parameters as $key => $array) {
+            if (isset($array[0]) && is_array($array[0])) {
+                // Might be a sub-array.
+                $array = reset($array);
+            }
+            $retval .= $key . '::' . implode(':', $array);
+        }
+
+        return $retval;
     }
 
     /**
