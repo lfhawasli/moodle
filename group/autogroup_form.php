@@ -111,6 +111,10 @@ class autogroup_form extends moodleform {
         $mform->disabledIf('nosmallgroups', 'groupby', 'noteq', 'members');
 
         $mform->addElement('header', 'groupinghdr', get_string('grouping', 'group'));
+        // START UCLA MOD: CCLE-4742 - Grouping Name should be indicated as "required".
+        // NOTE: We are simply expanding the Grouping header rather than making Grouping name required.
+        $mform->setExpanded('groupinghdr', true);
+        // END UCLA MOD: CCLE-4742.
 
         $options = array('0' => get_string('nogrouping', 'group'),
                          '-1'=> get_string('newgrouping', 'group'));
