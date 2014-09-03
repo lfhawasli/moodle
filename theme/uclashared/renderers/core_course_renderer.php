@@ -87,10 +87,10 @@ class theme_uclashared_core_course_renderer extends core_course_renderer {
             if (stripos($course->summary, $searchcriteria) !== false) {
                 // Course summary contains search term.
                 $summarysource = $course->summary;
-            } else if (stripos($course->reg_summary, $searchcriteria) !== false) {
+            } else if (isset($course->reg_summary) && stripos($course->reg_summary, $searchcriteria) !== false) {
                 // Registrar summary contains search term.
                 $summarysource = $course->reg_summary;
-            } else if (stripos($course->reg_desc, $searchcriteria) !== false) {
+            } else if (isset($course->reg_desc) && stripos($course->reg_desc, $searchcriteria) !== false) {
                 // Registrar description contains search term.
                 $summarysource = $course->reg_desc;
             } else if (!empty($course->summary)) {

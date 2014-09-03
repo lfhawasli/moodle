@@ -894,15 +894,21 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
-    $sql = "SELECT c.* $ccselect
+    // START UCLA MOD CCLE-3948
+    // $sql = "SELECT c.* $ccselect
+    //           FROM {course} c
+    //        $ccjoin
+    //          WHERE $searchcond AND c.id <> ".SITEID."
+    //       ORDER BY $sort";
+    $sql = "SELECT c.* $ccselect $collab_select $reg_select
               FROM {course} c
-           $collab_join
-           $reg_join
-           $ccjoin
+                   $collab_join
+                   $reg_join
+                   $ccjoin
              WHERE $searchcond AND c.id <> " . SITEID . "
-             $collab_and
+                   $collab_and
           ORDER BY $sort
-             $rest_limit";
+                   $rest_limit";
     // END UCLA MOD CCLE-3948
 
     $rs = $DB->get_recordset_sql($sql, $params);
