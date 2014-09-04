@@ -8,14 +8,14 @@ Feature: Restricting assignment submissions to certain file types.
 Background:
     # Need to be in UCLA theme for alert to show up.
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
         | username | firstname | lastname | email           |
         | teacher  | Teacher   | 1        | teacher@asd.com |
         | student  | Student   | 1        | student@asd.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
         | fullname | shortname |
         | Course 1 | course1   |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
         | user    | course  | role           |
         | teacher | course1 | editingteacher |
         | student | course1 | student        |
@@ -26,7 +26,7 @@ Scenario: Accept only txt files.
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Assignment" to section "1" 
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | Assignment name | Test assignment name |
       | Description | Accept txt only |
       | assignsubmission_file_enabled | 1 |
@@ -42,13 +42,12 @@ Scenario: Accept only txt files.
     When I press "Add submission"
     # I should see the file type that is accepted.
     And I should see "Other documents (odt, txt)"
-    And I upload "lib/tests/fixtures/tabfile.csv" file to "File submissions" filepicker and it fails
+    And I upload "lib/tests/fixtures/tabfile.csv" file to "File submissions" filemanager and it fails
     Then I should see "text/csv filetype cannot be accepted."
     And I reload the page
     # Upload valid file.
-    When I upload "lib/tests/fixtures/empty.txt" file to "File submissions" filepicker
+    When I upload "lib/tests/fixtures/empty.txt" file to "File submissions" filemanager
     And I press "Save changes"
     And I press "Submit assignment"
     And I press "Continue"
     Then I should see "Submitted for grading"
-    
