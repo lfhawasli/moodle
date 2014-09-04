@@ -5,16 +5,16 @@ Feature: Filter users by idnumber
   So that I can quickly find users based on an external key.
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email | idnumber |
-      | teacher1 | Teacher | 1 | teacher@asd.com | 00000002 |
+      | teacher1 | Teacher  | 1 | teacher@asd.com  | 0000002 |
       | student1 | Student1 | 1 | student1@asd.com | 0000003 |
       | student2 | Student2 | 1 | student2@asd.com | 2000000 |
       | student3 | Student3 | 1 | student3@asd.com | 3000000 |
     And I log in as "admin"
-    # Front page settings also has a "Users" node.
-    And I collapse "Front page settings" node
     And I expand "Site administration" node
+    # Front page settings also has a "Users" node.
+    And I expand "Users" node
     And I expand "Users" node
     And I expand "Accounts" node
     When I follow "Browse list of users"
@@ -28,7 +28,7 @@ Feature: Filter users by idnumber
     And I should see "Student2" in the "users" "table"
     And I should see "Student3" in the "users" "table"
     And I follow "Show more..."
-    And I select "is empty" from "id_idnumber_op"
+    And I set the field "id_idnumber_op" to "is empty"
     When I press "Add filter"
     # We should see admin on the user list, the following e-mail is admin's e-mail.
     Then I should see "moodle@moodlemoodle.com" in the "users" "table"
@@ -46,7 +46,7 @@ Feature: Filter users by idnumber
     And I should see "Student2" in the "users" "table"
     And I should see "Student3" in the "users" "table"
     And I follow "Show more..."
-    And I select "<Category>" from "id_idnumber_op"
+    And I set the field "id_idnumber_op" to "<Category>"
     And I set the field "idnumber" to "<Argument>"
     When I press "Add filter"
     Then I should <Admin's Visibility> "moodle@moodlemoodle.com" in the "users" "table"
