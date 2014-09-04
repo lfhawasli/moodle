@@ -8,14 +8,14 @@ Feature: We can enter in grades and view reports from the gradebook
 
   Background: Setup course and users
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email | idnumber |
       | instructor | 1 | Instructor | instructor@ucla.edu | 123456789 |
       | student | 1 | Student | student@ucla.edu | 987654321 |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
         | fullname | shortname | type |
         | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+    And the following ucla "enrollments" exist:
       | user | course | role |
       | instructor | C1 | editinginstructor |
       | student | C1 | student |
@@ -30,7 +30,7 @@ Feature: We can enter in grades and view reports from the gradebook
     And I should see "Simple view"
     And I follow "Simple view"
     And I press "Add grade item"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
         | Item name | Exam |
     And I press "Save changes"
     And I follow "Grades"
@@ -61,7 +61,7 @@ Feature: We can enter in grades and view reports from the gradebook
     And I should see "Simple view"
     And I follow "Simple view"
     And I press "Add grade item"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
         | Item name | Exam |
     And I press "Save changes"
     And I follow "Grades"
@@ -84,11 +84,11 @@ Feature: We can enter in grades and view reports from the gradebook
     And I should see "Simple view"
     And I follow "Simple view"
     And I press "Add grade item"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
         | Item name | Exam1 |
     And I press "Save changes"
     And I press "Add grade item"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
         | Item name | Exam2 |
     And I press "Save changes"
     And I follow "Grades"
