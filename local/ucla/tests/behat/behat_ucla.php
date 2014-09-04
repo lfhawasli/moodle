@@ -381,12 +381,12 @@ class behat_ucla extends behat_files {
      *
      * Future steps are expected to look for certain messages.
      *
-     * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filepicker_field_string>(?:[^"]|\\")*)" filepicker and it fails$/
+     * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filepicker_field_string>(?:[^"]|\\")*)" filemanager and it fails$/
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
      * @param string $filepickerelement
      */
-    public function i_upload_file_to_filepicker_exception($filepath, $filepickerelement) {
+    public function i_upload_file_to_filemanager_exception($filepath, $filepickerelement) {
         global $CFG;
 
         $filepickernode = $this->get_filepicker_node($filepickerelement);
