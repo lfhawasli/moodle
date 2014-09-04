@@ -9,10 +9,10 @@ Feature: Hidden section label
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
       | fullname | shortname | type |
       | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+    And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
 

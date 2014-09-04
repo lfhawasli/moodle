@@ -5,7 +5,7 @@ Feature: Change number of sections for the course
 
 Scenario: Modify number of sections of a course
     Given I am in a ucla environment
-    And a ucla "srs" site exists
+    And a ucla "srs" site exist
     And I log in as "instructor"
     And I go to the default ucla site
     When I follow "Edit settings"

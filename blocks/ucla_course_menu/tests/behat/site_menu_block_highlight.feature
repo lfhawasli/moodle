@@ -6,7 +6,7 @@ Feature: Current section in the site menu block is highlighted.
 
 Scenario: Current section is highlighted in the site menu block
     Given I am in a ucla environment
-    And a ucla "srs" site exists
+    And a ucla "srs" site exist
     And I log in as "instructor"
     And I go to the default ucla site
     When I follow the "Show all" section in the ucla site menu

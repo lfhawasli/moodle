@@ -9,10 +9,10 @@ Background:
     And the following "users" exist:
     | username | firstname | lastname | email |
     | teacher1 | Teacher | 1 | teacher1@abc.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
     | fullname | shortname | type | numsections |
     | course 1 | C1 | srs | 3 |
-    And the following ucla "enrollments" exists:
+    And the following ucla "enrollments" exist:
     | user | course | role |
     | teacher1 | C1 | editingteacher |
 
