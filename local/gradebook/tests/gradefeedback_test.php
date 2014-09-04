@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local gradebook plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ class gradefeedback_test extends basic_testcase {
                     (($current >= 0xE000) && ($current <= 0xFFFD)) ||
                     (($current >= 0x10000) && ($current <= 0x10FFFF))) {
                 // Valid character.
+                continue;
             } else {
                 return true;
             }

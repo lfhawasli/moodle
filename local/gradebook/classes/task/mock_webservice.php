@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local gradebook plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Fixtures for gradebook task tests.
  *
  * @package    local_gradebook
- * @category   phpunit
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,8 +26,7 @@ namespace local_gradebook\task;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Mocks the webservice call to MyUCLA for both the moodleItemModify and
- * moodleGradeModify methods.
+ * Mocks the webservice call to MyUCLA.
  *
  * @package    local_gradebook
  * @category   phpunit

@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local gradebook plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the MyUCLA gradebook webservice task for sending grade items by using
- * mock objects.
+ * Tests the MyUCLA gradebook webservice task for sending grade items.
  *
  * @package    local_gradebook
  * @category   test
@@ -200,7 +199,7 @@ class sendgradeitem_test extends advanced_testcase {
         $exceptionthrown = false;
         try {
             $task->execute();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $exceptionthrown = true;
         }
         $this->assertTrue($exceptionthrown);
@@ -240,7 +239,7 @@ class sendgradeitem_test extends advanced_testcase {
         $exceptionthrown = false;
         try {
             $task->execute();
-        } catch(\SoapFault $e) {
+        } catch (\SoapFault $e) {
             $exceptionthrown = true;
         }
         $this->assertTrue($exceptionthrown);
@@ -288,14 +287,13 @@ class sendgradeitem_test extends advanced_testcase {
 
     /**
      * Ensures that format_myucla_parameters() returns the proper parameters.
-     * @group testmenow
      */
     public function test_format_myucla_parameters() {
         global $CFG;
 
         // Create graded activity due 1 week from now.
         $assign = $this->getDataGenerator()
-                ->create_module('assign', array('course' => $this->course->id, 
+                ->create_module('assign', array('course' => $this->course->id,
                     'duedate' => strtotime("+1 week")));
 
         // A grade item should have been automatically generated and an adhoc
@@ -335,11 +333,11 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEmpty($myuclaparams['mItem']['itemComment']);
         $this->assertEquals($gradeitem->grademax, $myuclaparams['mItem']['itemMaxScore']);
 
-        // Need to make sure that itemDue is send in yyyy-mm-dd hh:mm:ss.fff, 
+        // Need to make sure that itemDue is send in yyyy-mm-dd hh:mm:ss.fff,
         // where fff stands for milliseconds, format.
         $expecteddatetime = date('Y-m-d H:i:s.000', $assign->duedate);
         $this->assertEquals($expecteddatetime, $myuclaparams['mItem']['itemDue']);
-        
+
         // Verify that the mClassList info is the same.
         $this->assertEquals($course->term, $myuclaparams['mClassList'][0]['term']);
         $this->assertEquals($course->subj_area, $myuclaparams['mClassList'][0]['subjectArea']);
@@ -384,7 +382,7 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEquals($gradeitem->id, $gradeinfo->id);
         $this->assertEquals($gradeitem->itemname, $gradeinfo->itemname);
         $this->assertEquals($gradeitem->categoryid, $gradeinfo->categoryid);
-        $this->assertEquals($gradeitem->hidden, $gradeinfo->hidden);        
+        $this->assertEquals($gradeitem->hidden, $gradeinfo->hidden);
         $this->assertEquals($gradeitem->grademax, $gradeinfo->grademax);
 
         // Verify that the transaction user is the same.

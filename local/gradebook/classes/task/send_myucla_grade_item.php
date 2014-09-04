@@ -29,6 +29,8 @@ global $CFG;
 require_once($CFG->libdir . '/grade/grade_item.php');
 
 /**
+ * Sends grade item data to MyUCLA.
+ *
  * Processes information from the grade_item object and produces data that can
  * be used to communication with the MyUCLA gradebook webservice.
  *
@@ -77,7 +79,7 @@ class send_myucla_grade_item extends send_myucla_base {
                 $gradeinfo->categoryname = $parentcategory->fullname;
             }
         }
-        
+
         // Get course module info from the module table, so that we can look up
         // the itemdue value.
         $gradeinfo->itemdue = '';
@@ -90,7 +92,7 @@ class send_myucla_grade_item extends send_myucla_base {
             }
         }
 
-        // Create link to view grade item. Course modules have a special way to 
+        // Create link to view grade item. Course modules have a special way to
         // get their view url.
         $gradeinfo->url = '';
         if (!empty($gradeitem)) {
@@ -110,13 +112,13 @@ class send_myucla_grade_item extends send_myucla_base {
                           'item'    => 'grade'));
             echo 'editurl = ' . $gradeinfo->editurl;
         }
-        
+
         // Set variables to notify deletion.
         if (!empty($deleted)) {
             $gradeinfo->comment    = get_string('deleted', 'local_gradebook');
             $gradeinfo->hidden      = 1;
-        }        
-        
+        }
+
         return array(
             'mInstance' => array(
                 'miID'          => $CFG->gradebook_id,
@@ -132,7 +134,7 @@ class send_myucla_grade_item extends send_myucla_base {
                 'itemEditURL'       => '',
                 'itemComment'       => $gradeinfo->comment,
                 'itemMaxScore'      => $gradeinfo->grademax,
-                'itemDue'           => $gradeinfo->itemdue 
+                'itemDue'           => $gradeinfo->itemdue
             ),
             'mClassList' => array(
                 array(
@@ -178,7 +180,7 @@ class send_myucla_grade_item extends send_myucla_base {
         $itemdue = '';
 
         switch ($modname) {
-            case 'assign':                
+            case 'assign':
                 $itemduefield = 'duedate';
                 break;
             case 'assignment':
@@ -187,31 +189,31 @@ class send_myucla_grade_item extends send_myucla_base {
                 break;
             case 'choice':
             case 'feedback':
-            case 'quiz':                
+            case 'quiz':
             case 'scorm':
                 $itemduefield = 'timeclose';
                 break;
             case 'data':
             case 'forum':
-            case 'glossary':            
+            case 'glossary':
                 $itemduefield = 'assesstimefinish';
                 break;
-            case 'elluminate':                    
+            case 'elluminate':
                 $itemduefield = 'timeend';
                 break;
             case 'lesson':
                 $itemduefield = 'deadline';
-                break;          
+                break;
             case 'questionnaire':
                 $itemduefield = 'closedate';
-                break;          
+                break;
             case 'workshop':
                 $itemduefield = 'assessmentend';
-                break;              
+                break;
             default:
                 // Not a course module we can handle.
         }
-        if (!empty($itemduefield) && isset($coursemod->$itemduefield) && 
+        if (!empty($itemduefield) && isset($coursemod->$itemduefield) &&
                 !empty($coursemod->$itemduefield)) {
             // MyUCLA is expecting the datetime to be in the following format:
             // yyyy-mm-dd hh:mm:ss.fff, where fff stands for milliseconds.
@@ -219,9 +221,9 @@ class send_myucla_grade_item extends send_myucla_base {
         }
         return $itemdue;
     }
-    
+
     /**
-     * Given a grade_item object get the necessary data to later sent the 
+     * Given a grade_item object get the necessary data to later sent the
      * information to MyUCLA and store it.
      *
      * @param grade_item $gradeitem

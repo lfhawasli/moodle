@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA Gradebook customizations plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ namespace local_gradebook\task;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Sends grade data to MyUCLA.
+ *
  * Processes information from the grade_grade object and produces data that can
  * be used to communication with the MyUCLA gradebook webservice.
  *

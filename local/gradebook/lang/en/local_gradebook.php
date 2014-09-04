@@ -1,26 +1,32 @@
 <?php
+// This file is part of the UCLA Gradebook customizations plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['pluginname'] = 'UCLA gradebook customizations';
+/**
+ * Language strings.
+ *
+ * @package    local_gradebook
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $string['continuecomments'] = '... [See full text on class website]';
-
-// Errors
-$string['nousers'] = 'WARNING: User in course but could not find matching role assignments in child courses: userid - {$a->userid}, courseid - {$a->courseid}';
-$string['badenrol'] = 'WARNING: User enrolled in more than one child course of a cross-listed course.';
-
 $string['deleted'] = 'Deleted'; // Used when we indicate to MyUCLA that a grade is deleted.
-// Log
 $string['eventgradesexported'] = 'Grades exported ({$a})';
 $string['eventgradesexportviewed'] = 'Grade {$a} export viewed';
 $string['eventgradesviewed'] = 'Gradebook {$a} report viewed';
-$string['gradesuccess'] = 'grade sent to MyUCLA';
-$string['gradefail'] = 'failed to send grade to MyUCLA';
-$string['gradefailinfo'] = 'General error: GradeID [{$a}]';
-
-$string['connectionfail'] = 'failed to connect with MyUCLA';
-$string['gradeconnectionfailinfo'] = 'Connection error: GradeID [{$a}]';
-$string['itemconnectionfailinfo'] = 'Connection error: ItemID [{$a}]';
-
-$string['itemsuccess'] = 'item update sent to MyUCLA';
-$string['itemfail'] = 'failed to send update to MyUCLA';
-$string['itemfailinfo'] = 'General error: ItemID [{$a}]';
+$string['pluginname'] = 'UCLA gradebook customizations';
+$string['settingsendupdates'] = 'Send gradebook updates';
+$string['settingsendupdateshelp'] = 'When enabled, this will send gradebook notifications to MyUCLA';

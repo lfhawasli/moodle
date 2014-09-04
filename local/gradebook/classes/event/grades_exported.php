@@ -1,6 +1,5 @@
 <?php
-// This file is part of UCLA gradebook customizations local plugin for 
-// Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,7 +40,7 @@ abstract class grades_exported extends \core\event\base {
      * Creates the event.
      */
     protected function init() {
-        $this->data['crud'] = 'r'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 

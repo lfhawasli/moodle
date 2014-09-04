@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local gradebook plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the MyUCLA gradebook webservice task for sending grades by using
- * mock objects.
+ * Tests the MyUCLA gradebook webservice task for sending grades.
  *
  * @package    local_gradebook
  * @category   test
@@ -138,13 +137,14 @@ class sendgrade_test extends advanced_testcase {
     /**
      * Sets given grade for precreated assignment and student.
      *
+     * @param float $grade
      * @return grade_grade  Returns grade_grade object that should be created.
      */
     protected function set_grade($grade) {
         // We are saving grades via the grader report, since the code for it is
         // more straightforward. See /grade/tests/report_graderlib_test.php.
         $gpr = new grade_plugin_return(array('type' => 'report',
-            'plugin'=>'grader', 'courseid' => $this->course->id));
+            'plugin' => 'grader', 'courseid' => $this->course->id));
         $report = new grade_report_grader($this->course->id, $gpr,
                 context_course::instance($this->course->id));
 
@@ -263,7 +263,7 @@ class sendgrade_test extends advanced_testcase {
         $exceptionthrown = false;
         try {
             $task->execute();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $exceptionthrown = true;
         }
         $this->assertTrue($exceptionthrown);
@@ -297,7 +297,7 @@ class sendgrade_test extends advanced_testcase {
         $exceptionthrown = false;
         try {
             $task->execute();
-        } catch(\SoapFault $e) {
+        } catch (\SoapFault $e) {
             $exceptionthrown = true;
         }
         $this->assertTrue($exceptionthrown);
