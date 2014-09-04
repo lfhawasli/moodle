@@ -6,11 +6,11 @@ Feature: Restore course backups with public/private content
 
     Background:
         Given I am in a ucla environment
-        And the following ucla "sites" exists:
+        And the following ucla "sites" exist:
           | fullname | shortname | type |
           | Source | source | instruction |
           | Target | target | instruction |
-        And the following ucla "activities" exists:
+        And the following ucla "activities" exist:
           | activity | course | idnumber | name | intro | section | private | visible |
           | assign | source | assignprivate | Private assign | Private assignment | 0 | 1 | 1 |
           | assign | source | assignpublic | Public assign | Public assignment | 0 | 0 | 1 |
@@ -20,7 +20,7 @@ Feature: Restore course backups with public/private content
           | page | source | pagepublic | Public page | Public page | 2 | 0 | 1 |
           | resource | source | resourceprivate | Private resource | Private resource | 3 | 1 | 1 |
           | resource | source | resourcepublic | Public resource | Public resource | 3 | 0 | 1 |
-        And I log in as ucla "admin"
+        And I log in as "admin"
         And I backup "Source" course using this options:
               | Filename | source_backup.mbz |
 
