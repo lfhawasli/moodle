@@ -58,7 +58,10 @@ if ($id) {
 }
 
 require_login($course, true, $cm);
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+// START UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
+// $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
+// END UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
 require_capability('mod/nanogong:view', $context);
 
 add_to_log($course->id, 'nanogong', 'view', "view.php?id={$cm->id}", $nanogong->name, $cm->id);

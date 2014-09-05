@@ -52,7 +52,11 @@ require_login();
                 <table>
                     <tr>
                         <td><img src="img/nanogong.gif" alt="NanoGong Sound" /></td>
-                        <td><applet id="nanogong" archive="<?php echo "{$CFG->wwwroot}/filter/nanogong/nanogong.jar"; ?>" code="gong.NanoGong" width="130" height="40">
+                        <td>
+                            <!-- START UCLA MOD: CCLE-4650-upgrade-nanogong-work-with-Moodle-2.7-TinyMCE-editor -->
+                            <!-- applet id="nanogong" archive="<?php echo "{$CFG->wwwroot}/filter/nanogong/nanogong.jar"; ?>" code="gong.NanoGong" width="130" height="40" -->
+                            <applet id="nanogong" archive="<?php echo "{$CFG->wwwroot}/filter/nanogong/nanogong.jar"; ?>" code="gong.NanoGong" width="180" height="40">
+                            <!-- END UCLA MOD: CCLE-4650-upgrade-nanogong-work-with-Moodle-2.7-TinyMCE-editor -->
                             <param name="ShowTime" value="true" />
                             <param name="ShowAudioLevel" value="false" />
                             <param name="ShowRecordButton" value="false" />

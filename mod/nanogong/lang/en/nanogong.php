@@ -166,6 +166,5 @@ $string['lockstudent'] = 'Lock this student from further modification';
 $string['submissionlocked'] = 'This submission has been locked from further modifications';
 // START UCLA MOD: CCLE-4156 - Upgrade nanogong to newest version that works with M2.5
 $string['nanogong:addinstance'] = 'Add a new recording';
-// END UCLA MOD: CCLE-4156
-
+// END UCLA MOD: CCLE-4156 - Upgrade nanogong to newest version that works with M2.5
 ?>

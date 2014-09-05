@@ -35,7 +35,10 @@ require_course_login($course);
 
 add_to_log($course->id, 'nanogong', 'view all', 'index.php?id=' . $course->id, '');
 
-$coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+// START UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
+// $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+$coursecontext = context_course::instance($course->id);
+// END UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
 
 $PAGE->set_url('/mod/nanogong/index.php', array('id' => $id));
 $PAGE->set_title(format_string($course->fullname));
