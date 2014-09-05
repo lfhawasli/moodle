@@ -6,18 +6,18 @@ Feature: Import a course with public/private material
 
   Background:
     Given I am in a ucla environment
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
       | fullname | shortname | type |
       | Source   | source | instruction |
       | Target   | target | instruction |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
-    And the following ucla "enrollments" exists:
+    And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | source | editinginstructor |
       | teacher1 | target | editinginstructor |
-    And the following ucla "activities" exists:
+    And the following ucla "activities" exist:
       | activity | course | idnumber | name | intro | section | private | visible |
       | assign | source | assignprivate | Private assign | Private assignment | 0 | 1 | 1 |
       | assign | source | assignpublic | Public assign | Public assignment | 0 | 0 | 1 |

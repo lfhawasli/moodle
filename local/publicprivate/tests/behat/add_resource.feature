@@ -11,14 +11,14 @@ Feature: Adding a resource
           | teacher1 | Teacher | 1 | teacher1@asd.com |
           | student1 | Student | 1 | student1@asd.com |
           | student2 | Student | 2 | student2@asd.com |
-        And the following ucla "sites" exists:
+        And the following ucla "sites" exist:
           | fullname | shortname | type |
           | course 1 | C1 | srs |
-        And the following ucla "enrollments" exists:
+        And the following ucla "enrollments" exist:
           | user | course | role |
           | teacher1 | C1 | editingteacher |
           | student1 | C1 | student |
-        And I log in as ucla "teacher1"
+        And I log in as "teacher1"
         And I browse to site "C1"
         And I turn editing mode on
         
@@ -39,14 +39,14 @@ Feature: Adding a resource
         Then "Test file name" activity should be private
         # Log out and check if student or guest can see activity and resource
         Given I log out
-        And I log in as ucla "student1"
+        And I log in as "student1"
         And I browse to site "C1"
         And I follow "Week 1"
         Then "Test glossary name" activity should be public
         And "Test file name" activity should be public
         And I log out
         # Check that other users or public cannot see private material
-        Given I log in as ucla "student2"
+        Given I log in as "student2"
         And I browse to site "C1"
         And I follow "Week 1"
         Then I should not see "Test glossary name"
@@ -57,14 +57,14 @@ Feature: Adding a resource
         Then I should not see "Test glossary name"
         And I should not see "Test file name"
         # Make material public
-        Given I log in as ucla "teacher1"
+        Given I log in as "teacher1"
         And I browse to site "C1"
         And I follow "Week 1"
         And I turn editing mode on
         And I make "Test file name" public
         And I make "Test glossary name" public
         And I log out
-        And I log in as ucla "student2"
+        And I log in as "student2"
         And I browse to site "C1"
         And I follow "Week 1"
         Then "Test glossary name" activity should be public
