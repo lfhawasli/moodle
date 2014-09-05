@@ -3040,7 +3040,11 @@ class assign {
         $workflowfilter = get_user_preferences('assign_workflowfilter', '');
         $controller = $gradingmanager->get_active_controller();
         $showquickgrading = empty($controller) && $this->can_grade();
-        $quickgrading = get_user_preferences('assign_quickgrading', false);
+        // START UCLA MOD: CCLE-4297 - Have "quick grading" turned on by default
+        //$quickgrading = get_user_preferences('assign_quickgrading', false);
+        $defaultquickgrading = get_config('local_ucla', 'defaultassignquickgrading');
+        $quickgrading = get_user_preferences('assign_quickgrading', $defaultquickgrading);
+        // END UCLA MOD: CCLE-4297
         $showonlyactiveenrolopt = has_capability('moodle/course:viewsuspendedusers', $this->context);
 
         $markingallocation = $this->get_instance()->markingallocation &&
