@@ -329,7 +329,7 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEmpty($myuclaparams['mItem']['categoryName']);
         $this->assertEquals(!($gradeitem->hidden), $myuclaparams['mItem']['itemReleaseScores']);
         $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['itemURL']));
-        $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['editItemURL']));
+        $this->assertTrue(validateUrlSyntax($myuclaparams['mItem']['itemEditURL']));
         $this->assertEmpty($myuclaparams['mItem']['itemComment']);
         $this->assertEquals($gradeitem->grademax, $myuclaparams['mItem']['itemMaxScore']);
 

@@ -110,7 +110,6 @@ class send_myucla_grade_item extends send_myucla_base {
                     array('id'      => $gradeitem->courseid,
                           'itemid'  => $gradeitem->id,
                           'item'    => 'grade'));
-            echo 'editurl = ' . $gradeinfo->editurl;
         }
 
         // Set variables to notify deletion.
@@ -131,7 +130,7 @@ class send_myucla_grade_item extends send_myucla_base {
                 'categoryName'      => $gradeinfo->categoryname,
                 'itemReleaseScores' => !($gradeinfo->hidden),
                 'itemURL'           => $gradeinfo->url,
-                'itemEditURL'       => '',
+                'itemEditURL'       => $gradeinfo->editurl,
                 'itemComment'       => $gradeinfo->comment,
                 'itemMaxScore'      => $gradeinfo->grademax,
                 'itemDue'           => $gradeinfo->itemdue
