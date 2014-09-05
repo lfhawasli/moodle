@@ -67,8 +67,10 @@ echo $OUTPUT->heading($strgroupings);
 
 $data = array();
 if ($groupings = $DB->get_records('groupings', array('courseid'=>$course->id), 'name')) {
+    // START UCLA MOD: CCLE-2229 - Public/Private for Moodle 2.x
     require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
-    $publicprivate_course = new PublicPrivate_Course($course);    
+    $publicprivate_course = new PublicPrivate_Course($course);
+    // START UCLA MOD: CCLE-2229
     
     $canchangeidnumber = has_capability('moodle/course:changeidnumber', $context);
     foreach ($groupings as $gid => $grouping) {
