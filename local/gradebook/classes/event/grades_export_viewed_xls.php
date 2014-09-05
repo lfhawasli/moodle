@@ -1,6 +1,5 @@
 <?php
-// This file is part of UCLA gradebook customizations local plugin for 
-// Moodle - http://moodle.org/
+// This file is part of the UCLA gradebook customizations plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2014 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class grades_export_viewed_xls extends grades_export_viewed {
 
     /**

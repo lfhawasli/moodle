@@ -787,6 +787,15 @@ class grade_grade extends grade_object {
             \availability_grade\callbacks::grade_changed($this->userid);
         }
 
+        // START UCLA MOD: CCLE-4466 - Convert MyUCLA grade transfer into scheduled task
+        $sendmyuclagrade = new \local_gradebook\task\send_myucla_grade();
+        $this->deleted = $deleted;  // Important to pass along.
+        $valid = $sendmyuclagrade->set_gradeinfo($this);
+        if ($valid) {
+            \core\task\manager::queue_adhoc_task($sendmyuclagrade);
+        }
+        // END UCLA MOD: CCLE-4466
+
         require_once($CFG->libdir.'/completionlib.php');
 
         // Bail out immediately if completion is not enabled for site (saves loading
