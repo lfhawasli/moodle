@@ -22,7 +22,7 @@ Feature: Uploading content to sections
   @javascript
   Scenario: Add a hidden section and upload content
     # Add a hidden section.
-    When I log in as ucla "teacher1"
+    When I log in as "teacher1"
     And I follow "course1"
     And I turn editing mode on
     And I follow "Modify sections"
@@ -53,14 +53,14 @@ Feature: Uploading content to sections
     And I log out
 
     # Student should accessible to visible section, but not hidden section.
-    Given I log in as ucla "student1"
+    Given I log in as "student1"
     And I follow "course1"
     When I follow "Show all"
     Then I should not see "new1"
     And I log out
 
     # Upload content to visible section.
-    Given I log in as ucla "teacher1"
+    Given I log in as "teacher1"
     And I follow "course1"
     And I press "Control Panel"
     And I follow "Upload a file"
@@ -78,7 +78,7 @@ Feature: Uploading content to sections
     And I log out
 
     # Student should accessible to visible section, but not hidden section.
-    Given I log in as ucla "student1"
+    Given I log in as "student1"
     And I follow "course1"
     When I follow "Show all"
     Then I should see "visible_file"
