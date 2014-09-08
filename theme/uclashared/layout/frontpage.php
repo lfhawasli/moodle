@@ -58,12 +58,12 @@ echo $OUTPUT->doctype() ?>
 
     <header id="page-header" class="container-fluid">
         <div class="header-main row">
-            <div class="col-sm-6 col-xs-3">
+            <div class="col-sm-1 col-xs-12">
                 <div class="header-logo" >
                     <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
                 </div>
             </div>
-            <div class="col-sm-6 col-xs-9 header-login">
+            <div class="col-sm-11 col-xs-12 header-login">
                 <div class="header-btn-group logininfo" >
                 <?php
                 if ($haslogininfo) {
@@ -77,7 +77,7 @@ echo $OUTPUT->doctype() ?>
             <div class="col-sm-2">
                 <div class="header-shared-server-list">
                 <?php 
-                    echo $OUTPUT->sublogo();
+//                    echo $OUTPUT->sublogo();
                 ?>
                 </div>
             </div>
@@ -85,7 +85,6 @@ echo $OUTPUT->doctype() ?>
                 <?php echo $OUTPUT->weeks_display() ?>
             </div>
         </div>
-        
     </header>
 <!-- END OF HEADER -->
 
@@ -96,8 +95,8 @@ echo $OUTPUT->doctype() ?>
                 <div id="region-main-wrap" >
                     <div id="region-main">
                         <div class="region-content">
+                            <?php echo $OUTPUT->blocks_for_region('side-pre') ?>
                             <?php echo core_renderer::MAIN_CONTENT_TOKEN ?>
-                            <?php echo $OUTPUT->blocks_for_region('side-post') ?>
                         </div>
                     </div>
                 </div>
@@ -105,7 +104,7 @@ echo $OUTPUT->doctype() ?>
                 <?php if ($hassidepre) { ?>
                 <div id="region-pre" class="block-region">
                     <div class="region-content">
-                        <?php echo $OUTPUT->blocks_for_region('side-pre') ?>
+                        <!--  empty on purpose-->
                     </div>
                 </div>
                 <?php } ?>
@@ -113,7 +112,7 @@ echo $OUTPUT->doctype() ?>
                 <?php if ($hassidepost) { ?>
                 <div id="region-post" class="block-region">
                     <div class="region-content">
-                        
+                        <?php echo $OUTPUT->blocks_for_region('side-post') ?>
                     </div>
                 </div>
                 <?php } ?>

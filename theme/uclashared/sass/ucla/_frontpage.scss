@@ -1,0 +1,157 @@
+//
+
+$frontpage-logo-bar-width:  175px;
+
+// Frontpage layout namespace
+.pagelayout-frontpage {
+    
+    // Embed the image on the #page wrapper element
+    #page {
+        background: url([[pix:theme|frontpage-image]]) no-repeat;
+        background-position: 50% 20%;
+        height: 100%;
+        /*z-index: -2;*/
+        min-height: 1000px;
+    }
+    
+    header {
+        z-index: 999;
+        height: 500px;
+        margin-bottom: 0;
+        
+        .header-main {
+            position: relative;
+            width: auto;
+            opacity: 0.9;
+            background: none;
+        }
+        .header-logo {
+            width: 160px;
+        }
+        .header-system {
+            margin-top: 8px;
+        }
+        .header-system {
+            background: none;
+            clear: both;
+            /*z-index: 999;*/
+            opacity: 0.9;
+        }
+        .header-system-name {
+            
+            color: white !important;
+            font-weight: 300;
+            /*background-color: $ucla-blue;*/
+        }
+        .logo-ccle-sub {
+            /*width: 100%;*/
+            display: block;
+            width: 160px;
+        }
+        .header-btn-group {
+            background-color: $ucla-blue;
+        }
+    }
+    
+    // Reflow the structure of #page-content so it all fits in a single column
+    #page-content {
+        background-color: white;
+        position: absolute;
+        opacity: .95;
+        border-left: $frontpage-logo-bar-width solid $ucla-blue;
+        
+        width: 240px;
+        min-width: 220px;
+        height: 100%;
+        
+        // Make sure content can be scrolled if needed.
+        overflow-y: scroll;
+        
+        @include box-sizing(content-box);
+        
+        .region-content {
+            padding: 0;
+        }
+        #region-main-wrap {
+            right: 0;
+            width: 100%;
+        }
+        #region-main {
+            margin: 0;
+        }
+        #region-main-box {
+            left: 0;
+            width: 100%;
+        }
+        #region-post-box {
+            margin-left: 0;
+            left: 0;
+        }
+        #region-pre {
+            left: 0;
+            margin-left: 0;
+            width: 100%;
+        }
+        #region-post {
+            width: 100%;
+        }
+        
+        .contentwithoutlink  {
+            padding: 0;
+        }
+    }
+    
+    .block  {
+        margin-bottom: 8px;
+    }
+    
+    .block_ucla_browseby {
+        .header {
+            background-color: #444;
+            margin-bottom: 0;
+            border-bottom: 0;
+            
+            h2 {
+                color: white;
+                text-align: left;
+            }
+        }
+        li.type_structure {
+            border: 0;
+            background-color: white;
+            
+            &:hover {
+                background-color: #eee;
+            }
+            
+            p.tree_item {
+                padding: 0 8px !important;
+            }
+        }
+        a, a:link {
+            color: #666  !important;
+            line-height: 2.4 !important;
+        }
+    }
+    
+    .box.sitetopic {
+        padding: 4px;
+        
+        .section {
+            margin: auto 0;
+        }
+        .mod-indent-outer {
+            padding-left: 0;
+        }
+        .label.modtype_label {
+            &:hover {
+                background-color: white;
+            }
+        }
+        h1 {
+            font-size: 3rem;
+            margin-top: 0;
+        }
+    }
+}
+

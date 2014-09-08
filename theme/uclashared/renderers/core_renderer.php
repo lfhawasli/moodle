@@ -594,6 +594,10 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         return $this->single_button($url, $editstring);
     }
+    
+    protected function course_logo() {
+        return '';
+    }
 
     /*
      * Override the notification in order to include the warning style.

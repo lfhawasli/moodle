@@ -1,27 +1,26 @@
 
+
+/* Remove background color and disable fixed positioning from header */
+header .header-main {
+    background-color: white !important;
+    position: inherit;
+    width: auto;
+}
+
+/* Environment color */
+header .header-main .header-btn-group {
+    background-color: #3d6196;
+}
+
+/* Structural fix */
+header .header-system {
+    margin-top: 0;
+}
+
 .uclashared-course-logo {
-    display: inline-block;
-    margin-left: 5px;
-    max-width: 225px;
-    height: 80px;
-    max-height: 80px;
-    overflow: hidden;
+    max-width: 180px;
 }
 
-.uclashared-course-logo > img {
-    max-width: 225px;
-    max-height: 80px;
-}
-
-.uclashared-course-logo-divider {
-    display: inline-block;
-    margin-left: 10px;
-}
-
-#uclalogo {
-    height: 89px;
-}
-
-#uclalogo  div > img {
-    display: inline;
+.uclashared-course-logo img {
+    width: 100%;
 }

@@ -74,6 +74,7 @@ header {
         opacity: 0.97;
         position: absolute;
         top: 40px;
+        z-index: 99999;
         
         @include box-shadow(#999 0px 1px 2px);
 
@@ -202,31 +203,26 @@ header {
     }
 }
 
-// Frontpage layout updates the header
-.pagelayout-frontpage {
+
+.course-logo-layout {
     
-    header {
-        background: url([[pix:theme|ccle-frontpage-2]]) no-repeat;
-        background-position: 50% 50%;
-        height: 500px;
-        margin-bottom: 0;
+    .course-logo-image {
+        width: 180px;
+        float: left;
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+    
+    .course-logo-title {
+        float: left;
         
-        .header-main {
-            position: relative;
-            width: auto;
-            opacity: 0.9;
+        & * {
+            vertical-align: bottom;
         }
-        .header-system {
-            margin-top: 8px;
-        }
-        .header-system {
-            background: none;
-        }
-        .header-system-name {
-            color: white !important;
-            /*font-weight: bold;*/
-            padding-top: 8px;
+        h1 {
+            margin: 0;
+            font-weight: 300;
+            margin-top: 10%;
         }
     }
-        
 }

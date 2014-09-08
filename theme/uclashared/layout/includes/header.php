@@ -54,6 +54,23 @@
 <?php
 } 
 
+$courselogos = $OUTPUT->course_logo();
+$fullname = $COURSE->fullname;
+
+if (!empty($courselogos)) { ?>
+<div class="course-logo-layout container-fluid" >
+    <div class="row">
+        <div class="course-logo-image">
+            <?php echo $courselogos ?>
+        </div>
+        <div class="course-logo-title">
+            <h1><?php echo $fullname ?></h1>
+        </div>
+    </div>    
+</div>
+<?php
+}
+
 if ($hasnavbar) { ?>
 <div class="navbar container-fluid">
     <div class="row">
