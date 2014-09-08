@@ -60,9 +60,9 @@ if (!$cutoff) {
 }
 
 if ($term == $cutoff) {
-    echo $OUTPUT->box(get_string('cutoff' . $cutoff, 'block_ucla_browseby'), array('class' => 'noticebox'));
+    echo $OUTPUT->notification(get_string('cutoff' . $cutoff, 'block_ucla_browseby'), 'notifywarning');
 } else if (term_cmp_fn($term, $cutoff) == -1) {
-    echo $OUTPUT->box(get_string('before' . $cutoff, 'block_ucla_browseby'), array('class' => 'noticebox'));    
+    echo $OUTPUT->notification(get_string('before' . $cutoff, 'block_ucla_browseby'), 'notifywarning');    
 }
 
 echo html_writer::tag('div', $innercontents, array('id' => 'browsebymain'));

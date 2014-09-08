@@ -252,8 +252,8 @@ class block_ucla_my_sites extends block_base {
             // server. Only display this info if 'archiveserver' config is set.
             if ((term_cmp_fn($showterm, '12S') == -1) && 
                     (get_config('local_ucla', 'archiveserver'))) {
-                $content[] = $OUTPUT->box(get_string('shared_server_archive_notice', 
-                    'block_ucla_my_sites'), 'noticebox');
+                $content[] = $OUTPUT->notification(get_string('shared_server_archive_notice', 
+                    'block_ucla_my_sites'), 'notifymessage');
             }
         }
         

@@ -48,7 +48,7 @@ if (block_ucla_subject_links::subject_exist($course, $subjarea)) {
     readfile(block_ucla_subject_links::get_location() . $subjarea . '/index.htm');
     ob_end_flush();
 } else {
-    echo $OUTPUT->box(get_string('error', 'block_ucla_subject_links'), 'noticebox');
+    echo $OUTPUT->notification(get_string('error', 'block_ucla_subject_links'), 'notifywarning');
 }               
             
 echo $OUTPUT->footer();

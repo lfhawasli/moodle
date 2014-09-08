@@ -1534,8 +1534,8 @@ function notice_course_status($course) {
     }
 
     if (!empty($noticestring)) {
-        return $OUTPUT->box(get_string($noticestring, 'local_ucla', 
-                $noticeparam), 'noticebox');
+        return $OUTPUT->notification(get_string($noticestring, 'local_ucla', 
+                $noticeparam), 'notifywarning');
     }
 }
 
