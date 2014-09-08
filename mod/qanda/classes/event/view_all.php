@@ -32,50 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class view_all extends \core\event\base {
-    /**
-    * Creates the event.
-    */
-    protected function init() {
-        $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'qanda_entries';
-    }
-    /**
-    * Returns the name of the event.
-    *
-    * @return string
-    */
-    public static function get_name() {
-        return get_string('eventviewall', 'qanda');
-    }
-    /**
-    * Returns a short description for the event.
-    *
-    * NOTE: Must be non-localized string.
-    *
-    * @return string
-    */
-    public function get_description() {
-        return "The user with id '$this->userid' has viewed all qanda entries of course with id '$this->courseid'.";
-    }
-    /**
-    * Returns URL to the course page.
-    *
-    * @return moodle_url
-    */
-    public function get_url() {
-        return new \moodle_url('/mod/qanda/index.php',
-            array('id' => $this->courseid)
-        );
-    }
-    /**
-    * Add data to legacy log.
-    *
-    * @return array
-    */
-    public function get_legacy_logdata() {
-        return array($this->courseid, 'qanda', 'view all', 
-            "index.php?id={$this->courseid}","");
-    }
+class view_all extends \core\event\course_module_instance_list_viewed {
+    // No code required here as the parent class handles it all.
 }
