@@ -42,10 +42,7 @@ $string['areacourseoverviewfiles'] = 'Course summary files';
 $string['arearoot'] = 'System';
 $string['areauserdraft'] = 'Drafts';
 $string['areauserbackup'] = 'User backup';
-// START UCLA MOD: CCLE-3470-Rename-private-files-to-my-ccle-files
-$string['areauserpersonal'] = 'My CCLE files';
-//$string['areauserpersonal'] = 'Private files';
-// END UCLA MOD: CCLE-3470
+$string['areauserpersonal'] = 'Private files';
 $string['areauserprofile'] = 'Profile';
 $string['attachedfiles'] = 'Attached files';
 $string['attachment'] = 'Attachment';
@@ -190,10 +187,7 @@ $string['pluginerror'] = 'Errors in repository plugin.';
 $string['popup'] = 'Click "Login" button to login';
 $string['popupblockeddownload'] = 'The downloading window is blocked, please allow the popup window, and try again.';
 $string['preview'] = 'Preview';
-// START UCLA MOD: CCLE-3470-Rename-private-files-to-my-ccle-files
-$string['privatefilesof'] = '{$a} My CCLE files';
-//$string['privatefilesof'] = '{$a} Private files';
-// END UCLA MOD: CCLE-3470
+$string['privatefilesof'] = '{$a} Private files';
 $string['readonlyinstance'] = 'You cannot edit/delete a read-only instance';
 $string['referencesexist'] = 'There are {$a} alias/shortcut files that use this file as their source';
 $string['referenceslist'] = 'Aliases/Shortcuts';
