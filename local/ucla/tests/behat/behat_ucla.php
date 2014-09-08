@@ -159,6 +159,15 @@ class behat_ucla extends behat_files {
 
                 break;
 
+            case 'roles':
+                // Import UCLA roles.
+                $roles = array();
+                foreach ($data->getHash() as $elementdata) {
+                    $roles[] = $elementdata['role'];
+                }
+                $this->get_data_generator()->create_ucla_roles($roles);
+                break;
+
             case 'role assigns':
                 // Import UCLA roles.
                 $roles = array();
