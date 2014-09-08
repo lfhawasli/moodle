@@ -6,7 +6,7 @@ Feature: Forum reporting
 
   Background:
     Given I am in a ucla environment
-    And a ucla "class" site exists
+    And a ucla "class" site exist
     And I log in as "instructor"
     And I go to the default ucla site
     And I turn editing mode on
@@ -34,11 +34,10 @@ Feature: Forum reporting
     When I log in as "instructor"
     And I go to the default ucla site
     And I follow "Grades"
-    And I press "Administration"
-    And I follow "Forum usage report"
+    And I set the field "jump" to "Forum usage report"
     # Created forum should be in third column (after Announcements and Discussion).
     Then I should see "1" in the ".r1 .lastcol" "css_element"
-    When I uncheck "Show simple view"
+    When I set the field "Show simple view" to ""
     And I press "Go"
     # Initial Posts column.
     Then I should see "1" in the ".r0 td.c7" "css_element"
