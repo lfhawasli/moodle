@@ -491,7 +491,7 @@ if ($coursebuilder->lock_exists()) { // if course build is in progress, let user
 if (!empty($build_notes)) {
     $build_notice = html_writer::tag('div', $build_notes, 
             array('id' => 'uclacourserequestor_notice'));
-    echo $OUTPUT->box($build_notice, 'noticebox');      
+    echo $OUTPUT->notification($build_notice, 'notifymessage');      
 }
 
 foreach ($cached_forms as $gn => $group) {
@@ -517,7 +517,7 @@ if (!empty($changemessages)) {
     $messagestr = implode(html_writer::empty_tag('br'), $changemessages);
 
     if (!empty($messagestr)) {
-        echo $OUTPUT->box($messagestr, 'noticebox');
+        echo $OUTPUT->notification($messagestr, 'notifymessage');
     }
 }
 
@@ -534,7 +534,7 @@ if (!empty($errormessages)) {
                 $viewstr = $message;
             }
 
-            echo $OUTPUT->box(get_string($viewstr, $rucr), 'errorbox');
+            echo $OUTPUT->notification(get_string($viewstr, $rucr), 'notifyproblem');
         }
     }
 }

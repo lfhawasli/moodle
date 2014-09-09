@@ -595,4 +595,22 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         return $this->single_button($url, $editstring);
     }
 
+    /*
+     * Override the notification in order to include the warning style.
+     * 
+     * @param string $message
+     * @param string $classes
+     * @return string HTML
+     */
+    public function notification($message, $classes = 'notifyproblem') {
+        $message = clean_text($message);
+        $type = '';
+
+        if ($classes == 'notifywarning') {
+            $type = 'alert alert-warning';
+            return "<div class=\"$type\">$message</div>";
+        } else {
+            return parent::notification($message, $classes);
+        } 
+    }
 }
