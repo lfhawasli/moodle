@@ -49,7 +49,7 @@ $string['foolin_disability'] = 'http://www.osd.ucla.edu/';
 
 $string['control_panel'] = 'Control Panel';
 
-$string['help_n_feedback'] = 'Help & Feedback';
+$string['help_n_feedback'] = 'Need Help';
 
 $string['copyright_information'] = '&copy; {$a} UC Regents';
 

@@ -291,7 +291,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         // Main Help & Feedback link.
         $hflink = html_writer::span(get_string('help_n_feedback', $this->theme), 'hidden-xs');
         $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
-        $outlink = html_writer::link($helplocale, $icon . $hflink, array('class' => 'btn-header btn-help-feedback'));
+        $outlink = html_writer::link($helplocale, $hflink . $icon, array('class' => 'btn-header btn-help-feedback'));
 
         // Show dropdown menu.
         $menu = $this->custom_menu();

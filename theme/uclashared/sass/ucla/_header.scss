@@ -22,9 +22,7 @@ header {
         width: 100%;
         z-index: 9999;
         height: $header-height;
-        
-        @include background-image(linear-gradient(left top, $header-color-prod, #3d6196));
-        
+    
         // System environment colors
         .env-dev & {
             background-image: none;
