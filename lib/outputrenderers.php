@@ -1921,7 +1921,7 @@ class core_renderer extends renderer_base {
     public function doc_link($path, $text = '', $forcepopup = false) {
         global $CFG;
 
-        $icon = $this->pix_icon('docs', $text, 'moodle', array('class'=>'iconhelp icon-pre'));
+        $icon = $this->pix_icon('docs', '', 'moodle', array('class'=>'iconhelp icon-pre', 'role'=>'presentation'));
 
         $url = new moodle_url(get_docs_url($path));
 
@@ -3565,10 +3565,6 @@ class core_renderer_ajax extends core_renderer {
      * Prepares the start of an AJAX output.
      */
     public function header() {
-        // MDL-39810: IE doesn't support JSON MIME type if version < 8 or when it runs in Compatibility View.
-        $supportsjsoncontenttype = !check_browser_version('MSIE') ||
-                (check_browser_version('MSIE', 8) &&
-                    !(preg_match("/MSIE 7.0/", $_SERVER['HTTP_USER_AGENT']) && preg_match("/Trident\/([0-9\.]+)/", $_SERVER['HTTP_USER_AGENT'])));
         // unfortunately YUI iframe upload does not support application/json
         if (!empty($_FILES)) {
             @header('Content-type: text/plain; charset=utf-8');
