@@ -15,6 +15,13 @@ Feature: Restrict invitable roles depending on site type
       And the following ucla "enrollments" exist:
          | user | course | role |
          | instructor | C1 | editinginstructor |
+      And the following ucla "roles" exist:
+         | role |
+         | instructional_assistant |
+         | editor |
+         | grader |
+         | participant |
+         | visitor |
       And I log in as "instructor"
       And I follow "Course 1"
       And I expand "Users" node
