@@ -30,6 +30,13 @@ require_once($CFG->dirroot . '/course/request_form.php');
 // Where we came from. Used in a number of redirects.
 $url = new moodle_url('/course/request.php');
 // START UCLA MOD CCLE-2389 - redirecting to my-sites instead
+//$return = optional_param('return', null, PARAM_ALPHANUMEXT);
+//if ($return === 'management') {
+//    $url->param('return', $return);
+//    $returnurl = new moodle_url('/course/management.php', array('categoryid' => $CFG->defaultrequestcategory));
+//} else {
+//    $returnurl = new moodle_url('/course/index.php');
+//}
 $returnurl = $CFG->wwwroot . '/my/';
 // END UCLA MOD CCLE-2389
 
@@ -53,6 +60,7 @@ $requestform = new course_request_form($url, compact('editoroptions'));
 $requestform->set_data($data);
 
 // START UCLAMOD CCLE-2389 - override string
+//$strtitle = get_string('courserequest');
 $strtitle = get_string('courserequest', 'tool_uclasiteindicator');
 // END UCLAMOD CCLE-2389 
 $PAGE->set_title($strtitle);
@@ -64,6 +72,10 @@ if ($requestform->is_cancelled()){
 
 } else if ($data = $requestform->get_data()) {
     // START UCLAMOD CCLE-2389 - clean shortname, add request to table, display message
+//    $request = course_request::create($data);
+//
+//    // And redirect back to the course listing.
+//    notice(get_string('courserequestsuccess'), $returnurl);
     siteindicator_manager::clean_shortname($data);
     $request = course_request::create($data);
     siteindicator_manager::create_request($data);
