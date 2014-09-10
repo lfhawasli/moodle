@@ -78,14 +78,7 @@ class block_ucla_search extends block_base {
                             'class' => 'form-control ucla-search-input', 
                             'name' => 'search',
                             'placeholder' => get_string('placeholder', 'block_ucla_search')
-                            )) .
-                html_writer::span(
-                        html_writer::tag('button', 
-                                html_writer::span('', 'glyphicon glyphicon-search'),
-                                array('class' => 'btn btn-primary', 'type' => 'submit')
-                                ),
-                        'input-group-btn'
-                        ),
+                            )),
                 'input-group input-group-' . $size
                 );
         
