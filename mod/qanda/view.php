@@ -59,7 +59,9 @@ comment::init();
 
 /// redirecting if adding a new entry
 if ($tab == QANDA_ADDENTRY_VIEW) {
-    redirect("edit.php?cmid=$cm->id&amp;mode=$mode");
+    $url = new moodle_url('edit.php', array('cmid' => $cm->id, 'mode' => $mode));
+    redirect($url);
+    
 }
 
 /// setting the defaut number of entries per page if not set
@@ -77,13 +79,6 @@ if ($page != 0 && $offset == 0) {
 if ($dp = $DB->get_record('qanda_formats', array('name' => $qanda->displayformat))) {
 /// Based on format->defaultmode, we build the defaulttab to be showed sometimes
     switch ($dp->defaultmode) {
-        /* case 'cat':
-          $defaulttab = qanda_CATEGORY_VIEW;
-          break;
-          case 'author':
-          $defaulttab = qanda_AUTHOR_VIEW;
-          break;        *
-         */
         case 'date':
             $defaulttab = QANDA_DATE_VIEW;
             break;
@@ -187,37 +182,6 @@ switch ($mode = strtolower($mode)) {
             $sortorder = 'desc';
         }
         break;
-
-    /*   case 'cat':    /// Looking for a certain cat
-      $tab = qanda_CATEGORY_VIEW;
-      if ($hook > 0) {
-      $category = $DB->get_record("qanda_categories", array("id" => $hook));
-      }
-      break;
-
-
-
-      case 'term':   /// Looking for entries that include certain term in its question, answer or aliases
-      $tab = QANDA_STANDARD_VIEW;
-      break;
-
-
-
-      case 'author':  /// Looking for entries, browsed by author
-      $tab = qanda_AUTHOR_VIEW;
-      if (!$hook) {
-      $hook = 'ALL';
-      }
-      if (!$sortkey) {
-      $sortkey = 'FIRSTNAME';
-      }
-      if (!$sortorder) {
-      $sortorder = 'asc';
-      }
-      break;
-
-      case 'letter':  /// Looking for entries that begin with a certain letter, ALL or SPECIAL characters
-     */
     default:
         $tab = QANDA_DATE_VIEW; //QANDA_STANDARD_VIEW;
         if (!$hook) {
@@ -273,120 +237,72 @@ if ($tab == QANDA_APPROVAL_VIEW) {
     echo $OUTPUT->header();
 }
 
-
-
-
 /// Info box
 if ($qanda->intro && $showcommonelements) {
-    // echo '<div id="qanda-title">Q & A</div>';
     echo '<div class="titleBox">';
     echo $OUTPUT->box('Q&A', 'generalbox', 'qanda-title');
     echo $OUTPUT->box(format_module_intro('qanda', $qanda, $cm->id), 'generalbox', 'intro');
     echo '</div>';
 }
 
-
-//echo '<br /><div class="controls">';
 /// All this depends if whe have $showcommonelements
 if ($showcommonelements) {
-
-    echo '<div class="add-and-search-box">';
-
+    echo html_writer::start_div('add-and-search-box');
 
 /// To calculate available options
     $availableoptions = '';
 
-/// Decide about to print the import link
-    /* if (has_capability('mod/qanda:import', $context)) {
-      $availableoptions = '<span class="help-link">' .
-      '<a href="' . $CFG->wwwroot . '/mod/qanda/import.php?id=' . $cm->id . '"' .
-      '  title="' . s(get_string('importentries', 'qanda')) . '">' .
-      get_string('importentries', 'qanda') . '</a>' .
-      '</span>';
-      }
-      /// Decide about to print the export link
-      if (has_capability('mod/qanda:export', $context)) {
-      if ($availableoptions) {
-      $availableoptions .= '&nbsp;/&nbsp;';
-      }
-      $availableoptions .='<span class="help-link">' .
-      '<a href="' . $CFG->wwwroot . '/mod/qanda/export.php?id=' . $cm->id .
-      '&amp;mode='.$mode . '&amp;hook=' . urlencode($hook) . '"' .
-      '  title="' . s(get_string('exportentries', 'qanda')) . '">' .
-      get_string('exportentries', 'qanda') . '</a>' .
-      '</span>';
-      } */
-
-
 /// Show the add entry button if allowed
 
     if (has_capability('mod/qanda:write', $context) && $showcommonelements) {
-        echo '<div class="single-button qanda-add-entry">';
-        echo "<form id=\"newentryform\" method=\"get\" action=\"$CFG->wwwroot/mod/qanda/edit.php\">";
-        echo '<div>';
-        echo "<input type=\"hidden\" name=\"cmid\" value=\"$cm->id\" />";
-        echo '<input type="submit" value="' . get_string('addentry', 'qanda') . '" />';
-        echo '</div>';
-        echo '</form>';
-        echo "</div>";
+        $url = new moodle_url('edit.php', array('cmid' => $cm->id, 'mode' => 'approval'));
+        $text = get_string('addentry', 'qanda');
+        $availableoptions.= html_writer::link($url, $text, array('class' => 'btn btn-primary', 'title' => $text));
     }
-
-
 
 /// Decide about to print the approval link
     if (has_capability('mod/qanda:answer', $context)) {
         /// Check we have pending entries
         if ($hiddenentries = $DB->count_records('qanda_entries', array('qandaid' => $qanda->id, 'approved' => 0))) {
-            if ($availableoptions) {
-                $availableoptions .= '<br />';
-            }
-            $availableoptions .='<span class="help-link">' .
-                    '<a href="' . $CFG->wwwroot . '/mod/qanda/view.php?id=' . $cm->id .
-                    '&amp;mode=approval' . '"' .
-                    '  class="approve-link" title="' . s(get_string('waitingapproval', 'qanda')) . '">' .
-                    get_string('waitingapproval', 'qanda') . ' (' . $hiddenentries . ')</a>' .
-                    '</span>';
+            $url = new moodle_url('view.php', array('id' => $cm->id, 'mode' => 'approval'));
+            $text = get_string('waitingapproval', 'qanda') . ' (' . $hiddenentries . ')';
+            $availableoptions.= html_writer::link($url, $text, array('id' => 'approval-link', 'class' => 'btn qanda-approve btn-default', 'title' => $text));
         }
     }
 
 /// Start to print qanda controls
-//        print_box_start('qanda-control clearfix');
-    echo '<div class="qanda-control" style="text-align: right">';
+    echo html_writer::start_div('qanda-control', array('style' => 'text-align: right'));
     echo $availableoptions;
 
 /// The print icon
     if ($showcommonelements and $mode != 'search') {
         if (has_capability('mod/qanda:manageentries', $context) or $qanda->allowprintview) {
-//                print_box_start('printicon');
-            echo '<span class="wrap printicon">';
-            echo " <a title =\"" . get_string("printerfriendly", "qanda") . "\" href=\"print.php?id=$cm->id&amp;mode=$mode&amp;hook=" . urlencode($hook) . "&amp;sortkey=$sortkey&amp;sortorder=$sortorder&amp;offset=$offset\"><img class=\"icon\" src=\"" . $OUTPUT->pix_url('print', 'qanda') . "\" alt=\"" . get_string("printerfriendly", "qanda") . "\" /></a>";
-            echo '</span>';
-//                print_box_end();
+            $url = new moodle_url('print.php', array('id' => $cm->id,
+                'mode' => $mode,
+                'hook' => $hook,
+                'sortkey' => $sortkey,
+                'sortorder' => $sortorder,
+                'offset' => $offset,
+            ));
+            echo html_writer::start_span('wrap printicon');
+            echo html_writer::start_tag('a', array('id' => 'printer', 'class' => 'btn', 'title' => get_string("printerfriendly", "qanda"), 'href' => $url));
+            echo html_writer::img($OUTPUT->pix_url('e/print', 'core'), get_string("printerfriendly", "qanda"), array('id' => 'printer-icon', 'class' => 'icon',));
+            echo html_writer::end_tag('a');
+            echo html_writer::end_span();
         }
     }
 /// End qanda controls
-//        print_box_end(); /// qanda-control
-    echo '</div>';
-
-//        print_box('&nbsp;', 'clearer');
+    echo html_writer::end_div();
 }
 
-
-
-//echo '<div class="add-and-search-box">';
 /// Search box
 if ($showcommonelements) {
-    echo '<div class="search-box">';
-    echo '<form method="post" action="view.php">';
-
-    echo '<table class="box-align-center" border="0">';
-    echo '<tr><td align="center" class="qanda-search-box">';
-
-
+    echo html_writer::start_div('search-box');
+    echo html_writer::start_tag('form', array('method' => 'post', 'action' => 'view.php'));
     if ($mode == 'search') {
-        echo '<input type="text" name="hook" size="20" value="' . s($hook) . '" alt="' . $strsearch . '" /> ';
+        echo html_writer::empty_tag('input', array('type' => 'text', 'class' => 'form-control', 'name' => 'hook', 'placeholder' => get_string('searchterms', 'qanda'), 'value' => $hook, 'alt' => $strsearch));
     } else {
-        echo '<input type="text" name="hook" size="20" value="" alt="' . $strsearch . '" /> ';
+        echo html_writer::empty_tag('input', array('type' => 'text', 'class' => 'form-control', 'name' => 'hook', 'placeholder' => get_string('searchterms', 'qanda'), 'alt' => $strsearch));
     }
     if ($fullsearch || $mode != 'search') {
         $fullsearchchecked = 'checked="checked"';
@@ -397,23 +313,15 @@ if ($showcommonelements) {
     echo '<input type="hidden" name="mode" value="search" />';
     echo '<input type="hidden" name="id" value="' . $cm->id . '" />';
     echo '<label for="fullsearch">' . $strsearchinanswer . '</label>';
-    echo '<input type="submit" value="' . $strsearch . '" name="searchbutton" /> ';
-    echo '</td></tr></table>';
-
-    echo '</form>';
-
-    //echo '<br />';
-    echo "</div>\n";
+    echo html_writer::empty_tag('input', array('type' => 'submit', 'class' => 'submit', 'name' => 'searchbutton', 'value' => $strsearch));
+    echo html_writer::end_tag('form');
+    echo html_writer::end_div();
     echo '<br />';
 }
 
-echo "</div>\n";
-
-
-
+echo html_writer::end_div();
 
 require("tabs.php");
-
 require("sql.php");
 
 /// printing the entries
@@ -439,25 +347,6 @@ if ($allentries) {
     echo '<div class="paging">';
     echo $paging;
     echo '</div>';
-
-    /* //load ratings
-      require_once($CFG->dirroot . '/rating/lib.php');
-      if ($qanda->assessed != RATING_AGGREGATE_NONE) {
-      $ratingoptions = new stdClass;
-      $ratingoptions->context = $context;
-      $ratingoptions->component = 'mod_qanda';
-      $ratingoptions->ratingarea = 'entry';
-      $ratingoptions->items = $allentries;
-      $ratingoptions->aggregate = $qanda->assessed; //the aggregation method
-      $ratingoptions->scaleid = $qanda->scale;
-      $ratingoptions->userid = $USER->id;
-      $ratingoptions->returnurl = $CFG->wwwroot . '/mod/qanda/view.php?id=' . $cm->id;
-      $ratingoptions->assesstimestart = $qanda->assesstimestart;
-      $ratingoptions->assesstimefinish = $qanda->assesstimefinish;
-
-      $rm = new rating_manager();
-      $allentries = $rm->get_ratings($ratingoptions);
-      } */
 
     foreach ($allentries as $entry) {
 

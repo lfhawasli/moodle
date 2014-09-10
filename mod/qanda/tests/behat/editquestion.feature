@@ -25,11 +25,11 @@ Scenario: Make sure students can edit unanswered questions
     And I log in as "student1"
     And I follow "Course 1"
     And I follow "Q&A test"
-    And I press "Ask a question"
+    And I follow "Ask a question"
     And I set the following fields to these values:
       | Question | What is the answer to life, the universe, and everything? |
     And I press "Save changes"
-    And I press "Ask a question"
+    And I follow "Ask a question"
     And I set the following fields to these values:
       | Question | What is my name? |
     And I press "Save changes"

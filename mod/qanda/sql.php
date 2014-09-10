@@ -266,7 +266,7 @@
     }
     $count = $DB->count_records_sql("SELECT COUNT(DISTINCT(ge.id)) $sqlfrom $sqlwhere", $params);
 
-    $limitfrom = $offset;
+    $limitfrom = ( $offset < 0 ) ? 0 : $offset;
     $limitnum = 0;
 
     if ( $offset >= 0 ) {

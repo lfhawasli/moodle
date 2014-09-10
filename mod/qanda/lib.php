@@ -773,17 +773,13 @@ function qanda_print_entry_default($entry, $qanda, $cm) {
     $question = file_rewrite_pluginfile_urls($question, 'pluginfile.php', $context->id, 'mod_qanda', 'question', $entry->id);
     $answer = $entry->answer;
     $answer = file_rewrite_pluginfile_urls($answer, 'pluginfile.php', $context->id, 'mod_qanda', 'answer', $entry->id);
-
-
     $question = preg_replace('/^<p[^>]*>(.*?)<\/p>$/i', '$1', $question); //Remove outer <p></p>
-    $text = html_writer::empty_tag('br');
-    $text.=html_writer::empty_tag('br');
-
-    $text.=html_writer::tag('h3', $entry->entrycount . '. ' . format_text($question, FORMAT_HTML));
-
     $answer = preg_replace('/^<p[^>]*>(.*?)<\/p>$/i', '$1', $answer); //Remove outer <p></p>
 
-    $text.=html_writer::tag('span', format_text($answer, FORMAT_HTML), array('class' => 'nolink'));
+    $text = html_writer::empty_tag('br');
+    $text .= html_writer::empty_tag('br');
+    $text .= html_writer::tag('h3', $entry->entrycount . '. ' . format_text($question, FORMAT_HTML));
+    $text .= html_writer::tag('span', format_text($answer, FORMAT_HTML), array('class' => 'nolink'));
 
     echo ($text);
 }
@@ -797,22 +793,11 @@ function qanda_print_entry_question($entry, $qanda, $cm, $return = false) {
 
     global $OUTPUT;
 
-    //$text = html_writer::tag('h3', format_string($entry->question));
-    //$text = html_writer::tag('title', format_text($entry->question, FORMAT_HTML));
-
     $question = $entry->question;
     $context = context_module::instance($cm->id);
     $question = file_rewrite_pluginfile_urls($question, 'pluginfile.php', $context->id, 'mod_qanda', 'question', $entry->id);
-    /*
-      $options = new stdClass();
-      $options->para = false;
-      $options->trusted = $entry->answertrust;
-      $options->context = $context;
-      $options->overflowdiv = true;
 
-      $text = format_text($answer, $entry->answerformat, $options); */
-    //$text = html_writer::tag('div', format_text($entry->question, FORMAT_HTML), array('class' => 'question-text'));
-    $text = html_writer::tag('div', format_text($question, FORMAT_HTML), array('class' => 'question-text'));
+    $text = format_text($question, FORMAT_HTML);
 
     if (!empty($entry->highlight)) {
         $text = highlight($entry->highlight, $text);
@@ -850,14 +835,7 @@ function qanda_print_entry_answer($entry, $qanda, $cm) {
     $context = context_module::instance($cm->id);
     $answer = file_rewrite_pluginfile_urls($answer, 'pluginfile.php', $context->id, 'mod_qanda', 'answer', $entry->id);
 
-    $options = new stdClass();
-    $options->para = false;
-    $options->trusted = $entry->answertrust;
-    $options->context = $context;
-    $options->overflowdiv = true;
-
-    $text = format_text($answer, $entry->answerformat, $options);
-
+    $text = format_text($answer, FORMAT_HTML);
     // Stop excluding questions from autolinking
     unset($qanda_EXCLUDEQUESTIONS);
 
@@ -924,102 +902,32 @@ function qanda_print_entry_icons($course, $cm, $qanda, $entry, $mode = '', $hook
     global $USER, $CFG, $DB, $OUTPUT;
 
     $context = context_module::instance($cm->id);
-
     $output = false;   //To decide if we must really return text in "return". Activate when needed only!
-    $importedentry = ($entry->sourceqandaid == $qanda->id);
-    $ismainqanda = $qanda->mainqanda;
-
-    $return_alt = '<div class="manage_entry">';
-    $return = '<span class="commands">';
-    // Differentiate links for each entry.
-    $altsuffix = ': ' . strip_tags(format_text($entry->question));
-
-    if (!$entry->approved) {
-        $output = true;
-        $return .= html_writer::tag('span', get_string('entryishidden', 'qanda'), array('class' => 'qanda-hidden-note'));
-    }
-
+    $return_alt = html_writer::start_div('manage_entry');
     $iscurrentuser = ($entry->userid == $USER->id);
 
-    if (has_capability('mod/qanda:manageentries', $context) or (isloggedin() and has_capability('mod/qanda:write', $context) and $iscurrentuser and !$entry->approved)) {
-        // only teachers can export entries so check it out
-        if (has_capability('mod/qanda:export', $context) and !$ismainqanda and !$importedentry) {
-            $mainqanda = $DB->get_record('qanda', array('mainqanda' => 1, 'course' => $course->id));
-            if ($mainqanda) {  // if there is a main qanda defined, allow to export the current entry
-                $output = true;
-                $return .= '<a class="action-icon" title="' . get_string('exporttomainqanda', 'qanda') . '" href="exportentry.php?id=' . $entry->id . '&amp;prevmode=' . $mode . '&amp;hook=' . urlencode($hook) . '"><img src="' . $OUTPUT->pix_url('export', 'qanda') . '" class="smallicon" alt="' . get_string('exporttomainqanda', 'qanda') . $altsuffix . '" /></a>';
-            }
-        }
-
-        if ($entry->sourceqandaid) {
-            $icon = $OUTPUT->pix_url('minus', 'qanda');   // graphical metaphor (minus) for deleting an imported entry
-        } else {
-            $icon = $OUTPUT->pix_url('t/delete');
-        }
-
+    if (has_capability('mod/qanda:manageentries', $context) or ( isloggedin() and has_capability('mod/qanda:write', $context) and $iscurrentuser and ! $entry->approved)) {
         //Decide if an entry is editable:
         // -It isn't a imported entry (so nobody can edit a imported (from secondary to main) entry)) and
         // -The user is teacher or he is a student with time permissions (edit period or editalways defined).
         $ineditperiod = ((time() - $entry->timecreated < $CFG->maxeditingtime) || $qanda->editalways);
-        if (!$importedentry and (has_capability('mod/qanda:manageentries', $context) or ($entry->userid == $USER->id and ($ineditperiod and has_capability('mod/qanda:write', $context))))) {
+        if ((has_capability('mod/qanda:manageentries', $context) || ($entry->userid == $USER->id && ($ineditperiod && has_capability('mod/qanda:write', $context))))) {
             $output = true;
-            $return .= "<a class='action-icon' title=\"" . get_string("delete") . "\" href=\"deleteentry.php?id=$cm->id&amp;mode=delete&amp;entry=$entry->id&amp;prevmode=$mode&amp;hook=" . urlencode($hook) . "\"><img src=\"";
-            $return .= $icon;
-            $return .= "\" class=\"smallicon\" alt=\"" . get_string("delete") . $altsuffix . "\" /></a>";
-
-            $return .= "<a class='action-icon' title=\"" . get_string("edit") . "\" href=\"edit.php?cmid=$cm->id&amp;id=$entry->id&amp;mode=$mode&amp;hook=" . urlencode($hook) . "\"><img src=\"" . $OUTPUT->pix_url('t/edit') . "\" class=\"smallicon\" alt=\"" . get_string("edit") . $altsuffix . "\" /></a>";
-
             if ($mode == 'approval') {
-                $return_alt .= "<a class='qanda-answer' title=\"" . get_string("answer") . "\" href=\"edit.php?cmid=$cm->id&amp;id=$entry->id&amp;mode=$mode&amp;hook=" . urlencode($hook) . "\">" . get_string("answer") . "</a>";
+                $url = new moodle_url('edit.php', array('cmid' => $cm->id, 'id' => $entry->id, 'mode' => $mode, 'hook' => urlencode($hook)));
+                $return_alt .= html_writer::link($url, get_string("answer"), array('class' => 'btn btn-primary btn-sm', 'title' => get_string("answer")));
             } else {
-                $return_alt .= "<a class='qanda-edit' title=\"" . get_string("edit") . "\" href=\"edit.php?cmid=$cm->id&amp;id=$entry->id&amp;mode=$mode&amp;hook=" . urlencode($hook) . "\">" . get_string("edit") . "</a>";
+                $url = new moodle_url('edit.php', array('cmid' => $cm->id, 'id' => $entry->id, 'mode' => $mode, 'hook' => urlencode($hook)));
+                $return_alt .= html_writer::link($url, get_string("edit"), array('class' => 'btn btn-primary btn-sm', 'title' => get_string("edit")));
             }
 
-            $return_alt .= "<a class='qanda-delete' title=\"" . get_string("delete") . "\" href=\"deleteentry.php?id=$cm->id&amp;mode=delete&amp;entry=$entry->id&amp;prevmode=$mode&amp;hook=" . urlencode($hook) . "\">" . get_string("delete") . "</a>";
-           
-        } elseif ($importedentry) {
-            $return .= "<font size=\"-1\">" . get_string("exportedentry", "qanda") . "</font>";
+            $url = new moodle_url('deleteentry.php', array('id' => $cm->id, 'entry' => $entry->id, 'mode' => 'delete', 'prevmode' => $mode, 'hook' => urlencode($hook)));
+            $return_alt .= html_writer::link($url, get_string("delete"), array('class' => 'btn btn-warning qanda-delete btn-sm', 'title' => get_string("delete")));
         }
     }
-    if (!empty($CFG->enableportfolios) && (has_capability('mod/qanda:exportentry', $context) || ($iscurrentuser && has_capability('mod/qanda:exportownentry', $context)))) {
-        require_once($CFG->libdir . '/portfoliolib.php');
-        $button = new portfolio_add_button();
-        $button->set_callback_options('qanda_entry_portfolio_caller', array('id' => $cm->id, 'entryid' => $entry->id), 'mod_qanda');
 
-        $filecontext = $context;
-        if ($entry->sourceqandaid == $cm->instance) {
-            if ($maincm = get_coursemodule_from_instance('qanda', $entry->qandaid)) {
-                $filecontext = context_module::instance($maincm->id);
-            }
-        }
-        $fs = get_file_storage();
-        if ($files = $fs->get_area_files($filecontext->id, 'mod_qanda', 'attachment', $entry->id, "timemodified", false) || $files = $fs->get_area_files($filecontext->id, 'mod_qanda', 'question', $entry->id, "timemodified", false) || $files = $fs->get_area_files($filecontext->id, 'mod_qanda', 'answer', $entry->id, "timemodified", false) || $files = $fs->get_area_files($filecontext->id, 'mod_qanda', 'entry', $entry->id, "timemodified", false)) {
+    $return_alt .= html_writer::end_div();
 
-            $button->set_formats(PORTFOLIO_FORMAT_RICHHTML);
-        } else {
-            $button->set_formats(PORTFOLIO_FORMAT_PLAINHTML);
-        }
-
-        $return .= $button->to_html(PORTFOLIO_ADD_ICON_LINK);
-    }
-    $return .= '</span>';
-    $return_alt .= '</div>';
-    /* Removing comment capability
-      if (!empty($CFG->usecomments) && has_capability('mod/qanda:comment', $context) and $qanda->allowcomments) {
-      require_once($CFG->dirroot . '/comment/lib.php');
-      $cmt = new stdClass();
-      $cmt->component = 'mod_qanda';
-      $cmt->context = $context;
-      $cmt->course = $course;
-      $cmt->cm = $cm;
-      $cmt->area = 'qanda_entry';
-      $cmt->itemid = $entry->id;
-      $cmt->showcount = true;
-      $comment = new comment($cmt);
-      $return .= '<div>' . $comment->output(true) . '</div>';
-      $output = true;
-      }
-     */
     //If we haven't calculated any REAL thing, delete result ($return)
     if (!$output) {
         $return = '';

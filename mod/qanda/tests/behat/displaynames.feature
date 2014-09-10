@@ -30,7 +30,7 @@ Scenario: Make sure that only instructors can see posts names/emails
     And I log in as "student1"
     And I follow "Course 1"
     And I follow "Q&A test"
-    And I press "Ask a question"
+    And I follow "Ask a question"
     And I set the following fields to these values:
       | Question | What is the answer to life, the universe, and everything? |
     And I press "Save changes"
