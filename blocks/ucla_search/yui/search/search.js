@@ -21,7 +21,6 @@ YUI.add('moodle-block_ucla_search-search', function(Y) {
             if (searchname === 'block-search') {
                 Y.one('.block-search #ucla-search').setAttribute('id', 'ucla-search-block');
                 
-                Y.one('.ucla-search.' + searchname + ' .input-group-btn').remove();
                 Y.one('.ucla-search.' + searchname + ' .input-group').setStyle('display', 'block');
 
                 inputid = '#ucla-search-block';
