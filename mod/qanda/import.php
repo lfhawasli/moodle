@@ -138,8 +138,16 @@ if ($xml = qanda_read_imported_file($result)) {
                 $qanda->defaultapproval = $CFG->qanda_defaultapproval;
             }
 
+            // These fields were not included in export, assume zero.
+            $qanda->assessed = 0;
+            $qanda->availability = null;
+
+            // New Q&A is to be inserted in section 0, it is always visible.
+            $qanda->section = 0;
+            $qanda->visible = 1;
+
             // Include new qanda and return the new ID
-            if (!($glossary = add_moduleinfo($qanda, $course))) {
+            if (!($qanda = add_moduleinfo($qanda, $course))) {
                 echo $OUTPUT->notification("Error while trying to create the new qanda.");
                 qanda_print_tabbed_table_end();
                 echo $OUTPUT->footer();
