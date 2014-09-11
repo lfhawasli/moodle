@@ -43,10 +43,10 @@
             </div>            
         </div>
         <div class="header-system row" >
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <?php echo $OUTPUT->sublogo(); ?>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-8">
                 <?php echo $OUTPUT->weeks_display() ?>
             </div>
         </div>

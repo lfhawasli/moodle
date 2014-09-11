@@ -8,6 +8,9 @@ and open the template in the editor.
     Author     : alfonso
 */
 /**
+ *   Default navigation bar button color.
+ */
+/**
  * Header color for PROD header
  * 
  * @type Color
@@ -442,7 +445,7 @@ input[type="button"].btn-block {
   }
 }
 
-/* line 29, ../sass/ucla/_buttons.scss */
+/* line 30, ../sass/ucla/_buttons.scss */
 .btn-default {
   color: #ffffff;
   background-color: #4d4d4d;
@@ -473,46 +476,50 @@ input[type="button"].btn-block {
   background-color: #ffffff;
 }
 
-/* line 33, ../sass/ucla/_buttons.scss */
+/* line 35, ../sass/ucla/_buttons.scss */
 .btn-primary, .block_recent_activity .activityhead a, .wiki_clear ~ .mform #save {
   color: white !important;
 }
 
-/* line 36, ../sass/ucla/_buttons.scss */
+/* line 40, ../sass/ucla/_buttons.scss */
 .btn-header {
-  background-color: none;
+  background-color: #3284bf;
   padding: 10px 12px;
   color: white;
   display: inline-block;
   font-weight: 300;
-  /*border-bottom: 2px solid darken($header-color-prod, 10%);*/
   height: 40px;
-}
-/* line 45, ../sass/ucla/_buttons.scss */
-.btn-header:hover {
-  background-color: #4874b3;
-  text-decoration: none;
-  /*border-bottom: 2px solid darken($ccle-color-blue, 2%);*/
+  -webkit-transition-property: background-color, color;
+  transition-property: background-color, color;
+  -webkit-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
 }
 /* line 52, ../sass/ucla/_buttons.scss */
+.btn-header:hover {
+  background-color: #3e91cc;
+  text-decoration: none;
+}
+/* line 58, ../sass/ucla/_buttons.scss */
 .btn-header.real-user {
   padding-right: 24px;
 }
-/* line 55, ../sass/ucla/_buttons.scss */
+/* line 61, ../sass/ucla/_buttons.scss */
 .btn-header.real-user:after {
   content: "]";
 }
-/* line 58, ../sass/ucla/_buttons.scss */
+/* line 64, ../sass/ucla/_buttons.scss */
 .btn-header.real-user:before {
   content: "[";
 }
 
-/* line 64, ../sass/ucla/_buttons.scss */
+/* line 71, ../sass/ucla/_buttons.scss */
 a.btn-header {
   color: white;
 }
 
-/* line 68, ../sass/ucla/_buttons.scss */
+/* line 76, ../sass/ucla/_buttons.scss */
 .btn-header-text {
   /*background-color: $ccle-color-blue;*/
   font-size: 1.2rem;
@@ -520,59 +527,61 @@ a.btn-header {
   color: white !important;
   display: inline-block;
   font-weight: 300;
-  height: 40px;
+  height: auto;
 }
 
-/* line 78, ../sass/ucla/_buttons.scss */
+/* line 87, ../sass/ucla/_buttons.scss */
 .btn-help-feedback {
-  background-color: #5b9cd9;
-  /*border-bottom: 2px solid darken(#295493, 10%);*/
+  background-color: #FFBC00;
 }
-/* line 82, ../sass/ucla/_buttons.scss */
+/* line 90, ../sass/ucla/_buttons.scss */
 .btn-help-feedback:hover {
-  background-color: #3489c6;
-  /*border-bottom: 2px solid lighten(#295493, 1%);*/
+  background-color: #ffc933;
 }
 
-/* line 88, ../sass/ucla/_buttons.scss */
+/* line 95, ../sass/ucla/_buttons.scss */
+a.btn-help-feedback {
+  color: black;
+}
+/* line 97, ../sass/ucla/_buttons.scss */
+a.btn-help-feedback i {
+  margin-left: 2px;
+}
+
+/* line 103, ../sass/ucla/_buttons.scss */
 .btn-login {
-  background-color: #f9c739;
+  background-color: #FFBC00;
   color: black !important;
-  /*border-bottom: 2px solid darken(#4cae4c, 10%);*/
 }
-/* line 93, ../sass/ucla/_buttons.scss */
+/* line 107, ../sass/ucla/_buttons.scss */
 .btn-login:hover {
-  background-color: #fbd56a;
-  /*border-bottom: 2px solid darken(#4cae4c, 1%);*/
+  background-color: #ffc933;
 }
 
-/* line 99, ../sass/ucla/_buttons.scss */
+/* line 113, ../sass/ucla/_buttons.scss */
 .header-btn-group {
   float: right;
   color: white;
 }
-/* line 103, ../sass/ucla/_buttons.scss */
+/* line 117, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name {
   padding-left: 8px;
   font-size: 1.1rem;
 }
-/* line 107, ../sass/ucla/_buttons.scss */
+/* line 121, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name:after {
   content: ")";
 }
-/* line 110, ../sass/ucla/_buttons.scss */
+/* line 124, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name:before {
   content: "(";
 }
-/* line 114, ../sass/ucla/_buttons.scss */
+/* line 128, ../sass/ucla/_buttons.scss */
 .header-btn-group .login-as {
   font-size: 1.1rem;
   margin-left: -20px;
 }
 
-/**
-    Default navigation bar button color.
-*/
 /* line 6, ../sass/_labels.scss */
 .label-bstp, .groupinglabel {
   display: inline;

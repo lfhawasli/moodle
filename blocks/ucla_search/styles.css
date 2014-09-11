@@ -1,56 +1,33 @@
-/* line 5, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) {
-  margin-bottom: 8px;
-}
-/* line 7, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist {
-  position: relative !important;
-}
-/* line 10, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist-content {
-  box-shadow: 0 0 0;
-  border: 0;
-}
-/* line 14, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist-item-active {
-  background-color: #3071a9;
-}
-/* line 17, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist-item-hover {
-  background-color: #b9d4ec;
-}
-/* line 20, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) #ucla-search-block.yui3-aclist-input {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
-}
-/* line 23, sass/styles.scss */
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .input-group {
-  margin-top: 4px;
-}
+/*@import "uclatheme";*/
+.pagelayout-frontpage .ucla-search .yui3-aclist {
+  position: relative;
+  display: inline-block; }
 
-/* line 29, sass/styles.scss */
+.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) {
+  margin-bottom: 8px; }
+  .ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist-content {
+    box-shadow: 0 0 0;
+    border: 0; }
+  .ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist-item-active {
+    /*background-color: darken($brand-primary, 10%);*/ }
+  .ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .yui3-aclist-item-hover {
+    /*background-color: lighten($brand-primary, 30%);*/ }
+  .ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) #ucla-search-block.yui3-aclist-input {
+    /*@include border-radius(4px);*/ }
+  .ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) .input-group {
+    margin-top: 4px; }
+
 .ucla-search .btn {
   border-top-left-radius: 0 !important;
-  border-bottom-left-radius: 0 !important;
-}
+  border-bottom-left-radius: 0 !important; }
 
-/* line 36, sass/styles.scss */
 .search-result .shortname {
-  font-weight: bold;
-}
-/* line 38, sass/styles.scss */
-.yui3-aclist-item-active.yui3-aclist-item-hover .search-result .shortname {
-  color: #444;
-}
-/* line 42, sass/styles.scss */
+  font-weight: bold; }
+  .yui3-aclist-item-active.yui3-aclist-item-hover .search-result .shortname {
+    color: #444; }
 .search-result .fullname {
-  color: #666;
-}
-/* line 45, sass/styles.scss */
-.yui3-aclist-item-active:not(.yui3-aclist-item-hover) .search-result .fullname {
-  color: #eee;
-}
+  color: #666; }
+  .yui3-aclist-item-active:not(.yui3-aclist-item-hover) .search-result .fullname {
+    color: #eee; }
+
+/*# sourceMappingURL=styles.css.map */

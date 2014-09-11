@@ -58,7 +58,7 @@ header {
     .weeks-display {
         float: right;
         display: inline-block;
-        padding: 2px 16px;
+        padding: 2px 4px;
         
         .week {
             font-weight: bold;
@@ -85,13 +85,13 @@ header {
             
             .arrow-up {
                 position: absolute;
-                left: 46%;
+                left: 5%;
                 top: -5px;
                 border-bottom-color: white;
             }
             
             a {
-                font-size: 1.2rem;
+                font-size: 1.3rem;
                 display: inline-block;
                 padding: 8px 10px;
                 width: 100%;
@@ -120,6 +120,7 @@ header {
 // it doesn't float in the middle of the page.
 .debuggingmessage ~ #page .header-main {
     position: relative;
+    width: 100%;
 }
 
 // Defines how header logo area looks
@@ -174,7 +175,7 @@ header {
 }
 
 // Responsive 
-@media (max-width: $screen-xs-max) {
+/*@media (max-width: $screen-xs-max) {
     .header-logo .logo-ucla {
         width: 44px;
         float: left;
@@ -186,7 +187,7 @@ header {
         clear: both;
         margin-left: 0
     }
-}
+}*/
 
 // Controls that are right above the breadcrumb and below the header
 
