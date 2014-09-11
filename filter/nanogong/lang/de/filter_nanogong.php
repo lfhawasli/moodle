@@ -15,21 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* NanoGong filter for TinyMCE Plugin
-*
-* @author     Ning
-* @author     Gibson
-* @package    filter
-* @subpackage nanogong
-* @copyright  2012 The Gong Project
-* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-* @version    4.2.2
-*/
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2014010000;
-$plugin->requires = 2011033008;       // Requires this Moodle version
-$plugin->component = 'filter_nanogong';
+ * Language string for filter/nanogong.
+ *
+ * @author     Detlef Anschlag, moodleSCHULE e.V. Germany
+ * @author     Gibson
+ * @package    filter
+ * @subpackage nanogong
+ * @copyright  2013 The Gong Project
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @version    4.2.3.2
+ */
+ 
+$string['filtername'] = 'NanoGong';
+$string['imgtitle'] = 'Zeige/verberge den NanoGong Player mit Klick auf diese Ikone';
 
 ?>

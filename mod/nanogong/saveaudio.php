@@ -35,7 +35,10 @@ $id = required_param('id', PARAM_INT);
 
 if ($id) {
     $cm = get_coursemodule_from_id('nanogong', $id, 0, false, MUST_EXIST);
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    // START UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
+    // $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
+    // END UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
     $nanogong = $DB->get_record('nanogong', array('id' => $cm->instance), '*', MUST_EXIST);
 }
 else {

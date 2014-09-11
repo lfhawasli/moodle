@@ -36,7 +36,10 @@ M.mod_nanogong.init = function(Y, url) {
         var applet = '';
         applet += '<div id="mod_nanogong_div" ';
         applet +=      'style="position:absolute;top:-40px;left:-130px;z-index:100;visibility:hidden">';
-        applet +=     '<applet id="mod_nanogong_applet" archive="' + M.cfg.wwwroot + '/mod/nanogong/nanogong.jar" code="gong.NanoGong" width="130" height="40">';
+        // START UCLA MOD: CCLE-4650-upgrade-nanogong-work-with-Moodle-2.7-TinyMCE-editor -->
+        // applet +=     '<applet id="mod_nanogong_applet" archive="' + M.cfg.wwwroot + '/mod/nanogong/nanogong.jar" code="gong.NanoGong" width="130" height="40">';
+        applet +=     '<applet id="mod_nanogong_applet" archive="' + M.cfg.wwwroot + '/mod/nanogong/nanogong.jar" code="gong.NanoGong" width="180" height="40">';
+        // END UCLA MOD: CCLE-4650-upgrade-nanogong-work-with-Moodle-2.7-TinyMCE-editor -->
         applet +=         '<param name="ShowTime" value="true" />';
         applet +=         '<param name="ShowAudioLevel" value="false" />';
         applet +=         '<param name="ShowRecordButton" value="false" />';
