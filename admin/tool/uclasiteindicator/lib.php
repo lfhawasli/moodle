@@ -664,8 +664,11 @@ class siteindicator_manager {
         $message = get_string('jira_msg', 'tool_uclasiteindicator', $ticketinfo);
 
         // Determine support contact(s).
-        $categorycontext = context_coursecat::instance($request->categoryid);
-        $supportcontacts = get_support_contact($categorycontext);
+        $context = context_coursecat::instance($request->categoryid, IGNORE_MISSING);
+        if (empty($categorycontext)) {
+            $context = context_system::instance();
+        }
+        $supportcontacts = get_support_contact($context);
 
         // Either send email or create a JIRA ticket.
         foreach ($supportcontacts as $supportcontact) {

@@ -15,6 +15,7 @@ $string['del_msg'] = 'Site indicator entry';
 $string['change'] = 'Change site type';
 $string['sitecreate'] = 'Create site indicator';
 $string['no_indicator_type'] = 'Please choose a site type below:';
+$string['defaultcategorywarning'] = 'Warning: collaboration site is in the default category for uncategorized sites. Please move site to an appropiate category.';
 
 // Site role groups
 $string['r_project'] = 'Project';
