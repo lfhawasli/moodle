@@ -3052,7 +3052,16 @@ class assign {
         // Get markers to use in drop lists.
         $markingallocationoptions = array();
         if ($markingallocation) {
-            $markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
+            //$markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
+            $ppcourse = PublicPrivate_Course::build($this->get_course());
+            $groupid = 0;
+            if ($ppcourse->is_activated()) {
+                $groupid = $ppcourse->get_group();
+            }
+            $markers = get_users_by_capability($this->context, 'mod/assign:grade', '', '', '', '', $groupid, '', false);
+            // END UCLA MOD: CCLE-4770.
             $markingallocationoptions[''] = get_string('filternone', 'assign');
             $markingallocationoptions[ASSIGN_MARKER_FILTER_NO_MARKER] = get_string('markerfilternomarker', 'assign');
             foreach ($markers as $marker) {
