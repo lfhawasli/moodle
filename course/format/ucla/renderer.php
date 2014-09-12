@@ -56,9 +56,6 @@ class format_ucla_renderer extends format_topics_renderer {
     
     // strings to generate jit links
     private $jit_links = array();
-
-    // How many crosslists to limit for display
-    const MAX_CROSSLIST_SHOWN = 5;
     
     /**
      * Constructor method, do necessary setup for UCLA format.
@@ -754,8 +751,9 @@ class format_ucla_renderer extends format_topics_renderer {
         }
         
         $theterm = false;
+        $maxcrosslistshown = get_config('local_ucla', 'maxcrosslistshown');
         foreach ($this->courseinfo as $key => $courseinfo) {
-            if (count($this->displayinfo) > self::MAX_CROSSLIST_SHOWN) {
+            if (count($this->displayinfo) >= $maxcrosslistshown) {
                 // going over the limit of crosslists to show, replace them
                 // with ...
                 $this->displayinfo[$key] = '...';

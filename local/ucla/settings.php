@@ -41,6 +41,12 @@ if ($hassiteconfig) {
             get_string('logfiledeletion', 'local_ucla'),
             get_string('logfiledeletiondesc', 'local_ucla'), 0,
             PARAM_INT));
+    
+    $settings->add(new admin_setting_configtext(
+            'local_ucla/maxcrosslistshown',
+            get_string('maxcrosslistshown', 'local_ucla'),
+            get_string('maxcrosslistshowndesc', 'local_ucla'), 6,
+            PARAM_INT));
 
     $ADMIN->add('localplugins', $settings);
 
