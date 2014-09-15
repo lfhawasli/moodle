@@ -303,25 +303,54 @@ header {
 }
 
 
-.course-logo-layout {
+.theme-uclasharedcourse {
     
-    .course-logo-image {
-        width: 180px;
-        float: left;
-        margin-left: 15px;
-        margin-right: 15px;
+    .header-border {
+        display: none !important;
+        visibility: hidden !important;
     }
     
-    .course-logo-title {
-        float: left;
-        
-        & * {
-            vertical-align: bottom;
+    header {
+        .header-main {
+            height: auto;
         }
-        h1 {
-            margin: 0;
-            font-weight: 300;
-            margin-top: 10%;
+        .header-btn-group {
+            background: none;
+        }
+    }
+    .course-logo-layout {
+        height: 40px;
+        max-height: 40px;
+        
+        .course-logo-image {
+            display: none;
+            max-width: 180px;
+            max-height: 60px;
+            float: left;
+            
+            @include respond-md {
+                display: inline-block;
+            }
+        }
+
+        .course-logo-title {
+            float: left;
+            margin-left: 0;
+
+            & * {
+                vertical-align: bottom;
+            }
+            h1 {
+                margin: 0;
+                font-weight: 300;
+                /*margin-top: 10%;*/
+            }
+            
+            @include respond-sm {
+                margin-left: 8px;
+            }
         }
     }
 }
+
+

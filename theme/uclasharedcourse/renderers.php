@@ -155,7 +155,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
      * 
      * @return type
      */
-    protected function course_logo() {
+    public function course_logo() {
         global $CFG, $COURSE;
         $logos = $this->course_logo_images($COURSE->id);
         

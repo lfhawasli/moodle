@@ -240,7 +240,13 @@ class format_ucla_renderer extends format_topics_renderer {
             $heading_text = html_writer::tag('div', $heading_text, array('class' => 'site-meta'));
         }
         
-        echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
+        // Check if this site has a custom course logo.  If so, then the title
+        // will be rendered by the theme.  
+        $courselogos = $OUTPUT->course_logo();
+        if (empty($courselogos)) {
+            echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
+        }
+        
         echo $heading_text;
         echo html_writer::tag('span', '', array('class' => 'site-title-divider'));
         

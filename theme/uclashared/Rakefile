@@ -36,7 +36,7 @@ end
 task :build_css do 
     # Compile compass with compressed options
     puts "Building theme CSS"
-    sh "compass compile -e production"
+    sh "compass compile -e production --force"
 end
 
 task :build_theme => [:build_fonts, :build_js, :build_css] do
