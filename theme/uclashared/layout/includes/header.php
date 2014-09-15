@@ -24,14 +24,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Custom site logos.
+
+// First get site logo
+$sitelogohtml = $OUTPUT->logo('ucla-logo', 'theme');
+// Get extra site logos
+$extrasitelogos = $OUTPUT->course_logo();
+// Check for custom logo 
+$customheaderlogo = isset($OUTPUT->hascustomheaderlogo) && 
+        $OUTPUT->hascustomheaderlogo ? 'header-custom-logo' : '';
+
 ?>
 
 <?php if ($hasheading || $hasnavbar) { ?>
     <header id="page-header" class="container-fluid">
         <div class="header-border visible-xs"></div>
-        <div class="header-main row">
+        <div class="header-main <?php echo $customheaderlogo; ?> row">
             <div class="header-logo">
-                <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
+                <?php echo  $sitelogohtml; ?>
             </div>
             <div class="header-login">
                 <div class="header-btn-group logininfo" >
@@ -55,16 +65,14 @@
 <?php
 } 
 
-$courselogos = $OUTPUT->course_logo();
-$fullname = $COURSE->fullname;
-
-if (!empty($courselogos)) { ?>
+// Render extra site logos if available.
+if (!empty($extrasitelogos)) { ?>
 <div class="course-logo-layout container-fluid" >
     <div class="course-logo-image">
-        <?php echo $courselogos ?>
+        <?php echo $extrasitelogos ?>
     </div>
     <div class="course-logo-title">
-        <h1><?php echo $fullname ?></h1>
+        <h1><?php echo $COURSE->fullname ?></h1>
     </div>
 </div>
 <?php

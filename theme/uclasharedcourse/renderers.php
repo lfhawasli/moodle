@@ -8,6 +8,7 @@ require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_renderer {
 
     public $coursetheme = true;
+    public $hascustomheaderlogo = false;
     
     private $theme = 'theme';
     private $component = 'theme_uclasharedcourse';
@@ -57,6 +58,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         // if main logo is overridden, then return that html
         if (!empty($alternative_logo)) {
+            $this->hascustomheaderlogo = true;
             return $alternative_logo . $additional_logos;
         } else if (!empty($additional_logos)) {
             // maybe we just have alternative sublogos, but keep main logo

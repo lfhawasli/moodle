@@ -2,14 +2,8 @@
 
 /* Remove background color and disable fixed positioning from header */
 header .header-main {
-    background-color: white !important;
     position: inherit;
     width: auto;
-}
-
-/* Environment color */
-header .header-main .header-btn-group {
-    /*background-color: #3d6196;*/
 }
 
 /* Structural fix */

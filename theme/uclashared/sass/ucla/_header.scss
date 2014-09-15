@@ -313,6 +313,10 @@ header {
     header {
         .header-main {
             height: auto;
+            
+            &.header-custom-logo {
+                background-color: white;
+            }
         }
         .header-btn-group {
             background: none;

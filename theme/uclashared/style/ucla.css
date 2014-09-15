@@ -1278,15 +1278,19 @@ header .help-dropdown-menu li:hover a {
   height: auto;
 }
 /* line 317, ../sass/ucla/_header.scss */
+.theme-uclasharedcourse header .header-main.header-custom-logo {
+  background-color: white;
+}
+/* line 321, ../sass/ucla/_header.scss */
 .theme-uclasharedcourse header .header-btn-group {
   background: none;
 }
-/* line 321, ../sass/ucla/_header.scss */
+/* line 325, ../sass/ucla/_header.scss */
 .theme-uclasharedcourse .course-logo-layout {
   height: 40px;
   max-height: 40px;
 }
-/* line 325, ../sass/ucla/_header.scss */
+/* line 329, ../sass/ucla/_header.scss */
 .theme-uclasharedcourse .course-logo-layout .course-logo-image {
   display: none;
   max-width: 180px;
@@ -1294,28 +1298,28 @@ header .help-dropdown-menu li:hover a {
   float: left;
 }
 @media (min-width: 992px) {
-  /* line 325, ../sass/ucla/_header.scss */
+  /* line 329, ../sass/ucla/_header.scss */
   .theme-uclasharedcourse .course-logo-layout .course-logo-image {
     display: inline-block;
   }
 }
-/* line 336, ../sass/ucla/_header.scss */
+/* line 340, ../sass/ucla/_header.scss */
 .theme-uclasharedcourse .course-logo-layout .course-logo-title {
   float: left;
   margin-left: 0;
 }
-/* line 340, ../sass/ucla/_header.scss */
+/* line 344, ../sass/ucla/_header.scss */
 .theme-uclasharedcourse .course-logo-layout .course-logo-title * {
   vertical-align: bottom;
 }
-/* line 343, ../sass/ucla/_header.scss */
+/* line 347, ../sass/ucla/_header.scss */
 .theme-uclasharedcourse .course-logo-layout .course-logo-title h1 {
   margin: 0;
   font-weight: 300;
   /*margin-top: 10%;*/
 }
 @media (min-width: 768px) {
-  /* line 336, ../sass/ucla/_header.scss */
+  /* line 340, ../sass/ucla/_header.scss */
   .theme-uclasharedcourse .course-logo-layout .course-logo-title {
     margin-left: 8px;
   }
