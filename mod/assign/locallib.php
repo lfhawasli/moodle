@@ -3054,13 +3054,7 @@ class assign {
         if ($markingallocation) {
             // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
             //$markers = get_users_by_capability($this->context, 'mod/assign:grade');
-            require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
-            $ppcourse = PublicPrivate_Course::build($this->get_course());
-            $groupid = 0;
-            if ($ppcourse->is_activated()) {
-                $groupid = $ppcourse->get_group();
-            }
-            $markers = get_users_by_capability($this->context, 'mod/assign:grade', '', '', '', '', $groupid, '', false);
+            $markers = local_ucla_core_edit::get_course_graders($this->get_course());
             // END UCLA MOD: CCLE-4770.
             $markingallocationoptions[''] = get_string('filternone', 'assign');
             $markingallocationoptions[ASSIGN_MARKER_FILTER_NO_MARKER] = get_string('markerfilternomarker', 'assign');
@@ -5835,7 +5829,10 @@ class assign {
         }
 
         if ($this->get_instance()->markingallocation && has_capability('mod/assign:manageallocations', $this->context)) {
-            $markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
+            //$markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            $markers = local_ucla_core_edit::get_course_graders($this->get_course());
+            // END UCLA MOD: CCLE-4770.
             $markerlist = array('' =>  get_string('choosemarker', 'assign'));
             foreach ($markers as $marker) {
                 $markerlist[$marker->id] = fullname($marker);
