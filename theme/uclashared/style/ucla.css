@@ -58,6 +58,14 @@
  * \@include glyphicon("\e021");
  *
  */
+/* Small devices (tablets, 768px and up) */
+/*@media (min-width: $screen-sm-min) { ... }
+
+ Medium devices (desktops, 992px and up) 
+@media (min-width: $screen-md-min) { ... }
+
+ Large devices (large desktops, 1200px and up) 
+@media (min-width: $screen-lg-min) { ... }*/
 /* line 7, ../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_panels.scss */
 .panel, .loginpanel {
   margin-bottom: 20px;
@@ -886,13 +894,17 @@ input[type="button"].btn-block {
 .btn-header.real-user:before {
   content: "[";
 }
+/* line 69, ../sass/ucla/_buttons.scss */
+.btn-header i {
+  margin-left: 4px;
+}
 
-/* line 71, ../sass/ucla/_buttons.scss */
+/* line 75, ../sass/ucla/_buttons.scss */
 a.btn-header {
   color: white;
 }
 
-/* line 76, ../sass/ucla/_buttons.scss */
+/* line 80, ../sass/ucla/_buttons.scss */
 .btn-header-text {
   /*background-color: $ccle-color-blue;*/
   font-size: 1.2rem;
@@ -903,53 +915,54 @@ a.btn-header {
   height: auto;
 }
 
-/* line 87, ../sass/ucla/_buttons.scss */
+/* line 91, ../sass/ucla/_buttons.scss */
 .btn-help-feedback {
   background-color: #FFBC00;
 }
-/* line 90, ../sass/ucla/_buttons.scss */
+/* line 94, ../sass/ucla/_buttons.scss */
 .btn-help-feedback:hover {
   background-color: #ffc933;
 }
 
-/* line 95, ../sass/ucla/_buttons.scss */
+/* line 99, ../sass/ucla/_buttons.scss */
 a.btn-help-feedback {
   color: black;
 }
-/* line 97, ../sass/ucla/_buttons.scss */
+/* line 101, ../sass/ucla/_buttons.scss */
 a.btn-help-feedback i {
   margin-left: 2px;
 }
 
-/* line 103, ../sass/ucla/_buttons.scss */
+/* line 107, ../sass/ucla/_buttons.scss */
 .btn-login {
   background-color: #FFBC00;
   color: black !important;
 }
-/* line 107, ../sass/ucla/_buttons.scss */
+/* line 111, ../sass/ucla/_buttons.scss */
 .btn-login:hover {
   background-color: #ffc933;
 }
 
-/* line 113, ../sass/ucla/_buttons.scss */
+/* line 117, ../sass/ucla/_buttons.scss */
 .header-btn-group {
   float: right;
   color: white;
 }
-/* line 117, ../sass/ucla/_buttons.scss */
+/* line 121, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name {
   padding-left: 8px;
-  font-size: 1.1rem;
+  font-size: 1.0rem;
+  color: #cbe2f2;
 }
-/* line 121, ../sass/ucla/_buttons.scss */
+/* line 126, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name:after {
   content: ")";
 }
-/* line 124, ../sass/ucla/_buttons.scss */
+/* line 129, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name:before {
   content: "(";
 }
-/* line 128, ../sass/ucla/_buttons.scss */
+/* line 133, ../sass/ucla/_buttons.scss */
 .header-btn-group .login-as {
   font-size: 1.1rem;
   margin-left: -20px;
@@ -983,14 +996,37 @@ header .header-main {
   background-image: none;
   background-color: #5749A7;
 }
-/* line 41, ../sass/ucla/_header.scss */
+@media (max-width: 480px) {
+  /* line 19, ../sass/ucla/_header.scss */
+  header .header-main {
+    position: relative;
+    width: auto;
+    height: auto;
+    background: none;
+  }
+}
+/* line 48, ../sass/ucla/_header.scss */
+header .header-border {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: #3284bf;
+}
+/* line 56, ../sass/ucla/_header.scss */
 header .header-system {
   background-color: #fff;
   font-size: 1.2rem;
   font-weight: 300;
   margin-top: 48px;
 }
-/* line 49, ../sass/ucla/_header.scss */
+@media (max-width: 480px) {
+  /* line 56, ../sass/ucla/_header.scss */
+  header .header-system {
+    margin-top: 8px;
+  }
+}
+/* line 68, ../sass/ucla/_header.scss */
 header .header-system-name {
   float: left;
   color: #3284bf;
@@ -999,17 +1035,17 @@ header .header-system-name {
   font-weight: bold;
   text-transform: uppercase;
 }
-/* line 58, ../sass/ucla/_header.scss */
+/* line 77, ../sass/ucla/_header.scss */
 header .weeks-display {
   float: right;
   display: inline-block;
   padding: 2px 4px;
 }
-/* line 63, ../sass/ucla/_header.scss */
+/* line 82, ../sass/ucla/_header.scss */
 header .weeks-display .week {
   font-weight: bold;
 }
-/* line 68, ../sass/ucla/_header.scss */
+/* line 87, ../sass/ucla/_header.scss */
 header .help-dropdown-menu {
   background-color: white;
   margin: 0;
@@ -1021,23 +1057,23 @@ header .help-dropdown-menu {
   -webkit-box-shadow: #999 0px 1px 2px;
   box-shadow: #999 0px 1px 2px;
 }
-/* line 79, ../sass/ucla/_header.scss */
+/* line 98, ../sass/ucla/_header.scss */
 header .help-dropdown-menu.hidden {
   display: none;
   visibility: hidden;
 }
-/* line 83, ../sass/ucla/_header.scss */
+/* line 102, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li {
   list-style: none;
 }
-/* line 86, ../sass/ucla/_header.scss */
+/* line 105, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li .arrow-up {
   position: absolute;
   left: 5%;
   top: -5px;
   border-bottom-color: white;
 }
-/* line 93, ../sass/ucla/_header.scss */
+/* line 112, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li a {
   font-size: 1.3rem;
   display: inline-block;
@@ -1045,61 +1081,86 @@ header .help-dropdown-menu li a {
   width: 100%;
   color: #333;
 }
-/* line 100, ../sass/ucla/_header.scss */
+/* line 119, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li a:hover {
   text-decoration: none;
 }
-/* line 105, ../sass/ucla/_header.scss */
+/* line 124, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li:nth-child(2n) {
   background-color: #efefef;
 }
-/* line 108, ../sass/ucla/_header.scss */
+/* line 127, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li:hover {
   background-color: #444;
 }
-/* line 111, ../sass/ucla/_header.scss */
+/* line 130, ../sass/ucla/_header.scss */
 header .help-dropdown-menu li:hover a {
   color: #eee;
 }
+@media (max-width: 480px) {
+  /* line 87, ../sass/ucla/_header.scss */
+  header .help-dropdown-menu {
+    left: 5%;
+    width: 90%;
+    top: auto;
+    margin-top: -4px;
+  }
+  /* line 142, ../sass/ucla/_header.scss */
+  header .help-dropdown-menu .arrow-up {
+    left: 50%;
+  }
+  /* line 146, ../sass/ucla/_header.scss */
+  header .help-dropdown-menu a {
+    font-size: 1.4rem;
+  }
+}
 
-/* line 121, ../sass/ucla/_header.scss */
+/* line 155, ../sass/ucla/_header.scss */
 .debuggingmessage ~ #page .header-main {
   position: relative;
   width: 100%;
 }
 
-/* line 129, ../sass/ucla/_header.scss */
+/* line 161, ../sass/ucla/_header.scss */
+.header-logo {
+  margin: 0 15px;
+  text-align: left;
+  width: 70px;
+  margin-top: 2px;
+  display: inline-block;
+}
+/* line 169, ../sass/ucla/_header.scss */
 .header-logo a, .header-logo a:hover {
   text-decoration: none;
 }
-/* line 134, ../sass/ucla/_header.scss */
+/* line 174, ../sass/ucla/_header.scss */
 .header-logo .logo-ucla {
-  width: 70px;
+  width: 40px;
   display: inline;
 }
-/* line 140, ../sass/ucla/_header.scss */
+/* line 180, ../sass/ucla/_header.scss */
 .header-logo .logo-ccle {
   color: #FFBC00;
   font-weight: bold;
-  font-size: 2.9rem;
-  margin-right: 8px;
-  margin-left: 4px;
+  font-size: 1.6rem;
+  /*margin-right: 8px;*/
+  /*margin-left: 4px;*/
 }
-/* line 147, ../sass/ucla/_header.scss */
+/* line 187, ../sass/ucla/_header.scss */
 .header-logo .logo-ccle:hover {
   text-decoration: none;
 }
-/* line 149, ../sass/ucla/_header.scss */
+/* line 189, ../sass/ucla/_header.scss */
 .env-dev .header-logo .logo-ccle, .env-test .header-logo .logo-ccle, .env-stage .header-logo .logo-ccle {
   color: white;
 }
-/* line 155, ../sass/ucla/_header.scss */
+/* line 195, ../sass/ucla/_header.scss */
 .header-logo .logo-ccle-sub {
   display: inline-block;
   font-size: 1.1rem;
   color: #c8dbf7;
 }
-/* line 161, ../sass/ucla/_header.scss */
+/* line 201, ../sass/ucla/_header.scss */
 .header-logo .logo-ccle-sub .logo-cc,
 .header-logo .logo-ccle-sub .logo-le {
   margin-right: 8px;
@@ -1107,116 +1168,177 @@ header .help-dropdown-menu li:hover a {
   width: 100%;
   text-transform: capitalize;
 }
-/* line 171, ../sass/ucla/_header.scss */
+/* line 211, ../sass/ucla/_header.scss */
 .env-dev .header-logo .logo-ccle-sub, .env-test .header-logo .logo-ccle-sub, .env-stage .header-logo .logo-ccle-sub {
   color: white;
 }
+@media (max-width: 480px) {
+  /* line 161, ../sass/ucla/_header.scss */
+  .header-logo {
+    width: 100%;
+    text-align: center;
+  }
+  /* line 220, ../sass/ucla/_header.scss */
+  .header-logo .logo-ucla {
+    width: 70px;
+    display: inline;
+  }
+  /* line 225, ../sass/ucla/_header.scss */
+  .header-logo .logo-ccle {
+    width: auto;
+    margin-left: 4px;
+    /*display: inline-block;*/
+    font-size: 2.9rem;
+  }
+}
+@media (min-width: 768px) {
+  /* line 161, ../sass/ucla/_header.scss */
+  .header-logo {
+    width: auto;
+  }
+  /* line 236, ../sass/ucla/_header.scss */
+  .header-logo .logo-ucla {
+    width: 70px;
+    display: inline;
+  }
+  /* line 240, ../sass/ucla/_header.scss */
+  .header-logo .logo-ccle {
+    color: #FFBC00;
+    font-weight: bold;
+    font-size: 2.9rem;
+    margin-right: 8px;
+    margin-left: 4px;
+  }
+  /* line 247, ../sass/ucla/_header.scss */
+  .header-logo .logo-ccle:hover {
+    text-decoration: none;
+  }
+  /* line 249, ../sass/ucla/_header.scss */
+  .env-dev .header-logo .logo-ccle, .env-test .header-logo .logo-ccle, .env-stage .header-logo .logo-ccle {
+    color: white;
+  }
+}
 
-/*@media (max-width: $screen-xs-max) {
-    .header-logo .logo-ucla {
-        width: 44px;
-        float: left;
-        margin-top: 2px;
-    }
-    .header-logo .logo-ccle {
-        font-size: 1.8rem;
-        float: left;
-        clear: both;
-        margin-left: 0
-    }
-}*/
-/* line 194, ../sass/ucla/_header.scss */
+/* line 256, ../sass/ucla/_header.scss */
+.header-login {
+  float: right;
+  margin-right: 15px;
+}
+/* line 260, ../sass/ucla/_header.scss */
+.header-login .header-btn-group {
+  /*width: 90%;*/
+  /*float: none;*/
+}
+/* line 264, ../sass/ucla/_header.scss */
+.header-login .header-btn-group .btn-header {
+  /*width: 100%;*/
+}
+@media (max-width: 480px) {
+  /* line 256, ../sass/ucla/_header.scss */
+  .header-login {
+    float: none;
+    text-align: center;
+    margin-right: 0;
+  }
+  /* line 275, ../sass/ucla/_header.scss */
+  .header-login .header-btn-group {
+    width: 90%;
+    float: none;
+    display: inline-block;
+  }
+  /* line 280, ../sass/ucla/_header.scss */
+  .header-login .header-btn-group .btn-header {
+    float: none;
+    margin-bottom: 4px;
+    width: 100%;
+  }
+}
+
+/* line 294, ../sass/ucla/_header.scss */
 .navbar-controls {
   text-align: right;
 }
-/* line 196, ../sass/ucla/_header.scss */
+/* line 296, ../sass/ucla/_header.scss */
 .navbar-controls .navbutton {
   float: none;
   display: inline-block;
 }
-/* line 200, ../sass/ucla/_header.scss */
+/* line 300, ../sass/ucla/_header.scss */
 .navbar-controls .control-panel {
   display: inline-block;
 }
 
-/* line 208, ../sass/ucla/_header.scss */
+/* line 308, ../sass/ucla/_header.scss */
 .course-logo-layout .course-logo-image {
   width: 180px;
   float: left;
   margin-left: 15px;
   margin-right: 15px;
 }
-/* line 215, ../sass/ucla/_header.scss */
+/* line 315, ../sass/ucla/_header.scss */
 .course-logo-layout .course-logo-title {
   float: left;
 }
-/* line 218, ../sass/ucla/_header.scss */
+/* line 318, ../sass/ucla/_header.scss */
 .course-logo-layout .course-logo-title * {
   vertical-align: bottom;
 }
-/* line 221, ../sass/ucla/_header.scss */
+/* line 321, ../sass/ucla/_header.scss */
 .course-logo-layout .course-logo-title h1 {
   margin: 0;
   font-weight: 300;
   margin-top: 10%;
 }
 
-/* Small devices (tablets, 768px and up) */
-/*@media (min-width: $screen-sm-min) { ... }
-
- Medium devices (desktops, 992px and up) 
-@media (min-width: $screen-md-min) { ... }
-
- Large devices (large desktops, 1200px and up) 
-@media (min-width: $screen-lg-min) { ... }*/
-/* line 10, ../sass/ucla/_frontpage.scss */
+/* line 9, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page {
   background: url([[pix:theme|frontpage-image]]) no-repeat;
-  background-position: 0 top;
+  background-position: 0 20%;
   /*background-size: 100% auto;*/
   height: 100%;
   min-height: 1000px;
 }
 @media (max-width: 480px) {
-  /* line 10, ../sass/ucla/_frontpage.scss */
+  /* line 9, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage #page {
     background-position: 55% -80px;
     background-size: auto 60%;
   }
 }
 @media (min-width: 1499px) {
-  /* line 10, ../sass/ucla/_frontpage.scss */
+  /* line 9, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage #page {
     background-position: right 20%;
     background-size: 100% auto;
   }
 }
-/* line 29, ../sass/ucla/_frontpage.scss */
+/* line 28, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .logo-ucla {
   width: 44px;
   float: left;
   margin-top: 2px;
 }
-/* line 34, ../sass/ucla/_frontpage.scss */
+/* line 33, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .logo-ccle {
   font-size: 1.8rem;
   float: left;
   clear: both;
   margin-left: 0;
 }
-/* line 42, ../sass/ucla/_frontpage.scss */
+/* line 41, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header {
   z-index: 999;
   margin-bottom: 0;
 }
-/* line 46, ../sass/ucla/_frontpage.scss */
+/* line 45, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .header-main {
   background: none;
   position: relative;
 }
 @media (max-width: 480px) {
-  /* line 46, ../sass/ucla/_frontpage.scss */
+  /* line 45, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-main {
+    height: 40px;
     background-color: #3284bf;
     opacity: 0.95;
     display: inline-block;
@@ -1230,57 +1352,67 @@ header .help-dropdown-menu li:hover a {
   margin-right: 15px;
   margin-top: 15px;
 }
+/* line 66, ../sass/ucla/_frontpage.scss */
+.pagelayout-frontpage header .help-dropdown-menu {
+  top: 55px;
+}
 /* line 68, ../sass/ucla/_frontpage.scss */
+.pagelayout-frontpage header .help-dropdown-menu .arrow-up {
+  left: auto;
+  right: 10%;
+}
+/* line 74, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .btn-header {
   float: right;
   clear: right;
   margin-bottom: 2px;
 }
-/* line 73, ../sass/ucla/_frontpage.scss */
+/* line 79, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .header-btn-group {
   background: none;
 }
-/* line 76, ../sass/ucla/_frontpage.scss */
+/* line 82, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .header-server {
   width: 60px;
   margin-top: 8px;
   font-size: 1.0rem;
 }
-/* line 82, ../sass/ucla/_frontpage.scss */
+/* line 88, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .header-logo {
   width: 100px;
-  padding: 20px 0 0 15px;
+  /*padding: 20px 0 0 15px;*/
+  margin-top: 8px;
   display: inline-block;
 }
 @media (max-width: 480px) {
-  /* line 82, ../sass/ucla/_frontpage.scss */
+  /* line 88, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-logo {
     padding-top: 10px;
     width: 100%;
     text-align: center;
   }
 }
-/* line 93, ../sass/ucla/_frontpage.scss */
+/* line 100, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .logo-ccle {
   margin-left: 0;
 }
-/* line 96, ../sass/ucla/_frontpage.scss */
+/* line 103, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .header-system {
   margin-top: 8px;
   background: none;
   clear: both;
   opacity: 0.9;
 }
-/* line 102, ../sass/ucla/_frontpage.scss */
+/* line 109, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .header-system-name {
   color: white !important;
   font-weight: 300;
 }
-/* line 106, ../sass/ucla/_frontpage.scss */
+/* line 113, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .logo-ccle-sub {
   display: none;
 }
-/* line 109, ../sass/ucla/_frontpage.scss */
+/* line 116, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage header .weeks-display {
   width: auto;
   max-width: 20%;
@@ -1289,7 +1421,7 @@ header .help-dropdown-menu li:hover a {
   text-align: right;
 }
 @media (max-width: 480px) {
-  /* line 109, ../sass/ucla/_frontpage.scss */
+  /* line 116, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .weeks-display {
     max-width: 90%;
     margin-top: 16px;
@@ -1299,29 +1431,48 @@ header .help-dropdown-menu li:hover a {
   }
 }
 @media (max-width: 480px) {
-  /* line 129, ../sass/ucla/_frontpage.scss */
+  /* line 136, ../sass/ucla/_frontpage.scss */
+  .pagelayout-frontpage header .header-main {
+    display: block;
+  }
+  /* line 139, ../sass/ucla/_frontpage.scss */
+  .pagelayout-frontpage header .header-system {
+    margin-top: 68px;
+  }
+  /* line 142, ../sass/ucla/_frontpage.scss */
+  .pagelayout-frontpage header .help-dropdown-menu {
+    left: 5%;
+    width: 90%;
+    top: auto;
+    margin-top: -4px;
+  }
+  /* line 148, ../sass/ucla/_frontpage.scss */
+  .pagelayout-frontpage header .help-dropdown-menu .arrow-up {
+    right: 50%;
+  }
+  /* line 152, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-system-name {
     display: inline;
   }
-  /* line 132, ../sass/ucla/_frontpage.scss */
+  /* line 155, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-logo {
     width: 100%;
     padding-left: 0;
     margin-top: 0;
     padding-top: 4px;
   }
-  /* line 138, ../sass/ucla/_frontpage.scss */
+  /* line 161, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .logo-ucla {
     width: 60px;
     float: none;
   }
-  /* line 142, ../sass/ucla/_frontpage.scss */
+  /* line 165, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .logo-ccle {
     font-size: 2.4rem;
     float: none;
     margin-left: 4px;
   }
-  /* line 147, ../sass/ucla/_frontpage.scss */
+  /* line 170, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-server {
     display: inline-block;
     float: none;
@@ -1330,7 +1481,7 @@ header .help-dropdown-menu li:hover a {
     vertical-align: text-bottom;
     width: auto;
   }
-  /* line 155, ../sass/ucla/_frontpage.scss */
+  /* line 178, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-login {
     display: inline-block;
     float: none;
@@ -1338,13 +1489,13 @@ header .help-dropdown-menu li:hover a {
     margin: 0;
     width: 100%;
   }
-  /* line 162, ../sass/ucla/_frontpage.scss */
+  /* line 185, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-login .header-btn-group {
     float: none;
     width: 100%;
     text-align: center;
   }
-  /* line 167, ../sass/ucla/_frontpage.scss */
+  /* line 190, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-login .btn-header {
     width: 90%;
     float: none;
@@ -1353,76 +1504,85 @@ header .help-dropdown-menu li:hover a {
   }
 }
 @media (min-width: 768px) {
-  /* line 180, ../sass/ucla/_frontpage.scss */
+  /* line 203, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-server {
     font-size: 1.2rem;
   }
-  /* line 183, ../sass/ucla/_frontpage.scss */
+  /* line 206, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .weeks-display {
     max-width: 25%;
   }
-  /* line 186, ../sass/ucla/_frontpage.scss */
+  /* line 209, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-server {
     font-size: 1.2rem;
     width: 80px;
   }
-  /* line 191, ../sass/ucla/_frontpage.scss */
+  /* line 214, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .logo-ucla {
     width: 70px;
     display: inline;
     float: none;
   }
-  /* line 197, ../sass/ucla/_frontpage.scss */
+  /* line 220, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .logo-ccle {
     font-size: 2.9rem;
     float: none;
   }
 }
 @media (min-width: 992px) {
-  /* line 208, ../sass/ucla/_frontpage.scss */
+  /* line 231, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-main .btn-header {
     float: none;
     clear: none;
     display: inline-block;
     margin-bottom: 0;
   }
-  /* line 214, ../sass/ucla/_frontpage.scss */
+  /* line 237, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-main .header-btn-group {
     background-color: #3284bf;
   }
-  /* line 220, ../sass/ucla/_frontpage.scss */
+  /* line 243, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-logo {
     width: 170px;
-    padding: 20px 0 0 15px;
+    /*padding: 20px 0 0 15px;*/
     display: inline-block;
   }
-  /* line 225, ../sass/ucla/_frontpage.scss */
+  /* line 248, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .logo-ccle {
     margin-left: 4px;
   }
-  /* line 228, ../sass/ucla/_frontpage.scss */
+  /* line 251, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .logo-ccle-sub {
     display: block;
     width: 160px;
     margin-top: 4px;
     font-size: 1.3rem;
   }
-  /* line 234, ../sass/ucla/_frontpage.scss */
+  /* line 257, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .weeks-display {
     max-width: 30%;
   }
-  /* line 237, ../sass/ucla/_frontpage.scss */
+  /* line 260, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .header-server {
     width: 100px;
   }
+  /* line 263, ../sass/ucla/_frontpage.scss */
+  .pagelayout-frontpage header .help-dropdown-menu {
+    right: auto;
+  }
+  /* line 265, ../sass/ucla/_frontpage.scss */
+  .pagelayout-frontpage header .help-dropdown-menu .arrow-up {
+    right: auto;
+    left: 10%;
+  }
 }
 @media (min-width: 1200px) {
-  /* line 246, ../sass/ucla/_frontpage.scss */
+  /* line 276, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage header .weeks-display {
     max-width: 40%;
   }
 }
-/* line 255, ../sass/ucla/_frontpage.scss */
+/* line 285, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content {
   background-color: white;
   position: absolute;
@@ -1438,7 +1598,7 @@ header .help-dropdown-menu li:hover a {
   box-sizing: content-box;
 }
 @media (max-width: 480px) {
-  /* line 255, ../sass/ucla/_frontpage.scss */
+  /* line 285, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage #page-content {
     overflow-y: none;
     border-left: 0;
@@ -1446,79 +1606,92 @@ header .help-dropdown-menu li:hover a {
     position: relative;
     height: auto;
     margin-top: 100px;
+    opacity: 1;
   }
 }
-/* line 281, ../sass/ucla/_frontpage.scss */
+/* line 312, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content .region-content {
   padding: 0;
 }
-/* line 284, ../sass/ucla/_frontpage.scss */
+/* line 315, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content #region-main-wrap {
   right: 0;
   width: 100%;
 }
-/* line 288, ../sass/ucla/_frontpage.scss */
+/* line 319, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content #region-main {
   margin: 0;
 }
-/* line 291, ../sass/ucla/_frontpage.scss */
+/* line 322, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content #region-main-box {
   left: 0;
   width: 100%;
 }
-/* line 295, ../sass/ucla/_frontpage.scss */
+/* line 326, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content #region-post-box {
   margin-left: 0;
   left: 0;
 }
-/* line 299, ../sass/ucla/_frontpage.scss */
+/* line 330, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content #region-pre {
   left: 0;
   margin-left: 0;
   width: 100%;
 }
-/* line 304, ../sass/ucla/_frontpage.scss */
+/* line 335, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content #region-post {
   width: 100%;
   margin-left: 0;
 }
-/* line 309, ../sass/ucla/_frontpage.scss */
+/* line 340, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage #page-content .contentwithoutlink {
   padding: 0;
 }
-/* line 314, ../sass/ucla/_frontpage.scss */
+/* line 346, ../sass/ucla/_frontpage.scss */
+.pagelayout-frontpage .env-dev #page-content {
+  border-left-color: #8fb33e;
+}
+/* line 349, ../sass/ucla/_frontpage.scss */
+.pagelayout-frontpage .env-test #page-content {
+  border-left-color: #DA9C31;
+}
+/* line 352, ../sass/ucla/_frontpage.scss */
+.pagelayout-frontpage .env-stage #page-content {
+  border-left-color: #5749A7;
+}
+/* line 356, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block {
   margin-bottom: 8px;
 }
 @media (min-width: 768px) {
-  /* line 321, ../sass/ucla/_frontpage.scss */
+  /* line 363, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage #page-content {
     border-left: 100px solid #0072b1;
   }
 }
 @media (min-width: 992px) {
-  /* line 327, ../sass/ucla/_frontpage.scss */
+  /* line 369, ../sass/ucla/_frontpage.scss */
   .pagelayout-frontpage #page-content {
     border-left-width: 175px;
     width: 50%;
   }
 }
-/* line 336, ../sass/ucla/_frontpage.scss */
+/* line 378, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_alert .header-box {
   background-color: white !important;
   margin-bottom: 4px;
   padding: 0px 4px;
 }
-/* line 341, ../sass/ucla/_frontpage.scss */
+/* line 383, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_alert .header-box.alert-header-default {
   background: none;
   border-bottom: 4px solid #75c326;
 }
-/* line 345, ../sass/ucla/_frontpage.scss */
+/* line 387, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_alert .header-box .header-subtitle {
   font-size: 1.5rem;
 }
-/* line 350, ../sass/ucla/_frontpage.scss */
+/* line 392, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_alert .header-box * {
   font-family: "Lato", verdana, Sans Serif;
   font-size: 2.7rem;
@@ -1528,66 +1701,66 @@ header .help-dropdown-menu li:hover a {
   color: #444;
   /*text-align: left;*/
 }
-/* line 360, ../sass/ucla/_frontpage.scss */
+/* line 402, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_alert .content {
   /*            > div > .box-boundary {
                   padding: 0 16px;
               }*/
 }
-/* line 361, ../sass/ucla/_frontpage.scss */
+/* line 403, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_alert .content > .box-boundary {
   padding: 0 16px;
 }
-/* line 371, ../sass/ucla/_frontpage.scss */
+/* line 413, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby {
   padding: 8px;
   margin-top: 24px;
   border-bottom: 1px solid #ddd;
 }
-/* line 376, ../sass/ucla/_frontpage.scss */
+/* line 418, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby .header {
   background-color: white;
   margin-bottom: 0;
   border-bottom: 0;
 }
-/* line 381, ../sass/ucla/_frontpage.scss */
+/* line 423, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby .header h2 {
   color: #222;
   text-align: center;
   font-weight: 300;
   padding: 0;
 }
-/* line 388, ../sass/ucla/_frontpage.scss */
+/* line 430, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby ul.block_tree {
   text-align: center !important;
 }
-/* line 391, ../sass/ucla/_frontpage.scss */
+/* line 433, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby li.type_structure {
   border: 0;
   background-color: white;
   /*margin-left: 2px;*/
   display: inline;
 }
-/* line 397, ../sass/ucla/_frontpage.scss */
+/* line 439, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby li.type_structure:hover {
   background: none;
 }
-/* line 401, ../sass/ucla/_frontpage.scss */
+/* line 443, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby li.type_structure:after {
   content: "•";
   margin-left: 4px;
   margin-right: 2px;
 }
-/* line 406, ../sass/ucla/_frontpage.scss */
+/* line 448, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby li.type_structure:last-child:after {
   content: "";
 }
-/* line 410, ../sass/ucla/_frontpage.scss */
+/* line 452, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby li.type_structure p.tree_item {
   padding: 0 !important;
   display: inline !important;
 }
-/* line 415, ../sass/ucla/_frontpage.scss */
+/* line 457, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby a, .pagelayout-frontpage .block_ucla_browseby a:link {
   color: #666  !important;
   line-height: 2.4 !important;
@@ -1595,78 +1768,78 @@ header .help-dropdown-menu li:hover a {
   display: inline;
   font-weight: 300;
 }
-/* line 422, ../sass/ucla/_frontpage.scss */
+/* line 464, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_browseby a:hover {
   color: #222 !important;
 }
-/* line 428, ../sass/ucla/_frontpage.scss */
+/* line 470, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search {
   padding: 8px;
   margin-top: 0;
   border-bottom: 1px solid #ddd;
 }
-/* line 433, ../sass/ucla/_frontpage.scss */
+/* line 475, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search .header {
   background-color: white;
   margin-bottom: 0;
   border-bottom: 0;
 }
-/* line 438, ../sass/ucla/_frontpage.scss */
+/* line 480, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search .header h2 {
   color: #222;
   text-align: center;
   font-weight: 300;
   padding: 0;
 }
-/* line 446, ../sass/ucla/_frontpage.scss */
+/* line 488, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search .content {
   padding: 4px 4px 0;
   font-weight: 300;
 }
-/* line 450, ../sass/ucla/_frontpage.scss */
+/* line 492, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search .content span {
   margin-right: 4px;
 }
-/* line 453, ../sass/ucla/_frontpage.scss */
+/* line 495, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search .content fieldset {
   display: inline;
 }
-/* line 457, ../sass/ucla/_frontpage.scss */
+/* line 499, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .block_ucla_search .ucla-search-input {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
   border-radius: 0;
 }
-/* line 463, ../sass/ucla/_frontpage.scss */
+/* line 505, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic {
   padding: 16px;
   border-bottom: 1px solid #ddd;
   margin: 0;
 }
-/* line 468, ../sass/ucla/_frontpage.scss */
+/* line 510, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic .section {
   margin: auto 0;
 }
-/* line 471, ../sass/ucla/_frontpage.scss */
+/* line 513, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic .mod-indent-outer {
   padding-left: 0;
 }
-/* line 475, ../sass/ucla/_frontpage.scss */
+/* line 517, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic .label.modtype_label:hover {
   background-color: white;
 }
-/* line 478, ../sass/ucla/_frontpage.scss */
+/* line 520, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic .label.modtype_label * {
   font-size: 1.4rem;
   line-height: 1.4;
   overflow: visible;
 }
-/* line 483, ../sass/ucla/_frontpage.scss */
+/* line 525, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic .label.modtype_label h1 {
   font-size: 2.2rem;
   margin-top: 0;
 }
-/* line 487, ../sass/ucla/_frontpage.scss */
+/* line 529, ../sass/ucla/_frontpage.scss */
 .pagelayout-frontpage .box.sitetopic .label.modtype_label h2 {
   font-size: 2rem;
   margin-top: 0;

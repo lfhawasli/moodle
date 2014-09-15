@@ -415,13 +415,17 @@ input[type="button"].btn-block {
 .btn-header.real-user:before {
   content: "[";
 }
+/* line 69, ../sass/ucla/_buttons.scss */
+.btn-header i {
+  margin-left: 4px;
+}
 
-/* line 71, ../sass/ucla/_buttons.scss */
+/* line 75, ../sass/ucla/_buttons.scss */
 a.btn-header {
   color: white;
 }
 
-/* line 76, ../sass/ucla/_buttons.scss */
+/* line 80, ../sass/ucla/_buttons.scss */
 .btn-header-text {
   /*background-color: $ccle-color-blue;*/
   font-size: 1.2rem;
@@ -432,53 +436,54 @@ a.btn-header {
   height: auto;
 }
 
-/* line 87, ../sass/ucla/_buttons.scss */
+/* line 91, ../sass/ucla/_buttons.scss */
 .btn-help-feedback {
   background-color: #FFBC00;
 }
-/* line 90, ../sass/ucla/_buttons.scss */
+/* line 94, ../sass/ucla/_buttons.scss */
 .btn-help-feedback:hover {
   background-color: #ffc933;
 }
 
-/* line 95, ../sass/ucla/_buttons.scss */
+/* line 99, ../sass/ucla/_buttons.scss */
 a.btn-help-feedback {
   color: black;
 }
-/* line 97, ../sass/ucla/_buttons.scss */
+/* line 101, ../sass/ucla/_buttons.scss */
 a.btn-help-feedback i {
   margin-left: 2px;
 }
 
-/* line 103, ../sass/ucla/_buttons.scss */
+/* line 107, ../sass/ucla/_buttons.scss */
 .btn-login {
   background-color: #FFBC00;
   color: black !important;
 }
-/* line 107, ../sass/ucla/_buttons.scss */
+/* line 111, ../sass/ucla/_buttons.scss */
 .btn-login:hover {
   background-color: #ffc933;
 }
 
-/* line 113, ../sass/ucla/_buttons.scss */
+/* line 117, ../sass/ucla/_buttons.scss */
 .header-btn-group {
   float: right;
   color: white;
 }
-/* line 117, ../sass/ucla/_buttons.scss */
+/* line 121, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name {
   padding-left: 8px;
-  font-size: 1.1rem;
+  font-size: 1.0rem;
+  color: #cbe2f2;
 }
-/* line 121, ../sass/ucla/_buttons.scss */
+/* line 126, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name:after {
   content: ")";
 }
-/* line 124, ../sass/ucla/_buttons.scss */
+/* line 129, ../sass/ucla/_buttons.scss */
 .header-btn-group .role-name:before {
   content: "(";
 }
-/* line 128, ../sass/ucla/_buttons.scss */
+/* line 133, ../sass/ucla/_buttons.scss */
 .header-btn-group .login-as {
   font-size: 1.1rem;
   margin-left: -20px;
@@ -3661,7 +3666,18 @@ a + .groupinglabel {
   margin-right: 8px;
 }
 
-/* line 47, ../sass/_progress-bars.scss */
+/* line 45, ../sass/_progress-bars.scss */
+.editing .mod-indent {
+  display: inline !important;
+}
+/* line 48, ../sass/_progress-bars.scss */
+.editing .mod-indent > .activityinstance {
+  padding-right: 0 !important;
+  display: inline-block !important;
+  width: 100%;
+}
+
+/* line 58, ../sass/_progress-bars.scss */
 .dndupload-progress-outer {
   margin-top: 8px;
   width: 100%;

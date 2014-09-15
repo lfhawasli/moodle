@@ -2,9 +2,9 @@
  * YUI script to toggle the help dropdown.
  * 
  *  - will show the dropdown on 'hover'
- *  - will remove the dropdown if user click anywhere else on body 
+ *  - will remove the dropdown if user 'taps' anywhere else on body 
  */
-YUI().use('node', 'event', function(Y) {
+YUI().use('node', 'event', 'event-tap', function(Y) {
 
     Y.on('domready', function() {
 
@@ -27,7 +27,7 @@ YUI().use('node', 'event', function(Y) {
                 }                
             });
             // Attach 'hover' event
-            dropdown.on('click', function(e) {
+            dropdown.on('mouseenter', function(e) {
                 e.preventDefault();
 
                 // Show the menu
@@ -39,14 +39,11 @@ YUI().use('node', 'event', function(Y) {
                     dropdownmenu.addClass('hidden');
                 });
 
-                // Hides the menu and detaches event.   
-                var hidemenu = function() {
-                    dropdownmenu.addClass('hidden');
-                    this.detach();
-                };
+            });
 
-                // Attach event to other header buttons to hide the menu on 'hover'
-                Y.all('.btn-header:not(.btn-help-feedback)').on('mouseenter', hidemenu);
+            // Tap hide
+            Y.one('body').on('touchstart', function() {
+                Y.one('.help-dropdown-menu').addClass('hidden');
             });
         }
     });

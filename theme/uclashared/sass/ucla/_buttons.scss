@@ -65,6 +65,10 @@ $btn-color-login:           #f9c739;
             content: "[";
         }
     }
+    
+    i {
+        margin-left: 4px;
+    }
 }
 
 // Keep links white
@@ -116,7 +120,8 @@ a.btn-help-feedback {
     
     .role-name {
         padding-left: 8px;
-        font-size: 1.1rem;
+        font-size: 1.0rem;
+        color: #cbe2f2;
         
         &:after {
             content: ")";

@@ -241,7 +241,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             $text = html_writer::span(get_string('logout'), 'hidden-xs');
             $logininfo[] = html_writer::link(
                     new moodle_url('/login/logout.php', array('sesskey' => sesskey())),
-                    $icon . $text,
+                    $text . $icon,
                     array('class' => 'btn-header')
             );
         }
@@ -375,7 +375,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                                 html_writer::span('common collaboration',
                                         'logo-cc') .
                                 html_writer::span('& learning environment',
-                                        'logo-le'), 'logo-ccle-sub hidden-xs')
+                                        'logo-le'), 'logo-ccle-sub hidden-xs hidden-sm')
         );
 
         return $link;

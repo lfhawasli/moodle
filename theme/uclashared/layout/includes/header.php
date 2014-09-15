@@ -28,11 +28,12 @@
 
 <?php if ($hasheading || $hasnavbar) { ?>
     <header id="page-header" class="container-fluid">
+        <div class="header-border visible-xs"></div>
         <div class="header-main row">
-            <div class="col-sm-6 col-xs-3 header-logo">
+            <div class="header-logo">
                 <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
             </div>
-            <div class="col-sm-6 col-xs-9 header-login">
+            <div class="header-login">
                 <div class="header-btn-group logininfo" >
                     <?php
                     if ($haslogininfo) {

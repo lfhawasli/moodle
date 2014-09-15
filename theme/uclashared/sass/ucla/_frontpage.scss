@@ -1,5 +1,4 @@
 //
-@import "ucla/mixins";
 
 $frontpage-logo-bar-width:  175px;
 
@@ -9,7 +8,7 @@ $frontpage-logo-bar-width:  175px;
     // Embed the image on the #page wrapper element
     #page {
         background: url([[pix:theme|frontpage-image]]) no-repeat;
-        background-position: 0 top;
+        background-position: 0 20%;
         /*background-size: 100% auto;*/
         height: 100%;
         min-height: 1000px;
@@ -48,6 +47,7 @@ $frontpage-logo-bar-width:  175px;
             position: relative;
             
             @include respond-xs {
+                height: 40px;
                 background-color: $ucla-color-blue;
                 opacity: 0.95;
                 display: inline-block;
@@ -63,7 +63,13 @@ $frontpage-logo-bar-width:  175px;
             margin-top: 15px;
             
         }
-        
+        .help-dropdown-menu {
+            top: 55px;
+            .arrow-up {
+                left: auto;
+                right: 10%;
+            }
+        }
         // Float buttons to the right, so they can collapse
         .btn-header {
             float: right;
@@ -81,7 +87,8 @@ $frontpage-logo-bar-width:  175px;
         // Contains the logo link
         .header-logo {
             width: 100px;
-            padding: 20px 0 0 15px;
+            /*padding: 20px 0 0 15px;*/
+            margin-top: 8px;
             display: inline-block;
             
             @include respond-xs {
@@ -126,6 +133,22 @@ $frontpage-logo-bar-width:  175px;
     // Reflow for tiny screens
     @include respond-xs {
         header {
+            .header-main {
+                display: block;
+            }
+            .header-system {
+                margin-top: 68px;
+            }
+            .help-dropdown-menu {
+                left: 5%;
+                width: 90%;
+                top: auto;
+                margin-top: -4px;
+                
+                .arrow-up {
+                    right: 50%;
+                }
+            }
             .header-system-name {
                 display: inline;
             }
@@ -219,7 +242,7 @@ $frontpage-logo-bar-width:  175px;
             // Contains the logo link
             .header-logo {
                 width: 170px;
-                padding: 20px 0 0 15px;
+                /*padding: 20px 0 0 15px;*/
                 display: inline-block;
             }
             .logo-ccle {
@@ -236,6 +259,13 @@ $frontpage-logo-bar-width:  175px;
             }
             .header-server {
                 width: 100px;
+            }
+            .help-dropdown-menu {
+                right: auto;
+                .arrow-up {
+                    right: auto;
+                    left: 10%;
+                }
             }
         }
     }
@@ -274,6 +304,7 @@ $frontpage-logo-bar-width:  175px;
             position: relative;
             height: auto;
             margin-top: 100px;
+            opacity: 1;
         }
 
         @include box-sizing(content-box);
@@ -309,6 +340,17 @@ $frontpage-logo-bar-width:  175px;
         .contentwithoutlink  {
             padding: 0;
         }
+    }
+    
+    // Environment colors
+    .env-dev #page-content {
+        border-left-color: $header-color-dev;
+    }
+    .env-test #page-content {
+        border-left-color: $header-color-test;
+    }
+    .env-stage #page-content {
+        border-left-color: $header-color-stage;
     }
 
     .block  {
