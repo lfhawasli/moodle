@@ -32,7 +32,10 @@ require('../../../../../config.php');
 require_login();
 
 $itemid = required_param('itemid', PARAM_INT);
-$context = get_context_instance(CONTEXT_USER, $USER->id);
+$context = NULL;
+if (isloggedin()) {
+    $context = context_user::instance($USER->id);
+}
 $elname = "nanogong_upload_file";
 
 // use date/time as the file name

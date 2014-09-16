@@ -19,7 +19,7 @@
  *
  * @author Andreas Grabs
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package feedback
+ * @package mod_feedback
  */
 
 require_once("../../config.php");
@@ -183,10 +183,8 @@ $feedback_is_closed = ($feedback->timeopen > $checktime) ||
 
 if ($feedback_is_closed) {
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<h2><font color="red">';
-        echo get_string('feedback_is_not_open', 'feedback');
-        echo '</font></h2>';
-        echo $OUTPUT->continue_button($CFG->wwwroot.'/course/view.php?id='.$course->id);
+    echo $OUTPUT->notification(get_string('feedback_is_not_open', 'feedback'));
+    echo $OUTPUT->continue_button($CFG->wwwroot.'/course/view.php?id='.$course->id);
     echo $OUTPUT->box_end();
     echo $OUTPUT->footer();
     exit;
@@ -210,12 +208,6 @@ if ($feedback_can_submit) {
         if (feedback_check_values($startitempos, $lastitempos)) {
             $userid = $USER->id; //arb
             if ($completedid = feedback_save_guest_values(sesskey())) {
-                add_to_log($course->id,
-                           'feedback',
-                           'startcomplete',
-                           'view.php?id='.$cm->id,
-                           $feedback->id);
-
                 //now it can be saved
                 if (!$gonextpage AND !$gopreviouspage) {
                     $preservevalues = false;
@@ -526,10 +518,8 @@ if ($feedback_can_submit) {
     }
 } else {
     echo $OUTPUT->box_start('generalbox boxaligncenter');
-        echo '<h2><font color="red">';
-        echo get_string('this_feedback_is_already_submitted', 'feedback');
-        echo '</font></h2>';
-        echo $OUTPUT->continue_button($CFG->wwwroot.'/course/view.php?id='.$course->id);
+    echo $OUTPUT->notification(get_string('this_feedback_is_already_submitted', 'feedback'));
+    echo $OUTPUT->continue_button($CFG->wwwroot.'/course/view.php?id='.$course->id);
     echo $OUTPUT->box_end();
 }
 /// Finish the page

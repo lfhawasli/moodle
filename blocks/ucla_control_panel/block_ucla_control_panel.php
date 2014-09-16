@@ -142,7 +142,7 @@ class block_ucla_control_panel extends block_base {
         }
 
         if ($context === null) {
-            $context = get_context_instance(CONTEXT_COURSE, $course_id);
+            $context = context_course::instance($course_id);
         }
 
         // Grab the possible collections of modules to display

@@ -142,7 +142,7 @@ if (!$csv) {
 if ($csv) {
 
     $shortname = format_string($course->shortname, true, array('context' => $context));
-    $shortname = preg_replace('/[^a-z0-9-]/', '_',textlib::strtolower(strip_tags($shortname)));
+    $shortname = preg_replace('/[^a-z0-9-]/', '_',core_text::strtolower(strip_tags($shortname)));
 
     $export = new csv_export_writer();
     $export->set_filename('completion-'.$shortname);
@@ -746,3 +746,7 @@ print '<li><a href="'.$excelurl->out().'">'.get_string('excelcsvdownload','compl
 print '</ul>';
 
 echo $OUTPUT->footer($course);
+
+// Trigger a report viewed event.
+$event = \report_completion\event\report_viewed::create(array('context' => $context));
+$event->trigger();

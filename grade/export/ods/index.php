@@ -70,7 +70,10 @@ $mform->display();
 
 echo $OUTPUT->footer();
 
-// START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$url = '/export/ods/index.php?id=' . $course->id;
-add_to_log($course->id, 'grade', 'view ods', $url);
-// END UCLA MOD: CCLE-3980
+// START UCLA MOD: CCLE-4659 - Migrate add to log calls for grade export
+$event = \local_gradebook\event\grades_export_viewed_ods::create(array(
+    'context' => $context,
+    'other' => array('type' => 'ods')
+));
+$event->trigger();
+// END UCLA MOD: CCLE-4659

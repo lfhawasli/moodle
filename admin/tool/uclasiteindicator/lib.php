@@ -72,7 +72,7 @@ class siteindicator_site {
             $newgroup = $uclaindicator->get_rolegroup_for_type($newtype);            
             
             // Get course context
-            $context = get_context_instance(CONTEXT_COURSE, $this->property->courseid);
+            $context = context_course::instance($this->property->courseid);
             
             // Get enrolled users
             $users = get_enrolled_users($context);
@@ -242,7 +242,7 @@ class siteindicator_request {
         enrol_try_internal_enrol($courseid, $userid, $role->id);        
         
         // Get context
-        $context = get_context_instance(CONTEXT_COURSE, $courseid);
+        $context = context_course::instance($courseid);
         
         // Assign default role
         role_assign($role->id, $userid, $context->id, '', NULL);

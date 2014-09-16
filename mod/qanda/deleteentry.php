@@ -116,7 +116,15 @@ if ($confirm and confirm_sesskey()) { // the operation was confirmed.
         $rm->delete_ratings($delopt);
     }
 
-    add_to_log($course->id, "qanda", "delete entry", "view.php?id=$cm->id&amp;mode=$prevmode&amp;hook=$hook", $entry->id, $cm->id);
+    $event = \mod_qanda\event\entry_deleted::create(array(
+        'context'  => $context,
+        'objectid' => $entry->id,
+        'other'    => array(
+            'mode' => $prevmode,
+            'hook' => $hook
+        )
+    ));
+    $event->trigger();
     redirect("view.php?id=$cm->id&amp;mode=$prevmode&amp;hook=$hook");
 } else {        // the operation has not been confirmed yet so ask the user to do so
     $PAGE->navbar->add(get_string('delete'));

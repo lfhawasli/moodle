@@ -11,7 +11,7 @@ $confirm = optional_param('confirm', 0, PARAM_BOOL);
 require_login();
 // START UCLA MOD: CCLE-2970 - Cannot disable "bulk user actions" in site admin menu
 // adding capability check for ability to perform bulk user actions
-require_capability('local/ucla:bulk_users', get_context_instance(CONTEXT_SYSTEM));
+require_capability('local/ucla:bulk_users', context_system::instance());
 // END UCLA MOD: CCLE-2970
 admin_externalpage_setup('userbulk');
 require_capability('moodle/user:delete', context_system::instance());
@@ -38,7 +38,7 @@ if ($confirm and confirm_sesskey()) {
         }
     }
     $rs->close();
-    session_gc(); // remove stale sessions
+    \core\session\manager::gc(); // Remove stale sessions.
     echo $OUTPUT->box_start('generalbox', 'notice');
     if (!empty($notifications)) {
         echo $notifications;

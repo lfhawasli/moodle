@@ -43,7 +43,14 @@
     $strchoices = get_string("modulenameplural", "choice");
     $strresponses = get_string("responses", "choice");
 
-    add_to_log($course->id, "choice", "report", "report.php?id=$cm->id", "$choice->id",$cm->id);
+    $eventdata = array();
+    $eventdata['objectid'] = $choice->id;
+    $eventdata['context'] = $context;
+    $eventdata['courseid'] = $course->id;
+    $eventdata['other']['content'] = 'choicereportcontentviewed';
+
+    $event = \mod_choice\event\report_viewed::create($eventdata);
+    $event->trigger();
 
     if (data_submitted() && $action == 'delete' && has_capability('mod/choice:deleteresponses',$context) && confirm_sesskey()) {
         choice_delete_responses($attemptids, $choice, $cm, $course); //delete responses.
@@ -55,6 +62,7 @@
         $PAGE->set_title(format_string($choice->name).": $strresponses");
         $PAGE->set_heading($course->fullname);
         echo $OUTPUT->header();
+        echo $OUTPUT->heading($choice->name, 2, null);
         /// Check to see if groups are being used in this choice
         $groupmode = groups_get_activity_groupmode($cm);
         if ($groupmode) {

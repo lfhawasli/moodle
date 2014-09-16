@@ -39,18 +39,21 @@ if (empty($enrolinvitationtoken)) {
 $invitation = $DB->get_record('enrol_invitation',
         array('token' => $enrolinvitationtoken, 'tokenused' => false));
 
-// If token is valid, enrol the user into the course.
-if (empty($invitation) or empty($invitation->courseid) or $invitation->timeexpiration < time()) {
-    $courseid = empty($invitation->courseid) ? $SITE->id : $invitation->courseid;
-    add_to_log($courseid, 'course', 'invitation expired',
-        "../enrol/invitation/history.php?courseid=$courseid",
-        $DB->get_record('course', array('id' => $courseid), 'fullname')->fullname);
-    throw new moodle_exception('expiredtoken', 'enrol_invitation');
-}
-
 // Make sure that course exists.
 $course = $DB->get_record('course', array('id' => $invitation->courseid), '*', MUST_EXIST);
 $context = context_course::instance($course->id);
+
+// If token is valid, enrol the user into the course.
+if (empty($invitation) or empty($invitation->courseid) or $invitation->timeexpiration < time()) {
+    $courseid = empty($invitation->courseid) ? $SITE->id : $invitation->courseid;
+    $event = \enrol_invitation\event\invitation_expired::create(array(
+            'objectid' => $invitation->id,
+            'context' => context_course::instance($courseid),
+            'other' => $course->fullname
+            ));
+    $event->trigger();
+    throw new moodle_exception('expiredtoken', 'enrol_invitation');
+}
 
 // Set up page.
 $PAGE->set_context($context);
@@ -98,8 +101,12 @@ if (empty($confirm)) {
     // Print out a heading.
     echo $OUTPUT->heading($pagetitle, 2, 'headingblock');
 
-    add_to_log($invitation->courseid, 'course', 'invitation view',
-        "../enrol/invitation/history.php?courseid=$invitation->courseid", $course->fullname);
+    $event = \enrol_invitation\event\invitation_viewed::create(array(
+            'objectid' => $invitation->id,
+            'context' => context_course::instance($invitation->courseid),
+            'other' => $course->fullname
+            ));
+    $event->trigger();
 
     $accepturl = new moodle_url('/enrol/invitation/enrol.php',
             array('token' => $invitation->token, 'confirm' => true));
@@ -130,16 +137,24 @@ if (empty($confirm)) {
     exit;
 } else {
     if ($invitation->email != $USER->email) {
-        add_to_log($invitation->courseid, 'course', 'invitation mismatch',
-            "../enrol/invitation/history.php?courseid=$invitation->courseid", $course->fullname);
+        $event = \enrol_invitation\event\invitation_mismatch::create(array(
+                'objectid' => $invitation->id,
+                'context' => context_course::instance($invitation->courseid),
+                'other' => $course->fullname
+                ));
+        $event->trigger();
     }
     // User confirmed, so add them.
     require_once($CFG->dirroot . '/enrol/invitation/locallib.php');
     $invitationmanager = new invitation_manager($invitation->courseid);
     $invitationmanager->enroluser($invitation);
 
-    add_to_log($invitation->courseid, 'course', 'invitation claim',
-        "../enrol/invitation/history.php?courseid=$invitation->courseid", $course->fullname);
+    $event = \enrol_invitation\event\invitation_claimed::create(array(
+            'objectid' => $invitation->id,
+            'context' => context_course::instance($invitation->courseid),
+            'other' => $course->fullname  
+            ));
+    $event->trigger();
 
     // Set token as used and mark which user was assigned the token.
     $invitation->tokenused = true;
@@ -151,11 +166,18 @@ if (empty($confirm)) {
         // Send an email to the user who sent the invitation.
         $inviter = $DB->get_record('user', array('id' => $invitation->inviterid));
 
+        // This is inviter's information.
         $contactuser = new object;
         $contactuser->email = $inviter->email;
         $contactuser->firstname = $inviter->firstname;
         $contactuser->lastname = $inviter->lastname;
         $contactuser->maildisplay = true;
+        $contactuser->id = $inviter->id;
+        // Moodle 2.7 introduced new username fields.
+        $contactuser->alternatename = '';
+        $contactuser->firstnamephonetic = '';
+        $contactuser->lastnamephonetic = '';
+        $contactuser->middlename = '';
 
         $emailinfo = prepare_notice_object($invitation);
         $emailinfo->userfullname = trim($USER->firstname . ' ' . $USER->lastname);

@@ -77,7 +77,11 @@ if ($entries) {
         }
 
         $entries[$key]->footer = "<p style=\"text-align:right\">&raquo;&nbsp;<a href=\"$CFG->wwwroot/mod/qanda/view.php?g=$entry->qandaid\">" . format_string($entry->qandaname, true) . "</a></p>";
-        add_to_log($entry->courseid, 'qanda', 'view entry', "showentry.php?eid=$entry->id", $entry->id, $entry->cmid);
+        $event = \mod_qanda\event\entry_viewed::create(array(
+            'context'  => $context,
+            'objectid' => $entry->id
+        ));
+        $event->trigger(); 
     }
 }
 

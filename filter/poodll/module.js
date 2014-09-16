@@ -7,15 +7,40 @@
  * @package filter_poodll
  */
 
-M.filter_poodll = {}
-M.filter_poodll.getwhiteboardcanvas=null;
-M.filter_poodll.timeouthandle=null;
+M.filter_poodll = {
 
-// Replace poodll_flowplayer divs with flowplayers
-M.filter_poodll.loadflowplayer = function(Y,opts) {
+	getwhiteboardcanvas: Array(),
+	
+	getwhiteboard: Array(),
+	
+	whiteboards: Array(),
+	
+	whiteboardopts: Array(),
+	
+	timeouthandles: Array(),
+	
+	poodllopts: Array(),
+	
+	gyui: null,
+	
 
-//the standard config. change backgroundcolor to go from blue to something else	
-theconfig = { plugins:
+// Called by PoodLL recorders to update filename field on page
+	updatepage: function(args) {
+	
+			//record the url on the html page,							
+			var filenamecontrol = document.getElementById(args[3]);
+			if(filenamecontrol==null){ filenamecontrol = parent.document.getElementById(args[3]);} 			
+			if(filenamecontrol){
+				filenamecontrol.value = args[2];
+			}
+	},
+
+
+	// Replace poodll_flowplayer divs with flowplayers
+	loadflowplayer: function(Y,opts) {
+
+			//the standard config. change backgroundcolor to go from blue to something else	
+			theconfig = { plugins:
                                 { controls:
                                         { fullscreen: false,
                                                 height: 40,
@@ -47,141 +72,154 @@ theconfig = { plugins:
                                                 timeBgColor: 'rgb(0, 0, 0, 0)',
                                                 opacity: 1.0 },
                                        
-                                audio:
-                                        { url: opts['audiocontrolsurl'] }
-                                },
-                playlist: opts['playlisturl'] ,
-                clip:
-                        { autoPlay: true }
-        } ;
+									audio:
+											{ url: opts['audiocontrolsurl'] }
+									},
+					playlist: opts['playlisturl'] ,
+					clip:
+							{ autoPlay: true }
+			} ;
 		
-	var splash=false;
+		var splash=false;
+		
+		//stash our Y for later use
+		this.gyui = Y;
 
-	//the params are different depending on the playertype
-	//we need to specify provider for audio if the clips are not MP3 or mp3
-	//jqueryseems unavoidable even if not using it for playlists
-	switch(opts['playertype']){
-		case "audio":
-			if (opts['jscontrols']){
-					theconfig.plugins.controls = null;
-					//we don't need to see the flowplayer video/audio at all if we are using js 
-					opts["height"]=1;
-			}else{
+		//the params are different depending on the playertype
+		//we need to specify provider for audio if the clips are not MP3 or mp3
+		//jqueryseems unavoidable even if not using it for playlists
+		switch(opts['playertype']){
+			case "audio":
+				if (opts['jscontrols']){
+						theconfig.plugins.controls = null;
+						//we don't need to see the flowplayer video/audio at all if we are using js 
+						opts["height"]=1;
+				}else{
 
-				theconfig.plugins.controls.fullscreen =false;
-				theconfig.plugins.controls.height = opts['height'];
-				theconfig.plugins.controls.autoHide= false;
-			}
+					theconfig.plugins.controls.fullscreen =false;
+					theconfig.plugins.controls.height = opts['height'];
+					theconfig.plugins.controls.autoHide= false;
+				}
 			
-			//We need to tell flowplayer if we have mp3 to play.
-			//if it is FLV, we should not pass in a provider flag
-			var ext = opts['path'].substr(opts['path'].lastIndexOf('.') + 1);
-			if(ext==".mp3" || ext==".MP3"){
-				theconfig.clip.provider='audio';			
-			}
+				//We need to tell flowplayer if we have mp3 to play.
+				//if it is FLV, we should not pass in a provider flag
+				var ext = opts['path'].substr(opts['path'].lastIndexOf('.') + 1);
+				if(ext==".mp3" || ext==".MP3"){
+					theconfig.clip.provider='audio';			
+				}
 	
 						
-			//If we have a splash screen show it and enable autoplay(user only clicks once)
-			//best to have a splash screen to prevent browser hangs on many flashplayers in a forum etc
-			if(opts['poodll_audiosplash']){
-				theconfig.clip.autoPlay=true;
-				splash=true;
-			}else{
-				theconfig.clip.autoPlay=false;
-			}
-			break;
+				//If we have a splash screen show it and enable autoplay(user only clicks once)
+				//best to have a splash screen to prevent browser hangs on many flashplayers in a forum etc
+				if(opts['poodll_audiosplash']){
+					theconfig.clip.autoPlay=true;
+					splash=true;
+				}else{
+					theconfig.clip.autoPlay=false;
+				}
+				break;
 		
-		case "audiolist":
-			if (opts['jscontrols']){
-					theconfig.plugins.controls = null;
-					//we don't need to see the flowplayer video/audio at all if we are using js 
-					opts["height"]=1;
-			}else{
+			case "audiolist":
+				if (opts['jscontrols']){
+						theconfig.plugins.controls = null;
+						//we don't need to see the flowplayer video/audio at all if we are using js 
+						opts["height"]=1;
+				}else{
+					theconfig.plugins.controls.fullscreen = false;
+					theconfig.plugins.controls.height = opts['defaultcontrolsheight'];
+					theconfig.plugins.controls.autoHide= false;
+					theconfig.plugins.controls.playlist = true;
+				}
+			
+				//without looking inside the playlist we don't know if the audios are flv or mp3.
+				//here we assume that audio playlists are mp3. If not we need to remove the provider element
+				if (opts['loop']=='true'){
+					theconfig.clip.autoPlay=true;
+				}else{
+					theconfig.clip.autoPlay=false;
+				}
+				theconfig.clip.provider='audio';
+				break;
+		
+			case "video":
+				//theconfig.plugins.audio= null;
+			
+				if (opts['jscontrols']){
+					theconfig.plugins.controls =null;
+				}else{
+					theconfig.plugins.controls.fullscreen = true;
+					theconfig.plugins.controls.height = opts['defaultcontrolsheight'];
+					theconfig.plugins.controls.autoHide= true;
+				}
+				//set the color to black on video screens
+				theconfig.plugins.controls.backgroundColor = '#0';
+
+			
+				//If we have a splash screen show it and enable autoplay(user only clicks once)
+				//best to have a splash screen to prevent browser hangs on many flashplayers in a forum etc
+				if(opts['poodll_videosplash']){
+					theconfig.clip.autoPlay=true;
+					splash=true;
+				}else{
+					theconfig.clip.autoPlay=false;
+				}
+				break;
+		
+			case "videolist":
 				theconfig.plugins.controls.fullscreen = false;
 				theconfig.plugins.controls.height = opts['defaultcontrolsheight'];
-				theconfig.plugins.controls.autoHide= false;
-				theconfig.plugins.controls.playlist = true;
-			}
-			
-			//without looking inside the playlist we don't know if the audios are flv or mp3.
-			//here we assume that audio playlists are mp3. If not we need to remove the provider element
-			if (opts['loop']=='true'){
-				theconfig.clip.autoPlay=true;
-			}else{
-				theconfig.clip.autoPlay=false;
-			}
-			theconfig.clip.provider='audio';
-			break;
-		
-		case "video":
-			//theconfig.plugins.audio= null;
-			
-			if (opts['jscontrols']){
-				theconfig.plugins.controls =null;
-			}else{
-				theconfig.plugins.controls.fullscreen = true;
-				theconfig.plugins.controls.height = opts['defaultcontrolsheight'];
 				theconfig.plugins.controls.autoHide= true;
-			}
-			//set the color to black on video screens
-			theconfig.plugins.controls.backgroundColor = '#0';
-
-			
-			//If we have a splash screen show it and enable autoplay(user only clicks once)
-			//best to have a splash screen to prevent browser hangs on many flashplayers in a forum etc
-			if(opts['poodll_videosplash']){
-				theconfig.clip.autoPlay=true;
-				splash=true;
-			}else{
+				theconfig.plugins.controls.playlist = true;
 				theconfig.clip.autoPlay=false;
-			}
-			break;
+				//set the color to black on video screens
+				theconfig.plugins.controls.backgroundColor = '#0';
+				break;
 		
-		case "videolist":
-			theconfig.plugins.controls.fullscreen = false;
-			theconfig.plugins.controls.height = opts['defaultcontrolsheight'];
-			theconfig.plugins.controls.autoHide= true;
-			theconfig.plugins.controls.playlist = true;
-			theconfig.clip.autoPlay=false;
-			//set the color to black on video screens
-			theconfig.plugins.controls.backgroundColor = '#0';
-			break;
-		
-	}
+		}
 	
 	
-	//Get our element to replace
-	var playerel= document.getElementById(opts['playerid']);
-	if(!playerel){return;}
+		//Get our element to replace
+		var playerel= document.getElementById(opts['playerid']);
+		if(!playerel){return;}
 	
-	//should there be a problem with standard embedding, we can try this simpler
-	//way
-	if(opts['embedtype']=='flashembed'){
-       theconfig.clip.url= opts['path'];
-		//we should not have to specify this, but we do ...?
-		var uniqconfig = theconfig;
-		if(splash){
-			playerel.onclick = function() {
+		//should there be a problem with standard embedding, we can try this simpler
+		//way
+		if(opts['embedtype']=='flashembed'){
+		   theconfig.clip.url= opts['path'];
+			//we should not have to specify this, but we do ...?
+			var uniqconfig = theconfig;
+			if(splash){
+				playerel.onclick = function() {
+					flashembed(opts['playerid'], opts['playerpath'], {config: uniqconfig});
+				}
+			}else{
 				flashembed(opts['playerid'], opts['playerpath'], {config: uniqconfig});
 			}
-		}else{
-			flashembed(opts['playerid'], opts['playerpath'], {config: uniqconfig});
-		}
-		//console.log("flashembed embedded");
+			//console.log("flashembed embedded");
 	
-	//embed via swf object
-	}else if(opts['embedtype']=='swfobject'){
+		//embed via swf object
+		}else if(opts['embedtype']=='swfobject'){
 
-       //we should not have to specify this, but we do ...?
-       theconfig.clip.url= opts['path'];
-       //we declare this here so that when called from click it refers to this config, and not a later one (object referecnes ...)
-       var configstring=Y.JSON.stringify(theconfig);
-	   //we need to convert double to single quotes, for IE's benefit
-	   configstring= configstring.replace(/"/g,"'");
-	   if(splash){
-			//console.log("playerid:" + opts['playerid']);
-			// get flash container and assign click handler for it
-			playerel.onclick = function() {
+		   //we should not have to specify this, but we do ...?
+		   theconfig.clip.url= opts['path'];
+		   //we declare this here so that when called from click it refers to this config, and not a later one (object referecnes ...)
+		   var configstring=Y.JSON.stringify(theconfig);
+		   //we need to convert double to single quotes, for IE's benefit
+		   configstring= configstring.replace(/"/g,"'");
+		   if(splash){
+				//console.log("playerid:" + opts['playerid']);
+				// get flash container and assign click handler for it
+				playerel.onclick = function() {
+					swfobject.embedSWF(opts['playerpath'],
+							opts['playerid'], opts['width'], 
+							opts['height'] , 
+							"9.0.0", 
+							null, 
+							{config: configstring}
+						);
+				}
+			
+			}else{
 				swfobject.embedSWF(opts['playerpath'],
 						opts['playerid'], opts['width'], 
 						opts['height'] , 
@@ -190,257 +228,353 @@ theconfig = { plugins:
 						{config: configstring}
 					);
 			}
-			
-		}else{
-			swfobject.embedSWF(opts['playerpath'],
-    				opts['playerid'], opts['width'], 
-    				opts['height'] , 
-    				"9.0.0", 
-    				null, 
-    				{config: configstring}
-    			);
-		}
 
 	
-	//we default to flowplayer embed method
-	}else{
-	
-		/* output the flowplayer */
-		var playerid= opts['playerid'];		
-		var playerpath = opts['playerpath'];
-		$fp = flowplayer(playerid,playerpath,theconfig);
-		//output any other bits and pieces required
-		if(opts['controls']!="0"){$fp = $fp.controls(opts['controls']);}
-		if(opts['ipad']){$fp=$fp.ipad();}
-		if(opts['playlist']){$fp=$fp.playlist("div.poodllplaylist", {loop: opts["loop"]});}
-	}
-
-	//for debugging
-//	console.log(theconfig);
-}
-
-// load drawingboard whiteboard for Moodle
-M.filter_poodll.loaddrawingboard = function(Y,opts) {
-
-		if(opts['bgimage'] ){
-			var erasercolor = 'transparent';
+		//we default to flowplayer embed method
 		}else{
-			var erasercolor = 'background';
-			opts['bgimage'] = '#FFF';
+	
+			/* output the flowplayer */
+			var playerid= opts['playerid'];		
+			var playerpath = opts['playerpath'];
+			$fp = flowplayer(playerid,playerpath,theconfig);
+			//output any other bits and pieces required
+			if(opts['controls']!="0"){$fp = $fp.controls(opts['controls']);}
+			if(opts['ipad']){$fp=$fp.ipad();}
+			if(opts['playlist']){$fp=$fp.playlist("div.poodllplaylist", {loop: opts["loop"]});}
 		}
 
-       // load the whiteboard and save the canvas reference
-       var db = new DrawingBoard.Board('drawing-board-id',{
-				size: 3,
-				background: opts['bgimage'],
-				controls: ['Color',
-							{ Size: { type: 'auto' } },
-							{ DrawingMode: { filler: false,eraser: false,pencil: false } },
-							'Navigation'
-						],
-				webStorage: false,
-				enlargeYourContainer: true,
-				eraserColor: erasercolor
-			});
-			
-			
-		if(opts['autosave']){		
-				//autosave, clear messages and save callbacks on start drawing
-				db.ev.bind('board:startDrawing', function(e) {
-						// update messages
-						var m = $id('p_messages');
-						m.innerHTML = 'File has not been saved.';
-						
-						var savebutton = $id('p_btn_upload_whiteboard');
-						savebutton.disabled=false;
-						
-						clearTimeout(M.filter_poodll.timeouthandle);
-					});
-					
-				//autosave, clear previous callbacks,set new save callbacks on stop drawing
-				db.ev.bind('board:stopDrawing', function(e) {
-						clearTimeout(M.filter_poodll.timeouthandle);
-						M.filter_poodll.timeouthandle = setTimeout(WhiteboardUploadHandler,3000);
-					});
-					
-				//set up the upload/save button
-			   var uploadbutton = $id('p_btn_upload_whiteboard');
-				if(uploadbutton){
-					uploadbutton.addEventListener("click", WhiteboardUploadHandler, false);
-					M.filter_poodll.getwhiteboardcanvas = function(){ return db.canvas;};
-				}
+		//for debugging
+	//	console.log(theconfig);
+	},
+
+	// load drawingboard whiteboard for Moodle
+	loaddrawingboard: function(Y,opts) {
 		
-		}else{
-			db.ev.bind('board:startDrawing', function(e) {
-						// update messages
-						var m = $id('p_messages');
-						m.innerHTML = 'File has not been saved.';
-			});
+		//stash our opts array
+		this.whiteboardopts[opts['recorderid']] = opts;
+		
+		//stash our Y for later use
+		this.gyui = Y;
+
+			if(opts['bgimage'] ){
+				var erasercolor = 'transparent';
+			}else{
+				var erasercolor = 'background';
+				opts['bgimage'] = '#FFF';
+			}
+
+		   // load the whiteboard and save the canvas reference
+		   var db = new DrawingBoard.Board(opts['recorderid'] + '_drawing-board-id',{
+		   			recorderid: opts['recorderid'],
+					size: 3,
+					background: opts['bgimage'],
+					controls: ['Color',
+								{ Size: { type: 'auto' } },
+								{ DrawingMode: { filler: false,eraser: true,pencil: true } },
+								'Navigation'
+							],
+					droppable: true,
+					webStorage: false,
+					enlargeYourContainer: true,
+					eraserColor: erasercolor
+				});
+				
+			//stash our whiteboard	
+			M.filter_poodll.whiteboards[opts['recorderid']] = db;
 			
-			//set up the upload/save button
-		   var uploadbutton = $id('p_btn_upload_whiteboard');
-			if(uploadbutton){
-				uploadbutton.addEventListener("click", CallFileUpload, false);
-				M.filter_poodll.getwhiteboardcanvas = function(){ return db.canvas;};
+			//restore vectordata
+			var vectordata = opts['vectordata'];
+			if(vectordata){
+				//dont do anything if its not JSON (ie it coule be from LC)
+				if(vectordata.indexOf('{"shapes"')!=0){
+					db.history = Y.JSON.parse(vectordata);
+					db.setImg(db.history.values[db.history.position-1]);
+				}
+			}
+			
+			//register events. if autosave we need to do more.
+			if(opts['autosave']){		
+					//autosave, clear messages and save callbacks on start drawing
+					db.ev.bind('board:startDrawing', (function(mfp,recid){
+								return function(){
+									var m = document.getElementById(recid + '_messages');
+									if(m){
+										m.innerHTML = 'File has not been saved.';
+										var savebutton = document.getElementById(recid + '_btn_upload_whiteboard');
+										savebutton.disabled=false;
+										var th = M.filter_poodll.timeouthandles[recid];
+										if(th){clearTimeout(th);}
+									}
+								}
+							})(this,opts['recorderid'])							
+					);
+
+					//autosave, clear previous callbacks,set new save callbacks on stop drawing
+					db.ev.bind('board:stopDrawing', (function(mfp,recid){
+								return function(){
+									var m = document.getElementById(recid + '_messages');
+									if(m){
+										var th = M.filter_poodll.timeouthandles[recid];
+										if(th){clearTimeout(th);}
+										M.filter_poodll.timeouthandles[recid] = setTimeout(
+															function(){ M.filter_poodll.WhiteboardUploadHandler(recid);},
+															M.filter_poodll.whiteboardopts[recid]['autosave']);
+									}
+								}
+							})(this,opts['recorderid'])
+					);
+
+		
+			}else{
+				db.ev.bind('board:stopDrawing', (function(mfp,recid){
+								return function(){
+									var m = document.getElementById(recid + '_messages');
+									if(m){
+										m.innerHTML = 'File has not been saved.';
+									}
+								}
+							})(this,opts['recorderid'])
+				);
+			}
+			
+			
+		//set up the upload/save button
+		var uploadbutton = this.getbyid(opts['recorderid'] + '_btn_upload_whiteboard');
+		if(uploadbutton){
+			if(opts['autosave']){
+				uploadbutton.addEventListener("click", function(){M.filter_poodll.WhiteboardUploadHandler(opts['recorderid']);}, false);
+			}else{
+				uploadbutton.addEventListener("click", function(){M.filter_poodll.CallFileUpload(opts['recorderid']);}, false);
 			}
 		}
-			
-			
+	
+	},
+
+	// handle literallycanvas whiteboard saves for Moodle
+	loadliterallycanvas: function(Y,opts) {
+	
+		//stash our opts array
+		this.whiteboardopts[opts['recorderid']] = opts;
 		
-}
+		//stash our Y for later use
+		this.gyui = Y;
 
-// handle literallycanvas whiteboard saves for Moodle
-M.filter_poodll.loadliterallycanvas = function(Y,opts) {
+			// disable scrolling on touch devices so we can actually draw
+			/*
+			$(document).bind('touchmove', function(e) {
+			  if (e.target === document.documentElement) {
+				return e.preventDefault();
+			  }
+			});
+			*/
+		
 
-		// disable scrolling on touch devices so we can actually draw
-		/*
-        $(document).bind('touchmove', function(e) {
-          if (e.target === document.documentElement) {
-            return e.preventDefault();
-          }
-        });
-        */
+			// load the whiteboard and save the canvas reference
+			//logic a bit diff if we have a background image
+			if(opts['bgimage']){
+				var bgimg = new Image();
+				bgimg.src = opts['bgimage'];
+			}else{
+				var bgimg = null;
+			}
 
-       // load the whiteboard and save the canvas reference
-       var lc =  $('.literally').literallycanvas({imageURLPrefix: opts['imageurlprefix']});
-	   M.filter_poodll.getwhiteboardcanvas = function(){ return lc.canvasForExport();};
-	   
-	   //loads a background image .. but LC ignores in redrawing stack :(
-	  // setCanvasBackgroundImage(opts['bgimage']);
-	  
-	//autosave if we have to. We get no events from LC so we make it 5 seconds
-	if(opts['autosave']){	
-		setInterval(WhiteboardUploadHandlerLC,10000);
-	}
+			//old style for erasable bg = watermarkImage: bgimg, 
+			//init the whiteboard	
+			var lc =  $('#' + opts['recorderid'] + '_literally').literallycanvas({imageURLPrefix: opts['imageurlprefix'], 
+				backgroundColor: opts['backgroundcolor'],
+				recorderid: opts['recorderid'],
+			
+				 onInit: function(lc) {
+						
+						var vectordata = M.filter_poodll.whiteboardopts[lc.opts.recorderid]['vectordata'];
+						if(vectordata){
+							//don't restore drawingboardjs vector if its there, goes to error
+							if(vectordata.indexOf('{"shapes"')==0){
+								lc.loadSnapshotJSON(vectordata);
+							}
+						}
+						//handle autosave
+						if(opts['autosave']){
+							//if user starts drawing, cancel the countdown to save
+							lc.on('drawingStart',(function(mfp,recid){
+								return function(){
+									var m = document.getElementById(recid + '_messages');
+									if(m){
+										m.innerHTML = 'File has not been saved.';
+										var savebutton = document.getElementById(recid + '_btn_upload_whiteboard');
+										savebutton.disabled=false;
+										var th = M.filter_poodll.timeouthandles[recid];
+										if(th){clearTimeout(th);}
+									}
+								}
+							})(this,lc.opts.recorderid));
+							
+							//if user has drawn commence countdown to save
+							lc.on('drawingChange',(function(mfp,recid){
+								return function(){
+									var m = document.getElementById(recid + '_messages');
+									if(m){
+										var th = M.filter_poodll.timeouthandles[recid];
+										if(th){clearTimeout(th);}
+										M.filter_poodll.timeouthandles[recid] = setTimeout(
+															function(){ M.filter_poodll.WhiteboardUploadHandler(recid);},
+															M.filter_poodll.whiteboardopts[recid]['autosave']);
+									}
+								}
+							})(this,lc.opts.recorderid));
 
-	//set up the upload/save button
-	var uploadbutton = $id('p_btn_upload_whiteboard');
-	if(uploadbutton){
-		uploadbutton.addEventListener("click", WhiteboardUploadHandlerLC, false);
-	}
-}
+						}else{
+							//lc.on('drawingChange',(function(mfp){return function(){mfp.setUnsavedWarning;}})(this));
+							//if user has drawn, alert to unsaved state
+							lc.on('drawingChange',(function(mfp,recid){
+								return function(){
+									var m = document.getElementById(recid + '_messages');
+									if(m){
+										m.innerHTML = 'File has not been saved.';
+									}
+								}
+							})(this,lc.opts.recorderid));
+						}//end of handling autosave
+						
+						//store our whiteboard globally
+						M.filter_poodll.whiteboards[lc.opts.recorderid] = lc;
+					}
+			});
+			
+		//set up the upload/save button
+		var uploadbutton = this.getbyid(opts['recorderid'] + '_btn_upload_whiteboard');
+		if(uploadbutton){
+			if(opts['autosave']){
+				uploadbutton.addEventListener("click", function(){M.filter_poodll.WhiteboardUploadHandler(opts['recorderid']);}, false);
+			}else{
+				uploadbutton.addEventListener("click", function(){M.filter_poodll.CallFileUpload(opts['recorderid']);}, false);
+			}
+		}
+	
+	},
 
-	/**
-	 * Image method: Force a background image, LC ignores when redrawing
-	 */
-	function setCanvasBackgroundImage (src) {
-		var cvs = M.filter_poodll.getwhiteboardcanvas();
-		var ctx = cvs && cvs.getContext && cvs.getContext('2d') ? cvs.getContext('2d') : null;
-		var img = new Image();
-		var oldGCO = ctx.globalCompositeOperation;
-		img.onload = function() {
-			ctx.globalCompositeOperation = "source-over";
-			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.width);
-			ctx.drawImage(img, 0, 0);
-			ctx.globalCompositeOperation = oldGCO;
-		};
-		img.src = src;
-		console.log("set bg image:" + src);
-	}
 /*
 	 * Image methods: To download an image to desktop
 	 */
-	function getCanvasBackgroundImage() {
-		var cvs = M.filter_poodll.getwhiteboardcanvas();
+	getCanvasBackgroundImage: function() {
+		var cvs = this.getwhiteboardcanvas();
 		return cvs.toDataURL("image/png");
-	}
+	},
 
-	function downloadCanvasBackgroundImage() {
+	downloadCanvasBackgroundImage: function() {
 		var img = this.getImg();
 		img = img.replace("image/png", "image/octet-stream");
 		window.location.href = img;
-	}
+	},
 
-
-// Call Upload file from literallycanvas, 
-function WhiteboardUploadHandlerLC(e) {
-		//clear the saved message
-		setTimeout(function(){
-			Output('')
-		},3000);
-		//call the file upload
-		CallFileUpload(e);
-}//end of WhiteboardUploadHandler
-
-// Call Upload file from drawingboard a, first handle autosave bits and pieces
-function WhiteboardUploadHandler(e) {
+	// Call Upload file from drawingboard a, first handle autosave bits and pieces
+	WhiteboardUploadHandler: function(recid) {
 		// Save button disabling a little risky db perm. fails publish "startdrawing" after mode change
-		var savebutton = $id('p_btn_upload_whiteboard');
+		var savebutton = this.getbyid(recid + '_btn_upload_whiteboard');
 		savebutton.disabled=true;
-		clearTimeout(M.filter_poodll.timeouthandle);
+		clearTimeout(this.timeouthandle);
 		//call the file upload
-		CallFileUpload(e);
+		this.CallFileUpload(recid);
+	},
 
-}//end of WhiteboardUploadHandler
+	// Call Upload file from whiteboard canvas
+	CallFileUpload: function(recid) {
+	
+		var wboard = this.whiteboards[recid];
+		var cvs = null;
+		var vectordata = "";
+		if(recid.indexOf('drawingboard_')==0){
+			cvs = wboard.canvas;	
+			var vectordata = this.gyui.JSON.stringify(wboard.history , null,2);	
+		}else{
+			if(this.whiteboardopts[recid]['bgimage']){
+				cvs = wboard.canvasWithBackground($('#' + recid + '_separate-background-image').get(0))
+			}else{
+				cvs = wboard.canvasForExport();
+			}
+			//only LC has vector data it seems
+			var vectordata = wboard.getSnapshotJSON();
+		}
 
-// Cal Upload file from whiteboard canvas
-function CallFileUpload(e) {
-		var cvs = M.filter_poodll.getwhiteboardcanvas();
+		//stash vectordata
+		if(this.whiteboardopts[recid]['vectorcontrol']){
+			var vc = this.getbyid(this.whiteboardopts[recid]['vectorcontrol']);
+			if (vc){
+				vc.value = vectordata;
+			}
+		}
+		
+		//prepare the upload
 		var filedata =  cvs.toDataURL().split(',')[1];
 		var file = {type:  'image/png'};
-		UploadFile(file, filedata);
-}//end of WhiteboardUploadHandler
+		this.UploadFile(file, filedata,recid);
+	},
 
-// handle audio/video/image file uploads for Mobile
-M.filter_poodll.loadmobileupload = function(Y,opts) {
-	var fileselect = $id('poodllfileselect');
-	if(fileselect){
-		fileselect.addEventListener("change", FileSelectHandler, false);
-	}
-}
+	// handle audio/video/image file uploads for Mobile
+	loadmobileupload: function(Y,opts) {
+	
+		//stash our Y for later use
+		this.gyui = Y;
+	
+		//stash our opts array
+		this.whiteboardopts[opts['recorderid']] = opts;
+
+		var fileselect = this.getbyid(opts['recorderid'] + '_poodllfileselect');
+		if(fileselect){
+			fileselect.addEventListener("change", function(theopts) {
+					return function(e) {M.filter_poodll.FileSelectHandler(e, theopts); };
+					} (opts) , false);
+		}
+	},
 
 	// file selection
-	function FileSelectHandler(e) {
+	FileSelectHandler: function(e,opts) {
 
 		// fetch FileList object
 		var files = e.target.files || e.dataTransfer.files;
 
 		// process all File objects
 		for (var i = 0, f; f = files[i]; i++) {
-			ParseFile(f);
-			//UploadFile(f);
+			this.ParseFile(f,opts);
 		}
-
-	}//end of FileSelectHandler
+	},
 	
 	// output file information
-	function ParseFile(file) {
+	ParseFile: function(file,opts) {
 			
 			// start upload
 			var filedata ="";
 			var reader = new FileReader();
-			//reader.onloadend = UploadFile;
 			reader.onloadend = function(e) {
 						filedata = e.target.result;
-						UploadFile(file, filedata);
+						M.filter_poodll.UploadFile(file, filedata, opts['recorderid']);
 			}
 			reader.readAsDataURL(file);
 
-	}//end of ParseFile
+	},
 
 
-// output information
-	function Output(msg) {
-		var m = $id('p_messages');
+	// output information
+	Output: function(recid,msg) {
+		var m = this.getbyid(recid + '_messages');
 		//m.innerHTML = msg + m.innerHTML;
 		m.innerHTML = msg;
-	}
+	},
 	
 	// getElementById
-	function $id(id) {
+	getbyid: function(id) {
 		return document.getElementById(id);
-	}
+	},
+	
 	// getElementById
-	function $parentid(id) {
+	getbyidinparent: function(id) {
 		return parent.document.getElementById(id);
-	}
+	},
 
 	// upload Media files
-	function UploadFile(file, filedata) {
-
-
+	UploadFile: function(file, filedata,recid) {
+		var opts = this.whiteboardopts[recid];
 		var xhr = new XMLHttpRequest();
-		//if (xhr.upload && file.type == "image/jpeg" && file.size <= $id("MAX_FILE_SIZE").value) {
 
 		//Might need more mimetypes than this, and 3gpp maynot work
 		var ext="";
@@ -458,7 +592,7 @@ M.filter_poodll.loadmobileupload = function(Y,opts) {
 		
 		if(true){
 			// create progress bar if we have a container for it
-			var o = $id("p_progress");
+			var o = this.getbyid(recid + "_progress");
 			if(o!=null){
 				var progress = o.firstChild;
 				if(progress==null){
@@ -477,11 +611,11 @@ M.filter_poodll.loadmobileupload = function(Y,opts) {
 			}else{
 				var progress=false;
 			}
-			Output("Uploading.");
+			this.Output(recid,"Uploading.");
 
 
 			// file received/failed
-			xhr.onreadystatechange = function(e) {
+			xhr.onreadystatechange = (function(mfp){return function(e) {
 				
 				if (xhr.readyState == 4 ) {
 					if(progress){
@@ -493,55 +627,77 @@ M.filter_poodll.loadmobileupload = function(Y,opts) {
 						if (start<1){return;}
 						var end = resp.indexOf("</error>");
 						var filename= resp.substring(start+14,end);
-						//Output("gotten filename:" + filename);
-						Output("File saved successfully.");
-						var upc = $id($id("p_updatecontrol").value);
-						if(!upc){upc = $parentid($id("p_updatecontrol").value);}
-						upc.value=filename;
-						//$id("saveflvvoice").value=filename;
+						
+						//invoke callbackjs if we have one, otherwise just update the control(default behav.)
+						if(opts['callbackjs'] && opts['callbackjs']!=''){ 
+							var callbackargs  = new Array();
+							callbackargs[0]=opts['recorderid'];
+							callbackargs[1]='filesubmitted';
+							callbackargs[2]=filename;
+							callbackargs[3]=opts['updatecontrol'];
+							//window[opts['callbackjs']](callbackargs);
+							mfp.Output(recid, "File saved successfully.");
+							mfp.executeFunctionByName(opts['callbackjs'],window,callbackargs);
+							
+						}else{
+							mfp.Output(recid, "File saved successfully.");
+							var upc = mfp.getbyid(mfp.getbyid(recid + "_updatecontrol").value);
+							if(!upc){upc = mfp.getbyidinparent(mfp.getbyid(recid + "_updatecontrol").value);}
+							upc.value=filename;
+						}
 					}else{
-						Output("File could not be uploaded.");
+						mfp.Output(recid, "File could not be uploaded.");
 					}
 				}
-			};
+			}})(this);
 
 			var params = "datatype=uploadfile";
 			//We must URI encode the base64 filedata, because otherwise the "+" characters get turned into spaces
 			//spent hours tracking that down ...justin 20121012
 			params += "&paramone=" + encodeURIComponent(filedata);
 			params += "&paramtwo=" + ext;
-			params += "&paramthree=" + $id("p_mediatype").value;
-			params += "&requestid=12345";
-			params += "&contextid=" + $id("p_contextid").value;
-			params += "&component=" + $id("p_component").value;
-			params += "&filearea=" + $id("p_filearea").value;
-			params += "&itemid=" + $id("p_itemid").value;
-			
-			
-			xhr.open("POST", $id("p_fileliburl").value, true);
+			params += "&paramthree=" + this.getbyid(recid + "_mediatype").value;
+			params += "&requestid=" + recid;
+			params += "&contextid=" + this.getbyid(recid + "_contextid").value;
+			params += "&component=" + this.getbyid(recid + "_component").value;
+			params += "&filearea=" + this.getbyid(recid + "_filearea").value;
+			params += "&itemid=" + this.getbyid(recid + "_itemid").value;
+					
+			xhr.open("POST", this.getbyid(recid + "_fileliburl").value, true);
 			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 			xhr.setRequestHeader("Cache-Control", "no-cache");
 			xhr.setRequestHeader("Content-length", params.length);
 			xhr.setRequestHeader("Connection", "close");
-
 			xhr.send(params);
-			
-
 		}
 
-	}//end of upload file
+	},
 	
-	//===============================
+	//function to call the callback function with arguments	
+	executeFunctionByName: function(functionName, context , args ) {
+	
+		  //var args = Array.prototype.slice.call(arguments).splice(2);
+		  var namespaces = functionName.split(".");
+		  var func = namespaces.pop();
+		  for(var i = 0; i < namespaces.length; i++) {
+			context = context[namespaces[i]];
+		  }
+		  return context[func].call(this, args);
+	},
+	
 	// Start of text scroller
-M.filter_poodll.loadscroller = function(Y,opts) {
+	loadscroller: function(Y,opts) {
+		//stash our Y for later use
+		this.gyui = Y;
 	
-	if(typeof window.scrollopts== 'undefined'){
-			window.scrollopts = new Array();
-		}
-	window.scrollopts[opts['scrollerid']] = opts;
-}
+		if(typeof window.scrollopts== 'undefined'){
+				window.scrollopts = new Array();
+			}
+		window.scrollopts[opts['scrollerid']] = opts;
+	},
 	 
-	function KickOff(scrollerid){
+	KickOff: function(scrollerid){
+	
 		if(typeof AreaHeight == 'undefined'){
 			AreaHeight = new Array();
 			AreaWidth = new Array();
@@ -550,14 +706,14 @@ M.filter_poodll.loadscroller = function(Y,opts) {
 		AreaWidth[scrollerid]=dataobj[scrollerid].offsetWidth;
 		
 		if(scrollopts[scrollerid]['axis']=="y"){
-			DoScrollAxisY(scrollerid);
+			this.DoScrollAxisY(scrollerid);
 		}else{
-			DoScrollAxisX(scrollerid);
+			this.DoScrollAxisX(scrollerid);
 		}
 	
-	}
+	},
 	 
-	function ScrollBoxStart(scrollerid){
+	ScrollBoxStart: function(scrollerid){
 		if(typeof dataobj == 'undefined'){
 			dataobj = new Array();
 		}
@@ -566,11 +722,11 @@ M.filter_poodll.loadscroller = function(Y,opts) {
 		dataobj[scrollerid].style.left=scrollopts[scrollerid]['leftspace'];
 		var startbutton = document.getElementById("p_scrollstartbutton" + scrollerid );
 		startbutton.style.display='none';
-		KickOff(scrollerid);
+		this.KickOff(scrollerid);
 
-	}
+	},
 	 
-	function DoScrollAxisY(scrollerid){
+	DoScrollAxisY: function(scrollerid){
 		var scroller = dataobj[scrollerid];
 		var opts = scrollopts[scrollerid];
 		scroller.style.top=(parseInt(scroller.style.top)- opts['pixelshift']) + "px";
@@ -581,12 +737,16 @@ M.filter_poodll.loadscroller = function(Y,opts) {
 				startbutton.style.display='';
 			}
 		}else {
-			//setTimeout("DoScrollAxisY()",scrollopts['scrollspeed']);
-			setTimeout(function() {DoScrollAxisY(scrollerid);},opts['scrollspeed']);
+
+			//setTimeout(function() {DoScrollAxisY(scrollerid);},opts['scrollspeed']);
+			
+			setTimeout(function(thescrollerid) {return function() {
+						M.filter_poodll.DoScrollAxisY(thescrollerid);}}(scrollerid),
+						opts['scrollspeed']);
 		}
-	}
+	},
 	
-	function DoScrollAxisX(scrollerid){
+	DoScrollAxisX: function(scrollerid){
 		var scroller = dataobj[scrollerid];
 		var opts = scrollopts[scrollerid];
 		scroller.style.left=(parseInt(scroller.style.left)- opts['pixelshift']) + "px";
@@ -597,9 +757,14 @@ M.filter_poodll.loadscroller = function(Y,opts) {
 				startbutton.style.display='';
 			}
 		}else {
-			//setTimeout("DoScrollAxisX()",scrollopts['scrollspeed']);
-			setTimeout(function() {DoScrollAxisX(scrollerid);},opts['scrollspeed']);
+			//setTimeout(function() {DoScrollAxisX(scrollerid);},opts['scrollspeed']);
+			
+			setTimeout(function(thescrollerid) {return function() {
+						M.filter_poodll.DoScrollAxisX(thescrollerid);}}(scrollerid),
+						opts['scrollspeed']);
+			
 		}
 	}
+}//end of M.filter_poodll
 	 
  

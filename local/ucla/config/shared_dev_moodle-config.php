@@ -159,6 +159,9 @@ $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 $CFG->cachejs = false;
 
+// Prevent blocks from docking
+$CFG->allowblockstodock = false;
+
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
@@ -207,7 +210,7 @@ $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lis
 $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_loggedin'] = 'popup,email';
 
 // CCLE-4345 - Moodle Authenticated Remote Command Execution (CVE-2013-3630).
-$CFG->preventexecpath = 1;
+//$CFG->preventexecpath = 1;
 
 // Site administration > Advanced features
 $CFG->usetags = 0;
@@ -334,10 +337,6 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] =
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
 
-// Site administration > Plugins > Blocks > Respondus LockDown Browser
-// NOTE: config is in local/ucla/configs, even though it is linked in root.
-$CFG->customscripts = __DIR__."/../../../"."blocks/lockdownbrowser/customscripts";
-
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
@@ -345,11 +344,54 @@ $CFG->block_quickmail_receipt = 1;
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
 
+// Site administration > Plugins > Filters > MathJax
+$CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.mathjax.org/mathjax/2.3-latest/MathJax.js';
+$CFG->forced_plugin_settings['filter_mathjaxloader']['texfiltercompatibility'] = 1;
+$CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [[\'$\',\'$\'], [\'\\\(\',\'\\\)\']],
+            processEscapes: true
+        },
+        config: ["MMLorHTML.js", "Safe.js"],
+        jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
+        extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+        TeX: {
+            extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+        },
+        menuSettings: {
+            zoom: "Double-Click",
+            mpContext: true,
+            mpMouse: true
+        },
+        errorSettings: { message: ["!"] },
+        skipStartupTypeset: true,
+        messageStyle: "none"
+    });';
+
 // Site administration > Plugins > Filters > PoodLL Filter
 $CFG->filter_poodll_download_media_ok = '1';
 
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
+
+// Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
+$CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
+    collapse = collapse
+    style1 = title, bold, italic, backcolor, fontcolor
+    list = unorderedlist, orderedlist
+    links = link
+    files = image, media, managefiles, poodll
+    style2 = underline, strike, subscript, superscript
+    align = align
+    indent = indent
+    insert = equation, charmap, table, clear
+    undo = undo
+    accessibility = accessibilitychecker, accessibilityhelper
+    other = html';
+
+// Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
+$CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
@@ -370,12 +412,15 @@ $CFG->forced_plugin_settings['local_ucla']['defaultassignsettings'] = 1;
 // CCLE-4289 - Show All View Action Icons
 $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
+// Site administration > Plugins > Message outputs > Email
+$CFG->emailonlyfromnoreplyaddress = 1;
+
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true; 
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
-$CFG->fullnamedisplay = 'language'; // CCLE-2550 - Lastname, Firstname sorting
+$CFG->fullnamedisplay = 'lastname, firstname';
 $CFG->cronclionly = true;
 // Make it easier to create accounts on dev instances.
 $CFG->minpasswordlength = 4;
@@ -387,8 +432,12 @@ $CFG->minpasswordnonalphanum = 0;
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
+$CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->themedesignermode = 1;
 $CFG->allowcoursethemes = 1;
+$CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
+    View self help articles|https://docs.ccle.ucla.edu/
+    Read tips & updates|https://docs.ccle.ucla.edu/w/Instructors#Tips_and_Updates";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
@@ -402,6 +451,7 @@ $CFG->dbsessions = false;
 
 // Site administration > Development > Experimental > Experimental settings
 $CFG->dndallowtextandlinks = 1;
+$CFG->enabletgzbackups = 1;
 
 // Site administration > Development > Debugging
 $CFG->debug = 32767;    // DEVELOPER level debugging messages
@@ -473,9 +523,6 @@ $CFG->forced_plugin_settings['enrol_database']['localcoursefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localuserfield'] = 'idnumber';
 $CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
-
-// CCLE-2802 - Frontpage banner layout include
-$CFG->customfrontpageinclude = $_dirroot_ . '/theme/uclashared/layout/frontpage.php';
 
 // CCLE-2364 - SUPPORT CONSOLE (put after $_dirroot_, because needs $CFG->dataroot to be set)
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_error'] = '/var/log/httpd/error_log';

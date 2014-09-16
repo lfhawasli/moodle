@@ -3,7 +3,7 @@
 /**
  *  Required by moodle.
  **/
-$plugin->version = 2011091200;
+$plugin->version = 2014080800;
 $plugin->dependencies = array(
     'local_ucla' => 2012041300,
 );

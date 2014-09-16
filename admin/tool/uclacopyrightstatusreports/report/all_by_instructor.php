@@ -20,7 +20,7 @@ $filter_array = array('term'=>$filter_term, 'uid'=>substr($filter_instr, 1));
 
 require_login();
 
-$syscontext = get_context_instance(CONTEXT_SYSTEM);
+$syscontext = context_system::instance();
 require_capability('tool/uclacopyrightstatusreports:view', $syscontext);
 
 // Initialize $PAGE

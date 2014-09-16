@@ -88,6 +88,8 @@ $string['newpairheight'] = 'Pairwork Widget Height';
 
 $string['wboardwidth'] = 'Whiteboard Default Width ';
 $string['wboardheight'] = 'Whiteboard Default Height';
+$string['wboardautosave'] = 'Autosave(milliseconds)';
+$string['wboardautosave_details'] = 'Saves the drawing when the user has paused drawing after X milliseconds. 0 = no autosave';
 
 //video capture settings
 $string['capturewidth'] = 'Video Recorder Capture Size';
@@ -106,6 +108,7 @@ $string['micgain'] = 'Mic. Gain';
 $string['micsilencelevel'] = 'Mic. Silence Level';
 $string['micecho'] = 'Mic. Echo';
 $string['micloopback'] = 'Mic. Loopback';
+$string['miccanpause'] = 'Allow pause (MP3 recorder only)';
 
 
 //fpembedtype
@@ -141,9 +144,5 @@ $string['mobile_os_version_warning'] ='<p>Your OS Version is too low</p>
 		<p>iOS requires version 6 or greater.</p>';
 
 $string['defaultwhiteboard'] = 'Default whiteboard';
-$string['autosavewhiteboard'] = 'Autosave whiteboard';
-$string['whiteboardsave'] = 'Save Picture';	
-// START UCLA MOD: CCLE-4365 - Upgrade PoodLL Filter to 2.5.8
-$string['poodll:candownloadmedia'] = 'You can download media';
-// END UCLA MOD: CCLE-4365
-?>
+$string['whiteboardsave'] = 'Save Picture';
+$string['poodll:candownloadmedia'] = 'Can download media'; 

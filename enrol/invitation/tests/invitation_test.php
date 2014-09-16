@@ -87,8 +87,11 @@ class invitation_manager_testcase extends advanced_testcase {
         $timeend = $DB->get_field('user_enrolments', 'timeend',
                 array('userid' => $this->testinvitee->id,
                       'enrolid' => $enrolinstance->id));
+
         // Do not count today as one of the days.
-        $expectedexpiration = strtotime(date('Y-m-d'))+86400*($daystoexpire+1)-1;
+        $today = strtotime(date('Y/m/d'));
+        $expectedexpiration = strtotime(sprintf('+%d days', $daystoexpire+1), $today)-1;
+
         $this->assertEquals($expectedexpiration, intval($timeend));
     }
 

@@ -283,8 +283,8 @@ class ucla_weeksdisplay_test extends advanced_testcase {
 
         // For this particular summer, instruction starts at same time as
         // session begins.
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
-                '</span><span class="week">Week 1</span>',
+        $this->assertEquals('<div class="weeks-display label-summer"><span class="session ">Summer 2012 - Session A, ' .
+                '</span><span class="week">Week 1</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('1', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
@@ -296,10 +296,10 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+        $this->assertEquals('<div class="weeks-display label-summer"><span class="session ">Summer 2012 - Session A, ' .
                 '</span><span class="week">Week 7</span> | ' .
                 '<span class="session ">Summer 2012 - Session C, </span>' .
-                '<span class="week">Week 1</span>',
+                '<span class="week">Week 1</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('7', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
@@ -313,10 +313,10 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+        $this->assertEquals('<div class="weeks-display label-summer"><span class="session ">Summer 2012 - Session A, ' .
                 '</span><span class="week">Week 8</span> | ' .
                 '<span class="session ">Summer 2012 - Session C, </span>' .
-                '<span class="week">Week 2</span>',
+                '<span class="week">Week 2</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('8', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
@@ -330,9 +330,9 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('<span class="session ">Summer 2012 - Session A, ' .
+        $this->assertEquals('<div class="weeks-display label-summer"><span class="session ">Summer 2012 - Session A, ' .
                 '</span><span class="week">Week 9</span> | <span class="session ' .
-                '">Summer 2012 - Session C, </span><span class="week">Week 3</span>',
+                '">Summer 2012 - Session C, </span><span class="week">Week 3</span></div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('9', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',
@@ -348,7 +348,7 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $session->update_today($today);
         $session->update();
 
-        $this->assertEquals('Summer 2012',
+        $this->assertEquals('<div class="weeks-display label-summer">Summer 2012</div>',
                 get_config('local_ucla', 'current_week_display'));
         $this->assertEquals('-1', get_config('local_ucla', 'current_week'));
         $this->assertEquals('121,12F,13W,13S',

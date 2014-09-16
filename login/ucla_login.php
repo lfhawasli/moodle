@@ -96,7 +96,7 @@ $loginsite = get_string('loginsite');
 //HTTPS is required in this page when $CFG->loginhttps enabled
 $PAGE->https_required();
 
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = context_system::instance();
 $PAGE->set_url("$CFG->wwwroot/login/ucla_login.php");
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('login');
@@ -172,10 +172,7 @@ if ($frm !== false && isset($frm->username)) {
         }
 
     /// Let's get them all set up.
-        add_to_log(SITEID, 'user', 'login', 
-                "view.php?id=$USER->id&course=".SITEID,
-                $user->id, 0, $user->id);
-        complete_user_login($user, true); // sets the username cookie
+        complete_user_login($user);
 
     /// Prepare redirection
         if (user_not_fully_set_up($USER)) {

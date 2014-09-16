@@ -54,8 +54,10 @@ if (isset($action)) {
     update_copyright_status($data);
     echo $OUTPUT->notification(get_string('changessaved', 'block_ucla_copyright_status'), 'notifysuccess');
 
-    $logurl = new moodle_url('../blocks/ucla_copyright_status/view.php', array('courseid' => $courseid));
-    add_to_log($courseid, 'course', 'manage copyright', $logurl, 'UCLA block Manage copyright used');
+    $event = \block_ucla_copyright_status\event\copyright_status_updated::create(array(
+        'context' => $context
+    ));
+    $event->trigger();
 }
 
 $filter = optional_param('filter_copyright', $CFG->sitedefaultlicense,

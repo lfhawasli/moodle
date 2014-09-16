@@ -13,9 +13,6 @@
 [submodule "local/codechecker"]
 	path = local/codechecker
 	url = https://github.com/moodlehq/moodle-local_codechecker.git
-[submodule "theme/uclashared/package/bootstrap"]
-	path = theme/uclashared/package/bootstrap
-	url = git@github.com:jlong/sass-twitter-bootstrap.git
 [submodule "admin/tool/mergeusers"]
 	path = admin/tool/mergeusers
 	url = https://github.com/ndunand/moodle-mergeusers.git
@@ -37,9 +34,6 @@
 [submodule "question/format/hotpot"]
 	path = question/format/hotpot
 	url = https://github.com/gbateson/moodle-qformat_hotpot.git
-[submodule "theme/uclashared/package/semantic-ui"]
-	path = theme/uclashared/package/semantic-ui
-	url = git@github.com:Semantic-Org/Semantic-UI.git
 [submodule "local/mr"]
 	path = local/mr
 	url = https://github.com/moodlerooms/moodle-local_mr.git

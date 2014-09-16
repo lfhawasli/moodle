@@ -184,7 +184,7 @@ abstract class testing_util {
             return false;
         }
 
-        $hash = self::get_version_hash();
+        $hash = core_component::get_all_versions_hash();
         $oldhash = file_get_contents($datarootpath . '/versionshash.txt');
 
         if ($hash !== $oldhash) {
@@ -242,7 +242,7 @@ abstract class testing_util {
         global $CFG;
 
         $framework = self::get_framework();
-        $hash = self::get_version_hash();
+        $hash = core_component::get_all_versions_hash();
 
         // add test db flag
         set_config($framework . 'test', $hash);
@@ -720,7 +720,7 @@ abstract class testing_util {
 
         make_temp_directory('');
         make_cache_directory('');
-        make_cache_directory('htmlpurifier');
+        make_localcache_directory('');
         // Reset the cache API so that it recreates it's required directories as well.
         cache_factory::reset();
         // Purge all data from the caches. This is required for consistency.
@@ -932,54 +932,4 @@ abstract class testing_util {
             fclose($fp);
         }
     }
-
-    /**
-     * Calculate unique version hash for all plugins and core.
-     * @static
-     * @return string sha1 hash
-     */
-    public static function get_version_hash() {
-        global $CFG;
-
-        if (self::$versionhash) {
-            return self::$versionhash;
-        }
-
-        $versions = array();
-
-        // main version first
-        $version = null;
-        include($CFG->dirroot.'/version.php');
-        $versions['core'] = $version;
-
-        // modules
-        $mods = get_plugin_list('mod');
-        ksort($mods);
-        foreach ($mods as $mod => $fullmod) {
-            $module = new stdClass();
-            $module->version = null;
-            include($fullmod.'/version.php');
-            $versions[$mod] = $module->version;
-        }
-
-        // now the rest of plugins
-        $plugintypes = get_plugin_types();
-        unset($plugintypes['mod']);
-        ksort($plugintypes);
-        foreach ($plugintypes as $type => $unused) {
-            $plugs = get_plugin_list($type);
-            ksort($plugs);
-            foreach ($plugs as $plug => $fullplug) {
-                $plugin = new stdClass();
-                $plugin->version = null;
-                @include($fullplug.'/version.php');
-                $versions[$plug] = $plugin->version;
-            }
-        }
-
-        self::$versionhash = sha1(serialize($versions));
-
-        return self::$versionhash;
-    }
-
 }

@@ -46,14 +46,6 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         )
     ),
-    
-    'local/ucla:viewotherusers' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-        )
-    ),
 
     'local/ucla:bulk_users' => array(
         'riskbitmask'   => RISK_DATALOSS,
@@ -65,6 +57,14 @@ $capabilities = array(
     ),
 
     'local/ucla:browsecourses' => array(
+        'captype'       => 'read',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes'    => array(
+            'manager'  => CAP_ALLOW
+        )
+    ),
+
+    'local/ucla:vieweventlist' => array(
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_SYSTEM,
         'archetypes'    => array(

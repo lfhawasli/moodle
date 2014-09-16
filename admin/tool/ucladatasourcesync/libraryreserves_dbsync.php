@@ -226,7 +226,7 @@ function update_libraryreserves_db($datasource_url) {
         }
         
         if ($num_entries_inserted == 0) {
-            log_ucla_data('library reserve', 'write', 'Inserting library reserve data', 
+            log_ucla_data('library reserves', 'write', 'Inserting library reserve data', 
                     get_string('errbcinsert', 'tool_ucladatasourcesync') );
             
             throw new moodle_exception('errbcinsert', 'tool_ucladatasourcesync');

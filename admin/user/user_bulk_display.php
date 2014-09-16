@@ -8,7 +8,7 @@ $dir  = optional_param('dir', 'asc', PARAM_ALPHA);
 
 // START UCLA MOD: CCLE-2970 - Cannot disable "bulk user actions" in site admin menu
 // adding capability check for ability to perform bulk user actions
-require_capability('local/ucla:bulk_users', get_context_instance(CONTEXT_SYSTEM));
+require_capability('local/ucla:bulk_users', context_system::instance());
 // END UCLA MOD: CCLE-2970
 admin_externalpage_setup('userbulk');
 
@@ -28,8 +28,9 @@ echo $OUTPUT->header();
 
 $countries = get_string_manager()->get_list_of_countries(true);
 
+$namefields = get_all_user_name_fields(true);
 foreach ($users as $key => $id) {
-    $user = $DB->get_record('user', array('id'=>$id), 'id, firstname, lastname, username, email, country, lastaccess, city');
+    $user = $DB->get_record('user', array('id'=>$id), 'id, ' . $namefields . ', username, email, country, lastaccess, city');
     $user->fullname = fullname($user, true);
     $user->country = @$countries[$user->country];
     unset($user->firstname);

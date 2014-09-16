@@ -60,7 +60,7 @@ class set_engineering_default_test extends advanced_testcase {
         foreach ($builtclasses as $class) {
             $eventdata->completed_requests[make_idnumber($class)] = $class;
         }
-        events_trigger('course_creator_finished', $eventdata);
+        events_trigger_legacy('course_creator_finished', $eventdata);
 
         return $builtclasses;
     }

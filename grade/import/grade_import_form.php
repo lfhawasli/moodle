@@ -49,7 +49,7 @@ class grade_import_form extends moodleform {
         // File upload.
         $mform->addElement('filepicker', 'userfile', get_string('file'), null, array('accepted_types' => $acceptedtypes));
         $mform->addRule('userfile', null, 'required');
-        $encodings = textlib::get_encodings();
+        $encodings = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $encodings);
 
         if (!empty($features['includeseparator'])) {

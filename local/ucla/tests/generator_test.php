@@ -355,23 +355,28 @@ class local_ucla_generator_testcase extends advanced_testcase {
      * created.
      */
     public function test_create_ucla_roles() {
-        global $CFG, $DB;
+        global $CFG;
 
         $createdroles = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_ucla_roles();
+        $shortnames = array();
 
-        // Load fixture of role data from PROD. This will grant access to a
-        // new variable called $roles.
-        include($CFG->dirroot . '/local/ucla/tests/fixtures/mdl_role.php');
-        
-        $createdroleshortnames = array_keys($createdroles);
-        foreach ($roles as $role) {
-            $this->assertTrue(in_array($role['shortname'], $createdroleshortnames));
+        // Go through each xml file in the fixtures folder, creating a $shortnames
+        // array for us to check with $createdroles.
+        foreach (glob($CFG->dirroot. '/local/ucla/tests/fixtures/roles/*.xml') as $file) {
+            $xml = file_get_contents($file);
+            if ($this->assertTrue(core_role_preset::is_valid_preset($xml))) {
+                $info = core_role_preset::parse_preset($xml);
+                $shortnames[] = $info['shortname'];
+            }
         }
 
-        // Also make sure that student is returned.
-         $this->assertTrue(isset($createdroles['student']));
+        // Check if each role in $shortnames is in $createdroles.
+        $createdroleshortnames = array_keys($createdroles);
+        foreach ($shortnames as $shortname) {
+            $this->assertTrue(in_array($shortname, $createdroleshortnames));
+        }
     }
 
     /**
@@ -453,4 +458,120 @@ class local_ucla_generator_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Test enrol_reg_user() with a crosslisted course.
+     */
+    public function test_enrol_reg_user_crosslisted() {
+        global $DB;
+
+        $roles = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_ucla_roles(array('student'));
+
+        $classrequests = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array(array(), array(), array()));
+        $course = reset($classrequests);
+        $coursecontext = context_course::instance($course->courseid);
+
+        foreach ($classrequests as $classrequest) {
+            $student = $this->getDataGenerator()
+                    ->get_plugin_generator('local_ucla')
+                    ->create_user();
+
+            // Make sure that student is enrolled in course with given role
+            // and is in ccle_roster_class_cache.
+            $result = $this->getDataGenerator()
+                    ->get_plugin_generator('local_ucla')
+                    ->enrol_reg_user($student->id, $classrequest->courseid,
+                            $roles['student'], $classrequest->srs);
+            $this->assertTrue($result);
+            $userroles = get_user_roles($coursecontext, $student->id);
+            $this->assertEquals($roles['student'], array_pop($userroles)->roleid);
+            $result = $DB->record_exists('ccle_roster_class_cache',
+                    array('param_term'  => $classrequest->term,
+                          'param_srs'   => $classrequest->srs,
+                          'stu_id'      => $student->idnumber));
+            $this->assertTrue($result);
+        }
+    }
+
+    /**
+     * Call enrol_reg_user() with a bunch of bad data and make sure it returns
+     * false.
+     */
+    public function test_enrol_reg_user_errors() {
+        $roles = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_ucla_roles(array('student'));
+
+        $student = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+
+        // Course not a Registrar course.
+        $collab = $this->getDataGenerator()->create_course();
+        $result = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->enrol_reg_user($student->id, $collab->id, $roles['student']);
+        $this->assertFalse($result);
+
+        // Enrolling in srs that does not exist.
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array(array('srs' => '123456789'),
+                                     array('srs' => '987654321')));
+        $course = reset($class);
+        $result = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->enrol_reg_user($student->id, $course->courseid, $roles['student'], '111222333');
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Test enrol_reg_user() with a non-crosslisted course.
+     */
+    public function test_enrol_reg_user_noncrosslisted() {
+        global $DB;
+
+        $roles = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_ucla_roles(array('editinginstructor', 'student'));
+
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array());
+        $course = reset($class);
+        $coursecontext = context_course::instance($course->courseid);
+
+        $instructor = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+        $student = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+
+        // Make sure that instructor is enrolled in course with given role
+        // and is not in ccle_roster_class_cache.
+        $result = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->enrol_reg_user($instructor->id, $course->courseid, $roles['editinginstructor']);
+        $this->assertTrue($result);
+        $userroles = get_user_roles($coursecontext, $instructor->id);
+        $this->assertEquals($roles['editinginstructor'], array_pop($userroles)->roleid);
+
+        // Make sure that student is enrolled in course with given role
+        // and is in ccle_roster_class_cache.
+        $result = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->enrol_reg_user($student->id, $course->courseid, $roles['student']);
+        $this->assertTrue($result);
+        $userroles = get_user_roles($coursecontext, $student->id);
+        $this->assertEquals($roles['student'], array_pop($userroles)->roleid);
+        $result = $DB->record_exists('ccle_roster_class_cache',
+                array('param_term'  => $course->term,
+                      'param_srs'   => $course->srs,
+                      'stu_id'      => $student->idnumber));
+        $this->assertTrue($result);
+    }
 }

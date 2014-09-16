@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -52,10 +51,7 @@ $string['dorestore'] = 'Yes';
 $string['download'] = 'Download';
 $string['downloadable'] = 'courses I can download';
 $string['downloadablecourses'] = 'Downloadable courses';
-// START UCLA MOD: CCLE-3470-Rename-private-files-to-my-ccle-files
-$string['downloadconfirmed'] = 'The backup has been saved in My CCLE files {$a}';
-//$string['downloadconfirmed'] = 'The backup has been saved in your private files {$a}';
-// END UCLA MOD: CCLE-3470
+$string['downloadconfirmed'] = 'The backup has been saved in your private files {$a}';
 $string['downloaded'] = '...finished.';
 $string['downloadingcourse'] = 'Downloading course';
 $string['downloadingsize'] = 'Please wait the course file is downloading ({$a->total}Mb)...';

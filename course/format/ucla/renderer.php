@@ -56,9 +56,6 @@ class format_ucla_renderer extends format_topics_renderer {
     
     // strings to generate jit links
     private $jit_links = array();
-    
-    // edit icons style preference
-    private $noeditingicons;
 
     // How many crosslists to limit for display
     const MAX_CROSSLIST_SHOWN = 5;
@@ -71,10 +68,6 @@ class format_ucla_renderer extends format_topics_renderer {
      */
     public function __construct(moodle_page $page, $target) {
         parent::__construct($page, $target);
-
-        // Build required forums for the UCLA format
-        $forum_new = forum_get_course_forum($page->course->id, 'news');
-        $forum_gen = forum_get_course_forum($page->course->id, 'general');       
         
         // get reg info, if any
         $this->courseinfo = ucla_get_course_info($page->course->id);
@@ -96,8 +89,6 @@ class format_ucla_renderer extends format_topics_renderer {
                                  'link' => get_string('link', 'format_ucla'),
                                  'text' => get_string('text', 'format_ucla'),
                                  'subheading' => get_string('subheading', 'format_ucla'));     
-        
-        $this->noeditingicons = get_user_preferences('noeditingicons', 1);
         
         // Use the public/private renderer.  This will permit us to override the
         // way we render course modules
@@ -155,7 +146,7 @@ class format_ucla_renderer extends format_topics_renderer {
         
         $eventdata->notices = array();  // populated by external sources
 
-        events_trigger('ucla_format_notices', $eventdata);
+        events_trigger_legacy('ucla_format_notices', $eventdata);
 
         if (!empty($eventdata->notices)) {
             // until we can get a better, more compact notice display, we are
@@ -249,7 +240,13 @@ class format_ucla_renderer extends format_topics_renderer {
             $heading_text = html_writer::tag('div', $heading_text, array('class' => 'site-meta'));
         }
         
-        echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
+        // Check if this site has a custom course logo.  If so, then the title
+        // will be rendered by the theme.  
+        $courselogos = $OUTPUT->course_logo();
+        if (empty($courselogos)) {
+            echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
+        }
+        
         echo $heading_text;
         echo html_writer::tag('span', '', array('class' => 'site-title-divider'));
         
@@ -380,29 +377,6 @@ class format_ucla_renderer extends format_topics_renderer {
 
             echo $this->end_section_list();
 
-            echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
-
-            // Increase number of sections.
-            $straddsection = get_string('increasesections', 'moodle');
-            $url = new moodle_url('/course/changenumsections.php',
-                array('courseid' => $course->id,
-                      'increase' => true,
-                      'sesskey' => sesskey()));
-            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-            echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
-
-            if ($course->numsections > 0) {
-                // Reduce number of sections sections.
-                $strremovesection = get_string('reducesections', 'moodle');
-                $url = new moodle_url('/course/changenumsections.php',
-                    array('courseid' => $course->id,
-                          'increase' => false,
-                          'sesskey' => sesskey()));
-                $icon = $this->output->pix_icon('t/switch_minus', $strremovesection);
-                echo html_writer::link($url, $icon.get_accesshide($strremovesection), array('class' => 'reduce-sections'));
-            }
-
-            echo html_writer::end_tag('div');
         } else {
             echo $this->end_section_list();
         }
@@ -643,13 +617,10 @@ class format_ucla_renderer extends format_topics_renderer {
         $url = new moodle_url('/course/editsection.php', 
                 array('id'=> $section->id, 'sr' => $section->section));
         
-        $controls[0] = html_writer::link($url, html_writer::empty_tag('img', 
-                    array('src' => $this->output->pix_url('t/edit'),
-                        'class' => 'icon edit', 
-                        'alt' => get_string('editsectiontitle', 'format_ucla'))
-                        ),
-                    array('title' => get_string('editsectiontitle', 'format_ucla'), 
-                        'class' => 'editing_section'));
+        $controls[0] = html_writer::link($url, html_writer::img($this->output->pix_url('t/edit'),
+                get_string('editsectiontitle', 'format_ucla'), array('class' => 'icon edit')),
+                array('title' => get_string('editsectiontitle', 'format_ucla'), 
+                      'class' => 'editing_section'));
 
         return $controls;
     }
@@ -684,11 +655,6 @@ class format_ucla_renderer extends format_topics_renderer {
             }
         }
         
-        // Apply section edit style
-        if($this->noeditingicons) {
-            $sectionstyle .= ' text-icons';
-        }
-
         $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
             'class' => 'section main clearfix'.$sectionstyle));
 
@@ -738,8 +704,7 @@ class format_ucla_renderer extends format_topics_renderer {
      * @return html
      */
     protected function start_section_list() {
-        $noeditingicons = get_user_preferences('noeditingicons', 1);
-        $classes = $noeditingicons ? 'ucla-format text-icons' : 'ucla-format';
+        $classes = 'ucla-format';
         return html_writer::start_tag('ul', array('class' => $classes));
     } 
 

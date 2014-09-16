@@ -133,16 +133,16 @@ class question_engine_data_mapper_testcase extends qbehaviour_walkthrough_test_b
     }
 
     protected function dotest_load_questions_usages_latest_steps() {
-        $rawstates = $this->dm->load_questions_usages_latest_steps($this->bothusages, $this->allslots);
+        $rawstates = $this->dm->load_questions_usages_latest_steps($this->bothusages, $this->allslots,
+                'qa.id AS questionattemptid, qa.questionusageid, qa.slot, ' .
+                'qa.questionid, qa.maxmark, qas.sequencenumber, qas.state');
 
         $states = array();
         foreach ($rawstates as $state) {
             $states[$state->questionusageid][$state->slot] = $state;
-            foreach (get_object_vars($state) as $name => $notused) {
-                if (!in_array($name, array('questionid', 'maxmark', 'sequencenumber', 'state'))) {
-                    unset($state->$name);
-                }
-            }
+            unset($state->questionattemptid);
+            unset($state->questionusageid);
+            unset($state->slot);
         }
 
         $state = $states[$this->usageids[0]][$this->allslots[0]];

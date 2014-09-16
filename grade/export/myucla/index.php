@@ -12,7 +12,7 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
 }
 
 require_login($course);
-$context = get_context_instance(CONTEXT_COURSE, $id);
+$context = context_course::instance($id);
 
 require_capability('moodle/grade:export', $context);
 require_capability('gradeexport/myucla:view', $context);
@@ -57,7 +57,10 @@ $mform->display();
 
 echo $OUTPUT->footer();
 
-// START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$url = '/export/myucla/index.php?id=' . $course->id;
-add_to_log($course->id, 'grade', 'view myucla', $url);
-// END UCLA MOD: CCLE-3980
+// START UCLA MOD: CCLE-4659 - Migrate add to log calls for grade export
+$event = \local_gradebook\event\grades_export_viewed_myucla::create(array(
+    'context' => $context,
+    'other' => array('type' => 'myucla')
+));
+$event->trigger();
+// END UCLA MOD: CCLE-4659

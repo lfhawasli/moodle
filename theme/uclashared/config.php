@@ -17,13 +17,24 @@ $THEME->sheets = array(
     'base',
     'core',     // custom core stlye changes
     'general',
-    'theme'
+    'theme',
+    'ucla',
+    'core',
+    'moodle',
+    'components',
+);
+
+$THEME->parents_exclude_sheets = array(
+    'base' => array(
+        'blocks',
+        'dock'
+    )
 );
 
 $tf_general     = 'course.php';
 $tf_course      = 'course.php';
 $tf_embedded    = 'embedded.php';
-$tf_frontpage   = 'course.php';
+$tf_frontpage   = 'frontpage.php';
 $tf_report      = 'report.php';
 
 $noconfigs = during_initial_install();
@@ -102,7 +113,7 @@ $THEME->layouts = array(
         'regions' => array('side-pre', 'side-post'),
         'defaultregion' => $defaultregion,
         'options' => array(
-            'introbanner' => true,
+            'controlpanel' => false,
         ),
     ),
     // Server administration scripts.
@@ -163,23 +174,6 @@ $THEME->layouts = array(
             'nocustommenu' => true
         ),
     ),
-    // Used during upgrade and install, and for the 'This site is 
-    // undergoing maintenance' message.
-    // This must not have any blocks, and it is good idea if it does not 
-    // have links to
-    // other places - for example there should not be a home link 
-    // in the footer...
-    'maintenance' => array(
-        'file' => $tf_general,
-        'regions' => array(),
-        'options' => array(
-            'noblocks' => true, 
-            'nofooter' => true, 
-            'nonavbar' => true, 
-            'nocustommenu' => true,
-            'nologininfo' => true
-        ),
-    ),
     // Should display the content and basic headers only.
     'print' => array(
         'file' => $tf_general,
@@ -215,3 +209,4 @@ $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->enable_dock = false;
 $THEME->csspostprocess = 'uclashared_process_css';
 $THEME->javascripts[] = 'shared_server_dropdown';
+$THEME->javascripts[] = 'help_feedback';

@@ -80,7 +80,9 @@ class behat_publicprivate extends behat_base {
     public function i_make_private($activityname)
     {
         $steps = array(
-            new Given('I click on "' . get_string('publicprivatemakeprivate', 'local_publicprivate') . '" "link" in the "' . $this->escape($activityname) . '" activity')
+            new Given('I open "' . $this->escape($activityname) . '" actions menu'),
+            new Given('I click on "' . get_string('publicprivatemakeprivate', 'local_publicprivate')
+                    . '" "link" in the "' . $this->escape($activityname) . '" activity')
         );
 
         if ($this->running_javascript()) {
@@ -99,7 +101,9 @@ class behat_publicprivate extends behat_base {
     public function i_make_public($activityname)
     {
         $steps = array(
-            new Given('I click on "' . get_string('publicprivatemakepublic', 'local_publicprivate') . '" "link" in the "' . $this->escape($activityname) . '" activity')
+            new Given('I open "' . $this->escape($activityname) . '" actions menu'),
+            new Given('I click on "' . get_string('publicprivatemakepublic', 'local_publicprivate')
+                    . '" "link" in the "' . $this->escape($activityname) . '" activity')
         );
 
         if ($this->running_javascript()) {

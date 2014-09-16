@@ -6,7 +6,7 @@ Feature: Display links to all activities available in the course
 
 Background:
     Given I am in a ucla environment
-    And a ucla "srs" site exists
+    And a ucla "srs" site exist
     And I log in as "instructor"
     And I go to the default ucla site
     And I turn editing mode on

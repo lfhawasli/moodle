@@ -47,7 +47,8 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         // START UCLA MOD: CCLE-3023 - restore in Moodle2.x site menu block is  not displayed and not default to UCLA format
         // Friendlier notice to users
         //$html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup'), 'noticebox');
-        $html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup', get_string('backupformat'.$details['format'], 'backup')), 'noticebox');
+        $html .= $this->output->notification(get_string('backupdetailsnonstandardinfo', 'backup', 
+                get_string('backupformat'.$details['format'], 'backup')), 'notifymessage');
         // END UCLA MOD: CCLE-3023
         $html .= $this->backup_detail_pair(
             get_string('backupformat', 'backup'),

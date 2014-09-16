@@ -4,6 +4,7 @@
     require_once($CFG->libdir.'/adminlib.php');
     require_once($CFG->libdir.'/authlib.php');
     require_once($CFG->dirroot.'/user/filters/lib.php');
+    require_once($CFG->dirroot.'/user/lib.php');
 
     $delete       = optional_param('delete', 0, PARAM_INT);
     $confirm      = optional_param('confirm', '', PARAM_ALPHANUM);   //md5 confirmation hash
@@ -86,10 +87,10 @@
             die;
         } else if (data_submitted() and !$user->deleted) {
             if (delete_user($user)) {
-                session_gc(); // remove stale sessions
+                \core\session\manager::gc(); // Remove stale sessions.
                 redirect($returnurl);
             } else {
-                session_gc(); // remove stale sessions
+                \core\session\manager::gc(); // Remove stale sessions.
                 echo $OUTPUT->header();
                 echo $OUTPUT->notification($returnurl, get_string('deletednot', '', fullname($user, true)));
             }
@@ -128,12 +129,9 @@
         if ($user = $DB->get_record('user', array('id'=>$suspend, 'mnethostid'=>$CFG->mnet_localhost_id, 'deleted'=>0))) {
             if (!is_siteadmin($user) and $USER->id != $user->id and $user->suspended != 1) {
                 $user->suspended = 1;
-                $user->timemodified = time();
-                $DB->set_field('user', 'suspended', $user->suspended, array('id'=>$user->id));
-                $DB->set_field('user', 'timemodified', $user->timemodified, array('id'=>$user->id));
-                // force logout
-                session_kill_user($user->id);
-                events_trigger('user_updated', $user);
+                // Force logout.
+                \core\session\manager::kill_user_sessions($user->id);
+                user_update_user($user, false);
             }
         }
         redirect($returnurl);
@@ -144,10 +142,7 @@
         if ($user = $DB->get_record('user', array('id'=>$unsuspend, 'mnethostid'=>$CFG->mnet_localhost_id, 'deleted'=>0))) {
             if ($user->suspended != 0) {
                 $user->suspended = 0;
-                $user->timemodified = time();
-                $DB->set_field('user', 'suspended', $user->suspended, array('id'=>$user->id));
-                $DB->set_field('user', 'timemodified', $user->timemodified, array('id'=>$user->id));
-                events_trigger('user_updated', $user);
+                user_update_user($user, false);
             }
         }
         redirect($returnurl);

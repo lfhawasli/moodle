@@ -9,6 +9,7 @@
 $string['created'] = 'Created';
 $string['updated'] = 'Updated';
 $string['postby'] = 'Posted by';
+$string['searchterms'] = 'Q&A search terms';
 
 $string['addcomment'] = 'Add comment';
 $string['addentry'] = 'Ask a question';
@@ -129,6 +130,16 @@ $string['entbypage'] = 'Entries shown per page';
 $string['entries'] = 'Entries';
 $string['entrieswithoutcategory'] = 'Entries without category';
 $string['entry'] = 'Entry';
+$string['evententryadded'] = 'Added entry';
+$string['evententryapproved'] = 'Approved entry';
+$string['evententrydeleted'] = 'Deleted entry';
+$string['evententryupdated'] = 'Updated entry';
+$string['eventcategoryedited'] = 'Edited category';
+$string['eventcategorydeleted'] = 'Deleted category';
+$string['eventcategoryadded'] = 'Added category';
+$string['eventviewall'] = 'View all';
+$string['evententryviewed'] = 'Viewed entry';
+$string['eventqandaviewed'] = 'Viewed qanda';
 $string['entryalreadyexist'] = 'Entry already exists';
 $string['entryapproved'] = 'This entry has been approved';
 $string['entrydeleted'] = 'Entry deleted';

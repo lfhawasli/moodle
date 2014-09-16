@@ -22,7 +22,7 @@ $course = $DB->get_record('course', array('id' => $course_id), '*', MUST_EXIST);
 $format = course_get_format($course_id);
 
 require_login($course, true);
-$context = get_context_instance(CONTEXT_COURSE, $course_id);
+$context = context_course::instance($course_id);
 
 
 // Make sure you can view this page.
@@ -54,66 +54,22 @@ $modinfo = get_fast_modinfo($course_id);
 $mods = $modinfo->get_cms();
 $modnames = get_module_types_names();
 
-// Prep things for activities
-// Checkout /course/lib.php:1778
+/**
+ * Prep things for activities.
+ * 
+ * Check out /course/lib.php, under the "get_module_metadata()" function.
+ * If anything, it appears that $activities and $resources, which are
+ * used later on in this page, require arrays containing the names of
+ * the activity and resource modules that the "Add Activities/Resources"
+ * page will list (in a dropdown menu). "get_module_metadata()" can 
+ * provide that information.
+ */
+$modulemetadata = get_module_metadata($course, $modnames);
 foreach ($modnames as $modname => $modnamestr) {
-    if (!course_allowed_module($course, $modname)) {
-        continue;
-    }
-
-    $libfile = "$CFG->dirroot/mod/$modname/lib.php";
-    if (!file_exists($libfile)) {
-        continue;
-    }
-
-    include_once($libfile);
-    $gettypesfunc =  $modname.'_get_types';
-    if (function_exists($gettypesfunc)) {
-        if ($types = $gettypesfunc()) {
-            $menu = array();
-            $atype = null;
-            $groupname = null;
-            foreach($types as $modtype) {
-                if ($modtype->typestr === '--') {
-                    continue;
-                }
-
-                if (strpos($modtype->typestr, '--') === 0) {
-                    $groupname = str_replace('--', '', $modtype->typestr);
-                    continue;
-                }
-
-                $modtype->type = str_replace('&amp;', '&', $modtype->type);
-                if ($modtype->modclass == MOD_CLASS_RESOURCE) {
-                    $atype = MOD_CLASS_RESOURCE;
-                }
-
-                $menu[$modtype->type] = $modtype->typestr;
-            }
-
-            if (!is_null($groupname)) {
-                if ($atype == MOD_CLASS_RESOURCE) {
-                    $resources[] = array($groupname => $menu);
-                } else {
-                    $activities[] = array($groupname => $menu);
-                }
-            } else {
-                if ($atype == MOD_CLASS_RESOURCE) {
-                    $resources = array_merge($resources, $menu);
-                } else {
-                    $activities = array_merge($activities, $menu);
-                }
-            }
-        }
+    if ($modulemetadata[$modname]->archetype == MOD_ARCHETYPE_RESOURCE) {
+        $resources[$modname] = $modulemetadata[$modname]->title;
     } else {
-        $archetype = plugin_supports('mod', $modname, 
-            FEATURE_MOD_ARCHETYPE, MOD_ARCHETYPE_OTHER);
-        if ($archetype == MOD_ARCHETYPE_RESOURCE) {
-            $resources[$modname] = $modnamestr;
-        } else {
-            // all other archetypes are considered activity
-            $activities[$modname] = $modnamestr;
-        }
+        $activities[$modname] = $modulemetadata[$modname]->title;
     }
 }
 
@@ -286,9 +242,7 @@ if ($uploadform->is_cancelled()) {
 
     // Observe course/modedit.php
     if (!empty($CFG->enableavailability)) {
-        $newcm->availablefrom = $data->availablefrom;
-        $newcm->availableuntil = $data->availableuntil;
-        $newcm->showavailability = $data->showavailability;
+        $newcm->availability = $data->availabilityconditionsjson;
     }
    
     // Make course content the same visibility as parent section
@@ -370,16 +324,15 @@ if ($uploadform->is_cancelled()) {
         block_ucla_rearrange::move_modules_section_bulk($newmodules);
     }
 
-    // The add_to_log function will truncate the info field if it is over 255
-    // characters long, which will remove the " - via control panel" postfix.
-    // So, we need to truncate the text if it is over 232 characters (255 mius
-    // 3 characters for the truncation (...) and 20 for the postfix text).
-    $name = strip_tags(format_string($data->name, true));
-    if (textlib::strlen($name) > 232) {
-        $name = textlib::substr($name, 0, 232)."...";
-    }
-    add_to_log($data->course_id, $data->modulename, 'add', 
-            "/view.php?id=$data->coursemodule", $name . " - via control panel");
+    $event = \block_ucla_easyupload\event\course_module_created::create(array(
+        'other' => array(
+            'module' => $data->modulename,
+            'name' => $data->name,
+        ),
+        'objectid' => $data->coursemodule,
+        'context' => $context
+    ));
+    $event->trigger();
     
     $eventdata = new stdClass();
     $eventdata->modulename = $data->modulename;
@@ -387,7 +340,7 @@ if ($uploadform->is_cancelled()) {
     $eventdata->cmid       = $data->coursemodule;
     $eventdata->courseid   = $data->course_id;
     $eventdata->userid     = $USER->id;
-    events_trigger('mod_created', $eventdata);    
+    events_trigger_legacy('mod_created', $eventdata);    
     
     rebuild_course_cache($course_id);
 }

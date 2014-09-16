@@ -5,24 +5,24 @@ Feature: Deleting a course with additional course content
   I need to be able to see if I am deleting a course with additional course content
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher | Teacher | 1 | teacher@asd.com |
-    Given the following "categories" exists:
+    Given the following "categories" exist:
       | name       | category | idnumber |
       | Category 1 | 0        | CAT1     |
       | Category 2 | CAT1     | CAT2     |
-    Given the following "courses" exists:
+    Given the following "courses" exist:
       | fullname | shortname | category | format | 
       | Course 1 | COURSE1   | CAT2     | ucla   |
       | Course 2 | COURSE2   | CAT2     | topics |
       | Course 3 | COURSE3   | CAT2     | weeks  |
-     Given the following "course enrolments" exists:
+     Given the following "course enrolments" exist:
       | user | course | role |
       | teacher | COURSE1 | editingteacher |
       | teacher | COURSE2 | editingteacher |
       | teacher | COURSE3 | editingteacher |
-     And I log in as administrator
+     And I log in as "admin"
 
   @javascript
   Scenario: Deleting a course with a block for all 3 course formats
@@ -33,10 +33,10 @@ Feature: Deleting a course with additional course content
     And I add the "Calendar" block
     Then I should see "Events key" in the ".block_calendar_month" "css_element"
     When I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
+    And I follow "Expand Category 1"
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 1" "table_row"
+    And I click on "delete" action for "Course 1" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
     And I am on homepage
@@ -45,10 +45,9 @@ Feature: Deleting a course with additional course content
     And I add the "Calendar" block
     Then I should see "Events key" in the ".block_calendar_month" "css_element"
     When I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 2" "table_row"
+    And I click on "delete" action for "Course 2" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
     And I am on homepage
@@ -57,10 +56,9 @@ Feature: Deleting a course with additional course content
     And I add the "Calendar" block
     Then I should see "Events key" in the ".block_calendar_month" "css_element"
     When I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 3" "table_row"
+    And I click on "delete" action for "Course 3" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
 
@@ -74,12 +72,12 @@ Feature: Deleting a course with additional course content
       | Message | Test Message |
     And I should see "Test Subject"
     And I log out
-    And I log in as administrator
+    And I log in as "admin"
     Then I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
+    And I follow "Expand Category 1"
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 1" "table_row"
+    And I click on "delete" action for "Course 1" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
 
@@ -94,12 +92,12 @@ Feature: Deleting a course with additional course content
       | Name | Test Quiz |
     And I should see "Test Quiz" in the "region-main" "region"
     And I log out
-    And I log in as administrator
+    And I log in as "admin"
     Then I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
+    And I follow "Expand Category 1"
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 1" "table_row"
+    And I click on "delete" action for "Course 1" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
     # Topics format.
@@ -111,12 +109,12 @@ Feature: Deleting a course with additional course content
       | Name | Test Quiz |
     And I should see "Test Quiz" in the "region-main" "region"
     And I log out
-    And I log in as administrator
+    And I log in as "admin"
     Then I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
+    And I follow "Expand Category 1"
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 2" "table_row"
+    And I click on "delete" action for "Course 2" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
     # Weeks format.
@@ -128,12 +126,12 @@ Feature: Deleting a course with additional course content
       | Name | Test Quiz |
     And I should see "Test Quiz" in the "region-main" "region"
     And I log out
-    And I log in as administrator
+    And I log in as "admin"
     Then I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
+    And I follow "Expand Category 1"
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 3" "table_row"
+    And I click on "delete" action for "Course 3" in management course listing
     Then I should see "WARNING" in the "region-main" "region"
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
 
@@ -142,28 +140,24 @@ Feature: Deleting a course with additional course content
     # UCLA format.
     When I follow "Course 1"
     And I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
+    And I follow "Expand Category 1"
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 1" "table_row"
+    And I click on "delete" action for "Course 1" in management course listing
     Then I should see "You are deleting a course for which no content has been added." in the "region-main" "region"
     And I am on homepage
     # Topics format.
     When I follow "Course 2"
     And I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 2" "table_row"
+    And I click on "delete" action for "Course 2" in management course listing
     Then I should see "You are deleting a course for which no content has been added." in the "region-main" "region"
     And I am on homepage
     # Weeks format.
     When I follow "Course 3"
     And I expand "Site administration" node
-    And I expand "Courses" node
-    And I follow "Add/edit courses"
+    And I go to the courses management page
     And I follow "Category 2"
-    And I click on "Delete" "link" in the "Course 3" "table_row"
+    And I click on "delete" action for "Course 3" in management course listing
     Then I should see "You are deleting a course for which no content has been added." in the "region-main" "region"
-
-

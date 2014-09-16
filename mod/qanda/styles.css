@@ -108,16 +108,19 @@
     -moz-border-radius:6px;
     -webkit-border-radius:6px;
     border-radius:6px;
-    border:1px solid #DDDDDD;
     display:inline-block;
     color:#ffffff;
     font-family:arial;
     font-size:12px;
-    padding:1px 10px;
+    padding-right: 10px;
     margin-right: 20px;
 }
-.path-mod-qanda div.add-and-search-box table.box-align-center {
 
+.path-mod-qanda div.add-and-search-box div.search-box input.submit {
+    vertical-align: top;
+}
+
+.path-mod-qanda div.add-and-search-box table.box-align-center {
     margin-left: auto;
     margin-right: auto;
 }
@@ -160,9 +163,14 @@
 
 .path-mod-qanda .qanda-post th.entry-header {
     text-align:left;
-    border-bottom: 1px solid #DDDDDD;
     padding-top: 0;
 }
+
+.path-mod-qanda .qanda-post tr.answer-row td.entry {
+    border-top: 1px solid #DDDDDD;
+}
+
+
 
 .path-mod-qanda .qanda-post th.entry {
     padding-top: 0;
@@ -247,7 +255,7 @@
 .path-mod-qanda .qanda-post div.user-information {
     clear:both;
     text-align: left;
-    font-size:8px;
+    font-size:0.85em;//8px;
     padding-left:25px;
 }
 
@@ -299,8 +307,6 @@
     font-weight:normal;
 }
 
-
-
 /** Hide the Keyword portion of the Q&A post **/
 .path-mod-qanda .qanda-post td.entry-lower-section td.aliases,
 .path-mod-qanda td.entry-attachment {
@@ -310,7 +316,6 @@
 .path-mod-qanda .qanda-post td.entry-lower-section {
     padding-top:0;
 }
-
 
 /** Hide the Q&A tabs  **/
 .path-mod-qanda div.qanda-display div.tabtree  { 
@@ -350,7 +355,7 @@
     color: black;
     background-color:#fff;
     background-image:none;
-    font-size:12px;
+    font-size:1em;//12px;
     -moz-border-radius: 4px 10px 10px 10px;
     -webkit-border-radius: 4px 10px 10px 10px;
     border-radius: 4px 10px 10px 10px;
@@ -380,7 +385,6 @@
     padding:10px;
 }
 
-
 .path-mod-qanda div#qanda-title {
     float:left;
     text-align: center;
@@ -395,6 +399,7 @@
 .path-mod-qanda div.add-and-search-box {
     float:left;
     margin-top:1em;
+    margin-bottom: 1em;
     width:100%;
 }
 
@@ -413,35 +418,11 @@
     text-align:center;
 }
 
-.path-mod-qanda div.qanda-control span.help-link a.approve-link,
-.path-mod-qanda div.qanda-add-entry input[type=submit] {
-    background-color:#79bbff;
-    background-image: none;
-    -moz-border-radius:6px;
-    -webkit-border-radius:6px;
-    border-radius:6px;
-    border:1px solid #84bbf3;
-    display:inline-block;
-    color:#ffffff;
-    font-family:arial;
-    font-size:1em;
-    padding:7px 24px;
-}
 
-.path-mod-qanda div.qanda-control span.help-link a.approve-link:hover,
-.path-mod-qanda div.qanda-add-entry input[type=submit]:hover {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #378de5), color-stop(1, #79bbff) );
-    background:-moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
-    background-color:#378de5;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.path-mod-qanda div.qanda-control span.help-link a.approve-link:active,
-.path-mod-qanda div.qanda-add-entry input[type=submit]:active{
-    position:relative;
-    top:1px;
+.path-mod-qanda div.qanda-control img#printer-icon {
+    width: 23px;
+    height: 23px;
+    padding: 0px;
 }
 
 .path-mod-qanda div.qanda-permalink a {
@@ -449,95 +430,20 @@
 }
 
 /* Style the searched term highlighting */
-
 .path-mod-qanda span.highlight {
     background-color: #ffb300;
 }
 
-/*  Style the control buttons */
-.path-mod-qanda a.qanda-edit, 
-.path-mod-qanda a.qanda-delete, 
-.path-mod-qanda a.qanda-permalink,
-.path-mod-qanda a.qanda-answer {
-    -moz-box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-    -webkit-box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-    box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-    background-color:#79bbff;
-    -moz-border-radius:6px;
-    -webkit-border-radius:6px;
-    border-radius:6px;
-    border:1px solid #84bbf3;
-    display:inline-block;
-    color:#ffffff;
-    font-family:arial;
-    font-size:12px;
-    padding:1px 10px;
-    text-decoration: none;
+.path-mod-qanda a.qanda-delete,
+.path-mod-qanda a.qanda-approve {
+    margin-left: 0.5ex;
+    color:#FFF;
 }
 
-.path-mod-qanda a.qanda-edit:link,
-.path-mod-qanda a.qanda-edit:visited,
-.path-mod-qanda a.qanda-answer:link,
-.path-mod-qanda a.qanda-answer:visited {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fffff), color-stop(1, #777777) );
-    background:-moz-linear-gradient( center top, #fffff 5%, #777777 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffff', endColorstr='#777777');
-    margin-right:10px;
-    color:#ffffff;
-
-}
-
-a.qanda-edit:hover,
-a.qanda-answer:hover {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #378de5), color-stop(1, #79bbff) );
-    background:-moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
-    background-color:#777777;
-    color:#fffff;
-    text-decoration: none;
-}
-
-.path-mod-qanda a.qanda-delete:link,
-.path-mod-qanda a.qanda-delete:visited {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fffff), color-stop(1, #777777) );
-    background:-moz-linear-gradient( center top, #fffff 5%, #777777 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffff', endColorstr='#777777');
-    margin-right:10px;
-    color:#ffffff;
-}
-
-.path-mod-qanda a.qanda-delete:hover {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #378de5), color-stop(1, #79bbff) );
-    background:-moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
-    background-color:#378de5;
-    color:#FF0000;
-    text-decoration: none;
-}
-
-.path-mod-qanda a.qanda-permalink:link,
-.path-mod-qanda a.qanda-permalink:visited {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fffff), color-stop(1, #777777) );
-    background:-moz-linear-gradient( center top, #fffff 5%, #777777 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffff', endColorstr='#777777');
-    margin-right:10px;
-    color:#ffffff;
-}
-
-.path-mod-qanda a.qanda-permalink:hover {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #378de5), color-stop(1, #79bbff) );
-    background:-moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
-    background-color:#378de5;
-    text-decoration: none;
-}
-
-.path-mod-qanda td.qanda-search-box input#fullsearch,
-.path-mod-qanda td.qanda-search-box label{
+.path-mod-qanda .search-box input#fullsearch,
+.path-mod-qanda .search-box label{
     display:none;
 }
-
-.path-mod-qanda td.qanda-search-box input[type=text] { margin-bottom:4px; }
 
 .path-mod-qanda div#notice p { margin-bottom:0px; }
 

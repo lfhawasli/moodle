@@ -35,7 +35,10 @@ require_login();
 $editor = get_texteditor('tinymce');
 $plugin = $editor->get_plugin('nanogong');
 $itemid = optional_param('itemid', '', PARAM_TEXT); 
-$contextid=get_context_instance(CONTEXT_USER, $USER->id)->id;
+$contextid = NULL;
+if (isloggedin()) {
+    $contextid = context_user::instance($USER->id)->id;
+}
 
 @header('Content-Type: text/html; charset=utf-8');
 // END UCLA MOD: CCLE-4156-upgrade-nanogong-work-with-Moodle-2.5

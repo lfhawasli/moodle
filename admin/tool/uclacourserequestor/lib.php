@@ -439,7 +439,12 @@ function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
 
                 $u->firstname = $fn;
                 $u->lastname = $ln;
-
+                // Moodle 2.7 introduced new username fields.
+                $u->alternatename = '';
+                $u->firstnamephonetic = '';
+                $u->lastnamephonetic = '';
+                $u->middlename = '';
+                
                 $fullname = fullname($u);
 
                 $instarr[$fullname] = $fullname;

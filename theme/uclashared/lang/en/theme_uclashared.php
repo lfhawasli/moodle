@@ -49,7 +49,7 @@ $string['foolin_disability'] = 'http://www.osd.ucla.edu/';
 
 $string['control_panel'] = 'Control Panel';
 
-$string['help_n_feedback'] = 'Help & Feedback';
+$string['help_n_feedback'] = 'Need Help';
 
 $string['copyright_information'] = '&copy; {$a} UC Regents';
 
@@ -88,7 +88,7 @@ $string['setting_desc_system_name'] = 'The system name that will be displayed in
 $string['setting_default_system_name'] = 'Shared system';
 
 $string['setting_title_system_link'] = 'System link';
-$string['setting_desc_system_link'] = 'The link associated witht he system name.';
+$string['setting_desc_system_link'] = 'The link associated with the system name.';
 $string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=924';
 
 $string['setting_title_disable_post_blocks'] = 'Disable blocks on right';
@@ -101,12 +101,6 @@ $string['env_prod'] = 'Production';
 $string['env_stage'] = 'Stage';
 $string['env_test'] = 'Test';
 $string['env_dev'] = 'Development';
-
-// CCLE-3069 - Editing icons preference.
-$string['noeditingicons'] = 'Site editing style';
-$string['useeditingicons'] = 'Use icons';
-$string['donotuseeditingicons'] = 'Use text';
-$string['donotuseeditingicons2'] = 'Use text, except for buttons that move the module';
 
 // CCLE-2862 - Main_site_logo_image_needs_alt_altribute.
 $string['UCLA_CCLE_text'] = 'UCLA CCLE Common Collaboration and Learning Environment';

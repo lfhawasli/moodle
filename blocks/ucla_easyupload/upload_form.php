@@ -177,33 +177,19 @@ abstract class easy_upload_form extends moodleform {
             );
         }
 
-        // From /course/moodleform_mod.php:513 (Moodle 2.5.1) with modifications: 
-        // Removed user and grade conditions.
-        if (!empty($CFG->enableavailability) && $this->enable_availability) {
-            // Conditional availability
-
-            // Available from/to defaults to midnight because then the display
-            // will be nicer where it tells users when they can access it (it
-            // shows only the date and not time).
-            $date = usergetdate(time());
-            $midnight = make_timestamp($date['year'], $date['mon'], $date['mday']);
-
-            // From/until controls
+        // From /course/moodleform_mod.php:448 (Moodle 2.7) with modifications: 
+        if (!empty($CFG->enableavailability)) {
+            // Availability field. This is just a textarea; the user interface
+            // interaction is all implemented in JavaScript.
             $mform->addElement('header', 'availabilityconditionsheader',
-                    get_string('availabilityconditions', 'condition'));
-            $mform->addElement('date_time_selector', 'availablefrom',
-                    get_string('availablefrom', 'condition'),
-                    array('optional' => true, 'defaulttime' => $midnight));
-            $mform->addHelpButton('availablefrom', 'availablefrom', 'condition');
-            $mform->addElement('date_time_selector', 'availableuntil',
-                    get_string('availableuntil', 'condition'),
-                    array('optional' => true, 'defaulttime' => $midnight));
+                    get_string('restrictaccess', 'availability'));
+            // Note: This field cannot be named 'availability' because that
+            // conflicts with fields in existing modules (such as assign).
+            // So it uses a long name that will not conflict.
+            $mform->addElement('textarea', 'availabilityconditionsjson',
+                    get_string('accessrestrictions', 'availability'));
 
-            // Do we display availability info to students?
-            $mform->addElement('select', 'showavailability', get_string('showavailability', 'condition'),
-                    array(CONDITION_STUDENTVIEW_SHOW=>get_string('showavailability_show', 'condition'),
-                    CONDITION_STUDENTVIEW_HIDE=>get_string('showavailability_hide', 'condition')));
-            $mform->setDefault('showavailability', CONDITION_STUDENTVIEW_SHOW);
+            \core_availability\frontend::include_all_javascript($course);
         }
         // END code from /course/moodleform_mod.php to display availability restrictions
 

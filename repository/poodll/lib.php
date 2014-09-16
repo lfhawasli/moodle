@@ -408,7 +408,7 @@ class repository_poodll extends repository {
 
 					//fetch the file we submitted earlier
 				   $fs = get_file_storage();
-				   $context = get_context_instance(CONTEXT_USER, $USER->id);
+				   $context = context_user::instance($USER->id);
 					$f = $fs->get_file($context->id, "user", "draft",
                         "0", "/", $recordedname);
 				
@@ -447,7 +447,7 @@ class repository_poodll extends repository {
 
 					//fetch the file we submitted earlier
 				   $fs = get_file_storage();
-				   $context = get_context_instance(CONTEXT_USER, $USER->id);
+				   $context = context_user::instance($USER->id);
 					$f = $fs->get_file($context->id, "user", "draft",
                         "0", "/", $recordedname);
 				
@@ -687,7 +687,7 @@ class repository_poodll extends repository {
         $ret ="";
 	
       //we get necessary info
-	 $context = get_context_instance(CONTEXT_USER, $USER->id);	
+	 $context = context_user::instance($USER->id);	
      $filename = 'filename' . '_' . $this->options['recording_format'] ;
 
 	 //HTML5 Recording and Uploading audio/video
@@ -762,25 +762,24 @@ class repository_poodll extends repository {
 	//	$filename = 'filename' . '_' . $this->options['recording_format'] ;
 		switch($this->options['recording_format']){
 			case self::POODLLAUDIO:
-				$ret .= fetchSimpleAudioRecorder('swf','poodllrepository',$USER->id,$filename);
+				//$ret .= fetchSimpleAudioRecorder('swf','poodllrepository',$USER->id,$filename);
+				$ret .= fetchAudioRecorderForSubmission('auto','poodllrepository', $filename,$context->id,'user','draft',0,0);
 				break;
 			case self::POODLLVIDEO:
-				$ret .= fetchSimpleVideoRecorder('swf','poodllrepository',$USER->id,$filename,'','298', '340');
+				//$ret .= fetchSimpleVideoRecorder('swf','poodllrepository',$USER->id,$filename,'','298', '340');
+				$ret .= fetchVideoRecorderForSubmission('swf', 'poodllrepository', $filename, $context->id,'user','draft',0,0);
 				break;
 			case self::MP3AUDIO:
 				//this is the mp3 recorder, by Paul Nichols
 				//$ret = $this->fetchMP3PostRecorder("filename","apic.jpg", '290','340');
 				//$ret = fetchMP3RecorderForRepo("filename");
-				//$context = get_context_instance(CONTEXT_USER, $USER->id);
 				$ret .= fetchMP3RecorderForSubmission($filename,$context->id,"user","draft","0" );
 				break;
 			case self::POODLLWHITEBOARD:
-				//$context = get_context_instance(CONTEXT_USER, $USER->id);
-				$ret .= fetchWhiteboardForSubmission($filename,$context->id,"user","draft","0",510,370);
+				$ret .= fetchWhiteboardForSubmission($filename,$context->id,"user","draft","0",305,350,"","poodll");
 				break;
 				
 			case self::POODLLSNAPSHOT:
-				//$context = get_context_instance(CONTEXT_USER, $USER->id);
 				$ret .= fetchSnapshotCameraForSubmission($filename,"apic.jpg", '290','340',$context->id,"user","draft","0");
 	
 				break;

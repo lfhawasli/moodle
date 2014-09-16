@@ -41,53 +41,12 @@ function user_preference_allow_ajax_update($name, $paramtype) {
 }
 
 /**
- * Returns whether ajax is enabled/allowed or not.
- * @param array $browsers optional list of alowed browsers, empty means use default list
- * @return bool
- */
-function ajaxenabled(array $browsers = null) {
-    global $CFG;
-
-    if (!empty($browsers)) {
-        $valid = false;
-        foreach ($browsers as $brand => $version) {
-            if (check_browser_version($brand, $version)) {
-                $valid = true;
-            }
-        }
-
-        if (!$valid) {
-            return false;
-        }
-    }
-
-    $ie = check_browser_version('MSIE', 6.0);
-    $ff = check_browser_version('Gecko', 20051106);
-    $op = check_browser_version('Opera', 9.0);
-    $sa = check_browser_version('Safari', 412);
-    $ch = check_browser_version('Chrome', 6);
-
-    if (!$ie && !$ff && !$op && !$sa && !$ch) {
-        /** @see http://en.wikipedia.org/wiki/User_agent */
-        // Gecko build 20051107 is what is in Firefox 1.5.
-        // We still have issues with AJAX in other browsers.
-        return false;
-    }
-
-    if (!empty($CFG->enableajax)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/**
  * Starts capturing output whilst processing an AJAX request.
  *
  * This should be used in combination with ajax_check_captured_output to
  * report any captured output to the user.
  *
- * @retrun Boolean Returns true on success or false on failure.
+ * @return Boolean Returns true on success or false on failure.
  */
 function ajax_capture_output() {
     // Start capturing output in case of broken plugins.
@@ -113,7 +72,7 @@ function ajax_check_captured_output() {
         $message = 'Unexpected output whilst processing AJAX request. ' .
                 'This could be caused by trailing whitespace. Output received: ' .
                 var_export($output, true);
-        if ($CFG->debug == DEBUG_DEVELOPER && !empty($output)) {
+        if ($CFG->debugdeveloper && !empty($output)) {
             // Only throw an error if the site is in debugdeveloper.
             throw new coding_exception($message);
         }

@@ -3,7 +3,7 @@
 // --------------------------------------------------
 
 // Need compass library
-@import "compass";
+/*@import "compass";*/
 
 //
 // REQUIRED THEME COMPONENTS
@@ -14,44 +14,53 @@
 // put all overrides in there.  If we don't modify Bootstrap, we just 
 // pull the file directly.
 
-/*@import "CSS:editor";*/
-/*@import "CSS:base/style/core";
-@import "CSS:base/style/pagelayout";*/
 
-// Core variables and mixins
+/*// Core variables and mixins
+@import "ucla/variables";
 @import "variables";
 @import "mixins";
 
 // Reset
-/*@import "bootstrap/lib/normalize";*/
+@import "bootstrap/lib/normalize";
 
 // Core CSS
 // -------------------
 @import "type";
 @import "form";
-@import "buttons";
+@import "moodle/adapter/form";
+
+@import "ucla/buttons";
+@import "moodle/adapter/buttons";
+
 @import "tables";
-@import "bootstrap/lib/grid";
+@import "moodle/adapter/table";
+@import "bootstrap/grid";
 
 
 // Components
 // -------------------
-@import "header";
+@import "ucla/header";
+@import "ucla/frontpage";
+@import "ucla/fontawesome";
 @import "footer";
-@import "alerts";
-@import "navs";
+@import "ucla/alerts";
+@import "moodle/adapter/alerts";
+@import "bootstrap/navs";
 @import "progress-bars";
-@import "panels";
+@import "bootstrap/panels";
+@import "moodle/adapter/panels";
 @import "labels";
-@import "glyphicons";
+@import "ucla/glyphicons";
 
-@import "dock";
+@import "bootstrap/button-groups";
 
-@import "bootstrap/lib/button-groups";
-@import "bootstrap/lib/input-groups";
-@import "breadcrumbs";
-@import "bootstrap/lib/wells";
-@import "bootstrap/lib/badges";
+@import "bootstrap/pagination";
+@import "moodle/adapter/pagination";
+
+@import "bootstrap/input-groups";
+@import "ucla/breadcrumbs";
+@import "bootstrap/wells";
+@import "bootstrap/badges";
 
 // Media queries
 // -------------------
@@ -63,6 +72,20 @@
 // Load CCLE Moodle specific elements
 // This course, and plugin styles
 // --------------------------------------------------
-@import "ccle/required";
+@import "ucla/login";
+@import "ucla/utilities";
+@import "ucla/ui_mods";
 
-@import "ui_mods";
+// Moodle
+@import "moodle/undo";
+@import "moodle/core";
+@import "moodle/blocks";
+@import "moodle/gradebook";
+@import "moodle/report";
+@import "moodle/admin";
+@import "moodle/category_management";
+@import "moodle/forum";
+@import "moodle/calendar";
+@import "moodle/wiki";
+@import "moodle/turnitin";
+@import "moodle/action_menu";*/

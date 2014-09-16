@@ -159,3 +159,7 @@ $string['manualconvertsyllabusreminder'] = 'Please complete the form below to ' 
         'convert your existing "{$a->name}" {$a->modname} into your official UCLA syllabus.';
 $string['errmanualsyllabusmismatch'] = 'Cannot convert manual syllabus, because it does not belong to current course.';
 $string['manualsuccessfulconversion'] = 'Successfully converted manual syllabus.';
+
+// Strings for events.
+$string['eventcoursemoduleconverted'] = 'Converted manual syllabus';
+$string['eventsyllabusviewed'] = 'Viewed syllabus';

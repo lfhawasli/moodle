@@ -1,5 +1,5 @@
 // TYPE
-
+@import "bootstrap/type";
 
 // We're going to use rem units, so all type will 
 // be relative to this size
@@ -23,17 +23,29 @@ table {
 }
 
 img.icon {
-    width: 24px;
-    height: 24px;
+    width: auto;
+    height: auto;
+    @include box-sizing(content-box);
+    
+    &.pluginicon {
+        width: 24px !important;
+        height: 24px !important;
+    }
 }
 
-#intro.generalbox {
-    /*@extend .well;*/
-    /*@extend .well-small;*/
+.defaultuserpic {
+    @include border-radius(50%);
+    border: 2px solid #ddd;
+}
+
+/*#intro.generalbox {
+    @extend .well;
+    @extend .well-small;
     
     margin-top: 0;
-}
+}*/
 
+// Define how links will look like
 a {
     &:link {
         text-decoration: none;
@@ -64,34 +76,17 @@ a {
 .mform .ffilemanager * {
     @include box-sizing(content-box);
 }
-
-
-/// Fix YUI typography
-h1 {
-    @include ccle-typography-h1;
+.iconhelp,
+.iconsmall {
+    @include box-sizing(content-box);
+}
+// Moodle dialogs need content-box
+.moodle-dialogue-base * {
+    @include box-sizing(content-box);
+}
+// Moodle text editors need content-box
+.mceEditor *,
+.feditor * {
+    @include box-sizing(content-box);
 }
 
-h2 {
-    @include ccle-typography-h2;
-    
-    &.main {
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 8px;
-    }
-}
-
-h3 {
-    @include ccle-typography-h3;
-}
-
-h4 {
-    @include ccle-typography-h4;
-}
-
-h5 {
-    @include ccle-typography-h5;
-}
-
-h6 {
-    @include ccle-typography-h6;
-}

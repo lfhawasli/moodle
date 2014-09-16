@@ -53,5 +53,5 @@ if(!defined('FPS_REPLYVOICE')){
 				1 => get_string("yes", "assignfeedback_poodll"));
 	$settings->add(new admin_setting_configselect('assignfeedback_poodll/showcurrentfeedback', 
 					new lang_string('showcurrentfeedback', 'assignfeedback_poodll'), 
-					new lang_string('showcurrentfeedbackdetails', 'assignfeedback_poodll'), 0, $yesno_options));
+					new lang_string('showcurrentfeedbackdetails', 'assignfeedback_poodll'), 1, $yesno_options));
 

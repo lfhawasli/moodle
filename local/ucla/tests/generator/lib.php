@@ -226,54 +226,126 @@ class local_ucla_generator extends testing_data_generator {
         return $courseobj;
     }
 
+
+    /**
+     * Helper function for create_ucla_roles function.  Creates a dummy role
+     * based off of XML information.
+     *
+     * @param string $xml
+     */
+    protected function create_dummy_role($xml) {
+        global $DB;
+        if (core_role_preset::is_valid_preset($xml)) {
+            $info = core_role_preset::parse_preset($xml);
+            if (!$DB->get_record('role', array('shortname' => $info['shortname']))) {
+                create_role($info['name'], $info['shortname'], $info['description'], $info['archetype']);
+            }
+        }
+    }
+
+    /**
+     * Helper function for create_ucla_roles function.  Fully defines
+     * a role from an xml file.  $shortname is used to retrieve dummy roles
+     * for updating.
+     *
+     * @param string $xml role xml definition
+     * @param string $shortname role shortname
+     * @return array $role role definition
+     */
+    protected function define_role_from_xml($xml, $shortname) {
+        global $DB;
+        // Preset options.
+        if ($role = $DB->get_record('role', array('shortname' => $shortname))) {
+            $options = array(
+                'shortname'     => 1,
+                'name'          => 1,
+                'description'   => 1,
+                'permissions'   => 1,
+                'archetype'     => 1,
+                'contextlevels' => 1,
+                'allowassign'   => 1,
+                'allowoverride' => 1,
+                'allowswitch'   => 1);
+            $definitiontable = new tool_uclarolesmigration_import_table(context_system::instance(), $role->id);
+            $definitiontable->force_preset($xml, $options);
+            $definitiontable->save_changes();
+            unset($definitiontable);
+            return $role;
+        }
+    }
+
+    /**
+     * Helper function for create_ucla_roles function.
+     * Checks $filepath to see if a file exists there, and
+     * returns its contents if it exists.
+     *
+     * @param string $filepath
+     * @return string file contents
+     */
+    protected function check_and_get_file($filepath) {
+        if (is_file($filepath)) {
+            return file_get_contents($filepath);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Create the roles needed to do enrollment. Note, that these roles will not
      * have the same capabilities as the real roles, they are just roles with
      * the same name as needed.
      *
-     * @return array        Returns an array of shortname to roleid.
+     * @param array $rolestocreate
+     * @return array Returns an array of shortname to roleid.
      */
-    public function create_ucla_roles() {
+    public function create_ucla_roles($rolestocreate = null) {
         global $CFG, $DB;
         $retval = array();
 
-        // Load fixture of role data from PROD. This will grant access to a
-        // new variable called $roles.
-        include($CFG->dirroot . '/local/ucla/tests/fixtures/mdl_role.php');
-
-        $archetypes = array();
-        foreach ($roles as $role) {
-            $retval[$role['shortname']] = create_role($role['name'],
-                    $role['shortname'], $role['description'], $role['archetype']);
-
-            // Now copy all the capabilities for given role from given
-            // archetype. For now, we are just copying capabilities, but later
-            // on we should import the role definitions from our PROD servers.
-
-            // Get roleid for archetype.
-            if (!isset($archetypes[$role['archetype']])) {
-                $archetypes[$role['archetype']] = $DB->get_field('role', 'id',
-                        array('shortname' => $role['archetype']));
+        // If rolestocreate is undefined, we assume that every role should be made from the fixtures.
+        if (empty($rolestocreate)) {
+            // Process each file with the *.xml extension and create dummy roles.
+            $xmlfiles = glob($CFG->dirroot . '/local/ucla/tests/fixtures/roles/*.xml', GLOB_NOSORT);
+            foreach ($xmlfiles as $file) {
+                $xml = file_get_contents($file);
+                $this->create_dummy_role($xml);
             }
 
-            // Do copying all in one query so this is as fast as possible.
-            $sql = "INSERT INTO {role_capabilities}
-                    (contextid, roleid, capability, permission)
-                    SELECT  contextid, :targetroleid, capability, permission
-                    FROM    {role_capabilities}
-                    WHERE   roleid=:sourceroleid";
+            // Process each file with the *.xml extension and update/define each role.
+            foreach ($xmlfiles as $file) {
+                $xml = file_get_contents($file);
+                if (core_role_preset::is_valid_preset($xml)) {
+                    $shortname = basename($file, '.xml');
+                    $role = $this->define_role_from_xml($xml, $shortname);
+                    $retval[$role->shortname] = $role->id;
+                }
+            }
 
-            $DB->execute($sql, array('targetroleid' => $retval[$role['shortname']],
-                                     'sourceroleid' => $archetypes[$role['archetype']]));
+        } else {
+            // Create dummy variable for each role.
+            foreach ($rolestocreate as $roletocreate) {
+                $filepath = $CFG->dirroot . '/local/ucla/tests/fixtures/roles/' . $roletocreate . '.xml';
+                $xml = $this->check_and_get_file($filepath);
+                if (is_null($xml)) {
+                    continue;
+                }
+                $this->create_dummy_role($xml);
+            }
+
+            // Process and update/define each role.
+            foreach ($rolestocreate as $roletocreate) {
+                $filepath = $CFG->dirroot . '/local/ucla/tests/fixtures/roles/' . $roletocreate . '.xml';
+                $xml = $this->check_and_get_file($filepath);
+                if (is_null($xml)) {
+                    continue;
+                } else if (core_role_preset::is_valid_preset($xml)) {
+                    $shortname = $roletocreate;
+                    $role = $this->define_role_from_xml($xml, $shortname);
+                    $retval[$role->shortname] = $role->id;
+                }
+            }
         }
 
-        // Although we didn't create it, we need the roleid for student.        
-        $retval['student'] = $archetypes['student'];
-        
-        // Adding required capability for TA.
-        assign_capability('moodle/course:viewparticipants', CAP_ALLOW, 
-                $retval['ta'], context_system::instance());
-        
         return $retval;
     }
 
@@ -401,6 +473,81 @@ class local_ucla_generator extends testing_data_generator {
         } catch (Exception $e) {
             $transaction->rollback($e);
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Enrolls the given user for a given course as if they were assigned via
+     * the Registrar (enrol_database).
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param int $roleid       If given user is a student, will also add their
+     *                          record to the ccle_roster_class_cache table.
+     * @param string $enrolsrs  If given, will make sure that user is associated
+     *                          with that cross-listed srs in the
+     *                          ccle_roster_class_cache table.
+     *
+     * @return boolean
+     */
+    public function enrol_reg_user($userid, $courseid, $roleid, $enrolsrs = null) {
+        global $DB;
+        // This function assumes that we are adding user to a Registrar course.
+        if (is_collab_site($courseid)) {
+            return false;
+        }
+
+        // Add database enrollment plugin, if needed.
+        if (!$DB->record_exists('enrol', 
+                array('courseid' => $courseid, 'enrol' => 'database'))) {
+            $enrol = enrol_get_plugin('database');
+            if (!$enrol->add_instance(get_course($courseid))) {
+                return false;
+            }
+        }
+
+        // Enroll user.
+        if (!parent::enrol_user($userid, $courseid, $roleid, 'database')) {
+            return false;
+        }
+
+        // Check if user is a student, if so, add record to
+        // ccle_roster_class_cache.
+        if ($DB->record_exists('role',
+                array('id' => $roleid, 'shortname' => 'student'))) {
+            $termsrses = ucla_map_courseid_to_termsrses($courseid);
+            // Find which record to associate with user. If $enrolsrs is not
+            // given, then just give them the hostcourse.
+            $regcourse = null;
+            foreach ($termsrses as $termsrs) {
+                if (!empty($enrolsrs) && $termsrs->srs == $enrolsrs) {
+                    $regcourse = $termsrs;
+                    break;
+                } else if (empty($enrolsrs) && $termsrs->hostcourse) {
+                    $regcourse = $termsrs;
+                    break;
+                }
+            }
+
+            if (empty($regcourse)) {
+                // Could not find matching srs.
+                return false;
+            }
+
+            // Now add record to ccle_roster_class_cache table.
+            $user = $DB->get_record('user', array('id' => $userid));
+            $DB->insert_record('ccle_roster_class_cache',
+                    array('param_term'          => $regcourse->term,
+                          'param_srs'           => $regcourse->srs,
+                          'expires_on'          => time()+get_config('local_ucla', 'registrar_cache_ttl'),
+                          'term_cd'             => $regcourse->term,
+                          'stu_id'              => $user->idnumber,
+                          'full_name_person'    => textlib::strtoupper(fullname($user)),
+                          'enrl_stat_cd'        => 'E',
+                          'ss_email_addr'       => $user->email,
+                          'bolid'               => str_replace('@ucla.edu', '', $user->username)));
         }
 
         return true;

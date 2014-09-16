@@ -85,9 +85,15 @@ class mod_nanogong_mod_form extends moodleform_mod {
         $mform->setDefault('grade', 100);
         $mform->addElement('text', 'maxduration', get_string('maxduration', 'nanogong'), array('size'=>'16'));
         $mform->addHelpButton('maxduration', 'maxduration', 'nanogong');
+        // START UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
+        $mform->setType('maxduration', PARAM_INT);
+        // END UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
         $mform->setDefault('maxduration', 300);
         $mform->addElement('text', 'maxnumber', get_string('maxnumber', 'nanogong'), array('size'=>'16'));
         $mform->addHelpButton('maxnumber', 'maxnumber', 'nanogong');
+        // START UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
+        $mform->setType('maxnumber', PARAM_INT);
+        // END UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
         $mform->setDefault('maxnumber', 0);
         $mform->addElement('selectyesno', 'preventlate', get_string('preventlate', 'nanogong'));
         $mform->addElement('selectyesno', 'permission', get_string('permission', 'nanogong'));

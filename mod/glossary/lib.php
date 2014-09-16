@@ -19,7 +19,7 @@
  * Library of functions and constants for module glossary
  * (replace glossary with the name of your module and delete this line)
  *
- * @package   mod-glossary
+ * @package   mod_glossary
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -201,7 +201,12 @@ function glossary_delete_instance($id) {
 
     glossary_grade_item_delete($glossary);
 
-    return $DB->delete_records('glossary', array('id'=>$id));
+    $DB->delete_records('glossary', array('id'=>$id));
+
+    // Reset caches.
+    \mod_glossary\local\concept_cache::reset_glossary($glossary);
+
+    return true;
 }
 
 /**
@@ -1025,7 +1030,7 @@ function glossary_get_entries_search($concept, $courseid) {
         $bypassteacher = 0; //This means YES
     }
 
-    $conceptlower = textlib::strtolower(trim($concept));
+    $conceptlower = core_text::strtolower(trim($concept));
 
     $params = array('courseid1'=>$courseid, 'courseid2'=>$courseid, 'conceptlower'=>$conceptlower, 'concept'=>$concept);
 
@@ -1099,7 +1104,7 @@ function glossary_print_entry_default ($entry, $glossary, $cm) {
 
     require_once($CFG->libdir . '/filelib.php');
 
-    echo '<h3>'. strip_tags($entry->concept) . ': </h3>';
+    echo $OUTPUT->heading(strip_tags($entry->concept), 4);
 
     $definition = $entry->definition;
 
@@ -1119,13 +1124,13 @@ function glossary_print_entry_default ($entry, $glossary, $cm) {
 }
 
 /**
- * Print glossary concept/term as a heading &lt;h3>
+ * Print glossary concept/term as a heading &lt;h4>
  * @param object $entry
  */
 function  glossary_print_entry_concept($entry, $return=false) {
     global $OUTPUT;
 
-    $text = html_writer::tag('h3', format_string($entry->concept));
+    $text = $OUTPUT->heading(format_string($entry->concept), 4);
     if (!empty($entry->highlight)) {
         $text = highlight($entry->highlight, $text);
     }
@@ -1145,19 +1150,12 @@ function  glossary_print_entry_concept($entry, $return=false) {
  * @param object $cm
  */
 function glossary_print_entry_definition($entry, $glossary, $cm) {
-    global $DB, $GLOSSARY_EXCLUDECONCEPTS;
+    global $GLOSSARY_EXCLUDEENTRY;
 
     $definition = $entry->definition;
 
-    //Calculate all the strings to be no-linked
-    //First, the concept
-    $GLOSSARY_EXCLUDECONCEPTS = array($entry->concept);
-    //Now the aliases
-    if ( $aliases = $DB->get_records('glossary_alias', array('entryid'=>$entry->id))) {
-        foreach ($aliases as $alias) {
-            $GLOSSARY_EXCLUDECONCEPTS[]=trim($alias->alias);
-        }
-    }
+    // Do not link self.
+    $GLOSSARY_EXCLUDEENTRY = $entry->id;
 
     $context = context_module::instance($cm->id);
     $definition = file_rewrite_pluginfile_urls($definition, 'pluginfile.php', $context->id, 'mod_glossary', 'entry', $entry->id);
@@ -1171,7 +1169,7 @@ function glossary_print_entry_definition($entry, $glossary, $cm) {
     $text = format_text($definition, $entry->definitionformat, $options);
 
     // Stop excluding concepts from autolinking
-    unset($GLOSSARY_EXCLUDECONCEPTS);
+    unset($GLOSSARY_EXCLUDEENTRY);
 
     if (!empty($entry->highlight)) {
         $text = highlight($entry->highlight, $text);
@@ -1250,6 +1248,15 @@ function glossary_print_entry_icons($course, $cm, $glossary, $entry, $mode='',$h
         $output = true;
         $return .= html_writer::tag('span', get_string('entryishidden','glossary'),
             array('class' => 'glossary-hidden-note'));
+    }
+
+    if (has_capability('mod/glossary:approve', $context) && !$glossary->defaultapproval && $entry->approved) {
+        $output = true;
+        $return .= '<a class="action-icon" title="' . get_string('disapprove', 'glossary').
+                   '" href="approve.php?newstate=0&amp;eid='.$entry->id.'&amp;mode='.$mode.
+                   '&amp;hook='.urlencode($hook).'&amp;sesskey='.sesskey().
+                   '"><img src="'.$OUTPUT->pix_url('t/block').'" class="smallicon" alt="'.
+                   get_string('disapprove','glossary').$altsuffix.'" /></a>';
     }
 
     $iscurrentuser = ($entry->userid == $USER->id);
@@ -2128,9 +2135,9 @@ function glossary_print_sorting_links($cm, $mode, $sortkey = '',$sortorder = '')
  */
 function glossary_sort_entries ( $entry0, $entry1 ) {
 
-    if ( textlib::strtolower(ltrim($entry0->concept)) < textlib::strtolower(ltrim($entry1->concept)) ) {
+    if ( core_text::strtolower(ltrim($entry0->concept)) < core_text::strtolower(ltrim($entry1->concept)) ) {
         return -1;
-    } elseif ( textlib::strtolower(ltrim($entry0->concept)) > textlib::strtolower(ltrim($entry1->concept)) ) {
+    } elseif ( core_text::strtolower(ltrim($entry0->concept)) > core_text::strtolower(ltrim($entry1->concept)) ) {
         return 1;
     } else {
         return 0;
@@ -2637,13 +2644,29 @@ function glossary_get_paging_bar($totalcount, $page, $perpage, $baseurl, $maxpag
 
     return $code;
 }
+
 /**
+ * List the actions that correspond to a view of this module.
+ * This is used by the participation report.
+ *
+ * Note: This is not used by new logging system. Event with
+ *       crud = 'r' and edulevel = LEVEL_PARTICIPATING will
+ *       be considered as view action.
+ *
  * @return array
  */
 function glossary_get_view_actions() {
     return array('view','view all','view entry');
 }
+
 /**
+ * List the actions that correspond to a post of this module.
+ * This is used by the participation report.
+ *
+ * Note: This is not used by new logging system. Event with
+ *       crud = ('c' || 'u' || 'd') and edulevel = LEVEL_PARTICIPATING
+ *       will be considered as post action.
+ *
  * @return array
  */
 function glossary_get_post_actions() {

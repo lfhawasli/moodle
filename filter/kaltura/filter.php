@@ -70,7 +70,10 @@ class filter_kaltura extends moodle_text_filter {
         }
 
         // Determine if the mobile theme is being used
-        $theme = get_selected_theme_for_device_type();
+        // START UCLA MOD: CCLE-4435 - Upgrade to Moodle 2.7
+        //$theme = get_selected_theme_for_device_type();
+        $theme = core_useragent::get_device_type_theme();
+        // END UCLA MOD: CCLE-4435
 
         if (0 == strcmp($theme, 'mymobile')) {
             self::$mobilethemeused = true;

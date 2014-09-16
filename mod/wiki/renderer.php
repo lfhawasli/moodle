@@ -18,7 +18,7 @@
 /**
  * Moodle Wiki 2.0 Renderer
  *
- * @package   mod-wiki
+ * @package   mod_wiki
  * @copyright 2010 Dongsheng Cai <dongsheng@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -53,12 +53,12 @@ class mod_wiki_renderer extends plugin_renderer_base {
     }
 
     public function search_result($records, $subwiki) {
-        global $CFG, $PAGE;
+        global $CFG;
         $table = new html_table();
-        $context = context_module::instance($PAGE->cm->id);
+        $context = context_module::instance($this->page->cm->id);
         $strsearchresults = get_string('searchresult', 'wiki');
         $totalcount = count($records);
-        $html = $this->output->heading("$strsearchresults $totalcount");
+        $html = $this->output->heading("$strsearchresults $totalcount", 3);
         foreach ($records as $page) {
             $table->head = array('title' => format_string($page->title) . ' (' . html_writer::link($CFG->wwwroot . '/mod/wiki/view.php?pageid=' . $page->id, get_string('view', 'wiki')) . ')');
             $table->align = array('title' => 'left');
@@ -294,7 +294,7 @@ class mod_wiki_renderer extends plugin_renderer_base {
         $html = '';
         $link = new moodle_url('/mod/wiki/prettyview.php', array('pageid' => $page->id));
         $html .= $this->output->container_start('wiki_right');
-        $html .= $this->output->action_link($link, get_string('prettyprint', 'wiki'), new popup_action('click', $link));
+        $html .= $this->output->action_link($link, get_string('prettyprint', 'wiki'), new popup_action('click', $link), array('class' => 'printicon'));
         $html .= $this->output->container_end();
         return $html;
     }

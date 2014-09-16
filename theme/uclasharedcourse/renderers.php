@@ -8,6 +8,7 @@ require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_renderer {
 
     public $coursetheme = true;
+    public $hascustomheaderlogo = false;
     
     private $theme = 'theme';
     private $component = 'theme_uclasharedcourse';
@@ -38,7 +39,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
             
             $pix_url = $this->pix_url($pix, $this->theme);
             $logo_alt = $COURSE->fullname; //get_string('UCLA_CCLE_text', 'theme_uclashared');
-            $logo_img = html_writer::empty_tag('img', array('src' => $pix_url, 'alt' => $logo_alt));
+            $logo_img = html_writer::img($pix_url, $logo_alt);
             $alternative_logo = html_writer::link($address, $logo_img);
         }
 
@@ -51,12 +52,13 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         // Now look for additional logos
         $additional_logos = '';
-        if (($is_private && $this->is_enrolled_user()) || !$is_private) {
-            $additional_logos = $this->course_logo_html($COURSE->id);
-        }
+//        if (($is_private && $this->is_enrolled_user()) || !$is_private) {
+//            $additional_logos = $this->course_logo($COURSE->id);
+//        }
 
         // if main logo is overridden, then return that html
         if (!empty($alternative_logo)) {
+            $this->hascustomheaderlogo = true;
             return $alternative_logo . $additional_logos;
         } else if (!empty($additional_logos)) {
             // maybe we just have alternative sublogos, but keep main logo
@@ -155,17 +157,13 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
      * 
      * @return type
      */
-    private function course_logo_html() {
+    public function course_logo() {
         global $CFG, $COURSE;
         $logos = $this->course_logo_images($COURSE->id);
         
         $out = '';
         if(!empty($logos)) {
-            $pix_url = $this->pix_url('logo_divider', $this->theme);
-            $img = html_writer::empty_tag('img', array('src' => $pix_url));
-            $divider = html_writer::tag('div', $img, array('class' => 'uclashared-course-logo-divider'));
-            $out .= $divider;
-            
+
             // Sort by filename
             if(count($logos) > 1) {
                 $logo1 = array_shift($logos);
@@ -184,9 +182,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
                 $url = "{$CFG->wwwroot}/pluginfile.php/{$logo->get_contextid()}/{$this->component}/{$this->filearea}";
                 $fileurl = $url . $logo->get_filepath() . $logo->get_itemid() . '/' . $logo->get_filename();
                 
-                $img = html_writer::empty_tag('img', array(
-                    'src' => $fileurl,
-                ));
+                $img = html_writer::img($fileurl, null);
                 
                 $div = html_writer::tag('div', $img, array('class' => 'uclashared-course-logo'));
                 $out .= $div;
@@ -213,7 +209,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         // Show logo guide
         $pix_url = $this->pix_url('guide', 'theme');
-        $img = html_writer::empty_tag('img', array('src' => $pix_url));
+        $img = html_writer::img($pix_url, null);
         $mform->addElement('static', 'description', '', $img);
 
         // Check if we already have images
@@ -221,7 +217,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         file_prepare_draft_area($draftitemid,
                 $contextid,
-                'theme_uclasharedcourse', 'course_logos', $courseid,
+                $this->component, $this->filearea, $courseid,
                 $this->course_logo_config());
 
         $data['logo_attachments'] = $draftitemid;

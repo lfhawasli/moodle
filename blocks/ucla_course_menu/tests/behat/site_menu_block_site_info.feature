@@ -6,7 +6,7 @@ Feature: "Site info" section in Site menu block
 
 Scenario: "Site info" works.
     Given I am in a ucla environment
-    And a ucla "srs" site exists
+    And a ucla "srs" site exist
     And I log in as "student"
     When I go to the default ucla site
     Then I should see "Site info" in the ucla site menu

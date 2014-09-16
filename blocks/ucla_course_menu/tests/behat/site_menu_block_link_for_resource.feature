@@ -6,7 +6,7 @@ Feature: Display links to all resources available in the course
 
 Background:
     Given I am in a ucla environment
-    And a ucla "srs" site exists
+    And a ucla "srs" site exist
     And I log in as "instructor"
     And I go to the default ucla site
     And I turn editing mode on
@@ -17,7 +17,7 @@ Scenario: Make sure "Files" section exists and works.
     And I add a "File" to section "1" and I fill the form with:
     | Name | Test file to section 1 |
     | Description | Test file to section 1 description |
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filepicker
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     When I press "Save and return to course"
     Then I should see "Files" in the ucla site menu
     When I follow the "Files" section in the ucla site menu

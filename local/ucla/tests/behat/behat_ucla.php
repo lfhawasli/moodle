@@ -70,8 +70,12 @@ class behat_ucla extends behat_files {
     public function load_default_ucla_environment() {
         global $CFG;
 
+        // Set the name display
+        set_config('fullnamedisplay', 'lastname' . ", " . 'firstname');
         // Set the UCLA theme.
         set_config('theme', 'uclashared');
+        // Restrict UCLA theme.
+        set_config('themelist', 'uclashared,uclasharedcourse');
         // Set public/private.
         set_config('enablepublicprivate', 1);
         set_config('enablegroupmembersonly', 1);
@@ -96,6 +100,10 @@ class behat_ucla extends behat_files {
         $enabled[] = 'meta';
         set_config('enrol_plugins_enabled', implode(',', $enabled));
 
+        // Enable guest and site invitation plugin.
+        set_config('status', ENROL_INSTANCE_ENABLED, 'enrol_guest');
+        set_config('status', ENROL_INSTANCE_ENABLED, 'enrol_invitation');
+
         // Purge all caches to force new configs to take effect.
         purge_all_caches();
     }
@@ -106,12 +114,12 @@ class behat_ucla extends behat_files {
      * NOTE: If you are creating activities, make sure to also set the idnumber
      * field.
      *
-     * @Given /^the following ucla "([^"]*)" exists:$/
+     * @Given /^the following ucla "([^"]*)" exist:$/
      *
      * @param string $elementname
      * @param TableNode $data
      */
-    public function the_following_exists($elementname, TableNode $data) {
+    public function the_following_exist($elementname, TableNode $data) {
         global $DB;
 
         switch ($elementname) {
@@ -128,30 +136,55 @@ class behat_ucla extends behat_files {
                     $this->getSession());
                 }
 
-                // Make sure that the proper UCLA roles exists.
-                $this->get_data_generator()->create_ucla_roles();
-
                 // Need to set proper course shortname so that Moodle's generator
                 // knows what to reference.  In this case, I have to regenerate the
                 // table as text because I can't modify the TableNode obj directly.
                 $table = "| user | course | role |";
 
+                $roles = array();
                 foreach ($data->getHash() as $elementdata) {
+                    $roles[] = $elementdata['role'];
                     $table .= "\n| {$elementdata['user']} | " .
                             "{$this->courses[$elementdata['course']]->shortname} | " .
                             "{$elementdata['role']} |";
                 }
 
+                // Make sure that the proper UCLA roles exists.
+                $this->get_data_generator()->create_ucla_roles($roles);
+
                 // Forward the work to Moodle's data generators.
                 $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exists('course enrolments',
+                        ->the_following_exist('course enrolments',
                                 new TableNode($table));
 
                 break;
+
+            case 'roles':
+                // Import UCLA roles.
+                $roles = array();
+                foreach ($data->getHash() as $elementdata) {
+                    $roles[] = $elementdata['role'];
+                }
+                $this->get_data_generator()->create_ucla_roles($roles);
+                break;
+
+            case 'role assigns':
+                // Import UCLA roles.
+                $roles = array();
+                foreach ($data->getHash() as $elementdata) {
+                    $roles[] = $elementdata['role'];
+                }
+                $this->get_data_generator()->create_ucla_roles($roles);
+
+                // Forward the data to Moodle's data generators.
+                $this->getMainContext()->getSubcontext('behat_data_generators')
+                    ->the_following_exist('role assigns', new TableNode($data));
+                break;
+
             case 'activities':
                 require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
                 $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exists('activities', $data);
+                        ->the_following_exist('activities', $data);
                 // Make each activity either public or private (default).
                 foreach ($data->getHash() as $elementdata) {
                     if (!empty($elementdata['private'])) {
@@ -167,12 +200,15 @@ class behat_ucla extends behat_files {
 
     /**
      * Step to browse directly to a site with a given shortname.
-     * 
+     *
+     * Since we can now specify fullname of a course in the UCLA data generator,
+     * we can use the regular 'I follow "course fullname"' step for the most
+     * part. But sometimes the only way to get to the course homepage easily is
+     * to use this step.
+     *
      * @Given /^I browse to site "([^"]*)"$/
      *
      * @param string $shortname
-     * @deprecated Since we can now specify fullname of a course in the UCLA
-     * data generator, we can use the regular 'I follow "course fullname"' step.
      */
     public function i_browse_to_site($shortname) {
         $courseid = $this->courses[$shortname]->id;
@@ -240,15 +276,15 @@ class behat_ucla extends behat_files {
      * Generates a single UCLA site.  The site will have two enrolled
      * users, a student and an editing instructor.
      * 
-     * @Given /^a ucla "([^"]*)" site exists$/
+     * @Given /^a ucla "([^"]*)" site exist$/
      * 
      * @param string $site type for a collab site, or 'class' for an SRS site
      */
-    public function ucla_site_exists($site) {
+    public function ucla_site_exist($site) {
         global $DB;
 
-        $data = "| shortname | type |
-                 | $site site | $site |";
+        $data = "| fullname | shortname | type |
+                 | $site site | $site site | $site |";
         $this->generate_ucla_sites(new TableNode($data));
 
         // Call Moodle's own generator to create users and enrollments.
@@ -258,7 +294,7 @@ class behat_ucla extends behat_files {
                 | student | Stu | Dent | student1@asd.com |';
 
         $this->getMainContext()->getSubcontext('behat_data_generators')
-                ->the_following_exists('users', new TableNode($data));
+                ->the_following_exist('users', new TableNode($data));
 
         // Now create enrollments.
         $shortnames = array_keys($this->courses);    // Use newly created course above.
@@ -267,7 +303,7 @@ class behat_ucla extends behat_files {
                 | instructor | {$shortname} | editinginstructor |
                 | student | {$shortname} | student |";
 
-        $this->the_following_exists('course enrolments', new TableNode($data));
+        $this->the_following_exist('course enrolments', new TableNode($data));
     }
 
     /**
@@ -316,20 +352,17 @@ class behat_ucla extends behat_files {
     /**
      * A log-in step that uses the UCLA special case login page.
      * 
-     * @Given /^I log in as ucla "([^"]*)"$/
+     * @deprecated since 2.7
+     * @see behat_ucla::i_login_as_ucla_user()
      *
+     * @Given /^I log in as ucla "([^"]*)"$/
+     * @throws ElementNotFoundException
      * @param string $user
-     * @return array
      */
     public function i_login_as_ucla_user($user) {
-        // Use UCLA special case login page.
-        $this->getSession()->visit($this->locate_path('/login/ucla_login.php'));
-
-        return array(
-            new Given('I fill in "' . get_string('username') . '" with "' . $user . '"'),
-            new Given('I fill in "' . get_string('password') . '" with "' . $user . '"'),
-            new Given('I press "' . get_string('login') . '"')
-        );
+        $alternative = 'I log in as "' . $this->escape($user) . '"';
+        $this->deprecated_message($alternative);
+        return new Given($alternative);
     }
 
     /**
@@ -357,12 +390,12 @@ class behat_ucla extends behat_files {
      *
      * Future steps are expected to look for certain messages.
      *
-     * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filepicker_field_string>(?:[^"]|\\")*)" filepicker and it fails$/
+     * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filepicker_field_string>(?:[^"]|\\")*)" filemanager and it fails$/
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
      * @param string $filepickerelement
      */
-    public function i_upload_file_to_filepicker_exception($filepath, $filepickerelement) {
+    public function i_upload_file_to_filemanager_exception($filepath, $filepickerelement) {
         global $CFG;
 
         $filepickernode = $this->get_filepicker_node($filepickerelement);
@@ -445,11 +478,73 @@ class behat_ucla extends behat_files {
     public function i_add_an_assignment_and_fill_the_form_with(TableNode $data) {
         return array(
             new Given('I follow "' . get_string('addresourceoractivity') . '"'),
-            new Given ('I select "Assignment" radio button'),
+            new Given ('I set the field "Assignment" to "1"'),
             new Given('I press "Add"'),
-            new Given('I fill the moodle form with:', $data),
+            new Given('I set the following fields to these values:', $data),
             new Given('I press "' . get_string('savechangesanddisplay') . '"')
         );
+    }
+
+    /**
+     * Throws an exception if $CFG->behat_usedeprecated is not allowed.
+     *
+     * @throws Exception
+     * @param string|array $alternatives Alternative/s to the requested step
+     * @return void
+     */
+    protected function deprecated_message($alternatives) {
+        global $CFG;
+
+        // We do nothing if it is enabled.
+        if (!empty($CFG->behat_usedeprecated)) {
+            return;
+        }
+
+        if (is_scalar($alternatives)) {
+            $alternatives = array($alternatives);
+        }
+
+        $message = 'Deprecated step, rather than using this step you can use:';
+        foreach ($alternatives as $alternative) {
+            $message .= PHP_EOL . '- ' . $alternative;
+        }
+        $message .= PHP_EOL . '- Set $CFG->behat_usedeprecated in config.php to allow the use of deprecated steps if you don\'t have any other option';
+        throw new Exception($message);
+    }
+
+    /**
+     * Step to generate UCLA SRS + collab sites, and enrolments.
+     *
+     * @deprecated since 2.7
+     * @see behat_ucla::the_following_exist()
+     *
+     * @Given /^the following ucla "([^"]*)" exists:$/
+     * @throws Exception
+     * @throws PendingException
+     * @param string $elementname
+     * @param TableNode $data
+     */
+    public function the_following_ucla_exists($elementname, TableNode $data) {
+        $alternative = 'the following ucla "' . $this->escape($elementname) . '" exist:';
+        $this->deprecated_message($alternative);
+        return new Given($alternative, $data);
+    }
+
+    /**
+     * Generates a single UCLA site.  The site will have two enrolled
+     * users, a student and an editing instructor.
+     * 
+     * @deprecated since 2.7
+     * @see behat_ucla::ucla_site_exist()
+     *
+     * @Given /^a ucla "([^"]*)" site exists$/
+     * @throws ElementNotFoundException
+     * @param string $site type for a collab site, or 'class' for an SRS site
+     */
+    public function ucla_site_exists($site) {
+        $alternative = 'a ucla "' . $this->escape($site) . '" site exist';
+        $this->deprecated_message($alternative);
+        return new Given($alternative);
     }
 
 }

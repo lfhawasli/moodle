@@ -2,7 +2,7 @@
 // MIXINS
 // --------------------------------------------------
 
-@import "bootstrap/lib/mixins";
+@import "bootstrap/mixins";
 
 $breakpoint-xxsmall:        360px !default;         // 360px is iPhone vertical
 $breakpoint-xsmall:         480px !default;         // 480px is iPhone horizontal 
@@ -191,8 +191,15 @@ $screen-phone-small: 360px !default;
     @include border-radius(4px);
 }
 
-// Generate glyphicons on the fly, only downside is that you must specify
-// the character index and not the character 'value'.
+/**
+ * Generate glyphicons on the fly, only downside is that you must specify 
+ * the character index and not the character 'value'.
+ * 
+ * @param {String} $icon - A Glyphicon symbol in escaped format.
+ * @example
+ * \@include glyphicon("\e021");
+ *
+ */ 
 @mixin glyphicon($icon) {
     position: relative;
     top: 1px;

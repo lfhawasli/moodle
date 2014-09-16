@@ -6,17 +6,17 @@ Feature: Alert notice
 
 Background:
    Given I am in a ucla environment
-   And the following "users" exists:
+   And the following "users" exist:
        | username | firstname | lastname | email |
        | teacher1 | Teacher | 1 | teacher1@asd.com |
-   And the following ucla "sites" exists:
+   And the following ucla "sites" exist:
        | fullname | shortname | type |
-       | course 1 | C1 | srs |
-   And the following ucla "enrollments" exists:
+       | Course 1 | C1 | srs |
+   And the following ucla "enrollments" exist:
        | user | course | role |
        | teacher1 | C1 | editingteacher |
    When I log in as "teacher1"
-   And I browse to site "C1"
+   And I follow "Course 1"
    Then I should see "A syllabus has not been added to your site, would you like to add one now?" in the ".ucla-format-notice-box" "css_element"
 
 Scenario: "Yes"

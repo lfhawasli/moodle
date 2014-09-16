@@ -28,9 +28,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012061501;
-// Required Moodle version.
-$plugin->requires  = 2013050100;
+$plugin->version   = 2014010000;
+$plugin->requires = 2011033008;       // Requires this Moodle version
 $plugin->component = 'filter_nanogong';
 
 ?>

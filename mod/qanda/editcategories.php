@@ -103,8 +103,11 @@ if ( $hook >0 ) {
             $cat->usedynalink = $usedynalink;
 
             $DB->update_record("qanda_categories", $cat);
-            add_to_log($course->id, "qanda", "edit category", "editcategories.php?id=$cm->id", $hook,$cm->id);
-
+            $event = \mod_qanda\event\category_edited::create(array(
+                'context'  => $context,
+                'objectid' => $hook
+            ));
+            $event->trigger();
         } else {
             echo "<h3 class=\"main\">" . get_string("edit"). " " . get_string("category","qanda") . "</h3>";
 
@@ -124,8 +127,11 @@ if ( $hook >0 ) {
             echo "<div>" . get_string("categorydeleted","qanda") ."</div>";
             echo $OUTPUT->box_end();
 
-            add_to_log($course->id, "qanda", "delete category", "editcategories.php?id=$cm->id", $hook,$cm->id);
-
+            $event = \mod_qanda\event\category_deleted::create(array(
+                'context'  => $context,
+                'objectid' => $hook
+            ));
+            $event->trigger();
             redirect("editcategories.php?id=$cm->id");
         } else {
             echo "<p>" . get_string("delete"). " " . get_string("category","qanda"). "</p>";
@@ -188,7 +194,11 @@ if ( $hook >0 ) {
             $cat->qandaid = $qanda->id;
 
             $cat->id = $DB->insert_record("qanda_categories", $cat);
-            add_to_log($course->id, "qanda", "add category", "editcategories.php?id=$cm->id", $cat->id,$cm->id);
+            $event = \mod_qanda\event\category_added::create(array(
+                'context'  => $context,
+                'objectid' => $cat->id
+            ));
+            $event->trigger();  
         }
     } else {
         echo "<h3 class=\"main\">" . get_string("add"). " " . get_string("category","qanda"). "</h3>";

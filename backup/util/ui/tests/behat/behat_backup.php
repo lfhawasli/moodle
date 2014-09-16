@@ -50,7 +50,6 @@ class behat_backup extends behat_base {
      * @param TableNode $options Backup options or false if no options provided
      */
     public function i_backup_course_using_this_options($backupcourse, $options = false) {
-
         // We can not use other steps here as we don't know where the provided data
         // table elements are used, and we need to catch exceptions contantly.
 
@@ -62,21 +61,24 @@ class behat_backup extends behat_base {
 
         // Click the backup link.
         $this->find_link(get_string('backup'))->click();
+        $this->wait();
 
         // Initial settings.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Initial"));
         $this->find_button(get_string('backupstage1action', 'backup'))->press();
+        $this->wait();
 
         // Schema settings.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Schema"));
         $this->find_button(get_string('backupstage2action', 'backup'))->press();
+        $this->wait();
 
         // Confirmation and review, backup filename can also be specified.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Confirmation"));
         $this->find_button(get_string('backupstage4action', 'backup'))->press();
 
         // Waiting for it to finish.
-        $this->wait(10);
+        $this->wait(self::EXTENDED_TIMEOUT);
 
         // Last backup continue button.
         $this->find_button(get_string('backupstage16action', 'backup'))->press();
@@ -101,12 +103,15 @@ class behat_backup extends behat_base {
 
         // Go to homepage.
         $this->getSession()->visit($this->locate_path('/'));
+        $this->wait();
 
         // Click the course link.
         $this->find_link($tocourse)->click();
+        $this->wait();
 
         // Click the import link.
         $this->find_link(get_string('import'))->click();
+        $this->wait();
 
         // Select the course.
         $exception = new ExpectationException('"' . $fromcourse . '" course not found in the list of courses to import from', $this->getSession());
@@ -121,18 +126,21 @@ class behat_backup extends behat_base {
         $radionode->click();
 
         $this->find_button(get_string('continue'))->press();
+        $this->wait();
 
         // Initial settings.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Initial"));
         $this->find_button(get_string('importbackupstage1action', 'backup'))->press();
+        $this->wait();
 
         // Schema settings.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Schema"));
         $this->find_button(get_string('importbackupstage2action', 'backup'))->press();
+        $this->wait();
 
         // Run it.
         $this->find_button(get_string('importbackupstage4action', 'backup'))->press();
-        $this->wait();
+        $this->wait(self::EXTENDED_TIMEOUT);
 
         // Continue and redirect to 'to' course.
         $this->find_button(get_string('continue'))->press();
@@ -292,19 +300,24 @@ class behat_backup extends behat_base {
         // table elements are used, and we need to catch exceptions contantly.
 
         // Settings.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Settings"));
         $this->find_button(get_string('restorestage4action', 'backup'))->press();
+        $this->wait();
 
         // Schema.
-        $this->fill_backup_restore_form($options);
+        $this->fill_backup_restore_form($this->get_step_options($options, "Schema"));
         $this->find_button(get_string('restorestage8action', 'backup'))->press();
+        $this->wait();
 
         // Review, no options here.
         $this->find_button(get_string('restorestage16action', 'backup'))->press();
-        $this->wait(10);
+        $this->wait();
 
         // Last restore continue button, redirected to restore course after this.
         $this->find_button(get_string('restorestage32action', 'backup'))->press();
+
+        // Long wait when waiting for the restore to finish.
+        $this->wait(self::EXTENDED_TIMEOUT);
     }
 
     /**
@@ -328,12 +341,9 @@ class behat_backup extends behat_base {
         // If we find any of the provided options in the current form we should set the value.
         $datahash = $options->getRowsHash();
         foreach ($datahash as $locator => $value) {
-
             try {
-                $fieldnode = $this->find_field($locator);
-                $field = behat_field_manager::get_form_field($fieldnode, $this->getSession());
+                $field = behat_field_manager::get_form_field_from_label($locator, $this);
                 $field->set_value($value);
-
             } catch (ElementNotFoundException $e) {
                 // Next provided option then, this one should be part of another page's fields.
             }
@@ -341,9 +351,41 @@ class behat_backup extends behat_base {
     }
 
     /**
-     * Waits until the DOM is ready.
+     * Get the options specific to this step of the backup/restore process.
      *
-     * @param int To override the default timeout
+     * @param TableNode $options The options table to filter
+     * @param string $step The name of the step
+     * @return TableNode The filtered options table
+     */
+    protected function get_step_options($options, $step) {
+        // Nothing to fill if no options are provided.
+        if (!$options) {
+            return;
+        }
+
+        $pageoptions = clone $options;
+
+        $rows = $options->getRows();
+        $newrows = array();
+        foreach ($rows as $k => $data) {
+            if (count($data) !== 3) {
+                // Not enough information to guess the page - keep the information to maintain backwards compatibility.
+                $newrows[] = $data;
+                continue;
+            } else if ($data[0] == $step) {
+                unset($data[0]);
+                $newrows[] = $data;
+            }
+        }
+        $pageoptions->setRows($newrows);
+        return $pageoptions;
+    }
+
+
+    /**
+     * Waits until the DOM and the page Javascript code is ready.
+     *
+     * @param int $timeout The number of seconds that we wait.
      * @return void
      */
     protected function wait($timeout = false) {
@@ -355,7 +397,8 @@ class behat_backup extends behat_base {
         if (!$timeout) {
             $timeout = self::TIMEOUT;
         }
-        $this->getSession()->wait($timeout, '(document.readyState === "complete")');
+
+        $this->getSession()->wait($timeout * 1000, self::PAGE_READY_JS);
     }
 
 }

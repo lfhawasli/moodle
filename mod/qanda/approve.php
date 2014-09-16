@@ -34,7 +34,11 @@ if (!$entry->approved and confirm_sesskey()) {
         $completion->update_state($cm, COMPLETION_COMPLETE, $entry->userid);
     }
 
-    add_to_log($course->id, "qanda", "approve entry", "showentry.php?id=$cm->id&amp;eid=$eid", "$eid", $cm->id);
+    $event = \mod_qanda\event\entry_approved::create(array(
+            'context'  => $context,
+            'objectid' => $eid
+        ));
+    $event->trigger();
 }
 
 redirect("view.php?id=$cm->id&amp;mode=$mode&amp;hook=$hook");

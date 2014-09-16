@@ -244,22 +244,48 @@ function uploadfile($filedata,  $fileextension, $mediatype, $actionid,$contextid
         
   
 	//make filename and set it
-	$filenamebase = "upfile_" . rand(100,32767) . rand(100,32767) . "." ;
+	//we are trying to remove useless junk in the draft area here
+	//when we know its stable, we will do the same for non images too
+	if($mediatype=='image'){
+		$filenamebase = "upfile_" . $actionid . "." ;
+	}else{
+		$filenamebase = "upfile_" . rand(100,32767) . rand(100,32767) . "." ;
+	}
 	$filename = $filenamebase . $fileextension;
 	$record->filename = $filename;
 	
 	
 	//in most cases we will be storing files in a draft area and lettign Moodle do the rest
-	//one condition of using this function is that only one file can be here,
-	//attachment limits in question. could be bypassed if reason enough
+	//previously we only allowed one file in draft, but we removed that limit
+	/*
 	if($farea=='draft'){
 		$fs->delete_area_files($contextid,$comp,$farea,$itemid);
 	}
+	*/
 	
 	//if file already exists, raise an error
 	if($fs->file_exists($contextid,$comp,$farea,$itemid,$filepath,$filename)){
-		$return['success']=false;
-		array_push($return['messages'],"Already exists, file with filename:" . $filename );
+		if($mediatype=='image'){
+			//delete any existing draft files.
+			$file = $fs->get_file($contextid,$comp,$farea,$itemid,$filepath,$filename);
+			$file->delete();
+			
+			//check there is no metadata prefixed to the base 64. From OL widgets, none, from JS yes
+			$metapos = strPos($filedata,",");
+			if($metapos >10 && $metapos <30){
+				$filedata = substr($filedata,$metapos+1);
+			}
+	
+			//decode the data and store it 
+			$xfiledata = base64_decode($filedata);
+			//create the file
+			$stored_file = $fs->create_file_from_string($record, $xfiledata);
+
+		}else{
+			$stored_file = false;
+			$return['success']=false;
+			array_push($return['messages'],"Already exists, file with filename:" . $filename );
+		}
 	}else{
 		
 		//check there is no metadata prefixed to the base 64. From OL widgets, none, from JS yes
@@ -323,18 +349,17 @@ function uploadfile($filedata,  $fileextension, $mediatype, $actionid,$contextid
 		}else{
 			$stored_file = $fs->create_file_from_string($record, $xfiledata);
 		}
-		
-		//if successful return filename
-		if($stored_file){
-			array_push($return['messages'],$filename );
-			//array_push($return['messages'],$filedata );
-			//array_push($return['messages'],$stored_file->get_itemid() );
-		//if unsuccessful, return error
-		}else{
-			$return['success']=false;
-			array_push($return['messages'],"unable to save file with filename:" . $filename );
-		}
 	
+	}
+	
+	//if successful return filename
+	if($stored_file){
+		array_push($return['messages'],$filename );
+
+	//if unsuccessful, return error
+	}else{
+		$return['success']=false;
+		array_push($return['messages'],"unable to save file with filename:" . $filename );
 	}
 		
 	//we process the result for return to browser
@@ -375,7 +400,15 @@ global $CFG, $USER;
 		//this takes the frame after 1 s
 		$ffmpegopts = "-ss 00:00:01 -vframes 1 -an ";
 		
-		shell_exec("ffmpeg -i " . $tempvideofilepath . " " . $ffmpegopts . " " . $tempsplashfilepath . " >/dev/null 2>/dev/null ");
+		//if there is a version in poodll filter dir, use that
+		//else use ffmpeg version on path
+		if(file_exists($CFG->dirroot . '/filter/poodll/ffmpeg')){
+			$ffmpegpath = $CFG->dirroot . '/filter/poodll/ffmpeg';
+		}else{
+			$ffmpegpath = 'ffmpeg';
+		}
+		
+		shell_exec($ffmpegpath . " -i " . $tempvideofilepath . " " . $ffmpegopts . " " . $tempsplashfilepath . " >/dev/null 2>/dev/null ");
 
 		//add the play button
 		//this can be done from ffmpeg, but probably not on all installs, so we do in php
@@ -459,7 +492,15 @@ global $CFG;
 			default:
 				$ffmpegopts = "";
 		}
-		shell_exec("ffmpeg -i " . $tempdir . $tempfilename . " " . $ffmpegopts . " " . $tempdir . $convfilename . " >/dev/null 2>/dev/null ");
+		
+		//if there is a version in poodll filter dir, use that
+		//else use ffmpeg version on path
+		if(file_exists($CFG->dirroot . '/filter/poodll/ffmpeg')){
+			$ffmpegpath = $CFG->dirroot . '/filter/poodll/ffmpeg';
+		}else{
+			$ffmpegpath = 'ffmpeg';
+		}
+		shell_exec($ffmpegpath . " -i " . $tempdir . $tempfilename . " " . $ffmpegopts . " " . $tempdir . $convfilename . " >/dev/null 2>/dev/null ");
 		
 		/* About FFMPEG conv
 		it would be better to do the conversion in the background not here.
@@ -485,8 +526,8 @@ global $CFG;
 		//and delete the temp file we made
 		}else{
 			$stored_file = false;
-			if(is_readable(realpath($tempdir . $filename))){
-				unlink(realpath($tempdir . $filename));
+			if(is_readable(realpath($tempdir . $tempfilename))){
+				unlink(realpath($tempdir . $tempfilename));
 			}
 		}		
 		return $stored_file;
@@ -753,7 +794,7 @@ function fetch_instancedir_contents($thedir, &$thecontext, $recursive=false){
 //we can try if it works but it might not.
 function fetch_legacydirlist($courseid){
 
-$thiscontext = get_context_instance(CONTEXT_COURSE, $courseid);
+$thiscontext = context_course::instance($courseid); //get_context_instance(CONTEXT_COURSE, $courseid);
 $contextid = $thiscontext->id;
     
     $fs = get_file_storage();
@@ -810,7 +851,7 @@ global $CFG, $DB;
 	
 
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid); //get_context_instance(CONTEXT_MODULE,$moduleid);
 	$contextid = $thiscontext->id;
 	
 	//fetch a list of files in this area, and sort them alphabetically
@@ -991,9 +1032,11 @@ $return=fetchReturnArray(true);
 
 		//one condition of using this function is that only one file can be here,
 		//attachment limits
+		/*
 		if($filearea=='draft'){
 			$fs->delete_area_files($contextid,$component,$filearea,$itemid);
 		}
+		*/
 		
 		//if file already exists, delete it
 		//we could use fileinfo, but it don&'t work
@@ -1077,12 +1120,13 @@ $return=fetchReturnArray(true);
 		}else{
 			// echo "yay:" . $red5_fileurl;
 				 //get a file object if successful
-				 $thecontext = get_context_instance_by_id($contextid);
+				 $thecontext = context::instance_by_id($contextid);//get_context_instance_by_id($contextid);
 				 $fileinfo = $browser->get_file_info($thecontext, $component,$filearea, $itemid, $filepath, $filename);
 			
 				//if we could get a fileinfo object, return the url of the object
 				 if($fileinfo){
 						//$returnfilepath  = $fileinfo->get_url();
+						//echo "boo:" . $red5_fileurl;
 						$returnfilepath = $filename;
 						array_push($return['messages'],$returnfilepath );
 				}else{
@@ -1202,7 +1246,7 @@ function bogus_instance_deletefile_internal($f){
 
 			//fetch our info object
 			$browser = get_file_browser();
-			$thecontext = get_context_instance_by_id($f->get_contextid());
+			$thecontext = context::instance_by_id($f->get_contextid());//get_context_instance_by_id($f->get_contextid());
 			$fileinfo = $browser->get_file_info($thecontext, $f->get_component(),$f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
 	
 			//if we don't have permission to delete, exit
@@ -1250,7 +1294,7 @@ function bogus_instance_deletedircontents($sfdir){
 		
 		foreach($files as $f){
 		
-			$thecontext = get_context_instance_by_id($f->get_contextid());
+			$thecontext = context::instance_by_id($f->get_contextid());
 			$fileinfo = $browser->get_file_info($thecontext, $f->get_component(),$f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
 			//if we have insuff permissions to delete. Exit.
 			//if(!$fileinfo){
@@ -1295,7 +1339,7 @@ function instance_deletefile_internal($f){
 
 			//fetch our info object
 			$browser = get_file_browser();
-			$thecontext = get_context_instance_by_id($f->get_contextid());
+			$thecontext = context::instance_by_id($f->get_contextid());//get_context_instance_by_id($f->get_contextid());
 			$fileinfo = $browser->get_file_info($thecontext, $f->get_component(),$f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
 	
 			//if we don't have permission to delete, or the file cant be info'd exit
@@ -1344,7 +1388,7 @@ function instance_deletedircontents($sfdir){
 		
 		foreach($files as $singlefile){
 		
-			$thecontext = get_context_instance_by_id($singlefile->get_contextid());
+			$thecontext = context::instance_by_id($singlefile->get_contextid());//get_context_instance_by_id($singlefile->get_contextid());
 			$fileinfo = $browser->get_file_info($thecontext, $singlefile->get_component(),$singlefile->get_filearea(), $singlefile->get_itemid(), $singlefile->get_filepath(), $singlefile->get_filename());
 			
 			//if the file cant be info'd, exit.
@@ -1423,7 +1467,7 @@ function do_createdir($moduleid, $courseid, $itemid, $filearea, $newdir){
 	$component = "mod_" . $cm->modname;
 	
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid);//get_context_instance(CONTEXT_MODULE,$moduleid);
 	$contextid = $thiscontext->id;
 
 	//get filehandling objects
@@ -1491,7 +1535,7 @@ function do_copyfilein($moduleid, $courseid, $itemid, $filearea, $filepath,$newp
 	$component = "mod_" . $cm->modname;
 	
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid);//get_context_instance(CONTEXT_MODULE,$moduleid);
 	$contextid = $thiscontext->id;
 	
 	//get filehandling objects
@@ -1714,7 +1758,7 @@ function instance_duplicatefilecontents($f, $moduleid, $courseid, $itemid, $file
 	$component = "mod_" . $cm->modname;
 	
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid);//get_context_instance(CONTEXT_MODULE,$moduleid);
 	$contextid = $thiscontext->id;
 	
 	
@@ -1772,7 +1816,7 @@ function instance_duplicatefilecontents($f, $moduleid, $courseid, $itemid, $file
 		}
 		
 		//fetch the file info object for our original file
-		$original_context = get_context_instance_by_id($f->get_contextid());
+		$original_context = context::instance_by_id($f->get_contextid());//get_context_instance_by_id($f->get_contextid());
 		$original_fileinfo = $browser->get_file_info($original_context, $f->get_component(),$f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
 	
 		//perform the copy	
@@ -1870,7 +1914,7 @@ function xinstance_renamefile($moduleid, $courseid, $itemid, $filearea,  $filepa
 	$component = "mod_" . $cm->modname;
 	
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid); //get_context_instance(CONTEXT_MODULE,$moduleid);
 	$contextid = $thiscontext->id;
 	
 
@@ -1967,7 +2011,7 @@ function fetchRealUrl($moduleid,$courseid, $itemid, $filearea, $filepath, $reque
 	
 	//get module context
 	//may be able to avoid useing moduleid, by using PAGE global
-	$thecontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thecontext = context_module::instance($moduleid); //get_context_instance(CONTEXT_MODULE,$moduleid);
 	//$thecontext=$PAGE->context;
 
 	
@@ -2152,7 +2196,7 @@ function fileIsWritable($f){
 	//get the file brower object
 	
 	$browser = get_file_browser();
-	$thecontext = get_context_instance_by_id($f->get_contextid());
+	$thecontext = context::instance_by_id($f->get_contextid());//get_context_instance_by_id($f->get_contextid());
 	$fileinfo = $browser->get_file_info($thecontext, $f->get_component(),$f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
 	//if we have insuff permissions to delete. Exit.
 	if(!$fileinfo || !$fileinfo->is_writable()){
@@ -2167,7 +2211,7 @@ function fileIsWritable($f){
 function fileIsReadable($f){
 	//get the file brower object
 	$browser = get_file_browser();
-	$thecontext = get_context_instance_by_id($f->get_contextid());
+	$thecontext = context::instance_by_id($f->get_contextid());//get_context_instance_by_id($f->get_contextid());
 	$fileinfo = $browser->get_file_info($thecontext, $f->get_component(),$f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
 	//if we have insuff permissions to delete. Exit.
 	if(!$fileinfo || !$fileinfo->is_readable()){
@@ -2185,7 +2229,7 @@ function pathIsWritable($moduleid, $courseid, $itemid, $filearea,$filepath=DIREC
 
 
 	//get a handle on the module context
-	$thiscontext = get_context_instance(CONTEXT_MODULE,$moduleid);
+	$thiscontext = context_module::instance($moduleid);//get_context_instance(CONTEXT_MODULE,$moduleid);
 	
 	//fetch info and ids about the module calling this data
 	$course = $DB->get_record('course', array('id'=>$courseid));

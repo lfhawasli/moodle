@@ -9,7 +9,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="assignment"/>
         <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="grade"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="assignment" NEXT="poodlltype"/>
-        <FIELD NAME="poodlltype" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The type of poodll feedback." PREVIOUS="grade"/>
+        <FIELD NAME="poodlltype" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The type of poodll feedback." PREVIOUS="grade" NEXT="filename"/>
+ 		<FIELD NAME="filename" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="The filename of the recorded file." PREVIOUS="poodlltype"  />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Unique id for this feedback value." NEXT="assignment"/>

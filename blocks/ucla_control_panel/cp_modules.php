@@ -120,11 +120,11 @@ if(has_capability('tool/uclasupportconsole:view', context_system::instance()) &&
         $link_arguments = array('console'=>'ccle_courseinstructorsget', 'term'=> $course_term, 'srs'=> $course_srs);
         $myucla_row->add_element(new ucla_cp_module('ccle_courseinstructorsget',
                                 new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
-                                $link_arguments, $temp_tag), $temp_tag));
+                                $link_arguments), $temp_tag));
         $link_arguments = array('console'=>'ccle_roster_class', 'term'=> $course_term, 'srs'=> $course_srs);
         $myucla_row->add_element(new ucla_cp_module('ccle_roster_class',
                                 new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
-                                $link_arguments, $temp_tag), $temp_tag));
+                                $link_arguments), $temp_tag));
         $modules[] = $myucla_row;
     }
 }

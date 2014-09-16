@@ -37,7 +37,7 @@ class block_ucla_alert extends block_base {
         if($PAGE->user_is_editing()) {
             
             // Make sure proper pemissions are set
-            $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+            $context = context_course::instance($COURSE->id);
             
             if(has_capability('moodle/course:update', $context)) {
                 $editurl = $CFG->wwwroot . '/blocks/ucla_alert/edit.php?id=' . $COURSE->id;

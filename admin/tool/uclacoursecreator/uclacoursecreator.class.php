@@ -26,7 +26,7 @@ require_once($CFG->dirroot  . '/' . $CFG->admin
 require_once($CFG->dirroot . '/course/lib.php');
 
 // Required for categories
-require_once($CFG->dirroot . '/course/editcategory_form.php');
+require_once($CFG->dirroot . '/course/classes/editcategory_form.php');
 
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
@@ -2097,7 +2097,7 @@ class uclacoursecreator {
         $edata->completed_requests = $this->built_requests;
 
         $this->println('. Triggering event.');
-        events_trigger('course_creator_finished', $edata);
+        events_trigger_legacy('course_creator_finished', $edata);
         $this->debugln('Triggered event with ' 
             . count($edata->completed_requests) . ' requests.');
     }
@@ -2478,7 +2478,7 @@ class uclacoursecreator {
                     $course = new stdClass();
                     $course->id = $failed_request->courseid;
                     $this->debugln('Manually invoking the course_deleted event');
-                    events_trigger('course_deleted', $course);
+                    events_trigger_legacy('course_deleted', $course);
                 }
                 $this->debugln('Deleted courseid ' . $failed_request->courseid);
             } else {

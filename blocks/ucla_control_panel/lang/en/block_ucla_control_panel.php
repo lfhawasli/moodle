@@ -146,4 +146,7 @@ $string['student_myucla_classmates_post'] = 'View a list of your classmates on M
 $string['student_myucla_textbooks'] = 'Textbooks';
 $string['student_myucla_textbooks_post'] = 'View required textbooks for this course on MyUCLA.';
 
+/** Logging event handler **/
+$string['eventcontrolpanelviewed'] = 'Viewed control panel';
+
 /** End of File **/

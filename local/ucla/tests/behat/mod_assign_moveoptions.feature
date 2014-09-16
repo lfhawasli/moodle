@@ -6,22 +6,22 @@ Feature: Have "quick grading" turned on by default
 
 Scenario: Check "Options" is at the top of the page
     Given I am in a ucla environment
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
-    And the following "users" exists:
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | T1 | teacher1@asd.com |
       | student1 | Student | S1 | student1@asd.com |
       | student2 | Student | S2 | student2@asd.com |
       | student3 | Student | S3 | student3@asd.com |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
       | student2 | C1 | student |
       | student3 | C1 | student |
-    And I log in as ucla "teacher1"
+    And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:

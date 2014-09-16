@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$plugin->version = 2011072800;
+$plugin->version = 2014080500;
 $plugin->dependencies = array(
     'local_ucla' => 2012041300,
 );

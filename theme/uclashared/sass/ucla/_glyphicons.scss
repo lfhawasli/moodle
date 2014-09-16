@@ -1,0 +1,18 @@
+//
+// Glyphicons for Bootstrap
+//
+// Since icons are fonts, they can be placed anywhere text is placed and are
+// thus automatically sized to match the surrounding child. To use, create an
+// inline element with the appropriate classes, like so:
+//
+// <a href="#"><span class="glyphicon glyphicon-star"></span> Star</a>
+
+
+@import "bootstrap/glyphicons";
+
+// Force the fonts to load the Moodlerific way
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url("[[font:theme|glyphicons-halflings-regular.eot]]");
+  src: url("[[font:theme|glyphicons-halflings-regular.eot]]?#iefix") format("embedded-opentype"), url("[[font:theme|glyphicons-halflings-regular.woff]]") format("woff"), url("[[font:theme|glyphicons-halflings-regular.ttf]]") format("truetype"), url("[[font:theme|glyphicons-halflings-regular.svg]]#glyphicons_halflingsregular") format("svg");
+}

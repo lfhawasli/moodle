@@ -50,13 +50,12 @@ class behat_permissions extends behat_base {
      */
     public function i_set_the_following_system_permissions_of_role($rolename, $table) {
 
+        $parentnodes = get_string('administrationsite') . ' > ' .
+            get_string('users', 'admin') . ' > ' .
+            get_string('permissions', 'role');
         return array(
             new Given('I am on homepage'),
-            new Given('I collapse "' . get_string('frontpagesettings', 'admin') . '" node'),
-            new Given('I expand "' . get_string('administrationsite') . '" node'),
-            new Given('I expand "' . get_string('users', 'admin') . '" node'),
-            new Given('I expand "' . get_string('permissions', 'role') . '" node'),
-            new Given('I follow "' . get_string('defineroles', 'role') . '"'),
+            new Given('I navigate to "' . get_string('defineroles', 'role') . '" node in "' . $parentnodes . '"'),
             new Given('I follow "Edit ' . $this->escape($rolename) . ' role"'),
             new Given('I fill the capabilities form with the following permissions:', $table),
             new Given('I press "' . get_string('savechanges') . '"')
@@ -76,7 +75,8 @@ class behat_permissions extends behat_base {
         $roleoption = $this->find('xpath', '//select[@name="roleid"]/option[contains(.,"' . $this->escape($rolename) . '")]');
 
         return array(
-            new Given('I select "' . $this->escape($roleoption->getText()) . '" from "' . get_string('advancedoverride', 'role') . '"'),
+            new Given('I set the field "' . get_string('advancedoverride', 'role') .
+                '" to "' . $this->escape($roleoption->getText()) . '"'),
             new Given('I fill the capabilities form with the following permissions:', $table),
             new Given('I press "' . get_string('savechanges') . '"')
         );
@@ -95,7 +95,10 @@ class behat_permissions extends behat_base {
         try {
             $advancedtoggle = $this->find_button(get_string('showadvanced', 'form'));
             if ($advancedtoggle) {
-                $this->getSession()->getPage()->pressButton(get_string('showadvanced', 'form'));
+                $advancedtoggle->click();
+
+                // Wait for the page to load.
+                $this->getSession()->wait(self::TIMEOUT * 1000, self::PAGE_READY_JS);
             }
         } catch (Exception $e) {
             // We already are in advanced mode.
@@ -127,7 +130,7 @@ class behat_permissions extends behat_base {
             // Converting from permission to constant value.
             $permissionvalue = constant($permissionconstant);
 
-            // Here we wait for the element to appear and exception if it does not exists.
+            // Here we wait for the element to appear and exception if it does not exist.
             $radio = $this->find('xpath', '//input[@name="' . $capability . '" and @value="' . $permissionvalue . '"]');
             $radio->click();
         }

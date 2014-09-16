@@ -6,17 +6,17 @@ Feature: Handle manually uploaded "Syllabus" files
 
 Background:
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
         | username | firstname | lastname | email |
         | teacher1 | Teacher | 1 | teacher1@asd.com |
-    And the following ucla "sites" exists:
+    And the following ucla "sites" exist:
         | fullname | shortname | type |
-        | course 1 | C1 | srs |
-    And the following ucla "enrollments" exists:
+        | Course 1 | C1 | srs |
+    And the following ucla "enrollments" exist:
         | user | course | role |
         | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
-    And I browse to site "C1"
+    And I follow "Course 1"
     And I turn editing mode on
     And I follow the "Show all" section in the ucla site menu
 
@@ -25,7 +25,7 @@ Scenario: Converting files called "Syllabus"
     When I add a "File" to section "1" and I fill the form with:
         | Name | Syllabus |
         | Description | Syllabus test file |
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filepicker
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     Then I should see "Syllabus"
     And I should see "We found a resource that might be a syllabus called \"Syllabus\". Would you like to make this your official syllabus?"

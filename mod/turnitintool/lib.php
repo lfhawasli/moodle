@@ -1991,16 +1991,8 @@ function turnitintool_view_tiitutors($cm,$turnitintool,$tutors) {
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
     // START UCLA MOD: CCLE-4440 - List of users eligible for Turnitin Tutor
     // includes managers who inherit rights from category and system
-    //$availabletutors=get_users_by_capability($context,'mod/turnitintool:grade','u.id,u.firstname,u.lastname,u.username','','','',0,'',false);
-    // Restrict list returned to only users who are in the course members groups.
-    require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
-    $ppcourse = PublicPrivate_Course::build($cm->course);
-    $groupid = 0;
-    if ($ppcourse->is_activated()) {
-        $groupid = $ppcourse->get_group();
-    }
-    $availabletutors=get_users_by_capability($context,'mod/turnitintool:grade',
-            'u.id,u.firstname,u.lastname,u.username','','','',$groupid,'',false);
+    //$availabletutors=get_users_by_capability($context,'mod/turnitintool:grade','u.id,u.firstname,u.lastname,u.username','','','',0,'',false);        
+    $availabletutors = local_ucla_core_edit::get_course_graders($cm->course);
     // END UCLA MOD: CCLE-4440
     $tutorselection=get_string('turnitintutorsallenrolled','turnitintool');
     foreach ($tutors->array as $value) {

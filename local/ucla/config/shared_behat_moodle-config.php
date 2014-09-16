@@ -289,9 +289,6 @@ $CFG->forced_plugin_settings['enrol_guest']['defaultenrol'] = 1;
 // Core Behat tests depend on default setting.
 //$CFG->forced_plugin_settings['enrol_guest']['status'] = 0;  // 0 is yes, 1 is no
 
-// Site administration > Plugins > Enrollments > Site invitation
-$CFG->forced_plugin_settings['enrol_invitation']['enabletempparticipant'] = 1;
-
 // Site administration > Plugins > Enrollments > Self enrolment
 // Core Behat tests depend on default setting.
 //$CFG->forced_plugin_settings['enrol_self']['defaultenrol'] = 0;
@@ -316,15 +313,26 @@ $CFG->forced_plugin_settings['tool_ucladatasourcesync']['contact_email']='ccle-o
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] = 'ccle-operations@lists.ucla.edu';
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 
-// Site administration > Plugins > Blocks > Respondus LockDown Browser
-// NOTE: config is in local/ucla/configs, even though it is linked in root.
-$CFG->customscripts = __DIR__."/../../../"."blocks/lockdownbrowser/customscripts";
-
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
 
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
+
+// Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
+$CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
+    collapse = collapse
+    style1 = title, bold, italic, backcolor, fontcolor
+    list = unorderedlist, orderedlist
+    links = link
+    files = image, media, managefiles, poodll
+    style2 = underline, strike, subscript, superscript
+    align = align
+    indent = indent
+    insert = equation, charmap, table, clear
+    undo = undo
+    accessibility = accessibilitychecker, accessibilityhelper
+    other = html';
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
@@ -335,7 +343,7 @@ $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP 
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
 // Core Behat tests depend on default setting.
-//$CFG->fullnamedisplay = 'language'; // CCLE-2550 - Lastname, Firstname sorting
+//$CFG->fullnamedisplay = 'lastname, firstname';
 $CFG->cronclionly = true;
 
 // Site administration > Security > HTTP security
@@ -432,10 +440,6 @@ $CFG->forced_plugin_settings['enrol_database']['localcoursefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
 
-// CCLE-2802 - Frontpage banner layout include
-// For core Behat tests, disable, but turn on for UCLA tests.
-//$CFG->customfrontpageinclude = $_dirroot_ . '/theme/uclashared/layout/frontpage.php';
-
 // CCLE-2364 - SUPPORT CONSOLE (put after $_dirroot_, because needs $CFG->dataroot to be set)
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_error'] = '/var/log/httpd/error_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_access'] = '/var/log/httpd/access_log';
@@ -457,8 +461,7 @@ $CFG->behat_extraallowedsettings = array(
     'allowcoursethemes',                    // Required for 'course edit' to work
     'forcedefaultmymoodle',                 // Experimental
     'debug',
-    'debugdisplay',
-    'customscripts'                         // Make sure Respondus doesn't break core quiz.
+    'debugdisplay'
 );
 
 $CFG->behat_config = array(

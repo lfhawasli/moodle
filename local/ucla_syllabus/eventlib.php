@@ -65,7 +65,7 @@ function delete_syllabi($course) {
         $data->access_type = $syllabus->access_type;
 
         // Trigger any necessary events.
-        events_trigger('ucla_syllabus_deleted', $data);
+        events_trigger_legacy('ucla_syllabus_deleted', $data);
     }
 }
 

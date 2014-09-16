@@ -7,34 +7,34 @@ Feature: Grader Report Grouping filter
   Background: Set up UCLA environment where srs site exists with students 
               enrolled in different sections
     Given I am in a ucla environment
-    And the following "users" exists: 
+    And the following "users" exist: 
       | username | firstname | lastname | email |
       | instructor | editing | instructor | prof@asd.com |
       | C1user1 | test1 | user1 | C1user1@asd.com |
       | C1user2 | test2 | user2 | C1user2@asd.com |
       | C1user3 | test3 | user3 | C1user3@asd.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | instructor | C1 | editingteacher |
       | C1user1 | C1 | student |
       | C1user2 | C1 | student |
       | C1user3 | C1 | student |
-    And the following "groups" exists:
+    And the following "groups" exist:
       | name | course | idnumber |
       | Group 1 | C1 | G1 |
       | Group 2 | C1 | G2 |
-    And the following "groupings" exists:
+    And the following "groupings" exist:
       | name | course | idnumber |
       | C1Section 1 | C1  | GG1 |
       | C1Section 2 | C1 | GG2 |
-    And the following "grouping groups" exists:
+    And the following "grouping groups" exist:
       | grouping | group |
       | GG1 | G1 |
       | GG2 | G2 |
-    And the following "group members" exists:
+    And the following "group members" exist:
       |  user | group |
       | C1user1 | G1 |
       | C1user2 | G1 |
@@ -42,7 +42,7 @@ Feature: Grader Report Grouping filter
 
   @javascript
   Scenario: View different groupings in grader report
-    Given I log in as ucla "instructor"
+    Given I log in as "instructor"
     When I follow "Course 1"
     And I follow "Grades"
     Then I should see "Grader report"
@@ -50,58 +50,61 @@ Feature: Grader Report Grouping filter
     And the "grouping" select box should contain "All"
     And the "grouping" select box should contain "C1Section 1"
     And the "grouping" select box should contain "C1Section 2"
-    When I select "C1Section 1" from "grouping"
+    When I set the field "grouping" to "C1Section 1"
     Then I should see "C1user1@asd.com"
     And I should see "C1user2@asd.com"
     And I should not see "C1user3@asd.com"
-    When I select "C1Section 2" from "grouping"
+    And I should see "All participants: 2/3"
+    When I set the field "grouping" to "C1Section 2"
     Then I should see "C1user3@asd.com"
     And I should not see "C1user1@asd.com"
     And I should not see "C1user2@asd.com"
-    When I select "All" from "grouping"
+    And I should see "All participants: 1/3"
+    When I set the field "grouping" to "All"
     Then I should see "C1user1@asd.com"
     And I should see "C1user2@asd.com"
     And I should see "C1user3@asd.com"
+    And I should see "All participants: 3/3"
 
   @javascript
   Scenario: Use ordering tools with grouping filter
-    Given I log in as ucla "instructor"
+    Given I log in as "instructor"
     When I follow "Course 1"
     And I follow "Grades"
-    And I select "C1Section 1" from "grouping"
+    And I set the field "grouping" to "C1Section 1"
     Then "C1user1@asd.com" "table_row" should appear before "C1user2@asd.com" "table_row"
     When I follow "Email address"
     And I wait "1" seconds
     Then "C1user2@asd.com" "table_row" should appear before "C1user1@asd.com" "table_row"
-    When I select "All" from "grouping"
+    When I set the field "grouping" to "All"
     Then "C1user3@asd.com" "table_row" should appear before "C1user2@asd.com" "table_row"
     And "C1user2@asd.com" "table_row" should appear before "C1user1@asd.com" "table_row"
 
   @javascript
   Scenario: Use grouping filter with a grouping containing two groups to 
              simulate cross-listed courses
-    Given the following "users" exists: 
+    Given the following "users" exist: 
       | username | firstname | lastname | email |
       | C1user4 | test4 | user4 | C1user4@asd.com |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | C1user4 | C1 | student |
-    And the following "groups" exists:
+    And the following "groups" exist:
       | name | course | idnumber |
       | Group 3 | C1 | G3 |
-    And the following "groupings" exists:
+    And the following "groupings" exist:
       | name | course | idnumber |
       | C1Section 3 | C1 | GG3 |
       | C1Section 2-3 | C1 | GG4 |
-    And the following "grouping groups" exists:
+    And the following "grouping groups" exist:
       | grouping | group |
       | GG3 | G3 |
       | GG4 | G2 |
       | GG4 | G3 |
-    And the following "group members" exists:
+    And the following "group members" exist:
       |  user | group |
       | C1user4 | G3 |
-    Given I log in as ucla "instructor"
+    Given I log in as "instructor"
     When I follow "Course 1"
     And I follow "Grades"
     Then I should see "Grader report"
@@ -111,9 +114,12 @@ Feature: Grader Report Grouping filter
     And the "grouping" select box should contain "C1Section 2"
     And the "grouping" select box should contain "C1Section 3"
     And the "grouping" select box should contain "C1Section 2-3"
-    When I select "C1Section 2" from "grouping"
+    And I should see "All participants: 4/4"
+    When I set the field "grouping" to "C1Section 2"
     Then I should see "C1user3@asd.com"
     And I should not see "C1user4@asd.com"
-    When I select "C1Section 2-3" from "grouping"
+    And I should see "All participants: 1/4"
+    When I set the field "grouping" to "C1Section 2-3"
     Then I should see "C1user3@asd.com"
     And I should see "C1user4@asd.com"
+    And I should see "All participants: 2/4"

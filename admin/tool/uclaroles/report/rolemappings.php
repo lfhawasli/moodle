@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.ph
 
 require_login();
 
-$syscontext = get_context_instance(CONTEXT_SYSTEM);
+$syscontext = context_system::instance();
 require_capability('tool/uclaroles:view', $syscontext);
 
 // Prepare and load Moodle Admin interface

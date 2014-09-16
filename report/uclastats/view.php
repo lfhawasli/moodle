@@ -85,15 +85,15 @@ if (!empty($action) && !empty($resultid)) {
                                  array('report' => $report , 'resultid' => $resultid)));
                 }                
             } 
-        break;
+            break;
         case UCLA_STATS_ACTION_LOCK: 
             uclastats_result::lock($resultid);
             $success_msg = get_string('successful_lock', 'report_uclastats');
-        break;
+            break;
         case UCLA_STATS_ACTION_UNLOCK:
             uclastats_result::unlock($resultid);
             $success_msg = get_string('successful_unlock', 'report_uclastats');
-        break;
+            break;
         default:
             $undefined_action = true;
     }
@@ -104,10 +104,29 @@ if (!empty($action) && !empty($resultid)) {
                     array('report' => $report)),$action);
         
     } else if ($action_confirmed) {
-        $log_url =  new moodle_url('../report/uclastats/view.php',
-                    array('report' => $report,'resultid'=> $resultid,
-                    'action' => $action));        
-        add_to_log(SITEID,'admin', $action, $log_url->out());
+        switch ($action) {
+            case UCLA_STATS_ACTION_DELETE:
+                $event = \report_uclastats\event\uclastats_deleted::create(array(
+                    'context' => $context,
+                    'other' => array('report' => $report, 'resultid' => $resultid)
+                ));
+                $event->trigger();
+                break;
+            case UCLA_STATS_ACTION_LOCK: 
+                $event = \report_uclastats\event\uclastats_locked::create(array(
+                    'context' => $context,
+                    'other' => array('report' => $report, 'resultid' => $resultid)
+                ));
+                $event->trigger();
+                break;
+            case UCLA_STATS_ACTION_UNLOCK:
+                $event = \report_uclastats\event\uclastats_unlocked::create(array(
+                    'context' => $context,
+                    'other' => array('report' => $report, 'resultid' => $resultid)
+                ));
+                $event->trigger();
+                break;
+        }
         
         $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "";
         //escape / in base url pattern for regex
@@ -122,13 +141,13 @@ if (!empty($action) && !empty($resultid)) {
         //also check that referer comes within jursidictions of the plugin
         //otherwise redirect to the specified redirect params
         if(($action == UCLA_STATS_ACTION_LOCK || $action == UCLA_STATS_ACTION_UNLOCK)
-            && !empty($referer) && preg_match($base_pattern,$referer)) {            
-            $redirect_url = $referer;            
-        } else {            
+            && !empty($referer) && preg_match($base_pattern,$referer)) {
+            $redirect_url = $referer;
+        } else {
             $redirect_url = new moodle_url('/report/uclastats/view.php',
                     array('report' => $report));
-        }               
-        flash_redirect($redirect_url, $success_msg);        
+        }
+        flash_redirect($redirect_url, $success_msg);
     }
 }
 

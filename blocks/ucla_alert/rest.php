@@ -56,7 +56,7 @@ try {
         
         // Make sure only a logged in user with permission can modify information
         require_login($courseid);
-        $context = get_context_instance(CONTEXT_COURSE, $courseid);
+        $context = context_course::instance($COURSE->id);
         require_capability('moodle/course:update', $context);
 
         // Get our packet

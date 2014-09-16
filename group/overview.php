@@ -67,7 +67,7 @@ $groupings = $DB->get_records('groupings', array('courseid'=>$courseid), 'name')
 foreach ($groupings as $gid => $grouping) {
     $groupings[$gid]->formattedname = format_string($grouping->name, true, array('context' => $context));
 }
-collatorlib::asort_objects_by_property($groupings, 'formattedname');
+core_collator::asort_objects_by_property($groupings, 'formattedname');
 $members = array();
 foreach ($groupings as $grouping) {
     $members[$grouping->id] = array();
@@ -94,7 +94,8 @@ if ($groupingid) {
 
 list($sort, $sortparams) = users_order_by_sql('u');
 
-$sql = "SELECT g.id AS groupid, gg.groupingid, u.id AS userid, u.firstname, u.lastname, u.idnumber, u.username
+$allnames = get_all_user_name_fields(true, 'u');
+$sql = "SELECT g.id AS groupid, gg.groupingid, u.id AS userid, $allnames, u.idnumber, u.username
           FROM {groups} g
                LEFT JOIN {groupings_groups} gg ON g.id = gg.groupid
                LEFT JOIN {groups_members} gm ON g.id = gm.groupid
@@ -105,11 +106,7 @@ $sql = "SELECT g.id AS groupid, gg.groupingid, u.id AS userid, u.firstname, u.la
 $rs = $DB->get_recordset_sql($sql, array_merge($params, $sortparams));
 foreach ($rs as $row) {
     $user = new stdClass();
-    $user->id        = $row->userid;
-    $user->firstname = $row->firstname;
-    $user->lastname  = $row->lastname;
-    $user->username  = $row->username;
-    $user->idnumber  = $row->idnumber;
+    $user = username_load_fields_from_object($user, $row, null, array('id' => 'userid', 'username', 'idnumber'));
     if (!$row->groupingid) {
         $row->groupingid = -1;
     }

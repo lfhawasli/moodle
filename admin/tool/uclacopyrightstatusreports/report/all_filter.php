@@ -21,7 +21,7 @@ $filter_div = optional_param('filter_div','', PARAM_TEXT);
 
 require_login();
 
-$syscontext = get_context_instance(CONTEXT_SYSTEM);
+$syscontext = context_system::instance();
 require_capability('tool/uclacopyrightstatusreports:view', $syscontext);
 
 // Initialize $PAGE

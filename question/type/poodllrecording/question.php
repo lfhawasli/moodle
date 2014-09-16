@@ -60,8 +60,7 @@ class qtype_poodllrecording_question extends question_with_responses {
 		global $CFG;
 			//The API for this changed on this date 20120214 (possibly the previous release)
 			//checked it with version numbers. then used defined(const)
-			if (($CFG->version > 2012062504.05 && $CFG->version < 2012120300 )|| ($CFG->version > 2012120301.07)){
-			//if(defined(question_attempt::PARAM_RAW_FILES)){
+			if(!defined('question_attempt::PARAM_CLEANHTML_FILES')) {
 				$expecteddata = array('answer' => question_attempt::PARAM_RAW_FILES);
 			}else{
 				$expecteddata = array('answer' => question_attempt::PARAM_CLEANHTML_FILES);

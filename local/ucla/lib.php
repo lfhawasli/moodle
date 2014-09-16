@@ -250,7 +250,8 @@ function ucla_map_courseid_to_termsrses($courseid) {
         return $termsrses;
     }
     
-    $termsrses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid));
+    $termsrses = $DB->get_records('ucla_request_classes',
+            array('courseid' => $courseid, 'action' => 'built'));
 
     $cache->set($cachekey, $termsrses);
     return $termsrses;
@@ -1534,8 +1535,8 @@ function notice_course_status($course) {
     }
 
     if (!empty($noticestring)) {
-        return $OUTPUT->box(get_string($noticestring, 'local_ucla', 
-                $noticeparam), 'noticebox');
+        return $OUTPUT->notification(get_string($noticestring, 'local_ucla', 
+                $noticeparam), 'notifywarning');
     }
 }
 

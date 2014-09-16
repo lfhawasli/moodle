@@ -2134,9 +2134,35 @@ class grade_item extends grade_object {
      * @return bool
      */
     public function can_control_visibility() {
-        if (get_plugin_directory($this->itemtype, $this->itemmodule)) {
+        if (core_component::get_plugin_directory($this->itemtype, $this->itemmodule)) {
             return !plugin_supports($this->itemtype, $this->itemmodule, FEATURE_CONTROLS_GRADE_VISIBILITY, false);
         }
         return parent::can_control_visibility();
+    }
+
+    /**
+     * Used to notify the completion system (if necessary) that a user's grade
+     * has changed, and clear up a possible score cache.
+     *
+     * @param bool $deleted True if grade was actually deleted
+     */
+    protected function notify_changed($deleted) {
+        global $CFG;
+
+        // Condition code may cache the grades for conditional availability of
+        // modules or sections. (This code should use a hook for communication
+        // with plugin, but hooks are not implemented at time of writing.)
+        if (!empty($CFG->enableavailability) && class_exists('\availability_grade\callbacks')) {
+            \availability_grade\callbacks::grade_item_changed($this->courseid);
+        }
+
+        // START UCLA MOD: CCLE-4466 - Convert MyUCLA grade transfer into scheduled task
+        $sendmyuclaitem = new \local_gradebook\task\send_myucla_grade_item();
+        $this->deleted = $deleted;  // Important to pass along.
+        $valid = $sendmyuclaitem->set_gradeinfo($this);
+        if ($valid) {
+            \core\task\manager::queue_adhoc_task($sendmyuclaitem);
+        }
+        // END UCLA MOD: CCLE-4466
     }
 }

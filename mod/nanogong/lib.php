@@ -182,7 +182,10 @@ function nanogong_delete_instance($id) {
     // now get rid of all files
     $fs = get_file_storage();
     if ($cm = get_coursemodule_from_instance('nanogong', $nanogong->id)) {
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        // START UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
+        // $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
+        // END UCLA MOD: CCLE-4650 - Update nanogong to support Moodle27
         $fs->delete_area_files($context->id);
     }
 

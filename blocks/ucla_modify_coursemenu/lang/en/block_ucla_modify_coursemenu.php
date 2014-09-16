@@ -38,3 +38,6 @@ $string['alertnumsections'] = 'Below are sections that are not being displayed:'
 $string['successnumsections'] = 'Successfully increased the number of sections for the course.';
 $string['failurenumsections'] = 'There was a problem in adjusting the number of sections for the course. Please contact system administrator.';
 $string['buttonnumsections'] = 'Increase number of sections';
+
+//Modify course menu event log handler
+$string['coursemenu_modified'] = 'Modified site menu';

@@ -51,7 +51,7 @@ class behat_ucla_syllabus extends behat_base {
         return array(
             new Given('I follow "Syllabus (empty)"'),
             new Given('I follow "Add syllabus"'),
-            new Given('I upload "lib/tests/fixtures/empty.txt" file to "File" filepicker'),
+            new Given('I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager'),
             new Given('I press "Save changes"')
         );
     }

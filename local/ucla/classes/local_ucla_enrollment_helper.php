@@ -786,6 +786,6 @@ class local_ucla_enrollment_helper {
         }
         $eventdata = new object();
         $eventdata->courses = $courses;
-        events_trigger('sync_enrolments_finished', $eventdata);
+        events_trigger_legacy('sync_enrolments_finished', $eventdata);
     }
 }

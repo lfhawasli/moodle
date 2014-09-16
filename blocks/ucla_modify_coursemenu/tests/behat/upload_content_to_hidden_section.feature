@@ -7,14 +7,14 @@ Feature: Uploading content to sections
 
   Background: I am in a UCLA environment
     Given I am in a ucla environment
-    And the following "users" exists:
+    And the following "users" exist:
     | username | firstname | lastname | email |
     | teacher1 | Teacher | 1 | teacher1@whatever.com |
     | student1 | Student | 1 | student1@whatever.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
     | fullname | shortname | format | numsections |
     | course1 | C1 | ucla | 10 |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
     | user | course | role |
     | teacher1 | C1 | editingteacher |
     | student1 | C1 | student |
@@ -22,14 +22,14 @@ Feature: Uploading content to sections
   @javascript
   Scenario: Add a hidden section and upload content
     # Add a hidden section.
-    When I log in as ucla "teacher1"
+    When I log in as "teacher1"
     And I follow "course1"
     And I turn editing mode on
     And I follow "Modify sections"
     And I press "Add new section"
     And I wait "5" seconds
     Then I should see "New"
-    And I fill in "title-new_0" with "new1"
+    And I set the field "title-new_0" to "new1"
     And I click on "hidden-new_0" "checkbox"
     And I press "Save changes"
     And I wait "5" seconds
@@ -43,9 +43,9 @@ Feature: Uploading content to sections
     When I press "Control Panel"
     And I follow "Upload a file"
     And I wait "5" seconds
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filepicker
-    And I fill in "Name" with "hidden_file"
-    And I select "new1" from "Add to section"
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
+    And I set the field "Name" to "hidden_file"
+    And I set the field "Add to section" to "new1"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
     When I press "Return to section"
@@ -53,21 +53,21 @@ Feature: Uploading content to sections
     And I log out
 
     # Student should accessible to visible section, but not hidden section.
-    Given I log in as ucla "student1"
+    Given I log in as "student1"
     And I follow "course1"
     When I follow "Show all"
     Then I should not see "new1"
     And I log out
 
     # Upload content to visible section.
-    Given I log in as ucla "teacher1"
+    Given I log in as "teacher1"
     And I follow "course1"
     And I press "Control Panel"
     And I follow "Upload a file"
     And I wait "5" seconds
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filepicker
-    And I fill in "Name" with "visible_file"
-    And I select "Week 1" from "Add to section"
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
+    And I set the field "Name" to "visible_file"
+    And I set the field "Add to section" to "Week 1"
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
     When I press "Return to section"
@@ -78,7 +78,7 @@ Feature: Uploading content to sections
     And I log out
 
     # Student should accessible to visible section, but not hidden section.
-    Given I log in as ucla "student1"
+    Given I log in as "student1"
     And I follow "course1"
     When I follow "Show all"
     Then I should see "visible_file"

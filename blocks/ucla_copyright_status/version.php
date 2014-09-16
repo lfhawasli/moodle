@@ -10,7 +10,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013021401;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2014081201;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->component = 'block_ucla_copyright_status'; // Full name of the plugin (used for diagnostics)
 
 //EOF

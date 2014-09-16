@@ -205,7 +205,7 @@ class cache_definition {
 
     /**
      * Gets set to true if this definition requires searchable stores.
-     * @since 2.4.4
+     * @since Moodle 2.4.4
      * @var bool
      */
     protected $requiresearchable = false;
@@ -734,7 +734,7 @@ class cache_definition {
 
     /**
      * Returns true if this definition requires a searchable cache.
-     * @since 2.4.4
+     * @since Moodle 2.4.4
      * @return bool
      */
     public function require_searchable() {
@@ -776,7 +776,7 @@ class cache_definition {
         }
 
         foreach ($this->requireidentifiers as $identifier) {
-            if (!array_key_exists($identifier, $identifiers)) {
+            if (!isset($identifiers[$identifier])) {
                 throw new coding_exception('Identifier required for cache has not been provided: '.$identifier);
             }
         }
@@ -816,7 +816,8 @@ class cache_definition {
      *
      * Please call {@link cache_definition::use_static_acceleration()} instead.
      *
-     * @deprecated since 2.5.3
+     * @see cache_definition::use_static_acceleration()
+     * @deprecated since 2.6
      * @return bool
      */
     public function should_be_persistent() {
@@ -846,7 +847,7 @@ class cache_definition {
      * Please call {@link cache_definition::get_static_acceleration_size()} instead.
      *
      * @see cache_definition::get_static_acceleration_size()
-     * @deprecated since 2.5.3
+     * @deprecated since 2.6
      * @return int
      */
     public function get_persistent_max_size() {

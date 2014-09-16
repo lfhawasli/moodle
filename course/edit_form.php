@@ -11,12 +11,18 @@ require_once($CFG->dirroot.'/local/publicprivate/lib/site.class.php');
 require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 // END UCLA MOD
 
+/**
+ * The form for handling editing a course.
+ */
 class course_edit_form extends moodleform {
     protected $course;
     protected $context;
 
+    /**
+     * Form definition.
+     */
     function definition() {
-        global $USER, $CFG, $DB, $PAGE;
+        global $CFG, $PAGE;
 
         $mform    = $this->_form;
         $PAGE->requires->yui_module('moodle-course-formatchooser', 'M.course.init_formatchooser',
@@ -133,8 +139,8 @@ class course_edit_form extends moodleform {
             }            
         }
         // END UCLA MOD CCLE-2389
-/// form definition with new course defaults
-//--------------------------------------------------------------------------------
+
+        // Form definition with new course defaults.
         $mform->addElement('header','general', get_string('general', 'form'));
 
         $mform->addElement('hidden', 'returnto', null);
@@ -194,11 +200,14 @@ class course_edit_form extends moodleform {
         $mform->addElement('select', 'visible', get_string('visible'), $choices);
         $mform->addHelpButton('visible', 'visible');
         $mform->setDefault('visible', $courseconfig->visible);
-        if (!has_capability('moodle/course:visibility', $context)) {
-            $mform->hardFreeze('visible');
-            if (!empty($course->id)) {
+        if (!empty($course->id)) {
+            if (!has_capability('moodle/course:visibility', $coursecontext)) {
+                $mform->hardFreeze('visible');
                 $mform->setConstant('visible', $course->visible);
-            } else {
+            }
+        } else {
+            if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
+                $mform->hardFreeze('visible');
                 $mform->setConstant('visible', $courseconfig->visible);
             }
         }
@@ -237,6 +246,7 @@ class course_edit_form extends moodleform {
             }
             $course->idnumber = $idnumber;     
         }
+        // END UCLA MOD CCLE-2940
 
         // Description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
@@ -290,24 +300,16 @@ class course_edit_form extends moodleform {
 
         // Appearance.
         $mform->addElement('header', 'appearancehdr', get_string('appearance'));
-
         if (!empty($CFG->allowcoursethemes)) {
             $themeobjects = get_list_of_themes();
             $themes=array();
             $themes[''] = get_string('forceno');
             foreach ($themeobjects as $key=>$theme) {
-                // START UCLA MOD: CCLE-2315 - CUSTOM DEPARTMENT THEMES
-                // Only allow UCLA specific themes.
-                if ($key != 'uclashared' && $key != 'uclasharedcourse') {
-                    continue;
-                }
-                // END UCLA MOD CCLE-2315
                 if (empty($theme->hidefromselector)) {
                     $themes[$key] = get_string('pluginname', 'theme_'.$theme->name);
                 }
             }
             $mform->addElement('select', 'theme', get_string('forcetheme'), $themes);
-
             // START UCLA MOD: CCLE-2315 - CUSTOM DEPARTMENT THEMES
             // If we're using the uclasharedcourse theme, we want to allow a course
             // to upload extra logos.
@@ -324,6 +326,16 @@ class course_edit_form extends moodleform {
         $languages += get_string_manager()->get_list_of_translations();
         $mform->addElement('select', 'lang', get_string('forcelanguage'), $languages);
         $mform->setDefault('lang', $courseconfig->lang);
+
+        // Multi-Calendar Support - see MDL-18375.
+        $calendartypes = \core_calendar\type_factory::get_list_of_calendar_types();
+        // We do not want to show this option unless there is more than one calendar type to display.
+        if (count($calendartypes) > 1) {
+            $calendars = array();
+            $calendars[''] = get_string('forceno');
+            $calendars += $calendartypes;
+            $mform->addElement('select', 'calendartype', get_string('forcecalendartype', 'calendar'), $calendars);
+        }
 
         $options = range(0, 10);
         $mform->addElement('select', 'newsitems', get_string('newsitemsnumber'), $options);
@@ -377,13 +389,12 @@ class course_edit_form extends moodleform {
             $mform->setType('enablecompletion', PARAM_INT);
             $mform->setDefault('enablecompletion', 0);
         }
-        
-//--------------------------------------------------------------------------------
+
         enrol_course_edit_form($mform, $course, $context);
 
-//--------------------------------------------------------------------------------
         $mform->addElement('header','groups', get_string('groupsettingsheader', 'group'));
 
+        // START UCLA MOD
         /**
          * Flag to enable or disable public/private if it is enabled for the
          * site or if it is activated for the course.
@@ -400,6 +411,7 @@ class course_edit_form extends moodleform {
             $mform->addHelpButton('enablepublicprivate', 'publicprivateenable', 'local_publicprivate');
             $mform->setDefault('enablepublicprivate', empty($course->enablepublicprivate) ? 1 : $course->enablepublicprivate);
         }
+        // END UCLA MOD
 
         $choices = array();
         $choices[NOGROUPS] = get_string('groupsnone', 'group');
@@ -418,10 +430,7 @@ class course_edit_form extends moodleform {
         $options[0] = get_string('none');
         $mform->addElement('select', 'defaultgroupingid', get_string('defaultgrouping', 'group'), $options);
 
-//--------------------------------------------------------------------------------
-
-/// customizable role names in this course
-//--------------------------------------------------------------------------------
+        // Customizable role names in this course.
         $mform->addElement('header','rolerenaming', get_string('rolerenaming'));
         $mform->addHelpButton('rolerenaming', 'rolerenaming');
 
@@ -434,17 +443,18 @@ class course_edit_form extends moodleform {
             }
         }
 
-//--------------------------------------------------------------------------------
         $this->add_action_buttons();
-//--------------------------------------------------------------------------------
+
         $mform->addElement('hidden', 'id', null);
         $mform->setType('id', PARAM_INT);
 
-/// finally set the current form data
-//--------------------------------------------------------------------------------
+        // Finally set the current form data
         $this->set_data($course);
     }
 
+    /**
+     * Fill in the current page data for this course.
+     */
     function definition_after_data() {
         global $DB;
 
@@ -458,7 +468,7 @@ class course_edit_form extends moodleform {
                     $options[$grouping->id] = format_string($grouping->name);
                 }
             }
-            collatorlib::asort($options);
+            core_collator::asort($options);
             $gr_el =& $mform->getElement('defaultgroupingid');
             $gr_el->load($options);
         }
@@ -502,7 +512,7 @@ class course_edit_form extends moodleform {
             $editcoursetheme = false;
             if (!empty($context) && has_capability('local/ucla:editcoursetheme', $context)) {
                 // Only allow collab sites to change themes.
-                $indicator = siteindicator_site::load($mform->getElementValue('id'));                
+                $indicator = siteindicator_site::load($mform->getElementValue('id'));
                 if ((!empty($indicator))) {
                     $editcoursetheme = true;
                 }
@@ -518,7 +528,13 @@ class course_edit_form extends moodleform {
         // END UCLA MOD: CCLE-4230
     }
 
-/// perform some extra moodle validation
+    /**
+     * Validation.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array the errors that were found
+     */
     function validation($data, $files) {
         global $DB;
 
@@ -535,7 +551,7 @@ class course_edit_form extends moodleform {
         if (!empty($data['idnumber']) && (empty($data['id']) || $this->course->idnumber != $data['idnumber'])) {
             if ($course = $DB->get_record('course', array('idnumber' => $data['idnumber']), '*', IGNORE_MULTIPLE)) {
                 if (empty($data['id']) || $course->id != $data['id']) {
-                    $errors['idnumber'] = get_string('idnumbertaken', 'error');
+                    $errors['idnumber'] = get_string('courseidnumbertaken', 'error', $course->fullname);
                 }
             }
         }

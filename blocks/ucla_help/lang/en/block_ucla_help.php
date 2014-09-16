@@ -11,7 +11,7 @@ $string['submit_button'] = 'Submit';
 
 $string['no_course'] = 'Other, please describe below';
 
-$string['error_empty_description'] = 'A description is required to send feedback';
+$string['error_empty_description'] = 'A description is required to send a report';
 
 $string['helpbox_header'] = 'Help/Feedback';
 $string['helpbox_text_default'] = 'Please use the settings option of the help block to set what displays in the Help Box';
@@ -56,10 +56,10 @@ $string['settings_support_contacts_table_contact'] = 'Contact';
 
 // error messages
 $string['error_emptysystemcontext'] = 'Please enter a value for the "System" support contact.';
-$string['error_sending_message'] = 'Sorry, there was a problem with sending your feedback. Please try again later.';
+$string['error_sending_message'] = 'Sorry, there was a problem with sending your report. Please try again later.';
 
 // success messages
-$string['success_sending_message'] = 'Thank you for your feedback. If you included your email address someone will respond to your message soon.';
+$string['success_sending_message'] = 'Thank you for contacting us. Your issue has been forwarded to your local support.';
 
 // Side block strings.
 $string['hidehelp'] = 'Hide help/legend';

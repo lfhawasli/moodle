@@ -14,7 +14,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('coursemisconf');
 }
 require_login($course);
-$context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+$context = context_course::instance($courseid, MUST_EXIST);
 
 init_page($course, $courseid, $context);
 

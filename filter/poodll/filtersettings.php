@@ -46,6 +46,7 @@ $items[] = new admin_setting_configtext('filter_poodll_micsilencelevel', get_str
 $items[] = new admin_setting_configtext('filter_poodll_micgain', get_string('micgain', 'filter_poodll'), '', '50', PARAM_INT); 
 $items[] = new admin_setting_configtext('filter_poodll_micecho', get_string('micecho', 'filter_poodll'), '', 'yes');
 $items[] = new admin_setting_configtext('filter_poodll_micloopback', get_string('micloopback', 'filter_poodll'), '', 'no');
+$items[] = new admin_setting_configcheckbox('filter_poodll_miccanpause', get_string('miccanpause', 'filter_poodll'), '', 0);
 //This is a hack for Juan. Later we can remove it
 //Justin 2012/11/23
 //$items[] = new admin_setting_configtext('filter_poodll_audiotimelimit', "Audio Rec. Time Limit(secs)", '', '0', PARAM_INT);	
@@ -106,9 +107,10 @@ $items[] = new admin_setting_configtext('filter_poodll_ffmpeg_mp4opts', get_stri
 $items[] = new admin_setting_heading('filter_poodll_whiteboard_setting', get_string('filter_poodll_whiteboard_heading', 'filter_poodll'), '');
 $options = array('poodll' => 'PoodLL Whiteboard(Flash)','drawingboard' => 'Drawing Board(js)', 'literallycanvas' => 'Literally Canvas(js)');
 $items[] = new admin_setting_configselect('filter_poodll_defaultwhiteboard', get_string('defaultwhiteboard', 'filter_poodll'), '', 'poodll', $options);
-$items[] = new admin_setting_configcheckbox('filter_poodll_autosavewhiteboard', get_string('autosavewhiteboard', 'filter_poodll'), '', 1);
 $items[] = new admin_setting_configtext('filter_poodll_whiteboardwidth', get_string('wboardwidth', 'filter_poodll'), '', '600', PARAM_INT);
 $items[] = new admin_setting_configtext('filter_poodll_whiteboardheight', get_string('wboardheight', 'filter_poodll'), '', '350', PARAM_INT);
+$items[] = new admin_setting_configtext('filter_poodll_autosavewhiteboard', get_string('wboardautosave', 'filter_poodll'), get_string('wboardautosave_details', 'filter_poodll'), 2000, PARAM_INT);
+
 
 //Video Gallery Settings
 $items[] = new admin_setting_heading('filter_poodll_videogallery_setting', get_string('filter_poodll_videogallery_heading', 'filter_poodll'), '');

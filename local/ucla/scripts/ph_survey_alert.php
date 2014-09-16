@@ -56,7 +56,7 @@ if(!empty($courseidarray)) {
     );
 
     // Trigger event
-    events_trigger('ucla_alert_post', $data);
+    events_trigger_legacy('ucla_alert_post', $data);
 
     // Display count and a list of course ids
     $n = count($courseidarray);

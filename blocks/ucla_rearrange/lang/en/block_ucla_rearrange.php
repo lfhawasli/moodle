@@ -23,4 +23,6 @@ $string['rearrange_post'] = '';
 $string['returntocourse'] = 'Return to course';
 $string['returntosection'] = 'Return to section';
 
+$string['eventrearrange'] = 'Rearranged course materials';
+
 // EoF

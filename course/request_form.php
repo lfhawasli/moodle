@@ -50,7 +50,7 @@ class course_request_form extends moodleform {
         
         // START UCLAMOD CCLE-2389
 //        // Do not show pending course requests to unauthorized viewers
-//        $context = get_context_instance(CONTEXT_SYSTEM);
+//        $context = context_system::instance();
 //        if(has_capability('tool/uclasiteindicator:view', $context)) {
 //
 //            if ($pending = $DB->get_records('course_request', array('requester' => $USER->id))) {

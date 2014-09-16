@@ -108,7 +108,7 @@ class behat_form_select extends behat_form_field {
 
         // Wait for all the possible AJAX requests that have been
         // already triggered by selectOption() to be finished.
-        $this->session->wait(behat_base::TIMEOUT * 1000, '(document.readyState === "complete")');
+        $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
 
         // Wrapped in try & catch as the element may disappear if an AJAX request was submitted.
         try {
@@ -163,7 +163,7 @@ class behat_form_select extends behat_form_field {
 
             // Wait for all the possible AJAX requests that have been
             // already triggered by clicking on the field to be finished.
-            $this->session->wait(behat_base::TIMEOUT * 1000, '(document.readyState === "complete")');
+            $this->session->wait(behat_base::TIMEOUT * 1000, behat_base::PAGE_READY_JS);
 
             // Wrapped in a try & catch as we can fall into race conditions
             // and the element may not be there.
@@ -261,7 +261,7 @@ class behat_form_select extends behat_form_field {
         );
 
         // Sort by value (keeping the keys is irrelevant).
-        collatorlib::asort($optionsarray, SORT_STRING);
+        core_collator::asort($optionsarray, SORT_STRING);
 
         // Returning it as a string which is easier to match against other values.
         return implode('|||', $optionsarray);
