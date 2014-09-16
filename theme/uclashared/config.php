@@ -17,7 +17,11 @@ $THEME->sheets = array(
     'base',
     'core',     // custom core stlye changes
     'general',
-    'theme'
+    'theme',
+    'ucla',
+    'core',
+    'moodle',
+    'components',
 );
 
 $THEME->parents_exclude_sheets = array(

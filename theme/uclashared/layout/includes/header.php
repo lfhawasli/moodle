@@ -24,15 +24,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Custom site logos.
+
+// First get site logo
+$sitelogohtml = $OUTPUT->logo('ucla-logo', 'theme');
+// Get extra site logos
+$extrasitelogos = $OUTPUT->course_logo();
+// Check for custom logo 
+$customheaderlogo = isset($OUTPUT->hascustomheaderlogo) && 
+        $OUTPUT->hascustomheaderlogo ? 'header-custom-logo' : '';
+
 ?>
 
 <?php if ($hasheading || $hasnavbar) { ?>
     <header id="page-header" class="container-fluid">
-        <div class="header-main row">
-            <div class="col-sm-6 col-xs-3 header-logo">
-                <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
+        <div class="header-border visible-xs"></div>
+        <div class="header-main <?php echo $customheaderlogo; ?> row">
+            <div class="header-logo">
+                <?php echo  $sitelogohtml; ?>
             </div>
-            <div class="col-sm-6 col-xs-9 header-login">
+            <div class="header-login">
                 <div class="header-btn-group logininfo" >
                     <?php
                     if ($haslogininfo) {
@@ -43,16 +54,29 @@
             </div>            
         </div>
         <div class="header-system row" >
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <?php echo $OUTPUT->sublogo(); ?>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-8">
                 <?php echo $OUTPUT->weeks_display() ?>
             </div>
         </div>
     </header>
 <?php
 } 
+
+// Render extra site logos if available.
+if (!empty($extrasitelogos)) { ?>
+<div class="course-logo-layout container-fluid" >
+    <div class="course-logo-image">
+        <?php echo $extrasitelogos ?>
+    </div>
+    <div class="course-logo-title">
+        <h1><?php echo $COURSE->fullname ?></h1>
+    </div>
+</div>
+<?php
+}
 
 if ($hasnavbar) { ?>
 <div class="navbar container-fluid">

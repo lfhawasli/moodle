@@ -8,6 +8,7 @@ require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_renderer {
 
     public $coursetheme = true;
+    public $hascustomheaderlogo = false;
     
     private $theme = 'theme';
     private $component = 'theme_uclasharedcourse';
@@ -51,12 +52,13 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         // Now look for additional logos
         $additional_logos = '';
-        if (($is_private && $this->is_enrolled_user()) || !$is_private) {
-            $additional_logos = $this->course_logo_html($COURSE->id);
-        }
+//        if (($is_private && $this->is_enrolled_user()) || !$is_private) {
+//            $additional_logos = $this->course_logo($COURSE->id);
+//        }
 
         // if main logo is overridden, then return that html
         if (!empty($alternative_logo)) {
+            $this->hascustomheaderlogo = true;
             return $alternative_logo . $additional_logos;
         } else if (!empty($additional_logos)) {
             // maybe we just have alternative sublogos, but keep main logo
@@ -155,17 +157,13 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
      * 
      * @return type
      */
-    private function course_logo_html() {
+    public function course_logo() {
         global $CFG, $COURSE;
         $logos = $this->course_logo_images($COURSE->id);
         
         $out = '';
         if(!empty($logos)) {
-            $pix_url = $this->pix_url('logo_divider', $this->theme);
-            $img = html_writer::img($pix_url, null);
-            $divider = html_writer::tag('div', $img, array('class' => 'uclashared-course-logo-divider'));
-            $out .= $divider;
-            
+
             // Sort by filename
             if(count($logos) > 1) {
                 $logo1 = array_shift($logos);
@@ -219,7 +217,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         file_prepare_draft_area($draftitemid,
                 $contextid,
-                'theme_uclasharedcourse', 'course_logos', $courseid,
+                $this->component, $this->filearea, $courseid,
                 $this->course_logo_config());
 
         $data['logo_attachments'] = $draftitemid;

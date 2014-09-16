@@ -41,6 +41,17 @@
     }
 }
 
+// Make the progress bar 100% width
+.editing .mod-indent {
+    display: inline !important;
+    
+    > .activityinstance {
+        padding-right: 0 !important;
+        display: inline-block !important;
+        width: 100%;
+    }
+}
+
 /// Modify the progress bar
 // --------------------------------------------------
 

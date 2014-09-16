@@ -48,6 +48,10 @@ if ($showsidepre && !$showsidepost) {
     $bodyclasses[] = 'content-only';
 }
 
+if (!empty($PAGE->layout_options['customlogo'])) {
+    $bodyclasses[] = 'theme-uclasharedcourse';
+}
+
 // Server environment flag.
 $envflag = $OUTPUT->get_environment();
 

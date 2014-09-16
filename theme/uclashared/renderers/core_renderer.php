@@ -177,7 +177,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             $rolename = '';
             // I guess only guests cannot switch roles.
             if (isguestuser()) {
-                $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text');
+                $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
                 $addloginurl = true;
             } else if (is_role_switched($course->id)) {
                 $context = context_course::instance($course->id);
@@ -193,7 +193,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
             $loginstr = $realuserinfo . $rolename . $userlink;
         } else {
-            $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text');
+            $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
         }
 
         if (isset($SESSION->justloggedin)) {
@@ -241,7 +241,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             $text = html_writer::span(get_string('logout'), 'hidden-xs');
             $logininfo[] = html_writer::link(
                     new moodle_url('/login/logout.php', array('sesskey' => sesskey())),
-                    $icon . $text,
+                    $text . $icon,
                     array('class' => 'btn-header')
             );
         }
@@ -289,9 +289,9 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         }
 
         // Main Help & Feedback link.
-        $hflink = html_writer::span(get_string('help_n_feedback', $this->theme), 'hidden-xs');
+        $hflinktext = html_writer::span(get_string('help_n_feedback', $this->theme), '');
         $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
-        $outlink = html_writer::link($helplocale, $icon . $hflink, array('class' => 'btn-header btn-help-feedback'));
+        $outlink = html_writer::link($helplocale, $hflinktext . $icon, array('class' => 'btn-header btn-help-feedback'));
 
         // Show dropdown menu.
         $menu = $this->custom_menu();
@@ -375,7 +375,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                                 html_writer::span('common collaboration',
                                         'logo-cc') .
                                 html_writer::span('& learning environment',
-                                        'logo-le'), 'logo-ccle-sub hidden-xs')
+                                        'logo-le'), 'logo-ccle-sub hidden-xs hidden-sm')
         );
 
         return $link;
@@ -593,6 +593,15 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         }
 
         return $this->single_button($url, $editstring);
+    }
+    
+    /**
+     * Set for custom course logos.  This is meant to be overridden by child themes.
+     * 
+     * @return empty string
+     */
+    public function course_logo() {
+        return '';
     }
 
     /*

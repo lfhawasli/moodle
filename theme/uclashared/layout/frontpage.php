@@ -56,48 +56,42 @@ echo $OUTPUT->doctype() ?>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
 <div id="page" class="env-<?php echo $envflag ?>">
 
-    <header id="page-header" class="container-fluid">
-        <div class="header-main row">
-            <div class="col-sm-6 col-xs-3">
-                <div class="header-logo" >
-                    <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
+    <header id="page-header" class="">
+        <div class="header-main">
+            <div class="header-logo" >
+                <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
+                
+                <div class="header-server">
+                    <?php 
+                        echo $OUTPUT->sublogo();
+                    ?>
                 </div>
             </div>
-            <div class="col-sm-6 col-xs-9 header-login">
+            <div class="header-login">
                 <div class="header-btn-group logininfo" >
-                <?php
-                if ($haslogininfo) {
-                    echo $OUTPUT->login_info();
-                }
-                ?>
+                    <?php
+                    if ($haslogininfo) {
+                        echo $OUTPUT->login_info();
+                    }
+                    ?>
                 </div>
+                
             </div>            
         </div>
-        <div class="header-system row" >
-            <div class="col-sm-2">
-                <div class="header-shared-server-list">
-                <?php 
-                    echo $OUTPUT->sublogo();
-                ?>
-                </div>
-            </div>
-            <div class="col-sm-10">
-                <?php echo $OUTPUT->weeks_display() ?>
-            </div>
+        <div class="header-system" >
+            
+            <?php echo $OUTPUT->weeks_display() ?>
         </div>
-        
     </header>
-<!-- END OF HEADER -->
 
     <div id="page-content">
-        <?php echo $OUTPUT->alert_banner() ?>
         <div id="region-main-box">
             <div id="region-post-box">
                 <div id="region-main-wrap" >
                     <div id="region-main">
                         <div class="region-content">
+                            <?php echo $OUTPUT->alert_banner() ?>
                             <?php echo core_renderer::MAIN_CONTENT_TOKEN ?>
-                            <?php echo $OUTPUT->blocks_for_region('side-post') ?>
                         </div>
                     </div>
                 </div>
@@ -105,6 +99,7 @@ echo $OUTPUT->doctype() ?>
                 <?php if ($hassidepre) { ?>
                 <div id="region-pre" class="block-region">
                     <div class="region-content">
+                        <!--  empty on purpose-->
                         <?php echo $OUTPUT->blocks_for_region('side-pre') ?>
                     </div>
                 </div>
@@ -113,7 +108,7 @@ echo $OUTPUT->doctype() ?>
                 <?php if ($hassidepost) { ?>
                 <div id="region-post" class="block-region">
                     <div class="region-content">
-                        
+                        <?php echo $OUTPUT->blocks_for_region('side-post') ?>
                     </div>
                 </div>
                 <?php } ?>

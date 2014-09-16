@@ -10,11 +10,11 @@ $btn-color-control-panel:   #ffcf48;
 $btn-color-forum-search:    #4d4d4d;
 $btn-color-login:           #f9c739;
 
-
 ////
 // Button overrides
 // --------------------------------------------------
 
+// Default Boostrap button
 .btn {
 
     @include respond-at(xs) {
@@ -26,26 +26,32 @@ $btn-color-login:           #f9c739;
     -webkit-appearance: none;
 }
 
+// Make default bootstrap buttons darker
 .btn-default {
     @include button-variant(#ffffff, #4d4d4d, #333);
 }
 
+// keep the primary color text white.
 .btn-primary {
     color: white !important;
 }
+
+// Header button definition.
 .btn-header {
-    background-color: none;
+    background-color: $ucla-color-blue;
     padding: 10px 12px; 
     color: white;
     display: inline-block;
     font-weight: 300;
-    /*border-bottom: 2px solid darken($header-color-prod, 10%);*/
     height: $header-height;
     
+    @include transition-property(background-color, color);
+    @include transition-duration(0.25s);
+    @include transition-timing-function(ease-out);
+    
     &:hover {
-        background-color: lighten($ccle-color-blue, 5%);
+        background-color: lighten($ucla-color-blue, 5%);
         text-decoration: none;
-        /*border-bottom: 2px solid darken($ccle-color-blue, 2%);*/
     }
     
     // Add braces for 'real user' for 'login-as'
@@ -59,12 +65,18 @@ $btn-color-login:           #f9c739;
             content: "[";
         }
     }
+    
+    i {
+        margin-left: 4px;
+    }
 }
 
+// Keep links white
 a.btn-header {
     color: white;
 }
 
+// A header button that is not a button.
 .btn-header-text {
     /*background-color: $ccle-color-blue;*/
     font-size: 1.2rem;
@@ -72,37 +84,44 @@ a.btn-header {
     color: white !important;
     display: inline-block;
     font-weight: 300;
-    height: $header-height;
+    height: auto;
 }
 
+// Help button
 .btn-help-feedback {
-    background-color: #5b9cd9;
-    /*border-bottom: 2px solid darken(#295493, 10%);*/
-    
+    background-color: $ccle-color-gold;
+
     &:hover {
-        background-color: lighten($header-color-prod, 2%);
-        /*border-bottom: 2px solid lighten(#295493, 1%);*/
+        background-color: #ffc933;
     }
 }
 
+a.btn-help-feedback {
+    color: black;
+    i {
+        margin-left: 2px;
+    }
+}
+
+// Login button
 .btn-login {
-    background-color: $btn-color-login;
+    background-color: $ccle-color-gold;
     color: black !important;
-    /*border-bottom: 2px solid darken(#4cae4c, 10%);*/
 
     &:hover {
-        background-color: lighten($btn-color-login, 10%);
-        /*border-bottom: 2px solid darken(#4cae4c, 1%);*/
+        background-color: #ffc933;
     }
 }
 
+// Button group
 .header-btn-group {
     float: right;
     color: white;
     
     .role-name {
         padding-left: 8px;
-        font-size: 1.1rem;
+        font-size: 1.0rem;
+        color: #cbe2f2;
         
         &:after {
             content: ")";
@@ -122,11 +141,6 @@ a.btn-header {
 // as traits with @extend -- primarily in adapter-like declarations.
 //
 
-/**
-    Default navigation bar button color.
-*/
-$btn-color-navbar:   #666;
-
 %btn-navbar {
     font-size: 1.4rem;
     background-color: $btn-color-navbar;
@@ -134,9 +148,12 @@ $btn-color-navbar:   #666;
     color: white;
     font-weight: 300;
     border: 1px solid $btn-color-navbar;
-    border-bottom: 2px solid darken($btn-color-navbar, 8%);
+    /*border-bottom: 2px solid darken($btn-color-navbar, 8%);*/
 
     @include border-radius(0);
+    @include transition-property(background-color, color);
+    @include transition-duration(0.25s);
+    @include transition-timing-function(ease-out);
 
     &:hover {
         background-color: darken($btn-color-editing, 5%);

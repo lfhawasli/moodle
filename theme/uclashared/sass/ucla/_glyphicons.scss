@@ -8,9 +8,11 @@
 // <a href="#"><span class="glyphicon glyphicon-star"></span> Star</a>
 
 
-// Mangle these vars to load fonts the Moodlerific way
-$icon-font-path:    "[[uclashared:font|";
-$icon-font-name: $icon-font-name + "]]";
-
-// After we override the vars, load from Bootstrap
 @import "bootstrap/glyphicons";
+
+// Force the fonts to load the Moodlerific way
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url("[[font:theme|glyphicons-halflings-regular.eot]]");
+  src: url("[[font:theme|glyphicons-halflings-regular.eot]]?#iefix") format("embedded-opentype"), url("[[font:theme|glyphicons-halflings-regular.woff]]") format("woff"), url("[[font:theme|glyphicons-halflings-regular.ttf]]") format("truetype"), url("[[font:theme|glyphicons-halflings-regular.svg]]#glyphicons_halflingsregular") format("svg");
+}
