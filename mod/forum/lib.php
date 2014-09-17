@@ -3914,6 +3914,9 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     $usermodified->id = $post->usermodified;
     $usermodified = username_load_fields_from_object($usermodified, $post, 'um');
 
+    // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
+    // Swapping order of date and name display so that sorting function can sort by date as opposed to name.
+    /*
     // Show link to last poster and their post if user can see them.
     if ($canviewparticipants) {
         echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
@@ -3924,10 +3927,15 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
           userdate($usedate, $datestring).'</a>';
     */
+    // Show link to last poster and their post if user can see them.
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
-          userdate($usedate, $datestring).'</a><br />';
-    echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
-         fullname($usermodified).'</a>';
+          userdate($usedate, $datestring).'</a>';
+    
+    if ($canviewparticipants) {
+        echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
+             fullname($usermodified).'</a><br />';
+        $parenturl = (empty($post->lastpostid)) ? '' : '&amp;parent='.$post->lastpostid;
+    }
     // END UCLA MOD: CCLE-4003/SSC-1805
     echo "</td>\n";
 
