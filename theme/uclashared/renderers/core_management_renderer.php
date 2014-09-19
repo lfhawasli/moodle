@@ -116,6 +116,6 @@ class theme_uclashared_core_course_management_renderer extends core_course_manag
         $out = str_replace('</a>', '</a></li>', $out);
         
         // Return wrapped in a 'center' div
-        return html_writer::div($out, 'center');
+        return html_writer::div($out, 'center-text');
     }
 }
