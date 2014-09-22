@@ -1,0 +1,129 @@
+
+// Quiz edit page
+#page-mod-quiz-edit,
+.path-mod-quiz {
+    
+    // Moodle block needs to be overriden
+    .questionbankwindow.block {
+        > .header {
+            margin-bottom: 0;
+            background-color: $brand-primary !important;
+            font-size: 1.8rem !important;
+        }
+        // This is being overriden by the general H2 styles
+        h2 {
+            margin-bottom: 0;
+            border-bottom: 0;
+        }
+        .questionbank {
+            background-color: #fafafa;
+            padding: 4px;
+        }
+        .container {
+            padding: 0;
+        }
+    }
+    
+    .categoryquestionscontainer {
+        padding: 0;
+    }
+    .categoryinfo {
+        //
+        border-bottom: 0;
+        padding: 4px auto;
+        background-color: white;
+        margin: 4px 0;
+    }
+
+    // The quiz question display
+    // Need to do deep nesting in order to override core moodle.
+    .editq div.quizpage  {
+        .pagetitle {
+            color: #666;
+        }
+        .pagecontent {
+            width: 90%;
+            background-color: #eee;
+            border-left: 1px solid #ddd;
+            @include border-radius(0);
+            
+            .content {
+                background-color: #f9f9f9;
+                width: 90%;
+                min-height: 65px;
+                
+                @include border-radius(0);
+                    
+                .points {
+                    top: 0;
+                    background-color: lighten($brand-info, 25%);
+                    height: 100%;
+                    padding: 4px;
+                    color: #222;
+                    border: 0;
+                    
+                    @include border-radius(0);
+                }
+            }
+        }
+        
+        .quizsavegradesform {
+            input[type="text"] {
+                width: 40px;
+            }
+            
+            input {
+                vertical-align: middle;
+            }
+        }
+        .pointssubmitbutton {
+            @extend .btn;
+            @extend .btn-warning;
+            
+            padding: 3px 6px !important;
+        }
+    }
+}
+
+// The quiz question (bank) page
+#page-question-edit {
+    
+    // Make it take up 100% of available content
+    .boxwidthwide {
+        width: 100%;
+    }
+}
+
+// Fix questions table rendering
+#categoryquestions {
+    .iconcol, .qtype, .checkbox {
+        width: auto;
+    }
+    .creatorname, .modifiername {
+        min-width: 150px;
+        width: 150px;
+    }
+    .questionnametext {
+        width: 50%;
+    }
+    // Override Boostrap checkbox style
+    .checkbox input[type="checkbox"] {
+        position: inherit;
+        margin: 0;
+    }
+    // Style header a bit
+    thead {
+        tr {
+            border-bottom: 2px solid #ddd;
+        }
+        th {
+            font-weight: bold;
+        }
+    }
+    // Make user names smaller so they fit in one line.
+    tbody {
+        .creatorname, .modifiername {
+            font-size: 1.2rem;
+        }
+    }
+}
