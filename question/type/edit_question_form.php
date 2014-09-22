@@ -105,6 +105,14 @@ abstract class question_edit_form extends question_wizard_form {
 
         $this->editoroptions = array('subdirs' => 1, 'maxfiles' => EDITOR_UNLIMITED_FILES,
                 'context' => $this->context);
+      
+        // BEGIN UCLA MOD: CCLE-4810
+        global $CFG;
+        if ($CFG->allowobjectembed) {
+            $this->editoroptions['noclean'] = true;
+        }
+        // END UCLA MOD: CCLE-4810
+        
         $this->fileoptions = array('subdirs' => 1, 'maxfiles' => -1, 'maxbytes' => -1);
 
         $this->category = $category;
@@ -146,6 +154,9 @@ abstract class question_edit_form extends question_wizard_form {
             // Editing question with no permission to move from category.
             $mform->addElement('questioncategory', 'category', get_string('category', 'question'),
                     array('contexts' => array($this->categorycontext)));
+            $mform->addElement('hidden', 'usecurrentcat', 1);
+            $mform->setType('usecurrentcat', PARAM_BOOL);
+            $mform->setConstant('usecurrentcat', 1);
         } else {
             // Editing question with permission to move from category or save as new q.
             $currentgrp = array();

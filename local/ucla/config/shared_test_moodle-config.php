@@ -216,7 +216,6 @@ $CFG->xsendfile = 'X-Sendfile';
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
 $CFG->bloglevel = 0; // Disable blog system completely
-$CFG->enablebadges = 0; // Disable badges
 
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
@@ -445,7 +444,8 @@ $CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     View self help articles|https://docs.ccle.ucla.edu/
-    Read tips & updates|https://docs.ccle.ucla.edu/w/Tips_and_Updates";
+    Read tips & updates|https://docs.ccle.ucla.edu/w/Tips_and_Updates
+    Request a site|/course/request.php";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)

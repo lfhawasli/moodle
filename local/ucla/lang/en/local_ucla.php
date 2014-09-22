@@ -224,3 +224,7 @@ $string['invalidfiletype'] = '{$a->notaccepted} filetype cannot be accepted.<br 
 
 // CCLE-3843 - Single file recovery
 $string['logfiledeleted'] = 'Deleted file';
+
+// CCLE-3673 - Limit crosslist display using config value.
+$string['maxcrosslistshown'] = 'Max crosslists shown';
+$string['maxcrosslistshowndesc'] = 'Limit the amount of crosslisted courses shown on a course page.';

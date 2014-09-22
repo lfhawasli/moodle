@@ -314,7 +314,9 @@ M.local_ucla.gradebook = {
         }
     },
     update_assignment_header_position: function() {
-
+        // CCLE-4795 - New header is static and is exactly 40px tall.
+        var static_header_offset = 40;
+        
         var header = document.getElementById('gradebook-header-container');
         var header_cell = document.getElementById('studentheader');
 
@@ -324,9 +326,11 @@ M.local_ucla.gradebook = {
 
         var headercelltop = header_cell.offsetTop + header_cell.offsetParent.offsetTop;
 
-        if (window.pageYOffset > headercelltop) {
-            header.style.top = window.pageYOffset + 'px';
-            user_column_header.style.top = window.pageYOffset + 'px';
+        // Check that we're at offset
+        if (window.pageYOffset + static_header_offset > headercelltop ) {
+            // Use new header height in offset calculation.
+            header.style.top = window.pageYOffset + static_header_offset + 'px';
+            user_column_header.style.top = window.pageYOffset + static_header_offset + 'px';
         } else {
             header.style.top = headercelltop + 'px';
             user_column_header.style.top = headercelltop + 'px';

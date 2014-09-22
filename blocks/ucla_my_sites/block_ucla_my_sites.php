@@ -28,9 +28,6 @@ require_once($CFG->dirroot.'/blocks/ucla_browseby/handlers/course.class.php');
 class block_ucla_my_sites extends block_base {
     private $cache = array();
 
-    // How many crosslists to limit for display
-    const MAX_CROSSLIST_SHOWN = 5;
-
     /**
      * block initializations
      */
@@ -300,11 +297,12 @@ class block_ucla_my_sites extends block_base {
                 // there might be multiple reg_info records for cross-listed 
                 // courses
                 $class_title = ''; $first_entry = true; $num_entries = 0;
+                $maxcrosslistshown = get_config('local_ucla', 'maxcrosslistshown');
                 foreach ($class->reg_info as $reg_info) {
                     $first_entry ? $first_entry = false : $class_title .= '/';
 
                     // don't show too many cross-listed entries
-                    if ($num_entries > self::MAX_CROSSLIST_SHOWN) {
+                    if ($num_entries >= $maxcrosslistshown) {
                         $class_title .= '...';
                         break;
                     }
