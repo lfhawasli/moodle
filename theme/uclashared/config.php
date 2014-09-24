@@ -11,11 +11,11 @@
 $THEME->name = 'uclashared';
 $tn = 'theme_' . $THEME->name;
 
-$THEME->parents = array('base');
+$THEME->parents = array('base', 'bootstrapbase');
 
 $THEME->sheets = array(
     'base',
-    'core',     // custom core stlye changes
+    'core',     // Custom core style changes.
     'general',
     'theme',
     'ucla',
@@ -28,6 +28,10 @@ $THEME->parents_exclude_sheets = array(
     'base' => array(
         'blocks',
         'dock'
+    ),
+    'bootstrapbase' => array(
+        'moodle',
+        'editor'
     )
 );
 
