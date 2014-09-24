@@ -186,7 +186,7 @@ class format_ucla_renderer extends format_topics_renderer {
      * logged in.
      */
     public function print_header() {
-        global $CFG, $OUTPUT, $PAGE;
+        global $CFG, $OUTPUT;
         
         // Formatting and determining information to display for these courses
         $regcoursetext = '';
@@ -238,8 +238,11 @@ class format_ucla_renderer extends format_topics_renderer {
         }
         
         // Check if this site has a custom course logo.  If so, then the title
-        // will be rendered by the theme.  
-        $courselogos = $OUTPUT->course_logo();
+        // will be rendered by the theme.
+        $courselogos = null;
+        if (method_exists($OUTPUT, 'course_logo')) {
+            $courselogos = $OUTPUT->course_logo();
+        }
         if (empty($courselogos)) {
             echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
         }
