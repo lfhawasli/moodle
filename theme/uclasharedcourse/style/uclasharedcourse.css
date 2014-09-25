@@ -1,11 +1,5 @@
 
 
-/* Remove background color and disable fixed positioning from header */
-header .header-main {
-    position: inherit;
-    width: auto;
-}
-
 /* Structural fix */
 header .header-system {
     margin-top: 0;
