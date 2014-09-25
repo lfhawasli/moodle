@@ -133,7 +133,7 @@ $site-menu-hover-color:         #fcfcfc;
             // Add subject area links icon
             .subject-area-link.leaf:before {
                 // bookmark
-                @include node-glyphicon("\1f516");
+                @include node-glyphicon("\e044");
             }
             // Add bruincast link icon
             .bruincast-link.leaf:before {
