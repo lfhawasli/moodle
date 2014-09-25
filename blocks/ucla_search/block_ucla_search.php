@@ -50,8 +50,6 @@ class block_ucla_search extends block_base {
         $collab = true;
         $course = true;
         $visibility = 'hidden';
-        $cssgrid = 'col-md-8 col-md-offset-2';
-        $size = 'lg';
         
         switch ($type) {
             case 'frontpage-search':
@@ -66,21 +64,16 @@ class block_ucla_search extends block_base {
                 break;
             case 'block-search':
                 $visibility = '';
-                $cssgrid = 'col-lg-12';
-                $size = 'md';
         }
         
-        $inputgroup = html_writer::div(
-                html_writer::empty_tag('input', 
+        $inputgroup = html_writer::empty_tag('input', 
                         array(
                             'id' => 'ucla-search', 
                             'type' => 'text', 
                             'class' => 'form-control ucla-search-input', 
                             'name' => 'search',
                             'placeholder' => get_string('placeholder', 'block_ucla_search')
-                            )),
-                'input-group input-group-' . $size
-                );
+                            ));
         
         $checkboxes = html_writer::div(
                 html_writer::tag('label', 
@@ -100,7 +93,7 @@ class block_ucla_search extends block_base {
                     array('class' => '', 'action' => $CFG->wwwroot . '/course/search.php')
                 );
         
-        $grid = html_writer::div(html_writer::div($form, $cssgrid), 'row ucla-search ' . $type);
+        $grid = html_writer::div($form, 'ucla-search ' . $type);
         
         return $grid;   
     }
