@@ -103,6 +103,12 @@
             border-top: 2px dashed orangered;
         }
     }
+    
+    .registrar-info {
+        .cancelled-course {
+            text-decoration: line-through;
+        }
+    }
 }
 
 // format_ucla namespace

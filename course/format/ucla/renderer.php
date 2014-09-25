@@ -254,7 +254,7 @@ class format_ucla_renderer extends format_topics_renderer {
 
         // Handle cancelled classes
         if (is_course_cancelled($this->courseinfo)) {
-            echo $OUTPUT->box(get_string('coursecancelled', 'format_ucla'), 'noticebox coursecancelled');
+            echo $OUTPUT->notification(get_string('coursecancelled', 'format_ucla'), 'notifywarning');
         } else {
             // display message if user is viewing an old course
             $notice = notice_course_status($this->course);
@@ -776,7 +776,7 @@ class format_ucla_renderer extends format_topics_renderer {
 
             // if section is cancelled, then cross it out
             if (enrolstat_is_cancelled($courseinfo->enrolstat)) {
-                $course_text = html_writer::tag('span', $course_text, array('class' => 'course_text_cancelled'));
+                $course_text = html_writer::tag('span', $course_text, array('class' => 'cancelled-course'));
             }
 
             // save section info
