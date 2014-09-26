@@ -42,7 +42,6 @@ class copyright_status_updated extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'u'; // c(reate), r(ead), u(pdate), d(elete)
         $this->data['edulevel'] = self::LEVEL_TEACHING;
-        $this->data['objecttable'] = 'block_ucla_copyright_status';
     }
 
     /**

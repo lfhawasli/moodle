@@ -27,9 +27,7 @@ Scenario: Upload same file twice and copyright status drop down only show once f
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file1"
     And I follow "Week 1"
     And I add a "File" to section "1" and I fill the form with:
@@ -38,9 +36,7 @@ Scenario: Upload same file twice and copyright status drop down only show once f
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     And I should see "Test file1" in the "//tr[@class='r0 lastrow']/descendant::td[@class='cell c0']" "xpath_element"
     And I should see "Test file2" in the "//tr[@class='r0 lastrow']/descendant::td[@class='cell c0']" "xpath_element"
     And "//tr[@class='r0 lastrow']/descendant::td[@class='cell c0']/descendant::select[contains(@name,'filecopyright_')]" "xpath_element" should exist
