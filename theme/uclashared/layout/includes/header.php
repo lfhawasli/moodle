@@ -30,16 +30,15 @@
 $sitelogohtml = $OUTPUT->logo('ucla-logo', 'theme');
 // Get extra site logos
 $extrasitelogos = $OUTPUT->course_logo();
-// Check for custom logo 
-$customheaderlogo = isset($OUTPUT->hascustomheaderlogo) && 
-        $OUTPUT->hascustomheaderlogo ? 'header-custom-logo' : '';
+// Append custom logo classes
+$headerclasses = isset($OUTPUT->headerclasses) ? $OUTPUT->headerclasses : array();
 
 ?>
 
 <?php if ($hasheading || $hasnavbar) { ?>
-    <header id="page-header" class="container-fluid">
+    <header id="page-header" class="container-fluid <?php echo implode(' ', $headerclasses) ?>">
         <div class="header-border visible-xs"></div>
-        <div class="header-main <?php echo $customheaderlogo; ?> row">
+        <div class="header-main row">
             <div class="header-logo">
                 <?php echo  $sitelogohtml; ?>
             </div>
@@ -51,7 +50,7 @@ $customheaderlogo = isset($OUTPUT->hascustomheaderlogo) &&
                     }
                     ?>
                 </div>
-            </div>            
+            </div>
         </div>
         <div class="header-system row" >
             <div class="col-sm-4">
@@ -67,13 +66,11 @@ $customheaderlogo = isset($OUTPUT->hascustomheaderlogo) &&
 
 // Render extra site logos if available.
 if (!empty($extrasitelogos)) { ?>
-<div class="course-logo-layout container-fluid" >
+<div class="course-logo-layout" >
     <div class="course-logo-image">
         <?php echo $extrasitelogos ?>
     </div>
-    <div class="course-logo-title">
-        <h1><?php echo $COURSE->fullname ?></h1>
-    </div>
+    <h1 class="course-logo-title"><?php echo $COURSE->fullname ?></h1>
 </div>
 <?php
 }
