@@ -46,3 +46,6 @@
 [submodule "grade/report/history"]
 	path = grade/report/history
 	url = https://github.com/ccle/moodle-gradereport_history.git
+[submodule "report/rolescapabilities"]
+	path = report/rolescapabilities
+	url = https://github.com/ccle/moodle-report-rolescapabilities.git
