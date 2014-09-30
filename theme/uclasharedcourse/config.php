@@ -54,6 +54,15 @@ $THEME->layouts = array(
             'customlogo' => true
         )
     ),
+    'admin' => array(
+        'file' => $tf_general,
+        'regions' => array('side-pre'),
+        'defaultregion' => 'side-pre',
+        'options' => array(
+            'controlpanel' => true,
+            'customlogo' => true
+        )
+    ),
 );
 
 $THEME->csspostprocess = 'uclashared_process_css';

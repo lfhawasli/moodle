@@ -8,7 +8,7 @@ require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_renderer {
 
     public $coursetheme = true;
-    public $hascustomheaderlogo = false;
+    public $headerclasses = array();
     
     private $theme = 'theme';
     private $component = 'theme_uclasharedcourse';
@@ -41,6 +41,15 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
             $logo_alt = $COURSE->fullname; //get_string('UCLA_CCLE_text', 'theme_uclashared');
             $logo_img = html_writer::img($pix_url, $logo_alt);
             $alternative_logo = html_writer::link($address, $logo_img);
+            
+            // Save the category and course short name as CSS classes
+            $categoryname = str_replace(' ', '-', $category->name);
+            $categoryname = str_replace('_', '-', $categoryname);
+            $coursename = str_replace(' ', '-', $COURSE->shortname);
+            $coursename = str_replace('_', '-', $coursename);
+            
+            $this->headerclasses[] = $categoryname;
+            $this->headerclasses[] = $coursename;
         }
 
         // If a site is 'private', then we only display logos to enrolled users
@@ -50,20 +59,10 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
             $is_private = true;
         }
 
-        // Now look for additional logos
-        $additional_logos = '';
-//        if (($is_private && $this->is_enrolled_user()) || !$is_private) {
-//            $additional_logos = $this->course_logo($COURSE->id);
-//        }
-
         // if main logo is overridden, then return that html
         if (!empty($alternative_logo)) {
-            $this->hascustomheaderlogo = true;
-            return $alternative_logo . $additional_logos;
-        } else if (!empty($additional_logos)) {
-            // maybe we just have alternative sublogos, but keep main logo
-            $main_logo = parent::logo($pix, $pix_loc);
-            return $main_logo . $additional_logos;
+            $this->headerclasses[] = 'header-custom-logo';
+            return $alternative_logo;
         } else {
             // Use default logo as a fallback
             return parent::logo($pix, $pix_loc);

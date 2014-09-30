@@ -1,41 +1,63 @@
 
-/*@import "uclatheme";*/
+@import "compass";
 
+.ucla-search {
+    display: inline-block;
 
-.pagelayout-frontpage {
-    .ucla-search .yui3-aclist {
+    // YUI styles override
+    .yui3-aclist {
         position: relative;
         display: inline-block;
+        
+        #browsebymain & {
+            position: absolute;
+        }
     }
-}
-.ucla-search:not(.frontpage-search):not(.course-search):not(.collab-search) {
-    margin-bottom: 8px;
-    
+
+    .yui3-aclist-list {
+        border: 1px solid #eee;
+        border-top: 0;
+        border-bottom: 0;
+        text-align: left;
+    }
+        
     .yui3-aclist-content {
         box-shadow: 0 0 0;
         border: 0;
     }
-    .yui3-aclist-item-active {
-        /*background-color: darken($brand-primary, 10%);*/
-    }
-    .yui3-aclist-item-hover {
-        /*background-color: lighten($brand-primary, 30%);*/
-    }
-    #ucla-search-block.yui3-aclist-input {
-        /*@include border-radius(4px);*/
-    }
+    
     .input-group {
         margin-top: 4px;
     }
-}
-
-.ucla-search {
-    .btn {
-        border-top-left-radius: 0 !important;
-        border-bottom-left-radius: 0 !important;
+        
+    // Browseby overrides
+    #browsebymain & {
+        width: 100%;
+        padding: 0 15%;
     }
+    
+    // Front page layout overrides
+    .pagelayout-frontpage & {
+        width: 100%;
+        text-align: center;
+        
+        label {
+            font-weight: 300;
+        }
+    }
+    
 }
 
+// Input box
+#ucla-search,
+#ucla-search-block {
+    width: 100%;
+    margin-top: 4px;
+    
+    @include border-radius(0);
+}
+
+// Search results formatting
 .search-result {
     .shortname {
         font-weight: bold;
