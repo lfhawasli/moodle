@@ -20,6 +20,29 @@ Background:
     And I follow "Week 1"
 
 @javascript
+Scenario: Copyright Status filter dropdown works
+    Given I add a "File" to section "1" and I fill the form with:
+      | Name | Test file A |
+      | Description | Test file A with Copyright status not yet identified to this file |
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
+    And I press "Save and return to course"
+    And I follow "Manage copyright"
+    Then I should see "Test file A"
+    And I set the field "filter_copyright" to "I own the copyright"
+    Then I should not see "Test file A"
+
+@javascript
+Scenario: Copyright Status for the uploaded file and filter are default to "Copyright status not yet identified"
+    Given I add a "File" to section "1" and I fill the form with:
+      | Name | Test file B |
+      | Description | Test file B with Copyright status not yet identified to this file |
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
+    And I press "Save and return to course"
+    And I follow "Manage copyright"
+    And "//select[@class='select autosubmit']/option[@value='tbd' and @selected='selected']" "xpath_element" should exist
+    And "//div[@class='block-ucla-copyright-status-list']/descendant::select/option[@value='tbd' and @selected='selected']" "xpath_element" should exist
+
+@javascript
 Scenario: Copyright Status: "I own the copyright" works
     Given I add a "File" to section "1" and I fill the form with:
       | Name | Test file with I own copyright status |
@@ -27,9 +50,7 @@ Scenario: Copyright Status: "I own the copyright" works
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with I own copyright status"
     And I click on "I own the copyright" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -43,9 +64,7 @@ Scenario: Copyright Status: "The UC Regents own the copyright" works
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with The UC Regents own the copyright status"
     And I click on "The UC Regents own the copyright" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -59,9 +78,7 @@ Scenario: Copyright Status: "Item is licensed by the UCLA Library" works
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with Item is licensed by the UCLA Library status"
     And I click on "Item is licensed by the UCLA Library" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -75,9 +92,7 @@ Scenario: Copyright Status: "Item is in the public domain" works
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with Item is in the public domain status"
     And I click on "Item is in the public domain" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -91,9 +106,7 @@ Scenario: Copyright Status: "Item is available for this use via Creative Commons
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with Item is available for this use via Creative Commons license status"
     And I click on "Item is available for this use via Creative Commons license" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -107,9 +120,7 @@ Scenario: Copyright Status: "I have obtained written permission from the copyrig
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with I have obtained written permission from the copyright holder status"
     And I click on "I have obtained written permission from the copyright holder" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -123,9 +134,7 @@ Scenario: Copyright Status: "I am using this item under fair use" works
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with I am using this item under fair use status"
     And I click on "I am using this item under fair use" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
@@ -139,9 +148,7 @@ Scenario: Copyright Status: "Copyright status not yet identified" works
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I follow "Manage copyright"
-    And I wait "2" seconds
     And I set the field "filter_copyright" to "All"
-    And I wait "2" seconds
     Then I should see "Test file with Copyright status not yet identified status"
     And I click on "Copyright status not yet identified" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"

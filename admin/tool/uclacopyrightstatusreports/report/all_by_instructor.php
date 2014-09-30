@@ -45,7 +45,7 @@ echo html_writer::tag('span', html_writer::link($baseurl . '/index.php', get_str
 echo html_writer::tag('span', html_writer::link($baseurl . '/report/all_filter.php', get_string('filterpage', 'tool_uclacopyrightstatusreports')),array('class'=>'spacer'));
 
 // Prepare data
-$list = get_copyright_list_by_instructor(&$filter_array);
+$list = get_copyright_list_by_instructor($filter_array);
 
 // Start output
 if (empty($list)) {

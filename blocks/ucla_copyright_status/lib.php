@@ -232,12 +232,12 @@ function display_copyright_status_contents($courseid, $filter) {
     echo html_writer::tag('span',
             get_string('copyright_status', 'block_ucla_copyright_status'),
             array('id' => 'block_ucla_copyright_status_t1'));
-    echo html_writer::select($license_options, 'filter_copyright', $filter,
-            false,
-            array('id' => 'block_ucla_copyright_status_id_filter_copyright'));
-    $PAGE->requires->js_init_call('M.util.init_select_autosubmit',
-            array('form_copyright_status_list', 'block_ucla_copyright_status_id_filter_copyright',
-        ''));
+    echo html_writer::select($license_options, 'filter_copyright', $filter, false,
+            array('id' => 'block_ucla_copyright_status_id_filter_copyright', 'class' => 'autosubmit'));
+    $PAGE->requires->yui_module('moodle-core-formautosubmit',
+           'M.core.init_formautosubmit',
+           array(array('selectid' => 'block_ucla_copyright_status_id_filter_copyright', 'nothing' => false))
+           );
     echo html_writer::end_tag('div');
     // end display copyright filter
     // display copyright status list
