@@ -20,13 +20,15 @@
     .mod-indent {
         text-align: center;
         vertical-align: center;
+        display: inline-block;
+        width: 100%;
 
         img {
             display: none;
         }
         .instancename {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 30px;
             font-size: 2.5rem;
             font-weight: bold;
             text-shadow: 0px 2px 3px #fff;
@@ -41,20 +43,24 @@
     }
 }
 
-// Make the progress bar 100% width
-.editing .mod-indent {
-    display: inline !important;
-    
-    > .activityinstance {
-        padding-right: 0 !important;
-        display: inline-block !important;
-        width: 100%;
-    }
-}
-
 /// Modify the progress bar
 // --------------------------------------------------
 
+// Do this only for editing mode
+.editing {
+    // Make the progress bar 100% width
+    .activity > .mod-indent {
+        display: inline !important;
+
+        > .activityinstance {
+            padding-right: 0 !important;
+            display: inline-block !important;
+            width: 100%;
+        }
+    }
+}
+
+// Inherit bootstrap styles.
 .dndupload-progress-outer {
     @extend .progress;
     @extend .progress-striped;
