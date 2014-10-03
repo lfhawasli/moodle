@@ -318,8 +318,16 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
             // Show an arrow above first item.
             $arrow = $k === 0 ? html_writer::span('', 'arrow-up') : '';
+            $url = $child->get_url();
+
+            // For help requests, get URL with courseid.
+            // Assume this link is the first item in the menu.
+            if ($k === 0) {
+                $url = $this->call_separate_block_function('ucla_help', 'get_action_link');
+            }
+
             $items[] = html_writer::tag('li',
-                html_writer::link($child->get_url(), $arrow . $child->get_text())
+                html_writer::link($url, $arrow . $child->get_text())
             );
         }
 
