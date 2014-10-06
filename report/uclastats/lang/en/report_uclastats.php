@@ -280,6 +280,9 @@ $string['research'] = 'Research';
 $string['test'] = 'Test';
 $string['private'] = 'Private';
 $string['tasite'] = 'TA site';
+$string['uncategorized'] = 'Uncategorized';
+$string['collabsitelisting'] = 'List of collaboration sites';
+$string['collabsitetype'] = 'Site type';
 
 // Strings for Syllabus by division.
 $string['syllabus_by_division'] = 'Syllabus by division';
