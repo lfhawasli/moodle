@@ -35,6 +35,12 @@
             .header-main {
                 background: none;
             }
+            // Keep text background prod-blue
+            .btn-header-text {
+                background-color: $header-color-prod;
+                height: $header-height;
+                vertical-align: top;
+            }
             
             @include respond-xs {
                 // Make the logos responsive
@@ -50,6 +56,7 @@
             .header-logo {
                 width: 180px;
                 overflow: hidden;
+                float: left;
                 
                 @include respond-md {
                     width: auto;
@@ -64,8 +71,32 @@
             }
         }
         
-        // Engineering & EXEC logo styles have slightly different look.
-        &.hsseas,
+        // Clip engineering logo for smaller screens
+        &.hsseas {
+            .header-logo {
+                margin-top: 2px;
+                width: 260px;
+                height: 32px;
+                overflow: hidden;
+                float: left;
+                
+                @include respond-md {
+                    width: auto;
+                    height: auto;
+                    margin-top: 0;
+                }
+                @include respond-xs {
+                    display: block;
+                    margin: 0 auto;
+                    margin-bottom: 4px;
+                    img {
+                        max-width: inherit;
+                    }
+                }
+            }
+        }
+        
+        // EXEC logo styles have slightly different look.
         &.executive-education-program {
             height: 62px;
             

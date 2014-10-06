@@ -214,21 +214,23 @@ class invitation_form extends moodleform {
      * @return string
      */
     private function format_role_string($role) {
-        $role_string = html_writer::tag('span', $role->name . ':',
+        $rolestring = html_writer::tag('span', $role->name . ':',
                 array('class' => 'role-name'));
 
         // Role description has a <hr> tag to separate out info for users
         // and admins.
-        $role_description = explode('<hr />', $role->description);
+        $role->description = str_ireplace(array('<hr />', '<hr/>'), '<hr>', $role->description);
+        $roledescription = explode('<hr>', $role->description);
 
-        // Need to clean html, because tinymce adds a lot of extra tags that mess up formatting.
-        $role_description = $role_description[0];
+        // Need to clean html, because TinyMCE adds a lot of extra tags that 
+        // mess up formatting.
+        $roledescription = $roledescription[0];
         // Whitelist some formatting tags.
-        $role_description = strip_tags($role_description, '<b><i><strong><ul><li><ol>');
+        $roledescription = strip_tags($roledescription, '<b><strong><i><em><ul><li><ol>');
 
-        $role_string .= ' ' . $role_description;
+        $rolestring .= ' ' . $roledescription;
 
-        return $role_string;
+        return $rolestring;
     }
 
     /**
