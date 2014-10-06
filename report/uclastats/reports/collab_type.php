@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/report/uclastats/locallib.php');
 require_once($CFG->libdir . '/coursecatlib.php');
 
 class collab_type extends uclastats_base {
-
+    
     /**
      * Given a category id, try to work through the category and its parents
      * trying to find a corresponding name match in the given division list.
@@ -112,6 +112,151 @@ class collab_type extends uclastats_base {
     }
 
     /**
+     * Display two results tables. One, for the aggregated list of collaboration 
+     * sites by division, and, two, a listing of those collaboration sites.
+     *
+     * @param uclastats_result $uclastats_result
+     * @return string
+     */
+    protected function get_results_table(uclastats_result $uclastats_result) {
+        $retval = '';
+
+        $results = $uclastats_result->results;
+        $courselisting = $results['courselisting'];
+        unset($results['courselisting']);
+
+        // Aggregated results.
+        $resultstable = new html_table();
+        $resultstable->id = 'uclastats-results-table';
+        $resultstable->attributes = array('class' => 'results-table ' .
+            get_class($this));
+
+        $resultstable->head = $uclastats_result->get_header();
+        $resultstable->data = $results;
+
+        $retval = html_writer::table($resultstable);
+
+        // Need to support old reports that don't have site listing.
+        if (empty($courselisting)) {
+            return $retval;
+        }        
+        
+        $retval .= html_writer::tag('h3', get_string('collabsitelisting', 'report_uclastats'));
+        
+        // Collaboration site listing.
+        $listingtable = new html_table();
+        $listingtable->id = 'uclastats-courselisting-table';
+        $listingtable->attributes = array('class' => 'results-table ' .
+            get_class($this));
+
+        $listingtable->head = array(get_string('division', 'report_uclastats'),
+                get_string('collabsitetype', 'report_uclastats'),
+                get_string('course_shortname', 'report_uclastats'));
+        $data = array();
+        foreach ($courselisting as $division => $sitetypes) {
+            foreach ($sitetypes as $sitetype => $course) {
+                foreach ($course as $courseid => $shortname) {
+                    $url = html_writer::link(
+                            new moodle_url('/course/view.php',
+                                    array('id' => $courseid)), $shortname,
+                            array('target' => '_blank'));
+                    $data[] = array($division, 
+                                    get_string($sitetype, 'report_uclastats'),
+                                    $url);
+                }
+            }
+        }
+        $listingtable->data = $data;
+
+        $retval .= html_writer::table($listingtable);
+
+        return $retval;
+    }    
+
+    /**
+     * Write out the aggregated results and the list of collaboration sites.
+     *
+     * @param MoodleExcelWorksheet $worksheet
+     * @param MoodleExcelFormat $boldformat
+     * @param uclastats_result $uclastats_result
+     * @param int $row      Row to start writing.
+     *
+     * @return int          Return row we stopped writing.
+     */
+    protected function get_results_xls(MoodleExcelWorksheet $worksheet,
+            MoodleExcelFormat $boldformat, uclastats_result $uclastats_result, $row) {
+
+        $results = $uclastats_result->results;
+        $courselisting = $results['courselisting'];
+        unset($results['courselisting']);
+
+        // Display aggregated results.
+        $col = 0;
+        $header = $uclastats_result->get_header();
+        foreach ($header as $name) {
+            $worksheet->write_string($row, $col, $name, $boldformat);
+            ++$col;
+        }
+
+        // Now go through result set.
+        foreach ($results as $result) {
+            ++$row; $col = 0;
+            foreach ($result as $value) {
+                // Values might have HTML in them.
+                $value = clean_param($value, PARAM_NOTAGS);
+                if (is_numeric($value)) {
+                    $worksheet->write_number($row, $col, $value);
+                } else {
+                    $worksheet->write_string($row, $col, $value);
+                }
+                ++$col;
+            }
+        }
+
+        // Need to support old reports that don't have site listing.
+        if (empty($courselisting)) {
+            return $row;
+        }        
+        
+        $row += 2; $col = 0;
+        $worksheet->write_string($row, $col,
+                get_string('collabsitelisting', 'report_uclastats'), $boldformat);
+        $row++; 
+        
+        // Display course listings table header.
+        $header = array(get_string('division', 'report_uclastats'),
+                get_string('collabsitetype', 'report_uclastats'),
+                get_string('course_shortname', 'report_uclastats'));
+        foreach ($header as $name) {
+            $worksheet->write_string($row, $col, $name, $boldformat);
+            ++$col;
+        }
+
+        // Now go through courselisting set.
+        foreach ($courselisting as $division => $sitetypes) {
+            foreach ($sitetypes as $sitetype => $course) {
+                foreach ($course as $courseid => $shortname) {                    
+                    ++$row; $col = 0;
+
+                    // Division.
+                    $worksheet->write_string($row, $col, $division);
+                    ++$col;
+                    
+                    // Site type.
+                    $worksheet->write_string($row, $col, 
+                            get_string($sitetype, 'report_uclastats'));
+                    ++$col;
+                    
+                    // Shortname.
+                    $worksheet->write_string($row, $col, $shortname);                    
+                }
+            }
+        }
+
+        return $row;
+    }    
+
+    /**
      * Helper method to setup the result array for a given division.
      * 
      * @param string $division
@@ -131,6 +276,7 @@ class collab_type extends uclastats_base {
         $retval[siteindicator_manager::SITE_TYPE_PRIVATE] = 0;
         $retval[siteindicator_manager::SITE_TYPE_TASITE] = 0;
         $retval[siteindicator_manager::SITE_TYPE_TEST] = 0;
+        $retval['uncategorized'] = 0;
 
         return $retval;
     }
@@ -143,9 +289,10 @@ class collab_type extends uclastats_base {
      */
     public function query($params) {
         global $DB;
-
-        // First get list of divisions.
         $retval = array();
+        $courselisting = array();
+        
+        // First get list of divisions.
         $divisions = $DB->get_records_menu('ucla_reg_division', null,
                 'fullname', 'code, fullname');
 
@@ -153,6 +300,7 @@ class collab_type extends uclastats_base {
         foreach ($divisions as $division) {
             $initializeddiv = $this->init_division($division);
             $retval[$initializeddiv['division']] = $initializeddiv;
+            $courselisting[$initializeddiv['division']] = array();
         }
         unset($divisions);
         $divisions = array_keys($retval);
@@ -165,13 +313,14 @@ class collab_type extends uclastats_base {
         }
 
         // Then get list of collaboration sites.
-        $sql = "SELECT  c.id,
-                        c.shortname,
-                        c.category,
-                        s.type
-                FROM    {course} AS c,
-                        {ucla_siteindicator} AS s
-                WHERE   s.courseid = c.id";
+        $sql = "SELECT c.id,
+                       c.shortname,
+                       c.category,
+                       s.type
+                  FROM {course} AS c
+             LEFT JOIN {ucla_request_classes} AS urc ON (urc.courseid = c.id) 
+             LEFT JOIN {ucla_siteindicator} AS s ON (s.courseid = c.id)
+                 WHERE urc.id IS NULL";
 
         // Check if start and/or end time is specified.
         if (!empty($params['startdate'])) {
@@ -179,7 +328,8 @@ class collab_type extends uclastats_base {
         }
         if (!empty($params['enddate'])) {
             $sql .= " AND c.timecreated<=:enddate";
-        }
+        }        
+        $sql .= " ORDER BY c.shortname";
 
         $sites = $DB->get_recordset_sql($sql, $params);
         if ($sites->valid()) {
@@ -189,6 +339,10 @@ class collab_type extends uclastats_base {
                     // Could not find division, so use other.
                     $division = 'Other';
                 }
+                
+                if (empty($site->type)) {
+                    $site->type = 'uncategorized';
+                }
 
                 // Increment division counts.
                 ++$retval[$division]['total'];
@@ -196,7 +350,10 @@ class collab_type extends uclastats_base {
 
                 // Increment total counts.
                 ++$retval['Total']['total'];
-                ++$retval['Total'][$site->type];               
+                ++$retval['Total'][$site->type];
+                
+                // Keep list of sites by department and type.
+                $courselisting[$division][$site->type][$site->id] = $site->shortname;
             }
 
             // Prune any division that has no collaboration sites.
@@ -204,9 +361,13 @@ class collab_type extends uclastats_base {
                 if (empty($data['total'])) {
                     unset($retval[$division]);
                 }
+                if (empty($courselisting[$division])) {
+                    unset($courselisting[$division]);
+                }
             }
         }
 
+        $retval['courselisting'] = $courselisting;        
         return $retval;
     }
 
