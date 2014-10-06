@@ -34,7 +34,10 @@ $filter  = optional_param('ifilter', 0, PARAM_INT);
 $search  = optional_param('search', '', PARAM_RAW);
 $role    = optional_param('role', 0, PARAM_INT);
 $fgroup  = optional_param('filtergroup', 0, PARAM_INT);
-$status  = optional_param('status', -1, PARAM_INT);
+// START UCLA MOD: CCLE-4418 - Do not display inactive users by default.
+//$status  = optional_param('status', -1, PARAM_INT);
+$status  = optional_param('status', ENROL_USER_ACTIVE, PARAM_INT);
+// END UCLA MOD: CCLE-4418
 
 // When users reset the form, redirect back to first page without other params.
 if (optional_param('resetbutton', '', PARAM_RAW) !== '') {
@@ -212,7 +215,10 @@ if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
 
 $filterform = new enrol_users_filter_form('users.php', array('manager' => $manager, 'id' => $id),
         'get', '', array('id' => 'filterform'));
-$filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role));
+// START UCLA MOD: CCLE-4418 - Do not display inactive users by default.
+//$filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role));
+$filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role, 'status' => $status));
+// END UCLA MOD: CCLE-4418
 
 $table->set_fields($fields, $renderer);
 

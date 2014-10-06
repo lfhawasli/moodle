@@ -553,7 +553,7 @@ $CFG->forced_plugin_settings['enrol_database']['remoterolefield'] = 'role';
 $CFG->forced_plugin_settings['enrol_database']['localcoursefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localuserfield'] = 'idnumber';
-$CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
+$CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 2;    // ENROL_EXT_REMOVED_SUSPEND
 
 // CCLE-2364 - SUPPORT CONSOLE (put after $_dirroot_, because needs $CFG->dataroot to be set)
 $log_date = date('Y-m-d') . '-00_00';

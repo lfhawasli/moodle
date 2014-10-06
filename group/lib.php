@@ -716,7 +716,10 @@ function groups_get_potential_members($courseid, $roleid = null, $cohortid = nul
 
     $context = context_course::instance($courseid);
 
-    list($esql, $params) = get_enrolled_sql($context);
+    // START UCLA MOD: CCLE-4418 - Do not display inactive users by default.
+    //list($esql, $params) = get_enrolled_sql($context);
+    list($esql, $params) = get_enrolled_sql($context, '', 0, true);
+    // END UCLA MOD: CCLE-4418
 
     if ($roleid) {
         // We are looking for all users with this role assigned in this context or higher.
