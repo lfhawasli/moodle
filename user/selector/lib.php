@@ -868,7 +868,10 @@ class group_non_members_selector extends groups_user_selector_base {
         list($searchcondition, $searchparams) = $this->search_sql($search, 'u');
 
         // Build the SQL.
-        list($enrolsql, $enrolparams) = get_enrolled_sql($context);
+        // START UCLA MOD: CCLE-4418 - Do not display inactive users by default.
+        //list($enrolsql, $enrolparams) = get_enrolled_sql($context);
+        list($enrolsql, $enrolparams) = get_enrolled_sql($context, '', 0, true);
+        // END UCLA MOD: CCLE-4418
         $fields = "SELECT r.id AS roleid, u.id AS userid,
                           " . $this->required_fields_sql('u') . ",
                           (SELECT count(igm.groupid)
