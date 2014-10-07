@@ -3093,7 +3093,7 @@ class assign {
                 $markingallocationoptions[$marker->id] = fullname($marker);
             }
         }
-
+        
         $markingworkflow = $this->get_instance()->markingworkflow;
         // Get marking states to show in form.
         $markingworkflowoptions = array();
@@ -3630,7 +3630,10 @@ class assign {
             'usershtml' => $usershtml,
         );
 
-        $markers = get_users_by_capability($this->get_context(), 'mod/assign:grade');
+        // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
+        //$markers = get_users_by_capability($this->get_context(), 'mod/assign:grade');
+        $markers = local_ucla_core_edit::get_course_graders($this->get_course());
+        // END UCLA MOD: CCLE-4770.
         $markerlist = array();
         foreach ($markers as $marker) {
             $markerlist[$marker->id] = fullname($marker);
@@ -5873,7 +5876,10 @@ class assign {
             $this->get_instance()->markingallocation &&
             has_capability('mod/assign:manageallocations', $this->context)) {
 
-            $markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
+            //$markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            $markers = local_ucla_core_edit::get_course_graders($this->course);
+            // END UCLA MOD: CCLE-4770.            
             $markerlist = array('' =>  get_string('choosemarker', 'assign'));
             foreach ($markers as $marker) {
                 $markerlist[$marker->id] = fullname($marker);
@@ -6256,7 +6262,10 @@ class assign {
             'usershtml' => ''   // initialise these parameters with real information.
         );
 
-        $markers = get_users_by_capability($this->get_context(), 'mod/assign:grade');
+        // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
+        //$markers = get_users_by_capability($this->get_context(), 'mod/assign:grade');
+        $markers = local_ucla_core_edit::get_course_graders($this->get_course());
+        // END UCLA MOD: CCLE-4770.
         $markerlist = array();
         foreach ($markers as $marker) {
             $markerlist[$marker->id] = fullname($marker);

@@ -59,3 +59,11 @@ Feature: Restrict grader drop down list to course members with grading permissio
     Then "Grader" "text" should exist in the "allocatedmarker" "select"
     And "Teacher" "text" should exist in the "allocatedmarker" "select"
     And "Manager" "text" should not exist in the "allocatedmarker" "select"
+    # Make sure bulk operations filter only shows local graders.
+    When I press "Cancel"
+    And I click on "Select all" "checkbox"
+    And I click on "Set allocated marker" "option" in the "select#id_operation" "css_element"
+    And I click on "Go" "button" confirming the dialogue
+    Then "Grader" "text" should exist in the "allocatedmarker" "select"
+    And "Teacher" "text" should exist in the "allocatedmarker" "select"
+    And "Manager" "text" should not exist in the "allocatedmarker" "select"
