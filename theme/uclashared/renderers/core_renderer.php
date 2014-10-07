@@ -45,6 +45,13 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     private $theme = 'theme_uclashared';
 
     /**
+     * Public theme name.
+     * 
+     * @var string 
+     */
+    public $theme_name = 'uclashared';
+    
+    /**
      * Returns separator used in header and footer links.
      * @return string
      */
