@@ -50,6 +50,8 @@ if ($showsidepre && !$showsidepost) {
     $bodyclasses[] = 'content-only';
 }
 
+$bodyclasses[] = 'theme-' . $OUTPUT->theme_name;
+
 $envflag = $OUTPUT->get_environment();
 
 // Start HTML output.

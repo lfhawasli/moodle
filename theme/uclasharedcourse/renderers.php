@@ -9,6 +9,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
     public $coursetheme = true;
     public $headerclasses = array();
+    public $theme_name = 'uclasharedcourse';
     
     private $theme = 'theme';
     private $component = 'theme_uclasharedcourse';
