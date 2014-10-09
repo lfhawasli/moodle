@@ -373,43 +373,6 @@ $frontpage-logo-bar-width:  175px;
         }
     }
         
-    // Customize the alert block
-    .block_ucla_alert {
-
-        .header-box {
-            background-color: white !important;
-            margin-bottom: 4px;
-            padding: 0px 4px;
-            
-            &.alert-header-default {
-                background: none;
-                border-bottom: 4px solid #75c326;
-            }
-            .header-subtitle {
-                font-size: 1.5rem;
-            }
-        }
-
-        .header-box * {
-            font-family: "Lato", verdana, Sans Serif;
-            font-size: 2.7rem;
-            text-shadow: 0 0 0;
-            text-transform: none;
-            font-weight: 300;
-            color: #444;
-            /*text-align: left;*/
-        }
-        
-        .content {
-            > .box-boundary {
-                padding: 0 16px;
-            }
-/*            > div > .box-boundary {
-                padding: 0 16px;
-            }*/
-        }
-    }
-    
     /// Customize the browseby block
     .block_ucla_browseby {
         padding: 8px;
