@@ -179,6 +179,23 @@ $CFG->gradebook_send_updates = 1;
 // CCLE-2810 - My Sites - disallow customized "My Moodle" page
 $CFG->forcedefaultmymoodle = true;
 
+// SSC-2223 - Video Annotation 2.7
+$CFG->tna_webservice_url = array(   "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                                    "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                                    "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                                    "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                                    "http://tvnews.library.ucla.edu/util/webservice.php", 
+                                    "http://newsscape.library.ucla.edu/util/webservice.php", 
+                                    "https://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php");
+$CFG->tna_permalink_url = array(    "http://www.sscnet.ucla.edu/tna/setesting/video,", 
+                                    "http://www.sscnet.ucla.edu/tna/edge/video,", 
+                                    "http://www.sscnet.ucla.edu/csa/search/video,", 
+                                    "http://dcl.sscnet.ucla.edu/search/video,", 
+                                    "http://tvnews.library.ucla.edu/video,", 
+                                    "http://newsscape.library.ucla.edu/video,", 
+                                    "https://tvnews.sscnet.ucla.edu/edge/video,");
+$CFG->tna_streamer_url = "rtmp://169.232.194.193/csa";
+
 // to enable database unit testing
 $CFG->unittestprefix = 'tst_';
 
