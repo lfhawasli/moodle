@@ -24,6 +24,7 @@
 
 /**
  * Called before theme outputs anything.
+ * Inject a FERPA waiver for tools that send student data to a 3rd party.
  *
  * @param moodle_page $page
  */
@@ -34,6 +35,12 @@ function theme_uclashared_page_init(moodle_page $page) {
     // Need to check for redirect layout or else we will end up in an infinite
     // loop, since the redirect() function calls page init again.
     if ($page->pagelayout != 'redirect' && isset($context) && isset($url)) {
+        // If true, then user needs to sign waiver.
+        if (local_ucla_ferpa_waiver::check($context, $url, $USER->id)) {
+            $redirecturl = local_ucla_ferpa_waiver::get_link($context, $url);
+            redirect($redirecturl, get_string('ferpawaiverrequired', 'local_ucla'), 0);
+        }
+
         // Do not attempt to autologin on login pages.
         $urlstring = $url->out();
         if (strpos($urlstring, '/login/') !== false ||
@@ -48,11 +55,11 @@ function theme_uclashared_page_init(moodle_page $page) {
 }
 
 /**
- * Process a CSS directive to load a font.  Currently works for Bootstrap3 glyphicons.
+ * Process a CSS directive to load a font. Currently works for Bootstrap3 glyphicons.
  * SSC-2778: This filter now also gives choice for the frontpage image! The image
  * is specified in the config file, where its title is set in the config variable
  * "$CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'];".
- * 
+ *
  * @global type $CFG
  * @param type $css
  * @param type $theme
