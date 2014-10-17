@@ -49,3 +49,9 @@
 [submodule "report/rolescapabilities"]
 	path = report/rolescapabilities
 	url = https://github.com/ccle/moodle-report-rolescapabilities.git
+[submodule "blocks/attendance"]
+	path = blocks/attendance
+	url = https://github.com/ccle/moodle-block_attendance.git
+[submodule "mod/attendance"]
+	path = mod/attendance
+	url = https://github.com/ccle/moodle-mod_attendance.git
