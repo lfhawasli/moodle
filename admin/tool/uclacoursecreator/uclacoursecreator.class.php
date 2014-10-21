@@ -1148,10 +1148,13 @@ class uclacoursecreator {
                     . ', putting course into ' . $category->name);
             }
 
-            if ($this->match_summer($term)) {
-                // TODO CCLE-2541 make this configurable: number of 
-                // section in summer?
+            $session = $rci_object->session;
+            if ($session == '6A' || $session == '6C') {
                 $courseobj->numsections = 6;
+            } else if ($session == '8A') {
+                $courseobj->numsections = 8;
+            } else {
+                $courseobj->numsections = 10;
             }
 
             $courseobj->category = $category->id;
@@ -2422,16 +2425,6 @@ class uclacoursecreator {
         }
 
         return $oldobj;
-    }
-
-    /**
-     *  Check if the term is summer.
-     *
-     *  @param $term The term to check.
-     *  @return boolean Is the term a summer term?
-     **/
-    function match_summer($term) {
-        return is_summer_term($term);
     }
 
     /**
