@@ -734,6 +734,14 @@ function request_parse_input($key, $value) {
     $vals = array();
     preg_match('/^([new_0-9]*)-(.*)$/', $key, $vals);
 
+    if (is_array($value)) {
+        foreach ($value as $index => $content) {
+            $value[$index] = trim($value[$index]);
+        }
+    } else {
+        $value = trim($value);
+    }
+
     $x = 1;
     if ($vals && count($vals) >= 2) {
         $set = $vals[$x++];
