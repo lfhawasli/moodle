@@ -84,7 +84,12 @@ class backup_course_task extends backup_task {
         $this->add_step(new backup_enrolments_execution_step('annotate_enrol_custom_fields'));
 
         // Annotate all the groups and groupings belonging to the course
-        $this->add_step(new backup_annotate_course_groups_and_groupings('annotate_course_groups'));
+        // BEGIN UCLA MOD: SSC-2572 - Importing course site also imports groups and groupings
+        //$this->add_step(new backup_annotate_course_groups_and_groupings('annotate_course_groups'));
+        if ($this->plan->get_mode() != backup::MODE_IMPORT) {
+            $this->add_step(new backup_annotate_course_groups_and_groupings('annotate_course_groups'));
+        }
+        // END UCLA MOD: SSC-2572
 
         // Annotate the groups used in already annotated groupings (note this may be
         // unnecessary now that we are annotating all the course groups and groupings in the

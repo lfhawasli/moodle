@@ -890,9 +890,18 @@ class restore_groups_structure_step extends restore_structure_step {
                                                FROM {groups}
                                               WHERE courseid = :courseid
                                                 AND name = :grname $description_clause", $params)) {
-            // group doesn't exist, create
-            $newitemid = $DB->insert_record('groups', $data);
-            $restorefiles = true; // We'll restore the files
+            // BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
+            // grouping doesn't exist, create
+            //$newitemid = $DB->insert_record('groupings', $data);
+            //$restorefiles = true; // We'll restore the files
+            if ($this->task->get_setting_value('groups') || $data->name == 'Course members') {
+                // group doesn't exist, create
+                $newitemid = $DB->insert_record('groups', $data);
+                $restorefiles = true; // We'll restore the files
+            } else {
+                $newitemid = $oldid;
+            }
+            // END UCLA MOD: SSC-2572
         } else {
             // group exists, use it
             $newitemid = $groupdb->id;
@@ -935,9 +944,18 @@ class restore_groups_structure_step extends restore_structure_step {
                                                   FROM {groupings}
                                                  WHERE courseid = :courseid
                                                    AND name = :grname $description_clause", $params)) {
-            // grouping doesn't exist, create
-            $newitemid = $DB->insert_record('groupings', $data);
-            $restorefiles = true; // We'll restore the files
+            // BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
+            // group doesn't exist, create
+            //$newitemid = $DB->insert_record('groups', $data);
+            //$restorefiles = true; // We'll restore the files
+            if ($this->task->get_setting_value('groups') || $data->name == 'Private Course Material') {
+                // grouping doesn't exist, create
+                $newitemid = $DB->insert_record('groupings', $data);
+                $restorefiles = true; // We'll restore the files
+            } else {
+                $newitemid = $oldid;
+            }
+            // END UCLA MOD: SSC-2572
         } else {
             // grouping exists, use it
             $newitemid = $groupingdb->id;
