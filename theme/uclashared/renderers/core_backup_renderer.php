@@ -87,18 +87,6 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         $hasrestoreoption = false;
 
         $html  = html_writer::start_tag('div', array('class'=>'backup-course-selector backup-restore'));
-        if ($wholecourse && !empty($categories) && ($categories->get_count() > 0 || $categories->get_search())) {
-            // New course
-            $hasrestoreoption = true;
-            $html .= $form;
-            $html .= html_writer::start_tag('div', array('class'=>'bcs-new-course backup-section'));
-            $html .= $this->output->heading(get_string('restoretonewcourse', 'backup'), 2, array('class'=>'header'));
-            $html .= $this->backup_detail_input(get_string('restoretonewcourse', 'backup'), 'radio', 'target', backup::TARGET_NEW_COURSE, array('checked'=>'checked'));
-            $html .= $this->backup_detail_pair(get_string('selectacategory', 'backup'), $this->render($categories));
-            $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('form');
-        }
 
         if ($wholecourse && !empty($currentcourse)) {
             // Current course
@@ -121,6 +109,19 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
             }
             // END UCLA MOD: CCLE-3446
 
+            $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('form');
+        }
+
+        if ($wholecourse && !empty($categories) && ($categories->get_count() > 0 || $categories->get_search())) {
+            // New course
+            $hasrestoreoption = true;
+            $html .= $form;
+            $html .= html_writer::start_tag('div', array('class'=>'bcs-new-course backup-section'));
+            $html .= $this->output->heading(get_string('restoretonewcourse', 'backup'), 2, array('class'=>'header'));
+            $html .= $this->backup_detail_input(get_string('restoretonewcourse', 'backup'), 'radio', 'target', backup::TARGET_NEW_COURSE, array('checked'=>'checked'));
+            $html .= $this->backup_detail_pair(get_string('selectacategory', 'backup'), $this->render($categories));
             $html .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
             $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('form');
