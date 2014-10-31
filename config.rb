@@ -14,6 +14,7 @@
 # 
 #   $ compass compile -e production --force 
 
+require './compass.rb'
 require 'sass-css-importer'
 add_import_path Sass::CssImporter::Importer.new("vendor")
 
@@ -48,27 +49,30 @@ output_style = (environment == :production) ? :compressed : :expanded
 # This scheme also gives module sass access to all the mixins defined for the project theme, 
 # so that it's possible to require any dependency in your local module styles.scss file
 # 
-watch "**/sass/styles.scss" do |project_dir, relative_path|
+watch "**/sass/*.scss" do |project_dir, relative_path|
   if File.exists?(File.join(project_dir, relative_path))
     
     ## Compile compass inside compass, whoa!
-    cmd = "compass compile --sass-dir #{relative_path.gsub(/\/styles.scss/, '')} --css-dir #{relative_path.gsub(/\/sass\/styles.scss/, '')} -I #{sass_dir} -e production"
-    puts cmd
     
-    ## Do system call
+    # Print a 'modified filename' message
+    print " modified ".brown
+    print relative_path
+    print "\n"
+
+    # Create the SASS path
+    module_sass = relative_path.sub(/sass\/_?.*\.scss/, "sass/")
+    # Create the CSS path
+    module_css = relative_path.sub(/sass\/_?.*\.scss/, "")
+
+    # Generate the compile command and run system call.
+    cmd = "compass compile --sass-dir #{module_sass} --css-dir #{module_css} -I #{sass_dir} -e production"
     system(cmd)
 
-    ## This is another way of doing it in pure ruby, but not possible with watch...
-    ## Save for reference
-    # Compass.add_configuration(
-    #     {
-    #         :project_path => '.',
-    #         :sass_path => "#{relative_path.gsub(/\/styles.scss/, '')}",
-    #         :css_path => "#{relative_path.gsub(/\/sass\/styles.scss/, '')}"
-    #     },
-    #     'moodle-modules'
-    # )
-    # Compass.compiler.compile('styles.scss', 'style2.css')
+    # Print a 'wrote styles.css' message
+    print "    write ".green
+    print "#{module_css}styles.css"
+    print "\n"
+
   end
 end
 

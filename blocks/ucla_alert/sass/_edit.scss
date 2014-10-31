@@ -102,37 +102,6 @@
     text-align: right;
 }
 
-// HEADER EDIT TEXT BOX 
-.alert-edit-header .alert-edit-header-wrapper .alert-edit-text-box {
-    margin: 5px;
-    border: 5px solid #88B851;
-}
-.alert-edit-header .alert-edit-text-box.alert-header-yellow {
-    border-color: #EDB83D;
-}
-.alert-edit-header .alert-edit-text-box.alert-header-red {
-    border-color: #E17D68;
-}
-.alert-edit-header .alert-edit-text-box.alert-header-blue {
-    border-color: #47BCBB;
-}
-
-// HEADER SELECT HIGHTLIGHT 
-.block-ucla-alert .header-box.header-selected {
-    border: 10px solid white;
-}
-.block-ucla-alert .header-box.header-selected:before {
-    color: white;
-    content: '✔';
-    font-size: 1em;
-    font-weight: bold;
-    left: -1px;
-    padding: 3px 7px;
-    position: relative;
-    top: -1px;
-}
-
-
 .alert-edit-commit-box {
     width: 100%;
     display: block;
@@ -221,113 +190,58 @@
     top: -1px;
 }
 
-// BANNER ELEMENTS 
-
-.banner-alert-header {
-    clear: both;
-    display: inline-block;
-    width: 178px;
-}
-.banner-ucla-alert {
-    width: 100%;
-    margin-top: 10px;
-    padding: 0 10px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-}
-.banner-ucla-alert-content {
-    background-color: #FAFAF8;
-    border: 1px solid #EBEBE2;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.067);
-}
-.banner-alert-section {
-    clear: both;
-    display: inline-block;
-    vertical-align: top;
-}
-.banner-alert-section .box-boundary {
-    display: inline-block;
-}
-.banner-alert-section .box-section-title {
-    display: none;
-}
-.banner-alert-section .box-boundary .box-text {
-    font-size: 1.1em;
-    line-height: 1.1em;
-    color: #463A45;
-    margin-top: 4px;
-}
-
-// EXPIRES ITEM 
-.alert-item-expires {
-    border-top: 1px solid #CCC;
-}
-
-// BOUNDARY BOX -- GENERAL BOX 
-.region-content .ucla-alert .content .box-boundary,
-#ucla-alert .content .box-boundary {
-    display: block;
-    padding: 4px;
-    padding-top: 0;
-}
-
-.region-content .ucla-alert .box-boundary.divider,
-#ucla-alert .box-boundary.divider {
-    border-bottom: 1px solid #E9EBDF;
-}
-
-
-// HEADER BOX -- FOR MAIN SITE
-.block-ucla-alert .header-box,
-.region-content .ucla-alert .content .header-box {
-    padding: 4px 0;
-    text-align: center;
-}
-
-.block-ucla-alert .header-box {
-    background-color: #88B851;
-    min-height: 30px;
-    text-shadow:1px 1px 3px #648A38;
-}
-
-
-// HEADER COLOR OVERRIDES 
-.block-ucla-alert .header-box.alert-header-yellow {
-    background-color: #EDB83D;
-    text-shadow: 1px 1px 3px #CD9513;
-}
-.block-ucla-alert .header-box.alert-header-red {
-    background-color: #E17D68;
-    text-shadow: 1px 1px 2px #D64F33;
-}
-.block-ucla-alert .header-box.alert-header-blue {
-    background-color: #47BCBB;
-    text-shadow: 1px 1px 3px #389998;
-}
-
-.block-ucla-alert .header-box.alert-header-empty {
-    background-color: #D1DBEF;
-    text-shadow: 1px 1px 3px #6083C8;
-}
-.block-ucla-alert .content .header-box.alert-header-empty {
-    display: none;
-}
-
-// HEADER TITLE & SUBTITLE 
-.block-ucla-alert .header-title,
-.region-content .ucla-alert .header-title {
-    color: white;
-    font-size: 1.7em;
-    font-family: Impact, Gill Sans, sans-serif;
-    text-transform: uppercase;
-    line-height: 1.1em;
-    padding-top: 5px;
-}
-
-.block-ucla-alert .header-subtitle,
-.region-content .ucla-alert .header-subtitle {
-    color: white;
-    padding-left: 2px;
-    padding-right: 2px;
+#ucla-alert-edit {
+    
+    .alert-edit-header 
+        .header-box {
+        
+        font-weight: 300;
+        min-height: 30px;
+        padding: 4px 0;
+        text-align: center;
+        
+        .header-title {
+            font-size: 2rem;
+        }
+        
+        &:hover {
+            background-color: #f9f9f9;
+        }
+        
+        &.alert-header-default {
+            background-color: #dcf3d8;
+            border-bottom: 4px solid $alert-green;
+        }
+        &.alert-header-blue {
+            background-color: #d8f2f2;
+            border-bottom: 4px solid $alert-blue;
+        }
+        &.alert-header-red {
+            background-color: $alert-red;
+            border-bottom: 4px solid $alert-red;
+            color: white;
+        }
+        &.alert-header-yellow {
+            background-color: #f8f7dd;
+            border-bottom: 4px solid $alert-yellow;
+        }
+        &.alert-header-empty {
+            border: 1px solid #ddd;;
+        }
+        
+        &.header-selected {
+            border: 4px solid black;
+ 
+            &:before {
+                color: black;
+                content: '✔ selected';
+                font-size: 1.5em;
+                font-weight: bold;
+                left: -1px;
+                padding: 3px 7px;
+                position: relative;
+                top: -1px;
+            }
+        }
+    }
 }
