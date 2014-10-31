@@ -3932,7 +3932,7 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
           userdate($usedate, $datestring).'</a>';
     
     if ($canviewparticipants) {
-        echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
+        echo ' <a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
              fullname($usermodified).'</a><br />';
         $parenturl = (empty($post->lastpostid)) ? '' : '&amp;parent='.$post->lastpostid;
     }
