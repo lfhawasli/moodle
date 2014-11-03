@@ -40,7 +40,7 @@ $string['emailmsgtxt'] =
     'email you are acknowledging that:' . "\n" .
     ' --you are the person to whom this email was addressed and for whom this' .
     '   invitation is intended;' . "\n" .
-    ' --the link below will expire on ({$a->expiration}).' . "\n\n" .
+    ' --the link below can be used only one time, and will expire on ({$a->expiration}).' . "\n\n" .
     'ACCESS LINK:' . "\n" .
     '------------------------------------------------------------' . "\n" .
     '{$a->inviteurl}' . "\n\n" .
@@ -121,7 +121,7 @@ $string['message_help'] =
     'email you are acknowledging that:<br />' .
     ' --you are the person to whom this email was addressed and for whom this ' .
     '   invitation is intended;<br />' .
-    ' --the link below will expire on ([expiration date]).<br /><br />' .
+    ' --the link below can be used only one time, and will expire on ([expiration date]).<br /><br />' .
     'ACCESS LINK:'.
     '<hr />'.
     '[invite url]<br /><br />'.
