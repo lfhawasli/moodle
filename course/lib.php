@@ -2841,7 +2841,10 @@ class course_request {
         $data->requester = $USER->id;
 
         // Setting the default category if none set.
-        if (empty($data->category) || empty($CFG->requestcategoryselection)) {
+        // START UCLA MOD: CCLE-4341 - Approved collab sites are always saved in Misc category
+        //if (empty($data->category) || empty($CFG->requestcategoryselection)) {
+        if (empty($data->category)) {
+        // END UCLA MOD:CCLE-4341        
             $data->category = $CFG->defaultrequestcategory;
         }
 

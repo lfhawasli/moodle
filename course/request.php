@@ -76,6 +76,7 @@ if ($requestform->is_cancelled()){
 //
 //    // And redirect back to the course listing.
 //    notice(get_string('courserequestsuccess'), $returnurl);
+    $data->category = $data->indicator_category;    // So the course_request object gets the right category.
     siteindicator_manager::clean_shortname($data);
     $request = course_request::create($data);
     siteindicator_manager::create_request($data);

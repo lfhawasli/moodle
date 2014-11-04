@@ -197,6 +197,17 @@ class behat_ucla extends behat_files {
                 }
         }
     }
+    
+    /**
+     * Step to browse directly to any address in the Moodle root.
+     * 
+     * @Given /^I am on "([^"]*)"$/
+     * 
+     * @param url relative to Moodle root
+     */
+    public function i_am_on($url) {
+        $this->getSession()->visit($this->locate_path($url));
+    }
 
     /**
      * Step to browse directly to a site with a given shortname.
