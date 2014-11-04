@@ -118,7 +118,7 @@ $CFG->shib_logged_in_cookie = '_ucla_sso';
 $CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/CreateIssueDetails.jspa';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu/w/';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs.ccle.ucla.edu/api.php';
-$block_ucla_help_support_contacts['System'] = 'dkearney';  // Default.
+$block_ucla_help_support_contacts['System'] = 'support';  // Default.
 
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
@@ -282,6 +282,10 @@ $CFG->forced_plugin_settings['enrol_self']['sendcoursewelcomemessage'] = 0;
 // Site administration > Plugins > Blocks > UCLA bruincast
 $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bcastlinks/';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
+
+// Site administration > Plugins > Blocks > UCLA bruinmedia
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 
 // Site administration > Plugins > Blocks > UCLA course download
 $CFG->forced_plugin_settings['block_ucla_course_download']['student_access_begins_week'] = 9;

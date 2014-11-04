@@ -24,6 +24,9 @@ $btn-color-login:           #f9c739;
 
     // Make buttons render correctly on iPhone
     -webkit-appearance: none;
+    
+    // Buttons need define ther margins/padding using border-box
+    @include box-sizing(border-box);
 }
 
 // Make default bootstrap buttons darker

@@ -30,14 +30,6 @@ class course_edit_form extends moodleform {
 
         $course        = $this->_customdata['course']; // this contains the data of this form
         $category      = $this->_customdata['category'];
-        // START UCLA MOD CCLE-2389 - override with site request category,
-        // This forces the edit form to display the requested category. 
-        // If the category is changed, that preference is also saved by siteindicator
-        if(!empty($course->id) && optional_param('approved', 0, PARAM_BOOL)
-                && $request = siteindicator_request::load($course->id)) {
-            $course->category = $request->request->categoryid;            
-        }
-        // END UCLA MOD CCLE-2389
         $editoroptions = $this->_customdata['editoroptions'];
         $returnto = $this->_customdata['returnto'];
 
@@ -90,6 +82,16 @@ class course_edit_form extends moodleform {
             if ($can_edit_sitetype || !empty($indicator)) {
                 $mform->addElement('header','uclasiteindicator', get_string('pluginname', 'tool_uclasiteindicator'));
             }
+            
+            // If user can edit site type, then they can also edit category, so 
+            // remind user that if course is in default category that they 
+            // should move it.
+            if ($can_edit_sitetype && $category->id == $CFG->defaultrequestcategory) {
+                global $OUTPUT;
+                $mform->addElement('html', $OUTPUT->notification(
+                                get_string('defaultcategorywarning', 'tool_uclasiteindicator'), 
+                                'notifywarning'));                
+            }            
             
             if(!empty($indicator)) {                
                 $indicator_type = html_writer::tag('strong',

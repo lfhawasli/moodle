@@ -82,7 +82,9 @@
     background-color: #444;
     color: white;
     
-    a {
+    // Only category name should be white.
+    a.categoryname,
+    a.coursename {
         color: white;
     }
 }

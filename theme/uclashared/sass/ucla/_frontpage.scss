@@ -280,7 +280,10 @@ $frontpage-logo-bar-width:  175px;
         }
     }
     
-    
+    // Removes excess padding
+    #maincontent ~ br {
+        display: none;
+    }
         
     // Reflow the structure of #page-content so it all fits in a single column
     #page-content {
@@ -323,6 +326,7 @@ $frontpage-logo-bar-width:  175px;
         #region-main-box {
             left: 0;
             width: 100%;
+            margin-top: 8px;
         }
         #region-post-box {
             margin-left: 0;
@@ -336,6 +340,7 @@ $frontpage-logo-bar-width:  175px;
         #region-post {
             width: 100%;
             margin-left: 0;
+            margin-top: 8px;
         }
 
         .contentwithoutlink  {
@@ -355,10 +360,9 @@ $frontpage-logo-bar-width:  175px;
     }
 
     .block  {
-        margin-bottom: 8px;
+        margin-bottom: 0;
     }
     
-
     
     @include respond-sm {
         #page-content {
@@ -373,47 +377,10 @@ $frontpage-logo-bar-width:  175px;
         }
     }
         
-    // Customize the alert block
-    .block_ucla_alert {
-
-        .header-box {
-            background-color: white !important;
-            margin-bottom: 4px;
-            padding: 0px 4px;
-            
-            &.alert-header-default {
-                background: none;
-                border-bottom: 4px solid #75c326;
-            }
-            .header-subtitle {
-                font-size: 1.5rem;
-            }
-        }
-
-        .header-box * {
-            font-family: "Lato", verdana, Sans Serif;
-            font-size: 2.7rem;
-            text-shadow: 0 0 0;
-            text-transform: none;
-            font-weight: 300;
-            color: #444;
-            /*text-align: left;*/
-        }
-        
-        .content {
-            > .box-boundary {
-                padding: 0 16px;
-            }
-/*            > div > .box-boundary {
-                padding: 0 16px;
-            }*/
-        }
-    }
-    
     /// Customize the browseby block
     .block_ucla_browseby {
         padding: 8px;
-        margin-top: 24px;
+        margin-top: 0;
         border-bottom: 1px solid #ddd;
          
         .header {
@@ -500,11 +467,16 @@ $frontpage-logo-bar-width:  175px;
         .ucla-search-input {
             @include border-radius(0);
         }
+        // Adds more space between the inputs and the checkbox.
+        #ucla-search-block {
+            margin-top: 12px;
+        }
     }
     
     // Customize custom text
     .box.sitetopic {
-        padding: 16px;
+        padding: 0 16px;
+        padding-bottom: 8px;
         border-bottom: 1px solid #ddd;
         margin: 0;
         

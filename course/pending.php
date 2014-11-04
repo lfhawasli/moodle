@@ -52,13 +52,10 @@ if (!empty($approve) and confirm_sesskey()) {
     $courseid = $course->approve();
 
     if ($courseid !== false) {
-        // START UCLA MOD: CCLE-2389
-        // Approving site indicator site, and sending 'approved' param.
+        // START UCLA MOD: CCLE-2389 - Approving site indicator site, and sending 'approved' param.
         siteindicator_manager::approve($courseid, $approve);
-//        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid);
-        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid . '&approved=1');
         // END UCLA MOD: CCLE-2389
-
+        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid);
     } else {
         print_error('courseapprovedfailed');
     }
@@ -132,6 +129,15 @@ if (empty($pending)) {
         
         // START UCLA MOD CCLE-2389 - Get site request obj
         $request = new siteindicator_request($course->id);
+        // Skip requests in categories that user does not have Manager access.
+        $categorycontext = context_coursecat::instance($request->request->categoryid, IGNORE_MISSING);
+        if (empty($categorycontext)) {
+            // Check default category.
+            $categorycontext = context_coursecat::instance($CFG->defaultrequestcategory);
+        }
+        if (!has_capability('moodle/course:update', $categorycontext)) {
+            continue;
+        }
 
         $category = $course->get_category();
 
