@@ -280,6 +280,10 @@ $CFG->forced_plugin_settings['enrol_self']['sendcoursewelcomemessage'] = 0;
 $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bcastlinks/';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'help@ssc.ucla.edu';
 
+// Site administration > Plugins > Blocks > UCLA bruinmedia
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'help@ssc.ucla.edu';
+
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 

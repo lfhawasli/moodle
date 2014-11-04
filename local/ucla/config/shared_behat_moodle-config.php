@@ -300,6 +300,11 @@ $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['quiet_mode'] = 1;
 
+// Site administration > Plugins > Blocks > UCLA bruinmedia
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
+$CFG->forced_plugin_settings['block_ucla_bruinmedia']['quiet_mode'] = 1;
+
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 
