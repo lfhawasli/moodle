@@ -35,7 +35,6 @@ $string['warning'] = 'Some of the courses that you have requested have different
 $string['pasttermalert'] = 'The courses that you have requested are courses from a past term.';
 
 $string['all_department'] = 'All departments';
-$string['all_term'] = 'All terms';
 $string['all_action'] = 'All statuses';
 $string['all_srs'] = '';
 
