@@ -321,6 +321,31 @@ $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due t
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
 
+// Site administration > Plugins > Filters > MathJax
+$CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.mathjax.org/mathjax/2.3-latest/MathJax.js';
+$CFG->forced_plugin_settings['filter_mathjaxloader']['texfiltercompatibility'] = 1;
+$CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [[\'$\',\'$\'], [\'\\\(\',\'\\\)\']],
+            processEscapes: true
+        },
+        config: ["MMLorHTML.js", "Safe.js"],
+        jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
+        extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+        TeX: {
+            extensions: ["mhchem.js","AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+        },
+        menuSettings: {
+            zoom: "Double-Click",
+            mpContext: true,
+            mpMouse: true
+        },
+        errorSettings: { message: ["!"] },
+        skipStartupTypeset: true,
+        messageStyle: "none"
+    });';
+
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
@@ -334,7 +359,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     style2 = underline, strike, subscript, superscript
     align = align
     indent = indent
-    insert = computing, equation, charmap, table, clear
+    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
     accessibility = accessibilitychecker, accessibilityhelper
     other = html';
