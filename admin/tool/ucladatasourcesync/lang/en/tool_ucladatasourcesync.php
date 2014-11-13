@@ -12,16 +12,29 @@ $string['errcannotinsert'] = 'Cannot insert record: {$a}';
 
 /** Strings for bruincast_dbsync **/ 
 // Error messages
-$string['errbcmsglocation'] = "ERROR: No location set for bruincast data.";
-$string['errbcmsgemail'] = "ERROR: No email set for bruincast error notification.";
+$string['errbcmsglocation'] = "ERROR: No location set for BruinCast data.";
+$string['errbcmsgemail'] = "ERROR: No email set for BruinCast error notification.";
 $string['errbcmsgquiet'] = "ERROR: Cannot access configuration option quiet_mode.";
 $string['errbcinsert'] = "ERROR: Problem writing to the database.";
-$string['errbcinvalidrowlen'] = "ERROR: Invalid row length in provided bruincast data.";
+$string['errbcinvalidrowlen'] = "ERROR: Invalid row length in provided Bruincast data.";
 
 // Notification messages
-$string['bcstartnoti'] = "Starting bruincast DB update:";
+$string['bcstartnoti'] = "Starting BruinCast DB update:";
 $string['bcsuccessnoti'] = '... {$a} records successfully inserted.';
-$string['bcnoentries'] = 'No Bruincast entries found.';
+$string['bcnoentries'] = 'No BruinCast entries found.';
+
+/** Strings for bruinmedia_dbsync **/ 
+// Error messages
+$string['errbmmsglocation'] = "ERROR: No location set for BruinMedia data.";
+$string['errbmmsgemail'] = "ERROR: No email set for BruinMedia error notification.";
+$string['errbmmsgquiet'] = "ERROR: Cannot access configuration option quiet_mode.";
+$string['errbminsert'] = "ERROR: Problem writing to the database.";
+$string['errbminvalidrowlen'] = "ERROR: Invalid row length in provided BruinMedia data.";
+
+// Notification messages
+$string['bmstartnoti'] = "Starting BruinMedia DB update:";
+$string['bmsuccessnoti'] = '... {$a} records successfully inserted.';
+$string['bmnoentries'] = 'No BruinMedia entries found.';
 
 /** Strings for libraryreserves_dbsync **/
 // Error messages
