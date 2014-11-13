@@ -187,7 +187,7 @@ function check_crosslists(&$data) {
                 if (strtolower($d->restricted) == 'restricted') {
                     foreach ($courses as $c) {  
                         if (empty($data[$c->term.'-'.$c->srs])) {
-                            $msg = "Restricted bruincast URL is not "
+                            $msg = "Restricted BruinCast URL is not "
                                     . "associated with crosslisted coures:\n"
                                     . "url: " . $d->bruincast_url . "\n"
                                     . "term: " . $d->term . "\n"

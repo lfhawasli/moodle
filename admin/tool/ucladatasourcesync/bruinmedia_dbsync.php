@@ -12,8 +12,8 @@ require_once(dirname(__FILE__) . '/lib.php');
 $source_url = get_config('block_ucla_bruinmedia', 'source_url');
 if (empty($source_url)) {
     log_ucla_data('bruinmedia', 'read', 'Initializing cfg variables', 
-            get_string('errbcmsglocation','tool_ucladatasourcesync') );
-    die("\n".get_string('errbcmsglocation','tool_ucladatasourcesync')."\n");
+            get_string('errbmmsglocation','tool_ucladatasourcesync') );
+    die("\n".get_string('errbmmsglocation','tool_ucladatasourcesync')."\n");
 }
 
 // Begin database update
@@ -60,7 +60,7 @@ function define_data_source() {
 function update_bruinmedia_db($source_url) {
     global $CFG, $DB;
     
-    echo get_string('bcstartnoti', 'tool_ucladatasourcesync') . "\n";
+    echo get_string('bmstartnoti', 'tool_ucladatasourcesync') . "\n";
 
     $csv_data = get_csv_data($source_url);
     $fields = define_data_source();
@@ -80,7 +80,7 @@ function update_bruinmedia_db($source_url) {
         $obj = new stdClass();
 
         if (sizeof($d) != sizeof($fields)) {
-            echo get_string('errbcinvalidrowlen', 'tool_ucladatasourcesync') . "\n";
+            echo get_string('errbminvalidrowlen', 'tool_ucladatasourcesync') . "\n";
             continue;
         }
         $invalid_fields = array();
@@ -118,7 +118,7 @@ function update_bruinmedia_db($source_url) {
 
     // Do not process bruinmedia data if there are no valid entries.
     if (empty($clean_data)) {
-        die(get_string('bcnoentries', 'tool_ucladatasourcesync'). "\n");
+        die(get_string('bmnoentries', 'tool_ucladatasourcesync'). "\n");
     }
 
     // Drop table if we are processing new entries.
@@ -141,13 +141,13 @@ function update_bruinmedia_db($source_url) {
         }
 
         // Give total inserts
-        echo get_string('bcsuccessnoti', 'tool_ucladatasourcesync', $insert_count) . "\n";
+        echo get_string('bmsuccessnoti', 'tool_ucladatasourcesync', $insert_count) . "\n";
 
         // Find errors in the crosslisted courses and notify
         check_crosslists($clean_data);
     } catch (dml_exception $e) {
         // Report a DB insert error
-        echo "\n" . get_string('errbcinsert', 'tool_ucladatasourcesync') . "\n";
+        echo "\n" . get_string('errbminsert', 'tool_ucladatasourcesync') . "\n";
     }
 }
 
@@ -187,7 +187,7 @@ function check_crosslists(&$data) {
                 if (strtolower($d->restricted) == 'restricted') {
                     foreach ($courses as $c) {  
                         if (empty($data[$c->term.'-'.$c->srs])) {
-                            $msg = "Restricted bruinmedia URL is not "
+                            $msg = "Restricted BruinMedia URL is not "
                                     . "associated with crosslisted coures:\n"
                                     . "url: " . $d->bruincast_url . "\n"
                                     . "term: " . $d->term . "\n"
