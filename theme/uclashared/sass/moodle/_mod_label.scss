@@ -1,0 +1,12 @@
+/// Moodle labels
+
+// For inline labels
+.activity.label {
+    
+    // Adds Boostrap-grid support to moodle labels.
+    // This assumes you enclose your rows in 'content' divs.
+    .content {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
