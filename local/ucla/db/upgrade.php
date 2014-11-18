@@ -534,6 +534,18 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         set_config('disabled', 1, 'availability_profile');
         upgrade_plugin_savepoint(true, 2014080600, 'local', 'ucla');
     }
+    
+    // CCLE-4333 - Activity Chooser off.
+    if ($oldversion < 2014111400) {
+        $configs = $DB->get_recordset('user_preferences', 
+                array('name' => 'usemodchooser', 'value' => 0));
+        if ($configs->valid()) {
+            foreach ($configs as $config) {
+                set_user_preference('usemodchooser', 1, $config->userid);        
+            }            
+        }
+        upgrade_plugin_savepoint(true, 2014111400, 'local', 'ucla');
+    }
 
     return $result;
 }
