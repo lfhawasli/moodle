@@ -20,9 +20,13 @@ class requestor_view_form extends requestor_shared_form {
         $group = array();
 
         foreach ($filters as $filter => $possibilities) {
-            $filterall = $this->get_all_filter($filter);
+            $options = array();
 
-            $options = array($filterall => get_string($filterall, $rucr));
+            if ($filter != 'term') {
+                $filterall = $this->get_all_filter($filter);
+
+                $options[$filterall] = get_string($filterall, $rucr);
+            }
 
             if (!empty($possibilities)) {
                 foreach ($possibilities as $poss) {
