@@ -52,3 +52,9 @@
 [submodule "lib/editor/atto/plugins/computing"]
 	path = lib/editor/atto/plugins/computing
 	url = git@github.com:geoffrowland/moodle-editor_atto-computing.git
+[submodule "blocks/attendance"]
+	path = blocks/attendance
+	url = https://github.com/ccle/moodle-block_attendance.git
+[submodule "mod/attendance"]
+	path = mod/attendance
+	url = https://github.com/ccle/moodle-mod_attendance.git
