@@ -416,8 +416,6 @@ $CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
 $CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 // CCLE-4297 - Have "quick grading" turned on by default
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
-// CCLE-3511 - Set defaults for new assignment module
-$CFG->forced_plugin_settings['local_ucla']['defaultassignsettings'] = 1;
 // CCLE-4289 - Show All View Action Icons
 $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
