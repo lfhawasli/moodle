@@ -1977,11 +1977,15 @@ body:not(.jsenabled) .langmenu:hover > .dropdown-menu,
   color: #666;
 }
 /* line 68, ../sass/moodle/_gradebook.scss */
+.path-grade-report-grader .right_scroller topscroll {
+  display: none;
+}
+/* line 72, ../sass/moodle/_gradebook.scss */
 .path-grade-report-grader .gradeparent {
   overflow: inherit;
 }
 
-/* line 73, ../sass/moodle/_gradebook.scss */
+/* line 77, ../sass/moodle/_gradebook.scss */
 table#user-grades {
   font-size: 1.2rem;
   /*    .r0:not(.odd):not(.even),
@@ -1993,7 +1997,7 @@ table#user-grades {
           }
       }*/
 }
-/* line 85, ../sass/moodle/_gradebook.scss */
+/* line 89, ../sass/moodle/_gradebook.scss */
 table#user-grades .avg th,
 table#user-grades .avg td,
 table#user-grades .heading th {
@@ -2002,101 +2006,105 @@ table#user-grades .heading th {
   color: #ddd;
   border-color: #444;
 }
-/* line 92, ../sass/moodle/_gradebook.scss */
+/* line 96, ../sass/moodle/_gradebook.scss */
 table#user-grades .avg th a,
 table#user-grades .avg td a,
 table#user-grades .heading th a {
   color: white;
   font-weight: normal;
 }
-/* line 97, ../sass/moodle/_gradebook.scss */
+/* line 101, ../sass/moodle/_gradebook.scss */
 table#user-grades .avg .cell {
   font-weight: bold;
   text-align: center;
 }
-/* line 101, ../sass/moodle/_gradebook.scss */
+/* line 105, ../sass/moodle/_gradebook.scss */
 table#user-grades .avg .cell.header {
   text-align: right;
 }
-/* line 103, ../sass/moodle/_gradebook.scss */
+/* line 107, ../sass/moodle/_gradebook.scss */
 table#user-grades th {
   font-weight: normal;
 }
-/* line 105, ../sass/moodle/_gradebook.scss */
+/* line 109, ../sass/moodle/_gradebook.scss */
 table#user-grades th.cell {
   height: 20px;
   white-space: nowrap;
 }
-/* line 109, ../sass/moodle/_gradebook.scss */
+/* line 113, ../sass/moodle/_gradebook.scss */
 .path-grade-report-history table#user-grades th.cell {
   white-space: normal;
 }
-/* line 114, ../sass/moodle/_gradebook.scss */
+/* line 118, ../sass/moodle/_gradebook.scss */
 table#user-grades .controls {
   text-align: right;
   background-color: #eee;
   height: 20px;
 }
-/* line 119, ../sass/moodle/_gradebook.scss */
+/* line 123, ../sass/moodle/_gradebook.scss */
 table#user-grades tr {
   height: 40px;
 }
-/* line 122, ../sass/moodle/_gradebook.scss */
+/* line 126, ../sass/moodle/_gradebook.scss */
 table#user-grades tr .gradevalue {
   width: 100%;
   text-align: center;
   display: inline-block;
 }
-/* line 127, ../sass/moodle/_gradebook.scss */
+/* line 131, ../sass/moodle/_gradebook.scss */
 table#user-grades tr .grade:hover {
   /*border: 2px solid $grade-report-color-overriden-border;*/
 }
-/* line 130, ../sass/moodle/_gradebook.scss */
-table#user-grades tr .user {
+/* line 134, ../sass/moodle/_gradebook.scss */
+table#user-grades tr .user.cell {
   min-width: 200px;
   max-width: 200px;
   width: 200px;
   background-color: #777777;
   border-color: #666666;
 }
-/* line 137, ../sass/moodle/_gradebook.scss */
-table#user-grades tr .user a {
+/* line 141, ../sass/moodle/_gradebook.scss */
+table#user-grades tr .user.cell a {
   color: white;
 }
-/* line 138, ../sass/moodle/_gradebook.scss */
-table#user-grades tr .user .userpicture {
+/* line 142, ../sass/moodle/_gradebook.scss */
+table#user-grades tr .user.cell .userpicture {
   display: none;
 }
 /* line 143, ../sass/moodle/_gradebook.scss */
+table#user-grades tr .user.cell .usersuspendedicon {
+  display: none;
+}
+/* line 148, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked {
   background-color: #F39A00;
   border-bottom-color: #F39A00;
 }
-/* line 146, ../sass/moodle/_gradebook.scss */
+/* line 151, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.overridden {
   background-color: #F39A00;
   border-color: #DC691A;
 }
-/* line 151, ../sass/moodle/_gradebook.scss */
+/* line 156, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked {
   background-color: #F5CD00;
   border-bottom-color: #F5CD00;
 }
-/* line 154, ../sass/moodle/_gradebook.scss */
+/* line 159, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.hmarked.overridden {
   background-color: #F5CD00;
 }
-/* line 158, ../sass/moodle/_gradebook.scss */
+/* line 163, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked {
   background-color: #F1B900;
   border-bottom-color: #F1B900;
 }
-/* line 161, ../sass/moodle/_gradebook.scss */
+/* line 166, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.vmarked.hmarked.overridden {
   background-color: #F1B900;
   border-color: #DC691A;
 }
-/* line 166, ../sass/moodle/_gradebook.scss */
+/* line 171, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.odd td.grade.overridden {
   background-color: #fff;
   /*border: 0;*/
@@ -2105,36 +2113,36 @@ table#user-grades tr.odd td.grade.overridden {
   height: 16px;
   background-color: #efefef;
 }
-/* line 180, ../sass/moodle/_gradebook.scss */
+/* line 185, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked {
   background-color: #F4A400;
   border-bottom-color: #F4A400;
 }
-/* line 183, ../sass/moodle/_gradebook.scss */
+/* line 188, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.overridden {
   background-color: #F4A400;
   border-color: #DC691A;
 }
-/* line 188, ../sass/moodle/_gradebook.scss */
+/* line 193, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked {
   background-color: #F5CF2C;
   border-bottom-color: #F5CF2C;
 }
-/* line 191, ../sass/moodle/_gradebook.scss */
+/* line 196, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.hmarked.overridden {
   background-color: #F5CF2C;
 }
-/* line 195, ../sass/moodle/_gradebook.scss */
+/* line 200, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked {
   background-color: #F1BE00;
   border-bottom-color: #F1BE00;
 }
-/* line 198, ../sass/moodle/_gradebook.scss */
+/* line 203, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.vmarked.hmarked.overridden {
   background-color: #F1BE00;
   border-color: #DC691A;
 }
-/* line 203, ../sass/moodle/_gradebook.scss */
+/* line 208, ../sass/moodle/_gradebook.scss */
 table#user-grades tr.even td.grade.overridden {
   background-color: #efefef;
   /*border: 2px dashed $grade-report-color-overriden-border;*/
@@ -2144,25 +2152,25 @@ table#user-grades tr.even td.grade.overridden {
   height: 16px;
   background-color: #fff;
 }
-/* line 216, ../sass/moodle/_gradebook.scss */
+/* line 221, ../sass/moodle/_gradebook.scss */
 table#user-grades .overridden .grade_icons {
   padding-left: 10px;
 }
-/* line 221, ../sass/moodle/_gradebook.scss */
+/* line 226, ../sass/moodle/_gradebook.scss */
 table#user-grades .catlevel1 .action-icon img {
   opacity: 0.5;
 }
-/* line 224, ../sass/moodle/_gradebook.scss */
+/* line 229, ../sass/moodle/_gradebook.scss */
 table#user-grades .catlevel1 .action-icon.selected img {
   opacity: 1;
 }
 
-/* line 230, ../sass/moodle/_gradebook.scss */
+/* line 235, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container {
   font-size: 1.2rem;
   background-color: #444;
 }
-/* line 234, ../sass/moodle/_gradebook.scss */
+/* line 239, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container .gradebook-header-cell {
   background-color: #444;
   color: white;
@@ -2173,23 +2181,23 @@ table#user-grades .catlevel1 .action-icon.selected img {
   border-right: 0;
   overflow: hidden;
 }
-/* line 244, ../sass/moodle/_gradebook.scss */
+/* line 249, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container .gradebook-header-cell.catlevel1 {
   background-color: #333;
 }
-/* line 247, ../sass/moodle/_gradebook.scss */
+/* line 252, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container .gradebook-header-cell.catlevel2 {
   background-color: #222;
 }
-/* line 250, ../sass/moodle/_gradebook.scss */
+/* line 255, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container .gradebook-header-cell a {
   color: white;
 }
-/* line 253, ../sass/moodle/_gradebook.scss */
+/* line 258, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container .gradebook-header-cell:hover {
   background-color: #111;
 }
-/* line 256, ../sass/moodle/_gradebook.scss */
+/* line 261, ../sass/moodle/_gradebook.scss */
 #gradebook-header-container .gradebook-header-cell .icon {
   width: 24px;
   height: 24px;
@@ -2198,11 +2206,11 @@ table#user-grades .catlevel1 .action-icon.selected img {
   padding-right: 6px;
 }
 
-/* line 266, ../sass/moodle/_gradebook.scss */
+/* line 271, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container {
   background-color: #777;
 }
-/* line 269, ../sass/moodle/_gradebook.scss */
+/* line 274, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell {
   background-color: #666;
   font-size: 1.2rem;
@@ -2210,48 +2218,55 @@ table#user-grades .catlevel1 .action-icon.selected img {
   border-top: 0;
   padding: 4px;
 }
-/* line 275, ../sass/moodle/_gradebook.scss */
+/* line 281, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell .userpicture {
   display: none;
 }
-/* line 278, ../sass/moodle/_gradebook.scss */
+/* line 284, ../sass/moodle/_gradebook.scss */
+#gradebook-user-container .gradebook-user-cell .usersuspendedicon {
+  margin-left: 6px;
+  float: right;
+}
+/* line 288, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell a {
+  display: inline;
   font-weight: normal;
   color: #fff;
+  line-height: 1;
 }
-/* line 282, ../sass/moodle/_gradebook.scss */
+/* line 294, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell:nth-child(2n+1) {
   background-color: #777;
   border-bottom: 1px solid #777;
 }
-/* line 286, ../sass/moodle/_gradebook.scss */
+/* line 298, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell:nth-child(2n):hover {
   background-color: #5c5c5c;
 }
-/* line 289, ../sass/moodle/_gradebook.scss */
+/* line 301, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell:hover {
   background-color: #6d6d6d;
 }
-/* line 292, ../sass/moodle/_gradebook.scss */
+/* line 304, ../sass/moodle/_gradebook.scss */
 #gradebook-user-container .gradebook-user-cell:first-child {
   /*border-top: 1px solid #666;*/
 }
 
-/* line 298, ../sass/moodle/_gradebook.scss */
+/* line 310, ../sass/moodle/_gradebook.scss */
 #gradebook-footer-container {
   display: none;
   font-size: 1.2rem;
   background-color: #444;
 }
-/* line 304, ../sass/moodle/_gradebook.scss */
+/* line 316, ../sass/moodle/_gradebook.scss */
 #gradebook-footer-container.gradebook-footer-row-sticky {
   display: block;
 }
-/* line 307, ../sass/moodle/_gradebook.scss */
+/* line 319, ../sass/moodle/_gradebook.scss */
 #gradebook-footer-container.gradebook-footer-row-sticky .cell {
   border-top: 2px solid gray;
 }
-/* line 311, ../sass/moodle/_gradebook.scss */
+/* line 323, ../sass/moodle/_gradebook.scss */
 #gradebook-footer-container .gradebook-footer-cell {
   padding: 8px;
   font-size: 1.2rem;
@@ -2262,11 +2277,11 @@ table#user-grades .catlevel1 .action-icon.selected img {
   border: 1px solid #444;
   border-right: 0;
 }
-/* line 322, ../sass/moodle/_gradebook.scss */
+/* line 334, ../sass/moodle/_gradebook.scss */
 #gradebook-footer-container .gradebook-footer-cell:nth-of-type(1) {
   text-align: right;
 }
-/* line 326, ../sass/moodle/_gradebook.scss */
+/* line 338, ../sass/moodle/_gradebook.scss */
 #gradebook-footer-container .gradebook-footer-cell .btn, #gradebook-footer-container .gradebook-footer-cell .block_recent_activity .activityhead a, .block_recent_activity .activityhead #gradebook-footer-container .gradebook-footer-cell a, #gradebook-footer-container .gradebook-footer-cell .forumaddnew input[type="submit"], .forumaddnew #gradebook-footer-container .gradebook-footer-cell input[type="submit"],
 #gradebook-footer-container .gradebook-footer-cell .forumnodiscuss input[type="submit"],
 .forumnodiscuss #gradebook-footer-container .gradebook-footer-cell input[type="submit"], #gradebook-footer-container .gradebook-footer-cell .wiki_clear ~ .mform #save, .wiki_clear ~ .mform #gradebook-footer-container .gradebook-footer-cell #save, #gradebook-footer-container .gradebook-footer-cell .wiki_clear ~ .mform #cancel, .wiki_clear ~ .mform #gradebook-footer-container .gradebook-footer-cell #cancel, #gradebook-footer-container .gradebook-footer-cell #page-mod-quiz-edit .editq div.quizpage .pointssubmitbutton, #page-mod-quiz-edit .editq div.quizpage #gradebook-footer-container .gradebook-footer-cell .pointssubmitbutton,
@@ -2277,19 +2292,19 @@ table#user-grades .catlevel1 .action-icon.selected img {
   float: left;
 }
 
-/* line 332, ../sass/moodle/_gradebook.scss */
+/* line 344, ../sass/moodle/_gradebook.scss */
 #gradebook-user-header-container {
   background-color: #333;
   font-size: 1.2rem;
   text-align: left;
   padding: 8px;
 }
-/* line 338, ../sass/moodle/_gradebook.scss */
+/* line 350, ../sass/moodle/_gradebook.scss */
 #gradebook-user-header-container a {
   color: white;
 }
 
-/* line 343, ../sass/moodle/_gradebook.scss */
+/* line 355, ../sass/moodle/_gradebook.scss */
 .gradebook-color {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -2303,7 +2318,7 @@ table#user-grades .catlevel1 .action-icon.selected img {
   float: left;
   margin-right: 10px;
 }
-/* line 354, ../sass/moodle/_gradebook.scss */
+/* line 366, ../sass/moodle/_gradebook.scss */
 .gradebook-color:after {
   content: "";
   float: right;
@@ -2311,39 +2326,39 @@ table#user-grades .catlevel1 .action-icon.selected img {
   height: 100%;
 }
 
-/* line 361, ../sass/moodle/_gradebook.scss */
+/* line 373, ../sass/moodle/_gradebook.scss */
 .gradebook-overridden {
   background: url([[pix:theme|corner-fold]]) no-repeat;
   height: 30px;
   background-color: #efefef;
 }
 
-/* line 366, ../sass/moodle/_gradebook.scss */
+/* line 378, ../sass/moodle/_gradebook.scss */
 .gradebook-row-color {
   background-color: #F5CD00;
 }
-/* line 368, ../sass/moodle/_gradebook.scss */
+/* line 380, ../sass/moodle/_gradebook.scss */
 .gradebook-row-color:after {
   background-color: #F5CF2C;
 }
 
-/* line 372, ../sass/moodle/_gradebook.scss */
+/* line 384, ../sass/moodle/_gradebook.scss */
 .gradebook-column-color {
   background-color: #F39A00;
 }
-/* line 374, ../sass/moodle/_gradebook.scss */
+/* line 386, ../sass/moodle/_gradebook.scss */
 .gradebook-column-color:after {
   background-color: #F4A400;
 }
 
-/* line 379, ../sass/moodle/_gradebook.scss */
+/* line 391, ../sass/moodle/_gradebook.scss */
 #user-report-table {
   clear: both;
   margin-top: 20px;
   font-size: 1.2rem;
 }
 
-/* line 387, ../sass/moodle/_gradebook.scss */
+/* line 399, ../sass/moodle/_gradebook.scss */
 .gradebook-loading-screen {
   width: 100%;
   height: 40px;
@@ -2356,7 +2371,7 @@ table#user-grades .catlevel1 .action-icon.selected img {
   padding: 10px;
   text-align: center;
 }
-/* line 399, ../sass/moodle/_gradebook.scss */
+/* line 411, ../sass/moodle/_gradebook.scss */
 .gradebook-loading-screen .gradebook-loading {
   /*margin: auto;*/
   padding-right: 40px;
@@ -2365,7 +2380,7 @@ table#user-grades .catlevel1 .action-icon.selected img {
   width: 100%;
 }
 
-/* line 408, ../sass/moodle/_gradebook.scss */
+/* line 420, ../sass/moodle/_gradebook.scss */
 .gradebook-loading i {
   width: 20px;
   height: 20px;
@@ -2374,7 +2389,7 @@ table#user-grades .catlevel1 .action-icon.selected img {
   background: #00b3d5;
 }
 
-/* line 415, ../sass/moodle/_gradebook.scss */
+/* line 427, ../sass/moodle/_gradebook.scss */
 .gradebook-loading i:first-child {
   -webkit-animation: gradebook-loading-ani2 0.5s linear infinite;
   animation: gradebook-loading-ani2 0.5s linear infinite;
@@ -2385,14 +2400,14 @@ table#user-grades .catlevel1 .action-icon.selected img {
   transform: translate(-20px);
 }
 
-/* line 421, ../sass/moodle/_gradebook.scss */
+/* line 433, ../sass/moodle/_gradebook.scss */
 .gradebook-loading i:nth-child(2),
 .gradebook-loading i:nth-child(3) {
   -webkit-animation: gradebook-loading-ani3 0.5s linear infinite;
   animation: gradebook-loading-ani3 0.5s linear infinite;
 }
 
-/* line 426, ../sass/moodle/_gradebook.scss */
+/* line 438, ../sass/moodle/_gradebook.scss */
 .gradebook-loading i:last-child {
   -webkit-animation: gradebook-loading-ani1 0.5s linear infinite;
   animation: gradebook-loading-ani1 0.5s linear infinite;
@@ -3528,3 +3543,8 @@ table#user-grades .catlevel1 .action-icon.selected img {
         }
     }
 }*/
+/* line 8, ../sass/moodle/_mod_label.scss */
+.activity.label .content {
+  padding-left: 15px;
+  padding-right: 15px;
+}
