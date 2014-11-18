@@ -68,7 +68,7 @@ function xmldb_format_ucla_upgrade($oldversion) {
         // ucla savepoint reached
         upgrade_plugin_savepoint(true, 2012061701, 'format', 'ucla');        
     }
-    
+
     // Map all data from mdl_ucla_course_prefs to mdl_course_format_options 
     if ($oldversion < 2013081203) {
         $table = new xmldb_table('ucla_course_prefs');
@@ -110,6 +110,20 @@ function xmldb_format_ucla_upgrade($oldversion) {
         $DB->delete_records('user_preferences', array('name' => 'noeditingicons'));
 
         upgrade_plugin_savepoint(true, 2014073100, 'format', 'ucla');
+    }
+    
+    // Update all courses using ucla format to have $course->coursedisplay set 
+    // to COURSE_DISPLAY_MULTIPAGE.
+    if ($oldversion < 2014110500) {
+        // Get all courses using UCLA format.
+        $courses = $DB->get_recordset('course', array('format' => 'ucla'));
+        foreach ($courses as $course) {
+            $course->coursedisplay = COURSE_DISPLAY_MULTIPAGE;
+            $DB->update_record('course', $course, true);
+        }
+        
+        // UCLA savepoint reached.
+        upgrade_plugin_savepoint(true, 2014110500, 'format', 'ucla');        
     }
 
     return true;
