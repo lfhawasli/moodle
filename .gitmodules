@@ -49,3 +49,6 @@
 [submodule "report/rolescapabilities"]
 	path = report/rolescapabilities
 	url = https://github.com/ccle/moodle-report-rolescapabilities.git
+[submodule "lib/editor/atto/plugins/computing"]
+	path = lib/editor/atto/plugins/computing
+	url = git@github.com:geoffrowland/moodle-editor_atto-computing.git
