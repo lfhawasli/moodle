@@ -352,8 +352,59 @@ class format_ucla extends format_topics {
         }
         
         $options = array_merge_recursive($options, $uclaoptions);
+
+        // Hide the course display option, since we always want it to be 
+        // COURSE_DISPLAY_MULTIPAGE.
+        $options['coursedisplay']['element_type'] = 'hidden';
         
         return $options;
+    }
+
+ /**
+     * The URL to use for the specified course (with section)
+     *
+     * @param int|stdClass $section Section object from database or just field course_sections.section
+     *     if omitted the course view page is returned
+     * @param array $options options for view URL. At the moment core uses:
+     *     'navigation' (bool) if true and section has no separate page, the function returns null
+     *     'sr' (int) used by multipage formats to specify to which section to return
+     * @return null|moodle_url
+     */
+    public function get_view_url($section, $options = array()) {
+        $course = $this->get_course();
+        $url = new moodle_url('/course/view.php', array('id' => $course->id));
+
+        $sr = null;
+        if (array_key_exists('sr', $options)) {
+            $sr = $options['sr'];
+        }
+        if (is_object($section)) {
+            $sectionno = $section->section;
+        } else {
+            $sectionno = $section;
+        }
+        if ($sectionno !== null) {
+            if ($sr !== null) {
+                if ($sr) {
+                    $usercoursedisplay = COURSE_DISPLAY_MULTIPAGE;
+                    $sectionno = $sr;
+                } else {
+                    $usercoursedisplay = COURSE_DISPLAY_SINGLEPAGE;
+                }
+            } else {
+                $usercoursedisplay = $course->coursedisplay;
+            }
+            // For UCLA format courses, do not exclude Section 0.
+            if ($usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+                $url->param('section', $sectionno);
+            } else {
+                if (!empty($options['navigation'])) {
+                    return null;
+                }
+                $url->set_anchor('section-'.$sectionno);
+            }
+        }
+        return $url;
     }
 
     /**
@@ -377,6 +428,13 @@ class format_ucla extends format_topics {
                 $s->name = $this->get_section_name($section);
                 $DB->update_record('course_sections', $s);
             }
+        }
+
+        // Change the default for the course display to show one section per page.
+        $course = $this->get_course();
+        if ($course->coursedisplay == COURSE_DISPLAY_SINGLEPAGE) {
+            $course->coursedisplay = COURSE_DISPLAY_MULTIPAGE;
+            $DB->update_record('course', $course, true);
         }
     }
 

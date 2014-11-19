@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Override Moodle's core calendar renderer.
+ * Override Moodle's core course renderer.
  *
  * @package    theme_uclashared
  * @copyright  UC Regents 2014
@@ -114,4 +114,10 @@ class theme_uclashared_core_course_renderer extends core_course_renderer {
         return $content;
     }
 
+    /*
+     * Overwrites the core course renderer function so that the modchooser ("Activity chooser on/off")
+     * does not appear. See comments for add_modchoosertoggle in course/renderer.php.
+     */
+    protected function add_modchoosertoggle() {
+    }
 }

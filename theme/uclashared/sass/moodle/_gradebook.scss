@@ -1,5 +1,5 @@
 //
-// CCLE / frontpage
+// Moodle / Gradebook
 // --------------------------------------------------
 
 
@@ -64,6 +64,10 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
         }
     }
     
+    // Remove top scroller.
+    .right_scroller topscroll {
+        display: none;
+    }
     // Remove the table overflow
     .gradeparent {
         overflow: inherit;
@@ -127,7 +131,7 @@ table#user-grades {
         .grade:hover {
             /*border: 2px solid $grade-report-color-overriden-border;*/
         }
-        .user {
+        .user.cell {
             min-width: 200px;
             max-width: 200px;
             width: 200px;
@@ -136,6 +140,7 @@ table#user-grades {
             
             a {color: white}
             .userpicture {display: none;}
+            .usersuspendedicon {display: none;}
         }
         
         // ODD rows
@@ -272,12 +277,19 @@ table#user-grades {
         border: 1px solid #666;
         border-top: 0;
         padding: 4px;
+        
         .userpicture {
             display: none;
         }
+        .usersuspendedicon {
+            margin-left: 6px;
+            float: right;
+        }
         a {
+            display: inline;
             font-weight: normal;
             color: #fff;
+            line-height: 1;
         }
         &:nth-child(2n+1) {
             background-color: #777;

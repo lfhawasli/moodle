@@ -128,10 +128,8 @@ class block_ucla_office_hours extends block_base {
                                                      $course, $context) {
         global $DB, $OUTPUT, $PAGE, $USER, $CFG;
 
-        $instructor_types = $CFG->instructor_levels_roles;
-
         $instr_info_table = '';
-            
+
         $appended_info = self::blocks_office_hours_append($instructors, 
                 $course, $context);
 
@@ -151,8 +149,32 @@ class block_ucla_office_hours extends block_base {
             }
         }
 
-        // Filter and organize users here?
+        // Gather all default rolenames from config
+        $instructor_types = $CFG->instructor_levels_roles;
+
+        // Query the database for course context specific roles.
+        $fixedroles = role_fix_names(get_all_roles(), $context);
+
+        /**
+         * Filter and organize users here.
+         *
+         * This code includes logic that allows renamed roles to appear in
+         * office hour blocks. This will rename the roles for the role 
+         * groups, depending on the renamed name of the Instructor, the
+         * Teaching Assistant, and the Student Facilitator.
+         *
+         * The "$listedusers" variable prevents users from being listed more
+         * than once on the office hours block.
+         */
+
+        $listedusers = array();
         foreach ($instructor_types as $title => $rolenames) {
+            foreach ($fixedroles as $fixedrole) {
+                if ($fixedrole->shortname == $rolenames[0]) {
+                    $title = $fixedrole->localname;
+                }
+            }
+
             $type_table_headers = $table_headers;
             $goal_users = array();
 
@@ -160,17 +182,16 @@ class block_ucla_office_hours extends block_base {
                 if (in_array($uk, $filtered_users)) {
                     continue;
                 }
-
-
-                if (in_array($user->shortname, $rolenames)) {
+                if (in_array($user->shortname, $rolenames)
+                        && !in_array($user->id, $listedusers)) {
                     $goal_users[$user->id] = $ohinstructors[$uk];
+                    $listedusers[] = $user->id;
                 }
             }
 
             if (empty($goal_users)) {
                 continue;
             }
-
 
             $table = new html_table();
             $table->width = '*';
@@ -184,7 +205,8 @@ class block_ucla_office_hours extends block_base {
             $table->align = $aligns;
 
             $table->attributes['class'] = 
-                    'boxalignleft generaltable cellborderless office-hours-table';
+                    'boxalignleft generaltable cellborderless office-hours-table ' . 
+                    $rolenames[0]; // This appendation allows Behat testing to work
 
             $table->head = array();
 
