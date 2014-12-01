@@ -116,6 +116,15 @@ if ($timeup) {
         } else {
             $becomingoverdue = true;
         }
+    // START UCLA MOD: CCLE-4424 - Quiz "Attempts must be submitted or they
+    //                             are not counted" is not working as
+    //                             expected
+    //
+    // Set parameters to trigger abandon quiz event
+    } else if ($attemptobj->get_quiz()->overduehandling == 'autoabandon') {
+        $finishattempt = true;
+        $becomingabandoned = true;
+    // END UCLA MOD: CCLE-4424
     } else {
         $finishattempt = true;
     }
@@ -161,6 +170,13 @@ if (!$finishattempt) {
 try {
     if ($becomingabandoned) {
         $attemptobj->process_abandon($timenow, true);
+        // START UCLA MOD: CCLE-4424 - Quiz "Attempts must be submitted or they
+        //                             are not counted" is not working as
+        //                             expected
+        //
+        // Abandon, then redirect to summary page
+        redirect($attemptobj->summary_url());
+        // END UCLA MOD: CCLE-4424
     } else {
         $attemptobj->process_finish($timenow, !$toolate);
     }
