@@ -8,74 +8,86 @@ define('CLI_SCRIPT', true);
 
 $moodleroot = dirname(dirname(dirname(dirname(__FILE__)))); 
 require($moodleroot . '/config.php');
+require($moodleroot . '/local/ucla/lib.php');
 require($CFG->libdir . '/clilib.php');
-
-global $DB;
 
 // Support a 'tolerance' param
 // Will allow admin to set a value threshold for retry count
 list($ext_argv, $unrecog) = cli_get_params(
     array(
         'tolerance' => false,
+        'maxcount' => false,
     ),
     array(
         't' => 'tolerance',
+        'x' => 'maxcount',
     )
 );
-
 
 // Default values
 $default_tolerance = 5;
 $default_display = 20;
+$defaultmaxcount = 30;
 
-$tolerance = (!empty($ext_argv['tolerance']) && !empty($unrecog[0])) 
+$tolerance = (!empty($ext_argv['tolerance']) && !empty($unrecog[0]))
     ? $unrecog[0] : $default_tolerance;
+
+$maxcount = (!empty($ext_argv['maxcount']) && !empty($unrecog[1]))
+    ? $unrecog[1] : $defaultmaxcount;
 
 try {
 
     // Find records with the 'status' count that's greater than the tolerance
-    $records = $DB->get_records_select('events_queue_handlers', 'status >= :limit', 
+    $records = $DB->get_records_select('events_queue_handlers', 'status >= :limit',
             array('limit' => $tolerance));
-    
+
+    // Get count of event records.
+    $totalrecords = $DB->count_records('events_queue_handlers');
+
     // If we find such records, notify admins
-    if(!empty($records)) {
+    if(!empty($records) || $totalrecords > $maxcount) {
+
         $out = "";
-        
-        $count = count($records);
-        
-        // Only display a small sampling.  Event queue backlog can grow
-        // rather large.
-        if($count <= $default_display) {
-            foreach($records as $r) {
-                $out .= json_encode($r, JSON_PRETTY_PRINT);
-                $out .= "\n\n";
+        if (!empty($records)) {
+            $count = count($records);
+            // Only display a small sampling.  Event queue backlog can grow
+            // rather large.
+            if($count <= $default_display) {
+                foreach($records as $r) {
+                    $out .= json_encode($r, JSON_PRETTY_PRINT);
+                    $out .= "\n\n";
+                }
+            } else {
+                $out = "There are more than $default_display records to display!";
             }
-        } else {
-            $out = "There are more than $default_display records to display!";
         }
 
-        // Prepare message
-        $message = "There are $count failed events in the queue that have been retried more than $tolerance times: \n";
-        $message .= "------------------\n";
-        $message .= $out;
-        
-        $subject = "Events queue report (" . $count . ") events";
+        // Prepare message.
+        $message = '';
+        if (!empty($records)) {
+            $message = "There are $count failed events in the queue that have been retried more than $tolerance times: \n";
+            $message .= "------------------\n";
+            $message .= $out;
+        }
+        if ($totalrecords > $maxcount) {
+            $message = "There are $totalrecords total events in the queue, which is more than our threshold of $maxcount.\n";
+        }
+
+        $subject = "Total events in queue: " . $totalrecords;
         $to = get_config('local_ucla', 'admin_email');
         if (empty($to)) {
             // variable not properly set
-            echo "Event queue check: Error -- you're missing the 'to' email field!\n";
-            return 0;
+            cli_error("Event queue check: Error -- you're missing the 'to' email field!");
         }
-        
-        echo "Event queue check: Event queue has grown too much, email sent\n";
+
+        cli_problem("Event queue check: Event queue has grown too much, email sent");
         return ucla_send_mail($to, $subject, $message);
     }
     
     echo "Event queue check: Successfully ran the script\n";
-    return 1;
+    return 0;
     
 } catch (Exception $e) {
     // DB error
-    echo "Event queue check: There was an error in the script.\n";
-    return 0;
+    cli_error("Event queue check: There was an error in the script.");
 }
