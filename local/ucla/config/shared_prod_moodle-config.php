@@ -355,7 +355,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
     accessibility = accessibilitychecker, accessibilityhelper
-    other = html';
+    other = html, fullscreen';
 
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;

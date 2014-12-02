@@ -61,3 +61,6 @@
 [submodule "mod/attendance"]
 	path = mod/attendance
 	url = https://github.com/ccle/moodle-mod_attendance.git
+[submodule "lib/editor/atto/plugins/fullscreen"]
+	path = lib/editor/atto/plugins/fullscreen
+	url = git@github.com:dthies/moodle-atto_fullscreen.git
