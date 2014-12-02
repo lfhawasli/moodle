@@ -344,7 +344,7 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
         jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
         extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
         TeX: {
-            extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+            extensions: ["mhchem.js","AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
         },
         menuSettings: {
             zoom: "Double-Click",
@@ -372,7 +372,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     style2 = underline, strike, subscript, superscript
     align = align
     indent = indent
-    insert = computing, equation, charmap, table, clear
+    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
     accessibility = accessibilitychecker, accessibilityhelper
     other = html';
