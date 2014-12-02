@@ -24,13 +24,16 @@ task :build_fonts do
 end
 
 task :build_js do
-    # Only one JS dependency for now...
-    semanticui_sidebar = "#{theme_package_dir}/semantic/ui//build/minified/modules/sidebar.min.js"
+    # JS files to copy
+    js_files = ["#{theme_package_dir}/semantic/ui/build/minified/modules/sidebar.min.js",
+                "#{theme_package_dir}/semantic/ui/build/minified/modules/accordion.min.js"]
 	
     puts "Building theme js"
 
-    # Move the file
-    sh "cp #{semanticui_sidebar} #{theme_js_dir}"
+    # Move the files
+    js_files.each do |js_file|
+        sh "cp #{js_file} #{theme_js_dir}"
+    end
 end
 
 task :build_css do 
