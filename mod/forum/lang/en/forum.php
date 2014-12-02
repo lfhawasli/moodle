@@ -480,3 +480,11 @@ $string['warnformorepost'] = 'Warning! There is more than one discussion in this
 $string['yournewquestion'] = 'Your new question';
 $string['yournewtopic'] = 'Your new discussion topic';
 $string['yourreply'] = 'Your reply';
+// START UCLA MOD: CCLE-4882 forum customization.
+$string['alldiscussionposts'] = 'Show all posts on one page';
+$string['showallpostsby'] = 'Show all posts sorted by: ';
+$string['sortbydiscussionname'] = 'title';
+$string['sortbytime'] = 'time';
+$string['sortbyuser'] = 'user';
+$string['modeprint'] = 'Printer-friendly version';
+// END UCLA MOD: CCLE-4882 forum customization.

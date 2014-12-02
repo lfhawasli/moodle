@@ -33,6 +33,9 @@ define('FORUM_MODE_FLATOLDEST', 1);
 define('FORUM_MODE_FLATNEWEST', -1);
 define('FORUM_MODE_THREADED', 2);
 define('FORUM_MODE_NESTED', 3);
+// START UCLA-MOD: CCLE-4882 forum customization
+define('FORUM_MODE_PRINT', 4);
+// END UCLA-MOD: CCLE-4882 forum customization
 
 define('FORUM_CHOOSESUBSCRIBE', 0);
 define('FORUM_FORCESUBSCRIBE', 1);
@@ -3299,8 +3302,14 @@ function forum_make_mail_post($course, $cm, $forum, $discussion, $post, $userfro
  * @param bool|null $istracked
  * @return void
  */
+
+// START UCLA-MOD: CCLE-4882 forum customization
+/*
 function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=false, $reply=false, $link=false,
                           $footer="", $highlight="", $postisread=null, $dummyifcantsee=true, $istracked=null, $return=false) {
+*/
+function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=false, $reply=false, $link=false,
+                          $footer="", $highlight="", $postisread=null, $dummyifcantsee=true, $istracked=null, $return=false, $mode=null) {
     global $USER, $CFG, $OUTPUT;
 
     require_once($CFG->libdir . '/filelib.php');
@@ -3534,9 +3543,24 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $postbyuser->user = $postuser->fullname;
     $discussionbyuser = get_string('postbyuser', 'forum', $postbyuser);
     $output .= html_writer::tag('a', '', array('id'=>'p'.$post->id));
-    $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass,
-                                                   'role' => 'region',
-                                                   'aria-label' => $discussionbyuser));
+
+    // START UCLA-MOD: CCLE-4882 forum customization
+    /*
+      $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass,
+                                                      'role' => 'region',
+                                                      'aria-label' => $discussionbyuser));
+     */
+    if ($mode == FORUM_MODE_PRINT){
+       $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass . ' print',
+                                                      'role' => 'region',
+                                                      'aria-label' => $discussionbyuser));
+    } else {
+       $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass,
+                                                      'role' => 'region',
+                                                      'aria-label' => $discussionbyuser));
+    }
+    // END UCLA-MOD: CCLE-4882 forum customization
+
     $output .= html_writer::start_tag('div', array('class'=>'row header clearfix'));
     $output .= html_writer::start_tag('div', array('class'=>'left picture'));
     $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id));
@@ -3632,8 +3656,14 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
             $commandhtml[] = $command;
         }
     }
-    $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
-
+    
+    // START UCLA-MOD:  CCLE-4882 forum customization
+    // $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
+    if ($mode != FORUM_MODE_PRINT) {
+        $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
+    }
+    // END UCLA-MOD:  CCLE-4882 forum customization
+    
     // Output link to post if required
     if ($link && forum_user_can_post($forum, $discussion, $USER, $cm, $course, $modcontext)) {
         if ($post->replies == 1) {
@@ -6020,12 +6050,21 @@ function forum_print_discussion($course, $cm, $forum, $discussion, $post, $mode,
 
     $postread = !empty($post->postread);
 
-    forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, false,
+    // START UCLA-MOD: CCLE-4882 forum customization.
+    /*
+     forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, false,
                          '', '', $postread, true, $forumtracked);
+     */
+    forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, false,
+                         '', '', $postread, true, $forumtracked, false, $mode);
+    // END UCLA-MOD: CCLE-4882 forum customization.
 
     switch ($mode) {
         case FORUM_MODE_FLATOLDEST :
         case FORUM_MODE_FLATNEWEST :
+        // START UCLA-MOD: CCLE-4882 forum customization
+        case FORUM_MODE_PRINT:
+        // END UCLA-MOD: CCLE-4882 forum customization
         default:
             forum_print_posts_flat($course, $cm, $forum, $discussion, $post, $mode, $reply, $forumtracked, $posts);
             break;
@@ -6076,8 +6115,14 @@ function forum_print_posts_flat($course, &$cm, $forum, $discussion, $post, $mode
 
         $postread = !empty($post->postread);
 
+        // START UCLA-MOD: CCLE-4882 forum customization
+        /* 
+           forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
+                             '', '', $postread, true, $forumtracked); 
+         */
         forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
-                             '', '', $postread, true, $forumtracked);
+                             '', '', $postread, true, $forumtracked, false, $mode); 
+        // END UCLA-MOD: CCLE-4882 forum customization
     }
 }
 

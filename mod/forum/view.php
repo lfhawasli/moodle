@@ -127,7 +127,22 @@
 
     echo $OUTPUT->heading(format_string($forum->name), 2);
     if (!empty($forum->intro) && $forum->type != 'single' && $forum->type != 'teacher') {
-        echo $OUTPUT->box(format_module_intro('forum', $forum, $cm->id), 'generalbox', 'intro');
+
+        // START UCLA MOD: CCLE-4882 forum customization.
+        // Modify to include the link inside the box.
+        // echo $OUTPUT->box(format_module_intro('forum', $forum, $cm->id), 'generalbox', 'intro');
+        echo $OUTPUT->box_start('generalbox', 'intro');
+        echo html_writer::nonempty_tag('p', format_module_intro('forum', $forum, $cm->id));
+
+        // If there are posts, show the link.        
+        if (forum_get_discussions_count($cm)){
+            echo html_writer::tag('div',
+                html_writer::link(new moodle_url('/mod/forum/allposts.php', array('forumid' => $forum->id)),
+                get_string('alldiscussionposts', 'forum')),
+                array('class' => 'allposts'));
+        }
+        echo $OUTPUT->box_end();
+        // END UCLA MOD: CCLE-4882 forum customization.
     }
 
 /// find out current groups mode

@@ -344,7 +344,7 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
         jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
         extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
         TeX: {
-            extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+            extensions: ["mhchem.js","AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
         },
         menuSettings: {
             zoom: "Double-Click",
@@ -372,7 +372,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     style2 = underline, strike, subscript, superscript
     align = align
     indent = indent
-    insert = computing, equation, charmap, table, clear
+    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
     accessibility = accessibilitychecker, accessibilityhelper
     other = html';
@@ -388,12 +388,11 @@ $CFG->forced_plugin_settings['local_kaltura']['conn_server'] = 'ce';
 $CFG->forced_plugin_settings['local_kaltura']['uri'] = 'https://www.kaltura.com';
 $CFG->forced_plugin_settings['local_kaltura']['enable_reports'] = 1;
 $CFG->forced_plugin_settings['local_kaltura']['player'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['player_custom'] = 15205332;
+$CFG->forced_plugin_settings['local_kaltura']['player_custom'] = 26365392;
 $CFG->forced_plugin_settings['local_kaltura']['assign_uploader'] = 0;
 $CFG->forced_plugin_settings['local_kaltura']['assign_uploader_custom'] = 15205342;
 $CFG->forced_plugin_settings['local_kaltura']['player_resource'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['player_resource_custom'] = 19816362;
-$CFG->forced_plugin_settings['local_kaltura']['assign_uploader_custom'] = 15205342;
+$CFG->forced_plugin_settings['local_kaltura']['player_resource_custom'] = 26365392;
 $CFG->forced_plugin_settings['local_kaltura']['player_resource_override'] = 1;
 $CFG->forced_plugin_settings['local_kaltura']['res_uploader'] = 0;
 $CFG->forced_plugin_settings['local_kaltura']['res_uploader_custom'] = 15205342;
@@ -404,11 +403,11 @@ $CFG->forced_plugin_settings['local_kaltura']['pres_uploader_custom'] = 15205342
 $CFG->forced_plugin_settings['local_kaltura']['simple_uploader'] = 0;
 $CFG->forced_plugin_settings['local_kaltura']['simple_uploader_custom'] = 15205362;
 $CFG->forced_plugin_settings['local_kaltura']['mymedia_uploader'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_uploader_custom'] = 15205372;
+$CFG->forced_plugin_settings['local_kaltura']['mymedia_uploader_custom'] = 23871951;
 $CFG->forced_plugin_settings['local_kaltura']['mymedia_screen_recorder'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_screen_recorder_custom'] = 15205382;
+$CFG->forced_plugin_settings['local_kaltura']['mymedia_screen_recorder_custom'] = 25573621;
 $CFG->forced_plugin_settings['local_kaltura']['player_filter'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['player_filter_custom'] = 15205332;
+$CFG->forced_plugin_settings['local_kaltura']['player_filter_custom'] = 26365392;
 $CFG->forced_plugin_settings['local_kaltura']['enable_html5'] = 1;
 $CFG->forced_plugin_settings['local_kaltura']['mymedia_application_name'] = 'ccle-shared-stage';
 

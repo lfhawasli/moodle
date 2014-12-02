@@ -69,6 +69,7 @@ class syllabus_ws_form extends moodleform {
         $mform->addRule('leadingsrs',
                 get_string('leading_srs', 'local_ucla_syllabus'),
                 'numeric', null, 'client');
+        $mform->setType('leadingsrs', PARAM_INT);
 
         // POST url.
         $mform->addElement('text', 'url',
@@ -77,6 +78,7 @@ class syllabus_ws_form extends moodleform {
         $mform->addRule('url',
                 get_string('post_url_required', 'local_ucla_syllabus'),
                 'required', null, 'client');
+        $mform->setType('url', PARAM_URL);
 
         // Contact email.
         $mform->addElement('text', 'contact',
@@ -89,12 +91,14 @@ class syllabus_ws_form extends moodleform {
                 get_string('contact_email_required', 'local_ucla_syllabus'),
                 'email', null, 'client');
         $mform->addHelpButton('contact', 'contact_email', 'local_ucla_syllabus');
+        $mform->setType('contact', PARAM_EMAIL);
 
         // Optional token.
         $mform->addElement('text', 'token',
                 get_string('token', 'local_ucla_syllabus'),
                 array('maxlength' => 64, 'size' => 50));
         $mform->addHelpButton('token', 'token', 'local_ucla_syllabus');
+        $mform->setType('token', PARAM_ALPHANUM);
 
         $mform->addElement('select', 'action',
                 get_string('select_action', 'local_ucla_syllabus'),

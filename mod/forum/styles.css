@@ -84,6 +84,11 @@
 #page-mod-forum-view .groupmenu {float: left;text-align:left;white-space: nowrap;}
 #page-mod-forum-index .subscription,
 #page-mod-forum-view .subscription {float: right;text-align:right;white-space: nowrap;margin: 5px 0;}
+/** START UCLA MOD: CCLE-4882 forum customization **/
+#page-mod-forum-allposts .allposts, 
+#page-mod-forum-view .allposts {text-align:right;white-space: nowrap;margin: 5px 0;}
+.forumpost.clearfix.print {border-width: 0px 0px 0px 0px;box-shadow: none;}
+/** END UCLA MOD: CCLE-4882 forum customization **/
 
 /** Styles for search.php */
 #page-mod-forum-search .introcontent {padding: 15px;font-weight:bold;}
