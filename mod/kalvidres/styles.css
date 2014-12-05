@@ -28,3 +28,7 @@
     font-weight: bold;
     left: 12px;
 }
+
+#id_video #video_thumbnail {
+    float: left;
+}

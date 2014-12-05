@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,20 +13,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_kalvidpres
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Kaltura video presentation version file.
+ *
+ * @package    mod_kalvidpres
+ * @author     Remote-Learner.net Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
-$module->version = 2013071808;
+$module->version = 2014102807;
 $module->component  = 'mod_kalvidpres';
-$module->release    = 'Kaltura release 3.1.02 (RL: 2.5.1.7)';
-$module->requires = 2013051400;
+$module->release    = 'Kaltura release 4.0.01';
+$module->requires = 2014050800;
 $module->cron       = 0;
 $module->maturity = MATURITY_STABLE;
 $module->dependencies = array(
-    'local_kaltura' => 2013041500
+    'local_kaltura' => 2014102807
 );

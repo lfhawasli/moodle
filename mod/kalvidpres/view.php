@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,36 +13,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video presentation
+ * Kaltura video presentation view page.
  *
- * @package    mod
- * @subpackage kalvidpres
+ * @package    mod_kalvidpres
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '/local/kaltura/locallib.php');
-require_once(dirname(__FILE__) . '/locallib.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 
-$id         = optional_param('id', 0, PARAM_INT);           // Course Module ID
-$admin_mode = '0';
+$id = optional_param('id', 0, PARAM_INT);
 
-// Retrieve module instance
+// Retrieve module instance.
 if (empty($id)) {
     print_error('invalidid', 'kalvidpres');
 }
 
 if (!empty($id)) {
 
-    if (! $cm = get_coursemodule_from_id('kalvidpres', $id)) {
+    if (!$cm = get_coursemodule_from_id('kalvidpres', $id)) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+    if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
         print_error('coursemisconf');
     }
 
-    if (! $kalvidpres = $DB->get_record('kalvidpres', array("id"=>$cm->instance))) {
+    if (!$kalvidpres = $DB->get_record('kalvidpres', array("id" => $cm->instance))) {
         print_error('invalidid', 'kalvidpres');
     }
 }
@@ -52,56 +49,38 @@ require_course_login($course->id, true, $cm);
 
 global $SESSION, $CFG;
 
-$PAGE->set_url('/mod/kalvidpres/view.php', array('id'=>$id));
+$PAGE->set_url('/mod/kalvidpres/view.php', array('id' => $id));
 $PAGE->set_title(format_string($kalvidpres->name));
 $PAGE->set_heading($course->fullname);
+$pageclass = 'kaltura-kalvidpres-body';
+$PAGE->add_body_class($pageclass);
 
-$renderer = $PAGE->get_renderer('mod_kalvidpres');
+$context = $PAGE->context;
 
-$PAGE->requires->js('/local/kaltura/js/jquery.js', true);
-$PAGE->requires->js('/local/kaltura/js/swfobject.js', true);
-$PAGE->requires->js('/local/kaltura/js/kcwcallback.js', true);
+add_to_log($course->id, 'kalvidpres', 'view video resource', 'view.php?id='.$cm->id, $kalvidpres->id, $cm->id);
 
-// Check if the user has the capability to manage activites
-$context = get_context_instance(CONTEXT_COURSE, $cm->course);
-if (has_capability('moodle/course:manageactivities', $context)) {
-    $admin_mode = '1';
-}
-
-// Try connection
-$result = local_kaltura_login(true, '');
-
-if ($result) {
-//    if (local_kaltura_has_mobile_flavor_enabled() && local_kaltura_get_enable_html5()) {
-//        $uiconf_id = local_kaltura_get_player_uiconf('presentation');
-//        $url = new moodle_url(local_kaltura_htm5_javascript_url($uiconf_id));
-//        $PAGE->requires->js($url, true);
-//        $PAGE->requires->js('/local/kaltura/js/frameapi.js', true);
-//    }
-
-    add_to_log($course->id, 'kalvidpres', 'view video resource', 'view.php?id='.$cm->id, $kalvidpres->id, $cm->id);
-
-    $completion = new completion_info($course);
-    $completion->set_module_viewed($cm);
-}
-
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->box_start('generalbox');
+$renderer = $PAGE->get_renderer('mod_kalvidpres');
 
-echo $renderer->display_mod_info($kalvidpres->name);
+echo $OUTPUT->box_start('generalbox');
 
 echo format_module_intro('kalvidpres', $kalvidpres, $cm->id);
 
 echo $OUTPUT->box_end();
 
-echo $renderer->video_notification_bar();
+// Require a YUI module to make the object tag be as large as possible.
+$params = array(
+    'bodyclass' => $pageclass,
+    'lastheight' => null,
+    'padding' => 15,
+    'kalvidwidth' => $kalvidpres->width
+);
+$PAGE->requires->yui_module('moodle-local_kaltura-lticontainer', 'M.local_kaltura.init', array($params), null, true);
 
-if ($result) {
-    echo $renderer->player_markup($kalvidpres, $admin_mode);
-} else {
-    echo $renderer->connection_failure();
-}
+echo $renderer->display_iframe($kalvidpres, $course->id);
 
 echo $OUTPUT->footer();

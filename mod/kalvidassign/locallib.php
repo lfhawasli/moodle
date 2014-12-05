@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,10 +13,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment locallib
+ * Kaltura video assignment locallib script.
  *
  * @package    mod_kalvidassign
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
 /**
@@ -32,7 +33,7 @@ define('KALASSIGN_ALL', 0);
 define('KALASSIGN_REQ_GRADING', 1);
 define('KALASSIGN_SUBMITTED', 2);
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/lib/gradelib.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/lib/gradelib.php');
 require_once($CFG->dirroot.'/mod/kalvidassign/renderable.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/local/kaltura/locallib.php');
 
@@ -53,42 +54,13 @@ function kalvidassign_assignemnt_submission_expired($kalvidassign) {
     return $expired;
 }
 
-function kalvidassign_submissions($mode) {
-    //make user global so we can use the id
-    global $USER, $OUTPUT, $DB, $PAGE;
-
-    $mailinfo = optional_param('mailinfo', null, PARAM_BOOL);
-
-    if (optional_param('next', null, PARAM_BOOL)) {
-        $mode='next';
-    }
-    if (optional_param('saveandnext', null, PARAM_BOOL)) {
-        $mode='saveandnext';
-    }
-
-    if (is_null($mailinfo)) {
-        if (optional_param('sesskey', null, PARAM_BOOL)) {
-            set_user_preference('kalvidassign_mailinfo', $mailinfo);
-        } else {
-            $mailinfo = get_user_preferences('kalvidassign_mailinfo', 0);
-        }
-    } else {
-        set_user_preference('kalvidassign_mailinfo', $mailinfo);
-    }
-
-    $function = $mode . '_display';
-
-    $function();
-}
-
 /**
  * Retrieve a list of users who have submitted assignments
  * 
- * @param int - assignment instance id
- * @param string - filter results by assignments that have been submitted or
- * assignment that need to be graded or no filter at all
- * 
- * @return mixed - collection of users or false
+ * @param int $kalvidassignid The assignment id.
+ * @param string $filter Filter results by assignments that have been submitted or
+ * assignment that need to be graded or no filter at all.
+ * @return mixed collection of users or false.
  */
 function kalvidassign_get_submissions($kalvidassignid, $filter = '') {
     global $DB;
@@ -106,31 +78,33 @@ function kalvidassign_get_submissions($kalvidassignid, $filter = '') {
     $param = array('instanceid' => $kalvidassignid);
     $where .= ' vidassignid = :instanceid';
 
-    // Reordering the fields returned to make it easier to use in the grade_get_grades function
-    $records = $DB->get_records_select('kalvidassign_submission', $where, $param, 'timemodified DESC',
-                                       'userid,vidassignid,entry_id,grade,submissioncomment,'.
-                                       'format,teacher,mailed,timemarked,timecreated,timemodified');
+    // Reordering the fields returned to make it easier to use in the grade_get_grades function.
+    $columns = 'userid,vidassignid,entry_id,grade,submissioncomment,format,teacher,mailed,timemarked,timecreated,timemodified,source,width,height';
+    $records = $DB->get_records_select('kalvidassign_submission', $where, $param, 'timemodified DESC', $columns);
 
     if (empty($records)) {
         return false;
     }
 
     return $records;
-
 }
 
+/**
+ * This function retrives the user's submission record.
+ * @param int $kalvidassignid The activity instance id.
+ * @param int $userid The user id.
+ * @return object A data object consisting of the user's submission.
+ */
 function kalvidassign_get_submission($kalvidassignid, $userid) {
     global $DB;
 
-    $param = array('instanceid' => $kalvidassignid,
-                   'userid' => $userid);
+    $param = array('instanceid' => $kalvidassignid, 'userid' => $userid);
     $where = '';
     $where .= ' vidassignid = :instanceid AND userid = :userid';
 
-    // Reordering the fields returned to make it easier to use in the grade_get_grades function
-    $record = $DB->get_record_select('kalvidassign_submission', $where, $param,
-                                       'userid,id,vidassignid,entry_id,grade,submissioncomment,'.
-                                       'format,teacher,mailed,timemarked,timecreated,timemodified');
+    // Reordering the fields returned to make it easier to use in the grade_get_grades function.
+    $columns = 'userid,id,vidassignid,entry_id,grade,submissioncomment,format,teacher,mailed,timemarked,timecreated,timemodified,source,width,height';
+    $record = $DB->get_record_select('kalvidassign_submission', $where, $param, '*');
 
     if (empty($record)) {
         return false;
@@ -140,16 +114,21 @@ function kalvidassign_get_submission($kalvidassignid, $userid) {
 
 }
 
-function kalvidassign_get_submission_grade_object($instance_id, $userid) {
+/**
+ * This function retrieves the submission grade object.
+ * @param int $instanceid The activity instance id.
+ * @param int $userid The user id.
+ * @return object A data object consisting of the user's submission.
+ */
+function kalvidassign_get_submission_grade_object($instanceid, $userid) {
     global $DB;
 
-    $param = array('kvid' => $instance_id,
-                   'userid' => $userid);
+    $param = array('kvid' => $instanceid, 'userid' => $userid);
 
     $sql = "SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback, s.format AS feedbackformat,
                    s.teacher AS usermodified, s.timemarked AS dategraded, s.timemodified AS datesubmitted
-            FROM {user} u, {kalvidassign_submission} s
-            WHERE u.id = s.userid AND s.vidassignid = :kvid
+              FROM {user} u, {kalvidassign_submission} s
+             WHERE u.id = s.userid AND s.vidassignid = :kvid
                    AND u.id = :userid";
 
     $data = $DB->get_record_sql($sql, $param);
@@ -161,25 +140,32 @@ function kalvidassign_get_submission_grade_object($instance_id, $userid) {
     return $data;
 }
 
+/**
+ * This function validates the course module id and returns the course module object, course object and activity instance object.
+ * @return array an array with the following values array(course module object, $course object, activity instance object).
+ */
 function kalvidassign_validate_cmid ($cmid) {
     global $DB;
 
-    if (! $cm = get_coursemodule_from_id('kalvidassign', $cmid)) {
+    if (!$cm = get_coursemodule_from_id('kalvidassign', $cmid)) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+    if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
         print_error('coursemisconf');
     }
 
-    if (! $kalvidassignobj = $DB->get_record('kalvidassign', array('id' => $cm->instance))) {
+    if (!$kalvidassignobj = $DB->get_record('kalvidassign', array('id' => $cm->instance))) {
         print_error('invalidid', 'kalvidassign');
     }
 
     return array($cm, $course, $kalvidassignobj);
-
 }
 
+/**
+ * This function returns HTML markup to signify a submission was late.
+ * @return string HTML markup
+ */
 function kalvidassign_display_lateness($timesubmitted, $timedue) {
     if (!$timedue) {
         return '';
@@ -194,13 +180,6 @@ function kalvidassign_display_lateness($timesubmitted, $timedue) {
     }
 }
 
-function kalvidassign_get_video_properties() {
-    return array('width' => '400',
-                 'height' => '365',
-                 'uiconf_id' => local_kaltura_get_player_uiconf('player'),
-                 'video_title' => 'Video assignment submission');
-}
-
 /**
  * Alerts teachers by email of new or changed assignments that need grading
  *
@@ -210,10 +189,10 @@ function kalvidassign_get_video_properties() {
  *
  * @global object
  * @global object
- * @param object - kaltura video assignment course module object
- * @param string - name of the video assignment instance
- * @param object - $submission object The submission that has changed
- * @param object - $context
+ * @param object $cm Kaltura video assignment course module object.
+ * @param string $name Name of the video assignment instance.
+ * @param object $submission The submission that has changed.
+ * @param object $context The context object.
  * @return void
  */
 function kalvidassign_email_teachers($cm, $name, $submission, $context) {
@@ -232,11 +211,11 @@ function kalvidassign_email_teachers($cm, $name, $submission, $context) {
             $info->username = fullname($user, true);
             $info->assignment = format_string($name, true);
             $info->url = $CFG->wwwroot.'/mod/kalvidassign/grade_submissions.php?cmid='.$cm->id;
-            $info->timeupdated = strftime('%c',$submission->timemodified);
+            $info->timeupdated = strftime('%c', $submission->timemodified);
             $info->courseid = $cm->course;
             $info->cmid     = $cm->id;
 
-            $postsubject = $strsubmitted.': '.$user->username .' -> '. $name;
+            $postsubject = $strsubmitted.': '.$user->username.' -> '.$name;
             $posttext = kalvidassign_email_teachers_text($info);
             $posthtml = ($teacher->mailformat == 1) ? kalvidassign_email_teachers_html($info) : '';
 
@@ -262,20 +241,22 @@ function kalvidassign_email_teachers($cm, $name, $submission, $context) {
 }
 
 /**
- * Returns a list of teachers that should be grading given submission
+ * Returns a list of teachers that should be grading given submission.
  *
- * @param object - kaltura video assignment course module object
- * @param object - $user
- * @param object - a context object
- * @return array
+ * @param object $cm Kaltura video assignment course module object.
+ * @param object $user The Moodle user object.
+ * @param object $context A context object.
+ * @return array An array of grading userids
  */
 function kalvidassign_get_graders($cm, $user, $context) {
-    //potential graders
+    // Potential graders.
     $potgraders = get_users_by_capability($context, 'mod/kalvidassign:gradesubmission', '', '', '', '', '', '', false, false);
 
     $graders = array();
-    if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {   // Separate groups are being used
-        if ($groups = groups_get_all_groups($cm->course, $user->id)) {  // Try to find all groups
+    // Separate groups are being used.
+    if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
+        // Try to find all groups.
+        if ($groups = groups_get_all_groups($cm->course, $user->id)) {
             foreach ($groups as $group) {
                 foreach ($potgraders as $t) {
                     if ($t->id == $user->id) {
@@ -290,9 +271,11 @@ function kalvidassign_get_graders($cm, $user, $context) {
             // user not in group, try to find graders without group
             foreach ($potgraders as $t) {
                 if ($t->id == $user->id) {
-                    continue; // do not send self
+                    // do not send self.
+                    continue;
                 }
-                if (!groups_get_all_groups($cm->course, $t->id)) { //ugly hack
+                // ugly hack.
+                if (!groups_get_all_groups($cm->course, $t->id)) {
                     $graders[$t->id] = $t;
                 }
             }
@@ -300,7 +283,8 @@ function kalvidassign_get_graders($cm, $user, $context) {
     } else {
         foreach ($potgraders as $t) {
             if ($t->id == $user->id) {
-                continue; // do not send self
+                // do not send self.
+                continue;
             }
             $graders[$t->id] = $t;
         }
@@ -322,9 +306,8 @@ function kalvidassign_email_teachers_text($info) {
     $posttext = '';
 
     if (!empty($course)) {
-        $posttext  = format_string($course->shortname, true, $course->id).' -> '.
-                     get_string('modulenameplural', 'kalvidassign') . '  -> '.
-                     format_string($info->assignment, true, $course->id)."\n";
+        $posttext  = format_string($course->shortname, true, $course->id).' -> '.get_string('modulenameplural', 'kalvidassign').'  -> ';
+        $posttext .= format_string($info->assignment, true, $course->id)."\n";
         $posttext .= '---------------------------------------------------------------------'."\n";
         $posttext .= get_string("emailteachermail", "kalvidassign", $info)."\n";
         $posttext .= "\n---------------------------------------------------------------------\n";
@@ -333,10 +316,10 @@ function kalvidassign_email_teachers_text($info) {
     return $posttext;
 }
 
- /**
+/**
  * Creates the html content for emails to teachers
  *
- * @param $info object The info used by the 'emailteachermailhtml' language string
+ * @param object $info The info used by the 'emailteachermailhtml' language string
  * @return string
  */
 function kalvidassign_email_teachers_html($info) {
@@ -347,38 +330,27 @@ function kalvidassign_email_teachers_html($info) {
     $posthtml = '';
 
     if (!empty($course)) {
-        $posthtml  = '<p><font face="sans-serif">'.
-                     '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'.format_string($course->shortname, true, $course->id).'</a> ->'.
-                     '<a href="'.$CFG->wwwroot.'/mod/kalvidassign/view.php?id='.$info->cmid.'">'.format_string($info->assignment, true, $course->id).'</a></font></p>';
-        $posthtml .= '<hr /><font face="sans-serif">';
-        $posthtml .= '<p>'.get_string('emailteachermailhtml', 'kalvidassign', $info).'</p>';
-        $posthtml .= '</font><hr />';
+        $posthtml .= html_writer::start_tag('p');
+        $attr = array('href' => new moodle_url('/course/view.php', array('id' => $course->id)));
+        $posthtml .= html_writer::tag('a', format_string($course->shortname, true, $course->id), $attr);
+        $posthtml .= '->';
+        $attr = array('href' => new moodle_url('/mod/kalvidassign/view.php', array('id' => $info->cmid)));
+        $posthtml .= html_writer::tag('a', format_string($info->assignment, true, $course->id), $attr);
+        $posthtml .= html_writer::end_tag('p');
+        $posthtml .= html_writer::start_tag('hr');
+        $posthtml .= html_writer::tag('p', get_string('emailteachermailhtml', 'kalvidassign', $info));
+        $posthtml .= html_writer::end_tag('hr');
     }
     return $posthtml;
 }
 
-
-function kalvidassign_get_assignment_students($cm) {
-    global $CFG;
-
-    $context    = get_context_instance(CONTEXT_MODULE, $cm->id);
-    $users = get_enrolled_users($context, 'mod/kalvidassign:submit', 0, 'u.id');
-    
-    return $users;
-}
-
 /**
- * This functions returns an array with the height and width used in the configiruation for displaying a video.
- * @return array An array whose first value is the width and second value is the height.
+ * This function retrieves a list of enrolled users with the capability to submit to the activity.
+ * @return array An array of user objects.
  */
-function kalvidassign_get_player_dimensions() {
-    $kalturaconfig = get_config(KALTURA_PLUGIN_NAME);
+function kalvidassign_get_assignment_students($cm) {
+    $context = context_module::instance($cm->id);
+    $users = get_enrolled_users($context, 'mod/kalvidassign:submit', 0, 'u.id');
 
-    $width = (isset($kalturaconfig->kalvidassign_player_width) && !empty($kalturaconfig->kalvidassign_player_width)) ?
-            $kalturaconfig->kalvidassign_player_width : KALTURA_ASSIGN_VIDEO_WIDTH;
-
-    $height = (isset($kalturaconfig->kalvidassign_player_height) && !empty($kalturaconfig->kalvidassign_player_height)) ?
-            $kalturaconfig->kalvidassign_player_height : KALTURA_ASSIGN_VIDEO_HEIGHT;
-
-    return array($width, $height);
+    return $users;
 }

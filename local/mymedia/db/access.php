@@ -1,4 +1,6 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -13,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura mymedia access.php
+ * My Media capabilities.
  *
- * @package    local
- * @subpackage mymedia
+ * @package    local_mymedia
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
 $capabilities = array(
-
     'local/mymedia:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
@@ -29,68 +31,4 @@ $capabilities = array(
             'user' => CAP_ALLOW
         )
     ),
-
-    'local/mymedia:search' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-
-    'local/mymedia:editmetadata' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-
-    'local/mymedia:sharecourse' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-
-    'local/mymedia:sharesite' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-
-    'local/mymedia:upload' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-
-    'local/mymedia:screenrecorder'  => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-
-/*    'local/mymedia:delete' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_USER,
-        'archetypes' => array(
-            'user' => CAP_ALLOW
-        )
-    ),
-*/
-//    'local/mymedia:clip' => array(
-//        'captype' => 'write',
-//        'contextlevel' => CONTEXT_USER,
-//        'archetypes' => array(
-//            'user' => CAP_ALLOW
-//        )
-//    ),
 );

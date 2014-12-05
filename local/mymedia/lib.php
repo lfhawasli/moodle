@@ -15,79 +15,42 @@
 /**
  * Kaltura my media library script
  *
- * @package    local
- * @subpackage mymedia
+ * @package    local_mymedia
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
-
-define('MYMEDIA_ITEMS_PER_PAGE', '9');
 
 /**
  * This function adds my media links to the navigation block
+ * @param global_navigation $navigation a global_navigation object
+ * @return void
  */
 function local_mymedia_extends_navigation($navigation) {
+    global $USER, $DB, $PAGE;
 
-    global $USER;
+    if (empty($USER->id)) {
+        return;
+    }
+
+    // When on the admin-index page, first check if the capability exists.
+    // This is to cover the edge case on the Plugins check page, where a check for the capability is performed before the capability has been added to the Moodle mdl_capabilities
+    // table.
+    if ('admin-index' === $PAGE->pagetype) {
+        $exists = $DB->record_exists('capabilities', array('name' => 'local/mymedia:view'));
+
+        if (!$exists) {
+            return;
+        }
+    }
+
+    $nodehome = $navigation->get('home');
+    $context = context_user::instance($USER->id);
+
+    if (empty($nodehome) || !has_capability('local/mymedia:view', $context, $USER)) {
+        return;
+    }
 
     $mymedia = get_string('nav_mymedia', 'local_mymedia');
-    $upload = get_string('nav_upload', 'local_mymedia');
-
-    $node_home = $navigation->get('home');
-
-    // START UCLA MOD: CCLE-4584 - Fix get_context_instance() is deprecated
-    //$context = get_context_instance(CONTEXT_USER, $USER->id);
-    $context = context_user::instance($USER->id, IGNORE_MISSING);
-    // END UCLA MOD: CCLE-4584
-
-    if ($node_home && has_capability('local/mymedia:view', $context, $USER)) {
-        $node_mymedia = $node_home->add($mymedia, new moodle_url('/local/mymedia/mymedia.php'),
-                                        navigation_node::NODETYPE_LEAF, $mymedia, 'mymedia');
-    }
-}
-
-/**
- * This function checks for capability across all context levels.
- *
- * @param string $capability The name of capability we are checking
- * @return boolean true if capability found, false otherwise
- */
-function local_mymedia_check_capability($capability) {
-    global $DB, $USER;
-    $result = false;
-
-    // Site admins can do anything
-    if (is_siteadmin($USER->id)) {
-        $result = true;
-    }
-
-    // Look for share permissions in the USER global
-    if (!$result && isset($USER->access['rdef'])) {
-        foreach ($USER->access['rdef'] as $contextelement) {
-            if (isset($contextelement[$capability]) && $contextelement[$capability] == 1) {
-                $result = true;
-            }
-        }
-    }
-
-    // Look for share permissions in the database for any context level in case it wasn't found in USER global
-    if (!$result) {
-        $sql = "SELECT ra.*
-                  FROM {role_assignments} ra
-            INNER JOIN {role_capabilities} rc ON rc.roleid = ra.roleid
-                 WHERE ra.userid = :userid
-                       AND rc.capability = :capability
-                       AND rc.permission = :permission";
-
-        $params = array(
-            'userid' => $USER->id,
-            'capability' => $capability,
-            'permission' => CAP_ALLOW
-        );
-
-        if ($DB->record_exists_sql($sql, $params)) {
-            $result = true;
-        }
-    }
-
-    return $result;
+    $nodemymedia = $nodehome->add($mymedia, new moodle_url('/local/mymedia/mymedia.php'), navigation_node::NODETYPE_LEAF, $mymedia, 'mymedia');
 }

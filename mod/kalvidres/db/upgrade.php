@@ -26,18 +26,46 @@ function xmldb_kalvidres_upgrade($oldversion) {
 
     if ($oldversion < 2011110702) {
 
-        // Changing type of field intro on table kalvidres to text
+        // Changing type of field intro on table kalvidres to text.
         $table = new xmldb_table('kalvidres');
         $field = new xmldb_field('intro', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'name');
 
-        // Launch change of type for field intro
+        // Launch change of type for field intro.
         $dbman->change_field_type($table, $field);
-        
-        // kalvidres savepoint reached
+
+        // Kalvidres savepoint reached.
         upgrade_mod_savepoint(true, 2011110702, 'kalvidres');
     }
 
-    
+    if ($oldversion < 2014013000) {
+
+        // Define field source to be added to kalvidres.
+        $table = new xmldb_table('kalvidres');
+        $field = new xmldb_field('source', XMLDB_TYPE_TEXT, null, null, null, null, null, 'width');
+
+        // Conditionally launch add field source.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Kalvidres savepoint reached.
+        upgrade_mod_savepoint(true, 2014013000, 'kalvidres');
+    }
+
+    if ($oldversion < 2014023000.01) {
+
+        // Define field metadata to be added to kalvidres.
+        $table = new xmldb_table('kalvidres');
+        $field = new xmldb_field('metadata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'source');
+
+        // Conditionally launch add field metadata.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Kalvidassign savepoint reached.
+        upgrade_mod_savepoint(true, 2014023000.01, 'kalvidres');
+    }
+
     return true;
 }
-    
