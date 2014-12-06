@@ -381,7 +381,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     style1 = title, bold, italic, backcolor, fontcolor
     list = unorderedlist, orderedlist
     links = link
-    files = image, media, managefiles, poodll
+    files = image, media, managefiles, poodll, kalturamedia
     style2 = underline, strike, subscript, superscript
     align = align
     indent = indent
@@ -395,6 +395,9 @@ $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 
 // Site administration > Plugins > Local plugins > Google Analytics
 $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
+
+// Site administration > Plugins > Local plugins > Kaltura package libraries
+$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031.kaf.kaltura.com';
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.

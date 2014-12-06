@@ -818,9 +818,21 @@ function local_kaltura_update_activities() {
                 $record->width = $width + KALTURA_MIGRATION_WIDTH_PADDING;
                 $record->height = $height + KALTURA_MIGRATION_HEIGHT_PADDING;
 
+                // START UCLA MOD: CCLE-4908 - Upgrade to Kaltura KAF
                 // Retrieve the Kaltura base entry object.
-                $kalentry = $client->baseEntry->get($record->entry_id);
+                //$kalentry = $client->baseEntry->get($record->entry_id);
+                //$newobject = local_kaltura_convert_kaltura_base_entry_object($kalentry);
+                try {
+                    // Retrieve the Kaltura base entry object.
+                    $kalentry = $client->baseEntry->get($record->entry_id);
+                }
+                catch(Exception $ex) {
+                    // if from some reason we were not able to get the entry - lets make an empty object to use for empty metadata
+                    // since this is for backward compatibility - we can ignore that for the sake of completing the migration
+                    $kalentry = new stdClass();
+                }
                 $newobject = local_kaltura_convert_kaltura_base_entry_object($kalentry);
+                // END UCLA MOD: CCLE-4908
                 // Searlize and base 64 encode the metadata.
                 $metadata = local_kaltura_encode_object_for_storage($newobject);
                 $record->metadata = $metadata;

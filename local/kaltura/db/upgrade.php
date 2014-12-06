@@ -57,7 +57,10 @@ function xmldb_local_kaltura_upgrade($oldversion) {
         }
 
         // Kaltura savepoint reached.
-        upgrade_plugin_savepoint(true, 2014102807, 'local', 'kaltura');
+        // START UCLA MOD: CCLE-4908 - Upgrade to Kaltura KAF
+        //upgrade_plugin_savepoint(true, 2014102807, 'local', 'kaltura');
+        upgrade_plugin_savepoint(true, 2014023000, 'local', 'kaltura');
+        // END UCLA MOD: CCLE-4908
     }
 
     if ($oldversion < 2014102807) {

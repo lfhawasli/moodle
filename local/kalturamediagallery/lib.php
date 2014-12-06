@@ -27,9 +27,12 @@
  * @param global_navigation $navigation a global_navigation object
  * @return void
  */
-function local_kalturamediagallery_extends_navigation($navigation) {
+// START UCLA MOD: CCLE-4908 - local_kaltura: Upgrade to Kaltura KAF
+// Display link to course media gallery in Administration > Course administration.
+//function local_kalturamediagallery_extends_navigation($navigation) {
+function local_kalturamediagallery_extends_settings_navigation($navigation) {
+// END UCLA MOD: CCLE-4908
     global $USER, $PAGE, $DB;
-
     if (empty($USER->id)) {
         return;
     }
@@ -60,7 +63,11 @@ function local_kalturamediagallery_extends_navigation($navigation) {
         $coursecontext = $context;
     }
 
-    $mycoursesnode = $navigation->find('currentcourse', $navigation::TYPE_ROOTNODE);
+    // START UCLA MOD: CCLE-4908 - local_kaltura: Upgrade to Kaltura KAF
+    // Display link to course media gallery in Administration > Course administration.
+    //$mycoursesnode = $navigation->find('currentcourse', $navigation::TYPE_ROOTNODE);
+    $mycoursesnode = $navigation->find('courseadmin', $navigation::TYPE_COURSE);
+    // END UCLA MOD: CCLE-4908
 
     if (empty($mycoursesnode) || !has_capability('local/kalturamediagallery:view', $coursecontext, $USER)) {
         return;
