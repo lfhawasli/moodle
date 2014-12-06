@@ -22,6 +22,12 @@ table {
     font-size: $type-font-size;
 }
 
+// Remove default padding for ul/ol
+ul, ol {
+    padding: 0;
+    margin-left: 25px;
+}
+
 img.icon {
     width: auto;
     height: auto;
