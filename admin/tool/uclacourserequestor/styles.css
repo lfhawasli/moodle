@@ -12,17 +12,13 @@
     text-align: center;
 }
 
-#uclacourserequestor_notice {
-/*    color: #c00;
-    text-align: center;*/
+#uclacourserequestor_requests thead {
+    color: white;
 }
 
-#uclacourserequestor_requests tbody .warning {
-    font-weight: bold;
-}
-
+#uclacourserequestor_requests tbody .warning,
 #uclacourserequestor_requests tbody .error {
-    color: #c00;
+    background-color: #f2dede; /* Bootstrap notice error color */
 }
 
 #tool_uclacourserequestor #checkrequests {
@@ -41,4 +37,33 @@
 /** This is currently overpowered by an !important **/
 #uclacourserequestor_requests thead {
     background-color: #536895;
+}
+
+#uclacourserequestor_requests .cmailinst {
+    text-align: center;
+}
+
+#ucrgeneraloptions input {
+    margin: 0 5px;
+}
+
+/* Make sure build labels are separated by some space between. */
+#ucrgeneraloptions span {
+    margin: 5px;
+    padding: 3px;
+}
+
+#uclacourserequestor_requests .ugrad,
+#ucrgeneraloptions .ugrad {
+    background-color: #E5EBFF; /* light blue */
+}
+
+#uclacourserequestor_requests .grad,
+#ucrgeneraloptions .grad {
+    background-color: #E5FBE7; /* light green */
+}
+
+#uclacourserequestor_requests .tut,
+#ucrgeneraloptions .tut {
+    background-color: #F2F2F2; /* light grey */
 }

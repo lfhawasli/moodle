@@ -47,6 +47,7 @@ $PAGE->set_context($syscontext);
 $PAGE->set_heading(get_string('pluginname', $rucr));
 $PAGE->set_pagetype('admin-uclacourserequestor');
 $PAGE->set_pagelayout('admin');
+$PAGE->requires->js_init_call('M.tool_uclacourserequestor.init');
 
 // Prepare and load Moodle Admin interface
 admin_externalpage_setup('uclacourserequestor');
@@ -398,27 +399,43 @@ if ($processrequests) {
         $requeststodisplay = $requestswitherrors;
     }
 
-    // Check to see if we need the requestor field
-    foreach ($requestswitherrors as $set) {
-        $first = reset($set);
+    // Check to see if we need global options.
+    $set = reset($requestswitherrors);
+    $first = reset($set);
+    if ($first['action'] == UCLA_COURSE_TOBUILD
+            || $first['action'] == UCLA_COURSE_FAILED) {
+        // Add options for global email to contact.
+        $requestor = html_writer::tag('label', get_string(
+            'requestorglobal', $rucr), array(
+                'for' => 'requestorglobal'
+            ));
 
-        $oneaction = $first['action'];
-        if ($oneaction == UCLA_COURSE_TOBUILD 
-                || $oneaction == UCLA_COURSE_FAILED) {
-            $requestor = html_writer::tag('label', get_string(
-                'requestorglobal', $rucr), array(
-                    'for' => 'requestorglobal'
-                ));
+        $requestor .= html_writer::tag('input', '', array(
+                'type' => 'text',
+                'value' => $requestorglobal,
+                'name' => 'requestorglobal'
+            ));
 
-            $requestor .= html_writer::tag('input', '', array(
-                    'type' => 'text',
-                    'value' => $requestorglobal,
-                    'name' => 'requestorglobal'
-                ));
+        $globaloptions[][] = $requestor;
 
-            $globaloptions[] = $requestor;
-            break;
-        }
+        // Add option to email instructors.
+        $globaloptions[][] = html_writer::checkbox('', 'mailinst',
+                get_config('tool_uclacourserequestor', 'mailinst_default'),
+                get_string('mailinsttoggle', 'tool_uclacourserequestor'),
+                array('class' => 'check-all'));
+
+        // Add build filter options.
+        $filters = get_string('buildfilters', 'tool_uclacourserequestor');
+        $filters .= html_writer::tag('span',
+                html_writer::checkbox('', 'ugrad', true, 'ugrad', array('class' => 'check-all')),
+                array('class' => 'label ugrad'));
+        $filters .= html_writer::tag('span',
+                html_writer::checkbox('', 'grad', true, 'grad', array('class' => 'check-all')),
+                array('class' => 'label grad'));
+        $filters .=  html_writer::tag('span',
+                html_writer::checkbox('', 'tut', true, 'tut', array('class' => 'check-all')),
+                array('class' => 'label tut'));
+        $globaloptions[][] = $filters;
     }
     
     // user wants to build courses now
@@ -450,20 +467,34 @@ if ($processrequests) {
     // Get the values as a set
     $errormessages = array_keys(array_flip($rowclasses));
 
-    $possfields = array();
-    foreach ($tabledata as $request) {
-        // Get the headers to display strings
-        foreach ($request as $f => $v) {
-            // get_string() should be cached...
-            $possfields[$f] = get_string($f, $rucr);
+    // Add class type to row for styling.
+    foreach ($tabledata as $key => $data) {
+        if (!isset($data['type'])) {
+            // Requests that are already built do not have a type.
+            continue;
         }
+
+        if(!isset($rowclasses[$key]) ||
+                !in_array($rowclasses[$key], array('warning', 'error'))) {
+            // If row has an error, it will already have style set.
+            $rowclasses[$key] = $data['type'];
+        }
+        unset($tabledata[$key]['type']);
+    }
+
+    // Get the headers to display strings.
+    $possfields = array();
+    $requestfields = reset($tabledata);
+    foreach ($requestfields as $f => $v) {
+        $possfields[$f] = get_string($f, $rucr);
     }
 
     $requeststable = new html_table();
     $requeststable->id = 'uclacourserequestor_requests';
     $requeststable->head = $possfields;
     $requeststable->data = $tabledata;
-    // For errors
+
+    // For errors and class types.
     $requeststable->rowclasses = $rowclasses;
 } 
 
@@ -524,6 +555,7 @@ if (!empty($changemessages)) {
 // display error to user regarding their requests
 if (!empty($errormessages)) {
     $sm = get_string_manager();
+    $errorlist = array();
     foreach ($errormessages as $message) {
         if (!empty($message)) {
             $contextspecificm = $message . '-' . $groupid;
@@ -534,9 +566,11 @@ if (!empty($errormessages)) {
                 $viewstr = $message;
             }
 
-            echo $OUTPUT->notification(get_string($viewstr, $rucr), 'notifyproblem');
+            $errorlist[] = get_string($viewstr, $rucr);
         }
     }
+
+    echo $OUTPUT->notification(html_writer::alist($errorlist), 'notifyproblem');
 }
 
 if (!empty($requeststable->data)) {
@@ -547,8 +581,9 @@ if (!empty($requeststable->data)) {
 
     if (!empty($globaloptions)) {
         $globaloptionstable = new html_table();
+        $globaloptionstable->id = 'ucrgeneraloptions';
         $globaloptionstable->head = array(get_string('optionsforall', $rucr));
-        $globaloptionstable->data = array($globaloptions);
+        $globaloptionstable->data = $globaloptions;
         echo html_writer::table($globaloptionstable);
     }
     

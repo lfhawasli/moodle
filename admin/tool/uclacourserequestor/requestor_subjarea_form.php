@@ -18,7 +18,7 @@ class requestor_subjarea_form extends requestor_shared_form {
         }
 
         $spec = array();
-        $spec[] =& $mform->createElement('select', 'subjarea', null, 
+        $spec[] =& $mform->createElement('select', 'subjarea', null,
             $pulldown_subject);
 
         return $spec;
@@ -29,7 +29,7 @@ class requestor_subjarea_form extends requestor_shared_form {
 
         $term = $ci['term'];
         $sa = $ci['subjarea'];
-        
+
         // Fetch all possible courses
         $sac = get_courses_for_subj_area($term, $sa);
 
@@ -38,7 +38,7 @@ class requestor_subjarea_form extends requestor_shared_form {
             return false;
         }
 
-        // The stored procedures returns fields with different names for 
+        // The stored procedures returns fields with different names for
         // the same semantic data
         // Destination - Source
         $translators = array(
@@ -67,7 +67,7 @@ class requestor_subjarea_form extends requestor_shared_form {
 
             $sacreq[$k] = $course;
         }
-       
+
         // Get the request in the DB...
         $exists = get_course_requests($sacreq);
 
@@ -79,7 +79,7 @@ class requestor_subjarea_form extends requestor_shared_form {
                 unset($sacreq[$key]);
             }
         }
-       
+
         $newones = registrar_to_requests($sacreq);
 
         $hcs = array_merge($exists, $newones);

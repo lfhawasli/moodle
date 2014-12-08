@@ -293,18 +293,18 @@ function get_request_info($term, $srs) {
  **/
 function get_crosslisted_courses($term, $srs) {
     global $CFG;
-    
+
     $regurl = 'http://webservices.registrar.ucla.edu/SRDB/SRDBWeb.asmx/'
         . 'getConSched?user=' . $CFG->registrar_dbuser . '&pass='
         . $CFG->registrar_dbpass . '&term=' . $term . '&SRS=' . $srs;
- 
+
     try {
         $r = new SimpleXMLElement($regurl, 0, true);
     } catch (Exception $e) {
         throw new Exception('Could not connect to Registrar Crosslisting '
             . 'Webservice');
     }
-   
+
     $exts = false;
 
     // Extract out Array('term' => , 'srs' => )
@@ -362,10 +362,10 @@ function requestor_ignore_entry($data) {
 
     $subj = $data->subj_area;
 
-    // Use this to compare exact strings
+    // Use this to compare exact strings.
     $rawnum = trim($data->coursenum);
-    // Use this to compare course numbers 
-    $num = (int)preg_replace('/[^0-9]/', '', $rawnum);
+    // Use this to compare course numbers.
+    $num = get_course_num($rawnum);
 
     if ($num > 495) {
         return true;
@@ -414,17 +414,19 @@ function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
     $term = $regdata['term'];
     $srs = $regdata['srs'];
 
-    // Generate a request array
+    // Generate a request array.
     $req = array();
-    $req['term'] = $term;
-    $req['srs'] = $srs;
+    $req['term']        = $term;
+    $req['srs']         = $srs;
+    $req['department']  = $regdata['subj_area'];
+    $req['course']      = get_course_from_reginfo($regdata);
+    $req['enrolstat']   = $regdata['enrolstat'];
 
-    $req['department'] = $regdata['subj_area'];
-    $req['course'] = get_course_from_reginfo($regdata);
+    // Get type of course, ugrad/grad/tut so that we can filter course builds.
+    $req['type']        = get_class_type($regdata);
 
+    $instarr = array();
     if (!isset($regdata['instructor'])) {
-        $instarr = array();
-
         // This is some redundant code...
         foreach ($instinfo as $inst) {
             if (is_object($inst)) {
@@ -451,9 +453,6 @@ function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
             }
         }
     }
-
-    $req['enrolstat'] = $regdata['enrolstat'];
-
     $req['instructor'] = $instarr;
 
     if (empty($defaults)) {
@@ -625,6 +624,40 @@ function get_course_from_reginfo($regdata) {
     return $regdata['coursenum'] . '-' . $regdata['sectnum'];
 }
 
+/**
+ * Returns class type for course requestor classes.
+ *
+ * @param array $regdata    Entry from Registrar SP cis_coursegetall.
+ * @return string   Undergraduate (ugrad), graduate (grad), or tutorial (tut)
+ *                  class type.
+ */
+function get_class_type($regdata) {
+    $type = '';
+
+    // If fields aren't set, entry is a cross-listed course
+    if (!isset($regdata['activitytype']) || !isset($regdata['catlg_no'])) {
+        return $type;
+    }
+
+    if ($regdata['activitytype'] == 'TUT') {
+        $type = 'tut';
+    } else {
+        $coursenum = get_course_num($regdata['catlg_no']);
+        $type = $coursenum < 200 ? 'ugrad' : 'grad';
+    }
+    return $type;
+}
+
+/**
+ * Returns course number from course that possibly contains section number
+ * and/or leading letter.
+ *
+ * @param string $coursenum     From ucla_reg_classinfo table.
+ * @return
+ */
+function get_course_num($coursenum) {
+    return (int)preg_replace('/[^0-9]/', '', $coursenum);
+}
 
 /**
  *  Takes a set of sets, and returns a flat requests list, with each
@@ -979,6 +1012,11 @@ function prep_request_entry($requestinfo) {
             continue;
         }
 
+        // Add class to "Email instructor" column checkbox.
+        if ($editme == 'mailinst') {
+            $sharedattr['class'] = $editme;
+        }
+
         if ($actionval == UCLA_COURSE_BUILT) {
             $requestinfo[$editme] = null;
             continue;
@@ -1184,6 +1222,9 @@ function prep_request_entry($requestinfo) {
                 $actval = false;
             }
 
+            // Add class to "To be built" column checkbox.
+            $buildoptions['class'] = $requestinfo['type'];
+
             $formatted[$k] = html_writer::checkbox("$key-$k", '1', 
                 $actval, $addedtext, $buildoptions);
         }
@@ -1207,7 +1248,7 @@ function prep_request_entry($requestinfo) {
         'timerequested',
         'requestoremail', 'action',
         'mailinst', 'hidden', 'nourlupdate',
-        'delete', 'build'
+        'delete', 'build', 'type'
     );
 
     foreach ($ordered as $field) {
