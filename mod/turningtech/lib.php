@@ -1225,6 +1225,12 @@ function turningtech_mail_reminder($course, $cron = true) {
         if (empty($user->email) || (isset($user->auth) && $user->auth == 'nologin') || over_bounce_threshold($user)) {
             continue;
         }
+        // START UCLA MOD: CCLE-2708 - Turning Technologies Clicker
+        // Prevent email from being sent out if $CFG->divertallemailsto is set.
+        if (!empty($CFG->divertallemailsto)) {
+            $user->email = $CFG->divertallemailsto;
+        }
+        // END UCLA MOD: CCLE-2708
         $mailer->AddBCC($user->email, "{$user->firstname} {$user->lastname}");
         $count++;
     }

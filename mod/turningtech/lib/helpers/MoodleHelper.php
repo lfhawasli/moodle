@@ -740,7 +740,18 @@ class TurningTechMoodleHelper {
         $params['group'] = $group;
         $sql = "{$sql} WHERE {$where} GROUP BY u.id, dcrs.id, d.deviceid, d.deleted,
 		d.all_courses, dall.created, d.courseid, r.roleid ORDER BY {$order}";
-        return $DB->get_records_sql($sql, $params);
+        // START UCLA MOD: CCLE-2708 - Turning Technologies Clicker
+        // Prevent suspended enrollments from showing up.
+        //return $DB->get_records_sql($sql, $params);
+        $activeusers = get_enrolled_users(context_course::instance($course->id), '', 0, 'u.id', null, 0, 0, true);
+        $classroster = $DB->get_records_sql($sql, $params);
+        foreach ($classroster as $index => $user) {
+            if (!array_key_exists($user->id, $activeusers)) {
+                unset($classroster[$index]);
+            }
+        }
+        return $classroster;
+        // END UCLA MOD: CCLE-2708
     }
     /**
      * creates a gradebook item
