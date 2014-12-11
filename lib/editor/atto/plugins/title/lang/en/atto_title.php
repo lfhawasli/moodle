@@ -23,9 +23,9 @@
  */
 
 // START UCLA MOD: CCLE-4612 Improve Attos
-// $string['h3'] = 'Heading 1';
-// $string['h4'] = 'Heading 2';
-// $string['h5'] = 'Heading 3';
+// $string['h3'] = 'Heading (large)';
+// $string['h4'] = 'Heading (medium)';
+// $string['h5'] = 'Heading (small)';
 $string['h1'] = 'Heading 1';
 $string['h2'] = 'Heading 2';
 $string['h3'] = 'Heading 3';
