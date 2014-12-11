@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,22 +13,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment library of hooks
+ * Kaltura video assignment main library script.
  *
- * @package    mod
- * @subpackage kalvidassign
+ * @package    mod_kalvidassign
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
-/** Include eventslib.php */
+/* Include eventslib.php */
 require_once($CFG->libdir.'/eventslib.php');
-/** Include calendar/lib.php */
+/* Include calendar/lib.php */
 require_once($CFG->dirroot.'/calendar/lib.php');
-
 
 /**
  * Given an object containing all the necessary data,
@@ -74,7 +73,7 @@ function kalvidassign_add_instance($kalvidassign) {
  * will update an existing instance with new data.
  *
  * @param object $kalvidassign An object from the form in mod_form.php
- * @return boolean Success/Fail
+ * @return bool Returns true on success, otherwise false.
  */
 function kalvidassign_update_instance($kalvidassign) {
     global $DB;
@@ -87,7 +86,7 @@ function kalvidassign_update_instance($kalvidassign) {
     if ($kalvidassign->timedue) {
         $event = new stdClass();
 
-        if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'kalvidassign', 'instance'=>$kalvidassign->id))) {
+        if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'kalvidassign', 'instance' => $kalvidassign->id))) {
 
             $event->name        = $kalvidassign->name;
             $event->description = format_module_intro('kalvidassign', $kalvidassign, $kalvidassign->coursemodule);
@@ -111,7 +110,7 @@ function kalvidassign_update_instance($kalvidassign) {
             calendar_event::create($event);
         }
     } else {
-        $DB->delete_records('event', array('modulename'=>'kalvidassign', 'instance'=>$kalvidassign->id));
+        $DB->delete_records('event', array('modulename' => 'kalvidassign', 'instance' => $kalvidassign->id));
     }
 
     if ($updated) {
@@ -121,14 +120,13 @@ function kalvidassign_update_instance($kalvidassign) {
     return $updated;
 }
 
-
 /**
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
  * and any data that depends on it.
  *
  * @param int $id Id of the module instance
- * @return boolean Success/Failure
+ * @return bool True on success, else false.
  */
 function kalvidassign_delete_instance($id) {
     global $DB;
@@ -143,7 +141,7 @@ function kalvidassign_delete_instance($id) {
         $result = false;
     }
 
-    if (! $DB->delete_records('event', array('modulename'=>'kalvidassign', 'instance'=>$kalvidassign->id))) {
+    if (! $DB->delete_records('event', array('modulename' => 'kalvidassign', 'instance' => $kalvidassign->id))) {
         $result = false;
     }
 
@@ -156,7 +154,6 @@ function kalvidassign_delete_instance($id) {
     return $result;
 }
 
-
 /**
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
@@ -164,13 +161,12 @@ function kalvidassign_delete_instance($id) {
  * $return->time = the time they did it
  * $return->info = a short text description
  *
- * @return null
- * @todo Finish documenting this function
+ * @return object Returns time and info properties.
  */
 function kalvidassign_user_outline($course, $user, $mod, $kalvidassign) {
     $return = new stdClass;
     $return->time = 0;
-    $return->info = ''; //TODO finish this function
+    $return->info = '';
     return $return;
 }
 
@@ -179,11 +175,10 @@ function kalvidassign_user_outline($course, $user, $mod, $kalvidassign) {
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @return boolean
- * @todo Finish documenting this function
+ * @return boolean always return true.
  */
 function kalvidassign_user_complete($course, $user, $mod, $kalvidassign) {
-    return true;  //TODO: finish this function
+    return true;
 }
 
 /**
@@ -191,12 +186,10 @@ function kalvidassign_user_complete($course, $user, $mod, $kalvidassign) {
  * that has occurred in kalvidassign activities and print it out.
  * Return true if there was output, or false is there was none.
  *
- * @return boolean
- * @todo Finish documenting this function
+ * @return boolean Always returns false.
  */
 function kalvidassign_print_recent_activity($course, $viewfullnames, $timestart) {
-    // TODO: finish this function
-    return false;  //  True if anything was printed, otherwise false
+    return false;
 }
 
 
@@ -207,10 +200,9 @@ function kalvidassign_print_recent_activity($course, $viewfullnames, $timestart)
  * must contain at least id property. See other modules as example.
  *
  * @param int $kalvidassign ID of an instance of this module
- * @return boolean|array false if no participants, array of objects otherwise
+ * @return bool Always returns false.
  */
 function kalvidassign_get_participants($kalvidassignid) {
-    // TODO: finish this function
     return false;
 }
 
@@ -222,21 +214,10 @@ function kalvidassign_get_participants($kalvidassignid) {
  * as reference.
  *
  * @param int $kalvidassign id ID of an instance of this module
- * @return mixed
- * @todo Finish documenting this function
+ * @return bool Returns false as scales are not supportd by this module.
  */
 function kalvidassign_scale_used($kalvidassignid, $scaleid) {
-    global $DB;
-
-    $return = false;
-
-    //$rec = $DB->get_record("newmodule", array("id" => "$newmoduleid", "scale" => "-$scaleid"));
-    //
-    //if (!empty($rec) && !empty($scaleid)) {
-    //    $return = true;
-    //}
-
-    return $return;
+    return false;
 }
 
 /**
@@ -244,8 +225,8 @@ function kalvidassign_scale_used($kalvidassignid, $scaleid) {
  * This function was added in 1.9
  *
  * This is used to find out if scale used anywhere
- * @param $scaleid int
- * @return boolean True if the scale is used by any kalvidassign
+ * @param int $scaleid The scale id.
+ * @return bool True if the scale is used by any kalvidassign
  */
 function kalvidassign_scale_used_anywhere($scaleid) {
     global $DB;
@@ -264,16 +245,33 @@ function kalvidassign_scale_used_anywhere($scaleid) {
  */
 function kalvidassign_supports($feature) {
     switch($feature) {
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
-        case FEATURE_GRADE_OUTCOMES:          return true;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-
-        default: return null;
+        case FEATURE_GROUPS:
+            return true;
+            break;
+        case FEATURE_GROUPINGS:
+            return true;
+            break;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+            break;
+        case FEATURE_MOD_INTRO:
+            return true;
+            break;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+            break;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+            break;
+        case FEATURE_GRADE_OUTCOMES:
+            return true;
+            break;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+            break;
+        default:
+            return null;
+            break;
     }
 }
 
@@ -285,12 +283,10 @@ function kalvidassign_supports($feature) {
  * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int, 0 if ok, error code otherwise
  */
-function kalvidassign_grade_item_update($kalvidassign, $grades=NULL) {
-    global $CFG;
+function kalvidassign_grade_item_update($kalvidassign, $grades = null) {
+    require_once(dirname(dirname(dirname(__FILE__))).'/lib/gradelib.php');
 
-    require_once(dirname(dirname(dirname(__FILE__))) . '/lib/gradelib.php');
-
-    $params = array('itemname'=>$kalvidassign->name, 'idnumber'=>$kalvidassign->cmidnumber);
+    $params = array('itemname' => $kalvidassign->name, 'idnumber' => $kalvidassign->cmidnumber);
 
     if ($kalvidassign->grade > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
@@ -302,16 +298,15 @@ function kalvidassign_grade_item_update($kalvidassign, $grades=NULL) {
         $params['scaleid']   = -$kalvidassign->grade;
 
     } else {
-        $params['gradetype'] = GRADE_TYPE_TEXT; // allow text comments only
+        $params['gradetype'] = GRADE_TYPE_TEXT;
     }
 
     if ($grades  === 'reset') {
         $params['reset'] = true;
-        $grades = NULL;
+        $grades = null;
     }
 
     return grade_update('mod/kalvidassign', $kalvidassign->course, 'mod', 'kalvidassign', $kalvidassign->id, 0, $grades, $params);
-
 }
 
 /**
@@ -321,24 +316,22 @@ function kalvidassign_grade_item_update($kalvidassign, $grades=NULL) {
  * @param int $courseid
  * @param string optional type
  */
-function kalvidassign_reset_gradebook($courseid, $type='') {
+function kalvidassign_reset_gradebook($courseid, $type = '') {
     global $DB;
 
     $sql = "SELECT l.*, cm.idnumber as cmidnumber, l.course as courseid
               FROM {kalvidassign} l, {course_modules} cm, {modules} m
-             WHERE m.name='kalvidassign' AND m.id=cm.module AND cm.instance=l.id AND l.course=:course";
+             WHERE m.name = 'kalvidassign' AND m.id = cm.module AND cm.instance = l.id AND l.course = :course";
 
     $params = array ('course' => $courseid);
 
-    if ($kalvisassigns = $DB->get_records_sql($sql,$params)) {
+    if ($kalvisassigns = $DB->get_records_sql($sql, $params)) {
 
         foreach ($kalvisassigns as $kalvisassign) {
             kalvidassign_grade_item_update($kalvisassign, 'reset');
         }
     }
-
 }
-
 
 /**
  * Actual implementation of the reset course functionality, delete all the
@@ -348,19 +341,17 @@ function kalvidassign_reset_gradebook($courseid, $type='') {
  * @global object
  * @param object $data the data submitted from the reset course.
  * @return array status array
- *
- * TODO: test user data reset feature
  */
 function kalvidassign_reset_userdata($data) {
-    global $CFG, $DB;
+    global $DB;
 
     $componentstr = get_string('modulenameplural', 'kalvidassign');
     $status = array();
 
     if (!empty($data->reset_kalvidassign)) {
         $kalvidassignsql = "SELECT l.id
-                           FROM {kalvidassign} l
-                           WHERE l.course=:course";
+                              FROM {kalvidassign} l
+                             WHERE l.course=:course";
 
         $params = array ("course" => $data->courseid);
         $DB->delete_records_select('kalvidassign_submission', "vidassignid IN ($kalvidassignsql)", $params);
@@ -370,52 +361,35 @@ function kalvidassign_reset_userdata($data) {
             kalvidassign_reset_gradebook($data->courseid);
         }
 
-        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallsubmissions', 'kalvidassign'), 'error'=>false);
+        $status[] = array('component' => $componentstr, 'item' => get_string('deleteallsubmissions', 'kalvidassign'), 'error' => false);
     }
 
-    /// updating dates - shift may be negative too
+    // updating dates - shift may be negative too
     if ($data->timeshift) {
-        shift_course_mod_dates('kalvidassign',array('timedue', 'timeavailable'), $data->timeshift, $data->courseid);
-        $status[] = array('component'=>$componentstr,
-                          'item'=>get_string('datechanged'),
-                          'error'=>false);
+        shift_course_mod_dates('kalvidassign', array('timedue', 'timeavailable'), $data->timeshift, $data->courseid);
+        $status[] = array('component' => $componentstr, 'item' => get_string('datechanged'), 'error' => false);
     }
 
     return $status;
 }
 
+/**
+ * This functions deletes a grade item.
+ * @param object $kalvidassign a Kaltura video assignment data object.
+ * @return int Returns GRADE_UPDATE_OK, GRADE_UPDATE_FAILED, GRADE_UPDATE_MULTIPLE or GRADE_UPDATE_ITEM_LOCKED.
+ */
 function kalvidassign_grade_item_delete($kalvidassign) {
     global $CFG;
-    require_once($CFG->libdir . '/gradelib.php');
-
-    return grade_update('mod/kalvidassign', $kalvidassign->course, 'mod', 'kalvidassign', $kalvidassign->id, 0,
-            null, array('deleted' => 1));
+    require_once($CFG->libdir.'/gradelib.php');
+    return grade_update('mod/kalvidassign', $kalvidassign->course, 'mod', 'kalvidassign', $kalvidassign->id, 0, null, array('deleted' => 1));
 }
-
 
 /**
  * Function to be run periodically according to the moodle cron
  *
- * Finds all assignment notifications that have yet to be mailed out, and mails them
+ * Finds all assignment notifications that have yet to be mailed out, and mails them.
+ * @return bool Returns false as the this module doesn't support cron jobs
  */
 function kalvidassign_cron () {
     return false;
-}
-
-/**
- * Return list of marked submissions that have not been mailed out for currently enrolled students
- *
- * @return array
- */
-function kalvidassign_get_unmailed_submissions($starttime, $endtime) {
-/*    global $CFG, $DB;
-
-    return $DB->get_records_sql("SELECT ks.*, k.course, k.name
-                                   FROM {kalvidassign_submission} ks,
-                                        {kalvidassign} k
-                                  WHERE ks.mailed = 0
-                                        AND ks.timemarked <= ?
-                                        AND ks.timemarked >= ?
-                                        AND ks.assignment = k.id", array($endtime, $starttime));
-*/
 }

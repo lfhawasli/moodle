@@ -1,7 +1,4 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
-//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +13,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
- * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Kaltura video assignment backup activity task class.
+ *
+ * @package    mod_kalvidassign
+ * @author     Remote-Learner.net Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
-require_once($CFG->dirroot . '/mod/kalvidassign/backup/moodle2/backup_kalvidassign_stepslib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/kalvidassign/backup/moodle2/backup_kalvidassign_settingslib.php'); // Because it exists (optional)
+require_once($CFG->dirroot.'/mod/kalvidassign/backup/moodle2/backup_kalvidassign_stepslib.php');
+require_once($CFG->dirroot.'/mod/kalvidassign/backup/moodle2/backup_kalvidassign_settingslib.php');
 
 /**
  * kalvidassign backup task that provides all the settings and steps to perform one
@@ -32,34 +31,34 @@ require_once($CFG->dirroot . '/mod/kalvidassign/backup/moodle2/backup_kalvidassi
 class backup_kalvidassign_activity_task extends backup_activity_task {
 
     /**
-     * Define (add) particular settings this activity can have
+     * Define (add) particular settings this activity can have.
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
-     * Define (add) particular steps this activity can have
+     * Define (add) particular steps this activity can have.
      */
     protected function define_my_steps() {
-        // Choice only has one structure step
+        // Choice only has one structure step.
         $this->add_step(new backup_kalvidassign_activity_structure_step('kalvidassign_structure', 'kalvidassign.xml'));
     }
 
     /**
      * Code the transformations to perform in the activity in
-     * order to get transportable (encoded) links
+     * order to get transportable (encoded) links.
      */
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot,"/");
+        $base = preg_quote($CFG->wwwroot, '/');
 
-        // Link to the list of kalvidassigns
+        // Link to the list of kalvidassigns.
         $search="/(".$base."\/mod\/kalvidassign\/index.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@KALVIDASSIGNINDEX*$2@$', $content);
 
-        // Link to kalvidassign view by moduleid
+        // Link to kalvidassign view by moduleid.
         $search="/(".$base."\/mod\/kalvidassign\/view.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@KALVIDASSIGNVIEWBYID*$2@$', $content);
 

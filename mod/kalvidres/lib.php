@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,15 +13,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video recourse library of hooks
+ * Kaltura video resource library script.
  *
- * @package    mod
- * @subpackage kalvidres
+ * @package    mod_kalvidres
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
- if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');
 }
 
 /**
@@ -35,10 +35,15 @@
  * @return int The id of the newly inserted kalvidassign record
  */
 function kalvidres_add_instance($kalvidres) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/local/kaltura/locallib.php');
 
     $kalvidres->timecreated = time();
 
+    $urlparts = parse_url($kalvidres->source);
+    if (!empty($urlparts['path'])) {
+        $kalvidres->source = 'http://'.KALTURA_URI_TOKEN.$urlparts['path'];
+    }
     $kalvidres->id =  $DB->insert_record('kalvidres', $kalvidres);
 
     return $kalvidres->id;
@@ -53,10 +58,15 @@ function kalvidres_add_instance($kalvidres) {
  * @return boolean Success/Fail
  */
 function kalvidres_update_instance($kalvidres) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/local/kaltura/locallib.php');
 
     $kalvidres->timemodified = time();
     $kalvidres->id = $kalvidres->instance;
+    $urlparts = parse_url($kalvidres->source);
+    if (!empty($urlparts['path'])) {
+        $kalvidres->source = 'http://'.KALTURA_URI_TOKEN.$urlparts['path'];
+    }
 
     $updated = $DB->update_record('kalvidres', $kalvidres);
 
@@ -96,7 +106,7 @@ function kalvidres_delete_instance($id) {
 function kalvidres_user_outline($course, $user, $mod, $kalvidres) {
     $return = new stdClass;
     $return->time = 0;
-    $return->info = ''; //TODO finish this function
+    $return->info = '';
     return $return;
 }
 
@@ -108,7 +118,7 @@ function kalvidres_user_outline($course, $user, $mod, $kalvidres) {
  * @todo Finish documenting this function
  */
 function kalvidres_user_complete($course, $user, $mod, $kalvidres) {
-    return true;  //TODO: finish this function
+    return true;
 }
 
 /**
@@ -155,16 +165,35 @@ function kalvidres_get_participants($kalvidresid) {
  */
 function kalvidres_supports($feature) {
     switch($feature) {
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-
-        default: return null;
+        case FEATURE_MOD_ARCHETYPE:
+            return MOD_ARCHETYPE_RESOURCE;
+            break;
+        case FEATURE_GROUPS:
+            return true;
+            break;
+        case FEATURE_GROUPINGS:
+            return true;
+            break;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+            break;
+        case FEATURE_MOD_INTRO:
+            return true;
+            break;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+            break;
+        case FEATURE_GRADE_HAS_GRADE:
+            return false;
+            break;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+            break;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+            break;
+        default:
+            return null;
+            break;
     }
 }

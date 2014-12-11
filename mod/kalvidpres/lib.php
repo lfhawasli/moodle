@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,15 +13,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video presentation library of hooks
+ * Kaltura video presentation main library file.
  *
- * @package    mod
- * @subpackage kalvidpres
+ * @package    mod_kalvidpres
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
- if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');
 }
 
 /**
@@ -35,9 +35,15 @@
  * @return int The id of the newly inserted kalvidassign record
  */
 function kalvidpres_add_instance($kalvidpres) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/local/kaltura/locallib.php');
 
     $kalvidpres->timecreated = time();
+
+    $urlparts = parse_url($kalvidpres->source);
+    if (!empty($urlparts['path'])) {
+        $kalvidpres->source = 'http://'.KALTURA_URI_TOKEN.$urlparts['path'];
+    }
 
     $kalvidpres->id =  $DB->insert_record('kalvidpres', $kalvidpres);
 
@@ -53,10 +59,16 @@ function kalvidpres_add_instance($kalvidpres) {
  * @return boolean Success/Fail
  */
 function kalvidpres_update_instance($kalvidpres) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/local/kaltura/locallib.php');
 
     $kalvidpres->timemodified = time();
     $kalvidpres->id = $kalvidpres->instance;
+
+    $urlparts = parse_url($kalvidpres->source);
+    if (!empty($urlparts['path'])) {
+        $kalvidpres->source = 'http://'.KALTURA_URI_TOKEN.$urlparts['path'];
+    }
 
     $updated = $DB->update_record('kalvidpres', $kalvidpres);
 
@@ -96,7 +108,7 @@ function kalvidpres_delete_instance($id) {
 function kalvidpres_user_outline($course, $user, $mod, $kalvidpres) {
     $return = new stdClass;
     $return->time = 0;
-    $return->info = ''; //TODO finish this function
+    $return->info = '';
     return $return;
 }
 
@@ -108,7 +120,7 @@ function kalvidpres_user_outline($course, $user, $mod, $kalvidpres) {
  * @todo Finish documenting this function
  */
 function kalvidpres_user_complete($course, $user, $mod, $kalvidpres) {
-    return true;  //TODO: finish this function
+    return true;
 }
 
 /**
@@ -120,8 +132,7 @@ function kalvidpres_user_complete($course, $user, $mod, $kalvidpres) {
  * @todo Finish documenting this function
  */
 function kalvidpres_print_recent_activity($course, $viewfullnames, $timestart) {
-    // TODO: finish this function
-    return false;  //  True if anything was printed, otherwise false
+    return false;
 }
 
 /**
@@ -145,7 +156,6 @@ function kalvidpres_cron () {
  * @return boolean|array false if no participants, array of objects otherwise
  */
 function kalvidpres_get_participants($kalvidpresid) {
-    // TODO: finish this function
     return false;
 }
 
@@ -155,16 +165,35 @@ function kalvidpres_get_participants($kalvidpresid) {
  */
 function kalvidpres_supports($feature) {
     switch($feature) {
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-
-        default: return null;
+        case FEATURE_MOD_ARCHETYPE:
+            return MOD_ARCHETYPE_RESOURCE;
+            break;
+        case FEATURE_GROUPS:
+            return true;
+            break;
+        case FEATURE_GROUPINGS:
+            return true;
+            break;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+            break;
+        case FEATURE_MOD_INTRO:
+            return true;
+            break;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+            break;
+        case FEATURE_GRADE_HAS_GRADE:
+            return false;
+            break;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+            break;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+            break;
+        default:
+            return null;
+            break;
     }
 }

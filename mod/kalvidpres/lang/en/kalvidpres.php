@@ -1,40 +1,36 @@
 <?php
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Kaltura video presentation language file.
+ *
+ * @package    mod_kalvidpres
+ * @author     Remote-Learner.net Inc
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
+ */
 
 $string['modulenameplural'] = 'Kaltura Video Presentation';
 $string['modulename'] = 'Kaltura Video Presentation';
-$string['modulename_help'] = 'The Kaltura Video Presentation enables a teacher to create a video that is synchronized with a '.
-                             'PowerPoint presentation or a PDF. First upload a video and then upload a document. '.
-                             'You must wait until the document has finished converting before saving the resource.';
+$string['modulename_help'] = 'The Kaltura Video Presentation enables a teacher to create a resource using a Kaltura video.';
 $string['pluginadministration'] = 'Kaltura Video Presentation';
 $string['pluginname'] = 'Kaltura Video Presentation';
 $string['name'] = 'Name';
+$string['novidsource'] = 'No media content found. You must add media content in order to save a video presentation.';
 $string['video_hdr'] = 'Video';
-$string['add_video'] = 'Add Media';
-$string['upload_successful'] = 'Upload Successful';
-$string['video_converting'] = 'Your video is still converting.  Please check the status of your video at a later time.';
-$string['vide_preview'] = 'Preview';
+$string['add_video'] = 'Add media';
 $string['invalidid'] = 'Invalid ID';
-$string['replace_video'] = 'Replace Media';
-$string['video_preview_header'] = 'Preview';
-$string['document_converting'] = 'Your document is still converting.  Please check the status of your document at a later time.';
-$string['add_document'] = 'Upload document';
-$string['check_status'] = 'Check status';
-$string['sync_document'] = 'Sync Keypoints';
-$string['update_video_pres_info'] = 'When updating the video or document for the video presentation, both the video and document must be uploaded again.';
-$string['view_vid_pres_btn'] = 'View video presentation';
-$string['vid_pres_incomplete'] = 'The video has been updated.  Please complete the steps and upload a document and wait for the document conversion to complete or cancel the update.';
-$string['pres_info'] = '<b>In order to create a video presentation resource, please upload a video and a document and wait for them to convert.'.
-                       'The conversion processes may take a few minutes depending on the sizes of the uploaded material. Once both video and '.
-                       'document are ready, click \'Preview\' in order to sync the document pages with the timeline of the video. Sync action is '.
-                       'also available once the resource is saved.</b>';
+$string['invalid_source_parameter'] = 'Invalid source parameter';
+$string['replace_video'] = 'Replace media';
 $string['kalvidpres:addinstance'] = 'Add a Kaltura Video Presentation';
-$string['use_screen_recorder'] = 'Record screen';
-$string['use_kcw'] = 'Upload media or record from webcam';
-$string['media_method'] = 'Media type';
-$string['media_creation'] = 'Media Type';
-$string['media_creation_help'] = 'Select the method of media you would like to add.  <b>Record Screen</b> will open a screen recording widget, where you can record the actions you make on your desktop.  <b>Upload Media</b> will open the Kaltura Content Wizard where you can upload media from your computer or select previously uploaded media.';
-$string['scr_loading'] = 'Loading...';
-$string['kalvidpres:screenrecorder'] = 'Screen recorder';
-$string['previewvideo'] = 'Preview';
-$string['checkingforjava'] = 'Checking for Java';
-$string['javanotenabled'] = 'Failed to detect Java, please make sure you have the latest version of Java installed and enabled and then try again.';
