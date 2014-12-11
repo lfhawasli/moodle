@@ -1,14 +1,8 @@
+//
+// General components
+//
 // Need compass library
 @import "compass";
-
-//
-// REQUIRED THEME COMPONENTS
-// --------------------------------------------------
-
-
-// When we override Bootstrap, we create an analogous file for it and 
-// put all overrides in there.  If we don't modify Bootstrap, we just 
-// pull the file directly.
 
 
 // Core variables and mixins
@@ -24,7 +18,6 @@
 // Components
 // -------------------
 @import "ucla/fontawesome";
-@import "ucla/footer";
 @import "ucla/alerts";
 @import "moodle/adapter/alerts";
 @import "ucla/navs";
@@ -47,6 +40,6 @@
 // Media queries
 // -------------------
 // Adds responsive capabilities to moodle's layout
-@import "responsive-utilities";
-@import "responsive";
+@import "bootstrap/responsive-utilities";
+@import "ucla/responsive";
 

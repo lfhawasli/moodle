@@ -1,27 +1,29 @@
-// Need compass library
-@import "compass";
-
 //
-// REQUIRED THEME COMPONENTS
-// --------------------------------------------------
+// Core CSS 
+//
 
-
-// When we override Bootstrap, we create an analogous file for it and 
-// put all overrides in there.  If we don't modify Bootstrap, we just 
-// pull the file directly.
-
+// Always need the compass library
+@import "compass";
 
 // Core variables and mixins
 @import "ucla/variables";
 @import "variables";
 @import "mixins";
 
+// Bootrap CSS reset.
+@import "bootstrap/normalize";
+
+
 // Dependencies
+// -------------------
+
 @import "labels";
+
 
 // Core CSS
 // -------------------
-@import "type";
+
+@import "ucla/type";
 @import "form";
 @import "moodle/adapter/form";
 
