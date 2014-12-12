@@ -465,12 +465,6 @@ $CFG->updateautocheck = 0;
 $CFG->dndallowtextandlinks = 1;
 $CFG->enabletgzbackups = 1;
 
-// Site administration > Development > Debugging
-$CFG->debug = 32767;    // DEVELOPER level debugging messages
-$CFG->debugdisplay = 1;  // show the debugging messages
-$CFG->perfdebug = 15; // show performance information
-$CFG->debugpageinfo = 1; // show page information
-
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later
 $_dirroot_ = dirname(realpath(__FILE__)) . '/../../..';
