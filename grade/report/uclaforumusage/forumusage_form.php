@@ -43,6 +43,8 @@ class forumusage_form extends moodleform {
         $courseid = $this->_customdata['courseid'];
         $mform->addElement('select', 'student', get_string('studentlist', 'gradereport_uclaforumusage'), $studentlist);
         $mform->setDefault('student', 0);
+        // Add group of forum checkbox
+        $mform->addElement('header', 'forumlist', get_string('forumlist', 'gradereport_uclaforumusage'));
         foreach ($forumlist as $id => $value) {
             $mform->addElement('advcheckbox', 'forum['.$id.']', $value, null, null, $id);
             // Default: all set.

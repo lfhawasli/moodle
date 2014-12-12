@@ -158,3 +158,87 @@ function get_stats($posts = null, $users = null, $tainstr = null) {
         return $result;
     }
 }
+
+function display_export_options($params) {
+    global $CFG, $OUTPUT;
+    $exportoptions = html_writer::start_tag('div',
+            array('class' => 'export-options'));
+    $exportoptions .= get_string('exportoptions', 'gradereport_uclaforumusage');
+
+    // Right now, only supporting xls.
+    $xlsstring = get_string('application/vnd.ms-excel', 'mimetypes');
+    $icon = html_writer::img($OUTPUT->pix_url('f/spreadsheet'), $xlsstring, array('title' => $xlsstring));
+    $params['export'] = 'xls';
+    $exportoptions .= html_writer::link(
+            new moodle_url('/grade/report/uclaforumusage/index.php',
+                    $params), $icon);
+
+    $exportoptions .= html_writer::end_tag('div');
+    return $exportoptions;
+}
+
+
+/**
+ * Outputs given data and inputs in an Excel file.
+ *
+ * @param string $title
+ * @param array $data
+ * @param int $forumtype
+ */
+function forumusage_export_to_xls($title, $data, $forumtype=1) {
+    global $CFG;
+    require_once($CFG->dirroot.'/lib/excellib.class.php');
+
+    // Might have HTML.
+    $fulltitle = clean_param($title, PARAM_NOTAGS);
+    $filename = clean_filename($title . '.xls');
+    // Creating a workbook (use "-" for writing to stdout).
+    $workbook = new MoodleExcelWorkbook("-");
+    // Sending HTTP headers.
+    $workbook->send($filename);
+    // Adding the worksheet.
+    $worksheet = $workbook->add_worksheet($fulltitle);
+
+    $boldformat = $workbook->add_format();
+    $boldformat->set_bold(true);
+    $rownum = $colnum = 0; 
+
+    // Add title.
+    $worksheet->write_string($rownum, $colnum, $fulltitle, $boldformat);
+    ++$rownum;
+
+    // Now go through the data set.
+    // Start row number 2.
+    
+    foreach ($data as $row) {
+        ++$rownum; $colnum = 0;
+        $row = get_object_vars($row);
+        $row = $row['cells'];
+        // If not simple forum, output row 3 differently
+        if (!$forumtype && $rownum == 3) {
+            ++$colnum;  // Skip the first column
+        }
+        foreach ($row as $col) {
+            $cell = get_object_vars($col);
+            $outval = clean_param($cell['text'], PARAM_NOTAGS);
+            if (is_numeric($outval)) {
+                $worksheet->write_number($rownum, $colnum, $outval);
+            } else {
+                $worksheet->write_string($rownum, $colnum, $outval);
+            }
+            // If not simple forum, output row 2 differently
+            if (!$forumtype && $rownum == 2 && $colnum > 0){
+                $colnum += 3;
+            } else {
+                ++$colnum;
+            }
+        }
+    }
+    // Close the workbook.
+    $workbook->close();
+
+    // If we are in the command line, don't die.
+    if (!defined('CLI_SCRIPT') || !CLI_SCRIPT) {
+        exit;
+    }
+}
