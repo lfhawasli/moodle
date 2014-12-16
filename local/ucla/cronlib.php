@@ -113,7 +113,7 @@ class ucla_reg_classinfo_cron {
                     )
                 );
             if (!$reginfo) {
-                echo "No data for {$request->term} {$request->srs}\n";
+                mtrace("No data for {$request->term} {$request->srs}");
                 $notfoundatregistrar[] =
                         array('term' => $request->term, 'srs' => $request->srs);
             } else {
@@ -152,8 +152,8 @@ class ucla_reg_classinfo_cron {
             }
         }
         
-        echo "Updated: $uc . Inserted: $ic . Not found at registrar: "
-            . "$numnotfound . No update needed: $nc\n";
+        mtrace("Updated: $uc . Inserted: $ic . Not found at registrar: "
+            . "$numnotfound . No update needed: $nc");
 
         return true;
     }
@@ -175,7 +175,7 @@ class ucla_reg_subjectarea_cron {
 
         $reg = registrar_query::get_registrar_query('cis_subjectareagetall');
         if (!$reg) {
-            echo "No registrar module found.";
+            mtrace("No registrar module found.");
         }
   
         $subjareas = array();
@@ -238,7 +238,7 @@ class ucla_reg_subjectarea_cron {
 
         }
 
-        echo "New: $newsa. Updated: $updsa.\n";
+        mtrace("New: $newsa. Updated: $updsa.");
 
         return true;
     }
@@ -258,6 +258,8 @@ class ucla_reg_enrolment_plugin_cron {
         foreach($records as $r) {
             self::update_plugin($r->courseid, $r->id);
         }
+        
+        return true;
     }
     
     static public function update_plugin($courseid, $instanceid) {
