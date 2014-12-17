@@ -364,6 +364,9 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
         $mform->addElement('header', 'moodle_additional_names', get_string('additionalnames'));
         foreach ($disabledusernamefields as $allname) {
             $mform->addElement('text', $allname, get_string($allname), 'maxlength="100" size="30"');
+            // START UCLA MOD: CCLE-4874 - Make "Additional Names" fields readonly.
+            $mform->hardFreeze($allname);
+            // END UCLA MOD: CCLE-4874.
             $mform->setType($allname, PARAM_NOTAGS);
         }
     }
