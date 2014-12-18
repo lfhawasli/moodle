@@ -362,7 +362,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
     accessibility = accessibilitychecker, accessibilityhelper
-    other = html';
+    other = html, fullscreen';
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour

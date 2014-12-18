@@ -347,7 +347,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     insert = computing, equation, charmap, table, clear
     undo = undo
     accessibility = accessibilitychecker, accessibilityhelper
-    other = html';
+    other = html, fullscreen';
 
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-3.kaf.kaltura.com';
