@@ -226,6 +226,7 @@ $THEME->enable_dock = false;
 $THEME->csspostprocess = 'uclashared_process_css';
 $THEME->javascripts[] = 'shared_server_dropdown';
 $THEME->javascripts[] = 'help_feedback';
+$THEME->javascripts[] = 'headroom.min';
 
 // CCLE-4807 - Atto Chemistry: Overriding plugin styles.
 $THEME->plugins_exclude_sheets = array('atto' => array('chemistry'));

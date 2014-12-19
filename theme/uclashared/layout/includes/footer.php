@@ -40,4 +40,23 @@
 
         <?php echo $OUTPUT->standard_footer_html() ?>
     </div>
+
+    <script type="text/javascript">
+        // Loads headroom.js for auto-hiding header: http://wicky.nillia.ms/headroom.js/
+        var header = document.querySelector(".header-main");
+
+        // You can add some tolerance to the amount a user must scroll before header animates.
+        // scroll-up: 5px
+        // scroll down: immediate
+        var headroom  = new Headroom(header, {
+            tolerance : {
+                up : 5,
+                down : 0
+            }
+        });
+
+        // initialise
+        headroom.init();
+
+    </script>
 <?php }
