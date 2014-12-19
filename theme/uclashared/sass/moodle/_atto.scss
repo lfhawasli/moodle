@@ -94,15 +94,3 @@
     }
 
 }
-
-// Atto full-screen mode fixes.
-.atto-fullscreen {
-    
-    // Makes sure the editor takes up the whole screen.
-    .editor_atto {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 4;
-    }
-}
