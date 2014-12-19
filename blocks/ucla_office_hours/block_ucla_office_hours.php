@@ -141,6 +141,15 @@ class block_ucla_office_hours extends block_base {
                 $instructors, $course, $context
             );
 
+        // Check that Instructor is not suspended user
+        $suspendedids = get_suspended_userids($context, true);
+        
+        foreach ($instructors as $k => $instructor) {
+            if (in_array($instructor->id, $suspendedids)) {
+                unset($instructors[$k]);
+            }
+        }
+
         // Flatten out results
         $filtered_users = array();
         foreach ($block_filtered_users as $block => $filtered_user_keys) {
