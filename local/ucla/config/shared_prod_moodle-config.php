@@ -345,17 +345,20 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     collapse = collapse
-    style1 = title, bold, italic, backcolor, fontcolor
+    style1 = title, bold, italic, underline, backcolor, fontcolor
     list = unorderedlist, orderedlist
-    links = link
-    files = image, media, managefiles, poodll, kalturamedia
-    style2 = underline, strike, subscript, superscript
-    align = align
     indent = indent
-    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
-    accessibility = accessibilitychecker, accessibilityhelper
-    other = html, fullscreen';
+    links = link
+    files = image, media, managefiles
+    other = html
+    style2 = strike, subscript, superscript
+    align = align
+    insert = chemistry, computing, equation, poodll, charmap, table, clear
+    accessibility = accessibilitychecker, accessibilityhelper';
+
+// CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
+$CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
