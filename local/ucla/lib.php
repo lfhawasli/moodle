@@ -567,45 +567,6 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
 
 }
 
-/**
- * Populates the reg-class-info cron, the subject areas and fixes the UCLA
- * enrollment plugin.
- */
-function local_ucla_cron($terms = array()) {
-    global $DB, $CFG;
-
-    if (empty($terms)) {
-        // If no term, process active terms.
-        $activeterms = get_config('local_ucla', 'active_terms');
-        $terms = explode(',', $activeterms);
-    }
-
-    include_once($CFG->dirroot . '/local/ucla/cronlib.php');
-    ucla_require_registrar();
-
-    $works = array('classinfo', 'subjectarea', 'enrolment_plugin');
-    foreach ($works as $work) {
-        $cn = 'ucla_reg_' . $work . '_cron';
-        if (class_exists($cn)) {
-            $runner = new $cn();
-            if (method_exists($runner, 'run')) {
-                echo "Running $cn\n";
-                $result = $runner->run($terms);
-            } else {
-                echo "Could not run() for $cn\n";
-            }
-        } else {
-            echo "Could not run cron for $cn, class not found.\n";
-        }
-
-        if (!$result) {
-            // Something?
-        }
-    }
-    
-    return true;
-}
-
 // Auto-login if user is guest
 function auto_login_as_guest() {
     global $SESSION, $USER;
