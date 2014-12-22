@@ -249,8 +249,8 @@ $CFG->grade_report_showuserimage = 0;
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
-// Site administration > Plugins > Activity modules > AssignmentAssignment (2.2)
-$CFG->assignment_maxbytes = 104857600;   // 100MB
+// Site administration > Plugins > Activity modules > Assignment
+$CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;

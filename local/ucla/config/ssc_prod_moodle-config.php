@@ -210,9 +210,6 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
-// Site administration > Plugins > Activity modules > Assignment
-$CFG->assignment_maxbytes = 104857600;   // 100MB
-
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
 

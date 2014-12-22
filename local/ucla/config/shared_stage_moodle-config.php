@@ -234,7 +234,7 @@ $CFG->grade_report_showanalysisicon = 0;
 $CFG->grade_report_showuserimage = 0;
 
 // Site administration > Plugins > Activity modules > Assignment
-$CFG->assignment_maxbytes = 104857600;   // 100MB
+$CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
