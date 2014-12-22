@@ -20,17 +20,11 @@ require_once(dirname(__FILE__) . '/../moodleblock.class.php');
 
 global $CFG;
 require_once($CFG->dirroot . '/local/ucla/lib.php');
-require_once(dirname(__FILE__) . '/locallib.php');
 
 class block_ucla_weeksdisplay extends block_base {
     
     public function init() {
         $this->title = get_string('pluginname', 'block_ucla_weeksdisplay');
-    }
-    
-    public function cron() {
-        self::set_current_week_display(date('c'));
-        return true;    // crons need to return true or they run all the time
     }
 
     /**
@@ -96,26 +90,26 @@ class block_ucla_weeksdisplay extends block_base {
     * @param date string that starts with the format YYYY-MM-DD that is the
     * date associated with the desired display string.
     */     
-    public static function set_current_week_display($date) {
+    public static function set_current_week_display($term = '') {
         global $CFG;
 
         //Include registrar files.
         ucla_require_registrar();
 
         //If the current term is not valid, heuristically initialize it.      
-        if(empty($CFG->currentterm) || !ucla_validator('term', $CFG->currentterm)) {
-            self::init_currentterm(date('c'));
+        if(empty($CFG->currentterm) && empty($term) || !ucla_validator('term', $CFG->currentterm)) {
+            error('Invalid term value');
         }
 
-        $current_term = $CFG->currentterm;
+        $current_term = empty($term) ? $CFG->currentterm : $term;
 
         try {
-            $query_result = registrar_query::run_registrar_query('ucla_getterms', 
-                    array($current_term), true);    
-
-            $session = new ucla_session($query_result);
-            $session->update();
+            $query = registrar_query::run_registrar_query('ucla_getterms', 
+                    array($current_term), true); 
             
+            $session = \block_ucla_weeksdisplay_session::create($query);
+            $session->update_week_display();
+
         } catch(Exception $e) {
             // mostly likely couldn't connect to registrar
             mtrace($e->getMessage());
@@ -133,33 +127,6 @@ class block_ucla_weeksdisplay extends block_base {
             'not-really-applicable' => true
         );
     }    
-    
-   /**
-    * Sets currentterm to the current term based on the input date.
-    * This function heuristically sets the term, and may not be 
-    * accurate 100% of the time.
-    * 
-    * @param date string of the format YYYY-MM-DD
-    */
-    public static function init_currentterm($date) {
-        
-        $year = substr($date, 2, 2); 
-
-        //Guess the quarter based on the month.
-        $month = intval(substr($date, 5, 2));
-        
-        if ($month <= 0 || $month > 12) {
-            debugging('Invalid system date month: '.$month);
-        } else if ($month < 3) {
-            set_config('currentterm', $year.'W');
-        } else if ($month < 6) {
-            set_config('currentterm', $year.'S');   
-        } else if ($month < 9) {
-            set_config('currentterm', $year.'1');
-        } else {//if($month <= 12) 
-            set_config('currentterm', $year.'F');
-        }        
-    }
         
 }
 

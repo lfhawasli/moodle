@@ -1418,7 +1418,7 @@ function notice_course_status($course) {
     
     if (is_past_course($course)) {
         $currentweek = get_config('local_ucla', 'current_week');
-        if ($currentweek == -1) {
+        if ($currentweek === \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
             // We are between terms, so make sure if this is a course for
             // exactly term before current term, that we don't display notice.
             $courseinfos = ucla_get_course_info($course->id);

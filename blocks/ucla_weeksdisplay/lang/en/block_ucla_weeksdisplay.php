@@ -12,4 +12,6 @@ $string['finals_week'] = 'Finals week';
 $string['session'] = 'Session {$a}';
 $string['winter_break'] = 'Winter break';
 
+$string['task'] = 'Update the weeks display';
+
 //EOF
