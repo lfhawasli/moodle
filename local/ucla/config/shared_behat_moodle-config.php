@@ -241,9 +241,6 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
-// Site administration > Plugins > Activity modules > Assignment
-$CFG->assignment_maxbytes = 10485760;   // 100MB
-
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
 

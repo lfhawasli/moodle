@@ -89,7 +89,6 @@ class behat_ucla extends behat_files {
         set_config('collapsedefaultcolumns', 1, 'local_ucla');
         set_config('collapsesubmissionstatus', 1, 'local_ucla');
         set_config('defaultassignquickgrading', 1, 'local_ucla');
-        set_config('defaultassignsettings', 1, 'local_ucla');
         set_config('showallgraderviewactions', 1, 'local_ucla');
 
         // Set other configs.
