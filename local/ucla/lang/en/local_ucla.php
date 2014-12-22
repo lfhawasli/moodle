@@ -228,3 +228,5 @@ $string['logfiledeleted'] = 'Deleted file';
 // CCLE-3673 - Limit crosslist display using config value.
 $string['maxcrosslistshown'] = 'Max crosslists shown';
 $string['maxcrosslistshowndesc'] = 'Limit the amount of crosslisted courses shown on a course page.';
+
+$string['crontask'] = 'Cron task for local_ucla';

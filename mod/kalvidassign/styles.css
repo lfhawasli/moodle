@@ -41,17 +41,13 @@
     overflow: hidden;
 }
 
-#progress_bar {
-    float: left;
-    height: 18px;
-    width: 0%;
-    /*border-right: 1px solid #000000;*/
-    background: #00FF00;
+#id_add_video {
+    float: none;
 }
 
-#loading_text {
-    position: relative;
-    top: -18px;
-    font-weight: bold;
-    right: 6px;
+#video_thumbnail {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
 }

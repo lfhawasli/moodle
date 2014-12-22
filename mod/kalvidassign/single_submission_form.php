@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,17 +13,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment single submission form
+ * Kaltura video assignment single submission form.
  *
  * @package    mod_kalvidassign
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/course/moodleform_mod.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/course/moodleform_mod.php');
 
 class kalvidassign_singlesubmission_form extends moodleform {
 
@@ -35,10 +36,6 @@ class kalvidassign_singlesubmission_form extends moodleform {
         global $CFG, $PAGE;
 
         $mform =& $this->_form;
-
-        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
-        $mform->setDisableShortforms(true);
-        // END UCLA MOD: CCLE-4471
 
         $cm = $this->_customdata->cm;
         $userid = $this->_customdata->userid;
@@ -57,64 +54,26 @@ class kalvidassign_singlesubmission_form extends moodleform {
         /* Submission section */
         $mform->addElement('header', 'single_submission_1', get_string('submission', 'kalvidassign'));
 
-        $mform->addelement('static', 'submittinguser',
-                           $this->_customdata->submissionuserpic,
-                           $this->_customdata->submissionuserinfo);
+        $mform->addelement('static', 'submittinguser', $this->_customdata->submissionuserpic, $this->_customdata->submissionuserinfo);
 
         /* Video preview */
         $mform->addElement('header', 'single_submission_2', get_string('previewvideo', 'kalvidassign'));
 
         $submission     = $this->_customdata->submission;
-        $grading_info   = $this->_customdata->grading_info;
-        $entryobject   = '';
+        $gradinginfo   = $this->_customdata->grading_info;
+        $entryobject    = '';
         $timemodified   = '';
 
-        if (!empty($submission->entry_id)) {
-
-            $kaltura        = new kaltura_connection();
-            $connection     = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
-            
-            if ($connection) {
-                $entryobject = local_kaltura_get_ready_entry_object($this->_customdata->submission->entry_id);
-    
-                // Determine the type of video (See KALDEV-28)
-                if (!local_kaltura_video_type_valid($entryobject)) {
-                    $entryobject = local_kaltura_get_ready_entry_object($entryobject->id, false);
-                }
-            }
-
-        }
-
-        if (!empty($entryobject)) {
-            list($entryobject->width, $entryobject->height) = kalvidassign_get_player_dimensions();
-            $courseid = get_courseid_from_context($this->_customdata->context);
-
-            // Set the session
-            $session = local_kaltura_generate_kaltura_session(array($entryobject->id));
-
-            // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
-//            $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-//                    local_kaltura_get_kdp_code($entryobject, 0, $courseid));
-            $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-                    local_kaltura_get_kdp_code($entryobject, 0, $courseid, $session));
-            // END UCLA MOD: CCLE-4471
-
-        } else if (empty($entryobject) && isset($submission->timemodified) && !empty($submission->timemodified)) {
-
-            if ($connection) {
-                // an empty entry object and a time modified timestamp means the video is still converting
-                $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-                                   get_string('video_converting', 'local_kaltura'));
-            } else {
-
-                $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-                                   get_string('conn_failed_alt', 'local_kaltura'));
-            }
-        } else {
-
-            // an empty entry object and an empty time modified tamstamp mean the student hasn't submitted anything
-            $mform->addElement('static', 'description', get_string('submission', 'kalvidassign'),
-                               '');
+        if (!empty($submission->entry_id) && !empty($submission->source)) {
+            $attr = array(
+                'src' => $this->_generateLtiLaunchLink($submission->source, $submission),
+                'height' => $submission->height,
+                'width' => $submission->width,
+                'allowfullscreen' => "true",
+                'webkitallowfullscreen' => "true",
+                'mozallowfullscreen' => "true"
+            );
+            $mform->addElement('html', html_writer::tag('iframe', '', $attr));
         }
 
         /* Grades section */
@@ -132,16 +91,16 @@ class kalvidassign_singlesubmission_form extends moodleform {
         $mform->addElement('select', 'xgrade', get_string('grade').':', $grademenu, $attributes);
 
         if (isset($submission->grade)) {
-            $mform->setDefault('xgrade', $this->_customdata->submission->grade ); //@fixme some bug when element called 'grade' makes it break
+            $mform->setDefault('xgrade', $this->_customdata->submission->grade );
         } else {
-            $mform->setDefault('xgrade', '-1' ); //@fixme some bug when element called 'grade' makes it break
+            $mform->setDefault('xgrade', '-1' );
         }
 
         $mform->setType('xgrade', PARAM_INT);
 
-        if (!empty($this->_customdata->enableoutcomes) && !empty($grading_info)) {
+        if (!empty($this->_customdata->enableoutcomes) && !empty($gradinginfo)) {
 
-            foreach($grading_info->outcomes as $n => $outcome) {
+            foreach ($gradinginfo->outcomes as $n => $outcome) {
 
                 $options = make_grades_menu(-$outcome->scaleid);
 
@@ -165,18 +124,16 @@ class kalvidassign_singlesubmission_form extends moodleform {
             }
         }
 
-        if (has_capability('gradereport/grader:view', $this->_customdata->context) &&
-            has_capability('moodle/grade:viewall', $this->_customdata->context)) {
+        if (has_capability('gradereport/grader:view', $this->_customdata->context) && has_capability('moodle/grade:viewall', $this->_customdata->context)) {
 
-
-            if (empty($grading_info) || !array_key_exists($this->_customdata->userid, $grading_info->items[0]->grades)) {
+            if (empty($gradinginfo) || !array_key_exists($this->_customdata->userid, $gradinginfo->items[0]->grades)) {
 
                 $grade = ' - ';
 
-            } elseif (0 != strcmp('-', $grading_info->items[0]->grades[$this->_customdata->userid]->str_grade)) {
+            } else if (0 != strcmp('-', $gradinginfo->items[0]->grades[$this->_customdata->userid]->str_grade)) {
 
-                $grade = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='. $this->_customdata->cm->course .'" >'.
-                            $this->_customdata->grading_info->items[0]->grades[$this->_customdata->userid]->str_grade . '</a>';
+                $grade = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='.$this->_customdata->cm->course.'" >';
+                $grade .= $this->_customdata->grading_info->items[0]->grades[$this->_customdata->userid]->str_grade.'</a>';
             } else {
 
                 $grade = $this->_customdata->grading_info->items[0]->grades[$this->_customdata->userid]->str_grade;
@@ -188,7 +145,7 @@ class kalvidassign_singlesubmission_form extends moodleform {
 
         }
 
-        $mform->addElement('static', 'finalgrade', get_string('currentgrade', 'assignment').':' ,$grade);
+        $mform->addElement('static', 'finalgrade', get_string('currentgrade', 'kalvidassign').':', $grade);
         $mform->setType('finalgrade', PARAM_INT);
 
         /* Feedback section */
@@ -196,8 +153,8 @@ class kalvidassign_singlesubmission_form extends moodleform {
 
         if (!empty($this->_customdata->gradingdisabled)) {
 
-            if (array_key_exists($this->_customdata->userid, $grading_info->items[0]->grades)) {
-                $mform->addElement('static', 'disabledfeedback', '&nbsp;', $grading_info->items[0]->grades[$this->_customdata->userid]->str_feedback );
+            if (array_key_exists($this->_customdata->userid, $gradinginfo->items[0]->grades)) {
+                $mform->addElement('static', 'disabledfeedback', '&nbsp;', $gradinginfo->items[0]->grades[$this->_customdata->userid]->str_feedback );
             } else {
                 $mform->addElement('static', 'disabledfeedback', '&nbsp;', '' );
             }
@@ -205,22 +162,23 @@ class kalvidassign_singlesubmission_form extends moodleform {
         } else {
 
             $mform->addElement('editor', 'submissioncomment_editor', get_string('feedback', 'kalvidassign').':', null, $this->get_editor_options() );
-            $mform->setType('submissioncomment_editor', PARAM_RAW); // to be cleaned before display
+            $mform->setType('submissioncomment_editor', PARAM_RAW);
 
         }
-
 
         /* Marked section */
         $mform->addElement('header', 'single_submission_5', get_string('lastgrade', 'kalvidassign'));
 
-        $mform->addElement('static', 'markingteacher',
-                           $this->_customdata->markingteacherpic,
-                           $this->_customdata->markingteacherinfo);
-
+        $mform->addElement('static', 'markingteacher', $this->_customdata->markingteacherpic, $this->_customdata->markingteacherinfo);
 
         $this->add_action_buttons();
     }
 
+    /**
+     * This function sets the text editor format.
+     * @param object|array $data object or array of default values
+     * @return void
+     */
     public function set_data($data) {
 
         if (!isset($data->submission->format)) {
@@ -235,17 +193,36 @@ class kalvidassign_singlesubmission_form extends moodleform {
 
     }
 
+    /**
+     * This function gets the editor options.
+     * @return array An array of editor options.
+     */
     protected function get_editor_options() {
-
         $editoroptions = array();
         $editoroptions['component'] = 'mod_kalvidassign';
-        //$editoroptions['filearea'] = 'feedback';
         $editoroptions['noclean'] = false;
-        $editoroptions['maxfiles'] = 0; //TODO: no files for now, we need to first implement assignment_feedback area, integration with gradebook, files support in quickgrading, etc. (skodak)
-        //$editoroptions['maxbytes'] = $this->_customdata->maxbytes;
+        $editoroptions['maxfiles'] = 0;
         $editoroptions['context'] = $this->_customdata->context;
 
         return $editoroptions;
     }
-
+    
+    private function _generateLtiLaunchLink($source, $data)
+    {
+        $cmid = $this->_customdata->cm->id;
+        $courseId = $this->_customdata->cm->course;
+        
+        $width = 485;
+        $height = 450;
+        if(isset($data->height) && isset($data->width))
+        {
+            $width = $data->width;
+            $height = $data->height;
+        }
+        $realSource = local_kaltura_add_kaf_uri_token($source);
+        $hashedSource = base64_encode($realSource);
+        
+        $target = new moodle_url('/mod/kalvidassign/lti_launch_grade.php?cmid='.$cmid.'&source='.urlencode($source).'&height='.$height.'&width='.$width.'&courseid='.$courseId);
+        return $target;
+    }
 }

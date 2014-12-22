@@ -28,3 +28,11 @@
     font-weight: bold;
     left: 12px;
 }
+
+#kalvid_content {
+    text-align: center;
+}
+
+#id_video #video_thumbnail {
+    float: left;
+}

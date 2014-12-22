@@ -432,7 +432,7 @@ class local_mymedia_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', $attr);
 
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        $context = context_user::instance($USER->id);
 
         $output .= $this->create_video_preview_link_markup();
         $output .= '&nbsp;&nbsp;';

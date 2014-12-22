@@ -6,6 +6,8 @@
 #
 #   If no task is specified, will run all tasks.
 
+require '../../compass.rb'
+
 theme_package_dir = "vendor"
 theme_font_dir = "fonts"
 theme_js_dir = "javascript"
@@ -15,20 +17,21 @@ task :build_fonts do
     fonts_dirs = ["#{theme_package_dir}/fortawesome/font-awesome/fonts", "#{theme_package_dir}/twbs/bootstrap-sass/assets/fonts/bootstrap"]
     # Where to copy
 
-    puts "Building theme fonts"
+    puts "Building theme fonts".brown
    
     # Copy them
     fonts_dirs.each do |font_dir|
         sh "cp #{font_dir}/* #{theme_font_dir}"
-	end
+    end
 end
 
 task :build_js do
     # JS files to copy
     js_files = ["#{theme_package_dir}/semantic/ui/build/minified/modules/sidebar.min.js",
-                "#{theme_package_dir}/semantic/ui/build/minified/modules/accordion.min.js"]
+                "#{theme_package_dir}/semantic/ui/build/minified/modules/accordion.min.js",
+                "#{theme_package_dir}/headroom.js/dist/headroom.min.js"]
 	
-    puts "Building theme js"
+    puts "Building theme js".brown
 
     # Move the files
     js_files.each do |js_file|
@@ -38,7 +41,7 @@ end
 
 task :build_css do 
     # Compile compass with compressed options
-    puts "Building theme CSS"
+    puts "Building theme CSS".brown
     sh "compass compile -e production --force"
 end
 

@@ -241,9 +241,6 @@ $CFG->recovergradesdefault = 1;
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
-// Site administration > Plugins > Activity modules > Assignment
-$CFG->assignment_maxbytes = 10485760;   // 100MB
-
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
 
@@ -352,17 +349,20 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     collapse = collapse
-    style1 = title, bold, italic, backcolor, fontcolor
+    style1 = title, bold, italic, underline, backcolor, fontcolor
     list = unorderedlist, orderedlist
-    links = link
-    files = image, media, managefiles, poodll
-    style2 = underline, strike, subscript, superscript
-    align = align
     indent = indent
-    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
-    accessibility = accessibilitychecker, accessibilityhelper
-    other = html';
+    links = link
+    files = image, media, managefiles, kalturamedia
+    other = html, fullscreen
+    style2 = strike, subscript, superscript
+    align = align
+    insert = chemistry, computing, equation, poodll, charmap, table, clear
+    accessibility = accessibilitychecker, accessibilityhelper';
+
+// CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
+$CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour

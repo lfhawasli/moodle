@@ -13,15 +13,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment language file
+ * Kaltura video assignment language file.
  *
  * @package    mod_kalvidassign
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
-$string['modulenameplural'] = 'Kaltura Video Assignments';
-$string['modulename'] = 'Kaltura Video Assignment';
-$string['modulename_help'] = 'The Kaltura Video Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
+$string['activity_not_migrated'] = 'This activity has not yet been migrated to use the new Kaltura instance.';
+$string['modulenameplural'] = 'Kaltura Media Assignments';
+$string['modulename'] = 'Kaltura Media Assignment';
+$string['modulename_help'] = 'The Kaltura Media Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
 $string['name'] = 'Name';
 $string['availabledate'] = 'Available from';
 $string['duedate'] = 'Due Date';
@@ -31,7 +34,8 @@ $string['allowdeleting_help'] = 'If enabled, students may replace submitted vide
 $string['emailteachers'] = 'Email alerts to teachers';
 $string['emailteachers_help'] = 'If enabled, teachers receive email notification whenever students add or update an assignment submission. Only teachers who are able to grade the particular assignment are notified. So, for example, if the course uses separate groups, teachers restricted to particular groups won\'t receive notification about students in other groups.';
 $string['invalidid'] = 'Invalid ID';
-$string['pluginadministration'] = 'Kaltura Video Assignment';
+$string['invalid_launch_parameters'] = 'Invalid launch parameters';
+$string['pluginadministration'] = 'Kaltura Media Assignment';
 $string['addvideo'] = 'Add media submission';
 $string['submitvideo'] = 'Submit media';
 $string['replacevideo'] = 'Replace media';
@@ -75,7 +79,7 @@ $string['savedchanges'] = 'Changed Saved';
 $string['save'] = 'Save Changes';
 $string['cancel'] = 'Close';
 $string['checkconversionstatus'] = 'Check video conversion status';
-$string['pluginname'] = 'Kaltura Video Assignment';
+$string['pluginname'] = 'Kaltura Media Assignment';
 $string['video_converting'] = 'The video is still converting.  Please check the status of the video at a later time.';
 $string['emailteachermail'] = '{$a->username} has updated their assignment submission
 for \'{$a->assignment}\' at {$a->timeupdated}
@@ -86,10 +90,10 @@ It is available here:
 $string['emailteachermailhtml'] = '{$a->username} has updated their assignment submission
 for <i>\'{$a->assignment}\'  at {$a->timeupdated}</i><br /><br />
 It is <a href="{$a->url}">available on the web site</a>.';
-$string['messageprovider:kalvidassign_updates'] = 'Kaltura Video assignment notifications';
+$string['messageprovider:kalvidassign_updates'] = 'Kaltura Media assignment notifications';
 $string['video_preview_header'] = 'Submission preview';
 $string['kalvidassign:gradesubmission'] = 'Grade video submissions';
-$string['kalvidassign:addinstance'] = 'Add a Kaltura Video Assignment';
+$string['kalvidassign:addinstance'] = 'Add a Kaltura Media Assignment';
 $string['kalvidassign:submit'] = 'Submit videos';
 $string['grade_video_not_cache'] = 'This video may still be in the process of converting...';
 $string['noenrolledstudents'] = 'No students are enrolled in the course';
@@ -106,3 +110,8 @@ $string['noassignments'] = 'No Kaltura video assignments found in the course';
 $string['submitted'] = 'Submitted';
 $string['nosubmission'] = 'No submission';
 $string['nosubmissions'] = 'No submissions';
+$string['viewsubmission'] = 'View submission';
+$string['failedtoinsertsubmission'] = 'Failed to insert submission record.';
+$string['video_thumbnail'] = 'Video thumbnail';
+$string['feedbackfromteacher'] = 'Feedback From Teacher';
+$string['currentgrade'] = 'Current grade in gradebook';

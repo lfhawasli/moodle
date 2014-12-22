@@ -11,19 +11,26 @@
 $THEME->name = 'uclashared';
 $tn = 'theme_' . $THEME->name;
 
+/**
+ * Parent themes.
+ */
 $THEME->parents = array('base', 'bootstrapbase');
 
+/**
+ * Style sheets from our current theme.
+ */
 $THEME->sheets = array(
     'base',
-    'core',     // Custom core style changes.
-    'general',
-    'theme',
-    'ucla',
     'core',
+    'general',
+    'ucla',
     'moodle',
     'components',
 );
 
+/**
+ * Style sheets from parent themes that we want to exclude .
+ */
 $THEME->parents_exclude_sheets = array(
     'base' => array(
         'blocks',
@@ -34,6 +41,11 @@ $THEME->parents_exclude_sheets = array(
         'editor'
     )
 );
+
+/**
+ * YUI CSS we want to include.  (we don't want any!)
+ */
+$THEME->yuicssmodules = array();
 
 $tf_general     = 'course.php';
 $tf_course      = 'course.php';
@@ -214,6 +226,7 @@ $THEME->enable_dock = false;
 $THEME->csspostprocess = 'uclashared_process_css';
 $THEME->javascripts[] = 'shared_server_dropdown';
 $THEME->javascripts[] = 'help_feedback';
+$THEME->javascripts[] = 'headroom.min';
 
 // CCLE-4807 - Atto Chemistry: Overriding plugin styles.
 $THEME->plugins_exclude_sheets = array('atto' => array('chemistry'));

@@ -1,4 +1,8 @@
+//
+// Theme specific CSS
+//
 
+// Always need the compass library
 @import "compass";
 
 // Core variables and mixins
@@ -9,11 +13,16 @@
 
 
 // Dependencies
+// -------------------
+
 @import "bootstrap/panels";
 @import "ucla/buttons";
 
+// Theme components
+// -------------------
 
 @import "ucla/header";
+@import "ucla/footer";
 @import "ucla/frontpage";
 @import "ucla/login";
 @import "ucla/utilities";
@@ -21,3 +30,5 @@
 
 // The uclasharedcourse theme styles
 @import "ucla/theme_uclasharedcourse";
+
+@import "ucla/headroom_js";

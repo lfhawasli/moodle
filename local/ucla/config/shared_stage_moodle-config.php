@@ -234,7 +234,7 @@ $CFG->grade_report_showanalysisicon = 0;
 $CFG->grade_report_showuserimage = 0;
 
 // Site administration > Plugins > Activity modules > Assignment
-$CFG->assignment_maxbytes = 104857600;   // 100MB
+$CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
@@ -365,17 +365,20 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     collapse = collapse
-    style1 = title, bold, italic, backcolor, fontcolor
+    style1 = title, bold, italic, underline, backcolor, fontcolor
     list = unorderedlist, orderedlist
-    links = link
-    files = image, media, managefiles, poodll
-    style2 = underline, strike, subscript, superscript
-    align = align
     indent = indent
-    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
-    accessibility = accessibilitychecker, accessibilityhelper
-    other = html';
+    links = link
+    files = image, media, managefiles, kalturamedia
+    other = html, fullscreen
+    style2 = strike, subscript, superscript
+    align = align
+    insert = chemistry, computing, equation, poodll, charmap, table, clear
+    accessibility = accessibilitychecker, accessibilityhelper';
+
+// CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
+$CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
@@ -384,32 +387,7 @@ $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 
 // Site administration > Plugins > Local plugins > Kaltura package libraries
-$CFG->forced_plugin_settings['local_kaltura']['conn_server'] = 'ce';
-$CFG->forced_plugin_settings['local_kaltura']['uri'] = 'https://www.kaltura.com';
-$CFG->forced_plugin_settings['local_kaltura']['enable_reports'] = 1;
-$CFG->forced_plugin_settings['local_kaltura']['player'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['player_custom'] = 26365392;
-$CFG->forced_plugin_settings['local_kaltura']['assign_uploader'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['assign_uploader_custom'] = 15205342;
-$CFG->forced_plugin_settings['local_kaltura']['player_resource'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['player_resource_custom'] = 26365392;
-$CFG->forced_plugin_settings['local_kaltura']['player_resource_override'] = 1;
-$CFG->forced_plugin_settings['local_kaltura']['res_uploader'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['res_uploader_custom'] = 15205342;
-$CFG->forced_plugin_settings['local_kaltura']['presentation'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['presentation_custom'] = 15205352;
-$CFG->forced_plugin_settings['local_kaltura']['pres_uploader'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['pres_uploader_custom'] = 15205342;
-$CFG->forced_plugin_settings['local_kaltura']['simple_uploader'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['simple_uploader_custom'] = 15205362;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_uploader'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_uploader_custom'] = 23871951;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_screen_recorder'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_screen_recorder_custom'] = 25573621;
-$CFG->forced_plugin_settings['local_kaltura']['player_filter'] = 0;
-$CFG->forced_plugin_settings['local_kaltura']['player_filter_custom'] = 26365392;
-$CFG->forced_plugin_settings['local_kaltura']['enable_html5'] = 1;
-$CFG->forced_plugin_settings['local_kaltura']['mymedia_application_name'] = 'ccle-shared-stage';
+$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-1.kaf.kaltura.com';
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
@@ -425,8 +403,6 @@ $CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
 $CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 // CCLE-4297 - Have "quick grading" turned on by default
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
-// CCLE-3511 - Set defaults for new assignment module
-$CFG->forced_plugin_settings['local_ucla']['defaultassignsettings'] = 1;
 // CCLE-4289 - Show All View Action Icons
 $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
@@ -489,12 +465,6 @@ $CFG->updateautocheck = 0;
 // Site administration > Development > Experimental > Experimental settings
 $CFG->dndallowtextandlinks = 1;
 $CFG->enabletgzbackups = 1;
-
-// Site administration > Development > Debugging
-$CFG->debug = 32767;    // DEVELOPER level debugging messages
-$CFG->debugdisplay = 1;  // show the debugging messages
-$CFG->perfdebug = 15; // show performance information
-$CFG->debugpageinfo = 1; // show page information
 
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later

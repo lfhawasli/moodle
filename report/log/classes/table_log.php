@@ -381,10 +381,7 @@ class report_log_table_log extends table_sql {
                 && !empty($this->filterparams->userid) && !empty($this->filterparams->modid);
 
         $groupid = 0;
-        // START UCLA MOD: CCLE-4834 - Moodle 2.7 "All logs" doesn't capture anything deeper than front page
-        //if (!empty($this->filterparams->courseid)) {
         if (!empty($this->filterparams->courseid) && $this->filterparams->courseid != SITEID) {
-        // END UCLA MOD: CCLE-4834
             if (!empty($this->filterparams->groupid)) {
                 $groupid = $this->filterparams->groupid;
             }

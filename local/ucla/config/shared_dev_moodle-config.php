@@ -249,8 +249,8 @@ $CFG->grade_report_showuserimage = 0;
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
-// Site administration > Plugins > Activity modules > AssignmentAssignment (2.2)
-$CFG->assignment_maxbytes = 104857600;   // 100MB
+// Site administration > Plugins > Activity modules > Assignment
+$CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
@@ -382,17 +382,20 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     collapse = collapse
-    style1 = title, bold, italic, backcolor, fontcolor
+    style1 = title, bold, italic, underline, backcolor, fontcolor
     list = unorderedlist, orderedlist
-    links = link
-    files = image, media, managefiles, poodll
-    style2 = underline, strike, subscript, superscript
-    align = align
     indent = indent
-    insert = chemistry, computing, equation, charmap, table, clear
     undo = undo
-    accessibility = accessibilitychecker, accessibilityhelper
-    other = html';
+    links = link
+    files = image, media, managefiles, kalturamedia
+    other = html, fullscreen
+    style2 = strike, subscript, superscript
+    align = align
+    insert = chemistry, computing, equation, poodll, charmap, table, clear
+    accessibility = accessibilitychecker, accessibilityhelper';
+
+// CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
+$CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
@@ -411,8 +414,6 @@ $CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
 $CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 // CCLE-4297 - Have "quick grading" turned on by default
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
-// CCLE-3511 - Set defaults for new assignment module
-$CFG->forced_plugin_settings['local_ucla']['defaultassignsettings'] = 1;
 // CCLE-4289 - Show All View Action Icons
 $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 

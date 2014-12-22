@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,34 +13,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment grade preferences form
+ * Kaltura grade preferences form.
  *
- * @package    mod
- * @subpackage kalvidassign
+ * @package    mod_kalvidassign
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/course/moodleform_mod.php');
-require_once(dirname(__FILE__) . '/locallib.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/course/moodleform_mod.php');
+require_once(dirname(__FILE__).'/locallib.php');
 require_once($CFG->libdir.'/formslib.php');
 
 class kalvidassign_gradepreferences_form extends moodleform {
-
-    function definition() {
+    /**
+     * This function defines all of the elements displayed on the grade preferences form.
+     */
+    public function definition() {
         global $CFG, $COURSE, $USER;
 
         $mform =& $this->_form;
 
         $mform->addElement('hidden', 'cmid', $this->_customdata['cmid']);
+        $mform->setType('cmid', PARAM_INT);
 
         $mform->addElement('header', 'kal_vid_subm_hdr', get_string('optionalsettings', 'kalvidassign'));
 
-
-        $context = get_context_instance(CONTEXT_MODULE, $this->_customdata['cmid']);
+        $context = context_module::instance($this->_customdata['cmid']);
 
         $group_opt = array();
         $groups    = array();
@@ -81,9 +83,11 @@ class kalvidassign_gradepreferences_form extends moodleform {
 
         $mform->addElement('select', 'group_filter', get_string('group_filter', 'mod_kalvidassign'), $group_opt);
 
-        $filters = array(KALASSIGN_ALL => get_string('all', 'kalvidassign'),
-                                KALASSIGN_REQ_GRADING => get_string('reqgrading', 'kalvidassign'),
-                                KALASSIGN_SUBMITTED => get_string('submitted', 'kalvidassign'));
+        $filters = array(
+            KALASSIGN_ALL => get_string('all', 'kalvidassign'),
+            KALASSIGN_REQ_GRADING => get_string('reqgrading', 'kalvidassign'),
+            KALASSIGN_SUBMITTED => get_string('submitted', 'kalvidassign')
+        );
 
         $mform->addElement('select', 'filter', get_string('show'), $filters);
         $mform->addHelpButton('filter', 'show', 'kalvidassign');
@@ -93,18 +97,21 @@ class kalvidassign_gradepreferences_form extends moodleform {
         $mform->addHelpButton('perpage', 'pagesize', 'kalvidassign');
 
         $mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'kalvidassign'));
-        // START UCLA MOD: CCLE-4471 - Update Kaltura to 2013071808
-        //$mform->setDefault('quickgrade', '');
-        $mform->setDefault('quickgrade', 1);
-        // START UCLA MOD: CCLE-4471
+        $mform->setDefault('quickgrade', '');
         $mform->addHelpButton('quickgrade', 'quickgrade', 'kalvidassign');
 
         $savepref = get_string('savepref', 'kalvidassign');
 
         $mform->addElement('submit', 'savepref', $savepref);
-
     }
 
+    /**
+     * This funciton validates te submitted data.
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
