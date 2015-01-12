@@ -227,7 +227,16 @@ class format_ucla extends format_topics {
                $additional_sql
            ORDER BY u.lastname, u.firstname";    
 
-       $instructors = $DB->get_records_sql($sql, $params);
+        $instructors = $DB->get_records_sql($sql, $params);
+
+        // Check that instructors are not suspended.
+        $suspendedids = get_suspended_userids(
+                context_course::instance($this->courseid), true);
+        foreach ($instructors as $k => $instructor) {
+            if (in_array($instructor->id, $suspendedids)) {
+                unset($instructors[$k]);
+            }
+        }
 
        return $instructors;
    }
