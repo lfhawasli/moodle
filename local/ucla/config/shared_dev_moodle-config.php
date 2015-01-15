@@ -216,6 +216,8 @@ $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
 $CFG->bloglevel = 0; // Disable blog system completely
+// CCLE-1266 - Enable RSS Feeds for Forum Posts
+$CFG->enablerssfeeds = 1;
 
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
@@ -260,6 +262,9 @@ $CFG->elluminate_max_talkers = 2;
 
 // Site administration > Plugins > Activity modules > Folder
 $CFG->forced_plugin_settings['folder']['requiremodintro'] = 0;
+
+// Site administration > Plugins > Activity modules > Forum
+$CFG->forum_enablerssfeeds = 1;
 
 // Site administration > Plugins > Activity modules > IMS content package
 $CFG->forced_plugin_settings['imscp']['requiremodintro'] = 0;
