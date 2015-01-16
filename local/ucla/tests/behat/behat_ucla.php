@@ -557,4 +557,16 @@ class behat_ucla extends behat_files {
         return new Given($alternative);
     }
 
+    /**
+     * Set a private config setting with a value
+     * 
+     * @Given /^I set the private config setting "([^"]*)" to "(\d+)";$/
+     * 
+     * @param string $config
+     * @param string $value
+     */
+    public function i_set_the_private_conig_setting_to($config, $value) {
+        set_config($config, $value);
+    }
+
 }

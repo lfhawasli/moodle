@@ -1464,7 +1464,10 @@ abstract class restore_dbops {
                                                        )
                                                    )",
                                            array($user->username, $user->mnethostid, $user->email, $user->firstaccess))) {
-                return false; // Conflict, username/mnethostid already exist and belong to another user (by email/firstaccess)
+                // START UCLA MOD: CCLE-4929 - Remove email restriction from restore/import
+                //return false; // Conflict, username/mnethostid already exist and belong to another user (by email/firstaccess)
+                return $rec;
+                // END UCLA MOD: CCLE-4929
             }
         }
 
