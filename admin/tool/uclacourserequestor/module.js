@@ -1,70 +1,73 @@
 M.tool_uclacourserequestor = {
-    init : function(Y) {
-        
+    init: function (Y) {
+
         // Workaround to override default Moodle table row styling.
         Y.one('body').hide();
 
         Y.on('domready', function () {
-            rows = Y.all('#uclacourserequestor_requests tr');
+            var rows = Y.all('#uclacourserequestor_requests tr');
 
-            rows.each(function(row) {
-                row.get('children').each(function(node) {
+            rows.each(function (row) {
+                row.get('children').each(function (node) {
                     rowClass = row.getAttribute('class').split(" ");
                     node.addClass(rowClass[0]);
                 });
             });
             Y.one('body').show();
-        }); 
 
-        // Helper function to get all valid checkboxes with a given class.
-        function getCheckboxes(classType) {
-            return Y.all("input." + classType).filter( function(checkbox) {
-                            return !checkbox.getAttribute('disabled');
-                         });
-        }
+            // All event listener to all checkboxes to toggle row highlight.
+            var allCheckboxes = Y.all('#uclacourserequestor_requests .lastcol input[type="checkbox"]');
 
-        // Handle "Check All" checkboxes.
-        checkAll = Y.all('.check-all');
+            allCheckboxes.on('change', function (e) {
+                var checkbox = e.target;
 
-        checkAll.on('change', function(e) {
-            var classType = e.currentTarget.get('value');
-            var checkboxes = getCheckboxes(classType);
+                if (checkbox.get('checked')) {
+                    checkbox.ancestor('tr').addClass('checkbox-checked');
+                } else {
+                    checkbox.ancestor('tr').removeClass('checkbox-checked');
+                }
+            });
+            
+            // Style the already selected checkboxes.
+            Y.all('#uclacourserequestor_requests .lastcol input[type="checkbox"]:checked').each(function(node) {
+                node.ancestor('tr').addClass('checkbox-checked');
+            })
+        });
+        
+        // Attach 'check-all' event to instructors 
+        Y.one('#ucrgeneraloptions .check-all-instructors').on('change', function(e) {
+            var intructorCheckboxes = Y.all('#uclacourserequestor_requests td.c9:not(.warning):not(.error) input[type="checkbox"]');
+            
+            intructorCheckboxes.each(function(node) {
+                node.set('checked', e.target.get('checked'));
+            });
+        }) 
 
-            if(e.currentTarget.get('checked')) {
-                checkboxes.set('checked', true);
+        // Attach 'check all' event to ugrad, grad and tut.
+        Y.all('#ucrgeneraloptions .label input[type="checkbox"]').on('change', function (e) {
+            
+            // Get the type: ugrad, grad, tut
+            var type = e.target.ancestor('span').getAttribute('class');
+            type = type.replace(/label /g, "");
+
+            // Select all checboxes of type
+            var myTypeCheckboxes = Y.all('#uclacourserequestor_requests td.lastcol.' + type + ' input[type="checkbox"]');
+
+            // If user checked, then 'check' all checkboxes of type
+            if (e.target.get('checked')) {
+
+                myTypeCheckboxes.each(function (node) {
+                    node.set('checked', true);
+                    node.ancestor('tr').addClass('checkbox-checked');
+                });
             } else {
-                checkboxes.set('checked', false);
+                // Else uncheck.
+                myTypeCheckboxes.each(function (node) {
+                    node.set('checked', false);
+                    node.ancestor('tr').removeClass('checkbox-checked');
+                });
             }
         });
 
-        // Handle individual checkboxes.
-
-        // Select checkboxes from last two columns (email instructor and to be built).
-        numCols = document.getElementById('uclacourserequestor_requests').rows[0].cells.length;
-        inputs = Y.all('.c' + (numCols-1) + ' input, .c' + (numCols-2) + ' input');
-
-        // Check for change in any individual checkbox.
-        inputs.on('change', function(e) {
-            var classType = e.currentTarget.get('className');
-            var checkboxes = getCheckboxes(classType)
-
-            // Update corresponding "Check All" checkbox.
-            checkAll.each(function(node) {
-                if(node.get('value') === classType) {
-                    // Select if all individual inputs selected.
-                    if(e.currentTarget.get('checked')) {
-                        var emptyCheckbox = checkboxes.some(function(checkbox) {
-                            return !checkbox.get('checked');
-                        });
-                        if(!emptyCheckbox) {
-                            node.set('checked', true);
-                        }
-                    } else {
-                        // Unselect if individual input unselected.
-                        node.set('checked', false);
-                    }
-                }
-            });
-        });
     }
 };

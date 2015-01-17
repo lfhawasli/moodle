@@ -1223,7 +1223,9 @@ function prep_request_entry($requestinfo) {
             }
 
             // Add class to "To be built" column checkbox.
-            $buildoptions['class'] = $requestinfo['type'];
+            if (isset($requestinfo['type'])) {
+                $buildoptions['class'] = $requestinfo['type'];
+            }
 
             $formatted[$k] = html_writer::checkbox("$key-$k", '1', 
                 $actval, $addedtext, $buildoptions);

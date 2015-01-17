@@ -400,42 +400,47 @@ if ($processrequests) {
     }
 
     // Check to see if we need global options.
-    $set = reset($requestswitherrors);
-    $first = reset($set);
-    if ($first['action'] == UCLA_COURSE_TOBUILD
+    if (!empty($requestswitherrors)) {
+        $set = reset($requestswitherrors);    
+        $first = reset($set);
+        if ($first['action'] == UCLA_COURSE_TOBUILD
             || $first['action'] == UCLA_COURSE_FAILED) {
-        // Add options for global email to contact.
-        $requestor = html_writer::tag('label', get_string(
-            'requestorglobal', $rucr), array(
-                'for' => 'requestorglobal'
-            ));
+            // Add options for global email to contact.
+            $requestor = html_writer::tag('label', get_string(
+                'requestorglobal', $rucr), array(
+                    'for' => 'requestorglobal'
+                ));
 
-        $requestor .= html_writer::tag('input', '', array(
-                'type' => 'text',
-                'value' => $requestorglobal,
-                'name' => 'requestorglobal'
-            ));
+            $requestor .= html_writer::tag('input', '', array(
+                    'type' => 'text',
+                    'value' => $requestorglobal,
+                    'name' => 'requestorglobal'
+                ));
 
-        $globaloptions[][] = $requestor;
+            $globaloptions[][] = $requestor;
 
-        // Add option to email instructors.
-        $globaloptions[][] = html_writer::checkbox('', 'mailinst',
-                get_config('tool_uclacourserequestor', 'mailinst_default'),
-                get_string('mailinsttoggle', 'tool_uclacourserequestor'),
-                array('class' => 'check-all'));
+            // We can only provide course filters if there is a type.
+            if (isset($first['type'])) {
+                // Add option to email instructors.
+                $globaloptions[][] = html_writer::checkbox('', 'mailinst',
+                        get_config('tool_uclacourserequestor', 'mailinst_default'),
+                        get_string('mailinsttoggle', 'tool_uclacourserequestor'),
+                        array('class' => 'check-all check-all-instructors'));
 
-        // Add build filter options.
-        $filters = get_string('buildfilters', 'tool_uclacourserequestor');
-        $filters .= html_writer::tag('span',
-                html_writer::checkbox('', 'ugrad', true, 'ugrad', array('class' => 'check-all')),
-                array('class' => 'label ugrad'));
-        $filters .= html_writer::tag('span',
-                html_writer::checkbox('', 'grad', true, 'grad', array('class' => 'check-all')),
-                array('class' => 'label grad'));
-        $filters .=  html_writer::tag('span',
-                html_writer::checkbox('', 'tut', true, 'tut', array('class' => 'check-all')),
-                array('class' => 'label tut'));
-        $globaloptions[][] = $filters;
+                // Add build filter options.
+                $filters = get_string('buildfilters', 'tool_uclacourserequestor');
+                $filters .= html_writer::tag('span',
+                        html_writer::checkbox('', 'ugrad', true, 'ugrad', array('class' => 'check-all')),
+                        array('class' => 'label ugrad'));
+                $filters .= html_writer::tag('span',
+                        html_writer::checkbox('', 'grad', true, 'grad', array('class' => 'check-all')),
+                        array('class' => 'label grad'));
+                $filters .=  html_writer::tag('span',
+                        html_writer::checkbox('', 'tut', true, 'tut', array('class' => 'check-all')),
+                        array('class' => 'label tut'));
+                $globaloptions[][] = $filters;            
+            }
+        }
     }
     
     // user wants to build courses now
@@ -459,16 +464,17 @@ if ($processrequests) {
         if (!empty($data['errclass'])) {
             $rowclasses[$key] = $data['errclass'];
 
-            // We do not need to display this in the table
+            // We do not need to display this in the table.
             unset($tabledata[$key]['errclass']);
         }
     }
 
-    // Get the values as a set
+    // Get the error values as a set.
     $errormessages = array_keys(array_flip($rowclasses));
-
+    
     // Add class type to row for styling.
     foreach ($tabledata as $key => $data) {
+        // Add class type to row for styling.
         if (!isset($data['type'])) {
             // Requests that are already built do not have a type.
             continue;
@@ -479,14 +485,16 @@ if ($processrequests) {
             // If row has an error, it will already have style set.
             $rowclasses[$key] = $data['type'];
         }
-        unset($tabledata[$key]['type']);
+        unset($tabledata[$key]['type']);        
     }
 
     // Get the headers to display strings.
     $possfields = array();
     $requestfields = reset($tabledata);
-    foreach ($requestfields as $f => $v) {
-        $possfields[$f] = get_string($f, $rucr);
+    if (is_array($requestfields)) {
+        foreach ($requestfields as $f => $v) {
+            $possfields[$f] = get_string($f, $rucr);
+        }
     }
 
     $requeststable = new html_table();
