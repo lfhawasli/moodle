@@ -23,7 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/local/ucla/lib.php');
+require_once(__DIR__ . '/../../ucla/lib.php');
 
 /**
  * Syllabus webservice item class.
@@ -35,9 +35,10 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_ws_item {
-    /** @var int Number of times a service will be requested before reporting an error. */
-    const MAX_ATTEMPTS = 3;
-
+    
+    /** @VAR int Two hours */
+    const NEXT_ATTEMPT = 7200;
+    
     /** @var mixed Data that may be sent for use during a service request. */
     private $_data;
 
@@ -60,30 +61,55 @@ class syllabus_ws_item {
     }
 
     /**
-     * POST $payload to specified URL if the criteria matches.
+     * POST $payload to specified URL if the criteria matches.  Also sets up an 
+     * alert to notify of failures.
      *
      * @param   object $payload
-     * @return  bool, true if successful, false if we run out of tries
+     * @return  bool    True if successful, false if we reported an error.
      */
     public function notify($payload) {
 
         if ($this->_match_criteria()) {
+            // See if there's an alert waiting for this SRS
+            $alerttime = get_config('next_attempt_alert_'.$payload->srs, 'local_ucla_syllabus');
+            $now = time();
 
-            // Attempt to POST at most MAX_ATTEMPTS times.
-            while (self::MAX_ATTEMPTS > $this->_attempt) {
-
+            // There's an alert waiting, try to process it.
+            if ($alerttime) {
+                // Attempt to POST.
                 if ($this->_post($payload)) {
-                    return true;
-                    break;
+                    
+                    // Successful POST, so remove timestamp.
+                    unset_config('local_ucla_syllabus', 'next_attempt_alert_'.$payload->srs);
+                } else {
+                    
+                    // Failed to POST, send an email if it has been more than two hours.
+                    if ($now >= $alerttime) {
+                        $this->_contact($payload);
+
+                        // Set a new reminder for two hours from now.
+                        set_config('local_ucla_syllabus', $now + self::NEXT_ATTEMPT, 'next_attempt_alert_'.$payload->srs);
+
+                        return false;
+                    }
                 }
+            } else {
+                // No alert is waiting.
+                // Set an alert to notify two hours from now in case we fail.
+                set_config('local_ucla_syllabus', $now + self::NEXT_ATTEMPT, 'next_attempt_alert_'.$payload->srs);
 
-                $this->_attempt++;
-            }
-
-            // If we kept trying and ran out of tries, then report.
-            if ($this->_attempt == self::MAX_ATTEMPTS) {
-                $this->_contact($payload);
-                return false;
+                // Attempt to POST.
+                if ($this->_post($payload)) {
+                    
+                    // Successful POST, so remove alert.
+                    unset_config('local_ucla_syllabus', 'next_attempt_alert_'.$payload->srs);
+                } else {
+                    
+                    // Failed to POST, so send an email.  Alert remains in place.
+                    $this->_contact($payload);
+                    
+                    return false;
+                }
             }
         }
 
@@ -96,7 +122,7 @@ class syllabus_ws_item {
      * @param   array $payload contains message, subject, and recipient
      * @return  bool, true if email sent successfully
      */
-    private function _contact($payload) {
+    protected function _contact($payload) {
 
         // Send email message.
         $payload['service'] = $this->_data->url;
@@ -115,7 +141,7 @@ class syllabus_ws_item {
      * 
      * @return bool, true if met
      */
-    private function _match_criteria() {
+    protected function _match_criteria() {
         return $this->_match_subject() || $this->_match_srs();
     }
 
@@ -151,7 +177,7 @@ class syllabus_ws_item {
      * @param   object $payload
      * @return  bool, true if request is successful
      */
-    private function _post($payload) {
+    protected function _post($payload) {
         $ch = curl_init();
 
         $sig = '';
