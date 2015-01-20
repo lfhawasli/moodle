@@ -3313,6 +3313,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
 */
 function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=false, $reply=false, $link=false,
                           $footer="", $highlight="", $postisread=null, $dummyifcantsee=true, $istracked=null, $return=false, $mode=null) {
+    // END UCLA-MOD: CCLE-4882 forum customization
     global $USER, $CFG, $OUTPUT;
 
     require_once($CFG->libdir . '/filelib.php');
