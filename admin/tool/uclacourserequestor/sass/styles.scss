@@ -1,0 +1,127 @@
+/* Make requestid, term, srs, department, course, status, email instructor,
+   do not send URL to MyUCLA, delete cells are centered*/
+#uclacourserequestor_requests .c0, 
+#uclacourserequestor_requests .c1, 
+#uclacourserequestor_requests .c2, 
+#uclacourserequestor_requests .c3, 
+#uclacourserequestor_requests .c4, 
+#uclacourserequestor_requests .c8, 
+#uclacourserequestor_requests .c9, 
+#uclacourserequestor_requests .c10, 
+#uclacourserequestor_requests .c11 {
+    text-align: center;
+}
+
+#uclacourserequestor_requests thead {
+    color: white;
+}
+
+#uclacourserequestor_requests tbody .warning,
+#uclacourserequestor_requests tbody .error {
+    background-color: #f2dede; /* Bootstrap notice error color */
+}
+
+#tool_uclacourserequestor #checkrequests {
+    margin-left: 5px;
+}
+
+#tool_uclacourserequestor .right {
+    float: right;     
+}
+
+#tool_uclacourserequestor h3.main {
+    text-align: left;
+    
+}
+
+/** This is currently overpowered by an !important **/
+#uclacourserequestor_requests thead {
+    background-color: #536895;
+}
+
+#uclacourserequestor_requests .cmailinst {
+    text-align: center;
+}
+
+#ucrgeneraloptions input {
+    margin: 0 5px;
+}
+
+/* Make sure build labels are separated by some space between. */
+#ucrgeneraloptions span {
+    margin: 5px;
+    padding: 3px;
+}
+
+$requestor-table-color-bg-ugrad: #e3edf7;
+$requestor-table-color-border-ugrad: #8bb0d9;
+
+$requestor-table-color-bg-grad: #f0f0fa;
+$requestor-table-color-border-grad: #908bd9;
+
+$requestor-table-color-bg-tut: #f0fafa;
+$requestor-table-color-border-tut: #80dbdb;
+
+#uclacourserequestor_requests {
+    tr.ugrad {
+        td.c0 {
+            border-left: 6px solid $requestor-table-color-border-ugrad;
+        }
+        
+        &.checkbox-checked td {
+            background-color: $requestor-table-color-bg-ugrad;
+        }
+    }
+    tr.grad {
+        td.c0 {
+            border-left: 6px solid $requestor-table-color-border-grad;
+        }
+        
+        &.checkbox-checked td {
+            background-color: $requestor-table-color-bg-grad;
+        }
+    }
+    tr.tut {
+        td.c0 {
+            border-left: 6px solid $requestor-table-color-border-tut;
+        }
+        
+        &.checkbox-checked td {
+            background-color: $requestor-table-color-bg-tut;
+        }
+    }
+    tr.warning {
+        td.c0 {
+            border-left: 6px solid orange;
+        }
+        td {
+            background-color: #faf3de;
+        }
+    }
+    tr.error {
+        td.c0 {
+            border-left: 6px solid orangered;
+        }
+    }
+}
+
+#ucrgeneraloptions {
+    span.label {
+        padding: 4px 12px 4px 4px;
+        
+        &.ugrad {
+            background-color: $requestor-table-color-bg-ugrad;
+            border-left: 12px solid $requestor-table-color-border-ugrad;
+        }
+        
+        &.grad {
+            background-color: $requestor-table-color-bg-grad;
+            border-left: 12px solid $requestor-table-color-border-grad;
+        }
+        
+        &.tut {
+            background-color: $requestor-table-color-bg-tut;
+            border-left: 12px solid $requestor-table-color-border-tut;
+        }
+    }
+}
