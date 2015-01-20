@@ -54,6 +54,8 @@ $string['norequestsfound-views'] = 'No requests found.';
 
 $string['optionsforall'] = 'Options that can affect all requests';
 $string['requestorglobal'] = 'Email to contact when these courses are built: ';
+$string['mailinsttoggle'] = 'Toggle email instructors';
+$string['buildfilters'] = 'Build filters:';
 
 // Table headers for the requests
 $string['id'] = 'Request ID';
@@ -68,7 +70,7 @@ $string['crosslist'] = 'Crosslist?';
 $string['timerequested'] = 'Time requested';
 $string['action'] = 'Status';
 $string['status'] = 'Condition';
-$string['mailinst'] = 'E-Mail instructor';
+$string['mailinst'] = 'Email instructors';
 $string['hidden'] = 'Course built hidden from students';
 $string['nourlupdate'] = 'Do NOT send URL to MyUCLA';
 $string['crosslists'] = 'Crosslisted SRSes';
