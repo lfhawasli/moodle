@@ -342,6 +342,12 @@ function create_help_message(&$fromform)
         @$accesstime = date('r' , $USER->lastaccess);
     }
 
+    // Parse user agent string
+    require_once($CFG->dirroot.'/vendor/autoload.php');
+    $ua = $_SERVER['HTTP_USER_AGENT'];
+    $parser = UAParser\Parser::create();
+    $result = $parser->parse($ua);
+    
     // Needs stripslashes after obtaining information that has been escaped for security reasons    
     $body = stripslashes($fromform->ucla_help_name) . " wrote: \n\n" . 
             stripslashes($fromform->ucla_help_description) . "\n
@@ -350,6 +356,8 @@ function create_help_message(&$fromform)
     Email: " . stripslashes($fromform->ucla_help_email) . "
     Server: $_SERVER[SERVER_NAME]
     User_Agent: $_SERVER[HTTP_USER_AGENT]
+    OS: " . $result->os->toString() . "
+    Browser: " . $result->ua->toString() . "
     Host: $_SERVER[REMOTE_ADDR]
     Referer: $_SERVER[HTTP_REFERER]
     Course Shortname: $fromform->course_name
