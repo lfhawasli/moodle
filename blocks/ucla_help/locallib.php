@@ -22,15 +22,10 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-spl_autoload_register(function ($class) {
-    require_once(__DIR__ . '/sidebar/sidebar.php');
-
-    list($mod, $name) = explode('_', $class);
-
-    if ($mod === 'sidebar') {
-        require_once(__DIR__ . '/sidebar/' . $name . '/sidebar.php');
-    }
-});
+require_once(__DIR__ . '/sidebar/sidebar.php');
+require_once(__DIR__ . '/sidebar/docs/sidebar.php');
+require_once(__DIR__ . '/sidebar/feedback/sidebar.php');
+require_once(__DIR__ . '/sidebar/file/sidebar.php');
 
 global $PAGE;
 

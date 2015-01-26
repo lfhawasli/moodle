@@ -1,0 +1,262 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * UCLA support tools plugin.
+ *
+ * @package    local_ucla_support_tools
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+@import "compass";
+@import "color_picker";
+@import "dialog";
+
+.ucla-support-tool-alltools,
+.ucla-support-tool-category-list {
+    > ul > li {
+        list-style: none;
+        width: 20%;
+        min-width: 150px;
+        max-width: 220px;
+        margin: 0 16px 16px 0;
+        float: left;
+    }
+}
+.ucla-support-category {
+    
+    border: 1px solid #d1d4d5;
+    background-color: #E6E9EB;
+    width: 100%;
+    overflow: hidden;
+    min-height: 100px;
+    
+    @include border-radius(2px);
+    
+    .ucla-support-category-wrapper {
+        border-left: 4px solid #ddd;
+    }
+    .ucla-support-category-body {
+        clear: both;
+    }
+
+    .ucla-support-category-empty {
+        padding: 8px;
+        border: 1px solid #ddd;
+        background-color: white;
+        margin: 4px;
+        text-align: center;
+        font-weight: 300;
+    }
+
+    .ucla-support-category-footer {
+        padding: 4px;
+        background-color: #f84b00;
+        
+        .btn-link {
+            color: white;
+        }
+    }
+    
+    .btn-primary[data-action="addtool"] {
+        margin: 4px;
+
+        @include border-radius(0);
+    }
+    
+    ul {
+        margin: 0;
+    }
+    
+    li {
+        list-style: none;
+        
+        &:first-child .ucla-support-tool {
+            @include box-shadow(#D1D7DA 2px -1px 3px);
+        }
+        
+        &:nth-child(2n) .ucla-support-tool {
+            background-color: #f0f3f5;
+        }
+        
+        &:last-child .ucla-support-tool {
+            border-bottom: 0;
+        }
+    }
+    
+    .ucla-support-tool {
+        margin: auto 0;
+        border: 0;
+        border-bottom: 1px solid #d1d4d5;
+        
+        @include box-shadow(0 0 0 0);
+        @include border-radius(0);
+        
+        a[data-action="delete"] {
+            display: none;
+        }
+        .ucla-support-tool-title i {
+            color: #f8ba00;
+            float: right;
+            margin-left: 8px;
+        }
+    }
+}
+
+.ucla-support-category-header {
+    padding: 6px;
+    background-color: #24596b;
+    font-size: 1.3rem !important;
+    border-left: 10px solid #24596b;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    font-weight: 300;
+    margin: 0 0 8px;
+    color: #eee;
+    display: inline-block;
+
+    @include box-shadow(#ddd 2px 2px 4px);
+
+    i {
+        color: white;
+        float: right;
+        margin-left: 8px;
+    }
+}
+
+.ucla-support-tool-category-labels {
+    text-align: right;
+    
+    li {
+        list-style: none;
+    }
+    .ucla-support-category-header {
+        border-right: 10px solid #24596b;
+        padding: 0 8px;
+        
+        @include box-shadow(0 0 0 0);
+        
+        label {
+            margin: 0;
+            display: inline-block;
+            padding: 8px 0;
+            i {
+                display: inline;
+                padding: 3px 0;
+            }
+        }
+        &:hover {
+            background-color: lighten(#173945, 20%);
+            border-right-color: lighten(#24596b, 5%);
+        }
+        &.selected {
+            border-right: 10px solid #eee;
+            background-color: #6c97a6;
+        }
+        input[type="checkbox"] {
+            display: none;
+        }
+    }
+}
+
+.ucla-support-label {
+    text-transform: uppercase;
+}
+
+.ucla-support-tool {
+    padding: 6px;
+    border: 1px solid #D1D7DA;
+    font-weight: 300;
+    background-color: white;
+    margin: 4px;
+    margin-bottom: 8px;
+
+    @include box-shadow(#D1D7DA 1px 1px 3px);
+    @include border-radius(2px);
+    
+    .ucla-support-tool-title {
+        margin: 0;
+        padding: 4px;
+        display: inline-block;
+        width: 100%;
+        a {
+            color: #111;
+        }
+        i {
+            color: #f84b00;
+            float: right;
+            margin-left: 8px;
+            margin-top: 4px;
+        }
+    }
+    
+    .ucla-support-tool-body {
+        color: #444;
+        padding: 8px;
+        margin: 4px;
+        background-color: #e1e8eb;
+        
+        blockquote {
+            border-left-color: #85a2ae;
+            font-size: 1.2rem;
+        }
+    }
+    
+    a.ucla-support-tool-link {
+        width: 100%;
+        display: inline-block;
+    }
+    
+    .ucla-support-tool-tags {
+        margin: 4px 0;
+        
+        li {
+            list-style: none;
+            margin-right: 4px;
+            float: left;
+        }
+    }
+}
+
+.ucla-support-tool-alltools {
+    a[data-action="remove"] {
+        display: none;
+    }
+}
+.ucla-support-tool-category-list,
+.ucla-support-tool-alltools {
+    li.hidden {
+        display: none;
+        visibility: hidden;
+    }
+}
+
+.ucla-support-tool-filter {
+    text-align: center;
+    
+    .form-control {
+        width: 50%;
+    }
+}
+
+.ucla-support-tool-accent {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+    padding: 16px 0 0;
+    text-align: center;
+    margin-bottom: 16px;
+}
