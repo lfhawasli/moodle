@@ -1418,7 +1418,7 @@ if ($displayforms) {
     
     $results = $DB->get_records_sql("
         SELECT 
-            m.id AS module_id,
+            (@s := @s+1) AS identifier,
             m.Due_date, 
             c.shortname, 
             c.fullname,
@@ -1426,7 +1426,6 @@ if ($displayforms) {
             m.Name
         FROM ((
             SELECT 
-                id,
                 'quiz' AS modtype, 
                 course, 
                 name, 
@@ -1436,15 +1435,25 @@ if ($displayforms) {
                 BETWEEN  {$timefrom} AND {$timeto}
         ) UNION (
             SELECT 
-                id,
                 'assignment' AS modtype, 
                 course, 
                 name, 
-                FROM_UNIXTIME(timedue, '%m-%d-%y %H:%i %a') AS Due_Date
-            FROM {assignment}
-            WHERE timedue
+                FROM_UNIXTIME(duedate) AS Due_Date
+            FROM {assign}
+            WHERE duedate
             BETWEEN {$timefrom} AND {$timeto}
-            )) AS m
+        ) UNION (
+            SELECT
+                'turnitintool' AS modtype,
+                tiit.course,
+                CONCAT_WS(' ', tiit.name, partname) AS name,
+            FROM_UNIXTIME(dtdue) AS Due_Date
+            FROM {turnitintool} tiit
+            JOIN {turnitintool_parts} ON tiit.id = turnitintoolid
+            WHERE dtdue
+            BETWEEN {$timefrom} AND {$timeto}
+        )) AS m
+        JOIN (SELECT @s := 0) AS increment
         INNER JOIN {course} c ON c.id = m.course
         ORDER BY `m`.`Due_Date` ASC
     ");    
