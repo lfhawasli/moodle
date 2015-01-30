@@ -59,6 +59,11 @@ class mod_kalvidres_renderer extends plugin_renderer_base {
             'withblocks' => 0,
             'source' => $kalvidres->source
         );
+        // START UCLA MOD: CCLE-5021 - Guests can't access "public" Kaltura Video Resources
+        // Need to pass id to kalvidres table, so that course_module entry
+        // can be queried.
+        $params['id'] = $kalvidres->id;
+        // END UCLA MOD: CCLE-5021
         $url = new moodle_url('/mod/kalvidres/lti_launch.php', $params);
 
         $attr = array(
