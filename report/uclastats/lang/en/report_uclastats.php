@@ -297,6 +297,14 @@ $string['syllabuscachedresult'] = 'ugrad: {$a->ugrad} / grad: {$a->grad}';
 $string['ugrad'] = 'Undergraduate courses';
 $string['grad'] = 'Graduate courses';
 
+// Strings for Logins by division.
+$string['logins_by_division'] = 'Login count (division)';
+$string['logins_by_division_help'] = 'Reports number of logins to course ' .
+        'websites by division. For a user\'s login session each division they ' .
+        'visit is only counted once until the next time they login or they log ' .
+        'out. Please see CCLE-4844 for more details.';
+$string['logins'] = 'Logins';
+
 // Error strings.
 $string['nocachedresults'] = 'No cached results found';
 $string['invalidterm'] = 'Invalid term';
