@@ -38,11 +38,38 @@ $source = optional_param('source', '', PARAM_URL);
 
 $context = context_course::instance($courseid);
 
-// If the user isn't a teacher or they are not enrolled in the course context then return with an error.
-if (!has_capability('mod/kalvidres:addinstance', $context) && is_guest($context)) {
-    echo get_string('nocapabilitytousethisservice', 'error');
-    die();
+// START UCLA MOD: CCLE-5021 - Guests can't access "public" Kaltura Video Resources
+//// If the user isn't a teacher or they are not enrolled in the course context then return with an error.
+//if (!has_capability('mod/kalvidres:addinstance', $context) && is_guest($context)) {
+//    echo get_string('nocapabilitytousethisservice', 'error');
+//    die();
+//}
+// Check public/private and if it is private, then use original Kaltura check.
+require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+$isprivate = true;
+$kalvidresid =  required_param('id', PARAM_INT);
+$ppcourse = PublicPrivate_Course::build($courseid);
+if ($ppcourse->is_activated()) {
+    // Get course module record directly from DB, because it is too hard to get
+    // it from get_fast_modinfo().
+    $sql = "SELECT cm.id
+              FROM {course_modules} cm
+              JOIN {modules} m ON (cm.module=m.id)
+             WHERE cm.instance=? AND
+                   m.name='kalvidres'";
+    $coursemoduleid = $DB->get_field_sql($sql, array($kalvidresid));
+    $pp = new PublicPrivate_Module($coursemoduleid);
+    if (!$pp->is_private()) {
+        $isprivate = false;
+    }
 }
+if ($isprivate) {
+    if (!has_capability('mod/kalvidres:addinstance', $context) && is_guest($context)) {
+        echo get_string('nocapabilitytousethisservice', 'error');
+        die();
+    }
+}
+// END UCLA MOD: CCLE-5021
 
 $course = get_course($courseid);
 
