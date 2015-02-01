@@ -47,9 +47,10 @@ $context = context_course::instance($courseid);
 // Check public/private and if it is private, then use original Kaltura check.
 require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
 $isprivate = true;
-$kalvidresid =  required_param('id', PARAM_INT);
+$kalvidresid = optional_param('id', null, PARAM_INT);
 $ppcourse = PublicPrivate_Course::build($courseid);
-if ($ppcourse->is_activated()) {
+// The 'id' is not passed in when creating a new video resource or on mod_form.
+if (!is_null($kalvidresid) && $ppcourse->is_activated()) {
     // Get course module record directly from DB, because it is too hard to get
     // it from get_fast_modinfo().
     $sql = "SELECT cm.id
