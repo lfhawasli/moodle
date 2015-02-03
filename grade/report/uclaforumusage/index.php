@@ -32,17 +32,18 @@ require_once($CFG->dirroot . '/grade/report/uclaforumusage/forumusage_form.php')
 $courseid = required_param('id', PARAM_INT);
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 $forumtype = optional_param('forumtype', 1, PARAM_INT);
-
+$exportoption = optional_param('export', null, PARAM_ALPHA);
 $formsubmitted = optional_param('submitbutton', 0, PARAM_TEXT);
+
 $PAGE->set_url(new moodle_url('/grade/report/uclaforumusage/index.php', array('id' => $courseid)));
 
 // Basic access checks.
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('nocourseid');
 }
+
 require_login($course);
 $PAGE->set_pagelayout('report');
-
 $context = context_course::instance($course->id);
 require_capability('gradereport/uclaforumusage:view', $context);
 
@@ -56,12 +57,7 @@ if (!isset($USER->grade_last_report)) {
 $USER->grade_last_report[$course->id] = 'forumusage';
 $reportname = get_string('modulename', 'gradereport_uclaforumusage');
 
-print_grade_page_head($COURSE->id, 'report', 'uclaforumusage', $reportname, false);
-
-echo $OUTPUT->box(get_string('description', 'gradereport_uclaforumusage'));
-
 $enrolledlist = gradereport_uclaforumusage_get_enrolled_user($courseid);
-
 $allowed_roles = array();
 while($role = array_shift($CFG->instructor_levels_roles)){
     $allowed_roles[]= implode("', '", $role);
@@ -101,26 +97,32 @@ foreach ($tainstr as $k => $v) {
     }
 }
 
-// Form post data.
-$forums = optional_param_array('forum', 0, PARAM_RAW);
+// If filter student
 $student = optional_param('student', 0, PARAM_INT);
 
-$mform = new forumusage_form(null, array('user' => $USER,
+// If pass from URL, need to reconstruct in form
+if ($exportoption == 'xls'){
+    $forums = optional_param('condition1', 0, PARAM_RAW);
+    $forums = explode(', ', $forums);
+} else {
+// If posted from form.
+// Form post data.
+    $forums = optional_param_array('forum', 0, PARAM_RAW);
+    $mform = new forumusage_form(null, array('user' => $USER,
                                          'studentlist' => $enrolledlist,
                                          'forumlist' => $forumlist,
                                          'courseid' => $courseid,
                                          'forums' => $forums,
                                          'forumtype' => $forumtype));
-$mform->set_data($PAGE->url->params());
-$data = $mform->get_data();
-$mform->display();
-
-if (!$forums) {
-    $forums = array_keys($forumlist);
-}
-foreach ($forums as $k => $value) {
-    if (!$value) {
-        unset($forums[$k]); // For query the right data.
+    $mform->set_data($PAGE->url->params());
+    $data = $mform->get_data();
+    if (!$forums) {
+        $forums = array_keys($forumlist);
+    }
+    foreach ($forums as $k => $value) {
+        if (!$value) {
+            unset($forums[$k]); // For query the right data.
+        }
     }
 }
 
@@ -146,6 +148,15 @@ if ($student) {
 }
 $sql .= " ORDER BY fp.userid, fp.parent";
 $rs = $DB->get_recordset_sql($sql, array('courseid' => $courseid));
+
+// Pass in for excel export to get the same data as the display page.
+$params = array('id' => $courseid,
+                'forumtype' => $forumtype,
+                'export' => $exportoption,
+                'condition1' => $condition1,
+                'condition2' => $condition2,
+                'student' => $student);
+
 if ($rs->valid()) {
     // Store result in array for statistics.
     $posts = array();
@@ -166,6 +177,7 @@ if ($rs->valid()) {
     $statdisplay = get_stats($posts, $users, $tainstr);
 
     $table = new html_table();
+    $table->attributes['class'] = 'table table-striped table-bordered';
     // Rows.
 
      // Row 1 and Row 2(header).
@@ -202,8 +214,17 @@ if ($rs->valid()) {
             $cell->header = true;
             $cell->text = get_string('labelinsttaresp', 'gradereport_uclaforumusage');
             $row2->cells[] = $cell;
+            $cell = new html_table_cell();
+   
         }
     }
+    $cell = new html_table_cell();
+    $cell->header = true;
+    if (!$forumtype) {
+        $cell->rowspan = 2;
+    }
+    $cell->text = get_string('usertotalpost', 'gradereport_uclaforumusage').$OUTPUT->help_icon('usertotalposthelp', 'gradereport_uclaforumusage');
+    $row1->cells[] = $cell;
     $table->data[] = $row1;
     if (!$forumtype) {
         $table->data[] = $row2;
@@ -211,9 +232,10 @@ if ($rs->valid()) {
 
     // Need to create all the rows.
     foreach ($studentdisplay as $userid => $studentname) {
+        $totalposts = 0;
         $row = new html_table_row();
         $cell = new html_table_cell();
-        $cell->text = $studentname;
+        $cell->text = html_writer::link(new moodle_url('/user/profile.php', array('id' =>$userid)), $studentname);
         $row->cells[] = $cell;
         foreach ($forums as $v) {
             if (!$forumtype) {
@@ -221,6 +243,7 @@ if ($rs->valid()) {
                 $cell = new html_table_cell();
                 if (isset($statdisplay[$userid][$v]['initial_posts'])) {
                     $cell->text = $statdisplay[$userid][$v]['initial_posts'];
+                    $totalposts += $statdisplay[$userid][$v]['initial_posts'];
                 } else {
                     $cell->text = 0;
                 }
@@ -230,6 +253,7 @@ if ($rs->valid()) {
             $cell = new html_table_cell();
             if (isset($statdisplay[$userid][$v]['responses'])) {
                 $cell->text = $statdisplay[$userid][$v]['responses'];
+                $totalposts += $statdisplay[$userid][$v]['responses'];
             } else {
                 $cell->text = 0;
             }
@@ -245,10 +269,27 @@ if ($rs->valid()) {
                 }
                 $row->cells[] = $cell;
             }
+            
         }// End forum.
+        // Total post for user
+        $cell = new html_table_cell();
+        $cell->text = $totalposts;
+        $row->cells[] = $cell;
         $table->data[] = $row;
     }
-    echo html_writer::tag('div', html_writer::table($table), array('class' => 'flexible-wrap'));
+
+    // If user chose to export
+    if ($exportoption == 'xls'){
+        // export to excel
+        $title = 'Output';
+        forumusage_export_to_xls($title, $table->data, $params['forumtype']);
+    } else {
+        print_grade_page_head($COURSE->id, 'report', 'uclaforumusage', $reportname, false);
+        echo $OUTPUT->box(get_string('description', 'gradereport_uclaforumusage'));
+        $mform->display();
+        echo display_export_options($params);
+        echo html_writer::tag('div', html_writer::table($table), array('class' => 'flexible-wrap'));
+    }
 } else {
     echo get_string('noforumpost', 'gradereport_uclaforumusage');
 }
