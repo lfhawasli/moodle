@@ -97,6 +97,11 @@ a.btn-header {
     &:hover {
         background-color: #ffc933;
     }
+    &:focus {
+        background-color: #ff9d00;
+        border: 2px solid white;
+        display: inline !important;
+    }
 }
 
 a.btn-help-feedback {
@@ -113,6 +118,11 @@ a.btn-help-feedback {
 
     &:hover {
         background-color: #ffc933;
+    }
+    &:focus {
+        background-color: #ff9d00;
+        border: 2px solid white;
+        display: inline !important;
     }
 }
 

@@ -36,3 +36,9 @@ $string['description'] = 'Displays the number of times someone has replied to ' 
         'a post in a forum. Unchecking the "simple view" displays the number ' .
         'of times an Instructor or TA has replied to a student and the number ' .
         'of initial posts by a student.';
+$string['usertotalpost'] = 'User total posts';   
+$string['exportoptions'] = 'Export: ';
+$string['forumlist'] = 'List of Forum(s)';
+$string['usertotalposthelp'] = 'Total number of posts for this user';
+$string['usertotalposthelp_help'] = 'Displays the number of posts when someone has replied to a post in a forum 
+                                     and the number of initial posts by the user';

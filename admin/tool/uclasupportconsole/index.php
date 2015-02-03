@@ -2291,7 +2291,9 @@ if (isset($consoles->no_finish)) {
 echo $OUTPUT->header();
 
 // Heading
-echo $OUTPUT->heading(get_string('pluginname', 'tool_uclasupportconsole'), 2, 'headingblock');
+
+// Add 'top' id to header as anchor link to return to top
+echo $OUTPUT->heading(get_string('pluginname', 'tool_uclasupportconsole'), 2, 'headingblock', 'top');
 
 if (!$displayforms) {
     echo html_writer::link(new moodle_url($gobackurl), 

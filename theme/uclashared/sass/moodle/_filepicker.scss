@@ -27,12 +27,57 @@
     
 }
 
+// Ugly override to fix the file manager drag & drop display in the
+// file manager embedded layout.
+#region-main .mform:not(.unresponsive) .femptylabel .ffilemanager {
+    width: inherit;
+}
+
+// Fixes alignment problems in the embedded file manager dialog
+.file-picker.fp-generallayout {
+    .control-group {
+        label {
+            display: inline-block;
+            margin-right: 12px;
+        }
+        .controls {
+            display: inline;
+        }
+    }
+}
+
+// More ugly hacks follow:
+
+// Remove the header from the atto dialog file manager (embedded)
+// and constrain width of embedded file picker dialog.
+#page-lib-editor-atto-plugins-managefiles-manage {
+    #page-header {
+        display: none;
+    }
+    .moodle-dialogue-base .moodle-dialogue-wrap {
+        width: 88%;
+                
+        // Force window sizes to remain constant:
+        // The repo area
+        .file-picker .fp-repo-area {
+            max-height: 140px;
+        }
+        // The file area
+        .file-picker .fp-content {
+            height: 350px;
+        }
+    }
+}
+
 // Fix structural alignments with general dialog boxes
 // and @extend boostrap styles to buttons and inputs.
 
 .moodle-dialogue-base {
     .moodle-dialogue-wrap {
         .moodle-dialogue-bd {
+            
+            // Removes awkward padding around embedded dialogs.
+            padding: 0;
 
             input[type="text"],
             input[type="url"] {

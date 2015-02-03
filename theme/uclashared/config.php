@@ -78,9 +78,17 @@ if ($disablepostblocks) {
  * courses
  */
 global $COURSE;
-$control_panel_option = array('controlpanel' => true);
 if (SITEID == $COURSE->id) {   // for most cases, user will usually be on course
-    $control_panel_option['controlpanel'] =  false;
+    $displaycontrolpanel = false;
+} else {
+    // CCLE-4941 - If the course format is something other than UCLA, then remove the Control Panel button.
+    include_once("$CFG->dirroot/course/format/lib.php");
+    $format = course_get_format($COURSE);
+    if ($format->get_format() == 'ucla') {
+        $displaycontrolpanel = true;
+    } else {
+        $displaycontrolpanel = false;
+    }
 }
 
 $THEME->layouts = array(
@@ -89,7 +97,9 @@ $THEME->layouts = array(
     'base' => array(
         'file' => $tf_general,
         'regions' => array(),
-        'options' => $control_panel_option
+        'options' => array(
+            'controlpanel' => $displaycontrolpanel
+        )
     ),
     // Standard layout with blocks, this is recommended for most 
     // pages with general information
@@ -97,7 +107,9 @@ $THEME->layouts = array(
         'file' => $tf_general,
         'regions' => $enabledregions,
         'defaultregion' => $defaultregion,
-        'options' => $control_panel_option
+        'options' => array(
+            'controlpanel' => $displaycontrolpanel
+        )
     ),
     // Main course page
     'course' => array(
@@ -105,7 +117,7 @@ $THEME->layouts = array(
         'regions' => $enabledregions,
         'defaultregion' => $defaultregion,
         'options' => array(
-            'controlpanel' => true
+            'controlpanel' => $displaycontrolpanel
         )
     ),
     'coursecategory' => array(
@@ -120,7 +132,7 @@ $THEME->layouts = array(
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
         'options' => array(
-            'controlpanel' => true
+            'controlpanel' => $displaycontrolpanel
         )
     ),
     // The site home page.
@@ -137,7 +149,9 @@ $THEME->layouts = array(
         'file' => $tf_general,
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
-        'options' => $control_panel_option
+        'options' => array(
+            'controlpanel' => $displaycontrolpanel
+        )
     ),
     // My dashboard page
     'mydashboard' => array(
@@ -176,7 +190,7 @@ $THEME->layouts = array(
         'regions' => array(),
         'options' => array(
             'nofooter' => true,
-            'controlpanel' => true
+            'controlpanel' => $displaycontrolpanel
         ),
     ),
     // Embeded pages, like iframe/object embeded in moodleform 
@@ -217,7 +231,9 @@ $THEME->layouts = array(
         'file' => $tf_report,
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
-        'options' => $control_panel_option
+        'options' => array(
+            'controlpanel' => $displaycontrolpanel
+        )
     ),
 );
 
