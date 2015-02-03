@@ -82,8 +82,13 @@ class tool_supportconsole_manager {
 
         $render = '';
         $sm = get_string_manager();
+
+        // Add anchor links and create a dropdown menu with anchor links 
+        // for each group
+        $dropdowngroup = '';
         foreach ($this->consolegroups as $groupname => $group) {
             $innercontent = '';
+            $listcontent = array();
             foreach ($group as $titleid => $contenthtml) {
                 if ($sm->string_exists($titleid, 'tool_uclasupportconsole')) {
                     $titlestr = get_string($titleid, 'tool_uclasupportconsole');
@@ -92,27 +97,57 @@ class tool_supportconsole_manager {
                         . get_string('notitledesc', 'tool_uclasupportconsole');
                 }
 
+                $contenthtml .=
+                        html_writer::link('#top', get_string('totop', 'tool_uclasupportconsole')) .
+                        html_writer::tag('i', '', array('class' => 'fa fa-fw fa-caret-up'));
                 $sectioncontent = $OUTPUT->heading($titlestr, 3)
                     . html_writer::tag('div', $contenthtml, array(
                             'class' => 'uclaconsole'
                         ));
-                $innercontent .= $OUTPUT->box($sectioncontent, 
-                    'generalbox supportconsole', $titleid);
 
+                // Add anchor tag to name attribute
+                $boxattrs = array('name'=>'#'.$titleid);
+                // $innercontent .= $OUTPUT->box($sectioncontent,
+                //     'generalbox supportconsole', $titleid);
+                $innercontent .= $OUTPUT->box($sectioncontent, 
+                    'generalbox supportconsole', $titleid, $boxattrs);
+
+                // Remove any pre-existing links within group string
+                $titlestr = preg_replace('%\(.*<a.*<\/a>.*\)%s', '', $titlestr);
+                $listcontent[] = html_writer::link('#'.$titleid, $titlestr);
             }
 
+            // Create dropdown with anchor links for each group
+            $dropdownbuttontext = get_string($groupname, 'tool_uclasupportconsole') .
+                    html_writer::tag('i', '', array('class' => 'fa fa-fw fa-caret-down'));
+            $dropdownbutton = html_writer::tag('button', $dropdownbuttontext,
+                    array(
+                        'class' => 'btn btn-default dropdown-toggle',
+                        'data-toggle' => 'dropdown',
+                        'aria-expanded' => 'false'
+                    ));
+            $dropdownmenu = html_writer::alist($listcontent, 
+                    array(
+                        'class' => 'dropdown-menu',
+                        'role' => 'menu')
+                    );
+            $dropdowngroup .=
+                    html_writer::div($dropdownbutton . $dropdownmenu, 'btn-group');
             $render .= $OUTPUT->heading(get_string($groupname,
                     'tool_uclasupportconsole'), 1);
-                    
+
             if ($groupname == 'srdb') {
                 // if displaying Registrar tools, give link to Registrar
                 $render .= html_writer::link('http://www.registrar.ucla.edu/schedule/', 
                         get_string('srslookup', 'tool_uclasupportconsole'),
                         array('target' => '_blank'));
             }
-            
+
             $render .= $innercontent;
         }
+
+        $tooldropdown = html_writer::div($dropdowngroup, 'btn-group');
+        $render = $tooldropdown . $render;
 
         return $render;
 

@@ -132,6 +132,7 @@ $string['oneresult'] = 'There is 1 result';
 $string['xresults'] = 'There are {$a} results';
 $string['forinput'] = ' for input [{$a}]';
 $string['exportoptions'] = 'Export: ';
+$string['totop'] = 'To top';
 
 // capability strings
 $string['uclasupportconsole:view'] = 'Use UCLA support console';
