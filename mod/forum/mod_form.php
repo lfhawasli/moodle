@@ -121,6 +121,10 @@ class mod_forum_mod_form extends moodleform_mod {
             $choices[2] = get_string('posts', 'forum');
             $mform->addElement('select', 'rsstype', get_string('rsstype'), $choices);
             $mform->addHelpButton('rsstype', 'rsstype', 'forum');
+            // START UCLA MOD: CCLE-1266 - Enable RSS Feeds for Forum Posts
+            // Set the RSS feed to be for posts
+            $mform->setDefault('rsstype', $CFG->forum_rsstype);
+            // END UCLA MOD: CCLE-1266
 
             $choices = array();
             $choices[0] = '0';
@@ -139,6 +143,10 @@ class mod_forum_mod_form extends moodleform_mod {
             $mform->addElement('select', 'rssarticles', get_string('rssarticles'), $choices);
             $mform->addHelpButton('rssarticles', 'rssarticles', 'forum');
             $mform->disabledIf('rssarticles', 'rsstype', 'eq', '0');
+            // START UCLA MOD: CCLE-1266 - Enable RSS Feeds for Forum Posts
+            // Set the number of articles in the RSS feed
+            $mform->setDefault('rssarticles', $CFG->forum_rssarticles);
+            // END UCLA MOD: CCLE-1266
         }
 
 //-------------------------------------------------------------------------------

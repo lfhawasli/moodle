@@ -99,6 +99,10 @@ $string['configmaxattachments'] = 'Default maximum number of attachments allowed
 $string['configmaxbytes'] = 'Default maximum size for all forum attachments on the site (subject to course limits and other local settings)';
 $string['configoldpostdays'] = 'Number of days old any post is considered read.';
 $string['configreplytouser'] = 'When a forum post is mailed out, should it contain the user\'s email address so that recipients can reply personally rather than via the forum? Even if set to \'Yes\' users can choose in their profile to keep their email address secret.';
+// START UCLA MOD: CCLE-1266 - Enable RSS Feeds for Forum Posts
+$string['configrsstypedefault'] = 'Default type of activity to be included in the RSS feed.';
+$string['configrssarticlesdefault'] = 'Default number of articles (either discussions or posts) to include in the RSS feed.';
+// END UCLA MOD: CCLE-1266
 $string['configshortpost'] = 'Any post under this length (in characters not including HTML) is considered short (see below).';
 $string['configtrackingtype'] = 'Default setting for read tracking.';
 $string['configtrackreadposts'] = 'Set to \'yes\' if you want to track read/unread for each user.';
@@ -399,6 +403,9 @@ $string['rssarticles'] = 'Number of RSS recent articles';
 $string['rssarticles_help'] = 'This setting specifies the number of articles (either discussions or posts) to include in the RSS feed. Between 5 and 20 generally acceptable.';
 $string['rsstype'] = 'RSS feed for this activity';
 $string['rsstype_help'] = 'To enable the RSS feed for this activity, select either discussions or posts to be included in the feed.';
+// START UCLA MOD: CCLE-1266 - Enable RSS Feeds for Forum Posts
+$string['rsstypedefault'] = 'RSS feed type';
+// END UCLA MOD: CCLE-1266
 $string['search'] = 'Search';
 $string['searchdatefrom'] = 'Posts must be newer than this';
 $string['searchdateto'] = 'Posts must be older than this';
