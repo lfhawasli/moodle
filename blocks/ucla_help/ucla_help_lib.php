@@ -240,7 +240,7 @@ class support_contacts_manager {
 
         // now merge with values from config file to overwrite user set ones
         $support_contacts = array_merge((array) $support_contacts, 
-                (array) $block_ucla_help_support_contacts);        
+                (array) $block_ucla_help_support_contacts);   
 
         // If there is no one listed at 'System' context, then try to guess it.
         if (!isset($support_contacts['System'])) {
@@ -414,8 +414,8 @@ function create_help_message(&$fromform)
  * @return boolean                  Returns false on error, otherwise true.
  */
 function message_support_contact($supportcontact, $from=null, $fromname=null,
-                                 $subject, $body) {
-    global $CFG;
+                                 $subject, $body, $attachmentfile=null, $attachmentname=null) {
+    global $CFG, $DB, $USER;
 
     $result = false;
     if (!empty($CFG->noemailever)) {
@@ -429,48 +429,81 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
     }
 
     // Now, is the support contact an email address?
-    if (validateEmailSyntax($supportcontact)) {
-        // send message via email
-        $mail = get_mailer();
+    if (validateEmailSyntax($supportcontact)) {        
+        // Create the user to send the email to.
+        $touser = new stdClass();
+        $touser->email = $supportcontact;
+        $touser->firstname = null;
+        $touser->lastname = null;
+        $touser->maildisplay = true;
+        $touser->mailformat = 1;
+        $touser->id = -99;
+        $touser->firstnamephonetic = null;
+        $touser->lastnamephonetic = null;
+        $touser->middlename = null;
+        $touser->alternatename = null;
 
-        // Check if we want the from email to be something else.
+        // Create the user who is sending the email.
+        if (isloggedin()) {
+            $fromuser = $DB->get_record('user', array('id'=>$USER->id), '*', MUST_EXIST);
+        } else {
+            $fromuser = $DB->get_record('user', array('username'=>'guest'), '*', MUST_EXIST);
+        }
         $altfrom = get_config('block_ucla_help', 'fromemail');
         if (!empty($altfrom)) {
-            $mail->From = $altfrom;
+            $fromuser->email = $altfrom;
         } else if (!empty($from)) {
-            $mail->From = $from;
+            $fromuser->email = $from;
         } else {
-            $mail->From = $CFG->noreplyaddress;
+            $fromuser->email = $CFG->noreplyaddress;
         }
-
         if (!empty($fromname)) {
-            $mail->FromName = $fromname;
+            $fromuser->firstname = $fromname;
         }
+        $fromuser->lastname = null;
+        $fromuser->maildisplay = true;
+        $fromuser->mailformat = 1;
 
-        // Add support contact email address.
-        $mail->AddAddress($supportcontact);
-
-        $mail->Subject = $subject;
-        $mail->Body = $body;
-
-        $result = $mail->Send();
-
+        $result = email_to_user($touser, $fromuser, $subject, $body, '',
+                        $attachmentfile, $attachmentname);
     } else if (!empty($supportcontact)) {
         // Send message via JIRA.
         $params = array(
-            'pid' => get_config('block_ucla_help', 'jira_pid'),
-            'issuetype' => 1,
-            'os_username' => get_config('block_ucla_help', 'jira_user'),
-            'os_password' => get_config('block_ucla_help', 'jira_password'),
-            'summary' => $subject,
-            'assignee' => $supportcontact,
-            'reporter' => $supportcontact,
-            'description' => $body,
+            'fields' => array(
+                'project' => array('id'=> get_config('block_ucla_help', 'jira_pid')),
+                'issuetype' => array('id' => 1),
+                'summary' => $subject,
+                'assignee' => array('name' => $supportcontact),
+                'reporter' => array('name' => $supportcontact),
+                'description' => $body
+            )
         );
 
         // Try to create the issue.
-        $result = send_jira_request(get_config('block_ucla_help', 'jira_endpoint'),
-                $params, 'POST');
+        $jiraresult = send_jira_request(get_config('block_ucla_help', 'jira_endpoint'),
+                true, array('Content-type: application/json'),
+                json_encode($params));
+
+        if ($jiraresult === false) {
+            $result = false;
+        } else {
+            $result = true;
+            $decodedresult = (array)json_decode($jiraresult);
+            $issueid = $decodedresult['key'];
+        }
+
+        // If there is an attachment, then attach it to the newly created issue.
+        if ($result != false && $attachmentfile != null) {
+            $url = get_config('block_ucla_help', 'jira_endpoint') . "/$issueid/attachments";
+            $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
+            $data = array('file'=>"@{$attachmentfile};filename={$attachmentname}");
+            $jiraresult = send_jira_request($url, true, $headers, $data);
+            if ($jiraresult === false) {
+                $result = false;
+            } else {
+                $result = true;
+            }
+        }
     } else {
         // No $supportcontact specified, so return false.
         return $result;
@@ -522,6 +555,41 @@ function get_support_contact($curcontext) {
     $retval = explode(',', $retval);
 
     return $retval;
+}
+
+/**
+ * Sends either a "GET", or "POST" request along with the specified parameters
+ * using JIRA's REST API
+ * 
+ * @param string $url       The JIRA URL to POST to or GET
+ * @param boolean $post     If true, then POST
+ * @param array $headers    Array containing the headers for the request
+ * @param array $data       Array containing the parameters for the request
+ * 
+ * @return string           Returns false on error, otherwise request result
+ */
+function send_jira_request($url, $post = false, $headers, $data) {
+    $username = get_config('block_ucla_help', 'jira_user');
+    $password = get_config('block_ucla_help', 'jira_password');
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+    if ($post) {
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    }
+
+    $result = curl_exec($curl);
+    curl_close($curl); 
+
+    return $result;
 }
 
 /**

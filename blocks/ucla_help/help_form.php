@@ -45,7 +45,15 @@ class help_form extends moodleform {
         $mform->addElement('textarea', 'ucla_help_description',
                 get_string("description_field", "block_ucla_help"),
                 'wrap="virtual" rows="6"');
-        
+
+        // Only allow logged in users to upload attachments.
+        if (isloggedin() && !isguestuser()) {
+            $mform->addElement('filepicker', 'ucla_help_attachment',
+                    get_string('helpform_upload', 'block_ucla_help'), null,
+                    array('maxbytes' => get_config('block_ucla_help', 'maxfilesize'),
+                    'accepted_types' => '*'));
+        }
+
         // no point in having a cancel option
         $this->add_action_buttons(false, get_string('submit_button', 'block_ucla_help'));
         
