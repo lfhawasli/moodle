@@ -1,5 +1,5 @@
 <?php
-// This file is part of the SSC WOWZA plugin for Moodle - http://moodle.org/
+// This file is part of the SSC WOWZA pluginf or Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,28 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  WOWZA streaming media filter plugin key checking.
+ *  WOWZA streaming media filter plugin.
+ *
+ *  This filter will replace any wowza links to a media file with
+ *  a media plugin that plays that media inline.
  *
  * @package    filter_sscwowza
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+defined('MOODLE_INTERNAL') || die();
 
-// Get global user variable.
-global $USER;
-
-$isvalid = true;
-if (!isset($USER->video_allowed)) {
-    $isvalid = false;
-}
-
-if (!$isvalid) {
-    header('HTTP/1.0 403 Forbidden');
-} else {
-    header('Content-Type: binary/octet-stream');
-    header('Pragma: no-cache');
-    echo hex2bin('7BFA375DEDE2756571EFD3487F6AEB4E');
-    exit(); // This is needed to ensure cr/lf is not added to output.
-}
+$plugin->version   = 2013012900;       // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2012062500;       // Requires this Moodle version.
+$plugin->cron      = 0;
+$plugin->component = 'filter_sscwowza';    // Full name of the plugin (used for diagnostics).

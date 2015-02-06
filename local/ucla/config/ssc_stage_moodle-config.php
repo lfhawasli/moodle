@@ -335,6 +335,9 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.
 // Site administration > Plugins > Filters > PoodLL Filter
 //$CFG->filter_poodll_download_media_ok = '1';
 
+// Site administration > Plugins > Filters > SSC Wowza filter
+$CFG->filter_sscwowza_enable_mp4 = 1;
+
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
