@@ -127,6 +127,9 @@ $string['deleteallsubmissions'] = 'Delete all submissions';
 $string['description'] = 'Description';
 $string['downloadall'] = 'Download all submissions';
 $string['download all submissions'] = 'Download all submissions in a zip file.';
+// START UCLA MOD: CCLE-4953 - Assignment download file names
+$string['downloadalluid'] = 'Download all submissions (UID format)';
+// END UCLA MOD: CCLE-4953
 $string['duedate'] = 'Due date';
 $string['duedate_help'] = 'This is when the assignment is due. Submissions will still be allowed after this date but any assignments submitted after this date are marked as late. To prevent submissions after a certain date - set the assignment cut off date.';
 $string['duedateno'] = 'No due date';
@@ -230,6 +233,9 @@ $string['hiddenuser'] = 'Participant ';
 $string['instructionfiles'] = 'Instruction files';
 $string['invalidgradeforscale'] = 'The grade supplied was not valid for the current scale';
 $string['invalidfloatforgrade'] = 'The grade provided could not be understood: {$a}';
+// START UCLA MOD: CCLE-4953 - Assignment download file names
+$string['isblindmarking'] = 'This assignment has blind marking enabled, so you cannot download by UID format.';
+// END UCLA MOD: CCLE-4953
 $string['lastmodifiedsubmission'] = 'Last modified (submission)';
 $string['lastmodifiedgrade'] = 'Last modified (grade)';
 $string['latesubmissions'] = 'Late submissions';
