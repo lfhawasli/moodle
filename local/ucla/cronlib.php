@@ -3,6 +3,9 @@
  *  Shared UCLA-written for cron-synching functions.
  **/
 
+require_once($CFG->dirroot  . '/' . $CFG->admin .
+        '/tool/uclacoursecreator/uclacoursecreator.class.php');
+
 /**
  * Updates the ucla_reg_classinfo table.
  */
@@ -22,6 +25,42 @@ class ucla_reg_classinfo_cron {
         }
 
         return $codes[$char];
+    }
+
+    /**
+     * Compares coursetitle and sectiontitle fields and if they are different
+     * will update course title if entry is for hostcourse.
+     *
+     * @param stdClass $old Database object.
+     * @param array $new    Note, $new comes in as an array, not object.
+     * @return boolean      Returns true if records needs to be updated,
+     *                      otherwise returns false.
+     */
+    public function handle_course_title(stdClass $old, array $new) {
+        global $DB;
+        // Check if we need to update course titles.
+        if ($old->coursetitle == $new['coursetitle'] &&
+                $old->sectiontitle == $new['sectiontitle']) {
+            return false;
+        }
+
+        // Titles are different, but do they belong to the hostcourse?
+        $request = $DB->get_record('ucla_request_classes',
+                array('term' => $old->term, 'srs' => $old->srs));
+        if (!$request->hostcourse) {
+            return false;
+        }
+
+        // Entry is for host course, so update course title.
+        $fullname = uclacoursecreator::make_course_title(
+                $new['coursetitle'], $new['sectiontitle']);
+        $DB->set_field('course', 'fullname', $fullname,
+                array('id' => $request->courseid));
+
+        mtrace(sprintf("Updated course title for %s, %s to %s",
+                $old->term, $old->srs, $fullname));
+
+        return true;
     }
 
     /**
@@ -127,6 +166,7 @@ class ucla_reg_classinfo_cron {
                     $newclassinfo['id'] = $existingclassinfo->id;
                     if (self::needs_updating($existingclassinfo, $newclassinfo)) {
                         $DB->update_record('ucla_reg_classinfo', $newclassinfo);
+                        $this->handle_course_title($existingclassinfo, $newclassinfo);
                         $uc++;
                     } else {
                         $nc++;
