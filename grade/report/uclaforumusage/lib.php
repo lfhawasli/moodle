@@ -159,7 +159,7 @@ function get_stats($posts = null, $users = null, $tainstr = null) {
     }
 }
 
-function display_export_options($params) {
+function display_uclaforumusage_export_options($params) {
     global $CFG, $OUTPUT;
     $exportoptions = html_writer::start_tag('div',
             array('class' => 'export-options'));
