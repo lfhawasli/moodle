@@ -344,19 +344,64 @@ class quiz {
      *      be displayed in a javascript alert on the start attempt button.
      */
     public function confirm_start_attempt_message($unfinished) {
-        if ($unfinished) {
+        // START UCLA MOD: CCLE-4424 - Quiz "Attempts must be submitted or they
+        //                             are not counted" is not working as
+        //                             expected
+        //
+        // Editted to append a warning message if the quiz is not submitted upon
+        // timeout.
+        global $CFG;
+        if ($CFG->theme == 'uclashared' || $CFG->theme == 'uclasharedcourse') {
+            $attemptmsg = '';
+
+            if ($unfinished) {
+                return $attemptmsg;
+            }
+
+            $warningheader =
+                        html_writer::tag('div', get_string('confirmstartwarningheader', 'local_ucla'),
+                                         array('style' => 'color: red;'));
+            $warninglist = array();
+
+            if ($this->quiz->timelimit) {
+                $timelimit = floor($this->quiz->timelimit / 60);
+                $warninglist[] = get_string('confirmstartwarningtimelimit', 'local_ucla',
+                                            $timelimit);
+            }
+
+            $attemptlimit = $this->quiz->attempts ? $this->quiz->attempts : 'unlimited';
+            $warninglist[] = get_string('confirmstartwarningattemptlimit', 'local_ucla',
+                                        $attemptlimit);
+
+            // Quiz abandonment is only relevant when there is a time limit
+            if ($this->quiz->overduehandling == 'autoabandon' && $this->quiz->timelimit) {
+                $warninglist[] = get_string('confirmstartwarningmessage', 'local_ucla');
+            }
+
+            if (!empty($warninglist)) {
+                $attemptprompt = get_string('confirmstartwarningprompt', 'local_ucla');
+                $attemptmsg .= $warningheader . html_writer::alist($warninglist) .
+                        $attemptprompt;
+            }
+
+            return $attemptmsg;
+        }
+        else {
+            if ($unfinished) {
+                return '';
+            }
+
+            if ($this->quiz->timelimit && $this->quiz->attempts) {
+                return get_string('confirmstartattempttimelimit', 'quiz', $this->quiz->attempts);
+            } else if ($this->quiz->timelimit) {
+                return get_string('confirmstarttimelimit', 'quiz');
+            } else if ($this->quiz->attempts) {
+                return get_string('confirmstartattemptlimit', 'quiz', $this->quiz->attempts);
+            }
+
             return '';
         }
-
-        if ($this->quiz->timelimit && $this->quiz->attempts) {
-            return get_string('confirmstartattempttimelimit', 'quiz', $this->quiz->attempts);
-        } else if ($this->quiz->timelimit) {
-            return get_string('confirmstarttimelimit', 'quiz');
-        } else if ($this->quiz->attempts) {
-            return get_string('confirmstartattemptlimit', 'quiz', $this->quiz->attempts);
-        }
-
-        return '';
+        // END UCLA MOD: CCLE-4424
     }
 
     /**
