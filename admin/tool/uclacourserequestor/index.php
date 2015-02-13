@@ -401,10 +401,24 @@ if ($processrequests) {
 
     // Check to see if we need global options.
     if (!empty($requestswitherrors)) {
-        $set = reset($requestswitherrors);    
-        $first = reset($set);
-        if ($first['action'] == UCLA_COURSE_TOBUILD
-            || $first['action'] == UCLA_COURSE_FAILED) {
+        $allcoursesbuilt = true;
+        $anycoursehastype = false;
+        foreach ($requestswitherrors as $setid => $set) {
+            foreach ($set as $course) {
+                // Check if all courses have been built.
+                if ($course['action'] == UCLA_COURSE_TOBUILD
+                    || $course['action'] == UCLA_COURSE_FAILED) {
+                    $allcoursesbuilt = false;
+                    // Check if there are any courses that have a type associated with them.
+                    if (!empty($course['type'])) {
+                        $anycoursehastype = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!$allcoursesbuilt) {
             // Add options for global email to contact.
             $requestor = html_writer::tag('label', get_string(
                 'requestorglobal', $rucr), array(
@@ -420,7 +434,7 @@ if ($processrequests) {
             $globaloptions[][] = $requestor;
 
             // We can only provide course filters if there is a type.
-            if (isset($first['type'])) {
+            if ($anycoursehastype) {
                 // Add option to email instructors.
                 $globaloptions[][] = html_writer::checkbox('', 'mailinst',
                         get_config('tool_uclacourserequestor', 'mailinst_default'),
