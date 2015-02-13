@@ -287,7 +287,7 @@ if ($rs->valid()) {
         print_grade_page_head($COURSE->id, 'report', 'uclaforumusage', $reportname, false);
         echo $OUTPUT->box(get_string('description', 'gradereport_uclaforumusage'));
         $mform->display();
-        echo display_export_options($params);
+        echo display_uclaforumusage_export_options($params);
         echo html_writer::tag('div', html_writer::table($table), array('class' => 'flexible-wrap'));
     }
 } else {

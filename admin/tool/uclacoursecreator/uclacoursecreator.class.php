@@ -1130,8 +1130,7 @@ class uclacoursecreator {
 
             // Sorry for the inconsistent calling scheme
             $courseobj->fullname = self::make_course_title(
-                trim($rci_object->coursetitle), 
-                trim($rci_object->sectiontitle)
+                $rci_object->coursetitle, $rci_object->sectiontitle
             );
 
             // Get the long version of the subject area (for category)
@@ -2396,16 +2395,18 @@ class uclacoursecreator {
     /**
      *  Will make a course title from Registrar course and section title data.
      *
-     *  @param $course_title The course title.
-     *  @param $section_title The section title.
+     *  @param $coursetitle The course title.
+     *  @param $sectiontitle The section title.
      *  @return string The combined title.
-     **/
-    static function make_course_title($course_title, $section_title) {
-        if (empty($section_title)) {
-            return $course_title;
+     */
+    static function make_course_title($coursetitle, $sectiontitle) {
+        $coursetitle = trim($coursetitle);
+        $sectiontitle = trim($sectiontitle);
+        if (empty($sectiontitle)) {
+            return $coursetitle;
         }
 
-        return "$course_title: $section_title";
+        return "$coursetitle: $sectiontitle";
     }
 
     /**
