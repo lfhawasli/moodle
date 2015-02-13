@@ -1401,17 +1401,17 @@ function crosslist_course_from_registrar($term, $srs) {
 }
 
 /**
- * Update MyUCLA urls that link to ccle course pages
+ * Update MyUCLA urls that link to ccle course pages.
  *
- * @param string $term  course term
- * @param string $srs   course srs
- * @param string $url   course url for myucla to link to.
- *                      An empty string or null will clear the url at MyUCLA
+ * @param string $term  Course term.
+ * @param string $srs   Course srs.
+ * @param string $url   Course url for myucla to link to. An empty string or
+ *                      null will clear the url at MyUCLA.
  */
 function update_myucla_urls($term, $srs, $url) {
-    $url_updater = new myucla_urlupdater();
+    $urlupdater = new myucla_urlupdater();
     $course = array('term' => $term, 'srs' => $srs);
-    $update_course = array(
+    $updatecourse = array(
         make_idnumber($course) => array(
             'term' => $term, 
             'srs' => $srs, 
@@ -1419,13 +1419,5 @@ function update_myucla_urls($term, $srs, $url) {
         )
     );
 
-    // if a url already exists, then don't overwrite it
-    $result = $url_updater->send_MyUCLA_urls($update_course, false);
-    $curr_url = array_pop($result);
-    if ( empty($curr_url) ) {
-        $url_updater->send_MyUCLA_urls($update_course, true);
-    }
-    
+    $urlupdater->send_MyUCLA_urls($updatecourse, true);    
 }
-
-// EOF
