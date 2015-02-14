@@ -13,7 +13,6 @@ require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir.'/formslib.php');
 
 // From the UCLA help block -- to get support contacts and send jira ticket
-require_once($CFG->dirroot . '/local/ucla/jira.php');
 require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
@@ -672,7 +671,7 @@ class siteindicator_manager {
 
         // Either send email or create a JIRA ticket.
         foreach ($supportcontacts as $supportcontact) {
-            message_support_contact($supportcontact, null, null, $title, $message);
+            message_support_contact($supportcontact, null, null, $title, $message, null, null);
         }
     }
 

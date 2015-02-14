@@ -18,7 +18,9 @@ $string['helpbox_text_default'] = 'Please use the settings option of the help bl
 
 $string['helpform_header'] = 'Report a problem';
 $string['helpform_text'] = 'Use the form below to report a problem or error. Include your email address so we can get back to you.';
-$string['helpform_login'] = 'Please {$a} if requesting help with a particular course.';
+$string['helpform_login'] = 'Please {$a} if requesting help with a particular course, or to add attachments.';
+
+$string['helpform_upload'] = 'Upload a file';
 
 // used by message being sent
 $string['message_header'] = 'CCLE Help: {$a}';
