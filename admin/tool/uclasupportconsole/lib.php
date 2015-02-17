@@ -10,7 +10,7 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasupportconsole/manag
  * @param array $params Params for to generate report. Will append 'export=xls'.
  * @return string
  */
-function display_export_options($params) {
+function display_uclasupportconsole_export_options($params) {
     global $CFG, $OUTPUT;
     $exportoptions = html_writer::start_tag('div',
             array('class' => 'export-options'));
@@ -268,7 +268,7 @@ function supportconsole_render_section_shortcut($title, $data,
     // Export options.
     $params = $inputs;
     $params['console'] = $title;
-    $export = display_export_options($params);
+    $export = display_uclasupportconsole_export_options($params);
 
     // Only display table if there is data to display.
     if (empty($data)) {

@@ -230,3 +230,13 @@ $string['maxcrosslistshown'] = 'Max crosslists shown';
 $string['maxcrosslistshowndesc'] = 'Limit the amount of crosslisted courses shown on a course page.';
 
 $string['crontask'] = 'Cron task for local_ucla';
+
+// CCLE-4424 - Reject attempt on quiz timeout
+$string['confirmstartwarningheader'] = 'Warning: ';
+$string['confirmstartwarningmessage'] = 'You must click submit for this attempt to be counted.';
+$string['confirmstartwarningattemptlimit'] = 'You have {$a} attempts.';
+$string['confirmstartwarningtimelimit'] = 'The time limit is {$a} minutes.';
+$string['confirmstartwarningprompt'] = 'Are you sure that you wish to start?';
+$string['finishsummary'] = 'Return to Quiz View';
+$string['persistentquizwarningmessage'] = 'This quiz is not automatically submitted. Please be sure to submit your quiz attempt before the time runs out or your attempt will not be counted.';
+$string['quizattemptabandoned'] = 'You did not submit your attempt before the time ran out. Your attempt was counted as zero.';

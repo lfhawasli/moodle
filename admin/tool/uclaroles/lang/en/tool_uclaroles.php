@@ -36,7 +36,7 @@ $string['reports_intro'] = 'Please choose a report type to view:';
 $string['back'] = 'Back';
 
 // listing report
-$string['listing'] = 'Role listing';
+$string['listing'] = 'UCLA roles and definitions';
 $string['role_type_dropdown'] = 'Role type: ';
 $string['supportstaff'] = 'Support staff';
 $string['instequiv'] = 'Full permissions';
@@ -52,13 +52,13 @@ $string['assignable_context'] = 'Assignable context';
 $string['noroletype'] = 'No role type';
 
 // rolemapping report
-$string['rolemappings'] = 'Role mappings';
+$string['rolemappings'] = 'Registrar to CCLE role mapping';
 $string['registrar_role'] = 'Registrar role';
 $string['subject_area'] = 'Subject area';
 $string['moodle_role'] = 'Moodle role';
 
 // role remapping report
-$string['remapping'] = 'Role remapping';
+$string['remapping'] = 'Role mapping by collaboration site type';
 $string['remapping_intro'] = 'Displays how a role should be remapping when changing site types.';
 
 // error strings

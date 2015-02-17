@@ -12,7 +12,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
  */
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->dirroot . '/local/ucla/jira.php');
 require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 
 // form to process help request
@@ -111,8 +110,6 @@ $mform = new help_form(NULL, array('courses' => $courses));
 
 // handle form post
 if ($fromform = $mform->get_data()) {
-
-    echo $OUTPUT->box_start('generalbox', 'notice');
     
     // Get email address from form submitter (if any).
     $fromaddress = null;
@@ -149,10 +146,29 @@ if ($fromform = $mform->get_data()) {
     // Get support contact(s).
     $supportcontacts = get_support_contact($context);
 
+    // Get uploaded attachment if there is one.
+    if (isloggedin() && !isguestuser()) {
+        $attachmentname = $mform->get_new_filename('ucla_help_attachment');
+
+        // Save attachment to a temporary directory.
+        if ($attachmentname != null) {
+            $attachmentfile = "{$CFG->tempdir}/helpupload/{$attachmentname}";
+            make_temp_directory('helpupload');
+            if (!$uploadresult = $mform->save_file('ucla_help_attachment', $attachmentfile, true)) {
+                throw new moodle_exception('uploadproblem');
+            }
+        } else {
+            $attachmentfile = null;
+        }
+    } else {
+        $attachmentname = null;
+        $attachmentfile = null;
+    }
+
     $result = true;
     foreach ($supportcontacts as $supportcontact) {
         if (!message_support_contact($supportcontact, $fromaddress,
-                $fromform->ucla_help_name, $header, $body)) {
+                $fromform->ucla_help_name, $header, $body, $attachmentfile, $attachmentname)) {
             $result = false;
             break;
         }
@@ -176,9 +192,7 @@ if ($fromform = $mform->get_data()) {
             $url = $CFG->wwwroot . '/course/view.php?id=' . $COURSE->id;
         }
         echo $OUTPUT->single_button($url, get_string('continue'), 'get');
-    }    
-    
-    echo $OUTPUT->box_end();    
+    }
     
 } else {
     // else display form and header text

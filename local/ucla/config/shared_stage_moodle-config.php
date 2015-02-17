@@ -85,7 +85,7 @@ $CFG->forced_plugin_settings['local_ucla']['oldest_available_term'] = '08S';
 // Browseby CCLE-2894
 $CFG->forced_plugin_settings['block_ucla_browseby']['use_local_courses'] = true;
 $CFG->forced_plugin_settings['block_ucla_browseby']['ignore_coursenum'] = '194,295,296,375';
-$CFG->forced_plugin_settings['block_ucla_browseby']['allow_acttypes'] = 'LEC,SEM';
+$CFG->forced_plugin_settings['block_ucla_browseby']['allow_acttypes'] = 'CLI,LEC,SEM,LAB,FLD,ACT,STU,REC,RGP';
 
 // Course builder \\
 
@@ -132,10 +132,11 @@ $CFG->shib_logged_in_cookie = '_ucla_sso';
 
 // CCLE-2306 - HELP SYSTEM BLOCK
 // If using JIRA, jira_user, jira_password, jira_pid should be defined in config_private.php.
-$CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/CreateIssueDetails.jspa';
+$CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/rest/api/latest/issue';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu/w/';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs.ccle.ucla.edu/api.php';
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
+$CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;

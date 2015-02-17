@@ -278,13 +278,13 @@ if ($processrequests) {
                 $coursedescstr = implode(' + ', $coursedescs);
                 $retmess = get_string($strid, $rucr, $coursedescstr);
 
-                // We care only for updates
+                // We care only for updates.
                 if ($retcode == ucla_courserequests::savesuccess) {
                     if (!empty($changed[$setid])) {
                         $fieldstr = '';
                         $fieldstrs = array();
 
-                        // Kludge to handle crosslisting changes
+                        // Kludge to handle crosslisting changes.
                         $thechanges = $changed[$setid];
                         if (!empty($thechanges['crosslists'])) {
                             $cldelta = $thechanges['crosslists'];
@@ -298,7 +298,7 @@ if ($processrequests) {
                                     . make_idnumber($cl) . ' '
                                     . requestor_dept_course($cl);
                                     
-                                    // update(remove) MyUCLA urls
+                                    // Update (remove) MyUCLA urls.
                                     if ($action == 'removed' && !empty($host_course)) {
                                         
                                         $idtermsrs = array(make_idnumber($host_course) => 
@@ -309,7 +309,9 @@ if ($processrequests) {
                                         $url_updater = new myucla_urlupdater();
                                         $results = $url_updater->send_MyUCLA_urls($idtermsrs, false);
                                         $class_url = array_pop($results);
-                                        
+
+                                        // Check host url to make sure it is on
+                                        // the same server.
                                         if (strpos($class_url, $CFG->wwwroot) !== false) {
                                             update_myucla_urls($cl['term'], $cl['srs'], '');
                                         }
@@ -401,10 +403,24 @@ if ($processrequests) {
 
     // Check to see if we need global options.
     if (!empty($requestswitherrors)) {
-        $set = reset($requestswitherrors);    
-        $first = reset($set);
-        if ($first['action'] == UCLA_COURSE_TOBUILD
-            || $first['action'] == UCLA_COURSE_FAILED) {
+        $allcoursesbuilt = true;
+        $anycoursehastype = false;
+        foreach ($requestswitherrors as $setid => $set) {
+            foreach ($set as $course) {
+                // Check if all courses have been built.
+                if ($course['action'] == UCLA_COURSE_TOBUILD
+                    || $course['action'] == UCLA_COURSE_FAILED) {
+                    $allcoursesbuilt = false;
+                    // Check if there are any courses that have a type associated with them.
+                    if (!empty($course['type'])) {
+                        $anycoursehastype = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!$allcoursesbuilt) {
             // Add options for global email to contact.
             $requestor = html_writer::tag('label', get_string(
                 'requestorglobal', $rucr), array(
@@ -420,7 +436,7 @@ if ($processrequests) {
             $globaloptions[][] = $requestor;
 
             // We can only provide course filters if there is a type.
-            if (isset($first['type'])) {
+            if ($anycoursehastype) {
                 // Add option to email instructors.
                 $globaloptions[][] = html_writer::checkbox('', 'mailinst',
                         get_config('tool_uclacourserequestor', 'mailinst_default'),
