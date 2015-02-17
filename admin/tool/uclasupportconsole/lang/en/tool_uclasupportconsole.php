@@ -10,7 +10,7 @@ $string['srdb'] = 'Registrar tools';
 $string['modules'] = 'Module tools';
 
 // System logs
-$string['syslogs'] = 'View last 1000 lines of a log';
+$string['syslogs'] = 'Last 1000 lines of Moodle cron, Course creator, or Pre-pop logs';
 $string['syslogs_info'] = 'If a selection is disabled, then the corresponding log file was not found.';
 $string['syslogs_select'] = 'Select a log file';
 $string['syslogs_choose'] = 'Choose log...';
@@ -29,66 +29,66 @@ $string['log_prepop'] = 'Pre-pop';
 $string['prepopfiles'] = 'Show pre-pop files';
 $string['prepopview'] = 'Show latest pre-pop output';
 $string['prepoprun'] = 'Run prepop for one course';
-$string['moodlelog'] = 'Show last 100 log entries';
+$string['moodlelog'] = 'Last Moodle 100 log entries';
 $string['moodlelog_select'] = 'Select which types of log entries to view';
 $string['moodlelog_filter'] = 'Filter log by action types';
-$string['moodlelogins'] = 'Show logins during the last 24 hours';
-$string['moodlelogbyday'] = 'Count Moodle logs by day';
-$string['moodlelogbydaycourse'] = 'Count Moodle logs by day and course (past 7 days, limited to top 100 results)';
-$string['moodlelogbydaycourseuser'] = 'Count Moodle logs by day, course and user (past 7 days, limited to top 100 results)';
-$string['moodlevideofurnacelist'] = 'Video furnace';
-$string['moodlelibraryreserveslist'] = 'Library reserves';
-$string['moodlebruincastlist'] = 'Bruincast';
+$string['moodlelogins'] = 'Logins during the last 24 hours';
+$string['moodlelogbyday'] = 'Moodle logs by day';
+$string['moodlelogbydaycourse'] = 'Moodle logs by day and course (past 7 days, limited to top 100 results)';
+$string['moodlelogbydaycourseuser'] = 'Moodle logs by day, course, and user (past 7 days, limited to top 100 results)';
+$string['moodlevideofurnacelist'] = 'Courses using Video furnace';
+$string['moodlelibraryreserveslist'] = 'Courses using Library reserves  ';
+$string['moodlebruincastlist'] = 'Courses using Bruincast';
 $string['sourcefile'] = 'Data source: {$a}';
 $string['recentlysentgrades'] = 'Show 100 most recent MyUCLA grade log entries';
 
 // Users
-$string['moodleusernamesearch'] = 'Show users with firstname and/or lastname';
-$string['roleassignments'] = 'View role assignments';
+$string['moodleusernamesearch'] = 'Users with firstname and/or lastname';
+$string['roleassignments'] = 'Role assignments (summary and list) by name, context, and site type';
 $string['userswithrole'] = 'Users with the given role assignment';
 $string['viewrole'] = 'View 1 role assignment';
 $string['viewroles'] = 'View {$a} role assignments';
 $string['exportroles'] = 'Export';
-$string['countnewusers'] = 'Show most recently created users';
+$string['countnewusers'] = 'Most recently created users';
 $string['pushgrades'] = 'Manually push grades to MyUCLA';
 $string['noenrollments'] = 'There are no enrollments';
 $string['usersdescription'] ='Users with role: {$a->role}, Context: {$a->contextlevel} and Component: {$a->component}';
-$string['listdupusers'] = "Show duplicate users";
+$string['listdupusers'] = "Users with multiple ccle accounts";
 // The SRDB
-$string['enrollview'] = 'Get courses for view enrollment (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3318">enroll2</a>)';
+$string['enrollview'] = 'Enrollment history per UID (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3318">enroll2</a>)';
 
 // For each stored procedure, the name is dynamically generated.
 // The item itself will be there when the SP-object is coded, but there
 // will be no explanation unless the code here is changed (or the SRDB
 // layer is altered to include descriptions within the object).
 $string['ccle_coursegetall'] = 'Get all courses in a subject area for BrowseBy (CCLE <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3305">ccle_coursegetall</a>)';
-$string['ccle_courseinstructorsget'] = 'Get instructors for course (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3306">ccle_courseinstructorsget</a>)';
-$string['ccle_getclasses'] = 'Get information about course (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3308">ccle_getclasses</a>)';
-$string['ccle_getinstrinfo'] = 'Get all instructors in a subject area (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3309">ccle_getinstrinfo</a>)';
-$string['ccle_roster_class'] = 'Get student roster for class (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3310">ccle_roster_class</a>)';
-$string['cis_coursegetall'] = 'Get all courses in a subject area  (CIS <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3311">cis_coursegetall</a>)';
-$string['cis_subjectareagetall'] = 'Get all subject area codes and full names (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3313">cis_subjectareagetall</a>)';
-$string['ucla_getterms'] = 'Get terms information (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3315">ucla_getterms</a>)';
+$string['ccle_courseinstructorsget'] = 'Instructor list by course per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3306">ccle_courseinstructorsget</a>)';
+$string['ccle_getclasses'] = 'Course info by srs# (description, type, enroll status) (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3308">ccle_getclasses</a>)';
+$string['ccle_getinstrinfo'] = 'Instructors by subject area per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3309">ccle_getinstrinfo</a>)';
+$string['ccle_roster_class'] = 'Class roster by srs# per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3310">ccle_roster_class</a>)';
+$string['cis_coursegetall'] = 'Courses by subject area per term (CIS <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3311">cis_coursegetall</a>)';
+$string['cis_subjectareagetall'] = 'Subject area codes and full names (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3313">cis_subjectareagetall</a>)';
+$string['ucla_getterms'] = 'UCLA term types (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3315">ucla_getterms</a>)';
 $string['ucla_get_user_classes'] = 'Get courses for My sites (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=16788">ucla_get_user_classes</a>)';
-$string['ccle_class_sections'] = 'Get course sections (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3304">ccle_class_sections</a>)';
-$string['ccle_get_primary_srs'] = 'Get primary course srs for given discussion srs (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=37526">ccle_get_primary_srs</a>)';
+$string['ccle_class_sections'] = 'Course sections detail by primary srs# (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3304">ccle_class_sections</a>)';
+$string['ccle_get_primary_srs'] = 'Primary course srs# by discussion section srs# (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=37526">ccle_get_primary_srs</a>)';
 
 $string['unknownstoredprocparam'] = 'This stored procedure has a unknown parameter type. This needs to be changed in code.';
 
-$string['courseregistrardifferences'] = 'Show courses with changed descriptions';
-$string['showreopenedclasses'] = "Show reopened classes";
+$string['courseregistrardifferences'] = 'Courses with changed descriptions';
+$string['showreopenedclasses'] = "Reopened classes per term";
 
 // Module
 $string['assignmentquizzesduesoon'] = 'Show courses with assignments or quizzes due soon';
 $string['assignmentquizzesduesoonmoreinfo'] = 'From {$a->start} to {$a->end} ({$a->days} days)';
 $string['modulespercourse'] = 'Count module totals and module types per course';
-$string['syllabusreoport'] = 'Syllabus report';
+$string['syllabusreoport'] = 'Syllabus report by subject area';
 $string['syllabus_header_course'] = '{$a->term} Course ({$a->num_courses})';
 $string['syllabus_header_instructor'] = 'Instructors';
 $string['syllabus_header_public'] = 'Public ({$a})';
 $string['syllabus_header_private'] = 'Private ({$a})';
 $string['syllabus_header_manual'] = 'Manual ({$a})';
-$string['syllabusoverview'] = 'Syllabus overview';
+$string['syllabusoverview'] = 'Syllabus overview by dvision/subject area';
 $string['syllabus_browseby'] = 'Browse by';
 $string['syllabus_division'] = 'Division';
 $string['syllabus_subjarea'] = 'Subject area';
