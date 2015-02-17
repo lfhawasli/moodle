@@ -1,0 +1,30 @@
+
+// Panel
+.yui3-skin-sam .yui3-panel-content {
+    border-color: #aaa;
+    @include box-shadow(#666 2px 2px 4px);
+    
+    .yui3-widget-ft {
+        background-color: #eee;
+    }
+}
+
+.ucla-tools-dialog {
+    .title {
+        border-bottom: 1px solid #ddd;
+        margin-top: 0;
+        padding-bottom: 8px;
+    }
+    .message {
+        label {
+            font-weight: bold;
+            /*margin-right: 10px;*/
+            /*text-align: right;*/
+            width: 100%;
+            font-weight: bold;
+        }
+    }
+    .form-control {
+        width: 100%;
+    }
+}

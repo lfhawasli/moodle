@@ -70,13 +70,13 @@ $string['sites_per_term_help'] = 'Returns number of Registrar course sites built
 $string['site_count'] = 'Site count';
 
 // Strings for course_modules_used.
-$string['course_modules_used'] = 'Activity/Resource modules (course)';
+$string['course_modules_used'] = 'Total Activity/Resource modules by type (course)';
 $string['course_modules_used_help'] = 'Returns name and number of course modules used by courses sites for a given term.';
 $string['module'] = 'Activity/Resource module';
 $string['count'] = 'Count';
 
 // Strings for collab_modules_used.
-$string['collab_modules_used'] = 'Activity/Resource modules (collab)';
+$string['collab_modules_used'] = 'Total Activity/Resource modules by type (collab)';
 $string['collab_modules_used_help'] = 'Returns name and number of collab modules used by collab sites. Excludes "test" sites.';
 
 // Strings for unique_logins_per_term.
@@ -124,7 +124,7 @@ $string['file_count'] = 'Number of files over 1 MB';
 $string['database_size'] = 'Size of database';
 
 // Strings for collab_num_sites.
-$string['collab_num_sites'] = 'Num sites (collab)';
+$string['collab_num_sites'] = 'Total collaboration sites per term';
 $string['collab_num_sites_help'] = 'Returns count of total, active, and inactive collab sites. ' .
         'Inactivity is based on if a site has not had a single page view for 6 months. ' .
         'Does not count guest user access. Includes test sites.';
@@ -134,7 +134,7 @@ $string['inactive_count'] = 'Inactive';
 $string['num_sites_cached_results'] = 'Total: {$a->total} | Active: {$a->active} | Inactive: {$a->inactive}';
 
 // Strings for course_num_sites.
-$string['course_num_sites'] = 'Num sites (course)';
+$string['course_num_sites'] = 'Total course sites per term';
 $string['course_num_sites_help'] = 'Reports count of total, active, and inactive course sites. ' .
         'Inactivity is based on if a course has not had any log hits 1 week after ' .
         'the start of the term. Handles the different starting times for summer ' .
@@ -142,21 +142,21 @@ $string['course_num_sites_help'] = 'Reports count of total, active, and inactive
 $string['division'] = 'Division';
 
 // Strings for role_count.
-$string['role_count'] = 'Role count (course)';
+$string['role_count'] = 'Role counts (course) by term';
 $string['role_count_help'] = 'Returns the total for each role for all courses for a given term';
 $string['role'] = 'Role';
 
 // String for course_block_sites.
-$string['course_block_sites'] = 'Blocks (course)';
+$string['course_block_sites'] = 'Total blocks per type by term (course)';
 $string['course_block_sites_help'] = 'Returns name and number of blocks used by course sites for a given term.';
 $string['blockname'] = 'Block name';
 
 // String for collab_block_sites.
-$string['collab_block_sites'] = 'Blocks (collab)';
+$string['collab_block_sites'] = 'Total blocks per type by term (collab)';
 $string['collab_block_sites_help'] = 'Returns the name and number of blocks used by collab sites.';
 
 // Strings for custom_theme_report.
-$string['custom_theme'] = 'Custom theme report (system)';
+$string['custom_theme'] = 'Courses using custom themes';
 $string['custom_theme_help'] = 'Displays sites that are using a custom theme.';
 $string['theme_count'] = 'Number of sites using custom theme: ';
 $string['course_shortname'] = 'Course';
@@ -164,7 +164,7 @@ $string['course_title'] = 'Course title';
 $string['theme'] = 'Theme';
 
 // Strings for repository usage report.
-$string['repository_usage'] = 'Repository usage (system)';
+$string['repository_usage'] = 'Repository usage summary by term';
 $string['repository_usage_help'] = 'Returns repository usage for: Dropbox, ' .
         'Google, Box, Server files, and My CCLE files for given term. ' .
         'Searches across all files created during that term for both course ' .
@@ -173,7 +173,7 @@ $string['repo_name'] = 'Repository';
 $string['repo_count'] = 'File count';
 
 // Strings for large courses report.
-$string['large_courses'] = 'Large sites (course)';
+$string['large_courses'] = 'Course sites over >2GB by term';
 $string['large_courses_help'] = 'For a given term, list all the courses over {$a}.';
 $string['other'] = 'Other';
 $string['video'] = 'Video';
@@ -186,7 +186,7 @@ $string['archive'] = 'Archive';
 $string['presentation'] = 'Presentation';
 
 // Strings for large collab sites report.
-$string['large_collab_sites'] = 'Large sites (collab)';
+$string['large_collab_sites'] = 'Collaboration sites over >2GB';
 $string['large_collab_sites_help'] = 'List all the collaboration sites over {$a}.';
 
 // Strings for final quiz report.
@@ -198,12 +198,12 @@ $string['last_week_count'] = 'Last Week';
 $string['final_count'] = 'Finals';
 
 // Strings for most active course site report.
-$string['most_active_course_sites'] = 'Most active (course)';
+$string['most_active_course_sites'] = 'Most active course site by term';
 $string['most_active_course_sites_help'] = 'Most active course site is one that has the most views.';
 $string['viewcount'] = 'Number of Views';
 
 // Strings for most active collab site report.
-$string['most_active_collab_sites'] = 'Most active (collab)';
+$string['most_active_collab_sites'] = 'Most active collaboration site per term';
 $string['most_active_collab_sites_help'] =  'Most active collab site is one that has the most views.';
 
 // Strings for total downloads.
@@ -211,9 +211,9 @@ $string['total_downloads'] = 'Total downloads (course)';
 $string['total_downloads_help'] = 'For a given term, get a count of all total downloads.';
 
 // Strings for forum usage.
-$string['collab_forum_usage'] = 'Forum usage (collab)';
+$string['collab_forum_usage'] = 'Total collab site forum usage';
 $string['collab_forum_usage_help'] = 'Forum usage by average number of posters, average number of threads';
-$string['course_forum_usage'] = 'Forum usage (course)';
+$string['course_forum_usage'] = 'Total course site forum usage';
 $string['course_forum_usage_help'] = $string['collab_forum_usage_help'];
 $string['avg_num_threads'] = 'Threads per Forum';
 $string['avg_num_posters'] = 'Posters per Forum';
@@ -229,7 +229,7 @@ $string['hits'] = 'Hits';
 $string['ratio_hits_users'] = 'Hits to Users';
 
 // Strings for gradebook usage.
-$string['gradebook_usage'] = 'Gradebook usage';
+$string['gradebook_usage'] = 'Gradebook usage by subject area';
 $string['gradebook_usage_help'] = 'Counts the number of courses that have used
     the gradebook in the following ways:
     <ol>
@@ -244,7 +244,7 @@ $string['usedgradebook'] = 'Total courses using gradebook';
 $string['totalcourses'] = 'Total courses';
 
 // Strings for Course activity (Instructor focused).
-$string['active_instructor_focused'] = 'Course activity (Instructor focused)';
+$string['active_instructor_focused'] = 'Course activity (Instructor focused) by division';
 $string['active_instructor_focused_help'] = 'A course is active ' .
         'if it has visible content added to it beyond the normal course ' .
         'shell. This includes adding a block, module, posting in the default ' .
@@ -256,13 +256,13 @@ $string['inactivecourselisting'] = 'List of inactive courses';
 $string['percentage'] = 'Percentage';
 
 // Strings for Course activity (Student focused).
-$string['active_student_focused'] = 'Course activity (Student focused)';
+$string['active_student_focused'] = 'Course activity (Student focused) by division';
 $string['active_student_focused_help'] = 'A course is active ' .
         'if it has at least 80% of its enrolled students ' .
         'viewed a course module or the syllabus at least once during the term.';
 
 // Strings for Category forum usage.
-$string['category_forum_usage'] = 'Category forum usage';
+$string['category_forum_usage'] = 'Forum use by CCLE category';
 $string['category_forum_usage_help'] = 'Forum usage, broken down by month and role, for a given category and timeframe.';
 $string['monthyear'] = 'Month/Year';
 $string['categorylisting'] = 'Category listing';
@@ -270,7 +270,7 @@ $string['courselisting'] = 'Course listing';
 $string['noposts'] = 'No posts found';
 
 // Strings for Collaborate types.
-$string['collab_type'] = 'Collaboration site types';
+$string['collab_type'] = 'Collaboration sites by type and division';
 $string['collab_type_help'] = 'Collaboration site types broken down by division. If date is selected, will only return those collaborate sites created within the time frame specified.';
 $string['total'] = 'Total';
 $string['instruction'] = 'Instruction (degree-related)';
