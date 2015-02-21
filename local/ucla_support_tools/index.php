@@ -23,7 +23,6 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__) . '/add_tag_form.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 // Needs user to be logged in.
@@ -32,34 +31,46 @@ require_login();
 // Need system context.
 $context = context_system::instance();
 
-$thisdir = '/local/ucla_support_tools/';
+$thisdir = '/local/ucla_support_tools';
 $thisfile = $thisdir . 'index.php';
 // Initialize $PAGE
-$PAGE->set_url($thisdir . $thisfile);
+$PAGE->set_url($thisdir);
 $PAGE->set_context($context);
 $PAGE->set_heading(get_string('pluginname', 'local_ucla_support_tools'));
 $PAGE->set_pagetype('admin-*');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('pluginname', 'local_ucla_support_tools'));
 
+// Editing.
 if (has_capability('local/ucla_support_tools:edit', $context)) {
     $PAGE->requires->yui_module('moodle-local_ucla_support_tools-categoryorganizer', 'M.local_ucla_support_tools.categoryorganizer.init', array());
     $PAGE->requires->yui_module('moodle-local_ucla_support_tools-toolorganizer', 'M.local_ucla_support_tools.toolorganizer.init', array());
 }
 
+// Logging.
+$PAGE->requires->yui_module('moodle-local_ucla_support_tools-usagelog', 'M.local_ucla_support_tools.usagelog.init', array());
+
+// Favorites.
+$PAGE->requires->yui_module('moodle-local_ucla_support_tools-favorite', 'M.local_ucla_support_tools.favorite.init', array());
+
+// Tool and category filters.
+$PAGE->requires->yui_module('moodle-local_ucla_support_tools-filter', 'M.local_ucla_support_tools.filter.tools', array(array(
+    'input_node_id' =>  '#ucla-support-filter-input',
+    'target_nodes' => '.ucla-support-tool-grid .ucla-support-tool',
+    'filter_nodes' => '.ucla-support-tool-grid li'
+)));
+
+// Filtering.
+$PAGE->requires->yui_module('moodle-local_ucla_support_tools-filter', 'M.local_ucla_support_tools.filter.categories', array());
+
+// Column tiles.
+$PAGE->requires->js('/theme/uclashared/javascript/salvattore.min.js');
+
 // Prepare and load Moodle Admin interface
 require_capability('local/ucla_support_tools:view', $context);
 
-// Renderer is required to print the tools.
-
 /* @var local_ucla_support_tools_renderer */
 $render = $PAGE->get_renderer('local_ucla_support_tools');
-
-//$tagform = new add_tag_form();
-//
-//if ($data = $tagform->get_data()) {
-//    \local_ucla_support_tools_tag::create($data);
-//}
 
 echo $OUTPUT->header();
 
@@ -68,7 +79,7 @@ echo $OUTPUT->heading('UCLA support tools', 3);
 echo html_writer::start_div('content');
     echo html_writer::start_div('row ucla-support-tool-accent');
         echo html_writer::start_div('col-md-12 ucla-support-tool-filter');
-            echo $render->category_tool_filter();
+            echo $render->all_tools_filter();
         echo html_writer::end_div();
     echo html_writer::end_div();
     echo html_writer::start_div('row');
@@ -79,16 +90,18 @@ echo html_writer::start_div('content');
             echo $render->categories();
         echo html_writer::end_div();
     echo html_writer::end_div();
+
+    echo html_writer::start_div('row ucla-support-tool-accent');
+        echo $OUTPUT->heading('All available tools', 4);
+    echo html_writer::end_div();
 echo html_writer::end_div();
 
-echo $OUTPUT->heading('All available tools', 4);
-
-echo $OUTPUT->box($render->tool_filter(), 'clearfix');
-
+// Conditionally render a 'tool create' button
 if (has_capability('local/ucla_support_tools:edit', $context)) {
     echo $render->tool_create_button();
 }
-echo $OUTPUT->box_start('clearfix ucla-support-tool-alltools');
+
+echo $OUTPUT->box_start('clearfix ucla-support-tool-alltools ucla-support-tool-grid');
 echo $render->tools();
 echo $OUTPUT->box_end();
 

@@ -26,17 +26,9 @@ YUI.add('moodle-local_ucla_support_tools-toolorganizer', function (Y, NAME) {
 M.local_ucla_support_tools = M.local_ucla_support_tools || {};
 
 M.local_ucla_support_tools.toolorganizer = {
-    
-    init: function() {
+    init: function () {
         Y.log('Loading tool organizer', 'info', 'local_ucla_support_tools');
-        
-        // Start the tool search filter.
-        M.local_ucla_support_tools.filter.tools({
-            input_node_id: "#ucla-support-tools-filter-input",
-            target_nodes: ".ucla-support-tool-alltools .ucla-support-tool",
-            filter_nodes: ".ucla-support-tool-alltools li"
-        });
-        
+
         // Generate a dialog to create new tools.
         var tool_form = M.local_ucla_support_tools.dialog.form_with_inputs(new Y.ArrayList([
             {
@@ -55,28 +47,27 @@ M.local_ucla_support_tools.toolorganizer = {
                 placeholder: "Documentation link?"
             }
         ]));
-        
+
         var description = '<div class="form-group">' +
-                                '<label for="desc-output" >Description</label>' +
-                                '<textarea id="tooldesc-output" class="form-control" rows="5" placeholder="Description is searchable"></textarea>' +
-                            '</div>';
+                '<label for="desc-output" >Description</label>' +
+                '<textarea id="tooldesc-output" class="form-control" rows="5" placeholder="Description is searchable"></textarea>' +
+                '</div>';
         tool_form.appendChild(Y.Node.create(description));
-        
-        var tool_dialog = M.local_ucla_support_tools.dialog.create({
-            id: "create-tool-dialog",
-            title: "Create a new tool",
-            body: tool_form.getHTML(),
-            cancel: "Cancel",
-            proceed: "Create tool"
-        });
-        
+
         // Set up event to load tool dialog.
-        Y.one('.ucla-support-tool-button-add').on('click', function(e) {
+        Y.one('.ucla-support-tool-button-add').on('click', function (e) {
             e.preventDefault();
 
+            var tool_dialog = M.local_ucla_support_tools.dialog.create({
+                id: "create-tool-dialog",
+                title: "Create a new tool",
+                body: tool_form.getHTML(),
+                cancel: "Cancel",
+                proceed: "Create tool"
+            });
             tool_dialog.reset();
             tool_dialog.callback = M.local_ucla_support_tools.toolorganizer.create_tool;
-            tool_dialog.validate = function() {
+            tool_dialog.validate = function () {
                 return new Y.ArrayList([
                     Y.one('#toolname-output'),
                     Y.one('#tooldesc-output'),
@@ -85,17 +76,25 @@ M.local_ucla_support_tools.toolorganizer = {
             };
             tool_dialog.show();
         }, this);
-        
+
         // Set up event delegate for tool deletion.
-        Y.one('.ucla-support-tool-alltools ul').delegate('click', function(e) {
+        Y.one('.ucla-support-tool-alltools ul').delegate('click', function (e) {
             e.preventDefault();
             var id = e.currentTarget.getAttribute('data-id');
             this.delete_tool(id);
-            
-        }, '.ucla-support-tool-title a[data-action="delete"]', this);
+
+        }, 'a[data-action="delete"]', this);
+
+        // Set up event delegate for tool edit.
+        Y.one('.ucla-support-tool-alltools ul').delegate('click', function (e) {
+            e.preventDefault();
+            var id = e.currentTarget.getAttribute('data-id');
+            this.edit_tool(id);
+
+        }, 'a[data-action="edit"]', this);
     },
-    create_tag_input: function(node, tags) {
-                    
+    create_tag_input: function (node, tags) {
+
         node.plug(Y.Plugin.AutoComplete, {
             allowTrailingDelimiter: true,
             minQueryLength: 0,
@@ -122,7 +121,7 @@ M.local_ucla_support_tools.toolorganizer = {
         node.on('focus', function () {
             node.ac.sendRequest('');
         });
-        
+
         node.ac.after('select', function () {
             // Send the query on the next tick to ensure that the input node's blur
             // handler doesn't hide the result list right after we show it.
@@ -137,69 +136,13 @@ M.local_ucla_support_tools.toolorganizer = {
      * 
      * @returns {bool} validate 
      */
-    create_tool: function() {
+    create_tool: function () {
         Y.log('Creating new tool', 'info', 'local_ucla_support_tools');
 
-        var name = Y.one('#toolname-output').get('value');
-        var desc = Y.one('#tooldesc-output').get('value');
-        var url = Y.one('#toolurl-output').get('value');
-        var docsurl = Y.one('#tooldocs-output').get('value');
-
-        var alert = Y.one('#create-tool-dialog .alert');
-
-        if (alert) {
-            alert.remove(true);
-        }
-
-        var data = {
-            name: name,
-            desc: desc,
-            url: url,
-            docsurl: docsurl
-        };
-
-        var validate = false;
-        
-        Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
-            method: 'POST',
-            data: {
-                action: 'createtool',
-                json: JSON.stringify(data),
-                sesskey: M.cfg.sesskey
-            },
-            on: {
-                success: function (id, result) {
-                    //
-                    var data = JSON.parse(result.responseText);
-
-                    if (data.status) {
-                        var html = '<li>' + data.html + '</li>';
-                        Y.one('.ucla-support-tool-alltools ul').appendChild(html);
-
-                    } else {
-                        // Check for invalid URL.
-                        if (data.error.msg.indexOf('out_as_local_url') !== -1) {
-                            var form = Y.one('#toolurl-output').ancestor('.form-group');
-                            form.addClass('has-error');
-                            form.one('label').setHTML('URL needs to be from this server');
-                        }
-
-                        if (data.error.msg.indexOf('Error writing to database') !== -1) {
-                            Y.one('#create-tool-dialog h3.title').insert('<div class="alert alert-warning" role="alert"><strong>Unable to create tool!</strong> Perhaps you are reusing the name or the link?</div>', 'after');
-                        }
-                    }
-
-                    validate = data.status;
-                },
-                failure: function (id, result) {
-                    return false;
-                }
-            },
-            // Hold execution until we validate.
-            sync: true
+        return M.local_ucla_support_tools.toolorganizer.update_tool('createtool', function (data) {
+            var html = '<li>' + data.html + '</li>';
+            Y.one('.ucla-support-tool-alltools ul').appendChild(html);
         });
-        
-        return validate;
     },
     /**
      * Deletes a tool with a given id.  If successful, will delete the nodes 
@@ -215,7 +158,7 @@ M.local_ucla_support_tools.toolorganizer = {
             cancel: "Cancel",
             proceed: "Delete tool"
         });
-        
+
         dialog.callback = function () {
             Y.log('Removing tool with ID: ' + id, 'info', 'local_ucla_support_tools');
 
@@ -242,6 +185,135 @@ M.local_ucla_support_tools.toolorganizer = {
             return true;
         };
         dialog.show();
+    },
+    /**
+     * Generates and 'edit tool' dialog.
+     * 
+     * @param {int} id of tool
+     */
+    edit_tool: function (id) {
+
+        Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
+            method: 'GET',
+            data: {
+                action: 'gettooledit',
+                json: JSON.stringify({id: id}),
+                sesskey: M.cfg.sesskey
+            },
+            on: {
+                success: function (id, result) {
+                    var data = JSON.parse(result.responseText);
+
+                    if (data.status) {
+                        // Generate a dialog from data we get back.
+                        var dialog = M.local_ucla_support_tools.dialog.create({
+                            id: 'edit-tool-dialog',
+                            title: "Edit tool",
+                            body: data.html,
+                            cancel: "Cancel",
+                            proceed: "Save changes"
+                        });
+
+                        dialog.callback = M.local_ucla_support_tools.toolorganizer.edit_tool_callback;
+                        dialog.show();
+                    }
+                }
+            }
+        });
+    },
+    /**
+     * Panel callback for tool edit 
+     * 
+     * @return {bool} validation
+     */
+    edit_tool_callback: function () {
+        var id = Y.one('#toolid-output').get('value');
+
+        return M.local_ucla_support_tools.toolorganizer.update_tool('updatetool', function (data) {
+
+            var newnode = Y.Node.create(data.html);
+
+            Y.all('.ucla-support-tool[data-id="' + data.id + '"]').each(function (node) {
+                node.set('innerHTML', newnode.getHTML());
+            });
+        }, {id: id});
+
+    },
+    /**
+     * Sets up an ajax call to update tool data.  
+     * 
+     * @param {string} action
+     * @param {function} callback function for successful callback.
+     * @param {obj} opts optional data params to send via Y.io
+     * 
+     * @returns {bool} validation
+     */
+    update_tool: function (action, callback, opts) {
+
+        var name = Y.one('#toolname-output').get('value');
+        var desc = Y.one('#tooldesc-output').get('value');
+        var url = Y.one('#toolurl-output').get('value');
+        var docsurl = Y.one('#tooldocs-output').get('value');
+
+        var alert = Y.one('#create-tool-dialog .alert');
+
+        if (alert) {
+            alert.remove(true);
+        }
+
+        var data = {
+            name: name,
+            desc: desc,
+            url: url,
+            docsurl: docsurl
+        };
+
+        if (opts) {
+            data = Y.merge(data, opts);
+        }
+
+        var validate = false;
+
+        Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
+            method: 'POST',
+            data: {
+                action: action,
+                json: JSON.stringify(data),
+                sesskey: M.cfg.sesskey
+            },
+            on: {
+                success: function (id, result) {
+                    //
+                    var data = JSON.parse(result.responseText);
+
+                    if (data.status) {
+                        // Forward result to specified callback.
+                        callback(data);
+
+                    } else if (data.error) {
+                        // Check for invalid URL.
+                        if (data.error.msg.indexOf('out_as_local_url') !== -1) {
+                            var form = Y.one('#toolurl-output').ancestor('.form-group');
+                            form.addClass('has-error');
+                            form.one('label').setHTML('URL needs to be from this server');
+                        }
+
+                        if (data.error.msg.indexOf('Error writing to database') !== -1) {
+                            Y.one('#create-tool-dialog h3.title').insert('<div class="alert alert-warning" role="alert"><strong>Unable to create tool!</strong> Perhaps you are reusing the name or the link?</div>', 'after');
+                        }
+                    }
+
+                    validate = data.status;
+                },
+                failure: function (id, result) {
+                    return false;
+                }
+            },
+            // Hold execution until we validate.
+            sync: true
+        });
+
+        return validate;
     }
 };
 

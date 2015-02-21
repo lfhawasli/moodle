@@ -76,16 +76,25 @@ abstract class local_ucla_support_tools_organizer extends local_ucla_support_too
         $tools = array();
 
         try {
-
-            $sql = "SELECT tool.* FROM {ucla_support_tools} AS tool "
-                    . "JOIN {" . static::TABLE_RELATION . "} AS rel ON tool.id = rel.toolid "
-                    . "WHERE rel." . static::TABLE_RELATION_ID . " = ?";
-
+            // Order tools by favorite status, if possible, and name.
+            $sql = "SELECT tool.* 
+                      FROM {ucla_support_tools} AS tool
+                      JOIN {" . static::TABLE_RELATION . "} AS rel ON tool.id = rel.toolid
+                     WHERE rel." . static::TABLE_RELATION_ID . " = ?
+                  ORDER BY tool.name";
             $records = $DB->get_records_sql($sql, array($this->id));
 
+            $favorites = $others = array();
             foreach ($records as $data) {
-                $tools[] = \local_ucla_support_tools_tool::fetch($data);
+                $tool = \local_ucla_support_tools_tool::fetch($data);
+                if ($tool->is_favorite()) {
+                    $favorites[] = $tool;
+                } else {
+                    $others[] = $tool;
+                }
             }
+
+            $tools = array_merge($favorites, $others);
         } catch (Exception $ex) {
             // Return empty array.
         }

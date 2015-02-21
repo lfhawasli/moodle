@@ -35,7 +35,7 @@ class tool_creation_test extends advanced_testcase {
         global $CFG;
 
         $originalcount = count(\local_ucla_support_tools_tool::fetch_all());
-        
+
         // Make sure constructor is protected.
         $class = new ReflectionClass('local_ucla_support_tools_tool');
         $constructor = $class->getConstructor();
@@ -69,14 +69,14 @@ class tool_creation_test extends advanced_testcase {
         // Create another tool.
         $tool2 = \local_ucla_support_tools_tool::create($data2);
         $this->assertNotEquals($tool2, $tool);
-        
+
         $this->assertEquals($data2['name'], $tool2->name);
         $this->assertEquals($data2['url'], $tool2->url);
-        
+
         // Should have 2 tools by now.
         $tools = \local_ucla_support_tools_tool::fetch_all();
         $this->assertEquals($originalcount + 2, count($tools));
-        
+
         $last = array_pop($tools);
         $this->assertEquals($data2['name'], $last->name);
         $this->assertEquals($data2['url'], $last->url);
@@ -94,20 +94,37 @@ class tool_creation_test extends advanced_testcase {
         $this->assertEquals($data3['name'], $last->name);
         $this->assertEquals($data3['url'], $last->url);
 
-        $exceptionthrown = false;
-        try {
-            \local_ucla_support_tools_tool::create(array(
+        // Test that external URLs are kept with the full path.
+        $data4 = array(
             'name' => 'test4',
             'url' => 'http://test.com',
             'description' => 'test4',
-        ));
-        } catch (Exception $ex) {
-            $this->assertEquals('coding_exception', get_class($ex));
-            $exceptionthrown = true;
+        );
+
+        $tool = \local_ucla_support_tools_tool::create($data4);
+        $tools = \local_ucla_support_tools_tool::fetch_all();
+        $last = array_pop($tools);
+        $this->assertEquals($data4['name'], $last->name);
+        $this->assertEquals($data4['url'], $last->url);
+
+        // Test that trying to add another tool with the same url as an existing
+        // tool will throw an exception.
+        $data5 = array(
+            'name' => 'test5',
+            'url' => 'http://test.com',
+            'description' => 'test5',
+        );
+
+        $thrownexception = false;
+        try {
+            $tool = \local_ucla_support_tools_tool::create($data5);
+        } catch (Exception $e) {
+            $thrownexception = true;
+            $this->assertEquals('Duplicate URL', $e->getMessage());
         }
-        $this->assertTrue($exceptionthrown);
+        $this->assertTrue($thrownexception);
     }
-    
+
     function test_tool_update() {
         global $CFG;
 
@@ -122,8 +139,8 @@ class tool_creation_test extends advanced_testcase {
 
         $tool->name = 'updated name';
         $tool->description = 'updated description';
-        
-        
+
+
 
         $tool->update();
 
@@ -131,10 +148,10 @@ class tool_creation_test extends advanced_testcase {
         $this->assertEquals($updatedtool->name, 'updated name');
         $this->assertEquals($updatedtool->description, 'updated description');
     }
-    
+
     function test_tool_deletion() {
         $originalcount = count(\local_ucla_support_tools_tool::fetch_all());
-        
+
         \local_ucla_support_tools_tool::create(array(
             'name' => 'a ucla tool',
             'url' => '/url/to/tool/1',
@@ -312,4 +329,135 @@ class tool_creation_test extends advanced_testcase {
         $this->assertEquals(count($tooltags), 2);
     }
 
+    /**
+     * Makes sure that favorited tools are returned first when returning tools
+     * for a given category.
+     */
+    public function test_favorite_category_sort() {
+        // Favoriting a tool requires an logged in user.
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $atool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'A favorite tool',
+            'url' => '/aurl',
+            'description' => ''
+        ));
+        $btool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'B favorite tool',
+            'url' => '/burl',
+            'description' => ''
+        ));
+        $ctool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'C favorite tool',
+            'url' => '/curl',
+            'description' => ''
+        ));
+
+        // Put all tools into the same category.
+        $category = \local_ucla_support_tools_category::create(array(
+                    'name' => 'category',
+                    'color' => 'abcdef'
+        ));
+        $category->add_tool($atool);
+        $category->add_tool($btool);
+        $category->add_tool($ctool);
+
+        // Favorite C tool and it should be returned first. Then A and B tools.
+        $ctool->toggle_favorite();
+        $tools = $category->get_tools();
+        $this->assertEquals($ctool->name, $tools[0]->name);
+        $this->assertEquals($atool->name, $tools[1]->name);
+        $this->assertEquals($btool->name, $tools[2]->name);
+
+        // Favorite A tool and it first be returned first, then C, and B tools.
+        $atool->toggle_favorite();
+        $tools = $category->get_tools();
+        $this->assertEquals($atool->name, $tools[0]->name);
+        $this->assertEquals($ctool->name, $tools[1]->name);
+        $this->assertEquals($btool->name, $tools[2]->name);
+    }
+
+    /**
+     * Makes sure that the is_favorite and toggle_favorite methods work as
+     * expected.
+     */
+    public function test_favorite_tool() {
+        // Favoriting a tool requires an logged in user.
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $tool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'My favorite tool',
+            'url' => '/url',
+            'description' => ''
+        ));
+
+        $this->assertFalse($tool->is_favorite());
+        $this->assertTrue($tool->toggle_favorite());
+        $this->assertTrue($tool->is_favorite());
+        $this->assertFalse($tool->toggle_favorite());
+        $this->assertFalse($tool->is_favorite());
+
+        // Try making two as a favorite.
+        $anothertool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'My other favorite tool',
+            'url' => '/someplace/else.php',
+            'description' => ''
+        ));
+
+        $this->assertFalse($anothertool->is_favorite());
+        $this->assertTrue($tool->toggle_favorite());
+        $this->assertTrue($anothertool->toggle_favorite());
+        $this->assertFalse($tool->toggle_favorite());
+        $this->assertFalse($anothertool->toggle_favorite());
+    }
+
+    /**
+     * Makes sure that anyone who favorited a tool and that url changed, then
+     * the corresponding hash urls should be updated as well.
+     */
+    public function test_favorite_url_change() {
+        global $USER;
+
+        // Favoriting a tool requires an logged in user.
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $tool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'My favorite tool',
+            'url' => '/url',
+            'description' => ''
+        ));
+        $this->assertTrue($tool->toggle_favorite());
+
+        // Now change URL and make sure that it is still marked as a favorite.
+        $tool->url = '/anotherurl';
+        $tool->update();
+
+        // Force refresh of user preferences cache (120s is cache lifetime).
+        $USER->preference['_lastloaded'] = time() - 121;
+        $this->assertTrue($tool->is_favorite());
+
+        // Check if multiple users favorited a tool that it still works.
+        $anotheruser = $this->getDataGenerator()->create_user();
+        $this->setUser($anotheruser);
+
+        $anothertool = \local_ucla_support_tools_tool::create(array(
+            'name' => 'Another favorite tool',
+            'url' => '/throwinginanothertool',
+            'description' => ''
+        ));
+
+        $this->assertTrue($tool->toggle_favorite());
+        $this->assertTrue($anothertool->toggle_favorite());
+
+        $tool->url = '/yetanotherurl';
+        $tool->update();
+
+        $USER->preference['_lastloaded'] = time() - 121;
+        $this->assertTrue($tool->is_favorite());
+        $this->setUser($user);
+        $this->assertTrue($tool->is_favorite());
+    }
 }

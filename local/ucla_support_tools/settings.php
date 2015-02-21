@@ -19,4 +19,4 @@ defined('MOODLE_INTERNAL') || die;
 $ADMIN->add('reports', 
         new admin_externalpage('uclasupporttools', 
                 get_string('pluginname', 'local_ucla_support_tools'),
-                "$CFG->wwwroot/local/ucla_support_tools/index.php", 'local/ucla_support_tools:view'));
+                "$CFG->wwwroot/local/ucla_support_tools", 'local/ucla_support_tools:view'));

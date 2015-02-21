@@ -1,0 +1,8 @@
+{
+    "moodle-local_ucla_support_tools-usagelog": {
+        "requires": [
+            "base",
+            "node"
+        ]
+    }
+}
