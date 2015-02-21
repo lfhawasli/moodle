@@ -3553,23 +3553,28 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
       $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass,
                                                       'role' => 'region',
                                                       'aria-label' => $discussionbyuser));
+      $output .= html_writer::start_tag('div', array('class'=>'row header clearfix'));
+      $output .= html_writer::start_tag('div', array('class'=>'left picture'));
+      $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id));
+      $output .= html_writer::end_tag('div');
      */
     if ($mode == FORUM_MODE_PRINT){
        $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass . ' print',
                                                       'role' => 'region',
                                                       'aria-label' => $discussionbyuser));
+       $output .= html_writer::start_tag('div', array('class'=>'row header clearfix'));
     } else {
        $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass,
                                                       'role' => 'region',
                                                       'aria-label' => $discussionbyuser));
+       $output .= html_writer::start_tag('div', array('class'=>'row header clearfix'));
+       $output .= html_writer::start_tag('div', array('class'=>'left picture'));
+       $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id));
+       $output .= html_writer::end_tag('div');
     }
+
+  
     // END UCLA-MOD: CCLE-4882 forum customization
-
-    $output .= html_writer::start_tag('div', array('class'=>'row header clearfix'));
-    $output .= html_writer::start_tag('div', array('class'=>'left picture'));
-    $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id));
-    $output .= html_writer::end_tag('div');
-
 
     $output .= html_writer::start_tag('div', array('class'=>'topic'.$topicclass));
 
