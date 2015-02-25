@@ -39,14 +39,14 @@ class block_ucla_search extends block_base {
      * Print advanced search form html for various components.  Compatible 
      * with default moodle search if javascript of off.
      * 
-     * @global type $CFG
-     * @param type $type
+     * @param string $type
+     * @param array $searchparams
      * @return html
      */
-    static function search_form($type = 'block-search') {
+    static function search_form($type = 'block-search', $searchparams = null) {
         global $CFG;
         
-        // Default 
+        // Default.
         $collab = true;
         $course = true;
         $visibility = 'hidden';
@@ -65,6 +65,20 @@ class block_ucla_search extends block_base {
             case 'block-search':
                 $visibility = '';
         }
+
+        // If search params were passed, then need to retain those settings.
+        $searchterm = null;
+        if (!empty($searchparams)) {
+            if (isset($searchparams['collab'])) {
+                $collab = $searchparams['collab'];
+            }
+            if (isset($searchparams['course'])) {
+                $course = $searchparams['course'];
+            }
+            if (!empty($searchparams['search'])) {
+                $searchterm = $searchparams['search'];
+            }
+        }
         
         $inputgroup = html_writer::empty_tag('input', 
                         array(
@@ -72,7 +86,8 @@ class block_ucla_search extends block_base {
                             'type' => 'text', 
                             'class' => 'form-control ucla-search-input', 
                             'name' => 'search',
-                            'placeholder' => get_string('placeholder', 'block_ucla_search')
+                            'placeholder' => get_string('placeholder', 'block_ucla_search'),
+                            'value' => $searchterm
                             ));
         
         $checkboxes = html_writer::div(
