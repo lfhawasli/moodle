@@ -122,8 +122,6 @@ class tool_creation_test extends advanced_testcase {
 
         $tool->name = 'updated name';
         $tool->description = 'updated description';
-        
-        
 
         $tool->update();
 
