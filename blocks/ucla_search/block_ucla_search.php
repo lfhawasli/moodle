@@ -49,6 +49,8 @@ class block_ucla_search extends block_base {
         // Default 
         $collab = true;
         $course = true;
+        $bytitle = true;
+        $bydescription = true;
         $visibility = 'hidden';
         
         switch ($type) {
@@ -86,10 +88,23 @@ class block_ucla_search extends block_base {
                         )
                 );
         
+        $filtercheckboxes = html_writer::div(
+                html_writer::tag('label', 
+                        html_writer::checkbox('bytitle', 1, $bytitle) . ' ' . get_string('bytitle', 'block_ucla_search'),
+                        array('class' => 'checkbox-inline')
+                        ) . 
+                html_writer::tag('label', 
+                        html_writer::checkbox('bydescription', 1, $bydescription) . ' ' . get_string('bydescription', 'block_ucla_search'),
+                        array('class' => 'checkbox-inline')
+                        )
+                );
+        
         $form = html_writer::tag('form', 
                     html_writer::span(get_string('show', 'block_ucla_search'), $visibility) .
                     html_writer::tag('fieldset', $checkboxes, array('class' => $visibility)) .
-                    $inputgroup, 
+                    $inputgroup .
+                    html_writer::span(get_string('filterby', 'block_ucla_search'), $visibility) .
+                    html_writer::tag('fieldset', $filtercheckboxes, array('class' => $visibility)), 
                     array('class' => '', 'action' => $CFG->wwwroot . '/course/search.php')
                 );
         

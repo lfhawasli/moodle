@@ -17,6 +17,8 @@ YUI.add('moodle-block_ucla_search-search', function(Y) {
 
             var collabcheck = Y.one('.ucla-search.' + searchname + ' input[name="collab"]');
             var coursecheck = Y.one('.ucla-search.' + searchname + ' input[name="course"]');
+            var bytitlecheck = Y.one('.ucla-search.' + searchname + ' input[name="bytitle"]');
+            var bydescriptioncheck = Y.one('.ucla-search.' + searchname + ' input[name="bydescription"]');
             
             if (searchname === 'block-search') {
                 Y.one('.block-search #ucla-search').setAttribute('id', 'ucla-search-block');
@@ -54,7 +56,9 @@ YUI.add('moodle-block_ucla_search-search', function(Y) {
             var params = function() {
                 var collab = '&collab=1';
                 var course = '&course=1';
-                var limit = '&limit=' + RESULTLIMIT
+                var bytitle = '&bytitle=1';
+                var bydescription = '&bydescription=1';
+                var limit = '&limit=' + RESULTLIMIT;
                 
                 if (searchname === 'block-search') {
                     collab = collabcheck.get('checked') ? '&collab=1' : '&collab=0';
@@ -67,7 +71,9 @@ YUI.add('moodle-block_ucla_search-search', function(Y) {
                     course = '&course=1';
                 }
 
-                return (collab + course + limit);
+                bytitle = bytitlecheck.get('checked') ? '&bytitle=1' : '&bytitle=0';
+                bydescription = bydescriptioncheck.get('checked') ? '&bydescription=1' : '&bydescription=0';
+                return (collab + course + bytitle + bydescription + limit);
             };
 
             Y.one(inputid).plug(Y.Plugin.AutoComplete, {

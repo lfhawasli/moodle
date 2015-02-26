@@ -761,10 +761,14 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     
     $collab = null;
     $course = null;
+    $bytitle = null;
+    $bydescription = null;
     
     if(!empty($otherargs)) {
         $collab = $otherargs['collab'];
         $course = $otherargs['course'];
+        $bytitle = $otherargs['bytitle'];
+        $bydescription = $otherargs['bydescription'];
     }
     
     $collab_join = 'LEFT JOIN {ucla_siteindicator} AS si ON si.courseid = c.id ';
@@ -822,22 +826,42 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     // BEGIN UCLA MOD CCLE-3948
     // Adding the registrar info to the concat list of fields to be searched on.
     if ($DB->get_dbfamily() == 'oracle') {
-        if (empty($reg_join)) {
-            $concat = "(c.summary|| ' ' || c.fullname || ' ' || c.idnumber || ' ' || c.shortname)";
-        } else {
-            $concat = "(c.summary|| ' ' || c.fullname || ' ' || c.idnumber || ' ' || c.shortname || ' ' || urci.crs_desc || ' ' || urci.crs_summary)";
+        $concatfields = array();
+        if ($bytitle) {
+            $concatfields[] = "c.fullname";
         }
+        if ($bydescription) {
+            $concatfields[] = "c.summary";
+            if (!empty($reg_join)) {
+                $concatfields[] = "urci.crs_desc";
+                $concatfields[] = "urci.crs_summary";
+            }
+        }
+        $concatfields[] = "c.idnumber";
+        $concatfields[] = "c.shortname";
+
+        $concat = "(" . implode(" || ' ' || ", $concatfields) . ")";
     } else {
-        if (empty($reg_join)) {
-            $concat = $DB->sql_concat("COALESCE(c.summary, '')", "' '", 'c.fullname', "' '", 'c.idnumber', "' '", 'c.shortname');
-        } else {
-            $concat = $DB->sql_concat("COALESCE(c.summary, '')", "' '",
-                                  'c.fullname', "' '",
-                                  'c.idnumber', "' '",
-                                  'c.shortname', "' '",
-                                  "COALESCE(urci.crs_desc, '')", "' '",
-                                  "COALESCE(urci.crs_summary, '')");
+        $concatfields = array();
+        if ($bytitle) {
+            $concatfields[] = "c.fullname";
+            $concatfields[] = "' '";
         }
+        if ($bydescription) {
+            $concatfields[] = "COALESCE(c.summary, '')";
+            $concatfields[] = "' '";
+            if (!empty($reg_join)) {
+                $concatfields[] = "COALESCE(urci.crs_desc, '')";
+                $concatfields[] = "' '";
+                $concatfields[] = "COALESCE(urci.crs_summary, '')";
+                $concatfields[] = "' '";
+            }
+        }
+        $concatfields[] = "c.idnumber";
+        $concatfields[] = "' '";
+        $concatfields[] = "c.shortname";
+        
+        $concat = call_user_func_array(array($DB,'sql_concat'), $concatfields);
     }
     // END UCLA MOD CCLE-3948
 

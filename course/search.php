@@ -35,6 +35,10 @@ $tagid     = optional_param('tagid', '', PARAM_INT);   // searches for courses t
 $collab    = optional_param('collab', 0, PARAM_BOOL);
 $course    = optional_param('course', 0, PARAM_BOOL);
 // END UCLA MOD: CCLE-3948
+// START UCLA MOD: CCLE-4796 - Re-add search filter by title/description
+$bytitle    = optional_param('bytitle', 0, PARAM_BOOL);
+$bydescription    = optional_param('bydescription', 0, PARAM_BOOL);
+// END UCLA MOD: CCLE-4796
 
 // List of minimum capabilities which user need to have for editing/moving course
 $capabilities = array('moodle/course:create', 'moodle/category:manage');
@@ -128,7 +132,7 @@ if (file_exists($ucla_search) && empty($modulelist)) {
     // Get course/collab IDs which meet search criteria.
     $courses = get_courses_search($searchcriteria, "fullname ASC",
                                   $page, $perpage, $totalcount,
-                                  array('collab' => $collab, 'course' => $course));
+                                  array('collab' => $collab, 'course' => $course, 'bytitle' => $bytitle, 'bydescription' => $bydescription));
 
     // If there are no courses which match our search, display appropriate
     // message.
