@@ -163,6 +163,32 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         $box = html_writer::div($button, 'ucla-support-tool-add');
         return $box;
     }
+
+    /**
+     * Returns the HTML to display the tool export feature.
+     *
+     * @return string
+     */
+    public function tool_export_button() {
+        $url = new moodle_url('/local/ucla_support_tools/export.php');
+        $icon = html_writer::tag('i', '', array('class' => 'fa fa-download'));
+        $button = html_writer::div($icon . ' Export tools', 'btn btn-primary');
+        $box = html_writer::link($url, $button, array('class' => 'ucla-support-tool-export'));
+        return $box;
+    }
+
+    /**
+     * Returns the HTML to display the tool import feature.
+     *
+     * @return string
+     */
+    public function tool_import_button() {
+        $url = new moodle_url('/local/ucla_support_tools/import.php');
+        $icon = html_writer::tag('i', '', array('class' => 'fa fa-upload'));
+        $button = html_writer::div($icon . ' Import tools', 'btn btn-primary');
+        $box = html_writer::link($url, $button, array('class' => 'ucla-support-tool-import'));
+        return $box;
+    }
     
     /**
      * Renders all tools in an unordered list.

@@ -105,4 +105,9 @@ echo $OUTPUT->box_start('clearfix ucla-support-tool-alltools ucla-support-tool-g
 echo $render->tools();
 echo $OUTPUT->box_end();
 
+if (has_capability('local/ucla_support_tools:edit', $context)) {
+    echo $render->tool_export_button();
+    echo $render->tool_import_button();
+}
+
 echo $OUTPUT->footer();

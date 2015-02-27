@@ -140,8 +140,6 @@ class tool_creation_test extends advanced_testcase {
         $tool->name = 'updated name';
         $tool->description = 'updated description';
 
-
-
         $tool->update();
 
         $updatedtool = \local_ucla_support_tools_tool::fetch($tool->get_id());

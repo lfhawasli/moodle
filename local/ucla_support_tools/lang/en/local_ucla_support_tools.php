@@ -24,6 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['backhome'] = 'Back to support tools';
+$string['importerror'] = 'Could not import support tools from import file. Nothing changed.';
+$string['importsuccess'] = 'Successfully overwrote existing tools, categories, and tags with data from import file.';
+$string['importtitle'] = 'Import UCLA support tools';
+$string['importwarning'] = 'Importing file will overwrite existing tool, categories, and tags with data from import file. Favorite selections should not be affected.';
 $string['pluginname'] = 'UCLA support tools';
 $string['mysiteslink'] = 'View all support tools';
 
