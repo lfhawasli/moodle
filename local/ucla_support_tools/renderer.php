@@ -276,4 +276,39 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
 
         return implode("\n", $out);
     }
+
+    /**
+     * Render favorites link for mysites.
+     * 
+     * @param \local_ucla_support_tools_tool $tool
+     * @return string HTML
+     */
+    protected function render_favorite_mysites_tool(\local_ucla_support_tools_tool $tool) {
+
+        $star = html_writer::span(html_writer::tag('i', '', array('class' => "fa fa-lg fa-star")));
+
+        $namelink = html_writer::link(new moodle_url($tool->url), $tool->name, array('title' => $tool->name, 'class' => 'tool-link'));
+        $out[] = html_writer::tag('h5', $star . $namelink , array('class' => 'title'));
+        // Conditionally show the description.
+        if (!empty($tool->description)) {
+            $out[] = html_writer::div($tool->description, 'body');
+        }
+        return html_writer::div(implode("\n", $out), 'ucla-support-tool favorite-view', array('data-id' => $tool->get_id(), 'data-keywords' => strtolower(addslashes($tool->name . ' ' . $tool->description))));
+    }
+
+    /**
+     * Renders a list of favorite tools to display in 'mysites'
+     * @return string HTML
+     */
+    function mysites_favorites() {
+        
+        $title = html_writer::tag('h4', 'Support tools');
+        $favs = \local_ucla_support_tools_tool::fetch_favorites();
+        $cols = array();
+        foreach ($favs as $fav) {
+            $cols[] = html_writer::tag('li', $this->render_favorite_mysites_tool($fav));
+        }
+        $list = html_writer::tag('ul', implode("\n", $cols));
+        return html_writer::div($title . $list, 'ucla-support-tools-mysites-favorites');
+    }
 }

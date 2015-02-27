@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'UCLA support tools';
+$string['mysiteslink'] = 'View all support tools';
 
 // Capabilities
 $string['ucla_support_tools:view'] = 'View the UCLA support tools';

@@ -247,7 +247,6 @@ class local_ucla_support_tools_tool extends local_ucla_support_tools_crud implem
             // Should be an JSON array of URL hashes.
             $favarray = array();
             if (!empty($favjson)) {
-                //print_object($favjson);
                 $favarray = json_decode($favjson);
             }
 
@@ -333,5 +332,21 @@ class local_ucla_support_tools_tool extends local_ucla_support_tools_crud implem
         if (!isset($this->_originalurl)) {
             $this->_originalurl = $this->url;
         }
+    }
+
+    /**
+     * Returns all favorite tools for current user.
+     * 
+     * @return type
+     */
+    public static function fetch_favorites() {
+        $tools = self::fetch_all();
+        $favtools = array();
+        foreach ($tools as $tool) {
+            if ($tool->is_favorite()) {
+                $favtools[] = $tool;
+            }
+        }
+        return $favtools;
     }
 }

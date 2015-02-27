@@ -352,3 +352,38 @@
         margin: 15px 0;
     }
 }
+
+.ucla-support-tools-mysites-favorites {
+    ul {
+        margin-left: 0;
+    }
+    li {
+        list-style: none;
+        display: inline-block;
+        vertical-align: top;
+    }
+    .ucla-support-tool {
+        border: 0;
+        max-width: 200px;
+        width: 200px;
+        
+        .body,
+        .title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0;
+        }
+        .body {
+            height: 20px;
+            background-color: #fff;
+            padding-left: 20px;
+        }
+
+        @include box-shadow(0 0 0 0);
+    }
+    .fa {
+        margin-right: 4px;
+        color: #eb6b2d
+    }
+}
