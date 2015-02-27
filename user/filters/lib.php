@@ -71,6 +71,12 @@ class user_filtering {
                                 // 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1);
                                 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1, 'idnumber'=>1);
                                 // END UCLA MOD CCLE-4534-add-id-filter
+
+            // START UCLA MOD: CCLE-3783 - Improve default filter on "Browse list of users" screen
+            // Set email and UID to be a default filter (non-advanced).
+            $fieldnames['email'] = 0;
+            $fieldnames['idnumber'] = 0;
+            // END UCLA MOD: CCLE-3783
         }
 
         $this->_fields  = array();
