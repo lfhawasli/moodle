@@ -73,6 +73,9 @@ class install_test extends advanced_testcase {
      */
     protected function setUp() {
         $this->resetAfterTest(true);
+
+        // Make sure that tool database is empty.
+        $this->assertEmpty(count(\local_ucla_support_tools_tool::fetch_all()));
     }
 
     /**

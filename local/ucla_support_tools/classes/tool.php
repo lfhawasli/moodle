@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Represents a UCLA support tool.
  */
@@ -38,24 +40,28 @@ class local_ucla_support_tools_tool extends local_ucla_support_tools_crud implem
     public $metadata;
 
     /**
+     * Caches current url value. Used when we call update to see if URL changed,
+     * thus meaning that we need to update the favorite values for all users.
+     * @var string
+     */
+    private $_originalurl;
+
+    /**
      * Creates a new tool.
      * 
      * @param array $data
      * @throws Exception
      */
     protected function __construct($data) {
-
         parent::__construct($data);
 
-        // Needs to have URL.
-        if (empty($this->url)) {
-            throw new Exception('Missing URL');
+        // If description was not passed, then just set it to blank.
+        if (is_array($data) && !isset($data['description'])) {
+            $this->description = '';
         }
-        // Try to make URL relative.
-        $moodleurl = new moodle_url($this->url);
-        $this->url = $moodleurl->out_as_local_url(false);
-        // Trim description.
-        $this->description = trim($this->description);
+
+        // Need to do special case handling for URL.
+        $this->handle_url();
     }
 
     /**
@@ -67,16 +73,52 @@ class local_ucla_support_tools_tool extends local_ucla_support_tools_crud implem
         $this->created = time();
         $this->updated = $this->created;
 
-        return parent::create_record();
+        try {
+            return parent::create_record();
+        } catch (dml_write_exception $e) {
+            // Error has to be from violating unique key restriction on url.
+            throw new Exception('Duplicate URL');
+        }
     }
 
     /**
-     * Updates tool last modified timestamp.
+     * Updates tool information. If tool url changes, then we need to update
+     * the related favorited tool entries.
+     *
+     * @throws Exception
      */
     public function update() {
+        global $DB;
+
+        // Validate and clean up url.
+        $this->handle_url();
+
+        if ($this->url != $this->_originalurl) {
+            // Get list of current users using old url hash.
+            $oldhash = $this->get_url_hash($this->_originalurl);
+            $records = $DB->get_records_select('user_preferences', 'name = :name AND ' .
+                    $DB->sql_like('value', ':value'),
+                    array('name'  => 'local_ucla_support_tools_favorites',
+                          'value' => "%$oldhash%"));
+            if (!empty($records)) {
+                $newhash = $this->get_url_hash();
+                foreach ($records as $record) {
+                    // Do a simple string replacement to update url hash. No
+                    // need to do json decode and encode.
+                    $record->value = str_replace($oldhash, $newhash, $record->value);
+
+                    // Call API and not update DB directly so that Moodle caches
+                    // are notified appropriately.
+                    set_user_preference('local_ucla_support_tools_favorites',
+                            $record->value, $record->userid);
+                }
+            }
+        }
 
         $this->updated = time();
         parent::update();
+
+        $this->_originalurl = $this->url;
     }
 
     /**
@@ -156,5 +198,157 @@ class local_ucla_support_tools_tool extends local_ucla_support_tools_crud implem
 
         return $tools;
     }
+    
+    /**
+     * Gets metadata for tool
+     * 
+     * @return stdClass
+     */
+    public function get_metadata() {
+        return json_decode($this->metadata);
+    }
+    
+    /**
+     * Sets key/value pairs in metadata for tool
+     */
+    public function set_metadata($key, $value) {
+        $metadata = $this->get_metadata();
+        $metadata->$key = $value;
+        $this->metadata = json_encode($metadata);
+    }
 
+    /**
+     * Will return URL hash used when saving user's favorites.
+     *
+     * @param string $url   URL to hash. If null, then hash current url value.
+     * @return string   Returns the first 7 characters from a sha1 hash.
+     */
+    public function get_url_hash($url = null) {
+        if (empty($url)) {
+            $url = $this->url;
+        }
+
+        // See: http://blog.cuviper.com/2013/11/10/how-short-can-git-abbreviate/
+        // on why it is okay to use 7 characters.
+        $urlhash = sha1($url);
+        return substr($urlhash, 0, 7);
+    }
+
+    /**
+     * Checks if tool is marked as a favorite for the current user.
+     *
+     * @return boolean
+     */
+    public function is_favorite() {
+        // Get user preference for given tool, using URL as the unique key.
+        $favjson = get_user_preferences('local_ucla_support_tools_favorites', null);
+
+        if (empty($favjson)) {
+            $this->isfavorite = false;
+        } else {
+            // Should be an JSON array of URL hashes.
+            $favarray = array();
+            if (!empty($favjson)) {
+                $favarray = json_decode($favjson);
+            }
+
+            if (in_array($this->get_url_hash(), $favarray)) {
+                $this->isfavorite = true;
+            } else {
+                $this->isfavorite = false;
+            }
+        }
+
+        return $this->isfavorite;
+    }
+
+    /**
+     * Toggles the favorite state of given tool for the current user.
+     *
+     * Note that user preferences table can only hold values up to 1333
+     * characters. So that is why we need to hash tool urls. A user can have
+     * around 150 or so tools favorited.
+     *
+     * We also want to hash tool urls instead of tool ids, because we want to
+     * be able to import/export tool listing around different servers and ids
+     * may not be consistent, but URLs are consistent.
+     *
+     * @boolean Returns current status of favorite status. True if favorited,
+     *          false if not favorited.
+     */
+    public function toggle_favorite() {
+        global $USER;
+
+        // Need to check if we need to add or remove tool from favorites list.
+        $isfavorite = $this->is_favorite();
+        $favjson = get_user_preferences('local_ucla_support_tools_favorites');
+        $favarray = array();
+        if (!empty($favjson)) {
+            $favarray = json_decode($favjson);
+        }
+        
+        if ($isfavorite) {
+            // Remove tool by reemoving url hash from array.
+            $favarray = array_diff($favarray, array($this->get_url_hash()));
+            // Need to make sure that array is reindexed back to zero, because
+            // if index starts at anything else it will be decoded into object
+            // and also take up more character space.
+            $favarray = array_values($favarray);
+        } else {
+            // Need to add as a favorite.
+            $favarray[] = $this->get_url_hash();
+        }
+
+        $savedfavs = null;
+        if (!empty($favarray)) {
+            $favarray = array_unique($favarray);
+            $savedfavs = json_encode($favarray);
+        }
+        set_user_preference('local_ucla_support_tools_favorites', $savedfavs);
+        $this->isfavorite = !$isfavorite;  // Update cache.
+
+        return $this->isfavorite;
+    }
+
+    /**
+     * Makes sure object URL is a relative url when possible.
+     *
+     * @throws Exception
+     */
+    private function handle_url() {
+        if (empty($this->url)) {
+            throw new Exception('Missing URL');
+        }
+
+        // Try to make URL relative if it is on the same server. Else, keep link
+        // to external server.
+        try {
+            $moodleurl = new moodle_url($this->url);
+            // Will throw an exception if url is not a local path.
+            $this->url = $moodleurl->out_as_local_url(false);
+        } catch (Exception $e) {
+            $this->url = $this->url;
+        }
+
+        // Save original URL in case it changes later.
+        if (!isset($this->_originalurl)) {
+            $this->_originalurl = $this->url;
+        }
+    }
+
+    /**
+     * Returns all favorite tools for current user.
+     * 
+     * @return type
+     */
+    public static function fetch_favorites() {
+        $tools = self::fetch_all();
+        $favtools = array();
+        foreach ($tools as $tool) {
+            if ($tool->is_favorite()) {
+                $favtools[] = $tool;
+            }
+        }
+        return $favtools;
+    }
 }

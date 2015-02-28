@@ -24,20 +24,62 @@
 M.local_ucla_support_tools = M.local_ucla_support_tools || {};
 
 M.local_ucla_support_tools.categoryorganizer = {
-    
     init: function () {
         Y.log('Loading category organizer', 'info', 'local_ucla_support_tools');
-        
+
         M.local_ucla_support_tools.dragdrop.init();
-        M.local_ucla_support_tools.filter.categories();
-        
-        // Start the category tool filter
-        M.local_ucla_support_tools.filter.tools({
-            input_node_id: "#ucla-support-category-filter-input",
-            target_nodes: ".ucla-support-tool-category-list .ucla-support-tool",
-            filter_nodes: ".ucla-support-tool-category-list .ucla-support-category li"
-        });
-        
+
+        // 'add category' button event.
+        Y.one('.ucla-support-tool-category-button-add').on('click', function () {
+
+            var category_panel = this.create_category_panel({
+                title: 'Create a new category',
+                proceed_label: 'Create category'
+            });
+
+            category_panel.callback = M.local_ucla_support_tools.categoryorganizer.create_category;
+            category_panel.validate = function () {
+                return new Y.ArrayList([
+                    Y.one('#catname-output'),
+                ]);
+            };
+            this.init_color_slider();
+            category_panel.show();
+
+        }, this);
+
+        // Category deletion delegate event.
+        Y.one('.ucla-support-tool-category-labels').delegate('click', function (e) {
+            e.preventDefault();
+            var id = e.currentTarget.getData('id');
+            this.delete_category(id);
+
+        }, 'a[data-action="delete"]', this);
+
+        // Category edit delegate event.
+        Y.one('.ucla-support-tool-category-labels').delegate('click', function (e) {
+            e.preventDefault();
+            var id = e.currentTarget.getData('id');
+            this.edit_category(id);
+
+        }, 'a[data-action="edit"]', this);
+
+        // Tool removal delegate event
+        Y.one('.ucla-support-tool-category-list ul').delegate('click', function (e) {
+
+            e.preventDefault();
+            var toolid = e.currentTarget.getData('id');
+            var catid = e.currentTarget.ancestor('.ucla-support-category').getData('id');
+
+            this.remove_tool({
+                toolid: toolid,
+                catid: catid
+            });
+
+        }, 'a[data-action="remove"]', this);
+    },
+    create_category_panel: function (config) {
+
         var category_panel_form = M.local_ucla_support_tools.dialog.form_with_inputs(new Y.ArrayList([
             {
                 label: "Name for category",
@@ -50,104 +92,91 @@ M.local_ucla_support_tools.categoryorganizer = {
                 placeholder: ""
             }
         ]));
-        
-        // Attach the color picker node.
-        var picker =  '<div class="picker well">' + 
-                        '<div id="hue-dial"></div>' + 
-                        '<div class="sliders">' +
-                            '<div id="sat-slider"><strong>Saturation: <span></span></strong></div>' +
-                            '<div id="lum-slider"><strong>Luminance: <span></span></strong></div>' +
-                        '</div>' +
-                        '<div class="color"></div>' +
-                    '</div>';
 
-        category_panel_form.appendChild(Y.Node.create(picker));
-        
+        // Attach the color picker node.
+        var picker = '<div class="picker well">' +
+                '<div id="hue-dial"></div>' +
+                '<div class="sliders">' +
+                '<div id="sat-slider"><strong>Saturation: <span></span></strong></div>' +
+                '<div id="lum-slider"><strong>Luminance: <span></span></strong></div>' +
+                '</div>' +
+                '<div class="color"></div>' +
+                '</div>';
+
+        category_panel_form.appendChild(picker);
+
         var category_panel = M.local_ucla_support_tools.dialog.create({
             id: "create-category-dialog",
-            title: "Create a new category",
+            title: config.title,
             body: category_panel_form.getHTML(),
             cancel: "Cancel",
-            proceed: "Create category"
+            proceed: config.proceed_label
         });
-
-        // 'add category' button event.
-        Y.one('.ucla-support-tool-category-button-add').on('click', function(){
-            this.init_color_slider();
-            
-            category_panel.callback = M.local_ucla_support_tools.categoryorganizer.create_category;
-            category_panel.validate = function() {
-                return new Y.ArrayList([
-                    Y.one('#catname-output'),
-                ]);
-            };
-
-            category_panel.show();
-
-        }, this);
-
-        // Category deletion delegate event.
-        Y.one('.ucla-support-tool-category-list ul').delegate('click', function (e) {
-            e.preventDefault();
-            var id = e.currentTarget.getData('id');
-            this.delete_category(id);
-
-        }, '.ucla-support-category-header a[data-action="delete"]', this);
-        
-        // Tool removal delegate event
-        Y.one('.ucla-support-tool-category-list ul').delegate('click', function (e) {
-
-            e.preventDefault();
-            var toolid = e.currentTarget.getData('id');
-            var catid = e.currentTarget.ancestor('.ucla-support-category').getData('id');
-            
-            this.remove_tool({
-                toolid: toolid,
-                catid: catid
-            });
-
-        }, '.ucla-support-tool-title a[data-action="remove"]', this);
+        return category_panel;
     },
-    init_color_slider: function(node) {
-        
+    init_color_slider: function (hexcolor) {
+
+        // Generate a random color.
+        function randomColor(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+        var hsl = {
+            h: randomColor(0, 360),
+            s: randomColor(0, 100),
+            l: randomColor(0, 100)
+        };
+        // If we have a preset color, use it.
+        if (hexcolor) {
+            var hslstring = Y.Color.convert(hexcolor, Y.Color.TYPES.HSL);
+
+            var hslarr = Y.Color.toArray(hslstring);
+            hsl = {
+                h: parseInt(hslarr[0]),
+                s: parseInt(hslarr[1]),
+                l: parseInt(hslarr[2])
+            };
+        }
+
         var hue = new Y.Dial({
             min: 0,
             max: 360,
             stepsPerRevolution: 360,
             continuous: true,
             centerButtonDiameter: 0.4,
-            render: '#hue-dial'
+            render: '#hue-dial',
+            value: hsl.h,
+            strings: {label: 'Hue', tooltipHandle: 'Drag to set value'}
         }),
-        sat = new Y.Slider({
-            min: 0,
-            max: 100,
-            value: 100,
-            render: '#sat-slider'
-        }),
-        lum = new Y.Slider({
-            min: 0,
-            max: 100,
-            value: 50,
-            render: '#lum-slider'
-        }),
-        satValue = Y.one('#sat-slider span'),
-        lumValue = Y.one('#lum-slider span'),
-        color = Y.one('.color');
+                sat = new Y.Slider({
+                    min: 0,
+                    max: 100,
+                    value: hsl.s,
+                    render: '#sat-slider'
+                }),
+                lum = new Y.Slider({
+                    min: 0,
+                    max: 100,
+                    value: hsl.l,
+                    render: '#lum-slider'
+                }),
+                satValue = Y.one('#sat-slider span'),
+                lumValue = Y.one('#lum-slider span'),
+                color = Y.one('.color');
 
         // 
-        hue.after('valueChange', function(e) {
+        hue.after('valueChange', function (e) {
             updatePickerUI();
         });
 
-        sat.after('thumbMove', function(e) {
+        sat.after('thumbMove', function (e) {
             updatePickerUI();
         });
 
-        lum.after('thumbMove', function(e) {
+        lum.after('thumbMove', function (e) {
             lumValue.set('text', lum.get('value') + '%');
             updatePickerUI();
         });
-        
+
         function setPickerUI(hsl) {
             if (typeof hsl.h !== 'undefined') {
                 hue.set('value', +hsl.h);
@@ -164,10 +193,10 @@ M.local_ucla_support_tools.categoryorganizer = {
 
         function updatePickerUI() {
             var h = hue.get('value'),
-                s = sat.get('value'),
-                l = lum.get('value'),
-                hslString = Y.Color.fromArray([h, s, l], Y.Color.TYPES.HSL),
-                hexString = Y.Color.toHex(hslString);
+                    s = sat.get('value'),
+                    l = lum.get('value'),
+                    hslString = Y.Color.fromArray([h, s, l], Y.Color.TYPES.HSL),
+                    hexString = Y.Color.toHex(hslString);
 
             satValue.set('text', s + '%');
             lumValue.set('text', l + '%');
@@ -176,15 +205,15 @@ M.local_ucla_support_tools.categoryorganizer = {
 
             updateOutput(hslString);
         }
-        
+
         var hexOutput = Y.one('#cathex-output'),
-        focused = null;
+                focused = null;
 
         hexOutput.on('focus', setFocused);
         hexOutput.on('blur', unsetFocused);
         hexOutput.on('valueChange', updatePickerFromValue);
 
-        
+
         function updateOutput(hslString) {
             if (hexOutput !== focused) {
                 hexOutput.set('value', Y.Color.toHex(hslString));
@@ -194,7 +223,7 @@ M.local_ucla_support_tools.categoryorganizer = {
 
         function updatePickerFromValue(e) {
             var val = e.newVal,
-                hsl = [];
+                    hsl = [];
 
             if (Y.Color.toArray(val)) {
                 hsl = Y.Color.toArray(Y.Color.toHSL(val));
@@ -215,7 +244,7 @@ M.local_ucla_support_tools.categoryorganizer = {
                 focused = null;
             }
         }
-        
+
         updatePickerUI();
 
     },
@@ -224,56 +253,19 @@ M.local_ucla_support_tools.categoryorganizer = {
      * category node and category label.
      * 
      */
-    create_category: function() {
-        var name = Y.one('#catname-output').get('value');
-        var color = Y.one('#cathex-output').get('value').replace('#', '');
-      
-        var alert = Y.one('#create-category-dialog .alert');
+    create_category: function () {
+        Y.log('Creating new category', 'info', 'local_ucla_support_tools');
 
-        if (alert) {
-            alert.remove(true);
-        }
+        return M.local_ucla_support_tools.categoryorganizer.update_category('createcategory', function (data) {
+            var html = '<li>' + data.category_html + '</li>';
+            Y.one('.ucla-support-tool-category-list ul').appendChild(html);
+            // Attach drag & drop events.
+            M.local_ucla_support_tools.dragdrop.set_drop_events(Y.one('.ucla-support-category[data-id="' + data.id + '"]'))
+            // Create the category label.
+            html = '<li>' + data.category_label + '</li>';
+            Y.one('.ucla-support-tool-category-labels ul').appendChild(html);
 
-        var data = {
-            name: name,
-            color: color
-        };
-
-        var validate = false;
-        Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
-            method: 'POST',
-            data: {
-                action: 'createcategory',
-                json: JSON.stringify(data),
-                sesskey: M.cfg.sesskey
-            },
-            on: {
-                success: function (id, result) {
-                    //
-                    var data = JSON.parse(result.responseText);
-
-                    if (data.status) {
-                        // Create the category node.
-                        var html = '<li>' + data.category_html + '</li>';
-                        Y.one('.ucla-support-tool-category-list ul').appendChild(html);
-                        // Attach drag & drop events.
-                        M.local_ucla_support_tools.dragdrop.set_drop_events(Y.one('.ucla-support-category[data-id="' + data.id + '"]'))
-                        // Create the category label.
-                        html = '<li>' + data.category_label + '</li>';
-                        Y.one('.ucla-support-tool-category-labels ul').appendChild(html);
-                    } else {
-                        if (data.error.msg.indexOf('Error writing to database') !== -1) {
-                            Y.one('#create-category-dialog h3.title').insert('<div class="alert alert-warning" role="alert"><strong>Unable to create category!</strong> Perhaps you already have a category with the same name?</div>', 'after');
-                        }
-                    }
-
-                    validate = data.status;
-                }
-            },
-            sync: true
         });
-
-        return validate;
     },
     /**
      * Deletes a category.  If successful, will delete the associated nodes.
@@ -304,8 +296,12 @@ M.local_ucla_support_tools.categoryorganizer = {
                         var data = JSON.parse(result.responseText);
 
                         if (data.status) {
-                            Y.one('.ucla-support-category[data-id="' + data.id + '"]').ancestor('li').remove(true);
-                            Y.one('.ucla-support-category-header[data-id="' + data.id + '"]').ancestor('li').remove(true);
+                            Y.one('.ucla-support-category[data-id="' + data.id + '"]')
+                                    .ancestor('li')
+                                    .remove(true);
+                            Y.one('.ucla-support-tool-category-labels .category-label[data-id="' + data.id + '"]')
+                                    .ancestor('li')
+                                    .remove(true);
                         }
                     }
                 }
@@ -315,6 +311,109 @@ M.local_ucla_support_tools.categoryorganizer = {
         };
 
         dialog.show();
+    },
+    edit_category: function (id) {
+
+        Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
+            method: 'GET',
+            data: {
+                action: 'getcategoryedit',
+                json: JSON.stringify({id: id}),
+                sesskey: M.cfg.sesskey
+            },
+            on: {
+                success: function (idx, result) {
+                    var data = JSON.parse(result.responseText);
+
+                    if (data.status) {
+
+                        var category_panel = M.local_ucla_support_tools.categoryorganizer.create_category_panel({
+                            title: 'Update category',
+                            proceed_label: 'Save changes'
+                        });
+
+                        category_panel.callback = M.local_ucla_support_tools.categoryorganizer.edit_category_callback;
+                        category_panel.validate = function () {
+                            return new Y.ArrayList([
+                                Y.one('#catname-output'),
+                            ]);
+                        };
+                        category_panel.show();
+
+                        // Init the color picker with category color.
+                        M.local_ucla_support_tools.categoryorganizer.init_color_slider(data.category.color);
+
+                        // Set the category name.
+                        Y.one('#catname-output').set('value', data.category.name);
+                        Y.one('#create-category-dialog .message').appendChild('<input type="hidden" id="catid-output" value="' + id + '"/>');
+                    }
+                }
+            }
+        });
+    },
+    edit_category_callback: function () {
+        var id = Y.one('#catid-output').get('value');
+
+        return M.local_ucla_support_tools.categoryorganizer.update_category('updatecategory', function (data) {
+            var category = Y.Node.create(data.html.category);
+            var label = Y.Node.create(data.html.label);
+
+            Y.one('.ucla-support-category[data-id="' + data.id + '"]')
+                    .set('innerHTML', category.getHTML());
+            Y.one('.ucla-support-tool-category-labels .category-label[data-id="' + data.id + '"]')
+                    .set('innerHTML', label.getHTML());
+
+        }, {id: id});
+
+    },
+    update_category: function (action, callback, opts) {
+        var name = Y.one('#catname-output').get('value');
+        var color = Y.one('#cathex-output').get('value').replace('#', '');
+
+        var alert = Y.one('#create-category-dialog .alert');
+
+        if (alert) {
+            alert.remove(true);
+        }
+
+        var data = {
+            name: name,
+            color: color
+        };
+
+        if (opts) {
+            data = Y.merge(data, opts);
+        }
+
+        var validate = false;
+        Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
+            method: 'POST',
+            data: {
+                action: action,
+                json: JSON.stringify(data),
+                sesskey: M.cfg.sesskey
+            },
+            on: {
+                success: function (id, result) {
+                    //
+                    var data = JSON.parse(result.responseText);
+
+                    if (data.status) {
+                        // Create the category node.
+                        callback(data);
+                    } else {
+                        if (data.error.msg.indexOf('Error writing to database') !== -1) {
+                            Y.one('#create-category-dialog h3.title').insert('<div class="alert alert-warning" role="alert"><strong>Unable to create category!</strong> Perhaps you already have a category with the same name?</div>', 'after');
+                        }
+                    }
+
+                    validate = data.status;
+                }
+            },
+            sync: true
+        });
+
+        return validate;
     },
     /**
      * Adds a tool to a category.
@@ -326,7 +425,7 @@ M.local_ucla_support_tools.categoryorganizer = {
      *
      * @param {obj} data 
      */
-    add_tool: function(data) {
+    add_tool: function (data) {
 
         Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
             method: 'POST',
@@ -347,7 +446,7 @@ M.local_ucla_support_tools.categoryorganizer = {
      *
      * @param {obj} data 
      */
-    remove_tool: function(data) {
+    remove_tool: function (data) {
         Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
             method: 'POST',
             data: {
@@ -356,14 +455,14 @@ M.local_ucla_support_tools.categoryorganizer = {
                 json: JSON.stringify(data)
             },
             on: {
-                    success: function (id, result) {
-                        var data = JSON.parse(result.responseText);
+                success: function (id, result) {
+                    var data = JSON.parse(result.responseText);
 
-                        if (data.status) {
-                            Y.one('.ucla-support-category[data-id="' + data.catid + '"] .ucla-support-tool[data-id="' + data.toolid + '"]').ancestor('li').remove(true);
-                        }
+                    if (data.status) {
+                        Y.one('.ucla-support-category[data-id="' + data.catid + '"] .ucla-support-tool[data-id="' + data.toolid + '"]').ancestor('li').remove(true);
                     }
                 }
+            }
         });
         return true;
     }

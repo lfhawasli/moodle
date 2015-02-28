@@ -26,12 +26,12 @@ M.local_ucla_support_tools.dialog = {
      * @returns {Y.Panel}
      */
     create: function(config) {
-        
+
         var panel_config = {
             contentBox : Y.Node.create('<div id="' + config.id + '" class="ucla-tools-dialog" />'),
             bodyContent: Y.Lang.sub('<h3 class="title">{title}</h3><div class="message">{body}</div>', config),
             width      : 400,
-            zIndex     : 20,
+            zIndex     : 999,
             centered   : true,
             modal      : true, // modal behavior
             render     : 'body',
@@ -49,7 +49,11 @@ M.local_ucla_support_tools.dialog = {
                         action   : 'proceed'
                     }
                 ]
-            }
+            },
+            // Disable 'esc' key event.  This does not clean up correctly and
+            // It's not clear how this event can be captured and processed, so 
+            // removing it to be safe.
+            hideOn: []
         };
         
         var panel = new Y.Panel(panel_config);
@@ -58,6 +62,7 @@ M.local_ucla_support_tools.dialog = {
             this.hide();
             this.callback = null;
             this.reset();
+            this.destroy();
         };
         panel.proceed = function (e) {
 
@@ -74,6 +79,7 @@ M.local_ucla_support_tools.dialog = {
             this.hide();
             this.callback = null;
             this.reset();
+            this.destroy();
         };
 
         return panel;
@@ -136,4 +142,4 @@ M.local_ucla_support_tools.dialog = {
     }
 };
 
-}, '@VERSION@', {"requires": ["base", "node", "panel"]});
+}, '@VERSION@', {"requires": ["base", "node", "panel", "event-key"]});

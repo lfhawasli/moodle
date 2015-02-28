@@ -106,16 +106,33 @@ M.local_ucla_support_tools.filter = {
             var category_node = Y.one('.ucla-support-category[data-id="' + checkbox.getData('id') + '"]');
 
             if (checkbox.get('checked')) {
-                category_node.ancestor('li').removeClass('hidden');
-                checkbox.ancestor('.ucla-support-category-header').removeClass('selected');
+                category_node.ancestor('li').removeClass('collapsed');
+                checkbox.ancestor('.category-label').removeClass('selected');
+                checkbox.previous('label').one('i').replaceClass('fa-plus-square', 'fa-minus-square');
             } else {
-                category_node.ancestor('li').addClass('hidden');
-                checkbox.ancestor('.ucla-support-category-header').addClass('selected');
+                category_node.ancestor('li').addClass('collapsed');
+                checkbox.ancestor('.category-label').addClass('selected');
+                checkbox.previous('label').one('i').replaceClass('fa-minus-square', 'fa-plus-square');
             }
 
         }, 'input[type="checkbox"]');
+        
+        Y.one('.ucla-support-tool-alltools').delegate('click', function (e) {
+            e.preventDefault();
+
+            // Hide all.
+            Y.all('.category-label input[type="checkbox"]').each(function (node) {
+                if (node.get('checked')) {
+                    node.previous('label').simulate('click');
+                }
+            });
+            // Show selected.
+            var catid = e.target.getData('catid');
+            Y.one('.category-label input[data-id="' + catid + '"]').set('checked', 'false').simulate('change');
+
+        }, 'a[data-action="filtercategory"]');
     }
 };
 
 
-}, '@VERSION@', {"requires": ["autocomplete-base", "autocomplete-filters"]});
+}, '@VERSION@', {"requires": ["autocomplete-base", "autocomplete-filters", "node-event-simulate"]});

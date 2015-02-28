@@ -3,7 +3,8 @@
         "requires": [
             "base",
             "node",
-            "panel"
+            "panel",
+            "event-key"
         ]
     }
 }

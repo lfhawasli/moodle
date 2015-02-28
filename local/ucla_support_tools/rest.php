@@ -33,7 +33,10 @@ require_sesskey(); // Gotta have the sesskey.
 require_login(); // Gotta be logged in (of course).
 
 global $PAGE;
-$PAGE->set_context(context_system::instance());
+$context = context_system::instance();
+$PAGE->set_context($context);
+
+require_capability('local/ucla_support_tools:view', $context);
 
 // Shared params
 $action = required_param('action', PARAM_ALPHA);
@@ -45,156 +48,282 @@ echo $OUTPUT->header();
 // Create response.
 $response = array('status' => 0);
 
-switch ($action) {
-    case 'createcategory':
+// Check for capability for mutable operations.
+if (has_capability('local/ucla_support_tools:edit', $context)) {
 
-        if (!empty($json)) {
+    switch ($action) {
+        case 'createcategory':
+
+            if (!empty($json)) {
+
+                $data = json_decode($json);
+
+                $name = clean_param($data->name, PARAM_TEXT);
+                $color = clean_param($data->color, PARAM_ALPHANUM);
+
+                try {
+                    $cat = \local_ucla_support_tools_category::create(array(
+                        'name' => $name,
+                        'color' => $color
+                    ));
+
+                    $output = $PAGE->get_renderer('local_ucla_support_tools');
+
+                    $response['id'] = $cat->get_id();
+                    $response['category_html'] = $output->render($cat);
+                    $response['category_label'] = $output->category_label($cat);
+                    $response['status'] = 1;
+
+                } catch (Exception $ex) {
+                    $response['error'] = array(
+                        'msg' => $ex->getMessage()
+                    );
+                }
+            }
+
+            break;
+            
+        case 'updatecategory': 
 
             $data = json_decode($json);
-
             $name = clean_param($data->name, PARAM_TEXT);
             $color = clean_param($data->color, PARAM_ALPHANUM);
+            $id = clean_param($data->id, PARAM_INT);
+            
+            $cat = \local_ucla_support_tools_category::fetch($id);
+            $cat->name = $name;
+            $cat->color = $color;
+            $cat->update();
 
-            try {
-                $cat = \local_ucla_support_tools_category::create(array(
-                    'name' => $name,
-                    'color' => $color
-                ));
+            $output = $PAGE->get_renderer('local_ucla_support_tools');
+            
+            $response['id'] = $id;
+            $response['html'] = array(
+                'category' => $output->render($cat),
+                'label' => $output->category_label($cat)
+            );
+            $response['status'] = 1;
 
-                $output = $PAGE->get_renderer('local_ucla_support_tools');
+            break;
 
-                $response['id'] = $cat->get_id();
-                $response['category_html'] = $output->render($cat);
-                $response['category_label'] = $output->category_label($cat);
-                $response['status'] = 1;
+        case 'createtool':
 
-            } catch (Exception $ex) {
-                $response['error'] = array(
-                    'msg' => $ex->getMessage()
-                );
+            if (!empty($json)) {
+                $data = json_decode($json);
+
+                $name = clean_param($data->name, PARAM_TEXT);
+                $url = clean_param($data->url, PARAM_URL);
+                $desc = clean_param($data->desc, PARAM_TEXT);
+
+                try {
+                    $response['name'] = $name;
+                    $response['url'] = $url;
+                    $response['desc'] = $desc;
+
+                    $tool = \local_ucla_support_tools_tool::create(array(
+                                'name' => urldecode($name),
+                                'url' => $url,
+                                'description' => urldecode($desc)
+                    ));
+
+                    $output = $PAGE->get_renderer('local_ucla_support_tools');
+
+                    $response['id'] = $id;
+                    $response['html'] = $output->render($tool);
+                    $response['status'] = 1;
+                } catch (Exception $ex) {
+                    $response['error'] = array(
+                        'msg' => $ex->getMessage()
+                    );
+                }
             }
-        }
 
-        break;
-
-    case 'createtool':
-
-        if (!empty($json)) {
+            break;
+            
+        case 'updatetool':
+            
             $data = json_decode($json);
             
             $name = clean_param($data->name, PARAM_TEXT);
             $url = clean_param($data->url, PARAM_URL);
             $desc = clean_param($data->desc, PARAM_TEXT);
-            
-            try {
-                $response['name'] = $name;
-                $response['url'] = $url;
-                $response['desc'] = $desc;
-
-                $tool = \local_ucla_support_tools_tool::create(array(
-                            'name' => urldecode($name),
-                            'url' => $url,
-                            'description' => urldecode($desc)
-                ));
-
-                $output = $PAGE->get_renderer('local_ucla_support_tools');
-
-                $response['id'] = $name;
-                $response['html'] = $output->render($tool);
-                $response['status'] = 1;
-            } catch (Exception $ex) {
-                $response['error'] = array(
-                    'msg' => $ex->getMessage()
-                );
-            }
-        }
-
-        break;
-    case 'deletecategory':
-
-        if (!empty($json)) {
-            $data = json_decode($json);
-
-            $id = clean_param($data->id, PARAM_TEXT);
-
-            $cat = \local_ucla_support_tools_category::fetch($id);
-            $cat->delete();
-
-            $response['status'] = 1;
-            $response['id'] = $id;
-        }
-
-        break;
-
-    case 'deletetool':
-        if (!empty($json)) {
-            
-            $data = json_decode($json);
             $id = clean_param($data->id, PARAM_INT);
             
             $tool = \local_ucla_support_tools_tool::fetch($id);
-            $tool->delete();
+            $tool->name = $name;
+            $tool->url = $url;
+            $tool->description = $desc;
+
+            $tool->update();
             
+            $output = $PAGE->get_renderer('local_ucla_support_tools');
+
+            $response['id'] = $id;
+            $response['html'] = $output->render($tool);
             $response['status'] = 1;
+            
+            break;
+        case 'deletecategory':
+
+            if (!empty($json)) {
+                $data = json_decode($json);
+
+                $id = clean_param($data->id, PARAM_TEXT);
+
+                $cat = \local_ucla_support_tools_category::fetch($id);
+                $cat->delete();
+
+                $response['status'] = 1;
+                $response['id'] = $id;
+            }
+
+            break;
+
+        case 'deletetool':
+            if (!empty($json)) {
+
+                $data = json_decode($json);
+                $id = clean_param($data->id, PARAM_INT);
+
+                $tool = \local_ucla_support_tools_tool::fetch($id);
+                $tool->delete();
+
+                $response['status'] = 1;
+                $response['id'] = $id;
+            }
+
+            break;
+
+        case 'addtooltocategory':
+
+            if (!empty($json)) {
+
+                $data = json_decode($json);
+
+                $catid = clean_param($data->catid, PARAM_INT);
+                $toolid = clean_param($data->toolid, PARAM_INT);
+
+                $cat = \local_ucla_support_tools_category::fetch($catid);
+                $tool = \local_ucla_support_tools_tool::fetch($toolid);
+
+                $status = $cat->add_tool($tool);
+
+                if ($status) {
+                    $response['status'] = 1;
+                }
+            }
+
+            break;
+
+        case 'removetoolfromcategory':
+
+            if (!empty($json)) {
+                $data = json_decode($json);
+
+                $catid = clean_param($data->catid, PARAM_INT);
+                $toolid = clean_param($data->toolid, PARAM_INT);
+
+                $cat = \local_ucla_support_tools_category::fetch($catid);
+                $tool = \local_ucla_support_tools_tool::fetch($toolid);
+
+                $status = $cat->remove_tool($tool);
+
+                if ($status) {
+                    $response['toolid'] = $toolid;
+                    $response['catid'] = $catid;
+                    $response['status'] = 1;
+                }
+            }
+
+            break;
+
+        case 'gettooledit': 
+            if (!empty($json)) {
+
+                $data = json_decode($json);
+                $id = clean_param($data->id, PARAM_INT);
+
+                $tool = \local_ucla_support_tools_tool::fetch($id);
+
+                $output = $PAGE->get_renderer('local_ucla_support_tools');
+                $html = $output->render_tool_edit($tool);
+                
+                $response['status'] = 1;
+                $response['html'] = $html;
+            }
+            break;
+            
+        case 'getcategoryedit':
+            $data = json_decode($json);
+            $id = clean_param($data->id, PARAM_INT);
+
+            $cat = \local_ucla_support_tools_category::fetch($id);
+
+            $response['id'] = $id;
+            $response['status'] = 1;
+            $response['category'] = $cat;
+            break;
+
+        case 'gettags':
+            $tags = \local_ucla_support_tools_tag::fetch_all();
+
+            $out = array();
+            foreach ($tags as $tag) {
+                $out[$tag->name] = $tag->get_id();
+            }
+
+            $response['status'] = 1;
+            $response['tags'] = $out;
+
+            break;
+
+    }
+}
+
+switch ($action) {
+    
+    case 'togglefavorite':
+        if (!empty($json)) {
+
+            $data = json_decode($json);
+            $id = clean_param($data->id, PARAM_INT);
+
+            $tool = \local_ucla_support_tools_tool::fetch($id);
+            $result = $tool->toggle_favorite();
+
+            $response['status'] = $result;
             $response['id'] = $id;
         }
 
         break;
-        
-    case 'addtooltocategory':
 
-        if (!empty($json)) {
-
-            $data = json_decode($json);
-
-            $catid = clean_param($data->catid, PARAM_INT);
-            $toolid = clean_param($data->toolid, PARAM_INT);
-
-            $cat = \local_ucla_support_tools_category::fetch($catid);
-            $tool = \local_ucla_support_tools_tool::fetch($toolid);
-
-            $status = $cat->add_tool($tool);
-
-            if ($status) {
-                $response['status'] = 1;
-            }
-        }
-
-        break;
-        
-    case 'removetoolfromcategory':
-        
+    case 'logtooluse':
         if (!empty($json)) {
             $data = json_decode($json);
 
-            $catid = clean_param($data->catid, PARAM_INT);
-            $toolid = clean_param($data->toolid, PARAM_INT);
+            $id = clean_param($data->id, PARAM_INT);
+            $tool = \local_ucla_support_tools_tool::fetch($id);
+            if (!empty($tool)) {
+                // Get number of times tool has been used from metadata
+                $toolmetadata = $tool->get_metadata();
+                $timesused = $toolmetadata->timesused;
+                if (empty($timesused)) {
+                    $timesused = 0;
+                }
+                $response['timesused'] = ++$timesused;
 
-            $cat = \local_ucla_support_tools_category::fetch($catid);
-            $tool = \local_ucla_support_tools_tool::fetch($toolid);
-            
-            $status = $cat->remove_tool($tool);
-
-            if ($status) {
-                $response['toolid'] = $toolid;
-                $response['catid'] = $catid;
-                $response['status'] = 1;
+                // Update database with incremented usage count
+                $tool->set_metadata('timesused', $timesused);
+                try {
+                    $tool->update();
+                    $response['status'] = 1;
+                } catch (Exception $ex) {
+                    $response['error'] = array(
+                        'msg' => $ex->getMessage()
+                    );
+                }
             }
         }
-        
-        break;
-
-    case 'gettags':
-        $tags = \local_ucla_support_tools_tag::fetch_all();
-        
-        $out = array();
-        foreach ($tags as $tag) {
-            $out[$tag->name] = $tag->get_id();
-        }
-        
-        $response['status'] = 1;
-        $response['tags'] = $out;
-        
         break;
 }
 
