@@ -53,6 +53,10 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configmultiselect('url/displayoptions',
         get_string('displayoptions', 'url'), get_string('configdisplayoptions', 'url'),
         $defaultdisplayoptions, $displayoptions));
+    // START UCLA MOD: CCLE-5033 - Remove URL Variables section in URL resource
+    $settings->add(new admin_setting_configcheckbox('url/enableuservar', get_string('enableuservar', 'url'), 
+        get_string('configenableuservar', 'url'), 1));
+    // END UCLA MOD: CCLE-5033
 
     //--- modedit defaults -----------------------------------------------------------------------------------
     $settings->add(new admin_setting_heading('urlmodeditdefaults', get_string('modeditdefaults', 'admin'), get_string('condifmodeditdefaults', 'admin')));
