@@ -25,6 +25,9 @@
 
 $string['clicktoopen'] = 'Click {$a} link to open resource.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
+// START UCLA MOD: CCLE-5033 - Remove URL Variables section in URL resource
+$string['configenableuservar'] = 'Disable this option if you do not want user variables to show when choosing URL variables.';
+// END UCLA MOD: CCLE-5033
 $string['configframesize'] = 'When a web page or an uploaded file is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
 $string['configrolesinparams'] = 'Enable if you want to include localized role names in list of available parameter variables.';
 $string['configsecretphrase'] = 'This secret phrase is used to produce encrypted code value that can be sent to some servers as a parameter.  The encrypted code is produced by an md5 value of the current user IP address concatenated with your secret phrase. ie code = md5(IP.secretphrase). Please note that this is not reliable because IP address may change and is often shared by different computers.';
@@ -41,6 +44,9 @@ $string['displayselect_help'] = 'This setting, together with the URL file type a
 * In frame - The URL is displayed within a frame below the navigation bar and URL description
 * New window - The URL is displayed in a new browser window with menus and an address bar';
 $string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all URLs.';
+// START UCLA MOD: CCLE-5033 - Remove URL Variables section in URL resource
+$string['enableuservar'] = 'Enable user variables';
+// END UCLA MOD: CCLE-5033
 $string['externalurl'] = 'External URL';
 $string['framesize'] = 'Frame height';
 $string['invalidstoredurl'] = 'Cannot display this resource, URL is invalid.';

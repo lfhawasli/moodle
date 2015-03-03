@@ -64,3 +64,6 @@
 [submodule "lib/editor/atto/plugins/fullscreen"]
 	path = lib/editor/atto/plugins/fullscreen
 	url = git@github.com:dthies/moodle-atto_fullscreen.git
+[submodule "local/metagroups"]
+	path = local/metagroups
+	url = git@github.com:ccle/moodle-local_metagroups.git

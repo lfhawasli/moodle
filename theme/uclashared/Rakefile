@@ -29,7 +29,8 @@ task :build_js do
     # JS files to copy
     js_files = ["#{theme_package_dir}/semantic/ui/build/minified/modules/sidebar.min.js",
                 "#{theme_package_dir}/semantic/ui/build/minified/modules/accordion.min.js",
-                "#{theme_package_dir}/headroom.js/dist/headroom.min.js"]
+                "#{theme_package_dir}/headroom.js/dist/headroom.min.js",
+                "#{theme_package_dir}/salvattore/dist/salvattore.min.js"]
 	
     puts "Building theme js".brown
 

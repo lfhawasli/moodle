@@ -44,7 +44,7 @@ class block_ucla_my_sites extends block_base {
      * @return object
      */
     public function get_content() {
-        global $USER, $CFG, $OUTPUT;
+        global $USER, $CFG, $OUTPUT, $PAGE;
 
         if($this->content !== NULL) {
             return $this->content;
@@ -72,7 +72,14 @@ class block_ucla_my_sites extends block_base {
             
             return $this->content;
         }
-        
+
+        // Render favorite UCLA support tools.
+        if (has_capability('local/ucla_support_tools:view', context_system::instance())) {
+            $render = $PAGE->get_renderer('local_ucla_support_tools');
+            $content[] = $render->mysites_favorites();
+            $content[] = $OUTPUT->single_button(new moodle_url('/local/ucla_support_tools'), get_string('mysiteslink', 'local_ucla_support_tools'));
+        }
+
         // NOTE: this thing currently takes the term in the get param...
         // so you may have some strange behavior if this block is not
         // in the my-home page...

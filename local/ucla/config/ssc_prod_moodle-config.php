@@ -251,6 +251,7 @@ $CFG->forced_plugin_settings['url']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['url']['displayoptions'] = '0,1,2,3,4,5,6';    // allow every option
 $CFG->forced_plugin_settings['url']['printheading'] = 1;
 $CFG->forced_plugin_settings['url']['display'] = 3; // RESOURCELIB_DISPLAY_NEW
+$CFG->forced_plugin_settings['url']['enableuservar'] = 0;
 
 // Site administration > Plugins > Assignment plugins > Submission plugins > File submissions
 $CFG->forced_plugin_settings['assignsubmission_file']['maxbytes'] = 104857600;   // 100MB

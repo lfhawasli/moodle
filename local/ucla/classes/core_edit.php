@@ -17,8 +17,9 @@
 /**
  * Class to contain miscellaneous methods used in Moodle core edits.
  *
- * @package    local_ucla
- * @copyright  2014 UC Regents
+ * @package local_ucla
+ * @copyright 2014 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -26,10 +27,35 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class file.
  *
- * @package    local_ucla
- * @copyright  2014 UC Regents
+ * @package local_ucla
+ * @copyright 2014 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_core_edit {
+    /**
+     * Caches subject area lookups.
+     * @var array
+     */
+    public static $profilecategorycached = array();
+
+    /**
+     * Stores collaboration site listing.
+     * @var array
+     */
+    public static $profilecollabsites = array();
+
+    /**
+     * Stores Registrar site listing.
+     * @var array
+     */
+    public static $profilesrscourses = array();
+
+    /**
+     * If set, will display a link to view all courses.
+     * @var string
+     */
+    public static $profileviewmore = '';
+
     /**
      * Returns an array of users who only the ability to grade only at the course
      * context. Moodle normally displays all users who have the ability to grade,
@@ -48,5 +74,146 @@ class local_ucla_core_edit {
         }
         return get_users_by_capability(context_course::instance($course->id),
                 'mod/assign:grade', '', '', '', '', $groupid, '', false);
+    }
+
+    /**
+     * Add the course that we're currently on to the list.
+     *
+     * @param mixed $courseinfo If false, then course is collab, else has term,
+     *                          subject area, catalog number, and section.
+     * @param string $cfullname
+     */
+    public static function profile_add_current_course_to_list($courseinfo, $cfullname) {
+        if (!empty($courseinfo)) {
+            list($term, $subjarearea, $catalognum, $section) = $courseinfo;
+            self::$profilesrscourses[$term][$subjarearea][$catalognum][$section] = $cfullname;
+        } else {
+            self::$profilecollabsites[$cfullname] = $cfullname;
+        }
+    }
+
+    /**
+     * Add a different course than the one we're currently on to the list.
+     *
+     * @param mixed $courseinfo If false, then course is collab, else has term,
+     *                          subject area, catalog number, and section.
+     * @param moodle_url $url
+     * @param string $cfullname     Full name for course context.
+     * @param array $linkattributes
+     */
+    public static function profile_add_other_course_to_list($courseinfo, $url, $cfullname, $linkattributes) {
+        if (!empty($courseinfo)) {
+            list($term, $subjarearea, $catalognum, $section) = $courseinfo;
+            self::$profilesrscourses[$term][$subjarearea][$catalognum][$section]
+                    = html_writer::link($url, $cfullname, $linkattributes);
+        } else {
+            self::$profilecollabsites[$cfullname] = html_writer::link($url, $cfullname, $linkattributes);
+        }
+    }
+
+    /**
+     * Displays Registrar courses ordered by term, subject area, and course name.
+     * Displays collaboration sites into alphabetical list.
+     */
+    public static function profile_display_formatted_courses() {
+        // Sort the courses by term, department, and course name.
+        self::profile_sort_courses();
+
+        // Display SRS courses.
+        foreach (self::$profilesrscourses as $term => $department) {
+            echo html_writer::tag('dd', $term);
+            foreach ($department as $departmentname => $courses) {
+                echo html_writer::start_tag('dd');
+                echo html_writer::start_tag('ul');
+                echo html_writer::tag('span', $departmentname);
+                echo html_writer::alist($courses, array(), 'ul');
+                echo html_writer::end_tag('ul');
+                echo html_writer::end_tag('dd');
+            }
+        }
+
+        // Display collab sites.
+        if (!empty(self::$profilecollabsites)) {
+            echo html_writer::tag('dd', get_string('collab_viewall', 'block_ucla_browseby'));
+            echo html_writer::start_tag('dd');
+            echo html_writer::alist(self::$profilecollabsites, array(), 'ul');
+            echo html_writer::end_tag('dd');
+        }
+
+        // Display a link to view more courses if all courses are not shown.
+        if (!empty(self::$profileviewmore)) {
+            echo html_writer::tag('dd', self::$profileviewmore);
+        }
+    }
+
+    /**
+     * Given a course ID, retrieve the course's number, term, and department.
+     * 
+     * @param int $courseid
+     */
+    public static function profile_get_course_info($courseid) {
+        global $DB;
+
+        // Ignore if the course we are processing is a collab site.
+        if (is_collab_site($courseid)) {
+            return false;
+        }
+
+        $term = $subjectarea = $catalognum = null;
+        $courseinfos = ucla_get_course_info($courseid);
+        foreach ($courseinfos as $courseinfo) {
+            if ($courseinfo->hostcourse == 1) {
+                $term       = $courseinfo->term;
+                $catalognum = $courseinfo->crsidx;
+                $section    = $courseinfo->classidx;
+                // Check if the category was already queried for before doing another DB lookup.
+                if (!isset(self::$profilecategorycached[$courseinfo->subj_area])) {
+                    $subjareafull = $DB->get_field('ucla_reg_subjectarea', 'subj_area_full',
+                            array('subjarea' => $courseinfo->subj_area));
+                    self::$profilecategorycached[$courseinfo->subj_area] = ucla_format_name($subjareafull);
+                }
+                $subjectarea = self::$profilecategorycached[$courseinfo->subj_area];
+                break;
+            }
+        }
+
+        return array($term, $subjectarea, $catalognum, $section);
+    }
+
+    /**
+     * Sorts the $profilesrscourses and $profilecollabsites arrays.
+     */
+    public static function profile_sort_courses() {
+        // Sort the terms in reverse chronological order.
+        $sortedcourses = terms_arr_sort(array_keys(self::$profilesrscourses), true);
+        foreach (self::$profilesrscourses as $term => $subjectarea) {
+            $sortedcourses[$term] = $subjectarea;
+        }
+        // Convert the terms into a nice format.
+        foreach ($sortedcourses as $term => $subjectarea) {
+            $sortedcourses[ucla_term_to_text($term)] = $subjectarea;
+            unset($sortedcourses[$term]);
+        }
+
+        // Sort by subject area, course number, and section.
+        foreach ($sortedcourses as $term => &$subjectarea) {
+            ksort($subjectarea);
+            foreach ($subjectarea as $index => $courses) {
+                ksort($courses);                
+                // Sort by section and then flatten array.
+                $termsubjectcourses = array();
+                foreach ($courses as &$sections) {
+                    ksort($sections);
+                    foreach ($sections as $section) {
+                        $termsubjectcourses[] = $section;
+                    }
+                }
+                $sortedcourses[$term][$index] = $termsubjectcourses;
+            }
+        }
+        self::$profilesrscourses = $sortedcourses;
+
+        // Sort collaboration sites via title.
+        ksort(self::$profilecollabsites);
     }
 }

@@ -11,7 +11,8 @@
             "io",
             "arraylist",
             "moodle-local_ucla_support_tools-dragdrop",
-            "moodle-local_ucla_support_tools-filter"
+            "moodle-local_ucla_support_tools-filter",
+            "node-event-simulate"
         ]
     }
 }

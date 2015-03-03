@@ -412,24 +412,46 @@ function url_get_variable_options($config) {
         $options[get_string('miscellaneous')]['encryptedcode'] = get_string('encryptedcode');
     }
 
-    $options[get_string('user')] = array(
-        'userid'          => 'id',
-        'userusername'    => get_string('username'),
-        'useridnumber'    => get_string('idnumber'),
-        'userfirstname'   => get_string('firstname'),
-        'userlastname'    => get_string('lastname'),
-        'userfullname'    => get_string('fullnameuser'),
-        'useremail'       => get_string('email'),
-        'usericq'         => get_string('icqnumber'),
-        'userphone1'      => get_string('phone').' 1',
-        'userphone2'      => get_string('phone2').' 2',
-        'userinstitution' => get_string('institution'),
-        'userdepartment'  => get_string('department'),
-        'useraddress'     => get_string('address'),
-        'usercity'        => get_string('city'),
-        'usertimezone'    => get_string('timezone'),
-        'userurl'         => get_string('webpage'),
-    );
+    // START UCLA MOD: CCLE-5033 - Remove URL Variables section in URL resource
+//    $options[get_string('user')] = array(
+//        'userid'          => 'id',
+//        'userusername'    => get_string('username'),
+//        'useridnumber'    => get_string('idnumber'),
+//        'userfirstname'   => get_string('firstname'),
+//        'userlastname'    => get_string('lastname'),
+//        'userfullname'    => get_string('fullnameuser'),
+//        'useremail'       => get_string('email'),
+//        'usericq'         => get_string('icqnumber'),
+//        'userphone1'      => get_string('phone').' 1',
+//        'userphone2'      => get_string('phone2').' 2',
+//        'userinstitution' => get_string('institution'),
+//        'userdepartment'  => get_string('department'),
+//        'useraddress'     => get_string('address'),
+//        'usercity'        => get_string('city'),
+//        'usertimezone'    => get_string('timezone'),
+//        'userurl'         => get_string('webpage'),
+//    );
+    if ($config->enableuservar) {
+        $options[get_string('user')] = array(
+            'userid'          => 'id',
+            'userusername'    => get_string('username'),
+            'useridnumber'    => get_string('idnumber'),
+            'userfirstname'   => get_string('firstname'),
+            'userlastname'    => get_string('lastname'),
+            'userfullname'    => get_string('fullnameuser'),
+            'useremail'       => get_string('email'),
+            'usericq'         => get_string('icqnumber'),
+            'userphone1'      => get_string('phone').' 1',
+            'userphone2'      => get_string('phone2').' 2',
+            'userinstitution' => get_string('institution'),
+            'userdepartment'  => get_string('department'),
+            'useraddress'     => get_string('address'),
+            'usercity'        => get_string('city'),
+            'usertimezone'    => get_string('timezone'),
+            'userurl'         => get_string('webpage'),
+        );
+    }
+    // END UCLA MOD: CCLE-5033
 
     if ($config->rolesinparams) {
         $roles = role_fix_names(get_all_roles());

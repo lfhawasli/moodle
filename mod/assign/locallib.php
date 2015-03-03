@@ -518,6 +518,10 @@ class assign {
             $o .= $this->view_grading_page();
         } else if ($action == 'downloadall') {
             $o .= $this->download_submissions();
+        // START UCLA MOD: CCLE-4953 - Assignment download file names
+        } else if ($action == 'downloadalluid') {
+            $o .= $this->download_uid_submissions();
+        // END UCLA MOD: CCLE-4953
         } else if ($action == 'submit') {
             $o .= $this->check_submit_for_grading($mform);
         } else if ($action == 'grantextension') {
@@ -2550,6 +2554,112 @@ class assign {
         return $result;
     }
 
+    // START UCLA MOD: CCLE-4953 - Assignment download file names
+    /**
+     * Download a zip file of all assignment submissions.
+     * Behaves like download_submissions(), but zips student files into subfolders
+     * with their uid.
+     *
+     * @return string - If an error occurs, this will contain the error page.
+     */
+    protected function download_uid_submissions() {
+        global $CFG, $DB;
+
+        // More efficient to load this here.
+        require_once($CFG->libdir.'/filelib.php');
+
+        $this->require_view_grades();
+
+        $result = '';
+
+        // Blind marking must be turned off in order to show UIDs.
+        if ($this->is_blind_marking()) {
+            $header = new assign_header($this->get_instance(),
+                                        $this->get_context(),
+                                        '',
+                                        $this->get_course_module()->id,
+                                        get_string('downloadalluid', 'assign'));
+            $result .= $this->get_renderer()->render($header);
+            $result .= $this->get_renderer()->notification(get_string('isblindmarking', 'assign'));
+            $url = new moodle_url('/mod/assign/view.php', array('id'=>$this->get_course_module()->id,
+                                                                'action'=>'grading'));
+            $result .= $this->get_renderer()->continue_button($url);
+            $result .= $this->view_footer();
+        } else {
+            // Load all users with submit.
+            $students = get_enrolled_users($this->context, "mod/assign:submit", null, 'u.*', null, null, null,
+                            $this->show_only_active_users());
+
+            // Build a list of files to zip.
+            $filesforzipping = array();
+            $fs = get_file_storage();
+
+            $groupmode = groups_get_activity_groupmode($this->get_course_module());
+            // All users.
+            $groupid = 0;
+            $groupname = '';
+            if ($groupmode) {
+                $groupid = groups_get_activity_group($this->get_course_module(), true);
+                $groupname = groups_get_group_name($groupid).'-';
+            }
+
+            // Construct the zip file name.
+            $filename = clean_filename($this->get_course()->shortname . '-' .
+                                       $this->get_instance()->name . '-' .
+                                       $groupname.$this->get_course_module()->id . '.zip');
+
+            // Get all the files for each student.
+            foreach ($students as $student) {
+                $userid = $student->id;
+
+                if ((groups_is_member($groupid, $userid) or !$groupmode or !$groupid)) {
+                    // Get the plugins to add their own files to the zip.
+
+                    if ($this->get_instance()->teamsubmission) {
+                        $submission = $this->get_group_submission($userid, 0, false);
+                    } else {
+                        $submission = $this->get_user_submission($userid, false);
+                    }
+
+                    if ($submission) {
+                        foreach ($this->submissionplugins as $plugin) {
+                            if ($plugin->is_enabled() && $plugin->is_visible()) {
+                                $pluginfiles = $plugin->get_files($submission, $student);
+                                foreach ($pluginfiles as $zipfilename => $file) {
+                                    $subfilename = clean_filename($zipfilename);
+                                    // Designate a path for the zipper to put the file.
+                                    $fullpath = clean_filename($student->idnumber) . '/' . $subfilename;
+                                    $filesforzipping[$fullpath] = $file;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (count($filesforzipping) == 0) {
+                $header = new assign_header($this->get_instance(),
+                                            $this->get_context(),
+                                            '',
+                                            $this->get_course_module()->id,
+                                            get_string('downloadalluid', 'assign'));
+                $result .= $this->get_renderer()->render($header);
+                $result .= $this->get_renderer()->notification(get_string('nosubmission', 'assign'));
+                $url = new moodle_url('/mod/assign/view.php', array('id'=>$this->get_course_module()->id,
+                                                                        'action'=>'grading'));
+                $result .= $this->get_renderer()->continue_button($url);
+                $result .= $this->view_footer();
+            } else if ($zipfile = $this->pack_files($filesforzipping)) {
+                \mod_assign\event\all_submissions_downloaded::create_from_assign($this)->trigger();
+                // Send file and delete after sending.
+                send_temp_file($zipfile, $filename);
+                // We will not get here - send_temp_file calls exit.
+            }
+        }
+        return $result;
+    }
+    // END UCLA MOD: CCLE-4953
+
     /**
      * Util function to add a message to the log.
      *
@@ -3042,6 +3152,11 @@ class assign {
         if ($this->is_any_submission_plugin_enabled() && $this->count_submissions()) {
             $downloadurl = '/mod/assign/view.php?id=' . $cmid . '&action=downloadall';
             $links[$downloadurl] = get_string('downloadall', 'assign');
+            // START UCLA MOD: CCLE-4953 - Assignment download file names
+            // Add 'Download all submissions (UID format)' to grading table dropdown
+            $downloaduidurl = '/mod/assign/view.php?id=' . $cmid . '&action=downloadalluid';
+            $links[$downloaduidurl] = get_string('downloadalluid', 'assign');
+            // END UCLA MOD: CCLE-4953
         }
         if ($this->is_blind_marking() &&
                 has_capability('mod/assign:revealidentities', $this->get_context())) {

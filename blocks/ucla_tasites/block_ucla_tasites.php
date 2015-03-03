@@ -6,6 +6,7 @@ require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/enrol/meta/locallib.php');
+require_once($CFG->dirroot . '/local/metagroups/locallib.php');
 
 /**
  *  Class that contains the library of function calls that control logic
@@ -390,6 +391,12 @@ class block_ucla_tasites extends block_base {
         ));
 
         enrol_meta_sync($course->id);
+        
+        // Sync groups from course site.
+        $trace = new null_progress_trace();
+        local_metagroups_sync($trace, $course->id);
+        $trace->finished();
+
         return $newcourse;
     }
 

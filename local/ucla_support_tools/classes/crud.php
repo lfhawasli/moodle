@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Abstract class that implements CRUD operations for UCLA support tools.
  */
@@ -58,7 +60,7 @@ abstract class local_ucla_support_tools_crud {
         // Map fields to properties
         foreach ($data as $k => $val) {
             if (in_array($k, $validprops)) {
-                $this->{$k} = $val;
+                $this->{$k} = trim($val);
             }
         }
     }
@@ -132,7 +134,7 @@ abstract class local_ucla_support_tools_crud {
     public static function fetch_all() {
         global $DB;
 
-        $records = $DB->get_records(static::TABLE);
+        $records = $DB->get_records(static::TABLE, null, 'name ASC');
 
         $all = array();
 

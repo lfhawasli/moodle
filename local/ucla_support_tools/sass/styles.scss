@@ -22,8 +22,10 @@
  */
 
 @import "compass";
+@import "lib";
 @import "color_picker";
 @import "dialog";
+@import "salvattore";
 
 .ucla-support-tool-alltools,
 .ucla-support-tool-category-list {
@@ -38,16 +40,38 @@
 }
 .ucla-support-category {
     
-    border: 1px solid #d1d4d5;
-    background-color: #E6E9EB;
+    border: 2px solid #ecf0f1;
+    background-color: #ecf0f1;
     width: 100%;
     overflow: hidden;
     min-height: 100px;
-    
+
     @include border-radius(2px);
     
-    .ucla-support-category-wrapper {
-        border-left: 4px solid #ddd;
+    &:hover {
+        border-color: #bdc3c7;
+    }
+    .cat-title {
+        padding: 6px;
+        font-size: 1.3rem !important;
+        font-size: 1.4rem;
+        text-transform: uppercase;
+        font-weight: 300;
+        margin: 4px 0 12px;
+        color: #55585d;
+    }
+    .cat-color {
+        display: inline-block;
+        float: left;
+        width: 25px;
+        height: 25px;
+        background-color: #ddd;
+        border: 2px solid #fff;
+        margin-right: 4px;
+        margin-top: 4px;
+        margin-left: 4px;
+        
+        @include border-radius(50%);
     }
     .ucla-support-category-body {
         clear: both;
@@ -89,7 +113,10 @@
         }
         
         &:nth-child(2n) .ucla-support-tool {
-            background-color: #f0f3f5;
+            background-color: #ebeef0;
+            .body {
+                background-color: #f7fafc;
+            }
         }
         
         &:last-child .ucla-support-tool {
@@ -116,60 +143,70 @@
     }
 }
 
-.ucla-support-category-header {
-    padding: 6px;
-    background-color: #24596b;
-    font-size: 1.3rem !important;
-    border-left: 10px solid #24596b;
-    font-size: 1.4rem;
-    text-transform: uppercase;
-    font-weight: 300;
-    margin: 0 0 8px;
-    color: #eee;
-    display: inline-block;
-
-    @include box-shadow(#ddd 2px 2px 4px);
-
-    i {
-        color: white;
-        float: right;
-        margin-left: 8px;
-    }
-}
-
 .ucla-support-tool-category-labels {
-    text-align: right;
+    margin-bottom: 20px;
     
+    ul {
+        margin: 0;
+    }
     li {
         list-style: none;
+        margin-bottom: 2px;
     }
-    .ucla-support-category-header {
-        border-right: 10px solid #24596b;
-        padding: 0 8px;
-        
-        @include box-shadow(0 0 0 0);
+    
+    .category-label {
+        background-color: #ecf0f1;
+        padding: 8px;
+        font-size: 1.4rem;
+        text-transform: uppercase;
+        font-weight: 300;
+        color: #55585D;
         
         label {
             margin: 0;
-            display: inline-block;
-            padding: 8px 0;
+            display: block;
+            padding: 4px 0;
+            font-weight: 300;
+            cursor: pointer;
+            
             i {
                 display: inline;
                 padding: 3px 0;
+                margin-left: 4px;
+                float: right;
             }
         }
         &:hover {
-            background-color: lighten(#173945, 20%);
-            border-right-color: lighten(#24596b, 5%);
+            background-color: #95a5a6;
+            color: white;
         }
         &.selected {
-            border-right: 10px solid #eee;
-            background-color: #6c97a6;
+            
+            background-color: lighten(#ecf0f1, 4%);
+            &:hover {
+                background-color: lighten(#95a5a6, 2%);
+            }
         }
         input[type="checkbox"] {
             display: none;
         }
+        .cat-color {
+            width: 25px;
+            height: 25px;
+            background-color: #ddd;
+            display: inline-block;
+            float: left;
+            border: 2px solid white;
+            margin-right: 8px;
+            
+            @include border-radius(50%);
+        }
+        .edit {
+            @extend %edit;
+            margin-top: 4px;
+        }
     }
+
 }
 
 .ucla-support-label {
@@ -177,8 +214,9 @@
 }
 
 .ucla-support-tool {
-    padding: 6px;
     border: 1px solid #D1D7DA;
+    border-left-color: #e6ecf0;
+    border-top-color: #e6ecf0;
     font-weight: 300;
     background-color: white;
     margin: 4px;
@@ -187,40 +225,36 @@
     @include box-shadow(#D1D7DA 1px 1px 3px);
     @include border-radius(2px);
     
-    .ucla-support-tool-title {
+    &:hover {
+        border-color: #16a085;
+    }
+
+    .title {
         margin: 0;
-        padding: 4px;
+        padding: 12px 8px;
         display: inline-block;
         width: 100%;
+
         a {
             color: #111;
+            display: inline;
         }
-        i {
-            color: #f84b00;
+        a[data-action="favorite"] {
+            color: #eb6b2d;
             float: right;
-            margin-left: 8px;
-            margin-top: 4px;
         }
     }
-    
-    .ucla-support-tool-body {
+    .body {
         color: #444;
-        padding: 8px;
-        margin: 4px;
-        background-color: #e1e8eb;
+        padding: 16px;
+        background-color: #eaf1f5;
         
         blockquote {
             border-left-color: #85a2ae;
             font-size: 1.2rem;
         }
     }
-    
-    a.ucla-support-tool-link {
-        width: 100%;
-        display: inline-block;
-    }
-    
-    .ucla-support-tool-tags {
+    .tool-tags {
         margin: 4px 0;
         
         li {
@@ -229,24 +263,78 @@
             float: left;
         }
     }
-}
+    .tool-cats {
+        padding: 8px;
+        text-align: right;
+        
+        .ucla-support-category & {
+            display: none;
+        }
+        
+        &:before {
+            content: "categories";
+            float: left;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+        
+        .cat-color {
+            width: 20px;
+            height: 20px;
+            background-color: #ddd;
+            display: inline-block;
+            
+            @include border-radius(50%);
+        }
+    }
+    
+    .edit {
+        @extend %edit;
 
-.ucla-support-tool-alltools {
-    a[data-action="remove"] {
-        display: none;
+        a[data-action="remove"] {
+            .ucla-support-tool-alltools & {
+                display: none;
+            }
+        }
+        a[data-action="edit"],
+        a[data-action="delete"] {
+            .ucla-support-category & {
+                display: none;
+            }
+        }
     }
 }
-.ucla-support-tool-category-list,
-.ucla-support-tool-alltools {
+
+.ucla-support-tool-grid {
+    ul {
+        margin-left: 0;
+    }
     li.hidden {
         display: none;
         visibility: hidden;
     }
 }
 
+.ucla-support-tool-category-list {
+    
+    li.collapsed {
+        width: 38px;
+        min-width: 30px;
+
+        .ucla-support-tool-grid {
+            display: none;
+        }
+        .ucla-support-category {
+            .cat-title {
+                display: none;
+            }
+            min-height: 40px;
+        }
+    }
+}
+
 .ucla-support-tool-filter {
     text-align: center;
-    
     .form-control {
         width: 50%;
     }
@@ -256,7 +344,46 @@
     background-color: #f5f5f5;
     border-bottom: 1px solid #eee;
     border-top: 1px solid #eee;
-    padding: 16px 0 0;
+    /*padding: 16px 0 0;*/
     text-align: center;
     margin-bottom: 16px;
+    
+    .form-group {
+        margin: 15px 0;
+    }
+}
+
+.ucla-support-tools-mysites-favorites {
+    ul {
+        margin-left: 0;
+    }
+    li {
+        list-style: none;
+        display: inline-block;
+        vertical-align: top;
+    }
+    .ucla-support-tool {
+        border: 0;
+        max-width: 200px;
+        width: 200px;
+        
+        .body,
+        .title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0;
+        }
+        .body {
+            height: 20px;
+            background-color: #fff;
+            padding-left: 20px;
+        }
+
+        @include box-shadow(0 0 0 0);
+    }
+    .fa {
+        margin-right: 4px;
+        color: #eb6b2d
+    }
 }

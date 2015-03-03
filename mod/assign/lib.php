@@ -240,6 +240,11 @@ function assign_extend_settings_navigation(settings_navigation $settings, naviga
 
         $link = new moodle_url('/mod/assign/view.php', array('id' => $cm->id, 'action'=>'downloadall'));
         $node = $navref->add(get_string('downloadall', 'assign'), $link, navigation_node::TYPE_SETTING);
+
+        // START UCLA MOD: CCLE-4953 - Assignment download file names
+        $link = new moodle_url('/mod/assign/view.php', array('id' => $cm->id, 'action'=>'downloadalluid'));
+        $node = $navref->add(get_string('downloadalluid', 'assign'), $link, navigation_node::TYPE_SETTING);
+        // END UCLA MOD: CCLE-4953
     }
 
     if (has_capability('mod/assign:revealidentities', $context)) {

@@ -28,9 +28,11 @@ defined('MOODLE_INTERNAL') || die();
  * Load existing support tools into database.
  */
 function xmldb_local_ucla_support_tools_install() {
-    load_report_uclastats();
-    load_tool_uclaroles();
-    load_tool_uclasupportconsole();
+    if (!PHPUNIT_TEST) {
+        load_report_uclastats();
+        load_tool_uclaroles();
+        load_tool_uclasupportconsole();
+    }
 }
 
 /**

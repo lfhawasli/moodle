@@ -318,6 +318,9 @@ if (!isset($hiddenfields['mycourses'])) {
                 context_helper::preload_from_record($mycourse);
                 $ccontext = context_course::instance($mycourse->id);
                 $cfullname = $ccontext->get_context_name(false);
+                // START UCLA MOD: CCLE-2184 - Clean up course listings under "profile"
+                $courseinfo = local_ucla_core_edit::profile_get_course_info($mycourse->id);
+                // END UCLA MOD: CCLE-2184
                 if ($mycourse->id != $course->id) {
                     $linkattributes = null;
                     if ($mycourse->visible == 0) {
@@ -331,22 +334,35 @@ if (!isset($hiddenfields['mycourses'])) {
                         $params['showallcourses'] = 1;
                     }
                     $url = new moodle_url('/user/view.php', $params);
-                    $courselisting .= html_writer::link($url, $ccontext->get_context_name(false), $linkattributes);
-                    $courselisting .= ', ';
+                    // START UCLA MOD: CCLE-2184 - Clean up course listings under "profile"
+                    // $courselisting .= html_writer::link($url, $ccontext->get_context_name(false), $linkattributes);
+                    // $courselisting .= ', ';
+                    local_ucla_core_edit::profile_add_other_course_to_list($courseinfo, $url, $cfullname, $linkattributes);
+                    // END UCLA MOD: CCLE-2184
                 } else {
-                    $courselisting .= $cfullname . ", ";
+                    // START UCLA MOD: CCLE-2184 - Clean up course listings under "profile"
+                    // $courselisting .= $cfullname . ", ";
+                    local_ucla_core_edit::profile_add_current_course_to_list($courseinfo, $cfullname);
+                    // END UCLA MOD: CCLE-2184
                     $PAGE->navbar->add($cfullname);
                 }
             }
             $shown++;
             if (!$showallcourses && $shown >= 20) {
                 $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $courseid, 'showallcourses' => 1));
-                $courselisting .= html_writer::link($url, '...', array('title' => get_string('viewmore')));
+                // START UCLA MOD: CCLE-2184 - Clean up course listings under "profile"
+                // $courselisting .= html_writer::link($url, '...', array('title' => get_string('viewmore')));
+                local_ucla_core_edit::$profileviewmore = html_writer::link($url, get_string('viewmore'), array('title' => get_string('viewmore')));
+                // END UCLA MOD: CCLE-2184
                 break;
             }
         }
         echo html_writer::tag('dt', get_string('courseprofiles'));
-        echo html_writer::tag('dd', rtrim($courselisting, ', '));
+        // START UCLA MOD: CCLE-2184 - Clean up course listings under "profile"
+        // echo html_writer::tag('dd', rtrim($courselisting, ', '));
+        // Format SRS courses and collab sites into lists.
+        local_ucla_core_edit::profile_display_formatted_courses();
+        // END UCLA MOD: CCLE-2184
     }
 }
 
