@@ -6952,20 +6952,21 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
     }
 
 
+    $adminroot = admin_get_root();
+    $error = '';
+    if (array_key_exists($fullname, $adminroot->errors)) {
+        $error = '<div><span class="error">' . $adminroot->errors[$fullname]->error . '</span></div>';
+    }
+
     $str = '
 <div class="form-item clearfix" id="admin-'.$setting->name.'">
   <div class="form-label">
     <label '.$labelfor.'>'.highlightfast($query, $title).$override.$warning.'</label>
     <span class="form-shortname">'.highlightfast($query, $name).'</span>
   </div>
-  <div class="form-setting">'.$form.$defaultinfo.'</div>
+  <div class="form-setting">'.$error.$form.$defaultinfo.'</div>
   <div class="form-description">'.highlight($query, markdown_to_html($description)).'</div>
 </div>';
-
-    $adminroot = admin_get_root();
-    if (array_key_exists($fullname, $adminroot->errors)) {
-        $str = '<fieldset class="error"><legend>'.$adminroot->errors[$fullname]->error.'</legend>'.$str.'</fieldset>';
-    }
 
     return $str;
 }
@@ -8424,7 +8425,7 @@ class admin_setting_configcolourpicker extends admin_setting {
             $content .= html_writer::empty_tag('input', array('type'=>'button','id'=>$this->get_id().'_preview', 'value'=>get_string('preview'), 'class'=>'admin_colourpicker_preview'));
         }
         $content .= html_writer::end_tag('div');
-        return format_admin_setting($this, $this->visiblename, $content, $this->description, false, '', $this->get_defaultsetting(), $query);
+        return format_admin_setting($this, $this->visiblename, $content, $this->description, true, '', $this->get_defaultsetting(), $query);
     }
 }
 
