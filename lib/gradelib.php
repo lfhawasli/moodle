@@ -699,10 +699,7 @@ function grade_format_gradevalue($value, &$grade_item, $localized=true, $display
             return grade_format_gradevalue_percentage($value, $grade_item, $decimals, $localized);
 
         case GRADE_DISPLAY_TYPE_LETTER:
-            // START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-            //return grade_format_gradevalue_letter($value, $grade_item);
-            return grade_format_gradevalue_letter($value, $grade_item, $decimals, $localized);
-            // END UCLA MOD: CCLE-4458
+            return grade_format_gradevalue_letter($value, $grade_item);
 
         case GRADE_DISPLAY_TYPE_REAL_PERCENTAGE:
             return grade_format_gradevalue_real($value, $grade_item, $decimals, $localized) . ' (' .
@@ -710,35 +707,23 @@ function grade_format_gradevalue($value, &$grade_item, $localized=true, $display
 
         case GRADE_DISPLAY_TYPE_REAL_LETTER:
             return grade_format_gradevalue_real($value, $grade_item, $decimals, $localized) . ' (' .
-            // START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-            //        grade_format_gradevalue_letter($value, $grade_item) . ')';
-            grade_format_gradevalue_letter($value, $grade_item, $decimals, $localized) . ')';
-            // END UCLA MOD: CCLE-4458
+                    grade_format_gradevalue_letter($value, $grade_item) . ')';
 
         case GRADE_DISPLAY_TYPE_PERCENTAGE_REAL:
             return grade_format_gradevalue_percentage($value, $grade_item, $decimals, $localized) . ' (' .
                     grade_format_gradevalue_real($value, $grade_item, $decimals, $localized) . ')';
 
         case GRADE_DISPLAY_TYPE_LETTER_REAL:
-            // START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-            //return grade_format_gradevalue_letter($value, $grade_item) . ' (' .
-            return grade_format_gradevalue_letter($value, $grade_item, $decimals, $localized) . ' (' .
-            // END UCLA MOD: CCLE-4458
+            return grade_format_gradevalue_letter($value, $grade_item) . ' (' .
                     grade_format_gradevalue_real($value, $grade_item, $decimals, $localized) . ')';
 
         case GRADE_DISPLAY_TYPE_LETTER_PERCENTAGE:
-            // START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-            //return grade_format_gradevalue_letter($value, $grade_item) . ' (' .
-            return grade_format_gradevalue_letter($value, $grade_item, $decimals, $localized) . ' (' .
-            // END UCLA MOD: CCLE-4458
+            return grade_format_gradevalue_letter($value, $grade_item) . ' (' .
                     grade_format_gradevalue_percentage($value, $grade_item, $decimals, $localized) . ')';
 
         case GRADE_DISPLAY_TYPE_PERCENTAGE_LETTER:
             return grade_format_gradevalue_percentage($value, $grade_item, $decimals, $localized) . ' (' .
-            // START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-            //        grade_format_gradevalue_letter($value, $grade_item) . ')';
-                    grade_format_gradevalue_letter($value, $grade_item, $decimals, $localized) . ')';
-            // END UCLA MOD: CCLE-4458
+                    grade_format_gradevalue_letter($value, $grade_item) . ')';
         default:
             return '';
     }
@@ -795,12 +780,7 @@ function grade_format_gradevalue_percentage($value, $grade_item, $decimals, $loc
  * @param object $grade_item Grade item object
  * @return string
  */
-
-// START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-//function grade_format_gradevalue_letter($value, $grade_item) {
-function grade_format_gradevalue_letter($value, $grade_item, $decimals, $localized) {
-// END UCLA MOD: CCLE-4458
-
+function grade_format_gradevalue_letter($value, $grade_item) {
     $context = context_course::instance($grade_item->courseid, IGNORE_MISSING);
     if (!$letters = grade_get_letters($context)) {
         return ''; // no letters??
@@ -812,11 +792,6 @@ function grade_format_gradevalue_letter($value, $grade_item, $decimals, $localiz
 
     $value = grade_grade::standardise_score($value, $grade_item->grademin, $grade_item->grademax, 0, 100);
     $value = bounded_number(0, $value, 100); // just in case
-
-    // START UCLA MOD: CCLE-4458 - Letter grade range mismatch with calculated grade in Gradebook
-    $value = format_float($value, $decimals, $localized);
-    // END UCLA MOD: CCLE-4458
-
     foreach ($letters as $boundary => $letter) {
         if ($value >= $boundary) {
             return format_string($letter);
