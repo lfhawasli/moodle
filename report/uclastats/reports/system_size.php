@@ -105,8 +105,8 @@ class system_size extends uclastats_base {
         // Get size of database in bytes.
         $sql = "SELECT SUM(data_length + index_length)
                   FROM information_schema.tables
-                 WHERE table_schema = 'moodle'";
-        $retval['database_size'] = display_size($DB->get_field_sql($sql));
+                 WHERE table_schema = ?";
+        $retval['database_size'] = display_size($DB->get_field_sql($sql, array($CFG->dbname)));
 
         return array($retval);
     }
