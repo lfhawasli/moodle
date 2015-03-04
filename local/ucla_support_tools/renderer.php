@@ -26,6 +26,13 @@
 class local_ucla_support_tools_renderer extends plugin_renderer_base {
     
     /**
+     * Caches edit mode check.
+     * 
+     * @var bool
+     */
+    private $editingcap;
+    
+    /**
      * Renders a category and all tools that belong to category.
      * 
      * @param \local_ucla_support_tools_category $category
@@ -91,7 +98,7 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         }
 
         // Tool editing.
-        if (has_capability('local/ucla_support_tools:edit', context_system::instance())) {
+        if ($this->is_editing()) {
             $delete = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-times-circle fa-lg')) . 'Delete', array('data-action' => 'delete', 'data-id' => $tool->get_id(), 'title' => 'Delete tool'));
             $remove = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-minus-circle fa-lg')) . 'Remove', array('data-action' => 'remove', 'data-id' => $tool->get_id(), 'title' => 'Remove tool from category'));
             $edit = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-pencil-square fa-lg')) . 'Edit', array('data-action' => 'edit', 'data-id' => $tool->get_id(), 'title' => 'Edit tool information'));
@@ -248,7 +255,7 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         $catcircle = html_writer::span('', 'cat-color', array('style' => 'background-color: #' . $cat->color));
 
         $out = '';
-        if (has_capability('local/ucla_support_tools:edit', context_system::instance())) {
+        if ($this->is_editing()) {
             // Button to delete category
             $delete = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-times-circle fa-lg')) . 'Delete',
                      array('data-action' => 'delete', 'data-id' => $cat->get_id(), 'title' => 'Delete category'));
@@ -279,7 +286,7 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
 
         $content[] = html_writer::tag('ul', implode("\n", $out));
 
-        if (has_capability('local/ucla_support_tools:edit', context_system::instance())) {
+        if ($this->is_editing()) {
             $content[] = html_writer::div($this->category_create_button());
         }
 
@@ -336,5 +343,20 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         }
         $list = html_writer::tag('ul', implode("\n", $cols));
         return html_writer::div($title . $list, 'ucla-support-tools-mysites-favorites');
+    }
+    
+    /**
+     * Checks if user can edit and is currently in editing mode.
+     * 
+     * @return bool
+     */
+    function is_editing() {
+        
+        if (!isset($this->editingcap)) {
+            $this->editingcap = has_capability('local/ucla_support_tools:edit', context_system::instance()) 
+                    && $this->page->user_is_editing();
+        }
+
+        return $this->editingcap;
     }
 }
