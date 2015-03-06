@@ -381,6 +381,9 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
         messageStyle: "none"
     });';
 
+// Site administration > Plugins > Filters > OID Wowza filter
+$CFG->filter_oidwowza_enable_mp4 = 1;
+
 // Site administration > Plugins > Filters > PoodLL Filter
 $CFG->filter_poodll_download_media_ok = '1';
 
