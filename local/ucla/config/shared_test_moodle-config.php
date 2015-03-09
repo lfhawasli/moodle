@@ -263,6 +263,7 @@ $CFG->forced_plugin_settings['folder']['requiremodintro'] = 0;
 
 // Site administration > Plugins > Activity modules > Forum
 $CFG->forum_enablerssfeeds = 1;
+$CFG->forum_enabletimedposts = 1;
 $CFG->forum_rsstype = 2;
 $CFG->forum_rssarticles = 5;
 
