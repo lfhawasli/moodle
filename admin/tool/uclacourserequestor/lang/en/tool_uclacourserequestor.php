@@ -9,7 +9,7 @@ $string['srslookup'] = "SRS number lookup (Registrar)";
 $string['registrarunavailable'] = 'The Registrar is unavailable, please try again later.';
 $string['fetch'] = 'Get courses from Registrar';
 $string['buildcourse'] = "Get course";
-$string['builddept'] = "Get department courses";
+$string['builddept'] = "Get subject area courses";
 
 $string['views'] = 'View existing requests';
 $string['viewcourses'] = "View/Edit existing requests";
@@ -34,7 +34,7 @@ $string['error'] = 'Some of the courses that you have requested have problems wi
 $string['warning'] = 'Some of the courses that you have requested have different values than default. Be sure to look over them if this message is unexpected.';
 $string['pasttermalert'] = 'The courses that you have requested are courses from a past term.';
 
-$string['all_department'] = 'All departments';
+$string['all_department'] = 'All subject areas';
 $string['all_action'] = 'All statuses';
 $string['all_srs'] = '';
 
