@@ -1,4 +1,4 @@
-@ucla @block_ucla_course_download @runme
+@ucla @block_ucla_course_download
 Feature: Alert students about course download feature
   As a student
   I want to be alerted that I can use the course download feature
@@ -28,6 +28,15 @@ Feature: Alert students about course download feature
     When I am on homepage
     And I follow "course 1"
     Then I should not see "Download course materials" in the "region-main" "region"
+
+  Scenario: Students see link in control panel during 10th week.
+    Given it is "10th" week
+    And I log in as "student1"
+    When I follow "course 1"
+    And I press "Control Panel"
+    Then I should see "Download course materials" in the "region-main" "region"
+    And I follow "Download course materials"
+    And I should see "UCLA course download" in the "region-main" "region"
 
    Scenario: Do not alert students in a course during 6th week.
      Given it is "6th" week

@@ -72,7 +72,7 @@ function student_zip_requestable($course) {
     }
 
     // Now see if we are 1 week before the quarter ends.
-    if ($currentweek == ($totalweeks - 1) || 
+    if ($currentweek >= ($totalweeks - 1) ||
             $currentweek === \block_ucla_weeksdisplay_session::WEEK_FINALS ||
             $currentweek === \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
         return true;
