@@ -8,7 +8,7 @@
 @import "font-awesome/scss/fixed-width";
 @import "font-awesome/scss/list";
 @import "font-awesome/scss/bordered-pulled";
-@import "font-awesome/scss/spinning";
+@import "font-awesome/scss/animated";
 @import "font-awesome/scss/rotated-flipped";
 @import "font-awesome/scss/stacked";
 @import "font-awesome/scss/icons";
@@ -21,6 +21,7 @@ $fa-font-path: "[[font:theme|";
   font-family: 'FontAwesome';
   src: url('#{$fa-font-path}fontawesome-webfont.eot]]');
   src: url('#{$fa-font-path}fontawesome-webfont.eot]]?#iefix') format('embedded-opentype'),
+    url('#{$fa-font-path}fontawesome-webfont.woff2]]') format('woff2'),
     url('#{$fa-font-path}fontawesome-webfont.woff]]') format('woff'),
     url('#{$fa-font-path}fontawesome-webfont.ttf]]') format('truetype'),
     url('#{$fa-font-path}fontawesome-webfont.svg]]#fontawesomeregular') format('svg');
