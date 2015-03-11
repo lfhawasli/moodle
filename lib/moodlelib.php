@@ -3156,11 +3156,20 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         }
     }
 
+    // Set the global $COURSE.
+    // TODO MDL-49434: setting current course/cm should be after the check $cm->uservisible .
+    if ($cm) {
+        $PAGE->set_cm($cm, $course);
+        $PAGE->set_pagelayout('incourse');
+    } else if (!empty($courseorid)) {
+        $PAGE->set_course($course);
+    }
+
+    // Check visibility of activity to current user; includes visible flag, groupmembersonly, conditional availability, etc.
     // START UCLA MOD: CCLE-3028 - Fix nonlogged users redirect on hidden content
     // If a user who is not logged in tries to access private course information
     //
-    // Check visibility of activity to current user; includes visible flag, groupmembersonly,
-    // conditional availability, etc
+    // Check visibility of activity to current user; includes visible flag, groupmembersonly, conditional availability, etc.
     if ($cm && !$cm->uservisible) {
         if ($preventredirect) {
             throw new require_login_exception('Activity is hidden');
@@ -3178,8 +3187,7 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
 
     /*
      * Replaced by CCLE-3028 Mod
-    // Check visibility of activity to current user; includes visible flag, groupmembersonly,
-    // conditional availability, etc
+    // Check visibility of activity to current user; includes visible flag, groupmembersonly, conditional availability, etc.
     if ($cm && !$cm->uservisible) {
         if ($preventredirect) {
             throw new require_login_exception('Activity is hidden');
@@ -3193,14 +3201,6 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     }
      *
      */
-
-    // Set the global $COURSE.
-    if ($cm) {
-        $PAGE->set_cm($cm, $course);
-        $PAGE->set_pagelayout('incourse');
-    } else if (!empty($courseorid)) {
-        $PAGE->set_course($course);
-    }
 
     // Finally access granted, update lastaccess times.
     user_accesstime_log($course->id);
