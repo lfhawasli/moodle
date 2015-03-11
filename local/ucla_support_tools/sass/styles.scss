@@ -126,6 +126,17 @@
         }
     }
     
+    &.favorites {
+        .cat-color {
+            background-color: #e67e22;
+        }
+        .ucla-support-tool {
+            .edit, .body {
+                display: none;
+            }
+        }
+    }
+    
     .ucla-support-tool {
         margin: auto 0;
         border: 0;
@@ -264,13 +275,13 @@
             display: inline;
         }
         a[data-action="favorite"] {
-            color: #eb982d;
+            color: #e67e22;
             float: right;
             margin-left: 4px;
             .fa-star-o {
                 color: #444;
                 &:hover {
-                    color: #eb982d;
+                    color: #e67e22;
                 }
             }
         }
@@ -295,7 +306,11 @@
             font-size: 1.2rem;
         }
     }
-
+    a.tool-docs-link {
+        float: right;
+        margin-left: 4px;
+        color: #7f8c8d;
+    }
     a[data-action="description"] {
         /*background-color: white;*/
         color: #444;

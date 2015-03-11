@@ -70,16 +70,17 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         $star = html_writer::link('', html_writer::tag('i', '', array('class' => "fa fa-lg $starstate")), array('data-action' => 'favorite', 'data-id' => $tool->get_id(), 'title' => $startitle));
 //        $chevron = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-chevron-down')), array('data-action' => 'options', 'data-id' => $tool->get_id(), 'title' => 'Options'));
 
+        $doclink = '';
+        if (!empty($tool->docs_url)) {
+            $doclink = html_writer::link(new moodle_url($tool->docs_url), html_writer::tag('i', '', array('class' => 'fa fa-file-text-o')), array('title' => $tool->docs_url, 'class' => 'tool-docs-link', 'target' => '_blank'));
+        }
+        
         $namelink = html_writer::link(new moodle_url($tool->url), $tool->name, array('title' => $tool->url, 'class' => 'tool-link'));
-        $out[] = html_writer::tag('h5', $star. $namelink, array('class' => 'title'));
+        $out[] = html_writer::tag('h5', $star . $doclink . $namelink, array('class' => 'title'));
 
         // Show description toggle.
         if (!empty($tool->description)) {
             $out[] = html_writer::link('', html_writer::tag('i', '', array('class' => "fa fa-info-circle fa-lg")), array('data-action' => 'description', 'data-id' => $tool->get_id(), 'title' => 'Show description'));
-        }
-
-        if (!empty($tool->docs_url)) {
-            $out[] = html_writer::link(new moodle_url($tool->docs_url), html_writer::tag('i', '', array('class' => 'fa fa-file')), array('title' => $tool->docs_url, 'class' => 'tool-docs-link', 'target' => '_blank'));
         }
 
         $cats = $tool->get_categories();
@@ -235,7 +236,7 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         }
 
         $catheader = html_writer::tag('h4', 'Favorites', array('class' => 'cat-title'));
-        $catcolor = html_writer::div('', 'cat-color', array('style' => 'background-color: #eb982d'));
+        $catcolor = html_writer::div('', 'cat-color');
         $ul = html_writer::tag('ul', implode("\n", $content));
         $catbody = html_writer::div($ul, 'ucla-support-category-body ucla-support-tool-grid');
 
