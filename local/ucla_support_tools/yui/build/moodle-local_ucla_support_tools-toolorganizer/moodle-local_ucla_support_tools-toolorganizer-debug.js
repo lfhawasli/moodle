@@ -92,6 +92,13 @@ M.local_ucla_support_tools.toolorganizer = {
             this.edit_tool(id);
 
         }, 'a[data-action="edit"]', this);
+
+        // Set up delegate for description toggle.
+        Y.one('.ucla-support-tool-alltools ul').delegate('click', function (e) {
+            e.preventDefault();
+            e.currentTarget.ancestor('.ucla-support-tool').toggleClass('expanded');
+
+        }, 'a[data-action="description"]', this);
     },
     create_tag_input: function (node, tags) {
 

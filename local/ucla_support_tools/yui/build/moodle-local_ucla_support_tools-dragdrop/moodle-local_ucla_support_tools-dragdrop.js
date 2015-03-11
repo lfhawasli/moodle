@@ -29,7 +29,7 @@ M.local_ucla_support_tools.dragdrop = {
 
     init: function () {
 
-        var drop_nodes = Y.all('.ucla-support-category');
+        var drop_nodes = Y.all('.ucla-support-category:not(.favorites)');
 
         var del = new Y.DD.Delegate({
             container: '.ucla-support-tool-alltools ul',
