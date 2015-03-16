@@ -1,7 +1,0 @@
-{
-    "moodle-atto_poodll-button": {
-        "requires": [
-            "moodle-editor_atto-plugin"
-        ]
-    }
-}
