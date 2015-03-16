@@ -209,7 +209,7 @@ class instructor_handler extends browseby_handler {
             }
 
             $s .= block_ucla_browseby_renderer::ucla_custom_list_render(
-                $lettertable, 0, 1, 'flattened-list');
+                $lettertable, 0, 1, 'instructor-list');
 
             if ($letter !== null) {
                 $table = $this->list_builder_helper($users, 'userid',
