@@ -267,7 +267,7 @@
         padding: 12px 8px;
         display: inline-block;
         width: 100%;
-        padding-bottom: 22px;
+        /*padding-bottom: 22px;*/
         background-color: lighten(#d7e2ee, 10%);
         
         a {
@@ -312,14 +312,10 @@
         color: #7f8c8d;
     }
     a[data-action="description"] {
-        /*background-color: white;*/
         color: #444;
         float: left;
         margin-left: 4px;
-        padding: 4px;
-        position: relative;
-        top: -10px;
-        /*height: 25px;*/
+        padding: 8px;
         text-align: center;
         text-transform: uppercase;
         
@@ -341,8 +337,6 @@
         text-align: right;
         float: right;
         display: inline-block;
-        position: relative;
-        top: -18px;
 
         .ucla-support-category & {
             display: none;
@@ -362,8 +356,6 @@
     .edit {
         @extend %edit;
         clear: both;
-        position: relative;
-        top: -18px;
         
         .ucla-support-category & {
             top: 0;
@@ -396,16 +388,11 @@
 .ucla-support-tool-category-list {
     
     li.collapsed {
-        width: 38px;
-        min-width: 30px;
 
         .ucla-support-tool-grid {
             display: none;
         }
         .ucla-support-category {
-            .cat-title {
-                display: none;
-            }
             min-height: 40px;
         }
     }

@@ -259,7 +259,7 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
             $out[] = html_writer::tag('li', $this->render($cat));
         }
 
-        return html_writer::tag('ul', implode("\n", $out));
+        return html_writer::tag('ul', implode("\n", $out), array('id' => 'cat-grid', 'data-columns' => '4'));
     }
 
     /**
