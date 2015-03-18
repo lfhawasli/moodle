@@ -37,6 +37,7 @@
     }
     
     // Front page layout overrides
+    &.course-search,
     .pagelayout-frontpage & {
         width: 100%;
         text-align: center;
@@ -46,6 +47,10 @@
         }
     }
     
+    fieldset + .well {
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
 }
 
 // Input box

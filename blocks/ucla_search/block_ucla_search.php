@@ -77,6 +77,12 @@ class block_ucla_search extends block_base {
             if (isset($searchparams['course'])) {
                 $course = $searchparams['course'];
             }
+            if (isset($searchparams['bytitle'])) {
+                $bytitle = $searchparams['bytitle'];
+            }
+            if (isset($searchparams['bydescription'])) {
+                $bydescription = $searchparams['bydescription'];
+            }
             if (!empty($searchparams['search'])) {
                 $searchterm = $searchparams['search'];
             }
@@ -113,13 +119,16 @@ class block_ucla_search extends block_base {
                         array('class' => 'checkbox-inline')
                         )
                 );
-        
+
+        $filterbywell = html_writer::div(
+                html_writer::span(get_string('filterby', 'block_ucla_search'), $visibility) . 
+                html_writer::tag('fieldset', $filtercheckboxes, array('class' => $visibility)), 
+                'well well-sm');
+
         $form = html_writer::tag('form', 
                     html_writer::span(get_string('show', 'block_ucla_search'), $visibility) .
                     html_writer::tag('fieldset', $checkboxes, array('class' => $visibility)) .
-                    $inputgroup .
-                    html_writer::span(get_string('filterby', 'block_ucla_search'), $visibility) .
-                    html_writer::tag('fieldset', $filtercheckboxes, array('class' => $visibility)), 
+                    $filterbywell . $inputgroup, 
                     array('class' => '', 'action' => $CFG->wwwroot . '/course/search.php')
                 );
         

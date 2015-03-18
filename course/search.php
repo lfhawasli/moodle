@@ -81,7 +81,7 @@ if (!empty($page)) {
 }
 // BEGIN UCLA MOD: CCLE-4187 - Add collab and course params to url
 //$PAGE->set_url('/course/search.php', $searchcriteria + $urlparams);
-$searchtype = array('collab' => $collab, 'course' => $course);
+$searchtype = array('collab' => $collab, 'course' => $course, 'bytitle' => $bytitle, 'bydescription' => $bydescription);
 $PAGE->set_url('/course/search.php', $searchtype + $searchcriteria + $urlparams);
 // END UCLA MOD: CCLE-4187
 $PAGE->set_context(context_system::instance());
@@ -131,7 +131,7 @@ if (file_exists($ucla_search) && empty($modulelist)) {
     $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
                         array(array('name' => 'frontpage-search')));
                        
-    echo block_ucla_search::search_form('frontpage-search', $searchcriteria + $searchtype);
+    echo block_ucla_search::search_form('course-search', $searchcriteria + $searchtype);
 
     // Get course/collab IDs which meet search criteria.
     $courses = get_courses_search($searchcriteria, "fullname ASC",
