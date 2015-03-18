@@ -774,7 +774,6 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     $collab_join = 'LEFT JOIN {ucla_siteindicator} AS si ON si.courseid = c.id ';
     $collab_and = "AND (si.type IS NULL OR (si.type NOT LIKE 'test' AND si.type NOT LIKE 'private'))";
     $collab_select = ', si.courseid as collabcheck';
-    $rest_limit = '';
     // CCLE-3948: Add registrar summary/description to corse info.
     // In this case (1), we don't want to include the ucla_reg_classinfo 
     // because we cannot do a JOIN conditon on all tables and get back collaboration
@@ -783,11 +782,6 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     $reg_join = '';
     $reg_select = '';
     
-    // Limit sql query results 
-    if(!empty($otherargs)) {
-        $rest_limit = 'LIMIT ' . $recordsperpage;
-    }
-
     // Handle case 2:
     if(empty($course) && !empty($collab)) {
         // Search only collab sites
@@ -931,8 +925,7 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
                    $ccjoin
              WHERE $searchcond AND c.id <> " . SITEID . "
                    $collab_and
-          ORDER BY $sort
-                   $rest_limit";
+          ORDER BY $sort";
     // END UCLA MOD CCLE-3948
 
     $rs = $DB->get_recordset_sql($sql, $params);
