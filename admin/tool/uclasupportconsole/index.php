@@ -25,6 +25,13 @@ admin_externalpage_setup('reportsupportconsole');
 require_login();
 require_capability('tool/uclasupportconsole:view', context_system::instance());
 
+// Set up a moodle page.
+$PAGE->set_url('/' . $CFG->admin . '/tool/uclasupportconsole/');
+$PAGE->set_context(context_system::instance());
+$PAGE->set_heading(get_string('pluginname', 'tool_uclasupportconsole'));
+$PAGE->set_pagetype('admin-*');
+$PAGE->set_pagelayout('admin');
+
 // The primary goal is to keep as much as possible in one script
 $consoles = new tool_supportconsole_manager();
 
