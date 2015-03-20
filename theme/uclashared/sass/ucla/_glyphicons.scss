@@ -7,6 +7,8 @@
 //
 // <a href="#"><span class="glyphicon glyphicon-star"></span> Star</a>
 
+// Need this in order to override default font location.
+$icon-font-path: "/theme/uclashared/fonts/";
 
 @import "bootstrap/glyphicons";
 

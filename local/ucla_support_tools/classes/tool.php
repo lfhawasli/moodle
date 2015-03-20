@@ -337,6 +337,24 @@ class local_ucla_support_tools_tool extends local_ucla_support_tools_crud implem
     }
 
     /**
+     * Fetching all tools should show favorite tools first.
+     * 
+     * @return array
+     */
+    public static function fetch_all() {
+        $tools = parent::fetch_all();
+        $favtools = array();
+
+        foreach ($tools as $k => $tool) {
+            if ($tool->is_favorite()) {
+                $favtools[] = $tool;
+                unset($tools[$k]);
+            }
+        }
+
+        return array_merge($favtools, $tools);
+    }
+    /**
      * Returns all favorite tools for current user.
      * 
      * @return type

@@ -28,7 +28,7 @@ M.local_ucla_support_tools.dragdrop = {
     init: function () {
         Y.log('Loading drag & drop', 'info', 'local_ucla_support_tools');
 
-        var drop_nodes = Y.all('.ucla-support-category');
+        var drop_nodes = Y.all('.ucla-support-category:not(.favorites)');
 
         var del = new Y.DD.Delegate({
             container: '.ucla-support-tool-alltools ul',

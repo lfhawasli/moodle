@@ -26,7 +26,7 @@
         }
     ],
     "require": {
-        "fortawesome/font-awesome": "4.1.0",
+        "fortawesome/font-awesome": "4.3.0",
         "twbs/bootstrap-sass": "3.2.0",
         "semantic/ui": "dev-master#b4d60ed52095ab923b81900337da7562470c20d2",
         "headroom.js": "0.7.0",

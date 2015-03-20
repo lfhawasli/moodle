@@ -114,6 +114,7 @@ if (has_capability('local/ucla_support_tools:edit', $context)) {
                 $name = clean_param($data->name, PARAM_TEXT);
                 $url = clean_param($data->url, PARAM_URL);
                 $desc = clean_param($data->desc, PARAM_TEXT);
+                $docs = clean_param($data->docsurl, PARAM_URL);
 
                 try {
                     $response['name'] = $name;
@@ -123,7 +124,8 @@ if (has_capability('local/ucla_support_tools:edit', $context)) {
                     $tool = \local_ucla_support_tools_tool::create(array(
                                 'name' => urldecode($name),
                                 'url' => $url,
-                                'description' => urldecode($desc)
+                                'description' => urldecode($desc),
+                                'docs_url' => $docs
                     ));
 
                     $output = $PAGE->get_renderer('local_ucla_support_tools');
@@ -148,11 +150,13 @@ if (has_capability('local/ucla_support_tools:edit', $context)) {
             $url = clean_param($data->url, PARAM_URL);
             $desc = clean_param($data->desc, PARAM_TEXT);
             $id = clean_param($data->id, PARAM_INT);
+            $docs = clean_param($data->docsurl, PARAM_URL);
             
             $tool = \local_ucla_support_tools_tool::fetch($id);
             $tool->name = $name;
             $tool->url = $url;
             $tool->description = $desc;
+            $tool->docs_url = $docs;
 
             $tool->update();
             
