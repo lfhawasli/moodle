@@ -27,6 +27,13 @@ M.local_ucla_support_tools.favorite = {
             var id = e.currentTarget.getAttribute('data-id');
             this.toggle_favorite(id);
         }, 'a[data-action="favorite"]', this);
+
+        // Set up delegate for description toggle.
+        Y.one('.ucla-support-tool-alltools ul').delegate('click', function (e) {
+            e.preventDefault();
+            e.currentTarget.ancestor('.ucla-support-tool').toggleClass('expanded');
+
+        }, 'a[data-action="description"]', this);
     },
     /**
      * Toggles the favorite state for a given tool.
