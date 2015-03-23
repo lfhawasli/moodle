@@ -761,16 +761,19 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     
     $collab = null;
     $course = null;
+    $bytitle = null;
+    $bydescription = null;
     
     if(!empty($otherargs)) {
         $collab = $otherargs['collab'];
         $course = $otherargs['course'];
+        $bytitle = $otherargs['bytitle'];
+        $bydescription = $otherargs['bydescription'];
     }
     
     $collab_join = 'LEFT JOIN {ucla_siteindicator} AS si ON si.courseid = c.id ';
     $collab_and = "AND (si.type IS NULL OR (si.type NOT LIKE 'test' AND si.type NOT LIKE 'private'))";
     $collab_select = ', si.courseid as collabcheck';
-    $rest_limit = '';
     // CCLE-3948: Add registrar summary/description to corse info.
     // In this case (1), we don't want to include the ucla_reg_classinfo 
     // because we cannot do a JOIN conditon on all tables and get back collaboration
@@ -779,11 +782,6 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     $reg_join = '';
     $reg_select = '';
     
-    // Limit sql query results 
-    if(!empty($otherargs)) {
-        $rest_limit = 'LIMIT ' . $recordsperpage;
-    }
-
     // Handle case 2:
     if(empty($course) && !empty($collab)) {
         // Search only collab sites
@@ -822,22 +820,42 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
     // BEGIN UCLA MOD CCLE-3948
     // Adding the registrar info to the concat list of fields to be searched on.
     if ($DB->get_dbfamily() == 'oracle') {
-        if (empty($reg_join)) {
-            $concat = "(c.summary|| ' ' || c.fullname || ' ' || c.idnumber || ' ' || c.shortname)";
-        } else {
-            $concat = "(c.summary|| ' ' || c.fullname || ' ' || c.idnumber || ' ' || c.shortname || ' ' || urci.crs_desc || ' ' || urci.crs_summary)";
+        $concatfields = array();
+        if ($bytitle) {
+            $concatfields[] = "c.fullname";
         }
+        if ($bydescription) {
+            $concatfields[] = "c.summary";
+            if (!empty($reg_join)) {
+                $concatfields[] = "urci.crs_desc";
+                $concatfields[] = "urci.crs_summary";
+            }
+        }
+        $concatfields[] = "c.idnumber";
+        $concatfields[] = "c.shortname";
+
+        $concat = "(" . implode(" || ' ' || ", $concatfields) . ")";
     } else {
-        if (empty($reg_join)) {
-            $concat = $DB->sql_concat("COALESCE(c.summary, '')", "' '", 'c.fullname', "' '", 'c.idnumber', "' '", 'c.shortname');
-        } else {
-            $concat = $DB->sql_concat("COALESCE(c.summary, '')", "' '",
-                                  'c.fullname', "' '",
-                                  'c.idnumber', "' '",
-                                  'c.shortname', "' '",
-                                  "COALESCE(urci.crs_desc, '')", "' '",
-                                  "COALESCE(urci.crs_summary, '')");
+        $concatfields = array();
+        if ($bytitle) {
+            $concatfields[] = "c.fullname";
+            $concatfields[] = "' '";
         }
+        if ($bydescription) {
+            $concatfields[] = "COALESCE(c.summary, '')";
+            $concatfields[] = "' '";
+            if (!empty($reg_join)) {
+                $concatfields[] = "COALESCE(urci.crs_desc, '')";
+                $concatfields[] = "' '";
+                $concatfields[] = "COALESCE(urci.crs_summary, '')";
+                $concatfields[] = "' '";
+            }
+        }
+        $concatfields[] = "c.idnumber";
+        $concatfields[] = "' '";
+        $concatfields[] = "c.shortname";
+        
+        $concat = call_user_func_array(array($DB,'sql_concat'), $concatfields);
     }
     // END UCLA MOD CCLE-3948
 
@@ -907,8 +925,7 @@ function get_courses_search($searchterms, $sort = 'fullname ASC', $page = 0, $re
                    $ccjoin
              WHERE $searchcond AND c.id <> " . SITEID . "
                    $collab_and
-          ORDER BY $sort
-                   $rest_limit";
+          ORDER BY $sort";
     // END UCLA MOD CCLE-3948
 
     $rs = $DB->get_recordset_sql($sql, $params);

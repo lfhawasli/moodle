@@ -11,6 +11,9 @@ $url = $CFG->wwwroot . '/course/view.php?id=';  // Base course URL
 $query = required_param('q', PARAM_TEXT);
 $collab_param = optional_param('collab', 0, PARAM_BOOL);
 $course_param = optional_param('course', 0, PARAM_BOOL);
+$title_param = optional_param('bytitle', 0, PARAM_BOOL);
+$desc_param = optional_param('bydescription', 0, PARAM_BOOL);
+
 $limit = optional_param('limit', SEARCH_MAX_LIMIT, PARAM_INT);
 
 // Ripped right out of the default search...
@@ -29,7 +32,7 @@ if ($search) {
 $limit = $limit > SEARCH_MAX_LIMIT ? SEARCH_MAX_LIMIT : $limit;
 
 $courses = get_courses_search($searchterms, 'fullname ASC', 0, $limit + 1, $totalcount, 
-        array('collab' => $collab_param, 'course' => $course_param));
+        array('collab' => $collab_param, 'course' => $course_param, 'bytitle' => $title_param, 'bydescription' => $desc_param));
 
 $totalcount = count($courses);
 
@@ -76,7 +79,8 @@ if(!empty($courses)) {
         $results[$limit]->shortname = '';
         $results[$limit]->text = get_string('more_results', 'block_ucla_search');
         $results[$limit]->summary = '';
-        $results[$limit]->url = $CFG->wwwroot . '/course/search.php?search=' . $search . '&collab=' . $collab_param . '&course=' . $course_param;
+        $results[$limit]->url = $CFG->wwwroot . '/course/search.php?search=' . $search . '&collab=' . $collab_param . '&course=' . $course_param . 
+                '&bytitle=' . $title_param . '&bydescription=' . $desc_param;
     }
     
 } else {

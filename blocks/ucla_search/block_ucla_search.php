@@ -39,16 +39,18 @@ class block_ucla_search extends block_base {
      * Print advanced search form html for various components.  Compatible 
      * with default moodle search if javascript of off.
      * 
-     * @global type $CFG
-     * @param type $type
+     * @param string $type
+     * @param array $searchparams
      * @return html
      */
-    static function search_form($type = 'block-search') {
+    static function search_form($type = 'block-search', $searchparams = null) {
         global $CFG;
         
-        // Default 
+        // Default.
         $collab = true;
         $course = true;
+        $bytitle = true;
+        $bydescription = true;
         $visibility = 'hidden';
         
         switch ($type) {
@@ -65,6 +67,26 @@ class block_ucla_search extends block_base {
             case 'block-search':
                 $visibility = '';
         }
+
+        // If search params were passed, then need to retain those settings.
+        $searchterm = null;
+        if (!empty($searchparams)) {
+            if (isset($searchparams['collab'])) {
+                $collab = $searchparams['collab'];
+            }
+            if (isset($searchparams['course'])) {
+                $course = $searchparams['course'];
+            }
+            if (isset($searchparams['bytitle'])) {
+                $bytitle = $searchparams['bytitle'];
+            }
+            if (isset($searchparams['bydescription'])) {
+                $bydescription = $searchparams['bydescription'];
+            }
+            if (!empty($searchparams['search'])) {
+                $searchterm = $searchparams['search'];
+            }
+        }
         
         $inputgroup = html_writer::empty_tag('input', 
                         array(
@@ -72,7 +94,8 @@ class block_ucla_search extends block_base {
                             'type' => 'text', 
                             'class' => 'form-control ucla-search-input', 
                             'name' => 'search',
-                            'placeholder' => get_string('placeholder', 'block_ucla_search')
+                            'placeholder' => get_string('placeholder', 'block_ucla_search'),
+                            'value' => $searchterm
                             ));
         
         $checkboxes = html_writer::div(
@@ -86,10 +109,26 @@ class block_ucla_search extends block_base {
                         )
                 );
         
+        $filtercheckboxes = html_writer::div(
+                html_writer::tag('label', 
+                        html_writer::checkbox('bytitle', 1, $bytitle) . ' ' . get_string('bytitle', 'block_ucla_search'),
+                        array('class' => 'checkbox-inline')
+                        ) . 
+                html_writer::tag('label', 
+                        html_writer::checkbox('bydescription', 1, $bydescription) . ' ' . get_string('bydescription', 'block_ucla_search'),
+                        array('class' => 'checkbox-inline')
+                        )
+                );
+
+        $filterbywell = html_writer::div(
+                html_writer::span(get_string('filterby', 'block_ucla_search'), $visibility) . 
+                html_writer::tag('fieldset', $filtercheckboxes, array('class' => $visibility)), 
+                'well well-sm');
+
         $form = html_writer::tag('form', 
                     html_writer::span(get_string('show', 'block_ucla_search'), $visibility) .
                     html_writer::tag('fieldset', $checkboxes, array('class' => $visibility)) .
-                    $inputgroup, 
+                    $filterbywell . $inputgroup, 
                     array('class' => '', 'action' => $CFG->wwwroot . '/course/search.php')
                 );
         

@@ -35,6 +35,10 @@ $tagid     = optional_param('tagid', '', PARAM_INT);   // searches for courses t
 $collab    = optional_param('collab', 0, PARAM_BOOL);
 $course    = optional_param('course', 0, PARAM_BOOL);
 // END UCLA MOD: CCLE-3948
+// START UCLA MOD: CCLE-4796 - Re-add search filter by title/description
+$bytitle    = optional_param('bytitle', 0, PARAM_BOOL);
+$bydescription    = optional_param('bydescription', 0, PARAM_BOOL);
+// END UCLA MOD: CCLE-4796
 
 // List of minimum capabilities which user need to have for editing/moving course
 $capabilities = array('moodle/course:create', 'moodle/category:manage');
@@ -75,7 +79,11 @@ if ($perpage !== 'all' && !($perpage = (int)$perpage)) {
 if (!empty($page)) {
     $urlparams['page'] = $page;
 }
-$PAGE->set_url('/course/search.php', $searchcriteria + $urlparams);
+// BEGIN UCLA MOD: CCLE-4187 - Add collab and course params to url
+//$PAGE->set_url('/course/search.php', $searchcriteria + $urlparams);
+$searchtype = array('collab' => $collab, 'course' => $course, 'bytitle' => $bytitle, 'bydescription' => $bydescription);
+$PAGE->set_url('/course/search.php', $searchtype + $searchcriteria + $urlparams);
+// END UCLA MOD: CCLE-4187
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $courserenderer = $PAGE->get_renderer('core', 'course');
@@ -123,12 +131,12 @@ if (file_exists($ucla_search) && empty($modulelist)) {
     $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
                         array(array('name' => 'frontpage-search')));
                        
-    echo block_ucla_search::search_form('frontpage-search');
+    echo block_ucla_search::search_form('course-search', $searchcriteria + $searchtype);
 
     // Get course/collab IDs which meet search criteria.
     $courses = get_courses_search($searchcriteria, "fullname ASC",
                                   $page, $perpage, $totalcount,
-                                  array('collab' => $collab, 'course' => $course));
+                                  $searchtype);
 
     // If there are no courses which match our search, display appropriate
     // message.
@@ -141,7 +149,7 @@ if (file_exists($ucla_search) && empty($modulelist)) {
     } else {    
         // Use the renderer to display the appropriate courses/collab sites.
         echo $courserenderer->heading(get_string('searchresults'). ": $totalcount");
-        echo $courserenderer->courses_list($courses, true, null, null, $totalcount, $page, $perpage);
+        echo $courserenderer->courses_list($courses, true, null, $PAGE->url, $totalcount, $page, $perpage);
     }
 } else {
     echo $courserenderer->search_courses($searchcriteria);
