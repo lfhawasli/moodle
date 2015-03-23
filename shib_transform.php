@@ -14,42 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// NOTE: This file is being included by auth/shibboleth/auth.php: get_userinfo
-// so there already exists an $result array.
+/**
+ * Does extra processing for Shibboleth variables.
+ *
+ * NOTE: This file is being included by auth/shibboleth/auth.php: get_userinfo
+ * so there already exists an $result array.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
-// Changing to retrieve displayname and if it exists, use it instead of 
-// official name.
-$displayname = array();
-if (isset($_SERVER['HTTP_SHIB_DISPLAYNAME'])) {
+$displayname = null;
+if (isset($_SERVER['HTTP_SHIB_EDUPERSONNICKNAME'])) {
+    // Handle preferred name by storing middle name.
+    if (isset($_SERVER['HTTP_UCLA_PERSON_MIDDLENAME'])) {
+        $result['middlename']  = $this->get_first_string(
+            $_SERVER['HTTP_UCLA_PERSON_MIDDLENAME']
+        );
+    }
+} else if (isset($_SERVER['HTTP_SHIB_DISPLAYNAME'])) {
+    // Use display name, instead of using given first and last name fields.
     $displayname = $this->get_first_string($_SERVER['HTTP_SHIB_DISPLAYNAME']);
-}
-
-if (!empty($displayname)) {
     $formattedname = format_displayname($displayname);
     $result['firstname'] = $formattedname['firstname'];
     $result['lastname'] = $formattedname['lastname'];
-} else {
-    // No display name, but use any middle or suffix name, if available.
-    if (isset($_SERVER['HTTP_UCLA_PERSON_MIDDLENAME'])) {
-        $middlename  = $this->get_first_string(
-            $_SERVER['HTTP_UCLA_PERSON_MIDDLENAME']
-        );
-        $middlename = ucla_format_name($middlename);
-        $result['firstname'] = $result['firstname'] . ' ' . $middlename;
-    }
+}
 
+if (empty($displayname)) {
+    // If display name isn't specified, then handle suffix by appending it to last name.
     if (isset($_SERVER['HTTP_SHIB_UCLAPERSONNAMESUFFIX'])) {
         $suffix = $this->get_first_string(
             $_SERVER['HTTP_SHIB_UCLAPERSONNAMESUFFIX']
         );
         $result['lastname'] .= ' ' . $suffix;
     }
-
-    $result['firstname'] = ucla_format_name($result['firstname']);
-    $result['lastname'] = ucla_format_name($result['lastname']);
 }
 
 $result['institution'] = str_replace("urn:mace:incommon:","", $result['institution']);
