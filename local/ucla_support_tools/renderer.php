@@ -26,6 +26,13 @@
 class local_ucla_support_tools_renderer extends plugin_renderer_base {
     
     /**
+     * Caches edit mode check.
+     * 
+     * @var bool
+     */
+    private $editingcap;
+    
+    /**
      * Renders a category and all tools that belong to category.
      * 
      * @param \local_ucla_support_tools_category $category
@@ -68,17 +75,19 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
             $startitle = 'Remove from favorites';
         }
         $star = html_writer::link('', html_writer::tag('i', '', array('class' => "fa fa-lg $starstate")), array('data-action' => 'favorite', 'data-id' => $tool->get_id(), 'title' => $startitle));
+//        $chevron = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-chevron-down')), array('data-action' => 'options', 'data-id' => $tool->get_id(), 'title' => 'Options'));
 
-        $namelink = html_writer::link(new moodle_url($tool->url), $tool->name, array('title' => $tool->url, 'class' => 'tool-link'));
-        $out[] = html_writer::tag('h5', $star. $namelink, array('class' => 'title'));
-
-        // Conditionally show the description.
-        if (!empty($tool->description)) {
-            $out[] = html_writer::div($tool->description, 'body');
-        }
-
+        $doclink = '';
         if (!empty($tool->docs_url)) {
-            $out[] = html_writer::link(new moodle_url($tool->docs_url), 'Docs' . html_writer::tag('i', '', array('class' => 'fa fa-question')), array('title' => $tool->docs_url, 'class' => 'ucla-support-tool-link-docs'));
+            $doclink = html_writer::link(new moodle_url($tool->docs_url), html_writer::tag('i', '', array('class' => 'fa fa-file-text-o')), array('title' => $tool->docs_url, 'class' => 'tool-docs-link', 'target' => '_blank'));
+        }
+        
+        $namelink = html_writer::link(new moodle_url($tool->url), $tool->name, array('title' => $tool->url, 'class' => 'tool-link'));
+        $out[] = html_writer::tag('h5', $star . $doclink . $namelink, array('class' => 'title'));
+
+        // Show description toggle.
+        if (!empty($tool->description)) {
+            $out[] = html_writer::link('', html_writer::tag('i', '', array('class' => "fa fa-info-circle fa-lg")), array('data-action' => 'description', 'data-id' => $tool->get_id(), 'title' => 'Show description'));
         }
 
         $cats = $tool->get_categories();
@@ -89,9 +98,12 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
             }
             $out[] = html_writer::div(implode("\n", $catout), 'tool-cats');
         }
-
+        // Conditionally show the description.
+        if (!empty($tool->description)) {
+            $out[] = html_writer::div($tool->description, 'body');
+        }
         // Tool editing.
-        if (has_capability('local/ucla_support_tools:edit', context_system::instance())) {
+        if ($this->is_editing()) {
             $delete = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-times-circle fa-lg')) . 'Delete', array('data-action' => 'delete', 'data-id' => $tool->get_id(), 'title' => 'Delete tool'));
             $remove = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-minus-circle fa-lg')) . 'Remove', array('data-action' => 'remove', 'data-id' => $tool->get_id(), 'title' => 'Remove tool from category'));
             $edit = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-pencil-square fa-lg')) . 'Edit', array('data-action' => 'edit', 'data-id' => $tool->get_id(), 'title' => 'Edit tool information'));
@@ -218,6 +230,27 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render a category that shows ONLY favorite tools.
+     * 
+     * @return string HTML
+     */
+    function favorite_category() {
+        $content = array();
+
+        $tools = \local_ucla_support_tools_tool::fetch_favorites();
+        foreach ($tools as $tool) {
+            $content[] = html_writer::tag('li', $this->render($tool));
+        }
+
+        $catheader = html_writer::tag('h4', 'Favorites', array('class' => 'cat-title'));
+        $catcolor = html_writer::div('', 'cat-color');
+        $ul = html_writer::tag('ul', implode("\n", $content));
+        $catbody = html_writer::div($ul, 'ucla-support-category-body ucla-support-tool-grid');
+
+        return html_writer::div($catcolor . $catheader . $catbody, 'ucla-support-category favorites', array('data-id' => 0, 'data-keyword' => 'favorites'));
+
+    }
+    /**
      * Renders all categories in an unordered list.
      * 
      * @return string renderable HTML
@@ -225,12 +258,15 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
     function categories() {
         $categories = \local_ucla_support_tools_category::fetch_all();
         $out = array();
-
+        
+        // Add favorites.
+        $out[] = html_writer::tag('li', $this->favorite_category());
+        // Add the rest.
         foreach ($categories as $cat) {
             $out[] = html_writer::tag('li', $this->render($cat));
         }
 
-        return html_writer::tag('ul', implode("\n", $out));
+        return html_writer::tag('ul', implode("\n", $out), array('id' => 'cat-grid', 'data-columns' => '4'));
     }
 
     /**
@@ -242,13 +278,13 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
     function category_label(\local_ucla_support_tools_category $cat) {
 
         $input = html_writer::empty_tag('input', array('type' => 'checkbox', 'name' => 'category-label-' . $cat->get_id(), 'id' => 'category-label-' . $cat->get_id(), 'data-id' => $cat->get_id(), 'checked' => 'true'));
-        $icon = html_writer::tag('i', '', array('class' => 'fa fa-minus-square'));
+        $icon = html_writer::tag('i', '', array('class' => 'fa fa-toggle-on fa-lg'));
         $label = html_writer::tag('label', $cat->name . $icon, array('for' => 'category-label-' . $cat->get_id()));
 
         $catcircle = html_writer::span('', 'cat-color', array('style' => 'background-color: #' . $cat->color));
 
         $out = '';
-        if (has_capability('local/ucla_support_tools:edit', context_system::instance())) {
+        if ($this->is_editing()) {
             // Button to delete category
             $delete = html_writer::link('', html_writer::tag('i', '', array('class' => 'fa fa-times-circle fa-lg')) . 'Delete',
                      array('data-action' => 'delete', 'data-id' => $cat->get_id(), 'title' => 'Delete category'));
@@ -279,7 +315,7 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
 
         $content[] = html_writer::tag('ul', implode("\n", $out));
 
-        if (has_capability('local/ucla_support_tools:edit', context_system::instance())) {
+        if ($this->is_editing()) {
             $content[] = html_writer::div($this->category_create_button());
         }
 
@@ -336,5 +372,20 @@ class local_ucla_support_tools_renderer extends plugin_renderer_base {
         }
         $list = html_writer::tag('ul', implode("\n", $cols));
         return html_writer::div($title . $list, 'ucla-support-tools-mysites-favorites');
+    }
+    
+    /**
+     * Checks if user can edit and is currently in editing mode.
+     * 
+     * @return bool
+     */
+    function is_editing() {
+        
+        if (!isset($this->editingcap)) {
+            $this->editingcap = has_capability('local/ucla_support_tools:edit', context_system::instance()) 
+                    && $this->page->user_is_editing();
+        }
+
+        return $this->editingcap;
     }
 }

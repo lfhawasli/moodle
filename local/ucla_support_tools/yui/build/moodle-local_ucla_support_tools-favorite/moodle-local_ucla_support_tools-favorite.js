@@ -26,6 +26,13 @@ M.local_ucla_support_tools.favorite = {
             var id = e.currentTarget.getAttribute('data-id');
             this.toggle_favorite(id);
         }, 'a[data-action="favorite"]', this);
+
+        // Set up delegate for description toggle.
+        Y.one('.ucla-support-tool-alltools ul').delegate('click', function (e) {
+            e.preventDefault();
+            e.currentTarget.ancestor('.ucla-support-tool').toggleClass('expanded');
+
+        }, 'a[data-action="description"]', this);
     },
     /**
      * Toggles the favorite state for a given tool.
@@ -54,6 +61,18 @@ M.local_ucla_support_tools.favorite = {
                             node.one('i').replaceClass('fa-star', 'fa-star-o');
                         }
                     });
+
+                    // Clean up 'favorites' category.
+                    if (data.status) {
+                        // Add tool
+                        var node = Y.one('.ucla-support-tool-alltools .ucla-support-tool[data-id="' + data.id + '"]');
+                        var li = Y.Node.create('<li></li>');
+                        li.append(node.cloneNode(true));
+                        Y.one('.ucla-support-category.favorites .ucla-support-tool-grid ul').append(li);
+                    } else {
+                        // Remove tool.
+                        Y.one('.ucla-support-category.favorites .ucla-support-tool[data-id="' + data.id + '"]').ancestor('li').remove(true);
+                    }
                 }
             }
         });

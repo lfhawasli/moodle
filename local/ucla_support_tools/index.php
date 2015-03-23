@@ -24,6 +24,7 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 // Needs user to be logged in.
 require_login();
@@ -32,7 +33,7 @@ require_login();
 $context = context_system::instance();
 
 $thisdir = '/local/ucla_support_tools';
-$thisfile = $thisdir . 'index.php';
+$thisfile = $thisdir . '/index.php';
 // Initialize $PAGE
 $PAGE->set_url($thisdir);
 $PAGE->set_context($context);
@@ -43,8 +44,14 @@ $PAGE->set_title(get_string('pluginname', 'local_ucla_support_tools'));
 
 // Editing.
 if (has_capability('local/ucla_support_tools:edit', $context)) {
-    $PAGE->requires->yui_module('moodle-local_ucla_support_tools-categoryorganizer', 'M.local_ucla_support_tools.categoryorganizer.init', array());
-    $PAGE->requires->yui_module('moodle-local_ucla_support_tools-toolorganizer', 'M.local_ucla_support_tools.toolorganizer.init', array());
+    // Editing mode button.
+    $supporttoolurl = new moodle_url($thisfile);
+    set_editing_mode_button($supporttoolurl);
+
+    if ($PAGE->user_is_editing()) {
+        $PAGE->requires->yui_module('moodle-local_ucla_support_tools-categoryorganizer', 'M.local_ucla_support_tools.categoryorganizer.init', array());
+        $PAGE->requires->yui_module('moodle-local_ucla_support_tools-toolorganizer', 'M.local_ucla_support_tools.toolorganizer.init', array());
+    }
 }
 
 // Logging.
@@ -97,7 +104,7 @@ echo html_writer::start_div('content');
 echo html_writer::end_div();
 
 // Conditionally render a 'tool create' button
-if (has_capability('local/ucla_support_tools:edit', $context)) {
+if ($render->is_editing()) {
     echo $render->tool_create_button();
 }
 
@@ -105,7 +112,7 @@ echo $OUTPUT->box_start('clearfix ucla-support-tool-alltools ucla-support-tool-g
 echo $render->tools();
 echo $OUTPUT->box_end();
 
-if (has_capability('local/ucla_support_tools:edit', $context)) {
+if ($render->is_editing()) {
     echo $render->tool_export_button();
     echo $render->tool_import_button();
 }

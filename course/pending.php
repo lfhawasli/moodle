@@ -145,7 +145,7 @@ if (empty($pending)) {
         $row[] = format_string($course->shortname);
         $row[] = format_string($course->fullname);
         $row[] = fullname($course->get_requester());
-        $row[] = $course->summary;
+        $row[] = format_text($course->summary, $course->summaryformat);
         // Set site type and requested category
 //        $row[] = $category->get_formatted_name();
 //        $row[] = format_string($course->reason);

@@ -126,9 +126,6 @@ $CFG->messaging = false;
 // development/testing environments
 $CFG->divertallemailsto = 'franks@ssc.ucla.edu';
 
-// CCLE-4479 - Yahoo email problems
-$CFG->emailonlyfromnoreplyaddress = 1;
-
 // CCLE-2590 - Implement Auto-detect Shibboleth Login
 $CFG->shib_logged_in_cookie = '_ucla_sso';
 
@@ -225,9 +222,11 @@ $CFG->enablecourserequests = 1;
 // Commenting this out until following tracker issue is resolved:
 // MDL-27886 - backup_general_users forbids all users to backup user data
 //$CFG->forced_plugin_settings['backup']['backup_general_users'] = 0;
+$CFG->forced_plugin_settings['backup']['backup_general_groups'] = 0;
 
 // Site administration > Grades > General settings
 $CFG->recovergradesdefault = 1;
+$CFG->unlimitedgrades = 1;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
@@ -243,6 +242,7 @@ $CFG->forced_plugin_settings['folder']['requiremodintro'] = 0;
 
 // Site administration > Plugins > Activity modules > Forum
 $CFG->forum_enablerssfeeds = 1;
+$CFG->forum_enabletimedposts = 1;
 $CFG->forum_rsstype = 2;
 $CFG->forum_rssarticles = 5;
 
@@ -336,6 +336,9 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.
 // Site administration > Plugins > Filters > PoodLL Filter
 //$CFG->filter_poodll_download_media_ok = '1';
 
+// Site administration > Plugins > Filters > SSC Wowza filter
+$CFG->filter_sscwowza_enable_mp4 = 1;
+
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
@@ -364,6 +367,7 @@ $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-3.kaf.kaltur
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
+$CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4521 - Handle "preferred name".
 
 // Grading config variables.
 // CCLE-4295 - Add Grouping Filter for the Grader Report
@@ -387,7 +391,7 @@ $CFG->forceloginforprofiles = true;
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
-$CFG->fullnamedisplay = 'lastname, firstname';
+$CFG->fullnamedisplay = 'lastname, firstname middlename';
 $CFG->cronclionly = true;
 
 // Site administration > Security > HTTP security

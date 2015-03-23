@@ -108,11 +108,11 @@ M.local_ucla_support_tools.filter = {
             if (checkbox.get('checked')) {
                 category_node.ancestor('li').removeClass('collapsed');
                 checkbox.ancestor('.category-label').removeClass('selected');
-                checkbox.previous('label').one('i').replaceClass('fa-plus-square', 'fa-minus-square');
+                checkbox.previous('label').one('i').replaceClass('fa-toggle-off', 'fa-toggle-on');
             } else {
                 category_node.ancestor('li').addClass('collapsed');
                 checkbox.ancestor('.category-label').addClass('selected');
-                checkbox.previous('label').one('i').replaceClass('fa-minus-square', 'fa-plus-square');
+                checkbox.previous('label').one('i').replaceClass('fa-toggle-on', 'fa-toggle-off');
             }
 
         }, 'input[type="checkbox"]');
