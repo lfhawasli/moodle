@@ -34,14 +34,17 @@ M.tool_uclacourserequestor = {
             })
         });
         
-        // Attach 'check-all' event to instructors 
-        Y.one('#ucrgeneraloptions .check-all-instructors').on('change', function(e) {
-            var intructorCheckboxes = Y.all('#uclacourserequestor_requests td.c9:not(.warning):not(.error) input[type="checkbox"]');
-            
-            intructorCheckboxes.each(function(node) {
-                node.set('checked', e.target.get('checked'));
-            });
-        }) 
+        // Attach 'check-all' event to instructors
+        var checkallinstructors = Y.one('#ucrgeneraloptions .check-all-instructors');
+        if (checkallinstructors) {
+            checkallinstructors.on('change', function(e) {
+                var intructorCheckboxes = Y.all('#uclacourserequestor_requests td.c9:not(.warning):not(.error) input[type="checkbox"]');
+
+                intructorCheckboxes.each(function(node) {
+                    node.set('checked', e.target.get('checked'));
+                });
+            })
+        }
 
         // Attach 'check all' event to ugrad, grad and tut.
         Y.all('#ucrgeneraloptions .label input[type="checkbox"]').on('change', function (e) {
