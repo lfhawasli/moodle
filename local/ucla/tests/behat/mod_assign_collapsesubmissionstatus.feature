@@ -36,8 +36,6 @@ Feature: Assignment Grading Submission Status Table Collapse
       And I press "Add submission"
       And I upload "lib/tests/fixtures/empty.txt" file to "File submissions" filemanager
       And I press "Save changes"
-      And I press "Submit assignment"
-      And I press "Continue"
       Then I should see "Submitted for grading"
       And I should see "empty.txt"
       And I should see "Not graded"
