@@ -66,6 +66,10 @@ $modnames = get_module_types_names();
  */
 $modulemetadata = get_module_metadata($course, $modnames);
 foreach ($modnames as $modname => $modnamestr) {
+    if (!isset($modulemetadata[$modname])) {
+        // If not set, then user cannot add given module.
+        continue;
+    }
     if ($modulemetadata[$modname]->archetype == MOD_ARCHETYPE_RESOURCE) {
         $resources[$modname] = $modulemetadata[$modname]->title;
     } else {
