@@ -95,7 +95,7 @@ function print_video_list($video_list, $header_title, $section_attr) {
         } else if ($header_title == get_string('futurevideo', 'block_ucla_video_furnace')) {
             $output_str = $video->video_title . ' (' . 
                     get_string('futurevideo_info', 'block_ucla_video_furnace', 
-                               date('Y-m-d', $video->stop_date)) . ')';
+                               date('Y-m-d', $video->start_date)) . ')';
         } else {
             $output_str = html_writer::link($video->video_url, $video->video_title);
         }
