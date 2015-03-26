@@ -103,6 +103,9 @@ class behat_ucla extends behat_files {
         set_config('status', ENROL_INSTANCE_ENABLED, 'enrol_guest');
         set_config('status', ENROL_INSTANCE_ENABLED, 'enrol_invitation');
 
+        // Enable course requestor.
+        set_config('enablecourserequests', 1);
+
         // Purge all caches to force new configs to take effect.
         purge_all_caches();
     }
