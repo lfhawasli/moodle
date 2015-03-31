@@ -48,6 +48,4 @@ Scenario: Accept only txt files.
     # Upload valid file.
     When I upload "lib/tests/fixtures/empty.txt" file to "File submissions" filemanager
     And I press "Save changes"
-    And I press "Submit assignment"
-    And I press "Continue"
     Then I should see "Submitted for grading"
