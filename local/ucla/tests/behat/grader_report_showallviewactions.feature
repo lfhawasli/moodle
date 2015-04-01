@@ -1,7 +1,7 @@
 @ucla @core_grades @core_edit @CCLE-4289
-Feature: Collapse some columns for assignment grading
+Feature: Viewing grade categories
   As an instructor
-  I want to see all 3 possible view stats for categories
+  I want to see all 3 possible view states for categories
   So that I know which view I am on and what other possible states there are
 
 @javascript
