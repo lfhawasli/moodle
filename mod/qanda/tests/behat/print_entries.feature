@@ -1,16 +1,17 @@
-@ucla @mod @mod_qanda 
-Feature: Edit unanswered questions
-  As a student
-  I want to edit unanswered questions
+@ucla @mod @mod_qanda @CCLE-4677
+Feature: Print Q&A entries, link to Q&A entries
+  In order to utilize the Q&A module
+  As a user
+  I want to link to a question and print Q&A entries
 
-Scenario: Make sure students can edit unanswered questions
+  Background:
     Given the following "courses" exist:
-      | fullname | shortname | category | groupmode |
-      | Course 1 | C1 | 0 | 1 |
+      | fullname | shortname |
+      | Course 1 | C1 |
     And the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher1 | Teacher | T1 | teacher1@asd.com |
-      | student1 | Student | S1 | student1@asd.com |
+      | username |
+      | teacher1 |
+      | student1 |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -44,15 +45,23 @@ Scenario: Make sure students can edit unanswered questions
     And I press "Save changes"
     And I log out
 
-    # Make sure that students can edit an unanswered question
-    And I log in as "student1"
+  Scenario: Print all Q&A entries
+    When I log in as "student1"
     And I follow "Course 1"
     And I follow "Q&A test"
-    And I follow "Edit"
-    And I set the following fields to these values:
-      | Question | I changed my question |
-    And I press "Save changes"
+    And I follow "Printer-friendly version"
+    Then I should see "What is the answer to life, the universe, and everything?"
+    And I should see "What is my name?"
+    And I should see "Your name is Sam."
+
+ @javascript
+  Scenario: Print a particular Q&A entry by using Permalink
+    When I log in as "student1"
+    And I follow "Course 1"
+    And I follow "Q&A test"
+    And I follow "Permalink"
     Then I should see "What is my name?"
-    Then I should see "Your name is Sam."
-    Then I should see "I changed my question"
-    And I log out
+    And I should not see "What is the answer to life"
+    When I follow "Printer-friendly version"
+    Then I should see "What is my name?"
+    And I should see "Your name is Sam."
