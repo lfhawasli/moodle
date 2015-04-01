@@ -38,7 +38,6 @@ Feature: Reopened Class Report
     And I set the field "showreopenedclasses_term_selector" to "12W"
     When I click on "Go" "button" in the "#showreopenedclasses" "css_element"
     Then I should see "There is 1 result for input [12W]"
-    Then I should see "Teacher"
     And I browse to site "C1"
     And I follow "Edit settings"
     And I set the field "visible" to "Hide"
