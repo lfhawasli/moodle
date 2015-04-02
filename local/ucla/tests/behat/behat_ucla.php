@@ -70,7 +70,7 @@ class behat_ucla extends behat_files {
     public function load_default_ucla_environment() {
         global $CFG;
 
-        // Set the name display
+        // Set the name display.
         set_config('fullnamedisplay', 'lastname' . ", " . 'firstname');
         // Set the UCLA theme.
         set_config('theme', 'uclashared');
@@ -94,7 +94,7 @@ class behat_ucla extends behat_files {
         // Set other configs.
         set_config('showuseridentity', 'idnumber,email');
 
-        // Enable course metalink plugin
+        // Enable course metalink plugin.
         $enabled = array_keys(enrol_get_plugins(true));
         $enabled[] = 'meta';
         set_config('enrol_plugins_enabled', implode(',', $enabled));
@@ -156,8 +156,7 @@ class behat_ucla extends behat_files {
 
                 // Forward the work to Moodle's data generators.
                 $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exist('course enrolments',
-                                new TableNode($table));
+                        ->the_following_exist('course enrolments', new TableNode($table));
 
                 break;
 
@@ -199,13 +198,13 @@ class behat_ucla extends behat_files {
                 }
         }
     }
-    
+
     /**
      * Step to browse directly to any address in the Moodle root.
      * 
      * @Given /^I am on "([^"]*)"$/
      * 
-     * @param url relative to Moodle root
+     * @param string $url   Relative to Moodle root.
      */
     public function i_am_on($url) {
         $this->getSession()->visit($this->locate_path($url));
@@ -330,55 +329,6 @@ class behat_ucla extends behat_files {
     }
 
     /**
-     * Shortcut definition to log in as "admin".
-     * 
-     * @Given /^I log in as administrator$/
-     *
-     * @return array
-     */
-    public function log_in_as_administrator() {
-        return $this->i_login_as_ucla_user('admin');
-    }
-
-    /**
-     * Shortcut definition to log in as "instructor".
-     *
-     * @Given /^I log in as instructor/
-     *
-     * @return array
-     */
-    public function log_in_as_instructor() {
-        return $this->i_login_as_ucla_user('instructor');
-    }
-
-    /**
-     * Shortcut definition to log in as "student"
-     * 
-     * @Given /^I log in as student/
-     *
-     * @return array
-     */
-    public function log_in_as_student() {
-        return $this->i_login_as_ucla_user('student');
-    }
-
-    /**
-     * A log-in step that uses the UCLA special case login page.
-     * 
-     * @deprecated since 2.7
-     * @see behat_ucla::i_login_as_ucla_user()
-     *
-     * @Given /^I log in as ucla "([^"]*)"$/
-     * @throws ElementNotFoundException
-     * @param string $user
-     */
-    public function i_login_as_ucla_user($user) {
-        $alternative = 'I log in as "' . $this->escape($user) . '"';
-        $this->deprecated_message($alternative);
-        return new Given($alternative);
-    }
-
-    /**
      * Pauses the scenario until the user presses a key. 
      * Useful when debugging a scenario. 
      * 
@@ -481,7 +431,7 @@ class behat_ucla extends behat_files {
         }
         return self::$generator;
     }
-    
+
     /**
      * Adds an assignment filling the form data with the specified field/value pairs.
      * 
@@ -496,68 +446,6 @@ class behat_ucla extends behat_files {
             new Given('I set the following fields to these values:', $data),
             new Given('I press "' . get_string('savechangesanddisplay') . '"')
         );
-    }
-
-    /**
-     * Throws an exception if $CFG->behat_usedeprecated is not allowed.
-     *
-     * @throws Exception
-     * @param string|array $alternatives Alternative/s to the requested step
-     * @return void
-     */
-    protected function deprecated_message($alternatives) {
-        global $CFG;
-
-        // We do nothing if it is enabled.
-        if (!empty($CFG->behat_usedeprecated)) {
-            return;
-        }
-
-        if (is_scalar($alternatives)) {
-            $alternatives = array($alternatives);
-        }
-
-        $message = 'Deprecated step, rather than using this step you can use:';
-        foreach ($alternatives as $alternative) {
-            $message .= PHP_EOL . '- ' . $alternative;
-        }
-        $message .= PHP_EOL . '- Set $CFG->behat_usedeprecated in config.php to allow the use of deprecated steps if you don\'t have any other option';
-        throw new Exception($message);
-    }
-
-    /**
-     * Step to generate UCLA SRS + collab sites, and enrolments.
-     *
-     * @deprecated since 2.7
-     * @see behat_ucla::the_following_exist()
-     *
-     * @Given /^the following ucla "([^"]*)" exists:$/
-     * @throws Exception
-     * @throws PendingException
-     * @param string $elementname
-     * @param TableNode $data
-     */
-    public function the_following_ucla_exists($elementname, TableNode $data) {
-        $alternative = 'the following ucla "' . $this->escape($elementname) . '" exist:';
-        $this->deprecated_message($alternative);
-        return new Given($alternative, $data);
-    }
-
-    /**
-     * Generates a single UCLA site.  The site will have two enrolled
-     * users, a student and an editing instructor.
-     * 
-     * @deprecated since 2.7
-     * @see behat_ucla::ucla_site_exist()
-     *
-     * @Given /^a ucla "([^"]*)" site exists$/
-     * @throws ElementNotFoundException
-     * @param string $site type for a collab site, or 'class' for an SRS site
-     */
-    public function ucla_site_exists($site) {
-        $alternative = 'a ucla "' . $this->escape($site) . '" site exist';
-        $this->deprecated_message($alternative);
-        return new Given($alternative);
     }
 
     /**
