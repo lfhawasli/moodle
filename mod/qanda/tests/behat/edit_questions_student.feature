@@ -1,9 +1,10 @@
 @ucla @mod @mod_qanda
-Feature: View pending questions
-  As an instructor
-  I want to see pending questions from students
+Feature: Edit unanswered questions
+  As a student
+  I want to edit unanswered questions
 
-Scenario: Make sure instructors can view pending questions
+  @javascript
+  Scenario: Make sure students can edit unanswered questions
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
@@ -29,14 +30,30 @@ Scenario: Make sure instructors can view pending questions
     And I set the following fields to these values:
       | Question | What is the answer to life, the universe, and everything? |
     And I press "Save changes"
+    And I follow "Ask a question"
+    And I set the following fields to these values:
+      | Question | What is my name? |
+    And I press "Save changes"
     And I log out
-
-    # Make sure that instructor view pending questions.
-    When I log in as "teacher1"
+    And I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Q&A test"
-    Then I should see "Questions Pending (1)"
-    And I follow "Questions Pending (1)"
-    Then I should see "What is the answer to life, the universe, and everything?"
-    Then I should see "Posted by: Student S1 (student1@asd.com)"
+    And I follow "Questions Pending (2)"
+    And I follow "Answer"
+    And I set the following fields to these values:
+      | Answer | Your name is Sam. |
+    And I press "Save changes"
+    And I log out
+
+    # Make sure that students can edit an unanswered question
+    And I log in as "student1"
+    And I follow "Course 1"
+    And I follow "Q&A test"
+    And I follow "Edit"
+    And I set the following fields to these values:
+      | Question | I changed my question |
+    And I press "Save changes"
+    Then I should see "What is my name?"
+    Then I should see "Your name is Sam."
+    Then I should see "I changed my question"
     And I log out
