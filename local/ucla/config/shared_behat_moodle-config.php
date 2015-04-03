@@ -447,6 +447,53 @@ $CFG->forced_plugin_settings['auth/shibboleth'] = array(
  *  End shibboleth configurations.
  **/
 
+// Allowed Behat environment configs
+// These are required to get Behat running in our very special environment.
+//
+// NOTE: These configs are active during Moodle @core tests, so we want to keep this list
+//       as small as possible
+$CFG->behat_extraallowedsettings = array(
+    'forced_plugin_settings',               // Required for most UCLA based stuff to work
+    // @todo: Move to dynamic UCLA environment loader
+    'shib_logged_in_cookie',                // Required for base login, or will crash
+    'instructor_levels_roles',              // Required for 'office hours' block to work
+    'allowcoursethemes',                    // Required for 'course edit' to work
+    'forcedefaultmymoodle',                 // Experimental
+    'debug',
+    'debugdisplay'
+);
+
+$CFG->behat_config = array(
+    'default' => array(
+        'formatter' => array(
+            'name' => 'pretty',
+            'parameters' => array(
+                'decorated' => true,
+                'verbose' => true
+            )
+        )
+    ),
+    'phantomjs' => array(
+        'filters' => array(
+            'tags' => '~@_file_upload&&~@_alert&&~@_bug_phantomjs'
+        ),
+        'extensions' => array(
+            'Behat\MinkExtension\Extension' => array(
+                'selenium2' => array(
+                    'browser' => 'phantomjs',
+                    'wd_host' => 'http://127.0.0.1:4444/wd/hub'
+                )
+            )
+        ),
+        'formatter' => array(
+            'name' => 'pretty',
+            'parameters' => array(
+                'decorated' => true,
+                'verbose' => true
+            )
+        )
+    ));
+
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later
 $_dirroot_ = dirname(realpath(__FILE__)) . '/../../..';
@@ -478,34 +525,6 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_access']
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_error'] = '/var/log/httpd/ssl_error_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_request'] = '/var/log/httpd/ssl_request_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
-
-// Allowed Behat environment configs
-// These are required to get Behat running in our very special environment.
-// 
-// NOTE: These configs are active during Moodle @core tests, so we want to keep this list
-//       as small as possible
-$CFG->behat_extraallowedsettings = array(
-    'forced_plugin_settings',               // Required for most UCLA based stuff to work
-                                            // @todo: Move to dynamic UCLA environment loader
-    'shib_logged_in_cookie',                // Required for base login, or will crash
-    'instructor_levels_roles',              // Required for 'office hours' block to work
-    'allowcoursethemes',                    // Required for 'course edit' to work
-    'forcedefaultmymoodle',                 // Experimental
-    'debug',
-    'debugdisplay'
-);
-
-$CFG->behat_config = array(
-       'default' => array(
-           'formatter' => array(
-               'name' => 'pretty',
-               'parameters' => array(
-                   'decorated' => true,
-                   'verbose' => true
-               )
-           )
-       )
-    );
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
