@@ -191,6 +191,7 @@ class local_ucla_generator extends testing_data_generator {
      * @return array            Returns created course object.
      */
     public function create_collab($course) {
+        global $DB;
 
         // Make sure public/private is enabled at the site level, so that
         // public/private event handlers work properly.
@@ -212,6 +213,16 @@ class local_ucla_generator extends testing_data_generator {
         }
         if (!isset($course['numsections'])) {
             $course['numsections'] = 10;
+        }
+
+        // If user is specifying category, then need to map idnumber to id.
+        if (isset($course['category']) && intval($course['category']) == 0) {
+            if (!$id = $DB->get_field('course_categories', 'id',
+                array('idnumber' => $course['category']))) {
+                throw new Exception('The specified category with idnumber "' .
+                    $course['category'] . '" does not exist');
+            }
+            $course['category'] = $id;
         }
 
         // Make shell course first.

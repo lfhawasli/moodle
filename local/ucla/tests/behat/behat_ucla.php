@@ -277,7 +277,7 @@ class behat_ucla extends behat_files {
                     break;
                 default:
                     throw new ExpectationException('The site type specified does not exist',
-                    $this->getSession());
+                        $this->getSession());
             }
         }
     }
@@ -379,7 +379,7 @@ class behat_ucla extends behat_files {
      * Pauses the scenario until the user presses a key. 
      * Useful when debugging a scenario. 
      * 
-     * @Then /^(?:|I )put a breakpoint$/ 
+     * @Given /^I put a breakpoint$/
      */
     public function i_put_a_breakpoint() {
 
