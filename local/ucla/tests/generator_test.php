@@ -336,11 +336,33 @@ class local_ucla_generator_testcase extends advanced_testcase {
     }
 
     /**
-     * Try creating a collaboration site with a nonexistant type.
+     * Test creating collab sites under a given category.
      */
-    public function test_create_collab_nonexistant() {
+    public function test_create_collab_category() {
+        $category = $this->getDataGenerator()->create_category(
+            array('idnumber' => 'test'));
+
+        // Try adding to a category via idnumber.
+        $collab1 = $this->getDataGenerator()
+            ->get_plugin_generator('local_ucla')
+            ->create_collab(array('type' => 'instructional',
+                'category' => $category->idnumber));
+        $this->assertEquals($collab1->category, $category->id);
+
+        // Try adding to a category via id.
+        $collab2 = $this->getDataGenerator()
+            ->get_plugin_generator('local_ucla')
+            ->create_collab(array('type' => 'instructional',
+                'category' => $category->id));
+        $this->assertEquals($collab2->category, $category->id);
+    }
+
+    /**
+     * Try creating a collaboration site with a nonexistent type.
+     */
+    public function test_create_collab_nonexistent() {
         $course = array();
-        $course['type'] = 'nonexistant';
+        $course['type'] = 'nonexistent';
         $collab = $this->getDataGenerator()
                 ->get_plugin_generator('local_ucla')
                 ->create_collab($course);
