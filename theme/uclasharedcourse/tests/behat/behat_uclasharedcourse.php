@@ -60,7 +60,7 @@ class behat_uclasharedcourse extends behat_base {
         if (empty($html) || core_text::strpos($html, $image) === false) {
             throw new ElementNotFoundException($this->getSession(), "$image image ");
         }
-        return true;
+        return;
     }
 
     /**
@@ -71,17 +71,20 @@ class behat_uclasharedcourse extends behat_base {
      * @param string $text
      * @param string $element Element we look in.
      * @param string $selectortype The type of element where we are looking in.
-
      */
     public function i_should_not_see_custom_logo($image, $element, $selectortype) {
 
-        // Getting the container where the image should not be found.
-        $container = $this->get_selected_node($selectortype, $element);
+        try {
+            // Getting the container where the image should not be found.
+            $container = $this->get_selected_node($selectortype, $element);
+        } catch (ElementNotFoundException $notfound) {
+            // If not found, then image doesn't exist.
+            return;
+        }
         $html = $container->getHtml();
         if (!empty($html) && core_text::strpos($html, $image) !== false) {
             throw new ExpectationException("Found $image image", $this->getSession());
         }
-        return true;
     }
 
 }
