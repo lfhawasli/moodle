@@ -65,7 +65,13 @@ class block_ucla_course_download extends block_base {
             require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/'.$request->type.'.php');
 
             $classname = 'block_ucla_course_download_' . $request->type;
-            $archive = new $classname($request->courseid, $request->userid);
+            try {
+                $archive = new $classname($request->courseid, $request->userid);
+            } catch (dml_exception $coursenotfound) {
+                $trace->output('Course not found, deleting request', 1);
+                $DB->delete_records('ucla_archives', array('id' => $request->id));
+                continue;
+            }
             $archive->process_request();
             unset($archive);
         }

@@ -66,6 +66,8 @@ abstract class block_ucla_course_download_base {
      *
      * @param int $courseid
      * @param int $userid
+     *
+     * @throws dml_exception If course is not found in database.
      */
     public function __construct($courseid, $userid) {
         $this->course = get_course($courseid);
@@ -207,7 +209,10 @@ abstract class block_ucla_course_download_base {
         if (!empty($request->fileid)) {
             $fs = get_file_storage();
             $file = $fs->get_file_by_id($request->fileid);
-            $file->delete();
+            if (!empty($file)) {
+                // If file doesn't exist, then ignore it.
+                $file->delete();
+            }
         }
         $DB->delete_records('ucla_archives', array('id' => $request->id));
         $this->refresh();
