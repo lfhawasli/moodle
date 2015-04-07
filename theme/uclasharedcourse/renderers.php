@@ -53,13 +53,6 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
             $this->headerclasses[] = $coursename;
         }
 
-        // If a site is 'private', then we only display logos to enrolled users
-        $collabsite = siteindicator_site::load($COURSE->id);
-        $is_private = false;
-        if(!empty($collabsite) && $collabsite->property->type == siteindicator_manager::SITE_TYPE_PRIVATE) {
-            $is_private = true;
-        }
-
         // if main logo is overridden, then return that html
         if (!empty($alternative_logo)) {
             $this->headerclasses[] = 'header-custom-logo';
@@ -137,14 +130,19 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
     }
     
     /**
-     * Retrieve logo images for a course
+     * Retrieve logo images for a course.
      * 
-     * @return type
+     * @return stored_file[] array of stored_files indexed by pathanmehash
      */
     private function course_logo_images() {
-        global $COURSE;        
+        global $COURSE;
+
+        // Do not display course logos to non-enrolled guests.
+        if (!$this->is_enrolled_user()) {
+            return array();
+        }
+
         $context = context_course::instance($COURSE->id);
-        
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, $this->component,
                 $this->filearea, $COURSE->id, '', false);

@@ -1,10 +1,11 @@
-@core @core_backup @core_edit @CCLE-4925
-Feature: Option to include groups and groupings when importing a course to another course
-  In order to import a course to another course with groups and groupings
+@core @core_backup @core_edit @CCLE-4925 @SSC-2572
+Feature: Do not include groups and groupings when importing a course to another course
+  In order to not include groups and groupings when importing a course to another course
   As a teacher
-  I need an option to include groups and groupings when importing a course to another course
+  I need to to import a course to another course without groups and groupings
 
-  Background:
+  @javascript
+  Scenario: Do not include groups and groupings when importing a course to another course
     Given the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | ucla |
@@ -25,25 +26,7 @@ Feature: Option to include groups and groupings when importing a course to anoth
       | Grouping 1 | C1 | GROUPING1 |
       | Grouping 2 | C1 | GROUPING2 |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
-
-  @javascript
-  Scenario: Include groups and groupings when importing a course to another course
     When I import "Course 1" course into "Course 2" course using this options:
-      | Include groups and groupings | 1 |
-    And I expand "Users" node
-    And I follow "Groups"
-    Then I should see "Group 1"
-    And I should see "Group 2"
-    And I follow "Groupings"
-    And I should see "Grouping 1"
-    And I should see "Grouping 2"
-
-  @javascript
-  Scenario: Do not include groups and groupings when importing a course to another course
-    When I import "Course 1" course into "Course 2" course using this options:
-      | Include groups and groupings | 0 |
     And I expand "Users" node
     And I follow "Groups"
     Then I should not see "Group 1"
