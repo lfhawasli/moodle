@@ -595,7 +595,7 @@ class restore_update_availability extends restore_execution_step {
             if (!is_null($section->availability)) {
                 $info = new \core_availability\info_section($section);
                 $info->update_after_restore($this->get_restoreid(),
-                        $this->get_courseid(), $this->get_logger(), $dateoffset, $this->task);
+                        $this->get_courseid(), $this->get_logger(), $dateoffset);
             }
         }
         $rs->close();
@@ -615,7 +615,7 @@ class restore_update_availability extends restore_execution_step {
             if (!is_null($cm->availability)) {
                 $info = new \core_availability\info_module($cm);
                 $info->update_after_restore($this->get_restoreid(),
-                        $this->get_courseid(), $this->get_logger(), $dateoffset, $this->task);
+                        $this->get_courseid(), $this->get_logger(), $dateoffset);
             }
         }
         $rs->close();
@@ -849,13 +849,10 @@ class restore_groups_structure_step extends restore_structure_step {
 
         $paths = array(); // Add paths here
 
-        // Do not include group/groupings information if not requested.
-        $groupinfo = $this->get_setting_value('groups');
-        if ($groupinfo) {
-            $paths[] = new restore_path_element('group', '/groups/group');
-            $paths[] = new restore_path_element('grouping', '/groups/groupings/grouping');
-            $paths[] = new restore_path_element('grouping_group', '/groups/groupings/grouping/grouping_groups/grouping_group');
-        }
+        $paths[] = new restore_path_element('group', '/groups/group');
+        $paths[] = new restore_path_element('grouping', '/groups/groupings/grouping');
+        $paths[] = new restore_path_element('grouping_group', '/groups/groupings/grouping/grouping_groups/grouping_group');
+
         return $paths;
     }
 
@@ -893,9 +890,18 @@ class restore_groups_structure_step extends restore_structure_step {
                                                FROM {groups}
                                               WHERE courseid = :courseid
                                                 AND name = :grname $description_clause", $params)) {
-            // group doesn't exist, create
-            $newitemid = $DB->insert_record('groups', $data);
-            $restorefiles = true; // We'll restore the files
+            // BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
+            // grouping doesn't exist, create
+            //$newitemid = $DB->insert_record('groupings', $data);
+            //$restorefiles = true; // We'll restore the files
+            if ($this->task->get_setting_value('groups') || $data->name == 'Course members') {
+                // group doesn't exist, create
+                $newitemid = $DB->insert_record('groups', $data);
+                $restorefiles = true; // We'll restore the files
+            } else {
+                $newitemid = $oldid;
+            }
+            // END UCLA MOD: SSC-2572
         } else {
             // group exists, use it
             $newitemid = $groupdb->id;
@@ -938,9 +944,18 @@ class restore_groups_structure_step extends restore_structure_step {
                                                   FROM {groupings}
                                                  WHERE courseid = :courseid
                                                    AND name = :grname $description_clause", $params)) {
-            // grouping doesn't exist, create
-            $newitemid = $DB->insert_record('groupings', $data);
-            $restorefiles = true; // We'll restore the files
+            // BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
+            // group doesn't exist, create
+            //$newitemid = $DB->insert_record('groups', $data);
+            //$restorefiles = true; // We'll restore the files
+            if ($this->task->get_setting_value('groups') || $data->name == 'Private Course Material') {
+                // grouping doesn't exist, create
+                $newitemid = $DB->insert_record('groupings', $data);
+                $restorefiles = true; // We'll restore the files
+            } else {
+                $newitemid = $oldid;
+            }
+            // END UCLA MOD: SSC-2572
         } else {
             // grouping exists, use it
             $newitemid = $groupingdb->id;
@@ -984,7 +999,7 @@ class restore_groups_members_structure_step extends restore_structure_step {
 
         $paths = array(); // Add paths here
 
-        if ($this->get_setting_value('groups') && $this->get_setting_value('users')) {
+        if ($this->get_setting_value('users')) {
             $paths[] = new restore_path_element('group', '/groups/group');
             $paths[] = new restore_path_element('member', '/groups/group/group_members/group_member');
         }
