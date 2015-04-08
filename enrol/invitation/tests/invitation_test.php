@@ -161,6 +161,49 @@ class invitation_manager_testcase extends advanced_testcase {
     }
 
     /**
+     * For project sites, tests that the invite has a warning message.
+     */
+    public function test_emailinvitemessage() {
+        global $DB;
+        unset_config('noemailever');
+        $this->setAdminUser();
+        $sink = $this->redirectEmails();
+
+        $localgen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $courseinfo['type'] = 'non_instruction';
+        // Force a different shortname so the new course doesn't conflict with $this->testcourse.
+        $courseinfo['shortname'] = 'cc_1';
+        $collabcourse = $localgen->create_collab($courseinfo);
+        // Create a specific invitation manager for the collab course.
+        $imanager = new invitation_manager($collabcourse->id);
+
+        $data = new stdClass();
+        $data->courseid = $collabcourse->id;
+        $data->email = $this->testinvitee->email;
+        $data->role_group['roleid'] = $DB->get_field('role', 'id', array('shortname' => 'student'));
+        $data->subject = 'Test invite';
+
+        $site = new siteindicator_site($collabcourse->id);
+        $imanager->send_invitations($data);
+        $site->set_type('research');
+        $imanager->send_invitations($data);
+        $site->set_type('private');
+        $imanager->send_invitations($data);
+
+        $messages = $sink->get_messages();
+        $warningtext = "Please be aware that if you accept this invitation your profile information"
+                . " will be available to the other members of this project.";
+        $timeexpire = time() + get_config('enrol_invitation', 'inviteexpiration');
+        $timeexpire = date('M j, Y g:ia', $timeexpire);
+        $expiretext = 'and will expire on (' . $timeexpire . ')';
+        foreach ($messages as $message) {
+            $cleanbody = preg_replace('/\s+/', ' ', $message->body);
+            $this->assertContains($warningtext, $cleanbody);
+            $this->assertContains($expiretext, $cleanbody);
+        }
+    }
+
+    /**
      * Provides array of days for invitation to expire after being accepted.
      *
      * @return array

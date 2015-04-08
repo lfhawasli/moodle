@@ -36,15 +36,16 @@ if (empty($enrolinvitationtoken)) {
 }
 
 // Retrieve the token info.
-$invitation = $DB->get_record('enrol_invitation',
-        array('token' => $enrolinvitationtoken, 'tokenused' => false));
+$invitation = $DB->get_record('enrol_invitation', array('token' => $enrolinvitationtoken));
 
 // Make sure that course exists.
 $course = $DB->get_record('course', array('id' => $invitation->courseid), '*', MUST_EXIST);
 $context = context_course::instance($course->id);
 
 // If token is valid, enrol the user into the course.
-if (empty($invitation) or empty($invitation->courseid) or $invitation->timeexpiration < time()) {
+$invalidinvite = (empty($invitation) or empty($invitation->courseid));
+$oldinvite = ($invitation->timeexpiration < time() or $invitation->tokenused == true);
+if ($invalidinvite or $oldinvite) {
     $courseid = empty($invitation->courseid) ? $SITE->id : $invitation->courseid;
     $event = \enrol_invitation\event\invitation_expired::create(array(
             'objectid' => $invitation->id,
