@@ -787,7 +787,11 @@ function turnitintool_refresh_events($courseid=0) {
             if ($events = turnitintool_get_record_select('event', "modulename='turnitintool' AND instance=".$turnitintool->id." AND name='".$turnitintool->name." - ".$part->partname."'")) {
                 $event->id = $events->id;
                 if(method_exists('calendar_event', 'update')){
-                    calendar_event::update($event);
+                    // START UCLA MOD: CCLE-5142 - Turnitin page hangs after editing the due dates
+                    //calendar_event::update($event);
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event);
+                    // END UCLA MOD: CCLE-5142
                 } else {
                     update_event($event);
                 }
@@ -1364,7 +1368,11 @@ function turnitintool_update_partnames($cm,$turnitintool,$post) {
             if ($events = turnitintool_get_record_select('event', "modulename='turnitintool' AND instance = ? AND name = ?", array($turnitintool->id, $currentevent))) {
                 $event->id = $events->id;
                 if(method_exists('calendar_event', 'update')){
-                    calendar_event::update($event);
+                    // START UCLA MOD: CCLE-5142 - Turnitin page hangs after editing the due dates
+                    //calendar_event::update($event);
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event);
+                    // END UCLA MOD: CCLE-5142
                 } else {
                     update_event($event);
                 }
