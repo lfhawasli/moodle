@@ -159,6 +159,7 @@ class sendgrade_test extends advanced_testcase {
         $data->grade = array();
         $data->grade[$this->student->id] = array();
         $data->grade[$this->student->id][$gradeitem->id] = $grade;
+        $data->timepageload = time(); 
 
         $warnings = $report->process_data($data);
         $this->assertEquals(count($warnings), 0);
