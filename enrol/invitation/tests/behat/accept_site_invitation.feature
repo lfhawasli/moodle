@@ -1,8 +1,8 @@
 @ucla @enrol_invitation @CCLE-4476
 Feature: Site invitations
-  In order to limit invitation enrolment
+  In order to use the enrolment invitation plugin
   As an instructor
-  I want to have enrolment prevented from a previously used invitation
+  I want to have enrolment be restricted to unexpired tokens and to the role specified
 
   Scenario Outline:
     Given I am in a ucla environment
@@ -24,18 +24,20 @@ Feature: Site invitations
     And I press "Control Panel"
     And I follow "Invite users"
     And I set the following fields to these values:
-      | role_group[roleid] | <roleid> |
+      | <rolename> | 1 |
       | Email address | receiv@asd.com |
     And I press "Invite users"
     And I log out
     And I log in as "receiver"
     And I follow the link in the last invitation sent to "receiver" for ucla site "COURSE1"
+    Then I should see "receiv@asd.com"
+    And I should see <rolename2>
     And I press "Accept invitation"
     Then I should see "Course 1"
     When I follow the link in the last invitation sent to "receiver" for ucla site "COURSE1"
     Then I should see "Site invitation token is expired or has already been used."
     
     Examples:
-      | type | role | inviterole | roleid  |
-      | class | editingteacher | editor | 28 |
-      | non_instruction | projectlead | projectparticipant | 34 |
+      | type | role | inviterole | rolename | rolename2 |
+      | class | editingteacher | editor | Editor | "Editor" |
+      | non_instruction | projectlead | projectparticipant | Project Participant | "Project Participant" |
