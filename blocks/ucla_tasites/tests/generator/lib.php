@@ -61,7 +61,8 @@ class block_ucla_tasites_generator extends testing_block_generator {
             $course = $this->datagenerator->create_course();
         }
         if (empty($user)) {
-            $user = $this->datagenerator->create_user();
+            $record = array('firstname'=>'afirstname', 'lastname'=>'alastname');
+            $user = $this->datagenerator->create_user($record);
         }
         $tasite = $this->create_instance_with_role($course, (array) $user, 'ta');
         return $tasite;
