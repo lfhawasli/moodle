@@ -92,18 +92,37 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                 );
         if (!$iswindowsos) {
             $out .= $fontlink . "\n";
-        }
-        // IE does have font-smoothing, so load font for IE 8 and above.
-        $out .= "<!--[if gt IE 8]>\n" . $fontlink . "\n" . "<![endif]-->\n";
+        } else {
+            // IE does have font-smoothing, so load font for IE 8 and above.
+            $out .= "<!--[if gt IE 8]>\n" . $fontlink . "\n" . "<![endif]-->\n";
 
-        // Show an unsupported browser message for IE 8 and lower.
-        $unsupportedbrowser = html_writer::tag('script', '',
+            // Show an unsupported browser message for IE 8 and lower.
+            $unsupportedbrowser = html_writer::tag('script', '',
                 array(
                     'type' => 'text/javascript',
-                    'src' => $CFG->wwwroot . '/theme/uclashared/javascript/unsupported-browser.js'
+                    'src' => $CFG->wwwroot . '/theme/uclashared/javascript/unsupported-browser-ie.js'
+                )
+            );
+            $out .= "<!--[if lte IE 8]>\n" . $unsupportedbrowser . "\n" . "<![endif]-->\n";
+        }
+
+        // Show an unsupported browser message for Safari 6.1.4 or lower.
+        if (strpos($agent, 'Safari') !== false) {
+            require_once($CFG->dirroot.'/vendor/autoload.php');
+            $ua = $_SERVER['HTTP_USER_AGENT'];
+            $parser = UAParser\Parser::create();
+            $result = $parser->parse($ua);
+
+            if ($this->is_unsupported_safari($result->os->toString(), $result->ua->toString())) {
+                $unsupportedbrowser = html_writer::tag('script', '',
+                    array(
+                        'type' => 'text/javascript',
+                        'src' => $CFG->wwwroot . '/theme/uclashared/javascript/unsupported-browser-safari.js'
                     )
                 );
-        $out .= "<!--[if lte IE 8]>\n" . $unsupportedbrowser . "\n" . "<![endif]-->\n";
+                $out .= $unsupportedbrowser . "\n";
+            }
+        }
 
         // Add mobile support with option to switch.
         if (core_useragent::get_user_device_type() != 'default') {
@@ -636,5 +655,55 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         } else {
             return parent::notification($message, $classes);
         } 
+    }
+
+    /**
+     * Checks if given browser string is an unsupported Safari version (6.1.4 or lower).
+     *
+     * @param string $osstring
+     * @param string $browserstring
+     */
+    public function is_unsupported_safari($osstring, $browserstring) {
+        // Only care about OSX 10.6 and OSX 10.7.
+        if (strrpos($osstring, 'Mac OS X 10.6') === false  &&
+                strrpos($osstring, 'Mac OS X 10.7') === false) {
+            return false;
+        }
+
+        // Want just the version number. Currently in format such as "Safari 6.1.4".
+
+        // Get rid of "Safari".
+        $parts = explode(' ', $browserstring);
+
+        // Make sure that we are only looking at Safari browsers.
+        if ($parts[0] != 'Safari') {
+            return false;
+        }
+
+        // Now get version string and look at the X.Y.Z versions.
+        $versionparts = explode('.', $parts[1]);
+        if (isset($versionparts[0])) {
+            if ($versionparts[0] == 6) {
+                if (isset($versionparts[1])) {
+                    if ($versionparts[1] == 1) {
+                        if (isset($versionparts[2])) {
+                            if ($versionparts[2] <= 4) {
+                                return true;
+                            }
+                        } else {
+                            return true;
+                        }
+                    } else if ($versionparts[1] < 1) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            } else if ($versionparts[0] < 6) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

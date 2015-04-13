@@ -12,5 +12,5 @@
     
 .unsupported-browser .container {
     padding: 10px 50px;
-    background: url([[pix:theme|ie-notice]]) no-repeat;
+    background: url([[pix:theme|unsupported-browser]]) no-repeat left center;
 }
