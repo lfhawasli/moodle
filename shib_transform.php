@@ -28,14 +28,22 @@ require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 $displayname = null;
-if (isset($_SERVER['HTTP_SHIB_EDUPERSONNICKNAME'])) {
-    // Handle preferred name by storing middle name.
-    if (isset($_SERVER['HTTP_UCLA_PERSON_MIDDLENAME'])) {
-        $result['middlename']  = $this->get_first_string(
-            $_SERVER['HTTP_UCLA_PERSON_MIDDLENAME']
-        );
+$haspreferredname = false;
+if (!empty($result['alternatename'])) {
+    // Make sure that preferred name is different than first name.
+    if ($result['alternatename'] != $result['firstname']) {
+        $haspreferredname = true;
+        // Handle preferred name by storing middle name.
+        if (isset($_SERVER['HTTP_UCLA_PERSON_MIDDLENAME'])) {
+            $result['middlename']  = $this->get_first_string(
+                $_SERVER['HTTP_UCLA_PERSON_MIDDLENAME']
+            );
+        }
     }
-} else if (isset($_SERVER['HTTP_SHIB_DISPLAYNAME'])) {
+}
+
+// If user doesn't have preferred name, then use display name.
+if (!$haspreferredname && isset($_SERVER['HTTP_SHIB_DISPLAYNAME'])) {
     // Use display name, instead of using given first and last name fields.
     $displayname = $this->get_first_string($_SERVER['HTTP_SHIB_DISPLAYNAME']);
     $formattedname = format_displayname($displayname);
