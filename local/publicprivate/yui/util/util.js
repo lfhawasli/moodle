@@ -35,7 +35,13 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             var mod = e.target.ancestor(CSS.ACTIVITYLI);
             
             var field = '';
-            var public = mod.one('.activityinstance .groupinglabel');
+            var instance = mod.one('.activityinstance');
+            // If an activity instance is not found, see if a  resource instance
+            // exists (e.g. label, folder)
+            if (!instance) {
+                instance = mod.one('.contentwithoutlink');
+            }
+            var public = instance.one('.groupinglabel');
             
             if (public) {
                 public.remove();
@@ -52,7 +58,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
                 }
             } else {
                 // Add label
-                mod.one('.activityinstance').insert(
+                instance.insert(
                     Y.Node.create('<span class="groupinglabel">(' + M.util.get_string('publicprivategroupingname', 'local_publicprivate') + ')</span>')
                 );
                 
