@@ -221,6 +221,69 @@ class invitation_manager_testcase extends advanced_testcase {
         $messages = $sink->get_messages();
         $this->assertEquals(count($messages), 2);
     }
+    /**
+     * Test that invitation form accepts multiple email addresses by testing
+     * enrol/invitation/invitation_form.php: parse_dsv_emails.
+     */
+    public function test_emailparsing() {
+        // Check that a single email address gets successfully parsed
+        $emails = 'user1@asd.com';
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(1, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+
+        // Check that multiple email addresses get successfully parsed
+        $emails .= ';user2@asd.com;user3@asd.com;user4@asd.com';
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        $emails = preg_replace('/;/', ',', $emails);
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        $emails = preg_replace('/,/', ' ', $emails);
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        $emails = preg_replace('/ /', "\r\n", $emails);
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        // Check that varying delimiters are successfully parsed.
+        $emails = "user1@asd.com,user2@asd.com; user3@asd.com user4@asd.com\nuser1@asd.com";
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+    }
+
+    /**
+     * Verify that when the user specifies duplicate emails, only one invite is
+     * sent to each unique email address.
+     */
+    public function test_multipleemails() {
+        unset_config('noemailever');
+        $this->setAdminUser();
+        $sink = $this->redirectEmails();
+
+        $emails = "user1@asd.com,user2@asd.com; user3@asd.com user4@asd.com\nuser1@asd.com";
+        $parsedemails = prepare_emails($emails);
+        $data = $this->generate_invite_form_data($this->testcourse->id);
+        foreach ($parsedemails as $email) {
+            $data->email = $email;
+            $this->courseinvitationmanager->send_invitations($data);
+        }
+        $messages = $sink->get_messages();
+        $this->assertCount(4, $messages);
+    }
 
     /**
      * Provides array of days for invitation to expire after being accepted.

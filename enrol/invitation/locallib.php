@@ -620,3 +620,18 @@ function print_page_tabs($active_tab) {
     // Display tabs here.
     print_tabs(array($tabs), $active_tab);
 }
+
+/**
+ * Convert a string of emails into an array with a separate entry for each unique
+ * email.
+ * 
+ * @param string $emailstring   string containing one or more email addresses
+ * @return array $email_list    array containing unique emails separated by delimiters
+ */
+function prepare_emails($emailstring) {
+    // Check for the invitation of multiple users.
+    $delimiters = "/[;, \r\n]/";
+    $email_list = invitation_form::parse_dsv_emails($emailstring, $delimiters);
+    $email_list = array_unique($email_list);
+    return $email_list;
+}
