@@ -302,9 +302,7 @@ class local_ucla_generator extends testing_data_generator {
     }
 
     /**
-     * Create the roles needed to do enrollment. Note, that these roles will not
-     * have the same capabilities as the real roles, they are just roles with
-     * the same name as needed.
+     * Create the roles needed to do enrollment.
      *
      * @param array $rolestocreate
      * @return array Returns an array of shortname to roleid.
