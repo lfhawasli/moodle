@@ -79,7 +79,8 @@ class preferredname_test extends advanced_testcase {
      * Makes sure that fullname works as expected for a user without an alternative name.
      */
     public function test_fullname_preferredname_empty() {
-        $user = $this->getDataGenerator()->create_user(array('alternatename' => '', 'middlename' => 'Test'));
+        $user = $this->getDataGenerator()->create_user(array('firstname' => 'afirstname', 'lastname' => 'alastname',
+                'alternatename' => '', 'middlename' => 'Test'));
 
         // Make sure that alternatename is not set.
         $this->assertEmpty($user->alternatename);
@@ -112,7 +113,8 @@ class preferredname_test extends advanced_testcase {
             ->create_ucla_roles();
 
         // Make sure that we have a user with alternatename set.
-        $user = $this->getDataGenerator()->create_user(array('alternatename' => 'Test'));
+        $user = $this->getDataGenerator()->create_user(array('firstname' => 'afirstname', 'lastname' => 'alastname',
+            'alternatename' => 'Test'));
         $this->assertNotEmpty($user->alternatename);
 
         // Check that name displays properly for different users.
