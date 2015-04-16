@@ -259,11 +259,13 @@ class course_edit_form extends moodleform {
         $mform->setType('summary_editor', PARAM_RAW);
         $summaryfields = 'summary_editor';
 
-        if ($overviewfilesoptions = course_overviewfiles_options($course)) {
-            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('courseoverviewfiles'), null, $overviewfilesoptions);
-            $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
-            $summaryfields .= ',overviewfiles_filemanager';
-        }
+        // START UCLA MOD: CCLE-4869 - Unable to display images Course Summary text editor
+        // if ($overviewfilesoptions = course_overviewfiles_options($course)) {
+        //    $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('courseoverviewfiles'), null, $overviewfilesoptions);
+        //    $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
+        //    $summaryfields .= ',overviewfiles_filemanager';
+        // }
+        // END UCLA MOD: CCLE-4869
 
         if (!empty($course->id) and !has_capability('moodle/course:changesummary', $coursecontext)) {
             // Remove the description header it does not contain anything any more.
