@@ -135,7 +135,7 @@ class invitation_manager {
     /**
      * Send invitation (create a unique token for each of them).
      *
-     * @param obj $data         data processed from the invite form, or an invite
+     * @param obj $data         data processed from the invite form, or an invite if resending
      * @param bool $resend      resend the invite specified by $data
      * @return int $retval      id of invitation in enrol_invitation table
      */
@@ -167,6 +167,7 @@ class invitation_manager {
                 $invitation->token = $token;
                 $invitation->tokenused = false;
                 $invitation->roleid = $resend ? $data->roleid : $data->role_group['roleid'];
+                $invitation->subject = '';
 
                 // Set time.
                 $timesent = time();
@@ -360,6 +361,35 @@ class invitation_manager {
             $emailinfo->siteurl = $siteurl->out(false);
 
             email_to_user($contactuser, get_admin(), get_string('emailtitleuserenrolled', 'enrol_invitation', $emailinfo), get_string('emailmessageuserenrolled', 'enrol_invitation', $emailinfo));
+        }
+    }
+
+    /**
+     * Updates invitation if inviter chooses to revoke, extend, or resend
+     * 
+     * @param obj $invite       an instance of an enrol_invitation record
+     * @param int $actionid     either INVITE_REVOKE, INVITE_EXTEND, or INVITE_RESEND
+     */
+    public function update_invitation($invite, $actionid) {
+        global $DB;
+        $course = $DB->get_record('course', array('id' => $this->courseid));
+
+        if($actionid == self::INVITE_REVOKE) {
+            $DB->set_field('enrol_invitation', 'timeexpiration', time()-1,
+                    array('courseid' => $invite->courseid, 'id' => $invite->id));
+
+            $event = \enrol_invitation\event\invitation_revoked::create(array(
+                    'objectid' => $invite->id,
+                    'context' => context_course::instance($invite->courseid),
+                    'other' => $course->fullname
+            ));
+            $event->trigger();
+        } else if ($actionid == self::INVITE_EXTEND) {
+            $this->send_invitations($invite, true);
+        } else if ($actionid == self::INVITE_RESEND) {
+            $redirect = new moodle_url('/enrol/inbitation/invitation.php',
+                    array('courseid' => $invite->courseid, 'inviteid' => $invite->id));
+            redirect($redirect);
         }
     }
 
