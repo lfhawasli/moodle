@@ -100,6 +100,7 @@ $CFG->forced_plugin_settings['tool_uclacoursecreator']['email_template_dir'] = '
 $CFG->forced_plugin_settings['tool_uclacoursecreator']['make_division_categories'] = false;
 $CFG->forced_plugin_settings['tool_uclacoursecreator']['desc_no_autofill'] = true;
 $CFG->forced_plugin_settings['format_ucla']['hideregsummary'] = true;
+$CFG->forced_plugin_settings['format_ucla']['disable_tasite_news_forum'] = true;
 
 // MyUCLA url updater
 $CFG->forced_plugin_settings['tool_myucla_url']['url_service'] = 'http://cis.ucla.edu/ieiWebMap/update.asp';
