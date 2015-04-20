@@ -375,7 +375,7 @@ class invitation_manager {
         $course = $DB->get_record('course', array('id' => $this->courseid));
 
         if($actionid == self::INVITE_REVOKE) {
-            $DB->set_field('enrol_invitation', 'timeexpiration', time()-1,
+            $DB->set_field('enrol_invitation', 'timeexpiration', $invite->timesent,
                     array('courseid' => $invite->courseid, 'id' => $invite->id));
 
             $event = \enrol_invitation\event\invitation_revoked::create(array(
@@ -387,7 +387,7 @@ class invitation_manager {
         } else if ($actionid == self::INVITE_EXTEND) {
             $this->send_invitations($invite, true);
         } else if ($actionid == self::INVITE_RESEND) {
-            $redirect = new moodle_url('/enrol/inbitation/invitation.php',
+            $redirect = new moodle_url('/enrol/invitation/invitation.php',
                     array('courseid' => $invite->courseid, 'inviteid' => $invite->id));
             redirect($redirect);
         }
@@ -451,8 +451,8 @@ class invitation_manager {
             // Invite was used already.
             $status = get_string('status_invite_used', 'enrol_invitation');
             return $status;
-        } else if ($invite->timeexpiration - $invite->timesent < get_config('enrol_invitation', 'inviteexpiration')) {
-            // Invite is revoked if expiration < two weeks from time of invitation.
+        } else if ($invite->timeexpiration == $invite->timesent) {
+            // Invite is revoked if expiration equals time sent.
             return get_string('status_invite_revoked', 'enrol_invitation');
         } else if ($invite->timeexpiration < time()) {
             // Invite is expired.

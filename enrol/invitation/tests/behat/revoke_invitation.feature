@@ -4,7 +4,7 @@ Feature: Revoke an invite
   As an instructor or project lead
   I want to be able to revoke an invite
 
-  Scenario Outline: Revoke invitation
+  Scenario: Revoke invitation
     Given I am in a ucla environment
     And the following "users" exist:
      | username | firstname | lastname | email |
@@ -17,13 +17,13 @@ Feature: Revoke an invite
      | teacher1 | C1 | editingteacher | 
     And the following ucla "roles" exist:
       | role |
-      | <inviterole> |
+      | editor |
     And I log in as "teacher1"
     And I browse to site "C1"
     And I press "Control Panel"
     And I follow "Invite users"
     And I set the following fields to these values:
-      | role_group[roleid] | <roleid> |
+      | role_group[roleid] | 9 |
       | Email address | s1@asd.com |
       | Subject | Site invitation to course 1 |
     And I press "Invite users"
@@ -33,7 +33,3 @@ Feature: Revoke an invite
     Then the following should exist in the "generaltable" table:
       | Status | 
       | Revoked |
-
-    Examples:
-      | inviterole | roleid |
-      | editor | 9 |
