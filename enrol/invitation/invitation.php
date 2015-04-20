@@ -87,12 +87,8 @@ $mform->set_data($invitationmanager);
 $data = $mform->get_data();
 if ($data and confirm_sesskey()) {
 
-    // Check for the invitation of multiple users.
-    $delimiters = "/[;, \r\n]/";
-    $email_list = invitation_form::parse_dsv_emails($data->email, $delimiters);
-    $email_list = array_unique($email_list);
-
-    foreach ($email_list as $email) {
+    $emaillist = prepare_emails($data->email);
+    foreach ($emaillist as $email) {
         $data->email = $email;
         $invitationmanager->send_invitations($data);
     }

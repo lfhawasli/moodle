@@ -229,6 +229,8 @@ class behat_ucla extends behat_files {
 
     /**
      * Generates UCLA SRS and collab sites and saves course objs in $courses array.
+     * NOTE: For 'class' site types, this method will generate a separate shortname to be saved
+     *       into the 'courses' db table.
      * 
      * @param \Behat\Gherkin\Node\TableNode $data
      * @throws PendingException
@@ -446,6 +448,31 @@ class behat_ucla extends behat_files {
             new Given('I set the following fields to these values:', $data),
             new Given('I press "' . get_string('savechangesanddisplay') . '"')
         );
+    }
+
+    /**
+     * Attempts to navigate to access page that enrols user in a course.
+     * Equivalent to clicking ACCESS LINK in the last invite email to the user.
+     *
+     * @Then /^I follow the link in the last invitation sent to "(?P<username_string>(?:[^"]|\\")*)" for ucla site "(?P<course_shortname_string>(?:[^"]|\\")*)"$/
+     */
+    public function i_follow_link_in_last_invitation_sent_to_for_ucla_site($uname, $shortname) {
+        global $DB;
+
+        $sql =      "SELECT e.token "
+                .     "FROM {enrol_invitation} e "
+                .     "JOIN {user} u ON u.email = e.email "
+                .    "WHERE e.courseid = :courseid AND u.username = :username "
+                . "ORDER BY e.id DESC";
+
+        $params = array('courseid' => $this->courses[$shortname]->id, 'username' => $uname);
+        if (!($token = $DB->get_field_sql($sql, $params, IGNORE_MULTIPLE))) {
+            throw new ElementNotFoundException('The user "' . $uname . '" does not have any pending invites for this course');
+        }
+        $inviteurl = new moodle_url('/enrol/invitation/enrol.php', array('token' => $token));
+        $inviteurl = $inviteurl->out(false);
+
+        $this->getSession()->visit($inviteurl);
     }
 
     /**

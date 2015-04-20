@@ -84,33 +84,13 @@ if (empty($invites)) {
         if (!$curr_invite = $invites[$inviteid]) {
             print_error('invalidinviteid');
         }
+
+        $invitationmanager->update_invitation($curr_invite, $actionid);
         if ($actionid == invitation_manager::INVITE_REVOKE) {
-            // Set the invite to be expired.
-            $DB->set_field('enrol_invitation', 'timeexpiration', time()-1,
-                    array('courseid' => $curr_invite->courseid, 'id' => $curr_invite->id) );
-
-            $event = \enrol_invitation\event\invitation_revoked::create(array(
-                    'objectid' => $curr_invite->id,
-                    'context' => context_course::instance($curr_invite->courseid),
-                    'other' => $course->fullname
-            ));
-            $event->trigger();
-
             echo $OUTPUT->notification(get_string('revoke_invite_sucess', 'enrol_invitation'), 'notifysuccess');
-
         } else if ($actionid == invitation_manager::INVITE_EXTEND) {
-            // Resend the invite and email.
-            $invitationmanager->send_invitations($curr_invite, true);
-
             echo $OUTPUT->notification(get_string('extend_invite_sucess', 'enrol_invitation'), 'notifysuccess');
-
-        } else if ($actionid == invitation_manager::INVITE_RESEND) {
-            // Send the user to the invite form with prefilled data.
-            $redirect = new moodle_url('/enrol/invitation/invitation.php',
-                    array('courseid' => $curr_invite->courseid, 'inviteid' => $curr_invite->id));
-            redirect($redirect);
-
-        } else {
+        } else if ($actionid != invitation_manager::INVITE_RESEND) {
             print_error('invalidactionid');
         }
 

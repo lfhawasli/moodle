@@ -41,7 +41,7 @@ class invitation_manager_testcase extends advanced_testcase {
      * 
      * @var invitation_manager
      */
-    private $invitationmanager = null;
+    private $courseinvitationmanager = null;
 
     /**
      * Course object.
@@ -79,11 +79,11 @@ class invitation_manager_testcase extends advanced_testcase {
 
         $invite = $this->create_invite();
         $invite->daysexpire = $daystoexpire;
-        $this->invitationmanager->enroluser($invite);
+        $this->courseinvitationmanager->enroluser($invite);
 
         // Check user_enrolments table and make sure endtime is $daystoexpire
         // days ahead.
-        $enrolinstance = $this->invitationmanager->get_invitation_instance($this->testcourse->id);
+        $enrolinstance = $this->courseinvitationmanager->get_invitation_instance($this->testcourse->id);
         $timeend = $DB->get_field('user_enrolments', 'timeend',
                 array('userid' => $this->testinvitee->id,
                       'enrolid' => $enrolinstance->id));
@@ -113,7 +113,7 @@ class invitation_manager_testcase extends advanced_testcase {
         $context = context_course::instance($this->testcourse->id);
         set_config('enabletempparticipant', 1, 'enrol_invitation');
 
-        $enrolinstance = $this->invitationmanager->get_invitation_instance($this->testcourse->id);
+        $enrolinstance = $this->courseinvitationmanager->get_invitation_instance($this->testcourse->id);
 
         // Enrol user with an timeend in the past.
         $invitation->enrol_user($enrolinstance, $this->testinvitee->id, $roleid,
@@ -161,6 +161,131 @@ class invitation_manager_testcase extends advanced_testcase {
     }
 
     /**
+     * For project sites, tests that the invite has a warning message.
+     */
+    public function test_emailinvitemessage() {
+        unset_config('noemailever');
+        $this->setAdminUser();
+        $sink = $this->redirectEmails();
+
+        $localgen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $courseinfo['type'] = 'non_instruction';
+        // Force a different shortname so the new course doesn't conflict with $this->testcourse.
+        $courseinfo['shortname'] = 'cc_1';
+        $collabcourse = $localgen->create_collab($courseinfo);
+        // Create a specific invitation manager for the collab course.
+        $imanager = new invitation_manager($collabcourse->id);
+        $data = $this->generate_invite_form_data($collabcourse->id);
+
+        $site = new siteindicator_site($collabcourse->id);
+        $imanager->send_invitations($data);
+        $site->set_type('research');
+        $imanager->send_invitations($data);
+        $site->set_type('private');
+        $imanager->send_invitations($data);
+
+        $messages = $sink->get_messages();
+        $warningtext = "Please be aware that if you accept this invitation your profile information"
+                . " will be available to the other members of this project.";
+        $timeexpire = time() + get_config('enrol_invitation', 'inviteexpiration');
+        $timeexpire = date('M j, Y g:ia', $timeexpire);
+        $expiretext = 'and will expire on (' . $timeexpire . ')';
+        foreach ($messages as $message) {
+            $cleanbody = preg_replace('/\s+/', ' ', $message->body);
+            $this->assertContains($warningtext, $cleanbody);
+            $this->assertContains($expiretext, $cleanbody);
+        }
+    }
+
+    /**
+     * Verifies that an inviter gets an email notification when an invitee accepts an
+     * invitation. (Provided they check the box "Notify me at..." in the invite form.)
+     */
+    public function test_notifyinviter() {
+        global $DB;
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
+
+        $teacherroleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
+        $this->getDataGenerator()->role_assign($teacherroleid, $this->testinviter->id,
+            context_course::instance($this->testcourse->id));
+        $this->setUser($this->testinviter);
+
+        $data = $this->generate_invite_form_data($this->testcourse->id);
+        $data->notify_inviter = 1;
+        $inviteid = $this->courseinvitationmanager->send_invitations($data);
+
+        $this->setUser($this->testinvitee);
+        $invitation = $DB->get_record('enrol_invitation', array('id' => $inviteid));
+        $this->courseinvitationmanager->accept_invite($invitation, $this->testcourse);
+        $messages = $sink->get_messages();
+        $this->assertEquals(count($messages), 2);
+    }
+    /**
+     * Test that invitation form accepts multiple email addresses by testing
+     * enrol/invitation/invitation_form.php: parse_dsv_emails.
+     */
+    public function test_emailparsing() {
+        // Check that a single email address gets successfully parsed
+        $emails = 'user1@asd.com';
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(1, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+
+        // Check that multiple email addresses get successfully parsed
+        $emails .= ';user2@asd.com;user3@asd.com;user4@asd.com';
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        $emails = preg_replace('/;/', ',', $emails);
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        $emails = preg_replace('/,/', ' ', $emails);
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        $emails = preg_replace('/ /', "\r\n", $emails);
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+
+        // Check that varying delimiters are successfully parsed.
+        $emails = "user1@asd.com,user2@asd.com; user3@asd.com user4@asd.com\nuser1@asd.com";
+        $parsedemails = prepare_emails($emails);
+        $this->assertCount(4, $parsedemails);
+        $this->assertEquals('user1@asd.com', $parsedemails[0]);
+        $this->assertEquals('user3@asd.com', $parsedemails[2]);
+    }
+
+    /**
+     * Verify that when the user specifies duplicate emails, only one invite is
+     * sent to each unique email address.
+     */
+    public function test_multipleemails() {
+        unset_config('noemailever');
+        $this->setAdminUser();
+        $sink = $this->redirectEmails();
+
+        $emails = "user1@asd.com,user2@asd.com; user3@asd.com user4@asd.com\nuser1@asd.com";
+        $parsedemails = prepare_emails($emails);
+        $data = $this->generate_invite_form_data($this->testcourse->id);
+        foreach ($parsedemails as $email) {
+            $data->email = $email;
+            $this->courseinvitationmanager->send_invitations($data);
+        }
+        $messages = $sink->get_messages();
+        $this->assertCount(4, $messages);
+    }
+
+    /**
      * Provides array of days for invitation to expire after being accepted.
      *
      * @return array
@@ -171,6 +296,23 @@ class invitation_manager_testcase extends advanced_testcase {
             $retval[] = array($daysexpire);
         }
         return $retval;
+    }
+
+    /**
+     * Generates data object needed to submit to send_invitations()
+     * 
+     * @return obj $data
+     */
+    private function generate_invite_form_data($courseid) {
+        global $DB;
+
+        $data = new stdClass();
+        $data->courseid = $courseid;
+        $data->email = $this->testinvitee->email;
+        $data->role_group['roleid'] = $DB->get_field('role', 'id', array('shortname' => 'student'));
+        $data->subject = 'Test invite';
+
+        return $data;
     }
 
     /**
@@ -216,6 +358,6 @@ class invitation_manager_testcase extends advanced_testcase {
         $this->testinviter = $this->getDataGenerator()->create_user();
 
         // Create manager that we want to test.
-        $this->invitationmanager = new invitation_manager($this->testcourse->id);
+        $this->courseinvitationmanager = new invitation_manager($this->testcourse->id);
     }
 }
