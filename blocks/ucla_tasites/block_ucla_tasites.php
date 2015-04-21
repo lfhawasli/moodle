@@ -392,6 +392,16 @@ class block_ucla_tasites extends block_base {
 
         enrol_meta_sync($course->id);
         
+        // Check if Announcements forum should be deleted for TA site.
+        $istasite = block_ucla_tasites::is_tasite($course->id);
+        if ($istasite) {
+            $enabletasitenewsforum = !(get_config('format_ucla', 'disable_tasite_news_forum'));
+            if (!$enabletasitenewsforum) {
+                $newsforum = forum_get_course_forum($course->id, 'news');
+                forum_delete_instance($newsforum->id);
+            }
+        }
+        
         // Sync groups from course site.
         $trace = new null_progress_trace();
         local_metagroups_sync($trace, $course->id);

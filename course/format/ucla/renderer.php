@@ -493,7 +493,9 @@ class format_ucla_renderer extends format_topics_renderer {
         $center_content .= html_writer::start_tag('div', array('class' => 'summary'));
         // If something is entered for the course summary then display that.        
         if (!empty($this->course->summary) && !$supresscoursesummary) {
-            $center_content .= format_text($this->course->summary);
+            $context = context_course::instance($this->course->id);
+            $summary = file_rewrite_pluginfile_urls($this->course->summary, 'pluginfile.php', $context->id, 'course', 'summary', NULL);
+            $center_content .= format_text($summary);
         } 
   
         $center_content .= html_writer::end_tag('div');

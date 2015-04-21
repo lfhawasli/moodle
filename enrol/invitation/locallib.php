@@ -135,8 +135,9 @@ class invitation_manager {
     /**
      * Send invitation (create a unique token for each of them).
      *
-     * @param array $data       data processed from the invite form, or an invite
-     * @param bool $resend     resend the invite specified by $data
+     * @param obj $data         data processed from the invite form, or an invite if resending
+     * @param bool $resend      resend the invite specified by $data
+     * @return int $retval      id of invitation in enrol_invitation table
      */
     public function send_invitations($data, $resend = false) {
         global $DB, $CFG, $SITE, $USER;
@@ -166,6 +167,7 @@ class invitation_manager {
                 $invitation->token = $token;
                 $invitation->tokenused = false;
                 $invitation->roleid = $resend ? $data->roleid : $data->role_group['roleid'];
+                $invitation->subject = '';
 
                 // Set time.
                 $timesent = time();
@@ -236,6 +238,9 @@ class invitation_manager {
 
                 if (!$resend) {
                     $objid = $DB->insert_record('enrol_invitation', $invitation);
+                    $retval = $objid;
+                } else {
+                    $retval = $data->id;
                 }
 
                 // Change FROM to be $CFG->supportemail if user has show_from_email off.
@@ -285,9 +290,106 @@ class invitation_manager {
                     $event->trigger();
                 }
             }
+            return $retval;
         } else {
             throw new moodle_exception('cannotsendinvitation', 'enrol_invitation',
-                    new moodle_url('/course/view.php', array('id' => $data['courseid'])));
+                    new moodle_url('/course/view.php', array('id' => $data->courseid)));
+        }
+    }
+
+    /**
+     * Enrol the user in the course, update the database to mark the token as used,
+     * and (optionally) notify inviter.
+     * 
+     * @param obj $invitation   a enrol_invitation record
+     * @param obj $course       a course object
+     */
+    public function accept_invite($invitation, $course) {
+        global $DB, $USER, $SITE;
+        if ($invitation->email != $USER->email) {
+            $event = \enrol_invitation\event\invitation_mismatch::create(array(
+                        'objectid' => $invitation->id,
+                        'context' => context_course::instance($invitation->courseid),
+                        'other' => $course->fullname
+            ));
+            $event->trigger();
+        }
+
+        $this->enroluser($invitation);
+
+        $event = \enrol_invitation\event\invitation_claimed::create(array(
+                    'objectid' => $invitation->id,
+                    'context' => context_course::instance($invitation->courseid),
+                    'other' => $course->fullname
+        ));
+        $event->trigger();
+
+        // Set token as used and mark which user was assigned the token.
+        $invitation->tokenused = true;
+        $invitation->timeused = time();
+        $invitation->userid = $USER->id;
+        $DB->update_record('enrol_invitation', $invitation);
+
+        if (!empty($invitation->notify_inviter)) {
+            // Send an email to the user who sent the invitation.
+            $inviter = $DB->get_record('user', array('id' => $invitation->inviterid));
+
+            // This is inviter's information.
+            $contactuser = new object;
+            $contactuser->email = $inviter->email;
+            $contactuser->firstname = $inviter->firstname;
+            $contactuser->lastname = $inviter->lastname;
+            $contactuser->maildisplay = true;
+            $contactuser->id = $inviter->id;
+            // Moodle 2.7 introduced new username fields.
+            $contactuser->alternatename = '';
+            $contactuser->firstnamephonetic = '';
+            $contactuser->lastnamephonetic = '';
+            $contactuser->middlename = '';
+
+            $emailinfo = prepare_notice_object($invitation);
+            $emailinfo->userfullname = trim($USER->firstname . ' ' . $USER->lastname);
+            $emailinfo->useremail = $USER->email;
+            $courseenrolledusersurl = new moodle_url('/enrol/users.php', array('id' => $invitation->courseid));
+            $emailinfo->courseenrolledusersurl = $courseenrolledusersurl->out(false);
+            $invitehistoryurl = new moodle_url('/enrol/invitation/history.php', array('courseid' => $invitation->courseid));
+            $emailinfo->invitehistoryurl = $invitehistoryurl->out(false);
+
+            $emailinfo->coursefullname = sprintf('%s: %s', $course->shortname, $course->fullname);
+            $emailinfo->sitename = $SITE->fullname;
+            $siteurl = new moodle_url('/');
+            $emailinfo->siteurl = $siteurl->out(false);
+
+            email_to_user($contactuser, get_admin(), get_string('emailtitleuserenrolled', 'enrol_invitation', $emailinfo), get_string('emailmessageuserenrolled', 'enrol_invitation', $emailinfo));
+        }
+    }
+
+    /**
+     * Updates invitation if inviter chooses to revoke, extend, or resend
+     * 
+     * @param obj $invite       an instance of an enrol_invitation record
+     * @param int $actionid     either INVITE_REVOKE, INVITE_EXTEND, or INVITE_RESEND
+     */
+    public function update_invitation($invite, $actionid) {
+        global $DB;
+        $course = $DB->get_record('course', array('id' => $this->courseid));
+
+        if($actionid == self::INVITE_REVOKE) {
+            $DB->set_field('enrol_invitation', 'timeexpiration', $invite->timesent,
+                    array('courseid' => $invite->courseid, 'id' => $invite->id));
+
+            $event = \enrol_invitation\event\invitation_revoked::create(array(
+                    'objectid' => $invite->id,
+                    'context' => context_course::instance($invite->courseid),
+                    'other' => $course->fullname
+            ));
+            $event->trigger();
+        } else if ($actionid == self::INVITE_EXTEND) {
+            $this->send_invitations($invite, true);
+        } else if ($actionid == self::INVITE_RESEND) {
+            $redirect = new moodle_url('/enrol/invitation/invitation.php',
+                    array('courseid' => $invite->courseid, 'inviteid' => $invite->id));
+            redirect($redirect);
         }
     }
 
@@ -349,8 +451,8 @@ class invitation_manager {
             // Invite was used already.
             $status = get_string('status_invite_used', 'enrol_invitation');
             return $status;
-        } else if ($invite->timeexpiration - $invite->timesent < get_config('enrol_invitation', 'inviteexpiration')) {
-            // Invite is revoked if expiration < two weeks from time of invitation.
+        } else if ($invite->timeexpiration == $invite->timesent) {
+            // Invite is revoked if expiration equals time sent.
             return get_string('status_invite_revoked', 'enrol_invitation');
         } else if ($invite->timeexpiration < time()) {
             // Invite is expired.
@@ -512,11 +614,12 @@ class invitation_manager {
  * @return object
  */
 function prepare_notice_object($invitation) {
-    global $CFG, $course, $DB;
+    global $CFG, $DB;
 
     $noticeobject = new stdClass();
     $noticeobject->email = $invitation->email;
-    $noticeobject->coursefullname = $course->fullname;
+    $noticeobject->coursefullname = $DB->get_field('course', 'fullname',
+            array('id' => $invitation->courseid));
     $noticeobject->supportemail = $CFG->supportemail;
 
     // Get role name for use in acceptance message.
@@ -546,4 +649,19 @@ function print_page_tabs($active_tab) {
 
     // Display tabs here.
     print_tabs(array($tabs), $active_tab);
+}
+
+/**
+ * Convert a string of emails into an array with a separate entry for each unique
+ * email.
+ * 
+ * @param string $emailstring   string containing one or more email addresses
+ * @return array $email_list    array containing unique emails separated by delimiters
+ */
+function prepare_emails($emailstring) {
+    // Check for the invitation of multiple users.
+    $delimiters = "/[;, \r\n]/";
+    $email_list = invitation_form::parse_dsv_emails($emailstring, $delimiters);
+    $email_list = array_unique($email_list);
+    return $email_list;
 }

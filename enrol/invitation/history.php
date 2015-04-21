@@ -84,33 +84,13 @@ if (empty($invites)) {
         if (!$curr_invite = $invites[$inviteid]) {
             print_error('invalidinviteid');
         }
+
+        $invitationmanager->update_invitation($curr_invite, $actionid);
         if ($actionid == invitation_manager::INVITE_REVOKE) {
-            // Set the invite to be expired.
-            $DB->set_field('enrol_invitation', 'timeexpiration', time()-1,
-                    array('courseid' => $curr_invite->courseid, 'id' => $curr_invite->id) );
-
-            $event = \enrol_invitation\event\invitation_revoked::create(array(
-                    'objectid' => $curr_invite->id,
-                    'context' => context_course::instance($curr_invite->courseid),
-                    'other' => $course->fullname
-            ));
-            $event->trigger();
-
             echo $OUTPUT->notification(get_string('revoke_invite_sucess', 'enrol_invitation'), 'notifysuccess');
-
         } else if ($actionid == invitation_manager::INVITE_EXTEND) {
-            // Resend the invite and email.
-            $invitationmanager->send_invitations($curr_invite, true);
-
             echo $OUTPUT->notification(get_string('extend_invite_sucess', 'enrol_invitation'), 'notifysuccess');
-
-        } else if ($actionid == invitation_manager::INVITE_RESEND) {
-            // Send the user to the invite form with prefilled data.
-            $redirect = new moodle_url('/enrol/invitation/invitation.php',
-                    array('courseid' => $curr_invite->courseid, 'inviteid' => $curr_invite->id));
-            redirect($redirect);
-
-        } else {
+        } else if ($actionid != invitation_manager::INVITE_RESEND) {
             print_error('invalidactionid');
         }
 
@@ -207,7 +187,8 @@ if (empty($invites)) {
             // Create link to extend an invite.
             $url->param('actionid', invitation_manager::INVITE_EXTEND);
             $row[5] .= html_writer::link($url, get_string('action_extend_invite', 'enrol_invitation'));
-        } else if ($status == get_string('status_invite_expired', 'enrol_invitation')) {
+        } else if ($status == get_string('status_invite_expired', 'enrol_invitation')
+            || $status == get_string('status_invite_revoked', 'enrol_invitation')) {
             // Create link to resend invite.
             $url->param('actionid', invitation_manager::INVITE_RESEND);
             $row[5] .= html_writer::link($url, get_string('action_resend_invite', 'enrol_invitation'));

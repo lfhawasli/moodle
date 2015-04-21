@@ -38,51 +38,6 @@ require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_course_section_fixe
 class course_section_fixer_test extends advanced_testcase {
 
     /**
-     * Add a course module to a given course, but bypassing Moodle's attempts to
-     * add that module to the course cache.
-     *
-     * We bypass the course cache by calling a module data generator for another
-     * course and then changing the reference to that course module to the
-     * original course.
-     *
-     * @param object $course
-     */
-    private function add_module($course) {
-        global $DB;
-
-        $diffcourse = $this->getDataGenerator()->create_course();
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_page');
-        $numsections = course_get_format($diffcourse)->get_course()->numsections;
-        $sectionnum = rand(1, $numsections);
-        $module = $generator->create_instance(array('course' => $diffcourse->id),
-                array('section' => $sectionnum));
-
-        // Now have reference to a course_modules entry, change course matching
-        // that entry to the parameter course.
-        $module->course = $course->id;
-        $DB->update_record('course_modules', $module);
-
-        // Then insert that course module in one of the sequences for one of the
-        // course sections for the parameter course.
-        // Get a random section.
-        $sections = $DB->get_records('course_sections',
-                array('course' => $course->id));
-        shuffle($sections);
-        $section = array_pop($sections);
-
-        $modarray = explode(",", trim($section->sequence));
-        if (empty($section->sequence)) {
-            $newsequence = "$module->id";
-        } else {
-            $newsequence = "$section->sequence,$module->id";
-        }
-        $DB->set_field('course_sections', 'sequence', $newsequence,
-                array('id' => $section->id));
-        $DB->set_field('course_modules', 'section', $section->id,
-                array('id' => $module->id));
-    }
-
-    /**
      * Add a course section to a given course, but bypass the course cache.
      * 
      * In order to do that, we will directly manipulate the DB.
@@ -162,52 +117,6 @@ class course_section_fixer_test extends advanced_testcase {
         rebuild_course_cache($course->id);
 
         return $DB->get_record('course', array('id' => $course->id));
-    }
-
-    /**
-     * Rearrange some random course modules for a given course, but bypassing
-     * Moodle's attempts to update the course cache.
-     *
-     * We bypass the course cache by directly modifying the course section
-     * table and editing the sequence columns.
-     *
-     * @param object $course
-     */
-    private function move_modules($course) {
-        global $DB;
-
-        // Get 2 random sections with something set for the sequence column.
-        $section1 = $section2 = null;
-
-        $sections = $DB->get_records('course_sections',
-                array('course' => $course->id));
-        shuffle($sections);
-        while (1) {
-            if (empty($sections)) {
-                throw new Exception('Unable to find 2 sections with sequences set');
-            }
-            $section = array_pop($sections);
-            if (!empty($section->sequence)) {
-                if (empty($section1)) {
-                    $section1 = $section;
-                } else if (empty($section2)) {
-                    $section2 = $section;
-                }
-            }
-
-            if (!empty($section1) && !empty($section2)) {
-                break;
-            }
-        }
-
-        // Swap the sequences for the 2 sections to give an illusion that
-        // sections were rearranged.
-        $swap = $section1->sequence;
-        $section1->sequence = $section2->sequence;
-        $section2->sequence = $swap;
-
-        $DB->update_record('course_sections', $section1);
-        $DB->update_record('course_sections', $section2);
     }
 
     /**
@@ -380,15 +289,10 @@ class course_section_fixer_test extends advanced_testcase {
 
     /**
      * Make sure that fix_problems properly fixes a course's sections.
+     *
      */
     public function test_fix_problems() {
         $course = $this->create_course_with_content();
-
-        // Let's really mess up this course's sections.
-        for ($i = 0; $i < 5; $i++) {
-            $this->add_module($course);
-            $this->move_modules($course);
-        }
 
         $this->add_section($course);
         $this->add_section($course);
