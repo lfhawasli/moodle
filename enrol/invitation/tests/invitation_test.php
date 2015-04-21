@@ -286,6 +286,42 @@ class invitation_manager_testcase extends advanced_testcase {
     }
 
     /**
+     * To verify when extend inviation is invoke, the expiration date is 
+     * this many days (set in config) from today (the day sent)
+     */
+    public function test_extendinvite() {
+        global $DB;
+        
+        // Settings avoid debug.
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
+
+        $teacherroleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
+        $this->getDataGenerator()->role_assign($teacherroleid, $this->testinviter->id,
+            context_course::instance($this->testcourse->id));
+        $this->setUser($this->testinviter);
+
+        $data = $this->generate_invite_form_data($this->testcourse->id);
+        $inviteid = $this->courseinvitationmanager->send_invitations($data);
+        
+        // Set the invitation expired.
+        $DB->set_field('enrol_invitation', 'timeexpiration', time()-1,
+                    array('id' => $inviteid));
+        $invitation = $DB->get_record('enrol_invitation', array('id' => $inviteid));
+
+        // Extend the invite.
+        $newinvitation = $this->courseinvitationmanager->update_invitation($invitation, invitation_manager::INVITE_EXTEND);
+
+        // Time ends.
+        $timeend = $DB->get_field('enrol_invitation', 'timeexpiration',
+                array('id' => $inviteid));
+
+        // If the invitation did sent out within 24 hours.
+        $expectedexpiration = time() + get_config('enrol_invitation', 'inviteexpiration');
+        $this->assertEquals(gmdate("Y-m-d", $expectedexpiration), gmdate("Y-m-d", $timeend));
+     }
+
+    /**
      * Provides array of days for invitation to expire after being accepted.
      *
      * @return array

@@ -1,10 +1,10 @@
 @ucla @enrol_invitation @CCLE-4476
-Feature: Revoke an invite
-  In order to revoke an invitation that is already sent
+Feature: Resend an invite
+  In order to send an invitation to student whose invitation has expired or revoked
   As an instructor or project lead
-  I want to be able to revoke an invite
+  I want to be able to resend an invite
 
-  Scenario: Revoke invitation
+  Scenario: Resend invitation
     Given I am in a ucla environment
     And the following "users" exist:
      | username | firstname | lastname | email |
@@ -28,8 +28,7 @@ Feature: Revoke an invite
       | Subject | Site invitation to course 1 |
     And I press "Invite users"
     And I should see "Invitation successfully sent"
-    When I follow "Invite history"
+    And I follow "Invite history"
     And I follow "Revoke invite"
-    Then the following should exist in the "generaltable" table:
-      | Status | 
-      | Revoked |
+    When I follow "Resend invite"
+    Then I should see "What role do you want to assign to the invitee?"
