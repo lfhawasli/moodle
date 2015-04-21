@@ -104,7 +104,12 @@ class grade_import_mapping_form extends moodleform {
             '0'            => get_string('ignore', 'grades')
         );
         $mform->addElement('select', 'mapto', get_string('mapto', 'grades'), $maptooptions);
-
+        
+        // START UCLA MOD: CCLE-5067 - Set default to "User IDnumber" for Grades Import
+        // Set default mapping to ID number instead of User ID
+        $mform->setDefault('mapto', 'useridnumber');
+        // END UCLA MOD: CCLE-5067
+        
         $mform->addElement('header', 'general', get_string('mappings', 'grades'));
 
         // Add a feedback option.
