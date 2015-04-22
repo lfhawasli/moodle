@@ -76,3 +76,6 @@
 [submodule "lib/editor/atto/plugins/poodll"]
 	path = lib/editor/atto/plugins/poodll
 	url = https://github.com/justinhunt/moodle-atto_poodll.git
+[submodule "mod/oublog"]
+	path = mod/oublog
+	url = https://github.com/ccle/moodle-mod_oublog
