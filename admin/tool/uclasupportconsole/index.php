@@ -185,7 +185,7 @@ if ($displayforms) {
         $form_content .= html_writer::start_tag('div');        
         $form_content .= html_writer::link(
                 new moodle_url('/admin/tool/uclasupportconsole/index.php', 
-                        array('moodlelog_show_filter' => 1)), 
+                        array('moodlelog_show_filter' => 1), 'moodlelog'), 
                 get_string('moodlelog_filter', 'tool_uclasupportconsole'), 
                 array('id' => 'show-log-types-filter', 
                     // TODO: there has to be a better way to show/hide using YUI...
