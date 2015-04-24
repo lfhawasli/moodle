@@ -143,7 +143,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $rtmppath = $url . '/' . $app . '/' . $format . $file;
 
     // Set playerid, so that we can support multiple video embeds.
-    $fileid = $file . '-' . uniqid();
+    $playerid = uniqid();
 
     if ($srt != '') {
         // Interactive timeline.
@@ -214,7 +214,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
         $index = 0;
         $timeline = '<div class="oidwowzafilter-timeline" style="width:' . $width . 'px;">';
         foreach ($text as $line) {
-            $timeline .= '<a onclick="jwplayer("player-' . $fileid . '").seek(' . $starts[$index] . ')" href="javascript:void(0)" id="t' . $starts[$index] . '">' . $times[$index] . '</a> - ' . $line . '<br/>';
+            $timeline .= '<a onclick="jwplayer("player-' . $playerid . '").seek(' . $starts[$index] . ')" href="javascript:void(0)" id="t' . $starts[$index] . '">' . $times[$index] . '</a> - ' . $line . '<br/>';
             $index++;
         }
         $timeline .= '</div>';
@@ -230,27 +230,24 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     }
 
     // Print out the player output.
-    return '
-        <div id="player-' . $fileid . '"></div>
-	<script type="text/javascript">
-	jwplayer("player-' . $fileid . '").setup({
-		width : "' . $width . '",
-		height : "' . $height . '",
-		ga: {},
-		plugins : {
-                                ' . $srtjs . '
-                                ' . $mbrjs . '
-                            },
-		playlist: [{
-            sources :
-                [
-                    {file: "' . $html5path . '",
+    return "
+        <div id='player-$playerid'></div>
+	<script type='text/javascript'>
+	jwplayer('player-$playerid').setup({
+		width: $width,
+		height: $height,
+		plugins: {
+                    $srtjs
+                    $mbrjs
                     },
-                    {file: "' . $rtmppath . '"
-                    }
-                ]
-                }],
-        primary: "flash"
+		playlist: [{
+                    sources :
+                        [
+                            {file: '$html5path'},
+                            {file: '$rtmppath'}
+                        ]
+                        }],
+                primary: 'html5'
 		});
-	</script>' . $timeline;
+	</script>" . $timeline;
 }

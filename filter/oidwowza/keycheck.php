@@ -28,8 +28,13 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 global $USER;
 
 $isvalid = true;
-if (!isset($USER->oid_video_allowed)) {
+if (!isset($USER->oid_video_allowed) || !$USER->oid_video_allowed) {
     $isvalid = false;
+}
+
+// Log to php error log to check if keycheck is being called.
+if (debugging()) {
+    error_log(sprintf('Called by %s, returning $isvalid = ', getremoteaddr(), $isvalid));
 }
 
 if (!$isvalid) {
