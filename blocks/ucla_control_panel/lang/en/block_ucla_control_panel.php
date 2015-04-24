@@ -81,6 +81,12 @@ $string['manage_syllabus_post'] = 'View and edit your course syllabus.';
 
 $string['course_download'] = 'Download course materials';
 $string['course_download_post'] = 'Request a zip file of your course materials.';
+$string['course_download_available'] = 'Download course materials';
+$string['course_download_available_post'] = 'Available one week before course ends.';
+$string['course_download_unavailable'] = 'Download course materials';
+$string['course_download_unavailable_post'] = 'Not available for this course';
+$string['course_download_disabled'] = 'Download course materials';
+$string['course_download_disabled_post'] = 'Disabled for students.';
 
 /** Stuff for advanced **/
 $string['more_advanced'] = 'Advanced functions';

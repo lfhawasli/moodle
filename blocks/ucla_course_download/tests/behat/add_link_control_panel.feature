@@ -18,14 +18,51 @@ Feature: Add link to Control Panel
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
 
-  Scenario: Control Panel link for students
-    Given it is "9th" week
+  Scenario: Instructor turned off course download and students cannot access Control Panel link.
+    Given I log in as "teacher1"
+    And I follow "course 1"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    When I set the field "Download course materials" to "No"
+    And I press "Save changes"
+    And I press "Control Panel"
+    Then I should see "Disabled for students" in the "region-main" "region"
+    And I log out
+    And it is "9th" week
     And I log in as "student1"
     And I follow "course 1"
-    When I press "Control Panel"
+    And I press "Control Panel"
+    Then I should see "Not available for this course" in the "region-main" "region"
+
+  Scenario: Course download is active and students can access Control Panel link.
+    Given I log in as "teacher1"
+    And I follow "course 1"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    When I set the field "Download course materials" to "Yes"
+    And I press "Save changes"
+    And I log out
+    And it is "9th" week
+    And I log in as "student1"
+    And I follow "course 1"
+    And I press "Control Panel"
     Then I should see "Download course materials" in the "region-main" "region"
     When I follow "Download course materials"
     Then I should see "UCLA course download" in the "region-main" "region"
+
+  Scenario: Course download is active, but students cannot access Control Panel link yet.
+    Given I log in as "teacher1"
+    And I follow "course 1"
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    When I set the field "Download course materials" to "Yes"
+    And I press "Save changes"
+    And I log out
+    And it is "2nd" week
+    And I log in as "student1"
+    And I follow "course 1"
+    And I press "Control Panel"
+    Then I should see "Available one week before course ends" in the "region-main" "region"
 
   Scenario: Control Panel link for instructors
     Given I log in as "teacher1"

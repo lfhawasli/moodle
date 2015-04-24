@@ -29,6 +29,12 @@ function student_zip_requestable($course) {
         return false;
     }
 
+    // See if the instructor has disabled downloading for this specific course.
+    $formatoptions = course_get_format($course->id)->get_format_options();
+    if ($formatoptions['coursedownload'] != 1) {
+        return false;
+    }
+
     // See if course is a UCLA course.
     $courseinfos = ucla_get_course_info($course->id);
     if (empty($courseinfos)) {
