@@ -227,8 +227,9 @@ function html_table_auto_headers($data) {
  *
  * @param string $title
  * @param array $data
- * @param array $inputs
- * @param string $moreinfo
+ * @param array $inputs     must be in format of params passed to a moodle_url
+ *                              constructor
+ * @param string $moreinfo  text to be displayed above the table
  * @return string
  */
 function supportconsole_render_section_shortcut($title, $data, 
@@ -414,19 +415,19 @@ function supportconsole_simple_form($title, $contents='', $buttonvalue='Go') {
 }
 
 /*
- * This function caches the module/action list used by the support console's
+ * This function caches the target_action list used by the support console's
  * "Show last 100 log entries" tool at some interval (nightly at the time of
  * this writing). See version.php for cron time.
  */
 function tool_uclasupportconsole_cron() {
     global $DB;
 
-    // Query the log for all module/action pairs (the id field must be included
+    // Query the log for all target_action pairs (the id field must be included
     // to give moodle a unique identifier for the records).
-    $logquery = 'SELECT DISTINCT CONCAT(module, \'-\', action), module, action
-                 FROM {log}
-                 GROUP BY module, action
-                 ORDER BY module, action';
+    $logquery = 'SELECT DISTINCT CONCAT(target, \'-\', action), target, action
+                 FROM {logstore_standard_log}
+                 GROUP BY target, action
+                 ORDER BY target, action';
     $records = $DB->get_records_sql($logquery);
     $encoding = json_encode($records);
 
