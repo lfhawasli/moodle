@@ -46,10 +46,22 @@ require_capability('moodle/course:managegroups', $context);
 $returnurl = $CFG->wwwroot.'/group/groupings.php?id='.$courseid;
 
 
-require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
-$publicprivate_course = new PublicPrivate_Course($course);
+if ($frm = data_submitted() and confirm_sesskey()) {
 
-if ($frm = data_submitted() and confirm_sesskey() and !$publicprivate_course->is_grouping($grouping)) {
+    // START UCLA MOD: CCLE-2229 - Public/Private for Moodle 2.x
+    require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
+    $ppcourse = new PublicPrivate_Course($course);
+
+    // Prevent Course members group from being removed.
+    $ppgroup = $ppcourse->get_group();
+    if (!empty($frm->removeselect) && !empty($ppgroup)) {
+        foreach ($frm->removeselect as $index => $groupid) {
+            if ($ppgroup == $groupid) {
+                unset($frm->removeselect[$index]);
+            }
+        }
+    }
+    // END UCLA MOD: CCLE-2229
 
     if (isset($frm->cancel)) {
         redirect($returnurl);
@@ -135,22 +147,6 @@ $PAGE->navbar->add($straddgroupstogroupings);
 $PAGE->set_title("$course->shortname: $strgroups");
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
-
-/**
- * Alert that public/private grouping cannot be edited.
- *
- * @author ebollens
- * @version 20110719
- */
-if($publicprivate_course->is_grouping($grouping)) {
-    echo '<h3 class="main">';
-    print_string('addgroupstogroupings', 'group');
-    echo ': '.$groupingname.'</h3>';
-    echo $OUTPUT->notification(get_string('publicprivatecannotedit','local_publicprivate'));
-    echo $OUTPUT->continue_button('groupings.php?id='.$groupingid);
-    echo $OUTPUT->footer();
-    die;
-}
 
 ?>
 <div id="addmembersform">

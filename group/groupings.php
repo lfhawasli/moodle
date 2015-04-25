@@ -70,7 +70,7 @@ if ($groupings = $DB->get_records('groupings', array('courseid'=>$course->id), '
     // START UCLA MOD: CCLE-2229 - Public/Private for Moodle 2.x
     require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
     $publicprivate_course = new PublicPrivate_Course($course);
-    // START UCLA MOD: CCLE-2229
+    // END UCLA MOD: CCLE-2229
     
     $canchangeidnumber = has_capability('moodle/course:changeidnumber', $context);
     foreach ($groupings as $gid => $grouping) {
@@ -108,14 +108,15 @@ if ($groupings = $DB->get_records('groupings', array('courseid'=>$course->id), '
                 array('class' => 'iconsmall')), array('title' => $strmanagegrping));
 
         /**
-         * Show buttons for all groupings except the public/private grouping.
+         * Show only the ability to assign groups for the public/private grouping.
          *
          * @author ebollens
          * @version 20110719
          */
         if($publicprivate_course->is_grouping($grouping)) {
-            $buttons = '';
-        }        
+            $buttons = html_writer::link($url, $OUTPUT->pix_icon('t/groups', $strmanagegrping, 'core',
+                array('class' => 'iconsmall')), array('title' => $strmanagegrping));
+        }
         
         $line[3] = $buttons;
         $data[] = $line;
