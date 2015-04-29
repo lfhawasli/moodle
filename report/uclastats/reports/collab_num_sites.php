@@ -56,9 +56,9 @@ class collab_num_sites extends uclastats_base {
         $guest_role = get_guest_role();
 
         $sql = "SELECT COUNT(DISTINCT c.id)
-                FROM {log} AS l
+                FROM {logstore_standard_log} AS l
                 JOIN {course} AS c ON (
-                    l.course = c.id
+                    l.courseid = c.id
                 )
                 LEFT JOIN {ucla_request_classes} AS urc ON (
                     urc.courseid = c.id
@@ -74,10 +74,10 @@ class collab_num_sites extends uclastats_base {
                     FROM {ucla_request_classes} 
                 )
                 AND c.id NOT IN (
-                    SELECT course
-                    FROM {log} l
+                    SELECT courseid
+                    FROM {logstore_standard_log} l
                     WHERE userid != :guestid AND
-                    time > :six_months_ago
+                    timecreated > :six_months_ago
                 )";
 
         $ret_val['inactive_count'] = $DB->get_field_sql($sql,
