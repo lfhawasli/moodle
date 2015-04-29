@@ -30,3 +30,4 @@ $string['eventgradesviewed'] = 'Gradebook {$a} report viewed';
 $string['pluginname'] = 'UCLA gradebook customizations';
 $string['settingsendupdates'] = 'Send gradebook updates';
 $string['settingsendupdateshelp'] = 'When enabled, this will send gradebook notifications to MyUCLA';
+$string['resendtask'] = "Send grades to MyUCLA that are no longer hidden";
