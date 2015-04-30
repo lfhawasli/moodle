@@ -193,6 +193,39 @@ class local_ucla_core_edit {
             echo html_writer::tag('dd', self::$profileviewmore);
         }
     }
+    
+    /**
+     * Display complete use details on profile pages.
+     *
+     * See CCLE-5147.
+     *
+     * @param object $user
+     */
+    public static function profile_display_help_request($user) {
+        $emailstop = array(0 => get_string('emailenable'), 1 => get_string('emaildisable'));
+        $maildigest = array(0 => get_string('emaildigestoff'), 1 => get_string('emaildigestcomplete'), 2 =>get_string('emaildigestsubjects'));
+        $maildisplay = array(0 => get_string('emaildisplayno'), 1 => get_string('emaildisplayyes'), 2 => get_string('emaildisplaycourse'));
+        $autosubscribe = array(0 => get_string('autosubscribeno'), 1 => get_string('autosubscribeyes'));
+        $trackforums = array(0 => get_string('trackforumsno'), 1 => get_string('trackforumsyes'));
+        $htmleditor = array('default' => get_string('defaulteditor'), 0 => get_string('texteditor'), 1 => get_string('htmleditor'));
+        $table = new html_table();
+        $table->head = array('Field', 'User Information');
+        $table->data = array(
+            array('Moodle ' . get_string('userid', 'grades'), $user->id),
+            array('Authentication method', $user->auth),
+            array(get_string('username'), $user->username),
+            array(get_string('alternatename'), $user->alternatename),
+            array('Email status', $emailstop[$user->emailstop]),
+            array(get_string('lastlogin'), userdate($user->lastlogin)."&nbsp; (".format_time(time() - $user->lastlogin).")"), 
+            array(get_string('emaildisplay'), $maildisplay[$user->maildisplay]),
+            array(get_string('emaildigest'),$maildigest[$user->maildigest]),
+            array(get_string('textediting'), $htmleditor[get_user_preferences('htmleditor', 'default', $user)]),
+            array(get_string('autosubscribe'), $autosubscribe[$user->autosubscribe]),
+            array(get_string('trackforums'), $trackforums[$user->trackforums]),
+            array('Time modified', userdate($user->timemodified)."&nbsp; (".format_time(time() - $user->timemodified).")"), 
+        );
+        echo html_writer::table($table);
+    }
 
     /**
      * Given a course ID, retrieve the course's number, term, and department.
