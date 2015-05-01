@@ -76,7 +76,7 @@ class active_student_focused extends uclastats_base {
 
         $sql = "SELECT  DISTINCT ra.userid
                 FROM    {course} c
-                JOIN    {log} l ON (l.course=c.id)
+                JOIN    {logstore_standard_log} l ON (l.courseid=c.id)
                 JOIN    {context} ct ON (
                             ct.instanceid=c.id AND
                             ct.contextlevel=:contextlevel
@@ -84,17 +84,17 @@ class active_student_focused extends uclastats_base {
                 JOIN    {role_assignments} ra ON (ct.id=ra.contextid)
                 JOIN    {role} r ON (ra.roleid=r.id)
                 WHERE   c.id=:courseid AND
-                        l.time>:starttime AND
-                        l.time<:endtime AND
+                        l.timecreated>:starttime AND
+                        l.timecreated<:endtime AND
                         ra.userid=l.userid AND
                         r.shortname='student' AND
-                        l.course=c.id AND
-                        l.module!='course' AND
-                        l.module!='user'";
+                        l.courseid=c.id AND
+                        (l.component LIKE 'mod_%' OR
+                         l.component='local_ucla_syllabus')";
 
         // If we need to filter out unused forums, then add SQL.
-        if (!empty($insql)) {
-            $sql .= " l.cmid $notinsql";
+        if (!empty($notinsql)) {
+            $sql .= " AND l.contextid $notinsql";
         }
 
         $students = $DB->get_records_sql($sql, $params);
@@ -128,7 +128,7 @@ class active_student_focused extends uclastats_base {
     }
 
     /**
-     * Returns the course module ids for the default Announcements and
+     * Returns the context ids for the default Announcements and
      * Discussions forums that do not have any posts.
      *
      * @param object $course
@@ -138,11 +138,12 @@ class active_student_focused extends uclastats_base {
     private function get_empty_default_forums($course) {
         global $DB;
 
-        $sql = "SELECT  cm.id
+        $sql = "SELECT  cxt.id
                 FROM    {forum} f
                 JOIN    {modules} m ON (m.name='forum')
                 JOIN    {course_modules} cm ON (cm.instance=f.id AND
                             cm.course=f.course AND cm.module=m.id)
+                JOIN    {context} cxt ON (cm.id=cxt.instanceid AND cxt.instanceid=70)
                 LEFT JOIN    {forum_discussions} fd ON (fd.forum=f.id)
                 WHERE   f.course=:courseid AND
                         ((f.type='news' AND f.name='Announcements') OR
