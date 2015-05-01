@@ -66,12 +66,12 @@ class users_by_division extends uclastats_base {
                 JOIN {role_assignments} ra ON (
                     ra.contextid = ctx.id
                 )
-                LEFT JOIN {log} l ON (
-                    l.course = urc.courseid AND
+                LEFT JOIN {logstore_standard_log} l ON (
+                    l.courseid = urc.courseid AND
                     l.userid = ra.userid
                 )
-                WHERE l.time >= :start AND
-                      l.time <= :end
+                WHERE l.timecreated >= :start AND
+                      l.timecreated <= :end
                 GROUP BY urci.division
                 ORDER BY urd.fullname";
         $ret = $DB->get_records_sql($sql, $params);
@@ -94,12 +94,12 @@ class users_by_division extends uclastats_base {
                 JOIN {role_assignments} ra on (
                     ra.contextid = ctx.id
                 )
-                LEFT JOIN {log} l ON (
-                    l.course = urc.courseid AND
+                LEFT JOIN {logstore_standard_log} l ON (
+                    l.courseid = urc.courseid AND
                     l.userid = ra.userid
                 )
-                WHERE l.time >= :start AND
-                      l.time <= :end";
+                WHERE l.timecreated >= :start AND
+                      l.timecreated <= :end";
         $system = $DB->get_record_sql($sql, $params);
 
         $system->ratio_hits_users = (
