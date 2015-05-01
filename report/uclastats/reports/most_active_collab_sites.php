@@ -63,15 +63,15 @@ class most_active_collab_sites extends uclastats_base {
         $sql = "SELECT  c.id,
                         c.shortname as course_title,
                         COUNT(l.id) AS viewcount
-                FROM {log} AS l
+                FROM {logstore_standard_log} AS l
                 JOIN {course} AS c ON (
-                    l.course = c.id
+                    l.courseid = c.id
                 )
                 LEFT JOIN {ucla_request_classes} AS urc ON (
                     urc.courseid = c.id
                 )
                 WHERE urc.id IS NULL AND
-                      l.action = 'view' AND
+                      l.action = 'viewed' AND
                       c.id != ?
                 GROUP BY c.id
                 ORDER BY viewcount DESC
