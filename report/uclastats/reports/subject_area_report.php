@@ -240,14 +240,14 @@ class subject_area_report extends uclastats_base {
             }
 
             $sql = "SELECT  l.id,
-                            l.course,
+                            l.courseid,
                             l.userid,
-                            COUNT( DISTINCT l.time ) AS num_hits
-                    FROM    {log} l
+                            COUNT( DISTINCT l.timecreated ) AS num_hits
+                    FROM    {logstore_standard_log} l
                     WHERE   l.action LIKE 'view%' AND
-                            l.course = $id AND
-                            l.time > $term_info->start AND
-                            l.time < $term_info->end AND
+                            l.courseid = $id AND
+                            l.timecreated > $term_info->start AND
+                            l.timecreated < $term_info->end AND
                             l.userid $inorequal
                     GROUP BY    l.userid";
             $records = $DB->get_records_sql($sql, $params);
@@ -278,7 +278,7 @@ class subject_area_report extends uclastats_base {
     private function get_students_ids($courseid) {
         global $DB;
 
-        $sql = "SELECT  ra.userid
+        $sql = "SELECT  DISTINCT ra.userid
                 FROM    {course} c
                 JOIN    {context} ctx ON ctx.instanceid = c.id
                 JOIN    {role_assignments} ra ON ra.contextid = ctx.id
