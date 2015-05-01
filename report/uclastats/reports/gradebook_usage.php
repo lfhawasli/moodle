@@ -58,9 +58,8 @@ class gradebook_usage extends uclastats_base {
                         urci.division " .
                 $this->from_filtered_courses(true)
                 ."
-                JOIN    {log} l ON l.course=c.id
-                WHERE   l.module='grade' AND
-                        l.action LIKE 'export%'";
+                JOIN    {logstore_standard_log} l ON l.courseid=c.id
+                WHERE   l.target='grades_exported'";
         $results = $DB->get_records_sql($sql, array('term' => $term));
 
         return $results;
