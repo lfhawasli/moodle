@@ -420,26 +420,26 @@ $consoles->push_console_html('logs', $title, $sectionhtml);
 // TODO combine with the next one
 $title = "moodlelogbydaycourse";
 $sectionhtml = '';
-if ($displayforms) { 
+if ($displayforms) {
     $sectionhtml .= supportconsole_simple_form($title);
-} else if ($consolecommand == "$title") { 
+} else if ($consolecommand == "$title") {
      $result = $DB->get_records_sql("
-        SELECT 
-            a.id, 
-            FROM_UNIXTIME(time,'%Y-%m-%d') AS date, 
+        SELECT
+            a.id,
+            FROM_UNIXTIME(a.timecreated,'%Y-%m-%d') AS date,
             c.shortname AS course,
-            COUNT(*) AS count 
-        FROM {log} a 
-        LEFT JOIN {course} c ON a.course = c.id
-        WHERE FROM_UNIXTIME(time) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND
+            COUNT(*) AS count
+        FROM {logstore_standard_log} a
+        LEFT JOIN {course} c ON a.courseid = c.id
+        WHERE FROM_UNIXTIME(a.timecreated) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND
                 c.id!=:siteid
-        GROUP BY date, course 
+        GROUP BY date, course
         ORDER BY count DESC
         LIMIT 100
     ", array('siteid' => SITEID));
 
     $sectionhtml .= supportconsole_render_section_shortcut($title, $result);
-} 
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
