@@ -402,29 +402,37 @@ if ($displayforms) {
         exit;
     }    
 
-    if ($filter ==" login") {
-        $whereclause = "AND action='login'";
+    // Do not return results for guest logins
+    $params = array();
+    $whereclause = "";
+    if ($filter == "login") {
+        $whereclause = "AND action = 'loggedin' AND userid <> ?";
         $what = 'Logins';
+        $params = array($CFG->siteguest);
     } else {
-        $whereclause = "";
         $what = 'Log Entries';
-    }    
+    }
 
     $sectionhtml = "Count of Moodle $what from the Last $days Days";
-    $days--;  # decrement days by 1 to get query to work
-    $result = $DB->get_records_sql("
-        SELECT 
-            FROM_UNIXTIME(time,'%Y-%m-%d') AS date,
-            COUNT(*) AS count 
-        FROM {log} a 
-        WHERE FROM_UNIXTIME(time) >= DATE_SUB(CURDATE(), INTERVAL $days DAY) 
-            $whereclause
-        GROUP BY date
-        ORDER BY a.id DESC
-    ");
+    $rs = $DB->get_recordset_sql("
+        SELECT FROM_UNIXTIME(timecreated,'%Y-%m-%d') AS date,
+               COUNT(*) AS count
+          FROM {logstore_standard_log}
+         WHERE FROM_UNIXTIME(timecreated, '%Y-%m-%d') >= DATE_SUB(CURDATE(), INTERVAL $days DAY)
+               $whereclause
+      GROUP BY date", $params);
 
-    $sectionhtml = supportconsole_render_section_shortcut($sectionhtml, $result);
-} 
+    $result = array();
+    if ($rs->valid()) {
+        foreach($rs as $record) {
+            $result[] = $record;
+        }    
+    }
+    $rs->close();
+
+    $sectionhtml = supportconsole_render_section_shortcut($title, $result,
+            array('radio' => $filter, 'days' => $days), $sectionhtml);
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
