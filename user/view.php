@@ -401,6 +401,13 @@ if (has_capability('moodle/user:viewlastip', $usercontext) && !isset($hiddenfiel
     echo html_writer::tag('dd', $ipstring);
 }
 echo html_writer::end_tag('dl');
+
+// START UCLA MOD: CCLE-5147 - Display complete use details on profile pages
+if (has_capability('moodle/user:viewalldetails', $usercontext)) {
+   local_ucla_core_edit::profile_display_help_request($user);
+}
+// END UCLA MOD: CCLE-5147
+
 echo "</div></div>"; // Closing desriptionbox and userprofilebox.
 // Print messaging link if allowed.
 if (isloggedin() && has_capability('moodle/site:sendmessage', $usercontext)
