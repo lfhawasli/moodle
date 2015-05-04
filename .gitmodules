@@ -79,3 +79,6 @@
 [submodule "lib/editor/atto/plugins/pastespecial"]
 	path = lib/editor/atto/plugins/pastespecial
 	url = https://github.com/jinhofer/pastespecial
+[submodule "mod/scheduler"]
+	path = mod/scheduler
+	url = https://github.com/bostelm/moodle-mod_scheduler.git
