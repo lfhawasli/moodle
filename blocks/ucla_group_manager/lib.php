@@ -1,4 +1,26 @@
 <?php
+// This file is part of the UCLA group management plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Class definition for the ucla_group_manager object.
+ *
+ * @package    block_ucla_group_manager
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -11,62 +33,105 @@ require_once($CFG->dirroot . '/blocks/ucla_group_manager/ucla_synced_grouping.cl
 ucla_require_registrar();
 
 /**
- *  
- **/
+ * Class file.
+ *
+ * @package    block_ucla_group_manager
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class ucla_group_manager {
-    
-    private $enrollment_helper;
-    
-    function __construct() {
-        $trace = new text_progress_trace();
+
+    /**
+     * Queries Registrar database.
+     *
+     * @var local_ucla_enrollment_helper
+     */
+    private $enrollmenthelper;
+
+    /**
+     * Controls output to screen.
+     *
+     * @var progress_trace
+     */
+    private $trace;
+
+    /**
+     * Constructor.
+     *
+     * @param progress_trace $trace
+     */
+    public function __construct(progress_trace $trace = null) {
+        if (empty($trace)) {
+            $trace = new text_progress_trace();
+        }
+        $this->trace = $trace;
         $enrol = enrol_get_plugin('database');
-        $this->enrollment_helper = new local_ucla_enrollment_helper($trace, $enrol);
-    }
-    // These are what are used to distinguish grouping names
-
-    // Hierarchical groupings
-    // This is at the level of the request, per request
-    static function crosslist_name_fields() {
-        return 'subj_area coursenum acttype sectnum';
+        $this->enrollmenthelper = new local_ucla_enrollment_helper($this->trace, $enrol);
     }
 
-    // This is at the level of the request
-    // for same course number, but can have more than one lecture
-    static function course_lecture_name_fields() {  
-        return 'subj_area coursenum lectnum acttype';
-    }
+    // These are what are used to distinguish grouping names.
 
-    // Bi-lateral groupings
-    // This is at the level of the request's section
-    static function section_type_name_fields() {
-        return 'acttype sectnum';
-    }
-
-    // This is at the level of the request's section
-    // This is for each section, super explicit
-    static function name_section_fields() {
+    /**
+     * Hierarchical groupings.
+     *
+     * This is at the level of the request, per request.
+     *
+     * @return string
+     */
+    public static function crosslist_name_fields() {
         return 'subj_area coursenum acttype sectnum';
     }
 
     /**
-     * Function to query registrar
-     * 
+     * This is at the level of the request for same course number,
+     * but can have more than one lecture.
+     *
+     * @return string
+     */
+    public static function course_lecture_name_fields() {
+        return 'subj_area coursenum lectnum acttype';
+    }
+
+    /**
+     * Bi-lateral groupings.
+     *
+     * This is at the level of the request's section.
+     * @return string
+     */
+    public static function section_type_name_fields() {
+        return 'acttype sectnum';
+    }
+
+    /**
+     * This is at the level of the request's section.
+     *
+     * This is for each section, super explicit.
+     *
+     * @return string
+     */
+    public static function name_section_fields() {
+        return 'subj_area coursenum acttype sectnum';
+    }
+
+    /**
+     * Function to query registrar.
+     *
      * @param string $sp stored procedure call
-     * @param array $request_arr containing the term and srs
+     * @param array $requestarr containing the term and srs
      * @param bool $filter
      *
      * @return array
      */
-    public function query_registrar($sp, $request_arr, $filter) {
-        return registrar_query::run_registrar_query($sp, $request_arr, $filter);
+    public function query_registrar($sp, $requestarr, $filter) {
+        return registrar_query::run_registrar_query($sp, $requestarr, $filter);
     }
 
     /**
-     *  Fetches section enrollments for a particular course set.
-     *  @param $courseid int
-     **/
+     * Fetches section enrollments for a particular course set.
+     *
+     * @param int $courseid
+     */
     public function course_sectionroster($courseid) {
-        global $PAGE;
 
         $requests = ucla_get_course_info($courseid);
         $debug = debugging();
@@ -75,46 +140,46 @@ class ucla_group_manager {
             return false;
         }
 
-        $requests_arr = array_map('get_object_vars', $requests);
+        $requestsarr = array_map('get_object_vars', $requests);
 
         if ($debug) {
-            echo "  course $courseid maps to " . count($requests) 
-                . " request(s)\n";
+            $this->trace->output("course $courseid maps to " . count($requests)
+                . " request(s)", 1);
         }
-    
+
         $requestsectioninfos = array();
 
-        // get the information needed            
-        foreach ($requests_arr as $reqarr) {
+        // Get the information needed .
+        foreach ($requestsarr as $reqarr) {
             $sections = $this->query_registrar(
                             'ccle_class_sections',
                             array($reqarr['term'], $reqarr['srs']),
                             true
                         );
 
-            echo "* " . make_idnumber($reqarr) . " has " . count($sections) 
-                . " sections\n";
+            $this->trace->output("* " . make_idnumber($reqarr) . " has " . count($sections)
+                . " sections");
 
             // Check this roster against section rosters to look for
-            // stragglers
+            // stragglers.
             $requestroster = $this->query_registrar(
-                        'ccle_roster_class', 
-                        array($reqarr['term'], $reqarr['srs']), 
+                        'ccle_roster_class',
+                        array($reqarr['term'], $reqarr['srs']),
                         true
                     );
 
             $indexedrequestroster = array();
             foreach ($requestroster as $student) {
                 if ($student['enrl_stat_cd'] != 'D' && $student['enrl_stat_cd'] != 'C') {
-                    $indexedrequestroster[] = $this->enrollment_helper->translate_ccle_roster_class($student);
+                    $indexedrequestroster[] = $this->enrollmenthelper->translate_ccle_roster_class($student);
                 }
             }
-            
+
             $reqobj = new stdclass();
             $reqobj->roster = $indexedrequestroster;
             $reqidnumber = make_idnumber($reqarr);
-            echo "* $reqidnumber has " . count($indexedrequestroster) 
-                . " students.\n";
+            $this->trace->output("* $reqidnumber has " . count($indexedrequestroster)
+                . " students.");
 
             $reqarr['courseid'] = $courseid;
             $reqobj->courseinfo = $reqarr;
@@ -127,13 +192,13 @@ class ucla_group_manager {
                 $section['term'] = $reqarr['term'];
                 $section['srs'] = $section['srs_crs_no'];
                 $section['subj_area'] = $reqarr['subj_area'];
-                // This is the discussion section info
+                // This is the discussion section info.
                 $section['acttype'] = $section['cls_act_typ_cd'];
                 $section['sectnum'] = ltrim($section['sect_no'], '0');
-                // This is the lecture section info
+                // This is the lecture section info.
                 $section['lectnum'] = ltrim($reqarr['sectnum'], '0');
                 $section['lectacttype'] = $reqarr['acttype'];
-                // This is the course number
+                // This is the course number.
                 $section['coursenum'] = ltrim($reqarr['coursenum'], '0');
 
                 $sectioninfo = new object();
@@ -152,13 +217,13 @@ class ucla_group_manager {
                 // Filter out students that have dropped course.
                 foreach ($sectionroster as $student) {
                     if ($student['enrl_stat_cd'] != 'D' && $student['enrl_stat_cd'] != 'C') {
-                        $indexedsectionroster[] = $this->enrollment_helper->translate_ccle_roster_class($student);
+                        $indexedsectionroster[] = $this->enrollmenthelper->translate_ccle_roster_class($student);
                     }
                 }
-                
+
                 if ($debug) {
-                    echo "-   " . make_idnumber($termsrsarr) . ' has ' 
-                        . count($indexedsectionroster) . " students\n";
+                    $this->trace->output("-   " . make_idnumber($termsrsarr) . ' has '
+                        . count($indexedsectionroster) . " students");
                 }
 
                 $sectioninfo->roster = $indexedsectionroster;
@@ -167,7 +232,6 @@ class ucla_group_manager {
 
             $reqobj->sectionsinfo = $sectionrosters;
 
-            //*/
             $requestsectioninfos[make_idnumber($reqarr)] = $reqobj;
         }
 
@@ -175,31 +239,36 @@ class ucla_group_manager {
     }
 
     /**
-     *  Fully sets up and synchronizes groups for a course.
-     **/
+     * Fully sets up and synchronizes groups for a course.
+     *
+     * @param int $courseid
+     */
     public function sync_course($courseid) {
+
         $reqsecinfos = self::course_sectionroster($courseid);
         if ($reqsecinfos === false) {
-            echo "Not a real course $courseid!\n";
+            $this->trace->output("Not a real course $courseid!");
             return true;
         }
 
         $isnormalcourse = count($reqsecinfos) == 1;
 
-        echo "Syncing section groups...";
+        $this->trace->output("Syncing section groups...");
 
-        // groups created should NOT be divisible in any logical way, 
-        // we should try to enforce usage of groupings
+        // Groups created should NOT be divisible in any logical way,
+        // we should try to enforce usage of groupings.
+        $outputstr = '';
+        $registrarconfigs = get_config('enrol_database');
         foreach ($reqsecinfos as $termsrs => &$reqinfo) {
-            // If there are no sections, then we want to do something later
+            // If there are no sections, then we want to do something later.
             if (empty($reqinfo->sectionsinfo)) {
                 if ($isnormalcourse) {
                     continue;
                 }
 
                 // Otherwise, we need to treat the crosslist as a section of
-                // its own
-                echo "crosslist-forced ";
+                // its own.
+                $outputstr .= "crosslist-forced ";
                 $fakesection = new object();
 
                 $fakesection->roster = $reqinfo->roster;
@@ -211,9 +280,9 @@ class ucla_group_manager {
             foreach ($reqinfo->sectionsinfo as $secttermsrs => &$sectioninfo) {
                 $moodleusers = array();
 
-                // TODO speed this loop up
+                // TODO speed this loop up.
                 foreach ($sectioninfo->roster as $student) {
-                    $moodleuser = ucla_registrar_user_to_moodle_user($student);
+                    $moodleuser = ucla_registrar_user_to_moodle_user($student, $registrarconfigs);
 
                     if ($moodleuser) {
                         $moodleusers[$moodleuser->id] = $moodleuser;
@@ -229,26 +298,27 @@ class ucla_group_manager {
 
                 $sectioninfo->group = $sectiongroup;
 
-                echo "[{$sectiongroup->id}] {$sectiongroup->name}";
-                echo "...";
+                $outputstr .= "[{$sectiongroup->id}] {$sectiongroup->name}";
+                $outputstr .= "...";
             }
         }
-        
+
         // When we hit that next foreach, if this is not unset, for some
         // reason PHP decides to set the address that $reqinfo is pointing
-        // to to be the first object of the iterating array
+        // to to be the first object of the iterating array.
         unset($reqinfo);
         unset($sectioninfo);
 
-        echo "done.\n";
+        $outputstr .= "done.";
+        $this->trace->output($outputstr);
 
-        echo "Deleting obsolete groups...";
-        // Delete unused groups
+        $outputstr = "Deleting obsolete groups...";
+        // Delete unused groups.
         $alltrackedgroups = ucla_synced_group::get_tracked_groups(
                 $courseid
             );
 
-        // Re-index this...optimization
+        // Re-index this...optimization.
         $existingtrackedgroups = array();
         foreach ($alltrackedgroups as $trackedgroup) {
             $existingtrackedgroups[$trackedgroup->groupid] = $trackedgroup;
@@ -260,7 +330,7 @@ class ucla_group_manager {
                 if (isset($existingtrackedgroups[$secgroupid])) {
                     unset($existingtrackedgroups[$secgroupid]);
                 } else {
-                    echo "ERROR: Could not find recently created group!";
+                    $this->trace->output("ERROR: Could not find recently created group!");
                 }
             }
         }
@@ -268,19 +338,15 @@ class ucla_group_manager {
         foreach ($existingtrackedgroups as $nolongertrackedgroup) {
             $delgroupid = $nolongertrackedgroup->groupid;
             groups_delete_group($delgroupid);
-            echo "[$delgroupid] {$nolongertrackedgroup->name}...";
+            $outputstr .= "[$delgroupid] {$nolongertrackedgroup->name}...";
         }
 
-        echo "done.\n";
+        $outputstr .= "done.";
+        $this->trace->output($outputstr);
 
-        // Create groupings
-        // Groupings are not necessary for courses that are not crosslisted,
-        // Just use the public private grouping for ALL students
-        if ($isnormalcourse) {
-            //return true;
-        }
+        // Create groupings.
 
-        // Set of all tracked groupids in course
+        // Set of all tracked groupids in course.
         $alltrackedgroupids = array();
         foreach ($alltrackedgroups as $trackedgroup) {
             $alltrackedgroupids[] = $trackedgroup->groupid;
@@ -289,27 +355,28 @@ class ucla_group_manager {
         sort($alltrackedgroupids, SORT_NUMERIC);
 
         // All the tracked groupings, used when checking which existing
-        // tracked groupings to delete
+        // tracked groupings to delete.
         $trackedgroupings = array();
 
-        // Groupings
+        // Groupings.
         $classmethods = get_class_methods('ucla_group_manager');
 
         $groupingspecfns = array();
 
-        // Dyanmically figure out which groups to create
+        // Dyanmically figure out which groups to create.
         foreach ($classmethods as $classmethod) {
             $matches = array();
-            // Get the type, and the function name
+            // Get the type, and the function name.
             if (preg_match('/(.*)_name_fields$/', $classmethod, $matches)) {
                 $groupingspecfns[$matches[1]] = $classmethod;
             }
         }
 
+        $outputstr = '';
         foreach ($groupingspecfns as $groupingtype => $groupingtypefn) {
             $organizedgroupings = array();
 
-            echo "Syncing groupings based on \"$groupingtype\"...";
+            $outputstr .= "Syncing groupings based on \"$groupingtype\"...";
 
             foreach ($reqsecinfos as $reqinfo) {
                 foreach ($reqinfo->sectionsinfo as $sectioninfo) {
@@ -329,10 +396,10 @@ class ucla_group_manager {
                 $groupingdata = ucla_synced_grouping::get_groupingdata(
                         $groupingname, $courseid
                     );
-                
-                // We want to avoid groupings that just has ALL groups
+
+                // We want to avoid groupings that just has ALL groups.
                 // There is an unoptimization, can't simply compare
-                // equality for an array of groups
+                // equality for an array of groups.
                 $groupids = array();
                 foreach ($groups as $group) {
                     $groupids[] = $group->id;
@@ -340,16 +407,16 @@ class ucla_group_manager {
 
                 sort($groupids, SORT_NUMERIC);
                 if ($groupids == $alltrackedgroupids) {
-                    echo "skip-all-group-grouping " 
+                    $outputstr .= "skip-all-group-grouping "
                         . $groupingdata->name . '...';
                     continue;
                 }
 
-                $trackedgrouping = 
+                $trackedgrouping =
                     ucla_synced_grouping::create_tracked_grouping(
                             $groupingdata, $groups
                         );
-               
+
                 $sameflag = '';
                 if (!isset($trackedgroupings[$trackedgrouping])) {
                     $trackedgroupings[$trackedgrouping] = true;
@@ -357,17 +424,19 @@ class ucla_group_manager {
                     $sameflag = 'repeat-';
                 }
 
-                echo '[' . $sameflag . $trackedgrouping . '] '
+                $outputstr .= '[' . $sameflag . $trackedgrouping . '] '
                     . $groupingdata->name . "...";
 
             }
 
-            echo "done.\n";
+            $outputstr .= "done.";
+            $this->trace->output($outputstr);
+            $outputstr = '';
         }
 
-        // Remove no-longer used groupings
-        echo "Deleting obsolete groupings...";
-        $coursetrackedgroupings = 
+        // Remove no-longer used groupings.
+        $outputstr = "Deleting obsolete groupings...";
+        $coursetrackedgroupings =
                 ucla_synced_grouping::get_course_tracked_groupings(
                         $courseid
                     );
@@ -375,24 +444,27 @@ class ucla_group_manager {
         foreach ($coursetrackedgroupings as $ctg) {
             if (!isset($trackedgroupings[$ctg->id])) {
                 groups_delete_grouping($ctg->id);
-                echo "[{$ctg->id}] {$ctg->name}...";
+                $outputstr .= "[{$ctg->id}] {$ctg->name}...";
 
             }
         }
 
-        echo "done.\n";
+        $outputstr .= "done.";
+        $this->trace->output($outputstr);
 
         return true;
     }
-    
+
     /**
-     *  This is how we distinguish sections.
-     **/
-    static function get_grouping_type_key($fn, $info) {
-        $specstr = self::$fn();
+     * This is how we distinguish sections.
+     *
+     * @param string $fn    Function name.
+     * @param array $info
+     */
+    public static function get_grouping_type_key($fn, $info) {
 
         $fieldsused = explode(' ', self::$fn());
-        
+
         $namestrs = array();
         foreach ($fieldsused as $field) {
             if (isset($info[$field])) {
