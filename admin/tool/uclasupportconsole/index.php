@@ -321,40 +321,39 @@ $sectionhtml = '';
 if ($displayforms) { 
     $sectionhtml = supportconsole_simple_form($title);
 } else if ($consolecommand == "$title") { 
-    ob_start();
-    $log_query = "
-        select 
-            a.id, 
-            from_unixtime(time) as logintime,
-            b.firstname,
-            b.lastname,
-            ip,
-            a.url
-        from {log} a 
-        left join {user} b on(a.userid=b.id)
-        where from_unixtime(time)  >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) and action='login'
-        order by a.id desc
-        ";
 
-    $result = $DB->get_records_sql($log_query);
+    $sql = "SELECT a.id,
+                   FROM_UNIXTIME(a.timecreated) as logintime,
+                   b.firstname,
+                   b.lastname,
+                   a.ip,
+                   a.userid
+              FROM {logstore_standard_log} a
+         LEFT JOIN {user} b ON (a.userid=b.id)
+             WHERE a.timecreated >= (UNIX_TIMESTAMP()-86400) AND
+                   a.action='loggedin' AND
+                   a.userid!=?
+          ORDER BY a.id desc";
+    $rs = $DB->get_recordset_sql($sql, array($CFG->siteguest));
 
-    foreach($result as $k => $res) {
-        $res->user = html_writer::link(new moodle_url("/user/$res->url"), 
-            "$res->firstname $res->lastname", array('target'=>'_blank'));
-        
-        // unset unneeded data for display
-        unset($res->id);      
-        unset($res->firstname);     
-        unset($res->lastname);     
-        unset($res->url);     
+    $result = array();
+    foreach($rs as $k => $res) {
+        $res->user = html_writer::link(new moodle_url('/user/view.php',
+                array('id' => $res->userid)), "$res->firstname $res->lastname",
+                array('target' => '_blank'));
 
-        $result[$k] = $res;        
+        // Unset unneeded data for display.
+        unset($res->id);
+        unset($res->firstname);
+        unset($res->lastname);
+        unset($res->userid);
+
+        $result[$k] = $res;
     }
-
-    echo supportconsole_render_section_shortcut($title, $result);
-
-    $sectionhtml = ob_get_clean();
-} 
+    $rs->close();
+    
+    $sectionhtml = supportconsole_render_section_shortcut($title, $result);
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
