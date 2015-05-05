@@ -76,3 +76,6 @@
 [submodule "lib/editor/atto/plugins/poodll"]
 	path = lib/editor/atto/plugins/poodll
 	url = https://github.com/justinhunt/moodle-atto_poodll.git
+[submodule "lib/editor/atto/plugins/pastespecial"]
+	path = lib/editor/atto/plugins/pastespecial
+	url = https://github.com/jinhofer/pastespecial

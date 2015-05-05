@@ -131,6 +131,7 @@ $string['noresults'] = 'There are no results';
 $string['oneresult'] = 'There is 1 result';
 $string['xresults'] = 'There are {$a} results';
 $string['forinput'] = ' for input [{$a}]';
+$string['filterfor'] = 'Results filtered for: ';
 $string['exportoptions'] = 'Export: ';
 $string['totop'] = 'To top';
 

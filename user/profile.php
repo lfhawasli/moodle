@@ -471,6 +471,13 @@ if (!empty($CFG->enablebadges)) {
 }
 
 echo html_writer::end_tag('dl');
+
+// START UCLA MOD: CCLE-5147 - Display complete use details on profile pages
+if (has_capability('moodle/user:viewalldetails', $context)) {
+   local_ucla_core_edit::profile_display_help_request($user);
+}
+// END UCLA MOD: CCLE-5147
+
 echo "</div></div>"; // Closing desriptionbox and userprofilebox.
 
 echo $OUTPUT->custom_block_region('content');

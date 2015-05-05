@@ -150,29 +150,29 @@ $sectionhtml = '';
 if ($displayforms) { 
     $moodlelog_show_filter = optional_param('moodlelog_show_filter', 0, PARAM_BOOL);
 
-    // Get module/action pairs from cached log.
-    $mapairs = get_config('tool_uclasupportconsole', 'moduleactionpairs');
-    $mapairs = json_decode($mapairs);
+    // Get target/action pairs from cached log.
+    $tapairs = get_config('tool_uclasupportconsole', 'moduleactionpairs');
+    $tapairs = json_decode($tapairs);
 
     $checkboxes = array();
-    $lastmodule = '';
+    $lasttarget = '';
 
-    if (!empty($mapairs)) {
-        foreach($mapairs as $pair) {
-            $module = $pair->module;
+    if (!empty($tapairs)) {
+        foreach($tapairs as $pair) {
+            $target = $pair->target;
             $action = $pair->action;
 
-            // If this is the first module in our list of its kind, we must output
+            // If this is the first target in our list of its kind, we must output
             // it as a heading above the actions
-            if ($module != $lastmodule) {
-                $lastmodule = $module;
-                $checkboxes[] = html_writer::tag('h4', $module);
+            if ($target != $lasttarget) {
+                $lasttarget = $target;
+                $checkboxes[] = html_writer::tag('h4', $target);
             }
 
             // Create the checkbox array for holding action types. The actions
-            // are represented as "module_action" (for example: user_login).
+            // are represented as "target_action" (for example: user_loggedin).
             $checkboxes[] = html_writer::tag('li',
-                    html_writer::checkbox('actiontypes[]', $module . '_' . $action,
+                    html_writer::checkbox('actiontypes[]', $target . '_' . $action,
                             false, $action));
         }
     }
@@ -185,17 +185,17 @@ if ($displayforms) {
         $form_content .= html_writer::start_tag('div');        
         $form_content .= html_writer::link(
                 new moodle_url('/admin/tool/uclasupportconsole/index.php', 
-                        array('moodlelog_show_filter' => 1)), 
+                        array('moodlelog_show_filter' => 1), 'moodlelog'), 
                 get_string('moodlelog_filter', 'tool_uclasupportconsole'), 
                 array('id' => 'show-log-types-filter', 
                     // TODO: there has to be a better way to show/hide using YUI...
                     'onclick' => "YAHOO.util.Dom.setStyle('log-action-types-container', 'display', '');YAHOO.util.Dom.setStyle('show-log-types-filter', 'display', 'none');return false;"));        
         $form_content .= html_writer::end_tag('div');
-        
+
         // hide action types
         $action_types_container_params['style'] = 'display:none';
     }
-    
+
     // Display the filter checkbox form.
     $form_content .= html_writer::start_tag('div', $action_types_container_params);
     $form_content .= html_writer::label(get_string('moodlelog_select', 'tool_uclasupportconsole'), 
@@ -206,87 +206,93 @@ if ($displayforms) {
     
     $sectionhtml = supportconsole_simple_form($title, $form_content);
 } else if ($consolecommand == "$title") { 
-    
-    // Initialize empty containers for the database query ($logquery), the 
-    // query parameters ($params), and the header to be displayed at the top of 
-    // the results ($headertext).
+
+    // Initialize empty containers for the database query ($logquery), 
+    // the array to contain the names of filters applied ($filterstring),
+    // the params that must be passed to generate the export options 
+    // ($urlparams), and the database query parameters ($whereparams).
     $logquery = '';
-    $params = array();
-    $headertext = array();
-    
-    // Get the module, action pairs (represented as module_action).
-    $moduleactions = optional_param_array('actiontypes', array(), PARAM_TEXT);
-    
+    $whereparams = array();
+    $filterstring = array();
+    $urlparams = array();
+
+    // Get the target, action pairs (represented as target_action).
+    // Note that a target can itself contain underscores.
+    $targetactions = optional_param_array('actiontypes', array(), PARAM_TEXT);
+
     // If there are no actions selected, either the form was hidden, or no
     // checkboxes were selected. In both cases, this results in the log not
     // filtering out any entries (the last 100 entries of any type are shown).
-    if (empty ($moduleactions))
+    if (empty ($targetactions))
     {
         $logquery = "
-            SELECT
-                a.id, 
-                from_unixtime(time) AS time,
-                b.firstname,
-                b.lastname,
-                ip,
-                c.shortname,
-                c.id AS courseid,
-                module,
-                action
-            FROM {log} a
-            LEFT JOIN {user} b ON (a.userid = b.id)
-            LEFT JOIN {course} c ON (a.course = c.id)
-            ORDER BY a.id DESC LIMIT 100
+            SELECT a.id,
+                   from_unixtime(a.timecreated) AS time,
+                   b.firstname,
+                   b.lastname,
+                   ip,
+                   c.shortname,
+                   c.id AS courseid,
+                   target,
+                   action
+              FROM {logstore_standard_log} a
+         LEFT JOIN {user} b ON (a.userid = b.id)
+         LEFT JOIN {course} c ON (a.courseid = c.id)
+          ORDER BY a.id DESC LIMIT 100
         ";
     }
     else
     {
-        // The $modules and $actions arrays are filled with the pairs of modules
-        // and actions found in $module_actions. The $header_text is also made
-        // at this point, and used after the query.
-        $modules = array();
-        $actions = array();
-        foreach ($moduleactions as $ma) {
-            $moduleactionpair = explode("_", $ma);
-            array_push($modules, $moduleactionpair[0]);
-            array_push($actions, $moduleactionpair[1]);
-            
-            $headertextstring = $moduleactionpair[1] . ' ' . $moduleactionpair[0];
-            array_push($headertext, $headertextstring);
+        // Construct the necessary conditional statements and parameters for
+        // the sql WHERE clause in order to implement the event filter.
+        // Also add all targetaction pairs to the URL params.
+        $wherequery = '';
+        $iterator = 0;
+        foreach ($targetactions as $ta) {
+            $targetactionset = explode("_", $ta);
+            // The string after the last underscore of target_action is
+            // the action. All but the last string is the target name.
+            $action = array_pop($targetactionset);
+            $target = implode('_', $targetactionset);
+            $filterstring[] = $target . ' ' . $action;
+
+            // Create a query that checks for the target and action together
+            // and append it via OR to the overall $wherequery.
+            if (!empty($wherequery)) {
+                $wherequery .= ' OR ';
+            }
+            list($actsql, $actparam) = $DB->get_in_or_equal($action);
+            list($tarsql, $tarparam) = $DB->get_in_or_equal($target);
+            $wherequery .= 'action ' . $actsql . ' AND target ' . $tarsql;
+            // Merge parameters into one array for use by the database query.
+            $whereparams = array_merge($whereparams, $actparam, $tarparam);
+
+            // A hacky way to add the targetactions array to the url params.
+            // Simply passing an array variable is not accepted by moodle_url
+            // params.
+            $urlparams['actiontypes[' . $iterator . ']'] = $ta;
+            $iterator++;
         }
 
-        // Create the necessary conditional statements and their parameters to
-        // be used in the query that follows. This must be done for both actions
-        // and modules for the different clauses of the AND in the conditional
-        // statement.
-        list($actsql, $actparams) = $DB->get_in_or_equal($actions);
-        $wheresqlactions = 'action ' . $actsql;
-        list($modsql, $modparams) = $DB->get_in_or_equal($modules);
-        $wheresqlmodules = 'module ' . $modsql;
-
-        // Merge the parameters into a single array for use by the querying
-        // function.
-        $params = array_merge($actparams, $modparams);
         $logquery = "
-            SELECT
-                a.id, 
-                from_unixtime(time) AS time,
-                b.firstname,
-                b.lastname,
-                ip,
-                c.shortname,
-                c.id AS courseid,
-                module,
-                action
-            FROM {log} a
-            LEFT JOIN {user} b ON (a.userid = b.id)
-            LEFT JOIN {course} c ON (a.course = c.id)
-            WHERE $wheresqlactions AND $wheresqlmodules
-            ORDER BY a.id DESC LIMIT 100
+            SELECT a.id, 
+                   from_unixtime(a.timecreated) AS time,
+                   b.firstname,
+                   b.lastname,
+                   ip,
+                   c.shortname,
+                   c.id AS courseid,
+                   target,
+                   action
+              FROM {logstore_standard_log} a
+         LEFT JOIN {user} b ON (a.userid = b.id)
+         LEFT JOIN {course} c ON (a.courseid = c.id)
+             WHERE $wherequery
+          ORDER BY a.id DESC LIMIT 100
         ";
     }
-    
-    $results = $DB->get_records_sql($logquery, $params);
+
+    $results = $DB->get_records_sql($logquery, $whereparams);
 
     foreach ($results as $k => $result) {
         if (!empty($result->courseid) && !empty($result->shortname)) {
@@ -299,9 +305,14 @@ if ($displayforms) {
         }
     }
 
+    $headertext = '';
+    if (!empty($filterstring)) {
+        $headertext = get_string('filterfor', 'tool_uclasupportconsole') . 
+                implode(', ', $filterstring);
+    }
     $sectionhtml = supportconsole_render_section_shortcut($title, $results,
-        $headertext);
-} 
+            $urlparams, $headertext);
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
@@ -420,55 +431,55 @@ $consoles->push_console_html('logs', $title, $sectionhtml);
 // TODO combine with the next one
 $title = "moodlelogbydaycourse";
 $sectionhtml = '';
-if ($displayforms) { 
+if ($displayforms) {
     $sectionhtml .= supportconsole_simple_form($title);
-} else if ($consolecommand == "$title") { 
+} else if ($consolecommand == "$title") {
      $result = $DB->get_records_sql("
-        SELECT 
-            a.id, 
-            FROM_UNIXTIME(time,'%Y-%m-%d') AS date, 
+        SELECT
+            a.id,
+            FROM_UNIXTIME(a.timecreated,'%Y-%m-%d') AS date,
             c.shortname AS course,
-            COUNT(*) AS count 
-        FROM {log} a 
-        LEFT JOIN {course} c ON a.course = c.id
-        WHERE FROM_UNIXTIME(time) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND
+            COUNT(*) AS count
+        FROM {logstore_standard_log} a
+        LEFT JOIN {course} c ON a.courseid = c.id
+        WHERE FROM_UNIXTIME(a.timecreated) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND
                 c.id!=:siteid
-        GROUP BY date, course 
+        GROUP BY date, course
         ORDER BY count DESC
         LIMIT 100
     ", array('siteid' => SITEID));
 
     $sectionhtml .= supportconsole_render_section_shortcut($title, $result);
-} 
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
 $title = "moodlelogbydaycourseuser";
 $sectionhtml = '';
 
-if ($displayforms) { 
+if ($displayforms) {
     $sectionhtml = supportconsole_simple_form($title);
-} else if ($consolecommand == "$title") { 
+} else if ($consolecommand == "$title") {
     $result = $DB->get_records_sql("
-        SELECT 
-            a.id, 
-            FROM_UNIXTIME(time,'%Y-%m-%d') AS day,
+        SELECT
+            a.id,
+            FROM_UNIXTIME(a.timecreated,'%Y-%m-%d') AS day,
             c.shortname AS course,
             b.firstname,
             b.lastname,
-            COUNT(*) AS count 
-        FROM {log} a 
+            COUNT(*) AS count
+        FROM {logstore_standard_log} a
         LEFT JOIN {user} b ON a.userid = b.id
-        LEFT JOIN {course} c ON a.course = c.id
-        WHERE FROM_UNIXTIME(time) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND
+        LEFT JOIN {course} c ON a.courseid = c.id
+        WHERE FROM_UNIXTIME(a.timecreated) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND
             c.id!=:siteid
-        GROUP BY day, course, a.userid 
+        GROUP BY day, course, a.userid
         ORDER BY count DESC
         LIMIT 100
     ", array('siteid' => SITEID));
-    
+
     $sectionhtml = supportconsole_render_section_shortcut($title, $result);
-} 
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
@@ -1418,7 +1429,7 @@ if ($displayforms) {
     
     $results = $DB->get_records_sql("
         SELECT 
-            m.id AS module_id,
+            (@s := @s+1) AS identifier,
             m.Due_date, 
             c.shortname, 
             c.fullname,
@@ -1426,7 +1437,6 @@ if ($displayforms) {
             m.Name
         FROM ((
             SELECT 
-                id,
                 'quiz' AS modtype, 
                 course, 
                 name, 
@@ -1436,15 +1446,25 @@ if ($displayforms) {
                 BETWEEN  {$timefrom} AND {$timeto}
         ) UNION (
             SELECT 
-                id,
                 'assignment' AS modtype, 
                 course, 
                 name, 
-                FROM_UNIXTIME(timedue, '%m-%d-%y %H:%i %a') AS Due_Date
-            FROM {assignment}
-            WHERE timedue
+                FROM_UNIXTIME(duedate) AS Due_Date
+            FROM {assign}
+            WHERE duedate
             BETWEEN {$timefrom} AND {$timeto}
-            )) AS m
+        ) UNION (
+            SELECT
+                'turnitintool' AS modtype,
+                tiit.course,
+                CONCAT_WS(' ', tiit.name, partname) AS name,
+            FROM_UNIXTIME(dtdue) AS Due_Date
+            FROM {turnitintool} tiit
+            JOIN {turnitintool_parts} ON tiit.id = turnitintoolid
+            WHERE dtdue
+            BETWEEN {$timefrom} AND {$timeto}
+        )) AS m
+        JOIN (SELECT @s := 0) AS increment
         INNER JOIN {course} c ON c.id = m.course
         ORDER BY `m`.`Due_Date` ASC
     ");    

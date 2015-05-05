@@ -40,6 +40,7 @@ class ucla_group_manager_testcase extends advanced_testcase {
 
     /**
      * Stores mocked version of ucla_group_manager.
+     *
      * @var ucla_group_manager
      */
     private $mockgroupmanager = null;
@@ -47,6 +48,7 @@ class ucla_group_manager_testcase extends advanced_testcase {
     /**
      * Used by mocked_query_registrar to return data for a given stored 
      * procedure, term, and srs.
+     *
      * @var array
      */
     private $mockregdata = array();
@@ -91,6 +93,7 @@ class ucla_group_manager_testcase extends advanced_testcase {
 
         // Only stub the query_registrar method.
         $this->mockgroupmanager = $this->getMockBuilder('ucla_group_manager')
+                ->setConstructorArgs(array(new null_progress_trace()))
                 ->setMethods(array('query_registrar'))
                 ->getMock();
 

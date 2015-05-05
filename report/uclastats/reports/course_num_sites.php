@@ -100,20 +100,20 @@ class course_num_sites extends uclastats_base {
                     WHERE 
                     ((urci.session IN ('6A', '8A', '1A') AND
                     urc.courseid NOT IN (
-                        SELECT l.course
-                        FROM {log} l 
+                        SELECT l.courseid
+                        FROM {logstore_standard_log} l 
                         WHERE l.userid != :guestida AND
-                        l.time > :first_week_of_a AND
-                        l.time <= :end_a)
+                        l.timecreated > :first_week_of_a AND
+                        l.timecreated <= :end_a)
                     )
                     OR
                     (urci.session IN ('6C') AND
                     urc.courseid NOT IN (
-                        SELECT l.course
-                        FROM {log} l 
+                        SELECT l.courseid
+                        FROM {logstore_standard_log} l 
                         WHERE l.userid != :guestidc AND
-                        l.time > :first_week_of_c AND
-                        l.time <= :end_c)
+                        l.timecreated > :first_week_of_c AND
+                        l.timecreated <= :end_c)
                     ))
                     GROUP BY urci.division
                     ORDER BY urd.fullname";
@@ -134,11 +134,11 @@ class course_num_sites extends uclastats_base {
                     )
                     WHERE 
                     urc.courseid  NOT IN (
-                         SELECT l.course
-                         FROM {log} l 
+                         SELECT l.courseid
+                         FROM {logstore_standard_log} l 
                          WHERE l.userid != :guestid AND
-                         l.time > :first_week_of_term AND
-                         l.time <= :end
+                         l.timecreated > :first_week_of_term AND
+                         l.timecreated <= :end
                     )
                     GROUP BY urci.division
                     ORDER BY urd.fullname";

@@ -67,3 +67,9 @@ $string['file'] = 'Upload file';
 $string['link'] = 'Add link';
 $string['text'] = 'Add text';
 $string['subheading'] = 'Add subheading';
+
+// CCLE-5098 - Download course content configurable
+$string['coursedownload'] = 'Download course materials';
+$string['coursedownload_help'] = 'Download is enabled by default. '
+        . 'If you do not want the students to be able to download the files in a single zip file, '
+        . 'click "No". This feature is available to students beginning one week before the course ends.';

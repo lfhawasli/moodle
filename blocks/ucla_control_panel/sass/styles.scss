@@ -11,21 +11,9 @@
     & > .cpheading {
         @include ccle-admin-header;
     }
-    
-    /*border: 1px solid #CCC;*/
+
     float: left;
-    /*padding: 5px;*/
     margin-bottom: 20px;
-/*    @include box-shadow(#AAA 0 2px 3px);*/
-    
-    // Main header
-/*    & .cpheading {
-        padding: 5px;
-        text-align: left;
-        background-color: $ucla_secondary_orange;
-        margin-top: 0;
-        color: white;
-    }*/
     
     & > .cpanel-group {
         width: 100%;
@@ -49,7 +37,7 @@
             padding: 5px 20px;
             @include box-sizing(border-box);
             
-            & > a {
+            & > a, .disabled {
                 width: 100%;
                 display: block;
                 font-size: 16px;

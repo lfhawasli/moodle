@@ -7,6 +7,7 @@
  **/
 require_once(dirname(__FILE__) . '/ucla_cp_module.php');
 require_once(dirname(__FILE__) . '/modules/ucla_cp_text_module.php');
+require_once(dirname(__FILE__) . '/modules/course_download.php');
 require_once(dirname(__FILE__) . '/modules/ucla_cp_myucla_row_module.php');
 
 global $CFG, $DB, $USER;
@@ -177,7 +178,12 @@ if ($syllabus_manager->can_host_syllabi()) {
 }
 
 // Course Content Download
-$modules[] = new ucla_cp_module('course_download', new moodle_url(
+$formatoptions = course_get_format($course->id)->get_format_options();
+$coursedownloadstr = 'course_download';
+if ($formatoptions['coursedownload'] != 1) {
+    $coursedownloadstr = 'course_download_disabled';
+}
+$modules[] = new ucla_cp_module($coursedownloadstr, new moodle_url(
         '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
         $temp_tag, 'moodle/course:manageactivities');
 
@@ -290,14 +296,27 @@ if (has_role_in_context('student', $context) || $is_role_switched_student) {
     $modules[] = new ucla_cp_module('student_grades', new moodle_url(
             $CFG->wwwroot . '/grade/index.php?id=' . $course->id), $temp_tag, $temp_cap);
 
-    if (student_zip_requestable($course)) {
-        $modules[] = new ucla_cp_module('course_download', new moodle_url(
-            '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
-            $temp_tag, 'block/ucla_course_download:requestzip');
+    $formatoptions = course_get_format($course->id)->get_format_options();
+    // See if the instructor has disabled downloading for this specific course.
+    if ($formatoptions['coursedownload'] == 1) {
+        if (student_zip_requestable($course)) {
+            // Course download is active and student can get to link.
+            $modules[] = new ucla_cp_module_course_download('course_download', new moodle_url(
+                '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
+                $temp_tag);
+        } else {
+            // Course download is active, but student cannot access link yet.
+            $modules[] = new ucla_cp_module_course_download('course_download_available',
+                    null, $temp_tag);
+        }
+    } else {
+        // Instructor turned off course download.
+        $modules[] = new ucla_cp_module_course_download('course_download_unavailable', 
+                null, $temp_tag);
     }
 
     if ($USER->auth != "shibboleth") {
-        $modules[] = new ucla_cp_module('student_change_password', 
+        $modules[] = new ucla_cp_module_course_download('student_change_password',
                 new moodle_url($CFG->wwwroot . '/login/change_password.php?=' . $USER->id), $temp_tag, $temp_cap);
     }
 

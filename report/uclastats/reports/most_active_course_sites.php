@@ -71,9 +71,9 @@ class most_active_course_sites extends uclastats_base {
                         COUNT(l.id) AS viewcount"
                 . $this->from_filtered_courses() .
                 "
-                JOIN {log} AS l ON (
-                 c.id = l.course AND
-                 l.action = 'view'
+                JOIN {logstore_standard_log} AS l ON (
+                 c.id = l.courseid AND
+                 l.action = 'viewed'
                 )
                 GROUP BY c.id
                 ORDER BY viewcount DESC

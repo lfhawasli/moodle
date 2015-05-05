@@ -3036,12 +3036,16 @@ function forum_subscribed_users($course, $forum, $groupid=0, $context = null, $f
         // only active enrolled users or everybody on the frontpage
         list($esql, $params) = get_enrolled_sql($context, '', $groupid, true);
         $params['forumid'] = $forum->id;
+        // START UCLA MOD: CCLE-4973 - Forum subscription list is sorted by email address.
+        // Changed to ORDER BY last name, firstname, instead of by email
         $results = $DB->get_records_sql("SELECT $fields
                                            FROM {user} u
                                            JOIN ($esql) je ON je.id = u.id
                                            JOIN {forum_subscriptions} s ON s.userid = u.id
                                           WHERE s.forum = :forumid
-                                       ORDER BY u.email ASC", $params);
+                                       ORDER BY u.lastname ASC, u.firstname ASC", $params);
+                                       //ORDER BY u.email ASC", $params);
+        // END UCLA MOD: CCLE-4973
     }
 
     // Guest user should never be subscribed to a forum.
