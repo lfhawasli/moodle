@@ -63,30 +63,13 @@ class total_downloads extends uclastats_base {
         
         $sql =  "SELECT COUNT(DISTINCT l.id) as count"
                  . $this->from_filtered_courses() .
-                "JOIN {log} AS l ON (
-                    l.course = c.id
+                "JOIN {logstore_standard_log} AS l ON (
+                    l.courseid = c.id
                  )
-                 JOIN {course_modules} AS cm ON (
-                    cm.course = c.id
-                 )
-                 JOIN {modules} AS m ON (
-                    cm.module = m.id
-                 )
-                 JOIN {context} ctx ON (
-                    cm.id = ctx.instanceid AND
-                    ctx.contextlevel = :contextlevel
-                 )
-                 JOIN {files} f ON (
-                     f.contextid = ctx.id
-                 )
-                 WHERE f.component = 'mod_resource' AND
-                 l.time >= :start AND
-                 l.time < :end AND
-                 m.name ='resource' AND
-                 l.cmid = cm.id AND
-                 f.filename != '.' AND
-                 l.module = 'resource' AND
-                 l.action = 'view'";
+                 WHERE l.timecreated >= :start AND
+                 l.timecreated < :end AND
+                 l.component = 'mod_resource' AND
+                 l.action = 'viewed'";
        
         $term_info = $this->get_term_info($params['term']);
         $params['start'] = $term_info['start'];
