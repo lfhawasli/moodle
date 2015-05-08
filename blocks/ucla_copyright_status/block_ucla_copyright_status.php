@@ -57,12 +57,12 @@ class block_ucla_copyright_status extends block_base {
                 new moodle_url('/blocks/ucla_copyright_status/view.php',
                     array('courseid' => $params['course']->id,
                           'section' => $params['section'])),
-                get_string('pluginname', 'block_ucla_copyright_status'),
+                get_string('pluginname', 'block_ucla_copyright_status') . $span,
                 array('id' => 'id-copyright-status'));
         
            // site menu block arranges editing links by key, make sure this is the
         // 3rd link
-        return array(3 => $link . $span);
+        return array(3 => $link);
     }
 
     /**
