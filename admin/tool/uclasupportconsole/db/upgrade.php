@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return boolean
  */
 function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
-    global $DB;
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager();
 
@@ -43,6 +43,39 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
             $tool = \local_ucla_support_tools_tool::fetch($data);
             $tool->delete();
         }
+
+        upgrade_plugin_savepoint(true, 2014050700, 'tool', 'uclasupportconsole');
+    }
+
+    // Create uclaieiclasses table and import 12F-13S IEI data.
+    if ($oldversion < 2015051200) {
+
+        // Add fields.
+        $table = new xmldb_table('uclaieiclasses');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('term', XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('srs', XMLDB_TYPE_CHAR, '9', null, XMLDB_NOTNULL, null, null);
+
+        // Add keys.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('uniqtermsrs', XMLDB_KEY_UNIQUE, array('term', 'srs'));
+
+        // Conditionally launch create table for uclaieiclasses.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Import data from text file to the new table.
+        // LOAD DATA INFILE syntax uses '\t' as field separator and '\n' as line
+        // separator by default, so no need to specify.
+        $sql = "LOAD DATA LOCAL INFILE '" . $CFG->dirroot . "/admin/tool/uclasupportconsole/db/iei/12F-13S.txt'
+                    INTO TABLE {uclaieiclasses}
+                    (term, srs)
+                ";
+        $DB->execute($sql);
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2015051200, 'tool', 'uclasupportconsole');
     }
 
     return true;

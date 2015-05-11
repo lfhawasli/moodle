@@ -549,6 +549,14 @@ $syllabusdateselector = html_writer::label('Start date ("MM/DD/YYYY")', 'startda
                     'name' => 'enddate',
                     'id' => 'enddate'
                 ));
+// Create IEI checkbox to be used for both syllabus overview and syllabus report.
+$syllabusieiselector = html_writer::label(get_string('syllabus_iei', 'tool_uclasupportconsole'), 'iei') .
+        html_writer::empty_tag('input', array(
+            'type' => 'checkbox',
+            'name' => 'iei',
+            'value' => 'x',
+            'id' => 'iei'
+        ));
 
 $title = "syllabusoverview";
 $sectionhtml = '';
@@ -565,18 +573,17 @@ if ($displayforms) {
             html_writer::tag('select', $overview_options, array('name' => 'syllabus'));
     
     $syllabus_selectors .= html_writer::start_tag('br') . $syllabusdateselector;
-    
+    $syllabus_selectors .= html_writer::empty_tag('br') . $syllabusieiselector;
+
     $sectionhtml = supportconsole_simple_form($title, $syllabus_selectors);
     
 } else if ($consolecommand == "$title") {
-    $sectionhtml .= $OUTPUT->box(get_string('syllabusoverviewnotes',
-            'tool_uclasupportconsole'));
-
     $selected_term = required_param('term', PARAM_ALPHANUM);
     $selected_type = required_param('syllabus', PARAM_ALPHA);
     
     $timestartstr = optional_param('startdate', '', PARAM_RAW);
     $timeendstr = optional_param('enddate', '', PARAM_RAW);
+    $filterbyiei = optional_param('iei', '', PARAM_RAW);
     
     $timesql = '';
     $timerange = '';
@@ -590,6 +597,23 @@ if ($displayforms) {
         $timerange .= ($timestart ? '' : $uploaddisplaymsg) . ' up to '. $timeendstr;
     }
     
+    // If we filter for IEI courses, then we want to include canceled and tutorial
+    // classes. If we don't, then we want to exclude them. We also want to display
+    // a note that reflects this.
+    $joinclause = '';
+    $excludeclause = '';
+    $message = '';
+    if(empty($filterbyiei)) {
+        $excludeclause = 'urci.enrolstat != \'X\' AND urci.acttype != \'TUT\' AND';
+        $message = get_string('syllabusnotesnoniei', 'tool_uclasupportconsole');
+    } else {
+        $joinclause = "JOIN {uclaieiclasses} AS uic ON uic.term = urc.term AND uic.srs = urc.srs";
+        $message = get_string('syllabusnotesiei', 'tool_uclasupportconsole');
+    }
+
+    $sectionhtml .= $OUTPUT->box($message . ' ' . get_string('syllabusoverviewnotes',
+            'tool_uclasupportconsole'));
+
     $syllabus_table = new html_table();
     
     $sql = '';
@@ -602,12 +626,12 @@ if ($displayforms) {
                 FROM        {ucla_reg_subjectarea} AS urs,
                             {ucla_reg_classinfo} AS urci,
                             {ucla_request_classes} AS urc
+                            ' . $joinclause . '
                 WHERE       urci.term =:term AND
                             urs.subjarea = urci.subj_area AND
                             urci.term = urc.term AND 
                             urci.srs = urc.srs AND
-                            urci.enrolstat != \'X\' AND
-                            urci.acttype != \'TUT\' AND
+                            ' . $excludeclause . '
                             urc.courseid IS NOT NULL
                 ORDER BY    urs.subjarea';
         $table_colum_name = get_string('syllabus_subjarea', 'tool_uclasupportconsole');
@@ -618,12 +642,12 @@ if ($displayforms) {
                 FROM        {ucla_reg_division} AS urd,
                             {ucla_reg_classinfo} AS urci,
                             {ucla_request_classes} AS urc
+                            ' . $joinclause . '
                 WHERE       urci.term =:term AND
                             urd.code = urci.division AND
                             urci.term = urc.term AND 
                             urci.srs = urc.srs AND
-                            urci.enrolstat != \'X\' AND
-                            urci.acttype != \'TUT\' AND
+                            ' . $excludeclause . '
                             urc.courseid IS NOT NULL
                 ORDER BY    urd.fullname';
     }
@@ -870,6 +894,12 @@ if ($displayforms) {
                 get_string('manual_syllabus_count', 'tool_uclasupportconsole',
                         $manual_syllabus_count));
         }
+    } else {
+        // No records found.
+        if(!empty($filterbyiei)) {
+            // Warn user that reason for no results may be that IEI information has not been uploaded.
+            $sectionhtml .= $OUTPUT->box(get_string('syllabusieiwarning', 'tool_uclasupportconsole'));
+        }
     }
         
     $sectionhtml .= $OUTPUT->box_start();
@@ -903,18 +933,17 @@ if ($displayforms) {
     $syllabus_selectors .= get_subject_area_selector($title);
     
     $syllabus_selectors .= html_writer::start_tag('br') . $syllabusdateselector;
+    $syllabus_selectors .= html_writer::empty_tag('br') . $syllabusieiselector;
     
     $sectionhtml = supportconsole_simple_form($title, $syllabus_selectors);
     
 } else if ($consolecommand == "$title") {
-    $sectionhtml .= $OUTPUT->box(get_string('syllabusreoportnotes',
-            'tool_uclasupportconsole'));
-
     $selected_term = required_param('term', PARAM_ALPHANUM);
     $selected_subj = required_param('subjarea', PARAM_NOTAGS);
     
     $timestartstr = optional_param('startdate', '', PARAM_RAW);
     $timeendstr = optional_param('enddate', '', PARAM_RAW);
+    $filterbyiei = optional_param('iei', '', PARAM_RAW);
     
     $timesql = '';
     $timerange = '';
@@ -927,7 +956,23 @@ if ($displayforms) {
         $timesql .= ' AND s.timecreated <= ' . $timeend . ' ';
         $timerange .= ($timestart ? '' : $uploaddisplaymsg) . ' up to '. $timeendstr;
     }
-    
+
+    // If we filter for IEI courses, then we want to include canceled and tutorial
+    // classes. If we don't, then we want to exclude them.
+    $joinclause = '';
+    $excludeclause = '';
+    $message = '';
+    if(empty($filterbyiei)) {
+        $excludeclause = 'AND uri.enrolstat != \'X\' AND uri.acttype != \'TUT\'';
+        $message = get_string('syllabusnotesnoniei', 'tool_uclasupportconsole');
+    } else {
+        $joinclause = "JOIN {uclaieiclasses} AS uic ON uic.term = urc.term AND uic.srs = urc.srs";
+        $message = get_string('syllabusnotesiei', 'tool_uclasupportconsole');
+    }
+
+    $sectionhtml .= $OUTPUT->box($message . ' ' . get_string('syllabusreoportnotes',
+            'tool_uclasupportconsole'));
+
     $sql = "SELECT      CONCAT(COALESCE(s.id, ''), urc.srs) AS idsrs, 
                         urc.department,
                         urc.course,
@@ -938,10 +983,10 @@ if ($displayforms) {
                         urc.term=uri.term AND
                         urc.srs=uri.srs)
             LEFT JOIN   {ucla_syllabus} AS s ON (urc.courseid = s.courseid {$timesql})
+            $joinclause
             WHERE       urc.term =:term AND
-                        urc.department =:department AND
-                        uri.enrolstat != 'X' AND
-                        uri.acttype != 'TUT'                        
+                        urc.department =:department
+                        $excludeclause
             ORDER BY    uri.term, uri.subj_area, uri.crsidx, uri.secidx";
     
     $params = array();
@@ -1003,6 +1048,12 @@ if ($displayforms) {
                 $syllabus_info[$num_courses] = $syllabus_record;
                 $num_courses++;
             }
+        }
+    } else {
+        // No records found.
+        if(!empty($filterbyiei)) {
+            // Warn user that reason for no results may be that IEI information has not been uploaded.
+            $sectionhtml .= $OUTPUT->box(get_string('syllabusieiwarning', 'tool_uclasupportconsole'));
         }
     }
     
