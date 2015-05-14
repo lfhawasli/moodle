@@ -53,4 +53,14 @@ if (block_ucla_subject_links::subject_exist($course, $subjarea)) {
             
 echo $OUTPUT->footer();
 
+// Log views.
+$event = \block_ucla_subject_links\event\page_viewed::create(array(
+    'courseid' => $courseid,
+    'context'  => $context,
+    'other'    => array(
+        'subjarea' => $subjarea
+    )
+));
+$event->trigger();
+
 /** eof **/
