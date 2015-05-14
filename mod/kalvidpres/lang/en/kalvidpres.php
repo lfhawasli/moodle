@@ -34,3 +34,6 @@ $string['invalidid'] = 'Invalid ID';
 $string['invalid_source_parameter'] = 'Invalid source parameter';
 $string['replace_video'] = 'Replace media';
 $string['kalvidpres:addinstance'] = 'Add a Kaltura Video Presentation';
+// START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
+$string['eventvideo_resource_viewed'] = 'Video resource viewed';
+// END UCLA MOD: CCLE-5179
