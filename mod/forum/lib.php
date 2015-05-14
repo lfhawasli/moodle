@@ -3030,7 +3030,11 @@ function forum_subscribed_users($course, $forum, $groupid=0, $context = null, $f
     }
 
     if (forum_is_forcesubscribed($forum)) {
-        $results = forum_get_potential_subscribers($context, $groupid, $fields, "u.email ASC");
+        // START UCLA MOD: CCLE-4973 - Forum subscription list is sorted by email address.
+        // Changed Announcements forum to be ordered by last name, firstname, instead of by email
+        // $results = forum_get_potential_subscribers($context, $groupid, $fields, "u.email ASC");
+        $results = forum_get_potential_subscribers($context, $groupid, $fields, "u.lastname ASC, u.firstname ASC");
+        // END UCLA MOD: CCLE-4973
 
     } else {
         // only active enrolled users or everybody on the frontpage
