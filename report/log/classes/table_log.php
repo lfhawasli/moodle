@@ -86,6 +86,24 @@ class report_log_table_log extends table_sql {
                 get_string('ip_address')
                 )
             ));
+        
+        // START UCLA MOD: CCLE-5212 - Improve log display
+        // Removed the Component and Origin columns for non-site admins
+        if (!is_siteadmin()) {
+            $this->define_columns(array_merge($cols, array('time', 'fullnameuser', 'relatedfullnameuser', 'context', 'eventname', 
+                    'description', 'ip')));
+            $this->define_headers(array_merge($headers, array(
+                    get_string('time'),
+                    get_string('fullnameuser'),
+                    get_string('eventrelatedfullnameuser', 'report_log'),
+                    get_string('eventcontext', 'report_log'),
+                    get_string('eventname'),
+                    get_string('description'),
+                    get_string('ip_address')
+                    )
+                ));
+        }
+        // END UCLA MOD: CCLE-5212
         $this->collapsible(false);
         $this->sortable(false);
         $this->pageable(true);
@@ -173,6 +191,12 @@ class report_log_table_log extends table_sql {
             if (empty($this->download)) {
                 $username = html_writer::link(new moodle_url('/user/view.php', $params), $username);
             }
+            // START UCLA MOD: CCLE-5212 - Improve log display
+            // Display blank space if affected user is same as user in first user column
+            if ($event->relateduserid == $event->userid) {
+                $username = ' ';
+            }
+            // END UCLA MOD: CCLE-5212
         } else {
             $username = '-';
         }
