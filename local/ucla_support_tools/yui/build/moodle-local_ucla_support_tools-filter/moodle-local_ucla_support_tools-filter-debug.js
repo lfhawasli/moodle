@@ -28,27 +28,28 @@ M.local_ucla_support_tools = M.local_ucla_support_tools || {};
 
 M.local_ucla_support_tools.filter = {
     /**
-     * Creates a tool filter.
-     * 
+     * Creates a tool filter
+     *
      *      config: {
      *          input_node_id: "#id",
      *          target_nodes: ".css .target",
-     *          filter_nodes: ".css .target"
+     *          filter_nodes: ".css .target",
+     *          category_nodes: "#id .target"
      *      }
-     * 
+     *
      * @param {type} config
      * @returns {undefined}
      */
     tools: function (config) {
         Y.log('Loading tool search filter', 'info', 'local_ucla_support_tools');
-        
-        var tool_filter = Y.Base.create('pieFilter', Y.Base, [Y.AutoCompleteBase], {
+
+        var ToolFilter = Y.Base.create('pieFilter', Y.Base, [Y.AutoCompleteBase], {
             initializer: function () {
                 this._bindUIACBase();
                 this._syncUIACBase();
             }
         }),
-        filter = new tool_filter({
+        filter = new ToolFilter({
             inputNode: config.input_node_id,
             minQueryLength: 0,
             queryDelay: 0,
@@ -85,13 +86,32 @@ M.local_ucla_support_tools.filter = {
         // Subscribe to the "results" event and update photo visibility based on
         // whether or not they were included in the list of results.
         filter.on('results', function (e) {
-            // First hide all the photos.
-            Y.all(config.filter_nodes).addClass('hidden');
+            // Only need to filter if a query is non-empty.
+            if (e.query) {
+                // First hide all the photos and categories.
+                Y.all(config.filter_nodes).addClass('hidden');
+                Y.all(config.category_nodes).each(function (node) {
+                    node.ancestor('li').hide();
+                });
 
-            // Then unhide the ones that are in the current result list.
-            Y.Array.each(e.results, function (result) {
-                result.raw.node.ancestor('li').removeClass('hidden');
-            });
+                // Then unhide the ones that are in the current result list.
+                Y.Array.each(e.results, function (result) {
+                    var resultNode = result.raw.node;
+                    resultNode.ancestor('li').removeClass('hidden');
+
+                    // Only unhide categories with results.
+                    var categoryNode = resultNode.ancestor('.ucla-support-category');
+                    if (categoryNode) {
+                        categoryNode.ancestor('li').show();
+                    }
+                });
+            } else {
+                // Display everything.
+                Y.all(config.filter_nodes).removeClass('hidden');
+                Y.all(config.category_nodes).each(function (node) {
+                    node.ancestor('li').show();
+                });
+            }
         });
     },
     /**
@@ -116,7 +136,7 @@ M.local_ucla_support_tools.filter = {
             }
 
         }, 'input[type="checkbox"]');
-        
+
         Y.one('.ucla-support-tool-alltools').delegate('click', function (e) {
             e.preventDefault();
 
