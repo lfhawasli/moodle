@@ -57,7 +57,7 @@ class unique_logins_per_term extends uclastats_base {
      * @param return array
      */
     public function query($params) {
-        global $DB;
+        global $CFG, $DB;
 
         $ret_val = array();
 
@@ -68,42 +68,49 @@ class unique_logins_per_term extends uclastats_base {
         }
 
         // Get start and end dates for term.
-        $term_info = $this->get_term_info($params['term']);
+        $terminfo = $this->get_term_info($params['term']);
+        $terminfo['guest'] = $CFG->siteguest;
 
         // count average unique logins per day (using derived tables! slow, but
         // a way to do all the calculation in the DB layer)
         $sql = "SELECT      ROUND(AVG(login_count))
                 FROM        (
-                    SELECT  DAYOFYEAR(FROM_UNIXTIME(l.time)) AS day,
+                    SELECT  DAYOFYEAR(FROM_UNIXTIME(l.timecreated)) AS day,
                             COUNT(DISTINCT userid) AS login_count
-                    FROM        {log} AS l
-                    WHERE       l.time >= :start AND
-                                l.time <= :end
+                    FROM        {logstore_standard_log} AS l
+                    WHERE       l.timecreated >= :start AND
+                                l.timecreated <= :end AND
+                                l.action='loggedin' AND
+                                l.userid!=:guest
                     GROUP BY    day
                 ) AS logins_per_day";
-        $per_day = $DB->get_field_sql($sql, $term_info);
+        $per_day = $DB->get_field_sql($sql, $terminfo);
         $ret_val['per_day'] = $per_day;
 
         // count average unique logins per week (using derived tables! slow, but
         // a way to do all the calculation in the DB layer)
         $sql = "SELECT      ROUND(AVG(login_count))
                 FROM        (
-                    SELECT  WEEKOFYEAR(FROM_UNIXTIME(l.time)) AS week,
+                    SELECT  WEEKOFYEAR(FROM_UNIXTIME(l.timecreated)) AS week,
                             COUNT(DISTINCT userid) AS login_count
-                    FROM        {log} AS l
-                    WHERE       l.time >= :start AND
-                                l.time <= :end
+                    FROM        {logstore_standard_log} AS l
+                    WHERE       l.timecreated >= :start AND
+                                l.timecreated <= :end AND
+                                l.action='loggedin' AND
+                                l.userid!=:guest
                     GROUP BY    week
                 ) AS logins_per_week";
-        $per_week = $DB->get_field_sql($sql, $term_info);
+        $per_week = $DB->get_field_sql($sql, $terminfo);
         $ret_val['per_week'] = $per_week;
 
         // count the number of unique logins for the term
         $sql = "SELECT  COUNT(DISTINCT userid)
-                FROM        {log} AS l
-                WHERE       l.time >= :start AND
-                            l.time <= :end";
-        $per_term = $DB->get_field_sql($sql, $term_info);
+                FROM        {logstore_standard_log} AS l
+                WHERE       l.timecreated >= :start AND
+                            l.timecreated <= :end AND
+                            l.action='loggedin' AND
+                            l.userid!=:guest";
+        $per_term = $DB->get_field_sql($sql, $terminfo);
         $ret_val['per_term'] = $per_term;
 
         //get total number of users for the given term
@@ -128,8 +135,8 @@ class unique_logins_per_term extends uclastats_base {
         
         // might be useful to display the start/end times used
         $ret_val['start_end_times'] = sprintf('%s/%s',
-                date('M j, Y', $term_info['start']),
-                date('M j, Y', $term_info['end']));
+                date('M j, Y', $terminfo['start']),
+                date('M j, Y', $terminfo['end']));
 
         // the base class is expecting an array of arrays
         return array($ret_val);

@@ -72,6 +72,22 @@ class filter_oidwowza extends moodle_text_filter {
         return $newtext;
     }
 
+    /**
+     * Returns given timecode formatted as time in seconds and HH:MM:SS.
+     *
+     * @param string $timecode  Expecting timecode format like: 00:01:11,736
+     * @return array            Returns array of time in seconds and string.
+     */
+    public static function parse_timecode($timecode) {
+        $parts   = explode(':', $timecode);
+        $hours   = $parts[0];
+        $minutes = $parts[1];
+        $seconds = substr($parts[2], 0, 2);
+        $timecodeinseconds = ($hours * 3600) + ($minutes * 60) + ($seconds);
+        $timecodestandard  = $hours . ':' . $minutes . ':' . $seconds;
+        return array($timecodeinseconds, $timecodestandard);
+    }
+
 }
 
 /**
@@ -95,6 +111,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
 
     // Handle VOD and Live streams.
     $timeline = '';
+    $srtjs = '';
     if (strpos($file, '*') !== false) {
         $files = explode('*', $file);
         $file = $files[0];
@@ -137,7 +154,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $USER->oid_video_allowed = true;
 
     // Streaming paths.
-    $srtpath = 'http://' . $parseurl['host'] . ':8080/' . $app . '/' . $srt;
+    $srtpath = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' . $app . '/' . $srt;
     $html5path = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' . $app . '/' . $format . $file . '/playlist.m3u8';
 
     $rtmppath = $url . '/' . $app . '/' . $format . $file;
@@ -145,88 +162,88 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     // Set playerid, so that we can support multiple video embeds.
     $playerid = uniqid();
 
+    $lines = array();
     if ($srt != '') {
         // Interactive timeline.
         $srtfile = file($srtpath);
-        $lines = array();
-        foreach ($srtfile as $line) {
-            $cleanline = trim($line);
-
-            if (!is_numeric($cleanline)) {
-                array_push($lines, $line);
+        if ($srtfile !== false) {
+            foreach ($srtfile as $line) {
+                $cleanline = trim($line);
+                if (!is_numeric($cleanline)) {
+                    array_push($lines, $cleanline);
+                }
             }
+        } else {
+            // Cannot ready subtitle file, so ignore it.
+            $srt = '';
         }
+    }
 
+    if (!empty($lines)) {
+        // Build arrays for timecodes and text.
         $timecodes = array();
         $text = array();
         $index = 0;
         $paragraph = '';
-
+        $numlines = count($lines) - 1;
         foreach ($lines as $line) {
-            $line = trim($line);
             if (preg_match('/^[0-9]{2}:[0-9]{2}/', $line)) {
+                // Found timecode.
                 array_push($timecodes, $line);
-                $index++;
             } else {
-                if ($index < count($lines) - 1) {
+                // Else we found a start of a paragraph.
+                $paragraph = $paragraph . ' ' . $line;
+
+                // Check if next line is a timecode, meaning paragraph ended.
+                if ($index < $numlines) {
                     $next = $lines[$index + 1];
                 } else {
-                    $next = '';
+                    $next = null;
                 }
-                $index++;
-                if (preg_match('/^[0-9]{2}:[0-9]{2}/', $next)) {
-                    $paragraph = $paragraph . ' ' . $line;
-                    array_push($text, trim($paragraph));
+                if (preg_match('/^[0-9]{2}:[0-9]{2}/', $next) || is_null($next)) {
+                    // Next line is timecode or reached end of file.
+                    $paragraph = trim($paragraph . ' ' . $line);
+                    array_push($text, $paragraph);
                     $paragraph = '';
-                } else {
-                    $paragraph = $paragraph . ' ' . $line;
-                    if ($next == '') {
-                        array_push($text, trim($paragraph));
-                    }
                 }
             }
+            $index++;
         }
+
         $starts = array();
         $ends = array();
         $times = array();
         foreach ($timecodes as $timecode) {
+            // Start and end times are delineated by "-->".
+            $timestoparse = explode('-->', $timecode);
+
             // Calculate start times.
-            $parts = preg_split(':', $timecode);
-            $hours = $parts[0];
-            $minutes = $parts[1];
-            $seconds = substr($parts[2], 0, 2);
-            $timecodeinseconds = ((int) $hours * 3600) + ((int) $minutes * 60) + ((int) $seconds);
-            $timecodestandard = $hours . ':' . $minutes . ':' . $seconds;
-            array_push($starts, $timecodeinseconds);
-            array_push($times, $timecodestandard);
+            $result = filter_oidwowza::parse_timecode($timestoparse[0]);
+            array_push($starts, $result[0]);
+            array_push($times, $result[1]);
 
             // Calculate end times.
-            $end = preg_split('-->', $timecode);
-            $parts = preg_split(':', $end[1]);
-            $hours = $parts[0];
-            $minutes = $parts[1];
-            $seconds = substr($parts[2], 0, 2);
-            $timecodeinseconds = ((int) $hours * 3600) + ((int) $minutes * 60) + ((int) $seconds);
-            $timecodestandard = $hours . ':' . $minutes . ':' . $seconds;
-            array_push($ends, $timecodeinseconds);
+            $result = filter_oidwowza::parse_timecode($timestoparse[1]);
+            array_push($ends, $result[0]);
         }
 
         $index = 0;
         $timeline = '<div class="oidwowzafilter-timeline" style="width:' . $width . 'px;">';
         foreach ($text as $line) {
-            $timeline .= '<a onclick="jwplayer("player-' . $playerid . '").seek(' . $starts[$index] . ')" href="javascript:void(0)" id="t' . $starts[$index] . '">' . $times[$index] . '</a> - ' . $line . '<br/>';
+            if (!empty($line)) {
+                $timeline .= '<a onclick="jwplayer(\'player-' . $playerid . '\').seek(' .
+                        $starts[$index] . ')" href="javascript:void(0)" id="t' .
+                        $starts[$index] . '">' . $times[$index] . '</a> - ' . $line . '<br/>';
+            }
             $index++;
         }
         $timeline .= '</div>';
-    }
 
-    if ($srt != '') {
-        $srtjs = '"captions-2":{
-                                "file":"' . $srtpath . '",
-                                "back": "true"
-				},';
-    } else {
-        $srtjs = "";
+        $srtjs = ",tracks: [{
+                    file: '$srtpath',
+                    kind: 'captions',
+                    'default': true
+                  }]";
     }
 
     // Print out the player output.
@@ -237,7 +254,6 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
 		width: $width,
 		height: $height,
 		plugins: {
-                    $srtjs
                     $mbrjs
                     },
 		playlist: [{
@@ -246,7 +262,8 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
                             {file: '$html5path'},
                             {file: '$rtmppath'}
                         ]
-                        }],
+                    $srtjs
+                    }],
                 primary: 'html5'
 		});
 	</script>" . $timeline;

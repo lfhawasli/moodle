@@ -321,40 +321,39 @@ $sectionhtml = '';
 if ($displayforms) { 
     $sectionhtml = supportconsole_simple_form($title);
 } else if ($consolecommand == "$title") { 
-    ob_start();
-    $log_query = "
-        select 
-            a.id, 
-            from_unixtime(time) as logintime,
-            b.firstname,
-            b.lastname,
-            ip,
-            a.url
-        from {log} a 
-        left join {user} b on(a.userid=b.id)
-        where from_unixtime(time)  >= DATE_SUB(CURDATE(), INTERVAL 1 DAY) and action='login'
-        order by a.id desc
-        ";
 
-    $result = $DB->get_records_sql($log_query);
+    $sql = "SELECT a.id,
+                   FROM_UNIXTIME(a.timecreated) as logintime,
+                   b.firstname,
+                   b.lastname,
+                   a.ip,
+                   a.userid
+              FROM {logstore_standard_log} a
+         LEFT JOIN {user} b ON (a.userid=b.id)
+             WHERE a.timecreated >= (UNIX_TIMESTAMP()-86400) AND
+                   a.action='loggedin' AND
+                   a.userid!=?
+          ORDER BY a.id desc";
+    $rs = $DB->get_recordset_sql($sql, array($CFG->siteguest));
 
-    foreach($result as $k => $res) {
-        $res->user = html_writer::link(new moodle_url("/user/$res->url"), 
-            "$res->firstname $res->lastname", array('target'=>'_blank'));
-        
-        // unset unneeded data for display
-        unset($res->id);      
-        unset($res->firstname);     
-        unset($res->lastname);     
-        unset($res->url);     
+    $result = array();
+    foreach($rs as $k => $res) {
+        $res->user = html_writer::link(new moodle_url('/user/view.php',
+                array('id' => $res->userid)), "$res->firstname $res->lastname",
+                array('target' => '_blank'));
 
-        $result[$k] = $res;        
+        // Unset unneeded data for display.
+        unset($res->id);
+        unset($res->firstname);
+        unset($res->lastname);
+        unset($res->userid);
+
+        $result[$k] = $res;
     }
-
-    echo supportconsole_render_section_shortcut($title, $result);
-
-    $sectionhtml = ob_get_clean();
-} 
+    $rs->close();
+    
+    $sectionhtml = supportconsole_render_section_shortcut($title, $result);
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
@@ -402,29 +401,37 @@ if ($displayforms) {
         exit;
     }    
 
-    if ($filter ==" login") {
-        $whereclause = "AND action='login'";
+    // Do not return results for guest logins
+    $params = array();
+    $whereclause = "";
+    if ($filter == "login") {
+        $whereclause = "AND action = 'loggedin' AND userid <> ?";
         $what = 'Logins';
+        $params = array($CFG->siteguest);
     } else {
-        $whereclause = "";
         $what = 'Log Entries';
-    }    
+    }
 
     $sectionhtml = "Count of Moodle $what from the Last $days Days";
-    $days--;  # decrement days by 1 to get query to work
-    $result = $DB->get_records_sql("
-        SELECT 
-            FROM_UNIXTIME(time,'%Y-%m-%d') AS date,
-            COUNT(*) AS count 
-        FROM {log} a 
-        WHERE FROM_UNIXTIME(time) >= DATE_SUB(CURDATE(), INTERVAL $days DAY) 
-            $whereclause
-        GROUP BY date
-        ORDER BY a.id DESC
-    ");
+    $rs = $DB->get_recordset_sql("
+        SELECT FROM_UNIXTIME(timecreated,'%Y-%m-%d') AS date,
+               COUNT(*) AS count
+          FROM {logstore_standard_log}
+         WHERE FROM_UNIXTIME(timecreated, '%Y-%m-%d') >= DATE_SUB(CURDATE(), INTERVAL $days DAY)
+               $whereclause
+      GROUP BY date", $params);
 
-    $sectionhtml = supportconsole_render_section_shortcut($sectionhtml, $result);
-} 
+    $result = array();
+    if ($rs->valid()) {
+        foreach($rs as $record) {
+            $result[] = $record;
+        }    
+    }
+    $rs->close();
+
+    $sectionhtml = supportconsole_render_section_shortcut($title, $result,
+            array('radio' => $filter, 'days' => $days), $sectionhtml);
+}
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
@@ -549,6 +556,14 @@ $syllabusdateselector = html_writer::label('Start date ("MM/DD/YYYY")', 'startda
                     'name' => 'enddate',
                     'id' => 'enddate'
                 ));
+// Create IEI checkbox to be used for both syllabus overview and syllabus report.
+$syllabusieiselector = html_writer::label(get_string('syllabus_iei', 'tool_uclasupportconsole'), 'iei') .
+        html_writer::empty_tag('input', array(
+            'type' => 'checkbox',
+            'name' => 'iei',
+            'value' => 'x',
+            'id' => 'iei'
+        ));
 
 $title = "syllabusoverview";
 $sectionhtml = '';
@@ -565,18 +580,17 @@ if ($displayforms) {
             html_writer::tag('select', $overview_options, array('name' => 'syllabus'));
     
     $syllabus_selectors .= html_writer::start_tag('br') . $syllabusdateselector;
-    
+    $syllabus_selectors .= html_writer::empty_tag('br') . $syllabusieiselector;
+
     $sectionhtml = supportconsole_simple_form($title, $syllabus_selectors);
     
 } else if ($consolecommand == "$title") {
-    $sectionhtml .= $OUTPUT->box(get_string('syllabusoverviewnotes',
-            'tool_uclasupportconsole'));
-
     $selected_term = required_param('term', PARAM_ALPHANUM);
     $selected_type = required_param('syllabus', PARAM_ALPHA);
     
     $timestartstr = optional_param('startdate', '', PARAM_RAW);
     $timeendstr = optional_param('enddate', '', PARAM_RAW);
+    $filterbyiei = optional_param('iei', '', PARAM_RAW);
     
     $timesql = '';
     $timerange = '';
@@ -590,6 +604,23 @@ if ($displayforms) {
         $timerange .= ($timestart ? '' : $uploaddisplaymsg) . ' up to '. $timeendstr;
     }
     
+    // If we filter for IEI courses, then we want to include canceled and tutorial
+    // classes. If we don't, then we want to exclude them. We also want to display
+    // a note that reflects this.
+    $joinclause = '';
+    $excludeclause = '';
+    $message = '';
+    if(empty($filterbyiei)) {
+        $excludeclause = 'urci.enrolstat != \'X\' AND urci.acttype != \'TUT\' AND';
+        $message = get_string('syllabusnotesnoniei', 'tool_uclasupportconsole');
+    } else {
+        $joinclause = "JOIN {uclaieiclasses} AS uic ON uic.term = urc.term AND uic.srs = urc.srs";
+        $message = get_string('syllabusnotesiei', 'tool_uclasupportconsole');
+    }
+
+    $sectionhtml .= $OUTPUT->box($message . ' ' . get_string('syllabusoverviewnotes',
+            'tool_uclasupportconsole'));
+
     $syllabus_table = new html_table();
     
     $sql = '';
@@ -602,12 +633,12 @@ if ($displayforms) {
                 FROM        {ucla_reg_subjectarea} AS urs,
                             {ucla_reg_classinfo} AS urci,
                             {ucla_request_classes} AS urc
+                            ' . $joinclause . '
                 WHERE       urci.term =:term AND
                             urs.subjarea = urci.subj_area AND
                             urci.term = urc.term AND 
                             urci.srs = urc.srs AND
-                            urci.enrolstat != \'X\' AND
-                            urci.acttype != \'TUT\' AND
+                            ' . $excludeclause . '
                             urc.courseid IS NOT NULL
                 ORDER BY    urs.subjarea';
         $table_colum_name = get_string('syllabus_subjarea', 'tool_uclasupportconsole');
@@ -618,12 +649,12 @@ if ($displayforms) {
                 FROM        {ucla_reg_division} AS urd,
                             {ucla_reg_classinfo} AS urci,
                             {ucla_request_classes} AS urc
+                            ' . $joinclause . '
                 WHERE       urci.term =:term AND
                             urd.code = urci.division AND
                             urci.term = urc.term AND 
                             urci.srs = urc.srs AND
-                            urci.enrolstat != \'X\' AND
-                            urci.acttype != \'TUT\' AND
+                            ' . $excludeclause . '
                             urc.courseid IS NOT NULL
                 ORDER BY    urd.fullname';
     }
@@ -870,6 +901,12 @@ if ($displayforms) {
                 get_string('manual_syllabus_count', 'tool_uclasupportconsole',
                         $manual_syllabus_count));
         }
+    } else {
+        // No records found.
+        if(!empty($filterbyiei)) {
+            // Warn user that reason for no results may be that IEI information has not been uploaded.
+            $sectionhtml .= $OUTPUT->box(get_string('syllabusieiwarning', 'tool_uclasupportconsole'));
+        }
     }
         
     $sectionhtml .= $OUTPUT->box_start();
@@ -903,18 +940,17 @@ if ($displayforms) {
     $syllabus_selectors .= get_subject_area_selector($title);
     
     $syllabus_selectors .= html_writer::start_tag('br') . $syllabusdateselector;
+    $syllabus_selectors .= html_writer::empty_tag('br') . $syllabusieiselector;
     
     $sectionhtml = supportconsole_simple_form($title, $syllabus_selectors);
     
 } else if ($consolecommand == "$title") {
-    $sectionhtml .= $OUTPUT->box(get_string('syllabusreoportnotes',
-            'tool_uclasupportconsole'));
-
     $selected_term = required_param('term', PARAM_ALPHANUM);
     $selected_subj = required_param('subjarea', PARAM_NOTAGS);
     
     $timestartstr = optional_param('startdate', '', PARAM_RAW);
     $timeendstr = optional_param('enddate', '', PARAM_RAW);
+    $filterbyiei = optional_param('iei', '', PARAM_RAW);
     
     $timesql = '';
     $timerange = '';
@@ -927,7 +963,23 @@ if ($displayforms) {
         $timesql .= ' AND s.timecreated <= ' . $timeend . ' ';
         $timerange .= ($timestart ? '' : $uploaddisplaymsg) . ' up to '. $timeendstr;
     }
-    
+
+    // If we filter for IEI courses, then we want to include canceled and tutorial
+    // classes. If we don't, then we want to exclude them.
+    $joinclause = '';
+    $excludeclause = '';
+    $message = '';
+    if(empty($filterbyiei)) {
+        $excludeclause = 'AND uri.enrolstat != \'X\' AND uri.acttype != \'TUT\'';
+        $message = get_string('syllabusnotesnoniei', 'tool_uclasupportconsole');
+    } else {
+        $joinclause = "JOIN {uclaieiclasses} AS uic ON uic.term = urc.term AND uic.srs = urc.srs";
+        $message = get_string('syllabusnotesiei', 'tool_uclasupportconsole');
+    }
+
+    $sectionhtml .= $OUTPUT->box($message . ' ' . get_string('syllabusreoportnotes',
+            'tool_uclasupportconsole'));
+
     $sql = "SELECT      CONCAT(COALESCE(s.id, ''), urc.srs) AS idsrs, 
                         urc.department,
                         urc.course,
@@ -938,10 +990,10 @@ if ($displayforms) {
                         urc.term=uri.term AND
                         urc.srs=uri.srs)
             LEFT JOIN   {ucla_syllabus} AS s ON (urc.courseid = s.courseid {$timesql})
+            $joinclause
             WHERE       urc.term =:term AND
-                        urc.department =:department AND
-                        uri.enrolstat != 'X' AND
-                        uri.acttype != 'TUT'                        
+                        urc.department =:department
+                        $excludeclause
             ORDER BY    uri.term, uri.subj_area, uri.crsidx, uri.secidx";
     
     $params = array();
@@ -1003,6 +1055,12 @@ if ($displayforms) {
                 $syllabus_info[$num_courses] = $syllabus_record;
                 $num_courses++;
             }
+        }
+    } else {
+        // No records found.
+        if(!empty($filterbyiei)) {
+            // Warn user that reason for no results may be that IEI information has not been uploaded.
+            $sectionhtml .= $OUTPUT->box(get_string('syllabusieiwarning', 'tool_uclasupportconsole'));
         }
     }
     
@@ -2016,69 +2074,6 @@ if ($displayforms) {
 }
 
 $consoles->push_console_html('users', $title, $sectionhtml);
-
-////////////////////////////////////////////////////////////////////
-$title = "recentlysentgrades";
-$sectionhtml = '';
-
-if ($displayforms) {
-
-    $sectionhtml = get_term_selector($title);
-    $sectionhtml .= get_subject_area_selector($title);
-
-    $sectionhtml = supportconsole_simple_form($title, $input_html);
-} else if ($consolecommand == "$title") {
-
-    // get optional filters
-    $term = optional_param('term', null, PARAM_ALPHANUM);
-    if (!ucla_validator('term', $term)) {
-        $term = null;
-    }
-    $subjarea = optional_param('subjarea', null, PARAM_NOTAGS);
-
-    //List of gradebook related actions for the log table.
-    $actions = array(get_string('gradesuccess', 'local_gradebook'), get_string('gradefail', 'local_gradebook'),
-                    get_string('itemsuccess', 'local_gradebook'), get_string('itemfail', 'local_gradebook'),
-                    get_string('connectionfail', 'local_gradebook'));
-
-    list($in, $params) = $DB->get_in_or_equal($actions);
-    $wheresql = 'l.action ' . $in;
-    
-    $sql = "SELECT DISTINCT l.id AS logid, from_unixtime(l.time) as time, c.shortname AS course, c.id AS courseid, l.userid, l.module, l.action, l.info
-            FROM {log} l
-            JOIN {course} c ON l.course = c.id
-            JOIN {ucla_request_classes} urc ON c.id = urc.courseid
-            WHERE $wheresql";
-
-    // handle term/subject area filter
-    if (!empty($term) && !empty($subjarea)) {
-        $sql .= " AND
-                  urc.term='$term' AND
-                  urc.department='$subjarea'";
-    } else if (!empty($term)) {
-        $sql .= " AND
-                  urc.term='$term'";
-    } else if (!empty($subjarea)) {
-        $sql .= " AND
-                  urc.department='$subjarea'";
-    }
-    $sql .= " ORDER BY time DESC
-              LIMIT 100";   //Prints from newest to oldest and limits to 100 results.
-
-    $results = $DB->get_records_sql($sql, $params);
-    foreach ($results as $k => $result) {
-        $result->course = html_writer::link(new moodle_url('/course/view.php',
-            array('id' => $result->courseid)), $result->course,
-                array('target' => '_blank'));
-        unset($result->courseid);
-        $results[$k] = $result;
-    }
-
-    $inputs = array('term' => $term, 'subjarea' => $subjarea);
-    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, $inputs);
-}
-
-$consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
 $title = "pushgrades";
