@@ -382,7 +382,7 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEquals($gradeitem->id, $gradeinfo->id);
         $this->assertEquals($gradeitem->itemname, $gradeinfo->itemname);
         $this->assertEquals($gradeitem->categoryid, $gradeinfo->categoryid);
-        $this->assertEquals($gradeitem->hidden, $gradeinfo->hidden);
+        $this->assertEquals($gradeitem->is_hidden(), $gradeinfo->hidden);
         $this->assertEquals($gradeitem->grademax, $gradeinfo->grademax);
 
         // Verify that the transaction user is the same.

@@ -247,7 +247,7 @@ class send_myucla_grade_item extends send_myucla_base {
         $gradeinfo->courseid    = $gradeitem->courseid;
         $gradeinfo->deleted     = isset($gradeitem->deleted) ? $gradeitem->deleted : false;
         $gradeinfo->grademax    = $gradeitem->grademax;
-        $gradeinfo->hidden      = $gradeitem->hidden;
+        $gradeinfo->hidden      = $gradeitem->is_hidden();
         $gradeinfo->id          = $gradeitem->id;
         $gradeinfo->itemname    = $gradeitem->itemname;
         $gradeinfo->itemtype    = $gradeitem->itemtype;
