@@ -149,6 +149,7 @@ class lesson_page_type_multichoice extends lesson_page {
             $wronganswerid = 0;
             // store student's answers for displaying on feedback page
             $result->studentanswer = '';
+            $result->studentanswerformat = FORMAT_HTML;
             foreach ($answers as $answer) {
                 foreach ($studentanswers as $answerid) {
                     if ($answerid == $answer->id) {
@@ -472,6 +473,9 @@ class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
             $attempt->answerid = null;
         }
 
+        // Disable shortforms.
+        $mform->setDisableShortforms();
+
         $mform->addElement('header', 'pageheader');
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
@@ -524,6 +528,9 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
 
         $lessonid = $this->_customdata['lessonid'];
         $contents = $this->_customdata['contents'];
+
+        // Disable shortforms.
+        $mform->setDisableShortforms();
 
         $mform->addElement('header', 'pageheader');
 

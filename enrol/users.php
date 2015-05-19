@@ -215,10 +215,8 @@ if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
 
 $filterform = new enrol_users_filter_form('users.php', array('manager' => $manager, 'id' => $id),
         'get', '', array('id' => 'filterform'));
-// START UCLA MOD: CCLE-4418 - Do not display inactive users by default.
-//$filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role, 'filtergroup' => $fgroup));
-$filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role, 'filtergroup' => $fgroup, 'status' => $status));
-// END UCLA MOD: CCLE-4418
+$filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role,
+    'filtergroup' => $fgroup, 'status' => $status));
 
 $table->set_fields($fields, $renderer);
 

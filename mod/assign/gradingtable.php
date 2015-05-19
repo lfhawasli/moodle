@@ -567,9 +567,10 @@ class assign_grading_table extends table_sql implements renderable {
         static $markers = null;
         static $markerlist = array();
         if ($markers === null) {
+            list($sort, $params) = users_order_by_sql();
             // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
-            //$markers = get_users_by_capability($this->assignment->get_context(), 'mod/assign:grade');
-            $markers = local_ucla_core_edit::get_course_graders($this->assignment->get_course());
+            //$markers = get_users_by_capability($this->assignment->get_context(), 'mod/assign:grade', '', $sort);
+            $markers = local_ucla_core_edit::get_course_graders($this->assignment->get_course(), $sort);
             // END UCLA MOD: CCLE-4770.
             $markerlist[0] = get_string('choosemarker', 'assign');
             foreach ($markers as $marker) {
