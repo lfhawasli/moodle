@@ -3287,9 +3287,10 @@ class assign {
         // Get markers to use in drop lists.
         $markingallocationoptions = array();
         if ($markingallocation) {
+            list($sort, $params) = users_order_by_sql();
             // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
-            //$markers = get_users_by_capability($this->context, 'mod/assign:grade');
-            $markers = local_ucla_core_edit::get_course_graders($this->get_course());
+            //$markers = get_users_by_capability($this->context, 'mod/assign:grade', '', $sort);
+            $markers = local_ucla_core_edit::get_course_graders($this->get_course(), $sort);
             // END UCLA MOD: CCLE-4770.
             $markingallocationoptions[''] = get_string('filternone', 'assign');
             $markingallocationoptions[ASSIGN_MARKER_FILTER_NO_MARKER] = get_string('markerfilternomarker', 'assign');
@@ -3777,7 +3778,12 @@ class assign {
 
         $mform = new mod_assign_batch_set_marking_workflow_state_form(null, $formparams);
         $mform->set_data($formdata);    // Initialises the hidden elements.
-        $o .= $this->get_renderer()->header();
+        $header = new assign_header($this->get_instance(),
+            $this->get_context(),
+            $this->show_intro(),
+            $this->get_course_module()->id,
+            get_string('setmarkingworkflowstate', 'assign'));
+        $o .= $this->get_renderer()->render($header);
         $o .= $this->get_renderer()->render(new assign_form('setworkflowstate', $mform));
         $o .= $this->view_footer();
 
@@ -3833,9 +3839,10 @@ class assign {
             'usershtml' => $usershtml,
         );
 
+        list($sort, $params) = users_order_by_sql();
         // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
-        //$markers = get_users_by_capability($this->get_context(), 'mod/assign:grade');
-        $markers = local_ucla_core_edit::get_course_graders($this->get_course());
+        //$markers = get_users_by_capability($this->get_context(), 'mod/assign:grade', '', $sort);
+        $markers = local_ucla_core_edit::get_course_graders($this->get_course(), $sort);
         // END UCLA MOD: CCLE-4770.
         $markerlist = array();
         foreach ($markers as $marker) {
@@ -3846,7 +3853,12 @@ class assign {
 
         $mform = new mod_assign_batch_set_allocatedmarker_form(null, $formparams);
         $mform->set_data($formdata);    // Initialises the hidden elements.
-        $o .= $this->get_renderer()->header();
+        $header = new assign_header($this->get_instance(),
+            $this->get_context(),
+            $this->show_intro(),
+            $this->get_course_module()->id,
+            get_string('setmarkingallocation', 'assign'));
+        $o .= $this->get_renderer()->render($header);
         $o .= $this->get_renderer()->render(new assign_form('setworkflowstate', $mform));
         $o .= $this->view_footer();
 
@@ -5462,6 +5474,7 @@ class assign {
 
         $adminconfig = $this->get_admin_config();
         $gradebookplugin = $adminconfig->feedback_plugin_for_gradebook;
+        $gradebookplugin = str_replace('assignfeedback_', '', $gradebookplugin);
         $grades = $DB->get_records('assign_grades', array('assignment'=>$this->get_instance()->id));
 
         $plugin = $this->get_feedback_plugin_by_type($gradebookplugin);
@@ -5526,7 +5539,8 @@ class assign {
         if ($markingallocation) {
             $markingallocationoptions[''] = get_string('filternone', 'assign');
             $markingallocationoptions[ASSIGN_MARKER_FILTER_NO_MARKER] = get_string('markerfilternomarker', 'assign');
-            $markers = get_users_by_capability($this->context, 'mod/assign:grade');
+            list($sort, $params) = users_order_by_sql();
+            $markers = get_users_by_capability($this->context, 'mod/assign:grade', '', $sort);
             foreach ($markers as $marker) {
                 $markingallocationoptions[$marker->id] = fullname($marker);
             }
@@ -6103,9 +6117,10 @@ class assign {
             $this->get_instance()->markingallocation &&
             has_capability('mod/assign:manageallocations', $this->context)) {
 
+            list($sort, $params) = users_order_by_sql();
             // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
-            //$markers = get_users_by_capability($this->context, 'mod/assign:grade');
-            $markers = local_ucla_core_edit::get_course_graders($this->course);
+            //$markers = get_users_by_capability($this->context, 'mod/assign:grade', '', $sort);
+            $markers = local_ucla_core_edit::get_course_graders($this->course, $sort);
             // END UCLA MOD: CCLE-4770.            
             $markerlist = array('' =>  get_string('choosemarker', 'assign'));
             foreach ($markers as $marker) {
@@ -6510,9 +6525,10 @@ class assign {
             'usershtml' => ''   // initialise these parameters with real information.
         );
 
+        list($sort, $params) = users_order_by_sql();
         // START UCLA MOD: CCLE-4770 - Grader drop down lists all users with grading access.
-        //$markers = get_users_by_capability($this->get_context(), 'mod/assign:grade');
-        $markers = local_ucla_core_edit::get_course_graders($this->get_course());
+        //$markers = get_users_by_capability($this->get_context(), 'mod/assign:grade', '', $sort);
+        $markers = local_ucla_core_edit::get_course_graders($this->get_course(), $sort);
         // END UCLA MOD: CCLE-4770.
         $markerlist = array();
         foreach ($markers as $marker) {
