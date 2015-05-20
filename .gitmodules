@@ -79,3 +79,6 @@
 [submodule "lib/editor/atto/plugins/pastespecial"]
 	path = lib/editor/atto/plugins/pastespecial
 	url = https://github.com/jinhofer/pastespecial
+[submodule "mod/oublog"]
+	path = mod/oublog
+	url = https://github.com/ccle/moodle-mod_oublog
