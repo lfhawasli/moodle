@@ -82,3 +82,6 @@
 [submodule "mod/oublog"]
 	path = mod/oublog
 	url = https://github.com/ccle/moodle-mod_oublog
+[submodule "mod/scheduler"]
+	path = mod/scheduler
+	url = https://github.com/bostelm/moodle-mod_scheduler.git
