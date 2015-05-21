@@ -487,22 +487,25 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
             )
         );
 
-        // Try to create the issue.
-        $jiraresult = send_jira_request(get_config('block_ucla_help', 'jira_endpoint'),
-                true, array('Content-type: application/json'),
-                json_encode($params));
+        $jiraendpoint = get_config('block_ucla_help', 'jira_endpoint');
 
-        if ($jiraresult === false) {
-            $result = false;
-        } else {
-            $result = true;
-            $decodedresult = (array)json_decode($jiraresult);
-            $issueid = $decodedresult['key'];
+        // Try to create the issue.
+        $jiraresult = send_jira_request($jiraendpoint, true,
+                array('Content-type: application/json'), json_encode($params));
+        $result = false;
+        $decodedresult = json_decode($jiraresult, true);
+        if (!empty($decodedresult)) {
+            // Issue is successfully created only when the issue key is
+            // returned. Otherwise, error.
+            if (!empty($decodedresult['key'])) {
+                $issueid = $decodedresult['key'];
+                $result = true;
+            }
         }
 
         // If there is an attachment, then attach it to the newly created issue.
         if ($result != false && $attachmentfile != null) {
-            $url = get_config('block_ucla_help', 'jira_endpoint') . "/$issueid/attachments";
+            $url = $jiraendpoint . "/$issueid/attachments";
             $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
             $data = array('file'=>"@{$attachmentfile};filename={$attachmentname}");
             $jiraresult = send_jira_request($url, true, $headers, $data);
