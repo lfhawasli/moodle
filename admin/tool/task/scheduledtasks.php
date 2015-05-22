@@ -35,7 +35,13 @@ $PAGE->set_heading($strheading);
 
 require_login();
 
-require_capability('moodle/site:config', context_system::instance());
+// START UCLA MOD: CCLE-5104 - Monitor cron jobs
+//require_capability('moodle/site:config', context_system::instance());
+if (!has_capability('moodle/site:config', context_system::instance(), null, true) &&
+        !has_capability('local/ucla:viewscheduledtasks', context_system::instance(), null, true)) {
+    throw new moodle_exception('invalidaccess');
+}
+// END UCLA MOD: CCLE-5104
 
 $renderer = $PAGE->get_renderer('tool_task');
 

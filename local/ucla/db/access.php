@@ -71,4 +71,12 @@ $capabilities = array(
             'manager'  => CAP_ALLOW
         )
     ),
+
+    'local/ucla:viewscheduledtasks' => array(
+        'captype'       => 'read',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes'    => array(
+            'manager'  => CAP_ALLOW
+        )
+    ),
 );

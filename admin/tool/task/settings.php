@@ -24,6 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-if ($hassiteconfig) {
-    $ADMIN->add('server', new admin_externalpage('scheduledtasks', new lang_string('scheduledtasks','tool_task'), "$CFG->wwwroot/$CFG->admin/tool/task/scheduledtasks.php"));
+// START UCLA MOD: CCLE-5104 - Monitor cron jobs
+//if ($hassiteconfig) {
+//    $ADMIN->add('server', new admin_externalpage('scheduledtasks', new lang_string('scheduledtasks','tool_task'), "$CFG->wwwroot/$CFG->admin/tool/task/scheduledtasks.php"));
+//}
+if ($hassiteconfig or has_capability('local/ucla:viewscheduledtasks', context_system::instance())) {
+    $ADMIN->add('server', new admin_externalpage('scheduledtasks', new lang_string('scheduledtasks','tool_task'), "$CFG->wwwroot/$CFG->admin/tool/task/scheduledtasks.php", 'local/ucla:viewscheduledtasks'));
+// END UCLA MOD: CCLE-5104
 }
