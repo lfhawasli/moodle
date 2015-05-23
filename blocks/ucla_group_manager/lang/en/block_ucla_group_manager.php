@@ -1,5 +1,4 @@
 <?php
-
 $string['pluginname'] = 'UCLA group manager';
 
 $string['group_name'] = '{$a->subj_area} {$a->acttype} {$a->sectnum}';
@@ -15,3 +14,4 @@ $string['ucla_groupmanagercannotremove'] = 'This grouping is a special grouping 
 $string['ucla_groupmanagercannotremove_one'] = 'The group selected is a special group for UCLA course sections. It cannot be removed.';
 $string['ucla_groupmanagercannotremove_oneof'] = 'One of the groups selected is a special group for UCLA course sections. It cannot be removed.';
 
+$string['eventsection_groups_synced'] = 'Section groups synced';

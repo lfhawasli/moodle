@@ -258,6 +258,7 @@ class ucla_group_manager {
         // Groups created should NOT be divisible in any logical way,
         // we should try to enforce usage of groupings.
         $outputstr = '';
+        $syncedgroups = [];
         $registrarconfigs = get_config('enrol_database');
         foreach ($reqsecinfos as $termsrs => &$reqinfo) {
             // If there are no sections, then we want to do something later.
@@ -296,11 +297,22 @@ class ucla_group_manager {
                 $sectiongroup->sync_members($moodleusers);
                 $sectiongroup->save();
 
+                $syncedgroups[] = $sectiongroup->id;
                 $sectioninfo->group = $sectiongroup;
 
                 $outputstr .= "[{$sectiongroup->id}] {$sectiongroup->name}";
                 $outputstr .= "...";
             }
+        }
+
+        if (!empty($syncedgroups)) {
+            $event = \block_ucla_group_manager\event\section_groups_synced::create(array(
+                        'context' => context_course::instance($courseid),
+                        'other' => array(
+                            'groupids' => $syncedgroups
+                        )
+            ));
+            $event->trigger();
         }
 
         // When we hit that next foreach, if this is not unset, for some
