@@ -34,7 +34,7 @@ $fullname = $course->fullname;
 $context = context_course::instance($courseid);
 
 require_login();
-if (!has_access($USER) && !has_capability('tool/uclaseniorscholar:edit', $context)) {
+if (!seniorscholar_has_access($USER) && !has_capability('tool/uclaseniorscholar:edit', $context)) {
     throw new required_capability_exception($context, 'tool/uclaseniorscholar:edit');
 }
 

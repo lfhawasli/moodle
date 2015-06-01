@@ -73,7 +73,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
     public function send_invitations($data, $resend = false) {
         global $DB, $CFG, $SITE, $USER;
 
-        if (has_access($USER) || has_capability('tool/uclaseniorscholar:edit', context_course::instance($data->courseid))) {
+        if (seniorscholar_has_access($USER) || has_capability('tool/uclaseniorscholar:edit', context_course::instance($data->courseid))) {
             // Get course record, to be used later.
             $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
 
@@ -261,7 +261,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
 
         return $invites;
     }
- }
+}
 
 /**
  * Prints out tabs and highlights the appropiate current tab.

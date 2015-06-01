@@ -36,9 +36,10 @@ $syscontext = context_system::instance();
 
 // Initialize $PAGE.
 $PAGE->set_url('/admin/tool/uclaseniorscholar/index.php');
+$PAGE->requires->js('/admin/tool/uclaseniorscholar/seniorscholar_invitation.js');
 
 require_login();
-if (!has_access($USER) && !has_capability('tool/uclaseniorscholar:edit', $syscontext)) {
+if (!seniorscholar_has_access($USER) && !has_capability('tool/uclaseniorscholar:edit', $syscontext)) {
     throw new required_capability_exception($syscontext, 'tool/uclaseniorscholar:edit');
 }
 
@@ -57,9 +58,9 @@ echo $OUTPUT->heading(get_string('pluginname_desc', 'tool_uclaseniorscholar'), 2
 echo $OUTPUT->box_start('generalbox');
 echo html_writer::tag('p', get_string('mainmenu', 'tool_uclaseniorscholar'));
 
-$subjlist = get_subjarea();
-$termlist = get_terms();
-$instrlist = get_instructors_list_by_term();
+$subjlist = seniorscholar_get_subjarea();
+$termlist = seniorscholar_get_terms();
+$instrlist = get_instructors_list_by_term($filterterm);
 
 // Output.
 echo html_writer::start_tag('div', array('id' => 'tool_uclaseniorscholar_filter'));
@@ -94,10 +95,11 @@ echo html_writer::select($instrlist, 'filter_instructor', $filterinstruid,
 echo html_writer::empty_tag('input', array('id' => 'course_by_instructor_btn',
                                             'name' => 'submit_button',
                                             'value' => get_string('submit_button', 'tool_uclaseniorscholar'),
-                                            'type' => 'submit'));
+                                            'type' => 'button'));
 echo html_writer::empty_tag('input', array('type' => 'hidden',
-                                                     'name' => 'filter',
-                                                     'value' => 'instr_term'));
+                                           'id' => 'id_filter',
+                                           'name' => 'filter',
+                                           'value' => 'instr_term'));
 echo html_writer::end_tag('form');
 echo html_writer::end_tag('div');
 
@@ -114,7 +116,7 @@ echo html_writer::empty_tag('input', array('id' => 'course_by_subj_btn',
                                            'name' => 'submit_button',
                                            'value' => get_string('submit_button', 'tool_uclaseniorscholar'),
                                            'type' => 'submit'));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'filter', 'value' =>'subj_term'));
+echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'filter', 'value' => 'subj_term'));
 echo html_writer::end_tag('form');
 echo html_writer::end_tag('div');
 
@@ -122,20 +124,23 @@ echo html_writer::end_tag('div');
 echo html_writer::start_tag('div');
 switch($filter) {
     case 'term':
-        $list = senior_scholar_course_check(get_courses_by_term($filterterm));
+        $list = seniorscholar_course_check(get_courses_by_term($filterterm));
         break;
     case 'instr_term':
         $param = array('filter_term' => $filterterm, 'filter_instructor' => substr($filterinstruid, 1));
-        $list = senior_scholar_course_check(get_courses_by_instructor_term($param));
+        $list = seniorscholar_course_check(get_courses_by_instructor_term($param));
         break;
     case 'subj_term':
         $param = array('filter_term' => $filterterm, 'filter_subj' => $filtersubj);
-        $list = senior_scholar_course_check(get_courses_by_subject_term($param));
+        $list = seniorscholar_course_check(get_courses_by_subject_term($param));
+        break;
+    case 'instr':
+        $list = array();  // When try to filter instructor by term.
         break;
     default:
-        $list = senior_scholar_course_check(get_courses_by_term($filterterm));
+        $list = seniorscholar_course_check(get_courses_by_term($filterterm));
 }
-if (empty($list)) {
+if (empty($list) && $filter != 'instr') {
     echo html_writer::empty_tag('br');
     echo html_writer::tag('p', get_string('no_result', 'tool_uclaseniorscholar'));
 } else {

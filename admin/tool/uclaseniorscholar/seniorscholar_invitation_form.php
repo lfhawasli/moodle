@@ -51,24 +51,39 @@ class seniorscholar_invitation_form extends invitation_form {
         // Set roles.
         $mform->addElement('header', 'header_role', get_string('header_role', 'tool_uclaseniorscholar'));
 
-        $site_roles = $this->get_roles();
+        $siteroles = $this->get_roles();
         $label = get_string('assignrole', 'tool_uclaseniorscholar');
-        $role_group = array();
-        foreach ($site_roles as $role_type => $roles) {
-            $role_type_string = html_writer::tag('div',
-                get_string($role_type, 'tool_uclaroles'),
+        $rolegroup = array();
+        $defaultrole = 0;
+        foreach ($siteroles as $roletype => $roles) {
+            $roletypestring = html_writer::tag('div',
+                get_string($roletype, 'tool_uclaroles'),
                 array('class' => 'label-bstp label-primary'));
-            $role_group[] = &$mform->createElement('static', 'role_type_header',
-                '', $role_type_string);
+            $rolegroup[] = &$mform->createElement('static', 'role_type_header',
+                '', $roletypestring);
 
             foreach ($roles as $role) {
-                $role_string = parent::format_role_string($role);
-                $role_group[] = &$mform->createElement('radio', 'roleid', '',
-                    $role_string, $role->id);
+                $rolestring = parent::format_role_string($role);
+                $rolegroup[] = &$mform->createElement('radio', 'roleid', '',
+                    $rolestring, $role->id);
+
+                // Set default role as Participant
+                if (!$defaultrole) {
+                    $defaultrole = $role->id;
+                }
             }
         }
+        $mform->addGroup($rolegroup, 'role_group', $label);
 
-        $mform->addGroup($role_group, 'role_group', $label);
+        // Set default role.
+        $mform->setDefaults(
+            array(
+                'role_group' => array(
+                    'roleid' => $defaultrole
+                )
+            )
+        );
+
         $mform->addRule('role_group',
                 get_string('norole', 'tool_uclaseniorscholar'), 'required');
 
@@ -102,7 +117,6 @@ class seniorscholar_invitation_form extends invitation_form {
         // Prepare string variables.
         $temp = new stdClass();
         $temp->seniorscholarsupportemail = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
-            //srscholars@mednet.ucla.edu // set at admin
         $mform->addElement('checkbox', 'show_from_email', '',
                 get_string('show_from_email', 'tool_uclaseniorscholar', $temp));
         $mform->addElement('checkbox', 'notify_inviter', '',

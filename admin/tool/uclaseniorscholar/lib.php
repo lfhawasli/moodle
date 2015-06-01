@@ -18,7 +18,7 @@
  * UCLA senior scholar
  *
  * @package     ucla
- * @subpackage  uclaseniorscholar
+ * @subpackage  tool_uclaseniorscholar
  * @author      Jun Wan
  */
 
@@ -28,7 +28,7 @@ require_once(dirname(__FILE__) . '/../../../config.php');
  * check if user has access to the interface
  **/
 
-function has_access($user) {
+function seniorscholar_has_access($user) {
     if (stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) == false) {
         return false;
     } else {
@@ -51,7 +51,7 @@ function get_seniorscholar_admin_userid() {
  * filter courses that allow senior scholar to take
  **/
 
-function senior_scholar_course_check($courses) {
+function seniorscholar_course_check($courses) {
     foreach ($courses as $k => $course) {
         // Only allow courses below 200.
         preg_match('/\d+/', $course->coursenum, $matches);
@@ -69,7 +69,7 @@ function senior_scholar_course_check($courses) {
  * get list of terms
  **/
 
-function get_terms() {
+function seniorscholar_get_terms() {
     global $DB;
     $termlist = array();
     $sql = "SELECT DISTINCT term FROM {ucla_request_classes}";
@@ -85,7 +85,7 @@ function get_terms() {
  * get subject area
  **/
 
-function get_subjarea() {
+function seniorscholar_get_subjarea() {
     global $DB;
     return $DB->get_records_menu('ucla_reg_subjectarea', null, 'subjarea', 'subjarea, subj_area_full');
 }
@@ -97,11 +97,11 @@ function get_subjarea() {
 function get_instructors_list_by_term($term='') {
     global $DB;
     $instlist = array();
-    $sql = "select * from {ucla_browseall_instrinfo} group by uid";
+    $sql = "SELECT id, uid, lastname, firstname from {ucla_browseall_instrinfo}";
     if ($term) {
-        $sql .= " having term = '" . $term . "'";
+        $sql .= " WHERE term = '" . $term . "'";
     }
-    $sql .= " order by lastname, firstname";
+    $sql .= " ORDER BY lastname, firstname";
     $result = $DB->get_records_sql($sql);
     foreach ($result as $inst) {
         $instlist['i'.$inst->uid] = $inst->lastname . ', ' . $inst->firstname;
@@ -116,7 +116,7 @@ function get_instructors_list_by_term($term='') {
 function get_courses_by_term($term) {
     global $DB;
     $list = array();
-    $sql = "SELECT rc.*, reg.*
+    $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
               FROM {course} c
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs";
@@ -134,16 +134,16 @@ function get_courses_by_term($term) {
 function get_courses_by_subject_term(&$param) {
     global $DB;
     $list = array();
-    $sql = "SELECT rc.*, reg.*
-            FROM {course} c
-            JOIN {ucla_request_classes} rc on c.id = rc.courseid
-            JOIN {ucla_reg_classinfo} reg on rc.srs = reg.srs and rc.term = reg.term
-            JOIN {ucla_reg_subjectarea} subj on subj.subjarea = reg.subj_area";
-    if ($param['filter_term']&&!$param['filter_subj']) {
+    $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+              FROM {course} c
+              JOIN {ucla_request_classes} rc on c.id = rc.courseid
+              JOIN {ucla_reg_classinfo} reg on rc.srs = reg.srs and rc.term = reg.term
+              JOIN {ucla_reg_subjectarea} subj on subj.subjarea = reg.subj_area";
+    if ($param['filter_term'] && empty($param['filter_subj'])) {
         $sql .= " WHERE rc.term = '". $param['filter_term'] . "'";
-    } else if ($param['filter_subj']&&!$param['filter_term']) {
+    } else if ($param['filter_subj'] && empty($param['filter_term'])) {
         $sql .= " WHERE reg.subj_area = '". $param['filter_subj'] . "'";
-    } else if ($param['filter_subj']&&$param['filter_term']) {
+    } else if ($param['filter_subj'] && $param['filter_term']) {
         $sql .= " WHERE rc.term = '". $param['filter_term'] . "' and reg.subj_area = '" . $param['filter_subj'] . "'";
     }
     $sql .= " ORDER BY reg.subj_area, reg.coursenum, reg.sectnum";
@@ -157,14 +157,14 @@ function get_courses_by_subject_term(&$param) {
 function get_courses_by_instructor_term(&$param) {
     global $DB;
     $list = array();
-    $sql = "SELECT reg.*, bi.*, rc.courseid, rc.department, rc.course
-            FROM {course} c
-            JOIN {ucla_request_classes} rc ON c.id = rc.courseid
-            JOIN {ucla_reg_classinfo} reg ON reg.srs = rc.srs and reg.term=rc.term
-            JOIN {ucla_browseall_instrinfo} bi ON bi.term = rc.term and bi.srs = rc.srs";
-    if ($param['filter_term'] &&!$param['filter_instructor']) {
+    $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+              FROM {course} c
+              JOIN {ucla_request_classes} rc ON c.id = rc.courseid
+              JOIN {ucla_reg_classinfo} reg ON reg.srs = rc.srs and reg.term=rc.term
+              JOIN {ucla_browseall_instrinfo} bi ON bi.term = rc.term and bi.srs = rc.srs";
+    if ($param['filter_term'] && empty($param['filter_instructor'])) {
         $sql .= " WHERE rc.term = '" . $param['filter_term'] . "'";
-    } else if ($param['filter_instructor'] &&!$param['filter_term']) {
+    } else if ($param['filter_instructor'] && empty($param['filter_term'])) {
         $sql .= " WHERE bi.uid = '" . $param['filter_instructor'] . "'";
     } else if ($param['filter_instructor'] && $param['filter_term']) {
         $sql .= " WHERE rc.term = '" . $param['filter_term'] . "' and bi.uid = '" . $param['filter_instructor'] . "'";
