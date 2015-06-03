@@ -127,6 +127,7 @@ $string['ucla:editcoursetheme'] = 'CCLE-2315: Can edit the theme a course uses';
 $string['ucla:bulk_users'] = 'CCLE-2970: Can perform bulk user actions';
 $string['ucla:browsecourses'] = 'CCLE-3773: Gives users link to "Add/edit courses"';
 $string['ucla:vieweventlist'] = 'CCLE-4671: Can view event list page';
+$string['ucla:viewscheduledtasks'] = 'CCLE-4999: Can view scheduled tasks page';
 
 // START UCLA MOD: CCLE-3028 - Fix nonlogged users redirect on hidden content
 // If a user who is not logged in tries to access private course information
