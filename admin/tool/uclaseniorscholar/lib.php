@@ -29,7 +29,8 @@ require_once(dirname(__FILE__) . '/../../../config.php');
  **/
 
 function seniorscholar_has_access($user) {
-    if (stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) == false) {
+    if (stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) == false
+        && !is_siteadmin()) {
         return false;
     } else {
         return true;
@@ -55,7 +56,7 @@ function seniorscholar_course_check($courses) {
     foreach ($courses as $k => $course) {
         // Only allow courses below 200.
         preg_match('/\d+/', $course->coursenum, $matches);
-        if ($matches[0] >= 200) {
+        if (empty($matches) || (!empty($matches) && $matches[0] >= 200)) {
             unset($courses[$k]);
         }
         if ($course->acttype != 'LEC') {
@@ -98,7 +99,7 @@ function get_instructors_list_by_term($term='') {
     global $DB;
     $instlist = array();
     $sql = "SELECT id, uid, lastname, firstname from {ucla_browseall_instrinfo}";
-    if ($term) {
+    if (!empty($term)) {
         $sql .= " WHERE term = '" . $term . "'";
     }
     $sql .= " ORDER BY lastname, firstname";

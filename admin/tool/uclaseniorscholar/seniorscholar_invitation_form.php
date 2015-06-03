@@ -67,7 +67,7 @@ class seniorscholar_invitation_form extends invitation_form {
                 $rolegroup[] = &$mform->createElement('radio', 'roleid', '',
                     $rolestring, $role->id);
 
-                // Set default role as Participant
+                // Set default role as Participant.
                 if (!$defaultrole) {
                     $defaultrole = $role->id;
                 }
@@ -102,9 +102,9 @@ class seniorscholar_invitation_form extends invitation_form {
         $mform->setType('subject', PARAM_TEXT);
         $mform->addRule('subject', get_string('required'), 'required');
         // Default subject is "Site invitation for <course title>".
-        $default_subject = get_string('default_subject', 'tool_uclaseniorscholar',
+        $defaultsubject = get_string('default_subject', 'tool_uclaseniorscholar',
                 sprintf('%s: %s', $course->shortname, $course->fullname));
-        $mform->setDefault('subject', $default_subject);
+        $mform->setDefault('subject', $defaultsubject);
 
         // Message field.
         $mform->addElement('textarea', 'message', get_string('message', 'tool_uclaseniorscholar'),

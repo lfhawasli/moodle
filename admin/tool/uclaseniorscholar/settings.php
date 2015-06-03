@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once(dirname(__FILE__) . '/lib.php');
+
 defined('MOODLE_INTERNAL') || die();
 
 $settings = new admin_settingpage('tool_uclaseniorscholar_settings',
@@ -37,9 +39,10 @@ $settings->add(new admin_setting_configtext('tool_uclaseniorscholar/seniorschola
                get_string('seniorscholarsupportemail', 'tool_uclaseniorscholar'),
                get_string('seniorscholarsupportemail_instruction', 'tool_uclaseniorscholar'), '', PARAM_NOTAGS));
 
-$ADMIN->add('tools', $settings);
-$ADMIN->add('users', new admin_externalpage(
-        'uclaseniorscholar',
-        get_string('pluginname', 'tool_uclaseniorscholar'),
-        "$CFG->wwwroot/$CFG->admin/tool/uclaseniorscholar/index.php",
-        "tool/uclaseniorscholar:view"));
+if (seniorscholar_has_access($USER)) {
+    $ADMIN->add('tools', $settings);
+    $ADMIN->add('users', new admin_externalpage(
+            'uclaseniorscholar',
+            get_string('pluginname', 'tool_uclaseniorscholar'),
+            "$CFG->wwwroot/$CFG->admin/tool/uclaseniorscholar/index.php"));
+}

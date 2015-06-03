@@ -39,8 +39,8 @@ $PAGE->set_url('/admin/tool/uclaseniorscholar/index.php');
 $PAGE->requires->js('/admin/tool/uclaseniorscholar/seniorscholar_invitation.js');
 
 require_login();
-if (!seniorscholar_has_access($USER) && !has_capability('tool/uclaseniorscholar:edit', $syscontext)) {
-    throw new required_capability_exception($syscontext, 'tool/uclaseniorscholar:edit');
+if (!seniorscholar_has_access($USER)) {
+    print_error('nopermissions');
 }
 
 $PAGE->set_context($syscontext);
@@ -145,7 +145,7 @@ if (empty($list) && $filter != 'instr') {
     echo html_writer::tag('p', get_string('no_result', 'tool_uclaseniorscholar'));
 } else {
     $a = new stdClass();
-    $a->term = ucla_term_to_text($filterterm);
+    $a->term = (empty($filterterm)) ? 'All terms' : ucla_term_to_text($filterterm);
     echo html_writer::tag('div', strtoupper(get_string('list_by_course_term', 'tool_uclaseniorscholar', $a)),
                           array('class' => 'linespacer'));
     $table = new html_table();

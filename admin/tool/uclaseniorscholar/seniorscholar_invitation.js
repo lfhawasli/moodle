@@ -28,7 +28,7 @@ YUI().use('node-event-delegate', 'event-key', function (Y) {
     termfilterinstructor.delegate('change', function () {
 		var filter = Y.one('#id_filter');
 		filter.set('value', 'instr');
-		form.submit();  
+		form.submit();
     }, 'select');
 
 	function formSubmit() {
