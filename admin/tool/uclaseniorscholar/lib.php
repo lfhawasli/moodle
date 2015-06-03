@@ -95,7 +95,7 @@ function seniorscholar_get_subjarea() {
  * get instructor
  **/
 
-function get_instructors_list_by_term($term='') {
+function seniorscholar_get_instructors_by_term($term='') {
     global $DB;
     $instlist = array();
     $sql = "SELECT id, uid, lastname, firstname from {ucla_browseall_instrinfo}";
@@ -114,7 +114,7 @@ function get_instructors_list_by_term($term='') {
  * get course list by term
  */
 
-function get_courses_by_term($term) {
+function seniorscholar_get_courses_by_term($term) {
     global $DB;
     $list = array();
     $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
@@ -132,7 +132,7 @@ function get_courses_by_term($term) {
  * get all information of class list (display subject area, division and list by course)
  **/
 
-function get_courses_by_subject_term(&$param) {
+function seniorscholar_get_courses_by_subject_term(&$param) {
     global $DB;
     $list = array();
     $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
@@ -155,7 +155,7 @@ function get_courses_by_subject_term(&$param) {
  * get course list by instructor
  **/
 
-function get_courses_by_instructor_term(&$param) {
+function seniorscholar_get_courses_by_instructor_term(&$param) {
     global $DB;
     $list = array();
     $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
