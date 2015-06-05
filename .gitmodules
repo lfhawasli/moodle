@@ -79,3 +79,6 @@
 [submodule "lib/editor/atto/plugins/pastespecial"]
 	path = lib/editor/atto/plugins/pastespecial
 	url = https://github.com/jinhofer/pastespecial
+[submodule "blocks/iclicker"]
+	path = blocks/iclicker
+	url = git@github.com:ccle/iclicker-moodle2-integrate.git
