@@ -267,6 +267,9 @@ class ucla_synced_group {
         // find the group enrolment.
         $groupmember = $DB->get_record('groups_members',
             array('groupid' => $groupid, 'userid' => $moodleuserid));
+        if (!$groupmember) {
+            return false;
+        }
 
         return self::new_membership($groupmember->id);
     }
