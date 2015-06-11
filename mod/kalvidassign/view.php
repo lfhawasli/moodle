@@ -48,7 +48,14 @@ $PAGE->add_body_class($pageclass);
 
 $context = context_module::instance($cm->id);
 
-add_to_log($course->id, 'kalvidassign', 'view assignment details', 'view.php?id='.$cm->id, $kalvidassign->id, $cm->id);
+// START UCLE MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
+//add_to_log($course->id, 'kalvidassign', 'view assignment details', 'view.php?id='.$cm->id, $kalvidassign->id, $cm->id);
+$event = \mod_kalvidassign\event\assignment_details_viewed::create(array(
+            'objectid' => $kalvidassign->id,
+            'context' => context_module::instance($cm->id)
+        ));
+$event->trigger();
+// END UCLA MOD: CCLE-5179
 
 // Update 'viewed' state if required by completion system
 $completion = new completion_info($course);
