@@ -204,6 +204,10 @@ $CFG->bloglevel = 0; // Disable blog system completely
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 
+// Site administration > Users > Accounts > User default preferences
+$CFG->defaultpreference_autosubscribe = 0;
+$CFG->defaultpreference_trackforums = 1;
+
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
