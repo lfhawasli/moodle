@@ -65,22 +65,6 @@ $instrlist = seniorscholar_get_instructors_by_term($filterterm);
 // Output.
 echo html_writer::start_tag('div', array('id' => 'tool_uclaseniorscholar_filter'));
 
-// Filter list by term.
-echo html_writer::start_tag('div', array('class' => 'filter-item'));
-echo html_writer::start_tag('form', array('id' => 'tool_uclaseniorscholar_course_by_term',
-                                          'action' => $PAGE->url->out(),
-                                          'method' => 'post'));
-echo html_writer::select($termlist, 'filter_term', $filterterm, array('' => 'All term'));
-echo html_writer::empty_tag('input', array('id' => 'course_by_term_btn',
-                                           'name' => 'submit_button',
-                                           'value' => get_string('submit_button', 'tool_uclaseniorscholar'),
-                                           'type' => 'submit'));
-echo html_writer::empty_tag('input', array('type' => 'hidden',
-                                           'name' => 'filter',
-                                           'value' => 'term'));
-echo html_writer::end_tag('form');
-echo html_writer::end_tag('div');
-
 // Filter list by instructor.
 echo html_writer::start_tag('div', array('class' => 'filter-item'));
 echo html_writer::start_tag('form', array('id' => 'tool_uclaseniorscholar_course_by_instructor',
@@ -151,15 +135,28 @@ if (empty($list) && $filter != 'instr') {
     $table = new html_table();
     $table->attributes['class'] = 'generaltable';
     $table->align = array('left', 'left');
-    foreach ($list as $key => $course) {
+
+    // For cross listed courses.
+    $maxcrosslistshown = get_config('local_ucla', 'maxcrosslistshown');
+    foreach ($list as $key => $courselist) {
+        // Output course.
+        // List host course.
+        $courseoutput = $courselist[1]->subj_area.' '.$courselist[1]->coursenum;
+        // Loop cross listed courses.
+        $i = 0;
+        while (!empty($courselist[0]) && $i <= $maxcrosslistshown) {
+            $course = array_shift($courselist[0]);
+            $courseoutput .= ' / ' . $course->subj_area.' '.$course->coursenum;
+            $i++;
+        }
         $row = array();
-        $row[] = $course->subj_area.' '.$course->coursenum.' (section '.$course->sectnum.')';
-        $row[] = $course->instructor;
+        $row[] = $courseoutput;
+        $row[] = $courselist[1]->instructor;
         $row[] = html_writer::link(new moodle_url('/admin/tool/uclaseniorscholar/seniorscholar_invitation.php',
-                                   array('courseid' => $course->courseid)),
+                                   array('courseid' => $courselist[1]->courseid)),
                                    get_string('invite_link', 'tool_uclaseniorscholar'), array('target' => '_blank'));
         $row[] = html_writer::link(new moodle_url('/admin/tool/uclaseniorscholar/seniorscholar_history.php',
-                                   array('courseid' => $course->courseid)),
+                                   array('courseid' => $courselist[1]->courseid)),
                                    get_string('history_link', 'tool_uclaseniorscholar'), array('target' => '_blank'));
         $table->data[] = $row;
     }

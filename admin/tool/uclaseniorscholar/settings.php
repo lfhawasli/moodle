@@ -41,7 +41,7 @@ $settings->add(new admin_setting_configtext('tool_uclaseniorscholar/seniorschola
 
 if (seniorscholar_has_access($USER)) {
     $ADMIN->add('tools', $settings);
-    $ADMIN->add('users', new admin_externalpage(
+    $ADMIN->add('accounts', new admin_externalpage(
             'uclaseniorscholar',
             get_string('pluginname', 'tool_uclaseniorscholar'),
             "$CFG->wwwroot/$CFG->admin/tool/uclaseniorscholar/index.php"));

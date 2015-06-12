@@ -23,6 +23,7 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 /**
  * check if user has access to the interface
@@ -49,35 +50,42 @@ function get_seniorscholar_admin_userid() {
 }
 
 /**
- * filter courses that allow senior scholar to take
+ * filter courses that allow senior scholar to take and re-organize to display cross listing courses
  **/
 
 function seniorscholar_course_check($courses) {
+    $output = array();
     foreach ($courses as $k => $course) {
         // Only allow courses below 200.
         preg_match('/\d+/', $course->coursenum, $matches);
         if (empty($matches) || (!empty($matches) && $matches[0] >= 200)) {
-            unset($courses[$k]);
-        }
-        if ($course->acttype != 'LEC') {
-            unset($courses[$k]);
+            // Nothing to do.
+        } else if ($course->acttype != 'LEC') {
+            // Nothing to do.
+        } else if ($course->hostcourse == 1) {
+            // Re-organize to display cross listing courses.
+            $output[$course->courseid][$course->hostcourse] = $course;
+        } else if ($course->hostcourse == 0) {
+            $output[$course->courseid][$course->hostcourse][] = $course;
         }
     }
-    return $courses;
+    return $output;
 }
 
 /**
- * get list of terms
+ * get list of terms (only current and future terms)
  **/
 
 function seniorscholar_get_terms() {
-    global $DB;
+    global $DB, $CFG;
     $termlist = array();
     $sql = "SELECT DISTINCT term FROM {ucla_request_classes}";
     $result = $DB->get_records_sql($sql);
     foreach ($result as $item) {
-        $termtext = ucla_term_to_text($item->term);
-        $termlist[$item->term] = $termtext;
+        if (term_cmp_fn($item->term, $CFG->currentterm) >= 0) {
+            $termtext = ucla_term_to_text($item->term);
+            $termlist[$item->term] = $termtext;
+        }
     }
     return $termlist;
 }
@@ -111,16 +119,25 @@ function seniorscholar_get_instructors_by_term($term='') {
 }
 
 /**
- * get course list by term
+ * get course list by term.  Limited only the courses that have invite from senior scholar program
  */
 
 function seniorscholar_get_courses_by_term($term) {
     global $DB;
-    $list = array();
-    $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+    $listofinviters = get_seniorscholar_admin_userid();
+    $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
               FROM {course} c
+              JOIN
+                   (SELECT DISTINCT courseid
+                      FROM {enrol_invitation}
+                      WHERE inviterid in (" . implode(',', $listofinviters) . ")) AS i
+                ON i.courseid = c.id
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
-              JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs";
+              JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs
+              JOIN
+                   (SELECT @row_num := 0) AS t";
+
     if ($term) {
         $sql .= " WHERE rc.term = '" . $term . "'";
     }
@@ -135,11 +152,14 @@ function seniorscholar_get_courses_by_term($term) {
 function seniorscholar_get_courses_by_subject_term(&$param) {
     global $DB;
     $list = array();
-    $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+    $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
               FROM {course} c
               JOIN {ucla_request_classes} rc on c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg on rc.srs = reg.srs and rc.term = reg.term
-              JOIN {ucla_reg_subjectarea} subj on subj.subjarea = reg.subj_area";
+              JOIN {ucla_reg_subjectarea} subj on subj.subjarea = reg.subj_area
+              JOIN (SELECT @row_num := 0) AS t";
+
     if ($param['filter_term'] && empty($param['filter_subj'])) {
         $sql .= " WHERE rc.term = '". $param['filter_term'] . "'";
     } else if ($param['filter_subj'] && empty($param['filter_term'])) {
@@ -158,11 +178,14 @@ function seniorscholar_get_courses_by_subject_term(&$param) {
 function seniorscholar_get_courses_by_instructor_term(&$param) {
     global $DB;
     $list = array();
-    $sql = "SELECT rc.id, rc.instructor, rc.courseid, reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+    $sql = "SELECT DISTINCT (@row_num := @row_num + 1) as id, rc.courseid, rc.instructor, rc.hostcourse,
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
               FROM {course} c
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg ON reg.srs = rc.srs and reg.term=rc.term
-              JOIN {ucla_browseall_instrinfo} bi ON bi.term = rc.term and bi.srs = rc.srs";
+              JOIN {ucla_browseall_instrinfo} bi ON bi.term = rc.term and bi.srs = rc.srs
+              JOIN (SELECT @row_num := 0) AS t";
+
     if ($param['filter_term'] && empty($param['filter_instructor'])) {
         $sql .= " WHERE rc.term = '" . $param['filter_term'] . "'";
     } else if ($param['filter_instructor'] && empty($param['filter_term'])) {

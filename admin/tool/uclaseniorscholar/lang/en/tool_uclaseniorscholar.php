@@ -29,7 +29,7 @@ $string['seniorscholarsupportemail_instruction'] = 'Enter support email for seni
 
 $string['pluginname'] = 'UCLA Senior Scholar';
 $string['pluginname_desc'] = 'Manage senior scholars';
-$string['mainmenu'] = 'You can search course(s) by term, term/instructor and term/subject area';
+$string['mainmenu'] = 'You can search by term/instructor and term/subject area';
 $string['all_by_course_current_term'] = 'All items for current term listed by course';
 $string['all_by_instructor_current_term'] = 'All items for current term listed by instructor (across all their courses)';
 $string['all_by_course_subj_current_term'] = 'All items for current term listed by subject area';
