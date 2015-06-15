@@ -15,11 +15,12 @@ class mod_turnitintool_mod_form extends moodleform_mod {
         $mform    =& $this->_form;
         // START UCLA MOD: CCLE-5099 - Alert instructors who use TurnItIn Direct and MyUCLA
         global $OUTPUT;
-        $message = get_string('turnitinwarning', 'local_ucla')
+        $message = html_writer::tag('b', get_string('warning') . ': ')
+                . get_string('turnitinwarning', 'local_ucla')
                 . html_writer::link('https://docs.ccle.ucla.edu/w/Turnitin_Assignment#Using_Turnitin:_MyUCLA_or_CCLE.3F',
                         'Using Turnitin: MyUCLA or CCLE', array('target' => '_blank'))
                 . '.';
-        $mform->addElement('html', $OUTPUT->notification($message, 'notifywarning')); 
+        $mform->addElement('html', $OUTPUT->notification($message, 'notifyproblem')); 
         // END UCLA MOD: CCLE-5099
         $mform->addElement('header', 'general', get_string('general', 'form'));
         $mform->addElement('text', 'name', get_string('turnitintoolname', 'turnitintool'), array('size'=>'64'));

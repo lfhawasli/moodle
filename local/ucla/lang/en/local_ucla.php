@@ -245,6 +245,5 @@ $string['persistentquizwarningmessage'] = 'This quiz is not automatically submit
 $string['quizattemptabandoned'] = 'You did not submit your attempt before the time ran out. Your attempt was counted as zero.';
 
 // CCLE-5099 - Alert instructors who use TurnItIn Direct and MyUCLA
-$string['turnitinwarning'] = 'Turnitin Assignments submitted through CCLE are processed differently '
-        . 'from work submitted through MyUCLA\'s Turnitin option. For further information '
-        . 'please read ';
+$string['turnitinwarning'] = 'Be aware there are two portals for TurnItIn submissions: MyUCLA and '
+        . 'CCLE. Only one should be used per course.<br/><br/>For further information please read ';
