@@ -546,6 +546,29 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         }
         upgrade_plugin_savepoint(true, 2014111400, 'local', 'ucla');
     }
+    
+    // CCLE-5178 - Changing forum subscription defaults
+    if ($oldversion < 2015061602) {
+        // Turn off forum auto-subscribe for all users.
+        $autosubscribeusers = $DB->get_recordset('user',
+                array('autosubscribe' => 1));
+        if ($autosubscribeusers->valid()) {
+            foreach ($autosubscribeusers as $autosubscribeuser) {
+                $autosubscribeuser->autosubscribe = 0;
+                $DB->update_record('user', $autosubscribeuser);
+            }
+        }
+        // Turn on forum tracking for all users.
+        $trackforumsusers = $DB->get_recordset('user',
+                array('trackforums' => 0));
+        if ($trackforumsusers->valid()) {
+            foreach ($trackforumsusers as $trackforumsuser) {
+                $trackforumsuser->trackforums = 1;
+                $DB->update_record('user', $trackforumsuser);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2015061602, 'local', 'ucla');
+    }
 
     return $result;
 }

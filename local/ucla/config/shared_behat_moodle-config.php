@@ -218,6 +218,10 @@ $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lis
 //$CFG->enablenotes = 0;
 //$CFG->bloglevel = 0; // Disable blog system completely
 
+// Site administration > Users > Accounts > User default preferences
+$CFG->defaultpreference_autosubscribe = 0;
+$CFG->defaultpreference_trackforums = 1;
+
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';

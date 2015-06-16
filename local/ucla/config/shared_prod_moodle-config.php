@@ -184,6 +184,10 @@ $CFG->bloglevel = 0; // Disable blog system completely
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 
+// Site administration > Users > Accounts > User default preferences
+$CFG->defaultpreference_autosubscribe = 0;
+$CFG->defaultpreference_trackforums = 1;
+
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
@@ -398,9 +402,6 @@ $CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
 // CCLE-4289 - Show All View Action Icons
 $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
-
-// Site administration > Plugins > Logging > Legacy log
-$CFG->forced_plugin_settings['logstore_legacy']['loglegacy'] = 1;
 
 // Site administration > Plugins > Message outputs > Email
 $CFG->emailonlyfromnoreplyaddress = 1;

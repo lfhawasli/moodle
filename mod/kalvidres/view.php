@@ -57,7 +57,14 @@ $PAGE->add_body_class($pageclass);
 
 $context = $PAGE->context;
 
-add_to_log($course->id, 'kalvidres', 'view video resource', 'view.php?id='.$cm->id, $kalvidres->id, $cm->id);
+// START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
+//add_to_log($course->id, 'kalvidres', 'view video resource', 'view.php?id='.$cm->id, $kalvidres->id, $cm->id);
+$event = \mod_kalvidres\event\video_resource_viewed::create(array(
+    'objectid' => $kalvidres->id,
+    'context' => context_module::instance($cm->id)
+));
+$event->trigger();
+// END UCLA MOD: CCLE-5179
 
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);

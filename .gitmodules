@@ -30,7 +30,7 @@
 	url = https://github.com/marinaglancy/moodle-tool_behatui
 [submodule "mod/hotpot"]
 	path = mod/hotpot
-	url = https://github.com/gbateson/moodle-mod_hotpot.git
+	url = git@github.com:gbateson/moodle-mod_hotpot.git
 [submodule "question/format/hotpot"]
 	path = question/format/hotpot
 	url = https://github.com/gbateson/moodle-qformat_hotpot.git
@@ -69,7 +69,7 @@
 	url = git@github.com:ccle/moodle-local_metagroups.git
 [submodule "filter/poodll"]
 	path = filter/poodll
-	url = https://github.com/justinhunt/moodle-filter_poodll.git
+	url = git@github.com:justinhunt/moodle-filter_poodll.git
 [submodule "question/type/poodllrecording"]
 	path = question/type/poodllrecording
 	url = https://github.com/justinhunt/moodle-qtype_poodllrecording.git
@@ -79,3 +79,9 @@
 [submodule "lib/editor/atto/plugins/pastespecial"]
 	path = lib/editor/atto/plugins/pastespecial
 	url = https://github.com/jinhofer/pastespecial
+[submodule "mod/oublog"]
+	path = mod/oublog
+	url = https://github.com/ccle/moodle-mod_oublog
+[submodule "mod/scheduler"]
+	path = mod/scheduler
+	url = https://github.com/bostelm/moodle-mod_scheduler.git

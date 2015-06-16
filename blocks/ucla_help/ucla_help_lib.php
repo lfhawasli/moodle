@@ -318,28 +318,12 @@ function create_description(&$fromform) {
  */
 function create_help_message(&$fromform)
 {
-    global $COURSE, $CFG, $DB, $SESSION, $USER;
-    
-    // If user is not logged in, then a majority of these values will raise PHP 
-    // notices, so supress them with @    
-    
-    // setup description array
-    $description['maildisplay'][0] = '0 - '.get_string('emaildisplayno');
-    $description['maildisplay'][1] = '1 - '.get_string('emaildisplayyes');
-    $description['maildisplay'][2] = '2 - '.get_string('emaildisplaycourse');
-    $description['autosubscribe'][0] = '0 - '.get_string('autosubscribeno');
-    $description['autosubscribe'][1] = '1 - '.get_string('autosubscribeyes');
-    $description['emailstop'][0] = '0 - '.get_string('emailenable');
-    $description['emailstop'][1] = '1 - '.get_string('emaildisable');
-    $description['htmleditor'][0] = '0 - '.get_string('texteditor');
-    $description['htmleditor'][1] = '1 - '.get_string('htmleditor');
-    $description['trackforums'][0] = '0 - '.get_string('trackforumsno');
-    $description['trackforums'][1] = '1 - '.get_string('trackforumsyes');
-    
-    if (isset($USER->currentcourseaccess[$COURSE->id])) {
-        $accesstime = date('r' , $USER->currentcourseaccess[$COURSE->id]);
-    } else {
-        @$accesstime = date('r' , $USER->lastaccess);
+    global $CFG, $SESSION, $USER;
+
+    // Some fields do not make sense for non-logged in users.
+    $isloggedin = true;
+    if (!isloggedin() || isguestuser()) {
+        $isloggedin = false;
     }
 
     // Parse user agent string
@@ -347,60 +331,68 @@ function create_help_message(&$fromform)
     $ua = $_SERVER['HTTP_USER_AGENT'];
     $parser = UAParser\Parser::create();
     $result = $parser->parse($ua);
-    
-    // Needs stripslashes after obtaining information that has been escaped for security reasons    
-    $body = stripslashes($fromform->ucla_help_name) . " wrote: \n\n" . 
-            stripslashes($fromform->ucla_help_description) . "\n
-    Name: " . stripslashes($fromform->ucla_help_name) . "
-    UCLA ID: " . @$USER->idnumber . "
-    Email: " . stripslashes($fromform->ucla_help_email) . "
-    Server: $_SERVER[SERVER_NAME]
-    User_Agent: $_SERVER[HTTP_USER_AGENT]
-    OS: " . $result->os->toString() . "
-    Browser: " . $result->ua->toString() . "
-    Host: $_SERVER[REMOTE_ADDR]
-    Referer: $_SERVER[HTTP_REFERER]
-    Course Shortname: $fromform->course_name
-    Access Time: $accesstime
-    User Profile: $CFG->wwwroot/user/view.php?id=$USER->id
-    SESSION_fromdiscussion   = " . @$SESSION->fromdiscussion . "
-    USER_id                  = $USER->id
-    USER_auth                = " . @$USER->auth . "
-    USER_username            = " . @$USER->username . "
-    USER_institution         = " . @$USER->institution . "
-    USER_firstname           = " . @$USER->firstname . "
-    USER_lastname            = " . @$USER->lastname . "
-    USER_email               = " . @$USER->email . "
-    USER_emailstop           = " . @$description['emailstop'][$USER->emailstop] . "
-    USER_lastaccess          = " . @date('r' , $USER->lastaccess) . "
-    USER_lastlogin           = " . @date('r' , $USER->lastlogin) . "
-    USER_lastip              = " . @$USER->lastip . "
-    USER_maildisplay         = " . @$description['maildisplay'][$USER->maildisplay] . "
-    USER_htmleditor          = " . @$description['htmleditor'][$USER->htmleditor] . "
-    USER_autosubscribe       = " . @$description['autosubscribe'][$USER->autosubscribe] . "
-    USER_trackforums         = " . @$description['trackforums'][$USER->trackforums] . "
-    USER_timemodified        = " . @date('r' , $USER->timemodified);
-    $body .= "\n";
+
+    // Create message body.
+    $body = $fromform->ucla_help_description . "\n\n";
+    $body .= "*User info*\n";
+    $body .= "Name: " . $fromform->ucla_help_name . "\n";
+    $body .= "Email: " . $fromform->ucla_help_email . "\n";
+    if ($isloggedin) {
+        $body .= "UCLA ID: " . $USER->idnumber . "\n";
+        $body .= "Username: " . $USER->username . "\n";
+        $body .= "Profile: " . $CFG->wwwroot . "/user/view.php?id=" . $USER->id . "\n";
+        $body .= "Time modified: " . date('D, M d Y G:H:s A' , $USER->timemodified) . "\n";
+        $body .= "Last access: " . date('D, M d Y G:H:s A' , $USER->lastaccess) . "\n";
+        $body .= "Last login: " . date('D, M d Y G:H:s A' , $USER->lastlogin) . "\n";
+    } else {
+        $body .= "_Not logged in_\n";
+    }
+
+    $body .= "\n*Referring site detail*\n";
+    $body .= "Course Shortname: " . $fromform->course_name . "\n";
+    $body .= "SESSION_fromdiscussion: " . @$SESSION->fromdiscussion . "\n";
+    if ($isloggedin) {
+        if (isset($USER->currentcourseaccess[$fromform->ucla_help_course])) {
+            $accesstime = date('D, M d Y G:H:s A' , $USER->currentcourseaccess[$fromform->ucla_help_course]);
+        } else {
+            $accesstime = date('D, M d Y G:H:s A' , $USER->lastaccess);
+        }
+
+        $body .= "Access Time: " . $accesstime . "\n";
+    }
+
+    $body .= "\n*System detail*\n";
+    if ($isloggedin) {
+        $body .= "Auth type: " . $USER->auth . "\n";
+        $body .= "Institution: " . $USER->institution . "\n";
+    }
+    $body .= "Server: " . $_SERVER['SERVER_NAME'] . "\n";
+    $body .= "OS: " . $result->os->toString() . "\n";
+    $body .= "Browser: " . $result->ua->toString() . "\n";
+    $body .= "User agent: " . $_SERVER['HTTP_USER_AGENT'] . "\n";
+    $body .= "IP: " . $_SERVER['REMOTE_ADDR'] . "\n";
+
+    $body .= "\n*Recent activity*\n";
     
     // Get logging records. If the user is logged in as a guest (user ID 1), or
     // is not logged in (user ID 0), then use their IP address to get records.
-    $log_records;
-    if (!isloggedin() || isguestuser()) {
+    $logmanager = get_log_manager();
+    $readers = $logmanager->get_readers();
+    $reader = $readers['logstore_standard'];
+    if (!$isloggedin) {
         // Get the guest user's IP address.
-        $guest_ip = $_SERVER['REMOTE_ADDR'];
-        $log_records = $DB->get_records('log', array('ip' => $guest_ip), 'time DESC', '*', 0, 10);
+        $guestip = $_SERVER['REMOTE_ADDR'];
+        $events = $reader->get_events_select("ip=?", array($guestip), 'timecreated DESC', 0, 10);
     } else {
-        $log_records = $DB->get_records('log', array('userid' => $USER->id), 'time DESC', '*', 0, 10);
+        $events = $reader->get_events_select("userid=?", array($USER->id), 'timecreated DESC', 0, 10);
     }
-    
-    if (empty($log_records)) {
-        $body .= "No log entries\n";
+
+    if (empty($events)) {
+        $body .= "\n_No log entries_";
     } else {
-        $body .= print_ascii_table($log_records);
+        $body .= print_ascii_table($events, $isloggedin);
     }
-    
-    $body .= 'This message was generated by ' . __FILE__;    
-    
+
     return $body;
 }
 
@@ -487,22 +479,25 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
             )
         );
 
-        // Try to create the issue.
-        $jiraresult = send_jira_request(get_config('block_ucla_help', 'jira_endpoint'),
-                true, array('Content-type: application/json'),
-                json_encode($params));
+        $jiraendpoint = get_config('block_ucla_help', 'jira_endpoint');
 
-        if ($jiraresult === false) {
-            $result = false;
-        } else {
-            $result = true;
-            $decodedresult = (array)json_decode($jiraresult);
-            $issueid = $decodedresult['key'];
+        // Try to create the issue.
+        $jiraresult = send_jira_request($jiraendpoint, true,
+                array('Content-type: application/json'), json_encode($params));
+        $result = false;
+        $decodedresult = json_decode($jiraresult, true);
+        if (!empty($decodedresult)) {
+            // Issue is successfully created only when the issue key is
+            // returned. Otherwise, error.
+            if (!empty($decodedresult['key'])) {
+                $issueid = $decodedresult['key'];
+                $result = true;
+            }
         }
 
         // If there is an attachment, then attach it to the newly created issue.
         if ($result != false && $attachmentfile != null) {
-            $url = get_config('block_ucla_help', 'jira_endpoint') . "/$issueid/attachments";
+            $url = $jiraendpoint . "/$issueid/attachments";
             $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
             $data = array('file'=>"@{$attachmentfile};filename={$attachmentname}");
             $jiraresult = send_jira_request($url, true, $headers, $data);
@@ -602,105 +597,102 @@ function send_jira_request($url, $post = false, $headers, $data) {
 
 /**
  * Copied from CCLE 1.9 feedback code.
- * @param type $stuff
+ * @param array $events
+ * @param boolean $isloggedin
  * @return string 
  */
-function print_ascii_table($stuff)
-{
-    $formatted_table = array();
-    $formatted_string = "";
+function print_ascii_table($events, $isloggedin) {
+    global $DB;
 
-    // Parse through once to get proper formatting length
-    $line_count = 0;
-    foreach ($stuff as $line) {
-        $line_count++;
-        foreach (get_object_vars($line) as $key => $data) {
-            unset($test_string);
+    $formattedtable = array();
+    $returnval = "";
+    $eventsinfo = array();
 
-            // Make the testing string
-            $test_string = ' ';
-            if ($key == 'time') {
-                $test_string .= date('r', $data);
+    // Cache usernames to avoid redundant database accesses.
+    $usernames = array();
+
+    // Parse through once to get proper formatting length.
+    $count = 0;
+    foreach ($events as $event) {
+        $eventinfo = array();
+        $eventinfo['–'] = ++$count;
+        $eventinfo['Time'] = date('D, M d Y G:H:s A', $event->timecreated);
+        if (!$isloggedin) {            
+            // Get the user's fullname.
+            if (!array_key_exists($event->userid, $usernames)) {
+                $user = $DB->get_record('user', array('id' => $event->userid));
+                if (!empty($user)) {
+                    $fullname = fullname($user);
+                    $usernames[$user->id] = $fullname;
+                    $eventinfo['User name'] = $fullname;
+                } else {
+                    $usernames[$event->userid] = '';
+                    $eventinfo['User name'] = '';
+                }
             } else {
-                $test_string .= $data;
+                $eventinfo['User name'] = $usernames[$event->userid];
             }
-            $test_string .= ' ';
+        }
+        $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
+        if ($context) {
+            $eventinfo['Event context'] = $context->get_context_name(true);
+        } else {
+            $eventinfo['Event context'] = '';
+        }
+        $eventinfo['Event name'] = $event->get_name();
+        $eventinfo['URL'] =  (string)$event->get_url();
+        $logextra = $event->get_logextra();
+        $eventinfo['IP'] = $logextra['ip'];
 
-            // Get length
-            $string_length = strlen($test_string);
+        // Save formatted table entry.
+        $eventsinfo[] = $eventinfo;
 
-            // Get max length
-            if (!isset($formatted_table[$key])) {
-                $formatted_table[$key] = $string_length;
-            } else if ($formatted_table[$key] < $string_length) {
-                $formatted_table[$key] = $string_length;
+        // Figure out table padding.
+        foreach ($eventinfo as $key => $data) {
+            // Get string length.
+            $stringlength = strlen(" $data ");
+
+            // Get max length.
+            if (!isset($formattedtable[$key])) {
+                $formattedtable[$key] = $stringlength;
+            } else if ($formattedtable[$key] < $stringlength) {
+                $formattedtable[$key] = $stringlength;
             }
 
-            if ($formatted_table[$key] < strlen(" " . $key . " ")) {
-                $formatted_table[$key] = strlen(" " . $key . " ");
+            if ($formattedtable[$key] < strlen(" " . $key . " ")) {
+                $formattedtable[$key] = strlen(" " . $key . " ");
             }
         }
     }
 
-    $formatted_table['KINDEX'] = 0;
-    while ($line_count >= 1) {
-        $line_count = $line_count / 10;
-        $formatted_table['KINDEX']++;
-    }
+    // Print table headers.
+    $formattedline = "||";
+    foreach ($eventinfo as $key => $data) {
+        $formattedset = strlen($formattedline);
+        $formattedline .= " ";
+        $formattedline .= $key;
 
-    $line_count = 0;
-    $formatted_string .= "\n";
-
-    // Print field names
-    $formatted_line = "| ";
-    while (strlen($formatted_line) - 2 < $formatted_table['KINDEX']) {
-        $formatted_line .= "-";
-    }
-    $formatted_line .= " |";
-    $formatted_set = strlen($formatted_line);
-
-    $sampleline = $stuff[array_rand($stuff)];
-    foreach (get_object_vars($sampleline) as $key => $data) {
-        $formatted_line .= " ";
-        $formatted_line .= $key;
-
-        while (strlen($formatted_line) - $formatted_set < $formatted_table[$key]) {
-            $formatted_line .= " ";
+        // Plus 1 additional, because || is one extra character.
+        while (strlen($formattedline) - $formattedset + 1 < $formattedtable[$key]) {
+            $formattedline .= " ";
         }
-        $formatted_line .= "|";
-        $formatted_set = strlen($formatted_line);
+        $formattedline .= "||";
     }
-    $formatted_string .= $formatted_line . "\n";
+    $returnval .= $formattedline . "\n";
 
-    for ($i = 0; $i < $formatted_set; $i++) {
-        $formatted_string .= "-";
-    }
-    $formatted_string .= "\n";
-
-    foreach ($stuff as $line) {
-        $line_count++;
-        $formatted_line = "| " . $line_count;
-        while (strlen($formatted_line) - 3 < $formatted_table['KINDEX']) {
-            $formatted_line .= " ";
-        }
-        $formatted_line .= "|";
-        $formatted_set = strlen($formatted_line);
-
-        foreach (get_object_vars($line) as $key => $data) {
-            $formatted_line .= " ";
-            if ($key == 'time') {
-                $formatted_line .= date('r', $data);
-            } else {
-                $formatted_line .= $data;
+    // Print table entries.
+    foreach ($eventsinfo as $eventinfo) {
+        $formattedline = "|";
+        $formattedset = strlen($formattedline);
+        foreach ($eventinfo as $key => $data) {
+            $formattedline .= " $data";
+            while (strlen($formattedline) - $formattedset < $formattedtable[$key]) {
+                $formattedline .= " ";
             }
-
-            while (strlen($formatted_line) - $formatted_set < $formatted_table[$key]) {
-                $formatted_line .= " ";
-            }
-            $formatted_line .= "|";
-            $formatted_set = strlen($formatted_line);
+            $formattedline .= "|";
+            $formattedset = strlen($formattedline);
         }
-        $formatted_string .= $formatted_line . "\n";
+        $returnval .= $formattedline . "\n";
     }
-    return $formatted_string;
+    return $returnval;
 }

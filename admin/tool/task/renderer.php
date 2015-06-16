@@ -72,7 +72,14 @@ class tool_task_renderer extends plugin_renderer_base {
             } else {
                 $nextrun = $asap;
             }
-            if (empty($CFG->preventscheduledtaskchanges)) {
+            // START UCLA MOD: CCLE-5104 - Monitor cron jobs
+            // Read-only access to the report.
+            if (has_capability('local/ucla:viewscheduledtasks', context_system::instance()) &&
+                    !has_capability('moodle/site:config', context_system::instance())) {
+                $editlink = $this->render(new pix_icon('t/locked', get_string('scheduledtaskchangesdisabled', 'tool_task')));
+            } else if (empty($CFG->preventscheduledtaskchanges)) {
+            //if (empty($CFG->preventscheduledtaskchanges)) {
+            // END UCLA MOD: CCLE-5104
                 $configureurl = new moodle_url('/admin/tool/task/scheduledtasks.php', array('action'=>'edit', 'task' => get_class($task)));
                 $editlink = $this->action_icon($configureurl, new pix_icon('t/edit', get_string('edittaskschedule', 'tool_task', $task->get_name())));
             } else {

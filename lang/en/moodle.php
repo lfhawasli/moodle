@@ -483,7 +483,7 @@ $string['deletechecktype'] = 'Are you absolutely sure you want to completely del
 $string['deletechecktypename'] = 'Are you absolutely sure you want to completely delete the {$a->type} "{$a->name}" and all the data it contains?';
 // END UCLA MOD: CCLE-4649
 $string['deletecheckfiles'] = 'Are you absolutely sure you want to delete these files?';
-$string['deletecheckfull'] = 'Are you absolutely sure you want to completely delete {$a} ?';
+$string['deletecheckfull'] = 'Are you absolutely sure you want to completely delete the user {$a}, including their enrolments, activity and other user data?';
 $string['deletecheckwarning'] = 'You are about to delete these files';
 $string['deletelogs'] = 'Delete logs';
 $string['deleteselected'] = 'Delete selected';
@@ -1345,7 +1345,7 @@ $string['notenrolled'] = '{$a} is not enrolled in this course.';
 $string['notenrolledprofile'] = 'This profile is not available because this user is not enrolled in this course.';
 $string['noteusercannotrolldatesoncontext'] = '<strong>Note:</strong> The ability to roll dates when restoring this backup has been disabled because you lack the required permissions.';
 $string['noteuserschangednonetocourse'] = '<strong>Note:</strong> Course users need to be restored when restoring user data (in activities, files or messages). This setting has been changed for you.';
-$string['nothingnew'] = 'Nothing new since your last login';
+$string['nothingnew'] = 'No recent activity';
 $string['nothingtodisplay'] = 'Nothing to display';
 $string['notice'] = 'Notice';
 $string['noticenewerbackup'] = 'This backup file has been created with Moodle {$a->backuprelease} ({$a->backupversion}) and it\'s newer than your currently installed Moodle {$a->serverrelease} ({$a->serverversion}). This could cause some inconsistencies because backwards compatibility of backup files cannot be guaranteed.';
@@ -1753,7 +1753,7 @@ $string['specifyname'] = 'You must specify a name.';
 $string['standard'] = 'Standard';
 $string['starpending'] = '([*] = course pending approval)';
 $string['startdate'] = 'Course start date';
-$string['startdate_help'] = 'This setting determines the start of the first week for a course in weekly format. It also determines the earliest date that logs of course activities are available for.';
+$string['startdate_help'] = 'This setting determines the start of the first week for a course in weekly format. It also determines the earliest date that logs of course activities are available for. If the course is reset and the course start date changed, all dates in the course will be moved in relation to the new start date.';
 $string['startingfrom'] = 'Starting from';
 $string['startsignup'] = 'Create new account';
 $string['state'] = 'State/Province';

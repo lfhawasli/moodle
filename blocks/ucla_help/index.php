@@ -177,7 +177,7 @@ if ($fromform = $mform->get_data()) {
     if (!empty($result)) {
         echo $OUTPUT->notification(get_string('success_sending_message', 'block_ucla_help'), 'notifysuccess');
     } else {
-        echo $OUTPUT->error_text(get_string('error_sending_message', 'block_ucla_help'));
+        echo $OUTPUT->notification(get_string('error_sending_message', 'block_ucla_help'), 'notifyproblem');
         // @todo: log error Send fails
     }    
     

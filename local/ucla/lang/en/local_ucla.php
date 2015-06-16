@@ -127,6 +127,7 @@ $string['ucla:editcoursetheme'] = 'CCLE-2315: Can edit the theme a course uses';
 $string['ucla:bulk_users'] = 'CCLE-2970: Can perform bulk user actions';
 $string['ucla:browsecourses'] = 'CCLE-3773: Gives users link to "Add/edit courses"';
 $string['ucla:vieweventlist'] = 'CCLE-4671: Can view event list page';
+$string['ucla:viewscheduledtasks'] = 'CCLE-4999: Can view scheduled tasks page';
 
 // START UCLA MOD: CCLE-3028 - Fix nonlogged users redirect on hidden content
 // If a user who is not logged in tries to access private course information
@@ -242,3 +243,7 @@ $string['confirmstartwarningprompt'] = 'Are you sure that you wish to start?';
 $string['finishsummary'] = 'Return to Quiz View';
 $string['persistentquizwarningmessage'] = 'This quiz is not automatically submitted. Please be sure to submit your quiz attempt before the time runs out or your attempt will not be counted.';
 $string['quizattemptabandoned'] = 'You did not submit your attempt before the time ran out. Your attempt was counted as zero.';
+
+// CCLE-5099 - Alert instructors who use TurnItIn Direct and MyUCLA
+$string['turnitinwarning'] = 'Be aware there are two portals for TurnItIn submissions: MyUCLA and '
+        . 'CCLE. Only one should be used per course.<br/><br/>For further information please read ';
