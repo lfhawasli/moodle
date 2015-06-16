@@ -37,8 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class grades_updated extends \core\event\base {
     protected function init() {
-        // 'crud' value is passed in other since event is used in multiple contexts
-        $this->data['crud'] = $this->other['crud']; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'u'; // c(reate), r(ead), u(pdate), d(elete)
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
  

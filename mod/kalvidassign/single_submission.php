@@ -139,7 +139,6 @@ if ($submissionform->is_cancelled()) {
         // Flag used when an instructor is about to grade a user who does not have
         // a submittion (see KALDEV-126)
         $updategrade = true;
-        $crud = 'u';
 
         if ($submission) {
 
@@ -174,7 +173,6 @@ if ($submissionform->is_cancelled()) {
                 $submission->teacher            = $USER->id;
 
                 $DB->insert_record('kalvidassign_submission', $submission);
-                $crud = 'c';
             }
         }
 
@@ -190,9 +188,6 @@ if ($submissionform->is_cancelled()) {
 //            add_to_log($kalvidassignobj->course, 'kalvidassign', 'update grades', 'grade_submissions.php?cmid='.$cm->id, $cm->id);
             $event = \mod_kalvidassign\event\grades_updated::create(array(
                         'context'   => context_module::instance($cm->id),
-                        'other'     => array(
-                            'crud'      => $crud
-                        )
             ));
             $event->trigger();
             // END UCLA MOD: CCLE-5179
