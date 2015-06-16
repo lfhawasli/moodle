@@ -207,7 +207,11 @@ class local_ucla_core_edit {
         $maildisplay = array(0 => get_string('emaildisplayno'), 1 => get_string('emaildisplayyes'), 2 => get_string('emaildisplaycourse'));
         $autosubscribe = array(0 => get_string('autosubscribeno'), 1 => get_string('autosubscribeyes'));
         $trackforums = array(0 => get_string('trackforumsno'), 1 => get_string('trackforumsyes'));
-        $htmleditor = array('default' => get_string('defaulteditor'), 0 => get_string('texteditor'), 1 => get_string('htmleditor'));
+        $htmleditor = array('default' => get_string('defaulteditor'));
+        $editors = editors_get_enabled();
+        foreach ($editors as $name => $editor) {
+            $htmleditor[$name] = get_string('pluginname', 'editor_' . $name);
+        }
         $table = new html_table();
         $table->head = array('Field', 'User Information');
         $table->data = array(
