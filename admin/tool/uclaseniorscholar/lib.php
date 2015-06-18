@@ -77,15 +77,11 @@ function seniorscholar_course_check($courses) {
  **/
 
 function seniorscholar_get_terms() {
-    global $DB, $CFG;
     $termlist = array();
-    $sql = "SELECT DISTINCT term FROM {ucla_request_classes}";
-    $result = $DB->get_records_sql($sql);
+    $result = get_active_terms();
     foreach ($result as $item) {
-        if (term_cmp_fn($item->term, $CFG->currentterm) >= 0) {
-            $termtext = ucla_term_to_text($item->term);
-            $termlist[$item->term] = $termtext;
-        }
+        $termtext = ucla_term_to_text($item);
+        $termlist[$item] = $termtext;
     }
     return $termlist;
 }
