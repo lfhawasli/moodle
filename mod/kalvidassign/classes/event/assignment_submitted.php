@@ -44,8 +44,8 @@ class assignment_submitted extends \core\event\base {
     }
  
     public function get_description() {
-        return "The user with id '{$this->userid}' submitted the assignment submission with id '{$this->objectid}'"
-        . " for the Kaltura media assignment with the course module id of '{$this->contextinstanceid}'.";
+        return "The user with id '{$this->userid}' made a submission to the Kaltura media"
+        . " assignment with the course module id of '{$this->contextinstanceid}'.";
     }
  
     public function get_url() {
