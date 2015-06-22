@@ -44,5 +44,6 @@ if (seniorscholar_has_access($USER)) {
     $ADMIN->add('accounts', new admin_externalpage(
             'uclaseniorscholar',
             get_string('pluginname', 'tool_uclaseniorscholar'),
-            "$CFG->wwwroot/$CFG->admin/tool/uclaseniorscholar/index.php"));
+            "$CFG->wwwroot/$CFG->admin/tool/uclaseniorscholar/index.php",
+            "moodle/user:viewalldetails"));
 }

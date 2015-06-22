@@ -70,8 +70,7 @@ echo html_writer::start_tag('div', array('class' => 'filter-item'));
 echo html_writer::start_tag('form', array('id' => 'tool_uclaseniorscholar_course_by_instructor',
                                           'action' => $PAGE->url->out(),
                                           'method' => 'post'));
-echo html_writer::select($termlist, 'filter_term', $filterterm,
-                         array('' => 'All term'),
+echo html_writer::select($termlist, 'filter_term', $filterterm, '',
                          array('id' => 'tool_uclaseniorscholar_id_filter_term'));
 echo html_writer::select($instrlist, 'filter_instructor', $filterinstruid,
                          array('' => 'Choose instructor'),
@@ -92,10 +91,10 @@ echo html_writer::start_tag('div', array('class' => 'filter-item'));
 echo html_writer::start_tag('form', array('id' => 'tool_uclaseniorscholar_course_by_subj',
                                           'action' => $PAGE->url->out(),
                                           'method' => 'post'));
-echo html_writer::select($termlist, 'filter_term', $filterterm,
-    array('' => 'All term'), array('id' => 'tool_uclaseniorscholar_id_filter_term_subj'));
+echo html_writer::select($termlist, 'filter_term', $filterterm, '',
+                         array('id' => 'tool_uclaseniorscholar_id_filter_term_subj'));
 echo html_writer::select($subjlist, 'filter_subj', $filtersubj,
-    array('' => 'Choose subject area'), array('id' => 'tool_uclaseniorscholar_id_filter_subj'));
+                         array('' => 'Choose subject area'), array('id' => 'tool_uclaseniorscholar_id_filter_subj'));
 echo html_writer::empty_tag('input', array('id' => 'course_by_subj_btn',
                                            'name' => 'submit_button',
                                            'value' => get_string('submit_button', 'tool_uclaseniorscholar'),
@@ -129,7 +128,7 @@ if (empty($list) && $filter != 'instr') {
     echo html_writer::tag('p', get_string('no_result', 'tool_uclaseniorscholar'));
 } else {
     $a = new stdClass();
-    $a->term = (empty($filterterm)) ? 'All terms' : ucla_term_to_text($filterterm);
+    $a->term = ucla_term_to_text($filterterm);
     echo html_writer::tag('div', strtoupper(get_string('list_by_course_term', 'tool_uclaseniorscholar', $a)),
                           array('class' => 'linespacer'));
     $table = new html_table();

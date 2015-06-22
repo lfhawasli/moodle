@@ -64,6 +64,7 @@ function seniorscholar_course_check($courses) {
             // Nothing to do.
         } else if ($course->hostcourse == 1) {
             // Re-organize to display cross listing courses.
+            // Only exact one course have the hostcourse value as 1 for cross listing courses.
             $output[$course->courseid][$course->hostcourse] = $course;
         } else if ($course->hostcourse == 0) {
             $output[$course->courseid][$course->hostcourse][] = $course;
