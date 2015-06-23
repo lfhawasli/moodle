@@ -50,7 +50,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
      * @var string 
      */
     public $theme_name = 'uclashared';
-    
+
     /**
      * Returns separator used in header and footer links.
      * @return string
@@ -628,7 +628,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         return $this->single_button($url, $editstring);
     }
-    
+
     /**
      * Set for custom course logos.  This is meant to be overridden by child themes.
      * 
@@ -638,9 +638,52 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         return '';
     }
 
+    /**
+     * Override confirmation dialog to be able to use different styles.
+     * See documentation for confirm() in /lib/outputrenderers.php
+     * 
+     * @param string $message
+     * @param single_button|moodle_url|string $continue
+     * @param single_button|moodle_url|string $cancel
+     * @param string $style The style of the confirmation dialog.
+     * Currently only 'success' is implemented; anything else uses the default appearance.
+     * @return string
+     */
+    public function confirm($message, $continue, $cancel, $style = '') {
+        if (is_string($continue)) {
+            $continue = new single_button(new moodle_url($continue), get_string('continue'), 'post');
+        } else if ($continue instanceof moodle_url) {
+            $continue = new single_button($continue, get_string('continue'), 'post');
+        } else if (!($continue instanceof single_button)) {
+            throw new coding_exception(
+                    'The continue param to $OUTPUT->confirm() must be either ' .
+                    'a URL (string/moodle_url) or a single_button instance.');
+        }
+
+        if (is_string($cancel)) {
+            $cancel = new single_button(new moodle_url($cancel), get_string('cancel'), 'get');
+        } else if ($cancel instanceof moodle_url) {
+            $cancel = new single_button($cancel, get_string('cancel'), 'get');
+        } else if (!($cancel instanceof single_button)) {
+            throw new coding_exception(
+                    'The cancel param to $OUTPUT->confirm() must be either ' .
+                    'a URL (string/moodle_url) or a single_button instance.');
+        }
+
+        if ($style == 'success') {
+            $output = $this->box_start('generalbox alert alert-success');
+        } else {
+            $output = $this->box_start('generalbox', 'notice');
+        }
+        $output .= html_writer::tag('p', $message);
+        $output .= html_writer::tag('div', $this->render($continue) . $this->render($cancel), array('class' => 'buttons'));
+        $output .= $this->box_end();
+        return $output;
+    }
+
     /*
      * Override the notification in order to include the warning style.
-     * 
+     *
      * @param string $message
      * @param string $classes
      * @return string HTML
@@ -654,7 +697,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             return "<div class=\"$type\">$message</div>";
         } else {
             return parent::notification($message, $classes);
-        } 
+        }
     }
 
     /**

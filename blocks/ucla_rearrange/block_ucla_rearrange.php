@@ -12,7 +12,7 @@ class block_ucla_rearrange extends block_base {
     // This is where the entire section stuff should go
     const primary_domnode = 'major-ns-container';
     const default_targetjq = '.ns-primary';
-   
+
     // This is the id of top UL
     const pagelist = 'ns-list';
 
@@ -24,7 +24,7 @@ class block_ucla_rearrange extends block_base {
 
     // This the id of UL
     const sectionlist = 's-list';
-    
+
     // this the class of UL
     const sectionlistclass = 's-list-class';
 
@@ -33,7 +33,7 @@ class block_ucla_rearrange extends block_base {
 
     // Non-nesting class
     const nonnesting = 'ns-invisible';
-    
+
     // Style "hidden" indicator for non-visisble sections/modules
     const hiddenclass = 'ucla_rearrange_hidden';
 
@@ -55,17 +55,17 @@ class block_ucla_rearrange extends block_base {
             'my' => false,
             'not-really-applicable' => true
         );
-    }        
-    
+    }
+
     /**
-     *  Returns an array of root modnode objects for a particular section.
-     *  @param $section     The section number
-     *  @param $sectinfo    Section info that includes the sequence of course 
-     *                      modules in the section
-     *  @param $mods        The list of mods from get_all_mods().
-     *  @param $modinfo     The mod information from get_all_mods().
+     * Returns an array of root modnode objects for a particular section.
+     * @param $section     The section number
+     * @param $sectinfo    Section info that includes the sequence of course 
+     *                     modules in the section
+     * @param $mods        The list of mods from get_all_mods().
+     * @param $modinfo     The mod information from get_all_mods().
      **/
-    static function mods_to_modnode_tree($section, &$sectinfo, &$mods, 
+    static function mods_to_modnode_tree($section, &$sectinfo, &$mods,
             &$modinfo, $courseid) {
 
         $nodes = array();
@@ -78,7 +78,7 @@ class block_ucla_rearrange extends block_base {
                 $cm =& $mods[$mod_id];
 
                 if ($cm->section != $sectinfo->id) {
-                    // For some reason code branch seems to occur 
+                    // For some reason code branch seems to occur
                     // intrinsically in Moodle.
                     // TODO Figure out why this happens and what we should do
                     // 'bout it.
@@ -91,7 +91,7 @@ class block_ucla_rearrange extends block_base {
                     true, $courseid);
                 $is_hidden = !$modinfo->cms[$mod_id]->visible;
 
-                $nodes[] = new modnode($mod_id, $display_text, $cm->indent, 
+                $nodes[] = new modnode($mod_id, $display_text, $cm->indent,
                         false, $is_hidden);
             }
         }
@@ -113,8 +113,8 @@ class block_ucla_rearrange extends block_base {
 
         $sectionnodes = array();
         foreach ($sections as $section) {
-            $sectionnodes[$section->id] = 
-                self::mods_to_modnode_tree($section->section, 
+            $sectionnodes[$section->id] =
+                self::mods_to_modnode_tree($section->section,
                     $section, $mods, $modinfo, $courseid);
         }
 
@@ -122,9 +122,9 @@ class block_ucla_rearrange extends block_base {
     }
 
     /**
-     *  Takes an array of an array of modnode objects and renders in such
-     *  a way that you get back an array of HTML.
-     *  @return Array of HTML.
+     * Takes an array of an array of modnode objects and renders in such
+     * a way that you get back an array of HTML.
+     * @return Array of HTML.
      **/
     static function render_set_modnodes(&$setmodnodes) {
         $rendered = array();
@@ -149,8 +149,8 @@ class block_ucla_rearrange extends block_base {
      *  Convenience function, returns an array of the HTML rendered
      *  UL and LI DOM Objects ready to be spit out into JSON.
      **/
-    static function get_section_modules_rendered(&$courseid, &$sections, 
-            &$mods, &$modinfo) {        
+    static function get_section_modules_rendered(&$courseid, &$sections,
+            &$mods, &$modinfo) {
         $snodes = self::get_sections_modnodes($courseid, $sections, $mods,
             $modinfo);
 
@@ -175,7 +175,7 @@ class block_ucla_rearrange extends block_base {
             $PAGE->requires->js($jspath . 'inestedsortable-1.0.1.pack.js');
         }
     }
-    
+
     /**
      *  Convenience function to generate a variable assignment 
      *  statement in JavaScript.
@@ -210,7 +210,7 @@ class block_ucla_rearrange extends block_base {
         $PAGE->requires->js_init_code(self::js_variable_code(
             'sections', json_encode($sectionslist), false));
 
-        // This is the jQuery query used to find the object to 
+        // This is the jQuery query used to find the object to
         // run NestedSortable upon.
         $PAGE->requires->js_init_code(self::js_variable_code(
             'targetjq', $targetobj));
@@ -274,7 +274,7 @@ class block_ucla_rearrange extends block_base {
 
         return $clean;
     }
-    
+
     /** 
      *  Moves a bunch of course modules to a different section
      *  There should already be a function for this, but there is not.
@@ -284,7 +284,7 @@ class block_ucla_rearrange extends block_base {
      *  @param $ordersections
      *      An Array of [ NEW_SECTION_ORDER ] => OLD_SECTION ID 
      **/
-    static function move_modules_section_bulk($sectionmodules, 
+    static function move_modules_section_bulk($sectionmodules,
             $ordersections=array()) {
         global $DB, $COURSE;
 
@@ -323,7 +323,7 @@ class block_ucla_rearrange extends block_base {
 
             // Get the sequence
             $sectionarr['sequence'] = trim(implode(',', $sectseq));
-           
+
             // Move the section itself.
             if (isset($ordersections[$section])) {
                 $sectionarr['section'] = $ordersections[$section];
@@ -336,7 +336,7 @@ class block_ucla_rearrange extends block_base {
         }
 
         foreach ($coursemodules as $module) {
-            // Note the boolean at the end is not used in mysql 
+            // Note the boolean at the end is not used in mysql
             // (as of moodle 2.1.1) also, this always returns true...
             $DB->update_record('course_modules', $module, true);
         }
@@ -374,18 +374,28 @@ class block_ucla_rearrange extends block_base {
         return array(2 => $link);
     }
 
+    /**
+     * Return information for displaying this block in the control panel.
+     * 
+     * @param stdClass $course
+     * @param context $context
+     * @return array of "modules", where each "module" is
+     * an array of (variable name => value) to initialize a ucla_cp_module
+     */
     static function ucla_cp_hook($course, $context) {
-        global $CFG;
-
         $thispath = '/blocks/ucla_rearrange/rearrange.php';
+
+        $section = optional_param('section', null, PARAM_INT);
+        $params = array('courseid' => $course->id);
+        if (!is_null($section)) {
+            $params['section'] = $section;
+        }
 
         $allmods = array();
         $allmods[] = array(
             'item_name' => 'rearrange',
             'tags' => array('ucla_cp_mod_common'),
-            'action' => new moodle_url($thispath, array(
-                'courseid' => $course->id
-            )),
+            'action' => new moodle_url($thispath, $params),
             'required_cap' => 'moodle/course:update'
         );
 
@@ -450,16 +460,16 @@ class modnode {
 
         $is_hidden_text = '';
         if ($this->is_hidden) {
-            $is_hidden_text = ' ' . html_writer::tag('span', 
-                    '(' . get_string('hidden', 'calendar') . ')', 
+            $is_hidden_text = ' ' . html_writer::tag('span',
+                    '(' . get_string('hidden', 'calendar') . ')',
                     array('class' => block_ucla_rearrange::hiddenclass));
         }
-        
-        $self = html_writer::tag('li', $this->modtext . $is_hidden_text . 
+
+        $self = html_writer::tag('li', $this->modtext . $is_hidden_text .
                 $childrender, array('id' => 'ele-' . $this->modid,
                                     'class' => $class
         ));
-        
+
         return $self;
     }
 
@@ -482,7 +492,7 @@ class modnode {
 
             $node_indent->id = $node['id'];
             $node_indent->indent = $indent;
-            
+
             $set[] = $node_indent;
 
             if (isset($node['children']) && !empty($node['children'])) {
@@ -508,9 +518,9 @@ class modnode {
                 array_push($root_nodes, $node);
             } else {
                 $indentdiff = $node->modindent - $nodes[$index - 1]->modindent;
-                
+
                 if ($indentdiff <= 0) {
-                    // Goto the previous possible parent at the same 
+                    // Goto the previous possible parent at the same
                     // indentation level
                     for ($i = abs($indentdiff) + 1; $i > 0; $i--) {
                         array_pop($parent_stack);

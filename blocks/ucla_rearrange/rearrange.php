@@ -47,16 +47,16 @@ set_editing_mode_button($go_back_url);
 
 $sections = $format->get_sections();
 $numsections = $format->get_course()->numsections;
-        
+
 $sectnums = array();
 $sectionnames = array();
 $sectionvisibility = array();
 foreach ($sections as $section) {
-    //CCLE-2930:rearrange tool now shows correct sections by limitimg it
-    //with the course numsections.
+    // CCLE-2930:rearrange tool now shows correct sections by limitimg it
+    // with the course numsections.
     if ($section->section > $numsections) {
-	unset($sections[$section->section]);
-	continue;
+        unset($sections[$section->section]);
+        continue;
     }
     $sid = $section->id;
     $sectids[$sid] = $sid;
@@ -153,7 +153,7 @@ block_ucla_rearrange::setup_nested_sortable_js($sectionshtml,
         '.' . block_ucla_rearrange::pagelistclass, $customvars);
 
 // Used later to determine which section to redirect to after successful form submit
-$section_redirect = $section_num;
+$sectionredirect = $section_num;
 
 // All prepped, now we need to add the actual rearrange form
 // The form is useful since it lets us maintain serialized data and
@@ -232,20 +232,20 @@ if ($data = $rearrangeform->get_data()) {
 
         $sectioncontents[$section] = $flattened;
     }
-    
+
     // Section id to redirect to after moving the sections around
     $sectionid = $DB->get_field('course_sections', 'id', array('course' => $course->id, 'section' => $section_num));
 
     // We're going to skip the API calls because it uses too many DBQ's
     block_ucla_rearrange::move_modules_section_bulk($sectioncontents,
             $sectiontranslation);
-    
+
     // Set the section correct value after moving sections around
-    if ( !$section_redirect = $DB->get_field('course_sections', 'section', array('id' => $sectionid)) ) {
+    if ( !$sectionredirect = $DB->get_field('course_sections', 'section', array('id' => $sectionid)) ) {
         // If no field is found, then the section we were on was either 'Site info' or 'Show all'
-        $section_redirect = $section_num;
+        $sectionredirect = $section_num;
     }
-    $_POST['section'] = $section_redirect;
+    $_POST['section'] = $sectionredirect;
 
     // Now we need to swap all the contents in each section...
     rebuild_course_cache($courseid);
@@ -261,24 +261,26 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($restr, 2, 'headingblock');
 
 if ($data != false) {
-    // allow user to either return to section they were on or go to course page
-    $params = array('id' => $courseid);
-    $courseurl = new moodle_url('/course/view.php', $params);
-    $courseret = new single_button($courseurl, get_string('returntocourse',
-                            'block_ucla_rearrange'), 'get');
-    
-    // TODO: Add in logic to determine if we should redirect to 'Show all'
+    $message = html_writer::tag('h3', get_string('success', 'block_ucla_rearrange'));
+    $message .= get_string('rearrange_success', 'block_ucla_rearrange');
+
+    // Return to site/section (where the user was).
     $secturl = new moodle_url('/course/view.php',
-                    array('id' => $courseid, 'section' => $section_redirect));
-    if ($section_redirect == UCLA_FORMAT_DISPLAY_ALL) {
+                    array('id' => $courseid, 'section' => $sectionredirect));
+    if ($sectionredirect == UCLA_FORMAT_DISPLAY_ALL) {
         $secturl->remove_params('section');
         $secturl->param('show_all', 1);
     }
-    $sectret = new single_button($secturl, get_string('returntosection',
-                            'block_ucla_rearrange'), 'get');
+    $returntositebutton = new single_button($secturl,
+            get_string('returntosite', 'block_ucla_rearrange'), 'get');
 
-    echo $OUTPUT->confirm(get_string('rearrange_success', 'block_ucla_rearrange'),
-            $courseret, $sectret);
+    // Rearrange more.
+    $rearrangeurl = new moodle_url($PAGE->url,
+            array('courseid' => $courseid, 'section' => $sectionredirect));
+    $rearrangebutton = new single_button($rearrangeurl,
+            get_string('rearrangemore', 'block_ucla_rearrange'), 'get');
+
+    echo $OUTPUT->confirm($message, $returntositebutton, $rearrangebutton, 'success');
 
     $event = \block_ucla_rearrange\event\module_rearranged::create(array(
         'context' => $context
