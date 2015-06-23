@@ -117,6 +117,9 @@ $string['course_edit_post'] = 'Edit the full name and description of the course 
 $string['reports'] = 'Reports';
 $string['reports_post'] = 'View course logs to see student activity.';
 
+$string['editdates'] = 'Dates';
+$string['editdates_post'] = "Edit the dates for this course's activities.";
+
 $string['groups'] = 'Groups';
 $string['groups_post'] = 'Set up and manage course groups. These provide separate work areas for groups of students in Forums, Wikis and other tools.';
 
