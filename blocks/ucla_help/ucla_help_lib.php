@@ -1,4 +1,19 @@
 <?php
+// This file is part of the UCLA Help plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Collection of classes/functions used across multiple scripts for the UCLA 
  * Help and Feedback block.
@@ -275,6 +290,55 @@ class support_contacts_manager {
     }
 }
 
+/**
+ * Adhoc task try_support_request.
+ *
+ * @package    ucla_help
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class try_support_request extends \core\task\adhoc_task {
+
+    /**
+     * Creates a JIRA issue for a support request.
+     * 
+     * @throws Exception    if issue creation is unsuccessful
+     */
+    public function execute() {
+        $cd = $this->get_custom_data();
+        $jiraendpoint = get_config('block_ucla_help', 'jira_endpoint');
+
+        // Try to create the issue.
+        $jiraresult = send_jira_request($jiraendpoint, true, array('Content-type: application/json'), 
+                json_encode($cd->params));
+        $decodedresult = json_decode($jiraresult, true);
+        if (!empty($decodedresult)) {
+            // Issue is successfully created only when the issue key is returned. Otherwise, error.
+            if (!empty($decodedresult['key'])) {
+                $issueid = $decodedresult['key'];
+            } else {
+                throw new Exception('JIRA issue creation error - ' . implode(', ', $decodedresult['errors']));
+            }
+        } else {
+            throw new Exception('JIRA request failed - issue creation unsuccessful');
+        }
+
+        // If there is an attachment, then attach it to the newly created issue.
+        if ($cd->attachmentfile != null) {
+            $url = $jiraendpoint . "/$issueid/attachments";
+            $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
+            $data = array('file' => "@{$cd->attachmentfile};filename={$cd->attachmentname}");
+            $jiraresult = send_jira_request($url, true, $headers, $data);
+            if ($jiraresult === false) {
+                // If attachment fails, comment a note on the JIRA ticket for reference.
+                $params = array('body'  => "The reporter attempted to attach a file, but that JIRA request failed.");
+                send_jira_request($jiraendpoint . "/{$issueid}/comment", true,
+                        array('Content-type: application/json'), json_encode($params));
+            }
+        }
+    }
+}
+
 /*** FUNCTIONS ***/
 
 /**
@@ -429,7 +493,7 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
     }
 
     // Now, is the support contact an email address?
-    if (validateEmailSyntax($supportcontact)) {        
+    if (validateEmailSyntax($supportcontact)) {
         // Create the user to send the email to.
         $touser = new stdClass();
         $touser->email = $supportcontact;
@@ -479,34 +543,14 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
             )
         );
 
-        $jiraendpoint = get_config('block_ucla_help', 'jira_endpoint');
-
-        // Try to create the issue.
-        $jiraresult = send_jira_request($jiraendpoint, true,
-                array('Content-type: application/json'), json_encode($params));
-        $result = false;
-        $decodedresult = json_decode($jiraresult, true);
-        if (!empty($decodedresult)) {
-            // Issue is successfully created only when the issue key is
-            // returned. Otherwise, error.
-            if (!empty($decodedresult['key'])) {
-                $issueid = $decodedresult['key'];
-                $result = true;
-            }
-        }
-
-        // If there is an attachment, then attach it to the newly created issue.
-        if ($result != false && $attachmentfile != null) {
-            $url = $jiraendpoint . "/$issueid/attachments";
-            $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
-            $data = array('file'=>"@{$attachmentfile};filename={$attachmentname}");
-            $jiraresult = send_jira_request($url, true, $headers, $data);
-            if ($jiraresult === false) {
-                $result = false;
-            } else {
-                $result = true;
-            }
-        }
+        // Add support request as an adhoc task. Adhoc tasks are retried until successful.
+        $task = new try_support_request();
+        $task->set_custom_data(array(
+            'params'            => $params,
+            'attachmentfile'    => $attachmentfile,
+            'attachmentname'    => $attachmentname
+        ));
+        $result = \core\task\manager::queue_adhoc_task($task);
     } else {
         // No $supportcontact specified, so return false.
         return $result;
@@ -590,7 +634,7 @@ function send_jira_request($url, $post = false, $headers, $data) {
     }
 
     $result = curl_exec($curl);
-    curl_close($curl); 
+    curl_close($curl);
 
     return $result;
 }
