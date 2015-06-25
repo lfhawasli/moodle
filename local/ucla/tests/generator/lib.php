@@ -237,6 +237,40 @@ class local_ucla_generator extends testing_data_generator {
         return $courseobj;
     }
 
+    /**
+     * Generate section data for testing that would otherwise be retrieved from the registrar.
+     * This function can be expanded if needed to specify more registrar data for the
+     * 'ccle_class_sections' query.
+     *
+     * @param int $reqid    ucla_request_classes record id
+     * @param int $num      number of sections to generate, between 1 and 26
+     * @param string $type  the action type for the class, i.e. DIS or LAB
+     * @return array of $num size, each index containing an array with registrar section data
+     */
+    public function generate_section_regdata($reqid, $num, $type = 'DIS') {
+        global $DB;
+        $sections = [];
+        if ($num > 26) {
+            throw new Exception('Invalid number of sections: over 26'); // We can't generate more than 26 section numbers.
+        } else if ($num < 1) {
+            $num = 0;
+        }
+        $class = $DB->get_record('ucla_request_classes', array('id' => $reqid), 'srs, course');
+        // Grab the second half of the course identifier (i.e. 4W-3) to get the lecture
+        // number (referred to as secid when creating a class).
+        $coursenos = explode('-', $class->course);
+        $lecno = $coursenos[1];
+        for ($i = 0; $i < $num; $i++) {
+            $section['srs_crs_no'] = $class->srs + $i + 1;
+            $section['cls_act_typ_cd'] = $type;
+            // Assign sections a number-letter combo made up of the class lecture number and
+            // a letter. Start with A. E.g. a LEC 4 with 3 sections would have them called: DIS 4A,
+            // DIS 4B, and DIS 4C.
+            $section['sect_no'] = $lecno . chr(65 + $i);
+            $sections[$i] = $section;
+        }
+        return $sections;
+    }
 
     /**
      * Helper function for create_ucla_roles function.  Creates a dummy role
@@ -837,7 +871,7 @@ class local_ucla_generator extends testing_data_generator {
                 $autogenfields['term'] = true;
             }
             if (empty($course['srs']) || !empty($autogenfields['srs'])) {
-                $course['srs'] = rand(100000000, 999999999);
+                $course['srs'] = rand(1000000, 9999999) * 100;
                 $autogenfields['srs'] = true;
             }
 

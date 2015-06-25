@@ -107,16 +107,12 @@ if ($groupings = $DB->get_records('groupings', array('courseid'=>$course->id), '
         $buttons .= html_writer::link($url, $OUTPUT->pix_icon('t/groups', $strmanagegrping, 'core',
                 array('class' => 'iconsmall')), array('title' => $strmanagegrping));
 
-        /**
-         * Show only the ability to assign groups for the public/private grouping.
-         *
-         * @author ebollens
-         * @version 20110719
-         */
-        if($publicprivate_course->is_grouping($grouping)) {
-            $buttons = html_writer::link($url, $OUTPUT->pix_icon('t/groups', $strmanagegrping, 'core',
-                array('class' => 'iconsmall')), array('title' => $strmanagegrping));
+        // START UCLA MOD: CCLE-5186 - Add auto-generated groups to "Private course materials" grouping
+        require_once $CFG->dirroot . '/blocks/ucla_group_manager/lib.php';
+        if($publicprivate_course->is_grouping($grouping) || ucla_group_manager::is_auto_grouping($grouping)) {
+            $buttons = '';
         }
+        // END UCLA MOD: CCLE-5186
         
         $line[3] = $buttons;
         $data[] = $line;

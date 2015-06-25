@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir .'/gradelib.php');
+
 /**
  * When the course creator has finished, check if it is an Engineering course. 
  * If so, check "Do not display auto-generated links" for upon build and add the
@@ -59,6 +61,19 @@ function set_engineering_default($edata) {
         $page->blocks->add_regions(array(BLOCK_POS_RIGHT), false);
         $page->blocks->add_block('recent_activity', BLOCK_POS_RIGHT, -10, 0, 'course-view-*');
         $page->blocks->add_block('calendar_upcoming', BLOCK_POS_RIGHT, -9, 0, 'course-view-*');
+
+        // Hide gradebook from user.
+        grade_set_setting($request->courseid, 'report_user_showrank', 0);
+        grade_set_setting($request->courseid, 'report_user_showpercentage', 0);
+        grade_set_setting($request->courseid, 'report_user_showgrade', 0);
+        grade_set_setting($request->courseid, 'report_user_showfeedback', 0);
+        grade_set_setting($request->courseid, 'report_user_showrange', 0);
+        grade_set_setting($request->courseid, 'report_user_showweight', 0);
+        grade_set_setting($request->courseid, 'report_user_showaverage', 0);
+        grade_set_setting($request->courseid, 'report_user_showlettergrade', 0);
+        grade_set_setting($request->courseid, 'report_user_rangedecimals', 0);
+        grade_set_setting($request->courseid, 'report_user_showhiddenitems', 0);
+        grade_set_setting($request->courseid, 'report_user_showtotalsifcontainhidden', GRADE_REPORT_HIDE_TOTAL_IF_CONTAINS_HIDDEN);
     }
     return true;
 }

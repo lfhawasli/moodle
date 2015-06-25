@@ -153,8 +153,54 @@ class ucla_reg_classinfo_cron {
                 );
             if (!$reginfo) {
                 mtrace("No data for {$request->term} {$request->srs}");
-                $notfoundatregistrar[] =
+                $regclass = $DB->get_record('ucla_reg_classinfo',
+                        array('term' => $request->term, 'srs' => $request->srs));
+                // Query registrar with reg_classinfo data to see if course still exists.
+                $coursesrs = $this->query_registrar('ucla_get_course_srs',
+                    array(
+                        'term' => $regclass->term,
+                        'subject area' => $regclass->subj_area,
+                        'crsidx' => $regclass->crsidx,
+                        'secidx' => $regclass->secidx,
+                    )
+                );
+                if (!$coursesrs) {
+                    // The course was not found in the registrar, it no longer exists.
+                    $notfoundatregistrar[] =
                         array('term' => $request->term, 'srs' => $request->srs);
+                } else {
+                    // The course does exist, but with a new srs.
+                    $outerarray = reset($coursesrs);
+                    $newsrs = reset($outerarray);
+                    mtrace("New srs {$newsrs} found for {$request->term} {$request->srs}");
+
+                    // Query the registrar again, with new termsrs data, so we can check
+                    // if other values need to be updated.
+                    $newreginfo = $this->query_registrar('ccle_getclasses',
+                        array(
+                            'term' => $request->term,
+                            'srs' => $newsrs
+                        )
+                    );
+                    // Update record in ucla_reg_classinfo and ucla_request_classes tables.
+                    $newclassinfo = reset($newreginfo);
+                    try {
+                        $transaction = $DB->start_delegated_transaction();
+                        $newclassinfo['id'] = $regclass->id;
+                        $DB->update_record('ucla_reg_classinfo', $newclassinfo);
+                        $this->handle_course_title($regclass, $newclassinfo);
+                        $DB->set_field('ucla_request_classes', 'srs', $newsrs, array(
+                            'term' => $request->term,
+                            'srs' => $request->srs
+                        ));
+
+                        $transaction->allow_commit();
+                        $uc++;
+                    } catch (Exception $ex) {
+                        $transaction->rollback($ex);
+                        mtrace("Update to {$request->term} {$request->srs} failed - records rolled back to original state");
+                    }
+                }
             } else {
                 $newclassinfo = reset($reginfo);  // Result is in an array.
 

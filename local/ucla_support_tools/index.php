@@ -64,7 +64,8 @@ $PAGE->requires->yui_module('moodle-local_ucla_support_tools-favorite', 'M.local
 $PAGE->requires->yui_module('moodle-local_ucla_support_tools-filter', 'M.local_ucla_support_tools.filter.tools', array(array(
     'input_node_id' =>  '#ucla-support-filter-input',
     'target_nodes' => '.ucla-support-tool-grid .ucla-support-tool',
-    'filter_nodes' => '.ucla-support-tool-grid li'
+    'filter_nodes' => '.ucla-support-tool-grid li',
+    'category_nodes' => '#cat-grid .ucla-support-category'
 )));
 
 // Filtering.
