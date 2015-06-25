@@ -88,3 +88,6 @@
 [submodule "mod/scheduler"]
 	path = mod/scheduler
 	url = https://github.com/bostelm/moodle-mod_scheduler.git
+[submodule "local/recyclebin"]
+	path = local/recyclebin
+	url = https://github.com/unikent/moodle-local_recyclebin

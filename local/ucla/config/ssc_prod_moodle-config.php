@@ -352,6 +352,9 @@ $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-4.kaf.kaltura.com';
 
+// Site administration > Plugins > Local plugins > Recycle Bin
+$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35; // CCLE-5227 - Recycle Bin Item Lifetime
+
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
