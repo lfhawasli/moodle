@@ -27,8 +27,9 @@ $string['deletesectioncontents'] = 'At least one of the section(s) you are delet
 $string['tbdel'] = 'To delete:';
 $string['deleteconfirm'] = 'Delete content';
 
-$string['successmodify'] = 'The sections have been successfully updated.';
+$string['successmodify'] = 'Your change has been applied.';
 $string['failuremodify'] = 'There was an error writing records to the database. Your modifications were not saved.';
+$string['modifymore'] = 'Modify more sections';
 
 // Alert for section mismatch.
 $string['alertnumsections'] = 'Below are sections that are not being displayed:' . 
