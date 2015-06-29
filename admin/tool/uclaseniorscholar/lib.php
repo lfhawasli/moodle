@@ -193,3 +193,32 @@ function seniorscholar_get_courses_by_instructor_term(&$param) {
     $sql .= " ORDER BY bi.lastname, bi.firstname, rc.department, rc.course";
     return $result = $DB->get_records_sql($sql);
 }
+
+function seniorscholar_get_userinvitehistory_by_term($term) {
+    global $DB;
+    $output = array();
+    // Get list invitations
+    $listofinviters = get_seniorscholar_admin_userid();
+    $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS tid, i.*, rc.courseid, rc.instructor, rc.hostcourse,
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, i.*
+              FROM {course} c
+              JOIN {enrol_invitation} i ON i.courseid = c.id
+              JOIN {ucla_request_classes} rc ON c.id = rc.courseid
+              JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs
+              JOIN (SELECT @row_num := 0) AS t
+             WHERE i.inviterid in (" . implode(',', $listofinviters) . ")";
+    if ($term) {
+        $sql .= " AND rc.term = '" . $term . "'";
+    }
+    $sql .= " ORDER BY i.email, reg.subj_area, reg.coursenum, reg.sectnum, rc.hostcourse, i.timeexpiration desc";
+    $invites = $DB->get_records_sql($sql);
+    // Get list of roles
+    foreach ($invites as $k => $v) {
+        if ($v->hostcourse == 1) {
+            $output[$v->email][$v->courseid][$v->hostcourse] = $v;
+        } else if ($v->hostcourse == 0) {
+            $output[$v->email][$v->courseid][$v->hostcourse][] = $v;
+        }
+    }
+    return $output;
+}

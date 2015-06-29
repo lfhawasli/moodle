@@ -29,7 +29,11 @@ $string['seniorscholarsupportemail_instruction'] = 'Enter support email for seni
 
 $string['pluginname'] = 'UCLA Senior Scholar';
 $string['pluginname_desc'] = 'Manage senior scholars';
-$string['mainmenu'] = 'You can search by term/instructor and term/subject area';
+$string['course'] = 'Course';
+$string['instructor'] = 'Instructor';
+$string['email'] = 'Senior scholar email';
+$string['mainmenu_course'] = 'You can search by term/instructor and term/subject area';
+$string['mainmenu_history'] = 'You can search user invite history by term';
 $string['all_by_course_current_term'] = 'All items for current term listed by course';
 $string['all_by_instructor_current_term'] = 'All items for current term listed by instructor (across all their courses)';
 $string['all_by_course_subj_current_term'] = 'All items for current term listed by subject area';
@@ -51,6 +55,8 @@ $string['ccle'] = 'CCLE';
 $string['allterm'] = 'all terms';
 $string['list_course_by_term'] = 'List course by';
 $string['submit_button'] = 'Submit';
+$string['print_button'] = 'Printer friendly';
+$string['export_button'] = 'Export to Excel';
 
 $string['no_result'] = 'Your search does not return any result';
 $string['class_name'] = 'Course';
