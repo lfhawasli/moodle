@@ -28,6 +28,7 @@ require_once(dirname(__FILE__) . '/invitation_form.php');
 
 require_once($CFG->dirroot . '/enrol/locallib.php');
 require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/admin/tool/uclaseniorscholar/lib.php');
 
 // For distance_of_time_in_words.
 require_once($CFG->dirroot . '/local/ucla/datetimehelpers.php');
@@ -81,11 +82,11 @@ if (empty($invites)) {
 
     // Update invitation if the user decided to revoke/extend/resend an invite.
     if ($inviteid && $actionid) {
-        if (!$curr_invite = $invites[$inviteid]) {
+        if (!$currinvite = $invites[$inviteid]) {
             print_error('invalidinviteid');
         }
 
-        $invitationmanager->update_invitation($curr_invite, $actionid);
+        $invitationmanager->update_invitation($currinvite, $actionid);
         if ($actionid == invitation_manager::INVITE_REVOKE) {
             echo $OUTPUT->notification(get_string('revoke_invite_sucess', 'enrol_invitation'), 'notifysuccess');
         } else if ($actionid == invitation_manager::INVITE_EXTEND) {
@@ -116,7 +117,10 @@ if (empty($invites)) {
 
     $table->setup();
 
-    $role_cache = array();
+    $rolecache = array();
+    // Get senior scholar administrator ids and support email.
+    $seniorscholaradministrators = get_seniorscholar_admin_userid();
+    $seniorscholarsupportemail = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
     foreach ($invites as $invite) {
         /* Build display row:
          * [0] - invitee and inviter
@@ -129,20 +133,26 @@ if (empty($invites)) {
 
         // Display invitee and inviter.
         $inviter = $DB->get_field('user', 'email', array( 'id' => $invite->inviterid));
-        $row[0] = $invite->email . " - " . $inviter;
+        // If inviter is senior scholar administrator.
+        if (in_array($invite->inviterid, $seniorscholaradministrators)) {
+            $row[0] = $invite->email . " - " . $seniorscholarsupportemail . html_writer::empty_tag('br');
+            $row[0] .= "(" . get_string('seniorscholar', 'enrol_invitation') . ")";
+        } else {
+            $row[0] = $invite->email . " - " . $inviter;
+        }
 
         // Figure out invited role.
-        if (empty($role_cache[$invite->roleid])) {
+        if (empty($rolecache[$invite->roleid])) {
             $role = $DB->get_record('role', array('id' => $invite->roleid));
             if (empty($role)) {
                 // Cannot find role, give error.
-                $role_cache[$invite->roleid] =
+                $rolecache[$invite->roleid] =
                         get_string('historyundefinedrole', 'enrol_invitation');
             } else {
-                $role_cache[$invite->roleid] = $role->name;
+                $rolecache[$invite->roleid] = $role->name;
             }
         }
-        $row[1] = $role_cache[$invite->roleid];
+        $row[1] = $rolecache[$invite->roleid];
 
         // What is the status of the invite?
         $status = $invitationmanager->get_invite_status($invite);
@@ -168,10 +178,10 @@ if (empty($invites)) {
 
         // If status is active, then state how many days/minutes left.
         if ($status == get_string('status_invite_active', 'enrol_invitation')) {
-            $expires_text = sprintf('%s %s',
+            $expirestext = sprintf('%s %s',
                     get_string('historyexpires_in', 'enrol_invitation'),
                     distance_of_time_in_words(time(), $invite->timeexpiration, true));
-            $row[4] .= ' ' . html_writer::tag('span', '(' . $expires_text . ')', array('expires-text'));
+            $row[4] .= ' ' . html_writer::tag('span', '(' . $expirestext . ')', array('expires-text'));
         }
 
         // Are there any actions user can do?
