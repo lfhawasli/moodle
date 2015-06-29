@@ -88,3 +88,9 @@
 [submodule "mod/scheduler"]
 	path = mod/scheduler
 	url = https://github.com/bostelm/moodle-mod_scheduler.git
+[submodule "lib/editor/atto/plugins/fontfamily"]
+	path = lib/editor/atto/plugins/fontfamily
+	url = git@github.com:projectestac/moodle-atto_fontfamily.git
+[submodule "local/recyclebin"]
+	path = local/recyclebin
+	url = https://github.com/unikent/moodle-local_recyclebin

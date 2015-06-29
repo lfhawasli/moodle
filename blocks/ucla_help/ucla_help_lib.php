@@ -1,4 +1,19 @@
 <?php
+// This file is part of the UCLA Help plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Collection of classes/functions used across multiple scripts for the UCLA 
  * Help and Feedback block.
@@ -26,14 +41,14 @@ require_once($CFG->dirroot . '/lib/validateurlsyntax.php');
  */
 class admin_setting_ucla_help_support_contact extends admin_setting {
     private $manager;
-    
+
     /**
      * Calls parent::__construct with specific args
      */
     public function __construct() {
         global $CFG;
-        $this->manager = get_support_contacts_manager();            
-        parent::__construct('block_ucla_help/support_contacts', 
+        $this->manager = get_support_contacts_manager();
+        parent::__construct('block_ucla_help/support_contacts',
                 get_string('settings_support_contacts', 'block_ucla_help'), '', '');
     }
 
@@ -44,7 +59,7 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
      */
     public function get_setting() {
         $config = $this->manager->get_support_contacts();
-        
+
         return $this->prepare_form_data($config);
     }
 
@@ -57,12 +72,12 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
      * @return bool
      */
     public function write_setting($data) {
-        
-        $support_contacts = $this->process_form_data($data);        
+
+        $support_contacts = $this->process_form_data($data);
         if ($support_contacts === false) {
             return false;
         }
-        
+
         if ($this->config_write($this->name, $this->manager->encode_stored_config($support_contacts))) {
             return ''; // success
         } else {
@@ -91,27 +106,27 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
          *     [context2] => 
          *     [support_contact2] => 
          * )
-         */        
+         */
         $t = new html_table();
         $t->attributes = array('class' => 'generaltable');
-        $t->head = array('', get_string('settings_support_contacts_table_context', 'block_ucla_help'), 
+        $t->head = array('', get_string('settings_support_contacts_table_context', 'block_ucla_help'),
                 get_string('settings_support_contacts_table_contact', 'block_ucla_help'), '');
 
-        $i = 0; $row_num = 1; $cur_context = ''; $row = array();       
-        foreach((array) $data as $field => $value) {
+        $i = 0; $row_num = 1; $cur_context = ''; $row = array();
+        foreach ((array) $data as $field => $value) {
 
             // first cell is row number
-            if ($i == 0) {  
+            if ($i == 0) {
                 $row = new html_table_row();
                 $cell = new html_table_cell();
                 $cell->text = sprintf('%d.', $row_num);
                 $row->cells[] = $cell;
                 $row_num++;
-                
+
                 // save context for later on
                 $cur_context = $value;
             }
-            
+
             $cell = new html_table_cell();
             $cell->text = html_writer::empty_tag('input',
                     array(
@@ -120,24 +135,24 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
                         'name'  => $this->get_full_name().'['.$field.']',
                         'value' => $value,
                     ));
-            $row->cells[] = $cell;            
-            
+            $row->cells[] = $cell;
+
             if ($i == 1) {
                 // on last element, so end row
                 $cell = new html_table_cell();
-                
+
                 // if context ws defined in config file, then give warning that
                 // user cannot change setting
                 if (!empty($block_ucla_help_support_contacts[$cur_context])) {
                     $cell->text = html_writer::tag('div', 'Defined in config.php', array('class' => 'form-overridden'));
-                }                             
-                $row->cells[] = $cell; 
+                }
+                $row->cells[] = $cell;
                 $t->data[] = $row;
 
                 $i = 0;
             } else {
                 $i++;
-            }            
+            }
         }
 
         return format_admin_setting($this, $this->visiblename, html_writer::table($t), $this->description, false, '', NULL, $query);
@@ -153,7 +168,7 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
      * @return array of form fields and their values
      */
     protected function prepare_form_data(array $support_contacts) {
-        
+
         $form = array();
         $i = 0;
         foreach ((array) $support_contacts as $context => $support_contact) {
@@ -178,11 +193,11 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
      */
     protected function process_form_data($form) {
         $NUM_FORM_ELEMENTS = 2;
-        
+
         if (!is_array($form)) {
             return false;
         }
-        
+
         $count = count($form); // number of form field values
         if ($count % $NUM_FORM_ELEMENTS) {
             // we must get two fields per support_contact
@@ -190,7 +205,7 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
         }
 
         $support_contacts = array();
-        $count = $count / $NUM_FORM_ELEMENTS;        
+        $count = $count / $NUM_FORM_ELEMENTS;
         for ($i = 0; $i < $count; $i++) {
             $context         = clean_param(trim($form['context'.$i]), PARAM_NOTAGS);
             $support_contact = clean_param(trim($form['support_contact'.$i]), PARAM_NOTAGS);
@@ -198,7 +213,7 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
             // make sure that entries exists
             if (!empty($context) && !empty($support_contact)) {
                 $support_contacts[$context] = $support_contact;
-            }            
+            }
         }
         return $support_contacts;
     }
@@ -234,13 +249,13 @@ class support_contacts_manager {
      */
     public function get_support_contacts() {
         global $block_ucla_help_support_contacts, $CFG;
-        
+
         $support_contacts = get_config('block_ucla_help', 'support_contacts');
         $support_contacts = $this->decode_stored_config((string) $support_contacts);
 
         // now merge with values from config file to overwrite user set ones
-        $support_contacts = array_merge((array) $support_contacts, 
-                (array) $block_ucla_help_support_contacts);   
+        $support_contacts = array_merge((array) $support_contacts,
+                (array) $block_ucla_help_support_contacts);
 
         // If there is no one listed at 'System' context, then try to guess it.
         if (!isset($support_contacts['System'])) {
@@ -288,10 +303,10 @@ function create_description(&$fromform) {
     // Set the maximum number of characters.
     $summarylength = 40;
     // Get the body of the message.
-    $headersummary = stripslashes($fromform->ucla_help_description); 
+    $headersummary = stripslashes($fromform->ucla_help_description);
     // Remove unnecessary spaces.
     $headersummary = preg_replace('!\s+!', ' ', $headersummary);
-    
+
     // Limit the summary into 40 characters and stop at the last complete word.
     // Source: http://stackoverflow.com/questions/79960/how-to-truncate-a-string-in-php-to-the-word-closest-to-a-certain-number-of-chara
     $parts = preg_split('/([\s\n\r]+)/', $headersummary, null, PREG_SPLIT_DELIM_CAPTURE);
@@ -299,13 +314,13 @@ function create_description(&$fromform) {
     $length = 0;
     $lastpart = 0;
     for (; $lastpart < $partscount; ++$lastpart) {
-      $length += strlen($parts[$lastpart]);
-      if ($length > $summarylength) { 
-          break; 
-      }
+        $length += strlen($parts[$lastpart]);
+        if ($length > $summarylength) {
+            break;
+        }
     }
     $headersummary = implode(array_slice($parts, 0, $lastpart));
-    
+
     return trim($headersummary);
 }
 
@@ -316,8 +331,7 @@ function create_description(&$fromform) {
  * 
  * @return string           Returns 
  */
-function create_help_message(&$fromform)
-{
+function create_help_message(&$fromform) {
     global $CFG, $SESSION, $USER;
 
     // Some fields do not make sense for non-logged in users.
@@ -373,7 +387,7 @@ function create_help_message(&$fromform)
     $body .= "IP: " . $_SERVER['REMOTE_ADDR'] . "\n";
 
     $body .= "\n*Recent activity*\n";
-    
+
     // Get logging records. If the user is logged in as a guest (user ID 1), or
     // is not logged in (user ID 0), then use their IP address to get records.
     $logmanager = get_log_manager();
@@ -418,6 +432,7 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
     global $CFG, $DB, $USER;
 
     $result = false;
+    // Comment out to test JIRA.
     if (!empty($CFG->noemailever)) {
         // We don't want any messages sent.
         return true;
@@ -429,7 +444,7 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
     }
 
     // Now, is the support contact an email address?
-    if (validateEmailSyntax($supportcontact)) {        
+    if (validateEmailSyntax($supportcontact)) {
         // Create the user to send the email to.
         $touser = new stdClass();
         $touser->email = $supportcontact;
@@ -479,34 +494,14 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
             )
         );
 
-        $jiraendpoint = get_config('block_ucla_help', 'jira_endpoint');
-
-        // Try to create the issue.
-        $jiraresult = send_jira_request($jiraendpoint, true,
-                array('Content-type: application/json'), json_encode($params));
-        $result = false;
-        $decodedresult = json_decode($jiraresult, true);
-        if (!empty($decodedresult)) {
-            // Issue is successfully created only when the issue key is
-            // returned. Otherwise, error.
-            if (!empty($decodedresult['key'])) {
-                $issueid = $decodedresult['key'];
-                $result = true;
-            }
-        }
-
-        // If there is an attachment, then attach it to the newly created issue.
-        if ($result != false && $attachmentfile != null) {
-            $url = $jiraendpoint . "/$issueid/attachments";
-            $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
-            $data = array('file'=>"@{$attachmentfile};filename={$attachmentname}");
-            $jiraresult = send_jira_request($url, true, $headers, $data);
-            if ($jiraresult === false) {
-                $result = false;
-            } else {
-                $result = true;
-            }
-        }
+        // Add support request as an adhoc task. Adhoc tasks are retried until successful.
+        $task = new block_ucla_help_try_support_request();
+        $task->set_custom_data(array(
+            'params'            => $params,
+            'attachmentfile'    => $attachmentfile,
+            'attachmentname'    => $attachmentname
+        ));
+        $result = \core\task\manager::queue_adhoc_task($task);
     } else {
         // No $supportcontact specified, so return false.
         return $result;
@@ -542,7 +537,7 @@ function get_support_contact($curcontext) {
     foreach ((array) $contextids as $contextid) {
         $context = context::instance_by_id($contextid);
         $contextname = $context->get_context_name(false, true);
-        
+
         // see if context matches something in support_contacts list
         if (!empty($supportcontacts[$contextname])) {
             $retval = $supportcontacts[$contextname];
@@ -583,6 +578,8 @@ function send_jira_request($url, $post = false, $headers, $data) {
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($curl, CURLOPT_HEADER, false);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    // JIRA's API can return responses but with an error code, which we would want to indicate failure.
+    curl_setopt($curl, CURLOPT_FAILONERROR, true);
 
     if ($post) {
         curl_setopt($curl, CURLOPT_POST, true);
@@ -590,7 +587,7 @@ function send_jira_request($url, $post = false, $headers, $data) {
     }
 
     $result = curl_exec($curl);
-    curl_close($curl); 
+    curl_close($curl);
 
     return $result;
 }
@@ -617,7 +614,7 @@ function print_ascii_table($events, $isloggedin) {
         $eventinfo = array();
         $eventinfo['–'] = ++$count;
         $eventinfo['Time'] = date('D, M d Y G:H:s A', $event->timecreated);
-        if (!$isloggedin) {            
+        if (!$isloggedin) {
             // Get the user's fullname.
             if (!array_key_exists($event->userid, $usernames)) {
                 $user = $DB->get_record('user', array('id' => $event->userid));

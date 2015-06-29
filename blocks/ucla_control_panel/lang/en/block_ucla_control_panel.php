@@ -33,6 +33,9 @@ $string['email_students_exception_post'] = 'There was a problem detecting your a
 $string['email_students_hidden_pre'] = 'Email students is disabled when the Announcements forum is hidden.';
 $string['email_students_hidden'] = 'Make Announcements forum visible';
 
+$string['invitation'] = 'Invite users';
+$string['invitation_post'] = 'Invite a user into your site by email.';
+
 $string['modify_sections'] = 'Modify course menu sections';
 $string['modify_sections_post'] = '';
 
@@ -72,9 +75,6 @@ $string['view_roster_post'] = 'Lists most recent logins of all students, TAs, an
 
 $string['edit_profile'] = 'Edit user profile';
 $string['edit_profile_post'] = 'You can change your personal information, upload a picture, turn your email on or off, etc.';
-
-$string['invitation'] = 'Invite users';
-$string['invitation_post'] = 'Invite a user into your site by email.';
 
 $string['manage_syllabus'] = 'Manage syllabus';
 $string['manage_syllabus_post'] = 'View and edit your course syllabus.';
@@ -116,6 +116,9 @@ $string['course_edit_post'] = 'Edit the full name and description of the course 
 
 $string['reports'] = 'Reports';
 $string['reports_post'] = 'View course logs to see student activity.';
+
+$string['editdates'] = 'Dates';
+$string['editdates_post'] = "Edit the dates for this course's activities.";
 
 $string['groups'] = 'Groups';
 $string['groups_post'] = 'Set up and manage course groups. These provide separate work areas for groups of students in Forums, Wikis and other tools.';

@@ -69,7 +69,7 @@ class file_deleted extends \core\event\base {
      * @return moodle_url
      */
     public function get_url() {
-        return new \moodle_url('course/view.php', array('id' => $this->courseid));
+        return new \moodle_url('/course/view.php', array('id' => $this->courseid));
     }
 
     /**
