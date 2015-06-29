@@ -34,6 +34,13 @@ if (ucla_cp_module::load('email_students')) {
     $modules[] = new ucla_cp_module_email_students($course);
 }
 
+// Site invitation
+if (enrol_invitationenrol_available($course->id)) {
+    $modules[] = new ucla_cp_module('invitation', new moodle_url(
+                            $CFG->wwwroot . '/enrol/invitation/invitation.php', array('courseid' => $course->id)),
+                    $temptag, 'enrol/invitation:enrol');
+}
+
 // For editing, it is a special UI case
 $spec_ops = array('pre' => false, 'post' => true);
 
@@ -160,13 +167,6 @@ $modules[] = new ucla_cp_module('import_moodle', new moodle_url($CFG->wwwroot .
 $modules[] = new ucla_cp_module('view_roster', new moodle_url(
                         $CFG->wwwroot . '/user/index.php', array('id' => $course->id)),
                 $temptag, 'moodle/course:viewparticipants');
-
-// Site invitation
-if (enrol_invitationenrol_available($course->id)) {
-    $modules[] = new ucla_cp_module('invitation', new moodle_url(
-                            $CFG->wwwroot . '/enrol/invitation/invitation.php', array('courseid' => $course->id)),
-                    $temptag, 'enrol/invitation:enrol');
-}
 
 // Syllabus tool
 $syllabus_manager = new ucla_syllabus_manager($course);
