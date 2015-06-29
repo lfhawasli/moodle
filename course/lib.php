@@ -1660,6 +1660,11 @@ function course_delete_module($cmid) {
         return true;
     }
 
+    // START UCLA MOD: CCLE-5227 - Safer delete for course modules (aka Recycle Bin)
+    // adding recyclebin pre-delete functionality
+    \local_recyclebin\Observer::pre_cm_delete($cm);
+    // END UCLA MOD: CCLE-5227
+
     // Get the module context.
     $modcontext = context_module::instance($cm->id);
 
