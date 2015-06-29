@@ -63,11 +63,11 @@ class ucla_help_lib_testcase extends advanced_testcase {
         $this->assertNull($task);
 
         // Call function that will send a JIRA request to create an issue.
-        message_support_contact('support', null, null, $this->requestdata['subj'], $this->requestdata['body'], 
+        message_support_contact('support', null, null, $this->requestdata['subj'], $this->requestdata['body'],
                 $this->requestdata['file'], $this->requestdata['name']);
         $task = \core\task\manager::get_next_adhoc_task(time());
         $this->assertNotNull($task);
-        $this->assertEquals('try_support_request', get_class($task));
+        $this->assertEquals('block_ucla_help_try_support_request', get_class($task));
         // Important to call this to release the cron lock.
         \core\task\manager::adhoc_task_complete($task);
 
