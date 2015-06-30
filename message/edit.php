@@ -108,6 +108,13 @@ if (($form = data_submitted()) && confirm_sesskey()) {
                 if (empty($linepref)) {
                     $linepref = 'none';
                 }
+                // START UCLA MOD: CCLE-5181-Users are unable to unsubscribe from Announcement forums through user Profile settings.
+                // When the checkboxes were removed, and the user clicked "Update profile", it thinks the $linepref is empty and sets it to 'none'
+                // This is necessary to keep the user receiving email notifications even after they press "Update profile". 
+                if ($provider->name=='posts') {
+                    $linepref = 'email';
+                }
+                // END UCLA MOD: CCLE-5181
                 $preferences['message_provider_'.$provider->component.'_'.$provider->name.'_'.$state] = $linepref;
             }
         }
