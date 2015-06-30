@@ -98,7 +98,6 @@ $CFG->forced_plugin_settings['block_ucla_browseby']['allow_acttypes'] = 'CLI,LEC
 
 // Course Requestor
 //$CFG->forced_plugin_settings['tool_uclacourserequestor']['terms'] = $terms_to_built;
-//$CFG->forced_plugin_settings['tool_uclacourserequestor']['selected_term'] = $CFG->currentterm;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['mailinst_default'] = false; 
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_default'] = true;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_hide'] = true;

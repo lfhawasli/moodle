@@ -24,11 +24,8 @@ if (!has_capability('tool/uclacourserequestor:edit', $syscontext)) {
     print_error('accessdenied', 'admin');
 }
 
-$selterm = optional_param('term', false, PARAM_ALPHANUM);
-$selected_term = $selterm ? $selterm : get_config($rucr, 'selected_term');
-if (!$selected_term) {
-    $selected_term = $CFG->currentterm;
-}
+// Find whatever term we want to view and pass it to all the forms.
+$selectedterm = get_term();
 
 $thisfile = $thisdir . 'index.php';
 
@@ -52,7 +49,8 @@ $PAGE->requires->js_init_call('M.tool_uclacourserequestor.init');
 // Prepare and load Moodle Admin interface
 admin_externalpage_setup('uclacourserequestor');
 
-$subjareas = $DB->get_records('ucla_reg_subjectarea', null, 'subjarea');
+$subjareas = registrar_query::run_registrar_query('cis_subjectareagetall',
+        array('term' => $selectedterm));
 
 $prefieldsdata = get_requestor_view_fields();
 
@@ -65,13 +63,13 @@ $top_forms = array(
 $terms = $prefieldsdata['term'] + get_active_terms();
 $terms = terms_arr_sort($terms, true);
 if (empty($terms)) {
-    $terms[$selected_term] = $selected_term;
+    $terms[$selectedterm] = $selectedterm;
 }
 
 // This will be passed to each form
 $nv_cd = array(
     'subjareas' => $subjareas,
-    'selterm' => $selected_term,
+    'selterm' => $selectedterm,
     'terms' => $terms,
     'prefields' => $prefieldsdata
 );
@@ -143,7 +141,7 @@ if ($getsrs && $requests === null) {
     $termsrsobj = new object();
     $termsrsobj->{$termsrsform->groupname} = array(
             'srs' => $getsrs,
-            'term' => $selterm
+            'term' => $selectedterm
         );
 
     $requests = $termsrsform->respond($termsrsobj);
@@ -694,4 +692,32 @@ echo $OUTPUT->footer();
  */
 function course_build_queued() {
     return events_pending_count('build_courses_now');
+}
+
+/**
+ * Returns the selected term.
+ *
+ * First looks for the term in the url. Then checks if term was passed as part
+ * of a request.
+ *
+ * @return string
+ */
+function get_term() {
+    global $CFG;
+
+    $selectedterm = optional_param('term', false, PARAM_ALPHANUM);
+    if (empty($selectedterm)) {
+        // If not passed via GET parameter, maybe via POST as requestgroup.
+        $requestgroup = optional_param_array('requestgroup', array(), PARAM_TEXT);
+        if (!empty($requestgroup) && isset($requestgroup['term'])) {
+            $selectedterm = $requestgroup['term'];
+        }
+    }
+
+    // If still empty, default to current term.
+    if (empty($selectedterm)) {
+        $selectedterm = $CFG->currentterm;
+    }
+
+    return $selectedterm;
 }

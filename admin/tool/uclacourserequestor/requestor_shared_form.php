@@ -13,6 +13,9 @@ class requestor_shared_form extends moodleform {
     /** The name of the group in the quickform **/
     var $groupname = 'requestgroup';
 
+    /** Attributes to prevent JavaScript refresh warning. **/
+    var $attributes = 'onChange="M.core_formchangechecker.set_form_submitted(); this.form.submit()"';
+
     function definition() {
         $mform =& $this->_form;
 
@@ -26,7 +29,7 @@ class requestor_shared_form extends moodleform {
        
         if (!$this->noterm) {
             $requestline[] =& $mform->createElement('select', 'term', null,
-                $terms);
+                $terms, $this->attributes);
         }
 
         $specline = $this->specification();

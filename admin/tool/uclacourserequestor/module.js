@@ -72,5 +72,32 @@ M.tool_uclacourserequestor = {
             }
         });
 
+        // Refresh the page on changing selected term.
+        //
+        // We do this by adding a "term=" query string param to the URL, and
+        // then refreshing the page.
+        //
+        Y.all('#id_requestgroup_term').on('change', function (e) {
+            var index = e.target.get('selectedIndex');
+            var term = e.target.get('options').item(index).getAttribute('value');
+            var url = window.location.href;
+            
+            // Check to see if the URL has the '?' necessary
+            // to include params. If so, we append a '?' and parse
+            // the URL appropriately.
+            if (url.indexOf('?') > -1) {
+                // Check to see if term param exists already or not. Then
+                // parse the URL appropriately.
+                if (url.indexOf("term=") > -1) {
+                    var indexTerm = url.indexOf("term=") + 5;
+                    url = url.substr(0, indexTerm) + term + url.substr(indexTerm + 3);
+                } else {
+                    url += "&term=" + term;
+                }
+            } else {
+                url += "?term=" + term;
+            }
+            window.location = url;
+        });
     }
 };
