@@ -53,4 +53,27 @@ class observers {
             }
         }
     }
+
+    /**
+     * Role assigned.
+     * 
+     * Called by Events API when a new role is assigned. Add user to private public group.
+     * 
+     * @param \core\event\role_assigned $event
+     */
+    public static function role_assigned(\core\event\role_assigned $event) {
+        global $CFG;
+
+        $context = \context::instance_by_id($event->contextid);
+        $userid = $event->relateduserid;
+
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
+            $pubprivcourse = \PublicPrivate_Course::build($context->instanceid);
+
+            if ($pubprivcourse->is_activated()) {
+                $pubprivcourse->add_user($userid);
+            }
+        }
+    }
 }

@@ -1675,7 +1675,7 @@ function get_roles_with_capability($capability, $permission = null, $context = n
  * @return int new/existing id of the assignment
  */
 function role_assign($roleid, $userid, $contextid, $component = '', $itemid = 0, $timemodified = '') {
-    global $USER, $DB, $CFG;
+    global $USER, $DB;
 
     // first of all detect if somebody is using old style parameters
     if ($contextid === 0 or is_numeric($component)) {
@@ -1731,26 +1731,6 @@ function role_assign($roleid, $userid, $contextid, $component = '', $itemid = 0,
             $ra = reset($ras);
         }
 
-        /*
-         * For an existing role assignment (buggy behaior but this function accounts
-         * for it), add the user to the public/private group if not already in the
-         * public/private group from this role assignment or another role
-         * assignment.
-         *
-         * @author ebollens
-         * @version 20110719
-         */
-
-        if($context->contextlevel == CONTEXT_COURSE) {
-            require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
-
-            $pubpriv_course = new PublicPrivate_Course($context->instanceid);
-
-            if($pubpriv_course->is_activated()) {
-                $pubpriv_course->add_user($userid);
-            }
-        }
-        
         // actually there is no need to update, reset anything or trigger any event, so just return
         return $ra->id;
     }
@@ -1768,24 +1748,6 @@ function role_assign($roleid, $userid, $contextid, $component = '', $itemid = 0,
 
     $ra->id = $DB->insert_record('role_assignments', $ra);
 
-    /*
-     * For a new role assignment, add the user to the public/private group if
-     * not already in the public/private group from another role assignment.
-     *
-     * @author ebollens
-     * @version 20110719
-     */
-
-    if($context->contextlevel == CONTEXT_COURSE) {
-        require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
-
-        $pubpriv_course = new PublicPrivate_Course($context->instanceid);
-
-        if($pubpriv_course->is_activated()) {
-            $pubpriv_course->add_user($userid);
-        }
-    }
-    
     // mark context as dirty - again expensive, but needed
     $context->mark_dirty();
 

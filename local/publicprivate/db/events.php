@@ -57,5 +57,9 @@ $observers = array(
     array(
         'eventname' => '\block_ucla_group_manager\event\section_groups_synced',
         'callback'  => '\local_publicprivate\observers::section_groups_synced'
+    ),
+    array(
+        'eventname' => '\core\event\role_assigned',
+        'callback'  => '\local_publicprivate\observers::role_assigned'
     )
 );
