@@ -100,15 +100,14 @@ $string['message_help'] =
     '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE."<br /><br />' .
     'If you think you already have a UCLA Logon ID, but cannot remember it, look it up here: ' .
     'https://logon-asm1.logon.ucla.edu/userlookup.php<br /><br />' .
-    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--Select the option “<strong>I do not have a UCLA Identification Number</strong>”<br /><br />' .
+    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--Select the option <strong>"I do not have a UCLA Identification Number"</strong><br /><br />' .
     '<strong>CONTACT INFORMATION:</strong>'.
     '<hr />'.
     'If you believe that you have received this message in error or are in need ' .
     'of assistance, please contact: [senior scholar support email].';
 
-
-$string['emailmsgtxt'] =
-    '<STRONG>CLASS WEBSITE INSTRUCTIONS:</STRONG>' . "<br />" .
+$string['emailmsghtml'] =
+    '<strong>CLASS WEBSITE INSTRUCTIONS:</strong>' . "<br />" .
     '------------------------------------------------------------' . "<br /><br />" .
     'You have been invited to access the class web site: {$a->fullname}. ' .
     'After clicking the ACCESS LINK below, you will need to log in ' .
@@ -120,10 +119,10 @@ $string['emailmsgtxt'] =
     ' --you are the person to whom this email was addressed and for whom this ' .
     '   invitation is intended;' . "<br />" .
     ' --the link below can be used only one time, and will expire on ({$a->expiration}).' . "<br /><br />" .
-    '<STRONG>ACCESS LINK:</STRONG>' . "<br />" .
+    '<strong>ACCESS LINK:</strong>' . "<br />" .
     '------------------------------------------------------------' . "<br />" .
     '{$a->inviteurl}' . "<br /><br />" .
-    '<STRONG>UCLA LOGON:</STRONG>' . "<br />" .
+    '<strong>UCLA LOGON:</strong>' . "<br />" .
     '------------------------------------------------------------' . "<br />" .
     'If you currently do not have a UCLA Logon ID, you can obtain one here:' . "<br />" .
     'https://logon.ucla.edu/activate.php' . "<br />" .
@@ -134,16 +133,54 @@ $string['emailmsgtxt'] =
     'If you think you already have a UCLA Logon ID, but cannot remember it, look it up here: ' .
     'https://logon-asm1.logon.ucla.edu/userlookup.php' . "<br /><br />" .
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' .
-    '--Select the option “<STRONG>I do not have a UCLA Identification Number</STRONG>”' . "<br /><br />" .
-    '<STRONG>CONTACT INFORMATION:</STRONG>' . "<br />" .
+    '--Select the option <strong>"I do not have a UCLA Identification Number"</strong>' . "<br /><br />" .
+    '<strong>CONTACT INFORMATION:</strong>' . "<br />" .
     '------------------------------------------------------------' . "<br />" .
     'If you believe that you have received this message in error or are in need ' .
     'of assistance, please contact: {$a->seniorscholarsupportemail}.';
 
-$string['administratormsg'] =
+$string['administratormsghtml'] =
     'MESSAGE FROM PROGRAM ADMINISTATOR:' . "<br />" .
     '------------------------------------------------------------' . "<br />" .
     '{$a}' . "<br /><br />";
+
+$string['emailmsgtxt'] =
+    'CLASS WEBSITE INSTRUCTIONS:' . "\n" .
+    '------------------------------------------------------------' . "\n\n" .
+    'You have been invited to access the class web site: {$a->fullname}. ' .
+    'After clicking the ACCESS LINK below, you will need to log in ' .
+    'using your UCLA logon ID and password, to confirm your access ' .
+    'to the site. If you do not have a UCLA logon ID, please follow ' .
+    'the UCLALOGON instructions below to create one.' . "\n\n" .
+    'Be advised that by clicking on the site access link provided in this ' .
+    'email you are acknowledging that:' . "\n" .
+    ' --you are the person to whom this email was addressed and for whom this ' .
+    '   invitation is intended;' . "\n" .
+    ' --the link below can be used only one time, and will expire on ({$a->expiration}).' . "\n\n" .
+    'ACCESS LINK:' . "\n" .
+    '------------------------------------------------------------' . "\n" .
+    '{$a->inviteurl}' . "\n\n" .
+    'UCLA LOGON:' . "\n" .
+    '------------------------------------------------------------' . "\n" .
+    'If you currently do not have a UCLA Logon ID, you can obtain one here:' . "\n" .
+    'https://logon.ucla.edu/activate.php' . "\n" .
+    'You do not need to be an enrolled student at UCLA or have a 9 digit UID ' .
+    'to create a UCLA Logon. When you are asked to identify your role in ' .
+    'the UCLA system, select the following option:' . "\n" .
+    '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE."' . "\n\n" .
+    'If you think you already have a UCLA Logon ID, but cannot remember it, look it up here: ' .
+    'https://logon-asm1.logon.ucla.edu/userlookup.php' . "\n\n" .
+    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' .
+    '--Select the option "I do not have a UCLA Identification Number"' . "\n\n" .
+    'CONTACT INFORMATION:' . "\n" .
+    '------------------------------------------------------------' . "\n" .
+    'If you believe that you have received this message in error or are in need ' .
+    'of assistance, please contact: {$a->seniorscholarsupportemail}.';
+
+$string['administratormsgtxt'] =
+    'MESSAGE FROM PROGRAM ADMINISTATOR:' . "\n" .
+    '------------------------------------------------------------' . "\n" .
+    '{$a}' . "\n\n";
 
 $string['inviteusers'] = 'Invite users';
 $string['show_from_email'] = 'Allow invited user to contact me at {$a->seniorscholarsupportemail} (your address will be on the "FROM" field. If not selected, the "FROM" field will be {$a->seniorscholarsupportemail})';

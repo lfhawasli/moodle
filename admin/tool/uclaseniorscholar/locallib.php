@@ -121,9 +121,12 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 $invitation->show_from_email = empty($data->show_from_email) ? 0 : 1;
 
                 // Construct message: custom (if any) + template.
-                $message = '';
+                $messagehtml = '';
+                $messagetxt = '';
                 if (!empty($data->message)) {
-                    $message .= get_string('administratormsg', 'tool_uclaseniorscholar',
+                    $messagehtml .= get_string('administratormsghtml', 'tool_uclaseniorscholar',
+                            $data->message);
+                    $messagetxt .= get_string('administratormsgtxt', 'tool_uclaseniorscholar',
                             $data->message);
                     $invitation->message = $data->message;
                 }
@@ -144,7 +147,8 @@ class seniorscholar_invitation_manager extends invitation_manager {
 
                 $messageparams->inviteurl = $inviteurl;
                 $messageparams->seniorscholarsupportemail = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
-                $message .= get_string('emailmsgtxt', 'tool_uclaseniorscholar', $messageparams);
+                $messagehtml.= get_string('emailmsghtml', 'tool_uclaseniorscholar', $messageparams);
+                $messagetxt .= get_string('emailmsgtxt', 'tool_uclaseniorscholar', $messageparams);
 
                 if (!$resend) {
                     $objid = $DB->insert_record('enrol_invitation', $invitation);
@@ -182,7 +186,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 $contactuser->middlename = '';
                 $contactuser->mailformat = 1;
 
-                email_to_user($contactuser, $fromuser, $invitation->subject, '', $message);
+                email_to_user($contactuser, $fromuser, $invitation->subject, $messagetxt, $messagehtml);
 
                 // Log activity after sending the email.
                 if ($resend) {
