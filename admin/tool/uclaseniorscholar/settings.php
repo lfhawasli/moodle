@@ -26,21 +26,23 @@ require_once(dirname(__FILE__) . '/lib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-$settings = new admin_settingpage('tool_uclaseniorscholar_settings',
-get_string('pluginname_desc', 'tool_uclaseniorscholar'));
+if ($hassiteconfig) {
+    $settings = new admin_settingpage('tool_uclaseniorscholar_settings',
+    get_string('pluginname_desc', 'tool_uclaseniorscholar'));
 
-// Setting for senior scholar administrator UID.
-$settings->add(new admin_setting_configtext('tool_uclaseniorscholar/seniorscholaradministrator',
-               get_string('seniorscholaradministratoraccount', 'tool_uclaseniorscholar'),
-               get_string('seniorscholaradministratoraccount_instruction', 'tool_uclaseniorscholar'), '', PARAM_NOTAGS));
+    // Setting for senior scholar administrator UID.
+    $settings->add(new admin_setting_configtext('tool_uclaseniorscholar/seniorscholaradministrator',
+                   get_string('seniorscholaradministratoraccount', 'tool_uclaseniorscholar'),
+                   get_string('seniorscholaradministratoraccount_instruction', 'tool_uclaseniorscholar'), '', PARAM_NOTAGS));
 
-// Setting for senior scholar support email.
-$settings->add(new admin_setting_configtext('tool_uclaseniorscholar/seniorscholarsupportemail',
-               get_string('seniorscholarsupportemail', 'tool_uclaseniorscholar'),
-               get_string('seniorscholarsupportemail_instruction', 'tool_uclaseniorscholar'), '', PARAM_NOTAGS));
+    // Setting for senior scholar support email.
+    $settings->add(new admin_setting_configtext('tool_uclaseniorscholar/seniorscholarsupportemail',
+                   get_string('seniorscholarsupportemail', 'tool_uclaseniorscholar'),
+                   get_string('seniorscholarsupportemail_instruction', 'tool_uclaseniorscholar'), '', PARAM_NOTAGS));
+    $ADMIN->add('tools', $settings);
+}
 
 if (seniorscholar_has_access($USER)) {
-    $ADMIN->add('tools', $settings);
     $ADMIN->add('accounts', new admin_externalpage(
             'uclaseniorscholar',
             get_string('pluginname', 'tool_uclaseniorscholar'),
