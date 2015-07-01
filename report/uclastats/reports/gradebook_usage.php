@@ -19,7 +19,10 @@ class gradebook_usage extends uclastats_base {
      * @return int
      */
     public function format_cached_results($results) {
-        return $results['SYSTEM']['usedgradebook'];
+        if (!empty($results)) {
+            return $results['SYSTEM']['usedgradebook'];
+        }
+        return get_string('nocachedresults', 'report_uclastats');
     }
 
     /**
@@ -55,6 +58,7 @@ class gradebook_usage extends uclastats_base {
         global $DB;
 
         $sql = "SELECT  DISTINCT c.id,
+                        c.shortname,
                         urci.division " .
                 $this->from_filtered_courses(true)
                 ."
@@ -76,6 +80,7 @@ class gradebook_usage extends uclastats_base {
         global $DB;
 
         $sql = "SELECT  DISTINCT c.id,
+                        c.shortname,
                         urci.division " .
                 $this->from_filtered_courses(true)
                 ."
@@ -99,6 +104,7 @@ class gradebook_usage extends uclastats_base {
         global $DB;
 
         $sql = "SELECT  DISTINCT c.id,
+                        c.shortname,
                         urci.division " .
                 $this->from_filtered_courses(true)
                 ."
@@ -128,6 +134,7 @@ class gradebook_usage extends uclastats_base {
         global $DB;
 
         $results = array();
+        $courselisting = array();
 
         // Make sure that term parameter exists.
         if (!isset($params['term']) ||
@@ -140,7 +147,6 @@ class gradebook_usage extends uclastats_base {
         if (empty($allcourses)) {
             return $results;    // Running on a site with no courses built.
         }
-
         // Get courses that match the following gradebook "usage" scenario.
 
         // Scenario 1: Courses that have graded grade items.
@@ -168,7 +174,6 @@ class gradebook_usage extends uclastats_base {
             if (!isset($results[$course->code])) {
                 $results[$course->code]['division']
                         = ucla_format_name($course->fullname, true);
-
                 $results[$course->code]['gradeditems'] = array();
                 $results[$course->code]['overriddengrades'] = array();
                 $results[$course->code]['exportedgrades'] = array();
@@ -189,6 +194,21 @@ class gradebook_usage extends uclastats_base {
         }
         foreach ($usedcourses as $course) {
             $results[$course->division]['usedgradebook'][] = $course->id;
+
+            // Get data for courselisting.
+            $division = ucla_format_name($allcourses[$course->id]->fullname, true);
+            $courselisting[$course->id] = array('division' => $division,
+                        'shortname' => $course->shortname, 'grades' => 'N',
+                        'overridden' => 'N', 'exported' => 'N');
+            if (in_array($course->id,  $results[$course->division]['gradeditems'])) {
+                    $courselisting[$course->id]['grades'] = 'Y';
+            }
+            if (in_array($course->id,  $results[$course->division]['overriddengrades'])) {
+                    $courselisting[$course->id]['overridden'] = 'Y';
+            }
+            if (in_array($course->id,  $results[$course->division]['exportedgrades'])) {
+                    $courselisting[$course->id]['exported'] = 'Y';
+            }
         }
 
         // Now unique and sum of counts.
@@ -218,6 +238,9 @@ class gradebook_usage extends uclastats_base {
             $numtotalcourse += $result['totalcourses'];
         }
 
+        // Sort courselisting by id.
+        ksort($courselisting);
+
         // Last row should be system totals.
         $results['SYSTEM']['division'] = 'SYSTEM TOTALS';
         $results['SYSTEM']['gradeditems'] = $numgradeditems;
@@ -225,7 +248,60 @@ class gradebook_usage extends uclastats_base {
         $results['SYSTEM']['exportedgrades'] = $numexportedgrades;
         $results['SYSTEM']['usedgradebook'] = $numusedgradebook;
         $results['SYSTEM']['totalcourses'] = $numtotalcourse;
+        $results['courselisting'] = $courselisting;
 
         return $results;
+    }
+
+
+
+    /**
+     * Display two results tables. One, for the inactive courses by division,
+     * and, two, a list of the inactive courses for spot checking.
+     *
+     * @param uclastats_result $uclastatsresult
+     * @return string
+     */
+    protected function get_results_table(uclastats_result $uclastatsresult) {
+        $retval = '';
+
+        $results = $uclastatsresult->results;
+        $courselisting = $results['courselisting'];
+        unset($results['courselisting']);
+
+        // Aggregated results.
+        $resultstable = new html_table();
+        $resultstable->id = 'uclastats-results-table';
+        $resultstable->attributes = array('class' => 'results-table ' .
+            get_class($this));
+
+        $resultstable->head = $uclastatsresult->get_header();
+        $resultstable->data = $results;
+
+        $retval = html_writer::table($resultstable);
+
+        $retval .= html_writer::tag('h3', get_string('gradebook_usage', 'report_uclastats'));
+
+        // Course listing.
+        $listingtable = new html_table();
+        $listingtable->id = 'uclastats-courselisting-table';
+        $listingtable->attributes = array('class' => 'results-table ' .
+            get_class($this));
+
+        $listingtable->head = array(get_string('division', 'report_uclastats'),
+                get_string('course_shortname', 'report_uclastats'),
+                get_string('gradeditems', 'report_uclastats')."&nbsp;&nbsp;&nbsp;&nbsp;",
+                get_string('overriddengrades', 'report_uclastats')."&nbsp;&nbsp;&nbsp;&nbsp;",
+                get_string('exportedgrades', 'report_uclastats'));
+        foreach ($courselisting as $courseid => $course) {
+            $courselisting[$courseid]['shortname'] = html_writer::link(
+                    new moodle_url('/course/view.php',
+                            array('id' => $courseid)), $course['shortname'],
+                    array('target' => '_blank'));
+        }
+        $listingtable->data = $courselisting;
+        $retval .= html_writer::table($listingtable);
+
+        return $retval;
     }
 }
