@@ -76,4 +76,31 @@ class observers {
             }
         }
     }
+    /**
+     * Role unassigned.
+     * 
+     * Called by Events API when an user is unassigned. If all roles of an user are unassigned, 
+     * remove this user from public/private group.
+     * 
+     * @param \core\event\role_unassigned $event
+     */
+    public static function role_unassigned(\core\event\role_unassigned $event) {
+        global $CFG, $DB;
+
+        $userid = $event->relateduserid;
+        $contextid = $event->contextid;
+        $context = \context::instance_by_id($contextid);
+
+        if ($context->contextlevel == CONTEXT_COURSE &&
+            !$DB->record_exists('role_assignments', array('userid' => $userid, 'contextid' => $contextid))) {
+
+            require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
+
+            $pubprivcourse = \PublicPrivate_Course::build($context->instanceid);
+
+            if ($pubprivcourse->is_activated()) {
+                $pubprivcourse->remove_user($userid);
+            }
+        }
+    }
 }

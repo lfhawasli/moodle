@@ -1904,33 +1904,6 @@ function role_unassign_all(array $params, $subcontexts = false, $includemanual =
         $params['component'] = '';
         role_unassign_all($params, $subcontexts, false);
     }
-    
-    /*
-     * If user no longer has any roles in the course, then remove the user's
-     * assignment in the public/private group if the user has one.
-     *
-     * @author ebollens
-     * @version 20110719
-     */
-
-    if(!isset($params['userid']) || !isset($params['contextid'])) {
-        return;
-    }
-
-    if(!isset($context)) {
-        $context = context::instance_by_id($params['contextid']);
-    }
-    
-    if($context->contextlevel == CONTEXT_COURSE && !$DB->record_exists('role_assignments', array('userid'=>$params['userid'], 'contextid'=>$params['contextid']))) {
-
-        require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
-        
-        $pubpriv_course = new PublicPrivate_Course($context->instanceid);
-
-        if($pubpriv_course->is_activated()) {
-            $pubpriv_course->remove_user($params['userid']);
-        }
-    }    
 }
 
 /**
