@@ -116,13 +116,28 @@ abstract class quiz_attempts_report extends quiz_default_report {
             return array($currentgroup, array(), array(), array());
         }
 
+        // START UCLA MOD: CCLE-5205 - Site managers included in quiz results.
+        // Workaround for MDL-27072: Limit users returned from get_users_by_capability to those
+        // belonging to this course's public/private group, which should comprise enrolled users only.
+        $pubprivgroup = '';
+        global $CFG;
+        require_once("{$CFG->dirroot}/local/publicprivate/lib/course.class.php");
+        if (!empty($course) && PublicPrivate_Course::is_publicprivate_capable($course)) {
+            $pubprivcourse = PublicPrivate_Course::build($course);
+            if ($pubprivcourse->is_activated()) {
+                $pubprivgroup = $pubprivcourse->get_group();
+            }
+        }
+
         if (!$students = get_users_by_capability($this->context,
                 array('mod/quiz:reviewmyattempts', 'mod/quiz:attempt'),
-                'u.id, 1', '', '', '', '', '', false)) {
+//                'u.id, 1', '', '', '', '', '', false)) {
+                'u.id, 1', '', '', '', $pubprivgroup, '', false)) {
             $students = array();
         } else {
             $students = array_keys($students);
         }
+        // END UCLA MOD: CCLE-5205.
 
         if (empty($currentgroup)) {
             return array($currentgroup, $students, array(), $students);
