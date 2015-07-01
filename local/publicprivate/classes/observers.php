@@ -55,6 +55,19 @@ class observers {
     }
 
     /**
+     * Triggered via user_enrolment_updated event.
+     *
+     * @param \core\event\user_enrolment_updated $event
+     * @global object $CFG
+     */
+    public static function user_enrolment_updated(\core\event\user_enrolment_updated $event) {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
+        $publicprivate = new \PublicPrivate_Course($event->courseid);
+        $publicprivate->check_enrolments($event->relateduserid);
+    }
+
+    /**
      * Role assigned.
      * 
      * Called by Events API when a new role is assigned. Add user to private public group.
