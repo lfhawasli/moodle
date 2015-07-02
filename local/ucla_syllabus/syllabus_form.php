@@ -91,7 +91,6 @@ class syllabus_form extends moodleform {
                 }
             }
 
-
             if ($this->type == UCLA_SYLLABUS_TYPE_PUBLIC) {
                 $this->display_public_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]);
             } else if ($this->type == UCLA_SYLLABUS_TYPE_PRIVATE) {
@@ -280,7 +279,7 @@ class syllabus_form extends moodleform {
 
                 $url = new moodle_url('/local/ucla_syllabus/index.php', $params);
                 $link = html_writer::link($url, $text, array('class' => 'btn btn-primary'));
-                
+
                 $mform->addElement('html', $link);
             }
         }
@@ -352,13 +351,13 @@ class syllabus_form extends moodleform {
                                 'type' => UCLA_SYLLABUS_TYPE_PUBLIC);
                 $text = '';
                 if ($manualsyllabus = $this->get_manual_syllabus_info()) {
-                    $text = get_string('manualpublicsyllabusadd', 
+                    $text = get_string('manualpublicsyllabusadd',
                             'local_ucla_syllabus', $manualsyllabus);
                     $params['manualsyllabus'] = $manualsyllabus->id;
                 } else {
                     $text = get_string('public_syllabus_add', 'local_ucla_syllabus');
                 }
-                
+
                 $url = new moodle_url('/local/ucla_syllabus/index.php', $params);
                 $link = html_writer::link($url, $text, array('class' => 'btn btn-primary'));
                 $mform->addElement('html', $link);
@@ -405,6 +404,10 @@ class syllabus_form extends moodleform {
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size'=>'50'));
             $mform->setType('syllabus_url', PARAM_URL);
+            // Warning about insecure URL's.
+            $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
+                    . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
+            $mform->addElement('static', 'insecure_url_notice', '', $notice);
         }
 
         // Show access type.
@@ -486,6 +489,10 @@ class syllabus_form extends moodleform {
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size'=>'50'));
             $mform->setType('syllabus_url', PARAM_URL);
+            // Warning about insecure URL's.
+            $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
+                    . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
+            $mform->addElement('static', 'insecure_url_notice', '', $notice);
         }
 
         // Show access type.
@@ -656,7 +663,7 @@ class syllabus_form extends moodleform {
                 $data['syllabus_file'] = $draftitemid;
             }
             $this->set_data($data);
-            
+
             // Want to give a different confirmation message and delete existing
             // module after it is converted.
             $this->_form->addElement('hidden', 'manualsyllabus', $manualsyllabus->id);
