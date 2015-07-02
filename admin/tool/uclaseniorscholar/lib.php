@@ -123,7 +123,7 @@ function seniorscholar_get_courses_by_term($term) {
     global $DB;
     $listofinviters = get_seniorscholar_admin_userid();
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
-            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat
               FROM {course} c
               JOIN
                    (SELECT DISTINCT courseid
@@ -150,7 +150,7 @@ function seniorscholar_get_courses_by_subject_term(&$param) {
     global $DB;
     $list = array();
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
-            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat
               FROM {course} c
               JOIN {ucla_request_classes} rc on c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg on rc.srs = reg.srs and rc.term = reg.term
@@ -176,7 +176,7 @@ function seniorscholar_get_courses_by_instructor_term(&$param) {
     global $DB;
     $list = array();
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) as id, rc.courseid, rc.instructor, rc.hostcourse,
-            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat
               FROM {course} c
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg ON reg.srs = rc.srs and reg.term=rc.term
@@ -197,10 +197,10 @@ function seniorscholar_get_courses_by_instructor_term(&$param) {
 function seniorscholar_get_userinvitehistory_by_term($term) {
     global $DB;
     $output = array();
-    // Get list invitations
+    // Get list invitations.
     $listofinviters = get_seniorscholar_admin_userid();
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS tid, i.*, rc.courseid, rc.instructor, rc.hostcourse,
-            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, i.*
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, i.*
               FROM {course} c
               JOIN {enrol_invitation} i ON i.courseid = c.id
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
@@ -212,7 +212,8 @@ function seniorscholar_get_userinvitehistory_by_term($term) {
     }
     $sql .= " ORDER BY i.email, reg.subj_area, reg.coursenum, reg.sectnum, rc.hostcourse, i.timeexpiration desc";
     $invites = $DB->get_records_sql($sql);
-    // Get list of roles
+
+    // Get list of roles.
     foreach ($invites as $k => $v) {
         if ($v->hostcourse == 1) {
             $output[$v->email][$v->courseid][$v->hostcourse] = $v;

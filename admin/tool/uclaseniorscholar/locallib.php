@@ -147,7 +147,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
 
                 $messageparams->inviteurl = $inviteurl;
                 $messageparams->seniorscholarsupportemail = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
-                $messagehtml.= get_string('emailmsghtml', 'tool_uclaseniorscholar', $messageparams);
+                $messagehtml .= get_string('emailmsghtml', 'tool_uclaseniorscholar', $messageparams);
                 $messagetxt .= get_string('emailmsgtxt', 'tool_uclaseniorscholar', $messageparams);
 
                 if (!$resend) {

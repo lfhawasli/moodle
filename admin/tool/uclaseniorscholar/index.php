@@ -130,12 +130,7 @@ if (empty($mode)) {
                                                'class' => 'button_grp',
                                                'value' => get_string('print_button', 'tool_uclaseniorscholar'),
                                                'type' => 'submit'));
-    // Export to Excel.
-    echo html_writer::empty_tag('input', array('id' => 'history_export_btn',
-                                               'class' => 'button_grp',
-                                               'name' => 'mode',
-                                               'value' => get_string('export_button', 'tool_uclaseniorscholar'),
-                                               'type' => 'submit'));
+
     echo html_writer::empty_tag('input', array('type' => 'hidden',
                                                'id' => 'id_filter',
                                                'name' => 'filter',
@@ -220,8 +215,7 @@ if (empty($list) && $filter != 'instr') {
         $row[0] = $emailcolumn;
         // Loop through the courses this person taken and being invited.
         foreach ($record as $courseid => $courselist) {
-          //  print_object($courselist[1]);
-             $courseoutput = $courselist[1]->subj_area.' '.$courselist[1]->coursenum;
+            $courseoutput = $courselist[1]->subj_area.' '.$courselist[1]->coursenum;
             // Loop cross listed courses.
             $i = 0;
             while (!empty($courselist[0]) && $i <= $maxcrosslistshown) {
@@ -229,6 +223,14 @@ if (empty($list) && $filter != 'instr') {
                 $courseoutput .= ' / ' . $course->subj_area.' '.$course->coursenum;
                 $i++;
             }
+
+            // If the course is cancelled, mark it.
+            if ($courselist[1]->enrolstat == 'X') {
+                $courseoutput .= html_writer::start_span('coursecancelled') . ' (' .
+                                 get_string('coursecanlled', 'tool_uclaseniorscholar') . ')' .
+                                 html_writer::end_span();
+            }
+
             // Course.
             $row[1] = html_writer::link(new moodle_url('/admin/tool/uclaseniorscholar/seniorscholar_history.php',
                                    array('courseid' => $courselist[1]->courseid)), $courseoutput, array('target' => '_blank'));
@@ -310,6 +312,14 @@ if (empty($list) && $filter != 'instr') {
             $courseoutput .= ' / ' . $course->subj_area.' '.$course->coursenum;
             $i++;
         }
+
+         // If the course is cancelled, mark it.
+        if ($courselist[1]->enrolstat == 'X') {
+            $courseoutput .= html_writer::start_span('coursecancelled') . ' (' .
+                             get_string('coursecanlled', 'tool_uclaseniorscholar') . ')' .
+                             html_writer::end_span();
+        }
+
         $row = array();
         $row[0] = $courseoutput;
         $row[1] = $courselist[1]->instructor;

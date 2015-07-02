@@ -30,6 +30,7 @@ $string['seniorscholarsupportemail_instruction'] = 'Enter support email for seni
 $string['pluginname'] = 'UCLA Senior Scholar';
 $string['pluginname_desc'] = 'Manage senior scholars';
 $string['course'] = 'Course';
+$string['coursecanlled'] = 'Cancelled';
 $string['instructor'] = 'Instructor';
 $string['email'] = 'Senior scholar email';
 $string['mainmenu_course'] = 'You can search by term/instructor and term/subject area';
