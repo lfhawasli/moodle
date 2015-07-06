@@ -17,10 +17,10 @@
 /**
  * Internal library of functions for UCLA syllabus.
  *
- * All the core Moodle functions, neeeded to allow the module to work
- * integrated in Moodle should be placed here.
+ * All the core Moodle functions, needed to allow the module to work
+ * integrated in Moodle should be placed in lib.php.
  * All the newmodule specific functions, needed to implement all the module
- * logic, should go to locallib.php. This will help to save some memory when
+ * logic, should go here. This will help to save some memory when
  * Moodle is performing actions across all modules.
  *
  * @package    local_ucla_syllabus
@@ -754,4 +754,14 @@ class ucla_public_syllabus extends ucla_syllabus {
 
         return $retval;
     }
+}
+
+/**
+ * Check if a URL is secure.
+ *
+ * @param string $url
+ * @return boolean
+ */
+function is_secure_url($url) {
+    return strpos($url, 'https://') === 0;
 }

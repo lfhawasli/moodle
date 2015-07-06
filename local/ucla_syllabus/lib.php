@@ -17,7 +17,7 @@
 /**
  * Library of interface functions and constants for UCLA syllabus.
  *
- * All the core Moodle functions, neeeded to allow the module to work
+ * All the core Moodle functions, needed to allow the module to work
  * integrated in Moodle should be placed here.
  * All the UCLA syllabus specific functions, needed to implement all the plugin
  * logic, should go to locallib.php. This will help to save some memory when

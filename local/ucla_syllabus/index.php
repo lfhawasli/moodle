@@ -104,29 +104,61 @@ if ($canmanagesyllabus) {
 }
 
 if (!empty($USER->editing) && $canmanagesyllabus) {
-    // User uploaded/edited a syllabus file, so handle it.
+    // Look for submitted data.
     $data = $syllabusform->get_data();
-    if (!empty($data) && confirm_sesskey()) {
-        $result = $syllabusmanager->save_syllabus($data);
-        if ($result) {
-            // Upload was successful, give success message to user (redirect to
-            // refresh site menu and prevent duplication submission of file).
+    // Check if we stored the data in the session (e.g. after the confirm dialog).
+    if (empty($data) && isset($_SESSION['ucla_syllabus_data'])) {
+        $data = $_SESSION['ucla_syllabus_data'];
+        unset($_SESSION['ucla_syllabus_data']);
+    }
 
-            $url = new moodle_url('/local/ucla_syllabus/index.php',
-                    array('action' => UCLA_SYLLABUS_ACTION_VIEW,
-                          'id' => $course->id));
-            if (isset($data->manualsyllabus)) {
-                // Manual syllabus was converted.
-                $successmessage = get_string('manualsuccessfulconversion', 'local_ucla_syllabus');
-            } else if (isset($data->entryid)) {
-                // Syllabus was updated.
-                $successmessage = get_string('successful_update', 'local_ucla_syllabus');
-            } else {
-                // Syllabus was added.
-                $successmessage = get_string('successful_add', 'local_ucla_syllabus');
+    // User uploaded/edited a syllabus file, so handle it.
+    if (($action == UCLA_SYLLABUS_ACTION_ADD || $action == UCLA_SYLLABUS_ACTION_EDIT)
+            && !empty($data) && confirm_sesskey()) {
+        $viewcourseurl = new moodle_url('/local/ucla_syllabus/index.php', array(
+            'action' => UCLA_SYLLABUS_ACTION_VIEW,
+            'id' => $course->id
+        ));
+        $confirm = optional_param('confirm', 0, PARAM_INT);
+
+        // Present confirmation dialog if: the user has set an insecure URL, and confirm parameter is not set.
+        if (!empty($data->syllabus_url) && !is_secure_url($data->syllabus_url) && !$confirm) {
+            // We have to save the form data in the session so it can be accessed on the next page.
+            $_SESSION['ucla_syllabus_data'] = $data;
+            // To continue saving the insecure URL, just set confirm to 1.
+            $continueurl = new moodle_url('/local/ucla_syllabus/index.php', array(
+                'id' => $course->id,
+                'action' => $action,
+                'confirm' => 1,
+                'sesskey' => sesskey(),
+                'type' => $type
+            ));
+            // If they cancel, go to $viewcourseurl.
+            display_header(get_string('syllabus_manager', 'local_ucla_syllabus'));
+            echo $OUTPUT->confirm(get_string('confirm_insecure_url', 'local_ucla_syllabus', $data->syllabus_url),
+                    $continueurl, $viewcourseurl);
+            echo $OUTPUT->footer();
+            // We are done with output; do not print the syllabus form.
+            die();
+        } else {
+            // Otherwise, they either set a secure URL or confirmed the insecure URL, so save the form.
+            $result = $syllabusmanager->save_syllabus($data);
+            if ($result) {
+                // Upload was successful, give success message to user (redirect to
+                // refresh site menu and prevent duplication submission of file).
+                if (isset($data->manualsyllabus)) {
+                    // Manual syllabus was converted.
+                    $successmessage = get_string('manualsuccessfulconversion', 'local_ucla_syllabus');
+                } else if (isset($data->entryid)) {
+                    // Syllabus was updated.
+                    $successmessage = get_string('successful_update', 'local_ucla_syllabus');
+                } else {
+                    // Syllabus was added.
+                    $successmessage = get_string('successful_add', 'local_ucla_syllabus');
+                }
+
+                flash_redirect($viewcourseurl, $successmessage);
             }
-
-            flash_redirect($url, $successmessage);
         }
     } else if ($action == UCLA_SYLLABUS_ACTION_DELETE) {
         // User wants to delete syllabus.
@@ -206,7 +238,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
 
     $syllabi = $syllabusmanager->get_syllabi();
 
-     $syllabustodisplay = null;
+    $syllabustodisplay = null;
     if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]) &&
             $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view()) {
         // See if logged in user can view private syllabus.
@@ -258,11 +290,14 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         // Add download link.
         $body .= html_writer::tag('div', $downloadlink, array('id' => 'download_link'));
 
-        // Try to embed file using resource functions.
-        if ($mimetype === 'application/pdf') {
-            $body .= resourcelib_embed_pdf($fullurl, $title, $clicktoopen);
-        } else {
-            $body .= resourcelib_embed_general($fullurl, $title, $clicktoopen, $mimetype);
+        // Only embed file if served from https.
+        if (is_secure_url($fullurl)) {
+            // Try to embed file using resource functions.
+            if ($mimetype === 'application/pdf') {
+                $body .= resourcelib_embed_pdf($fullurl, $title, $clicktoopen);
+            } else {
+                $body .= resourcelib_embed_general($fullurl, $title, $clicktoopen, $mimetype);
+            }
         }
 
         // If this is a preview syllabus, give some disclaimer text.
@@ -292,18 +327,18 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         }
         $body .= html_writer::tag('p', $modifiedtext,
                 array('class' => 'syllabus-modified'));
+
+        // Log for statistics later.
+        $event = \local_ucla_syllabus\event\syllabus_viewed::create(array(
+            'objectid' => $syllabustodisplay->id,
+            'context' => $coursecontext
+        ));
+        $event->trigger();
     }
 
     // Now display content.
     display_header($title);
     echo $OUTPUT->container($body, 'ucla_syllabus-container');
-
-    // Log for statistics later.
-    $event = \local_ucla_syllabus\event\syllabus_viewed::create(array(
-        'objectid' => $syllabustodisplay->id,
-        'context' => $coursecontext
-    ));
-    $event->trigger();
 }
 
 echo $OUTPUT->footer();
