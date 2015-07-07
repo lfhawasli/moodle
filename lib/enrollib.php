@@ -1710,6 +1710,11 @@ abstract class enrol_plugin {
         global $DB;
 
         $instance->status = $newstatus;
+
+        // START MOD CCLE-5277 Create clean-up script.
+        $instance->timemodified = time();
+        // END MOD CCLE-5277.
+
         $DB->update_record('enrol', $instance);
 
         // invalidate all enrol caches
