@@ -230,7 +230,7 @@ $string['daysexpire_string'] = 'Expires {$a} days after being accepted.';
 $string['daysexpire_notice'] = 'After accepting this invitation, your access to the site will expire in {$a} days.';
 $string['err_daysexpire'] = 'Invalid choice option for days expiration.';
 
-// Strings to handle event
+// Strings to handle event.
 $string['eventinvitationsent'] = 'Invitation has been sent';
 $string['eventinvitationviewed'] = 'Invitation has been viewed';
 $string['eventinvitationextended'] = 'Invitation has been extended';
@@ -238,3 +238,6 @@ $string['eventinvitationexpired'] = 'Invitation has expired';
 $string['eventinvitationclaimed'] = 'Invitation has been claimed';
 $string['eventinvitationmismatch'] = 'Invitation has an mismatch email with the user profile email';
 $string['eventinvitationrevoked'] = 'Invitation has been revoked';
+
+// Label senior scholar.
+$string['seniorscholar'] = 'Senior Scholar';

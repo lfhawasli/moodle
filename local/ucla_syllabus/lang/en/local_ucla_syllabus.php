@@ -59,6 +59,8 @@ $string['no_syllabus'] = 'No syllabus uploaded yet';
 $string['make_private'] = 'Restrict';
 $string['make_public'] = 'Unrestrict';
 $string['confirm_deletion'] = 'Are you sure you want to delete this syllabus?';
+$string['form_notice_insecure_url'] = "For URL's not using https, only a link will be shown (the website will not be embedded).";
+$string['confirm_insecure_url'] = 'The syllabus URL ({$a}) does not use https, and will not be embedded in the page for <a href="https://support.mozilla.org/en-US/kb/how-does-content-isnt-secure-affect-my-safety" target="_blank">security reasons</a>. It will display as a link instead. Do you want to continue?';
 
 // Strings for displaying syllabus.
 $string['cannot_view_private_syllabus'] = 'This syllabus is available only to enrolled students in the course.';

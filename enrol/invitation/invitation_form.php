@@ -199,7 +199,7 @@ class invitation_form extends moodleform {
      * @param object $role  Record from role table.
      * @return string
      */
-    private function format_role_string($role) {
+    protected function format_role_string($role) {
         $rolestring = html_writer::tag('span', $role->name . ':',
                 array('class' => 'role-name'));
 

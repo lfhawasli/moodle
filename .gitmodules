@@ -94,3 +94,6 @@
 [submodule "local/recyclebin"]
 	path = local/recyclebin
 	url = https://github.com/unikent/moodle-local_recyclebin
+[submodule "lib/editor/atto/plugins/htmlplus"]
+	path = lib/editor/atto/plugins/htmlplus
+	url = https://github.com/andrewnicols/moodle-atto_htmlplus.git
