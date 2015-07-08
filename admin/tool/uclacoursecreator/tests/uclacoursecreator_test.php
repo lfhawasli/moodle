@@ -85,6 +85,14 @@ class uclacoursecreator_test extends advanced_testcase {
         $this->assertFalse(empty($parent->path));
         $child = $DB->get_record('course_categories', array('name' => 'Child'));
         $this->assertFalse(empty($child->path));
+
+        // Check that creating a new category with the same short name updates
+        // the course.
+        $original = $this->uclacoursecreator->new_category('Original Category', 0, 'OC');
+        $renamed = $this->uclacoursecreator->new_category('Renamed Category', 0, 'OC');
+        // Make sure that the entry ids are the same to ensure an update and not
+        // a creation.
+        $this->assertTrue($original->id == $renamed->id);
     }
 
     /**
