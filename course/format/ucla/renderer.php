@@ -315,51 +315,44 @@ class format_ucla_renderer extends format_topics_renderer {
 
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
         for ($section = 1; $section <= $course->numsections; $section++) {
-            if (!empty($sections[$section])) {
-                $thissection = $sections[$section];
-            } else {
-                // This will create a course section if it doesn't exist..
-                $thissection = get_fast_modinfo($course->id)->get_section_info($section);
+            // People who cannot view hidden sections are not allowed to see sections titles with no content.
+            if (!empty($sections[$section]->sequence) || $canviewhidden) {
+                if (!empty($sections[$section])) {
+                    $thissection = $sections[$section];
+                } else {
+                    // This will create a course section if it doesn't exist..
+                    $thissection = get_fast_modinfo($course->id)->get_section_info($section);
 
-                // The returned section is only a bare database object rather than
-                // a section_info object - we will need at least the uservisible
-                // field in it.
-                $thissection->uservisible = true;
-                $thissection->availableinfo = null;
-                $thissection->showavailability = 0;
-            }
-            // Show the section if the user is permitted to access it, OR if it's not available
-            // but showavailability is turned on (and there is some available info text).
-            $showsection = $thissection->uservisible ||
-                    ($thissection->visible && !$thissection->available && $thissection->showavailability
-                    && !empty($thissection->availableinfo));
-            if (!$showsection) {
-//                // Hidden section message is overridden by 'unavailable' control
-//                // (showavailability option).
-//                if (!$course->hiddensections && $thissection->available) {
-//                    echo $this->section_hidden($section);
-//                }
-
-                unset($sections[$section]);
-                continue;
-            }
-
-            // always show section content, even if editing is off
-            echo $this->section_header($thissection, $course, false);
-            if ($thissection->uservisible) {
-//                print_section($course, $thissection, $mods, $modnamesused);
-//                $courserenderer = $PAGE->get_renderer('core', 'course'); 
-                echo $this->courserenderer->course_section_cm_list($course, $thissection);
-       
-                if ($PAGE->user_is_editing()) {
-//                    print_section_add_menus($course, $section, $modnames);
-//                    $courserenderer = $PAGE->get_renderer('core', 'course'); 
-                    $output = $this->courserenderer->course_section_add_cm_control($course, $section); 
-                    echo $output;
+                    // The returned section is only a bare database object rather than
+                    // a section_info object - we will need at least the uservisible
+                    // field in it.
+                    $thissection->uservisible = true;
+                    $thissection->availableinfo = null;
+                    $thissection->showavailability = 0;
                 }
-            }
-            echo $this->section_footer();
+                // Show the section if the user is permitted to access it, OR if it's not available
+                // but showavailability is turned on (and there is some available info text).
+                $showsection = $thissection->uservisible ||
+                        ($thissection->visible && !$thissection->available && $thissection->showavailability
+                        && !empty($thissection->availableinfo));
+                if (!$showsection) {
 
+                    unset($sections[$section]);
+                    continue;
+                }
+
+                // always show section content, even if editing is off
+                echo $this->section_header($thissection, $course, false);
+                if ($thissection->uservisible) {
+                    echo $this->courserenderer->course_section_cm_list($course, $thissection);
+           
+                    if ($PAGE->user_is_editing()) {
+                        $output = $this->courserenderer->course_section_add_cm_control($course, $section); 
+                        echo $output;
+                    }
+                }
+                echo $this->section_footer();
+            }
             unset($sections[$section]);
         }
 
