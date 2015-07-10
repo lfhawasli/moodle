@@ -117,11 +117,8 @@ class seniorscholar_invitation_form extends invitation_form {
         // Prepare string variables.
         $temp = new stdClass();
         $temp->seniorscholarsupportemail = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
-        $mform->addElement('checkbox', 'show_from_email', '',
-                get_string('show_from_email', 'tool_uclaseniorscholar', $temp));
         $mform->addElement('checkbox', 'notify_inviter', '',
                 get_string('notify_inviter', 'tool_uclaseniorscholar', $temp));
-        $mform->setDefault('show_from_email', 1);
         $mform->setDefault('notify_inviter', 0);
 
         // Set defaults if the user is resending an invite that expired.
@@ -130,7 +127,6 @@ class seniorscholar_invitation_form extends invitation_form {
             $mform->setDefault('email', $prefilled['email']);
             $mform->setDefault('subject', $prefilled['subject']);
             $mform->setDefault('message', $prefilled['message']);
-            $mform->setDefault('show_from_email', $prefilled['show_from_email']);
             $mform->setDefault('notify_inviter', $prefilled['notify_inviter']);
         }
 

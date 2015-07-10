@@ -27,6 +27,7 @@ require_once(dirname(__FILE__) . '/lib.php');
 require_once($CFG->dirroot . '/enrol/invitation/locallib.php');
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->dirroot . '/local/ucla/datetimehelpers.php');
+require_once($CFG->dirroot . '/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
 
 $baseurl = $CFG->wwwroot . '/' . $CFG->admin . '/tool/uclaseniorscholar';
 $filterterm = optional_param('filter_term', $CFG->currentterm, PARAM_TEXT);
@@ -215,12 +216,12 @@ if (empty($list) && $filter != 'instr') {
         $row[0] = $emailcolumn;
         // Loop through the courses this person taken and being invited.
         foreach ($record as $courseid => $courselist) {
-            $courseoutput = $courselist[1]->subj_area.' '.$courselist[1]->coursenum;
+            $courseoutput = uclacoursecreator::make_course_shortname($courselist[1]);
             // Loop cross listed courses.
             $i = 0;
             while (!empty($courselist[0]) && $i <= $maxcrosslistshown) {
                 $course = array_shift($courselist[0]);
-                $courseoutput .= ' / ' . $course->subj_area.' '.$course->coursenum;
+                $courseoutput .= ' / ' . uclacoursecreator::make_course_shortname($course);
                 $i++;
             }
 
@@ -304,12 +305,12 @@ if (empty($list) && $filter != 'instr') {
     foreach ($list as $key => $courselist) {
         // Output course.
         // List host course.
-        $courseoutput = $courselist[1]->subj_area.' '.$courselist[1]->coursenum;
+        $courseoutput = uclacoursecreator::make_course_shortname($courselist[1]);
         // Loop cross listed courses.
         $i = 0;
         while (!empty($courselist[0]) && $i <= $maxcrosslistshown) {
             $course = array_shift($courselist[0]);
-            $courseoutput .= ' / ' . $course->subj_area.' '.$course->coursenum;
+            $courseoutput .= ' / ' . uclacoursecreator::make_course_shortname($course);
             $i++;
         }
 
