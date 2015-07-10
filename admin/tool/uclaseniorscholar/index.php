@@ -30,8 +30,8 @@ require_once($CFG->dirroot . '/local/ucla/datetimehelpers.php');
 require_once($CFG->dirroot . '/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
 
 $baseurl = $CFG->wwwroot . '/' . $CFG->admin . '/tool/uclaseniorscholar';
-$filterterm = optional_param('filter_term', $CFG->currentterm, PARAM_TEXT);
-$filterinstruid = optional_param('filter_instructor', '', PARAM_TEXT);
+$filterterm = optional_param('filter_term', $CFG->currentterm, PARAM_ALPHANUM);
+$filterinstruid = optional_param('filter_instructor', '', PARAM_ALPHANUM);
 $filtersubj = optional_param('filter_subj', '', PARAM_TEXT);
 $filter = optional_param('filter', '', PARAM_TEXT);
 $mode = optional_param('mode', '', PARAM_TEXT);
@@ -145,7 +145,7 @@ switch($filter) {
         $list = seniorscholar_course_check(seniorscholar_get_courses_by_term($filterterm));
         break;
     case 'instr_term':
-        $param = array('filter_term' => $filterterm, 'filter_instructor' => substr($filterinstruid, 1));
+        $param = array('filter_term' => $filterterm, 'filter_instructor' => $filterinstruid);
         $list = seniorscholar_course_check(seniorscholar_get_courses_by_instructor_term($param));
         break;
     case 'subj_term':

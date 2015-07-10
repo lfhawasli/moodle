@@ -17,21 +17,22 @@
 /**
  * UCLA senior scholar
  *
- * @package     ucla
- * @subpackage  tool_uclaseniorscholar
+ * @package     tool_uclaseniorscholar
  * @author      Jun Wan
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 /**
- * check if user has access to the interface
- **/
-
+ * Check if user has access to the interface.
+ *
+ * @param object $user
+ * @return boolean
+ */
 function seniorscholar_has_access($user) {
-    if (stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) === false
-        && !is_siteadmin()) {
+    if (stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) === false && !is_siteadmin()) {
         return false;
     } else {
         return true;
@@ -39,9 +40,10 @@ function seniorscholar_has_access($user) {
 }
 
 /**
- * return array of senior scholar administrator userid
- **/
-
+ * Return array of senior scholar administrator userid
+ *
+ * @return array
+ */
 function get_seniorscholar_admin_userid() {
     global $DB;
     $uidstringarray = explode(';', get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'));
@@ -50,9 +52,12 @@ function get_seniorscholar_admin_userid() {
 }
 
 /**
- * filter courses that allow senior scholar to take and re-organize to display cross listing courses
- **/
-
+ * Filter courses that allow senior scholar to take and re-organize to display
+ * cross listing courses.
+ *
+ * @param array $courses
+ * @return array    Filtered list of courses.
+ */
 function seniorscholar_course_check($courses) {
     $output = array();
     foreach ($courses as $k => $course) {
@@ -60,8 +65,10 @@ function seniorscholar_course_check($courses) {
         preg_match('/\d+/', $course->coursenum, $matches);
         if (empty($matches) || (!empty($matches) && $matches[0] >= 200)) {
             // Nothing to do.
+            continue;
         } else if ($course->acttype != 'LEC' && $course->acttype != 'SEM') {
             // Nothing to do.
+            continue;
         } else if ($course->hostcourse == 1) {
             // Re-organize to display cross listing courses.
             // Only exact one course have the hostcourse value as 1 for cross listing courses.
@@ -74,9 +81,10 @@ function seniorscholar_course_check($courses) {
 }
 
 /**
- * get list of terms (only current and future terms)
- **/
-
+ * Get list of terms (only current and future terms).
+ *
+ * @return array
+ */
 function seniorscholar_get_terms() {
     $termlist = array();
     $result = get_active_terms();
@@ -88,67 +96,65 @@ function seniorscholar_get_terms() {
 }
 
 /**
- * get subject area
- **/
-
+ * Get subject areas.
+ *
+ * @return array
+ */
 function seniorscholar_get_subjarea() {
     global $DB;
     return $DB->get_records_menu('ucla_reg_subjectarea', null, 'subjarea', 'subjarea, subj_area_full');
 }
 
 /**
- * get instructor
- **/
-
-function seniorscholar_get_instructors_by_term($term='') {
+ * Get instructors by term.
+ *
+ * @param string $term  Optional.
+ * @return array
+ */
+function seniorscholar_get_instructors_by_term($term = null) {
     global $DB;
-    $instlist = array();
-    $sql = "SELECT id, uid, lastname, firstname from {ucla_browseall_instrinfo}";
+    $params = array();
     if (!empty($term)) {
-        $sql .= " WHERE term = '" . $term . "'";
+        $params['term'] = $term;
     }
-    $sql .= " ORDER BY lastname, firstname";
-    $result = $DB->get_records_sql($sql);
-    foreach ($result as $inst) {
-        $instlist['i'.$inst->uid] = $inst->lastname . ', ' . $inst->firstname;
-    }
-    return $instlist;
+    return $DB->get_records_menu('ucla_browseall_instrinfo', $params,
+            'lastname, firstname', 'DISTINCT uid, CONCAT(lastname, ", ", firstname)');
 }
 
 /**
- * get course list by term.  Limited only the courses that have invite from senior scholar program
+ * Get course list by term.  Limited only the courses that have invite from senior scholar program
+ *
+ * @param string $term
+ * @return array
  */
-
 function seniorscholar_get_courses_by_term($term) {
     global $DB;
     $listofinviters = get_seniorscholar_admin_userid();
+    list($listofinviterssql, $params) = $DB->get_in_or_equal($listofinviters, SQL_PARAMS_NAMED);
+    $params['term'] = $term;
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
             reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group
               FROM {course} c
-              JOIN
-                   (SELECT DISTINCT courseid
+              JOIN (SELECT DISTINCT courseid
                       FROM {enrol_invitation}
-                      WHERE inviterid in (" . implode(',', $listofinviters) . ")) AS i
+                     WHERE inviterid $listofinviterssql) AS i
                 ON i.courseid = c.id
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs
-              JOIN
-                   (SELECT @row_num := 0) AS t";
-
-    if ($term) {
-        $sql .= " WHERE rc.term = '" . $term . "'";
-    }
-    $sql .= " ORDER BY reg.subj_area, reg.coursenum, reg.sectnum";
-    return $result = $DB->get_records_sql($sql);
+              JOIN (SELECT @row_num := 0) AS t
+            WHERE rc.term = :term
+            ORDER BY reg.subj_area, reg.coursenum, reg.sectnum";
+    return $DB->get_records_sql($sql, $params);
 }
 
 /**
- * get all information of class list (display subject area, division and list by course)
- **/
-
+ * Get all information of class list (display subject area, division and list by course)
+ *
+ * @param array $param
+ * @return array
+ */
 function seniorscholar_get_courses_by_subject_term(&$param) {
     global $DB;
-    $list = array();
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
             reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group
               FROM {course} c
@@ -158,23 +164,24 @@ function seniorscholar_get_courses_by_subject_term(&$param) {
               JOIN (SELECT @row_num := 0) AS t";
 
     if ($param['filter_term'] && empty($param['filter_subj'])) {
-        $sql .= " WHERE rc.term = '". $param['filter_term'] . "'";
+        $sql .= " WHERE rc.term = :filter_term";
     } else if ($param['filter_subj'] && empty($param['filter_term'])) {
-        $sql .= " WHERE reg.subj_area = '". $param['filter_subj'] . "'";
+        $sql .= " WHERE reg.subj_area = :filter_subj";
     } else if ($param['filter_subj'] && $param['filter_term']) {
-        $sql .= " WHERE rc.term = '". $param['filter_term'] . "' and reg.subj_area = '" . $param['filter_subj'] . "'";
+        $sql .= " WHERE rc.term = :filter_term and reg.subj_area = :filter_subj";
     }
-    $sql .= " ORDER BY reg.subj_area, reg.coursenum, reg.sectnum";
-    return $result = $DB->get_records_sql($sql);
+    $sql .= " ORDER BY reg.subj_area, reg.crsidx, reg.secidx";
+    return $DB->get_records_sql($sql, $param);
 }
 
 /**
- * get course list by instructor
- **/
-
+ * Get course list by instructor.
+ *
+ * @param array $param
+ * @return array
+ */
 function seniorscholar_get_courses_by_instructor_term(&$param) {
     global $DB;
-    $list = array();
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) as id, rc.courseid, rc.instructor, rc.hostcourse,
             reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group
               FROM {course} c
@@ -184,21 +191,29 @@ function seniorscholar_get_courses_by_instructor_term(&$param) {
               JOIN (SELECT @row_num := 0) AS t";
 
     if ($param['filter_term'] && empty($param['filter_instructor'])) {
-        $sql .= " WHERE rc.term = '" . $param['filter_term'] . "'";
+        $sql .= " WHERE rc.term = :filter_term";
     } else if ($param['filter_instructor'] && empty($param['filter_term'])) {
-        $sql .= " WHERE bi.uid = '" . $param['filter_instructor'] . "'";
+        $sql .= " WHERE bi.uid = :filter_instructor";
     } else if ($param['filter_instructor'] && $param['filter_term']) {
-        $sql .= " WHERE rc.term = '" . $param['filter_term'] . "' and bi.uid = '" . $param['filter_instructor'] . "'";
+        $sql .= " WHERE rc.term = :filter_term and bi.uid = :filter_instructor";
     }
     $sql .= " ORDER BY bi.lastname, bi.firstname, rc.department, rc.course";
-    return $result = $DB->get_records_sql($sql);
+    return $DB->get_records_sql($sql, $param);
 }
 
+/**
+ * Gets invite history by term.
+ *
+ * @param string $term
+ * @return array
+ */
 function seniorscholar_get_userinvitehistory_by_term($term) {
     global $DB;
     $output = array();
     // Get list invitations.
     $listofinviters = get_seniorscholar_admin_userid();
+    list($listofinviterssql, $params) = $DB->get_in_or_equal($listofinviters, SQL_PARAMS_NAMED);
+    $params['term'] = $term;
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS tid, i.*, rc.courseid, rc.instructor, rc.hostcourse,
             reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group, i.*
               FROM {course} c
@@ -206,12 +221,10 @@ function seniorscholar_get_userinvitehistory_by_term($term) {
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
               JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs
               JOIN (SELECT @row_num := 0) AS t
-             WHERE i.inviterid in (" . implode(',', $listofinviters) . ")";
-    if ($term) {
-        $sql .= " AND rc.term = '" . $term . "'";
-    }
-    $sql .= " ORDER BY i.email, reg.subj_area, reg.coursenum, reg.sectnum, rc.hostcourse, i.timeexpiration desc";
-    $invites = $DB->get_records_sql($sql);
+             WHERE i.inviterid $listofinviterssql AND
+                   rc.term = :term
+          ORDER BY i.email, reg.subj_area, reg.coursenum, reg.sectnum, rc.hostcourse, i.timeexpiration DESC";
+    $invites = $DB->get_records_sql($sql, $params);
 
     // Get list of roles.
     foreach ($invites as $k => $v) {
