@@ -30,6 +30,7 @@ $role['student_instructor']['*SYSTEM*'] = 'studentfacilitator';
 $role['editingteacher']['*SYSTEM*'] = 'editinginstructor'; // Always an 01.
 $role['student']['*SYSTEM*'] = 'student'; // Student enrolled in the course.
 $role['waitlisted']['*SYSTEM*'] = 'student'; // Student waitlisted in the course.
+$role['grader']['*SYSTEM*'] = 'grader';
 
 // Subject areas using limited TA roles.
 $role['ta']['CHEM'] = 'ta';

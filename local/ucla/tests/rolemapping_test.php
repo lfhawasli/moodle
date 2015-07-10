@@ -194,6 +194,26 @@ class rolemapping_test extends advanced_testcase {
     }
 
     /**
+     * Make sure that get_pseudorole always returns grader if
+     * passing in anyone with a role code of 04.
+     * 
+     * @dataProvider role_combo_provider
+     *
+     * @param array $rolecombo
+     */
+    public function test_get_pseudorole_grader($rolecombo) {
+        $params[] = array('primary' => array('04'));
+        $params[] = array('secondary' => array('04'));
+        $params[] = array('primary' => array('04'),
+            'secondary' => array('04'));
+
+        foreach ($params as $param) {
+            $pseudorole = get_pseudorole($param, $rolecombo);
+            $this->assertEquals('grader', $pseudorole);
+        }
+    }
+
+    /**
      * Make sure that get_pseudorole always returns student_instructor if
      * passing in anyone with a role code of 22.
      * 
