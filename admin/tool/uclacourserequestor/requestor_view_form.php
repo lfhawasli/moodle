@@ -11,38 +11,48 @@ class requestor_view_form extends requestor_shared_form {
     const noviewcourses = 'noviewcourses';
 
     function specification() {
+        global $DB;
         $rucr = 'tool_uclacourserequestor';
-
         $mf =& $this->_form;
-
         $filters = $this->_customdata['prefields'];
-
         $group = array();
 
-        foreach ($filters as $filter => $possibilities) {
-            $options = array();
-
-            if ($filter != 'term') {
-                $filterall = $this->get_all_filter($filter);
-
-                $options[$filterall] = get_string($filterall, $rucr);
-            }
-
-            if (!empty($possibilities)) {
-                foreach ($possibilities as $poss) {
-                    $posstext = requestor_statuses_translate($poss);
-
-                    if (empty($poss)) {
-                        $posstext = get_string('none');
-                    }
-
-                    $options[$poss] = $posstext;
-                }
-            }
-
-            $group[] =& $mf->createElement('select', $filter,
-                null, $options);
+        // Create the Term field.
+        $options = array();
+        $terms = $this->_customdata['terms'];
+        foreach ($terms as $term) {
+            $options[$term] = $term;
         }
+        $group[] =& $mf->createElement('select', 'term', null, $options, $this->attributes);
+
+        // Create the Department field.
+        $options = array();
+        $filterall = $this->get_all_filter('department');
+        $options[$filterall] = get_string($filterall, $rucr);
+
+        // Only display subject areas that have course built.
+        $departments = $DB->get_records_menu('ucla_request_classes',
+                array('term' => $this->_customdata['selterm']), 'department',
+                'DISTINCT department AS idx, department AS subjarea');
+        if (!empty($departments)) {
+            foreach ($departments as $department) {
+                $options[$department] = $department;
+            }
+        }
+        $group[] =& $mf->createElement('select', 'department', null, $options);
+        
+        // Create the Action field.
+        $options = array();
+        $filterall = $this->get_all_filter('action');
+        $options[$filterall] = get_string($filterall, $rucr);
+        foreach ($filters['action'] as $action) {
+            $optiontext = requestor_statuses_translate($action);
+            if (empty($action)) {
+                $optiontext = get_string('none');
+            }
+            $options[$action] = $optiontext;
+        }
+        $group[] =& $mf->createElement('select', 'action', null, $options);
 
         if (empty($group)) {
             $this->type = self::noviewcourses;
