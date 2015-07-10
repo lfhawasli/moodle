@@ -125,9 +125,8 @@ if (empty($invites)) {
          * [5] - actions
          */
 
-        // Display invitee and inviter.
-        $inviter = $DB->get_field('user', 'email', array( 'id' => $invite->inviterid));
-        $row[0] = $invite->email . " - " . $inviter;
+        // Display invitee and inviter.  Inviter always show from $CFG->seniorscholarsupportemail email address.
+        $row[0] = $invite->email . " - " . get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
 
         // Figure out invited role.
         if (empty($rolecache[$invite->roleid])) {
