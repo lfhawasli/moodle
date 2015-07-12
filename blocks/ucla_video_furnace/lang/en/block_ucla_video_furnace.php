@@ -14,19 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['pluginname'] = 'UCLA video furnace';
-$string['title'] = 'Video furnace';
-$string['header'] = 'Video furnace: {$a}';
+$string['pluginname'] = 'UCLA video reserves';
+$string['title'] = 'Video reserves';
+$string['header'] = 'Video reserves: {$a}';
 $string['headervideofurnaceurl'] = 'Source URL';
 $string['descvideofurnaceurl'] = 'TSV source URL for video furnace data';
 $string['guest_not_allow'] = 'Guests can not view this page';
-$string['videofurnaceintro'] = 'Please note that this media is intended for on-campus use only. 
-    Off-campus use is possible through use of the <a href="http://www.bol.ucla.edu/services/vpn/" target=_blank>BOL VPN</a>, 
-    however, you will likely experience hiccups, skips or other problems due to insufficient bandwidth.<br />
-    When launching the application, click "Run" or "Trust" to allow the applet to run on your computer. 
-    If the file does not run and you do not see the player, then you must install 
-    <a href="http://www.java.com/en/" target="_blank">Java (java.com/en)</a> in order to use this media. For more help, 
-    go to the <a href="http://www.oid.ucla.edu/edtech/medialab/faq/vf" target="_blank">Media Lab Video Furnace FAQ</a>';
+$string['videofurnaceintro'] = 'Please note that this media is intended for on-campus use only.
+    Off-campus use is possible in certain circumstances, but it is not supported, dependable, or 
+    recommended. In order to view the video streams, you will need to download and install the 
+    <a href="http://www.microsoft.com/silverlight/get-started/install/default.aspx" target="_blank">Silverlight plugin</a>';
 
 $string['currentvideo'] = 'Current videos';
 $string['futurevideo'] = 'Future videos';
