@@ -44,6 +44,13 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     private $course = null;
 
     /**
+     * Message sink for emails.
+     *
+     * @var phpunit_message_sink
+     */
+    private $sink = null;
+
+    /**
      * Test student.
      *
      * @var object
@@ -127,7 +134,10 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     public function setUp() {
         global $DB;
         $this->resetAfterTest(true);
+
+        // Redirect emails to message sink.
         unset_config('noemailever');
+        $this->sink = $this->redirectEmails();
 
         // Create test course and users.
         $this->course = $this->getDataGenerator()->create_course();
@@ -165,10 +175,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
-        $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
 
         // Make sure there is still nothing in the temp directory.
         $this->assertEquals(2, count(scandir($CFG->tempdir.'/coursedownloaddir')));
@@ -189,10 +197,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursefiles = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $coursefiles->add_request();
-        $sink = $this->redirectEmails();
         $request = $coursefiles->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
         $this->assertNotEmpty($request->fileid);
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
 
@@ -205,6 +211,12 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $request = $coursefiles->process_request();
         $this->assertNull($request);
         $this->assertEquals('request_available', $coursefiles->get_request_status());
+
+        // Make sure that existing request was made inactive.
+        $request = $coursefiles->get_request();
+        $this->assertEmpty($request);
+        $request = $coursefiles->get_request(0);
+        $this->assertNotEmpty($request);
     }
 
     /**
@@ -216,7 +228,6 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $this->populate_course($contenttocreate);
 
         // Declare variables for email strings.
-        $sink = $this->redirectEmails();
         $a = new StdClass();
         $a->shortname = $this->course->shortname;
         $a->ziplifetime = get_config('block_ucla_course_download', 'ziplifetime');
@@ -232,9 +243,9 @@ class block_ucla_course_download_files_test extends advanced_testcase {
             $coursedownload->process_request();
             $a->type = $coursedownload->get_type();
             // Get email.
-            $emails = $sink->get_messages();
+            $emails = $this->sink->get_messages();
             $this->assertCount(1, $emails);
-            $sink->clear();
+            $this->sink->clear();
 
             // Verify email contents - subject and body.
             $this->assertEquals(get_string('emailsubject', 'block_ucla_course_download', $a), $emails[0]->subject);
@@ -247,7 +258,6 @@ class block_ucla_course_download_files_test extends advanced_testcase {
             $this->assertEquals(preg_replace('/\n/', ' ', $expectedbody),
                     trim(preg_replace('/\n/', ' ', $emails[0]->body)));
         }
-        $sink->close();
     }
 
     /**
@@ -271,10 +281,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
             $this->assertNotEmpty($request);
 
             // Request should then be deleted.
-            $sink = $this->redirectEmails();
             $processedrequest = $coursefiles->process_request();
-            $this->assertCount(0, $sink->get_messages());
-            $sink->close();
+            $this->assertCount(0, $this->sink->get_messages());
             $this->assertNull($processedrequest);
             $request = $coursefiles->get_request();
             $this->assertEmpty($request);
@@ -305,10 +313,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $request = $coursefiles->get_request();
         // Clone, since process requests modifies the request variable.
         $initialrequest = clone $request;
-        $sink = $this->redirectEmails();
         $processedrequest = $coursefiles->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
 
         // Newly processed request should have proper fields set.
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
@@ -335,10 +341,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
                 $this->course->id, $this->teacher->id);
         $result = $coursefiles->add_request();
         $this->assertTrue($result);
-        $sink = $this->redirectEmails();
         $coursefiles->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
         $this->assertEquals('request_completed', $coursefiles->get_request_status());
 
         // Now delete added file.
@@ -387,10 +391,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
-        $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
         $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
 
@@ -440,10 +442,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $coursedownload = new block_ucla_course_download_files(
                 $this->course->id, $this->student->id);
         $coursedownload->add_request();
-        $sink = $this->redirectEmails();
         $request = $coursedownload->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
         $ziparray = $coursedownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
 
@@ -479,6 +479,46 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $this->compare_content($expectedfiles, $ziparray);
     }
 
+
+    /**
+     * Make sure that if someone requests a course download that we use the
+     * previous request.
+     */
+    public function test_reuse_request() {
+        global $DB;
+
+        // Set ziplifetime to a known value (7 days).
+        set_config('ziplifetime', 7, 'block_ucla_course_download');
+
+        // Add content to section 1 and 2.
+        $contenttocreate[0] = array('section' => 1);
+        $contenttocreate[1] = array('section' => 2);
+        $this->populate_course($contenttocreate);
+
+        // Redirect all emails to sink.
+        $sink = $this->redirectEmails();
+
+        // Make request.
+        $coursefiles = new block_ucla_course_download_files(
+                $this->course->id, $this->teacher->id);
+        $coursefiles->add_request();
+        $request1 = $coursefiles->process_request();
+
+         // Now, make request really old (7 days + 1 second).
+        $request1->timerequested = $request1->timerequested - 7*DAYSECS - 1;
+        $request1->numdownloaded = rand(1, 1000);
+        $DB->update_record('ucla_archives', $request1);
+        $coursefiles->refresh();
+        $request = $coursefiles->process_request();
+        $this->assertNull($request);
+
+        // Redo request.
+        $coursefiles->add_request();
+        $request2 = $coursefiles->process_request();
+        $this->assertEquals($request1->id, $request2->id);
+        $this->assertEquals($request1->numdownloaded, $request2->numdownloaded);
+    }
+
     /**
      * Tests that a course with the same content for 2 users will share the same
      * zip file.
@@ -495,10 +535,9 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $teacherdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $teacherdownload->add_request();
-        $sink = $this->redirectEmails();
         $teacherrequest = $teacherdownload->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->clear();
+        $this->assertCount(1, $this->sink->get_messages());
+        $this->sink->clear();
 
         // Create request for student.
         $studentdownload = new block_ucla_course_download_files(
@@ -514,8 +553,7 @@ class block_ucla_course_download_files_test extends advanced_testcase {
 
         // Now, process request.
         $studentrequest = $studentdownload->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
 
         // Make sure that both requests share the same content.
         foreach (array('contexthash', 'content') as $column) {
@@ -542,10 +580,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $teacherdownload = new block_ucla_course_download_files(
                 $this->course->id, $this->teacher->id);
         $teacherdownload->add_request();
-        $sink = $this->redirectEmails();
         $request1 = $teacherdownload->process_request();
-        $this->assertCount(1, $sink->get_messages());
-        $sink->close();
+        $this->assertCount(1, $this->sink->get_messages());
         
         $ziparray = $teacherdownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);

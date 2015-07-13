@@ -115,6 +115,11 @@ $string['mediausage_help'] = 'Lists course with video content for a given term.'
 $string['syllabusrecentlinks'] = 'Recently updated syllabus links at Registrar';
 $string['syllabuslinkslimit'] = 'Get last {$a} results';
 $string['visiblecontentlist'] = 'List courses with visible content in hidden sections';
+$string['coursedownloadhistory'] = 'Course download requests history';
+$string['coursedownloadhistorytotalrequests'] = '# of requests';
+$string['coursedownloadhistorynumdownloaded'] = '# of downloads';
+$string['coursedownloadhistorynumnotdownloaded'] = '# of requests not downloaded';
+$string['coursedownloadhistoryuniquezipfile'] = '# of unique ZIP files';
 
 // Course
 $string['collablist'] = 'Show collaboration sites';

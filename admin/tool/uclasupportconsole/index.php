@@ -2226,6 +2226,7 @@ if ($displayforms) {
         $params, get_string('mediausage_help', 'tool_uclasupportconsole'));
 }
 $consoles->push_console_html('modules', $title, $sectionhtml);
+
 ///////////////////////////////////////////////////////////////
 $title = "visiblecontentlist";
 $sectionhtml = '';
@@ -2294,6 +2295,68 @@ if ($displayforms) {
     $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
 }
 $consoles->push_console_html('modules', $title, $sectionhtml);
+
+///////////////////////////////////////////////////////////////
+$title = "coursedownloadhistory";
+$sectionhtml = '';
+if ($displayforms) {
+    $content = get_term_selector($title);
+    $sectionhtml .= supportconsole_simple_form($title, $content);
+} else if ($consolecommand == "$title") {
+    $params = array('term' => required_param('term', PARAM_ALPHANUM));
+
+    // Get list of courses with requests, ordered by subject area. Join the
+    // "ucla_archives" table with the "course" and "ucla_reg_classinfo" tables
+    // to display courses and subject area.
+    //
+    // Use the 'ucla_request_classes' table to map Moodle course IDs to UCLA
+    // course terms and SRSs. Create a SQL query which selects information from
+    // 'ucla_reg_classinfo', where the terms and SRS are equal to those of a
+    // subquery. The subqeury will select terms and SRSs from the
+    // 'ucla_request_classes' where the course ID is equal to those in
+    // 'ucla_archives'.
+    //
+    // Run a SQL query to get all the course IDs, user IDs, timestamps, and activeness
+    // of each request in the 'ucla_archives' table.
+    $sql = "SELECT ua.id,
+                   urci.division,
+                   c.id AS courseid,
+                   c.shortname AS course,
+                   COUNT(ua.courseid) AS '" . get_string('coursedownloadhistorytotalrequests', 'tool_uclasupportconsole') . "',
+                   SUM(ua.numdownloaded) AS '" . get_string('coursedownloadhistorynumdownloaded', 'tool_uclasupportconsole') . "',
+                   SUM(IF(ua.fileid IS NULL, 0, f.filesize)) AS filesize,
+                   SUM(IF(ua.numdownloaded, 0, 1)) AS '" . get_string('coursedownloadhistorynumnotdownloaded', 'tool_uclasupportconsole') . "',
+                   COUNT(DISTINCT ua.contexthash) AS '" . get_string('coursedownloadhistoryuniquezipfile', 'tool_uclasupportconsole') . "'
+              FROM {ucla_archives} ua
+              JOIN {ucla_request_classes} urc ON ua.courseid = urc.courseid
+              JOIN {ucla_reg_classinfo} urci ON (urc.term = urci.term AND urc.srs = urci.srs)
+              JOIN {course} c ON (urc.courseid = c.id)
+         LEFT JOIN {files} f ON ua.fileid = f.id
+             WHERE urc.term=:term AND
+                   urci.enrolstat!='X'
+          GROUP BY ua.courseid
+          ORDER BY urci.division,urci.subj_area, crsidx, secidx";
+    $results = $DB->get_records_sql($sql, $params);
+
+    foreach ($results as &$result) {
+        $result->course = html_writer::link(new moodle_url('/course/view.php',
+                array('id' => $result->courseid)), $result->course);
+        unset($result->courseid);
+
+        // Give user friendly sizes.
+        $result->storagesize = display_size($result->filesize);
+        $result->sortablestoragesize = round($result->filesize / 1048576 * 10) / 10;
+        unset($result->filesize);
+    }
+
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results, $params);
+}
+
+$consoles->push_console_html('modules', $title, $sectionhtml);
+
+//
+//
+///////////////////////////////////////////////////////////////
 
 // see if user came from a specific page, if so, then direct them back there
 $gobackurl = $PAGE->url;
