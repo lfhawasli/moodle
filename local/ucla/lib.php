@@ -21,7 +21,7 @@ require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
  *  will be web-forbidden.
  **/
 function ucla_verify_configuration_setup() {
-   global $CFG;
+    global $CFG;
 
     if (!function_exists('curl_init')) {
         throw new moodle_exception('curl_failure', 'local_ucla');
@@ -61,7 +61,7 @@ function ucla_verify_configuration_setup() {
  **/
 function array_alphasort(&$array, $sortkey) {
     usort($array, function($a, $b) use ($sortkey) {
-        if(!empty($a) && !empty($b)) {
+        if (!empty($a) && !empty($b)) {
             return strcmp(strtolower($a->$sortkey), strtolower($b->$sortkey));
         }
     });
@@ -85,9 +85,9 @@ function ucla_require_db_helper() {
 function ucla_require_registrar() {
     global $CFG;
 
-    require_once($CFG->dirroot 
+    require_once($CFG->dirroot
         . '/local/ucla/registrar/registrar_stored_procedure.base.php');
-    require_once($CFG->dirroot 
+    require_once($CFG->dirroot
         . '/local/ucla/registrar/registrar_tester.php');
 }
 
@@ -101,7 +101,7 @@ function is_dummy_ucla_user($ucla_id) {
     // dummy THE STAFF
     if ($ucla_id == '100399990') {
         return true;
-    } 
+    }
 
     // dummy TA
     if ($ucla_id == '200399999') {
@@ -149,7 +149,7 @@ function is_course_cancelled($courseset) {
  *  TODO Make the URL a configuration variable.
  **/
 function build_registrar_finals_url($courseinfo) {
-    if (!empty($courseinfo->term) 
+    if (!empty($courseinfo->term)
             && ucla_validator('term', $courseinfo->term)) {
         $term = $courseinfo->term;
     } else {
@@ -208,8 +208,8 @@ function enrolstat_string($enrolstat) {
 function ucla_make_course_title($courseinfo, $displayone=true) {
     if (is_object($courseinfo)) {
         $courseinfo = get_object_vars($courseinfo);
-    }    
-    
+    }
+ 
     $sectnum = '-' . $courseinfo['sectnum'];
     if (!$displayone && $courseinfo['sectnum'] == 1) {
         $sectnum = '';
@@ -249,7 +249,7 @@ function ucla_map_courseid_to_termsrses($courseid) {
     if ($termsrses = $cache->get($cachekey)) {
         return $termsrses;
     }
-    
+ 
     $termsrses = $DB->get_records('ucla_request_classes',
             array('courseid' => $courseid, 'action' => 'built'));
 
@@ -345,7 +345,7 @@ function index_ucla_course_requests($requests, $indexby='setid') {
  **/
 function ucla_get_courses_by_terms($terms) {
     global $DB;
-   
+ 
     list($sqlin, $params) = $DB->get_in_or_equal($terms);
     $where = 'term ' . $sqlin;
 
@@ -354,7 +354,7 @@ function ucla_get_courses_by_terms($terms) {
 
     return index_ucla_course_requests($records, 'courseid');
 }
-    
+ 
 /**
  *  Based on what is set by the enrolment plugin, match user info
  *  provided by the Registrar to the local database.
@@ -379,7 +379,7 @@ function ucla_registrar_user_to_moodle_user($reginfo,
     $usersearch = array();
 
     if ($localuserfield === 'username') {
-        $usersearch['mnethostid'] = $CFG->mnet_localhost_id; 
+        $usersearch['mnethostid'] = $CFG->mnet_localhost_id;
         $usersearch['deleted'] = 0;
     }
 
@@ -393,14 +393,14 @@ function ucla_registrar_user_to_moodle_user($reginfo,
     if (!empty($reginfo[$userfield])) {
         $mapping = $reginfo[$userfield];
     }
-    
+ 
     $searchstr = "$localuserfield = ?";
     $sqlparams[] = $mapping;
 
     $sqlbuilder[] = $searchstr;
     $usersql = implode(' AND ', $sqlbuilder);
 
-    return $DB->get_record_select('user', $usersql, $sqlparams, 
+    return $DB->get_record_select('user', $usersql, $sqlparams,
         "*", IGNORE_MULTIPLE);
 }
 
@@ -422,21 +422,21 @@ function ucla_term_to_text($term, $session=null) {
     } else if ($term_letter == "s") {
         // S -> Spring
         $termtext = "Spring";
-    } else if ($term_letter == "1"){
+    } else if ($term_letter == "1") {
         // 1 -> Summer
         $termtext = "Summer";
     } else {
         debugging("Invalid term letter: ".$term_letter);
-        return NULL;
+        return null;
     }
 
     $years = substr($term, 0, 2);
-    $termtext .= " 20$years";    
-    
+    $termtext .= " 20$years";
+ 
     if ($term_letter == "1" && !empty($session)) {
-        $termtext .= " - Session " . strtoupper($session);   
-    }   
-    
+        $termtext .= " - Session " . strtoupper($session);
+    }
+ 
     return $termtext;
 }
 
@@ -463,7 +463,7 @@ function is_summer_term($term) {
  * @return string                       Name in proper format.
  */
 function ucla_format_name($name=null, $handleconjunctions=false) {
-    $name = ucfirst(textlib::strtolower(trim($name)));    
+    $name = ucfirst(textlib::strtolower(trim($name)));
 
     if (empty($name)) {
         return '';
@@ -478,7 +478,7 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
      *  - If name starts with "MC".
      *  - If name has conjunctions, e.g. "and", "of", "the", "as", "a".
      *  - If name has initials.
-     */    
+     */
 
     // Has space?
     $namearray = explode(' ', $name);
@@ -523,14 +523,14 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
     if (count($namearray) > 1) {
         foreach ($namearray as $key => $element) {
             /*
-            * Special case: If a name as 's, like Women's studies, then the S 
+            * Special case: If a name as 's, like Women's studies, then the S
             * shouldn't be capitalized.
             */
             if (preg_match('/^[s]{1}\\s+.*/i', $element)) {
                 // Found a single lowercase s with a space and maybe something
                 // following, that means you found a possessive s, so make sure
                 // it is lowercase and do not recuse.
-                $element[0] = 's'; 
+                $element[0] = 's';
                 $namearray[$key] = $element;
             } else {
                 // Found a ' that is part of a name.
@@ -583,7 +583,7 @@ function auto_login_as_guest() {
 // Return the value of the Shibboleth cookie, or false if it does not exist
 function get_shib_logged_in_cookie() {
     global $CFG;
-    return isset($_COOKIE[$CFG->shib_logged_in_cookie]) ? 
+    return isset($_COOKIE[$CFG->shib_logged_in_cookie]) ?
         $_COOKIE[$CFG->shib_logged_in_cookie] : false;
 }
 
@@ -594,31 +594,31 @@ function is_shib_logged_in_cookie_set() {
         isset($_COOKIE[$CFG->shib_logged_in_cookie]);
 }
 
-// If the user is guest but an Shibboleth cookie exists, we "click" 
+// If the user is guest but an Shibboleth cookie exists, we "click"
 // the "login" link for them
 function require_user_finish_login() {
     global $CFG, $FULLME, $SESSION;
     if ((!isloggedin() || isguestuser()) && is_shib_logged_in_cookie_set()) {
-        
-        // If a flag is set in $SESSION indicating that the user has 
-        // chosen "Guess Access" in the login page, don't redirect her 
+ 
+        // If a flag is set in $SESSION indicating that the user has
+        // chosen "Guess Access" in the login page, don't redirect her
         // back to the login page
-        if (isset($SESSION->ucla_login_as_guest) 
-                && $SESSION->ucla_login_as_guest 
+        if (isset($SESSION->ucla_login_as_guest)
+                && $SESSION->ucla_login_as_guest
                     === get_shib_logged_in_cookie()) {
             return;
         }
 
-        // Now using timeout value in new cookie for semi-lazy session 
+        // Now using timeout value in new cookie for semi-lazy session
         // initialization with Shibboleth cookie documented here:
         // https://spaces.ais.ucla.edu/display/iamuclabetadocs/DetectingShibbolethSession
         $login_cookie_value = get_shib_logged_in_cookie();
         if (strtotime($login_cookie_value) < time()) {
             return;
         }
-        
-        // Otherwise, redirect the user to the login page and note 
-        // in $SESSION->wantsurl that the login page should eventually 
+ 
+        // Otherwise, redirect the user to the login page and note
+        // in $SESSION->wantsurl that the login page should eventually
         // redirect back to this page
         $SESSION->wantsurl = $FULLME;
         redirect($CFG->wwwroot .'/login/index.php');
@@ -658,7 +658,7 @@ function role_mapping($profcode, array $otherroles, $subjectarea="*SYSTEM*") {
 
     // Logic to parse profcodes, and return pseudorole.
     $pseudorole = get_pseudorole($profcode, $otherroles);
-    
+ 
     // Convert pseudorole to the appropiate role for given subject area.
     $moodleroleid = get_moodlerole($pseudorole, $subjectarea);
 
@@ -672,6 +672,7 @@ function role_mapping($profcode, array $otherroles, $subjectarea="*SYSTEM*") {
  * role InstSet     Pseudo Role
  * 01   any         editingteacher
  * 03	any	    supervising_instructor
+ * 04   any         grader
  * 22	any	    student_instructor
  * 02 (in any section)	01 (in any section)       ta
  * 02 (primary)	03 (in any section)       ta_instructor
@@ -687,50 +688,56 @@ function role_mapping($profcode, array $otherroles, $subjectarea="*SYSTEM*") {
  *                              student_instructor
  *                              Returns null if no pseudo role can be found
  */
-function get_pseudorole(array $prof_code, array $other_prof_codes) {
-    
-    // shortcuts for 01 and 03
-    if (isset($prof_code['primary']) && in_array('01', $prof_code['primary']) ||
-            isset($prof_code['secondary']) && in_array('01', $prof_code['secondary'])) {
+function get_pseudorole(array $profcode, array $otherprofcodes) {
+ 
+    // Shortcuts for 01 and 03.
+    if (isset($profcode['primary']) && in_array('01', $profcode['primary']) ||
+            isset($profcode['secondary']) && in_array('01', $profcode['secondary'])) {
         return 'editingteacher';
     }
-    if (isset($prof_code['primary']) && in_array('03', $prof_code['primary']) ||
-            isset($prof_code['secondary']) && in_array('03', $prof_code['secondary'])) {
+    if (isset($profcode['primary']) && in_array('03', $profcode['primary']) ||
+            isset($profcode['secondary']) && in_array('03', $profcode['secondary'])) {
         return 'supervising_instructor';
     }
-    
-    // handling the complex 02 roles
-    if (isset($prof_code['primary']) && in_array('02', $prof_code['primary']) ||
-            isset($prof_code['secondary']) && in_array('02', $prof_code['secondary'])) {
+ 
+    // Handling the complex 02 roles.
+    if (isset($profcode['primary']) && in_array('02', $profcode['primary']) ||
+            isset($profcode['secondary']) && in_array('02', $profcode['secondary'])) {
 
-        // Anyone with 02 on a course with an 01 is a ta
+        // Anyone with 02 on a course with an 01 is a ta.
         // 02 (in any section)	01 (in any section)       ta
-        if (isset($other_prof_codes['primary']) && in_array('01', $other_prof_codes['primary']) ||
-                isset($other_prof_codes['secondary']) && in_array('01', $other_prof_codes['secondary'])) {
+        if (isset($otherprofcodes['primary']) && in_array('01', $otherprofcodes['primary']) ||
+                isset($otherprofcodes['secondary']) && in_array('01', $otherprofcodes['secondary'])) {
             return 'ta';
         }
 
-        // if someone is an 02 in the primary section, and there is an 03, they 
-        // are a ta_instructor (assumes no 01, because of first condition)
+        // If someone is an 02 in the primary section, and there is an 03, they
+        // are a ta_instructor (assumes no 01, because of first condition).
         // 02 (primary)	03 (in any section)       ta_instructor
-        if (isset($prof_code['primary']) && in_array('02', $prof_code['primary'])) {
-            if (isset($other_prof_codes['primary']) && in_array('03', $other_prof_codes['primary']) ||
-                    isset($other_prof_codes['secondary']) && in_array('03', $other_prof_codes['secondary'])) {
+        if (isset($profcode['primary']) && in_array('02', $profcode['primary'])) {
+            if (isset($otherprofcodes['primary']) && in_array('03', $otherprofcodes['primary']) ||
+                    isset($otherprofcodes['secondary']) && in_array('03', $otherprofcodes['secondary'])) {
                 return 'ta_instructor';
-            }            
+            }
         }
-        
-        // for all other 02 cases, default to ta
+ 
+        // For all other 02 cases, default to ta.
         return 'ta';
     }
-    
-    // Handle role mapping of prof code 22
-    if (isset($prof_code['primary']) && in_array('22', $prof_code['primary']) ||
-            isset($prof_code['secondary']) && in_array('22', $prof_code['secondary'])) {
+
+    // Handle role mapping of prof code 04.
+    if (isset($profcode['primary']) && in_array('04', $profcode['primary']) ||
+            isset($profcode['secondary']) && in_array('04', $profcode['secondary'])) {
+        return 'grader';
+    }
+
+    // Handle role mapping of prof code 22.
+    if (isset($profcode['primary']) && in_array('22', $profcode['primary']) ||
+            isset($profcode['secondary']) && in_array('22', $profcode['secondary'])) {
         return 'student_instructor';
     }
 
-    // no role to return
+    // No role to return.
     return null;
 }
 
@@ -776,7 +783,7 @@ function get_student_pseudorole($studentcode) {
  */
 function ucla_validator($type, $value) {
     $result = 0;
-    
+ 
     switch($type) {
         case 'term':
             $result = preg_match('/^[0-9]{2}[FWS1]$/', $value);
@@ -789,8 +796,8 @@ function ucla_validator($type, $value) {
             throw new moodle_exception('invalid type', 'ucla_validator');
             break;
     }
-    
-    return $result == 1; 
+ 
+    return $result == 1;
 }
 
 /**
@@ -824,27 +831,27 @@ function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
 
     // if mapping exists in file, then don't care what values are in the db
     if (!empty($role[$pseudorole][$subjectarea])) {
-        if ($moodlerole = $DB->get_record('role', 
+        if ($moodlerole = $DB->get_record('role',
                 array('shortname' => $role[$pseudorole][$subjectarea]))) {
             $cache->set($cachekey, $moodlerole->id);
             return $moodlerole->id;
-        }            
+        }
     }
-    
+ 
     // didn't find role mapping in config file, check database
-    if ($moodlerole = $DB->get_record('ucla_rolemapping', 
+    if ($moodlerole = $DB->get_record('ucla_rolemapping',
             array(
-                'pseudo_role' => $pseudorole, 
+                'pseudo_role' => $pseudorole,
                 'subject_area' => $subjectarea
             ))) {
         $cache->set($cachekey, $moodlerole->moodle_roleid);
-        return $moodlerole->moodle_roleid;    
+        return $moodlerole->moodle_roleid;
     }
-    
-    // if no role was found, then use *SYSTEM* default 
+ 
+    // if no role was found, then use *SYSTEM* default
     // (should be set in config)
     if (!empty($role[$pseudorole]['*SYSTEM*'])) {
-        if ($moodlerole = $DB->get_record('role', 
+        if ($moodlerole = $DB->get_record('role',
                 array('shortname' => $role[$pseudorole]['*SYSTEM*']))) {
             $cache->set($cachekey, $moodlerole->id);
             return $moodlerole->id;
@@ -852,10 +859,10 @@ function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
             debugging('pseudorole mapping found, but local role not found');
         }
     }
-    
+ 
     // oh no... didn't find proper role mapping, stop the presses
-    throw new moodle_exception('invalidrolemapping', 'local_ucla', null, 
-            sprintf('Params: $pseudorole - %s, $subjectarea - %s', 
+    throw new moodle_exception('invalidrolemapping', 'local_ucla', null,
+            sprintf('Params: $pseudorole - %s, $subjectarea - %s',
                     $pseudorole, $subjectarea));
 }
 
@@ -872,15 +879,15 @@ function ucla_send_mail($to, $subj, $body='', $header='') {
 
     if (!empty($CFG->divertallemailsto)) {
         // change subject to have divert message
-        $subj = "[DIVERTED $to] $subj";      
+        $subj = "[DIVERTED $to] $subj";
         // clear out old to
         $to = $CFG->divertallemailsto;
         // clear header variable, because it might contain an email address
-        $header = '';        
+        $header = '';
     }
 
     if (debugging() && empty($CFG->divertallemailsto)) {
-        // if divertallemailsto is set, then send out email even if debugging is 
+        // if divertallemailsto is set, then send out email even if debugging is
         // enabled
         debugging("TO: $to\nSUBJ: $subj\nBODY: $body\nHEADER: $header");
     } else {
@@ -908,14 +915,14 @@ function terms_arr_sort($terms, $descending = false) {
 
     // sort
     asort($ksorter);
-    
+ 
     // denumerate terms
     $sorted = array();
     foreach ($ksorter as $k => $v) {
         $term = $terms[$k];
         $sorted[$term] = $term;
     }
-    
+ 
     // sort in descending order
     if ($descending == true) {
         $sorted = array_reverse($sorted, true);
@@ -932,7 +939,7 @@ function terms_arr_sort($terms, $descending = false) {
  *  @param  $currweek       Week to use as current week
  *  @param  $limitweek      Week to use as cut-off week
  **/
-function term_role_can_view($term, $roleshortname, $currterm=null, 
+function term_role_can_view($term, $roleshortname, $currterm=null,
                             $currweek=null, $limitweek=null, $leastterm=null) {
     // Nobody can see courses from non-terms
     if (!ucla_validator('term', $term)) {
@@ -952,21 +959,21 @@ function term_role_can_view($term, $roleshortname, $currterm=null,
     if ($limitweek === null) {
         $limitweek = get_config('local_ucla', 'student_access_ends_week');
     }
-    
+ 
     if ($currweek === null) {
         $currweek = get_config('local_ucla', 'current_week');
     }
 
     if ($currterm === null) {
         $currterm = get_config(null, 'currentterm');
-    } 
-    
+    }
+ 
     // find the maximum-access-role
     // Check out CCLE-2834 for documentation and reasoning
     $canviewprev = false;
     if (in_array($roleshortname, array(
                 // Role-mapped course editors
-                'ta_admin', 'ta_instructor', 'editinginstructor', 
+                'ta_admin', 'ta_instructor', 'editinginstructor',
                     'supervising_instructor', 'studentfacilitator',
                 // Site adjuncts
                 'manager', 'instructional_assistant', 'editor'
@@ -975,7 +982,7 @@ function term_role_can_view($term, $roleshortname, $currterm=null,
     }
 
     // Either can see all terms or can see until week 2, the previous term
-    if ($canviewprev || term_cmp_fn($term, $currterm) >= 0 
+    if ($canviewprev || term_cmp_fn($term, $currterm) >= 0
         || ($currweek < $limitweek
             && term_cmp_fn($term, term_get_prev($currterm)) == 0)) {
         // This should evaluate to true
@@ -999,7 +1006,7 @@ function terms_arr_fill($terms) {
 }
 
 function terms_range($startterm, $endterm) {
-    if (!ucla_validator('term', $startterm) 
+    if (!ucla_validator('term', $startterm)
             || !ucla_validator('term', $endterm)) {
         throw new moodle_exception('invalidterm', 'local_ucla');
     }
@@ -1038,12 +1045,12 @@ function terms_range($startterm, $endterm) {
  * 
  *  @param current_term a valid term string (Ex: '11F')
  *  @return the term after the current term.
- */       
+ */
 function term_get_next($term) {
     if (empty($term)) {
         return null;
     }
-    $year = intval(substr($term,0 , 2));
+    $year = intval(substr($term, 0, 2));
     $quarter = substr($term, -1);
 
     switch($quarter) {
@@ -1066,7 +1073,7 @@ function term_get_next($term) {
  * 
  *  @param current_term a valid term string (Ex: '11F')
  *  @return the term after the current term.
- */       
+ */
 function term_get_prev($term) {
     if (empty($term)) {
         return null;
@@ -1098,7 +1105,7 @@ function term_enum($term) {
     if (!ucla_validator('term', $term)) {
         return false;
     }
-    
+ 
     // assumption: 65F is the oldest term that registrar has
     // so treat years 65 and older as 19XX and years before as 20XX
     $year = (int) substr($term, 0, -1);
@@ -1108,7 +1115,7 @@ function term_enum($term) {
     } else {
         $year = '19' . $year;
     }
-    
+ 
     $r = array(
         'W' => 0,
         'S' => 1,
@@ -1187,25 +1194,25 @@ function is_engineering($courseid) {
  * 
  * @return boolean true if the user has the role in the context, false otherwise
  **/
-function has_role_in_context($role_shortname, $context) {    
+function has_role_in_context($role_shortname, $context) {
     global $DB;
     $does_role_exist = $DB->get_records('role', array('shortname'=>$role_shortname));
-    if(empty($does_role_exist)) {
+    if (empty($does_role_exist)) {
         debugging("Role shortname not found in database table.");
         return false;
     }
-    
+ 
     // cast $role_shortname as array, if not already
     if (!is_array($role_shortname)) {
         $role_shortname = array($role_shortname);
     }
-    
+ 
     $roles_result = get_user_roles($context);
-    foreach($roles_result as $role) {
-        if(in_array($role->shortname, $role_shortname)) {
+    foreach ($roles_result as $role) {
+        if (in_array($role->shortname, $role_shortname)) {
             return true;
         }
-    } 
+    }
     return false;
 }
 
@@ -1224,18 +1231,18 @@ function has_role_in_context($role_shortname, $context) {
  */
 function set_editing_mode_button($url=null) {
     global $OUTPUT, $PAGE, $USER;
-    
+ 
     if (empty($url)) {
         $url = $PAGE->url;
     }
-    
+ 
     // see if user is trying to turn editing on/off
     // copied from course/view.php:line 12, 104-128, 153-155, 205-206
     // (at the time of Moodle 2.2.2)
     $edit = optional_param('edit', -1, PARAM_BOOL);
     if (!isset($USER->editing)) {
         $USER->editing = 0;
-    }    
+    }
     if ($PAGE->user_allowed_editing()) {
         if (($edit == 1) and confirm_sesskey()) {
             $USER->editing = 1;
@@ -1243,16 +1250,16 @@ function set_editing_mode_button($url=null) {
             redirect($url);
         } else if (($edit == 0) and confirm_sesskey()) {
             $USER->editing = 0;
-            if(!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
+            if (!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
                 $USER->activitycopy       = false;
-                $USER->activitycopycourse = NULL;
+                $USER->activitycopycourse = null;
             }
             // edited to use url specified in function
             redirect($url);
         }
         // edited to use url specified in function
         $buttons = $OUTPUT->edit_button($url);
-        $PAGE->set_button($buttons);                
+        $PAGE->set_button($buttons);
     } else {
         $USER->editing = 0;
     }
@@ -1268,24 +1275,24 @@ function make_friendly_url($course) {
 }
 
 /*
- * Checks the role_assignments table and sees if the viewer shares a context 
+ * Checks the role_assignments table and sees if the viewer shares a context
  * with the target.
- * 
+ *
  * @param int $targetid     Id of user to check if viewer shares a context with
  * @param int $userid       Defaults to null. If null, then will use currently
  *                          logged in user.
- * 
- * @return boolean          True if viewer does share a context with target, 
- *                          otherwise false. 
+ *
+ * @return boolean          True if viewer does share a context with target,
+ *                          otherwise false.
  */
 function has_shared_context($targetid, $viewerid=null) {
     global $DB, $USER;
-    
+ 
     if (empty($viewerid)) {
         $viewerid = $USER->id;
     }
-    
-    // use raw SQL, because there is no built in moodle database api to join a 
+ 
+    // use raw SQL, because there is no built in moodle database api to join a
     // table on itself
     $sql = "SELECT  COUNT(*)
             FROM    {role_assignments} AS ra_target,
@@ -1293,7 +1300,7 @@ function has_shared_context($targetid, $viewerid=null) {
             WHERE   ra_target.userid=:targetid AND
                     ra_viewer.userid=:viewerid AND
                     ra_target.contextid=ra_viewer.contextid";
-    $result = $DB->get_field_sql($sql, array('targetid' => $targetid, 
+    $result = $DB->get_field_sql($sql, array('targetid' => $targetid,
                                              'viewerid' => $viewerid));
 
     // if there is a result, return true, otherwise false
@@ -1310,23 +1317,23 @@ function has_shared_context($targetid, $viewerid=null) {
  */
 function get_active_terms($descending = 'false') {
     $ret_val = array();
-    
+ 
     $terms = get_config('local_ucla', 'active_terms');
-    if (is_string($terms)) {    
-       // terms should a comma deliminated list (but might be array already if
-       // if defined in config file)
-       $terms = explode(',', $terms);
+    if (is_string($terms)) {
+        // terms should a comma deliminated list (but might be array already if
+        // if defined in config file)
+        $terms = explode(',', $terms);
     }
-    
+ 
     if (!empty($terms)) {
         foreach ($terms as $term) {
             $term = trim($term);
             if (ucla_validator('term', $term)) {
                 $ret_val[$term] = $term;
-            }                              
+            }
         }
-    }    
-   
+    }
+ 
     // The weeksdisplay block generates all the terms in correct order
     // But in case this is from a Config file instead
     return terms_arr_sort($ret_val, $descending);
@@ -1354,7 +1361,7 @@ function setup_js_tablesorter($tableid=null) {
         $tableid = uniqid();
     }
 
-    $PAGE->requires->js_init_code('$(document).ready(function() { $("#' 
+    $PAGE->requires->js_init_code('$(document).ready(function() { $("#'
         . $tableid . '").addClass("tablesorter").tablesorter('
         . '{widgets: ["zebra"]}); });');
 
@@ -1366,8 +1373,8 @@ function prompt_login($PAGE, $OUTPUT, $CFG, $course) {
     $PAGE->set_course($course);
     $PAGE->set_title($course->shortname);
     $PAGE->set_heading($course->fullname);
-    $PAGE->navbar->add(get_string('loginredirect','local_ucla'));
-            
+    $PAGE->navbar->add(get_string('loginredirect', 'local_ucla'));
+ 
     notice(get_string('notloggedin', 'local_ucla'), get_login_url());
 }
 
@@ -1377,7 +1384,7 @@ function prompt_login($PAGE, $OUTPUT, $CFG, $course) {
  * @global object $OUTPUT
  */
 function flash_display() {
-    global $OUTPUT;    
+    global $OUTPUT;
     if (isset($_SESSION['flash_success_msg'])) {
         echo $OUTPUT->notification($_SESSION['flash_success_msg'], 'notifysuccess');
         unset($_SESSION['flash_success_msg']);
@@ -1391,7 +1398,7 @@ function flash_display() {
  * @param moodle_url|string $url A moodle_url to redirect to. Strings are not to be trusted!
  * @param string $success_msg The message to display to the user
  */
-function flash_redirect($url, $success_msg) {    
+function flash_redirect($url, $success_msg) {
     // message to indicate to user that content was edited
     $_SESSION['flash_success_msg']  = $success_msg;
     redirect($url);
@@ -1415,7 +1422,7 @@ function notice_course_status($course) {
 
     $noticestring = '';
     $noticeparam = null;
-    
+ 
     if (is_past_course($course)) {
         $currentweek = get_config('local_ucla', 'current_week');
         if ($currentweek === \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
@@ -1486,7 +1493,7 @@ function notice_course_status($course) {
             }
         } else {
             $noticestring = 'notice_course_status_pasthidden';
-        }        
+        }
     } else if ($ispastcourse && !$ishidden && $istemprole) {
         $noticestring = 'notice_course_status_pasttemp';
     } else if (!$ispastcourse && $ishidden && $istemprole) {
@@ -1496,7 +1503,7 @@ function notice_course_status($course) {
     }
 
     if (!empty($noticestring)) {
-        return $OUTPUT->notification(get_string($noticestring, 'local_ucla', 
+        return $OUTPUT->notification(get_string($noticestring, 'local_ucla',
                 $noticeparam), 'notifywarning');
     }
 }
@@ -1663,7 +1670,7 @@ function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
 
     // Check that user has the capability to view all groups.
     $context = context_course::instance($course->id);
-    if(!has_capability('moodle/site:accessallgroups', $context)) {
+    if (!has_capability('moodle/site:accessallgroups', $context)) {
         return '';
     }
 
@@ -1679,18 +1686,18 @@ function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
         // Change the "Private Course Material" grouping to show as "All" if it exists.
         $publicprivatecourse = new PublicPrivate_Course($course);
         $pubprivgroupingid = $publicprivatecourse->get_grouping();
-        if($pubprivgroupingid && isset($groupingsmenu[$pubprivgroupingid])) {
+        if ($pubprivgroupingid && isset($groupingsmenu[$pubprivgroupingid])) {
             $groupingsmenu[$pubprivgroupingid] = get_string('all_groupings', 'local_ucla');
         }
 
-        // Set the active grouping to be the course's default grouping if no 
-        // active grouping was supplied.  
+        // Set the active grouping to be the course's default grouping if no
+        // active grouping was supplied.
         if (!isset($activegrouping) && isset($course->defaultgroupingid)
             && isset($groupingsmenu[$course->defaultgroupingid])) {
-            
+ 
             $activegrouping = $course->defaultgroupingid;
         }
-    
+ 
         // Build a string with the grouping being viewed,
         // or a select with all available groupings.
         $groupinglabel = get_string('view_grouping', 'local_ucla');

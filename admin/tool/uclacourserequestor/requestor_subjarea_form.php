@@ -13,8 +13,8 @@ class requestor_subjarea_form extends requestor_shared_form {
 
         $pulldown_subject = array();
         foreach ($subjareas as $subjarea) {
-            $s = $subjarea->subjarea;
-            $pulldown_subject[$s] = $s . ' - ' . $subjarea->subj_area_full;
+            $s = $subjarea['subjarea'];
+            $pulldown_subject[$s] = $s . ' - ' . $subjarea['subj_area_full'];
         }
 
         $spec = array();

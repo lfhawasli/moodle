@@ -117,12 +117,12 @@ function display_video_furnace_contents($course) {
     echo $OUTPUT->heading(get_string('header', 'block_ucla_video_furnace', 
             $course->fullname), 2, 'headingblock');
 
-    echo html_writer::tag('p', get_string('videofurnaceintro', 'block_ucla_video_furnace'), 
+    echo html_writer::tag('p', get_string('videofurnaceintro', 'block_ucla_video_furnace'),
             array('id' => 'videofurnaceintro'));
     
     $videos = get_video_data($course->id);
     
-    echo html_writer::start_tag('div', array('id' => 'vidfurnace-content'));        
+    echo html_writer::start_tag('div', array('id' => 'vidfurnace-content'));
     if (!empty($videos['current'])) {
         print_video_list($videos['current'], get_string('currentvideo', 'block_ucla_video_furnace'), array('class' => 'vidFurnaceLinks'));
     } else {

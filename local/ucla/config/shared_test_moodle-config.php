@@ -98,7 +98,6 @@ $CFG->forced_plugin_settings['block_ucla_browseby']['allow_acttypes'] = 'CLI,LEC
 
 // Course Requestor
 //$CFG->forced_plugin_settings['tool_uclacourserequestor']['terms'] = $terms_to_built;
-//$CFG->forced_plugin_settings['tool_uclacourserequestor']['selected_term'] = $CFG->currentterm;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['mailinst_default'] = false; 
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_default'] = true;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_hide'] = true;
@@ -285,6 +284,9 @@ $CFG->forced_plugin_settings['resource']['printheading'] = 1;
 $CFG->forced_plugin_settings['quiz']['overduehandling'] = 'autosubmit';
 $CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 300;
 
+// Site administration > Plugins > Activity modules > Scheduler
+$CFG->scheduler_maxstudentsperslot = 75;
+
 // Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
 $CFG->turnitin_studentemail = 0;
@@ -387,6 +389,7 @@ $CFG->filter_oidwowza_enable_mp4 = 1;
 
 // Site administration > Plugins > Filters > PoodLL Filter
 $CFG->filter_poodll_download_media_ok = '1';
+$CFG->filter_poodll_miccanpause = '1';
 
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files

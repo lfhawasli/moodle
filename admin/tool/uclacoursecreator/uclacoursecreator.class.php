@@ -1045,12 +1045,22 @@ class uclacoursecreator {
      * @return coursecat
      */
     function new_category($name, $parent=0, $idnumber=null) {
+        global $DB;
         $newcategory = new stdClass();
         $newcategory->name = $name;
         $newcategory->parent = $parent;
         $newcategory->idnumber = $idnumber;
 
-        return  coursecat::create($newcategory);
+        // If we have idnumber, then we can have a conflict if we try to add
+        // a category with the same idnumber (CCLE-5100).
+        if (!empty($idnumber) && ($record = $DB->get_record('course_categories',
+                array ('idnumber' => $idnumber)))) {
+             $coursecat = coursecat::get($record->id);
+             $coursecat->update($newcategory);
+             return $coursecat;
+        } else {
+            return coursecat::create($newcategory);
+        }
     }
 
     /**

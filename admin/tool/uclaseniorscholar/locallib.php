@@ -108,7 +108,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 // Update invite to have the proper timesent/timeexpiration.
                 if ($resend) {
                     $DB->set_field('enrol_invitation', 'timeexpiration', $invitation->timeexpiration,
-                            array('courseid' => $data->courseid,  'id' => $data->id));
+                                  array('courseid' => $data->courseid,  'id' => $data->id));
 
                     // Prepend subject heading with a 'Reminder' string.
                     $invitation->subject = get_string('reminder', 'enrol_invitation');
@@ -118,7 +118,6 @@ class seniorscholar_invitation_manager extends invitation_manager {
 
                 $invitation->inviterid = $USER->id;
                 $invitation->notify_inviter = empty($data->notify_inviter) ? 0 : 1;
-                $invitation->show_from_email = empty($data->show_from_email) ? 0 : 1;
 
                 // Construct message: custom (if any) + template.
                 $messagehtml = '';
@@ -157,20 +156,17 @@ class seniorscholar_invitation_manager extends invitation_manager {
                     $retval = $data->id;
                 }
 
-                // Change FROM to be $CFG->seniorscholarsupportemail if user has show_from_email off.
-                $fromuser = $USER;
-                if (empty($invitation->show_from_email)) {
-                    $fromuser = new stdClass();
-                    $fromuser->email = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
-                    $fromuser->firstname = '';
-                    $fromuser->lastname = $SITE->fullname;
-                    $fromuser->maildisplay = true;
-                    // Moodle 2.7 introduced new username fields.
-                    $fromuser->alternatename = '';
-                    $fromuser->firstnamephonetic = '';
-                    $fromuser->lastnamephonetic = '';
-                    $fromuser->middlename = '';
-                }
+                // Always show FROM $CFG->seniorscholarsupportemail email address.
+                $fromuser = new stdClass();
+                $fromuser->email = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
+                $fromuser->firstname = '';
+                $fromuser->lastname = get_string('fromlastname', 'tool_uclaseniorscholar');
+                $fromuser->maildisplay = true;
+                // Moodle 2.7 introduced new username fields.
+                $fromuser->alternatename = '';
+                $fromuser->firstnamephonetic = '';
+                $fromuser->lastnamephonetic = '';
+                $fromuser->middlename = '';
 
                 // Send invitation to the user.
                 $contactuser = new stdClass();

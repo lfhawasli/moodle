@@ -43,7 +43,7 @@ $returnurl = $CFG->wwwroot . '/my/';
 $PAGE->set_url($url);
 
 // Check permissions.
-require_login();
+require_login(null, false);
 if (isguestuser()) {
     print_error('guestsarenotallowed', '', $returnurl);
 }

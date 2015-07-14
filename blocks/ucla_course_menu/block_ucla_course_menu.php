@@ -242,6 +242,11 @@ class block_ucla_course_menu extends block_navigation {
                 continue;
             }
 
+            // Add (empty) tag to sections with no content.
+            if (empty($section->sequence) && $viewhiddensections) {
+                $sectionname = $sectionname . " (empty)";
+            }      
+
             $sectnum = $section->section;
             $key = 'section-' . $sectnum;
             $elements[$key] = navigation_node::create($sectionname,
@@ -250,7 +255,7 @@ class block_ucla_course_menu extends block_navigation {
                     'section' => $sectnum
                 )), navigation_node::TYPE_SECTION
             );
-            
+
             // Indicate that section is hidden.
             if(!$section->visible) {
                 $elements[$key]->classes = array('block_ucla_course_menu_hidden');
@@ -263,6 +268,9 @@ class block_ucla_course_menu extends block_navigation {
                     $elements[$key]->classes = array('hascontent');
 
                 }
+            // People who cannot view hidden sections are not allowed to see sections with no content.
+            } else if (!$viewhiddensections) {
+                unset($elements[$key]);
             }
         }
 

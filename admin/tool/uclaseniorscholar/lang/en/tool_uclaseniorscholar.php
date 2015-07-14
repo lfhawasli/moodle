@@ -33,6 +33,7 @@ $string['course'] = 'Course';
 $string['coursecanlled'] = 'Cancelled';
 $string['instructor'] = 'Instructor';
 $string['email'] = 'Senior scholar email';
+$string['fromlastname'] = 'Senior scholar coordinator';
 $string['mainmenu_course'] = 'You can search by term/instructor and term/subject area';
 $string['mainmenu_history'] = 'You can search user invite history by term';
 $string['all_by_course_current_term'] = 'All items for current term listed by course';
