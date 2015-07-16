@@ -61,7 +61,21 @@ if (empty($history)) {
         $row[] = siteindicator_manager::get_categories_list($h->categoryid);
         $name = siteindicator_manager::get_username($h->requester);
 
+        $timerequestedstr = '';
+        if (!empty($h->timerequested)) {
+            $timerequestedstr = get_string('timerequested', 'tool_uclasiteindicator', userdate($h->timerequested));
+        }
+
+        $procesedbystr = '';
+        if (!empty($h->processedby)) {
+            $procesedby = new stdClass();
+            $procesedby->name = siteindicator_manager::get_username($h->processedby);
+            $procesedby->time = userdate($h->timeprocessed);
+            $procesedbystr = get_string('procesedby', 'tool_uclasiteindicator', $procesedby);
+        }
+
         if($h->courseid) {
+            // Site request was approved.
             $course = $DB->get_record('course', array('id' => $h->courseid));
 
             // if course was not found, then course was deleted
@@ -75,12 +89,13 @@ if (empty($history)) {
             $row[] = html_writer::tag('span', $course->shortname . '<br/>' . $link);
 
             // Requester
-            $row[] = html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $h->requester, $name);
+            $row[] = html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $h->requester, $name) . $timerequestedstr;
 
             // Site status
-            $link = html_writer::link($CFG->wwwroot . '/course/view.php?id=' . $h->courseid, 'Active');
-            $row[] = html_writer::tag('span', $link, array('class' => 'indicator-active indicator-block'));
+            $link = html_writer::link($CFG->wwwroot . '/course/view.php?id=' . $h->courseid, 'Approved');
+            $row[] = html_writer::tag('span', $link, array('class' => 'indicator-active indicator-block')) . $procesedbystr;
         } else if($h->requestid) {
+            // Site request is pending.
             $course = $DB->get_record('course_request', array('id' => $h->requestid));
 
             // Site name
@@ -88,18 +103,20 @@ if (empty($history)) {
             $row[] = html_writer::tag('span', $sitename);
 
             // Requester
-            $row[] = html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $h->requester, $name);
+            $row[] = html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $h->requester, $name) . $timerequestedstr;
 
             // Status
             $link = html_writer::link($CFG->wwwroot . '/course/pending.php?request=' . $h->requestid, 'Pending');
             $row[] = html_writer::tag('span', $link, array('class' => 'indicator-pending indicator-block'));
         } else {
+            // Site request was rejected.
+
             // Site name is empty
             $row[] = html_writer::tag('span', '&lt;empty&gt;');
             // Requester
-            $row[] = html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $h->requester, $name);
+            $row[] = html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $h->requester, $name) . $timerequestedstr;
             // Site status
-            $row[] = html_writer::tag('span', 'Rejected', array('class' => 'indicator-reject indicator-block'));
+            $row[] = html_writer::tag('span', 'Rejected', array('class' => 'indicator-reject indicator-block')) . $procesedbystr;
         }
 
         $table->data[] = $row;

@@ -32,6 +32,7 @@
 
 .indicator-block {
     padding: 2px 4px;
+    color: white;
 }
 .indicator-block a:link, 
 .indicator-block a:visited{
@@ -47,7 +48,7 @@
 }
 
 .indicator-reject {
-    color: red;
+    background-color: #d9534f;
 }
 
 /* autocomplete search */
