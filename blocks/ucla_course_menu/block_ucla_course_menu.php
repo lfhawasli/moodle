@@ -243,7 +243,8 @@ class block_ucla_course_menu extends block_navigation {
             }
 
             // Add (empty) tag to sections with no content.
-            if (empty($section->sequence) && $viewhiddensections) {
+            $nocontent = empty($section->sequence) && empty($section->summary);
+            if ($nocontent && $viewhiddensections) {
                 $sectionname = $sectionname . " (empty)";
             }      
 
@@ -261,7 +262,7 @@ class block_ucla_course_menu extends block_navigation {
                 $elements[$key]->classes = array('block_ucla_course_menu_hidden');
             }
             // Check that section contains activities.
-            if (!empty($section->sequence)) {
+            if (empty($nocontent)) {
                 if (is_array($elements[$key]->classes)) {
                     $elements[$key]->classes[] = 'hascontent';
                 } else {
