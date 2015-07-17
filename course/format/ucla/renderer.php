@@ -301,13 +301,9 @@ class format_ucla_renderer extends format_topics_renderer {
         // do not display section summary/header info for section 0
         echo $this->section_header($thissection, $course, false);
 
-//        print_section($course, $thissection, $mods, $modnamesused, true);
-//        $courserenderer = $PAGE->get_renderer('core', 'course'); 
         echo $this->courserenderer->course_section_cm_list($course, $thissection);
         
         if ($PAGE->user_is_editing()) {
-//            print_section_add_menus($course, 0, $modnames);
-//            $courserenderer = $PAGE->get_renderer('core', 'course'); 
             $output = $this->courserenderer->course_section_add_cm_control($course, 0); 
             echo $output; // if $return argument in print_section_add_menus() set to false
         }
@@ -316,7 +312,8 @@ class format_ucla_renderer extends format_topics_renderer {
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
         for ($section = 1; $section <= $course->numsections; $section++) {
             // People who cannot view hidden sections are not allowed to see sections titles with no content.
-            if (!empty($sections[$section]->sequence) || $canviewhidden) {
+            $nocontent = empty($section->sequence) && empty($sections[$section]->summary);
+            if (empty($nocontent) || $canviewhidden) {
                 if (!empty($sections[$section])) {
                     $thissection = $sections[$section];
                 } else {
