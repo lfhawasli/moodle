@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Observers file.
- * 
+ * Handles events when roles are (un)assigned and enrolment status updated.
+ *
  * @package    local_publicprivate
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,26 +25,74 @@
 namespace local_publicprivate;
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
 
-require_once($CFG->dirroot . '/local/publicprivate/lib.php');
-
+/**
+ * Observers class.
+ *
+ * @package    local_publicprivate
+ * @copyright  2015 UCLA regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class observers {
 
     /**
+     * Role assigned.
+     *
+     * Called by Events API when a new role is assigned. Add user to private public group.
+     *
+     * @param \core\event\role_assigned $event
+     */
+    public static function role_assigned(\core\event\role_assigned $event) {
+        $context = \context::instance_by_id($event->contextid);
+        $userid = $event->relateduserid;
+
+        if ($context->contextlevel == CONTEXT_COURSE) {
+            $pubprivcourse = \PublicPrivate_Course::build($context->instanceid);
+            if ($pubprivcourse->is_activated()) {
+                $pubprivcourse->add_user($userid);
+            }
+        }
+    }
+    /**
+     * Role unassigned.
+     *
+     * Called by Events API when an user is unassigned. If all roles of an user
+     * are unassigned, remove this user from public/private group.
+     *
+     * @param \core\event\role_unassigned $event
+     */
+    public static function role_unassigned(\core\event\role_unassigned $event) {
+        global $DB;
+
+        $userid = $event->relateduserid;
+        $contextid = $event->contextid;
+        $context = \context::instance_by_id($contextid);
+
+        if ($context->contextlevel == CONTEXT_COURSE &&
+            !$DB->record_exists('role_assignments',
+                    array('userid' => $userid, 'contextid' => $contextid))) {
+            $ppcourse = \PublicPrivate_Course::build($context->instanceid);
+            if ($ppcourse->is_activated()) {
+                $ppcourse->remove_user($userid);
+            }
+        }
+    }
+
+    /**
      * Section groups synced.
-     * 
-     * Called by Events API when new section groups are created for a course. Adds the new groups to
-     * the course's public/private grouping.
-     * 
+     *
+     * Called by Events API when new section groups are created for a course.
+     * Adds the new groups to the course's public/private grouping.
+     *
      * @param \block_ucla_group_manager\event\section_groups_synced $event
      */
     public static function section_groups_synced(\block_ucla_group_manager\event\section_groups_synced $event) {
         global $CFG;
-        require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
         $groupids = $event->other['groupids'];
         $course = get_course($event->courseid);
-        if (\PublicPrivate_Course::is_publicprivate_capable($course)) {
-            $ppcourse = \PublicPrivate_Course::build($course);
+        $ppcourse = \PublicPrivate_Course::build($course);
+        if ($ppcourse->is_activated()) {
             if ($ppgroupingid = $ppcourse->get_grouping()) {
                 require_once($CFG->dirroot . '/group/lib.php');
                 foreach ($groupids as $groupid) {
@@ -58,62 +106,11 @@ class observers {
      * Triggered via user_enrolment_updated event.
      *
      * @param \core\event\user_enrolment_updated $event
-     * @global object $CFG
      */
     public static function user_enrolment_updated(\core\event\user_enrolment_updated $event) {
-        global $CFG;
-        require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
-        $publicprivate = new \PublicPrivate_Course($event->courseid);
-        $publicprivate->check_enrolments($event->relateduserid);
-    }
-
-    /**
-     * Role assigned.
-     * 
-     * Called by Events API when a new role is assigned. Add user to private public group.
-     * 
-     * @param \core\event\role_assigned $event
-     */
-    public static function role_assigned(\core\event\role_assigned $event) {
-        global $CFG;
-
-        $context = \context::instance_by_id($event->contextid);
-        $userid = $event->relateduserid;
-
-        if ($context->contextlevel == CONTEXT_COURSE) {
-            require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
-            $pubprivcourse = \PublicPrivate_Course::build($context->instanceid);
-
-            if ($pubprivcourse->is_activated()) {
-                $pubprivcourse->add_user($userid);
-            }
-        }
-    }
-    /**
-     * Role unassigned.
-     * 
-     * Called by Events API when an user is unassigned. If all roles of an user are unassigned, 
-     * remove this user from public/private group.
-     * 
-     * @param \core\event\role_unassigned $event
-     */
-    public static function role_unassigned(\core\event\role_unassigned $event) {
-        global $CFG, $DB;
-
-        $userid = $event->relateduserid;
-        $contextid = $event->contextid;
-        $context = \context::instance_by_id($contextid);
-
-        if ($context->contextlevel == CONTEXT_COURSE &&
-            !$DB->record_exists('role_assignments', array('userid' => $userid, 'contextid' => $contextid))) {
-
-            require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
-
-            $pubprivcourse = \PublicPrivate_Course::build($context->instanceid);
-
-            if ($pubprivcourse->is_activated()) {
-                $pubprivcourse->remove_user($userid);
-            }
+        $ppcourse = new \PublicPrivate_Course($event->courseid);
+        if ($ppcourse->is_activated()) {
+            $ppcourse->check_enrolment($event->relateduserid);
         }
     }
 }

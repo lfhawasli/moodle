@@ -1,7 +1,24 @@
 <?php
+// This file is part of the UCLA public/private plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
+ * Combs through courses and cleans up public/private membership.
+ *
  * @package    local_publicprivate
- * @copyright  2013 UCLA regents
+ * @copyright  2015 UCLA regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -39,14 +56,13 @@ if ($unrecognized) {
 
 if ($options['help']) {
     $help =
-"
-Description:
+    "Description:
 Combs through courses and cleans up group membership based on roles and enrolment plugins.
 By default, checks all courses with publicprivate enabled.
 
 Options:
 -c, --courseid=COURSEID Cleans specified course
--d, --days=DAYS         Cleans only publicprivate enabled courses whose enrolment methods 
+-d, --days=DAYS         Cleans only publicprivate enabled courses whose enrolment methods
                         that have been modified in the last 'DAYS' days.
 -v, --verbose           Print verbose progress information
 -h, --help              Print out this help
@@ -69,8 +85,8 @@ $daysgiven = !empty($options['days']) && $options['days'] !== true;
 
 if ($idgiven) {
     // Get a single course.
-    $c = $DB->get_record('course', array('id' => intval($options['courseid'])), 
-                                 'id,enablepublicprivate,grouppublicprivate,groupingpublicprivate');
+    $c = $DB->get_record('course', array('id' => intval($options['courseid'])),
+            'id,enablepublicprivate,grouppublicprivate,groupingpublicprivate');
     if (empty($c)) {
         cli_error('Failed to get course, check course id.');
     } else {
@@ -80,47 +96,36 @@ if ($idgiven) {
         cli_error('Publicprivate not enabled on specified course');
     }
 } else if ($daysgiven) {
-    $t = time() - ($options['days'] * 86400); // There are 86400 seconds in a day.
+    $t = time() - ($options['days'] * DAYSECS);
+    // We don't want to get newly created enrolment plugins, just updated ones.
     $sql = "SELECT c.*
               FROM {course} c
               JOIN {enrol} e ON (e.courseid=c.id)
-             WHERE e.timemodified >= ? AND c.enablepublicprivate=1";
+             WHERE e.timemodified >= ? AND
+                   c.enablepublicprivate=1 AND
+                   e.timecreated!=e.timemodified";
     $courses = $DB->get_recordset_sql($sql, array($t));
 } else {
     // Get all courses.
     // We only need id, grouppublicprivate, enablepublicprivate, groupingpublicprivate.
     $courses = $DB->get_recordset('course', array('enablepublicprivate' => 1), '',
-                                  'id,enablepublicprivate,grouppublicprivate,groupingpublicprivate');
+            'id,enablepublicprivate,grouppublicprivate,groupingpublicprivate');
 }
 
 foreach ($courses as $course) {
-    if ($verbose ) {
-        echo "checking course with id $course->id\n";
+    if ($verbose) {
+        cli_heading("checking course with id $course->id");
     }
     $context = context_course::instance($course->id);
     $ppc = new PublicPrivate_Course($course);
     $users = get_enrolled_users($context);
-    $instances = enrol_get_instances($course->id, true);
-    
+
     foreach ($users as $user) {
-        if ($verbose ) {
+        if ($verbose) {
             echo "checking user with id $user->id\n";
         }
-        $roles = get_user_roles($context, $user->id);
-        if (empty($roles)) {
-            // If a user has no roles, remove them from all groups
-            $groups = groups_get_all_groups($course->id, $user->id);
-            foreach ($groups as $group) {
-                groups_remove_member($group->id, $user->id);
-            }
-        } else {
-            $ppc->check_enrolments($user->id, $instances);
-        }
+        $ppc->check_enrolment($user->id);
     }
 }
 
-if (!$idgiven && !$daysgiven) {
-    $courses->close();
-}
-
-exit(0);
+cli_heading('DONE!');

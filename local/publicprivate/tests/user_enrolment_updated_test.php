@@ -32,19 +32,6 @@ require_once($CFG->dirroot . '/lib/grouplib.php');
 class user_enrolment_updated_testcase extends advanced_testcase {
 
     /**
-     * Stores mocked version of ucla_group_manager.
-     * @var ucla_group_manager
-     */
-    private $mockuclagroupmanager = null;
-
-    /**
-     * Used by mocked_query_registrar to return data for a given stored
-     * procedure, term, and srs.
-     * @var array
-     */
-    private $mockregdata = array();
-
-    /**
      * Stores data generator.
      * @var testing_data_generator
      */
@@ -57,53 +44,32 @@ class user_enrolment_updated_testcase extends advanced_testcase {
     protected $class;
 
     /**
-     * Creates mock registrar and test class.
+     * Creates test class.
      */
     public function setUp() {
         $this->resetAfterTest();
 
-        // Create a new course and enable public/private. We pass an array containing
-        // an empty array so that only one course is generated. (No crosslisting).
+        // Create a new course and enable public/private. We pass an array 
+        // containing  an empty array so that only one course is generated.
+        // (No crosslisting).
         $this->gen = $this->getDataGenerator();
         $creqarr = $this->gen->get_plugin_generator('local_ucla')->create_class(array(array()));
         $this->class = reset($creqarr);
         $this->setAdminUser();
     }
 
-    public function test_single_enrolment_plugin() {
-        global $DB;
-        $user = $this->getDataGenerator()->create_user();
-        $student = $DB->get_record('role', array('shortname' => 'student'));
-        $this->getDataGenerator()->enrol_user($user->id, $this->class->courseid, $student->id, 'manual');
-
-        // Check to make sure user is a member of "Course members" now.
-        $ppc = PublicPrivate_Course::build($this->class->courseid);
-        $this->assertTrue(groups_is_member($ppc->get_group(), $user->id));
-
-        $instance = $DB->get_record('enrol', array('courseid' => $this->class->courseid, 'enrol' => 'manual'));
-        $plugin = enrol_get_plugin('manual');
-
-        // Suspend the user from the only enrolment.
-        $plugin->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
-        $this->assertFalse(groups_is_member($ppc->get_group(), $user->id));
-
-        // Reactivate it.
-        $plugin->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE);
-        $this->assertTrue(groups_is_member($ppc->get_group(), $user->id));
-    }
-
     /** 
-     * Try combos of plugins. 
-     * @param array(string) $enable the set of plugins to enable
-     * @param array(string) $suspend the set to suspend the user from 
-     **/
-    private function try_combo_enrolment_plugins($enable, $suspend, $user=null) {
+     * Try combos of plugins.
+     *
+     * @dataProvider enrolment_plugin_provider
+     *
+     * @param array $enable     The set of plugins to enable
+     * @param array $suspend    The set to suspend the user from
+     */
+    public function test_combo_enrolment_plugins($enable, $suspend) {
         global $DB;
-        $instanecs = array();
         $plugins = array();
-        if (empty($user)) {
-            $user = $this->getDataGenerator()->create_user();
-        }
+        $user = $this->getDataGenerator()->create_user();
         $student = $DB->get_record('role', array('shortname' => 'student'));
 
         // Enable each plugin and enrol the user in them.
@@ -143,25 +109,28 @@ class user_enrolment_updated_testcase extends advanced_testcase {
     }
 
     /** 
-     * Test combinations of manual, self, and guest plugins. 
-     **/
-    public function test_combos_enrolment_plugins() {
+     * Provides combinations of manual, self, and guest plugins.
+     */
+    public function enrolment_plugin_provider() {
         $a = array('manual');
         $b = array('manual', 'self');
         $c = array('manual', 'self', 'guest');
         $d = array('manual', 'guest');
 
-        $this->try_combo_enrolment_plugins($a, $a);
-        $this->try_combo_enrolment_plugins($b, $b);
-        $this->try_combo_enrolment_plugins($b, $a);
-        $this->try_combo_enrolment_plugins($c, $b);
-        $this->try_combo_enrolment_plugins($c, $a);
-        $this->try_combo_enrolment_plugins($d, $a);
+        return array(
+            array($a, $a),
+            array($b, $b),
+            array($b, $a),
+            array($c, $b),
+            array($c, $a),
+            array($d, $a)
+        );
     }
 
     /** 
-     * Make sure that being suspended from all plugins means that the user is dropped from all course groups. 
-     **/
+     * Make sure that being suspended from all plugins means that the user is
+     * dropped from all course groups.
+     */
     public function test_multiple_groups() {
         global $DB;
         $user = $this->getDataGenerator()->create_user();
@@ -192,8 +161,9 @@ class user_enrolment_updated_testcase extends advanced_testcase {
     }
 
     /** 
-     * Make sure that when the user has no roles, we don't re add them to "Course members".
-     **/
+     * Make sure that when the user has no roles, we don't re-add them to
+     * "Course members".
+     */
     public function test_readd_no_roles() {
         global $DB;
         $user = $this->getDataGenerator()->create_user();
@@ -216,5 +186,31 @@ class user_enrolment_updated_testcase extends advanced_testcase {
         // Reactivate it.
         $plugin->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE);
         $this->assertFalse(groups_is_member($ppc->get_group(), $user->id));
+    }
+
+    /**
+     * Make sure that suspending a user or disabling the enrolment plugin will
+     * remove user.
+     */
+    public function test_single_enrolment_plugin() {
+        global $DB;
+        $user = $this->getDataGenerator()->create_user();
+        $student = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($user->id, $this->class->courseid, $student->id, 'manual');
+
+        // Check to make sure user is a member of "Course members" now.
+        $ppc = PublicPrivate_Course::build($this->class->courseid);
+        $this->assertTrue(groups_is_member($ppc->get_group(), $user->id));
+
+        $instance = $DB->get_record('enrol', array('courseid' => $this->class->courseid, 'enrol' => 'manual'));
+        $plugin = enrol_get_plugin('manual');
+
+        // Suspend the user from the only enrolment.
+        $plugin->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
+        $this->assertFalse(groups_is_member($ppc->get_group(), $user->id));
+
+        // Reactivate it.
+        $plugin->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE);
+        $this->assertTrue(groups_is_member($ppc->get_group(), $user->id));
     }
 }

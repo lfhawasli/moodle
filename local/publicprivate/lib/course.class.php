@@ -57,7 +57,7 @@ class PublicPrivate_Course {
 
         if (is_scalar($course)) {
             try {
-                $this->_course = $DB->get_record('course', array('id' => $course), '*', MUST_EXIST);
+                $this->_course = get_course($course);
             } catch (DML_Exception $e) {
                 throw new PublicPrivate_Course_Exception('Database query failed for __construct.', 100, $e);
             }
@@ -513,12 +513,12 @@ class PublicPrivate_Course {
      * Add user to the public/private group if they're not already in the
      * public/private group.
      *
-     * @global object $CFG
-     * @global Moodle_Database $DB
+     * @param object $user
+     *
      * @throws PublicPrivate_Course_Exception
      */
     public function add_user($user) {
-        global $DB, $CFG;
+        global $DB;
 
         /*
          * Cannot add enrolled if public/private not activated.
@@ -552,9 +552,22 @@ class PublicPrivate_Course {
             return;
         }
 
-        // if the user has no active enrolments, we don't want to re add them
-        if(!$this->any_enrolled($userid)) {
+        /*
+         * Do not add a user if they have no roles in the course.
+         */
+
+        $coursecontext = context_course::instance($this->_course->id);
+        $roles = get_user_roles($coursecontext, $userid, false);
+        if (empty($roles)) {
             return;
+        }
+
+        /*
+         * If the user has no active enrolments, we don't want to add them.
+         */
+
+        if (!is_enrolled($coursecontext, $userid, '', true)) {
+            throw new PublicPrivate_Course_Exception('Trying to add unenroled user to public/private group.', 502);
         }
 
         /*
@@ -568,7 +581,7 @@ class PublicPrivate_Course {
             $member->timeadded = time();
             $DB->insert_record('groups_members', $member);
         } catch (DML_Exception $e) {
-            throw new PublicPrivate_Course_Exception('Failed to add user to public/private group.', 502, $e);
+            throw new PublicPrivate_Course_Exception('Failed to add user to public/private group.', 503, $e);
         }
     }
 
@@ -661,49 +674,42 @@ class PublicPrivate_Course {
         }
     }
 
-    public function any_enrolled($userid, $instances=null) {
-        global $DB;
-
-        // Get enabled enrolment instances for this course, and the user's enrolments.
-        if (!isset($instances)) {
-            $instances = enrol_get_instances($this->_course->id, true);
-        }
-        $userenrolments = $DB->get_records('user_enrolments', array('userid' => $userid));
-
-        // See if there are non-guest active enrolment plugins.
-        if (isset($userenrolments)) {
-            foreach ($userenrolments as $ue) {
-                if (isset($instances[$ue->enrolid]) && $instances[$ue->enrolid]->enrol !== 'guest' &&
-                        $ue->status == ENROL_USER_ACTIVE) {
-                    return true;
-                }
-            }
-        }
-    }
-
     /**
-     * Check the user's enrolment plugins. If none (except guest) are active, remove them.
+     * Check the user's enrolment. If not active, then remove from all groups
+     * in course.
+     * 
      * If they are enrolled, make sure they are in the group.
      *
      * @param int $userid
-     * @global Moodle_Database $DB
      */
-    public function check_enrolments($userid, $instances=null) {
-
-        if ($this->any_enrolled($userid, $instances)) {
-            // If the user is enrolled in any plugin, but not a member of 'Course members',
-            // and if they have an existing role, add them.
-
-            $context = context_course::instance($this->_course->id);
-            $roles = get_user_roles($context, $userid);
-            if (!empty($roles)) {
+    public function check_enrolment($userid) {
+        $coursecontext = context_course::instance($this->_course->id);
+        if (is_enrolled($coursecontext, $userid, '', true)) {
+            // If the user is enrolled, but not a member of 'Course members',
+            // add them.
+            if (!$this->is_member($userid)) {
                 $this->add_user($userid);
             }
         } else {
-            // If the user is not enrolled in any plugin, but is a member, remove them from all groups.
-            $groups = groups_get_all_groups($this->_course->id, $userid);
-            foreach ($groups as $group) {
-                groups_remove_member($group->id, $userid);
+            $removefromgroups = false;
+            if ($this->is_member($userid)) {
+                $removefromgroups = true;
+            } else {
+                $roles = get_user_roles($coursecontext, $userid, false);
+                if (empty($roles)) {
+                    $removefromgroups = true;
+                }
+            }
+
+            // If the user is not enrolled, but is a member or has no roles,
+            // remove them from all groups.
+            if ($removefromgroups) {
+                $groups = groups_get_all_groups($this->_course->id, $userid);
+                if (!empty($groups)) {
+                    foreach ($groups as $group) {
+                        groups_remove_member($group->id, $userid);
+                    }
+                }
             }
         }
     }
