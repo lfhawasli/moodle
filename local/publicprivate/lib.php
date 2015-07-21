@@ -149,26 +149,26 @@ function handle_mod($mod) {
 
 /**
  * Cron for public/private to do some sanity checks:
- *  1) courses with public/private enabled should have the public/private 
- *     grouping as the default grouping
- *  2) group members for public/private grouping should only be in group once
+ *  1) Courses with public/private enabled should have the public/private
+ *     grouping as the default grouping, if no other grouping is set.
+ *  2) Group members for public/private grouping should only be in group once.
  *  3) Make sure that enablegroupmembersonly is enabled for course content
- *     using the public/private goruping if enablepublicprivate is true
+ *     using the public/private goruping if enablepublicprivate is true.
+ *  4) For courses with recently updated enrollment plugins, make sure users
+ *     are in the correct public/private status.
  */
 function local_publicprivate_cron() {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
 
-    // 1) courses with public/private enabled should have the public/private
-    //    grouping as the default grouping
+    // 1) Courses with public/private enabled should have the public/private
+    //    grouping as the default grouping, if no other grouping is set.
     mtrace('Looking for courses with invalid publicprivate groupings set');
 
-    // first find all courses that have enablepublicprivate=1, but
-    // have defaultgroupingid=0 (should be publicprivate grouping)
-
+    // First find all courses that have enablepublicprivate=1, but
+    // have defaultgroupingid=0 (should be publicprivate grouping).
     $courses = $DB->get_recordset('course',
-            array('enablepublicprivate' => 1,
-        'defaultgroupingid' => 0));
+            array('enablepublicprivate' => 1, 'defaultgroupingid' => 0));
     if ($courses->valid()) {
         foreach ($courses as $course) {
             if (empty($course->groupingpublicprivate)) {
@@ -176,7 +176,7 @@ function local_publicprivate_cron() {
                                 'setup, skipping', $course->id));
                 continue;
 
-                // public/private is enabled, but there is no public/private
+                // Public/private is enabled, but there is no public/private
                 // grouping?! disable pp and then reenable
                 $ppcourse = new PublicPrivate_Course($course);
                 if ($ppcourse->is_activated()) {
@@ -202,11 +202,11 @@ function local_publicprivate_cron() {
         }
     }
 
-    // 2) group members for public/private grouping should only be in group once
+    // 2) Group members for public/private grouping should only be in group once.
     mtrace('Looking for duplicate groups_members entries');
 
-    // just find any duplicate entries in groups_members table, since they
-    // shouldn't be there anyways
+    // Just find any duplicate entries in groups_members table, since they
+    // shouldn't be there anyways.
     $sql = "SELECT  duplicate.*
             FROM    {groups_members} AS original,
                     {groups_members} AS duplicate
@@ -225,7 +225,7 @@ function local_publicprivate_cron() {
                 continue;
             }
 
-            // found duplicate, so delete it
+            // Found duplicate, so delete it.
             mtrace(sprintf('  Deleting duplicate entry in groups_members for ' .
                             'groupid %d and userid %d', $groupid, $userid));
             $DB->delete_records('groups_members', array('id' => $result->id));
@@ -233,7 +233,7 @@ function local_publicprivate_cron() {
     }
 
     // 3) Make sure that enablegroupmembersonly is enabled for course content
-    //    using the public/private grouping if enablepublicprivate is true
+    //    using the public/private grouping if enablepublicprivate is true.
     mtrace('Looking for private course content with enablepublicprivate=0');
 
     $sql = "SELECT  cm.id
@@ -251,6 +251,32 @@ function local_publicprivate_cron() {
                             $result->id));
             $DB->set_field('course_modules', 'groupmembersonly', 1,
                     array('id' => $result->id));
+        }
+    }
+
+    // 4) For courses with recently updated enrollment plugins, make sure users
+    // are in the correct public/private status. See CCLE-5246.
+    mtrace('Looking for courses with recently updated enrolment plugins');
+    $lastcron = get_config('local_publicprivate', 'lastcron');
+    $sql = "SELECT DISTINCT c.*
+              FROM {course} c
+              JOIN {enrol} e ON (e.courseid=c.id)
+             WHERE e.timemodified >= ? AND 
+                   c.enablepublicprivate=1 AND
+                   e.timecreated!=e.timemodified";
+    $courses = $DB->get_recordset_sql($sql, array($lastcron));
+    if ($courses->valid()) {
+        foreach ($courses as $course) {
+            mtrace(sprintf('  Checking course %d', $course->id), '');
+            $ppcourse = new PublicPrivate_Course($course);
+            $context = context_course::instance($course->id);
+            $users = get_enrolled_users($context);
+            foreach ($users as $user) {
+                // Print dot to give a sense of progression.
+                mtrace('.', '');
+                $ppcourse->check_enrolment($user->id);
+            }
+            mtrace('');
         }
     }
 }

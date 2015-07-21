@@ -57,5 +57,17 @@ $observers = array(
     array(
         'eventname' => '\block_ucla_group_manager\event\section_groups_synced',
         'callback'  => '\local_publicprivate\observers::section_groups_synced'
+    ),
+    array(
+        'eventname' => '\core\event\user_enrolment_updated',
+        'callback'  => '\local_publicprivate\observers::user_enrolment_updated'
+    ),
+    array(
+        'eventname' => '\core\event\role_assigned',
+        'callback'  => '\local_publicprivate\observers::role_assigned'
+    ),
+    array(
+        'eventname' => '\core\event\role_unassigned',
+        'callback'  => '\local_publicprivate\observers::role_unassigned'
     )
 );

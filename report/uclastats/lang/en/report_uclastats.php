@@ -116,7 +116,7 @@ $string['system_size'] = 'System size (system)';
 $string['system_size_help'] = 'Returns the size of course files for a given ' .
         'term, the number of files over 1 MB and size of database.' .
         '<p><strong>NOTE: To get cumulative file size, run the following ' .
-        'command on the command-line <blockquote>' . 
+        'command on the command-line <blockquote>' .
         '"du -s --block-size=1 $CFG->dataroot/filedir/"</blockquote></strong></p>';
 $string['cumulativefilesize'] = 'Cumulative file size';
 $string['termfilesize'] = 'Term file size';
@@ -204,7 +204,7 @@ $string['viewcount'] = 'Number of Views';
 
 // Strings for most active collab site report.
 $string['most_active_collab_sites'] = 'Most active collaboration site per term';
-$string['most_active_collab_sites_help'] =  'Most active collab site is one that has the most views.';
+$string['most_active_collab_sites_help'] = 'Most active collab site is one that has the most views.';
 
 // Strings for total downloads.
 $string['total_downloads'] = 'Total downloads (course)';
