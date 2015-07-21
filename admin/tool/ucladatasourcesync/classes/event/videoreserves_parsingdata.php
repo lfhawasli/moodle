@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA data source sync tool for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 /**
  * UCLA events.
  *
- * Contains the event class for ucladatasourcesync.
+ * Contains the event class for video reserves parsing data.
  *
  * @package    tool_ucladatasourcesync
- * @copyright  2014 UC Regents
+ * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,63 +28,26 @@ namespace tool_ucladatasourcesync\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The class for the events in ucladatasourcesync.
+ * The class for the events in video reserves parsing data.
  *
  * @package    tool_ucladatasourcesync
- * @copyright  2014 UC Regents
+ * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ucladatasourcesync_event extends \core\event\base {
+class videoreserves_parsingdata extends ucladatasourcesync_event {
     /**
      * Creates the event.
      */
     protected function init() {
-        $this->data['crud'] = 'c';
+        $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**
      * Returns the name of the event.
      * @return string
-     **/
+     */
     public static function get_name() {
-        return "";
-    }
-
-    /**
-     * Returns a short description for the event.
-     * @return string
-     **/
-    public function get_description() {
-        return $this->other['message'];
-    }
-
-    /**
-     * Returns URL to the report result page.
-     * @return moodle_url
-     **/
-    public function get_url() {
-        return null;
-    }
-
-    /**
-     * Add data to legacy log.
-     * @return array
-     **/
-    public function get_legacy_logdata() {
-        return array($this->contextinstanceid, $this->other['func'], $this->other['action'], '',
-            $this->other['message']);
-    }
-
-    /**
-     * Returns the correct event path
-     * @param string $func
-     * @param string $action
-     *
-     * @return string
-     **/
-    public static function datasource($func, $action) {
-        $source = $func.'_'.$action;
-        return "\\tool_ucladatasourcesync\\event\\".$source;
+        return get_string('eventvrparsing', 'tool_ucladatasourcesync');
     }
 }

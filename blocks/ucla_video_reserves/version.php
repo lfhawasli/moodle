@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA data source sync tool for Moodle - http://moodle.org/
+// This file is part of the UCLA video reserves block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,15 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Version file.
- *
- * @package    tool_ucladatasourcesync
- * @copyright  2015 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015061700;
-$plugin->requires  = 2011092100;
-$plugin->component = 'tool_ucladatasourcesync';
+$plugin->version   = 2015061700;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2011112900;        // Requires this Moodle version.
+$plugin->component = 'block_ucla_video_reserves'; // Full name of the plugin (used for diagnostics).
+
+$plugin->dependencies = array(
+    'tool_ucladatasourcesync' => 2015061700,
+);

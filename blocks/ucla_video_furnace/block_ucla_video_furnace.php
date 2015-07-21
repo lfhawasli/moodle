@@ -18,7 +18,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../moodleblock.class.php');
-require_once($CFG->dirroot . '/blocks/ucla_video_furnace/lib.php');
 
 class block_ucla_video_furnace extends block_base {
 

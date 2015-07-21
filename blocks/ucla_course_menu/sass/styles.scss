@@ -143,8 +143,12 @@ $site-menu-hover-color:         #fcfcfc;
             .bruinmedia-link.leaf:before {
                 @include node-glyphicon("\e059");
             }
-            // Add video furnace link icon 
+            // Add video furnace link icon
             .video-furnace-link.leaf:before {
+                @include node-glyphicon("\e009");
+            }
+            // Add video reserves link icon
+            .video-reserves-link.leaf:before {
                 @include node-glyphicon("\e009");
             }
             // Add myengineer link icon 

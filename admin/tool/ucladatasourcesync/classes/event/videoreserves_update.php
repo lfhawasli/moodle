@@ -15,14 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Event class for video reserves update.
  *
  * @package    tool_ucladatasourcesync
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace tool_ucladatasourcesync\event;
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015061700;
-$plugin->requires  = 2011092100;
-$plugin->component = 'tool_ucladatasourcesync';
+/**
+ * The class for the events in video reserves update.
+ *
+ * @package    tool_ucladatasourcesync
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class videoreserves_update extends ucladatasourcesync_event {
+    /**
+     * Creates the event.
+     */
+    protected function init() {
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
+    }
+
+    /**
+     * Returns the name of the event.
+     * @return string
+     **/
+    public static function get_name() {
+        return get_string('eventvrupdate', 'tool_ucladatasourcesync');;
+    }
+}
