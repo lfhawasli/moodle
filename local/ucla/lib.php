@@ -1341,16 +1341,20 @@ function get_active_terms($descending = 'false') {
 
 /**
  * Sets up the JQuery plugin to sort a given table.
- *  
+ *
  * @global object $PAGE
- * 
- * @param string $tableid   Optional. If entered, will be used to associate 
+ *
+ * @param string $tableid   Optional. If entered, will be used to associate
  *                          which table to enable sorting. If not passed will
  *                          generate a unique id number.
+ * @param array  $options   Optional. Specify additional options to be passed
+ *                          to initialize the tablesorter. Each element in the
+ *                          array represents an option/value pair, e.g.
+ *                          'debug: true'
  * @return string           Returns table id, either the one passed in or the
  *                          one auto-generated.
  */
-function setup_js_tablesorter($tableid=null) {
+function setup_js_tablesorter($tableid = null, $options = array()) {
     global $PAGE;
 
     $PAGE->requires->js('/local/ucla/tablesorter/jquery-latest.js');
@@ -1361,9 +1365,12 @@ function setup_js_tablesorter($tableid=null) {
         $tableid = uniqid();
     }
 
+    $options[] = 'widgets:["zebra"]';
+    $optionsstring = '{' . implode(',', $options) . '}';
+
     $PAGE->requires->js_init_code('$(document).ready(function() { $("#'
         . $tableid . '").addClass("tablesorter").tablesorter('
-        . '{widgets: ["zebra"]}); });');
+        . $optionsstring . '); });');
 
     return $tableid;
 }
