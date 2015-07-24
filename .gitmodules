@@ -103,3 +103,6 @@
 [submodule "mod/zoom"]
 	path = mod/zoom
 	url = git@github.com:ucla/moodle-mod_zoom.git
+[submodule "blocks/massaction"]
+	path = blocks/massaction
+	url = git@github.com:ccle/moodle-block_massaction.git 
