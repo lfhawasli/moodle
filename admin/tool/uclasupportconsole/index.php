@@ -490,18 +490,18 @@ if ($displayforms) {
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
-$title = "moodlevideofurnacelist";
+$title = "moodlevideoreserveslist";
 $sectionhtml = '';
 
 if ($displayforms) {
     $sectionhtml = supportconsole_simple_form($title);
 } else if ($consolecommand == "$title") {
-    $result = get_reserve_data('video_furnace');
-    
-    $sourcelocation = get_config('block_ucla_video_furnace', 'source_url');
+    $result = get_reserve_data('video_reserves');
+
+    $sourcelocation = get_config('block_ucla_video_reserves', 'sourceurl');
     $sourcelink = html_writer::link($sourcelocation, $sourcelocation, array('target' => '_blank'));
     $sourcefile = get_string('sourcefile', 'tool_uclasupportconsole', $sourcelink);
-    
+
     $sectionhtml = supportconsole_render_section_shortcut($title, $result, array(), $sourcefile);
 }
 $consoles->push_console_html('logs', $title, $sectionhtml);
