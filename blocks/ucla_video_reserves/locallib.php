@@ -67,7 +67,8 @@ function cmp_title($a, $b) {
 }
 
 /**
- * Prints out all of the html for displaying the video furnace page contents.
+ * Prints out all of the html for displaying the video reserves page contents.
+ *
  * @param object $course
  */
 function display_video_reserves_contents($course) {

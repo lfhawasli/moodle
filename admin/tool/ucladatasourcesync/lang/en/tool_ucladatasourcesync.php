@@ -30,10 +30,6 @@ $string['errcannotinsert'] = 'Cannot insert record: {$a}';
 // Event messages.
 $string['eventbcread'] = "Bruincast read error.";
 $string['eventbcparsing'] = "Bruincast parsing data error.";
-$string['eventvfparsing'] = "Video furnace parsing data error.";
-$string['eventvfread'] = "Video furnace read error.";
-$string['eventvfwrite'] = "Video furnace write error.";
-$string['eventvfupdate'] = "Video furnace update error.";
 $string['eventlrread'] = "Library reserves read error.";
 $string['eventlrwrite'] = "Library reserves write error.";
 $string['eventlrupdate'] = "Library reserves update error.";
@@ -79,16 +75,6 @@ $string['noticefoundaltcourseid'] = 'NOTICE: Found courseid {$a->courseid} by us
 $string['lrstartnoti'] = "Starting library reserves DB update:";
 $string['lrsuccessnoti'] = '{$a} records successfully inserted.';
 $string['lrnoentries'] = 'No library reserve entries found.';
-
-// Strings for videofurnace_dbsync.
-// Error messages.
-$string['errvfmsglocation'] = "ERROR: No location set for video furnace data.";
-$string['errvfinvalidrowlen'] = "ERROR: Invalid row length in provided video furnace data.";
-$string['errvffileopen'] = "ERROR: Problem accessing data URL";
-$string['errinvalidtitle'] = 'ERROR: Title has invalid characters in parsed line {$a->line_num}: {$a->data}';
-// Notification messages.
-$string['vfstartnoti'] = "Starting video furnace DB update:";
-$string['vfsuccessnoti'] = "records successfully inserted.";
 
 // Strings for videoreserves_dbsync.
 // Error messages.

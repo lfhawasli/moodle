@@ -54,7 +54,7 @@ class block_ucla_video_reserves extends block_base {
     }
 
     /**
-     * This will create a link to the ucla video furnace page.
+     * This will create a link to the ucla video reserves page.
      *
      * @param int $courseid
      * @return moodle_url

@@ -1,7 +1,7 @@
 <?php
 /**
  * Library for use by the Datasource Syncronization Scripts of the Bruincast
- * (CCLE-2314), Library reserves (CCLE-2312), and Video furnace (CCLE-2311)
+ * (CCLE-2314), Library reserves (CCLE-2312), and Video reserves (CCLE-5185)
  *
  * See CCLE-2790 for details.
  **/
@@ -41,35 +41,6 @@ function get_csv_data($datasource_url) {
         log_ucla_data('bruincast', 'parsing data', 'CSV data retrieval', $csverror);
 
         echo "\n$csverror\n";
-        exit(5);
-    }
-
-    return $lines;
-}
-
-/**
- * Returns an array of raw TSV data from the TSV file at datasource_url.
- * @param $datasource_url The URL of the TSV data to attempt to retrieve.
- **/
-function get_tsv_data($datasource_url) {
-    //Allows \r characters to be read as \n's. The config file has \r's instead of \n's.
-    ini_set('auto_detect_line_endings', true);
-
-    $fp = fopen($datasource_url, 'r');
-    $lines = array();
-
-    if ($fp) {
-        while (!feof($fp)) {
-            $lines[] = fgetcsv($fp, 0, "\t","\n"); //Use tabs as a delimiter instead of commas.
-        }
-    }
-
-    if (empty($lines)) {
-        $tsverror = "... ERROR: Could not open $datasource_url!";
-        log_ucla_data('video furnace', 'parsing data', 'TSV data retrieval', $tsverror);
-
-        echo "\n$tsverror\n";
-        //Why is the exit code 5?
         exit(5);
     }
 
@@ -382,10 +353,10 @@ function validate_field($type, $field, $minsize=0, $maxsize=100) {
 
 /**
  * Gets table information from database for: bruincast, library reserves, and
- * video furnace.
+ * video reserves.
  *
  * @param string $table The type of table you want to get information for.
- *                      Options: "bruincast", "library_reserves", "video_furnace"
+ *                      Options: "bruincast", "library_reserves", "video_reserves"
  *
  * @return array
  */
@@ -421,11 +392,11 @@ function get_reserve_data($table) {
 }
 
 /**
- * Generic logging of library reserves and video furnace data processing scripts
+ * Generic logging of library reserves and video reserves data processing scripts
  * Sends email to ccle support if an error occured
  *
  * @param string $func     Activity to be logged
- *                         (video furnace, library reserve, bruincast)
+ *                         (video reserves, library reserve, bruincast)
  * @param string $action   Action taken
  * @param string $notice   Description of what is to be logged
  * @param string $error    Possible errors that occured when running the script
@@ -450,7 +421,7 @@ function log_ucla_data($func, $action, $notice, $error = '') {
     ));
     $event->trigger();
 
-    // If an error was reported, then send an email to ccle support
+    // If an error was reported, then send an email to ccle support.
     if (!empty($error)) {
         $contact_email = get_config('contact_email', 'tool_ucladatasourcesync');
         if (!empty($contact_email)) {
