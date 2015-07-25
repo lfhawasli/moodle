@@ -419,7 +419,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
                               'FA' => 'AA',
                               'LA' => 'EI',
                               'SW' => 'PH');
-        foreach($mapdivisions as $oldcode => $newcode) {
+        foreach ($mapdivisions as $oldcode => $newcode) {
             $DB->set_field('ucla_reg_classinfo', 'division', $newcode,
                     array('division' => $oldcode));
         }
@@ -432,7 +432,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         $olddivisions[] = array('code' => 'LA', 'fullname' => 'LIBRARY AND INFORMATION SCIENCE');
         $olddivisions[] = array('code' => 'SW', 'fullname' => 'SOCIAL WELFARE');
         foreach ($olddivisions as $olddivision) {
-            $DB->delete_records('ucla_reg_division', 
+            $DB->delete_records('ucla_reg_division',
                     array('code' => $olddivision['code']));
         }
 
@@ -478,7 +478,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         // Savepoint reached.
         upgrade_plugin_savepoint(true, 2014021900, 'local', 'ucla');
     }
-    
+
     // CCLE-4587 - Set up new MathJax filter
     // Turn new MathJax on to replace old equation filters, then uninstall old MathJax.
     if ($oldversion < 2014071500) {
@@ -486,12 +486,12 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         filter_set_global_state('mathjaxloader', TEXTFILTER_ON);
 
         $courses = get_courses('all', 'c.sortorder ASC', 'c.id');
-        foreach($courses as $course) {
+        foreach ($courses as $course) {
             $context = context_course::instance($course->id);
             $activefilters = filter_get_active_in_context($context);
             // If past courses had an equation editor on, turn them off and
             // replace with new MathJax.
-            if(isset($activefilters['tex']) || isset($activefilters['mathjax'])) {
+            if (isset($activefilters['tex']) || isset($activefilters['mathjax'])) {
                 filter_set_local_state('tex', $context->id, TEXTFILTER_OFF);
                 filter_set_local_state('mathjax', $context->id, TEXTFILTER_OFF);
                 filter_set_local_state('mathjaxloader', $context->id, TEXTFILTER_ON);
@@ -514,7 +514,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2014071500, 'local', 'ucla');
     }
 
-    // CCLE-4481 - Remove Role Migration Tool
+    // CCLE-4481 - Remove Role Migration Tool.
     if ($oldversion < 2014071601) {
         // Get role migration info.
         $pluginman = core_plugin_manager::instance();
@@ -534,20 +534,20 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         set_config('disabled', 1, 'availability_profile');
         upgrade_plugin_savepoint(true, 2014080600, 'local', 'ucla');
     }
-    
+
     // CCLE-4333 - Activity Chooser off.
     if ($oldversion < 2014111400) {
-        $configs = $DB->get_recordset('user_preferences', 
+        $configs = $DB->get_recordset('user_preferences',
                 array('name' => 'usemodchooser', 'value' => 0));
         if ($configs->valid()) {
             foreach ($configs as $config) {
-                set_user_preference('usemodchooser', 1, $config->userid);        
-            }            
+                set_user_preference('usemodchooser', 1, $config->userid);
+            }
         }
         upgrade_plugin_savepoint(true, 2014111400, 'local', 'ucla');
     }
-    
-    // CCLE-5178 - Changing forum subscription defaults
+
+    // CCLE-5178 - Changing forum subscription defaults.
     if ($oldversion < 2015061602) {
         // Turn off forum auto-subscribe for all users.
         $autosubscribeusers = $DB->get_recordset('user',
@@ -568,6 +568,49 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
             }
         }
         upgrade_plugin_savepoint(true, 2015061602, 'local', 'ucla');
+    }
+
+    // CCLE-5181 - Turn on forum email notifications and disable popup notifications.
+    if ($oldversion < 2015071500) {
+        // Get users who do not have instructing roles and have an alternative email set.
+        $roles = array();
+        $keys = array_keys($CFG->instructor_levels_roles);
+        foreach ($keys as $key) {
+            $roles = array_merge($roles, $CFG->instructor_levels_roles[$key]);
+        }
+        list($shortnamesql, $params) = $DB->get_in_or_equal($roles);
+        $sql = "SELECT u.id, u.email, p.value AS altemail
+                  FROM {user_preferences} p
+                  JOIN {user} u ON (p.userid=u.id)
+                 WHERE p.name = 'message_processor_email_email'
+                       AND p.value <> ''
+                       AND u.id NOT IN (
+                                    SELECT DISTINCT ra.userid
+                                    FROM {role_assignments} ra
+                                    JOIN {role} r ON (r.id=ra.roleid)
+                                    WHERE r.shortname $shortnamesql)";
+        $users = $DB->get_recordset_sql($sql, $params);
+        if ($users->valid()) {
+            foreach ($users as $user) {
+                // Clear the alternative email.
+                $DB->set_field('user_preferences', 'value', "", array('name' => 'message_processor_email_email', 'userid' => $user->id));
+            }
+        }
+        $users->close();
+        // Disable popup notifications.
+        $DB->set_field('message_processors', 'enabled', '0', array('name' => 'popup'));
+        // Fetch records where users don't have email notifications.
+        $select = "(value = 'none' AND name = 'message_provider_mod_forum_posts_loggedoff') OR (value = 'none' AND name = 'message_provider_mod_forum_posts_loggedin')";
+        $providers = $DB->get_recordset_select('user_preferences', $select, array());
+        // Set the record to include email notifications.
+        if ($providers->valid()) {
+            foreach ($providers as $provider) {
+                $provider->value = 'email';
+                $DB->update_record('user_preferences', $provider);
+            }
+        }
+        $providers->close();
+        upgrade_plugin_savepoint(true, 2015071500, 'local', 'ucla');
     }
 
     return $result;

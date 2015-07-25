@@ -101,8 +101,11 @@ class message_output_email extends message_output {
      */
     function config_form($preferences){
         global $USER, $OUTPUT, $CFG;
-
-        if (empty($CFG->messagingallowemailoverride)) {
+        // START UCLA MOD: CCLE-5181-Users are unable to unsubscribe from Announcement forums through user Profile settings.
+        // Causes users to only be able to edit the email address they will receieve email notifications from if they have instructing roles.
+        // if (empty($CFG->messagingallowemailoverride)) {
+        if (empty($CFG->messagingallowemailoverride) || (local_ucla_core_edit::is_instructor($USER) == false)) {
+        // END UCLA MOD: CCLE-5181
             return null;
         }
 

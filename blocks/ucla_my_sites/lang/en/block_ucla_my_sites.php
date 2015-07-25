@@ -19,3 +19,8 @@ $string['shared_server_archive_notice'] = 'Starting June 16, 2012 any courses fr
 $string['student_access_notice'] = 'Students/guests no longer have access to past content after the class has ended.';
 
 $string['loginrequired'] = 'Please login to view My sites';
+
+$string['changeemail'] = 'You have set an alternative email ({$a}). To change it, please go to "My profile settings > Messaging".';
+
+$string['dismiss'] = 'Dismiss';
+$string['dismissed'] = 'You have successfully dismissed the notification.';

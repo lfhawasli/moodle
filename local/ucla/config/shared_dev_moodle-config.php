@@ -213,6 +213,8 @@ $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
 $CFG->bloglevel = 0; // Disable blog system completely
+// CCLE-5181 Allow users to enter an alternate email
+$CFG->messagingallowemailoverride = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 

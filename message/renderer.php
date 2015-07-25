@@ -334,7 +334,13 @@ class core_message_renderer extends plugin_renderer_base {
                             );
                             $label = get_string('sendingviawhen', 'message', $labelparams);
                             $cellcontent = html_writer::label($label, $elementname, true, array('class' => 'accesshide'));
-                            $cellcontent .= html_writer::checkbox($elementname, 1, $checked, '', array_merge(array('id' => $elementname, 'class' => 'notificationpreference'), $disabled));
+                            // START UCLA MOD: CCLE-5181-Users are able to unsubscribe from Announcement forums through user Profile settings.
+                            // Removing the 'Email' checkboxes for Subscribed forum posts
+                            // $cellcontent .= html_writer::checkbox($elementname, 1, $checked, '', array_merge(array('id' => $elementname, 'class' => 'notificationpreference'), $disabled));
+                            if (!($preferencebase == 'mod_forum_posts' && $processor->name == 'email')) {
+                                $cellcontent .= html_writer::checkbox($elementname, 1, $checked, '', array_merge(array('id' => $elementname, 'class' => 'notificationpreference'), $disabled));
+                            }
+                            // END UCLA MOD: CCLE-5181.
                             $optioncell = new html_table_cell($cellcontent);
                             $optioncell->attributes['class'] = 'mdl-align';
                         }
@@ -367,13 +373,16 @@ class core_message_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('fieldset', array('id' => 'messageprocessor_general', 'class' => 'clearfix'));
         $output .= html_writer::nonempty_tag('legend', get_string('generalsettings','admin'), array('class' => 'ftoggler'));
 
-        $output .= html_writer::start_tag('div');
+        // START UCLA MOD: CCLE-5181-Users are able to unsubscribe from Announcement forums through user Profile settings
+        // Removing "Beep when popup notification is displayed" and "Prevent non-contacts from messaging me" from My profile settings/Messaging
+        /*$output .= html_writer::start_tag('div');
         $output .= html_writer::checkbox('beepnewmessage', 1, $preferences->beepnewmessage, get_string('beepnewmessage', 'message'));
         $output .= html_writer::end_tag('div');
 
         $output .= html_writer::start_tag('div');
         $output .= html_writer::checkbox('blocknoncontacts', 1, $preferences->blocknoncontacts, get_string('blocknoncontacts', 'message'));
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');*/
+        // END UCLA MOD: CCLE-5181.
 
         $disableallcheckbox = html_writer::checkbox('disableall', 1, $notificationsdisabled, get_string('disableall', 'message'), array('class'=>'disableallcheckbox'));
         $disableallcheckbox .= $this->output->help_icon('disableall', 'message');
