@@ -17,8 +17,8 @@ $string['helpbox_header'] = 'Help/Feedback';
 $string['helpbox_text_default'] = 'Please use the settings option of the help block to set what displays in the Help Box';
 
 $string['helpform_header'] = 'Report a problem';
-$string['helpform_text'] = 'Use the form below to report a problem or error. Include your email address so we can get back to you.';
-$string['helpform_login'] = 'Please {$a} if requesting help with a particular course, or to add attachments.';
+$string['helpform_text'] = 'Use the form below to report a problem or error.';
+$string['helpform_alternative'] = 'CCLE uses your official email address. {$a->students} can change it at MyUCLA and {$a->facultystaff} can change it through their directory coordinator.';
 
 $string['helpform_upload'] = 'Upload a file';
 
