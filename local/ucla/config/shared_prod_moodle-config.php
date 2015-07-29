@@ -281,6 +281,9 @@ $CFG->forced_plugin_settings['assignfeedback_comments']['default'] = 1;
 // Site administration > Plugins > Assignment plugins > Feedback plugins > File feedback
 $CFG->forced_plugin_settings['assignfeedback_file']['default'] = 1;
 
+// Site administration > Plugins > Admin tools > Merge user accounts
+$CFG->forced_plugin_settings['tool_mergeusers']['quizattemptsaction'] = 'renumber';
+
 // Site administration > Plugins > Admin tools > Manage senior scholars
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '003215880;303536506';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
