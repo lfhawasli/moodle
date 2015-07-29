@@ -312,7 +312,7 @@ class format_ucla_renderer extends format_topics_renderer {
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
         for ($section = 1; $section <= $course->numsections; $section++) {
             // People who cannot view hidden sections are not allowed to see sections titles with no content.
-            $nocontent = empty($section->sequence) && empty($sections[$section]->summary);
+            $nocontent = empty($sections[$section]->sequence) && empty($sections[$section]->summary);
             if (empty($nocontent) || $canviewhidden) {
                 if (!empty($sections[$section])) {
                     $thissection = $sections[$section];
