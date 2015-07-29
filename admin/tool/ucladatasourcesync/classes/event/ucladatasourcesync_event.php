@@ -75,9 +75,12 @@ class ucladatasourcesync_event extends \core\event\base {
         return array($this->contextinstanceid, $this->other['func'], $this->other['action'], '',
             $this->other['message']);
     }
-    
+
     /**
      * Returns the correct event path
+     * @param string $func
+     * @param string $action
+     *
      * @return string
      **/
     public static function datasource($func, $action) {

@@ -83,6 +83,13 @@ if (is_mnet_remote_user($user)) {
     redirect($CFG->wwwroot . "/user/view.php?course={$course->id}");
 }
 
+// START UCLA MOD: CCLE-4568 - Need a better screen for users without an email address
+// Prompt message if user logging in is missing email and has shib.
+if ($USER->id == $user->id && empty($user->email) && $user->auth == 'shibboleth') {
+    print_error('errmissingemail', 'local_ucla');
+}
+// END UCLA MOD: CCLE-4568
+
 // Load the appropriate auth plugin.
 $userauth = get_auth_plugin($user->auth);
 

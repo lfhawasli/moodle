@@ -43,7 +43,10 @@ $string['context'] = 'context';
 $string['defaultmessageoutputs'] = 'Default message outputs';
 $string['defaults'] = 'Defaults';
 $string['deletemessagesdays'] = 'Number of days before old messages are automatically deleted';
-$string['disableall'] = 'Temporarily disable notifications';
+// START UCLA MOD: CCLE-5181-Users are unable to unsubscribe from Announcement forums through user Profile settings.
+// $string['disableall'] = 'Temporarily disable notifications';
+$string['disableall'] = 'Disable notifications';
+// END UCLA MOD: CCLE-5181
 $string['disableall_help'] = 'Temporarily disable all notifications except those marked as "forced" by the site administrator';
 $string['disabled'] = 'Messaging is disabled on this site';
 $string['disallowed'] = 'Disallowed';

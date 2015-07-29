@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA data source sync tool for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 /**
  * UCLA events.
  *
- * Contains the event class for video furnace parsing data.
+ * Contains the event class for video reserves parsing data.
  *
  * @package    tool_ucladatasourcesync
- * @copyright  2014 UC Regents
+ * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,13 +28,13 @@ namespace tool_ucladatasourcesync\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The class for the events in video furnace parsing data.
+ * The class for the events in video reserves parsing data.
  *
  * @package    tool_ucladatasourcesync
- * @copyright  2014 UC Regents
+ * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class videofurnace_parsingdata extends ucladatasourcesync_event {
+class videoreserves_parsingdata extends ucladatasourcesync_event {
     /**
      * Creates the event.
      */
@@ -46,8 +46,8 @@ class videofurnace_parsingdata extends ucladatasourcesync_event {
     /**
      * Returns the name of the event.
      * @return string
-     **/
+     */
     public static function get_name() {
-        return get_string('eventvfparsing', 'tool_ucladatasourcesync');;
+        return get_string('eventvrparsing', 'tool_ucladatasourcesync');
     }
 }

@@ -193,7 +193,32 @@ class local_ucla_core_edit {
             echo html_writer::tag('dd', self::$profileviewmore);
         }
     }
-    
+
+    /**
+     * Given a user, return true if they have an instructing role in the system.
+     *
+     * See CCLE-5181
+     *
+     * @param object $user
+     * Returns if the user has instructor roles or not.
+     * @return boolean
+     */
+    public static function is_instructor($user) {
+        global $DB, $CFG;
+        $roles = array();
+        $keys = array_keys($CFG->instructor_levels_roles);
+        foreach ($keys as $key) {
+            $roles = array_merge($roles, $CFG->instructor_levels_roles[$key]);
+        }
+        list($shortnamesql, $params) = $DB->get_in_or_equal($roles);
+        $sql = "SELECT DISTINCT u.id
+                           FROM {user} u
+                           JOIN {role_assignments} ra ON (ra.userid=u.id)
+                           JOIN {role} r ON (r.id=ra.roleid)
+                          WHERE r.shortname $shortnamesql
+                                AND u.id = $user->id";
+        return $DB->record_exists_sql($sql, $params);
+    }
     /**
      * Display complete use details on profile pages.
      *

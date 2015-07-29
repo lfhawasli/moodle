@@ -181,6 +181,8 @@ $CFG->xsendfile = 'X-Sendfile';
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
 $CFG->bloglevel = 0; // Disable blog system completely
+// CCLE-5181 Allow users to enter an alternate email
+$CFG->messagingallowemailoverride = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 
@@ -313,10 +315,10 @@ $CFG->forced_plugin_settings['block_ucla_course_download']['student_access_begin
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 
-// Site administration > Plugins > Blocks > UCLA video furnace
-$CFG->forced_plugin_settings['block_ucla_video_furnace']['source_url'] = 'ftp://guest:access270@164.67.141.31//Users/guest/Sites/VF_LINKS.txt';
+// Site administration > Plugins > Blocks > UCLA video reserves
+$CFG->forced_plugin_settings['block_ucla_video_reserves']['sourceurl'] = 'ftp://guest:access270@164.67.141.31//Users/guest/Sites/MEDIA_LINKS.txt';
 
-// Data Source Sync (bruincast, video furnace, library reserves) contact Email
+// Data Source Sync (bruincast, video reserves, library reserves) contact Email
 $CFG->forced_plugin_settings['tool_ucladatasourcesync']['contact_email']='ccle-operations@lists.ccle.ucla.edu';
 
 // Site administration > Plugins > Blocks > i>clicker Moodle integrate

@@ -106,7 +106,7 @@ function load_tool_uclasupportconsole() {
         3 => 'moodlelogbyday',
         4 => 'moodlelogbydaycourse',
         5 => 'moodlelogbydaycourseuser',
-        6 => 'moodlevideofurnacelist',
+        6 => 'moodlevideoreserveslist',
         7 => 'moodlelibraryreserveslist',
         8 => 'moodlebruincastlist',
         9 => 'recentlysentgrades',

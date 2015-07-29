@@ -25,6 +25,8 @@ require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uclasiteindicator/lib.php');
 require_once($CFG->dirroot.'/blocks/ucla_browseby/handlers/browseby.class.php');
 require_once($CFG->dirroot.'/blocks/ucla_browseby/handlers/course.class.php');
 
+require_once($CFG->dirroot . '/blocks/ucla_my_sites/alert_form.php');
+
 class block_ucla_my_sites extends block_base {
     private $cache = array();
 
@@ -44,7 +46,7 @@ class block_ucla_my_sites extends block_base {
      * @return object
      */
     public function get_content() {
-        global $USER, $CFG, $OUTPUT, $PAGE;
+        global $USER, $CFG, $OUTPUT, $PAGE, $DB;
 
         if($this->content !== NULL) {
             return $this->content;
@@ -69,8 +71,22 @@ class block_ucla_my_sites extends block_base {
             $content[] = $OUTPUT->render($loginbutton);
             $content[] = $OUTPUT->box_end();      
             $this->content->text = implode($content);
-            
+
             return $this->content;
+        }
+
+        // Notification if user with instructor role has an alternate email set.
+        if (local_ucla_core_edit::is_instructor($USER)) {
+            $mysites = new my_sites_form(new moodle_url('/blocks/ucla_my_sites/alert.php'));
+            $instructor = get_user_preferences('message_processor_email_email');
+            if (!empty($instructor) && (!get_user_preferences('ucla_altemail_noprompt_' . $USER->id))) {
+                $content[] = $OUTPUT->container_start('alert alert-info');
+                $content[] = get_string('changeemail', 'block_ucla_my_sites', $instructor);
+                ob_start();
+                $mysites->display();
+                $content[] = ob_get_clean();
+                $content[] = $OUTPUT->container_end();
+            }
         }
 
         // Render favorite UCLA support tools.

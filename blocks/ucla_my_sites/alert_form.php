@@ -15,32 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UCLA events.
+ * my_sites alert form definition.
  *
- * Contains the event class for video furnace write.
- *
- * @package    tool_ucladatasourcesync
- * @copyright  2014 UC Regents
+ * @package    blocks
+ * @subpackage ucla_my_sites
+ * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_ucladatasourcesync\event;
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->libdir . '/formslib.php');
 
 /**
- * The class for the events in video furnace write.
+ * my_sites form class.
  *
- * @package    tool_ucladatasourcesync
- * @copyright  2014 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Used to create a form for dismissing the notification
+ * regarding an alternate email.
+ *
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class videofurnace_write extends ucladatasourcesync_event {
-
+class my_sites_form extends moodleform {
     /**
-     * Returns the name of the event.
-     * @return string
-     **/
-    public static function get_name() {
-        return get_string('eventvfwrite', 'tool_ucladatasourcesync');;
+     * Generates the button on the my_sites block for dismissing the notification
+     * about whether the user has an alternate email set or not.
+     */
+    public function definition() {
+        $mform = $this->_form;
+        $mform->addElement('submit', 'dismissbutton', get_string('dismiss', 'block_ucla_my_sites'));
     }
 }
+

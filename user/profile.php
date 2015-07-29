@@ -230,6 +230,15 @@ $event->trigger();
 echo $OUTPUT->header();
 echo '<div class="userprofile">';
 
+// START UCLA MOD: CCLE-5181-Users are unable to unsubscribe from Announcement forums through user Profile settings
+// Notification if user with instructor role has alternate email set.
+if (local_ucla_core_edit::is_instructor($USER)) {
+    $instructor = get_user_preferences('message_processor_email_email');
+    if (!empty($instructor)) {
+        echo $OUTPUT->notification(get_string('changeemail', 'block_ucla_my_sites', $instructor), 'notifymessage');
+    }
+}
+// END UCLA MOD: CCLE-5181
 
 // Print the standard content of this page, the basic profile info.
 echo $OUTPUT->heading(fullname($user));
