@@ -24,6 +24,7 @@ Background: Specifying URL as a syllabus
    When I follow "Add syllabus"
    And I set the field "URL" to "http://ucla.edu"
    And I press "Save changes"
+   And I press "Continue"
    And I log out
 
 Scenario: Viewing URL as a student
