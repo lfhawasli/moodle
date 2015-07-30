@@ -26,4 +26,4 @@ Feature: Adding a section
     And I press "Add new section"
     Then I should see "New"
     And I press "Save changes"
-    Then I should see "The sections have been successfully updated."
+    Then I should see "Success!"

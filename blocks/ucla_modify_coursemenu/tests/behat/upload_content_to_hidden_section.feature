@@ -33,8 +33,8 @@ Feature: Uploading content to sections
     And I click on "hidden-new_0" "checkbox"
     And I press "Save changes"
     And I wait "5" seconds
-    Then I should see "The sections have been successfully updated."
-    And I press "Return to course"
+    Then I should see "Success!"
+    And I press "Return to site"
     And I follow "Show all"
     # Verify that "new1" section is hidden.
     Then section "11" should be hidden

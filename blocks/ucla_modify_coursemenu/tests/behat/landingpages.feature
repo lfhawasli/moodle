@@ -27,8 +27,11 @@ Feature: Setting a landing page
     And I wait "2" seconds
     And I set the field "landing-page-syllabus" to "1"
     And I press "Save changes"
-    And I should see "The sections have been successfully updated."
-    When I press "Return to course"
+    And I should see "Success!"
+    Then I log out
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
     Then I should see "Syllabus manager"
     And I log out
     And I log in as "student1"
@@ -46,8 +49,8 @@ Feature: Setting a landing page
     # Select Week 4
     And I set the field "landing-page-4" to "1"
     And I press "Save changes"
-    And I should see "The sections have been successfully updated."
-    And I press "Return to course"
+    Then I should see "Success!"
+    And I press "Return to site"
     And I log out
     And I log in as "teacher1"
     And I follow "Course 1"
