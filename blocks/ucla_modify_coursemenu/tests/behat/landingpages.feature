@@ -28,7 +28,7 @@ Feature: Setting a landing page
     And I set the field "landing-page-syllabus" to "1"
     And I press "Save changes"
     And I should see "Success!"
-    Then I log out
+    And I log out
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on

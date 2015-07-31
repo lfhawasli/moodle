@@ -17,26 +17,81 @@ Background: Specifying URL as a syllabus
        | user | course | role |
        | teacher1 | C1 | editingteacher |
        | student1 | C1 | student |
-   And I log in as "teacher1"
-   And I follow "Course 1"
-   And I turn editing mode on
-   And I follow the "Syllabus (empty)" section in the ucla site menu
-   When I follow "Add syllabus"
-   And I set the field "URL" to "http://ucla.edu"
-   And I press "Save changes"
-   And I press "Continue"
-   And I log out
+
+Scenario: Check warning for unsecure urls
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I follow the "Syllabus (empty)" section in the ucla site menu
+    And I follow "Add syllabus"
+    And I set the field "URL" to "http://ucla.edu"
+    And I press "Save changes"
+    Then I should see "The syllabus URL (http://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
+    And I press "Continue"
+    And I turn editing mode off
+    And I should see "http://ucla.edu"
+    And I turn editing mode on
+    When I follow "Edit"
+    And I set the field "URL" to "https://ucla.edu"
+    And I press "Save changes"
+    Then I should not see "The syllabus URL (https://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
 
 Scenario: Viewing URL as a student
-    Given I log in as "student1"
-    When I follow "Course 1"
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I follow the "Syllabus (empty)" section in the ucla site menu
+    And I follow "Add syllabus"
+    And I set the field "URL" to "http://ucla.edu"
+    And I press "Save changes"
+    Then I should see "The syllabus URL (http://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
+    Given I press "Continue"
+    And I log out
+    And I log in as "student1"
+    And I follow "Course 1"
     And  I follow the "Syllabus" section in the ucla site menu
     Then I should see "Syllabus" in the "region-main" "region"
     And I should see "http://ucla.edu" in the "region-main" "region"
+    #Check nested syllabus site does not show up
+    And "//*[contains(@id, 'resourceobject')]" "xpath_element" should not exist
+    And I log out
+    And I log in as "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I follow the "Syllabus" section in the ucla site menu
+    When I follow "Edit"
+    Then I set the field "URL" to "https://ucla.edu"
+    And I press "Save changes"
+    And I log out
+    And I log in as "student1"
+    When I follow "Course 1"
+    And  I follow the "Syllabus" section in the ucla site menu
+    Then I should see "Syllabus" in the "region-main" "region"
+    And I should see "https://ucla.edu" in the "region-main" "region"
+    #Check nested syllabus site does show up
+    And "//*[contains(@id, 'resourceobject')]" "xpath_element" should exist
 
 Scenario: Viewing URL as an instructor
     Given I log in as "teacher1"
-    When I follow "Course 1"
-    And  I follow the "Syllabus" section in the ucla site menu
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I follow the "Syllabus (empty)" section in the ucla site menu
+    And I follow "Add syllabus"
+    And I set the field "URL" to "http://ucla.edu"
+    And I press "Save changes"
+    Then I should see "The syllabus URL (http://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
+    And I press "Continue"
+    And I turn editing mode off
     Then I should see "Syllabus" in the "region-main" "region"
     And I should see "http://ucla.edu" in the "region-main" "region"
+    #Check nested syllabus site does not show up
+    And "//*[contains(@id, 'resourceobject')]" "xpath_element" should not exist
+    And I turn editing mode on
+    And I follow "Edit"
+    And I set the field "URL" to "https://ucla.edu"
+    And I press "Save changes"
+    And I turn editing mode off
+    Then I should see "Syllabus" in the "region-main" "region"
+    And I should see "https://ucla.edu" in the "region-main" "region"
+    #Check nested syllabus site does show up
+    And "//*[contains(@id, 'resourceobject')]" "xpath_element" should exist
