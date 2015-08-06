@@ -1,4 +1,4 @@
-@ucla @block_ucla_copyright_status
+@ucla @block_ucla_copyright_status @CCLE-4396
 Feature: Assign copyright status.
     As an instructor
     I want to be able to assign the copyright status to the file I uploaded.
@@ -153,3 +153,44 @@ Scenario: Copyright Status: "Copyright status not yet identified" works
     And I click on "Copyright status not yet identified" "option" in the "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And I press "Save changes"
     And "//option[@value='tbd' and @selected='selected']" "xpath_element" should exist
+
+@javascript
+Scenario: Copyright status has section column and link
+    Given I upload the "lib/tests/fixtures/empty.txt" file as "Test file" to section "1"
+    When I follow "Manage copyright"
+    Then I should see "Section" in the "copyright_status_table" "table"
+    And "Week 1" "link" in the "copyright_status_table" "table" should be visible
+
+@javascript
+Scenario: Copyright status columns are sortable
+    Given I add a "File" to section "1"
+    And I set the field "Name" to "File resource 1"
+    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager as:
+      | title | test.txt |
+      | author | User, Admin |
+    And I press "Save and return to course"
+    And I upload the "lib/tests/fixtures/empty.txt" file as "File resource 2" to section "1"
+    And I follow the "Week 2" section in the ucla site menu
+    And I upload the "lib/tests/fixtures/tabfile.csv" file as "File Resource 3" to section "2"
+    And I follow "Manage copyright"
+    And I change window size to "large"
+    # Sort by file name.
+    When I click on "Copyright status" "text" in the "copyright_status_table" "table"
+    Then "tabfile.csv" "table_row" should appear before "test.txt" "table_row"
+    When I click on "Copyright status" "text" in the "copyright_status_table" "table"
+    Then "test.txt" "table_row" should appear before "tabfile.csv" "table_row"
+    # Sort by section.
+    When I click on "Section" "text" in the "copyright_status_table" "table"
+    Then "Week 1" "table_row" should appear before "Week 2" "table_row"
+    When I click on "Section" "text" in the "copyright_status_table" "table"
+    Then "Week 2" "table_row" should appear before "Week 1" "table_row"
+    # Sort by date: test.txt should be older than tabfile.csv.
+    When I click on "Updated date" "text" in the "copyright_status_table" "table"
+    Then "test.txt" "table_row" should appear before "tabfile.csv" "table_row"
+    When I click on "Updated date" "text" in the "copyright_status_table" "table"
+    Then "tabfile.csv" "table_row" should appear before "test.txt" "table_row"
+    # Sort by author: tabfile.csv is by "1, Teacher" and test.txt is by "User, Admin".
+    When I click on "Author" "text" in the "copyright_status_table" "table"
+    Then "tabfile.csv" "table_row" should appear before "test.txt" "table_row"
+    When I click on "Author" "text" in the "copyright_status_table" "table"
+    Then "test.txt" "table_row" should appear before "tabfile.csv" "table_row"
