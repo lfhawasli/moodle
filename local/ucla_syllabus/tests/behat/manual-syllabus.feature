@@ -1,4 +1,4 @@
-@ucla @local_ucla_syllabus
+@ucla @local_ucla_syllabus @CCLE-3684
 Feature: Handle manually uploaded "Syllabus" files
     As an instructor
     I want to be able to convert an existing file I uploaded to a syllabus
@@ -18,24 +18,53 @@ Background:
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I follow the "Show all" section in the ucla site menu
 
 @javascript
-Scenario: Converting files called "Syllabus"
-    When I add a "File" to section "1" and I fill the form with:
+Scenario Outline: Converting files/URLs called "Syllabus"
+    When I follow the "Show all" section in the ucla site menu
+    And I add a "<resourcename>" to section "1"
+    And I set the following fields to these values:
         | Name | Syllabus |
-        | Description | Syllabus test file |
-    And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
+        | Description | Syllabus test |
+    And <secondarystep>
     And I press "Save and return to course"
     Then I should see "Syllabus"
-    And I should see "We found a resource that might be a syllabus called \"Syllabus\". Would you like to make this your official syllabus?"
+    And I should see "We found a <resource> that might be a syllabus called \"Syllabus\". Would you like to make this your official syllabus?"
     When I press "Yes"
-    Then I should see "Please select the type of syllabus to convert your existing \"Syllabus\" resource."
+    Then I should see "Please select the type of syllabus to convert your existing \"Syllabus\" <resource>."
     When I follow "Add \"Syllabus\" as a syllabus"
-    Then I should see "Please complete the form below to convert your existing \"Syllabus\" resource into your official UCLA syllabus."
+    Then I should see "Please complete the form below to convert your existing \"Syllabus\" <resource> into your official UCLA syllabus."
     When I press "Save changes"
     Then I should see "Successfully converted manual syllabus."
-    When I follow the "Week 1" section in the ucla site menu
     # Converting a manual syllabus should delete the old file.
+    When I follow the "Week 1" section in the ucla site menu
     Then I should not see "Syllabus" in the "region-main" "region"
+    # Converting a manual syllabus should be logged.
+    When I log out
+    And I log in as "admin"
+    And I navigate to "Logs" node in "Site administration > Reports"
+    And I set the following fields to these values:
+        | Select a course | Course 1 |
+        | Select a user | 1, Teacher |
+    And I press "Get these logs"
+    Then I should see "Converted manual syllabus"
+    Examples:
+        | resource | resourcename | secondarystep |
+        | resource | File         | I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager |
+        | url      | URL          | I set the field "External URL" to "https://www.google.com" |
 
+@javascript
+Scenario Outline: Adding file/URL when syllabus already exists
+    Given I add a new public syllabus
+    When I follow the "Show all" section in the ucla site menu
+    And I add a "<resourcename>" to section "1"
+    And I set the following fields to these values:
+        | Name | Syllabus |
+        | Description | Syllabus test |
+    And <secondarystep>
+    And I press "Save and return to course"
+    Then I should not see "We found a <resource> that might be a syllabus called \"Syllabus\". Would you like to make this your official syllabus?"
+    Examples:
+        | resource | resourcename | secondarystep |
+        | resource | File         | I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager |
+        | url      | URL          | I set the field "External URL" to "https://www.google.com" |
