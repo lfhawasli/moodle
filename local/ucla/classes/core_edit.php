@@ -68,9 +68,11 @@ class local_ucla_core_edit {
      * even those inherited from the category or site context.
      *
      * @param object $course
+     * @param string $sort          Optional.
+     * @param string $capability    Defaults to 'mod/assign:grade'.
      * @return array
      */
-    public static function get_course_graders($course, $sort = '') {
+    public static function get_course_graders($course, $sort = '', $capability = 'mod/assign:grade') {
         global $CFG;
         require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
         $ppcourse = PublicPrivate_Course::build($course);
@@ -79,7 +81,7 @@ class local_ucla_core_edit {
             $groupid = $ppcourse->get_group();
         }
         return get_users_by_capability(context_course::instance($course->id),
-                'mod/assign:grade', '', $sort, '', '', $groupid, '', false);
+                $capability, '', $sort, '', '', $groupid, '', false);
     }
 
     /**
