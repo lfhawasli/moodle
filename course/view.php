@@ -139,6 +139,16 @@
             // Note: We actually already know they don't have this capability
             // or uservisible would have been true; this is just to get the
             // correct error message shown.
+
+            // START UCLA MOD: SSC-2155 CCLE-5329 - Update error messages for hidden sections
+            if (!empty($coursesections->availableinfo)) {
+                echo $OUTPUT->header();
+                $formattedinfo = \core_availability\info::format_info(
+                        $coursesections->availableinfo, $course);
+                echo html_writer::tag('div', $formattedinfo, array('class' => 'availabilityinfo'));
+            }
+            // END UCLA MOD: SSC-2155 CCLE-5329
+
             require_capability('moodle/course:viewhiddensections', $context);
         }
     }
