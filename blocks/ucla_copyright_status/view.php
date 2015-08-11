@@ -36,8 +36,15 @@ if (isset($cancelled)) {
     redirect(new moodle_url('/course/view.php', array('id' => $courseid)));
 }
 
+// Since set_editing_mode_button() depends on the data, we update the data before it is called.
+if (isset($action)) {
+    $data = data_submitted();
+    update_copyright_status($data);
+}
+
 init_copyright_page($course, $courseid, $context);
 set_editing_mode_button();
+setup_js_tablesorter('copyright_status_table', array('textExtraction:uclaCopyrightTextExtraction'));
 
 // Start output screen.
 echo $OUTPUT->header();
@@ -50,8 +57,6 @@ echo html_writer::tag('noscript',
         array('id' => 'block-ucla-copyright-status-noscript'));
 
 if (isset($action)) {
-    $data = data_submitted();
-    update_copyright_status($data);
     echo $OUTPUT->notification(get_string('changessaved', 'block_ucla_copyright_status'), 'notifysuccess');
 
     $event = \block_ucla_copyright_status\event\copyright_status_updated::create(array(

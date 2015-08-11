@@ -367,7 +367,7 @@ class format_ucla extends format_topics {
         return $options;
     }
 
- /**
+    /**
      * The URL to use for the specified course (with section)
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
@@ -378,39 +378,39 @@ class format_ucla extends format_topics {
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = array()) {
-        $course = $this->get_course();
-        $url = new moodle_url('/course/view.php', array('id' => $course->id));
+        // All UCLA format courses use multipage display (one page per section),
+        // except for the "Show all" page, which is a single page for all the sections.
+        $url = new moodle_url('/course/view.php', array('id' => $this->get_courseid()));
 
-        $sr = null;
-        if (array_key_exists('sr', $options)) {
-            $sr = $options['sr'];
-        }
+        // $sectionno denotes the section we want to return to.
         if (is_object($section)) {
             $sectionno = $section->section;
         } else {
             $sectionno = $section;
         }
-        if ($sectionno !== null) {
-            if ($sr !== null) {
-                if ($sr) {
-                    $usercoursedisplay = COURSE_DISPLAY_MULTIPAGE;
-                    $sectionno = $sr;
-                } else {
-                    $usercoursedisplay = COURSE_DISPLAY_SINGLEPAGE;
-                }
-            } else {
-                $usercoursedisplay = $course->coursedisplay;
-            }
-            // For UCLA format courses, do not exclude Section 0.
-            if ($usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                $url->param('section', $sectionno);
-            } else {
+        // $sr denotes the page we want to return to, either the same as $sectionno
+        // or 0/empty for "Show all".
+        if (array_key_exists('sr', $options)) {
+            $sr = $options['sr'];
+        }
+
+        if (isset($sectionno)) {
+            // There is an ambiguous case if both $sr and $sectionno are empty:
+            // go to site info (section 0) on the "Show all" page, or the site info page alone?
+            // We interpret it as going to the site info page alone.
+            if (empty($sr) && !empty($sectionno)) {
+                // Navigation would not have a link to this section, since it is part of "Show all".
                 if (!empty($options['navigation'])) {
                     return null;
                 }
+                // Return to "Show all" page.
+                $url->param('show_all', 1);
                 $url->set_anchor('section-'.$sectionno);
+            } else {
+                $url->param('section', $sectionno);
             }
         }
+
         return $url;
     }
 

@@ -43,33 +43,54 @@ function init_copyright_page($course, $courseid, $context) {
 function get_files_copyright_status_by_course($courseid, $filter = 'all') {
     global $DB, $CFG;
 
-    // Cache results
+    // Cache results.
     static $output = array();
 
     $params = array(CONTEXT_MODULE, $courseid);
     if (!isset($output[$courseid][$filter])) {
-        $sql = "SELECT  MAX(f.id) as id,
-                        f.filename,
-                        f.author,
-                        f.license,
-                        f.timemodified,
-                        f.contenthash,
-                        cm.id AS cmid,
-                        r.name AS rname
-                FROM    {files} f
-                INNER JOIN {context} c ON (c.id = f.contextid AND c.contextlevel = ?)
-                INNER JOIN {course_modules} cm ON cm.id = c.instanceid
-                INNER JOIN {resource} r ON cm.instance = r.id
-                WHERE   r.course = ? AND
-                        f.filename NOT LIKE  '.%'
-                GROUP BY c.id, cm.id";
+        $includedmodules = array('resource', 'folder');
+        // Contains, e.g., 'resource.name, folder.name'.
+        $modulenamefields = '';
+        // Joins for each of the modules' tables, which we need to get the module name/title.
+        $modulejoins = '';
+        foreach ($includedmodules as $module) {
+            $modulenamefields .= "$module.name, ";
+            // We're adding data for relevant modules, so we use a left join.
+            $modulejoins .= " LEFT JOIN {" . $module . "} $module ON (m.name = '$module' AND cm.instance = $module.id)";
+        }
+        // Remove last ', '.
+        $modulenamefields = substr($modulenamefields, 0, strlen($modulenamefields) - 2);
+        $includedmodulesexpression = $DB->get_in_or_equal($includedmodules);
+        $params = array_merge($params, $includedmodulesexpression[1]);
 
-        // include files have null value in copyright status as default status
+        $sql = "SELECT f.id,
+                       f.filename,
+                       f.author,
+                       f.license,
+                       f.timemodified,
+                       f.contenthash,
+                       f.sortorder,
+                       cm.id AS cmid,
+                       s.section AS sectionid,
+                       s.name AS sectionname,
+                       m.name AS module,
+                       COALESCE($modulenamefields) AS rname
+                  FROM {files} f
+                  JOIN {context} c ON (c.id = f.contextid AND c.contextlevel = ?)
+                  JOIN {course_modules} cm ON cm.id = c.instanceid
+                  JOIN {course_sections} s ON s.id = cm.section
+                  JOIN {modules} m ON m.id = cm.module
+                  $modulejoins
+                 WHERE cm.course = ?
+                       AND f.filename NOT LIKE '.%'
+                       AND m.name $includedmodulesexpression[0]";
+
+        // Include files that have null value in copyright status as default status.
         if ($filter && $filter == $CFG->sitedefaultlicense) {
-            $sql .= " HAVING (f.license IS NULL OR f.license = '' OR f.license = ?)";
+            $sql .= " AND (f.license IS NULL OR f.license = '' OR f.license = ?)";
             $params[] = $filter;
         } else if ($filter && $filter != 'all') {
-            $sql .= " HAVING f.license = ?";
+            $sql .= " AND f.license = ?";
             $params[] = $filter;
         }
 
@@ -82,7 +103,7 @@ function get_files_copyright_status_by_course($courseid, $filter = 'all') {
 /*
  * Process result return from function get_files_copyright_status_by_course to
  * return a data structure for display
- * 
+ *
  * @param array $filelist
  * @return array            Returns an array indexed by content hash
  */
@@ -93,8 +114,13 @@ function process_files_list($filelist) {
                 array('license' => $result->license,
                     'timemodified' => $result->timemodified,
                     'author' => $result->author,
-                    'filedisplayname' => !empty($result->rname) ? $result->rname : $result->filename,
-                    'cmid' => $result->cmid);
+                    'filename' => $result->filename,
+                    'ismainfile' => $result->sortorder == 1,
+                    'cmid' => $result->cmid,
+                    'sectionid' => $result->sectionid,
+                    'sectionname' => $result->sectionname,
+                    'module' => $result->module,
+                    'resourcename' => $result->rname);
     }
     return $result_array;
 }
@@ -103,7 +129,7 @@ function process_files_list($filelist) {
  * Calculate files copyright status statistics.  Files with same contenthash treated as one file
  * Files have license as null will be included as Copyright status not yet identified.
  * @param $filelist, $licensetypes
- * @return statistics array with file license type as key, and number of the files of that type as value. 
+ * @return statistics array with file license type as key, and number of the files of that type as value.
  * @including total file count. File with same contenthash treated as one file.
  */
 function calculate_copyright_status_statistics($filelist) {
@@ -125,7 +151,7 @@ function calculate_copyright_status_statistics($filelist) {
 /*
  * Return a group of file ids that have the same content hash
  * @param $fileid
- * @return array of file ids 
+ * @return array of file ids
  */
 function get_file_ids($fileid) {
     global $DB;
@@ -163,7 +189,7 @@ function update_copyright_status($data) {
 
 /*
  * Display file list with copyright status associated with the file for a course
- * 
+ *
  * @param int $courseid
  * @param string $filter    Should be copyright license shortname.
  *
@@ -171,16 +197,13 @@ function update_copyright_status($data) {
  */
 
 function display_copyright_status_contents($courseid, $filter) {
-    global $CFG;
-    global $OUTPUT;
-    global $PAGE;
+    global $CFG, $COURSE, $OUTPUT, $PAGE;
 
     $url = '/blocks/ucla_copyright_status/view.php';
     $PAGE->set_url($url, array('courseid' => $courseid));   // get copyright data
-    $PAGE->requires->js('/theme/uclashared/javascript/jquery-1.5.2.min.js');
     $PAGE->requires->js('/blocks/ucla_copyright_status/view.js');
 
-    // get license types
+    // Get license types.
     $licensemanager = new license_manager();
     $licenses = $licensemanager->get_licenses(array('enabled' => 1));
     $license_options = array();
@@ -189,10 +212,10 @@ function display_copyright_status_contents($courseid, $filter) {
         $license_options[$license->shortname] = $license->fullname;
     }
 
-    // display statistics 
+    // Display statistics.
     $all_copyrights = get_files_copyright_status_by_course($courseid);
     $stat_array = calculate_copyright_status_statistics($all_copyrights);
-    //if no files, do not calculate
+    // If no files, do not calculate.
     if ($stat_array['total'] > 0) {
         echo html_writer::start_tag('fieldset',
                 array('id' => 'block_ucla_copyright_status_stat'));
@@ -201,7 +224,7 @@ function display_copyright_status_contents($courseid, $filter) {
         echo html_writer::start_tag('ul');
         foreach ($license_options as $k => $v) {
             if ($k != 'all') {
-                // if tbd, shown in red
+                // If tbd, shown in red.
                 $text_style_class = 'block-ucla-copyright-status-stat-num';
                 if ($k == $CFG->sitedefaultlicense) {
                     $text_style_class = 'block-ucla-copyright-status-stat-num-red';
@@ -253,6 +276,7 @@ function display_copyright_status_contents($courseid, $filter) {
             array('target' => '_blank'));
     $t->head = array(get_string('copyrightstatus', 'block_ucla_copyright_status')
         . ' ' . $helpicon,
+        get_string('section'),
         get_string('updated_dt', 'block_ucla_copyright_status'),
         get_string('author', 'block_ucla_copyright_status'));
     $t->attributes[] = 'generaltable';
@@ -262,31 +286,45 @@ function display_copyright_status_contents($courseid, $filter) {
     $files_list = process_files_list($course_copyright_status_list);
     foreach ($files_list as $contenthash_record) {
         $file_names = array();
+        $file_sections = array();
         $file_dates = array();
         $file_authors = array();
         $select_copyright = null;
 
-        //loop through all the files with the same content hash        
+        // Loop through all the files with the same content hash,
+        // which we assume to have the same copyright status.
         foreach ($contenthash_record as $id => $record) {
             $select_copyright = html_writer::select($license_options,
                             'filecopyright_' . $id, $record['license']);
 
-            $file_names[] = html_writer::link(new moodle_url('/mod/resource/view.php',
-                            array('id' => $record['cmid'])),
-                            $record['filedisplayname']);
-            $file_dates[] = strftime("%B %d %Y %r", $record['timemodified']);
+            $resourceinfo = html_writer::link(
+                    new moodle_url("/mod/{$record['module']}/view.php", array('id' => $record['cmid'])),
+                    $record['resourcename']);
+            if ($record['module'] == 'resource') {
+                $resourceinfo .= $record['ismainfile'] ? ': main file' : ': secondary file';
+            }
+            $name = $record['filename'] . ' (' . $resourceinfo . ')';
+
+            $file_names[] = $name;
+            $sectionurl = course_get_url($COURSE->id, $record['sectionid']);
+            $file_sections[] = html_writer::link($sectionurl, $record['sectionname']);
+            // Hack to sort by date properly: insert a hidden timestamp at the beginning.
+            $file_dates[] = html_writer::tag('span', $record['timemodified'], array('hidden' => 'hidden'))
+                    . strftime("%B %d %Y %r", $record['timemodified']);
             $file_authors[] = $record['author'];
         }
 
-        // if there are mutliple records for a given contenthash, then display
-        // then in a ordered list
+        // If there are multiple records for a given contenthash, then display
+        // then in a ordered list.
         if (count($contenthash_record) > 1) {
             $file_names = html_writer::alist($file_names, null, 'ol');
+            $file_sections = html_writer::alist($file_sections, null, 'ol');
             $file_dates = html_writer::alist($file_dates, null, 'ol');
             $file_authors = html_writer::alist($file_authors, null, 'ol');
         } else {
-            // only one file, so just show information normally
+            // Only one file, so just show information normally.
             $file_names = array_pop($file_names);
+            $file_sections = array_pop($file_sections);
             $file_dates = array_pop($file_dates);
             $file_authors = array_pop($file_authors);
         }
@@ -294,7 +332,7 @@ function display_copyright_status_contents($courseid, $filter) {
         $t->data[] = array($file_names .
             html_writer::tag('div', $select_copyright,
                     array('class' => 'block-ucla-copyright-status-list')),
-            $file_dates, $file_authors);
+            $file_sections, $file_dates, $file_authors);
     }
     echo html_writer::start_tag('div',
             array('id' => 'block_ucla_copyright_status_id_cp_list'));

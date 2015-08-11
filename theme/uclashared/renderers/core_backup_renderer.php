@@ -175,7 +175,9 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         $html .= html_writer::start_tag('div', array('class'=>'ics-existing-course backup-section'));
         $html .= $this->output->heading(get_string('importdatafrom'), 2, array('class'=>'header'));
 
-        $html .= $this->backup_detail_pair(get_string('selectacourse', 'backup'), $this->render($courses));
+        $search = new local_ucla_import_course_search(array('url'=>$nextstageurl));
+        $html .= $this->backup_detail_pair(get_string('selectacourse', 'backup'), $this->render($search));
+        
         $html .= html_writer::end_tag('div');
         $html .= html_writer::end_tag('form');
         $html .= html_writer::end_tag('div');
@@ -188,9 +190,8 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
      * @param import_course_search $component
      * @return string
      */
-    public function render_import_course_search(import_course_search $component) {
+    public function render_local_ucla_import_course_search(import_course_search $component) {
         $url = $component->get_url();
-
         $output = html_writer::start_tag('div', array('class' => 'import-course-search'));
         $output .= html_writer::start_tag('div', array('class'=>'ics-search'));
         $output .= html_writer::empty_tag('input', array('type'=>'text', 'name'=>restore_course_search::$VAR_SEARCH, 'value'=>$component->get_search()));
@@ -200,17 +201,12 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
  
         if ($component->get_count() === 0) {
             $output .= $this->output->notification(get_string('nomatchingcourses', 'backup'));
-
-            $output .= html_writer::start_tag('div', array('class'=>'ics-search'));
-            $output .= html_writer::empty_tag('input', array('type'=>'text', 'name'=>restore_course_search::$VAR_SEARCH, 'value'=>$component->get_search()));
-            $output .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'searchcourses', 'value'=>get_string('search')));
-            $output .= html_writer::end_tag('div');
-
             $output .= html_writer::end_tag('div');
             return $output;
         }
 
         $countstr = '';
+
         if ($component->has_more_results()) {
             $countstr = get_string('morecoursesearchresults', 'backup', $component->get_count());
         } else {
@@ -221,21 +217,24 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         $output .= html_writer::start_tag('div', array('class' => 'ics-results', 'style' => 'overflow-y:scroll; height:300px;'));
 
         $table = new html_table();
-        $table->head = array('', get_string('shortnamecourse'), get_string('fullnamecourse'));
+        $table->head = array('', get_string('shortnamecourse'), get_string('fullnamecourse'), get_string('instructorcourse', 'theme_uclashared'));
         $table->data = array();
+        
         foreach ($component->get_results() as $course) {
             $row = new html_table_row();
             $row->attributes['class'] = 'ics-course';
             if (!$course->visible) {
                 $row->attributes['class'] .= ' dimmed';
             }
-        $row->cells = array(
+            $row->cells = array(
                 html_writer::empty_tag('input', array('type'=>'radio', 'name'=>'importid', 'value'=>$course->id)),
                 format_string($course->shortname, true, array('context' => context_course::instance($course->id))),
-                format_string($course->fullname, true, array('context' => context_course::instance($course->id)))
+                format_string($course->fullname, true, array('context' => context_course::instance($course->id))),
+                format_string($course->lastname.', '.$course->firstname, true, array('context'=>context_course::instance($course->id)))
             );
             $table->data[] = $row;
         }
+
         if ($component->has_more_results()) {
             $cell = new html_table_cell(get_string('moreresults', 'backup'));
             $cell->colspan = 3;
@@ -244,10 +243,10 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
             $row->attributes['class'] = 'rcs-course';
             $table->data[] = $row;
         }
+
         $output .= html_writer::table($table);
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
         return $output;
     }
 }
-

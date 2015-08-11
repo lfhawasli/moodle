@@ -1,11 +1,10 @@
-@ucla @format_ucla
+@ucla @format_ucla @CCLE-3520
 Feature: Return after creation
    In order to have consistent navigation
    As an instructor
    I want to return to the section I was previously on after adding an activity
 
-@javascript
-Scenario: Adding a resource
+Background:
     Given I am in a ucla environment
     And the following "users" exist:
        | username | firstname | lastname | email |
@@ -19,13 +18,37 @@ Scenario: Adding a resource
     And I log in as "teacher1"
     And I follow "Test course 1"
     And I turn editing mode on
-    When I follow the "Week 1" section in the ucla site menu
-    And I follow "Add an activity or resource"
-    And I set the field "Page" to "1"
-    And I press "Add"
-    And I set the following fields to these values:
-       | Name | newpage |
+    And I follow "Modify sections"
+    And I click on "landing-page-5" "radio"
+    And I press "Save changes"
+
+@javascript
+Scenario Outline: Adding/editing a resource
+    When I follow the "<section>" section in the ucla site menu
+    And I add a "page" to section "<sectionnumber>" and I fill the form with:
+       | Name | <pagename> |
        | Page content | lorem ipsum |
+    Then I should be on section "<section>"
+    And I should see "<pagename>"
+    When I open "<pagename>" actions menu
+    And I click on "Edit settings" "link" in the "#section-<sectionnumber> .page .commands" "css_element"
     And I press "Save and return to course"
-    Then I should see "Week 1" highlighted in the ucla site menu
-    And I should see "newpage"
+    Then I should be on section "<section>"
+    And I should see "<pagename>"
+    Examples:
+       | section   | sectionnumber | pagename |
+       | Site info | 0             | newpage0 |
+       | Week 1    | 1             | newpage1 |
+       | Show all  | 2             | newpage2 |
+
+@javascript
+Scenario Outline: Cancel adding a resource
+    When I follow the "<section>" section in the ucla site menu
+    And I add a "page" to section "<sectionnumber>"
+    And I press "Cancel"
+    Then I should be on section "<section>"
+    Examples:
+       | section   | sectionnumber |
+       | Site info | 0             |
+       | Week 1    | 1             |
+       | Show all  | 2             |

@@ -315,6 +315,9 @@ $CFG->forced_plugin_settings['assignfeedback_comments']['default'] = 1;
 // Site administration > Plugins > Assignment plugins > Feedback plugins > File feedback
 $CFG->forced_plugin_settings['assignfeedback_file']['default'] = 1;
 
+// Site administration > Plugins > Admin tools > Merge user accounts
+$CFG->forced_plugin_settings['tool_mergeusers']['quizattemptsaction'] = 'renumber';
+
 // Site administration > Plugins > Enrollments > UCLA registrar
 $CFG->forced_plugin_settings['local_ucla']['overrideenroldatabase'] = 1;
 

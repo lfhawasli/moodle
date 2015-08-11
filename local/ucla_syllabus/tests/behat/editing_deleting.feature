@@ -24,6 +24,7 @@ Background:
     And I follow "Add syllabus"
     And I set the field "URL" to "http://ucla.edu"
     And I press "Save changes"
+    And I press "Continue"
 
 Scenario: Editing syllabus information
     Given I should see "http://ucla.edu"
@@ -32,6 +33,7 @@ Scenario: Editing syllabus information
     And I set the field "URL" to "http://www.uclabruins.com/"
     And I set the field "Display name" to "Course outline"
     And I press "Save changes"
+    And I press "Continue"
     Then I should see "http://www.uclabruins.com/"
     And I should see "Course outline"
 
