@@ -428,7 +428,7 @@ class ucla_courserequests {
             foreach ($set as $key => $course) {
                 if (isset($course['enrolstat'])
                         && enrolstat_is_cancelled($course['enrolstat'])) {
-                    $course[UCLA_REQUESTOR_WARNING][UCLA_REQUESTOR_CANCELLED]
+                    $course[UCLA_REQUESTOR_ERROR][UCLA_REQUESTOR_CANCELLED]
                         = true;
                 }
 
@@ -449,6 +449,15 @@ class ucla_courserequests {
                     $hcthere = true;
                     continue;
                 }*/
+                // Avoid affecting requests already built on another server when
+                // fetching requests from the Registrar.
+                if ($context == UCLA_REQUESTOR_FETCH) {
+                    // $course will only have the index 'existselsewhere' if it has a url
+                    // associated to it and the server is PROD.
+                    if (array_key_exists('existselsewhere', $course)) {
+                        $course[UCLA_REQUESTOR_WARNING][UCLA_REQUESTOR_URLEXISTS] = $course['existselsewhere'];
+                    }
+                }
 
                 // Avoid affecting existing requests when fetching requests from
                 // the Registrar
