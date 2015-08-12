@@ -136,56 +136,6 @@ if (has_capability('tool/uclasupportconsole:view', context_system::instance()) &
     }
 }
 
-/******************************** Other Functions *********************/
-// Other Functions
-$modules[] = new ucla_cp_module('ucla_cp_mod_other', null, null, $ta_cap);
-
-// Saving typing...
-$temptag = array('ucla_cp_mod_other');
-// Redundency in case prev tempcap isn't this one.
-$tempcap = 'moodle/course:update';
-// Edit user profile!
-$modules[] = new ucla_cp_module('edit_profile', new moodle_url(
-                        $CFG->wwwroot . '/user/edit.php'), $temptag, 'moodle/user:editownprofile');
-
-/* Import from classweb!? TODO
-  $modules[] = new ucla_cp_module('import_classweb', new moodle_url('view.php'),
-  $temptag, $tempcap);
-  /* Import from classweb */
-
-// Import from existing moodle course
-$modules[] = new ucla_cp_module('import_moodle', new moodle_url($CFG->wwwroot .
-        '/backup/import.php', array('id' => $course->id)), $temptag,
-        'moodle/restore:restoretargetimport');
-
-/* Create a TA-Site TODO
-  $modules[] = new ucla_cp_module('create_tasite', new moodle_url('view.php'),
-  $temptag, $ta_cap);
-  /* Create a TA-Site */
-
-// View moodle participants
-$modules[] = new ucla_cp_module('view_roster', new moodle_url(
-                        $CFG->wwwroot . '/user/index.php', array('id' => $course->id)),
-                $temptag, 'moodle/course:viewparticipants');
-
-// Syllabus tool
-$syllabus_manager = new ucla_syllabus_manager($course);
-if ($syllabus_manager->can_host_syllabi()) {
-    $modules[] = new ucla_cp_module('manage_syllabus', new moodle_url(
-            '/local/ucla_syllabus/index.php', array('id' => $course->id)),
-            $temptag, 'local/ucla_syllabus:managesyllabus');
-}
-
-// Course Content Download
-$formatoptions = course_get_format($course->id)->get_format_options();
-$coursedownloadstr = 'course_download';
-if ($formatoptions['coursedownload'] != 1) {
-    $coursedownloadstr = 'course_download_disabled';
-}
-$modules[] = new ucla_cp_module($coursedownloadstr, new moodle_url(
-        '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
-        $temptag, 'moodle/course:manageactivities');
-
 /******************************** Advanced Functions *********************/
 $modules[] = new ucla_cp_module('ucla_cp_mod_advanced', null, null, 'moodle/course:manageactivities');
 
@@ -289,35 +239,40 @@ if (is_role_switched($course->id)) {
     }
 }
 
+// Text and URL for course download.
+$coursedownloadstr = 'course_download';
+$coursedownloadurl = new moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $course->id));
+$isinstructor = has_capability('moodle/course:manageactivities', context_course::instance($course->id));
+$formatoptions = course_get_format($course->id)->get_format_options();
+// See if the instructor has disabled downloading for this specific course.
+if ($formatoptions['coursedownload'] == 1) {
+    if (!$isinstructor && !student_zip_requestable($course)) {
+        // Course download is active, but student cannot access link yet.
+        $coursedownloadstr = 'course_download_available';
+        $coursedownloadurl = null;
+    }
+} else {
+    // Instructor turned off course download.
+    if ($isinstructor) {
+        $coursedownloadstr = 'course_download_disabled';
+    } else {
+        $coursedownloadstr = 'course_download_unavailable';
+        $coursedownloadurl = null;
+    }
+}
+
+// Student section/tag.
 if (has_role_in_context('student', $context) || $is_role_switched_student) {
     $tempcap = null;
     $temptag = array('ucla_cp_mod_student');
     $modules[] = new ucla_cp_module('ucla_cp_mod_student', null, null, $tempcap);
-
 
     $modules[] = new ucla_cp_module('edit_profile', new moodle_url(
             $CFG->wwwroot . '/user/edit.php'), $temptag, 'moodle/user:editownprofile');
     $modules[] = new ucla_cp_module('student_grades', new moodle_url(
             $CFG->wwwroot . '/grade/index.php?id=' . $course->id), $temptag, $tempcap);
 
-    $formatoptions = course_get_format($course->id)->get_format_options();
-    // See if the instructor has disabled downloading for this specific course.
-    if ($formatoptions['coursedownload'] == 1) {
-        if (student_zip_requestable($course)) {
-            // Course download is active and student can get to link.
-            $modules[] = new ucla_cp_module_course_download('course_download', new moodle_url(
-                '/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
-                $temptag);
-        } else {
-            // Course download is active, but student cannot access link yet.
-            $modules[] = new ucla_cp_module_course_download('course_download_available',
-                    null, $temptag);
-        }
-    } else {
-        // Instructor turned off course download.
-        $modules[] = new ucla_cp_module_course_download('course_download_unavailable',
-                null, $temptag);
-    }
+    $modules[] = new ucla_cp_module_course_download($coursedownloadstr, $coursedownloadurl, $temptag);
 
     if ($USER->auth != "shibboleth") {
         $modules[] = new ucla_cp_module_course_download('student_change_password',
@@ -353,6 +308,49 @@ if (has_role_in_context('student', $context) || $is_role_switched_student) {
 
         $modules[] = $myucla_row;
     }
+} else {
+    /******************************** Other Functions *********************/
+    // Other Functions
+    $modules[] = new ucla_cp_module('ucla_cp_mod_other', null, null, null);
+
+    // Saving typing...
+    $temptag = array('ucla_cp_mod_other');
+    // Redundency in case prev tempcap isn't this one.
+    $tempcap = 'moodle/course:update';
+    // Edit user profile!
+    $modules[] = new ucla_cp_module('edit_profile', new moodle_url(
+                            $CFG->wwwroot . '/user/edit.php'), $temptag, 'moodle/user:editownprofile');
+
+    /* Import from classweb!? TODO
+      $modules[] = new ucla_cp_module('import_classweb', new moodle_url('view.php'),
+      $temptag, $tempcap);
+      /* Import from classweb */
+
+    // Import from existing moodle course
+    $modules[] = new ucla_cp_module('import_moodle', new moodle_url($CFG->wwwroot .
+            '/backup/import.php', array('id' => $course->id)), $temptag,
+            'moodle/restore:restoretargetimport');
+
+    /* Create a TA-Site TODO
+      $modules[] = new ucla_cp_module('create_tasite', new moodle_url('view.php'),
+      $temptag, $ta_cap);
+      /* Create a TA-Site */
+
+    // View moodle participants
+    $modules[] = new ucla_cp_module('view_roster', new moodle_url(
+                            $CFG->wwwroot . '/user/index.php', array('id' => $course->id)),
+                    $temptag, 'moodle/course:viewparticipants');
+
+    // Syllabus tool
+    $syllabus_manager = new ucla_syllabus_manager($course);
+    if ($syllabus_manager->can_host_syllabi()) {
+        $modules[] = new ucla_cp_module('manage_syllabus', new moodle_url(
+                '/local/ucla_syllabus/index.php', array('id' => $course->id)),
+                $temptag, 'local/ucla_syllabus:managesyllabus');
+    }
+
+    // Course Content Download
+    $modules[] = new ucla_cp_module_course_download($coursedownloadstr, $coursedownloadurl, $temptag);
 }
 // Functions for features that haven't been implemented in moodle 2.0 yet.
 /*   if (!is_collab($course->id)){

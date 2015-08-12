@@ -37,8 +37,9 @@ function student_zip_requestable($course) {
 
     // See if course is a UCLA course.
     $courseinfos = ucla_get_course_info($course->id);
+    // If not, then this is a collab site, so always allow downloading course (CCLE-4758).
     if (empty($courseinfos)) {
-        return false;
+        return true;
     }
     $courseinfo = reset($courseinfos);  // Just care about first item.
 
