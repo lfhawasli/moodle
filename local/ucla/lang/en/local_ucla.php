@@ -249,4 +249,4 @@ $string['turnitinwarning'] = 'Be aware there are two portals for TurnItIn submis
         . 'CCLE. Only one should be used per course.<br/><br/>For further information please read ';
 
 // CCLE-4568 - Need a better screen for users who log into Moodle without an email address
-$string['errmissingemail'] = 'Because your email address is missing from your CCLE profile, you will not be able to login to CCLE until you update your official UCLA email address through <a href="https://my.ucla.edu/">MyUCLA</a>. <br/><br/> Please see the following: <a href="https://docs.ccle.ucla.edu/w/Changing_your_email_address">https://docs.ccle.ucla.edu/w/Changing_your_email_address</a>';
+$string['errmissingemail'] = 'Because your email address is missing from your CCLE profile, you will not be able to login to CCLE until you update your official UCLA email address.<br/><br/>Instructions vary for faculty/staff and students. For more information go to: <a href="http://directory.ucla.edu/update.php">http://directory.ucla.edu/update.php</a>';
