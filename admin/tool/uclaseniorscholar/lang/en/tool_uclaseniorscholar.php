@@ -228,3 +228,23 @@ $string['status_invite_active'] = 'Active';
 $string['action_revoke_invite'] = 'Revoke invite';
 $string['action_extend_invite'] = 'Extend invite';
 $string['action_resend_invite'] = 'Resend invite';
+
+// Bulk upload invitation.
+$string['importfile'] = 'Import invitation file';
+$string['separator'] = 'Separator';
+$string['sepcolon'] = 'Colon';
+$string['sepcomma'] = 'Comma';
+$string['sepsemicolon'] = 'Semicolon';
+$string['septab'] = 'Tab';
+$string['uploadseniorscholar'] = 'Upload senior scholars';
+$string['sendinvites'] = 'Send invites';
+$string['status'] = 'Upload status';
+$string['notavailableforimport'] = 'Not available for import';
+$string['alreadyinvite'] = 'There is already invite for this email for this course';
+$string['readyforimport'] = 'Ready for import';
+$string['bulkupload_button'] = 'Bulk upload senior scholars';
+$string['bulkupload_byterm'] = 'You can bulk upload senior scholar for invites';
+$string['encoding'] = 'Encoding';
+$string['coursenotexists'] = 'Course not exists';
+$string['nobulkinvite'] = 'No course available for bulk invite';
+$string['continue'] = 'Continue';

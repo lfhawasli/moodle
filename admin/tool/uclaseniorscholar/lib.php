@@ -215,7 +215,7 @@ function seniorscholar_get_userinvitehistory_by_term($term) {
     list($listofinviterssql, $params) = $DB->get_in_or_equal($listofinviters, SQL_PARAMS_NAMED);
     $params['term'] = $term;
     $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS tid, i.*, rc.courseid, rc.instructor, rc.hostcourse,
-            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group, i.*
+            reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group
               FROM {course} c
               JOIN {enrol_invitation} i ON i.courseid = c.id
               JOIN {ucla_request_classes} rc ON c.id = rc.courseid
@@ -235,4 +235,25 @@ function seniorscholar_get_userinvitehistory_by_term($term) {
         }
     }
     return $output;
+}
+
+/**
+ * get course list by srs and term.
+ * Only support the senior scholar who does not have any invite for this course
+ * including invites from the senior scholar administrator or course instructor.
+ */
+function seniorscholar_get_courses_by_srsterm($srs, $term) {
+    global $DB;
+    $sql = "SELECT DISTINCT (@row_num := @row_num + 1) AS id, rc.courseid, rc.instructor, rc.hostcourse,
+                             reg.subj_area, reg.coursenum, reg.sectnum, reg.acttype, reg.enrolstat, reg.term, reg.session_group, i.email
+              FROM {course} c
+         LEFT JOIN {enrol_invitation} i
+                ON i.courseid = c.id
+              JOIN {ucla_request_classes} rc ON c.id = rc.courseid
+              JOIN {ucla_reg_classinfo} reg ON reg.term = rc.term and reg.srs = rc.srs
+              JOIN
+                   (SELECT @row_num := 0) AS t
+             WHERE rc.term = ?
+               AND rc.srs = ?";
+    return $result = $DB->get_records_sql($sql, array($term, $srs));
 }

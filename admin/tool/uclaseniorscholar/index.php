@@ -28,6 +28,7 @@ require_once($CFG->dirroot . '/enrol/invitation/locallib.php');
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->dirroot . '/local/ucla/datetimehelpers.php');
 require_once($CFG->dirroot . '/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
+require_once($CFG->libdir . '/weblib.php');
 
 $baseurl = $CFG->wwwroot . '/' . $CFG->admin . '/tool/uclaseniorscholar';
 $filterterm = optional_param('filter_term', $CFG->currentterm, PARAM_ALPHANUM);
@@ -136,6 +137,21 @@ if (empty($mode)) {
                                                'id' => 'id_filter',
                                                'name' => 'filter',
                                                'value' => 'history_by_user'));
+    echo html_writer::end_tag('form');
+    echo html_writer::end_tag('div');
+    // Bulk upload by term.
+    echo html_writer::empty_tag('br');
+    echo html_writer::tag('p', get_string('bulkupload_byterm', 'tool_uclaseniorscholar'));
+    echo html_writer::start_tag('div', array('class' => 'filter-item'));
+    echo html_writer::start_tag('form', array('id' => 'tool_uclaseniorscholar_bulk_upload',
+                                              'action' => new moodle_url('/admin/tool/uclaseniorscholar/seniorscholar_import.php'),
+                                              'method' => 'post'));
+    echo html_writer::select($termlist, 'filter_term', $filterterm, '',
+                             array('id' => 'tool_uclaseniorscholar_id_filter_term'));
+    echo html_writer::empty_tag('input', array('id' => 'bulk_upload_btn',
+                                               'name' => 'submit_button',
+                                               'value' => get_string('bulkupload_button', 'tool_uclaseniorscholar'),
+                                               'type' => 'submit'));
     echo html_writer::end_tag('form');
     echo html_writer::end_tag('div');
 }
