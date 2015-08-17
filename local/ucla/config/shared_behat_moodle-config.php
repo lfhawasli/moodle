@@ -368,9 +368,6 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
-// Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35; // CCLE-5227 - Recycle Bin Item Lifetime
-
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 
