@@ -632,25 +632,29 @@ class grade_report_user extends grade_report {
     public function print_table($return=false) {
          $maxspan = $this->maxdepth;
 
-        // START UCLA MOD CCLE-4433 - striping Moodle styles in favor of Bootstrap tables.
         /// Build table structure
-//        $html = "
-//            <table cellspacing='0'
-//                   cellpadding='0'
-//                   summary='" . s($this->get_lang_string('tablesummary', 'gradereport_user')) . "'
-//                   class='boxaligncenter generaltable user-grade'>
-//            <thead>
-//                <tr>
-//                    <th id='".$this->tablecolumns[0]."' class=\"header\" colspan='$maxspan'>".$this->tableheaders[0]."</th>\n";
         $html = "
             <table cellspacing='0'
                    cellpadding='0'
                    summary='" . s($this->get_lang_string('tablesummary', 'gradereport_user')) . "'
-                   class='table table-bordered table-striped ccle-responsive-table-collapse'
-                   id='user-report-table'>
+                   class='boxaligncenter generaltable user-grade'>
             <thead>
                 <tr>
                     <th id='".$this->tablecolumns[0]."' class=\"header\" colspan='$maxspan'>".$this->tableheaders[0]."</th>\n";
+
+        // START UCLA MOD CCLE-4433 - striping Moodle styles in favor of Bootstrap tables.
+        global $CFG;
+        if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+            $html = "
+                <table cellspacing='0'
+                       cellpadding='0'
+                       summary='" . s($this->get_lang_string('tablesummary', 'gradereport_user')) . "'
+                       class='table table-bordered table-striped ccle-responsive-table-collapse'
+                       id='user-report-table'>
+                <thead>
+                    <tr>
+                        <th id='".$this->tablecolumns[0]."' class=\"header\" colspan='$maxspan'>".$this->tableheaders[0]."</th>\n";
+        }
         // END UCLA MOD CCLE-4433
         for ($i = 1; $i < count($this->tableheaders); $i++) {
             $html .= "<th id='".$this->tablecolumns[$i]."' class=\"header\">".$this->tableheaders[$i]."</th>\n";
