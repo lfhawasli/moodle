@@ -87,10 +87,11 @@ $string['nochanges'] = 'Nothing was changed.';
 
 // Crosslisting errors
 $string['illegalcrosslist'] = 'This SRS has already been requested to be built.';
-$string['hostandchild'] = 'This course or one of its crosslists has already been built, and is preventing this request from proceding.';
+$string['hostandchild'] = 'This course or one of its crosslists has already been built, and is preventing this request from proceeding.';
 $string['srserror'] = 'The SRS number must be exactly 9 digits long';
 $string['cancelledcourse'] = 'This course is marked as cancelled by the Registrar.';
 $string['nosrsfound'] = 'Could not find course with this SRS.';
+$string['builtbyanothersystem'] = 'This course is marked as already existing at {$a}.';
 
 $string['queuetobebuilt'] = "Courses in queue to be built";
 $string['queueempty'] = "The queue is empty. All courses have been built as of now.";

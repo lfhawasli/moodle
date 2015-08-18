@@ -36,6 +36,7 @@ define('UCLA_REQUESTOR_GHOST', 'ghostcoursecreated');
 define('UCLA_REQUESTOR_BADHOST', 'inconsistenthost');
 define('UCLA_REQUESTOR_CANCELLED', 'cancelledcourse');
 define('UCLA_REQUESTOR_NOCOURSE', 'nosrsfound');
+define('UCLA_REQUESTOR_URLEXISTS', 'builtbyanothersystem');
 
 define('UCLA_REQUESTOR_FETCH', 'fetch');
 define('UCLA_REQUESTOR_VIEW', 'views');
@@ -411,6 +412,7 @@ function requestor_ignore_entry($data) {
  *  in the request classes tables.
  **/
 function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
+    global $OUTPUT;
     $term = $regdata['term'];
     $srs = $regdata['srs'];
 
@@ -424,6 +426,12 @@ function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
 
     // Get type of course, ugrad/grad/tut so that we can filter course builds.
     $req['type']        = get_class_type($regdata);
+
+    // Get the url of the course to check if it has already been built
+    // on another server.
+    if (!empty($regdata['url']) && $OUTPUT->get_environment() == 'prod' && (!array_key_exists('crs_desc', $regdata))) {
+        $req['existselsewhere'] = $regdata['url'];
+    }
 
     $instarr = array();
     if (!isset($regdata['instructor'])) {
@@ -699,7 +707,7 @@ function prepare_requests_for_display($requestinfos, $context) {
         if ($context == UCLA_REQUESTOR_FETCH) {
             $k = 'build';
             // Hack, perhaps find a better place for this...
-            if (isset($displayrow[UCLA_REQUESTOR_WARNING]
+            if (isset($displayrow[UCLA_REQUESTOR_ERROR]
                     [UCLA_REQUESTOR_CANCELLED])) {
                 $default = false;
             } else {
@@ -854,20 +862,20 @@ function prep_request_entry($requestinfo) {
     // Add build/delete button
     $actiondefault = null;
     $addedtext = '';
-    $e = UCLA_REQUESTOR_CANCELLED;
+    $e = UCLA_REQUESTOR_URLEXISTS;
     if (isset($requestinfo[$wars][$e])) {
         $worstnote = $wars;
-        $addedtext = $br . get_string($e, $rucr);
+        $addedtext = $br . get_string($e, $rucr, $requestinfo[$wars][$e]);
         // This hidden field will who us that this request has already
         // been viewed at least once
-        $addedtext .= html_writer::tag('input', 
+        $addedtext .= html_writer::tag('input',
             '', array(
                 'value' => 1,
                 'name' => "$key-" . request_warning_checked_key($requestinfo),
                 'type' => 'hidden'
             ));
     }
-    
+
     // Handle the action drop down
     $tr = 'action';
     $actionval = $requestinfo[$tr];
@@ -919,9 +927,17 @@ function prep_request_entry($requestinfo) {
     // Finished with timerequested
     $formatted[$f] = $timestr;
     unset($requestinfo[$f]);
-    
-    // Deal with id field
+
+    // Deal with id field.
     $e = UCLA_REQUESTOR_EXIST;
+    // If a class has already been built and is cancelled, display the already
+    // sent to be built error message.
+    if (isset($requestinfo[$errs][UCLA_REQUESTOR_CANCELLED])) {
+        $e = UCLA_REQUESTOR_CANCELLED;
+    }
+    if (!empty($requestinfo[$errs][UCLA_REQUESTOR_EXIST])) {
+        $e = UCLA_REQUESTOR_EXIST;
+    }
     $f = 'id';
     $idstr = '';
 
@@ -933,18 +949,21 @@ function prep_request_entry($requestinfo) {
     if (!empty($requestinfo[$errs][$e])) {
         $worstnote = $errs;
 
-        // Can't use an MForm due to disability to use nested form,
-        // so cannot be clever, unless decide to overwrite some PEAR
-        // Libraries... which is not desired
-        $gotosinglesrshtml = html_writer::link(new moodle_url(
-            $PAGE->url, array('srs' => $requestinfo['srs'], 
-                'term' => $requestinfo['term'])
-            ), get_string('viewrequest', $rucr));
-        
-        $idstr = get_string($e, $rucr) . html_writer::empty_tag('br')
-            . $gotosinglesrshtml;
+            // Can't use an MForm due to disability to use nested form,
+            // so cannot be clever, unless decide to overwrite some PEAR
+            // Libraries... which is not desired
+            if ($e == UCLA_REQUESTOR_EXIST) {
+                $gotosinglesrshtml = html_writer::link(new moodle_url(
+                  $PAGE->url, array('srs' => $requestinfo['srs'],
+                       'term' => $requestinfo['term'])
+                   ), get_string('viewrequest', $rucr));
+                $idstr = get_string($e, $rucr) . html_writer::empty_tag('br')
+                . $gotosinglesrshtml;
+            } else {
+                $idstr = get_string($e, $rucr) . html_writer::empty_tag('br');
+            }
         $editable = false;
-        
+
     } else {
         $idstr .= $requestinfo[$f];
     }
@@ -1075,7 +1094,7 @@ function prep_request_entry($requestinfo) {
 
                 $errstr = '';
                 foreach ($ocl[$errs] as $error => $true) {
-                    if ($error == UCLA_REQUESTOR_EXIST) {
+                    if ($error == UCLA_REQUESTOR_EXIST || $error == UCLA_REQUESTOR_CANCELLED) {
                         continue;
                     }
 
@@ -1220,6 +1239,12 @@ function prep_request_entry($requestinfo) {
             if ($worstnote == $errs || !empty($addedtext)) {
                 $buildoptions['disabled'] = true;
                 $actval = false;
+            }
+
+            // CCLE-4984.
+            // Allow the user to build the course even if the URL exists already and it is not cancelled.
+            if (array_key_exists('existselsewhere', $requestinfo) && !isset($requestinfo[$errs][UCLA_REQUESTOR_CANCELLED])) {
+                unset($buildoptions['disabled']);
             }
 
             // Add class to "To be built" column checkbox.
