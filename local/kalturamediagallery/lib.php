@@ -33,6 +33,7 @@
 function local_kalturamediagallery_extends_settings_navigation($navigation) {
 // END UCLA MOD: CCLE-4908
     global $USER, $PAGE, $DB;
+
     if (empty($USER->id)) {
         return;
     }

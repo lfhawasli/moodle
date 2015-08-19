@@ -101,8 +101,8 @@ if ($submission) {
         echo $OUTPUT->single_button($url, $continue, 'post');
         echo html_writer::end_tag('center');
 
-        // START UCLE MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
-//        add_to_log($course->id, 'kalvidassign', 'submit', 'view.php?id=' . $cm->id, $kalvidassignobj->id, $cm->id);
+        // START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
+        //add_to_log($course->id, 'kalvidassign', 'submit', 'view.php?id=' . $cm->id, $kalvidassignobj->id, $cm->id);
         $event = \mod_kalvidassign\event\assignment_submitted::create(array(
                     'objectid'  => $kalvidassignobj->id,
                     'context'   => context_module::instance($cm->id)
@@ -138,14 +138,13 @@ if ($submission) {
         echo $OUTPUT->single_button($url, $continue, 'post');
         echo html_writer::end_tag('center');
 
-        // START UCLE MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
+        // START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
         $event = \mod_kalvidassign\event\assignment_submitted::create(array(
                     'objectid'  => $kalvidassignobj->id,
                     'context'   => context_module::instance($cm->id)
         ));
         $event->trigger();
         // END UCLA MOD: CCLE-5179
-
     } else {
         notice(get_string('failedtoinsertsubmission', 'kalvidassign'), $url, $course);
     }
