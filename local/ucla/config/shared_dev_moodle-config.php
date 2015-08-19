@@ -156,6 +156,9 @@ $CFG->cachejs = false;
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
+// CCLE-5251 - Use our own version of enrolled users page.
+$CFG->customscripts = '/vagrant/moodle/local/ucla/customscripts';
+
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
