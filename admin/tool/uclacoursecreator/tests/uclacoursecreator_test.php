@@ -47,6 +47,7 @@ class uclacoursecreator_test extends advanced_testcase {
      */
     protected function setUp() {
         $this->resetAfterTest();
+        set_config('currentterm', '13S');
         $this->uclacoursecreator = new uclacoursecreator();
     }
 
@@ -111,4 +112,58 @@ class uclacoursecreator_test extends advanced_testcase {
         $this->assertFalse(empty($result['subject']));
     }
 
+    /**
+     * Test the #=previousclasses=# template variable.
+     */
+    public function test_instructor_previous_classes() {
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+
+        // Create classes. Current term is 13S as set in setUp().
+        // Cross-listing, more than 8 quarters ago (should not be included).
+        $classes = $generator->create_class(array(
+            array('term' => '11W'),
+            array('term' => '11W')
+            ));
+        // Cross-listing, 8 quarters ago (main class, the first one, should be included).
+        $classes = array_merge($classes, $generator->create_class(array(
+            array(
+                'term' => '11S',
+                'subj_area' => 'COM SCI',
+                'crsidx' => '0051A M',
+                'secidx' => 2,
+                'coursetitle' => 'Logic Design of Digital Systems'
+                ),
+            array(
+                'term' => '11S',
+                'subj_area' => 'EE',
+                'crsidx' => '0016 M',
+                'secidx' => 1,
+                'coursetitle' => 'Logic Design of Digital Systems'
+                )
+            )));
+        // Single class, 1 quarter ago (should be included).
+        $classes = array_merge($classes, $generator->create_class(array(
+            'term' => '13W',
+            'subj_area' => 'GEOG',
+            'crsidx' => '0003',
+            'secidx' => 1,
+            'coursetitle' => 'Cultural Geography'
+            )));
+        // Single class, this quarter (should not be included).
+        $classes = array_merge($classes, $generator->create_class(array('term' => '13S')));
+
+        // Create instructor user.
+        $user = $generator->create_user();
+        // Create instructor role.
+        $roles = $generator->create_ucla_roles(array('editinginstructor'));
+        $roleid = $roles['editinginstructor'];
+        // Enroll as instructor.
+        foreach ($classes as $class) {
+            $generator->enrol_reg_user($user->id, $class->id, $roleid);
+        }
+
+        $previouscourses = $this->uclacoursecreator->get_instructor_previous_courses($user->idnumber);
+        $this->assertEquals($previouscourses, "COM SCI M51A-2 - Logic Design of Digital Systems (Spring 2011)\n" .
+                "GEOG 3-1 - Cultural Geography (Winter 2013)");
+    }
 }

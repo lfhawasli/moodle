@@ -1380,9 +1380,83 @@ class uclacoursecreator {
     }
 
     /**
-     *  Sends emails to instructors and course requestors.
-     *  TODO move this outside the course creator as well..
-     *  @throws course_creator_exception
+     * Get a human-friendly list of courses the given instructor has recently taught.
+     *
+     * @param string|int $uclaid
+     * @param int $nterms Optional. Indicate how many terms to search back.
+     * @return string
+     */
+    public function get_instructor_previous_courses($uclaid, $nterms = 8) {
+        global $CFG, $DB;
+
+        // Check cache.
+        $cache = cache::make('tool_uclacoursecreator', 'previouscourses');
+        $key = "$CFG->currentterm $uclaid";
+        $data = $cache->get($key);
+        if ($data !== false) {
+            // Use cache.
+            return $data;
+        }
+
+        // Generate expression to check for terms in the past $nterms quarters (default 2 years).
+        $terms = array();
+        // Start from the previous term.
+        $term = term_get_prev($CFG->currentterm);
+        for ($i = 0; $i < $nterms; $i++) {
+            $terms[] = $term;
+            $term = term_get_prev($term);
+        }
+        $termsexpr = $DB->get_in_or_equal($terms);
+
+        // Only include the primary course for cross-listings.
+        // Make sure the course isn't canceled by checking urci.enrolstat.
+        // Look for courses where this instructor has the editinginstructor role.
+        $sql = "SELECT c.id,
+                       urci.term,
+                       urci.subj_area,
+                       urci.coursenum,
+                       urci.sectnum,
+                       urci.coursetitle
+                  FROM {course} c
+                  JOIN {ucla_request_classes} urc
+                    ON (urc.courseid = c.id AND
+                        urc.term $termsexpr[0] AND
+                        urc.hostcourse = 1)
+                  JOIN {ucla_reg_classinfo} urci
+                    ON (urci.term = urc.term AND
+                        urci.srs = urc.srs AND
+                        urci.enrolstat <> 'X')
+                  JOIN {context} ct
+                    ON (ct.instanceid = c.id AND ct.contextlevel = ?)
+                  JOIN {role_assignments} ra
+                    ON (ra.contextid = ct.id)
+                  JOIN {role} r ON r.id = ra.roleid
+                  JOIN {user} u ON u.id = ra.userid
+                 WHERE r.shortname = ?
+                       AND u.idnumber = ?";
+        $params = $termsexpr[1];
+        $params[] = CONTEXT_COURSE;
+        $params[] = 'editinginstructor';
+        $params[] = $uclaid;
+
+        $result = $DB->get_records_sql($sql, $params);
+        $coursestrings = array();
+        foreach ($result as $course) {
+            $prettyterm = ucla_term_to_text($course->term);
+            $coursestrings[] = "$course->subj_area $course->coursenum-$course->sectnum - " .
+                    "$course->coursetitle ($prettyterm)";
+        }
+
+        $data = implode("\n", $coursestrings);
+        // Set cache.
+        $cache->set($key, $data);
+        return $data;
+    }
+
+    /**
+     * Sends emails to instructors and course requestors.
+     * TODO move this outside the course creator as well..
+     * @throws course_creator_exception
      **/
     function send_emails() {
         if (empty($this->cron_term_cache['url_info'])) {
@@ -1390,16 +1464,16 @@ class uclacoursecreator {
                 'ERROR: We have no URL information for emails.'
             );
             return false;
-        }   
+        }
 
         if (!isset($this->cron_term_cache['trim_requests'])) {
             $this->trim_requests();
         }
 
-        // This should fill the term cache 'instructors' with data from 
+        // This should fill the term cache 'instructors' with data from
         // ccle_CourseInstructorsGet
-        $this->println('Getting instructors for ' 
-            . count($this->cron_term_cache['trim_requests']) 
+        $this->println('Getting instructors for '
+            . count($this->cron_term_cache['trim_requests'])
             . ' request(s) from registrar...');
 
         $results = array();
@@ -1423,7 +1497,7 @@ class uclacoursecreator {
         }
 
         // I think the old version works pretty well...
-        // These are read-only, no need to duplicate contents 
+        // These are read-only, no need to duplicate contents
         $courses =& $this->cron_term_cache['requests'];
         $rci_objects =& $this->cron_term_cache['term_rci'];
         $instructors =& $this->cron_term_cache['instructors'];
@@ -1438,13 +1512,13 @@ class uclacoursecreator {
         // These are the collection of people we are going to email
         $emails = array();
 
-        // These are non-host-courses 
+        // These are non-host-courses
         $indexed_hc = array();
         foreach ($courses as $cronkey => $course) {
             // TODO make this comparison a function
             if ($course->hostcourse < 1) {
                 if (isset($created_courses_check[$cronkey])) {
-                    $indexed_hc[$course->setid][$cronkey] 
+                    $indexed_hc[$course->setid][$cronkey]
                         = $rci_objects[$cronkey];
                 }
             }
@@ -1465,7 +1539,7 @@ class uclacoursecreator {
 
             $rci_course = $rci_objects[$cronkey];
 
-            $pretty_term = ucla_term_to_text($term, 
+            $pretty_term = ucla_term_to_text($term,
                 $rci_course->session_group);
 
             // This is the courses to display the email for
@@ -1495,14 +1569,14 @@ class uclacoursecreator {
 
             // Determine which instructors to email
             if (!isset($profcodes[$csrs])) {
-                $this->debugln('No instructors for ' 
+                $this->debugln('No instructors for '
                     . "$term $csrs $course_text.");
             } else {
                 $profcode_set = $profcodes[$csrs];
 
                 if (isset($instructors[$csrs])) {
                     foreach ($instructors[$csrs] as $instructor) {
-                        $viewable = $this->get_viewable_status($instructor, 
+                        $viewable = $this->get_viewable_status($instructor,
                             $profcode_set, $course_dept);
 
                         if ($viewable) {
@@ -1527,7 +1601,7 @@ class uclacoursecreator {
             } else {
                 $course_url = 'No URL';
             }
-    
+
             // Check if we should email the professors
             // Default to not emailing professors
             $retain_emails = true;
@@ -1547,7 +1621,7 @@ class uclacoursecreator {
                 // If they do not have an email from the Registrar, and we did
                 // not already find one locally, attempt to find one locally
                 if ($email == '' && !isset($this->local_emails[$uid])) {
-                    $this->cron_term_cache['no_emails'][$uid] = 
+                    $this->cron_term_cache['no_emails'][$uid] =
                         $instructor;
                 }
 
@@ -1560,6 +1634,7 @@ class uclacoursecreator {
                 $email_ref['url'] = $course_url;
                 $email_ref['term'] = $term;
                 $email_ref['nameterm'] = $pretty_term;
+                $email_ref['previouscourses'] = $this->get_instructor_previous_courses($instructor->ucla_id);
 
                 // These are not parsed
                 $email_ref['subjarea'] = $course_dept;
@@ -1579,12 +1654,12 @@ class uclacoursecreator {
 
             $local_emails =& $this->cron_term_cache['local_emails'];
         }
-        
+
         if (!$this->send_mails()) {
             $this->debugln('--- Email sending disabled ---');
             // continue so that we can see debugging messages
-        }        
-        
+        }
+
         // TODO move the rest of this out
         // Parsed
         // This may take the most memory
@@ -1611,28 +1686,28 @@ class uclacoursecreator {
                 // Attempt to find user
                 if (!isset($local_emails[$userid])) {
                     // No email, specify that and send to BCCs
-                    $this->println("Cannot email $userid " 
+                    $this->println("Cannot email $userid "
                         . $emailing['lastname']);
 
                     $add_subject = ' (No email)';
 
-                    $email_summary_data[$csrs][$userid] .= "! " 
+                    $email_summary_data[$csrs][$userid] .= "! "
                         . $emailing['lastname']
                         . "\t $userid \tNo email address.\n";
                 } else {
                     $emailing['to'] = $local_emails[$userid];
 
-                    $email_summary_data[$csrs][$userid] .= '* ' 
+                    $email_summary_data[$csrs][$userid] .= '* '
                         . $emailing['lastname']
-                        . "\t $userid \t" . $local_emails[$userid] 
+                        . "\t $userid \t" . $local_emails[$userid]
                         . " - Local email ONLY\n";
                 }
-            } 
+            }
 
             // This is also used later to not send the email...
             $block_email = $emailing['block'];
             unset($emailing['block']);
-            
+
             // Handle special emails to THE STAFF and TA
             if (is_dummy_ucla_user($userid)) {
                 $email_to = '';
@@ -1659,7 +1734,7 @@ class uclacoursecreator {
                 if (file_exists($deptfile)) {
                     $this->debugln('Using special template for subject area '
                         . $subj);
-                    
+
                     $file = $deptfile;
                 } else {
                     // Else search for a division template.
@@ -1678,9 +1753,9 @@ class uclacoursecreator {
 
             if (!isset($this->parsed_param[$subj])) {
                 $headers = '';
-                $email_subject = '-not parsed - ' 
+                $email_subject = '-not parsed - '
                     . $emailing['coursenum-sect'] . ' '
-                    . $emailing['url'] 
+                    . $emailing['url']
                     . $add_subject;
 
                 $email_body = '!-not parsed-!';
@@ -1688,7 +1763,7 @@ class uclacoursecreator {
                 $used_param = $this->parsed_param[$subj];
                 unset($emailing['subjarea']);
 
-                $email_params = 
+                $email_params =
                     $this->email_fill_template($used_param, $emailing);
 
                 // Setup the email
@@ -1699,7 +1774,7 @@ class uclacoursecreator {
                 // (make sure there are no errant spaces or else email headers
                 // wouldn't parse correctly)
                 $headers = "From: $from\r\nBcc: $bcc\r\n";
-           
+
                 $email_subject = $email_params['subject'];
 
                 // Append filler user explanations
@@ -1708,14 +1783,14 @@ class uclacoursecreator {
                 $email_body = $email_params['body'];
             }
 
-            $email_summary_data[$csrs][$userid] .= '. ' 
-                . $emailing['lastname'] . "\t $userid \t" 
+            $email_summary_data[$csrs][$userid] .= '. '
+                . $emailing['lastname'] . "\t $userid \t"
                 . $email_to . " \t $email_subject";
 
             if ($this->send_mails() && !$block_email) {
                 $this->println("Emailing: $email_to");
 
-                ucla_send_mail($email_to, $email_subject, 
+                ucla_send_mail($email_to, $email_subject,
                     $email_body, $headers);
             } else {
                 if ($block_email) {
