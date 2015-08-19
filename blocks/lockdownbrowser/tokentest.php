@@ -34,7 +34,10 @@ if (!extension_loaded("curl")) {
 } else {
     echo '<p>' . get_string('request_tokens', 'block_lockdownbrowser') . '</p>';
     flush();
-    if (is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (is_siteadmin()) {
+    if (lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_generate_tokens_debug(false);
     } else {
         lockdownbrowser_generate_tokens(false);

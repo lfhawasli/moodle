@@ -733,3 +733,13 @@ function lockdownbrowser_check_for_lock() {
     }
 }
 
+/**
+ * Checks if the currently logged in user is the Respondus Monitor user.
+ *
+ * @return boolean
+ */
+function lockdownbrowser_is_monitor_user() {
+    global $CFG, $USER;
+
+    return $CFG->block_lockdownbrowser_monitor_username == $USER->username;
+}

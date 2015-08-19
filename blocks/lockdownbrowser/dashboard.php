@@ -51,7 +51,10 @@ $lockdownbrowser_institution_id = $CFG->block_lockdownbrowser_ldb_serverid;
 $lockdownbrowser_server_name    = $CFG->block_lockdownbrowser_ldb_servername;
 $lockdownbrowser_course_id      = $lockdownbrowser_urlcourse;
 $lockdownbrowser_instructor_id  = $USER->username;
-$lockdownbrowser_is_admin       = is_siteadmin() ? "true" : "false";
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+// $lockdownbrowser_is_admin       = is_siteadmin() ? "true" : "false";
+$lockdownbrowser_is_admin       = lockdownbrowser_is_monitor_user() ? "true" : "false";
+// END UCLA MOD: CCLE-4027
 $lockdownbrowser_time           = strval(time()) . "000";
 
 $lockdownbrowser_mac = lockdownbrowser_dashboardgeneratemac2(

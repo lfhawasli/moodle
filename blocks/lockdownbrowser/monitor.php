@@ -735,7 +735,10 @@ function lockdownbrowser_monitoractionchangesettings($parameters) {
     if (!isloggedin()) {
         lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
     }
-    if (!is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
     }
     if (!isset($parameters["courseRefId"]) || strlen($parameters["courseRefId"]) == 0) {
@@ -864,7 +867,10 @@ function lockdownbrowser_monitoractionexamroster($parameters) {
     if (!isloggedin()) {
         lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
     }
-    if (!is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
     }
     if (!isset($parameters["courseRefId"]) || strlen($parameters["courseRefId"]) == 0) {
@@ -1053,7 +1059,10 @@ function lockdownbrowser_monitoractionexamsync($parameters) {
     if (!isloggedin()) {
         lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
     }
-    if (!is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
     }
     if (!isset($parameters["courseRefId"]) || strlen($parameters["courseRefId"]) == 0) {
@@ -1205,7 +1214,10 @@ function lockdownbrowser_monitoractionusercourserole($parameters) {
     if (!isloggedin()) {
         lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
     }
-    if (!is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
     }
     if (!isset($parameters["courseRefId"]) || strlen($parameters["courseRefId"]) == 0) {
@@ -1334,7 +1346,10 @@ function lockdownbrowser_monitoractionretrievecourse($parameters) {
     if (!isloggedin()) {
         lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
     }
-    if (!is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
     }
     if (!isset($parameters["courseRefId"]) || strlen($parameters["courseRefId"]) == 0) {
@@ -1374,7 +1389,10 @@ function lockdownbrowser_monitoractiontestintegration($parameters) {
     if (!isloggedin()) {
         lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
     }
-    if (!is_siteadmin()) {
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
         lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
     }
 
