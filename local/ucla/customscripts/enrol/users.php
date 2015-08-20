@@ -182,6 +182,7 @@ if ($action) {
     }
 }
 
+$bulkoperations = has_capability('moodle/course:bulkmessaging', $context);
 
 $renderer = $PAGE->get_renderer('core_enrol');
 $userdetails = array (
@@ -194,7 +195,13 @@ foreach ($extrafields as $field) {
     $userdetails[$field] = get_user_field_name($field);
 }
 
-$fields = array(
+$fields = [];
+
+if ($bulkoperations) {
+    $fields['select'] = get_string('select');
+}
+
+$fields += array(
     'userdetails' => $userdetails,
     'lastcourseaccess' => get_string('lastcourseaccess'),
     'role' => get_string('roles', 'role'),
@@ -223,6 +230,9 @@ $table->set_fields($fields, $renderer);
 $canassign = has_capability('moodle/role:assign', $manager->get_context());
 $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
 foreach ($users as $userid=>&$user) {
+    if ($bulkoperations) {
+        $user['select'] = '<br /><input type="checkbox" class="usercheckbox" name="user'.$userid.'" /> ';
+    }
     $user['picture'] = $OUTPUT->render($user['picture']);
     $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $manager->get_assignable_roles(), $canassign, $PAGE->url);
     $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'], $manager->get_all_groups(), has_capability('moodle/course:managegroups', $manager->get_context()), $PAGE->url);
@@ -237,6 +247,41 @@ $PAGE->set_heading($PAGE->title);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('enrolledusers', 'enrol'));
 echo get_string('totalenrolledusers', 'enrol', $manager->get_total_users());
+
+if ($bulkoperations) {
+    echo '<form action="'.$CFG->wwwroot.'/user/action_redir.php" method="post" id="participantsform">';
+    echo '<div>';
+    echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
+    echo '<input type="hidden" name="returnto" value="'.s($PAGE->url->out(false)).'" />';
+}
+
 echo $renderer->render_course_enrolment_users_table($table, $filterform);
+
+if ($bulkoperations) {
+    echo '<br /><div class="buttons">';
+    echo '<input type="button" id="checkall" value="'.get_string('selectall').'" /> ';
+    echo '<input type="button" id="checknone" value="'.get_string('deselectall').'" /> ';
+    $displaylist = array();
+    $displaylist['messageselect.php'] = get_string('messageselectadd');
+    if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context) && $context->id != $frontpagectx->id) {
+        $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
+        $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+    }
+
+    echo $OUTPUT->help_icon('withselectedusers');
+    echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
+    echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+
+    echo '<input type="hidden" name="id" value="'.$course->id.'" />';
+    echo '<noscript style="display:inline">';
+    echo '<div><input type="submit" value="'.get_string('ok').'" /></div>';
+    echo '</noscript>';
+    echo '</div></div>';
+    echo '</form>';
+
+    $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
+    $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
+}
+
 echo $OUTPUT->footer();
 die();
