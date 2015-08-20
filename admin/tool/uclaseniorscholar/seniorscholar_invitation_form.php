@@ -139,4 +139,15 @@ class seniorscholar_invitation_form extends invitation_form {
         $roles = $DB->get_records_list('role', 'shortname', $shortnams, 'sortorder');
         return uclaroles_manager::orderby_role_type($roles);
     }
+
+    public function get_data_without_submission() {
+        $dataarray = $this->_form->_defaultValues;
+        $dataobject = new stdClass();
+        $dataobject->courseid = $dataarray['courseid'];
+        $dataobject->role_group['roleid'] = $dataarray['role_group']['roleid'];
+        $dataobject->subject = $dataarray['subject'];
+        $dataobject->notify_inviter = $dataarray['notify_inviter'];
+        $dataobject->sesskey = sesskey();
+        return $dataobject;
+    }
 }
