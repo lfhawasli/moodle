@@ -25,5 +25,6 @@ Background:
     And I follow "Course 1"
 
 Scenario: Show number of displayed users.
-    When I navigate to "Enrolled users" node in "Course administration > Users"
+    When I navigate to "Participants" node in "Course administration > Users"
     Then I should see "4 enrolled users" in the "#page" "css_element"
+    And I should not see "Enrolled users"

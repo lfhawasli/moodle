@@ -49,7 +49,10 @@ $string['enrolcandidatesmatching'] = 'Matching not enrolled users';
 $string['enrolcohort'] = 'Enrol cohort';
 $string['enrolcohortusers'] = 'Enrol users';
 $string['enrollednewusers'] = 'Successfully enrolled {$a} new users';
-$string['enrolledusers'] = 'Enrolled users';
+// START UCLA MOD: CCLE-5251-enrolled-users-participants-list
+// $string['enrolledusers'] = 'Enrolled users';
+$string['enrolledusers'] = 'Participants';
+// END UCLA MOD: CCLE-5251
 $string['enrolledusersmatching'] = 'Matching enrolled users';
 $string['enrolme'] = 'Enrol me in this course';
 $string['enrolmentinstances'] = 'Enrolment methods';
