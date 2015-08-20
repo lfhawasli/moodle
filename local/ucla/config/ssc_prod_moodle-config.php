@@ -127,6 +127,10 @@ $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
+// Enable customscripts for Respondus and other UCLA custom changes.
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = __DIR__."/../../../"."local/ucla/customscripts";
+
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 

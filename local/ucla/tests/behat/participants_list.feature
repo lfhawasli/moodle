@@ -1,0 +1,29 @@
+@ucla @enrol @core_edit @CCLE-5251
+Feature: Combine "Enrolled Users" and "Participants" pages
+  As an instructor
+  I want to list participant information on one page
+  so that I can manage it more efficiently.
+
+Background:
+    Given I am in a ucla environment
+    And the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
+    And the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | T1 | teacher1@asd.com |
+      | student1 | Student | S1 | student1@asd.com |
+      | student2 | Student | S2 | student2@asd.com |
+      | student3 | Student | S3 | student3@asd.com |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
+      | student3 | C1 | student |
+    And I log in as "teacher1"
+    And I follow "Course 1"
+
+Scenario: Show number of displayed users.
+    When I navigate to "Enrolled users" node in "Course administration > Users"
+    Then I should see "4 enrolled users" in the "#page" "css_element"

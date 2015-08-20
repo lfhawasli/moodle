@@ -239,3 +239,4 @@ echo $OUTPUT->heading(get_string('enrolledusers', 'enrol'));
 echo get_string('totalenrolledusers', 'enrol', $manager->get_total_users());
 echo $renderer->render_course_enrolment_users_table($table, $filterform);
 echo $OUTPUT->footer();
+die();
