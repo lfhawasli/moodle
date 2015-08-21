@@ -253,3 +253,6 @@ $string['errmissingemail'] = 'Because your email address is missing from your CC
 
 // CCLE-4329 - Handling public forums.
 $string['warningpublicforum'] = 'This forum is public and viewable by anyone, not just those enrolled in the site.';
+
+// CCLE-5316 - Checkbox to message students
+$string['noselectedusers'] = 'No users selected.';

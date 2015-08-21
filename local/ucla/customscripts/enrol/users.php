@@ -253,6 +253,8 @@ if ($bulkoperations) {
     echo '<div>';
     echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
     echo '<input type="hidden" name="returnto" value="'.s($PAGE->url->out(false)).'" />';
+
+    $PAGE->requires->strings_for_js(array('noselectedusers'), 'local_ucla');
 }
 
 echo $renderer->render_course_enrolment_users_table($table, $filterform);

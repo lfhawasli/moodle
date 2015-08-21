@@ -15,6 +15,19 @@ M.core_user.init_participation = function(Y) {
         });
         if (!ok) {
             // no checkbox selected
+
+            // START UCLA MOD: CCLE-
+            alertstring = M.util.get_string('noselectedusers', 'local_ucla');
+
+            var alert = new M.core.alert({
+                message: alertstring
+            });
+
+            /* Set the dropdown back to "Choose...", otherwise, after you select and come back to the
+             * dropdown, it'll do nothing if you don't actually change the option.
+             */
+            action.set('value', '');
+
             return;
         }
         Y.one('#participantsform').submit();
