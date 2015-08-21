@@ -141,3 +141,7 @@ $string['nositelisting'] = 'No sites found';
 $string['back'] = 'Back';
 
 $string['search_placeholder'] = 'Search for a collaboration site';
+
+// CCLE-4828
+$string['procesedby'] = '<br />by {$a->name} <br />on {$a->time}';
+$string['timerequested'] = '<br />on {$a}';

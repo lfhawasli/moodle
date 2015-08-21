@@ -140,7 +140,7 @@ class siteindicator_site {
         
             $site = $new;
         }
-        
+
         $DB->insert_record('ucla_siteindicator', $site);
 
         if ($site->type == siteindicator_manager::SITE_TYPE_PRIVATE) {
@@ -207,7 +207,7 @@ class siteindicator_request {
     }
     
     private function _update_history() {
-        global $DB;
+        global $DB, $USER;
         
         $update = $this->request;
         
@@ -215,6 +215,9 @@ class siteindicator_request {
         $update->courseid = $this->entry->courseid;
         $update->requestid = null;
         $update->type = $this->entry->type;
+        // CCLE-4828 
+        $update->timeprocessed = time();
+        $update->processedby = $USER->id;
         
         $DB->update_record('ucla_siteindicator_request', $update);
     }
@@ -251,7 +254,7 @@ class siteindicator_request {
      * Reject the site indicator request 
      */
     public function reject() {
-        global $DB;
+        global $DB, $USER;
         
         $update = $this->request;
         
@@ -259,6 +262,9 @@ class siteindicator_request {
         $update->courseid = null;
         $update->requestid = null;
         $update->type = $this->entry->type;
+        // CCLE-4828
+        $update->timeprocessed = time();
+        $update->processedby = $USER->id;
         
         $DB->update_record('ucla_siteindicator_request', $update);
     }
@@ -650,6 +656,8 @@ class siteindicator_manager {
         $request->type = $data->indicator_type;
         $request->categoryid = $data->indicator_category;
         $request->requester = $course_request->requester;
+        // CCLE-4828
+        $request->timerequested = time();
         
         // Create actual request
         siteindicator_request::create($request);
