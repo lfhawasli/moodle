@@ -290,7 +290,7 @@ $content .= html_writer::start_tag('div');
 
 // Bar of first initials.
 $content .= html_writer::start_tag('div', array('class' => 'initialbar firstinitial'));
-$content .= html_writer::label(get_string('firstname').' : ', null).' ';
+$content .= html_writer::label(get_string('firstname').': ', null).' ';
 if (!empty($firstinitial)) {
     $content .= html_writer::link($PAGE->url.'&sifirst=', $strall).' ';
 } else {
@@ -307,12 +307,12 @@ $content .= html_writer::end_tag('div');
 
 // Bar of last initials.
 $content .= html_writer::start_tag('div', array('class' => 'initialbar lastinitial'));
-$content .= html_writer::label(get_string('lastname').' : ', null).' ';
+$content .= html_writer::label(get_string('lastname').': ', null).' ';
 
 if (!empty($lastinitial)) {
     $content .= html_writer::link($PAGE->url.'&silast=', $strall).' ';
 } else {
-        $content .= html_writer::tag('strong', $strall).' ';
+    $content .= html_writer::tag('strong', $strall).' ';
 }
 foreach ($alpha as $letter) {
     if ($letter == $lastinitial) {
