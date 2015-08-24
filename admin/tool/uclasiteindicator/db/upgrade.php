@@ -82,5 +82,24 @@ function xmldb_tool_uclasiteindicator_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2012070505, 'tool', 'uclasiteindicator');
     }
     
+    if ($oldversion < 2015072109) {
+        // Add timerequested, timeprocessed, and processedby fields to ucla_siteindicator_request.
+        $fields = array();
+        $table = new xmldb_table('ucla_siteindicator_request');
+        $fields[] = new xmldb_field('timerequested', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'courseid');
+        $fields[] = new xmldb_field('timeprocessed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'courseid');
+        $fields[] = new xmldb_field('processedby', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'courseid');
+
+        foreach ($fields as $field) {
+            // Conditionally launch add fields.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Uclasiteindicator savepoint reached.
+        upgrade_plugin_savepoint(true, 2015072109, 'tool', 'uclasiteindicator');
+    }
+
     return $result;
 }

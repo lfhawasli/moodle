@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA course creator plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,8 +13,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2015081800;
+/**
+ * Define caches used by the UCLA course creator.
+ *
+ * @package    tool_uclacoursecreator
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-// EoF
+$definitions = array(
+    'previouscourses' => array(
+        'mode' => cache_store::MODE_REQUEST
+    )
+);

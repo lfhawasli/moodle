@@ -65,3 +65,13 @@ $string['rearrangejsrequired'] = 'The Rearrange Tool requires JavaScript to work
 $string['upload'] = 'Want to upload more than one file at the same time?';
 $string['bulkupload'] = 'Bulk upload files';
 $string['bulkupload_help'] = 'If you want to upload more than one file at a time, use Drag and Drop instead of Easy File Upload.<br /><br /><a href="https://docs.ccle.ucla.edu/w/Drag_and_drop" target="_blank">Visit the documentation site for more information.</a>';
+
+// SSC-1928 - Public-private Syllabus Defaulter Descriptions (Help Button included)
+$string['upload_public_file'] = ' -- Anyone viewing the class site can access this.';
+$string['upload_private_file'] = ' -- Only users currently enrolled in the class can access this.';
+$string['default_change'] = ' Default has changed!';
+$string['syllabus_box_header'] = 'Syllabus Upload';
+$string['syllabus_box_body'] = 'If you are uploading a syllabus, please use the {$a}.';
+$string['syllabus_tool_name'] = 'Syllabus Upload Tool';
+$string['syllabus_help_button'] = 'Default has changed to "Public"';
+$string['syllabus_help_button_help'] = 'You might have noticed that when you titled this upload to "Syllabus" or "Course Description", this option defaulted to the \'Public\' selection. We encourage instructors to post a publicly accessible syllabus to help students who are shopping around for courses. You can still opt to make the syllabus private by selecting the \'Private\' radio button.<br><br>We also encourage instructors to use our Syllabus Upload Tool instead.';
