@@ -51,7 +51,11 @@ $string['enrolcohortusers'] = 'Enrol users';
 $string['enrollednewusers'] = 'Successfully enrolled {$a} new users';
 // START UCLA MOD: CCLE-5251-enrolled-users-participants-list
 // $string['enrolledusers'] = 'Enrolled users';
-$string['enrolledusers'] = 'Participants';
+if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+    $string['enrolledusers'] = 'Participants';
+} else {
+    $string['enrolledusers'] = 'Enrolled users';
+}
 // END UCLA MOD: CCLE-5251
 $string['enrolledusersmatching'] = 'Matching enrolled users';
 $string['enrolme'] = 'Enrol me in this course';

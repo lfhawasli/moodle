@@ -44,6 +44,18 @@ if (optional_param('resetbutton', '', PARAM_RAW) !== '') {
     redirect('users.php?id=' . $id);
 }
 
+$graderreportsifirst = optional_param('sifirst', null, PARAM_NOTAGS);
+$graderreportsilast = optional_param('silast', null, PARAM_NOTAGS);
+if (isset($graderreportsifirst)) {
+    $SESSION->gradereport['filterfirstname'] = $graderreportsifirst;
+}
+if (isset($graderreportsilast)) {
+    $SESSION->gradereport['filtersurname'] = $graderreportsilast;
+}
+
+$firstinitial = isset($SESSION->gradereport['filterfirstname']) ? $SESSION->gradereport['filterfirstname'] : '';
+$lastinitial  = isset($SESSION->gradereport['filtersurname']) ? $SESSION->gradereport['filtersurname'] : '';
+
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 $context = context_course::instance($course->id, MUST_EXIST);
 
@@ -229,6 +241,29 @@ $table->set_fields($fields, $renderer);
 
 $canassign = has_capability('moodle/role:assign', $manager->get_context());
 $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
+$usercount = $manager->get_total_users();
+foreach ($users as $userid => &$user) {
+    $name = explode(",", $user['firstname']);
+    $lastword = $name[0];
+    $firstword = $name[1];
+    if ($firstinitial != '' && $lastinitial != '') {
+        if ($firstword[1] != $firstinitial || $lastword[0] != $lastinitial) {
+            unset($users[$userid]);
+            $usercount--;
+        }
+    } else if ($firstinitial != '') {
+        if ($firstword[1] != $firstinitial) {
+            unset($users[$userid]);
+            $usercount--;
+        }
+    } else if ($lastinitial != '') {
+        if ($lastword[0] != $lastinitial) {
+            unset($users[$userid]);
+            $usercount--;
+        }
+    }
+}
+
 foreach ($users as $userid=>&$user) {
     if ($bulkoperations) {
         $user['select'] = '<br /><input type="checkbox" class="usercheckbox" name="user'.$userid.'" /> ';
@@ -245,45 +280,59 @@ $PAGE->set_title($PAGE->course->fullname.': '.get_string('totalenrolledusers', '
 $PAGE->set_heading($PAGE->title);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('enrolledusers', 'enrol'));
-echo get_string('totalenrolledusers', 'enrol', $manager->get_total_users());
+echo $OUTPUT->heading(get_string('enrolledusers', 'enrol').get_string('labelsep', 'langconfig').$usercount.'/'.$manager->get_total_users(), 3);
 
-if ($bulkoperations) {
-    echo '<form action="'.$CFG->wwwroot.'/user/action_redir.php" method="post" id="participantsform">';
-    echo '<div>';
-    echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
-    echo '<input type="hidden" name="returnto" value="'.s($PAGE->url->out(false)).'" />';
+$strall = get_string('all');
+$alpha  = explode(',', get_string('alphabet', 'langconfig'));
 
-    $PAGE->requires->strings_for_js(array('noselectedusers'), 'local_ucla');
+$content = html_writer::start_tag('form', array('action' => new moodle_url($PAGE->url)));
+$content .= html_writer::start_tag('div');
+
+// Bar of first initials.
+$content .= html_writer::start_tag('div', array('class' => 'initialbar firstinitial'));
+$content .= html_writer::label(get_string('firstname').' : ', null).' ';
+if (!empty($firstinitial)) {
+    $content .= html_writer::link($PAGE->url.'&sifirst=', $strall).' ';
+} else {
+    $content .= html_writer::tag('strong', $strall).' ';
 }
-
-echo $renderer->render_course_enrolment_users_table($table, $filterform);
-
-if ($bulkoperations) {
-    echo '<br /><div class="buttons">';
-    echo '<input type="button" id="checkall" value="'.get_string('selectall').'" /> ';
-    echo '<input type="button" id="checknone" value="'.get_string('deselectall').'" /> ';
-    $displaylist = array();
-    $displaylist['messageselect.php'] = get_string('messageselectadd');
-    if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context) && $context->id != $frontpagectx->id) {
-        $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
-        $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+foreach ($alpha as $letter) {
+    if ($letter == $firstinitial) {
+        $content .= html_writer::tag('strong', $letter).' ';
+    } else {
+        $content .= html_writer::link($PAGE->url.'&sifirst='.$letter, $letter).' ';
     }
-
-    echo $OUTPUT->help_icon('withselectedusers');
-    echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
-    echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
-
-    echo '<input type="hidden" name="id" value="'.$course->id.'" />';
-    echo '<noscript style="display:inline">';
-    echo '<div><input type="submit" value="'.get_string('ok').'" /></div>';
-    echo '</noscript>';
-    echo '</div></div>';
-    echo '</form>';
-
-    $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
-    $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
 }
+$content .= html_writer::end_tag('div');
 
+// Bar of last initials.
+$content .= html_writer::start_tag('div', array('class' => 'initialbar lastinitial'));
+$content .= html_writer::label(get_string('lastname').' : ', null).' ';
+
+if (!empty($lastinitial)) {
+    $content .= html_writer::link($PAGE->url.'&silast=', $strall).' ';
+} else {
+        $content .= html_writer::tag('strong', $strall).' ';
+}
+foreach ($alpha as $letter) {
+    if ($letter == $lastinitial) {
+        $content .= html_writer::tag('strong', $letter).' ';
+    } else {
+        $content .= html_writer::link($PAGE->url.'&silast='.$letter, $letter).' ';
+    }
+}
+$content .= html_writer::end_tag('div');
+
+$content .= html_writer::end_tag('div');
+$content .= html_writer::tag('div', '&nbsp;');
+$content .= html_writer::end_tag('form');
+
+echo $content;
+
+if ($usercount < 1) {
+    echo $OUTPUT->heading(get_string('nothingtodisplay'));
+} else {
+    echo $renderer->render_course_enrolment_users_table($table, $filterform);
+}
 echo $OUTPUT->footer();
 die();
