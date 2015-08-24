@@ -4,6 +4,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
 abstract class easy_upload_form extends moodleform {
     protected $course;
@@ -38,7 +39,7 @@ abstract class easy_upload_form extends moodleform {
      *  Called by moodleforms when we are rendering the form.
      **/
     function definition() {
-        global $CFG;
+        global $CFG, $PAGE;
 
         $mform = $this->_form;
 
@@ -98,7 +99,7 @@ abstract class easy_upload_form extends moodleform {
             $renametitle = 'dialog_rename_' . $type;
             $mform->addElement('header', '', get_string($renametitle,
                 self::associated_block));
-
+            $mform->addElement('static', 'syllabus', '', '<span id="id_syllabus_prompt"></span>');
             $mform->addElement('text', 'name', get_string('name'),
                 array('size' => 40));
             $mform->addRule('name', null, 'required');
@@ -118,24 +119,27 @@ abstract class easy_upload_form extends moodleform {
                 // make sure public/private is enabled for course
                 $ppcourse = PublicPrivate_Course::build($course);
                 if ($ppcourse->is_activated()) {
-                    // Generate the public private elements
-                    $t = array('public', 'private');
-
-                    $pubpriels = array();
-
-                    foreach ($t as $p) {
-                        $pubpriels[] = $mform->createElement('radio',
-                            'publicprivate', '',
-                            get_string('publicprivatemake' . $p, 'local_publicprivate'),
-                            $p);
-                    }
-
+                    /**
+                     * SSC-1928 - Make Upload default to Public if Name contains Syllabus
+                     *
+                     * Generate the public private elements.
+                     *
+                     * The public_warning span is the anchor point for some JavaScript
+                     * that displays text when someone uploads a syllabus with
+                     * public/private radios set to private. The syllabus_prompt
+                     * span is the anchor point for the same JavaScript
+                     * suggests instructors to use the Syllabus Tool instead.
+                     *
+                     **/
                     $mform->addElement('header', '', get_string(
                         'publicprivateenable','local_publicprivate'));
 
-                    $mform->addGroup($pubpriels, 'publicprivateradios',
-                        get_string('publicprivate','local_publicprivate'), ' ', true);
-
+                    $pubpriels[] = $mform->createElement('radio', 'publicprivate', 'publicbutton',
+                        'Public'. get_string('upload_public_file', self::associated_block)
+                        . '<span style="color: red" id="id_public_warning"></span>', 'public');
+                    $pubpriels[] = $mform->createElement('radio', 'publicprivate', 'privatebutton',
+                        'Private' . get_string('upload_private_file',  self::associated_block), 'private');
+                    $mform->addGroup($pubpriels, 'publicprivateradios', '', '<br>', true);
                     $mform->setDefaults(
                         array(
                             'publicprivateradios' => array(
@@ -143,6 +147,8 @@ abstract class easy_upload_form extends moodleform {
                             )
                         )
                     );
+
+                    $mform->addHelpButton('publicprivateradios', 'syllabus_help_button', 'block_ucla_easyupload');
                 }
             }
         }
@@ -175,6 +181,24 @@ abstract class easy_upload_form extends moodleform {
             $PAGE->requires->js_init_code(
                 'M.block_ucla_easyupload.initiate_sortable_content()'
             );
+        }
+
+        $syllabus_manager = new ucla_syllabus_manager($course);
+        if ($syllabus_manager->can_host_syllabi()) {
+            // SSC-1928 - Make Upload default to Public if Name contains Syllabus
+            // Create a JavaScript function call that gets (continually?) called
+            // when on the form.
+            $PAGE->requires->js_init_code('M.block_ucla_easyupload.syllabus_default_public()');
+
+            // Place code to grab language strings for the syllabus function!
+            // Get course ID for url           
+            $cpurl = new moodle_url('/local/ucla_syllabus/index.php?id=' . $course->id);
+            // Generate url string to pass to js function
+            $jsparam = '<a href="' . $cpurl . '">' . get_string('syllabus_tool_name', 'block_ucla_easyupload') . '</a>';
+
+            // Pass in strings for the JavaScript function to use.
+            $PAGE->requires->string_for_js('default_change', 'block_ucla_easyupload');
+            $PAGE->requires->string_for_js('syllabus_box_body', 'block_ucla_easyupload', $jsparam);
         }
 
         // From /course/moodleform_mod.php:448 (Moodle 2.7) with modifications: 
