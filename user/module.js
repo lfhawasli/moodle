@@ -16,7 +16,7 @@ M.core_user.init_participation = function(Y) {
         if (!ok) {
             // no checkbox selected
 
-            // START UCLA MOD: CCLE-
+            // START UCLA MOD: CCLE-5316
             alertstring = M.util.get_string('noselectedusers', 'local_ucla');
 
             var alert = new M.core.alert({
