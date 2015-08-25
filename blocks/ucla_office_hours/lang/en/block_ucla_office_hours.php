@@ -10,6 +10,7 @@ $string['edit_office_hours_post'] = 'Update your office hours, office location a
 $string['officelocation'] = 'Office';
 $string['phone'] = 'Phone';
 $string['email'] = 'Email';
+$string['sections'] = 'Section: Location / Hours';
 $string['officehours'] = 'Office hours';
 $string['update_icon'] = '';
 $string['update'] = 'Update';
@@ -44,4 +45,7 @@ $string['ucla_office_hours:editothers'] = 'Edit other instructor/ta office hours
 
 // Office hours form validation strings
 $string['officehours_format'] = 'Try using a shorter format (e.g. M 11:30a-12:30p).';
+
+$string['task'] = 'Update TA Sections';
+
 //EOF
