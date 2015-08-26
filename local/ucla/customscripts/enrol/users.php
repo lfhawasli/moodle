@@ -329,6 +329,8 @@ if ($firstinitial == '' && $lastinitial == '') {
                     $usercount--;
                 }
             }
+        } else {
+            unset($users[$userid]);
         }
     }
 }
