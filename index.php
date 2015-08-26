@@ -31,7 +31,6 @@
     require_once('config.php');
     require_once($CFG->dirroot .'/course/lib.php');
     require_once($CFG->libdir .'/filelib.php');
-    require_once($CFG->dirroot .'/local/ucla/lib.php');
 
     redirect_if_major_upgrade_required();
 
@@ -92,11 +91,6 @@
         }
     }
 
-    // START UCLA Modification - CCLE-2590 - Implement Auto-detect Shibboleth 
-    // Login - Lazy login ON front page (before header is outputted)
-    require_user_finish_login();
-    // End UCLA Modification - CCLE-2590            
-    
     $PAGE->set_pagetype('site-index');
     $PAGE->set_docs_path('');
     $PAGE->set_pagelayout('frontpage');
@@ -105,7 +99,7 @@
     $PAGE->set_heading($SITE->fullname);
     $courserenderer = $PAGE->get_renderer('core', 'course');
     echo $OUTPUT->header();
-    
+
 /// Print Section or custom info
     $siteformatoptions = course_get_format($SITE)->get_format_options();
     $modinfo = get_fast_modinfo($SITE);
