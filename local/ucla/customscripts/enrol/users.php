@@ -300,9 +300,6 @@ $filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' =>
     'filtergroup' => $fgroup, 'status' => $status));
 
 $table->set_fields($fields, $renderer);
-<<<<<<< HEAD
-$table->set_total_users($manager->get_total_users());
-=======
 
 $canassign = has_capability('moodle/role:assign', $manager->get_context());
 $usercount = $manager->get_total_users();
@@ -346,7 +343,6 @@ foreach ($users as $userid=>&$user) {
     $user['enrol'] = $renderer->user_enrolments_and_actions($user['enrolments']);
 }
 $table->set_total_users($usercount);
->>>>>>> CCLE-5251 / CCLE-5318: Add alphabetical filtering
 $table->set_users($users);
 
 $usercountstring = $usercount.'/'.$manager->get_total_users();
