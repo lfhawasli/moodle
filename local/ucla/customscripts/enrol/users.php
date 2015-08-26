@@ -300,7 +300,53 @@ $filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' =>
     'filtergroup' => $fgroup, 'status' => $status));
 
 $table->set_fields($fields, $renderer);
+<<<<<<< HEAD
 $table->set_total_users($manager->get_total_users());
+=======
+
+$canassign = has_capability('moodle/role:assign', $manager->get_context());
+$usercount = $manager->get_total_users();
+if ($firstinitial == '' && $lastinitial == '') {
+    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
+} else {
+    $table->perpage = $manager->get_total_users();
+    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
+    foreach ($users as $userid => &$user) {
+        $name = explode(",", $user['firstname']);
+        if (isset($name[1])) {
+            $lastword = $name[0];
+            $firstword = $name[1];
+            if ($firstinitial != '' && $lastinitial != '') {
+                if ($firstword[1] != $firstinitial || $lastword[0] != $lastinitial) {
+                    unset($users[$userid]);
+                    $usercount--;
+                }
+            } else if ($firstinitial != '') {
+                if ($firstword[1] != $firstinitial) {
+                    unset($users[$userid]);
+                    $usercount--;
+                }
+            } else if ($lastinitial != '') {
+                if ($lastword[0] != $lastinitial) {
+                    unset($users[$userid]);
+                    $usercount--;
+                }
+            }
+        }
+    }
+}
+
+foreach ($users as $userid=>&$user) {
+    if ($bulkoperations) {
+        $user['select'] = '<br /><input type="checkbox" class="usercheckbox" name="user'.$userid.'" /> ';
+    }
+    $user['picture'] = $OUTPUT->render($user['picture']);
+    $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $manager->get_assignable_roles(), $canassign, $PAGE->url);
+    $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'], $manager->get_all_groups(), has_capability('moodle/course:managegroups', $manager->get_context()), $PAGE->url);
+    $user['enrol'] = $renderer->user_enrolments_and_actions($user['enrolments']);
+}
+$table->set_total_users($usercount);
+>>>>>>> CCLE-5251 / CCLE-5318: Add alphabetical filtering
 $table->set_users($users);
 
 $usercountstring = $usercount.'/'.$manager->get_total_users();

@@ -62,6 +62,10 @@ if ($contextid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $context = context_course::instance($course->id, MUST_EXIST);
 }
+// START UCLA MOD: CCLE-5251-enrolled-users-participants-list
+// Redirect to the new combined participants page
+redirect(new moodle_url('/enrol/users.php', array('id' => $course->id)));
+// END UCLA MOD: CCLE-5251
 // Not needed anymore.
 unset($contextid);
 unset($courseid);
