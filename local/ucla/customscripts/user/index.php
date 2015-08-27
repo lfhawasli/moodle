@@ -22,7 +22,7 @@
  * @package core_user
  */
 
-require_once('../config.php');
+require_once("$CFG->dirroot/config.php");
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/filelib.php');
 
@@ -62,6 +62,11 @@ if ($contextid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $context = context_course::instance($course->id, MUST_EXIST);
 }
+
+if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+    redirect(new moodle_url('/enrol/users.php', array('id' => $course->id)));
+}
+
 // Not needed anymore.
 unset($contextid);
 unset($courseid);
@@ -170,6 +175,7 @@ if ($isseparategroups and (!$currentgroup) ) {
     echo $OUTPUT->heading(get_string("notingroup"));
     echo $OUTPUT->footer();
     exit;
+    die();
 }
 
 
@@ -846,41 +852,7 @@ if ($perpage == SHOW_ALL_PAGE_SIZE) {
 echo '</div>';  // Userlist.
 
 echo $OUTPUT->footer();
-
 if ($userlist) {
     $userlist->close();
 }
-
-/**
- * Returns SQL that can be used to limit a query to a period where the user last accessed a course..
- *
- * @param string $accesssince
- * @return string
- */
-function get_course_lastaccess_sql($accesssince='') {
-    if (empty($accesssince)) {
-        return '';
-    }
-    if ($accesssince == -1) { // Never.
-        return 'ul.timeaccess = 0';
-    } else {
-        return 'ul.timeaccess != 0 AND ul.timeaccess < '.$accesssince;
-    }
-}
-
-/**
- * Returns SQL that can be used to limit a query to a period where the user last accessed the system.
- *
- * @param string $accesssince
- * @return string
- */
-function get_user_lastaccess_sql($accesssince='') {
-    if (empty($accesssince)) {
-        return '';
-    }
-    if ($accesssince == -1) { // Never.
-        return 'u.lastaccess = 0';
-    } else {
-        return 'u.lastaccess != 0 AND u.lastaccess < '.$accesssince;
-    }
-}
+die();

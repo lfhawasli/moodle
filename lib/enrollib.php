@@ -408,14 +408,6 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
             $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
         }
 
-        // START UCLA MOD: CCLE-3839 - Move Participants from Navigation block to Course administration
-        // View participants - same as participants link in 'People' block (block_participants).
-        // Hide the link if not in an UCLA environment.
-        if (has_capability('moodle/course:viewparticipants', $coursecontext) && ($CFG->theme != 'uclashared' && $CFG->theme != ' uclasharedcourse')) {
-            $url = new moodle_url('/user/index.php', array('contextid'=>$coursecontext->id));
-            $usersnode->add(get_string('participants'), $url, navigation_node::TYPE_SETTING, null, 'participants', new pix_icon('i/users', ''));
-        }
-        // END UCLA MOD: CCLE-3839
 
         // manage enrol plugin instances
         if (has_capability('moodle/course:enrolconfig', $coursecontext) or has_capability('moodle/course:enrolreview', $coursecontext)) {

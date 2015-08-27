@@ -27,6 +27,7 @@ require_once("$CFG->dirroot/enrol/locallib.php");
 require_once("$CFG->dirroot/enrol/users_forms.php");
 require_once("$CFG->dirroot/enrol/renderer.php");
 require_once("$CFG->dirroot/group/lib.php");
+require_once("$CFG->dirroot/local/ucla/classes/participants.php");
 
 // Originally defined in user/index.php.
 define('MODE_BRIEF', 0);
@@ -72,7 +73,7 @@ require_login($course);
 require_capability('moodle/course:enrolreview', $context);
 $PAGE->set_pagelayout('admin');
 
-$manager = new course_enrolment_manager($PAGE, $course, $filter, $role, $search, $fgroup, $status);
+$manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
 $table = new course_enrolment_users_table($manager, $PAGE);
 $PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+array('mode' => $mode));
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $id)));
@@ -199,29 +200,18 @@ if ($action) {
     }
 }
 
-$users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
-$usercount = $manager->get_total_users();
-foreach ($users as $userid => &$user) {
-    $name = explode(",", $user['firstname']);
-    $lastword = $name[0];
-    $firstword = $name[1];
-    if ($firstinitial != '' && $lastinitial != '') {
-        if ($firstword[1] != $firstinitial || $lastword[0] != $lastinitial) {
-            unset($users[$userid]);
-            $usercount--;
-        }
-    } else if ($firstinitial != '') {
-        if ($firstword[1] != $firstinitial) {
-            unset($users[$userid]);
-            $usercount--;
-        }
-    } else if ($lastinitial != '') {
-        if ($lastword[0] != $lastinitial) {
-            unset($users[$userid]);
-            $usercount--;
-        }
-    }
+if ($firstinitial == '' && $lastinitial == '') {
+    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
+} else if ($firstinitial != '' && $lastinitial != '') {
+    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage, $firstinitial, $lastinitial);
+} else if ($firstinitial != '') {
+    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage, $firstinitial);
+} else if ($lastinitial != '') {
+    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage, '', $lastinitial);
 }
+
+$usercount = $manager->get_usercount();
+$table->set_total_users($usercount);
 
 $bulkoperations = has_capability('moodle/course:bulkmessaging', $context);
 $renderer = $PAGE->get_renderer('core_enrol');
@@ -348,11 +338,11 @@ $table->set_total_users($usercount);
 $table->set_users($users);
 
 $usercountstring = $usercount.'/'.$manager->get_total_users();
-$PAGE->set_title($PAGE->course->fullname.': '.get_string('enrolledusers', 'enrol')." ($usercountstring)");
+$PAGE->set_title($PAGE->course->fullname.': '.get_string('participants', 'local_ucla')." ($usercountstring)");
 $PAGE->set_heading($PAGE->title);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('enrolledusers', 'enrol').get_string('labelsep', 'langconfig').$usercountstring, 3);
+echo $OUTPUT->heading(get_string('participants', 'local_ucla').get_string('labelsep', 'langconfig').$usercountstring, 3);
 
 $strall = get_string('all');
 $alpha  = explode(',', get_string('alphabet', 'langconfig'));
