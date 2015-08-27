@@ -56,7 +56,7 @@ class logging_test extends advanced_testcase {
         log_ucla_data('bruincast', 'read', 'Initializing cfg variables', 
                 get_string('errbcmsglocation','tool_ucladatasourcesync') );
         log_ucla_data('library reserves', 'read', 'Initializing cfg variables', 
-                get_string('errvfmsglocation', 'tool_ucladatasourcesync'));
+                get_string('errlrmsglocation', 'tool_ucladatasourcesync'));
         log_ucla_data('library reserves', 'write', 'Inserting library reserve data', 
                 get_string('errbcinsert', 'tool_ucladatasourcesync') );
         $logs = $DB->get_records('logstore_standard_log', array());
