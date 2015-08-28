@@ -1,4 +1,4 @@
-@ucla @block_ucla_control_panel
+@ucla @block_ucla_control_panel @block_ucla_easyupload @CCLE-4010
 Feature: Add a link
     In order to easily add a link to my course
     As an instructor
@@ -40,7 +40,7 @@ Feature: Add a link
       And I follow "Add a link"
       And I set the field "Enter link URL" to "http://cnet.com"
       And I set the field "Name" to "Cnet"
-      And I set the field "Make public" to "1"
+      And I set the field "Public" to "1"
       And I set the field "Add to section" to "Week 1"
       And I press "Save changes"
       And I press "Return to section"
