@@ -18,7 +18,7 @@
  * Helper class to aid the filtering of course_enrolment_manager.
  *
  * @package local_ucla
- * @author  Ram Sivasundaram
+ * @author  UCLA Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
