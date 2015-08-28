@@ -344,19 +344,11 @@ $table->set_total_users($usercount);
 $table->set_users($users);
 
 $usercountstring = $usercount.'/'.$manager->get_total_users();
-if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
-    $PAGE->set_title($PAGE->course->fullname.': '.'Participants'." ($usercountstring)");
-} else {
-    $PAGE->set_title($PAGE->course->fullname.': '.'Enrolled users'." ($usercountstring)");
-}
+$PAGE->set_title($PAGE->course->fullname.': '.'Participants'." ($usercountstring)");
 $PAGE->set_heading($PAGE->title);
 
 echo $OUTPUT->header();
-if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
-    echo $OUTPUT->heading('Participants'.get_string('labelsep', 'langconfig').$usercountstring, 3);
-} else {
-    echo $OUTPUT->heading('Enrolled users'.get_string('labelsep', 'langconfig').$usercountstring, 3);
-}
+echo $OUTPUT->heading('Participants'.get_string('labelsep', 'langconfig').$usercountstring, 3);
 
 $strall = get_string('all');
 $alpha  = explode(',', get_string('alphabet', 'langconfig'));
