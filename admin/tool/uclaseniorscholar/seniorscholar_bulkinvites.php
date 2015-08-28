@@ -48,7 +48,7 @@ echo $OUTPUT->header();
 
 // Upload only need courseid (srs, term), default role id, email address, everything else default.
 // New invite only.
-// Data format: colunm 0: srs/column 1: email
+// Data format: colunm 0: srs/column 1: email.
 
 $bulkuploadarray = unserialize($bulkuploaddata);
 if (empty($bulkuploadarray)) {

@@ -162,7 +162,7 @@ if (!$iid) {
             echo html_writer::start_tag('form', array('id' => 'tool_uclaseniorscholar_bulkupload',
                                         'action' => new moodle_url('/admin/tool/uclaseniorscholar/seniorscholar_bulkinvites.php'),
                                         'method' => 'post'));
-            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'bulkuploaddata', 
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'bulkuploaddata',
                                         'value' => serialize($bulkuploaddata)));
             echo html_writer::empty_tag('input', array('id' => 'send_invites',
                                         'name' => 'submit_button',

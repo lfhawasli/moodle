@@ -228,6 +228,7 @@ $string['status_invite_active'] = 'Active';
 $string['action_revoke_invite'] = 'Revoke invite';
 $string['action_extend_invite'] = 'Extend invite';
 $string['action_resend_invite'] = 'Resend invite';
+$string['action_unenroll'] = 'Unenroll';
 
 // Bulk upload invitation.
 $string['importfile'] = 'Import invitation file';
@@ -248,3 +249,7 @@ $string['encoding'] = 'Encoding';
 $string['coursenotexists'] = 'Course not exists';
 $string['nobulkinvite'] = 'No course available for bulk invite';
 $string['continue'] = 'Continue';
+
+// Unenrol user.
+$string['unenrol'] = 'Unenroll user';
+$string['unenroluser'] = 'Do you really want to unenroll "{$a->user}" from course "{$a->course}"?';
