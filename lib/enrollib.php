@@ -405,7 +405,14 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
         // list all participants - allows assigning roles, groups, etc.
         if (has_capability('moodle/course:enrolreview', $coursecontext)) {
             $url = new moodle_url('/enrol/users.php', array('id'=>$course->id));
-            $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            // START UCLA MOD: CCLE-5251 - Add alphabetical user filtering
+            //$usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+                $usersnode->add('Participants', $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            } else {
+                $usersnode->add('Enrolled users', $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            }
+            // END UCLA MOD: CCLE-5251
         }
 
 

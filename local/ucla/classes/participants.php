@@ -108,14 +108,14 @@ class local_ucla_participants extends course_enrolment_manager {
                     $period = get_string('periodstartend', 'enrol', array('start' => userdate($ue->timestart), 'end' => userdate($ue->timeend)));
                     $periodoutside = ($ue->timestart && $ue->timeend && ($now < $ue->timestart || $now > $ue->timeend));
                 } else if ($ue->timestart) {
-                    $period = get_string('periodstart', 'enrol', userdate($ue->timestart, get_string('strftimedaydate', 'langconfig')));
+                    $period = get_string('periodstart', 'enrol', userdate($ue->timestart, get_string('strftimedatefullshort', 'langconfig')));
                     $periodoutside = ($ue->timestart && $now < $ue->timestart);
                 } else if ($ue->timeend) {
-                    $period = get_string('periodend', 'enrol', userdate($ue->timeend, get_string('strftimedaydate', 'langconfig')));
+                    $period = get_string('periodend', 'enrol', userdate($ue->timeend, get_string('strftimedatefullshort', 'langconfig')));
                     $periodoutside = ($ue->timeend && $now > $ue->timeend);
                 } else {
                     // If there is no start or end show when user was enrolled.
-                    $period = get_string('periodnone', 'enrol', userdate($ue->timecreated, get_string('strftimedaydate', 'langconfig')));
+                    $period = get_string('periodnone', 'enrol', userdate($ue->timecreated, get_string('strftimedatefullshort', 'langconfig')));
                     $periodoutside = false;
                 }
                 $details['enrolments'][$ue->id] = array(

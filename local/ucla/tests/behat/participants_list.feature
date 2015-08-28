@@ -29,17 +29,13 @@ Scenario: Show number of displayed users in renamed page.
     Then I should see "Participants: 4/4" in the "#page" "css_element"
     And I should not see "Enrolled users"
 
-Scenario: Use brief and detailed list views.
+Scenario: View user details.
     Given I navigate to "Participants" node in "Course administration > Users"
-    When I select "User details" from the "User list" singleselect
     Then I should see "Activity" in the "userenrolment" "table"
     But I should not see "Log in as" in the "userenrolment" "table"
-    When I select "Brief" from the "User list" singleselect
-    Then I should not see "Activity" in the "userenrolment" "table"
     When I log out
     And I log in as "admin"
     And I follow "Course 1"
     And I navigate to "Participants" node in "Course administration > Users"
-    And I select "User details" from the "User list" singleselect
     Then I should see "Activity" in the "userenrolment" "table"
     And I should see "Log in as" in the "userenrolment" "table"

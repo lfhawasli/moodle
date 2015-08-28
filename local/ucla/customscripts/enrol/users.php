@@ -29,10 +29,6 @@ require_once("$CFG->dirroot/enrol/renderer.php");
 require_once("$CFG->dirroot/group/lib.php");
 require_once("$CFG->dirroot/local/ucla/classes/participants.php");
 
-// Originally defined in user/index.php.
-define('MODE_BRIEF', 0);
-define('MODE_USERDETAILS', 1);
-
 $id      = required_param('id', PARAM_INT); // course id
 $action  = optional_param('action', '', PARAM_ALPHANUMEXT);
 $filter  = optional_param('ifilter', 0, PARAM_INT);
@@ -43,7 +39,6 @@ $fgroup  = optional_param('filtergroup', 0, PARAM_INT);
 //$status  = optional_param('status', -1, PARAM_INT);
 $status  = optional_param('status', ENROL_USER_ACTIVE, PARAM_INT);
 // END UCLA MOD: CCLE-4418
-$mode = optional_param('mode', MODE_BRIEF, PARAM_INT);
 
 // When users reset the form, redirect back to first page without other params.
 if (optional_param('resetbutton', '', PARAM_RAW) !== '') {
@@ -75,7 +70,7 @@ $PAGE->set_pagelayout('admin');
 
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
 $table = new course_enrolment_users_table($manager, $PAGE);
-$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+array('mode' => $mode));
+$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params());
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $id)));
 
 // Check if there is an action to take
@@ -216,22 +211,33 @@ $table->set_total_users($usercount);
 $bulkoperations = has_capability('moodle/course:bulkmessaging', $context);
 $renderer = $PAGE->get_renderer('core_enrol');
 $canassign = has_capability('moodle/role:assign', $manager->get_context());
-$canviewreports = has_capability('moodle/site:viewreports', $context);
-$canloginas = has_capability('moodle/user:loginas', $context);
+$canviewlog = has_capability('report/log:view', $context);
+$canloginas = has_capability('moodle/user:loginas', $context) && !\core\session\manager::is_loggedinas();
 $misclinks = false;
 foreach ($users as $userid=>&$user) {
     if ($bulkoperations) {
         $user['select'] = '<br /><input type="checkbox" class="usercheckbox" name="user'.$userid.'" /> ';
     }
 
+    // Miscellaneous links.
     $links = array();
-    $usercontext = context_user::instance($user['userid']);
-    if ($canviewreports || has_capability('moodle/user:viewuseractivitiesreport', $usercontext)) {
-        $links[] = html_writer::link(new moodle_url('/course/user.php?id='. $course->id .'&user='. $user['userid']), get_string('activity'));
+    // Activity link.
+    if ($canviewlog) {
+        $url = new moodle_url('/report/log/index.php', array(
+            'id' => $course->id,
+            'user' => $user['userid'],
+            'chooselog' => true
+            ));
+        $links[] = html_writer::link($url, get_string('activity'));
     }
-    if ($canloginas && $USER->id != $user['userid'] &&
-            !\core\session\manager::is_loggedinas() && !is_siteadmin($user['userid'])) {
-        $links[] = html_writer::link(new moodle_url('/course/loginas.php?id='. $course->id .'&user='. $user['userid'] .'&sesskey='. sesskey()), get_string('loginas'));
+    // Log in as link.
+    if ($canloginas && $USER->id != $user['userid'] && !is_siteadmin($user['userid'])) {
+        $url = new moodle_url('/course/loginas.php', array(
+            'id' => $course->id,
+            'user' => $user['userid'],
+            'sesskey' => sesskey()
+            ));
+        $links[] = html_writer::link($url, get_string('loginas'));
     }
     if (!empty($links)) {
         $misclinks = true;
@@ -254,8 +260,8 @@ $extrafields = get_extra_user_fields($context);
 foreach ($extrafields as $field) {
     $userdetails[$field] = get_user_field_name($field);
 }
-// Show miscellaneous links if they exist and if the detailed list is being viewed.
-if ($mode == MODE_USERDETAILS && $misclinks) {
+// Show miscellaneous links if they exist.
+if (!empty($misclinks)) {
     $userdetails['misc'] = get_string('miscellaneous');
 }
 
@@ -358,7 +364,6 @@ $alpha  = explode(',', get_string('alphabet', 'langconfig'));
 // Navigation by first/last initial.
 $content = html_writer::start_tag('form', array(
     'action' => new moodle_url($PAGE->url),
-    'class' => 'pull-left'
     ));
 $content .= html_writer::start_tag('div');
 
@@ -401,16 +406,7 @@ $content .= html_writer::end_tag('div');
 $content .= html_writer::tag('div', '&nbsp;');
 $content .= html_writer::end_tag('form');
 
-// Brief or detailed user list. Based on user/index.php.
-$formatmenuoptions = array( '0' => get_string('brief'),
-                     '1' => get_string('userdetails'));
-$formatmenuselect = new single_select($PAGE->url, 'mode', $formatmenuoptions, $mode, null, 'formatmenu');
-$formatmenuselect->set_label(get_string('userlist'));
-$formatmenu = html_writer::div($OUTPUT->render($formatmenuselect), 'pull-right');
-
-$topbar = html_writer::div($content . $formatmenu, 'clearfix');
-
-echo $topbar;
+echo $content;
 
 if ($usercount < 1) {
     echo $OUTPUT->heading(get_string('nothingtodisplay'));

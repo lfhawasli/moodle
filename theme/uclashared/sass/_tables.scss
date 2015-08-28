@@ -159,6 +159,12 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
 // This is only implemented for userenrollment table
 // --------------------------------------------------
 
+// Make the role column flexible width (overriding bootstrapbase).
+.userenrolment .col_role {
+    max-width: 262px;
+    width: auto;
+}
+
 @media only screen and (max-width: $breakpoint-xsmall),
 only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medium-small) {
 
@@ -209,7 +215,7 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
     }
     .userenrolment td.col_userdetails,
     .userenrolment th.col_userdetails {
-        min-height: 70px;
+        min-height: 110px;
     }
     .userenrolment .col_lastseen,
     .userenrolment .col_role { 
