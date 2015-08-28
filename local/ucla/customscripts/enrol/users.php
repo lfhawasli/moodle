@@ -338,11 +338,19 @@ $table->set_total_users($usercount);
 $table->set_users($users);
 
 $usercountstring = $usercount.'/'.$manager->get_total_users();
-$PAGE->set_title($PAGE->course->fullname.': '.get_string('participants', 'local_ucla')." ($usercountstring)");
+if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+    $PAGE->set_title($PAGE->course->fullname.': '.'Participants'." ($usercountstring)");
+} else {
+    $PAGE->set_title($PAGE->course->fullname.': '.'Enrolled users'." ($usercountstring)");
+}
 $PAGE->set_heading($PAGE->title);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('participants', 'local_ucla').get_string('labelsep', 'langconfig').$usercountstring, 3);
+if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+    echo $OUTPUT->heading('Participants'.get_string('labelsep', 'langconfig').$usercountstring, 3);
+} else {
+    echo $OUTPUT->heading('Enrolled users'.get_string('labelsep', 'langconfig').$usercountstring, 3);
+}
 
 $strall = get_string('all');
 $alpha  = explode(',', get_string('alphabet', 'langconfig'));
@@ -356,35 +364,35 @@ $content .= html_writer::start_tag('div');
 
 // Bar of first initials.
 $content .= html_writer::start_tag('div', array('class' => 'initialbar firstinitial'));
-$content .= html_writer::label(get_string('firstname').': ', null).' ';
+$content .= html_writer::label(get_string('firstname').': ', null);
 if (!empty($firstinitial)) {
-    $content .= html_writer::link($PAGE->url.'&sifirst=', $strall).' ';
+    $content .= html_writer::link($PAGE->url.'&sifirst=', $strall);
 } else {
-    $content .= html_writer::tag('strong', $strall).' ';
+    $content .= html_writer::tag('strong', $strall);
 }
 foreach ($alpha as $letter) {
     if ($letter == $firstinitial) {
-        $content .= html_writer::tag('strong', $letter).' ';
+        $content .= html_writer::tag('strong', $letter);
     } else {
-        $content .= html_writer::link($PAGE->url.'&sifirst='.$letter, $letter).' ';
+        $content .= html_writer::link($PAGE->url.'&sifirst='.$letter, $letter);
     }
 }
 $content .= html_writer::end_tag('div');
 
 // Bar of last initials.
 $content .= html_writer::start_tag('div', array('class' => 'initialbar lastinitial'));
-$content .= html_writer::label(get_string('lastname').': ', null).' ';
+$content .= html_writer::label(get_string('lastname').': ', null);
 
 if (!empty($lastinitial)) {
-    $content .= html_writer::link($PAGE->url.'&silast=', $strall).' ';
+    $content .= html_writer::link($PAGE->url.'&silast=', $strall);
 } else {
-    $content .= html_writer::tag('strong', $strall).' ';
+    $content .= html_writer::tag('strong', $strall);
 }
 foreach ($alpha as $letter) {
     if ($letter == $lastinitial) {
-        $content .= html_writer::tag('strong', $letter).' ';
+        $content .= html_writer::tag('strong', $letter);
     } else {
-        $content .= html_writer::link($PAGE->url.'&silast='.$letter, $letter).' ';
+        $content .= html_writer::link($PAGE->url.'&silast='.$letter, $letter);
     }
 }
 $content .= html_writer::end_tag('div');
