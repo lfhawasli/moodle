@@ -13,10 +13,11 @@ M.core_user.init_participation = function(Y) {
                 ok = true;
             }
         });
+
+        // START UCLA MOD: CCLE-5316 - Checkbox to message students
         if (!ok) {
             // no checkbox selected
 
-            // START UCLA MOD: CCLE-5316
             alertstring = M.util.get_string('noselectedusers', 'local_ucla');
 
             var alert = new M.core.alert({
@@ -30,6 +31,20 @@ M.core_user.init_participation = function(Y) {
 
             return;
         }
+
+        var s = document.getElementById("formactionid");
+        var label = s.options[s.selectedIndex].parentNode.getAttribute('label');
+        if (label == "Messaging") {
+            document.getElementById('participantsform').action = 
+                    document.getElementById('participantsform').getAttribute("action_messaging");
+        } else {
+            document.getElementById('participantsform').action = 
+                    document.getElementById('participantsform').getAttribute("action_enrolment");
+            s.setAttribute('name', 'bulkuserop');
+            Y.all('input.usercheckbox').set('name','bulkuser[]');
+        }
+        // END UCLA MOD: CCLE-5316
+
         Y.one('#participantsform').submit();
 	}, '#formactionid');
 

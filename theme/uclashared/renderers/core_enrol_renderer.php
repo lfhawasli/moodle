@@ -48,4 +48,42 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
                         false, $pageurl);
     }
 
+    /**
+     * Renders a course enrolment table
+     *
+     * @param course_enrolment_table $table
+     * @param moodleform $mform Form that contains filter controls
+     * @return string
+     */
+    public function render_course_enrolment_users_table(course_enrolment_users_table $table,
+            moodleform $mform) {
+
+        $table->initialise_javascript();
+
+        $buttons = $table->get_manual_enrol_buttons();
+        $buttonhtml = '';
+        if (count($buttons) > 0) {
+            $buttonhtml .= html_writer::start_tag('div', array('class' => 'enrol_user_buttons'));
+            foreach ($buttons as $button) {
+                $buttonhtml .= $this->render($button);
+            }
+            $buttonhtml .= html_writer::end_tag('div');
+        }
+
+        $content = '';
+        if (!empty($buttonhtml)) {
+            $content .= $buttonhtml;
+        }
+        $content .= $mform->render();
+
+        $content .= $this->output->render($table->get_paging_bar());
+
+        $content .= html_writer::table($table);
+
+        $content .= $this->output->render($table->get_paging_bar());
+        if (!empty($buttonhtml)) {
+            $content .= $buttonhtml;
+        }
+        return $content;
+    }
 }

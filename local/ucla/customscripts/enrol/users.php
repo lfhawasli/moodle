@@ -25,7 +25,7 @@
 require_once("$CFG->dirroot/config.php");
 require_once("$CFG->dirroot/enrol/locallib.php");
 require_once("$CFG->dirroot/enrol/users_forms.php");
-require_once("$CFG->dirroot/enrol/renderer.php");
+require_once("$CFG->dirroot/theme/uclashared/renderers.php");
 require_once("$CFG->dirroot/group/lib.php");
 require_once("$CFG->dirroot/local/ucla/classes/participants.php");
 
@@ -69,8 +69,8 @@ require_capability('moodle/course:enrolreview', $context);
 $PAGE->set_pagelayout('admin');
 
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
-$table = new course_enrolment_users_table($manager, $PAGE);
-$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params());
+$table = new local_ucla_course_enrolment_users_table($manager, $PAGE);
+$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+array('mode' => $mode));
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $id)));
 
 // Check if there is an action to take
@@ -208,7 +208,7 @@ if ($firstinitial == '' && $lastinitial == '') {
 $usercount = $manager->get_usercount();
 $table->set_total_users($usercount);
 
-$bulkoperations = has_capability('moodle/course:bulkmessaging', $context);
+$bulkoperations = $table->has_bulk_operations();
 $renderer = $PAGE->get_renderer('core_enrol');
 $canassign = has_capability('moodle/role:assign', $manager->get_context());
 $canviewlog = has_capability('report/log:view', $context);
@@ -216,7 +216,10 @@ $canloginas = has_capability('moodle/user:loginas', $context) && !\core\session\
 $misclinks = false;
 foreach ($users as $userid=>&$user) {
     if ($bulkoperations) {
-        $user['select'] = '<br /><input type="checkbox" class="usercheckbox" name="user'.$userid.'" /> ';
+        $user['select'] = html_writer::empty_tag('input', array('type' => 'checkbox',
+                                                          'class' => 'usercheckbox',
+                                                          'name' => 'user'.$userid,
+                                                          'value' => $userid));
     }
 
     // Miscellaneous links.
@@ -403,7 +406,84 @@ echo $content;
 if ($usercount < 1) {
     echo $OUTPUT->heading(get_string('nothingtodisplay'));
 } else {
+    if ($table->has_bulk_operations()) {
+
+        $enrolaction = $CFG->wwwroot.'/enrol/bulkchange.php"';
+        $messageaction = $CFG->wwwroot.'/user/action_redir.php';
+
+        $formattributes = array('action_messaging' => $CFG->wwwroot.'/user/action_redir.php',
+                                'action_enrolment' => $CFG->wwwroot.'/enrol/bulkchange.php',
+                                'id' => 'participantsform',
+                                'name' => 'participantsform', 'method' => 'post');
+
+        echo html_writer::start_tag('form', $formattributes);
+        echo html_writer::empty_tag('div');
+        echo html_writer::start_tag('input', array('type' => 'hidden',
+                                                   'name' => 'sesskey',
+                                                   'value' => sesskey()));
+        echo html_writer::start_tag('input', array('type' => 'hidden',
+                                                   'name' => 'returnto',
+                                                   'value' => s($PAGE->url->out(false))));
+
+        foreach ($table->get_combined_url_params() as $key => $value) {
+            if ($key == 'action') {
+                continue;
+            }
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $key, 'value' => $value));
+        }
+
+        $PAGE->requires->strings_for_js(array('noselectedusers'), 'local_ucla');
+    }
+
     echo $renderer->render_course_enrolment_users_table($table, $filterform);
+
+    if ($bulkoperations) {
+        echo html_writer::tag('br');
+        echo html_writer::start_tag('div', array('class' => 'buttons'));
+        echo html_writer::empty_tag('input', array('type' => 'button',
+                                                   'id' => 'checkall',
+                                                   'value' => get_string('selectall')));
+        echo html_writer::empty_tag('input', array('type' => 'button',
+                                                   'id' => 'checkall',
+                                                   'value' => get_string('deselectall')));
+
+        $displaylist = array();
+        $displaylist2 = array();
+
+        $displaylist['messageselect.php'] = get_string('messageselectadd');
+        if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context) && $context->id != $frontpagectx->id) {
+            $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
+            $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+        }
+        foreach ($table->get_bulk_user_enrolment_operations() as $operation) {
+            $displaylist2[$operation->get_identifier()] = $operation->get_title();
+        }
+
+        $list = array(array('Messaging' => $displaylist), array('Enrolment' => $displaylist2));
+
+        echo $OUTPUT->help_icon('withselectedusers');
+        echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
+        echo html_writer::select($list, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+
+        echo html_writer::empty_tag('input', array('type' => 'hidden',
+                                                   'name' => 'id',
+                                                   'value' => $course->id));
+        echo html_writer::start_tag('noscript', array('style' => 'display:inline')); // hides go button
+
+        echo html_writer::start_tag('div');
+        echo html_writer::empty_tag('input', array('type' => 'submit',
+                                                   'value' => get_string('ok')));
+        echo html_writer::end_tag('div');
+        echo html_writer::end_tag('noscript');
+
+        echo html_writer::end_tag('div');
+        echo html_writer::end_tag('div');
+        echo html_writer::end_tag('form');
+
+
+        $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
+        $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
+    }
 }
 echo $OUTPUT->footer();
 die();
