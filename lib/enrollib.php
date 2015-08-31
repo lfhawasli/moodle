@@ -408,9 +408,9 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
             // START UCLA MOD: CCLE-5251 - Add alphabetical user filtering
             //$usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
             if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
-                $usersnode->add('Participants', $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+                $usersnode->add(get_string('participants', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
             } else {
-                $usersnode->add('Enrolled users', $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+                $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
             }
             // END UCLA MOD: CCLE-5251
         }

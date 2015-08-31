@@ -56,6 +56,7 @@ if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
 } else {
     $string['enrolledusers'] = 'Enrolled users';
 }
+$string['participants'] = 'Participants';
 // END UCLA MOD: CCLE-5251
 $string['enrolledusersmatching'] = 'Matching enrolled users';
 $string['enrolme'] = 'Enrol me in this course';

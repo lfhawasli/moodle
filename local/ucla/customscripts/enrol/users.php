@@ -344,11 +344,11 @@ $table->set_total_users($usercount);
 $table->set_users($users);
 
 $usercountstring = $usercount.'/'.$manager->get_total_users();
-$PAGE->set_title($PAGE->course->fullname.': '.'Participants'." ($usercountstring)");
+$PAGE->set_title($PAGE->course->fullname.': '.get_string('participants', 'enrol')." ($usercountstring)");
 $PAGE->set_heading($PAGE->title);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('Participants'.get_string('labelsep', 'langconfig').$usercountstring, 3);
+echo $OUTPUT->heading(get_string('participants', 'enrol').get_string('labelsep', 'langconfig').$usercountstring, 3);
 
 $strall = get_string('all');
 $alpha  = explode(',', get_string('alphabet', 'langconfig'));
