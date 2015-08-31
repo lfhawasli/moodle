@@ -12,7 +12,7 @@ class local_ucla_import_course_search extends import_course_search {
         $joinon = 'c.id';
         list($ctxselect, $ctxjoin) = array((", " . context_helper::get_preload_record_columns_sql($tablealias)),
                 "LEFT JOIN {context} $tablealias ON ($tablealias.instanceid = $joinon AND $tablealias.contextlevel = $contextlevel)");
-        
+
         $params = array(
             'fullnamesearch' => '%'.$this->get_search().'%',
             'shortnamesearch' => '%'.$this->get_search().'%',
@@ -21,19 +21,18 @@ class local_ucla_import_course_search extends import_course_search {
             'teacherfullnamesearch' => '%'.$this->get_search().'%',
             'siteid' => SITEID
         );
-        $select   = " SELECT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder, usr.lastname, usr.firstname ";
-        $from       = " FROM {course} c ";
-        $join       = " JOIN {role_assignments} ra ON ra.contextid = ctx.id
-                        JOIN {role} r ON r.id = ra.roleid
-                        JOIN {user} usr ON usr.id = ra.userid ";
-        $where     = " WHERE (r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor' OR r.shortname= 'ta_instructor') 
-                         AND (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). " 
-                          OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). " 
-                          OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). " 
-                          OR ".$DB->sql_like('c.fullname', ':fullnamesearch', false)." 
-                          OR ".$DB->sql_like('c.shortname', ':shortnamesearch', false).") 
-                         AND c.id <> :siteid";
-        $orderby    = " ORDER BY c.sortorder";
+        $select = "      SELECT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder, usr.lastname, usr.firstname ";
+        $from     = "      FROM {course} c ";
+        $join     = " LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id
+                      LEFT JOIN {role} r ON r.id = ra.roleid
+                      LEFT JOIN {user} usr ON usr.id = ra.userid ";
+        $where   = "      WHERE (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). "
+                             OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). "
+                             OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). "
+                             OR ".$DB->sql_like('c.fullname', ':fullnamesearch', false)."
+                             OR ".$DB->sql_like('c.shortname', ':shortnamesearch', false).")
+                            AND c.id <> :siteid";
+        $orderby  = "  ORDER BY c.sortorder";
         if ($this->currentcourseid !== null && !$this->includecurrentcourse) {
             $where .= " AND c.id <> :currentcourseid";
             $params['currentcourseid'] = $this->currentcourseid;

@@ -132,6 +132,11 @@ class PublicPrivate_Module {
                 $DB->set_field('course_modules', 'groupmembersonly', 1, $conditions);
             }
             rebuild_course_cache($this->get_course(), true);
+
+            $context = context_module::instance($conditions['id']);
+            $event = \local_publicprivate\event\private_used::create(array('context' => $context));
+            $event->trigger();
+
         } catch(DML_Exception $e) {
             throw new PublicPrivate_Module_Exception('Failed to set public/private visibility settings for module.', 300, $e);
         }
@@ -160,6 +165,11 @@ class PublicPrivate_Module {
                 $DB->set_field('course_modules', 'groupmembersonly', 0, $conditions);
             }
             rebuild_course_cache($this->get_course(), true);
+
+            $context = context_module::instance($conditions['id']);
+            $event = \local_publicprivate\event\public_used::create(array('context' => $context));
+            $event->trigger();
+
         } catch(DML_Exception $e) {
             throw new PublicPrivate_Module_Exception('Failed to set public/private visibility settings for module.', 400, $e);
         }
