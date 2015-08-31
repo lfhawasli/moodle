@@ -1814,7 +1814,7 @@ class grade_report_grader extends grade_report {
                 $key = array_search($targetid, $collapsed['aggregatesonly']);
                 if ($key !== false) {
                     unset($collapsed['aggregatesonly'][$key]);
-                    set_user_preference('grade_report_grader_collapsed_categories', serialize($collapsed));
+                    static::set_collapsed_preferences($courseid, $collapsed);
                 }
                 // END UCLA MOD: CCLE-4289
 
