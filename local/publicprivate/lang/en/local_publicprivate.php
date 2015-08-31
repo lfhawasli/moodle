@@ -36,3 +36,7 @@ $string['publicprivatecannotedit'] = 'ERROR: This is a special grouping for publ
 $string['publicprivatecannotremove_oneof'] = 'ERROR: One of the groups selected is a special group for public/private. It cannot be removed.';
 $string['publicprivatecannotremove_one'] = 'ERROR: The group selected is a special group for public/private. It cannot be removed.';
 $string['publicprivatecannotremove'] = 'ERROR: This is a special grouping for public/private. It cannot be removed.';
+
+// CCLE-5351
+$string['eventpublic_used'] = 'Course module is set to public';
+$string['eventprivate_used'] = 'Course module is set to private';

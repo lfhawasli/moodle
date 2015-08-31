@@ -54,6 +54,7 @@ if ($class === 'resource') {
                 require_once($CFG->dirroot.'/local/publicprivate/lib/module.class.php');
                 PublicPrivate_Module::build($cm)->enable();
             }
+
             break;
     }
 }
