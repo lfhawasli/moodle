@@ -13,7 +13,7 @@ require_once('lib.php');
 $datasource_url = get_config('block_ucla_library_reserves', 'source_url');
 if (empty($datasource_url)) {
     log_ucla_data('library reserves', 'read', 'Initializing cfg variables', 
-                get_string('errvfmsglocation', 'tool_ucladatasourcesync'));
+                get_string('errlrmsglocation', 'tool_ucladatasourcesync'));
     die("\n" . get_string('errlrmsglocation', 'tool_ucladatasourcesync') . "\n");
 }
 
