@@ -223,6 +223,14 @@ class enrol_cohort_plugin extends enrol_plugin {
             return false;
         }
 
+        // START UCLA MOD: CCLE-5352 - Enable Cohort-Sync Enrollment plugin
+        // Do not display "Enroll cohort" button.
+        global $CFG;
+        if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+            return false;
+        }
+        // END UCLA MOD: CCLE-5352
+
         $cohorturl = new moodle_url('/enrol/cohort/edit.php', array('courseid' => $course->id));
         $button = new enrol_user_button($cohorturl, get_string('enrolcohort', 'enrol'), 'get');
         $button->class .= ' enrol_cohort_plugin';
