@@ -50,6 +50,8 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
 
     /**
      * Renders a course enrolment table
+     * Clone of the original that omits enrolment buttons;
+     * this is now taken care of in local/ucla/customscripts/enrol/users.php
      *
      * @param course_enrolment_table $table
      * @param moodleform $mform Form that contains filter controls

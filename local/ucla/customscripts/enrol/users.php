@@ -28,7 +28,7 @@ require_once("$CFG->dirroot/enrol/users_forms.php");
 require_once("$CFG->dirroot/theme/uclashared/renderers.php");
 require_once("$CFG->dirroot/group/lib.php");
 require_once("$CFG->dirroot/local/ucla/classes/participants.php");
-require_once("$CFG->dirroot/local/ucla/classes/participants_filter_form.php");
+require_once("$CFG->dirroot/local/ucla/classes/local_ucla_course_enrolment_users_table.php");
 
 $id      = required_param('id', PARAM_INT); // course id
 $action  = optional_param('action', '', PARAM_ALPHANUMEXT);
