@@ -28,6 +28,7 @@ require_once("$CFG->dirroot/enrol/users_forms.php");
 require_once("$CFG->dirroot/theme/uclashared/renderers.php");
 require_once("$CFG->dirroot/group/lib.php");
 require_once("$CFG->dirroot/local/ucla/classes/participants.php");
+require_once("$CFG->dirroot/local/ucla/classes/participants_filter_form.php");
 
 $id      = required_param('id', PARAM_INT); // course id
 $action  = optional_param('action', '', PARAM_ALPHANUMEXT);
@@ -70,7 +71,7 @@ $PAGE->set_pagelayout('admin');
 
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
 $table = new local_ucla_course_enrolment_users_table($manager, $PAGE);
-$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+array('mode' => $mode));
+$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params());
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $id)));
 
 // Check if there is an action to take
@@ -452,7 +453,7 @@ if ($usercount < 1) {
     echo $renderer->render_course_enrolment_users_table($table, $filterform);
 
     if ($bulkoperations) {
-        echo html_writer::tag('br');
+        echo html_writer::empty_tag('br');
         echo html_writer::start_tag('div', array('class' => 'buttons'));
         echo html_writer::empty_tag('input', array('type' => 'button',
                                                    'id' => 'checkall',
