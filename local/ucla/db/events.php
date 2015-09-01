@@ -64,3 +64,10 @@ $handlers = array(
         'schedule'        => 'instant'
     ),
 );
+
+$observers = array(
+    array(
+        'eventname'   => '\core\event\user_loggedout',
+        'callback'    => 'local_ucla_autologin::clear',
+    ),
+);
