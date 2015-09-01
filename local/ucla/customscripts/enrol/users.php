@@ -65,7 +65,7 @@ if ($course->id == SITEID) {
 }
 
 require_login($course);
-require_capability('moodle/course:enrolreview', $context);
+require_capability('moodle/course:viewparticipants', $context);
 $PAGE->set_pagelayout('admin');
 
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
@@ -277,10 +277,24 @@ if ($bulkoperations) {
 $fields += array(
     'userdetails' => $userdetails,
     'lastcourseaccess' => get_string('lastcourseaccess'),
-    'role' => get_string('roles', 'role'),
-    'group' => get_string('groups', 'group'),
-    'enrol' => get_string('enrolmentinstances', 'enrol')
 );
+// Only the manager can manage roles.
+if (has_capability('moodle/role:manage', $context)) {
+    $fields += array(
+        'role' => get_string('roles', 'role')
+    );
+}
+if (has_capability('moodle/course:managegroups', $context)) {
+    $fields += array(
+        'group' => get_string('groups', 'group')
+    );
+}
+// Only manager can manage user enrolments.
+if (has_capability('enrol/manual:manage', $context)) {
+    $fields += array(
+        'enrol' => get_string('enrolmentinstances', 'enrol')
+    );
+}
 
 // Remove hidden fields if the user has no access
 if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
@@ -293,7 +307,7 @@ if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
     }
 }
 
-$filterform = new enrol_users_filter_form('users.php', array('manager' => $manager, 'id' => $id),
+$filterform = new local_ucla_participants_filter_form('users.php', array('manager' => $manager, 'id' => $id),
         'get', '', array('id' => 'filterform'));
 $filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role,
     'filtergroup' => $fgroup, 'status' => $status));

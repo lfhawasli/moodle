@@ -23,6 +23,73 @@
  */
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/enrol/locallib.php");
+require_once("$CFG->dirroot/enrol/users_forms.php");
+
+
+/**
+ * Form that lets users filter the participants list.
+ */
+class local_ucla_participants_filter_form extends enrol_users_filter_form {
+    /**
+     * Omits sections of the participants page filter if the user
+     * does not have the capabilities to view them.
+     *
+     * @global moodle_database $DB
+     */
+    public function definition() {
+        global $CFG, $DB;
+        $context = context_course::instance($this->_customdata['id'], MUST_EXIST);
+        $manager = $this->_customdata['manager'];
+        $mform = $this->_form;
+        // Text search box.
+        $mform->addElement('text', 'search', get_string('search'));
+        $mform->setType('search', PARAM_RAW);
+        // Filter by enrolment plugin type.
+        if (has_capability('enrol/manual:manage', $context)) {
+            $mform->addElement('select', 'ifilter', get_string('enrolmentinstances', 'enrol'),
+                    array(0 => get_string('all')) + (array)$manager->get_enrolment_instance_names());
+        }
+        // Role select dropdown includes all roles, but using course-specific
+        // names if applied. The reason for not restricting to roles that can
+        // be assigned at course level is that upper-level roles display in the
+        // enrolments table so it makes sense to let users filter by them.
+        if (has_capability('moodle/role:manage', $context)) {
+            $allroles = $manager->get_all_roles();
+            $rolenames = array();
+            foreach ($allroles as $id => $role) {
+                $rolenames[$id] = $role->localname;
+            }
+            $mform->addElement('select', 'role', get_string('role'),
+                    array(0 => get_string('all')) + $rolenames);
+        }
+        // Filter by group.
+        if (has_capability('moodle/course:managegroups', $context)) {
+            $allgroups = $manager->get_all_groups();
+            $groupsmenu[0] = get_string('allparticipants');
+            foreach ($allgroups as $gid => $unused) {
+                $groupsmenu[$gid] = $allgroups[$gid]->name;
+            }
+            if (count($groupsmenu) > 1) {
+                $mform->addElement('select', 'filtergroup', get_string('group'), $groupsmenu);
+            }
+        }
+        // Status active/inactive.
+        $mform->addElement('select', 'status', get_string('status'),
+                array(-1 => get_string('all'),
+                    ENROL_USER_ACTIVE => get_string('active'),
+                    ENROL_USER_SUSPENDED => get_string('inactive')));
+        // Submit button does not use add_action_buttons because that adds
+        // another fieldset which causes the CSS style to break in an unfixable
+        // way due to fieldset quirks.
+        $group = array();
+        $group[] = $mform->createElement('submit', 'submitbutton', get_string('filter'));
+        $group[] = $mform->createElement('submit', 'resetbutton', get_string('reset'));
+        $mform->addGroup($group, 'buttons', '', ' ', false);
+        // Add hidden fields required by page.
+        $mform->addElement('hidden', 'id', $this->_customdata['id']);
+        $mform->setType('id', PARAM_INT);
+    }
+}
 
 /**
  * Table control used for filtering users
