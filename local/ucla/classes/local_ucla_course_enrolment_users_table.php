@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+require_once($CFG->dirroot.'/enrol/renderer.php');
+
 /**
  * Table control used for enrolled users
  *
@@ -43,8 +45,6 @@ class local_ucla_course_enrolment_users_table extends course_enrolment_users_tab
 
     /**
      * Sets the users for this table
-     *
-     * 
      *
      * @param array $users
      * @return void

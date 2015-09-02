@@ -25,7 +25,6 @@
 require_once("$CFG->dirroot/config.php");
 require_once("$CFG->dirroot/enrol/locallib.php");
 require_once("$CFG->dirroot/enrol/users_forms.php");
-require_once("$CFG->dirroot/theme/uclashared/renderers.php");
 require_once("$CFG->dirroot/group/lib.php");
 require_once("$CFG->dirroot/local/ucla/classes/participants.php");
 require_once("$CFG->dirroot/local/ucla/classes/local_ucla_course_enrolment_users_table.php");
