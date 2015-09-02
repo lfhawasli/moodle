@@ -51,9 +51,9 @@ class local_ucla_course_enrolment_users_table extends course_enrolment_users_tab
      */
     public function set_users(array $users) {
         parent::set_users($users);
-        foreach ($this->data as $row) {
-            if ($hasbulkops = !empty($this->bulkoperations)) {
-                unset($row->cells[0]);
+        if ($hasbulkops = !empty($this->bulkoperations)) {
+            foreach ($this->data as $row) {
+                    unset($row->cells[0]);
             }
         }
     }
