@@ -278,8 +278,8 @@ $fields += array(
     'userdetails' => $userdetails,
     'lastcourseaccess' => get_string('lastcourseaccess'),
 );
-// Only the manager can manage roles.
-if (has_capability('moodle/role:manage', $context)) {
+
+if (has_capability('moodle/role:assign', $context)) {
     $fields += array(
         'role' => get_string('roles', 'role')
     );
@@ -289,8 +289,7 @@ if (has_capability('moodle/course:managegroups', $context)) {
         'group' => get_string('groups', 'group')
     );
 }
-// Only manager can manage user enrolments.
-if (has_capability('enrol/manual:manage', $context)) {
+if (has_capability('moodle/course:enrolconfig', $context) or has_capability('moodle/course:enrolreview', $context)) {
     $fields += array(
         'enrol' => get_string('enrolmentinstances', 'enrol')
     );

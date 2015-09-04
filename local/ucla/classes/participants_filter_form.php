@@ -44,7 +44,7 @@ class local_ucla_participants_filter_form extends enrol_users_filter_form {
         $mform->addElement('text', 'search', get_string('search'));
         $mform->setType('search', PARAM_RAW);
         // Filter by enrolment plugin type.
-        if (has_capability('enrol/manual:manage', $context)) {
+        if (has_capability('moodle/course:enrolconfig', $context) or has_capability('moodle/course:enrolreview', $context)) {
             $mform->addElement('select', 'ifilter', get_string('enrolmentinstances', 'enrol'),
                     array(0 => get_string('all')) + (array)$manager->get_enrolment_instance_names());
         }
@@ -52,7 +52,7 @@ class local_ucla_participants_filter_form extends enrol_users_filter_form {
         // names if applied. The reason for not restricting to roles that can
         // be assigned at course level is that upper-level roles display in the
         // enrolments table so it makes sense to let users filter by them.
-        if (has_capability('moodle/role:manage', $context)) {
+        if (has_capability('moodle/role:assign', $context)) {
             $allroles = $manager->get_all_roles();
             $rolenames = array();
             foreach ($allroles as $id => $role) {
