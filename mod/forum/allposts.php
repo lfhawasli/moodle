@@ -82,6 +82,14 @@ if (!$discussions) {
 $PAGE->set_title("$course->shortname: ".format_string($forum->name));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
+// START UCLA MOD: CCLE-4329 Handling public forums.
+require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+$ppmodule = PublicPrivate_Module::build($cm);
+if (!$ppmodule->is_private()) {
+    $warningpublicforummsg = get_string('warningpublicforum', 'local_ucla');
+    echo $OUTPUT->notification($warningpublicforummsg, 'notifywarning');
+}
+// END UCLA MOD: CCLE-4329 Handling public forums.
 echo $OUTPUT->heading(format_string($forum->name), 2);
 
 if (!$print) {
