@@ -41,6 +41,10 @@ div#block_ucla_copyright_status_filter, div#block_ucla_copyright_status_id_cp_li
     margin: 0;
 }
 
+#checkall, #checknone{
+    margin-right:2px;
+}
+
 /* CCLE-4127 limit copyright select's width in moodle filepicker */
 .fp-setlicense select {
     width: 100%;
