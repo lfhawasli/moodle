@@ -127,9 +127,6 @@ $CFG->messaging = false;
 // development/testing environments
 $CFG->divertallemailsto = 'franks@ssc.ucla.edu';
 
-// CCLE-2590 - Implement Auto-detect Shibboleth Login
-$CFG->shib_logged_in_cookie = '_ucla_sso';
-
 // CCLE-2306 - HELP SYSTEM BLOCK
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://moodle2.sscnet.ucla.edu/docs/';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://moodle2.sscnet.ucla.edu/wiki/api.php';
