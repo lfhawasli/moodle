@@ -127,6 +127,7 @@ function load_tool_uclasupportconsole() {
         4 => 'modulespercourse',
         5 => 'mediausage',
         6 => 'visiblecontentlist',
+        7 => 'unhiddencourseslist',
     );
     $groups['srdb'] = array(
         0 => 'enrollview',

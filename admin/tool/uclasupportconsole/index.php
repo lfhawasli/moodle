@@ -159,6 +159,10 @@ if ($displayforms) {
 
     if (!empty($tapairs)) {
         foreach($tapairs as $pair) {
+            if (!isset($pair->target) || !isset($pair->action)) {
+                continue;
+            }
+
             $target = $pair->target;
             $action = $pair->action;
 
@@ -2292,6 +2296,47 @@ if ($displayforms) {
     }
     unset($params['contextlevel']);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $results);
+}
+$consoles->push_console_html('modules', $title, $sectionhtml);
+///////////////////////////////////////////////////////////////
+$title = "unhiddencourseslist";
+$sectionhtml = '';
+if ($displayforms) {
+    $content = html_writer::tag('p',
+            get_string('unhiddencourseslist_help', 'tool_uclasupportconsole')) .
+            get_term_selector($title);
+    $sectionhtml .= supportconsole_simple_form($title, $content);
+} else if ($consolecommand == "$title") {
+    $term = required_param('term', PARAM_ALPHANUM);
+    $params['term'] = $term;
+    if (term_cmp_fn($term, $CFG->currentterm) < 0) {
+        // Show visible courses for past terms.
+        $params['visible'] = 1;
+    } else {
+        // Show hidden courses for current and future terms.
+        $params['visible'] = 0;
+    }
+
+    $sql = "SELECT DISTINCT c.id, c.shortname
+                   FROM {course} c
+                   JOIN {ucla_request_classes} urc
+                     ON (c.id = urc.courseid AND
+                         urc.term = :term)
+                   JOIN {ucla_reg_classinfo} urci
+                     ON (urci.term = urc.term AND
+                         urci.srs = urc.srs AND
+                         urci.enrolstat <> 'X')
+                  WHERE c.visible = :visible";
+    $results = $DB->get_records_sql($sql, $params);
+
+    foreach($results as $key => $result) {
+        $result->shortname = html_writer::link(new moodle_url('/course/view.php',
+                array('id' => $result->id)), $result->shortname,
+                array('target' => '_blank'));
+    }
+    unset($params['visible']);
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $results,
+            $params, get_string('unhiddencourseslist_help', 'tool_uclasupportconsole'));
 }
 $consoles->push_console_html('modules', $title, $sectionhtml);
 
