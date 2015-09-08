@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2014080500;  // YYYYMMDDXX.
+$plugin->version = 2015071300;  // YYYYMMDDXX.
 $plugin->requires = 2010112400; // YYYYMMDDHH (This is the release version for Moodle 2.0)
 $plugin->cron = 0;          // TODO: Turn off cron until we get schedule tasks in Moodle 2.7.

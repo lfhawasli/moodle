@@ -67,5 +67,24 @@ function xmldb_block_ucla_course_download_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2014053000, 'ucla_course_download');
     }
 
+    // CCLE-4570 - Implement Report of Request History.
+    if ($oldversion < 2015071300) {
+
+        // Define fields to be added to ucla_archives.
+        $table = new xmldb_table('ucla_archives');
+        $fields[] =  new xmldb_field('numdownloaded', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '0', 'timedownloaded');
+        $fields[] = new xmldb_field('active', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'numdownloaded');
+
+        // Conditionally add fields.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Ucla_course_download savepoint reached.
+        upgrade_block_savepoint(true, 2015071300, 'ucla_course_download');
+    }
+
     return true;
 }
