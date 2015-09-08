@@ -385,6 +385,7 @@ class syllabus_form extends moodleform {
 
             $mform->addElement('hidden', 'syllabus_url', '');
             $mform->setType('syllabus_url', PARAM_URL);
+            
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('upload_file', 'local_ucla_syllabus'), null, $config);
@@ -393,19 +394,25 @@ class syllabus_form extends moodleform {
                     'required');
         } else {
             // Add a syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc',
-                    get_string('syllabus_url_file', 'local_ucla_syllabus'),
-                    get_string('syllabus_choice', 'local_ucla_syllabus'));
+            $mform->addElement('static', 'syllabus_upload_desc', '',
+                    get_string('syllabus_url_file', 'local_ucla_syllabus'));
 
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('file', 'local_ucla_syllabus'), null, $config);
             $mform->addElement('static', 'desc', '', 'OR');
-
+            $mform->addHelpButton('syllabus_file', 'filetypepreference', 'local_ucla_syllabus');
+           
             // Add URL field.
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size'=>'50'));
             $mform->setType('syllabus_url', PARAM_URL);
+                                    
+            // Warning about multiple resource upload.
+            $multiple_resource = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
+                    . ' ' . get_string('syllabus_choice', 'local_ucla_syllabus');
+            $mform->addElement('static', 'form_multiple_resource_note', '', $multiple_resource);
+            
             // Warning about insecure URL's.
             $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
                     . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
@@ -491,19 +498,26 @@ class syllabus_form extends moodleform {
                     get_string('err_file_not_uploaded', 'local_ucla_syllabus'),
                     'required');
         } else {
-            // Add syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc', get_string('syllabus_url_file', 'local_ucla_syllabus'),
-                    get_string('syllabus_choice', 'local_ucla_syllabus'));
+            // Add a syllabus description.
+            $mform->addElement('static', 'syllabus_upload_desc', '',
+                    get_string('syllabus_url_file', 'local_ucla_syllabus'));
 
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('file', 'local_ucla_syllabus'), null, $config);
             $mform->addElement('static', 'desc', '', 'OR');
+            $mform->addHelpButton('syllabus_file', 'filetypepreference', 'local_ucla_syllabus');
 
             // Add URL field.
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size'=>'50'));
             $mform->setType('syllabus_url', PARAM_URL);
+            
+            // Warning about multiple resource upload.
+            $multiple_resource = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
+                    . ' ' . get_string('syllabus_choice', 'local_ucla_syllabus');
+            $mform->addElement('static', 'form_multiple_resource_note', '', $multiple_resource);
+            
             // Warning about insecure URL's.
             $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
                     . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
