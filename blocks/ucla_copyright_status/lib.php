@@ -4,8 +4,8 @@
  *
  * @package    ucla
  * @subpackage ucla_copyright_status
- * @copyright  2012 UC Regents    
- * @author     Jun Wan <jwan@humnet.ucla.edu>                                  
+ * @copyright  2012 UC Regents
+ * @author     Jun Wan <jwan@humnet.ucla.edu>
  */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/licenselib.php');
@@ -172,16 +172,22 @@ function update_copyright_status($data) {
     global $DB, $USER;
    // $data_array = explode('|', $data);
     foreach ($data as $key => $value) {
-        if (!empty($value)&& preg_match('/^file/',$key)) {
-            $a = explode('_', $key);
-            $id = trim($a[1]);
-            if (isset($id)) {
-                $id_array_with_same_contenthash = get_file_ids($id);
-                // loop through all files with same contenthash
-                foreach ($id_array_with_same_contenthash as $fid => $other) {
-                    $params = array('id' => $fid, 'license' => $value, 'timemodified' => time());
-                    $DB->update_record('files', $params);
-                }
+        // If bulk assign
+        if (!empty($data->bulkassign) && preg_match('/^checkbox/',$key) && !empty($value)) {
+            $license = $data->bulkassign;
+        } else if (empty($data->bulkassign) && !empty($value) && preg_match('/^file/',$key)) {
+            $license = $value;
+        } else {
+            continue;
+        }
+        $a = explode('_', $key);
+        $id = trim($a[1]);
+        if (isset($id)) {
+            $id_array_with_same_contenthash = get_file_ids($id);
+            // loop through all files with same contenthash
+            foreach ($id_array_with_same_contenthash as $fid => $other) {
+                $params = array('id' => $fid, 'license' => $license, 'timemodified' => time());
+                $DB->update_record('files', $params);
             }
         }
     }
@@ -247,7 +253,7 @@ function display_copyright_status_contents($courseid, $filter) {
             array('id' => 'block_ucla_copyright_status_cp'));
     echo html_writer::start_tag('form',
             array('id' => 'block_ucla_copyright_status_form_copyright_status_list',
-        'action' => $PAGE->url->out(), 'method' => 'post'));
+                  'action' => $PAGE->url->out(), 'method' => 'post'));
 
     // display copyright filter
     echo html_writer::start_tag('div',
@@ -270,11 +276,11 @@ function display_copyright_status_contents($courseid, $filter) {
     $helpicon = html_writer::link(new moodle_url('/help.php',
                 array('component' => 'local_ucla', 'identifier' => 'license',
                       'lang' => 'en')),
-            html_writer::img(new moodle_url('/theme/image.php', array('theme' => 'uclashared', 'image' => 'help')),
+                html_writer::img(new moodle_url('/theme/image.php', array('theme' => 'uclashared', 'image' => 'help')),
                     get_string('copyrightstatushelp', 'block_ucla_copyright_status'),
                     array('class' => 'iconhelp')),
-            array('target' => '_blank'));
-    $t->head = array(get_string('copyrightstatus', 'block_ucla_copyright_status')
+                    array('target' => '_blank'));
+    $t->head = array('', get_string('copyrightstatus', 'block_ucla_copyright_status')
         . ' ' . $helpicon,
         get_string('section'),
         get_string('updated_dt', 'block_ucla_copyright_status'),
@@ -294,6 +300,7 @@ function display_copyright_status_contents($courseid, $filter) {
         // Loop through all the files with the same content hash,
         // which we assume to have the same copyright status.
         foreach ($contenthash_record as $id => $record) {
+            $file_checkbox = html_writer::checkbox('checkbox_' . $id, $id, false, $label= '', array('class' => 'usercheckbox'));
             $select_copyright = html_writer::select($license_options,
                             'filecopyright_' . $id, $record['license']);
 
@@ -329,7 +336,7 @@ function display_copyright_status_contents($courseid, $filter) {
             $file_authors = array_pop($file_authors);
         }
 
-        $t->data[] = array($file_names .
+        $t->data[] = array($file_checkbox, $file_names .
             html_writer::tag('div', $select_copyright,
                     array('class' => 'block-ucla-copyright-status-list')),
             $file_sections, $file_dates, $file_authors);
@@ -346,16 +353,26 @@ function display_copyright_status_contents($courseid, $filter) {
     // end display copyright status list
     // display save changes button, hidden field data and submit form
     if (count($course_copyright_status_list) > 0) {
+        $selectall =  html_writer::tag('button', get_string('selectall'),
+                                       array('id' => 'checkall',
+                                             'class' => 'btn btn-default',
+                                             'type' => 'button'));
+        $selectnone =  html_writer::tag('button', get_string('deselectall'),
+                                        array('id' => 'checknone',
+                                              'class' => 'btn btn-default',
+                                              'type' => 'button'));
+        $label = get_string('withselected', 'block_ucla_copyright_status') . "&nbsp;&nbsp;";
+        $bulkassign = html_writer::select($license_options, 'bulkassign');
         $savebtn = html_writer::tag('button', get_string('savechanges'),
-                        array('class' => 'btn btn-primary',
-                    'name' => 'action_edit',
-                    'type' => 'submit'));
+                                     array('class' => 'btn btn-primary',
+                                           'name' => 'action_edit',
+                                           'type' => 'submit'));
         $cancelbtn = html_writer::tag('button', get_string('cancel'),
-                        array('class' => 'btn-cancel',
-                    'name' => 'action_cancel',
-                    'type' => 'submit'));
-        echo html_writer::tag('div', $savebtn . $cancelbtn,
-                array('class' => 'mform'));
+                                      array('class' => 'btn-cancel',
+                                            'name' => 'action_cancel',
+                                            'type' => 'submit'));
+        echo html_writer::tag('div', $selectall . $selectnone . $label . $bulkassign . $savebtn . $cancelbtn,
+                              array('class' => 'mform'));
     }
     // end display save changes button
     echo html_writer::end_tag('form');

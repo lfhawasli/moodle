@@ -254,11 +254,18 @@ class seniorscholar_invitation_manager extends invitation_manager {
         if (empty($courseid)) {
             $invites = $DB->get_records_list('enrol_invitation', 'inviterid', $userids);
         } else {
-             $table = 'enrol_invitation';
-             $select = "courseid = " . $courseid  . " AND inviterid IN (" . implode(', ', $userids) . ")";
-             $invites = $DB->get_records_select($table, $select);
+            list($listofinviterssql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            $params['courseid'] = $courseid;
+            $sql = "SELECT i.*, ue.id as ueid, ue.enrolid
+                      FROM {enrol_invitation} i
+                 LEFT JOIN {user_enrolments} ue
+                        ON i.userid = ue.userid
+                 LEFT JOIN {enrol} e
+                        ON ue.enrolid = e.id
+                     WHERE i.courseid = :courseid
+                       AND i.inviterid $listofinviterssql";
+            $invites = $DB->get_records_sql($sql, $params);
         }
-
         return $invites;
     }
 }

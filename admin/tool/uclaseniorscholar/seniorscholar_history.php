@@ -189,6 +189,11 @@ if (empty($invites)) {
             // Create link to resend invite.
             $url->param('actionid', invitation_manager::INVITE_RESEND);
             $row[5] .= html_writer::link($url, get_string('action_resend_invite', 'tool_uclaseniorscholar'));
+        } else if ($status == get_string('status_invite_used', 'tool_uclaseniorscholar') 
+                   && $invitationmanager->get_access_expiration($invite) != get_string('status_invite_used_noaccess', 'tool_uclaseniorscholar')) {
+            $url = new moodle_url('/admin/tool/uclaseniorscholar/seniorscholar_unenroluser.php',
+            array('courseid' => $courseid, 'ueid' => $invite->ueid, 'userid' => $invite->userid));
+            $row[5] .= html_writer::link($url, get_string('action_unenroll', 'tool_uclaseniorscholar'));
         }
 
         $table->add_data($row);

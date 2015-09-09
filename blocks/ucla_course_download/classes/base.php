@@ -134,6 +134,7 @@ abstract class block_ucla_course_download_base {
     public function add_request() {
         global $DB;
 
+        $retval = true;
         $request = new stdClass();
         $request->courseid = $this->course->id;
         $request->userid = $this->userid;
@@ -141,6 +142,8 @@ abstract class block_ucla_course_download_base {
         $request->content = json_encode($this->get_content());
         $request->contexthash = sha1($request->content);
         $request->timerequested = time();
+        $request->numdownloaded = 0;
+        $request->active = 1;
 
         $conditions = array(
             'courseid' => $request->courseid,
@@ -148,18 +151,28 @@ abstract class block_ucla_course_download_base {
             'type' => $this->get_type()
         );
 
-        if (!$DB->record_exists('ucla_archives', $conditions)) {
-            $objid = $DB->insert_record('ucla_archives', $request);
-
-            // Log requests.
-            $event = \block_ucla_course_download\event\request_created::create(array(
-                'context' => context_course::instance($this->course->id),
-                'objectid' => $objid
-            ));
-            $event->trigger();
-            return true;
+        $requestid = null;
+        $existingrequest = $DB->get_record('ucla_archives', $conditions);
+        if (empty($existingrequest)) {
+            // If doesn't exist, create it.
+            $requestid = $DB->insert_record('ucla_archives', $request);
+        } else {
+            // Get the inactive request and make it active again.
+            $request->id = $existingrequest->id;
+            $request->numdownloaded = $existingrequest->numdownloaded;
+            $DB->update_record('ucla_archives', $request);
+            $retval = false;
+            $requestid = $existingrequest->id;
         }
-        return false;
+
+        // Log requests.
+        $event = \block_ucla_course_download\event\request_created::create(array(
+            'context' => context_course::instance($this->course->id),
+            'objectid' => $requestid
+        ));
+        $event->trigger();
+
+        return $retval;
     }
 
     /**
@@ -194,7 +207,7 @@ abstract class block_ucla_course_download_base {
     }
 
     /**
-     * Delete request and corresponding file entry.
+     * Delete corresponding file entry and make request inactive.
      *
      * @return boolean
      */
@@ -214,7 +227,12 @@ abstract class block_ucla_course_download_base {
                 $file->delete();
             }
         }
-        $DB->delete_records('ucla_archives', array('id' => $request->id));
+
+        // Make the request inactive.
+        $request->fileid = null;
+        $request->timeupdated = time();
+        $request->active = 0;
+        $DB->update_record('ucla_archives', $request);
         $this->refresh();
 
         return true;
@@ -244,6 +262,7 @@ abstract class block_ucla_course_download_base {
 
         // Record download.
         $request->timedownloaded = time();
+        $request->numdownloaded++;
         $objid = $DB->update_record('ucla_archives', $request);
 
         $event = \block_ucla_course_download\event\zip_downloaded::create(array(
@@ -302,16 +321,19 @@ abstract class block_ucla_course_download_base {
     /**
      * Returns record from ucla_archives table.
      *
+     * @param int $activestatus Default of 1 (active).
      * @return object
      */
-    public function get_request() {
+    public function get_request($activestatus = 1) {
         global $DB;
 
-        if (empty($this->request)) {
-            $this->request = $DB->get_record('ucla_archives',
-                    array('courseid' => $this->course->id,
-                'userid' => $this->userid,
-                'type' => $this->get_type()));
+        if (empty($this->request) || $this->request->active != $activestatus) {
+            $this->request = $DB->get_record('ucla_archives', array(
+                    'courseid' => $this->course->id,
+                    'userid' => $this->userid,
+                    'type' => $this->get_type(),
+                    'active' => $activestatus)
+            );
         }
         return $this->request;
     }

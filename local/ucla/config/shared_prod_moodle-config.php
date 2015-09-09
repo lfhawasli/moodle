@@ -107,9 +107,6 @@ $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ccle@ucla.edu';
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
 
-// CCLE-2590 - Implement Auto-detect Shibboleth Login
-$CFG->shib_logged_in_cookie = '_ucla_sso';
-
 // CCLE-2306 - HELP SYSTEM BLOCK
 // If using JIRA, jira_user, jira_password, jira_pid should be defined in config_private.php.
 $CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/rest/api/latest/issue';

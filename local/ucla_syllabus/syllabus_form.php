@@ -371,7 +371,9 @@ class syllabus_form extends moodleform {
      * @param object $existingsyllabus
      */
     private function display_private_syllabus_form($existingsyllabus) {
+        global $CFG;
         $mform = $this->_form;
+        $privatesyllabusstring = get_string('icon_private_syllabus', 'local_ucla_syllabus');
 
         // Check if course is subscribed to web service.
         $webserviced = syllabus_ws_manager::is_subscribed($this->courseid);
@@ -383,6 +385,7 @@ class syllabus_form extends moodleform {
 
             $mform->addElement('hidden', 'syllabus_url', '');
             $mform->setType('syllabus_url', PARAM_URL);
+            
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('upload_file', 'local_ucla_syllabus'), null, $config);
@@ -391,19 +394,25 @@ class syllabus_form extends moodleform {
                     'required');
         } else {
             // Add a syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc',
-                    get_string('syllabus_url_file', 'local_ucla_syllabus'),
-                    get_string('syllabus_choice', 'local_ucla_syllabus'));
+            $mform->addElement('static', 'syllabus_upload_desc', '',
+                    get_string('syllabus_url_file', 'local_ucla_syllabus'));
 
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('file', 'local_ucla_syllabus'), null, $config);
             $mform->addElement('static', 'desc', '', 'OR');
-
+            $mform->addHelpButton('syllabus_file', 'filetypepreference', 'local_ucla_syllabus');
+           
             // Add URL field.
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size'=>'50'));
             $mform->setType('syllabus_url', PARAM_URL);
+                                    
+            // Warning about multiple resource upload.
+            $multiple_resource = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
+                    . ' ' . get_string('syllabus_choice', 'local_ucla_syllabus');
+            $mform->addElement('static', 'form_multiple_resource_note', '', $multiple_resource);
+            
             // Warning about insecure URL's.
             $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
                     . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
@@ -421,6 +430,16 @@ class syllabus_form extends moodleform {
                 get_string('display_name_none_entered', 'local_ucla_syllabus'),
                 'required');
 
+        // Private Access notification.
+        $private = html_writer::tag('img', '',
+                            array('src' => $CFG->wwwroot . '/local/ucla_syllabus/pix/private.png',
+                                'alt' => $privatesyllabusstring,
+                                'title' => $privatesyllabusstring
+                                )
+                            )
+                . ' ' . get_string('private_syllabus_help', 'local_ucla_syllabus');
+        $mform->addElement('static', 'private_syllabus', '', $private);
+        
         // Set defaults or use existing syllabus.
         $defaults = array();
         if (empty($existingsyllabus)) {
@@ -458,7 +477,10 @@ class syllabus_form extends moodleform {
      * @param object $existingsyllabus
      */
     private function display_public_syllabus_form($existingsyllabus) {
+        global $CFG;
         $mform = $this->_form;
+        $publicworldsyllabusstring = get_string('icon_public_world_syllabus', 'local_ucla_syllabus');
+        $publicuclasyllabusstring = get_string('icon_public_ucla_syllabus', 'local_ucla_syllabus');
 
         $webserviced = syllabus_ws_manager::is_subscribed($this->courseid);
         $config = $this->syllabusmanager->get_filemanager_config();
@@ -476,19 +498,26 @@ class syllabus_form extends moodleform {
                     get_string('err_file_not_uploaded', 'local_ucla_syllabus'),
                     'required');
         } else {
-            // Add syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc', get_string('syllabus_url_file', 'local_ucla_syllabus'),
-                    get_string('syllabus_choice', 'local_ucla_syllabus'));
+            // Add a syllabus description.
+            $mform->addElement('static', 'syllabus_upload_desc', '',
+                    get_string('syllabus_url_file', 'local_ucla_syllabus'));
 
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('file', 'local_ucla_syllabus'), null, $config);
             $mform->addElement('static', 'desc', '', 'OR');
+            $mform->addHelpButton('syllabus_file', 'filetypepreference', 'local_ucla_syllabus');
 
             // Add URL field.
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size'=>'50'));
             $mform->setType('syllabus_url', PARAM_URL);
+            
+            // Warning about multiple resource upload.
+            $multiple_resource = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
+                    . ' ' . get_string('syllabus_choice', 'local_ucla_syllabus');
+            $mform->addElement('static', 'form_multiple_resource_note', '', $multiple_resource);
+            
             // Warning about insecure URL's.
             $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
                     . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
@@ -499,10 +528,22 @@ class syllabus_form extends moodleform {
         $label = get_string('access', 'local_ucla_syllabus');
         $accesstypes = array();
         $accesstypes[] = $mform->createElement('radio', 'access_type', '',
-                get_string('accesss_loggedin_info', 'local_ucla_syllabus'),
+                html_writer::tag('img', '',
+                            array('src' => $CFG->wwwroot . '/local/ucla_syllabus/pix/public_ucla.png',
+                                'alt' => $publicuclasyllabusstring,
+                                'title' => $publicuclasyllabusstring
+                                )
+                            )
+                . ' ' . get_string('accesss_loggedin_info', 'local_ucla_syllabus'),
                 UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN);
         $accesstypes[] = $mform->createElement('radio', 'access_type', '',
-                get_string('accesss_public_info', 'local_ucla_syllabus'),
+                html_writer::tag('img', '',
+                            array('src' => $CFG->wwwroot . '/local/ucla_syllabus/pix/public_world.png',
+                                'alt' => $publicworldsyllabusstring,
+                                'title' => $publicworldsyllabusstring
+                                )
+                            )
+                . ' ' . get_string('accesss_public_info', 'local_ucla_syllabus'),
                 UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC);
         $mform->addGroup($accesstypes, 'access_types', $label,
                 html_writer::empty_tag('br'));

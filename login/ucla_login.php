@@ -113,6 +113,8 @@ if ($loginguest && !$frm) {
     $frm = new stdClass();
     $frm->username = 'guest';
     $frm->password = 'guest';
+
+    local_ucla_autologin::clear();
 }
 
 if ($frm !== false && isset($frm->username)) {

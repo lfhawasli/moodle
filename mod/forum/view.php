@@ -125,6 +125,14 @@
         notice(get_string('noviewdiscussionspermission', 'forum'));
     }
 
+    // START UCLA MOD: CCLE-4329 Handling public forums.
+    require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+    $ppmodule = PublicPrivate_Module::build($cm);
+    if (!$ppmodule->is_private()) {
+        $warningpublicforummsg = get_string('warningpublicforum', 'local_ucla');
+        echo $OUTPUT->notification($warningpublicforummsg, 'notifywarning');
+    }
+    // END UCLA MOD: CCLE-4329 Handling public forums.
     echo $OUTPUT->heading(format_string($forum->name), 2);
     if (!empty($forum->intro) && $forum->type != 'single' && $forum->type != 'teacher') {
 

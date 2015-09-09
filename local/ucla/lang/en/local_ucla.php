@@ -250,3 +250,6 @@ $string['turnitinwarning'] = 'Be aware there are two portals for TurnItIn submis
 
 // CCLE-4568 - Need a better screen for users who log into Moodle without an email address
 $string['errmissingemail'] = 'Because your email address is missing from your CCLE profile, you will not be able to login to CCLE until you update your official UCLA email address.<br/><br/>Instructions vary for faculty/staff and students. For more information go to: <a href="http://directory.ucla.edu/update.php">http://directory.ucla.edu/update.php</a>';
+
+// CCLE-4329 - Handling public forums.
+$string['warningpublicforum'] = 'This forum is public and viewable by anyone, not just those enrolled in the site.';

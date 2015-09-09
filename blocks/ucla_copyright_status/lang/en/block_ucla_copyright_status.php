@@ -12,8 +12,9 @@ $string['changessaved'] = 'Sucessfully saved changes.';
 $string['no_files'] = 'No materials found with this copyright status';
 $string['instruction_text1'] = 'Be sure to click the "Save changes" button at the bottom of the page when your changes are complete';
 $string['javascriptdisabled'] = 'Javascript is disabled on your browser. Please enable it to ensure the page function correctly.';
+$string['withselected'] = ' With selected: ';
 
-// These are for the link into control panel
+// These are for the link into control panel.
 $string['manage_copyright'] = 'Manage copyright status';
 $string['manage_copyright_post'] = 'View and edit the copyright status for uploaded files.';
 
@@ -27,7 +28,7 @@ $string['alert_no_redirect'] = 'You will no longer be prompted to assign copyrig
         'the Control Panel to assign copyright status later.';
 $string['alert_later_redirect'] = 'Assign copyright status reminder set.';
 
-// aria strings
+// Aria strings.
 $string['aria_copyright_badge'] = ' items without copyright status.';
 
 // Strings for events.
