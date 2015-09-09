@@ -1,6 +1,6 @@
 /**
  * On select copyright status store strings with file ids to an element
- * 
+ *
  */
 
 YUI().use('event-delegate', function(Y){
@@ -11,7 +11,7 @@ YUI().use('event-delegate', function(Y){
 
 /**
  * On button click save changes to database
- * 
+ *
  */
 
 YUI().use('node-base', function(Y){
@@ -29,3 +29,19 @@ function uclaCopyrightTextExtraction(node) {
     }
     return node.text();
 }
+
+/**
+ * On button click toggle checkboxes
+ */
+Y.one('#checkall').on('click', function() {
+    Y.all('input.usercheckbox').each(function() {
+        this.set('checked', 'checked');
+    })
+});
+
+Y.one('#checknone').on('click', function() {
+    Y.all('input.usercheckbox').each(function() {
+        this.set('checked', '');
+    })
+});
+
