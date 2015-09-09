@@ -4,6 +4,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . '/local/ucla/registrar/registrar_query.base.php');
 
 class block_ucla_office_hours extends block_base {
     const DISPLAYKEY_PREG = '/([0-9]+[_])(.*)/';
@@ -14,7 +15,7 @@ class block_ucla_office_hours extends block_base {
     public function init() {
         $this->title = get_string('pluginname', 'block_ucla_office_hours');
     }
-    
+
     public function get_content() {
         if($this->content !== null) {
             return $this->content;
@@ -234,7 +235,7 @@ class block_ucla_office_hours extends block_base {
                     if (isset($user->{$field})) {
                         $value = $user->{$field};
                     }
-                    
+
                     // We need to attach attribute in order to make 
                     // this table responsive
                     $cell = new html_table_cell($value);
@@ -242,9 +243,9 @@ class block_ucla_office_hours extends block_base {
                         $header = $title;
                     }
                     // Put in the header title in a special attribute
-                    $cell->attributes['data-content'] = $header; 
+                    $cell->attributes['data-content'] = $header;
 
-                    $user_row[$field] = $cell;                    
+                    $user_row[$field] = $cell;
                 }
 
                 $table->data[] = $user_row;
@@ -262,7 +263,7 @@ class block_ucla_office_hours extends block_base {
 
             $instr_info_table .= html_writer::table($table);
         }
-        
+
         return $instr_info_table;
     }
 
@@ -447,7 +448,7 @@ class block_ucla_office_hours extends block_base {
         // to determine if a user is an admin or not
         $enrolled_or_admin = is_enrolled($context, $USER) 
                 || has_capability('moodle/course:update', $context);
-      
+
         $streditsummary     = get_string('update', 'block_ucla_office_hours');
         $link_options = array('title' => get_string('editofficehours',
             'format_ucla'), 'class' => 'editing_instr_info');
@@ -457,10 +458,11 @@ class block_ucla_office_hours extends block_base {
         $fullname = '01_fullname';
         $defaultinfo = array(
             $fullname,
-            '02_email',
-            '03_officelocation',
-            '04_officehours',
-            '05_phone'
+            '02_sections',
+            '03_email',
+            '04_officelocation',
+            '05_officehours',
+            '06_phone'
         );
 
         // Add another column for the "Update" link
@@ -503,7 +505,7 @@ class block_ucla_office_hours extends block_base {
             }
 
             $user->fullname = $fullname;
-          
+
             // Update button
             if ($editing_office_hours) {
                 $user->update_icon = html_writer::tag(
@@ -550,13 +552,211 @@ class block_ucla_office_hours extends block_base {
 
         $officehoursusers = array();
         foreach ($instructors as $uk => $user) {
+            $user->sections = self::get_ta_sections($course->id, $user->id);
             foreach ($user as $field => $value) {
                 if (isset($defaults[$field])) {
                     $officehoursusers[$uk][$defaults[$field]] = $value;
                 }
             }
         }
-
         return $officehoursusers;
     }
+
+    /**
+     * Returns formatted location/time for given section.
+     *
+     * @param int $courseid
+     * @param int $userid
+     * @return string
+     */
+    static private function get_ta_sections($courseid, $userid) {
+        global $DB;
+        if ($user = $DB->get_record('ucla_officehours', array('courseid' => $courseid, 'userid' => $userid))) {
+            // Return empty string if no sections is stored.
+            if (empty($user->encodedsections)) {
+                return '';
+            }
+
+            // Process data.
+            $decodedsections = json_decode($user->encodedsections);
+            $sections = '';
+            $calendar = array();
+            $calendar['M'] = get_string('monday', 'calendar');
+            $calendar['T'] = get_string('tuesday', 'calendar');
+            $calendar['W'] = get_string('wednesday', 'calendar');
+            $calendar['R'] = get_string('thursday', 'calendar');
+            $calendar['F'] = get_string('friday', 'calendar');
+            foreach ($decodedsections as $srs => $section) {
+                $sections = $sections.ltrim($section->sect_no, '0');
+                $sections .= ':<br/>';
+                foreach ($section->sect_hr_to_loc as $hr => $loc) {
+                    $sections .= $loc;
+                    $sections .= ' / ';
+                    // Process sections hours string.
+                    $hour = str_replace('A', 'am', $hr);
+                    $hour = str_replace('P', 'pm', $hour);
+                    switch ($hour[0]) {
+                        case 'M':
+                            $hour = str_replace('M', $calendar['M'].' ', $hour);
+                            break;
+                        case 'T':
+                            $hour = str_replace('T', $calendar['T'].' ', $hour);
+                            break;
+                        case 'W':
+                            $hour = str_replace('W', $calendar['W'].' ', $hour);
+                            break;
+                        case 'R':
+                            $hour = str_replace('R', $calendar['R'].' ', $hour);
+                            break;
+                        case 'F':
+                            $hour = str_replace('F', $calendar['F'].' ', $hour);
+                            break;
+                        default:
+                            return 'Error';
+                            break;
+                    }
+                    $sections .= $hour;
+                    $sections .= '<br/>';
+                }
+            }
+            return $sections;
+        } else {
+            // Cannot get data from database.
+            return '';
+        }
+    }
+
+    /**
+     * Updating TA sections.
+     *
+     * @param int $courseid
+     * @return void
+     */
+    static public function update_ta_sections($courseid) {
+        global $USER, $DB;
+        $termsrses = ucla_map_courseid_to_termsrses($courseid);
+        if (!$termsrses) {
+            return null;
+        }
+
+        $section2ta = array();
+        foreach ($termsrses as $termsrs) {
+            $section2ta = array_merge($section2ta, \registrar_query::run_registrar_query(
+                'ccle_CourseInstructorsGet',
+                array(
+                    'term' => $termsrs->term,
+                    'srs' => $termsrs->srs
+                )
+            ));
+        }
+
+        // Remove non-ta roles from the array.
+        if (!empty($section2ta)) {
+            foreach ($section2ta as $key => $value) {
+                if ($value['role'] !== '02') {
+                    unset($section2ta[$key]);
+                }
+            }
+        }
+
+        // If no TAs found, then return.
+        if (empty($section2ta)) {
+            return null;
+        }
+
+        $tasections = array();
+        foreach ($termsrses as $termsrs) {
+            $tasections = array_merge($tasections, \registrar_query::run_registrar_query(
+                'ccle_class_Sections',
+                array(
+                    'term' => $termsrs->term,
+                    'srs' => $termsrs->srs
+                )
+            ));
+        }
+
+        $sections = array();
+        $classcalendarcache = array();
+        foreach ($section2ta as $key => &$value) {
+            foreach ($tasections as $k => &$session) {
+                if ($value['srs'] == $session['srs_crs_no']) {
+                    $value['sect_no'] = isset($session['sect_no']) ? $session['sect_no'] : '';
+                }
+            }
+
+            if (!isset($value['sect_no'])) {
+                continue;
+            }
+
+            if (!isset($sections[$value['ucla_id']])) {
+                $sections[$value['ucla_id']] = array();
+            }
+            if (!isset($sections[$value['ucla_id']][$value['srs']])) {
+                $newrecord = array();
+                $newrecord['sect_no'] = $value['sect_no'];
+
+                if (!isset($classcalendarcache[$value['term']][$value['srs']])) {
+                    $tacalendar = \registrar_query::run_registrar_query(
+                            'ccle_classCalendar',
+                            array(
+                                'term' => $value['term'],
+                                'srs' => $value['srs']
+                            )
+                        );
+                    $classcalendarcache[$value['term']][$value['srs']] = $tacalendar;
+                } else {
+                    $tacalendar = $classcalendarcache[$value['term']][$value['srs']];
+                }
+                $talocationandhour = array();
+                foreach ($tacalendar as $k => $v) {
+                    if (!isset($talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
+                                                    '-'.$v['meet_stop_tm']])) {
+                        $talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
+                                        '-'.$v['meet_stop_tm']] = $v['meet_bldg'].' '.$v['meet_room'];
+                    }
+                }
+                $newrecord['sect_hr_to_loc'] = $talocationandhour;
+                if (!in_array($newrecord, $sections[$value['ucla_id']])) {
+                    $sections[$value['ucla_id']][$value['srs']] = $newrecord;
+                }
+            }
+        }
+
+        $idtoidnumber = array();
+        foreach ($sections as $key => &$value) {
+            if ($userid = $DB->get_field('user', 'id', array('idnumber' => $key))) {
+                $idtoidnumber[$userid] = $key;
+            }
+        }
+
+        foreach ($idtoidnumber as $id => $idnumber) {
+            $officehoursentry = $DB->get_record('ucla_officehours',
+                array('courseid' => $courseid, 'userid' => $id));
+
+            $newofficehoursentry = new stdClass();
+            $newofficehoursentry->userid          = $id;
+            $newofficehoursentry->courseid        = $courseid;
+            $newofficehoursentry->modifierid      = $USER->id;
+            $newofficehoursentry->timemodified    = time();
+            $newofficehoursentry->encodedsections = json_encode($sections[$idnumber]);
+
+            if (empty($officehoursentry)) {
+                // Need to insert new record.
+                $DB->insert_record('ucla_officehours', $newofficehoursentry);
+            } else if ($officehoursentry->encodedsections !=
+                    $newofficehoursentry->encodedsections) {
+                // Use existing record id to update if sections changed.
+                $newofficehoursentry->id = $officehoursentry->id;
+                $newofficehoursentry->officehours     = $officehoursentry->officehours;
+                $newofficehoursentry->officelocation  = $officehoursentry->officelocation;
+                $newofficehoursentry->email           = $officehoursentry->email;
+                $newofficehoursentry->phone           = $officehoursentry->phone;
+
+                $DB->update_record('ucla_officehours', $newofficehoursentry);
+            }
+        }
+
+        return null;
+    }
+
 }

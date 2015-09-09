@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA office hours block for Moodle - http://moodle.org/
+// This file is part of the UCLA weeks display block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,11 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of UCLA office hours block.
+ * Weeks display task definition.
  *
  * @package    block_ucla_office_hours
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-$plugin->version = 2015081500;
+$tasks = array(
+    array(
+        'classname' => 'block_ucla_office_hours\task\update_tasections',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '8,20',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);
