@@ -399,9 +399,10 @@ class format_ucla extends format_topics {
             // go to site info (section 0) on the "Show all" page, or the site info page alone?
             // We interpret it as going to the site info page alone.
             if (empty($sr) && !empty($sectionno)) {
-                // Navigation would not have a link to this section, since it is part of "Show all".
+                // This section is needed for navigating back through breadcrumbs.
                 if (!empty($options['navigation'])) {
-                    return null;
+                    $url->set_anchor('section-'.$sectionno);
+                    return $url;
                 }
                 // Return to "Show all" page.
                 $url->param('show_all', 1);
