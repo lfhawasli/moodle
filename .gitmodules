@@ -103,3 +103,6 @@
 [submodule "mod/zoom"]
 	path = mod/zoom
 	url = git@github.com:ucla/moodle-mod_zoom.git
+[submodule "mod/turnitintool"]
+	path = mod/turnitintool
+	url = git@github.com:ccle/MoodleDirect.git
