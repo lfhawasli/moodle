@@ -5765,7 +5765,7 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
         switch ($forum->type) {
             case 'news':
                 // START UCLA MOD: SSC-966 - Change "Add a new discussion topic" wording
-                $buttonadd = get_string('addanannouncement', 'forum');
+                $buttonadd = get_string('forumaddannouncement', 'local_ucla');
                 break;
                 // END UCLA MOD: SSC-966
             case 'blog':

@@ -24,9 +24,6 @@
  */
 
 $string['activityoverview'] = 'There are new forum posts';
-// START UCLA MOD: SSC-966 - Change "Add a new discussion topic" wording
-$string['addanannouncement'] = 'Add an announcement';
-// END UCLA MOD: SSC-966
 $string['addanewdiscussion'] = 'Add a new discussion topic';
 $string['addanewquestion'] = 'Add a new question';
 $string['addanewtopic'] = 'Add a new topic';

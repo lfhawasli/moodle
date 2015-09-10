@@ -608,6 +608,11 @@ if (!empty($parent)) {
     } else {
         $heading = get_string('yournewtopic', 'forum');
     }
+    // START UCLA MOD: SSC-966 - Change "Add a new discussion topic" wording
+    if ($forum->type == 'news') {
+        $heading = get_string('forumyournewannoucement', 'local_ucla');
+    }
+    // END UCLA MOD: SSC-966
 }
 
 if (forum_is_subscribed($USER->id, $forum->id)) {
