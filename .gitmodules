@@ -106,3 +106,6 @@
 [submodule "blocks/massaction"]
 	path = blocks/massaction
 	url = git@github.com:ccle/moodle-block_massaction.git 
+[submodule "mod/turnitintool"]
+	path = mod/turnitintool
+	url = git@github.com:ccle/MoodleDirect.git
