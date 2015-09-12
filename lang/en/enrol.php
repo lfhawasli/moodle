@@ -49,15 +49,7 @@ $string['enrolcandidatesmatching'] = 'Matching not enrolled users';
 $string['enrolcohort'] = 'Enrol cohort';
 $string['enrolcohortusers'] = 'Enrol users';
 $string['enrollednewusers'] = 'Successfully enrolled {$a} new users';
-// START UCLA MOD: CCLE-5251-enrolled-users-participants-list
-// $string['enrolledusers'] = 'Enrolled users';
-if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
-    $string['enrolledusers'] = 'Participants';
-} else {
-    $string['enrolledusers'] = 'Enrolled users';
-}
-$string['participants'] = 'Participants';
-// END UCLA MOD: CCLE-5251
+$string['enrolledusers'] = 'Enrolled users';
 $string['enrolledusersmatching'] = 'Matching enrolled users';
 $string['enrolme'] = 'Enrol me in this course';
 $string['enrolmentinstances'] = 'Enrolment methods';

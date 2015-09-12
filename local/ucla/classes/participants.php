@@ -18,7 +18,7 @@
  * Helper class to aid the filtering of course_enrolment_manager.
  *
  * @package local_ucla
- * @author  UCLA Regents
+ * @copyright 2015 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -27,6 +27,7 @@ require_once("$CFG->dirroot/enrol/locallib.php");
 /**
  * Table control used for filtering users
  *
+ * @copyright 2015 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_participants extends course_enrolment_manager {
@@ -51,7 +52,8 @@ class local_ucla_participants extends course_enrolment_manager {
      * @param string $lastinitial
      * @return array
      */
-    public function get_users_for_display(course_enrolment_manager $manager, $sort, $direction, $page, $perpage, $firstinitial='', $lastinitial='') {
+    public function get_users_for_display(course_enrolment_manager $manager,
+            $sort, $direction, $page, $perpage, $firstinitial='', $lastinitial='') {
         $pageurl = $manager->get_moodlepage()->url;
         $users = $this->get_users($sort, $direction, $page, $perpage, $firstinitial, $lastinitial);
 
@@ -105,23 +107,29 @@ class local_ucla_participants extends course_enrolment_manager {
                     );
                     continue;
                 } else if ($ue->timestart and $ue->timeend) {
-                    $period = get_string('periodstartend', 'enrol', array('start' => userdate($ue->timestart), 'end' => userdate($ue->timeend)));
-                    $periodoutside = ($ue->timestart && $ue->timeend && ($now < $ue->timestart || $now > $ue->timeend));
+                    $period = get_string('periodstartend', 'enrol',
+                            array('start' => userdate($ue->timestart), 'end' => userdate($ue->timeend)));
+                    $periodoutside = ($ue->timestart && $ue->timeend &&
+                            ($now < $ue->timestart || $now > $ue->timeend));
                 } else if ($ue->timestart) {
-                    $period = get_string('periodstart', 'enrol', userdate($ue->timestart, get_string('strftimedatefullshort', 'langconfig')));
+                    $period = get_string('periodstart', 'enrol',
+                            userdate($ue->timestart, get_string('strftimedatefullshort', 'langconfig')));
                     $periodoutside = ($ue->timestart && $now < $ue->timestart);
                 } else if ($ue->timeend) {
-                    $period = get_string('periodend', 'enrol', userdate($ue->timeend, get_string('strftimedatefullshort', 'langconfig')));
+                    $period = get_string('periodend', 'enrol',
+                            userdate($ue->timeend, get_string('strftimedatefullshort', 'langconfig')));
                     $periodoutside = ($ue->timeend && $now > $ue->timeend);
                 } else {
                     // If there is no start or end show when user was enrolled.
-                    $period = get_string('periodnone', 'enrol', userdate($ue->timecreated, get_string('strftimedatefullshort', 'langconfig')));
+                    $period = get_string('periodnone', 'enrol',
+                            userdate($ue->timecreated, get_string('strftimedatefullshort', 'langconfig')));
                     $periodoutside = false;
                 }
                 $details['enrolments'][$ue->id] = array(
                     'text' => $ue->enrolmentinstancename,
                     'period' => $period,
-                    'dimmed' => ($periodoutside or $ue->status != ENROL_USER_ACTIVE or $ue->enrolmentinstance->status != ENROL_INSTANCE_ENABLED),
+                    'dimmed' => ($periodoutside or $ue->status != ENROL_USER_ACTIVE or
+                            $ue->enrolmentinstance->status != ENROL_INSTANCE_ENABLED),
                     'actions' => $ue->enrolmentplugin->get_user_enrolment_actions($manager, $ue)
                 );
             }
@@ -137,7 +145,6 @@ class local_ucla_participants extends course_enrolment_manager {
      * in this course by means of that instance. If role or search filters were
      * specified then these will also be applied.
      *
-     * @global moodle_database $DB
      * @param string $sort
      * @param string $direction ASC or DESC
      * @param int $page First page should be 0
@@ -146,7 +153,8 @@ class local_ucla_participants extends course_enrolment_manager {
      * @param string $lastinitial
      * @return array
      */
-    public function get_users($sort, $direction='ASC', $page=0, $perpage=25, $firstinitial='', $lastinitial='') {
+    public function get_users($sort, $direction='ASC', $page=0, $perpage=25,
+            $firstinitial='', $lastinitial='') {
         global $DB;
         if ($direction !== 'ASC') {
             $direction = 'DESC';

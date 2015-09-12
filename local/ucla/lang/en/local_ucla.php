@@ -256,6 +256,3 @@ $string['warningpublicforum'] = 'This forum is public and viewable by anyone, no
 
 // CCLE-5316 - Checkbox to message students
 $string['noselectedusers'] = 'No users selected.';
-
-// CCLE-5251 - Enrolled users participants list
-$string['participants'] = "Participants";

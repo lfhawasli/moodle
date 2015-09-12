@@ -26,8 +26,6 @@ require_once("$CFG->dirroot/config.php");
 require_once("$CFG->dirroot/enrol/locallib.php");
 require_once("$CFG->dirroot/enrol/users_forms.php");
 require_once("$CFG->dirroot/group/lib.php");
-require_once("$CFG->dirroot/local/ucla/classes/participants.php");
-require_once("$CFG->dirroot/local/ucla/classes/local_ucla_course_enrolment_users_table.php");
 
 $id      = required_param('id', PARAM_INT); // course id
 $action  = optional_param('action', '', PARAM_ALPHANUMEXT);
@@ -67,6 +65,11 @@ if ($course->id == SITEID) {
 require_login($course);
 require_capability('moodle/course:viewparticipants', $context);
 $PAGE->set_pagelayout('admin');
+
+// Check that user can view inactive status.
+if (!has_capability('moodle/course:viewsuspendedusers', $context)) {
+    $status = ENROL_USER_ACTIVE;
+}
 
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
 $table = new local_ucla_course_enrolment_users_table($manager, $PAGE);
@@ -157,7 +160,7 @@ if ($action) {
          */
         case 'addmember':
             /** CCLE-2302 - Remove ability to change group information from this
-             *  screen. 
+             *  screen.
             if (has_capability('moodle/course:managegroups', $manager->get_context())) {
                 $userid = required_param('user', PARAM_INT);
                 $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
@@ -195,16 +198,9 @@ if ($action) {
     }
 }
 
-if ($firstinitial == '' && $lastinitial == '') {
-    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
-} else if ($firstinitial != '' && $lastinitial != '') {
-    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage, $firstinitial, $lastinitial);
-} else if ($firstinitial != '') {
-    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage, $firstinitial);
-} else if ($lastinitial != '') {
-    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage, '', $lastinitial);
-}
-
+$users = $manager->get_users_for_display($manager, $table->sort, 
+        $table->sortdirection, $table->page, $table->perpage,
+        $firstinitial, $lastinitial);
 $usercount = $manager->get_usercount();
 $table->set_total_users($usercount);
 
@@ -313,58 +309,13 @@ $filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' =>
 
 $table->set_fields($fields, $renderer);
 
-$canassign = has_capability('moodle/role:assign', $manager->get_context());
-$usercount = $manager->get_total_users();
-if ($firstinitial == '' && $lastinitial == '') {
-    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
-} else {
-    $table->perpage = $manager->get_total_users();
-    $users = $manager->get_users_for_display($manager, $table->sort, $table->sortdirection, $table->page, $table->perpage);
-    foreach ($users as $userid => &$user) {
-        $name = explode(",", $user['firstname']);
-        if (isset($name[1])) {
-            $lastword = $name[0];
-            $firstword = $name[1];
-            if ($firstinitial != '' && $lastinitial != '') {
-                if ($firstword[1] != $firstinitial || $lastword[0] != $lastinitial) {
-                    unset($users[$userid]);
-                    $usercount--;
-                }
-            } else if ($firstinitial != '') {
-                if ($firstword[1] != $firstinitial) {
-                    unset($users[$userid]);
-                    $usercount--;
-                }
-            } else if ($lastinitial != '') {
-                if ($lastword[0] != $lastinitial) {
-                    unset($users[$userid]);
-                    $usercount--;
-                }
-            }
-        } else {
-            unset($users[$userid]);
-        }
-    }
-}
-
-foreach ($users as $userid=>&$user) {
-    if ($bulkoperations) {
-        $user['select'] = '<br /><input type="checkbox" class="usercheckbox" name="user'.$userid.'" /> ';
-    }
-    $user['picture'] = $OUTPUT->render($user['picture']);
-    $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $manager->get_assignable_roles(), $canassign, $PAGE->url);
-    $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'], $manager->get_all_groups(), has_capability('moodle/course:managegroups', $manager->get_context()), $PAGE->url);
-    $user['enrol'] = $renderer->user_enrolments_and_actions($user['enrolments']);
-}
-$table->set_total_users($usercount);
 $table->set_users($users);
 
-$usercountstring = $usercount.'/'.$manager->get_total_users();
-$PAGE->set_title($PAGE->course->fullname.': '.get_string('participants', 'enrol')." ($usercountstring)");
+$PAGE->set_title($PAGE->course->fullname.': '.get_string('participants')." ($usercount)");
 $PAGE->set_heading($PAGE->title);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('participants', 'enrol').get_string('labelsep', 'langconfig').$usercountstring, 3);
+echo $OUTPUT->heading(get_string('participants').get_string('labelsep', 'langconfig').$usercount, 3);
 
 $strall = get_string('all');
 $alpha  = explode(',', get_string('alphabet', 'langconfig'));
@@ -416,7 +367,7 @@ $content .= html_writer::end_tag('form');
 
 echo $content;
 
-if ($usercount < 1) {
+if (!has_capability('moodle/course:enrolreview', $context) && $usercount < 1) {
     echo $OUTPUT->heading(get_string('nothingtodisplay'));
 } else {
     if ($table->has_bulk_operations()) {
@@ -457,13 +408,14 @@ if ($usercount < 1) {
                                                    'id' => 'checkall',
                                                    'value' => get_string('selectall')));
         echo html_writer::empty_tag('input', array('type' => 'button',
-                                                   'id' => 'checkall',
+                                                   'id' => 'checknone',
                                                    'value' => get_string('deselectall')));
 
         $displaylist = array();
         $displaylist2 = array();
 
         $displaylist['messageselect.php'] = get_string('messageselectadd');
+        $frontpagectx = context_course::instance(SITEID);
         if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context) && $context->id != $frontpagectx->id) {
             $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
             $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
@@ -498,5 +450,6 @@ if ($usercount < 1) {
         $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
     }
 }
+
 echo $OUTPUT->footer();
 die();

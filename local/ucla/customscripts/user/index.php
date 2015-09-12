@@ -15,27 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Lists all the users within a given course.
+ * Redirect users to combined enrolled users and participants page.
  *
- * @copyright 1999 Martin Dougiamas  http://dougiamas.com
+ * @copyright 2015 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @package core_user
+ * @package local_ucla
  */
 
-$contextid    = optional_param('contextid', 0, PARAM_INT); // One of this or.
-$courseid     = optional_param('id', 0, PARAM_INT); // This are required.
+if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+    $contextid    = optional_param('contextid', 0, PARAM_INT); // One of this or.
+    $courseid     = optional_param('id', 0, PARAM_INT); // This are required.
 
-if ($contextid) {
-    $context = context::instance_by_id($contextid, MUST_EXIST);
-    if ($context->contextlevel != CONTEXT_COURSE) {
-        print_error('invalidcontext');
+    if (!empty($contextid) && empty($courseid)) {
+        $context = context::instance_by_id($contextid, MUST_EXIST);
+        if ($context->contextlevel != CONTEXT_COURSE) {
+            print_error('invalidcontext');
+        }
+        $courseid = $context->instanceid;
     }
-    $course = $DB->get_record('course', array('id' => $context->instanceid), '*', MUST_EXIST);
-} else {
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $context = context_course::instance($course->id, MUST_EXIST);
+
+    redirect(new moodle_url('/enrol/users.php', array('id' => $courseid)));
 }
-
-redirect(new moodle_url('/enrol/users.php', array('id' => $course->id)));
-
-

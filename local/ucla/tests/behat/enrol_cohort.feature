@@ -23,7 +23,7 @@ Scenario: In UCLA environment
     And I log in as "manager"
     And I follow "Course 1"
     And I expand "Users" node
-    When I follow "Enrolled users"
+    When I follow "Participants"
     Then I should not see "Enrol cohort"
 
 # Need to run in non-js mode, so that we can find text on button.

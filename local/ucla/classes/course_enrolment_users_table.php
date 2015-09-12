@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA theme plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,11 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Overrides the course_enrolment_users_table class.
+ *
+ * @package local_ucla
+ * @copyright 2015 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/enrol/renderer.php');
 
 /**
- * Table control used for enrolled users
+ * Table control used for enrolled users.
  *
+ * @copyright 2015 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_course_enrolment_users_table extends course_enrolment_users_table {
 

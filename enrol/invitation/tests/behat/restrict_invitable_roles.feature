@@ -25,7 +25,7 @@ Feature: Restrict invitable roles depending on site type
       And I log in as "instructor"
       And I follow "Course 1"
       And I expand "Users" node
-      And I follow "Enrolled users"
+      And I follow "Participants"
       When I press "Invite user"
       Then I should see "Instructional Assistant"
       And I should see "Editor"
@@ -58,7 +58,7 @@ Feature: Restrict invitable roles depending on site type
       And I log in as "projectlead"
       And I follow "Course 1"
       And I expand "Users" node
-      And I follow "Enrolled users"
+      And I follow "Participants"
       When I press "Invite user"
       Then I should see "Project Lead"
       And I should see "Project Contributor"

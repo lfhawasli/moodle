@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Helper class to limit the filtering of the participants page if the user
- * does not have access to view certain fields.
+ * Overrides enrol_users_filter_form class.
  *
  * @package local_ucla
- * @author  UCLA Regents
+ * @copyright 2015 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/enrol/users_forms.php");
 
 /**
- * Form that lets users filter the participants list.
+ * Helper class to limit the filtering of the participants page..
+ *
+ * @copyright 2015 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_participants_filter_form extends enrol_users_filter_form {
     /**
      * Omits sections of the participants page filter if the user
      * does not have the capabilities to view them.
-     *
-     * @global moodle_database $DB
      */
     public function definition() {
         global $CFG, $DB;
@@ -73,10 +73,13 @@ class local_ucla_participants_filter_form extends enrol_users_filter_form {
             }
         }
         // Status active/inactive.
-        $mform->addElement('select', 'status', get_string('status'),
-                array(-1 => get_string('all'),
-                    ENROL_USER_ACTIVE => get_string('active'),
-                    ENROL_USER_SUSPENDED => get_string('inactive')));
+        if (has_capability('moodle/course:viewsuspendedusers', $context)) {
+            $mform->addElement('select', 'status', get_string('status'),
+                    array(-1 => get_string('all'),
+                        ENROL_USER_ACTIVE => get_string('active'),
+                        ENROL_USER_SUSPENDED => get_string('inactive')));
+        }
+
         // Submit button does not use add_action_buttons because that adds
         // another fieldset which causes the CSS style to break in an unfixable
         // way due to fieldset quirks.

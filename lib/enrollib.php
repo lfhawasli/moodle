@@ -405,16 +405,17 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
         // list all participants - allows assigning roles, groups, etc.
         // START UCLA MOD: CCLE-5251 - Combine enrolled users and participants list
         // if (has_capability('moodle/course:enrolreview', $coursecontext)) {
-        if (has_capability('moodle/course:viewparticipants', $coursecontext)) {
+        if (has_capability('moodle/course:enrolreview', $coursecontext) ||
+                has_capability('moodle/course:viewparticipants', $coursecontext)) {
             $url = new moodle_url('/enrol/users.php', array('id'=>$course->id));
             //$usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
             if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
-                $usersnode->add(get_string('participants', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+                $usersnode->add(get_string('participants'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
             } else {
                 $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
-            }
-            // END UCLA MOD: CCLE-5251
+            }            
         }
+        // END UCLA MOD: CCLE-5251
 
 
         // manage enrol plugin instances
