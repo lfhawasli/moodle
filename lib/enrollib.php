@@ -403,18 +403,20 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
 
     if ($course->id != SITEID) {
         // list all participants - allows assigning roles, groups, etc.
-        if (has_capability('moodle/course:enrolreview', $coursecontext)) {
+        // START UCLA MOD: CCLE-5251 - Combine enrolled users and participants list
+        // if (has_capability('moodle/course:enrolreview', $coursecontext)) {
+        if (has_capability('moodle/course:enrolreview', $coursecontext) ||
+                has_capability('moodle/course:viewparticipants', $coursecontext)) {
             $url = new moodle_url('/enrol/users.php', array('id'=>$course->id));
-            $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            //$usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+                $usersnode->add(get_string('participants'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            } else {
+                $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
+            }            
         }
+        // END UCLA MOD: CCLE-5251
 
-        // START UCLA MOD: CCLE-3839 - Move Participants from Navigation block to Course administration
-        // View participants - same as participants link in 'People' block (block_participants).
-        if (has_capability('moodle/course:viewparticipants', $coursecontext)) {
-            $url = new moodle_url('/user/index.php', array('contextid'=>$coursecontext->id));
-            $usersnode->add(get_string('participants'), $url, navigation_node::TYPE_SETTING, null, 'participants', new pix_icon('i/users', ''));
-        }
-        // END UCLA MOD: CCLE-3839
 
         // manage enrol plugin instances
         if (has_capability('moodle/course:enrolconfig', $coursecontext) or has_capability('moodle/course:enrolreview', $coursecontext)) {

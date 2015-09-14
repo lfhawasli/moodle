@@ -153,6 +153,10 @@ $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 $CFG->cachejs = false;
 
+// Enable customscripts for Respondus and other UCLA custom changes.
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = __DIR__."/../../../"."local/ucla/customscripts";
+
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
@@ -460,7 +464,8 @@ $CFG->behat_extraallowedsettings = array(
     'allowcoursethemes',                    // Required for 'course edit' to work
     'forcedefaultmymoodle',                 // Experimental
     'debug',
-    'debugdisplay'
+    'debugdisplay',
+    'customscripts'
 );
 
 $CFG->behat_config = array(

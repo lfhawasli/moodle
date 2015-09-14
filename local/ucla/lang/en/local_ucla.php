@@ -257,3 +257,6 @@ $string['warningpublicforum'] = 'This forum is public and viewable by anyone, no
 // SSC-966 - Change "Add a new discussion topic" wording
 $string['forumaddannouncement'] = 'Add an announcement';
 $string['forumyournewannoucement'] = 'Your new announcement';
+
+// CCLE-5316 - Checkbox to message students
+$string['noselectedusers'] = 'No users selected.';
