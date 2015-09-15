@@ -103,3 +103,27 @@
 [submodule "mod/zoom"]
 	path = mod/zoom
 	url = git@github.com:ucla/moodle-mod_zoom.git
+[submodule "blocks/massaction"]
+	path = blocks/massaction
+	url = git@github.com:ccle/moodle-block_massaction.git 
+[submodule "mod/turnitintool"]
+	path = mod/turnitintool
+	url = git@github.com:ccle/MoodleDirect.git
+[submodule "mod/mediagallery"]
+	path = mod/mediagallery
+	url = https://github.com/netspotau/moodle-mod_mediagallery.git
+[submodule "lib/editor/atto/plugins/mediagallery"]
+	path = lib/editor/atto/plugins/mediagallery
+	url = https://github.com/netspotau/moodle-atto_mediagallery.git
+[submodule "blocks/mediagallery"]
+	path = blocks/mediagallery
+	url = https://github.com/netspotau/moodle-block_mediagallery.git
+[submodule "mod/assign/submission/mediagallery"]
+	path = mod/assign/submission/mediagallery
+	url = https://github.com/netspotau/moodle-assignsubmission_mediagallery.git
+[submodule "lib/editor/tinymce/plugins/mediagallery"]
+	path = lib/editor/tinymce/plugins/mediagallery
+	url = https://github.com/netspotau/moodle-tinymce_mediagallery.git
+[submodule "filter/mediagallery"]
+	path = filter/mediagallery
+	url = https://github.com/netspotau/moodle-filter_mediagallery.git

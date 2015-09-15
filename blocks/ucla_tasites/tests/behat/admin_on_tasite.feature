@@ -35,5 +35,5 @@ Scenario: Check if TA is TA (admin) in his TA site
     And I follow the "Site info" section in the ucla site menu
     And I follow "View TA site"
     And I expand "Users" node
-    And I follow "Enrolled users"
+    And I follow "Participants"
     Then I should see "Teaching Assistant (admin)"

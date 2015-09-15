@@ -184,13 +184,14 @@ if ($submissionform->is_cancelled()) {
             kalvidassign_grade_item_update($kalvidassignobj, $gradeobj);
 
             // Add to log.
-            // START UCLE MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
-//            add_to_log($kalvidassignobj->course, 'kalvidassign', 'update grades', 'grade_submissions.php?cmid='.$cm->id, $cm->id);
+            // START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
+            //add_to_log($kalvidassignobj->course, 'kalvidassign', 'update grades', 'grade_submissions.php?cmid='.$cm->id, $cm->id);
             $event = \mod_kalvidassign\event\grades_updated::create(array(
                         'context'   => context_module::instance($cm->id),
             ));
             $event->trigger();
             // END UCLA MOD: CCLE-5179
+
         }
 
         // Handle outcome data
