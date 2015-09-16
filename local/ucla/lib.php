@@ -1409,28 +1409,40 @@ function notice_course_status($course) {
     if (!$ispastcourse && !$ishidden && !$istemprole) {
         return;
     } else if ($ispastcourse && !$ishidden && !$istemprole) {
+        $coursecontext = context_course::instance($course->id);
         // Do not indicate that access expires if we do not it enabled.
-        if (get_config('local_ucla', 'student_access_ends_week')) {
-            // Slightly different message if user is instructor vs student.
-            if (has_capability('moodle/course:viewhiddencourses',
-                    context_course::instance($course->id))) {
+        if (has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
+            if (get_config('local_ucla', 'student_access_ends_week') && !is_siteadmin()) {
                 $noticestring = 'notice_course_status_pastinstructor';
             } else {
-                $noticestring = 'notice_course_status_paststudent';
+                $noticestring = 'notice_course_status_pasthidden';
             }
+        } else if (!isloggedin() || isguestuser()) {
+            $noticestring = get_string('notice_course_status_pasthidden_login', 'local_ucla');
+            $loginbutton = new single_button(new moodle_url('/login/index.php'), 
+                    get_string('login', 'local_ucla'));
+            $loginbutton->class = 'continuebutton';
+            $noticestring .= $OUTPUT->render($loginbutton);
+            return $OUTPUT->box($noticestring, 'alert alert-warning alert-login');
+        } else if (!is_enrolled($coursecontext, $USER)) {
+            $noticestring = 'notice_course_status_pasthidden_nonenrolled';
         } else {
-            $noticestring = 'notice_course_status_pasthidden';
+            if (get_config('local_ucla', 'student_access_ends_week')) {
+                $noticestring = 'notice_course_status_paststudent';
+            } else {
+                $noticestring = 'notice_course_status_pasthidden';
+            }
         }
     } else if (!$ispastcourse && $ishidden && !$istemprole) {
         $noticestring = 'notice_course_status_hidden';
     } else if (!$ispastcourse && !$ishidden && $istemprole) {
         $noticestring = 'notice_course_status_temp';
     } else if ($ispastcourse && $ishidden && !$istemprole) {
+        $coursecontext = context_course::instance($course->id);
         // Give different message if Temporary Participant is not enabled.
         if (get_config('enrol_invitation', 'enabletempparticipant')) {
             // Give message if user can use invitation.
-            if (has_capability('enrol/invitation:enrol',
-                    context_course::instance($course->id))) {
+            if (has_capability('enrol/invitation:enrol', $coursecontext)) {
                 // Create link to invite.
                 $inviteurl = new moodle_url('/enrol/invitation/invitation.php',
                         array('courseid' => $course->id));
@@ -1439,6 +1451,15 @@ function notice_course_status($course) {
             } else {
                 $noticestring = 'coursehidden';
             }
+        } else if (!isloggedin() || isguestuser()) {
+            $noticestring = get_string('notice_course_status_pasthidden_login', 'local_ucla');
+            $loginbutton = new single_button(new moodle_url('/login/index.php'), 
+                    get_string('login', 'local_ucla'));
+            $loginbutton->class = 'continuebutton';
+            $noticestring .= $OUTPUT->render($loginbutton);
+            return $OUTPUT->box($noticestring, 'alert alert-warning alert-login');
+        } else if (!is_enrolled($coursecontext, $USER) && !is_siteadmin()) {
+            $noticestring = 'notice_course_status_pasthidden_nonenrolled';
         } else {
             $noticestring = 'notice_course_status_pasthidden';
         }
