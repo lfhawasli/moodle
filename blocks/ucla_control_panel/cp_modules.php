@@ -193,13 +193,10 @@ $modules[] = new ucla_cp_module('course_grades', new moodle_url(
                         $CFG->wwwroot . '/grade/index.php', array('id' => $course->id)),
                 $temptag, 'gradereport/grader:view');
 
-// Activity report (In M19 there was one link to get all reports, however in
-// M2 no such link exists anymore. The most used report is the activity report
-// so that's why we are linking to it from control panel. Other report links
-// can be found in the course administration section in the settings block.
-$modules[] = new ucla_cp_module('reports',
-        new moodle_url('/report/outline/index.php', array('id' => $course->id)),
-        $temptag, 'report/outline:view');
+// Logs
+$modules[] = new ucla_cp_module('logs',
+        new moodle_url('/report/log/index.php', array('id' => $course->id)),
+        $temptag, 'report/log:view');
 
 // Edit dates "report" (added per CCLE-4385).
 $modules[] = new ucla_cp_module('editdates',

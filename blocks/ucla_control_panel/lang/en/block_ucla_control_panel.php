@@ -114,8 +114,8 @@ $string['course_grades_post'] = 'View your Moodle gradebook. Activate the advanc
 $string['course_edit'] = 'Course settings';
 $string['course_edit_post'] = 'Edit the full name and description of the course or hide the course from students.';
 
-$string['reports'] = 'Reports';
-$string['reports_post'] = 'View course logs to see student activity.';
+$string['logs'] = 'Logs';
+$string['logs_post'] = 'View logs to see course activity.';
 
 $string['editdates'] = 'Dates';
 $string['editdates_post'] = "Edit the dates for this course's activities.";
