@@ -127,3 +127,6 @@
 [submodule "filter/mediagallery"]
 	path = filter/mediagallery
 	url = https://github.com/netspotau/moodle-filter_mediagallery.git
+[submodule "lib/editor/atto/plugins/bsgrid"]
+ 	path = lib/editor/atto/plugins/bsgrid
+	url = git@github.com:academic-moodle-cooperation/moodle-atto_bsgrid.git
