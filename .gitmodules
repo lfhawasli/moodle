@@ -127,3 +127,6 @@
 [submodule "filter/mediagallery"]
 	path = filter/mediagallery
 	url = https://github.com/netspotau/moodle-filter_mediagallery.git
+[submodule "local/ltiprovider"]
+	path = local/ltiprovider
+	url = git@github.com:jleyva/moodle-local_ltiprovider.git
