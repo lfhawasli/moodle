@@ -18,8 +18,8 @@
         <FIELD NAME="video_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="filename" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="subtitle" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="height" TYPE="number" LENGTH="4" NOTNULL="false" SEQUENCE="false" DECIMALS="0" COMMENT="In pixels"/>
-        <FIELD NAME="width" TYPE="number" LENGTH="4" NOTNULL="false" SEQUENCE="false" DECIMALS="0" COMMENT="In pixels"/>
+        <FIELD NAME="height" TYPE="number" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="In pixels"/>
+        <FIELD NAME="width" TYPE="number" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="In pixels"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

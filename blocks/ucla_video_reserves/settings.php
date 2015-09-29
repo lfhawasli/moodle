@@ -32,4 +32,11 @@ if ($ADMIN->fulltree) {
             '',
             PARAM_URL
         ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_video_reserves/wowzaurl',
+            get_string('wowzaurl', 'block_ucla_video_reserves'),
+            get_string('wowzaurl_desc', 'block_ucla_video_reserves'),
+            'wowza.oid.ucla.edu:1935',
+            PARAM_URL
+        ));
 }

@@ -60,7 +60,7 @@ class block_ucla_video_reserves extends block_base {
      * @return moodle_url
      */
     public static function get_action_link($courseid) {
-        return new moodle_url('/blocks/ucla_video_reserves/view.php',
+        return new moodle_url('/blocks/ucla_video_reserves/index.php',
                 array('courseid' => $courseid));
     }
 
