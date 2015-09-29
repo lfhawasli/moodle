@@ -44,13 +44,8 @@ function xmldb_block_ucla_video_reserves_upgrade($oldversion) {
             $dbman->change_field_type($table, $field);
         }
 
-        $index = new xmldb_index('uniquecoursevideo', XMLDB_INDEX_UNIQUE, array('courseid', 'video_title'));
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
         // Video_furnace savepoint reached.
-        upgrade_block_savepoint(true, 2015092500, 'ucla_video_furnace');
+        upgrade_block_savepoint(true, 2015092500, 'ucla_video_reserves');
     }
 
     return true;
