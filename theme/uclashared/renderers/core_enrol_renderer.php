@@ -50,8 +50,9 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
 
     /**
      * Renders a course enrolment table
-     * Clone of the original that omits enrolment buttons;
-     * this is now taken care of in local/ucla/customscripts/enrol/users.php
+     *
+     * Clone of the original that omits handles bulk operations for messaging
+     * and enrollment handling.
      *
      * @param course_enrolment_table $table
      * @param moodleform $mform Form that contains filter controls
@@ -59,6 +60,7 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
      */
     public function render_course_enrolment_users_table(course_enrolment_users_table $table,
             moodleform $mform) {
+        global $CFG, $COURSE, $OUTPUT, $PAGE;
 
         $table->initialise_javascript();
 
@@ -71,7 +73,7 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
             }
             $buttonhtml .= html_writer::end_tag('div');
         }
-
+        
         $content = '';
         if (!empty($buttonhtml)) {
             $content .= $buttonhtml;
@@ -80,8 +82,87 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
 
         $content .= $this->output->render($table->get_paging_bar());
 
+        // Check if the table has any bulk operations. If it does we want to wrap the table in a
+        // form so that we can capture and perform any required bulk operations.
+        if ($table->has_bulk_operations()) {
+            // Handle POST actions to two different scripts.
+            $enrolaction = $CFG->wwwroot.'/enrol/bulkchange.php"';
+            $messageaction = $CFG->wwwroot.'/user/action_redir.php';
+
+            $formattributes = array('action_messaging' => $CFG->wwwroot.'/user/action_redir.php',
+                                    'action_enrolment' => $CFG->wwwroot.'/enrol/bulkchange.php',
+                                    'id' => 'participantsform',
+                                    'name' => 'participantsform', 'method' => 'post');
+
+            $content .= html_writer::start_tag('form', $formattributes);
+            $content .= html_writer::empty_tag('div');
+            $content .= html_writer::start_tag('input', array('type' => 'hidden',
+                                                       'name' => 'sesskey',
+                                                       'value' => sesskey()));
+            $content .= html_writer::start_tag('input', array('type' => 'hidden',
+                                                       'name' => 'returnto',
+                                                       'value' => s($PAGE->url->out(false))));
+
+            foreach ($table->get_combined_url_params() as $key => $value) {
+                if ($key == 'action') {
+                    continue;
+                }
+                $content .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $key, 'value' => $value));
+            }
+
+            $PAGE->requires->strings_for_js(array('noselectedusers'), 'local_ucla');            
+        }    
+        
         $content .= html_writer::table($table);
 
+        if ($table->has_bulk_operations()) {
+            $content .= html_writer::empty_tag('br');
+            $content .= html_writer::start_tag('div', array('class' => 'buttons'));
+            $content .= html_writer::empty_tag('input', array('type' => 'button',
+                                                       'id' => 'checkall',
+                                                       'value' => get_string('selectall')));
+            $content .= html_writer::empty_tag('input', array('type' => 'button',
+                                                       'id' => 'checknone',
+                                                       'value' => get_string('deselectall')));
+
+            $displaylist = array();
+            $displaylist2 = array();
+
+            $displaylist['messageselect.php'] = get_string('messageselectadd');
+            $frontpagectx = context_course::instance(SITEID);
+            if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context) && $context->id != $frontpagectx->id) {
+                $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
+                $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
+            }
+            foreach ($table->get_bulk_user_enrolment_operations() as $operation) {
+                $displaylist2[$operation->get_identifier()] = $operation->get_title();
+            }
+
+            $list = array(array('Messaging' => $displaylist), array('Enrolment' => $displaylist2));
+
+            $content .= $OUTPUT->help_icon('withselectedusers');
+            $content .= html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
+            $content .= html_writer::select($list, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+
+            $content .= html_writer::empty_tag('input', array('type' => 'hidden',
+                                                       'name' => 'id',
+                                                       'value' => $COURSE->id));
+            $content .= html_writer::start_tag('noscript', array('style' => 'display:inline')); // hides go button
+
+            $content .= html_writer::start_tag('div');
+            $content .= html_writer::empty_tag('input', array('type' => 'submit',
+                                                       'value' => get_string('ok')));
+            $content .= html_writer::end_tag('div');
+            $content .= html_writer::end_tag('noscript');
+
+            $content .= html_writer::end_tag('div');
+            $content .= html_writer::end_tag('div');
+            $content .= html_writer::end_tag('form');
+
+            $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
+            $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
+        }        
+        
         $content .= $this->output->render($table->get_paging_bar());
         if (!empty($buttonhtml)) {
             $content .= $buttonhtml;
