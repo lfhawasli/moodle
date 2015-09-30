@@ -152,10 +152,11 @@ function get_video_data($courseid) {
  *
  * @param object $course
  * @param context_course $context
+ * @param moodle_url $url
  */
-function init_page($course, $context) {
+function init_page($course, $context, $url) {
     global $PAGE;
-    $PAGE->set_url('/blocks/ucla_video_reserves/view.php', array('courseid' => $course->id));
+    $PAGE->set_url($url);
 
     $pagetitle = $course->shortname . ': ' . get_string('pluginname', 'block_ucla_video_reserves');
 
@@ -192,7 +193,9 @@ function print_video_list($videolist, $headertitle) {
                     get_string('futurevideo_info', 'block_ucla_video_reserves',
                                date('Y-m-d', $video->start_date)) . ')';
         } else {
-            $outputstr = html_writer::link($video->video_url, $video->video_title);
+            $outputstr = html_writer::link(
+                    new moodle_url('/blocks/ucla_video_reserves/view.php',
+                            array('id' => $video->id)), $video->video_title);
         }
         $output[] = $outputstr;
     }

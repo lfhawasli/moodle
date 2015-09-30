@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->libdir . '/filelib.php');
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Filter class file.
@@ -98,7 +98,7 @@ class filter_oidwowza extends moodle_text_filter {
  * @return string       HTML fragment to display video player.
  */
 function oidwowza_filter_mp4_callback($link, $autostart = false) {
-    global $CFG, $COURSE, $USER;
+    global $COURSE, $USER;
 
     // Clean url and get variables.
     $type   = clean_param($link[1], PARAM_NOTAGS);

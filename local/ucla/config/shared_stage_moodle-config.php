@@ -273,7 +273,7 @@ $CFG->forced_plugin_settings['resource']['printheading'] = 1;
 
 // Site administration > Plugins > Activity modules > Quiz
 $CFG->forced_plugin_settings['quiz']['overduehandling'] = 'autosubmit';
-$CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 300;
+$CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 120;
 
 // Site administration > Plugins > Activity modules > Scheduler
 $CFG->scheduler_maxstudentsperslot = 75;

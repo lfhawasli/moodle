@@ -16,10 +16,10 @@ defined('MOODLE_INTERNAL') || die();
 class help_form extends moodleform {
  
     function definition() {
-        global $CFG, $COURSE, $USER;
+        global $CFG, $COURSE, $SITE, $USER;
 
         // if on a real course, be sure to include courseid as GET variable
-        if ($COURSE->id > 1) {
+        if ($COURSE->id > $SITE->id) {
             $this->_form->_attributes['action'] .= '?course='. $COURSE->id;
         }
         
@@ -34,12 +34,31 @@ class help_form extends moodleform {
                 get_string('name_field', 'block_ucla_help'));
         $mform->addElement('text', 'ucla_help_email',
                 get_string('email_field', 'block_ucla_help'));
+        
+        // set and freeze defaults for name/email
+        if (isloggedin() && !isguestuser()) {
+            $mform->setDefault('ucla_help_name', "$USER->firstname $USER->lastname");
+            $mform->setDefault('ucla_help_email', $USER->email);
+            $mform->hardFreeze('ucla_help_name');
+            $mform->hardFreeze('ucla_help_email');
+            
+            $docswikiurl = get_config('block_ucla_help', 'docs_wiki_url');
+            $changeemail = new stdClass;
+            $changeemail->students = html_writer::link(($docswikiurl . 'Changing_your_email_address#Students'),
+                    'Students');
+            $changeemail->facultystaff = html_writer::link(($docswikiurl . 'Changing_your_email_address#Faculty.2FStaff'),
+                    'faculty/staff');
+            $mform->addElement('static', '', '', get_string('helpform_alternative', 'block_ucla_help',
+                    $changeemail));
+        }
+
         $mform->addElement('select', 'ucla_help_course',
                 get_string('course_field', 'block_ucla_help'), $courses);
-
-        if (!isloggedin()) {
-            $mform->addElement('static', '', '', get_string('helpform_login', 'block_ucla_help',
-                    html_writer::link($CFG->wwwroot . '/login/index.php', 'login')));
+        
+        // set and freeze default for course
+        $mform->setDefault('ucla_help_course', $COURSE->id);
+        if ($COURSE->id > $SITE->id) {
+            $mform->hardFreeze('ucla_help_course');
         }
 
         $mform->addElement('textarea', 'ucla_help_description',
@@ -76,21 +95,7 @@ class help_form extends moodleform {
         $mform->addRule('ucla_help_email', get_string('err_email', 'form'), 'email');
         
         // make description field a required field 
-        $mform->addRule('ucla_help_description', get_string('requiredelement', 'form'), 'required');        
-        
-        // set and freeze defaults for name/email
-        if (isloggedin() && !isguestuser()) {
-            $mform->setDefault('ucla_help_name', "$USER->firstname $USER->lastname");
-            $mform->setDefault('ucla_help_email', $USER->email);
-            $mform->hardFreeze('ucla_help_name');
-            $mform->hardFreeze('ucla_help_email');
-        }
-        
-        // set and freeze default for course
-        $mform->setDefault('ucla_help_course', $COURSE->id);
-        if ($COURSE->id > 1) {
-            $mform->hardFreeze('ucla_help_course');
-        }
+        $mform->addRule('ucla_help_description', get_string('requiredelement', 'form'), 'required');
     }                           
 }          
 ?>
