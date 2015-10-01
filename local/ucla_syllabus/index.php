@@ -292,10 +292,15 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
 
         // Only embed file if served from https.
         if (is_secure_url($fullurl)) {
+            // Allowed image mimetype.
+            $allowedimagetypes = array('image/jpeg', 'image/gif', 'image/png', 'image/bmp', 'image/tiff');
+            $allowedothertypes = array('text/plain', 'text/richtext', 'text/html', 'text/calendar');
             // Try to embed file using resource functions.
             if ($mimetype === 'application/pdf') {
                 $body .= resourcelib_embed_pdf($fullurl, $title, $clicktoopen);
-            } else {
+            } else if (in_array($mimetype, $allowedimagetypes)) {
+                $body .= resourcelib_embed_image($fullurl, $title, $clicktoopen);
+            } else if (in_array($mimetype, $allowedothertypes)) {
                 $body .= resourcelib_embed_general($fullurl, $title, $clicktoopen, $mimetype);
             }
         }
