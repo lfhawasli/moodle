@@ -411,8 +411,8 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     files = image, media, managefiles, kalturamedia, mediagallery
     other = htmlplus, fullscreen
     style2 = strike, subscript, superscript
-    align = align
-    insert = chemistry, computing, equation, poodll, charmap, table, clear, pastespecial
+    align = align, table, bsgrid
+    insert = chemistry, computing, equation, poodll, charmap, clear, pastespecial
     accessibility = accessibilitychecker, accessibilityhelper';
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor

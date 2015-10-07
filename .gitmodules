@@ -130,3 +130,6 @@
 [submodule "local/ltiprovider"]
 	path = local/ltiprovider
 	url = git@github.com:jleyva/moodle-local_ltiprovider.git
+[submodule "lib/editor/atto/plugins/bsgrid"]
+ 	path = lib/editor/atto/plugins/bsgrid
+	url = git@github.com:academic-moodle-cooperation/moodle-atto_bsgrid.git
