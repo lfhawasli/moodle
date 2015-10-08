@@ -25,7 +25,7 @@ Feature: Email students via Control Panel
     And I should see "(via Announcements forum)"
     When I follow "Email students"
     Then I should see "General news and announcements" in the "intro" "region"
-    And I should see "Your new discussion topic"
+    And I should see "Your new announcement"
 
   Scenario: Email Students link is disabled while the Announcements forum is hidden
     Given I log in as "teacher1"
@@ -39,6 +39,6 @@ Feature: Email students via Control Panel
     And I should see "(via Announcements forum)"
     When I follow "Email students"
     Then I should see "General news and announcements" in the "intro" "region"
-    And I should see "Your new discussion topic"
+    And I should see "Your new announcement"
     When I browse to site "C1"
     Then "Announcements" activity should be visible
