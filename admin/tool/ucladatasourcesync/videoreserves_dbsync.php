@@ -110,11 +110,10 @@ function update_videoreserves_db($incomingdata) {
 
     $fields = define_data_source();
 
-    // Delete everything and refresh table.
-    $transaction = $DB->start_delegated_transaction();
-    $DB->delete_records('ucla_video_reserves');
+    // Index existing videos by term, srs, and video_title (same as unique key).
+    $existingvideos = array();
 
-    $insertcount = 0;
+    $insertcount = $updatecount = 0;
     $row = 2;   // Entries start on line 2 in file.
     foreach ($incomingdata as $rowdata) {
         ++$row;
@@ -142,50 +141,70 @@ function update_videoreserves_db($incomingdata) {
             $error = new stdClass();
             $error->fields = implode(', ', $invalidfields);
             $error->line_num = $row;
-            $error->data = print_r($rowdata, true);
+            $error->data = implode('|', $rowdata);
             echo(get_string('warninvalidfields', 'tool_ucladatasourcesync',
                     $error) . "\n");
         }
 
         fix_data_format($rowdata);
 
-        $id = null;
         try {
-            $id = $DB->insert_record('ucla_video_reserves', $rowdata);
-        } catch (Exception $e) {
-            // Handle CCLE-3378 - Video reserves crashing on video title "ClŽo de 5 ˆ 7".
-            if (strpos($e->error, 'video_title')) {
-                // Try to recover by converting titles to ASCII.
-                $rowdata['video_title'] = textlib::specialtoascii($rowdata['video_title']);
-                try {
-                    $id = $DB->insert_record('ucla_video_reserves', $rowdata);
-                } catch (Exception $e) {
-                    // Cannot fix invalid title.
-                    $error = new stdClass();
-                    $error->fields = implode(', ', $invalidfields);
-                    $error->line_num = $row;
-                    $error->data = print_r($rowdata, true);
-                    log_ucla_data('video reserves', 'write', 'Invalid title',
-                            get_string('errinvalidtitle', 'tool_ucladatasourcesync', $error));
-                    echo get_string('errinvalidtitle', 'tool_ucladatasourcesync', $error);
-                }
-            } else {
-                // Error, log this and print out error.
-                log_ucla_data('video reserves', 'write', 'Inserting video reserves data',
-                        get_string('errcannotinsert', 'tool_ucladatasourcesync', $e->error));
-                echo get_string('errcannotinsert', 'tool_ucladatasourcesync', $e->error);
+            // Get all videos for course.
+            if (!isset($existingvideos[$rowdata['term']][$rowdata['srs']])) {
+                // Get video titles as keys, so that we can check if video exists.
+                $results = $DB->get_records_menu('ucla_video_reserves',
+                        array('term' => $rowdata['term'], 'srs' => $rowdata['srs']),
+                        '', 'video_title, id');
+                $existingvideos[$rowdata['term']][$rowdata['srs']] = $results;
             }
-        }
 
-        if (!empty($id)) {
-            $insertcount++;
-            echo '.';   // Give process bar.
+            // Check if video currently exists.
+            if (isset($existingvideos[$rowdata['term']][$rowdata['srs']][$rowdata['video_title']])) {
+                $id = $existingvideos[$rowdata['term']][$rowdata['srs']][$rowdata['video_title']];
+
+                // Update record.
+                $rowdata['id'] = $id;
+                $DB->update_record('ucla_video_reserves', $rowdata);
+
+                // Unset it. We will be deleting any remaining videos later.
+                unset($existingvideos[$rowdata['term']][$rowdata['srs']][$rowdata['video_title']]);
+
+                $updatecount++;
+                echo '.';   // Give process bar.
+            } else {
+                // Video doesn't exist, so add it.
+                $DB->insert_record('ucla_video_reserves', $rowdata);
+                $insertcount++;
+                echo '+';   // Give process bar.
+            }
+
+        } catch (Exception $e) {
+            // Error, log this and print out error.
+            log_ucla_data('video reserves', 'write', 'Inserting video reserves data',
+                    get_string('errcannotinsert', 'tool_ucladatasourcesync', $e->error));
+            echo get_string('errcannotinsert', 'tool_ucladatasourcesync', $e->error);
         }
     }
 
-    $transaction->allow_commit();
-    log_ucla_data('video reserves', 'update', get_string('vrsuccessnoti', 'tool_ucladatasourcesync'));
-    echo "\n" . $insertcount . " " . get_string('vrsuccessnoti', 'tool_ucladatasourcesync') . "\n";
+    // Now delete any left over existing records.
+    $deletedcount = 0;
+    foreach ($existingvideos as $term => $termvideos) {
+        foreach ($termvideos as $srs => $srsvideos) {
+            foreach ($srsvideos as $videotitle => $id) {
+                $DB->delete_records('ucla_video_reserves', array('id' => $id));
+                $deletedcount++;
+                echo '-';   // Give process bar.
+            }
+        }
+    }
+
+    $counts = new stdClass();
+    $counts->deleted    = $deletedcount;
+    $counts->inserted   = $insertcount;
+    $counts->updated    = $updatecount;
+    $logstring = get_string('vrsuccessnoti', 'tool_ucladatasourcesync', $counts);
+    log_ucla_data('video reserves', 'update', $logstring);
+    echo "\n" . $logstring . "\n";
 
     // Save current timestamp so we don't do unncessary updates.
     set_config('lastruntime', time(), 'block_ucla_video_reserves');
@@ -203,13 +222,13 @@ function fix_date_format($date) {
     return $date;
 }
 
-/*
+/**
  * Formats the raw data stored in row, and replaces row with an object
  * containing the formatted data and a new courseid field based on the raw data.
  *
- * @param $row Array containing the raw TSV data obtained from the datasource.
+ * @param array $row    Contains the raw TSV data obtained from the datasource.
+ * @return array
  */
-
 function fix_data_format(&$row) {
 
     // If the term is less than 3 characters, it's probably from
@@ -232,14 +251,19 @@ function fix_data_format(&$row) {
     $row[7] = trim($row[7]);
 
     $dataobject = array();
-    $dataobject['term'] = $row[0];
-    $dataobject['srs'] = $row[1];
-    $dataobject['start_date'] = $row[2];
-    $dataobject['stop_date'] = $row[3];
-    $dataobject['class'] = $row[4];
-    $dataobject['instructor'] = $row[5];
-    $dataobject['video_title'] = $row[6];
-    $dataobject['video_url'] = $row[7];
+    $dataobject['term']         = $row[0];
+    $dataobject['srs']          = $row[1];
+    $dataobject['start_date']   = $row[2];
+    $dataobject['stop_date']    = $row[3];
+    $dataobject['class']        = $row[4];
+    $dataobject['instructor']   = $row[5];
+    // Handle CCLE-3378 - Video reserves crashing on video title "ClŽo de 5 ˆ 7".
+    $dataobject['video_title']  = textlib::specialtoascii($row[6]);
+    $dataobject['video_url']    = $row[7];
+    $dataobject['filename']     = $row[8];
+    $dataobject['subtitle']     = $row[9];
+    $dataobject['height']       = $row[10];
+    $dataobject['width']        = $row[11];
 
     // Find related course.
     $courseid = match_course($dataobject['term'], $dataobject['srs']);
@@ -328,7 +352,13 @@ Options:
     // Process file line by line.
     while (!feof($datasource)) {
         // Use tabs as a delimiter instead of commas.
-        $entries[] = fgetcsv($datasource, 0, "\t", "\n");
+        $entry = fgetcsv($datasource, 0, "\t", "\n");
+
+        // A blank line in a CSV file will be returned as an array comprising a
+        // single null field, and will not be treated as an error.
+        if (!empty($entry[0])) {
+            $entries[] = $entry;
+        }
     }
 
     // Remove first row of file, since it is a header line.

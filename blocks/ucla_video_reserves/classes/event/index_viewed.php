@@ -26,9 +26,20 @@ namespace block_ucla_video_reserves\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class file.
+ *
+ * @package    block_ucla_video_reserves
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class index_viewed extends \core\event\base {
+
+    /**
+     * Initialization method.
+     */
     protected function init() {
-        $this->data['crud'] = 'r'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
