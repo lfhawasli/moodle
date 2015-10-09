@@ -44,7 +44,7 @@ function xmldb_block_ucla_video_reserves_upgrade($oldversion) {
             $dbman->change_field_type($table, $field);
         }
 
-        upgrade_block_savepoint(true, 2015092500, 'ucla_video_furnace');
+        upgrade_block_savepoint(true, 2015092500, 'ucla_video_reserves');
     }
 
     if ($oldversion < 2015100700) {
@@ -55,7 +55,7 @@ function xmldb_block_ucla_video_reserves_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_block_savepoint(true, 2015100700, 'ucla_video_furnace');
+        upgrade_block_savepoint(true, 2015100700, 'ucla_video_reserves');
     }
 
     return true;
