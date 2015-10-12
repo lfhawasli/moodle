@@ -88,8 +88,7 @@ class officehours_form extends moodleform {
         // Set maxlength and email verification rules and type for alternate email field.
         $mform->addRule('email', get_string('maximumchars', '', $emaillimit), 
                         'maxlength', $emaillimit);
-        $mform->addRule('email', get_string('err_email', 'form'), 'email'); 
-        $mform->setType('email', PARAM_EMAIL);    
+        $mform->setType('email', PARAM_RAW_TRIMMED);    
 
         // Set maxlenth rule and type for phone field.
         $mform->addRule('phone', get_string('maximumchars', '', $phonelimit), 

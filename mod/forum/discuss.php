@@ -181,6 +181,8 @@
     $PAGE->set_title("$course->shortname: ".format_string($discussion->name));
     $PAGE->set_heading($course->fullname);
     $PAGE->set_button($searchform);
+    $renderer = $PAGE->get_renderer('mod_forum');
+
     echo $OUTPUT->header();
     // START UCLA MOD: CCLE-4329 Handling public forums.
     require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
@@ -207,6 +209,11 @@
             $canreply = enrol_selfenrol_available($course->id);
         }
     }
+
+    // Output the links to neighbour discussions.
+    $neighbours = forum_get_discussion_neighbours($cm, $discussion);
+    $neighbourlinks = $renderer->neighbouring_discussion_navigation($neighbours['prev'], $neighbours['next']);
+    echo $neighbourlinks;
 
 /// Print the controls across the top
     echo '<div class="discussioncontrols clearfix">';
@@ -292,6 +299,8 @@
 
     $canrate = has_capability('mod/forum:rate', $modcontext);
     forum_print_discussion($course, $cm, $forum, $discussion, $post, $displaymode, $canreply, $canrate);
+
+    echo $neighbourlinks;
 
     echo $OUTPUT->footer();
 

@@ -102,7 +102,7 @@ if (optional_param('confirm', 0, PARAM_BOOL) && confirm_sesskey()) {
         // perform action
         $checkboxname = block_ucla_tasites::checkbox_naming($tasite);
         $checked = optional_param($checkboxname, false, PARAM_BOOL);
-        if (!empty($checked)) {
+        if (!empty($checked) && empty($existing_tasites[$tasite->id])) {
             if (!function_exists($fn)) {
                 throw new block_ucla_tasites_exception('badresponse', $fn);
             }
@@ -117,13 +117,14 @@ if (optional_param('confirm', 0, PARAM_BOOL) && confirm_sesskey()) {
 
     // if there are many success messages, then display in list, else just
     // show one message
-    if (count($messages) > 1) {
-        $messages = html_writer::alist($messages);
-    } else {
-        $messages = array_pop($messages);
+    if (!empty($messages)) {
+        if (count($messages) > 1) {
+            $messages = html_writer::alist($messages);
+        } else {
+            $messages = array_pop($messages);
+        }
+        flash_redirect($redirect, $messages);
     }
-    flash_redirect($redirect, $messages);
-
 }
 
 // Display everything else

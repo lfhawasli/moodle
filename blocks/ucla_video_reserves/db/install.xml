@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/video_furnace/db" VERSION="20150617" COMMENT="XMLDB file for Moodle blocks/video_furnace"
+<XMLDB PATH="blocks/ucla_video_reserves/db" VERSION="20151007" COMMENT="XMLDB file for Moodle blocks/ucla_video_reserves"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -18,8 +18,8 @@
         <FIELD NAME="video_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="filename" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="subtitle" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="height" TYPE="number" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="In pixels"/>
-        <FIELD NAME="width" TYPE="number" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="In pixels"/>
+        <FIELD NAME="height" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="In pixels"/>
+        <FIELD NAME="width" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="In pixels"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -27,6 +27,7 @@
       <INDEXES>
         <INDEX NAME="termsrs" UNIQUE="false" FIELDS="term, srs"/>
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="uniquevideo" UNIQUE="true" FIELDS="term, srs, video_title"/>
       </INDEXES>
     </TABLE>
   </TABLES>

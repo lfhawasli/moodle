@@ -81,7 +81,6 @@ $string['lrnoentries'] = 'No library reserve entries found.';
 $string['errvrsourceurl'] = "ERROR: No location set for video reserve data.";
 $string['errvrinvalidrowlen'] = 'ERROR: Invalid row length in provided video reserve data. Line: {$a}';
 $string['errvrfileopen'] = "ERROR: Problem accessing data URL";
-$string['errinvalidtitle'] = 'ERROR: Title has invalid characters in parsed line {$a->line_num}: {$a->data}';
 // Notification messages.
 $string['vrstartnoti'] = "Starting video reserves DB update:";
-$string['vrsuccessnoti'] = "records successfully inserted.";
+$string['vrsuccessnoti'] = 'Inserted: {$a->inserted}, Updated: {$a->updated}, Deleted: {$a->deleted} records.';

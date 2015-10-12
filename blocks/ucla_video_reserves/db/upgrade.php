@@ -44,8 +44,18 @@ function xmldb_block_ucla_video_reserves_upgrade($oldversion) {
             $dbman->change_field_type($table, $field);
         }
 
-        // Video_furnace savepoint reached.
         upgrade_block_savepoint(true, 2015092500, 'ucla_video_reserves');
+    }
+
+    if ($oldversion < 2015100700) {
+        // Add unique key.
+        $table = new xmldb_table('ucla_video_reserves');
+        $index = new xmldb_index('uniquevideo', XMLDB_INDEX_UNIQUE, array('term', 'srs', 'video_title'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_block_savepoint(true, 2015100700, 'ucla_video_reserves');
     }
 
     return true;

@@ -6,7 +6,7 @@
  **/
 class local_ucla_import_course_search extends import_course_search {
     protected function get_searchsql() {
-        global $DB, $CFG;
+        global $DB;
         $tablealias = 'ctx';
         $contextlevel = CONTEXT_COURSE;
         $joinon = 'c.id'; 
@@ -34,7 +34,7 @@ class local_ucla_import_course_search extends import_course_search {
             'teacherfullnamesearch' => '%'.$this->get_search().'%',
             'siteid' => SITEID
         );
-        $select = "      SELECT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder, usr.lastname, usr.firstname ";
+        $select = "      SELECT DISTINCT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder";
         $from     = "      FROM {course} c ";
         $join     = " LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id
                       LEFT JOIN {role} r ON r.id = ra.roleid
