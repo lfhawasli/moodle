@@ -299,7 +299,7 @@ $string['grad'] = 'Graduate courses';
 
 // Strings for Logins by division.
 $string['logins_by_division'] = 'Login count (division)';
-$string['logins_by_division_help'] = 'Reports number of logins to course ' .
+$string['logins_by_division_help'] = 'Reports number of logins to IEI course ' .
         'websites by division. For a user\'s login session each division they ' .
         'visit is only counted once until the next time they login or they log ' .
         'out. Please see CCLE-4844 for more details.';
