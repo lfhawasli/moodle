@@ -218,14 +218,15 @@ foreach ($instances as $instance) {
             $edit[] = $OUTPUT->action_icon($aurl, new pix_icon('t/delete', $strdelete, 'core', array('class' => 'iconsmall')));
         }
 
-        if (enrol_is_enabled($instance->enrol)) {
-            // START UCLA MOD: CCLE-3739 
-            // Preventing UCLA registrar (database) enrollment from being hidden
-            // if ($instance->status == ENROL_INSTANCE_ENABLED) {
-            if ($instance->status == ENROL_INSTANCE_ENABLED && $instance->enrol !== 'database') {
+        // START UCLA MOD: CCLE-3739 and 5486 
+        // Preventing UCLA registrar (database) enrollment from showing icon
+        // if (enrol_is_enabled($instance->enrol)) {
+        if (enrol_is_enabled($instance->enrol) && $instance->enrol !== 'database') {
+        // END UCLA MOD: CCLE-3739 and 5486 
+
+            if ($instance->status == ENROL_INSTANCE_ENABLED) {
                 $aurl = new moodle_url($url, array('action'=>'disable', 'instance'=>$instance->id));
                 $edit[] = $OUTPUT->action_icon($aurl, new pix_icon('t/hide', $strdisable, 'core', array('class' => 'iconsmall')));
-            // END UCLA MOD: CCLE-3739
             } else if ($instance->status == ENROL_INSTANCE_DISABLED) {
                 $aurl = new moodle_url($url, array('action'=>'enable', 'instance'=>$instance->id));
                 $edit[] = $OUTPUT->action_icon($aurl, new pix_icon('t/show', $strenable, 'core', array('class' => 'iconsmall')));

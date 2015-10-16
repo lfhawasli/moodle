@@ -260,3 +260,21 @@ $string['forumyournewannoucement'] = 'Your new announcement';
 
 // CCLE-5316 - Checkbox to message students
 $string['noselectedusers'] = 'No users selected.';
+
+// CCLE-5486 - Welcome message for registrar enrollment method
+$string['sendcoursewelcomemessage'] = 'Send course welcome message';
+$string['sendcoursewelcomemessage_help'] = 'If enabled, users receive a welcome message via email when they enrol in a course.';
+$string['welcometocourse'] = 'Welcome to {$a}';
+$string['welcometocoursetext'] = 'Welcome to {$a->coursename}!
+
+URL: {$a->courseurl}
+';
+$string['customwelcomemessage'] = 'Custom welcome message';
+$string['customwelcomemessage_help'] = 'A custom welcome message may be added as plain text or Moodle-auto format, including HTML tags and multi-lang tags.
+
+The following placeholders may be included in the message:
+
+* Course name {$a->coursename}
+* Link to course page {$a->courseurl}
+* Link to user\'s profile page {$a->profileurl}';
+
