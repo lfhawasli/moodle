@@ -230,11 +230,27 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
     }
 
     $choices = get_string_manager()->get_list_of_countries();
-    $choices = array('' => get_string('selectacountry') . '...') + $choices;
-    $mform->addElement('select', 'country', get_string('selectacountry'), $choices);
+    // START UCLA MOD: CCLE-5445 - Move United States to top of list/Default
+    //$choices = array('' => get_string('selectacountry') . '...') + $choices;
+    //$mform->addElement('select', 'country', get_string('selectacountry'), $choices);
+
+    $selectstring = get_string('selectacountry');
+    
+    // Default country is set, so move that to the top.
     if (!empty($CFG->country)) {
+        // Remove country from its original location.
+        unset($choices[$CFG->country]); 
+
+        // Then create a new list with 'Select Country...' and default country at the top.
+        $choices = array('' => $selectstring . '...', $CFG->country => get_string($CFG->country, 'countries')) + $choices;
+        $mform->addElement('select', 'country', $selectstring, $choices);
         $mform->setDefault('country', $CFG->country);
-    }  
+    } else {
+        // No default country.
+        $choices = array('' => $selectstring . '...') + $choices;
+        $mform->addElement('select', 'country', $selectstring, $choices);
+    }
+    // END UCLA MOD: CCLE-5445
 
     $choices = get_list_of_timezones();
     $choices['99'] = get_string('serverlocaltime');

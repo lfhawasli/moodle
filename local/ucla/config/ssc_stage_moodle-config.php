@@ -239,6 +239,11 @@ $CFG->unlimitedgrades = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
+// CCLE-5445 - Default city and country
+// Site administration > Location > Location settings
+$CFG->defaultcity = 'Los Angeles';
+$CFG->country = 'US';
+
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 $CFG->forced_plugin_settings['assign']['submissiondrafts'] = 0;

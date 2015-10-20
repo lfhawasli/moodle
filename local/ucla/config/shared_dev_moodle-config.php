@@ -254,6 +254,11 @@ $CFG->grade_report_showeyecons = 0;
 $CFG->grade_report_showanalysisicon = 0;
 $CFG->grade_report_showuserimage = 0;
 
+// CCLE-5445 - Default city and country
+// Site administration > Location > Location settings
+$CFG->defaultcity = 'Los Angeles';
+$CFG->country = 'US';
+
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
 
