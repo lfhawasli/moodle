@@ -36,11 +36,13 @@ list($options, $unrecognized) = cli_get_params(array('help' => false),
 if ($options['help']) {
     $help = "Command line script to bulk run and export reports for the end of quarter activity report.
 
+Need to pass in term and, optionally, a comma delinated list of reports.
+
 Options:
 -h, --help            Print out this help
 
 Example:
-\$sudo -u www-data /usr/bin/php report/uclastats/cli/run_reports.php [TERM]
+\$sudo -u www-data /usr/bin/php report/uclastats/cli/run_reports.php [TERM] [REPORTS|OPTIONAL]
 ";
 
     echo $help;
@@ -49,17 +51,17 @@ Example:
 
 // Get the term to process.
 $term = null;
+$reportstorun = array();
 if ($unrecognized) {
     foreach ($unrecognized as $index => $param) {
         // Maybe someone is passing us a term to run.
         if (ucla_validator('term', $param)) {
             $term = $param;
-            unset($unrecognized[$index]);
+        } else {
+            // Maybe it is a list of reports to run.
+            $param = clean_param($param, PARAM_NOTAGS);
+            $reportstorun = explode(',', $param);
         }
-    }
-    if (!empty($unrecognized)) {
-        $unrecognized = implode("\n  ", $unrecognized);
-        cli_error(get_string('cliunknowoption', 'admin', $unrecognized));
     }
 }
 
@@ -105,7 +107,13 @@ $reports = array('collab_modules_used', 'course_modules_used',
                  'system_size',
                  'total_downloads',
                  'unique_logins_per_term',
-                 'users_by_division');
+                 'users_by_division',
+                 'logins_by_division');
+
+// Check if we want to only run certain reports.
+if (!empty($reportstorun)) {
+    $reports = $reportstorun;
+}
 
 // We are unable to output progress of the reports in realtime, because
 // otherwise the report generation will complain about "headers already been
@@ -117,7 +125,13 @@ $admin = get_admin();   // User running report.
 $reportfiles = array();
 foreach ($reports as $reportname) {
     // Include report.
-    require_once($CFG->dirroot . '/report/uclastats/reports/'.$reportname.'.php');
+    $reportpath = $CFG->dirroot . '/report/uclastats/reports/'.$reportname.'.php';
+    if (is_file($reportpath)) {
+        require_once($CFG->dirroot . '/report/uclastats/reports/'.$reportname.'.php');
+    } else {
+        $output[] = "Could not find $reportname report";
+        continue;
+    }
 
     // Create report object.
     $report = new $reportname($admin->id);
@@ -150,12 +164,14 @@ foreach ($reports as $reportname) {
     $reportfiles[$reportname.'.xls'] = $reportpath;
 }
 
-// Now get cumulative file system data.
-$cumulativefilesize = shell_exec("du -s --block-size=1 $CFG->dataroot/filedir/");
-$reportpath = $reportoutputcachedir . '/cumulative_file_size.txt';
-file_put_contents($reportpath, display_size($cumulativefilesize));
-$reportfiles['cumulative_file_size.txt'] = $reportpath;
-$output[] = 'Generated cumulative_file_size report';
+// Now get cumulative file system data, if running all reports.
+if (empty($reportstorun)) {
+    $cumulativefilesize = shell_exec("du -s --block-size=1 $CFG->dataroot/filedir/");
+    $reportpath = $reportoutputcachedir . '/cumulative_file_size.txt';
+    file_put_contents($reportpath, display_size($cumulativefilesize));
+    $reportfiles['cumulative_file_size.txt'] = $reportpath;
+    $output[] = 'Generated cumulative_file_size report';
+}
 
 // Zip all generated reports and save it in $reportoutputfile.
 $zippacker = get_file_packer('application/zip');

@@ -614,6 +614,18 @@ abstract class uclastats_base implements renderable {
     }
 
     /**
+     * Generate FROM statement that joins {ucla_request_classes} urc with
+     * {uclaieiclasses} iei to filter out non-iei courses.
+     *
+     * @return string
+     */
+    protected function from_iei_courses() {
+        $sql =  " JOIN {uclaieiclasses} iei
+                  ON (urc.term = iei.term AND urc.srs = iei.srs) ";
+        return $sql;
+    }
+
+    /**
      * Runs query for given parameters and caches the results.
      *
      * @throws  moodle_exception
