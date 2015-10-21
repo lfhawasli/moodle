@@ -60,9 +60,10 @@ class term_test extends basic_testcase {
 
         foreach ($testcases as $orderedlist) {
             $tmplist = $orderedlist;
-            shuffle($tmplist);
+            while ($tmplist == $orderedlist) {
+                shuffle($tmplist);
+            }
 
-            // Maybe once in a blue moon this will fail?
             $this->assertNotEquals($orderedlist, $tmplist);
 
             $tmplist = terms_arr_sort($tmplist, true);
@@ -140,9 +141,10 @@ class term_test extends basic_testcase {
 
         foreach ($testcases as $orderedlist) {
             $tmplist = $orderedlist;
-            shuffle($tmplist);
+            while ($tmplist == $orderedlist) {
+                shuffle($tmplist);
+            }
 
-            // Maybe once in a blue moon this will fail?
             $this->assertNotEquals($orderedlist, $tmplist);
 
             $tmplist = terms_arr_sort($tmplist);
