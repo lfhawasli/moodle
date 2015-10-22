@@ -111,7 +111,7 @@
 	url = git@github.com:ccle/MoodleDirect.git
 [submodule "mod/mediagallery"]
 	path = mod/mediagallery
-	url = https://github.com/netspotau/moodle-mod_mediagallery.git
+	url = git@github.com:ccle/moodle-mod_mediagallery.git
 [submodule "lib/editor/atto/plugins/mediagallery"]
 	path = lib/editor/atto/plugins/mediagallery
 	url = https://github.com/netspotau/moodle-atto_mediagallery.git
