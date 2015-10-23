@@ -40,6 +40,29 @@ class local_ucla_participants extends course_enrolment_manager {
     protected $usercount = 0;
 
     /**
+     * Gets the list of roles assigned to this course context only.
+     *
+     * @param context_course $context
+     * @return array    Roles sorted alphabetically.
+     */
+    function get_roles_used_in_course(context_course $context) {
+        global $DB;
+
+        // For some reason cannot have rn.contextid = ra.contextid in ON clause.
+        $params[] = $context->id;
+        $params[] = $context->id;
+
+        $sql = "SELECT DISTINCT r.id, r.name, r.shortname, rn.name AS coursealias
+                  FROM {role_assignments} ra, {role} r
+             LEFT JOIN {role_names} rn ON (rn.contextid = ? AND rn.roleid = r.id)
+                 WHERE r.id = ra.roleid
+                       AND ra.contextid = ?
+              ORDER BY r.name ASC";
+
+        return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
      * Gets an array of users for display, this includes minimal user information
      * as well as minimal information on the users roles, groups, and enrolments.
      *
@@ -239,4 +262,5 @@ class local_ucla_participants extends course_enrolment_manager {
     public function get_usercount() {
         return $this->usercount;
     }
+
 }

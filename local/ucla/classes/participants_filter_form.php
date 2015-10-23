@@ -48,16 +48,15 @@ class local_ucla_participants_filter_form extends enrol_users_filter_form {
             $mform->addElement('select', 'ifilter', get_string('enrolmentinstances', 'enrol'),
                     array(0 => get_string('all')) + (array)$manager->get_enrolment_instance_names());
         }
-        // Role select dropdown includes all roles, but using course-specific
-        // names if applied. The reason for not restricting to roles that can
-        // be assigned at course level is that upper-level roles display in the
-        // enrolments table so it makes sense to let users filter by them.
+        // Role select dropdown includes only roles appearing in the course, 
+        // but using course-specific names if applied. 
         if (has_capability('moodle/role:assign', $context)) {
-            $allroles = $manager->get_all_roles();
+            $allroles = role_fix_names($manager->get_roles_used_in_course($context));
             $rolenames = array();
             foreach ($allroles as $id => $role) {
                 $rolenames[$id] = $role->localname;
             }
+            
             $mform->addElement('select', 'role', get_string('role'),
                     array(0 => get_string('all')) + $rolenames);
         }
