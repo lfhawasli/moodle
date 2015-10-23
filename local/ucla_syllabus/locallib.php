@@ -617,9 +617,38 @@ abstract class ucla_syllabus {
         if (empty($fullurl)) {
             return '';
         }
-        $string = html_writer::link($fullurl, get_string('clicktodownload',
+        $string = html_writer::link($fullurl, $this->get_icon() . get_string('clicktodownload',
                 'local_ucla_syllabus', $this->properties->display_name));
 
+        return $string;
+    }
+    
+    /**
+     * Returns html for icon image.
+     * 
+     * @return string   Returns html for icon image
+     */
+    public function get_icon() {
+        global $OUTPUT;
+        $output = $OUTPUT;
+        
+        // Get file type
+        $file = $this->stored_file;
+        $filename = $file->get_filename();
+        $file_type = substr($filename, strpos($filename, '.') + 1);
+                
+        // Displays correct icon if file is of PDF or DOC/DOCX type
+        // Displays the default icon if file is of any other type
+        if ($file_type == 'pdf') {
+            $icon_url = $output->pix_url('f/pdf-24');
+        } else if ($file_type == 'doc' || $file_type == 'docx') {
+            $icon_url = $output->pix_url('f/document-24');
+        } else {
+            $icon_url = $output->pix_url('icon', 'resource');
+        }
+                
+        $string = html_writer::empty_tag('img', array('src' => $icon_url,
+                'class' => 'iconlarge activityicon', 'alt' => ' ', 'role' => 'presentation'));
         return $string;
     }
 
