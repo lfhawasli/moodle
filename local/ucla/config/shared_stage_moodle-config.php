@@ -420,7 +420,8 @@ $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-1.kaf.kaltura.com';
 
 // Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35; // CCLE-5227 - Recycle Bin Item Lifetime
+$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35;
+$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 35;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
