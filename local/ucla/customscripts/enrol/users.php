@@ -330,7 +330,7 @@ $content .= html_writer::start_tag('div');
 $content .= html_writer::start_tag('div', array('class' => 'initialbar firstinitial'));
 $content .= html_writer::label(get_string('firstname').': ', null);
 if (!empty($firstinitial)) {
-    $content .= html_writer::link($PAGE->url.'&sifirst=', $strall);
+    $content .= html_writer::link(new moodle_url($PAGE->url, array('sifirst' => false)), $strall);
 } else {
     $content .= html_writer::tag('strong', $strall);
 }
@@ -338,7 +338,7 @@ foreach ($alpha as $letter) {
     if ($letter == $firstinitial) {
         $content .= html_writer::tag('strong', $letter);
     } else {
-        $content .= html_writer::link($PAGE->url.'&sifirst='.$letter, $letter);
+        $content .= html_writer::link(new moodle_url($PAGE->url, array('sifirst' => $letter)), $letter);
     }
 }
 $content .= html_writer::end_tag('div');
@@ -348,7 +348,7 @@ $content .= html_writer::start_tag('div', array('class' => 'initialbar lastiniti
 $content .= html_writer::label(get_string('lastname').': ', null);
 
 if (!empty($lastinitial)) {
-    $content .= html_writer::link($PAGE->url.'&silast=', $strall);
+    $content .= html_writer::link(new moodle_url($PAGE->url, array('silast' => false)), $strall);
 } else {
     $content .= html_writer::tag('strong', $strall);
 }
@@ -356,7 +356,7 @@ foreach ($alpha as $letter) {
     if ($letter == $lastinitial) {
         $content .= html_writer::tag('strong', $letter);
     } else {
-        $content .= html_writer::link($PAGE->url.'&silast='.$letter, $letter);
+        $content .= html_writer::link(new moodle_url($PAGE->url, array('silast' => $letter)), $letter);
     }
 }
 $content .= html_writer::end_tag('div');
