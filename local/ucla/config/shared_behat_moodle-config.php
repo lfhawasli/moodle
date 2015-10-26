@@ -369,6 +369,16 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
+// Site administration > Plugins > Text editors > TinyMCE HTML editor > General settings
+$CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
+    wrap,formatselect,wrap,bold,italic,wrap,bullist,numlist,wrap,link,unlink,wrap,image, mediagallery
+
+    undo,redo,wrap,underline,strikethrough,sub,sup,wrap,justifyleft,justifycenter,justifyright,wrap,outdent,indent,wrap,forecolor,backcolor,wrap,ltr,rtl,
+
+    nonbreaking, poodllaudiomp3, poodllvideo, poodllwhiteboard, poodllsnapshot, charmap,table
+
+    fontselect,fontsizeselect,code,search,replace,wrap,cleanup,removeformat,pastetext,pasteword,wrap,fullscreen';
+
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 
