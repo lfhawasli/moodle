@@ -117,7 +117,6 @@ comply with copyright law in the handling of course materials;</strong> see the
 $string['announcementshidden'] = 'The Announcements forum is currently hidden: Emails will NOT be sent out to students.';
 $string['unhidelink'] = 'Click here to unhide';
 $string['askinstructortounhide'] = 'Please ask the instructor to unhide this forum.';
-// End SSC Modification
 
 // capability strings
 $string['ucla:assign_all'] = 'CCLE-2530: Can see the entire user database when assigning roles';
@@ -129,19 +128,21 @@ $string['ucla:browsecourses'] = 'CCLE-3773: Gives users link to "Add/edit course
 $string['ucla:vieweventlist'] = 'CCLE-4671: Can view event list page';
 $string['ucla:viewscheduledtasks'] = 'CCLE-4999: Can view scheduled tasks page';
 
-// START UCLA MOD: CCLE-3028 - Fix nonlogged users redirect on hidden content
+// CCLE-3028 - Fix nonlogged users redirect on hidden content
 // If a user who is not logged in tries to access private course information
-$string['notloggedin'] = 'Please login to view this content.';
+$string['login'] = 'Log in';
 $string['loginredirect'] = 'Login required';
-// END UCLA MOD: CCLE-3028
+$string['notloggedin'] = 'Please login to view this content.';
 
 // Strings for notice_course_status.
-$string['notice_course_status_paststudent'] = 'You are viewing a site for a course that is no longer in session. Your access will expire at the end of Week 2 of the subsequent term.';
-$string['notice_course_status_pastinstructor'] = 'You are viewing a site for a course that is no longer in session. Student access will expire at the end of Week 2 of the subsequent term.';
 $string['notice_course_status_hidden'] = 'This site is unavailable.';
-$string['notice_course_status_temp'] = 'You have temporary access to this site. Your access will expire after {$a}.';
+$string['notice_course_status_pasthidden'] = 'You are viewing a course that is no longer in session.';
+$string['notice_course_status_pastinstructor'] = 'You are viewing a site for a course that is no longer in session. Student access will expire at the end of Week 2 of the subsequent term.';
+$string['notice_course_status_paststudent'] = 'You are viewing a site for a course that is no longer in session. Your access will expire at the end of Week 2 of the subsequent term.';
+$string['notice_course_status_pasthidden_login'] = 'You are viewing a course that is no longer in session. This is the public display of the course site. If you are enrolled, please log in to view private course materials.';
+$string['notice_course_status_pasthidden_nonenrolled'] = 'You are viewing a course that is no longer in session. You need to be associated with the course to view private course materials.';
 $string['notice_course_status_pasthidden_tempparticipant'] = 'You are viewing a site for a course that is no longer in session. Student access has expired. Use the <a href="{$a}">Site invitation tool</a>/Temporary Participant role to grant temporary access to this site.';
-$string['notice_course_status_pasthidden'] = 'You are viewing a course that is no longer in session. ';
+$string['notice_course_status_temp'] = 'You have temporary access to this site. Your access will expire after {$a}.';
 $string['notice_course_status_pasttemp'] = 'You have temporary access to a site for a course that is no longer in session. Your access will expire after {$a}.';
 $string['notice_course_status_hiddentemp'] = 'You have temporary access to a site that is currently unavailable. Your access will expire after {$a}.';
 $string['notice_course_status_pasthiddentemp'] = 'You have temporary access to a site for a course that is no longer in session. Your access will expire after {$a}.';
