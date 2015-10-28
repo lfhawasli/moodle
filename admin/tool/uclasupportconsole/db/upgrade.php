@@ -78,5 +78,20 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015051200, 'tool', 'uclasupportconsole');
     }
 
+    // Import 13F-151 IEI data.
+    if ($oldversion < 2015101600) {
+        // Import data from text file to the IEI table.
+        // LOAD DATA INFILE syntax uses '\t' as field separator and '\n' as line
+        // separator by default, so no need to specify.
+        $sql = "LOAD DATA LOCAL INFILE '" . $CFG->dirroot . "/admin/tool/uclasupportconsole/db/iei/13F-151.txt'
+                    INTO TABLE {uclaieiclasses}
+                    (term, srs)
+                ";
+        $DB->execute($sql);
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2015101600, 'tool', 'uclasupportconsole');
+    }
+
     return true;
 }

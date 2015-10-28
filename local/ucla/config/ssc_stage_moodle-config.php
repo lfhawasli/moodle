@@ -239,6 +239,11 @@ $CFG->unlimitedgrades = 1;
 // Site administration > Grades > Grade category settings
 $CFG->grade_overridecat = 0;
 
+// CCLE-5445 - Default city and country
+// Site administration > Location > Location settings
+$CFG->defaultcity = 'Los Angeles';
+$CFG->country = 'US';
+
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 $CFG->forced_plugin_settings['assign']['submissiondrafts'] = 0;
@@ -387,7 +392,8 @@ $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-3.kaf.kaltura.com';
 
 // Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35; // CCLE-5227 - Recycle Bin Item Lifetime
+$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35;
+$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 35;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.

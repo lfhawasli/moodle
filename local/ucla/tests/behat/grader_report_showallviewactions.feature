@@ -44,7 +44,7 @@ Scenario: View grader report
     When I click on "Select Homework 1" "checkbox"
     And I click on "Select Homework 2" "checkbox"
     And I set the field "Move selected items to" to "Homework"
-    Then I follow "Grades"
+    And I navigate to "Grades" node in "Course administration"
     # Make sure 3 icons appear in "Course 1" cell.
     And "Grades only" "link" should exist in the ".category.catlevel1" "css_element"
     And "Full view" "link" should exist in the ".category.catlevel1" "css_element"

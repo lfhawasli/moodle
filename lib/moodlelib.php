@@ -5029,6 +5029,12 @@ function delete_course($courseorid, $showfeedback = true) {
         return false;
     }
 
+    // START UCLA MOD: CCLE-5479 - Recycle bin clean up task failed.
+    // Subtask-5483 - Add support for putting deleted courses into recycle bin.
+    // Notify the recycle bin plugin.
+    \local_recyclebin\Observer::pre_course_delete($course);
+    // END UCLA MOD: CCLE-5479 - Recycle bin clean up task failed.
+
     // Make the course completely empty.
     remove_course_contents($courseid, $showfeedback);
 

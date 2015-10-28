@@ -253,6 +253,10 @@ class enrol_database_plugin extends enrol_plugin {
             } else {
                 $roleid = reset($roles);
                 $this->enrol_user($instance, $user->id, $roleid, 0, 0, ENROL_USER_ACTIVE);
+                
+                // START UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
+                $this->email_welcome_message($instance, $user);
+                // END UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
             }
 
             if (!$context = context_course::instance($instance->courseid, IGNORE_MISSING)) {
@@ -637,6 +641,9 @@ class enrol_database_plugin extends enrol_plugin {
                 foreach ($userroles as $roleid) {
                     if (empty($current_roles[$userid])) {
                         $this->enrol_user($instance, $userid, $roleid, 0, 0, ENROL_USER_ACTIVE);
+                        // START UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
+                        $this->email_welcome_message($instance, $userid);
+                        // END UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
                         $current_roles[$userid][$roleid] = $roleid;
                         $current_status[$userid] = ENROL_USER_ACTIVE;
                         $trace->output("enrolling: $userid ==> $course->shortname as ".$allroles[$roleid]->shortname, 1);
@@ -1149,4 +1156,103 @@ class enrol_database_plugin extends enrol_plugin {
         error_reporting($CFG->debug);
         ob_end_flush();
     }
+
+    // START UCLA MOD: CCLE-5486 - Enable welcome message for ucla registrar enrollment
+    /**
+     * Returns edit icons for the page with list of instances
+     *
+     * @param stdClass $instance
+     * @return array
+     */
+    public function get_action_icons(stdClass $instance) {
+        global $OUTPUT;
+
+        if ($instance->enrol !== 'database') {
+            throw new coding_exception('invalid enrol instance!');
+        }
+        $context = context_course::instance($instance->courseid);
+
+        $icons = array();
+
+        if (has_capability('moodle/course:enrolconfig', $context) || has_capability('enrol/database:unenrol', $context)) {
+            $editlink = new moodle_url("/enrol/database/edit.php", array('courseid'=>$instance->courseid, 'id'=>$instance->id));
+            $icons[] = $OUTPUT->action_icon($editlink, new pix_icon('t/edit', get_string('edit'), 'core',
+                array('class' => 'iconsmall')));
+        }
+
+        return $icons;
+    }
+
+    /**
+     * Send course welcome email to specified user.
+     *
+     * @param stdClass $instance
+     * @param mixed $user   User id or user record.
+     * @return void
+     */
+    protected function email_welcome_message($instance, $user) {
+        global $CFG, $DB;
+
+        // Check if we need to send custom welcome message.
+        if (empty($instance->customint4)) {
+            return;
+        }
+
+        if (!is_object($user)) {
+            // Get the user object.
+            $user = $DB->get_record('user', array('id' => $user));
+        }
+
+        $course = get_course($instance->courseid);
+        $context = context_course::instance($course->id);
+
+        $a = new stdClass();
+        $a->coursename = format_string($course->fullname, true, array('context' => $context));
+        $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id&course=$course->id";
+        if (get_config('local_ucla', 'friendly_urls_enabled')) {
+            $url = new moodle_url('/course/view/' . $course->shortname);
+        } else {
+            $url = new moodle_url('/course/view.php', array('id' => $course->id));
+        }
+        $a->courseurl = $url->out();
+
+        if (trim($instance->customtext1) !== '') {
+            $message = $instance->customtext1;
+            $message = str_replace('{$a->coursename}', $a->coursename, $message);
+            $message = str_replace('{$a->profileurl}', $a->profileurl, $message);
+            $message = str_replace('{$a->courseurl}', $a->courseurl, $message);
+            if (strpos($message, '<') === false) {
+                // Plain text only.
+                $messagetext = $message;
+                $messagehtml = text_to_html($messagetext, null, false, true);
+            } else {
+                // This is most probably the tag/newline soup known as FORMAT_MOODLE.
+                $messagehtml = format_text($message, FORMAT_MOODLE, 
+                        array('context' => $context, 'para' => false, 'newlines' => true, 'filter' => true));
+                $messagetext = html_to_text($messagehtml);
+            }
+        } else {
+            $message = get_string('welcometocoursetext', 'local_ucla', $a);
+            $messagetext = $message;
+            $messagehtml = text_to_html($messagetext, null, false, true);
+        }
+
+        $subject = get_string('welcometocourse', 'local_ucla', $course->fullname);
+        
+        $rusers = array();
+        if (!empty($CFG->coursecontact)) {
+            $croles = explode(',', $CFG->coursecontact);
+            list($sort, $sortparams) = users_order_by_sql('u');
+            $rusers = get_role_users($croles, $context, true, '', 'r.sortorder ASC, ' . $sort, null, '', '', '', '', $sortparams);
+        }
+        if ($rusers) {
+            $contact = reset($rusers);
+        } else {
+            $contact = core_user::get_support_user();
+        }
+        
+        // Directly emailing welcome message rather than using messaging.
+        email_to_user($user, $contact, $subject, $messagetext, $messagehtml);
+    }
+    // END UCLA MOD: CCLE-5486 - Enable welcome message for ucla registrar enrollment
 }

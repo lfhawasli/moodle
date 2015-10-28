@@ -55,11 +55,17 @@ class logins_by_division extends uclastats_base {
     private $coursetodivisions = array();
 
     /**
+     * Term we are processing.
+     * @var string
+     */
+    private $term = null;
+
+    /**
      * Number of records to process at a time.
      *
      * @var int
      */
-    public $RECORDCHUNK = 5000000;
+    const RECORDCHUNK = 5000000;
 
     /**
      * If user has never visited the course before for their session, then look
@@ -129,13 +135,13 @@ class logins_by_division extends uclastats_base {
         }
 
         // Let's query it then.
-        $sql = "SELECT DISTINCT urd.code, urd.fullname
-                  FROM {course} c
-                  JOIN {ucla_request_classes} urc ON (c.id=urc.courseid)
-                  JOIN {ucla_reg_classinfo} urci ON (urc.term=urci.term AND urc.srs=urci.srs)
-                  JOIN {ucla_reg_division} urd ON (urci.division=urd.code)
-                 WHERE c.id=?";
-        $this->coursetodivisions[$courseid] = $DB->get_records_sql($sql, array($courseid));
+        $sql = "SELECT DISTINCT urd.code, urd.fullname";
+        $sql .= $this->from_filtered_courses();
+        $sql .= $this->from_iei_courses();
+        $sql .= " JOIN {ucla_reg_division} urd ON (urci.division=urd.code)
+                 WHERE c.id=:courseid";
+        $this->coursetodivisions[$courseid] = $DB->get_records_sql($sql, 
+                array('term' => $this->term, 'courseid' => $courseid));
         return $this->coursetodivisions[$courseid];
     }
 
@@ -171,68 +177,68 @@ class logins_by_division extends uclastats_base {
                 !ucla_validator('term', $params['term'])) {
             throw new moodle_exception('invalidterm', 'report_uclastats');
         }
+        $this->term = $params['term'];
 
         // Get start and end dates for term.
         $terminfo = $this->get_term_info($params['term']);
 
-        // Get all events matching start and end date of the term. We aren't
-        // adding in a condition for eventname in the query, because that field
-        // isn't indexed. Also, we aren't using the Log reader API, because we
-        // want to use recordsets.
-        $where = "timecreated >= :start AND "
-                . "timecreated <= :end";
+        // Get all events matching start and end date of the term.
         $params['start'] = $terminfo['start'];
         $params['end'] = $terminfo['end'];
+        $params['guestid'] = $CFG->siteguest;
 
-        // Count how many records for that term we need to process.
-        $total = $DB->count_records_select('logstore_standard_log', $where, $params);
+        // Limit search to only events we want, to speed up query. Although
+        // eventname isn't indexed, it is faster to process fewer records.
+        list($inorequal, $inorequalparams) = $DB->get_in_or_equal(array(
+            '\core\event\user_loggedin', '\core\event\user_loggedout',
+            '\core\event\course_viewed'
+        ), SQL_PARAMS_NAMED, 'eventname');
+        $params = array_merge($params, $inorequalparams);
 
         // We cannot query all the events all at once, even with recordsets,
         // because the query will crash. We will split of the record processing
         // into chunks.
         $currentrecord = 0;
-        while ($total > 0) {
-            $records = $DB->get_recordset_select('logstore_standard_log',
-                    $where, $params, 'timecreated', 'eventname,courseid,userid',
-                    $currentrecord, $this->RECORDCHUNK);
-
-            if ($records->valid()) {
-                foreach ($records as $record) {
-                    // Exclude records that involve a guest user.
-                    if ($record->userid == $CFG->siteguest) {
-                        continue;
-                    }
-
-                    /* The query works as follows:
-                     * 1) On a user login, add user to $loggedin array
-                     * 2) For any course visit event, find that courseid in the
-                     *    user's entry in the $loggedin array.
-                     * 3) If that courseid did not exist, add it and increment the
-                     *    related divisions for the course.
-                     * 4) If we see a logout or login event from the same user,
-                     *    remove that user's entry from $loggedin array.
-                     */
-                    // Have state machine to handle counting of user visits.
-                    switch ($record->eventname) {
-                        case '\core\event\user_loggedin':
-                            $this->userloggedin($record);
-                            break;
-                        case '\core\event\user_loggedout':
-                            $this->userloggedout($record);
-                            break;
-                        case '\core\event\course_viewed':
-                            $this->courseviewed($record);
-                            break;
-                        default:
-                            // Ignore all other events.
-                            break;
-                    }
-                }
-                $records->close();
+        while (true) {
+            $sql = "SELECT log.id, log.eventname, log.courseid, log.userid
+                      FROM {logstore_standard_log} log
+                     WHERE log.timecreated >= :start
+                           AND log.timecreated <= :end
+                           AND log.userid > :guestid
+                           AND log.eventname $inorequal
+                  ORDER BY log.timecreated";
+            $records = $DB->get_recordset_sql($sql, $params, $currentrecord, self::RECORDCHUNK);
+            if (!$records->valid()) {
+                break;
             }
-
-            $currentrecord += $this->RECORDCHUNK;
-            $total -= $this->RECORDCHUNK;
+            foreach ($records as $record) {
+                /* The query works as follows:
+                 * 1) On a user login, add user to $loggedin array
+                 * 2) For any course visit event, find that courseid in the
+                 *    user's entry in the $loggedin array.
+                 * 3) If that courseid did not exist, add it and increment the
+                 *    related divisions for the course.
+                 * 4) If we see a logout or login event from the same user,
+                 *    remove that user's entry from $loggedin array.
+                 */
+                // Have state machine to handle counting of user visits.
+                switch ($record->eventname) {
+                    case '\core\event\user_loggedin':
+                        $this->userloggedin($record);
+                        break;
+                    case '\core\event\user_loggedout':
+                        $this->userloggedout($record);
+                        break;
+                    case '\core\event\course_viewed':
+                        $this->courseviewed($record);
+                        break;
+                    default:
+                        // Ignore all other events.
+                        break;
+                }
+            }
+            $records->close();
+            $currentrecord += self::RECORDCHUNK;
         }
 
         // Format results into alphabtized divisions.
