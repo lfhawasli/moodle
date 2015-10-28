@@ -37,6 +37,9 @@ $string['choiceno'] = 'Choice {$a}';
 $string['choices'] = 'Available choices';
 $string['clozeaid'] = 'Enter missing word';
 $string['correctansweris'] = 'The correct answer is: {$a}';
+// START UCLA MOD: CCLE-5503 - Quiz, One answer only allows multiple answers
+$string['correctanswersare'] = 'The correct answers are: {$a}';
+// END UCLA MOD: CCLE-5503
 $string['correctfeedback'] = 'For any correct response';
 $string['errgradesetanswerblank'] = 'Grade set, but the Answer is blank';
 $string['errfractionsaddwrong'] = 'The positive grades you have chosen do not add up to 100%<br />Instead, they add up to {$a}%';
