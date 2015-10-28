@@ -791,6 +791,126 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
     }
 
     /**
+     * Tests the core edit we made to support custom welcome messages
+     * (see CCLE-5486).
+     */
+    public function test_email_welcome_message() {
+        global $CFG, $DB;
+
+        // Add mocked enrollment helper.
+        $enrol = enrol_get_plugin('database');
+        $enrol->enrollmenthelper = $this->mockenrollmenthelper;
+
+        // Test email.
+        unset_config('noemailever');
+        $sink = $this->redirectEmails();
+        set_config('emailonlyfromnoreplyaddress', 1);
+
+        // Get a non-crosslisted class.
+        $class = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_class(array());
+        $entry = array_pop($class);
+        $term = $entry->term;
+        $srs = $entry->srs;
+        $courseid = $entry->courseid;
+        $course = get_course($courseid);
+
+        // In order to test the custom message, we need to first have the
+        // database enrollment plugin installed. It is installed when the first
+        // user is enrolled, most likely the instructor.
+        $instructor = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+        $reginstructors = array();
+        $reginstructors[] = $this->create_ccle_courseinstructorsget_entry(
+                $term, $srs, '01', $instructor);
+        $this->set_mockregdata('ccle_courseinstructorsget', $term, $srs,
+                $reginstructors);
+        $enrol->sync_enrolments($this->trace, array($term));
+
+        // Make sure that database plugin is installed.
+        $enrolplugin = $DB->get_record('enrol',
+                array('courseid' => $courseid, 'enrol' => 'database'));
+        $this->assertNotEmpty($enrolplugin);
+
+        // Test default welcome emails.
+        $enrolplugin->customint4 = 1;
+        $DB->update_record('enrol', $enrolplugin);
+
+        // Enroll student.
+        $student = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+        $regstudents[] = $this->create_ccle_roster_class_entry(
+                $term, $srs, 'E', $student);
+        $this->set_mockregdata('ccle_roster_class', $term, $srs, $regstudents);
+        $enrol->sync_enrolments($this->trace, array($term));
+
+        // Verify that email was sent out.
+        $messages = $sink->get_messages();
+        $this->assertEquals(1, count($messages));
+        $sink->clear();
+        $parsedemail = array_pop($messages);
+
+        // Make sure email is coming form no-reply address.
+        $this->assertTrue(strpos($parsedemail->from, $CFG->noreplyaddress) !== false);
+        
+        // Make sure default message includes course fullname and url.
+        $coursefullname = quoted_printable_encode($course->fullname);
+        $urlstring = quoted_printable_encode("$CFG->wwwroot/course/view.php?id=$course->id");
+        $this->assertTrue(strpos($parsedemail->body, $coursefullname) !== false);
+        $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);
+
+        // Test custom welcome message.
+        $enrolplugin->customtext1 = 'Welcome to {$a->coursename}, and the link to the '
+                . 'course is {$a->courseurl}. See you soon!';
+        $DB->update_record('enrol', $enrolplugin);
+
+        // Enroll another student.
+        $anotherstudent = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+        $regstudents[] = $this->create_ccle_roster_class_entry(
+                $term, $srs, 'E', $anotherstudent);
+        $this->set_mockregdata('ccle_roster_class', $term, $srs, $regstudents);
+        $enrol->sync_enrolments($this->trace, array($term));
+
+        // Verify that email was sent out.
+        $messages = $sink->get_messages();
+        $this->assertEquals(1, count($messages));
+        $sink->clear();
+        $parsedemail = array_pop($messages);
+
+        // Since we are sending email, we need to do quoted-printable format.
+        $this->assertTrue(strpos($parsedemail->body, 'Welcome to ' . 
+                $coursefullname) !== false);        
+        $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);
+
+        // See if we send friendly urls.
+        set_config('friendly_urls_enabled', 1, 'local_ucla');
+
+        // Enroll another student.
+        $yetanotherstudent = $this->getDataGenerator()
+                ->get_plugin_generator('local_ucla')
+                ->create_user();
+        $regstudents[] = $this->create_ccle_roster_class_entry(
+                $term, $srs, 'E', $yetanotherstudent);
+        $this->set_mockregdata('ccle_roster_class', $term, $srs, $regstudents);
+        $enrol->sync_enrolments($this->trace, array($term));
+
+        // Verify that email was sent out.
+        $messages = $sink->get_messages();
+        $this->assertEquals(1, count($messages));
+        $sink->clear();
+        $parsedemail = array_pop($messages);
+
+        // Verify that course url is now friendly.
+        $urlstring = quoted_printable_encode("$CFG->wwwroot/course/view/$course->shortname");
+        $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);
+    }    
+    
+    /**
      * Call enrol_database_plugin->sync_enrolments() and make sure that it
      * adds the database enrollment plugin for given set of courses that do
      * not already have it.
