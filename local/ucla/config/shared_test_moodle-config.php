@@ -462,7 +462,7 @@ $CFG->forceloginforprofiles = true;
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
-$CFG->fullnamedisplay = 'lastname, firstname middlename';
+$CFG->fullnamedisplay = 'lastname, firstname';
 $CFG->cronclionly = true;
 
 // Site administration > Security > HTTP security
