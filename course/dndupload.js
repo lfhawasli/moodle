@@ -161,7 +161,10 @@ M.course_dndupload = {
         });
         fadeanim.once('end', function(e) {
             this.set('reverse', 1);
-            Y.later(3000, this, 'run', null, false);
+            // START UCLA MOD: CCLE-5436 - Bulk upload help text
+            //Y.later(3000, this, 'run', null, false);
+            Y.later(10000, this, 'run', null, false);
+            // END UCLA MOD: CCLE-5436
         });
         fadeanim.run();
     },

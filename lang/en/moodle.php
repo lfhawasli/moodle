@@ -56,7 +56,10 @@ $string['addedrecips'] = 'Added {$a} new recipients';
 $string['addedtogroup'] = 'Added to group "{$a}"';
 $string['addedtogroupnot'] = 'Not added to group "{$a}"';
 $string['addedtogroupnotenrolled'] = 'Not added to group "{$a}", because not enrolled in course';
-$string['addfilehere'] = 'Add file(s) here';
+// START UCLA MOD: CCLE-5436 - Bulk upload help text
+//$string['addfilehere'] = 'Add file(s) here';
+$string['addfilehere'] = 'Drag and drop file(s) here';
+// END UCLA MOD: CCLE-5436
 $string['addinganew'] = 'Adding a new {$a}';
 $string['addinganewto'] = 'Adding a new {$a->what} to {$a->to}';
 $string['addingdatatoexisting'] = 'Adding data to existing';
