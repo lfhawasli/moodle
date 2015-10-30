@@ -48,10 +48,10 @@ $string['emailmsgtxt'] =
     '------------------------------------------------------------' . "\n" .
     'If you currently do not have a UCLA Logon ID, you can obtain one here:' . "\n" .
     'https://logon.ucla.edu/activate.php' . "\n" .
-    'You do not need to be an enrolled student at UCLA or have a 9 digit UID ' .
-    'to create a UCLA Logon. When you are asked to identify your role in ' .
-    'the UCLA system, select the following option:' . "\n" .
-    '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE."' . "\n\n" .
+    'When asked to identify your role in the UCLA system, use the guidelines below:' . "\n" .
+    '* If you are not currently an enrolled student at UCLA with a 9 digit UID, select ' .
+    '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE".' . "\n" .
+    '* If you are a UC cross-campus visiting student, select "New UCLA Student".' . "\n\n" .
     'CONTACT CCLE:' . "\n" .
     '------------------------------------------------------------' . "\n" .
     'If you believe that you have received this message in error or are in need ' .
@@ -127,12 +127,12 @@ $string['message_help'] =
     '[invite url]<br /><br />'.
     'UCLA LOGON:'.
     '<hr />'.
-    'If you currently do not have a UCLA Logon ID, you can obtain one here: ' .
+    'If you currently do not have a UCLA Logon ID, you can obtain one here:<br />' .
     'https://logon.ucla.edu/activate.php<br />' .
-    'You do not need to be an enrolled student at UCLA or have a 9 digit UID ' .
-    'to create a UCLA Logon. When you are asked to identify your role in the ' .
-    'UCLA system, select the following option: <br />' .
-    '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE."<br /><br />'.
+    'When asked to identify your role in the UCLA system, use the guidelines below:<br />' .
+    '* If you are not currently an enrolled student at UCLA with a 9 digit UID, select ' .
+    '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE".<br />' .
+    '* If you are a UC cross-campus visiting student, select "New UCLA Student".<br /><br />' .
     'CONTACT CCLE:'.
     '<hr />'.
     'If you believe that you have received this message in error or are in need ' .
