@@ -284,7 +284,8 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
             $fullurl = $syllabustodisplay->url;
             $mimetype = 'text/html';
             $clicktoopen = get_string('err_noembed', 'local_ucla_syllabus');
-            $downloadlink = html_writer::link($syllabustodisplay->url, $syllabustodisplay->url);
+            $downloadlink = $syllabustodisplay->get_icon() . 
+                    html_writer::link($syllabustodisplay->url, $syllabustodisplay->url);
         }
 
         // Add download link.
@@ -313,9 +314,6 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
                 $typetext = get_string('preview', 'local_ucla_syllabus');
                 $disclaimertext = get_string('preview_disclaimer', 'local_ucla_syllabus');
             }
-        } else {
-            $typetext = get_string('private', 'local_ucla_syllabus');
-            $disclaimertext = get_string('private_disclaimer', 'local_ucla_syllabus');
         }
 
         // Add modified date.
