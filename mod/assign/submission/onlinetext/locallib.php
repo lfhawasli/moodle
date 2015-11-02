@@ -423,7 +423,14 @@ class assign_submission_onlinetext extends assign_submission_plugin {
      * @return string
      */
     public function view(stdClass $submission) {
-        $result = '';
+        // START UCLA MOD: SSC-2387 - Display student names when viewing Online Text assignments
+        //$result = '';
+        global $DB;
+        
+        $user = $DB->get_record('user', array('id'=>$submission->userid));
+        $fullname = "<b>" . $user->firstname . ' ' . $user->lastname . "</b>" . "<br/>" . "<br/>";
+        $result = $fullname;
+        // END UCLA MOD: SSC-2387
 
         $onlinetextsubmission = $this->get_onlinetext_submission($submission->id);
 
