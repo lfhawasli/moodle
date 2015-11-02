@@ -86,6 +86,19 @@ function get_browseby_link($type, $params) {
 }
 
 /**
+ * Generates input field for generic text type.
+ *
+ * @param string $id
+ * @return string       Returns HTML to render text input.
+ */
+function get_generic_input($id, $name) {
+    $retval = html_writer::label($name, $id.'_'.$name);
+    $retval .= html_writer::empty_tag('input',
+            array('type' => 'text', 'name' => $name, 'id' => $id.'_'.$name));
+    return $retval;
+}
+
+/**
  * Generates input field for SRS number
  * 
  * @param string $id        Id to use for label
@@ -103,40 +116,37 @@ function get_srs_input($id) {
 /**
  * Either creates or returns a subject area selector dropdown.
  * 
- * @global object $DB
- * @staticvar string $term_selector
+ * @param string $id        Id to use for label.
+ * @param string $selectedsubjectarea Default subject area selected.
  * 
- * @param string $id        Id to use for label
- * @param string $selected_subject_area If passed, will be the default subject area selected
- * 
- * @return string           Returns HTML to render subject area dropdown 
+ * @return string           Returns HTML to render subject area dropdown.
  */
-function get_subject_area_selector($id, $selected_subject_area = null) {
+function get_subject_area_selector($id, $selectedsubjectarea = null) {
     global $DB;  
-    static $_subject_area_selector_subjects;  // to store cached copy of db record
-    $ret_val = '';
+    static $_subjectareaselectorsubjects;  // To store cached copy of db record.
+    $retval = '';
   
-    if (!isset($_subject_area_selector_subjects)) {
-        // generate associative array: subject area => subject area
+    if (!isset($_subjectareaselectorsubjects)) {
+        // Generate associative array: subject area => subject area.
         $sql = 'SELECT DISTINCT subjarea
-                FROM            {reg_subjectarea}
-                WHERE           1
-                ORDER BY        subjarea';
-        $_subject_area_selector_subjects = $DB->get_records_menu('ucla_reg_subjectarea', 
+                  FROM {reg_subjectarea}
+                 WHERE 1
+              ORDER BY subjarea';
+        $_subjectareaselectorsubjects = $DB->get_records_menu('ucla_reg_subjectarea',
                 null, 'subjarea', 'subjarea, subjarea AS subject_area');
-        if (empty($_subject_area_selector_subjects)) {
+        if (empty($_subjectareaselectorsubjects)) {
             return '';
         }        
     }
 
-    $ret_val .= html_writer::label(get_string('subject_area', 
+    $retval .= html_writer::label(get_string('subject_area',
             'tool_uclasupportconsole'), $id.'_subject_area_selector');
-    $ret_val .= html_writer::select($_subject_area_selector_subjects, 
-            'subjarea', $selected_subject_area, 
+    $retval .= html_writer::select($_subjectareaselectorsubjects,
+            'subjarea', $selectedsubjectarea,
             get_string('choose_subject_area', 'tool_uclasupportconsole'), 
             array('id' => $id.'_subject_area_selector'));
         
-    return $ret_val;
+    return $retval;
 }
 
 /**

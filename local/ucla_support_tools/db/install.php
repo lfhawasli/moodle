@@ -144,6 +144,8 @@ function load_tool_uclasupportconsole() {
         11 => 'ucla_get_user_classes',
         12 => 'courseregistrardifferences',
         13 => 'showreopenedclasses',
+        14 => 'ccle_classcalendar',
+        15 => 'ucla_get_course_srs'
     );
 
     // Should now have access to $consoles object.
