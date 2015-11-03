@@ -484,7 +484,8 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             'school',
             'registrar',
             'myucla',
-            'disability'
+            'disability',
+            'caps'
         );
 
         $footerstring = '';
