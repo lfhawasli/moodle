@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA TA site creator plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA TA sites block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class block_ucla_tasites_generator extends testing_block_generator {
             $course = $this->datagenerator->create_course();
         }
         if (empty($user)) {
-            $record = array('firstname'=>'afirstname', 'lastname'=>'alastname');
+            $record = array('firstname' => 'afirstname', 'lastname' => 'alastname');
             $user = $this->datagenerator->create_user($record);
         }
         $tasite = $this->create_instance_with_role($course, (array) $user, 'ta');
@@ -90,7 +90,7 @@ class block_ucla_tasites_generator extends testing_block_generator {
         $this->datagenerator->enrol_user($user['id'], $course->id, $roleid);
 
         $tainfo = new stdClass();
-        $tainfo->parent_course = $course;
+        $tainfo->parentcourse = $course;
         $tainfo->id = $user['id'];
         $tainfo->firstname = $user['firstname'];
         $tainfo->lastname = $user['lastname'];
