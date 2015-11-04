@@ -133,3 +133,6 @@
 [submodule "lib/editor/atto/plugins/bsgrid"]
  	path = lib/editor/atto/plugins/bsgrid
 	url = git@github.com:academic-moodle-cooperation/moodle-atto_bsgrid.git
+[submodule "filter/collapsible"]
+	path = filter/collapsible
+	url = git@github.com:ccle/moodle-filter_collapsible.git
