@@ -371,10 +371,10 @@ function get_reserve_data($table) {
         $columnsreturned[] = $columnname;
     }
 
-
     $result = $DB->get_records('ucla_' . $table, null, null,
             implode(',', $columnsreturned));
 
+    $timeformat = get_string('strftimedatefullshort');
     foreach ($result as $index => $item) {
         // Give link to course as first column of table.
         if ($item->courseid != null) {
@@ -386,6 +386,9 @@ function get_reserve_data($table) {
 
             $item->courseid = $shortnamewithlink;
         }
+        // Convert start/end date to standard format.
+        $item->start_date = userdate($item->start_date, $timeformat);
+        $item->stop_date = userdate($item->stop_date, $timeformat);
     }
 
     return $result;
