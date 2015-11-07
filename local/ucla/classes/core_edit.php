@@ -90,14 +90,13 @@ class local_ucla_core_edit {
      * See CCLE-4521 - Handle "preferred name"
      *
      * @param object $user
-     * @param boolean $forcehybridmode  If true, will return name formatting for
-     *                                  hybrid display. By reference, because if
-     *                                  we are handling preferred name, then
-     *                                  need to turn off override flag from
-     *                                  fullname function.
-     * @return string           Returns name string to use in template.
+     * @param boolean $override  If true, will return name formatting for hybrid
+     *                           display. By reference, because if we are
+     *                           handling preferred name, then need to turn off
+     *                           override flag from fullname function.
+     * @return string            Returns name string to use in template.
      */
-    public static function get_fullnamedisplay($user, &$forcehybridmode) {
+    public static function get_fullnamedisplay($user, &$override) {
 
         // Be quick to exit, so that Behat tests aren't slowed down.
         if (!isset(self::$handlepreferredname)) {
@@ -107,9 +106,13 @@ class local_ucla_core_edit {
             return false;
         }
 
+        $forcehybridmode = $override;
+        $override = false;   // Setting is on, so disable override handling.
+
         // See if we even need to handle the logic of figuring out preferred name.
-        if (empty($user->alternatename)) {
-            $forcehybridmode = false;   // Setting is on, so disable override handling.
+        if (empty($user->alternatename) && !empty($user->middlename) && !empty($forcehybridmode)) {
+            return 'lastname, firstname middlename';
+        } else if (empty($user->alternatename)) {
             return false;
         }
 
@@ -120,7 +123,6 @@ class local_ucla_core_edit {
             // Display middle name, if needed.
             $firstname = empty($user->middlename) ? 'firstname' : 'firstname middlename';
             $fullnamedisplay .= " ($firstname)";
-            $forcehybridmode = false;   // Setting is on, so disable override handling.
         }
 
         return $fullnamedisplay;
@@ -239,18 +241,23 @@ class local_ucla_core_edit {
         foreach ($editors as $name => $editor) {
             $htmleditor[$name] = get_string('pluginname', 'editor_' . $name);
         }
+        $texteditingpref = get_user_preferences('htmleditor', null, $user);
+        if (empty($texteditingpref)) {
+            $texteditingpref = 'default';
+        }
         $table = new html_table();
         $table->head = array('Field', 'User Information');
         $table->data = array(
             array('Moodle ' . get_string('userid', 'grades'), $user->id),
             array('Authentication method', $user->auth),
             array(get_string('username'), $user->username),
+            array(get_string('fullnameuser'), fullname($user, true)),
             array(get_string('alternatename'), $user->alternatename),
             array('Email status', $emailstop[$user->emailstop]),
             array(get_string('lastlogin'), userdate($user->lastlogin)."&nbsp; (".format_time(time() - $user->lastlogin).")"), 
             array(get_string('emaildisplay'), $maildisplay[$user->maildisplay]),
             array(get_string('emaildigest'),$maildigest[$user->maildigest]),
-            array(get_string('textediting'), $htmleditor[get_user_preferences('htmleditor', 'default', $user)]),
+            array(get_string('textediting'), $htmleditor[$texteditingpref]),
             array(get_string('autosubscribe'), $autosubscribe[$user->autosubscribe]),
             array(get_string('trackforums'), $trackforums[$user->trackforums]),
             array('Time modified', userdate($user->timemodified)."&nbsp; (".format_time(time() - $user->timemodified).")"), 
