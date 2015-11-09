@@ -136,3 +136,6 @@
 [submodule "lib/editor/tinymce/plugins/poodll"]
 	path = lib/editor/tinymce/plugins/poodll
 	url = https://github.com/justinhunt/moodle-tinymce_poodll.git
+[submodule "filter/collapsible"]
+	path = filter/collapsible
+	url = git@github.com:ccle/moodle-filter_collapsible.git
