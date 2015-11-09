@@ -64,7 +64,7 @@ $string['rearrangejsrequired'] = 'The Rearrange Tool requires JavaScript to work
 
 $string['upload'] = 'Want to upload more than one file at the same time?';
 $string['bulkupload'] = 'Bulk upload files';
-$string['bulkupload_help'] = 'If you want to upload more than one file at a time, use Drag and Drop instead of Easy File Upload.<br /><br /><a href="https://docs.ccle.ucla.edu/w/Drag_and_drop" target="_blank">Visit the documentation site for more information.</a>';
+$string['bulkupload_help'] = 'To upload multiple files you will need to use drag and drop on a course section.<br /><a href="https://docs.ccle.ucla.edu/w/Drag_and_drop" target="_blank">See the documentation site for help uploading multiple files.</a>';
 
 // SSC-1928 - Public-private Syllabus Defaulter Descriptions (Help Button included)
 $string['upload_public_file'] = ' -- Anyone viewing the class site can access this.';
