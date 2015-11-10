@@ -39,7 +39,8 @@ class preferredname_test extends advanced_testcase {
      *
      * If the current logged in user has the capability "moodle/site:viewfullnames",
      * then name should be displayed as follows:
-     *  - Hybrid (Legal Last name, Preferred first name (Legal first name in parentheses)
+     *  - Hybrid Legal Last name, Preferred first name (Legal first name Legal middle name in parentheses)
+     *           Legal Last name, Legal first name Legal middle name
      *
      * Otherwise the name should be displayed as follows:
      *  - Preferred Name (Legal Last name, Preferred first name, no middle name)
@@ -71,7 +72,7 @@ class preferredname_test extends advanced_testcase {
     protected function setUp() {
         $this->resetAfterTest(true);
 
-        set_config('fullnamedisplay', 'lastname, firstname middlename');
+        set_config('fullnamedisplay', 'lastname, firstname');
         set_config('handlepreferredname', true, 'local_ucla');
     }
 
@@ -87,7 +88,7 @@ class preferredname_test extends advanced_testcase {
         $this->assertNotEmpty($user->middlename);
 
         $name = fullname($user);
-        $this->assertEquals(sprintf('%s, %s %s', $user->lastname, $user->firstname, $user->middlename), $name);
+        $this->assertEquals(sprintf('%s, %s', $user->lastname, $user->firstname), $name);
         $name = fullname($user, true);
         $this->assertEquals(sprintf('%s, %s %s', $user->lastname, $user->firstname, $user->middlename), $name);
 

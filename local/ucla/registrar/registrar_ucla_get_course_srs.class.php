@@ -41,7 +41,7 @@ class registrar_ucla_get_course_srs extends registrar_stored_procedure {
      * @return array    array of strings
      */
     function get_query_params() {
-        return array('term', 'subject area', 'crsidx', 'secidx');
+        return array('term', 'subjarea', 'crsidx', 'secidx');
     }
 
 }

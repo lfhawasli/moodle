@@ -159,7 +159,7 @@ class ucla_reg_classinfo_cron {
                 $coursesrs = $this->query_registrar('ucla_get_course_srs',
                     array(
                         'term' => $regclass->term,
-                        'subject area' => $regclass->subj_area,
+                        'subjarea' => $regclass->subj_area,
                         'crsidx' => $regclass->crsidx,
                         'secidx' => $regclass->secidx,
                     )

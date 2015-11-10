@@ -72,6 +72,8 @@ $string['ucla_getterms'] = 'UCLA term types (<a target="_blank" href="https://cc
 $string['ucla_get_user_classes'] = 'Get courses for My sites (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=16788">ucla_get_user_classes</a>)';
 $string['ccle_class_sections'] = 'Course sections detail by primary srs# (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3304">ccle_class_sections</a>)';
 $string['ccle_get_primary_srs'] = 'Primary course srs# by discussion section srs# (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=37526">ccle_get_primary_srs</a>)';
+$string['ccle_classcalendar'] = 'Course meeting dates/times (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3303">ccle_classcalendar</a>)';
+$string['ucla_get_course_srs'] = 'Get srs by term, subject area, unformatted catalog number, and unformatted section number (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=395287">ucla_get_course_srs</a>)';
 
 $string['unknownstoredprocparam'] = 'This stored procedure has a unknown parameter type. This needs to be changed in code.';
 

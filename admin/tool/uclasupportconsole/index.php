@@ -1221,6 +1221,10 @@ foreach ($qs as $query) {
                 case 'srs':
                     $input_html .= get_srs_input($query);
                     break;
+                case 'crsidx':
+                case 'secidx':
+                    $input_html .= get_generic_input($query, $param);
+                    break;
                 default:
                     $input_html .= get_string('unknownstoredprocparam',
                         'tool_uclasupportconsole');
@@ -1244,8 +1248,8 @@ foreach ($qs as $query) {
                 $params[$param_name] = $param_value;
             }
         }
+
         
-                
         // get all data, even bad, and uncached
         $results = registrar_query::run_registrar_query($query, $params, false);
         

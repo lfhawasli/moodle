@@ -48,8 +48,8 @@ class block_ucla_course_download extends block_base {
             $trace = new null_progress_trace();
         }
 
-        // Get all requests.
-        $requests = $DB->get_recordset('ucla_archives');
+        // Get all requests that are active (ignore stale requests).
+        $requests = $DB->get_recordset('ucla_archives', array('active' => '1'));
         if (!$requests->valid()) {
             $trace->output('No records to process.');
             return true;    // No records to process.

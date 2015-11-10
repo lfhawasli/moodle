@@ -12,3 +12,11 @@
 .syllabus_help {
     padding-bottom: 1.0em;
 }
+
+.ucla_syllabus-container #download_link a {
+    font-size: 1.8em;
+}
+
+.ucla_syllabus-container #download_link img {
+    vertical-align: inherit;
+}

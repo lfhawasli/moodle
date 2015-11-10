@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/base.php');
 require_once($CFG->dirroot . '/blocks/ucla_course_download/classes/files.php');
+require_once("$CFG->dirroot/blocks/moodleblock.class.php");
+require_once("$CFG->dirroot/blocks/ucla_course_download/block_ucla_course_download.php");
 
 /**
  * Tests for the block_ucla_course_download_files class.
@@ -623,5 +625,51 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         $this->assertNotEquals($request1->fileid, $request2->fileid);
         $ziparray = $teacherdownload->get_content();
         $this->compare_content($expectedfiles, $ziparray);
+    }
+
+    /**
+     * Test that inactive requests are ignored by cron process.
+     */
+    public function test_ignore_inactive_requests() {
+        global $DB;
+
+        // Set ziplifetime to a known value (7 days).
+        set_config('ziplifetime', 7, 'block_ucla_course_download');
+
+        // Add content and create initial zip.
+        $contenttocreate[] = array('section' => 1);
+        $this->populate_course($contenttocreate);
+        $coursefiles = new block_ucla_course_download_files(
+                $this->course->id, $this->teacher->id);
+        $coursefiles->add_request();
+        $request = $coursefiles->process_request();
+        $this->assertCount(1, $this->sink->get_messages());
+        $this->assertNotEmpty($request->fileid);
+        $this->assertEquals('request_completed', $coursefiles->get_request_status());
+
+        // Now, make request really old (8 days).
+        $request->timerequested = $request->timerequested - (8 * DAYSECS);
+        $DB->update_record('ucla_archives', $request);
+        $coursefiles->refresh();
+
+        // Process request again
+        $request = $coursefiles->process_request();
+        $this->assertNull($request);
+        $this->assertEquals('request_available', $coursefiles->get_request_status());
+
+        // Make sure that existing request was made inactive.
+        $request = $coursefiles->get_request();
+        $this->assertEmpty($request);
+        $request = $coursefiles->get_request(0);
+        $this->assertNotEmpty($request);
+
+        // Check that cron ignores inactive processes.
+        ob_start();
+        $trace = new text_progress_trace();
+        $blockcoursedownload = new block_ucla_course_download();
+        $blockcoursedownload->cron($trace);
+        $list = ob_get_contents();
+        ob_end_clean(); 
+        $this->assertEquals("No records to process.\n", $list);
     }
 }

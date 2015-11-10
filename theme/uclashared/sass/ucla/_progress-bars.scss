@@ -10,7 +10,7 @@
 
 .dndupload-preview {
     margin: 8px;
-    border: 4px dashed #ddd;
+    border: 4px dashed #2d7bc6;
     background-color: #efefef;
     height: 100px;
     width: 100%;
@@ -42,6 +42,26 @@
         }
     }
 }
+
+.dndupload-hidden {
+    display: inline-block;
+    border: 4px dashed #ddd;
+}
+
+#dndupload-status {
+    width:40%;
+    margin:0 30%;
+    padding:6px;
+    border:1px solid #ddd;
+    top:40px;
+    text-align:center;
+    background:#ffc;
+    position:absolute;
+    left:100;box-shadow:2px 2px 5px 1px #ccc;
+    border-radius:0px 0px 8px 8px;
+    z-index: 1;
+}
+
 
 /// Modify the progress bar
 // --------------------------------------------------

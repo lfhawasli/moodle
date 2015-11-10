@@ -47,6 +47,9 @@ $string['foolin_myucla'] = 'http://my.ucla.edu/';
 $string['foodis_disability'] = 'Disability';
 $string['foolin_disability'] = 'http://www.osd.ucla.edu/';
 
+$string['foodis_caps'] = 'Couns/PsychSvc (CAPS)';
+$string['foolin_caps'] = 'http://www.counseling.ucla.edu/';
+
 $string['control_panel'] = 'Control Panel';
 
 $string['help_n_feedback'] = 'Need Help';
