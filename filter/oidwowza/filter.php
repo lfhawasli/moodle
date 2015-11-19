@@ -1,5 +1,5 @@
 <?php
-// This file is part of the SSC WOWZA plugin for Moodle - http://moodle.org/
+// This file is part of the OID WOWZA plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,6 +70,36 @@ class filter_oidwowza extends moodle_text_filter {
                 . $newtext;
 
         return $newtext;
+    }
+    
+    /**
+     * Generates the SecureToken described in: 
+     * http://www.wowza.com/forums/content.php?620-How-to-protect-streaming-using-SecureToken-in-Wowza-Streaming-Engine
+     * http://www.wowza.com/forums/showthread.php?38768-Hash-generation-using-SecureToken-version-2
+     *
+     * @param string $clientip
+     * @param string $contentpath
+     * @param int $endtime
+     * @param string $remoteip      Used primarily for unit testing.
+     *
+     * @return string               SecureToken hash to send to Wowza.
+     */
+    public static function generate_securetoken($contentpath, $endtime, $remoteip = null) {
+        $hashclientip = get_config('', 'filter_oidwowza_hashclientip');
+        $sharedsecret = get_config('', 'filter_oidwowza_sharedsecret');
+
+        // Parameters need to be in alphabetical order, even the numbers.
+        if (!empty($hashclientip)) {
+            $params[] = $remoteip ? $remoteip : $_SERVER['REMOTE_ADDR'];
+        }
+        $params[] = $sharedsecret;
+        $params[] = "wowzatokenendtime=$endtime";
+        sort($params);
+
+        $hashurl = $contentpath . '?' . implode('&', $params);
+        $hashstr = hash('sha256', $hashurl, true);
+
+        return strtr(base64_encode($hashstr), '+/', '-_');
     }
 
     /**
@@ -150,14 +180,18 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
             break;
     }
 
-    // Set server variables.
-    $USER->oid_video_allowed = true;
+    // Generate SecureToken hash.
+    $contentpath = $app . '/' . $format . $file;
+    $endtime = time() + HOURSECS * get_config('', 'filter_oidwowza_hoursexpire');
+    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
+    $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
 
     // Streaming paths.
     $srtpath = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' . $app . '/' . $srt;
-    $html5path = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' . $app . '/' . $format . $file . '/playlist.m3u8';
+    $html5path = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
+            $contentpath . '/playlist.m3u8' . $additionalparams;
 
-    $rtmppath = $url . '/' . $app . '/' . $format . $file;
+    $rtmppath = $url . '/' . $contentpath . $additionalparams;
 
     // Set playerid, so that we can support multiple video embeds.
     $playerid = uniqid();

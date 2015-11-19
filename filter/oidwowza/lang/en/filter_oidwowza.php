@@ -1,5 +1,5 @@
 <?php
-// This file is part of the SSC WOWZA plugin for Moodle - http://moodle.org/
+// This file is part of the OID WOWZA plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,3 +24,9 @@
 
 $string['filtername'] = 'OID Wowza filter';
 $string['filter_oidwowza_enable_mp4'] = 'Enable Wowza filter';
+$string['filter_oidwowza_hashclientip'] = 'Hash client IP';
+$string['filter_oidwowza_hashclientip_desc'] = 'Include client IP when creating secure hash. Would need to disable for local dev testing on VMs, because IPs will not match what Wowza sees.';
+$string['filter_oidwowza_hoursexpire'] = 'Expiration';
+$string['filter_oidwowza_hoursexpire_desc'] = 'Number of hours before video link expires';
+$string['filter_oidwowza_sharedsecret'] = 'Shared secret';
+$string['filter_oidwowza_sharedsecret_desc'] = 'Used to generate SecureToken for Wowza. Must match same token on Wowza server.';
