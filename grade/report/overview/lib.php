@@ -74,8 +74,10 @@ class grade_report_overview extends grade_report {
         // Get the user (for full name).
         $this->user = $DB->get_record('user', array('id' => $userid));
 
-        // Load the user's courses.
-        $this->courses = enrol_get_users_courses($this->user->id, false, 'id, shortname, showgrades');
+        // START UCLA MOD: CCLE-5514 - Dropped course still appears in student's Overview report
+        // Load the user's courses in which that have active enrollment (suspended/dropped not shown)
+        $this->courses = enrol_get_users_courses($this->user->id, true, 'id, shortname, showgrades');
+        // END UCLA MOD: CCLE-5514
 
         $this->showrank = array();
         $this->showrank['any'] = false;
