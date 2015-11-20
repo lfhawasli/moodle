@@ -672,7 +672,7 @@ class siteindicator_manager {
 
         // Determine support contact(s).
         $context = context_coursecat::instance($request->categoryid, IGNORE_MISSING);
-        if (empty($categorycontext)) {
+        if (empty($context)) {
             $context = context_system::instance();
         }
         $supportcontacts = get_support_contact($context);
