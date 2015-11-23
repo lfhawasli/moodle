@@ -89,5 +89,9 @@ class local_ucla_participants_filter_form extends enrol_users_filter_form {
         // Add hidden fields required by page.
         $mform->addElement('hidden', 'id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'sifirst', null);
+        $mform->setType('sifirst', PARAM_NOTAGS);
+        $mform->addElement('hidden', 'silast', null);
+        $mform->setType('silast', PARAM_NOTAGS);
     }
 }

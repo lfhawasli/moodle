@@ -43,17 +43,8 @@ if (optional_param('resetbutton', '', PARAM_RAW) !== '') {
     redirect('users.php?id=' . $id);
 }
 
-$graderreportsifirst = optional_param('sifirst', null, PARAM_NOTAGS);
-$graderreportsilast = optional_param('silast', null, PARAM_NOTAGS);
-if (isset($graderreportsifirst)) {
-    $SESSION->gradereport['filterfirstname'] = $graderreportsifirst;
-}
-if (isset($graderreportsilast)) {
-    $SESSION->gradereport['filtersurname'] = $graderreportsilast;
-}
-
-$firstinitial = isset($SESSION->gradereport['filterfirstname']) ? $SESSION->gradereport['filterfirstname'] : '';
-$lastinitial  = isset($SESSION->gradereport['filtersurname']) ? $SESSION->gradereport['filtersurname'] : '';
+$firstinitial = optional_param('sifirst', null, PARAM_NOTAGS);
+$lastinitial = optional_param('silast', null, PARAM_NOTAGS);
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 $context = context_course::instance($course->id, MUST_EXIST);
@@ -73,7 +64,8 @@ if (!has_capability('moodle/course:viewsuspendedusers', $context)) {
 
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
 $table = new local_ucla_course_enrolment_users_table($manager, $PAGE);
-$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params());
+$initialparams = array('sifirst' => $firstinitial, 'silast' => $lastinitial);
+$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+$initialparams);
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $id)));
 
 // Check if there is an action to take
@@ -305,7 +297,7 @@ if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
 $filterform = new local_ucla_participants_filter_form('users.php', array('manager' => $manager, 'id' => $id),
         'get', '', array('id' => 'filterform'));
 $filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role,
-    'filtergroup' => $fgroup, 'status' => $status));
+    'filtergroup' => $fgroup, 'status' => $status, 'sifirst' => $firstinitial, 'silast' => $lastinitial));
 
 $table->set_fields($fields, $renderer);
 
@@ -328,7 +320,9 @@ $content .= html_writer::start_tag('div');
 
 // Bar of first initials.
 $content .= html_writer::start_tag('div', array('class' => 'initialbar firstinitial'));
-$content .= html_writer::label(get_string('firstname').': ', null);
+$content .= html_writer::start_tag('label');
+$content .= html_writer::tag('strong', get_string('firstname') . ': ');
+$content .= html_writer::end_tag('label');
 if (!empty($firstinitial)) {
     $content .= html_writer::link(new moodle_url($PAGE->url, array('sifirst' => false)), $strall);
 } else {
@@ -345,7 +339,9 @@ $content .= html_writer::end_tag('div');
 
 // Bar of last initials.
 $content .= html_writer::start_tag('div', array('class' => 'initialbar lastinitial'));
-$content .= html_writer::label(get_string('lastname').': ', null);
+$content .= html_writer::start_tag('label');
+$content .= html_writer::tag('strong', get_string('lastname') . ': ');
+$content .= html_writer::end_tag('label');
 
 if (!empty($lastinitial)) {
     $content .= html_writer::link(new moodle_url($PAGE->url, array('silast' => false)), $strall);
