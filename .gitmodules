@@ -72,7 +72,7 @@
 	url = git@github.com:justinhunt/moodle-filter_poodll.git
 [submodule "question/type/poodllrecording"]
 	path = question/type/poodllrecording
-	url = git@:github.com:justinhunt/moodle-qtype_poodllrecording.git
+	url = git@github.com:justinhunt/moodle-qtype_poodllrecording.git
 [submodule "lib/editor/atto/plugins/poodll"]
 	path = lib/editor/atto/plugins/poodll
 	url = https://github.com/justinhunt/moodle-atto_poodll.git
