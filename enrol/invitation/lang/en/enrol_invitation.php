@@ -52,10 +52,10 @@ $string['emailmsgtxt'] =
     '* If you are not currently an enrolled student at UCLA with a 9 digit UID, select ' .
     '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE".' . "\n" .
     '* If you are a UC cross-campus visiting student, select "New UCLA Student".' . "\n\n" .
-    'CONTACT CCLE:' . "\n" .
+    'NEED HELP?:' . "\n" .
     '------------------------------------------------------------' . "\n" .
     'If you believe that you have received this message in error or are in need ' .
-    'of assistance, please contact: {$a->supportemail}.';
+    'of assistance, please contact: {$a->supportemail} or submit a help request at {$a->helpurl}.';
 
 $string['instructormsg'] =
     'MESSAGE FROM INSTRUCTOR:' . "\n" .
@@ -74,6 +74,7 @@ $string['defaultrole_desc'] = 'Select role which should be assigned to users dur
 $string['default_subject'] = 'Site invitation for {$a}';
 $string['editenrollment'] = 'Edit enrollment';
 $string['header_email'] = 'Who do you want to invite?';
+$string['fromemail'] = 'From';
 $string['emailaddressnumber'] = 'Email address';
 
 $string['notifymsg'] = 'Hello, I would like to inform you that user $a->username, with email $a->email has successful gained access to your course, $a->course';
@@ -103,7 +104,6 @@ $string['editenrolment'] = 'Edit enrolment';
 $string['inviteexpiration'] = 'Invitation expiration';
 $string['inviteexpiration_desc'] = 'Length of time that an invitation is valid (in seconds). Default is 2 weeks.';
 
-$string['show_from_email'] = 'Allow invited user to contact me at {$a->email} (your address will be on the "FROM" field. If not selected, the "FROM" field will be {$a->supportemail})';
 $string['inviteusers'] = 'Invite users';
 $string['maxinviteerror'] = 'It must be a number.';
 $string['maxinviteperday'] = 'Maximum invitation per day';
@@ -133,10 +133,10 @@ $string['message_help'] =
     '* If you are not currently an enrolled student at UCLA with a 9 digit UID, select ' .
     '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE".<br />' .
     '* If you are a UC cross-campus visiting student, select "New UCLA Student".<br /><br />' .
-    'CONTACT CCLE:'.
+    'NEED HELP?:'.
     '<hr />'.
     'If you believe that you have received this message in error or are in need ' .
-    'of assistance, please contact: [support email].';
+    'of assistance, please contact: [sender\'s email] or submit a help request at [help block link with course id]';
 
 $string['noinvitationinstanceset'] = 'No invitation enrollment instance has been found. Please add an invitation enroll instance to your course first.';
 $string['nopermissiontosendinvitation'] = 'No permission to send invitation';

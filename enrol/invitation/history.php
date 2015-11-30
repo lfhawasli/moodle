@@ -138,7 +138,7 @@ if (empty($invites)) {
             $row[0] = $invite->email . " - " . $seniorscholarsupportemail . html_writer::empty_tag('br');
             $row[0] .= "(" . get_string('seniorscholar', 'enrol_invitation') . ")";
         } else {
-            $row[0] = $invite->email . " - " . $inviter;
+            $row[0] = $invite->email . " - " . $invite->fromemail;
         }
 
         // Figure out invited role.
