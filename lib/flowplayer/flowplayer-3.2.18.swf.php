@@ -15,15 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Flowplayer handling file.
  *
- * @package   mod_forum
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package core
+ * @copyright  Petr Skoda <petr.skoda@totaralms.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+define('NO_DEBUG_DISPLAY', true);
+define('NO_MOODLE_COOKIES', true);
+define('NO_UPGRADE_CHECK', true);
 
-$plugin->version   = 2014051204;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;       // Requires this Moodle version
-$plugin->component = 'mod_forum';      // Full name of the plugin (used for diagnostics)
+require('../../config.php');
+require('../../lib/flowplayer/lib.php');
+
+flowplayer_send_flash_content('flowplayer-3.2.18.swf');
