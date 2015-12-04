@@ -1,5 +1,5 @@
 <?php
-// This file is part of the SSC WOWZA plugin for Moodle - http://moodle.org/
+// This file is part of the OID WOWZA plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,3 +24,15 @@
 
 $settings->add(new admin_setting_configcheckbox('filter_oidwowza_enable_mp4',
         get_string('filter_oidwowza_enable_mp4', 'filter_oidwowza'), '', '0'));
+
+$settings->add(new admin_setting_configcheckbox('filter_oidwowza_hashclientip',
+        get_string('filter_oidwowza_hashclientip', 'filter_oidwowza'),
+        get_string('filter_oidwowza_hashclientip_desc', 'filter_oidwowza'), '1'));
+
+$settings->add(new admin_setting_configtext('filter_oidwowza_hoursexpire',
+        get_string('filter_oidwowza_hoursexpire', 'filter_oidwowza'),
+        get_string('filter_oidwowza_hoursexpire_desc', 'filter_oidwowza'), 4, PARAM_INT));
+
+$settings->add(new admin_setting_configtext('filter_oidwowza_sharedsecret',
+        get_string('filter_oidwowza_sharedsecret', 'filter_oidwowza'),
+        get_string('filter_oidwowza_sharedsecret_desc', 'filter_oidwowza'), '', PARAM_ALPHANUMEXT));
