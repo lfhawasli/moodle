@@ -1,4 +1,18 @@
-<?php  // $Id: lib.php,v 1.7.2.5 2009/04/22 21:30:57 skodak Exp $
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library of functions and constants for module videoannotation
@@ -25,6 +39,45 @@ define('VIDEOANNOTATION_GROUPMODE_ALL_GROUP', 7);
 define('VIDEOANNOTATION_GROUPMODE_ALL_ALL', 8);
 
 /**
+ * Returns the information on whether the module supports a feature
+ *
+ * See {@link plugin_supports()} for more info.
+ *
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed True if module supports feature, null if doesn't know
+ */
+function videoannotation_supports($feature) {
+    switch($feature) {
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_CONTROLS_GRADE_VISIBILITY:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
+        case FEATURE_IDNUMBER:
+            return true;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMMENT:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        default:
+            return null;
+    }
+}
+
+/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -37,9 +90,10 @@ function videoannotation_add_instance($videoannotation) {
     global $DB;
     $videoannotation->timecreated = time();
     $videoannotation->id = $DB->insert_record('videoannotation', $videoannotation);
-    if (!$videoannotation->id)
+    if (!$videoannotation->id) {
         return false;
-    
+    }
+
     if ($videoannotation->clipselect == 1) {
         $clip = new stdClass();
         $clip->videoannotationid = $videoannotation->id;
@@ -52,35 +106,28 @@ function videoannotation_add_instance($videoannotation) {
 
         $clip->timecreated = time();
         $clipid = $DB->insert_record('videoannotation_clips', $clip);
-        if (!$clipid)
+        if (!$clipid) {
             return false;
+        }
     }
-    
-    // Set groupmode field of the record in mdl_course_modules table
-    // Valid values are: NOGROUPS (group mode off) or SEPARATEGROUPS (group mode on) or VISIBLEGROUPS (group mode on visible)
-    
-    $courseModule = videoannotation_get_course_module_by_video_annotation($videoannotation->id);
-    if($videoannotation->groupmode == 0) {
+
+    // Set groupmode field of the record in mdl_course_modules table.
+    // Valid values are: NOGROUPS (group mode off) or SEPARATEGROUPS (group mode on) or VISIBLEGROUPS (group mode on visible).
+    $coursemodule = videoannotation_get_course_module_by_video_annotation($videoannotation->id);
+    if ($videoannotation->groupmode == 0) {
         $gm = NOGROUPS;
         $videoannotation->groupmode = NOGROUPS;
-    } else if($videoannotation->groupmode == 1) {
+    } else if ($videoannotation->groupmode == 1) {
         $gm = SEPARATEGROUPS;
         $videoannotation->groupmode = SEPARATEGROUPS;
     } else {
-        $gm = VISIBLEGROUPS; 
+        $gm = VISIBLEGROUPS;
         $videoannotation->groupmode = VISIBLEGROUPS;
     }
     $DB->set_field('course_modules', 'groupmode', $gm, array('instance' => $videoannotation->id));
-    // For some reason, it seems that the caller will reuse $videoannotation->groupmode 
-    // and set mdl_course_modules record's groupmode to this value
-    // So we have to set $videoannotation->groupmode to a value valid for mdl_course_modules.groupmode
-    // Valid values are: NOGROUPS (group mode off) or SEPARATEGROUPS (group mode on) or VISIBLEGROUPS (groupmode on visible)
-    
-    //$videoannotation->groupmode = $videoannotation->groupmode ? SEPARATEGROUPS : NOGROUPS;
-    
+
     return $videoannotation->id;
 }
-
 
 /**
  * Given an object containing all the necessary data,
@@ -94,9 +141,10 @@ function videoannotation_update_instance($videoannotation) {
     global $DB;
     $videoannotation->timemodified = time();
     $videoannotation->id = $videoannotation->instance;
-    if (!$DB->update_record('videoannotation', $videoannotation))
+    if (!$DB->update_record('videoannotation', $videoannotation)) {
         return false;
-        
+    }
+
     if ($videoannotation->clipselect == 1) {
         $clip = new Object();
         $clip->videoannotationid = $videoannotation->instance;
@@ -106,45 +154,39 @@ function videoannotation_update_instance($videoannotation) {
         $clip->playabletimeend = $videoannotation->playabletimeend;
         $clip->videowidth = $videoannotation->videowidth;
         $clip->videoheight = $videoannotation->videoheight;
-        
-        if ($clipid = $DB->get_field('videoannotation_clips', 'id', array('videoannotationid'=> $videoannotation->instance, 'userid'=> null))) {
+
+        if ($clipid = $DB->get_field('videoannotation_clips', 'id', array(
+            'videoannotationid' => $videoannotation->instance, 'userid' => null))) {
             $clip->id = $clipid;
             $clip->timemodified = time();
-            if (!$DB->update_record('videoannotation_clips', $clip))
+            if (!$DB->update_record('videoannotation_clips', $clip)) {
                 return false;
+            }
         } else {
             $clip->timecreated = time();
-            if (!($clipid = $DB->insert_record('videoannotation_clips', $clip)))
+            if (!($clipid = $DB->insert_record('videoannotation_clips', $clip))) {
                 return false;
+            }
         }
     }
-    
-    // Set groupmode field of the record in mdl_course_modules table
-    // Valid values are: NOGROUPS (group mode off) or SEPARATEGROUPS (group mode on) or VISIBLEGROUPS (group mode on visible)
-    
-    $courseModule = videoannotation_get_course_module_by_video_annotation($videoannotation->id);
-    if($videoannotation->groupmode == 0) {
+
+    // Set groupmode field of the record in mdl_course_modules table.
+    // Valid values are: NOGROUPS (group mode off) or SEPARATEGROUPS (group mode on) or VISIBLEGROUPS (group mode on visible).
+    $coursemodule = videoannotation_get_course_module_by_video_annotation($videoannotation->id);
+    if ($videoannotation->groupmode == 0) {
         $gm = NOGROUPS;
         $videoannotation->groupmode = NOGROUPS;
-    } else if($videoannotation->groupmode == 1) {
+    } else if ($videoannotation->groupmode == 1) {
         $gm = SEPARATEGROUPS;
         $videoannotation->groupmode = SEPARATEGROUPS;
     } else {
-        $gm = VISIBLEGROUPS; 
+        $gm = VISIBLEGROUPS;
         $videoannotation->groupmode = VISIBLEGROUPS;
     }
-    $DB->set_field('course_modules', 'groupmode', $gm, array('instance'=>$videoannotation->id));
-    
-    // For some reason, it seems that the caller will reuse $videoannotation->groupmode 
-    // and set mdl_course_modules record's groupmode to this value
-    // So we have to set $videoannotation->groupmode to a value valid for mdl_course_modules.groupmode
-    // Valid values are: NOGROUPS (group mode off) or SEPARATEGROUPS (group mode on) or VISIBLEGROUPS (group mode on visible)
-    
-    //$videoannotation->groupmode = $videoannotation->groupmode ? SEPARATEGROUPS : NOGROUPS;
-    
+    $DB->set_field('course_modules', 'groupmode', $gm, array('instance' => $videoannotation->id));
+
     return true;
 }
-
 
 /**
  * Given an ID of an instance of this module,
@@ -156,55 +198,49 @@ function videoannotation_update_instance($videoannotation) {
  */
 function videoannotation_delete_instance($id) {
     global $CFG, $DB;
-    if (! $videoannotation = $DB->get_record('videoannotation', array('id'=>$id))) {
+    if (!$videoannotation = $DB->get_record('videoannotation', array('id' => $id))) {
         return false;
     }
     $result = true;
 
-    # Delete any dependent records here #
-    
-    // Events
-    
-    $sql = "DELETE ve 
-            FROM {videoannotation_clips} vc 
-            JOIN {videoannotation_tags} vt ON vc.id = vt.clipid
-            JOIN {videoannotation_events} ve ON vt.id = ve.tagid
-            WHERE vc.videoannotationid =" . $videoannotation->id;
-/*    try {
-        $DB->delete_records_select('videoannotation_events', $sql, array('vaid'=> $videoannotation->id));
-    } catch (dml_exception $e) { */
+    // Delete any dependent records here.
+    // Delete events.
+    $sql = "DELETE ve
+              FROM {videoannotation_clips} vc
+              JOIN {videoannotation_tags} vt ON vc.id = vt.clipid
+              JOIN {videoannotation_events} ve ON vt.id = ve.tagid
+             WHERE vc.videoannotationid =" . $videoannotation->id;
+
     if (!$DB->execute($sql)) {
         $result = false;
     }
-    
-    // Tags
-    
-    $sql = "DELETE vt 
-            FROM {videoannotation_clips} vc 
-            JOIN {videoannotation_tags} vt ON vc.id = vt.clipid
-            WHERE vc.videoannotationid =" . $videoannotation->id;
+
+    // Delete tags.
+    $sql = "DELETE vt
+              FROM {videoannotation_clips} vc
+              JOIN {videoannotation_tags} vt ON vc.id = vt.clipid
+             WHERE vc.videoannotationid =" . $videoannotation->id;
     if (!$DB->execute($sql)) {
         $result = false;
     }
-    
-    // Module, clips, locks, submissions
-    // Each operation can be done independently
-        
-    if (!$DB->delete_records('videoannotation_clips', array('videoannotationid'=> $videoannotation->id))) {
+
+    // Delete module, clips, locks, submissions.
+    // Each operation can be done independently.
+    if (!$DB->delete_records('videoannotation_clips', array('videoannotationid' => $videoannotation->id))) {
         $result = false;
     }
-    
-    if (!$DB->delete_records('videoannotation_locks', array('videoannotationid'=> $videoannotation->id))) {
+
+    if (!$DB->delete_records('videoannotation_locks', array('videoannotationid' => $videoannotation->id))) {
         $result = false;
     }
-    
-    if (!$DB->delete_records('videoannotation_submissions', array('videoannotationid'=>$videoannotation->id))) {
+
+    if (!$DB->delete_records('videoannotation_submissions', array('videoannotationid' => $videoannotation->id))) {
         $result = false;
     }
-    
-    // Grades
-    videoannotation_grade_item_delete($videoannotation); 
-    if (!$DB->delete_records('videoannotation', array('id'=>$videoannotation->id))) {
+
+    // Delete grades.
+    videoannotation_grade_item_delete($videoannotation);
+    if (!$DB->delete_records('videoannotation', array('id' => $videoannotation->id))) {
         $result = false;
     }
 
@@ -220,7 +256,7 @@ function videoannotation_delete_instance($id) {
 function videoannotation_grade_item_delete($va) {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
-    return grade_update('mod/videoannotation', $va->course, 'mod', 'videoannotation', $va->id, 0, NULL, array('deleted' => 1));
+    return grade_update('mod/videoannotation', $va->course, 'mod', 'videoannotation', $va->id, 0, null, array('deleted' => 1));
 }
 
 /**
@@ -237,7 +273,6 @@ function videoannotation_user_outline($course, $user, $mod, $videoannotation) {
     return $return;
 }
 
-
 /**
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
@@ -249,7 +284,6 @@ function videoannotation_user_complete($course, $user, $mod, $videoannotation) {
     return true;
 }
 
-
 /**
  * Given a course and a time, this module should find recent activity
  * that has occurred in videoannotation activities and print it out.
@@ -259,9 +293,8 @@ function videoannotation_user_complete($course, $user, $mod, $videoannotation) {
  * @todo Finish documenting this function
  */
 function videoannotation_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  //  True if anything was printed, otherwise false
+    return false;  //  True if anything was printed, otherwise false.
 }
-
 
 /**
  * Function to be run periodically according to the moodle cron
@@ -274,7 +307,6 @@ function videoannotation_print_recent_activity($course, $isteacher, $timestart) 
 function videoannotation_cron () {
     return true;
 }
-
 
 /**
  * Must return an array of user records (all data) who are participants
@@ -289,7 +321,6 @@ function videoannotation_get_participants($videoannotationid) {
     return false;
 }
 
-
 /**
  * This function returns if a scale is being used by one videoannotation
  * if it has support for grading and scales. Commented code should be
@@ -303,15 +334,14 @@ function videoannotation_get_participants($videoannotationid) {
 function videoannotation_scale_used($videoannotationid, $scaleid) {
     $return = false;
 
-    //$rec = get_record("videoannotation","id","$videoannotationid","scale","-$scaleid");
+    // $rec = get_record("videoannotation","id","$videoannotationid","scale","-$scaleid");
     //
-    //if (!empty($rec) && !empty($scaleid)) {
+    // if (!empty($rec) && !empty($scaleid)) {
     //    $return = true;
-    //}
+    // }
 
     return $return;
 }
-
 
 /**
  * Checks if scale is being used by any instance of videoannotation.
@@ -322,13 +352,12 @@ function videoannotation_scale_used($videoannotationid, $scaleid) {
  * @return boolean True if the scale is used by any videoannotation
  */
 function videoannotation_scale_used_anywhere($scaleid) {
-    if ($scaleid and $DB->record_exists('videoannotation', array('grade'=> -$scaleid))) {
+    if ($scaleid and $DB->record_exists('videoannotation', array('grade' => -$scaleid))) {
         return true;
     } else {
         return false;
     }
 }
-
 
 /**
  * Execute post-install custom actions for the module
@@ -340,7 +369,6 @@ function videoannotation_install() {
     return true;
 }
 
-
 /**
  * Execute post-uninstall custom actions for the module
  * This function was added in 1.9
@@ -351,51 +379,50 @@ function videoannotation_uninstall() {
     return true;
 }
 
+// Any other videoannotation functions go here.  Each of them must have a name that
+// starts with videoannotation_
+// Remember (see note in first lines) that, if this section grows, it's HIGHLY
+// recommended to move all funcions below to a new "localib.php" file.
 
-//////////////////////////////////////////////////////////////////////////////////////
-/// Any other videoannotation functions go here.  Each of them must have a name that
-/// starts with videoannotation_
-/// Remember (see note in first lines) that, if this section grows, it's HIGHLY
-/// recommended to move all funcions below to a new "localib.php" file.
-
-function videoannotation_get_submission_count($video_annotation_id, $group_id=null) {
+function videoannotation_get_submission_count($videoannotationid, $groupid=null) {
     global $CFG, $DB;
-    
-    $base_sql = 
-    "SELECT COUNT(*) 
-    FROM {$CFG->prefix}videoannotation_submissions 
-    WHERE videoannotationid = " . (int) $video_annotation_id . '
-    AND timesubmitted IS NOT NULL';
-    if ($group_id == 'all')
-        $base_sql .= ' AND groupid IS NOT NULL';
-    else if ($group_id)
-        $base_sql .= ' AND groupid = ' . (int) $group_id;
-    else
-        $base_sql .= ' AND groupid IS NULL';
-    
-    $total_submission_count = $DB->count_records_sql($base_sql);
-    $ungraded_submission_count = $DB->count_records_sql($base_sql . ' AND timegraded IS NULL');
-    
-    return array($total_submission_count, $ungraded_submission_count);
+
+    $basesql = "SELECT COUNT(*)
+                   FROM {$CFG->prefix}videoannotation_submissions
+                  WHERE videoannotationid = " . (int) $videoannotationid . '
+                    AND timesubmitted IS NOT NULL';
+    if ($groupid == 'all') {
+        $basesql .= ' AND groupid IS NOT NULL';
+    } else if ($groupid) {
+        $basesql .= ' AND groupid = ' . (int) $groupid;
+    } else {
+        $basesql .= ' AND groupid IS NULL';
+    }
+
+    $totalsubmissioncount = $DB->count_records_sql($basesql);
+    $ungradedsubmissioncount = $DB->count_records_sql($basesql . ' AND timegraded IS NULL');
+
+    return array($totalsubmissioncount, $ungradedsubmissioncount);
 }
 
-function videoannotation_get_clip_info($clip_url) {
+function videoannotation_get_clip_info($clipurl) {
     global $CFG;
-    
+
     $result = array();
-    
-    // If the URL is a TNA permalink,
-    // Use the web service to translate it into a RTMP link
-    foreach ($CFG->tna_permalink_url as $idx => $tna_permalink_url) {
-        if ($clip_url and stripos($clip_url, $tna_permalink_url) === 0) {
-            @list($uuid, $offset) = explode(',', substr($clip_url, strlen($tna_permalink_url)));
+
+    // If the URL is a TNA permalink, use the web service to translate it into a RTMP link.
+    foreach ($CFG->tnapermalinkurl as $idx => $tnapermalinkurl) {
+        if ($clipurl and stripos($clipurl, $tnapermalinkurl) === 0) {
+            @list($uuid, $offset) = explode(',', substr($clipurl, strlen($tnapermalinkurl)));
             if ($uuid) {
-                $content = file_get_contents($CFG->tna_webservice_url[$idx] . '?action=uuidToFileName&uuid=' . urlencode(trim($uuid)));
+                $content = file_get_contents($CFG->tnawebservice_url[$idx] .
+                    '?action=uuidToFileName&uuid=' . urlencode(trim($uuid)));
                 $contentobj = json_decode($content);
                 if (preg_match('/^(\d{4})\-(\d{2})\-(\d{2})_(\d{2})(\d{2})/', $contentobj->filename, $matches)) {
                     return array(
-                    'streamer' => $CFG->tna_streamer_url,
-                    'file' => "{$matches[1]}/{$matches[1]}-{$matches[2]}/{$matches[1]}-{$matches[2]}-{$matches[3]}/" . basename($contentobj->filename, '.txt') . '.mp4',
+                    'streamer' => $CFG->tnastreamerurl,
+                    'file' => "{$matches[1]}/{$matches[1]}-{$matches[2]}/{$matches[1]}-{$matches[2]}-{$matches[3]}/" .
+                        basename($contentobj->filename, '.txt') . '.mp4',
                     'start' => $offset > 0 ? $offset : 0
                     );
                 }
@@ -403,44 +430,40 @@ function videoannotation_get_clip_info($clip_url) {
         }
     }
 
-    
-    if (preg_match('/^(rtmp:\/\/.*?\/.*?)\/(.*)/', $clip_url, $matches)) {
+    if (preg_match('/^(rtmp:\/\/.*?\/.*?)\/(.*)/', $clipurl, $matches)) {
         return array('streamer' => $matches[1], 'file' => $matches[2]);
     }
 
-	if (stripos($clip_url, 'http://www.youtube.com/watch?') === 0) {
-		return array('file' => $clip_url, 'width' => 640, 'height' => 385);
-	}
-    
-    return array('file' => $clip_url);
+    if (stripos($clipurl, 'http://www.youtube.com/watch?') === 0) {
+        return array('file' => $clipurl, 'width' => 640, 'height' => 385);
+    }
+
+    return array('file' => $clipurl);
 }
 
-function videoannotation_get_course_module_by_video_annotation($videoannotationId) {
+function videoannotation_get_course_module_by_video_annotation($videoannotationid) {
     global $CFG, $DB;
-    $sql = "
-    SELECT cm.*
-    FROM mdl_course_modules cm
-    JOIN mdl_modules m ON cm.module = m.id and m.name = 'videoannotation'
-    JOIN mdl_videoannotation v ON cm.instance = v.id AND v.id = " . (int) $videoannotationId;
+    $sql = "SELECT cm.*
+              FROM mdl_course_modules cm
+              JOIN mdl_modules m ON cm.module = m.id and m.name = 'videoannotation'
+              JOIN mdl_videoannotation v ON cm.instance = v.id AND v.id = " . (int) $videoannotationid;
     return $DB->get_record_sql($sql);
 }
 
-// Define json_encode and json_decode if they are not defined (i.e. PHP < 5.2)
+// Define json_encode and json_decode if they are not defined (i.e. PHP < 5.2).
 
 if (!function_exists('json_decode')) {
     require_once(dirname(__FILE__) . '/JSON.php');
     function json_encode($data) {
         $value = new Services_JSON();
-        return $value->encode($data); 
+        return $value->encode($data);
     }
     function json_decode($data, $assoc = false) {
-        if ($assoc)
+        if ($assoc) {
             $value = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
-        else
+        } else {
             $value = new Services_JSON();
-        
+        }
         return $value->decode($data);
     }
 }
-
-?>

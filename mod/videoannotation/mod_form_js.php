@@ -52,7 +52,6 @@ jQuery('#id_preview').click(function() {
             jwplayerParams = {
                 players: [
                     { type: "flash", src: wwwroot + "/mod/videoannotation/jwplayer-6.6/player.swf" }
-                    //{ type: "flash", src: wwwroot + "/mod/videoannotation/jwplayer-5.3/player.swf" }
                 ],
                 height: Number(jQuery('#id_videoheight').val()),
                 width: Number(jQuery('#id_videowidth').val()),

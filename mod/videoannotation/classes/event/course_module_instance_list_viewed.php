@@ -14,8 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-function videoannotation_user_candoanything() {
-    $context = get_context_instance(CONTEXT_SYSTEM);
+/**
+ * The mod_quiz instance list viewed event.
+ *
+ * @package    mod_videoannotation
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-    return (has_capability('moodle/site:doanything', $context));
+namespace mod_videoannotation\event;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * The mod_videoannotation instance list viewed event class.
+ *
+ * @package    mod_videoannotation
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+    // No code required here as the parent class handles it all.
 }

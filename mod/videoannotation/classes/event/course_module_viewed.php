@@ -15,13 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Code fragment to define the version of videoannotation
- * This fragment is called by moodle_needs_upgrading() and /admin/index.php
+ * The mod_videoannotation course module viewed event.
  *
  * @package    mod_videoannotation
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$module->version  = 2013110600;  // The current module version (Date: YYYYMMDDXX)
-$module->cron     = 0;           // Period for cron to check this module (secs)
+namespace mod_videoannotation\event;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * The mod_videoannotation course module viewed event class.
+ *
+ * If the view mode needs to be stored as well, you may need to
+ * override methods get_url() and get_legacy_log_data(), too.
+ *
+ * @package    mod_videoannotation
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_module_viewed extends \core\event\course_module_viewed {
+
+    /**
+     * Initialize the event
+     */
+    protected function init() {
+        $this->data['objecttable'] = 'videoannotation';
+        parent::init();
+    }
+}

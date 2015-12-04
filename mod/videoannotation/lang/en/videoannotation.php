@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * English strings for Video Annotation.
+ *
+ * @package   mod_videoannotation
+ * @copyright 2015 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $string['videoannotation'] = 'Video Annotation';
 $string['pluginname'] = 'Video Annotation';
@@ -108,10 +130,14 @@ $string['coursemodincorrect'] = 'Course module is incorrect';
 $string['specifyid'] = 'you must specify a course_module ID or an instance ID';
 $string['vaidincorrect'] = 'Video annotation activity ID was incorrect';
 $string['vididincorrect'] = 'Video annotation ID was incorrect';
+$string['clipnotfound'] = 'Clip not found for video annotation {$a->vaid} and user {$a->userid}';
+$string['invalidclipselect'] = 'Invalid clipselect value {$a->clipselect} for video annotation {$a->vaid} and user {$a->$userid}';
 $string['groupmustbe'] = 'Group must be given';
 $string['notingroup'] = 'Not in given group';
 $string['onegroup'] = 'Must have at least one group';
 $string['notgroup'] = 'Not a valid group';
 $string['importsyntax'] = 'The import file contains sytax errors';
 
+$string['tnastreamerurl'] = 'TNA Streamer URL';
+$string['tnastreamerurl_desc'] = '';
 ?>

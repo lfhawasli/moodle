@@ -14,8 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-function videoannotation_user_candoanything() {
-    $context = get_context_instance(CONTEXT_SYSTEM);
+/**
+ * @package    mod_videoannotation
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-    return (has_capability('moodle/site:doanything', $context));
+defined('MOODLE_INTERNAL') || die();
+
+if ($ADMIN->fulltree) {
+    $settings = new admin_settingpage('modsettingvideoannotation', get_string('pluginname', 'mod_videoannotation'));
+
+    $tnastreamerurl = new admin_setting_configtext('tnastreamerurl', get_string('tnastreamerurl', 'mod_videoannotation'),
+            get_string('tnastreamerurl_desc', 'mod_videoannotation'), '', PARAM_URL);
+    $settings->add($tnastreamerurl);
 }
