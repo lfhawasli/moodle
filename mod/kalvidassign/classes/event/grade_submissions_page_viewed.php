@@ -19,7 +19,7 @@
  *
  * @package    mod
  * @subpackage kalvidassign
- * @copyright  2015 UC Regents
+ * @copyright  2015 Rex Lorenzo <rexlorenzo@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_kalvidassign\event;
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
  * 
  *
  * @since     Moodle 2.7
- * @copyright 2015 UC Regents
+ * @copyright 2015 Rex Lorenzo <rexlorenzo@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 class grade_submissions_page_viewed extends \core\event\base {

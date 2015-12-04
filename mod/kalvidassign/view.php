@@ -48,14 +48,11 @@ $PAGE->add_body_class($pageclass);
 
 $context = context_module::instance($cm->id);
 
-// START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
-//add_to_log($course->id, 'kalvidassign', 'view assignment details', 'view.php?id='.$cm->id, $kalvidassign->id, $cm->id);
 $event = \mod_kalvidassign\event\assignment_details_viewed::create(array(
             'objectid' => $kalvidassign->id,
             'context' => context_module::instance($cm->id)
         ));
 $event->trigger();
-// END UCLA MOD: CCLE-5179
 
 // Update 'viewed' state if required by completion system
 $completion = new completion_info($course);
@@ -134,7 +131,9 @@ if (!has_capability('mod/kalvidassign:gradesubmission', $context)) {
     $params = array(
         'bodyclass' => $pageclass,
         'lastheight' => null,
-        'padding' => 15
+        'padding' => 15,
+        'width' => isset($kalvidassign->width) ? $kalvidassign->width : null,
+        'height' => isset($kalvidassign->height) ? $kalvidassign->height : null
     );
     $PAGE->requires->yui_module('moodle-local_kaltura-lticontainer', 'M.local_kaltura.init', array($params), null, true);
     $PAGE->requires->string_for_js('replacevideo', 'kalvidassign');
