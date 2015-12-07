@@ -156,10 +156,6 @@ $CFG->cachejs = false;
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
-// Enable customscripts for Respondus and other UCLA custom changes.
-// NOTE: config is in local/ucla/configs, even though it is linked in root.
-$CFG->customscripts = __DIR__."/../../../"."local/ucla/customscripts";
-
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
@@ -584,6 +580,10 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_access']
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_error'] = '/var/log/httpd/ssl_error_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_apache_ssl_request'] = '/var/log/httpd/ssl_request_log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
+
+// Enable customscripts for Respondus and other UCLA custom changes.
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = $_dirroot_ . "/local/ucla/customscripts";
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
