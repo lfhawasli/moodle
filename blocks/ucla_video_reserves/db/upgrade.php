@@ -58,5 +58,21 @@ function xmldb_block_ucla_video_reserves_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2015100700, 'ucla_video_reserves');
     }
 
+    if ($oldversion < 2015120700) {
+
+        // Changing precision of field filename on table ucla_video_reserves to (255).
+        $table = new xmldb_table('ucla_video_reserves');
+        $fields[] = new xmldb_field('filename', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'video_url');
+        $fields[] = new xmldb_field('subtitle', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'filename');
+
+        // Launch change of precision.
+        foreach ($fields as $field) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        // Ucla_video_reserves savepoint reached.
+        upgrade_block_savepoint(true, 2015120700, 'ucla_video_reserves');
+    }
+
     return true;
 }
