@@ -47,7 +47,7 @@
  * @return boolean
  */
 function xmldb_enrol_invitation_upgrade($oldversion) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
@@ -274,6 +274,49 @@ function xmldb_enrol_invitation_upgrade($oldversion) {
 
         // Invitation savepoint reached.
         upgrade_plugin_savepoint(true, 2013042600, 'enrol', 'invitation');
+    }
+
+    // Add fromemail column and delete show_from_email column.
+    if ($oldversion < 2015120700) {
+        $table = new xmldb_table('enrol_invitation');
+
+        // 1) Delete show_from_email column.
+        $showfromemail = new xmldb_field('show_from_email');
+        if($dbman->field_exists($table, $showfromemail)) {
+            $dbman->drop_field($table, $showfromemail);
+        }
+
+        // 2) Add from column.
+        $fromemail = new xmldb_field('fromemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'notify_inviter');
+        if(!$dbman->field_exists($table, $fromemail)) {
+            $dbman->add_field($table, $fromemail);
+        }
+
+        // Fill in fromemail field with inviterid current email.
+        $fromemailempty = $DB->sql_isempty('enrol_invitation', 'fromemail', false, true);
+        $invites = $DB->get_recordset_select('enrol_invitation', $fromemailempty, null, 'id,inviterid');
+        if ($invites->valid()) {
+            // Display progress.
+            $totalcount = $DB->count_records_select('enrol_invitation', $fromemailempty);
+
+            $pbar = new progress_bar('enrol_invitation_upgrade', 500, true);
+            $cacheemails = array();
+            $i = 1;
+            foreach ($invites as $invite) {
+                if (!isset($cacheemails[$invite->inviterid])) {
+                    $cacheemails[$invite->inviterid] = $DB->get_field('user', 
+                            'email', array('id' => $invite->inviterid));
+                }
+                $fromemail = $cacheemails[$invite->inviterid];
+                $DB->set_field('enrol_invitation', 'fromemail', $fromemail,
+                        array('id' => $invite->id));
+                $pbar->update($i, $totalcount, "Upgrading enrol_invitation table - $i/$totalcount.");
+                $i++;
+            }
+        }
+
+        // Invitation savepoint reached.
+        upgrade_plugin_savepoint(true, 2015120700, 'enrol', 'invitation');
     }
 
     return true;

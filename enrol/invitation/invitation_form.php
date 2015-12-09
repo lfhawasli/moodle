@@ -120,8 +120,13 @@ class invitation_form extends moodleform {
         $mform->addRule('role_group',
                 get_string('norole', 'enrol_invitation'), 'required');
 
-        // Email address field.
         $mform->addElement('header', 'header_email', get_string('header_email', 'enrol_invitation'));
+        // Email from field
+        $mform->addElement('text', 'fromemail', get_string('fromemail', 'enrol_invitation'));
+        $mform->addRule('fromemail', null, 'required', null, 'client');
+        $mform->setType('fromemail', PARAM_EMAIL);
+        $mform->setDefault('fromemail', $USER->email);
+        // Email address field.
         $mform->addElement('textarea', 'email', get_string('emailaddressnumber', 'enrol_invitation'),
                 array('maxlength' => 1000, 'class' => 'form-invite-email'));
         $mform->addRule('email', null, 'required', null, 'client');
@@ -151,20 +156,17 @@ class invitation_form extends moodleform {
         $temp = new stdClass();
         $temp->email = $USER->email;
         $temp->supportemail = $CFG->supportemail;
-        $mform->addElement('checkbox', 'show_from_email', '',
-                get_string('show_from_email', 'enrol_invitation', $temp));
         $mform->addElement('checkbox', 'notify_inviter', '',
                 get_string('notify_inviter', 'enrol_invitation', $temp));
-        $mform->setDefault('show_from_email', 1);
         $mform->setDefault('notify_inviter', 0);
 
         // Set defaults if the user is resending an invite that expired.
         if ( !empty($prefilled) ) {
             $mform->setDefault('role_group[roleid]', $prefilled['roleid']);
             $mform->setDefault('email', $prefilled['email']);
+            $mform->setDefault('fromemail', $prefilled['fromemail']);
             $mform->setDefault('subject', $prefilled['subject']);
             $mform->setDefault('message', $prefilled['message']);
-            $mform->setDefault('show_from_email', $prefilled['show_from_email']);
             $mform->setDefault('notify_inviter', $prefilled['notify_inviter']);
         }
 
