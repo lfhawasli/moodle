@@ -300,6 +300,7 @@ class enrol_invitation_events_testcase extends advanced_testcase {
         $data = new stdClass();
         $data->courseid = $this->testcourse->id;
         $data->email = $this->testinvitee->email;
+        $data->fromemail = $this->testinviter->email;
         $data->role_group['roleid'] = $DB->get_field('role', 'id', array('shortname' => 'student'));
         $data->subject = 'Test invite';
 

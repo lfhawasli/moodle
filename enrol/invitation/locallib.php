@@ -163,6 +163,7 @@ class invitation_manager {
                 // Save token information in config (token value, course id, TODO: role id).
                 $invitation = new stdClass();
                 $invitation->email = $data->email;
+                $invitation->fromemail = $data->fromemail;
                 $invitation->courseid = $data->courseid;
                 $invitation->token = $token;
                 $invitation->tokenused = false;
@@ -188,7 +189,6 @@ class invitation_manager {
 
                 $invitation->inviterid = $USER->id;
                 $invitation->notify_inviter = empty($data->notify_inviter) ? 0 : 1;
-                $invitation->show_from_email = empty($data->show_from_email) ? 0 : 1;
 
                 // Construct message: custom (if any) + template.
                 $message = '';
@@ -233,7 +233,10 @@ class invitation_manager {
                 }
 
                 $message_params->inviteurl = $inviteurl;
-                $message_params->supportemail = $CFG->supportemail;
+                $message_params->supportemail = $data->fromemail;
+                $helpurl = new moodle_url('/blocks/ucla_help/index.php', array('course' => $this->courseid));
+                $helpurl = $helpurl->out(false);
+                $message_params->helpurl = $helpurl;
                 $message .= get_string('emailmsgtxt', 'enrol_invitation', $message_params);
 
                 if (!$resend) {
@@ -243,20 +246,18 @@ class invitation_manager {
                     $retval = $data->id;
                 }
 
-                // Change FROM to be $CFG->supportemail if user has show_from_email off.
-                $fromuser = $USER;
-                if (empty($invitation->show_from_email)) {
-                    $fromuser = new stdClass();
-                    $fromuser->email = $CFG->supportemail;
-                    $fromuser->firstname = '';
-                    $fromuser->lastname = $SITE->fullname;
-                    $fromuser->maildisplay = true;
-                    // Moodle 2.7 introduced new username fields.
-                    $fromuser->alternatename = '';
-                    $fromuser->firstnamephonetic = '';
-                    $fromuser->lastnamephonetic = '';
-                    $fromuser->middlename = '';
-                }
+                // User sending invitation.
+                $fromuser = new stdClass();
+                $fromuser->email = $data->fromemail;
+                $fromuser->firstname = '';
+                $fromuser->lastname = '';
+                $fromuser->maildisplay = true;
+                $fromuser->id = $USER->id;
+                // Moodle 2.7 introduced new username fields.
+                $fromuser->alternatename = '';
+                $fromuser->firstnamephonetic = '';
+                $fromuser->lastnamephonetic = '';
+                $fromuser->middlename = '';
 
                 // Send invitation to the user.
                 $contactuser = new stdClass();

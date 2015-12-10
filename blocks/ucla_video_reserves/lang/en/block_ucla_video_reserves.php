@@ -23,6 +23,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+$string['availability'] = 'Available: ';
 $string['back'] = 'Back to video listing';
 $string['currentvideo'] = 'Current videos';
 $string['errorinvalidvideo'] = 'Cannot find given video.';
@@ -30,7 +31,7 @@ $string['errorpermission'] = 'You do not have permission to view this video.';
 $string['eventindexviewed'] = 'Index viewed';
 $string['eventvideoviewed'] = 'Video viewed';
 $string['futurevideo'] = 'Future videos';
-$string['futurevideo_info'] = 'This video will be available on {$a}';
+$string['futurevideo_info'] = 'Will be available on {$a}';
 $string['intro'] = 'Please note that this media is intended for on-campus use only.
     Off-campus use is possible in certain circumstances, but it is not supported, dependable, or
     recommended. In order to view the video streams, you may need to download and install the
@@ -38,7 +39,7 @@ $string['intro'] = 'Please note that this media is intended for on-campus use on
 $string['header'] = 'Video reserves: {$a}';
 $string['novideo'] = 'No videos available';
 $string['pastvideo'] = 'Past videos';
-$string['pastvideo_info'] = 'This video is no longer available as of {$a}';
+$string['pastvideo_info'] = 'No longer available as of {$a}';
 $string['pluginname'] = 'UCLA video reserves';
 $string['title'] = 'Video reserves';
 $string['sourceurl'] = 'Source URL';

@@ -139,3 +139,15 @@
 [submodule "filter/collapsible"]
 	path = filter/collapsible
 	url = git@github.com:ccle/moodle-filter_collapsible.git
+[submodule "mod/turnitintooltwo"]
+	path = mod/turnitintooltwo
+	url = git@github.com:ccle/moodle-mod_turnitintooltwo.git
+[submodule "blocks/turnitin"]
+	path = blocks/turnitin
+	url = git@github.com:ccle/moodle-block_turnitin.git
+[submodule "plagiarism/turnitin"]
+	path = plagiarism/turnitin
+	url = git@github.com:ccle/moodle-plagiarism_turnitin.git
+[submodule "mod/certificate"]
+	path = mod/certificate
+	url = git@github.com:ccle/moodle-mod_certificate.git 

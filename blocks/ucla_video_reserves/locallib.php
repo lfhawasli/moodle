@@ -187,15 +187,23 @@ function print_video_list($videolist, $headertitle) {
         if ($headertitle == get_string('pastvideo', 'block_ucla_video_reserves')) {
             $outputstr = $video->video_title . ' (' .
                     get_string('pastvideo_info', 'block_ucla_video_reserves',
-                               date('Y-m-d', $video->stop_date)) . ')';
+                               userdate($video->stop_date, get_string('strftimedatefullshort'))) . ')';
         } else if ($headertitle == get_string('futurevideo', 'block_ucla_video_reserves')) {
             $outputstr = $video->video_title . ' (' .
                     get_string('futurevideo_info', 'block_ucla_video_reserves',
-                               date('Y-m-d', $video->start_date)) . ')';
+                               userdate($video->start_date, get_string('strftimedatefullshort'))) . ')';
         } else {
             $outputstr = html_writer::link(
                     new moodle_url('/blocks/ucla_video_reserves/view.php',
                             array('id' => $video->id)), $video->video_title);
+            // Append available dates to each link.
+            if ($video->start_date != null && $video->stop_date != null) {
+                $start = userdate($video->start_date, get_string('strftimedatefullshort'));
+                $stop = userdate($video->stop_date, get_string('strftimedatefullshort'));
+                $outputstr .= ' (' .
+                        get_string('availability', 'block_ucla_video_reserves') .
+                        $start . ' - ' . $stop . ')';
+            }
         }
         $output[] = $outputstr;
     }
