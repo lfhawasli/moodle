@@ -61,14 +61,11 @@ echo $OUTPUT->header();
 
 require_capability('mod/kalvidassign:gradesubmission', context_module::instance($cm->id));
 
-// START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
-//add_to_log($course->id, 'kalvidassign', 'view submissions page', 'grade_submissions.php?cmid='.$cm->id, $kalvidassignobj->id, $cm->id);
 $event = \mod_kalvidassign\event\grade_submissions_page_viewed::create(array(
     'objectid'  => $kalvidassignobj->id,
     'context'   => context_module::instance($cm->id)
 ));
 $event->trigger();
-// END UCLA MOD: CCLE-5179
 
 $prefform =  new kalvidassign_gradepreferences_form(null, array('cmid' => $cm->id, 'groupmode' => $cm->groupmode));
 $data = null;
@@ -151,8 +148,6 @@ if (!empty($gradedata->mode)) {
                 kalvidassign_grade_item_update($kalvidassignobj, $grade);
 
                 // Add to log only if updating.
-                // START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
-                //add_to_log($kalvidassignobj->course, 'kalvidassign', 'update grades', 'grade_submissions.php?cmid='.$cm->id, $cm->id);
                 $event = \mod_kalvidassign\event\grades_updated::create(array(
                             'context'   => context_module::instance($cm->id),
                             'other'     => array(
@@ -160,7 +155,6 @@ if (!empty($gradedata->mode)) {
                             )
                 ));
                 $event->trigger();
-                // END UCLA MOD: CCLE-5179
             }
 
         } else {
@@ -203,8 +197,6 @@ if (!empty($gradedata->mode)) {
                 kalvidassign_grade_item_update($kalvidassignobj, $grade);
 
                 // Add to log only if updating
-                // START UCLA MOD: CCLE-5179 - Kaltura plugin does not log to new logstore table
-                //add_to_log($kalvidassignobj->course, 'kalvidassign', 'update grades', 'grade_submissions.php?cmid='.$cm->id, $cm->id);
                 $event = \mod_kalvidassign\event\grades_updated::create(array(
                             'context'   => context_module::instance($cm->id),
                             'other'     => array(
@@ -212,7 +204,6 @@ if (!empty($gradedata->mode)) {
                             )
                 ));
                 $event->trigger();
-                // END UCLA MOD: CCLE-5179
             }
 
         }

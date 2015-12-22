@@ -143,10 +143,6 @@ $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
-// Enable customscripts for Respondus and other UCLA custom changes.
-// NOTE: config is in local/ucla/configs, even though it is linked in root.
-$CFG->customscripts = __DIR__."/../../../"."local/ucla/customscripts";
-
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
@@ -249,6 +245,8 @@ $CFG->country = 'US';
 
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
+// CCLE-5193: Disable assignment module default student notification
+$CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
@@ -586,6 +584,10 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_shibd'] 
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_shibboleth_trans'] = '/var/log/shibboleth/transaction.log';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_moodle_cron'] = '/home/moodle/logs/moodlecron/moodlecron.out';
 $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = $CFG->dataroot . '/course_creator/';
+
+// Enable customscripts for Respondus and other UCLA custom changes.
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = $_dirroot_ . "/local/ucla/customscripts";
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');

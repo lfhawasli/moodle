@@ -83,11 +83,11 @@ function define_data_source() {
     $retval[] = array('name' => 'filename',
                       'type' => 'string',
                       'min_size' => '0',
-                      'max_size' => '30');
+                      'max_size' => '255');
     $retval[] = array('name' => 'subtitle',
                       'type' => 'string',
                       'min_size' => '0',
-                      'max_size' => '30');
+                      'max_size' => '255');
     $retval[] = array('name' => 'height',
                       'type' => 'int',
                       'min_size' => '0',

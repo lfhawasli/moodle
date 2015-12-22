@@ -345,6 +345,7 @@ class invitation_manager_testcase extends advanced_testcase {
         $data = new stdClass();
         $data->courseid = $courseid;
         $data->email = $this->testinvitee->email;
+        $data->fromemail = $this->testinviter->email;
         $data->role_group['roleid'] = $DB->get_field('role', 'id', array('shortname' => 'student'));
         $data->subject = 'Test invite';
 
@@ -371,7 +372,6 @@ class invitation_manager_testcase extends advanced_testcase {
         $invitation->inviterid = $this->testinviter->id;
         $invitation->subject = 'Test';
         $invitation->notify_inviter = 0;
-        $invitation->show_from_email = 1;
         $invitation->daysexpire = 0;
 
         return $invitation;

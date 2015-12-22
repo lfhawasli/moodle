@@ -71,9 +71,9 @@ if ($inviteid) {
     if ( $invite = $DB->get_record('enrol_invitation', array('courseid' => $courseid, 'id' => $inviteid)) ) {
         $prefilled['roleid'] = $invite->roleid;
         $prefilled['email'] = $invite->email;
+        $prefilled['fromemail'] = $invite->fromemail;
         $prefilled['subject'] = $invite->subject;
         $prefilled['message'] = $invite->message;
-        $prefilled['show_from_email'] = $invite->show_from_email;
         $prefilled['notify_inviter'] = $invite->notify_inviter;
     } else {
         print_error('invalidinviteid');

@@ -144,10 +144,6 @@ $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
-// Enable customscripts for Respondus and other UCLA custom changes.
-// NOTE: config is in local/ucla/configs, even though it is linked in root.
-$CFG->customscripts = __DIR__."/../../../"."local/ucla/customscripts";
-
 // Newly created courses for ucla formats should only have the course menu block
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
@@ -545,6 +541,10 @@ $CFG->forced_plugin_settings['enrol_database']['localcoursefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localrolefield'] = 'id';
 $CFG->forced_plugin_settings['enrol_database']['localuserfield'] = 'idnumber';
 $CFG->forced_plugin_settings['enrol_database']['unenrolaction'] = 0;    // ENROL_EXT_REMOVED_UNENROL
+
+// Enable customscripts for Respondus and other UCLA custom changes.
+// NOTE: config is in local/ucla/configs, even though it is linked in root.
+$CFG->customscripts = $_dirroot_ . "/local/ucla/customscripts";
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');

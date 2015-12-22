@@ -15,15 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for 'cclevoice' plugin.
+ * Flowplayer handling file.
  *
- * @package   tinymce_cclevoice
- * @copyright 2013 CCLE UCLA
- * @license
+ * @package core
+ * @copyright  Petr Skoda <petr.skoda@totaralms.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'CCLE Voice';
+define('NO_DEBUG_DISPLAY', true);
+define('NO_MOODLE_COOKIES', true);
+define('NO_UPGRADE_CHECK', true);
 
-/* All lang strings used from TinyMCE JavaScript code must be named 'pluginname:stringname', no need to create langs/en_dlg.js */
-$string['cclevoice:desc'] = 'CCLE Voice';
-$string['title'] = 'Insert a CCLE Voice Recording';
+require('../../config.php');
+require('../../lib/flowplayer/lib.php');
+
+flowplayer_send_flash_content('flowplayer-3.2.18.swf');

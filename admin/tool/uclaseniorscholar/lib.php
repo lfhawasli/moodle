@@ -46,7 +46,11 @@ function seniorscholar_has_access($user) {
  */
 function get_seniorscholar_admin_userid() {
     global $DB;
-    $uidstringarray = explode(';', get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'));
+    $uidstring = get_config('tool_uclaseniorscholar', 'seniorscholaradministrator');
+    if (empty($uidstring)) {
+        return array();
+    }
+    $uidstringarray = explode(';', $uidstring);
     $result = $DB->get_records_list('user', 'idnumber', $uidstringarray, null, 'id');
     return array_keys($result);
 }

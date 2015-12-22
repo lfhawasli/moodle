@@ -19,7 +19,7 @@
  *
  * @package    mod
  * @subpackage kalvidres
- * @copyright  2015 UC Regents
+ * @copyright  2015 Rex Lorenzo <rexlorenzo@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_kalvidres\event;
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  * The video_resource_viewed event class.
  *
  * @since     Moodle 2.7
- * @copyright 2015 UC Regents
+ * @copyright 2015 Rex Lorenzo <rexlorenzo@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 class video_resource_viewed extends \core\event\base {
