@@ -9,14 +9,14 @@ Feature: Restoring a course and keeping section names from backup
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher | Teacher | 1 | teacher@asd.com |
-    And the following "courses" exist:
-      | fullname | shortname | format |
-      | Source | source | ucla |
-      | Target | target | ucla |
-    And the following "course enrolments" exist:
+    And the following ucla "sites" exist:
+      | fullname | shortname | type |
+      | Source | source | instruction |
+      | Target | target | instruction |
+    And the following ucla "enrollments" exist:
       | user | course | role |
-      | teacher | source | editingteacher |
-      | teacher | target | editingteacher |
+      | teacher | source | editinginstructor |
+      | teacher | target | editinginstructor |
     And I log in as "teacher"
 
   @javascript
@@ -24,13 +24,13 @@ Feature: Restoring a course and keeping section names from backup
     When I am on homepage
     And I follow "Source"
     And I turn editing mode on
-    And I follow "Week 1"
+    And I follow the "Week 1" section in the ucla site menu
     And I click on "Edit section" "link"
     And I set the following fields to these values:
       | Use default section name | 0 |
       | id_name | testsection1 |
     And I press "Save changes"
-    And I follow "Week 2"
+    And I follow the "Week 2" section in the ucla site menu
     And I click on "Edit section" "link"
     And I set the following fields to these values:
       | Use default section name | 0 |
@@ -39,4 +39,4 @@ Feature: Restoring a course and keeping section names from backup
     And I import "Source" course into "Target" course using this options:
     Then I should see "testsection1"
     And I should see "testsection2"
-    And I should see "Week 3"
+    And I should see "Week 3" in the ucla site menu

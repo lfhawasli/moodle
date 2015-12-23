@@ -130,6 +130,7 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
 
             $displaylist['messageselect.php'] = get_string('messageselectadd');
             $frontpagectx = context_course::instance(SITEID);
+            $context = context_course::instance($COURSE->id);
             if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $frontpagectx) && $context->id != $frontpagectx->id) {
                 $displaylist['addnote.php'] = get_string('addnewnote', 'notes');
                 $displaylist['groupaddnote.php'] = get_string('groupaddnewnote', 'notes');
