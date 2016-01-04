@@ -1158,14 +1158,24 @@ class uclacoursecreator {
             }
 
             $session = $rci_object->session;
-            if ($session == '6A' || $session == '6C') {
-                $courseobj->numsections = 6;
-            } else if ($session == '8A') {
-                $courseobj->numsections = 8;
-            } else {
-                $courseobj->numsections = 10;
+            switch ($session) {
+                case '6A':
+                case '6C':
+                case 'FP':
+                case 'PC':
+                case 'OC':
+                    $courseobj->numsections = 6;
+                    break;
+                case '8A':
+                    $courseobj->numsections = 8;
+                    break;
+                case 'OS':
+                    $courseobj->numsections = 12;
+                    break;
+                default:
+                    $courseobj->numsections = 10;
+                    break;
             }
-
             $courseobj->category = $category->id;
 
             // save course
