@@ -15,20 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Cache definitions.
  *
  * @package    block_ucla_tasites
- * @copyright  2015 UC Regents
+ * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2016011300;
+defined('MOODLE_INTERNAL') || die();
 
-// Add dependency for meta courses, local_ucla (for flash), and site indicator
-// (for tasite type).
-$plugin->dependencies = array(
-    'enrol_meta'  => ANY_VERSION,
-    'local_metagroups' => ANY_VERSION,
-    'local_ucla'  => 2012112800,
-    'tool_uclasiteindicator' => 2013021900
+$definitions = array(
+    'tasitemapping' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => HOURSECS
+    )
 );

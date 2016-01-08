@@ -62,4 +62,6 @@ function xmldb_block_ucla_tasites_upgrade($oldversion) {
         // Migration complete.
         upgrade_block_savepoint(true, 2013021900, 'ucla_tasites');
     }
+
+    return true;
 }

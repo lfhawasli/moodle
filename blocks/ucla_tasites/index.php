@@ -27,160 +27,112 @@ require(dirname(__FILE__) . '/../../config.php');
 require_oncE($CFG->dirroot . '/user/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_tasites/block_ucla_tasites.php');
 require_once($CFG->dirroot . '/blocks/ucla_tasites/tasites_form.php');
-require_once($CFG->dirroot . '/blocks/ucla_tasites/form_response.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
+// Setup parameters.
 $courseid = required_param('courseid', PARAM_INT);
+$formaction = optional_param('action', null, PARAM_ALPHA);
+$course = get_course($courseid);
 
-$course = $DB->get_record('course', array('id' => $courseid));
-
+// Check access.
 require_login($courseid);
 block_ucla_tasites::check_access($courseid);
-
 if (block_ucla_tasites::is_tasite($courseid)) {
     throw new block_ucla_tasites_exception('erristasite');
 }
 
-
+// Setup page.
 $PAGE->set_url(new moodle_url(
         '/blocks/ucla_tasites/index.php',
         array('courseid' => $courseid)
     ));
-
 $PAGE->set_course($course);
 $PAGE->set_title(get_string('pluginname', 'block_ucla_tasites'));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);
 
-// Get all potentional TA users and their according TA sites
-// from {role_assignments}.
-$tasra = block_ucla_tasites::get_tasite_users($courseid);
-if (!empty($tasra)) {
-    // Used for user_get_users_by_id.
-    $userids = array();
+// Setup form.
+$formdata = array(
+    'action' => $formaction,
+    'courseid' => $courseid
+);
+$tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
 
-    // Index $tasra by userid.
-    $tas = array();
-    foreach ($tasra as $tara) {
-        $userid = $tara->userid;
-        $userids[] = $userid;
-        $tas[$userid] = $tara;
-    }
+$pagebody = '';
+if ($formaction == 'create') {
+    // User wants to create TA site.
+    if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
 
-    // From user table.
-    $users = user_get_users_by_id($userids);
+        print_object($params);
 
-    // From enrol table indexed by customint4.
-    $existingtasites = block_ucla_tasites::get_tasites($courseid);
 
-    // Create $tasiteinfo array.
-    $tasiteinfo = array();
-    foreach ($users as $userid => $user) {
-        if (!empty($existingtasites[$userid])) {
-            // Associate ta to TA-site.
-            $tasite = $existingtasites[$userid];
-            $user->tasite = $tasite;
+        // User submitted form, so process it.
+        $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
 
-            // These are all for display sake.
-            $courseurl = new moodle_url('/course/view.php', array('id' => $tasite->id));
-            $user->courseurl = $courseurl->out();
-
-            $user->courseshortname = $tasite->shortname;
-        }
-
-        // Some more shortcuts.
-        $user->fullname = fullname($user);
-        $user->parentcourse = $course;
-
-        $tasiteinfo[$userid] = $user;
-    }
-
-    $formdata = array(
-        'courseid' => $courseid,
-        'tasiteinfo' => $tasiteinfo
-    );
-
-    $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
-}
-
-// Process any forms, if user confirmed.
-if (optional_param('confirm', 0, PARAM_BOOL) && confirm_sesskey()) {
-    foreach ($tasiteinfo as $tasite) {
-        // What action is user trying to do?
-        $actionname = block_ucla_tasites::action_naming($tasite);
-        $action = optional_param($actionname, false, PARAM_ALPHA);
-        if (empty($action)) {
-            debugging('Could not find registered action for '
-                . $tasite->username);
-            continue;
-        }
-
-        $fn = 'block_ucla_tasites_respond_' . $action;
-
-        // Perform action.
-        $checkboxname = block_ucla_tasites::checkbox_naming($tasite);
-        $checked = optional_param($checkboxname, false, PARAM_BOOL);
-        if (!empty($checked) && empty($existingtasites[$tasite->id])) {
-            if (!function_exists($fn)) {
-                throw new block_ucla_tasites_exception('errbadresponse', $fn);
+        // What type of TA site does user want?
+        $typeinfo = array();
+        if (isset($params->bysection)) {
+            // What section is user building?
+            if ($params->bysection == 'all') {
+                $typeinfo['bysection'] = $mapping['bysection'];
+            } else {
+                $typeinfo['bysection'] = array($mapping['bysection'][$params->bysection]);
             }
-            $a = $fn($tasite);
-            $messages[] = get_string($a->mstr, 'block_ucla_tasites', $a->mstra);
         }
+
+        $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
+
+        // Save messages in flash and redirect user.
+        $redirect = new moodle_url('/blocks/ucla_tasites/index.php',
+                array('courseid' => $courseid));
+
+        //flash_redirect($redirect, $messages);
+    } else {
+        // Display form to process.
+        ob_start();
+        $tasitesform->display();
+        $pagebody = ob_get_contents();
+        ob_end_clean();
     }
 
-    // Save messages in flash and redirect user.
+} else if ($formaction == 'toggle') {
+    // Show or hide given TA site.
+    $tasiteid = required_param('tasite', PARAM_INT);
+    $visiblity = block_ucla_tasites::toggle_visiblity($tasiteid);
+    $tasite = get_course($tasiteid);
+
     $redirect = $url = new moodle_url('/blocks/ucla_tasites/index.php',
             array('courseid' => $courseid));
 
-    // If there are many success messages, then display in list, else just
-    // show one message.
-    if (!empty($messages)) {
-        if (count($messages) > 1) {
-            $messages = html_writer::alist($messages);
-        } else {
-            $messages = array_pop($messages);
-        }
-        flash_redirect($redirect, $messages);
+    if ($visiblity) {
+        $message = get_string('sucshowsite', 'block_ucla_tasites', $tasite->shortname);
+    } else {
+        $message = get_string('suchidsite', 'block_ucla_tasites', $tasite->shortname);
     }
-}
 
-// Display everything else.
-echo $OUTPUT->header();
-echo $OUTPUT->heading($PAGE->title);
-if (empty($tasra)) {
-    // User is accessing TA sites page when they cannot set one up.
-    $rolefullname = $DB->get_field('role', 'name', array(
-            'id' => block_ucla_tasites::get_ta_role_id()
-        ));
-
-    throw new block_ucla_tasites_exception('notasites', $rolefullname);
-} else if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
-    // User submitted form, but first needs to confirm it.
-
-    // Unset submit button value.
-    unset($params->submitbutton);
-
-    // Create confirm message, url passed needs to have all form elements. the
-    // single_button renderer will make the url param array into hidden form
-    // elements.
-    $params->sesskey = sesskey();
-    $params->confirm = 1;
-    $url = new moodle_url('/blocks/ucla_tasites/index.php', (array)$params);
-    $button = new single_button($url, get_string('yes'), 'post');
-
-    // Cancel button takes them back to the page the TA site page.
-    $return = new moodle_url('/blocks/ucla_tasites/index.php',
-            array('courseid' => $courseid));
-
-    echo $OUTPUT->confirm(get_string('tasitecreateconfirm', 'block_ucla_tasites'),
-            $button, $return);
+    flash_redirect($redirect, $message);
 
 } else {
+    ob_start();
     // Display any messages, if any.
     flash_display();
-    $tasitesform->display();
+
+    // Show existing TA sites.
+    $tasites = block_ucla_tasites::get_tasites($courseid);
+    $output = $PAGE->get_renderer('block_ucla_tasites');
+    echo $output->render_tasites($tasites);
+
+    $url = new moodle_url('/blocks/ucla_tasites/index.php', 
+            array('courseid' => $courseid,'action' => 'create'));
+    echo $OUTPUT->single_button($url, get_string('create', 'block_ucla_tasites'), 'get');
+
+    $pagebody = ob_get_contents();
+    ob_end_clean();
 }
 
+// Display page.
+echo $OUTPUT->header();
+echo $OUTPUT->heading($PAGE->title);
+echo $pagebody;
 echo $OUTPUT->footer();

@@ -102,7 +102,7 @@ class block_ucla_tasites_generator extends testing_block_generator {
     }
 
     /**
-     * Does al needed setup to get TA sites working in phpunit.
+     * Does all needed setup to get TA sites working in phpunit.
      *  - Creates TA and TA admin roles necessary to use the TA site block for 
      *    unit tests.
      *  - Enables meta enrollment plugin.

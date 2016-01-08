@@ -1,8 +1,8 @@
-@ucla @block_ucla_tasites @same_member
-Feature: Same Member
-    In order to provide content to my students
-    As a TA
-    I want have the same course members in my TA site as in the course site
+@ucla @block_ucla_tasites @tasite_toggling
+Feature: Link to TA Site
+    In order to get to a TA site
+    As a user
+    I want to find the link next to the TA's name in the office hours block
 
 Background:
    Given I am in a ucla environment
@@ -24,20 +24,16 @@ Background:
       | ta1 | C1 | ta |
       | student1 | C1 | student |
 
-Scenario: Check participants on TA Site
+Scenario: Hide and show TA site
     Given I log in as "ta1"
     And I follow "Test course 1"
     And I press "Control Panel"
-    When I follow "TA sites"
+    And I follow "TA sites"
     And I press "Create TA site"
     And I set the field "Create TA site for 1, TA" to "1"
     And I press "Save changes"
     And I press "Yes"
-    And I should see "was successfully built"
-    And I follow the "Site info" section in the ucla site menu
-    And I follow "View TA site"
-    And I press "Control Panel"
-    And I follow "View participants"
-    Then I should see "1, Student"
-    And I should see "1, Teacher"
-    And I should see "1, TA"
+    When I click on "Hide" "link"
+    Then I should see "Successfully hid TA site"
+    When I click on "Show" "link"
+    Then I should see "Successfully un-hid TA site"

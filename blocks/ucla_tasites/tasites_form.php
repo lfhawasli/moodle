@@ -41,79 +41,97 @@ class tasites_form extends moodleform {
     public function definition() {
         $mform =& $this->_form;
 
-        $courseid = $this->_customdata['courseid'];
-        $tasiteinfo = $this->_customdata['tasiteinfo'];
+        $action = $this->_customdata['action'];
+        $mform->addElement('hidden', 'action', $action);
+        $mform->setType('action', PARAM_ALPHA);
 
+        $courseid = $this->_customdata['courseid'];
         $mform->addElement('hidden', 'courseid', $courseid);
         $mform->setType('courseid', PARAM_INT);
 
-        $formactions = array(
-            'view' => array(),
-            'build' => array()
-        );
+//        $tasiteinfo = $this->_customdata['tasiteinfo'];
 
-        foreach ($tasiteinfo as $tainfo) {
-            if (empty($tainfo->tasite)) {
-                $formaction = 'build';
+        // Get mapping of sections and TAs.
+        $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
+
+        print_object($mapping);
+
+        $mform->addElement('header', 'bysectionheader', 
+                get_string('bysectionheader', 'block_ucla_tasites'));
+        $mform->addElement('static', 'bysection',
+                get_string('bysection', 'block_ucla_tasites'),
+                get_string('bysectiondesc', 'block_ucla_tasites'));
+
+        // Add options to create TA site by section.
+        $bysectionbox = array();
+        foreach ($mapping['bysection'] as $secnum => $sectioninfo) {
+            $a = new stdClass();
+            if ($secnum == 'all') {
+                // Course doesn't have sections.
+                $label = get_string('bysectionlabelall', 'block_ucla_tasites');
             } else {
-                $formaction = 'view';
+                $a->sec = block_ucla_tasites::format_sec_num($secnum);
+                $label = get_string('bysectionlabel', 'block_ucla_tasites', $a);
             }
-
-            $formactions[$formaction][] = $tainfo;
+            if (!empty($sectioninfo['tas'])) {
+                $a->tas = implode(' / ', $sectioninfo['tas']);
+            } else {
+                $a->tas = 'N/A';
+            }
+            $text = get_string('bysectiontext', 'block_ucla_tasites', $a);
+            $mform->addElement('advcheckbox', 'bysection['.$secnum.']', $label,
+                    $text, array('group' => 1));
         }
+        $this->add_checkbox_controller(1);
 
-        foreach ($formactions as $action => $tas) {
-            if (empty($tas)) {
-                continue;
-            }
+        // Policy agreement statement.
+        $mform->addElement('checkbox', 'confirmation', '',
+                get_string('tasitecreateconfirm', 'block_ucla_tasites'));
+        $mform->addRule('confirmation',
+                get_string('errconfirmation', 'block_ucla_tasites'),
+                'required', null, 'server');
 
-            $mform->addElement('header', $action . '_header',
-                get_string($action . '_tasites', 'block_ucla_tasites'));
+        // Add advanced features, such as ability to edit shortname and title.
+        $mform->addElement('header', 'miscellaneoussettingshdr',
+                get_string('miscellaneoussettings', 'form'));
+        $mform->setAdvanced('miscellaneoussettingshdr');
+        $mform->addElement('static', 'coursename', '',
+                get_string('coursenamedesc', 'block_ucla_tasites'));
+        $mform->addElement('text', 'shortname', get_string('shortnamecourse'));
+        $mform->setType('shortname', PARAM_TEXT);
+        $mform->addElement('text', 'fullname', get_string('fullnamecourse'));
+        $mform->setType('fullname', PARAM_TEXT);
 
-            if ($action == 'view') {
-                $mform->addElement('html', html_writer::start_tag('ul'));
-            }
 
-            foreach ($tas as $ta) {
-                // View is special.
-                if ($action == 'view') {
-                    $talink = html_writer::link(
-                            $ta->courseurl,
-                            get_string(
-                                $action . '_tadesc', 'block_ucla_tasites',
-                                $ta
-                            ));
-                    $tagrouping = get_string('view_tadesc_grouping',
-                            'block_ucla_tasites',
-                            $ta->tasite->defaultgroupingname);
+        $this->add_action_buttons(true, get_string('create', 'block_ucla_tasites'));
+    }
 
-                    $mform->addElement('html',
-                        html_writer::tag('li', $talink . $tagrouping));
-                } else {
-                    // This specifies whether to take the action or not.
-                    $mform->addElement(
-                        'checkbox',
-                        block_ucla_tasites::checkbox_naming($ta),
-                        '',
-                        get_string($action . '_tadesc', 'block_ucla_tasites',
-                            $ta)
-                    );
+    /**
+     * Verifies that the form is ready to be processed.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        $retval = array();
+
+        // Check if at least one section is choosen for bysection and it is valid.
+        $mapping = block_ucla_tasites::get_tasection_mapping($data['courseid']);
+        $validsectionfound = false;
+        foreach ($data['bysection'] as $section => $value) {
+            if (!empty($value)) {
+                // Section choosen, now make sure it exists.
+                if (isset($mapping['bysection'][$section])) {
+                    $validsectionfound = true;
                 }
-
-                // This specifies what action to take for the TA.
-                $mform->addElement(
-                    'hidden',
-                    block_ucla_tasites::action_naming($ta),
-                    $action
-                );
-                $mform->setType(block_ucla_tasites::action_naming($ta), PARAM_ACTION);
-            }
-
-            if ($action == 'view') {
-                $mform->addElement('html', html_writer::end_tag('ul'));
             }
         }
 
-        $this->add_action_buttons();
+        if (!$validsectionfound) {
+            $retval['sectionheader'] = get_string('errinvalidsetupselected', 'block_ucla_tasites');
+        }
+
+        return $retval;
     }
 }
