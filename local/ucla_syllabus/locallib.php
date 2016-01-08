@@ -634,9 +634,15 @@ abstract class ucla_syllabus {
         
         // Get file type
         $file = $this->stored_file;
-        $filename = $file->get_filename();
-        $file_type = substr($filename, strpos($filename, '.') + 1);
-                
+
+        // Only get the file type if a file exists.
+        if ($file) {
+            $filename = $file->get_filename();
+            $file_type = substr($filename, strpos($filename, '.') + 1);
+        } else {
+            $file_type = '';
+        }
+
         // Displays correct icon if file is of PDF or DOC/DOCX type
         // Displays the default icon if file is of any other type
         if ($file_type == 'pdf') {
