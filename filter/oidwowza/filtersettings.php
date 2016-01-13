@@ -29,9 +29,9 @@ $settings->add(new admin_setting_configcheckbox('filter_oidwowza_hashclientip',
         get_string('filter_oidwowza_hashclientip', 'filter_oidwowza'),
         get_string('filter_oidwowza_hashclientip_desc', 'filter_oidwowza'), '1'));
 
-$settings->add(new admin_setting_configtext('filter_oidwowza_hoursexpire',
-        get_string('filter_oidwowza_hoursexpire', 'filter_oidwowza'),
-        get_string('filter_oidwowza_hoursexpire_desc', 'filter_oidwowza'), 4, PARAM_INT));
+$settings->add(new admin_setting_configtext('filter_oidwowza_minutesexpire',
+        get_string('filter_oidwowza_minutesexpire', 'filter_oidwowza'),
+        get_string('filter_oidwowza_minutesexpire_desc', 'filter_oidwowza'), 5, PARAM_INT));
 
 $settings->add(new admin_setting_configtext('filter_oidwowza_sharedsecret',
         get_string('filter_oidwowza_sharedsecret', 'filter_oidwowza'),
