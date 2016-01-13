@@ -128,4 +128,12 @@ class block_ucla_alert extends block_base {
         return parent::instance_delete();
     }
 
+    /**
+     * Returns true because block has a settings.php file.
+     *
+     * @return boolean
+     */
+    public function has_config() {
+        return true;
+    }
 }
