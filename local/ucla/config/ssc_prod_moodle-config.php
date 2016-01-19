@@ -178,6 +178,7 @@ $CFG->xsendfile = 'X-Sendfile';
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
+$CFG->enablewebservices = 1;
 $CFG->bloglevel = 0; // Disable blog system completely
 $CFG->enablebadges = 0; // Disable badges
 // CCLE-5181 Allow users to enter an alternate email
@@ -377,6 +378,9 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-4.kaf.kaltura.com';
 
+// Site administration > Plugins > Local plugins > Moodle Mobile additional features
+$CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
+
 // Site administration > Plugins > Local plugins > Recycle Bin
 $CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 21;
 $CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 21;
@@ -403,6 +407,9 @@ $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
 // Site administration > Plugins > Message outputs > Email
 $CFG->emailonlyfromnoreplyaddress = 1;
+
+// Site administration > Plugins > Web services > Mobile
+$CFG->enablemobilewebservice = 1;
 
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true;
