@@ -474,7 +474,6 @@ class ucla_group_manager {
      * @param array $info
      */
     public static function get_grouping_type_key($fn, $info) {
-
         $fieldsused = explode(' ', self::$fn());
 
         $namestrs = array();
@@ -495,7 +494,6 @@ class ucla_group_manager {
      * @param int|object|array $group
      * @return boolean
      */
-
     public static function is_auto_grouping($grouping) {
         global $DB;
         $groupingid = is_scalar($grouping)

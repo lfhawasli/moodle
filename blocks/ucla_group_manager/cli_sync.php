@@ -1,4 +1,26 @@
 <?php
+// This file is part of the UCLA group management plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * CLI script.
+ *
+ * @package    block_ucla_group_manager
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 define('CLI_SCRIPT', true);
 
@@ -22,9 +44,9 @@ list($options, $unrecog) = cli_get_params(
 );
 
 if ($options['help']) {
-    $help = "Syncs courses with the registrar so that their groups and groupings correspond
-to their course sections. With its default options, this script will sync all courses in the 
-'mdl_courses' table.
+    $help = "Syncs courses with the registrar so that their groups and groupings
+correspond to their course sections. With its default options, this script will
+sync all courses in the 'mdl_courses' table.
 
 Options:
 -h, --help              Print this help text.
@@ -37,7 +59,7 @@ Options:
                         The --term option has precedence over --current-term.
 -v, --verbose           Include output from syncing function, reports errors,
                         warnings, and status of group and groupings syncing
-                        
+
 Examples:
 php blocks/ucla_group_manager/cli_sync.php                  Syncs all courses in any term
 php blocks/ucla_group_manager/cli_sync.php --course-id=812  Syncs course with id 812 regardless of term
@@ -70,7 +92,7 @@ if ($options['term'] || $options['current-term'] && !empty($CFG->currentterm)) {
         $termslist = array($CFG->currentterm);
     }
     list($termsql, $termparams) = $DB->get_in_or_equal($termslist, SQL_PARAMS_NAMED, 'term');
-    $join = 'JOIN {ucla_request_classes} AS urc ON c.id = urc.courseid ';
+    $join = 'JOIN {ucla_request_classes} urc ON c.id = urc.courseid ';
     if (empty($where)) {
         $where = 'WHERE ';
     } else {
@@ -81,7 +103,7 @@ if ($options['term'] || $options['current-term'] && !empty($CFG->currentterm)) {
 
 // Make DB call.
 $params = array_merge($courseparams, $termparams);
-$courses = $DB->get_fieldset_sql('SELECT c.id FROM {course} AS c ' . $join . $where, $params);
+$courses = $DB->get_fieldset_sql('SELECT c.id FROM {course} c ' . $join . $where, $params);
 if (!$courses) {
     cli_error('No courses found');
 }
