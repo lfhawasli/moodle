@@ -53,7 +53,7 @@ Feature: Easy Upload
     When I press "Return to course"
     Then I should see "UCLA homepage" in the "region-main" "region"
     When I follow "UCLA homepage"
-    Then I should see "Click http://www.ucla.edu link to open resource." in the "region-main" "region"
+    Then I should see "UCLA"
 
   Scenario: Add an activity via Control Panel
     When I follow "Add an activity"
