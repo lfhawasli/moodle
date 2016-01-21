@@ -73,4 +73,4 @@ Background:
     Then I should see "Test Syllabus" in the "region-pre" "region"
     When I turn editing mode off
     And I follow "Test Syllabus"
-    Then I should see "Test Syllabus (restricted)*" in the "region-main" "region"  
+    Then I should see "Test Syllabus" in the "region-main" "region"  

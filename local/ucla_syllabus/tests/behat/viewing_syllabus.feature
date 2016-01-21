@@ -49,5 +49,5 @@ Background:
     Given I log in as "student2"
     And I follow "Course 1"
     And I follow "Test Syllabus"
-    Then I should see "Test Syllabus (restricted)*" in the "region-main" "region"
+    Then I should see "Test Syllabus" in the "region-main" "region"
     And I should see "Download: Test Syllabus" in the "region-main" "region"
