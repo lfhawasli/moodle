@@ -259,7 +259,15 @@ abstract class backup_activity_task extends backup_task {
         // - activities root setting
         // - section_included setting (if exists)
         $settingname = $settingprefix . 'included';
-        $activity_included = new backup_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
+        // START UCLA MOD: CCLE-4447 - Prevent import of announcements and discussion forums by default
+        $include = true;
+        if ($this->plan->get_mode() == backup::MODE_IMPORT &&
+            ($this->name == 'Announcements' || $this->name == 'Discussion forum')) {
+            $include = false;
+        }
+        $activity_included = new backup_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, $include);
+        //$activity_included = new backup_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
+        // END UCLA MOD: CCLE-4447
         $activity_included->get_ui()->set_icon(new pix_icon('icon', get_string('pluginname', $this->modulename),
             $this->modulename, array('class' => 'iconlarge icon-post')));
         $this->add_setting($activity_included);
