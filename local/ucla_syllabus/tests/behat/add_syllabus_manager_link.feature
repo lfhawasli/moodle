@@ -48,4 +48,4 @@ Background:
     Then I should see "Private Syllabus" in the "region-pre" "region"
     When I turn editing mode off
     And I follow "Private Syllabus"
-    Then I should see "Private Syllabus (restricted)*" in the "region-main" "region"  
+    Then I should see "Private Syllabus" in the "region-main" "region"  
