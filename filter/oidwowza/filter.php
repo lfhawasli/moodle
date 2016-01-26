@@ -182,7 +182,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
 
     // Generate SecureToken hash.
     $contentpath = $app . '/' . $format . $file;
-    $endtime = time() + HOURSECS * get_config('', 'filter_oidwowza_hoursexpire');
+    $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
     $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
     $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
 

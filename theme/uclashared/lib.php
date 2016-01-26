@@ -37,7 +37,8 @@ function theme_uclashared_page_init(moodle_page $page) {
         // Do not attempt to autologin on login pages.
         $urlstring = $url->out();
         if (strpos($urlstring, '/login/') !== false ||
-                strpos($urlstring, '/auth/') !== false) {
+                strpos($urlstring, '/auth/') !== false ||
+                strpos($urlstring, '/local/mobile/') !== false) {
             return;
         }
 

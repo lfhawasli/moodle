@@ -209,6 +209,7 @@ $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
+$CFG->enablewebservices = 1;
 $CFG->bloglevel = 0; // Disable blog system completely
 // CCLE-5181 Allow users to enter an alternate email
 $CFG->messagingallowemailoverride = 1;
@@ -438,9 +439,12 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 
+// Site administration > Plugins > Local plugins > Moodle Mobile additional features
+$CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
+
 // Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 35;
-$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 35;
+$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 21;
+$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 21;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
@@ -462,6 +466,9 @@ $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 
 // Site administration > Plugins > Message outputs > Email
 $CFG->emailonlyfromnoreplyaddress = 1;
+
+// Site administration > Plugins > Web services > Mobile
+$CFG->enablemobilewebservice = 1;
 
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true; 

@@ -19,12 +19,11 @@ Feature: Search and filter by instructor in the Import Course Search feature.
     And the following ucla "enrollments" exist:
       | user        | course  | role                   |
       | instructor1 | C1      | editinginstructor      |
-      | instructor2 | C2      | supervising_instructor |
+      | instructor2 | C2      | studentfacilitator     |
       | instructor3 | C3      | ta_instructor          |
 
   @javascript
-  Scenario: Search for classes in the Import Moodle Course Data feature by
-    course instructor.
+  Scenario: Search for classes in import by course instructor.
     Given I log in as "admin"
     And I browse to site "C1"
     And I press "Control Panel"

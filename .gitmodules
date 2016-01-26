@@ -151,3 +151,6 @@
 [submodule "mod/certificate"]
 	path = mod/certificate
 	url = git@github.com:ccle/moodle-mod_certificate.git 
+[submodule "local/mobile"]
+	path = local/mobile
+	url = git@github.com:jleyva/moodle-local_mobile.git
