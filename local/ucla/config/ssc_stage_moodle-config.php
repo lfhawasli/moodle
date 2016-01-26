@@ -402,8 +402,8 @@ $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-3.kaf.kaltur
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
 
 // Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 21;
-$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 21;
+$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 14;
+$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 14;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
