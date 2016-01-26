@@ -793,7 +793,7 @@ function forum_cron() {
                     $mailcount[$post->id]++;
 
                     // START UCLA-MOD: CCLE-5537 - Log forum emails
-                    email_logger::store_email_log($userto->email, $post->id);
+                    email_logger::store_email_log($userto->id, $userto->email, $post->id);
                     // END UCLA-MOD: CCLE-5537 - Log forum emails
 
                 // Mark post as read if forum_usermarksread is set off
@@ -1097,7 +1097,7 @@ function forum_cron() {
                     $usermailcount++;
 
                     // START UCLA-MOD: CCLE-5537 - Log forum emails
-                    email_logger::store_email_log($userto->email, $post->id);
+                    email_logger::store_email_log($userto->id, $userto->email, $post->id);
                     // END UCLA-MOD: CCLE-5537 - Log forum emails
 
                     // Mark post as read if forum_usermarksread is set off

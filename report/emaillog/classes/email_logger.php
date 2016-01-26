@@ -26,22 +26,24 @@ class email_logger {
     /*
      * Inserts a new email log record into the report_emaillog database.
      *
-     * @param $to
-     * @param $post
+     * @param int $userid the recipient's user id
+     * @param string $email the recipient's email address
+     * @param int $post post id
      * @return boolean true on success
      */
-    static public function store_email_log($to, $post) {
+    static public function store_email_log($userid, $email, $post) {
         global $DB;
 
         // Sanity check on inputs.
-        if (empty($to) || is_null($post)) {
+        if (empty($userid) || empty($email) || is_null($post)) {
             return false;
         }
 
         // Create and insert database record.
         $record = new stdClass();
         $record->post = $post;
-        $record->recipient_email = $to;
+        $record->recipient_id = $userid;
+        $record->recipient_email = $email;
         $record->timestamp = time();
 
         $lastinsertid = $DB->insert_record('report_emaillog', $record);
