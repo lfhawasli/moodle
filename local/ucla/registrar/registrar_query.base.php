@@ -329,7 +329,7 @@ abstract class registrar_query {
         return $extdb;
     }
 
-    const DEFAULT_ENCODING = 'utf-8';
+    const DEFAULT_ENCODING = 'ISO-8859-1';
 
     /**
      *  Go from the utf-8 to the remote db's encoding.
@@ -346,7 +346,7 @@ abstract class registrar_query {
             }
         } else {
             $text = textlib::convert($text, self::DEFAULT_ENCODING, $dbenc);
-        } 
+        }
 
         return $text;
     }
@@ -359,14 +359,14 @@ abstract class registrar_query {
         if (!$dbenc) {
             return $text;
         }
-        
+
         if (is_array($text)) {
             foreach ($text as $k => $value) {
                 $text[$k] = self::db_decode($value);
             }
         } else {
             $text = textlib::convert($text, $dbenc, self::DEFAULT_ENCODING);
-        } 
+        }
 
         return $text;
     }
