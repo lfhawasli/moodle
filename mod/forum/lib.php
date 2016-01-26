@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/eventslib.php');
 require_once($CFG->dirroot.'/user/selector/lib.php');
+// START UCLA-MOD: CCLE-5537 - Log forum emails
+require_once($CFG->dirroot.'/report/emaillog/classes/email_logger.php');
+// END UCLA-MOD: CCLE-5537 - Log forum emails
 
 /// CONSTANTS ///////////////////////////////////////////////////////////
 
@@ -789,6 +792,10 @@ function forum_cron() {
                 } else {
                     $mailcount[$post->id]++;
 
+                    // START UCLA-MOD: CCLE-5537 - Log forum emails
+                    email_logger::store_email_log($userto->email, $post->id);
+                    // END UCLA-MOD: CCLE-5537 - Log forum emails
+
                 // Mark post as read if forum_usermarksread is set off
                     if (!$CFG->forum_usermarksread) {
                         $userto->markposts[$post->id] = $post->id;
@@ -1088,6 +1095,10 @@ function forum_cron() {
                 } else {
                     mtrace("success.");
                     $usermailcount++;
+
+                    // START UCLA-MOD: CCLE-5537 - Log forum emails
+                    email_logger::store_email_log($userto->email, $post->id);
+                    // END UCLA-MOD: CCLE-5537 - Log forum emails
 
                     // Mark post as read if forum_usermarksread is set off
                     forum_tp_mark_posts_read($userto, $userto->markposts);
