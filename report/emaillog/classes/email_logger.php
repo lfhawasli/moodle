@@ -51,16 +51,6 @@ class email_logger {
     }
 
     /*
-     * If $post is defined, retrieves all email logs from the database
-     * associated with the post. Otherwise, retrieve all email logs.
-     *
-     * @param $post
-     * @return array of email logs
-     */
-    static public function get_email_logs($post) {
-    }
-
-    /*
      * Delete from the database all email logs older than seven days.
      *
      * @return bool true on success

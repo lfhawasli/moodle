@@ -15,18 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version info
+ * Capabilities
  *
- * This file contains information about the current version of report/emaillog
- * 
+ * Defines capablities related to logs
+ *
  * @package report_emaillog
  * @copyright  2015 UC Regents
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016020100;    // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2014050800;    // Requires this Moodle version.
-$plugin->component = 'report_emaillog';  // Full name of the plugin (used for diagnostics).
+$capabilities = array(
+    'report/emaillog:view' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    )
+);
 
 

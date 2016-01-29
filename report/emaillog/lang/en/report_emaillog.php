@@ -23,4 +23,10 @@
  * @copyright  2015 UC Regents
  */
 
+$string['emaillog:view'] = 'View email logs';
+$string['message'] = 'Message';
 $string['pluginname'] = 'Email Logs';
+$string['recipient'] = 'Recipient full name';
+$string['recipient_email'] = 'Recipient email address';
+$string['sender'] = 'Sender full name';
+$string['subject'] = 'Subject';

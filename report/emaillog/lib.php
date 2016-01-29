@@ -15,18 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version info
+ * Defines the APIs used by email log reports
  *
- * This file contains information about the current version of report/emaillog
- * 
  * @package report_emaillog
  * @copyright  2015 UC Regents
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2016020100;    // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2014050800;    // Requires this Moodle version.
-$plugin->component = 'report_emaillog';  // Full name of the plugin (used for diagnostics).
-
-
+/**
+ * This function extends the navigation with the report items
+ *
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass $course The course to object for the report
+ * @param stdClass $context The context of the course
+ */
+function report_emaillog_extend_navigation_course($navigation, $course, $context) {
+    if (has_capability('report/emaillog:view', $context)) {
+        $url = new moodle_url('/report/emaillog/index.php', array('id' => $course->id));
+        $navigation->add(get_string('pluginname', 'report_emaillog'), $url,
+                navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+    }
+}
