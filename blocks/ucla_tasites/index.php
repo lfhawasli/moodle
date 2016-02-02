@@ -64,9 +64,6 @@ if ($formaction == 'create') {
     // User wants to create TA site.
     if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
 
-        print_object($params);
-
-
         // User submitted form, so process it.
         $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
 

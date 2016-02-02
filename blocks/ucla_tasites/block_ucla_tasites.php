@@ -95,7 +95,7 @@ class block_ucla_tasites extends block_base {
         $tas = self::get_tasite_users($courseid);
         foreach ($tas as $ta) {
             // Check if user is one of the TAs.
-            if ($ta->userid == $user->id) {
+            if ($ta->id == $user->id) {
                 return true;
             }
         }
@@ -149,9 +149,6 @@ class block_ucla_tasites extends block_base {
         global $DB;
         $course = clone($parentcourse);
 
-
-        print_object($typeinfo);
-
         // Get default name for TA site.
         $course->fullname = self::new_fullname($parentcourse->fullname, $typeinfo);
         $course->shortname = self::new_shortname($parentcourse->shortname, $typeinfo);
@@ -182,7 +179,6 @@ class block_ucla_tasites extends block_base {
                 $sections = $typeinfo['bysection'];
             }
             foreach ($typeinfo['bysection'] as $secnum) {
-                print_object($secnum);
                 $idarray = array_merge($idarray, $mapping['bysection'][$secnum['secsrs']]);
             }
         }
@@ -397,6 +393,27 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
+     * Returns TA full name from UID.
+     *
+     * @param int $uid
+     * @return string
+     */
+    public static function get_tafullname($uid) {
+        static $tanamecache = array();
+        global $DB;
+
+        if (!isset($tanamecache[$uid])) {
+            $user = $DB->get_record('user', array('idnumber' => $uid));
+            $tanamecache[$uid] = fullname($user);
+        }
+
+        $fullname = $tanamecache[$uid];
+
+        return $fullname;
+    }
+
+
+    /**
      * Returns a mapping of discussion srs to TAs, if available.
      *
      * Consolidates cross-listed sections as well.
@@ -406,12 +423,10 @@ class block_ucla_tasites extends block_base {
      *                  [term]
      *                  [bysection] => [secnum] => [secsrs] => [array of srs numbers]
      *                                          => [tas] => [array of uid => fullname]
-     *                  [byta] => [uid] => [fullname]
-     *                                     [secsrs] => [secnum] => [srs numbers]
+     *                  [byta] => [fullname] => [uid]
+     *                            [secsrs] => [secnum] => [srs numbers]
      */
     public static function get_tasection_mapping($courseid) {
-        global $DB;
-
         $cache = cache::make('block_ucla_tasites', 'tasitemapping');
         $tasitemapping = $cache->get($courseid);
         if (empty($tasitemapping)) {
@@ -430,50 +445,31 @@ class block_ucla_tasites extends block_base {
             $tasitemapping['term'] = $term;
             foreach ($termsrses as $termsrs) {
                 $sections = \registrar_query::run_registrar_query(
-                    'ccle_class_sections',
+                    'ccle_ta_sections',
                     array(
                         'term' => $termsrs->term,
                         'srs' => $termsrs->srs
                     ));
                 if (!empty($sections)) {
                     foreach ($sections as $section) {
+                        $fullname = self::get_tafullname($section['ucla_id']);
+
                         // There might be multiple srs numbers for cross-listed sections.
                         $tasitemapping['bysection'][$section['sect_no']]['secsrs'][] = $section['srs_crs_no'];
+                        $tasitemapping['bysection'][$section['sect_no']]['tas'][$section['ucla_id']] = $fullname;
+
+                        $tasitemapping['byta'][$fullname]['secsrs'][$section['sect_no']][] = $section['srs_crs_no'];
+                        $tasitemapping['byta'][$fullname]['ucla_id'] = $section['ucla_id'];
                     }
                 } else {
                     // No course sections found, so just use main lecture.
                     $tasitemapping['bysection']['all']['secsrs'][] = $termsrs->srs;
-                }
-            }
 
-            // For every section, get the TAs.
-            $tanamecache = array();
-            foreach ($tasitemapping['bysection'] as $secnum => $sections) {
-                foreach ($sections as $sectioninfo) {
-                    foreach ($sectioninfo as $secsrs) {
-                        $tas = $sections = \registrar_query::run_registrar_query(
-                            'ccle_courseinstructorsget',
-                            array(
-                                'term' => $term,
-                                'srs' => $secsrs
-                            ));
-                        if (!empty($tas)) {
-                            foreach ($tas as $ta) {
-                                // Ignore dummy users.
-                                if (is_dummy_ucla_user($ta['ucla_id'])) {
-                                    continue;
-                                }
-                                // SP ccle_courseinstructorsget returns all instructors.
-                                if ($ta['srs'] != $secsrs) {
-                                    continue;
-                                }
-                                if (!isset($tanamecache[$ta['ucla_id']])) {
-                                   $user = $DB->get_record('user', array('idnumber' => $ta['ucla_id']));
-                                   $tanamecache[$ta['ucla_id']] = fullname($user);
-                                }
-                                $tasitemapping['bysection'][$secnum]['tas'][$ta['ucla_id']] = $tanamecache[$ta['ucla_id']];
-                            }
-                        }
+                    // Get users with the role of TA and TA admin.
+                    $tausers = self::get_tasite_users($courseid);
+                    foreach($tausers as $tauser) {
+                        $fullname = self::get_tafullname($tauser->idnumber);
+                        $tasitemapping['byta'][$fullname]['ucla_id'] = $tauser->idnumber;
                     }
                 }
             }
@@ -485,9 +481,12 @@ class block_ucla_tasites extends block_base {
                 }
             }
 
+            // Sort the byta mapping by TAs.
+            ksort($tasitemapping['byta']);
+
             $cache->set($courseid, $tasitemapping);
         }
-        
+
         return $tasitemapping;
     }
 
@@ -548,42 +547,25 @@ class block_ucla_tasites extends block_base {
     /**
      * Checks if there are any valid users that can have a TA-site.
      *
-     * Cached using static variables.
      *
      * @param int $courseid
      * @return array    Role assignments for users that can have TA-sites.
      */
     public static function get_tasite_users($courseid) {
-        static $retrar;
+        global $DB;
 
-        if (!isset($retrar[$courseid])) {
-            // Allow ta and ta-admins to have ta sites.
-            $role = new object();
-            $context = context_course::instance($courseid);
+        // Allow ta and ta-admins to have ta sites.
+        $role = new object();
+        $context = context_course::instance($courseid);
 
-            $role->id = self::get_ta_role_id();
-            $tas = get_users_from_role_on_context($role, $context);
+        $taroleid = self::get_ta_role_id();
+        $taadminroleid = self::get_ta_admin_role_id();
 
-            $role->id = self::get_ta_admin_role_id();
-            $taadmins = get_users_from_role_on_context($role, $context);
-
-            // Merge both roles.
-            $tausers = $tas + $taadmins;
-
-            // Then remove any duplicated users.
-            $userids = array();
-            foreach ($tausers as $index => $tauser) {
-                if (in_array($tauser->userid, $userids)) {
-                    // Exist already, so unset it.
-                    unset($tausers[$index]);
-                } else {
-                    $userids[] = $tauser->userid;
-                }
-            }
-            $retrar[$courseid] = $tausers;
-        }
-
-        return $retrar[$courseid];
+        return $DB->get_records_sql("SELECT u.id, u.idnumber
+            FROM {role_assignments} ra
+            JOIN {user} u ON ra.userid = u.id
+            WHERE ra.contextid = ? AND (ra.roleid = ? OR ra.roleid = ?)",
+        array($context->id, $taroleid, $taadminroleid));
     }
 
     /**
@@ -705,7 +687,7 @@ class block_ucla_tasites extends block_base {
             $secnums = array_map(array('block_ucla_tasites', 'format_sec_num'), $secnums);
             $shortname .= implode('-', $secnums);
         }
-        
+
         if ($cascade) {
             // Name conflict, so try appending number.
             $shortname .= '-' . $cascade;

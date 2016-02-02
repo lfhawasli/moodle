@@ -54,8 +54,6 @@ class tasites_form extends moodleform {
         // Get mapping of sections and TAs.
         $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
 
-        print_object($mapping);
-
         $mform->addElement('header', 'bysectionheader', 
                 get_string('bysectionheader', 'block_ucla_tasites'));
         $mform->addElement('static', 'bysection',
