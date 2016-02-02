@@ -108,7 +108,7 @@
 	url = git@github.com:ccle/moodle-block_massaction.git 
 [submodule "mod/turnitintool"]
 	path = mod/turnitintool
-	url = git@github.com:ccle/MoodleDirect.git
+	url = git@github.com:ccle/moodle-mod_turnitintool.git
 [submodule "mod/mediagallery"]
 	path = mod/mediagallery
 	url = git@github.com:ccle/moodle-mod_mediagallery.git
