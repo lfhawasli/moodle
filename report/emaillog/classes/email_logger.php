@@ -49,12 +49,4 @@ class email_logger {
         $lastinsertid = $DB->insert_record('report_emaillog', $record);
         return true;
     }
-
-    /*
-     * Delete from the database all email logs older than seven days.
-     *
-     * @return bool true on success
-     */
-    static public function prune_email_log() {
-    }
 }

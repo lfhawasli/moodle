@@ -36,3 +36,4 @@ $string['recipient'] = 'Recipient full name';
 $string['recipient_email'] = 'Recipient email address';
 $string['sender'] = 'Sender full name';
 $string['subject'] = 'Subject';
+$string['taskname'] = 'Email log cleanup';

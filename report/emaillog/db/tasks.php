@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the UCLA report_emaillog for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,18 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version info
+ * UCLA report_emaillog cron task.
  *
- * This file contains information about the current version of report/emaillog
- * 
- * @package report_emaillog
- * @copyright  2015 UC Regents
+ * Contains the settings for removing old email logs.
+ *
+ * @package    report_emaillog
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die;
-
-$plugin->version   = 2016020200;    // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2014050800;    // Requires this Moodle version.
-$plugin->component = 'report_emaillog';  // Full name of the plugin (used for diagnostics).
-
-
+$tasks = array(
+    array(
+        'classname' => 'report_emaillog\task\report_emaillog_cron_task',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '0', // Midnight.
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);
