@@ -46,6 +46,9 @@ class report_emaillog_table_log extends table_sql {
      * @param string $uniqueid unique id of form.
      * @param stdClass $filterparams (optional) filter params.
      *     - int courseid: id of course
+     *     - int sender: id of sender
+     *     - int recipient: id of recipient
+     *     - int post: id of post
      *     - int date: Date from which logs to be viewed.
      */
     public function __construct($uniqueid, $filterparams = null) {
@@ -54,16 +57,13 @@ class report_emaillog_table_log extends table_sql {
         $this->set_attribute('class', 'reportemaillog generaltable generalbox');
         $this->filterparams = $filterparams;
 
-        $this->define_columns(array('time', 'sender', 'recipient',  'recipient_email',
-                'course', 'subject', 'message'));
+        $this->define_columns(array('time', 'sender', 'recipient',  'recipient_email', 'subject'));
         $this->define_headers(array(
                 get_string('time'),
                 get_string('sender', 'report_emaillog'),
                 get_string('recipient', 'report_emaillog'),
                 get_string('recipient_email', 'report_emaillog'),
-                get_string('course'),
                 get_string('subject', 'report_emaillog'),
-                get_string('message', 'report_emaillog'),
                 )
             );
         $this->collapsible(false);
@@ -121,17 +121,27 @@ class report_emaillog_table_log extends table_sql {
     }
 
     /**
-     * Generate the course column.
+     * Generate the subject column.
      *
      * @param stdClass $log emaillog data.
-     * @return string HTML for the course column.
+     * @return string HTML for the subject column
      */
-    public function col_course($log) {
-        if (empty($log->course) || empty($this->courseshortnames[$log->course])) {
-            return '-';
+    public function col_subject($log) {
+        if (!empty($log->subject)) {
+            $title = $log->subject;
+
+            $subjectwords = str_word_count($title, 2);
+            // Show shortened subject title (only five words).
+            if (count($subjectwords) > EMAILLOG_MAX_SUBJECT_WORDS) {
+                $title = implode(' ', array_slice($subjectwords, 0, EMAILLOG_MAX_SUBJECT_WORDS)) . '...';
+            }
+            $params['d'] = $log->discussion_id;
+            $anchor = 'p' . $log->post_id;
+            $subject = html_writer::link(new moodle_url('/mod/forum/discuss.php', $params, $anchor), $title);
         } else {
-            return $this->courseshortnames[$log->course];
+            $subject = '-';
         }
+        return $subject;
     }
 
     /**
@@ -152,32 +162,52 @@ class report_emaillog_table_log extends table_sql {
             $params['course'] = $this->filterparams->courseid;
         }
 
+        if (!empty($this->filterparams->sender)) {
+            $joins[] = "posts.userid = :sender";
+            $params['sender'] = $this->filterparams->sender;
+        }
+
+        if (!empty($this->filterparams->recipient)) {
+            $joins[] = "recipient_id = :recipient";
+            $params['recipient'] = $this->filterparams->recipient;
+        }
+
+        if (!empty($this->filterparams->post)) {
+            $joins[] = "post = :post";
+            $params['post'] = $this->filterparams->post;
+        }
+
         if (!empty($this->filterparams->date)) {
             $joins[] = "timestamp > :date AND timestamp < :enddate";
             $params['date'] = $this->filterparams->date;
             $params['enddate'] = $this->filterparams->date + DAYSECS; // Show logs only for the selected date.
         }
 
+        $fields = "emaillog.id, posts.id AS post_id, discussions.id AS discussion_id,
+                   timestamp, course, posts.userid AS sender,
+                   recipient_id AS recipient, recipient_email, subject";
+        $from = "{report_emaillog} emaillog
+            JOIN {forum_posts} posts ON emaillog.post = posts.id
+            JOIN {forum_discussions} discussions ON posts.discussion = discussions.id";
         $where = implode(' AND ', $joins);
         $order = $this->filterparams->orderby;
-        $sql = "SELECT emaillog.id, timestamp, course, post, posts.userid AS sender,
-                        recipient_id AS recipient, recipient_email, subject, message
-                  FROM {report_emaillog} emaillog
-                  JOIN {forum_posts} posts ON emaillog.post = posts.id
-                  JOIN {forum_discussions} discussions ON posts.discussion = discussions.id
-                 WHERE $where
-              ORDER BY $order";
 
-        // Select emaillog data as an array of objects (each object is one log entry).
-        $this->rawdata = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
-
-        $total = $DB->count_records('report_emaillog');
+        $countsql = "SELECT COUNT(1) FROM {$from} WHERE {$where}";
+        $total = $DB->count_records_sql($countsql, $params);
         $this->pagesize($pagesize, $total);
 
         // Set initial bars.
         if ($useinitialsbar && !$this->is_downloading()) {
             $this->initialbars($total > $pagesize);
         }
+
+        $sql = "SELECT {$fields}
+                  FROM {$from}
+                 WHERE {$where}
+              ORDER BY {$order}";
+
+        // Select emaillog data as an array of objects (each object is one log entry).
+        $this->rawdata = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 
         // Update list of users and courses list which will be displayed on log page.
         $this->update_users_and_courses_used();
@@ -218,27 +248,6 @@ class report_emaillog_table_log extends table_sql {
                     $uparams);
             foreach ($users as $userid => $user) {
                 $this->userfullnames[$userid] = fullname($user);
-            }
-        }
-
-        // Get course shortname and put that in return list.
-        if (!empty($courseids)) { // If all logs don't belog to site level then get course info.
-            list($coursesql, $courseparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
-            $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
-            $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
-            $courseparams['contextlevel'] = CONTEXT_COURSE;
-            $sql = "SELECT c.id,c.shortname $ccselect FROM {course} c
-                   $ccjoin
-                     WHERE c.id " . $coursesql;
-
-            $courses = $DB->get_records_sql($sql, $courseparams);
-            foreach ($courses as $courseid => $course) {
-                $url = new moodle_url("/course/view.php", array('id' => $courseid));
-                context_helper::preload_from_record($course);
-                $context = context_course::instance($courseid, IGNORE_MISSING);
-                // Method format_string() takes care of missing contexts.
-                $this->courseshortnames[$courseid] = html_writer::link($url, format_string($course->shortname, true,
-                        array('context' => $context)));
             }
         }
     }

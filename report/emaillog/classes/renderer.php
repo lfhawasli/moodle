@@ -54,7 +54,10 @@ class report_emaillog_renderer extends plugin_renderer_base {
         echo html_writer::start_tag('form', array('class' => 'logselecform', 'action' => $reportlog->url, 'method' => 'get'));
         echo html_writer::start_div();
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'chooselog', 'value' => '1'));
-        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'showusers', 'value' => $reportlog->showusers));
+        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'showsenders',
+            'value' => $reportlog->showsenders));
+        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'showrecipients',
+            'value' => $reportlog->showrecipients));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'showcourses',
             'value' => $reportlog->showcourses));
 
@@ -75,43 +78,90 @@ class report_emaillog_renderer extends plugin_renderer_base {
             // Check if user is admin and this came because of limitation on number of courses to show in dropdown.
             if (has_capability('report/emaillog:view', $sitecontext)) {
                 $a = new stdClass();
-                $a->url = new moodle_url('/report/emaillog/index.php', array('chooselog' => 0,
-                    'user' => $reportlog->userid,
-                    'id' => $selectedcourseid, 'date' => $reportlog->date,
-                    'showcourses' => 1, 'showusers' => $reportlog->showusers));
+                $a->url = new moodle_url('/report/emaillog/index.php', array(
+                    'chooselog' => 0,
+                    'sender' => $reportlog->sender,
+                    'recipient' => $reportlog->recipient,
+                    'post' => $reportlog->post,
+                    'id' => $selectedcourseid,
+                    'date' => $reportlog->date,
+                    'showcourses' => 1,
+                    'showsenders' => $reportlog->showsenders,
+                    'showrecipients' => $reportlog->showrecipients));
                 $a->url = $a->url->out(false);
                 print_string('logtoomanycourses', 'moodle', $a);
             }
         }
 
-        // Add user selector.
-        $users = $reportlog->get_user_list();
+        // Add sender selector.
+        $senders = $reportlog->get_user_list();
 
-        if ($reportlog->showusers) {
+        if ($reportlog->showsenders) {
             echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
-            echo html_writer::select($users, "user", $reportlog->userid, get_string("allparticipants"));
+            echo html_writer::select($senders, "sender", $reportlog->sender, get_string('allsenders', 'report_emaillog'));
         } else {
-            $users = array();
-            if (!empty($reportlog->userid)) {
-                $users[$reportlog->userid] = $reportlog->get_selected_user_fullname();
+            $senders = array();
+            if (!empty($reportlog->sender)) {
+                $senders[$reportlog->sender] = $reportlog->get_selected_user_fullname($reportlog->sender);
             } else {
-                $users[0] = get_string('allparticipants');
+                $senders[0] = get_string('allsenders', 'report_emaillog');
             }
             echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
-            echo html_writer::select($users, "user", $reportlog->userid, false);
+            echo html_writer::select($senders, "sender", $reportlog->sender, false);
             $a = new stdClass();
-            $a->url = new moodle_url('/report/emaillog/index.php', array('chooselog' => 0,
-                'user' => $reportlog->userid,
-                'id' => $selectedcourseid, 'date' => $reportlog->date,
-                'showusers' => 1, 'showcourses' => $reportlog->showcourses));
+            $a->url = new moodle_url('/report/emaillog/index.php', array(
+                    'chooselog' => 0,
+                    'sender' => $reportlog->sender,
+                    'recipient' => $reportlog->recipient,
+                    'post' => $reportlog->post,
+                    'id' => $selectedcourseid,
+                    'date' => $reportlog->date,
+                    'showcourses' => $reportlog->showcourses,
+                    'showsenders' => 1,
+                    'showrecipients' => $reportlog->showrecipients));
             $a->url = $a->url->out(false);
             print_string('logtoomanyusers', 'moodle', $a);
         }
 
+        // Add recipient selector.
+        $recipients = $reportlog->get_user_list(true);
+
+        if ($reportlog->showrecipients) {
+            echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
+            echo html_writer::select($recipients, "recipient", $reportlog->recipient, get_string('allrecipients', 'report_emaillog'));
+        } else {
+            $recipients = array();
+            if (!empty($reportlog->recipient)) {
+                $recipients[$reportlog->recipient] = $reportlog->get_selected_user_fullname($reportlog->recipient);
+            } else {
+                $recipients[0] = get_string('allrecipients', 'report_emaillog');
+            }
+            echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
+            echo html_writer::select($recipients, "recipient", $reportlog->recipient, false);
+            $a = new stdClass();
+            $a->url = new moodle_url('/report/emaillog/index.php', array(
+                    'chooselog' => 0,
+                    'sender' => $reportlog->sender,
+                    'recipient' => $reportlog->recipient,
+                    'post' => $reportlog->post,
+                    'id' => $selectedcourseid,
+                    'date' => $reportlog->date,
+                    'showcourses' => $reportlog->showcourses,
+                    'showsenders' => $reportlog->showsenders,
+                    'showrecipients' => 1));
+            $a->url = $a->url->out(false);
+            print_string('logtoomanyusers', 'moodle', $a);
+        }
+
+        // Add post selector.
+        $posts = $reportlog->get_post_list();
+        echo html_writer::label(get_string('post'), 'menupost', false, array('class' => 'accesshide'));
+        echo html_writer::select($posts, "post", $reportlog->post, get_string('allposts', 'report_emaillog'));
+
         // Add date selector.
         $dates = $reportlog->get_date_options();
         echo html_writer::label(get_string('date'), 'menudate', false, array('class' => 'accesshide'));
-        echo html_writer::select($dates, "date", $reportlog->date, get_string("alldays"));
+        echo html_writer::select($dates, "date", $reportlog->date, get_string('pastsevendays', 'report_emaillog'));
 
         echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('gettheselogs')));
 

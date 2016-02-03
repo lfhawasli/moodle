@@ -26,14 +26,17 @@ require_once($CFG->dirroot.'/report/emaillog/lib.php');
 require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->dirroot.'/lib/tablelib.php');
 
-$id          = optional_param('id', 0, PARAM_INT);// Course ID.
-$user        = optional_param('user', 0, PARAM_INT); // User to display.
-$date        = optional_param('date', 0, PARAM_INT); // Date to display.
-$page        = optional_param('page', '0', PARAM_INT);     // Which page to show.
-$perpage     = optional_param('perpage', '100', PARAM_INT); // How many per page.
-$showcourses = optional_param('showcourses', false, PARAM_BOOL); // Whether to show courses if we're over our limit.
-$showusers   = optional_param('showusers', false, PARAM_BOOL); // Whether to show users if we're over our limit.
-$chooselog   = optional_param('chooselog', false, PARAM_BOOL);
+$id             = optional_param('id', 0, PARAM_INT);// Course ID.
+$sender         = optional_param('sender', 0, PARAM_INT); // Sender to display.
+$recipient      = optional_param('recipient', 0, PARAM_INT); // Recipient to display.
+$date           = optional_param('date', 0, PARAM_INT); // Date to display.
+$post           = optional_param('post', 0, PARAM_INT); // Date to display.
+$page           = optional_param('page', '0', PARAM_INT);     // Which page to show.
+$perpage        = optional_param('perpage', '100', PARAM_INT); // How many per page.
+$showcourses    = optional_param('showcourses', false, PARAM_BOOL); // Whether to show courses if we're over our limit.
+$showsenders    = optional_param('showsenders', false, PARAM_BOOL); // Whether to show senders if we're over our limit.
+$showrecipients = optional_param('showrecipients', false, PARAM_BOOL); // Whether to show recipients if we're over our limit.
+$chooselog      = optional_param('chooselog', false, PARAM_BOOL);
 
 $params = array();
 
@@ -43,11 +46,18 @@ if (!empty($id)) {
     $site = get_site();
     $id = $site->id;
 }
-if ($user !== 0) {
-    $params['user'] = $user;
+if ($sender !== 0) {
+    $params['sender'] = $sender;
 }
+if ($recipient !== 0) {
+    $params['recipient'] = $recipient;
+}
+
 if ($date !== 0) {
     $params['date'] = $date;
+}
+if ($post !== 0) {
+    $params['post'] = $post;
 }
 if ($page !== '0') {
     $params['page'] = $page;
@@ -58,8 +68,11 @@ if ($perpage !== '100') {
 if ($showcourses) {
     $params['showcourses'] = $showcourses;
 }
-if ($showusers) {
-    $params['showusers'] = $showusers;
+if ($showsenders) {
+    $params['showsenders'] = $showsenders;
+}
+if ($showrecipients) {
+    $params['showrecipients'] = $showrecipients;
 }
 if ($chooselog) {
     $params['chooselog'] = $chooselog;
@@ -80,16 +93,33 @@ if (empty($id)) {
 }
 require_capability('report/emaillog:view', $context);
 
-$PAGE->set_url($url);
+$PAGE->set_url('/report/emaillog/index.php', array('id' => $id));
 $PAGE->set_pagelayout('report');
 
+if (!empty($page)) {
+    $strlogs = get_string('pluginname', 'report_emaillog'). ": ". get_string('page', 'report_emaillog', $page + 1);
+} else {
+    $strlogs = get_string('pluginname', 'report_emaillog');
+}
+
+$PAGE->set_title($course->shortname .': '. $strlogs);
+$PAGE->set_heading($course->fullname);
+
 // Create table.
-$emaillog = new report_emaillog_renderable($course, $user, $showcourses, $showusers,
-        true, false, $url, $date, $page, $perpage, 'timestamp DESC');
+$emaillog = new report_emaillog_renderable($course, $sender, $recipient, $post,
+        $showcourses, $showsenders, $showrecipients, $chooselog, true,
+        $url, $date, $page, $perpage, 'timestamp DESC');
 
 $output = $PAGE->get_renderer('report_emaillog');
-$emaillog->setup_table();
 
 echo $output->header();
+
+if (!empty($chooselog)) {
+    // Delay creation of table, till called by user with filter.
+    $emaillog->setup_table();
+} else {
+    echo $output->heading(get_string('chooseforumlogs', 'report_emaillog') .':');
+}
+
 echo $output->render($emaillog);
 echo $output->footer();

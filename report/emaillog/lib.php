@@ -23,6 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+// Max words in subject before truncation.
+define('EMAILLOG_MAX_SUBJECT_WORDS', 10);
+
 /**
  * This function extends the navigation with the report items
  *

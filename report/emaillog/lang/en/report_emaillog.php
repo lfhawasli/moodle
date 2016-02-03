@@ -23,9 +23,15 @@
  * @copyright  2015 UC Regents
  */
 
+$string['allrecipients'] = 'All recipients';
+$string['allposts'] = 'All posts';
+$string['allsenders'] = 'All senders';
+$string['chooseforumlogs'] = 'Choose which forum email logs you want to see from the past 7 days';
 $string['emaillog:view'] = 'View email logs';
 $string['message'] = 'Message';
-$string['pluginname'] = 'Email Logs';
+$string['page'] = 'Page {$a}';
+$string['pluginname'] = 'Forum email logs';
+$string['pastsevendays'] = 'Past 7 days';
 $string['recipient'] = 'Recipient full name';
 $string['recipient_email'] = 'Recipient email address';
 $string['sender'] = 'Sender full name';

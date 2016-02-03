@@ -47,14 +47,23 @@ class report_emaillog_renderable implements renderable {
     /** @var int selected date from which records should be displayed */
     public $date;
 
-    /** @var int selected user id for which logs are displayed */
-    public $userid;
+    /** @var int selected user id of sender for which logs are displayed */
+    public $sender;
+
+    /** @var int selected user id of recipient for which logs are displayed */
+    public $recipient;
+
+    /** @var int selected post id for which logs are displayed */
+    public $post;
 
     /** @var bool show courses */
     public $showcourses;
 
-    /** @var bool show users */
-    public $showusers;
+    /** @var bool show senders */
+    public $showsenders;
+
+    /** @var bool show recipients */
+    public $showrecipients;
 
     /** @var bool show report */
     public $showreport;
@@ -72,9 +81,12 @@ class report_emaillog_renderable implements renderable {
      * Constructor.
      *
      * @param stdClass|int $course (optional) course record or id
-     * @param int $userid (optional) id of user to filter records for.
+     * @param int $sender (optional) id of sender to filter records for.
+     * @param int $recipient (optional) id of recipient to filter records for.
+     * @param int $post (optional) id of post to filter records for.
      * @param bool $showcourses (optional) show courses.
-     * @param bool $showusers (optional) show users.
+     * @param bool $showsenders (optional) show senders.
+     * @param bool $showrecipients (optional) show recipients.
      * @param bool $showreport (optional) show report.
      * @param bool $showselectorform (optional) show selector form.
      * @param moodle_url|string $url (optional) page url.
@@ -84,9 +96,9 @@ class report_emaillog_renderable implements renderable {
      * @param string $order (optional) sortorder of fetched records
      */
 
-    public function __construct($course = 0, $userid = 0, $showcourses = false,
-            $showusers = false, $showreport = true, $showselectorform = true, $url = "", $date = 0,
-            $page = 0, $perpage = 100, $order = "timestamp DESC") {
+    public function __construct($course = 0, $sender = 0,  $recipient = 0, $post = 0,
+            $showcourses = false, $showsenders = false, $showrecipients = false, $showreport = true, $showselectorform = true,
+            $url = "", $date = 0, $page = 0, $perpage = 100, $order = "timestamp DESC") {
 
         global $PAGE;
 
@@ -102,14 +114,17 @@ class report_emaillog_renderable implements renderable {
             $course = get_course($course);
         }
         $this->course = $course;
-        $this->userid = $userid;
+        $this->sender = $sender;
+        $this->recipient = $recipient;
+        $this->post = $post;
         $this->date = $date;
         $this->page = $page;
         $this->perpage = $perpage;
         $this->url = $url;
         $this->order = $order;
         $this->showcourses = $showcourses;
-        $this->showusers = $showusers;
+        $this->showsenders = $showsenders;
+        $this->showrecipients = $showrecipients;
         $this->showreport = $showreport;
         $this->showselectorform = $showselectorform;
     }
@@ -119,8 +134,8 @@ class report_emaillog_renderable implements renderable {
      *
      * @return string user fullname.
      */
-    public function get_selected_user_fullname() {
-        $user = core_user::get_user($this->userid);
+    public function get_selected_user_fullname($userid) {
+        $user = core_user::get_user($userid);
         return fullname($user);
     }
 
@@ -142,7 +157,7 @@ class report_emaillog_renderable implements renderable {
         }
 
         // Check if course filter should be shown.
-        if (has_capability('report/log:view', $sitecontext) && $this->showcourses) {
+        if (has_capability('report/emaillog:view', $sitecontext) && $this->showcourses) {
             if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
                 foreach ($courserecords as $course) {
                     if ($course->id == SITEID) {
@@ -162,25 +177,35 @@ class report_emaillog_renderable implements renderable {
      *
      * @return array list of users.
      */
-    public function get_user_list() {
+    public function get_user_list($recipients = false) {
         global $CFG, $SITE;
+
+        $showusers = $this->showsenders;
+        if ($recipients) {
+            $showusers = $this->showrecipients;
+        }
 
         $courseid = $SITE->id;
         if (!empty($this->course)) {
             $courseid = $this->course->id;
         }
         $context = context_course::instance($courseid);
-        $limitfrom = empty($this->showusers) ? 0 : '';
-        $limitnum  = empty($this->showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
+        $limitfrom = empty($showusers) ? 0 : '';
+        $limitnum  = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
         $courseusers = get_enrolled_users($context, '', 0, 'u.id, ' . get_all_user_name_fields(true, 'u'),
                 null, $limitfrom, $limitnum);
 
-        if (count($courseusers) < COURSE_MAX_USERS_PER_DROPDOWN && !$this->showusers) {
-            $this->showusers = 1;
+        if (count($courseusers) < COURSE_MAX_USERS_PER_DROPDOWN && !$showusers) {
+            $showusers = 1;
+            if ($recipients) {
+                $this->showrecipients = $showusers;
+            } else {
+                $this->showsenders = $showusers;
+            }
         }
 
         $users = array();
-        if ($this->showusers) {
+        if ($showusers) {
             if ($courseusers) {
                 foreach ($courseusers as $courseuser) {
                      $users[$courseuser->id] = fullname($courseuser, has_capability('moodle/site:viewfullnames', $context));
@@ -189,6 +214,35 @@ class report_emaillog_renderable implements renderable {
             $users[$CFG->siteguest] = get_string('guestuser');
         }
         return $users;
+    }
+
+    public function get_post_list() {
+        global $DB, $SITE;
+
+        $courseid = $SITE->id;
+        if (!empty($this->course)) {
+            $courseid = $this->course->id;
+        }
+
+        $sql = "SELECT DISTINCT posts.id, subject
+                           FROM {forum_posts} posts
+                           JOIN {forum_discussions} forum ON posts.discussion = forum.id
+                          WHERE mailed = 1 AND course = :course";
+
+        $postlist = $DB->get_records_sql($sql, array('course' => $courseid));
+
+        $posts = array();
+        foreach ($postlist as $post) {
+            $subject = $post->subject;
+
+            $subjectwords = str_word_count($subject, 2);
+            // Show shortened subject title (only five words).
+            if (count($subjectwords) > EMAILLOG_MAX_SUBJECT_WORDS) {
+                $subject = implode(' ', array_slice($subjectwords, 0, EMAILLOG_MAX_SUBJECT_WORDS)) . '...';
+            }
+            $posts[$post->id] = $subject . ' (ID: ' . $post->id .')';
+        }
+        return $posts;
     }
 
     /**
@@ -245,7 +299,9 @@ class report_emaillog_renderable implements renderable {
             $filter->courseid = 0;
         }
 
-        $filter->userid = $this->userid;
+        $filter->sender = $this->sender;
+        $filter->recipient = $this->recipient;
+        $filter->post = $this->post;
         $filter->date = $this->date;
         $filter->orderby = $this->order;
 
