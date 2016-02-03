@@ -55,12 +55,40 @@ class block_ucla_tasites_test extends advanced_testcase {
         $fullname = block_ucla_tasites::new_fullname($course->fullname, $typeinfo);
         $a = new stdClass();
         $a->fullname = $course->fullname;
-        $a->sections = '1C';
+        $a->text = '1C';
         $this->assertEquals(get_string('tasitefullname', 'block_ucla_tasites', $a), $fullname);
 
         // See if this handles shortname collisions as well.
         $test = $this->getDataGenerator()->create_course(array('shortname' => $shortname));
         $anothershortname = block_ucla_tasites::new_shortname($course->shortname, $typeinfo);
         $this->assertEquals($course->shortname . '-1C-1', $anothershortname);
+    }
+
+    /**
+     * Makes sure that new_name handles ta types.
+     */
+    public function test_new_name_byta() {
+        $course = $this->getDataGenerator()->create_course();
+        $ta = $this->getDataGenerator()->create_user(array('idnumber' => '325783542'));
+        $typeinfo = array();
+        $taname = fullname($ta);
+        $escchars = array(" ", ",", "'");
+        $tanameformated = str_replace($escchars, "", $taname);
+
+        $typeinfo['byta'][$taname]['ucla_id'] = '325783542';
+        $shortname = block_ucla_tasites::new_shortname($course->shortname, $typeinfo);
+        $this->assertEquals($course->shortname . '-'.$tanameformated, $shortname);
+
+        // See if fullname is created properly as well.
+        $fullname = block_ucla_tasites::new_fullname($course->fullname, $typeinfo);
+        $a = new stdClass();
+        $a->fullname = $course->fullname;
+        $a->text = $taname;
+        $this->assertEquals(get_string('tasitefullname', 'block_ucla_tasites', $a), $fullname);
+
+        // See if this handles shortname collisions as well.
+        $test = $this->getDataGenerator()->create_course(array('shortname' => $shortname));
+        $anothershortname = block_ucla_tasites::new_shortname($course->shortname, $typeinfo);
+        $this->assertEquals($course->shortname . '-'.$tanameformated.'-1', $anothershortname);
     }
 }

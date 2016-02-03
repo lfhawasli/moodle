@@ -39,22 +39,37 @@ class tasites_form extends moodleform {
      * Definition.
      */
     public function definition() {
+        global $USER;
         $mform =& $this->_form;
 
         $action = $this->_customdata['action'];
         $mform->addElement('hidden', 'action', $action);
         $mform->setType('action', PARAM_ALPHA);
 
-        $courseid = $this->_customdata['courseid'];
-        $mform->addElement('hidden', 'courseid', $courseid);
+        $course = $this->_customdata['course'];
+        $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
 //        $tasiteinfo = $this->_customdata['tasiteinfo'];
 
         // Get mapping of sections and TAs.
-        $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
+        $mapping = block_ucla_tasites::get_tasection_mapping($course->id);
+        if(!empty($mapping['bysection']['all'])) {
+            $taidfound = false;
+            foreach($mapping['byta'] as $name=>$uid) {
+                if($USER->idnumber == $uid['ucla_id']) {
+                    $taidfound = true;
+                    $tainfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
+                    block_ucla_tasites::create_tasite($course, $tainfo);
+                }
+            }
+            if(!$taidfound) {
+                throw new block_ucla_tasites_exception('errcantcreatetasite');
+            }
+        }
 
-        $mform->addElement('header', 'bysectionheader', 
+        // Commented out temporarily 02/03/2016.
+        /*$mform->addElement('header', 'bysectionheader',
                 get_string('bysectionheader', 'block_ucla_tasites'));
         $mform->addElement('static', 'bysection',
                 get_string('bysection', 'block_ucla_tasites'),
@@ -98,8 +113,7 @@ class tasites_form extends moodleform {
         $mform->addElement('text', 'shortname', get_string('shortnamecourse'));
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addElement('text', 'fullname', get_string('fullnamecourse'));
-        $mform->setType('fullname', PARAM_TEXT);
-
+        $mform->setType('fullname', PARAM_TEXT);*/
 
         $this->add_action_buttons(true, get_string('create', 'block_ucla_tasites'));
     }

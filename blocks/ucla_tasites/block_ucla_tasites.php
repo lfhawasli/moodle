@@ -423,8 +423,8 @@ class block_ucla_tasites extends block_base {
      *                  [term]
      *                  [bysection] => [secnum] => [secsrs] => [array of srs numbers]
      *                                          => [tas] => [array of uid => fullname]
-     *                  [byta] => [fullname] => [uid]
-     *                            [secsrs] => [secnum] => [srs numbers]
+     *                  [byta] => [fullname] => [ucla_id] => [uid]
+     *                                       => [secsrs] => [secnum] => [srs numbers]
      */
     public static function get_tasection_mapping($courseid) {
         $cache = cache::make('block_ucla_tasites', 'tasitemapping');
@@ -652,19 +652,20 @@ class block_ucla_tasites extends block_base {
      * @return string
      */
     public static function new_fullname($parentfullname, $typeinfo) {
-        global $DB;
-
         $fullname = '';
         $a = new stdClass();
         $a->fullname = $parentfullname;
+
         if (isset($typeinfo['bysection'])) {
             $secnums = array_keys($typeinfo['bysection']);
             // Format secnums.
             $secnums = array_map(array('block_ucla_tasites', 'format_sec_num'), $secnums);
-            $a->sections = implode(', ', $secnums);
-            $fullname = get_string('tasitefullname', 'block_ucla_tasites', $a);
+            $a->text = implode(', ', $secnums);
+        } else if (isset($typeinfo['byta'])) {
+            $tanames = array_keys($typeinfo['byta']);
+            $a->text = implode(', ', $tanames);
         }
-
+        $fullname = get_string('tasitefullname', 'block_ucla_tasites', $a);
         return $fullname;
     }
 
@@ -686,6 +687,12 @@ class block_ucla_tasites extends block_base {
             // Format secnums.
             $secnums = array_map(array('block_ucla_tasites', 'format_sec_num'), $secnums);
             $shortname .= implode('-', $secnums);
+        } else if (isset($typeinfo['byta'])) {
+            $tanames = array_keys($typeinfo['byta']);
+
+            $shortname .= implode('-', $tanames);
+            $escchars = array(" ", ",", "'");
+            $shortname = str_replace($escchars, "", $shortname);
         }
 
         if ($cascade) {

@@ -55,7 +55,7 @@ $PAGE->set_pagetype('course-view-' . $course->format);
 // Setup form.
 $formdata = array(
     'action' => $formaction,
-    'courseid' => $courseid
+    'course' => $course
 );
 $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
 
