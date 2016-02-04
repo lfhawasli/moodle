@@ -54,6 +54,7 @@ $string['noexistingtasites'] = 'No existing TA sites.';
 $string['notasites'] = 'There is no eligible {$a} to make a site for.';
 $string['pluginname'] = 'UCLA TA sites';
 $string['returntocourse'] = 'Return to main course';
+$string['succreatesite'] = 'Successfully created TA site {$a}';
 $string['suchidsite'] = 'Successfully hid TA site {$a}';
 $string['sucshowsite'] = 'Successfully un-hid TA site {$a}';
 $string['tasite'] = 'TA site';

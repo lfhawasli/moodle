@@ -146,7 +146,7 @@ class block_ucla_tasites extends block_base {
      * @return stdClass          Returns created course.
      */
     public static function create_tasite($parentcourse, $typeinfo) {
-        global $DB;
+        global $DB, $USER;
         $course = clone($parentcourse);
 
         // Get default name for TA site.
@@ -166,11 +166,13 @@ class block_ucla_tasites extends block_base {
         self::set_site_indicator($newcourse);
 
         // Map section numbers to SRS numbers.
-        $type = 'TA';
-        $idarray = array();
-        $mapping = block_ucla_tasites::get_tasection_mapping($parentcourse->id);
+        //$type = 'TA';
+        $uidarray = array();
+        $srsarray = array();
+
+        //$mapping = block_ucla_tasites::get_tasection_mapping($parentcourse->id);
         if (isset($typeinfo['bysection'])) {
-            $type = 'section';
+            /*$type = 'section';
             $sections = array();
             if ($typeinfo['bysection'] == 'all') {
                 // Add all sections.
@@ -180,7 +182,9 @@ class block_ucla_tasites extends block_base {
             }
             foreach ($typeinfo['bysection'] as $secnum) {
                 $idarray = array_merge($idarray, $mapping['bysection'][$secnum['secsrs']]);
-            }
+            }*/
+        } else if (isset($typeinfo['byta'])) {
+            //print_object($typeinfo);
         }
 
         // Setup meta enrolment plugin and sync enrolments.
@@ -189,9 +193,9 @@ class block_ucla_tasites extends block_base {
             'customint1' => $parentcourse->id,
             'customint2' => self::get_ta_role_id(),
             'customint3' => self::get_ta_admin_role_id(),
-            //'customint4' => $tainfo->id,
-            'customint5' => $type,
-            'customint6' => implode(',', $idarray),
+            'customint4' => $USER->id,
+            'customtext1' => implode(',', $uidarray),
+            'customtext2' => implode(',', $srsarray),
         ));
         enrol_meta_sync($newcourse->id);
 

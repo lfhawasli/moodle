@@ -61,14 +61,18 @@ $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 't
 
 $pagebody = '';
 if ($formaction == 'create') {
+    $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
+    $typeinfo = array();
+
+
+
     // User wants to create TA site.
     if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
 
         // User submitted form, so process it.
-        $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
-
+        
         // What type of TA site does user want?
-        $typeinfo = array();
+        
         if (isset($params->bysection)) {
             // What section is user building?
             if ($params->bysection == 'all') {
@@ -76,8 +80,7 @@ if ($formaction == 'create') {
             } else {
                 $typeinfo['bysection'] = array($mapping['bysection'][$params->bysection]);
             }
-        }
-
+        } 
         $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
 
         // Save messages in flash and redirect user.
@@ -86,6 +89,24 @@ if ($formaction == 'create') {
 
         //flash_redirect($redirect, $messages);
     } else {
+        if(!empty($mapping['bysection']['all'])) {
+            $taidfound = false;
+            foreach($mapping['byta'] as $name=>$uid) {
+                if($USER->idnumber == $uid['ucla_id']) {
+                    $taidfound = true;
+                    $typeinfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
+                    $tasite = block_ucla_tasites::create_tasite($course, $typeinfo);
+                    $redirect = new moodle_url('/blocks/ucla_tasites/index.php',
+                            array('courseid' => $courseid));
+                    $message = get_string('succreatesite', 'block_ucla_tasites', $tasite->shortname);
+                    flash_redirect($redirect, $message);
+                }
+            }
+            if(!$taidfound) {
+                throw new block_ucla_tasites_exception('errcantcreatetasite');
+            }
+        }
+    
         // Display form to process.
         ob_start();
         $tasitesform->display();

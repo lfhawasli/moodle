@@ -53,20 +53,8 @@ class tasites_form extends moodleform {
 //        $tasiteinfo = $this->_customdata['tasiteinfo'];
 
         // Get mapping of sections and TAs.
-        $mapping = block_ucla_tasites::get_tasection_mapping($course->id);
-        if(!empty($mapping['bysection']['all'])) {
-            $taidfound = false;
-            foreach($mapping['byta'] as $name=>$uid) {
-                if($USER->idnumber == $uid['ucla_id']) {
-                    $taidfound = true;
-                    $tainfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
-                    block_ucla_tasites::create_tasite($course, $tainfo);
-                }
-            }
-            if(!$taidfound) {
-                throw new block_ucla_tasites_exception('errcantcreatetasite');
-            }
-        }
+        //$mapping = block_ucla_tasites::get_tasection_mapping($course->id);
+        
 
         // Commented out temporarily 02/03/2016.
         /*$mform->addElement('header', 'bysectionheader',
