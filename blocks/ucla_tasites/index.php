@@ -55,6 +55,9 @@ $PAGE->requires->jquery();
 
 // Get TA mappings.
 $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
+if (empty($mapping['byta'])) {
+    throw new block_ucla_tasites_exception('errcantcreatetasite');
+}
 
 // Setup form.
 $formdata = array(
