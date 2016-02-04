@@ -85,7 +85,7 @@ class block_ucla_tasites extends block_base {
         $tas = self::get_tasite_users($courseid);
         foreach ($tas as $ta) {
             // Check if user is one of the TAs.
-            if ($ta->id == $user->id) {
+            if ($ta->idnumber == $user->idnumber) {
                 return true;
             }
         }
@@ -102,9 +102,19 @@ class block_ucla_tasites extends block_base {
      * @return boolean
      */
     public static function can_make_tasite($user, $courseid) {
-        // Make sure that TA site doesn't already exist.
-        return self::can_have_tasite($user, $courseid)
-                && !self::get_tasite($courseid, $user);
+        if (self::can_have_tasite($user, $courseid)) {
+            // Make sure that TA site doesn't already exist.
+            $tasites = self::get_tasites($courseid);
+            foreach ($tasites as $tasite) {
+                if (strpos($tasite->enrol->ta_uclaids, $user->idnumber) !== false) {
+                    return false;
+                }
+            }
+        } else {
+
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -531,7 +541,9 @@ class block_ucla_tasites extends block_base {
                 . 'courseid, '
                 . 'customint1 as parentcourseid, '
                 . 'customint2 as ta_roleid, '
-                . 'customint3 as ta_admin_roleid'
+                . 'customint3 as ta_admin_roleid, '
+                . 'customtext1 as ta_uclaids, '
+                . 'customtext2 as ta_secsrs'
         );
 
         return $enrols;

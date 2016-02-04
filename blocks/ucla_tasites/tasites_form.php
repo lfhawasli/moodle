@@ -42,9 +42,8 @@ class tasites_form extends moodleform {
         global $USER;
         $mform =& $this->_form;
 
-        $action = $this->_customdata['action'];
-        $mform->addElement('hidden', 'action', $action);
-        $mform->setType('action', PARAM_ALPHA);
+        $mform->addElement('hidden', 'tasiteaction', 'create');
+        $mform->setType('tasiteaction', PARAM_ALPHA);
 
         $course = $this->_customdata['course'];
         $mform->addElement('hidden', 'courseid', $course->id);
@@ -52,22 +51,26 @@ class tasites_form extends moodleform {
 
         $mapping = $this->_customdata['mapping'];
 
-        $mform->addElement('static', 'tasectiondesc', '',
-                get_string('tasectiondesc', 'block_ucla_tasites'));
-
+        $mform->addElement('header','createheader', get_string('create', 'block_ucla_tasites'));
+        
         $sections = array();
         $fullname = fullname($USER);
-        $sections = array_keys($mapping['byta'][$fullname]['secsrs']);
-        $sections = array_map(array('block_ucla_tasites', 'format_sec_num'), $sections);
+        if (isset($mapping['byta'][$fullname]['secsrs'])) {
+            $mform->addElement('static', 'tasectiondesc', '',
+                get_string('tasectiondesc', 'block_ucla_tasites'));
+            
+            $sections = array_keys($mapping['byta'][$fullname]['secsrs']);
+            $sections = array_map(array('block_ucla_tasites', 'format_sec_num'), $sections);
 
-        $choicearray=array();
-        $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
-                get_string('tasectionchoiceonly', 'block_ucla_tasites',
-                        implode(', ', $sections)), 'only');
-        $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
-                get_string('tasectionchoiceentire', 'block_ucla_tasites'), 'all');
-        $mform->addGroup($choicearray, 'tasectionchoicegroup', '', '<br />', false);
-        $mform->addRule('tasectionchoicegroup', null, 'required');
+            $choicearray=array();
+            $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
+                    get_string('tasectionchoiceonly', 'block_ucla_tasites',
+                            implode(', ', $sections)), 'only');
+            $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
+                    get_string('tasectionchoiceentire', 'block_ucla_tasites'), 'all');
+            $mform->addGroup($choicearray, 'tasectionchoicegroup', '', '<br />', false);
+            $mform->addRule('tasectionchoicegroup', null, 'required');
+        }
 
         $mform->addElement('hidden', 'byta', $USER->idnumber);
         $mform->setType('byta', PARAM_INT);
@@ -106,14 +109,14 @@ class tasites_form extends moodleform {
                     $text, array('group' => 1));
         }
         $this->add_checkbox_controller(1);
-
+*/
         // Policy agreement statement.
         $mform->addElement('checkbox', 'confirmation', '',
                 get_string('tasitecreateconfirm', 'block_ucla_tasites'));
         $mform->addRule('confirmation',
                 get_string('errconfirmation', 'block_ucla_tasites'),
                 'required', null, 'server');
-
+/*
         // Add advanced features, such as ability to edit shortname and title.
         $mform->addElement('header', 'miscellaneoussettingshdr',
                 get_string('miscellaneoussettings', 'form'));
@@ -125,7 +128,7 @@ class tasites_form extends moodleform {
         $mform->addElement('text', 'fullname', get_string('fullnamecourse'));
         $mform->setType('fullname', PARAM_TEXT);*/
 
-        $this->add_action_buttons(true, get_string('create', 'block_ucla_tasites'));
+        $this->add_action_buttons(false, get_string('create', 'block_ucla_tasites'));
     }
 
     /**

@@ -21,7 +21,6 @@
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require(dirname(__FILE__) . '/../../config.php');
 
 require_oncE($CFG->dirroot . '/user/lib.php');
@@ -31,7 +30,7 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 // Setup parameters.
 $courseid = required_param('courseid', PARAM_INT);
-$formaction = optional_param('action', null, PARAM_ALPHA);
+$formaction = optional_param('tasiteaction', null, PARAM_ALPHA);
 $course = get_course($courseid);
 
 // Check access.
@@ -51,29 +50,44 @@ $PAGE->set_title(get_string('pluginname', 'block_ucla_tasites'));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->requires->js('/blocks/ucla_tasites/tasites_form.js');
+$PAGE->requires->jquery();
 
 // Get TA mappings.
 $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
 
 // Setup form.
 $formdata = array(
-    'action' => $formaction,
     'course' => $course,
     'mapping' => $mapping
 );
 $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
 
 $pagebody = '';
+
 if ($formaction == 'create') {
     $typeinfo = array();
     $newtasite = null;
     // User wants to create TA site.
     if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
 
-        // User submitted form, so process it.
+        // What type of TA site does user want?
         
-        // What type of TA site does user want?        
-        if (isset($params->bysection)) {
+        // If course doesn't have section, then just create the TA site for
+        // the logged in TA.
+        if(!empty($mapping['bysection']['all'])) {
+            $taidfound = false;
+            foreach($mapping['byta'] as $name=>$uid) {
+                if($USER->idnumber == $uid['ucla_id']) {
+                    $taidfound = true;
+                    $typeinfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
+                }
+            }
+            if(!$taidfound) {
+                throw new block_ucla_tasites_exception('errcantcreatetasite');
+            }
+
+        } else if (isset($params->bysection)) {
             // What section is user building?
             if ($params->bysection == 'all') {
                 $typeinfo['bysection'] = $mapping['bysection'];
@@ -98,29 +112,7 @@ if ($formaction == 'create') {
             }
         }
         $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
-    } else {
-        // If course doesn't have section, then just create the TA site for
-        // the logged in TA.
-        if(!empty($mapping['bysection']['all'])) {
-            $taidfound = false;
-            foreach($mapping['byta'] as $name=>$uid) {
-                if($USER->idnumber == $uid['ucla_id']) {
-                    $taidfound = true;
-                    $typeinfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
-                    $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
-                }
-            }
-            if(!$taidfound) {
-                throw new block_ucla_tasites_exception('errcantcreatetasite');
-            }
-        }
-    
-        // Display form to process.
-        ob_start();
-        $tasitesform->display();
-        $pagebody = ob_get_contents();
-        ob_end_clean();
-    }
+    } 
 
     // If new TA site was created, then display success message.
     if (!empty($newtasite)) {
@@ -128,6 +120,12 @@ if ($formaction == 'create') {
         $redirect = new moodle_url('/blocks/ucla_tasites/index.php',
                 array('courseid' => $courseid));
         flash_redirect($redirect, $message);
+    } else {
+         // Display form to process.
+        ob_start();
+        $tasitesform->display();
+        $pagebody = ob_get_contents();
+        ob_end_clean();
     }
 
 } else if ($formaction == 'toggle') {
@@ -157,9 +155,10 @@ if ($formaction == 'create') {
     $output = $PAGE->get_renderer('block_ucla_tasites');
     echo $output->render_tasites($tasites);
 
-    $url = new moodle_url('/blocks/ucla_tasites/index.php', 
-            array('courseid' => $courseid,'action' => 'create'));
-    echo $OUTPUT->single_button($url, get_string('create', 'block_ucla_tasites'), 'get');
+    if (block_ucla_tasites::can_make_tasite($USER, $course->id)) {
+        // Display form to process.
+        $tasitesform->display();
+    }
 
     $pagebody = ob_get_contents();
     ob_end_clean();
