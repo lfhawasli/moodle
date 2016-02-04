@@ -40,16 +40,6 @@ class block_ucla_tasites extends block_base {
 
     const GROUPINGID = 'tasitegrouping';
 
-//    /**
-//     * Used to keep track of naming schemas used in the form.
-//     *
-//     * @param stdClass $tainfo
-//     * @return string
-//     */
-//    public static function action_naming($tainfo) {
-//        return $tainfo->id . '-action';
-//    }
-
     /**
      * Do not make this block available to add via "Add a block" dropdown.
      *
@@ -72,15 +62,15 @@ class block_ucla_tasites extends block_base {
      *
      * @return boolean
      */
-    public static function can_access($courseid, $user=false) {
+    public static function can_access($courseid, $user = false) {
         global $USER;
         $user = $user ? $user : $USER;
 
         return self::can_have_tasite($user, $courseid)
-            || has_capability('moodle/course:update',
-                    context_course::instance($courseid), $user)
-            || require_capability('moodle/site:config',
-                    context_system::instance(), $user);
+                || has_capability('moodle/course:update',
+                        context_course::instance($courseid), $user)
+                || require_capability('moodle/site:config',
+                        context_system::instance(), $user);
     }
 
     /**
@@ -142,7 +132,12 @@ class block_ucla_tasites extends block_base {
      * Creates a new course and assigns enrolments.
      *
      * @param stdClass $parentcourse
-     * @param array $typeinfo
+     * @param array $typeinfo   This is a subset of what we get from
+     *                          get_tasection_mapping:
+     *                  [bysection] => [secnum] => [secsrs] => [array of srs numbers]
+     *                                          => [tas] => [array of uid => fullname]
+     *                  [byta] => [fullname] => [ucla_id] => [uid]
+     *                                       => [secsrs] => [secnum] => [srs numbers]
      * @return stdClass          Returns created course.
      */
     public static function create_tasite($parentcourse, $typeinfo) {
@@ -166,25 +161,33 @@ class block_ucla_tasites extends block_base {
         self::set_site_indicator($newcourse);
 
         // Map section numbers to SRS numbers.
-        //$type = 'TA';
         $uidarray = array();
         $srsarray = array();
-
-        //$mapping = block_ucla_tasites::get_tasection_mapping($parentcourse->id);
         if (isset($typeinfo['bysection'])) {
-            /*$type = 'section';
-            $sections = array();
-            if ($typeinfo['bysection'] == 'all') {
-                // Add all sections.
-                $sections = array_keys($mapping['bysection']);
-            } else {
-                $sections = $typeinfo['bysection'];
-            }
-            foreach ($typeinfo['bysection'] as $secnum) {
-                $idarray = array_merge($idarray, $mapping['bysection'][$secnum['secsrs']]);
-            }*/
+            /* $type = 'section';
+              $sections = array();
+              if ($typeinfo['bysection'] == 'all') {
+              // Add all sections.
+              $sections = array_keys($mapping['bysection']);
+              } else {
+              $sections = $typeinfo['bysection'];
+              }
+              foreach ($typeinfo['bysection'] as $secnum) {
+              $idarray = array_merge($idarray, $mapping['bysection'][$secnum['secsrs']]);
+              } */
         } else if (isset($typeinfo['byta'])) {
-            //print_object($typeinfo);
+            // Getting the TA's UID and section SRS numbers.
+            foreach ($typeinfo['byta'] as $tainfo) {
+                $uidarray[] = $tainfo['ucla_id'];
+                if (!empty($tainfo['secsrs'])) {
+                    // If course has sections, then handle multiple srs numbers.
+                    foreach ($tainfo['secsrs'] as $secnum => $secinfo) {
+                        foreach ($secinfo as $srs) {
+                            $srsarray[] = $srs;
+                        }
+                    }
+                }
+            }
         }
 
         // Setup meta enrolment plugin and sync enrolments.
@@ -204,59 +207,50 @@ class block_ucla_tasites extends block_base {
         local_metagroups_sync($trace, $newcourse->id);
         $trace->finished();
 
+        if (!empty($srsarray)) {
+            // For the new TA site, create a special grouping based on sections.
+            // Create grouping.
+            $tasitegrouping = new stdClass();
+            $tasitegrouping->name = 'TA site grouping';
+            $tasitegrouping->idnumber = self::GROUPINGID;
+            $tasitegrouping->courseid = $newcourse->id;
+            $tasitegrouping->id = groups_create_grouping($tasitegrouping);
+
+            // Find matching groups in TA site matching section groups.
+            // The local_metagroups_sync function sets the idnumber for
+            // groups in the TA site to match the group ids in the parent.
+            list($sqlidnumber, $params) = $DB->get_in_or_equal($srsarray);
+            $params[] = $newcourse->id;
+            $sql = "SELECT child.id
+                       FROM {groups} parent
+                       JOIN {groups} child
+                      WHERE parent.idnumber $sqlidnumber
+                            AND child.idnumber=parent.id
+                            AND child.courseid=?";
+            $tasitegroups = $DB->get_fieldset_sql($sql, $params);
+
+            // Add these groups to the $tasitegrouping.
+            foreach ($tasitegroups as $groupid) {
+                groups_assign_grouping($tasitegrouping->id, $groupid);
+            }
+
+            // Set default grouping to be this grouping.
+            $newcourse->defaultgroupingid = $tasitegrouping->id;
+            $DB->update_record('course', $newcourse);
+        }
+
         // Check if Announcements forum should be deleted for TA site. We only
         // want Annoucement forums if the TA site was created for a specific
         // section and not all sections.
-        if (isset($typeinfo['bysection'])) {
-            if ($typeinfo['bysection'] == 'all') {
-                $enabletasitenewsforum = !(get_config('format_ucla', 'disable_tasite_news_forum'));
-                if (!$enabletasitenewsforum) {
-                    $newsforum = forum_get_course_forum($newcourse->id, 'news');
-                    forum_delete_instance($newsforum->id);
-                }
-            } else {
-                // We want to create a TA site with specific sections.
-
-                // Create grouping.
-                $secnums = array_keys($typeinfo['bysection']);
-                $secnums = array_map(array('block_ucla_tasites', 'format_sec_num'), $secnums);
-                $tasitegrouping = new stdClass();
-                $tasitegrouping->name = sprintf('Section %s grouping', implode(', ', $secnums));
-                $tasitegrouping->idnumber = self::GROUPINGID;
-                $tasitegrouping->id = groups_create_grouping($tasitegrouping);
-
-                // Find all groups from parent that match SRSes in $idarray.
-                $term = $typeinfo['term'];
-                foreach ($idarray as &$element) {
-                    // Create array to search idnumbers in group table.
-                    $element = $term . '-' . $element;
-                }
-                list($sqlidnumber, $params) = $DB->get_in_or_equal($idarray);
-                $where = 'idnumber '. $sql . ' AND courseid=' . $parentcourse->id;
-                $groups = $DB->get_field_select('group', $where, 'id', $params);
-
-                // Find matching groups in TA site matching section groups.
-                // The local_metagroups_sync function sets the idnumber for
-                // groups in the TA site to match the group ids in the parent.
-                $params[] = $newcourse->id;
-                $sql = "SELECT child.id
-                          FROM {group} parent
-                          JOIN {group} child
-                         WHERE parent.idnumber $sqlidnumber
-                               AND child.idnumber=parent.id
-                               AND child.courseid=?";
-                $tasitegroups = $DB->get_field_sql($sql, $params);
-
-                // Add these groups to the $tasitegrouping.
-                foreach ($tasitegroups as $groupid) {
-                    groups_assign_grouping($tasitegrouping->id, $groupid);
-                }
-
-                // Set default grouping to be this grouping.
-                $newcourse->defaultgroupingid = $tasitegrouping->id;
-                $DB->update_record('course', $newcourse);
-            }
-        }
+        /*
+          if (isset($typeinfo['bysection'])) {
+          if ($typeinfo['bysection'] == 'all') {
+          $enabletasitenewsforum = !(get_config('format_ucla', 'disable_tasite_news_forum'));
+          if (!$enabletasitenewsforum) {
+          $newsforum = forum_get_course_forum($newcourse->id, 'news');
+          forum_delete_instance($newsforum->id);
+          }
+         */
 
         return $newcourse;
     }
@@ -284,16 +278,16 @@ class block_ucla_tasites extends block_base {
             $retval = intval($secnum);
         } elseif (strlen($secnum) <= 5) {
             // Then maybe the last and/or first character doesn't exist; truncated.
-            $len = strlen($secnum);
-            $num      = intval(substr($secnum, 1, 3));
-            $SS       = trim(substr($secnum, $len-1, 1));
-            $retval   = $num . $SS;
+            $len    = strlen($secnum);
+            $num    = intval(substr($secnum, 1, 3));
+            $SS     = trim(substr($secnum, $len - 1, 1));
+            $retval = $num . $SS;
         } else {
             // All characters should be present.
-            $P        = trim(substr($secnum, 0, 1));
-            $num      = intval(substr($secnum, 1, 3));
-            $SS       = trim(substr($secnum, 4, 2));
-            $retval   = $P . $num . $SS;
+            $P      = trim(substr($secnum, 0, 1));
+            $num    = intval(substr($secnum, 1, 3));
+            $SS     = trim(substr($secnum, 4, 2));
+            $retval = $P . $num . $SS;
         }
         return $retval;
     }
@@ -369,7 +363,7 @@ class block_ucla_tasites extends block_base {
      * @param boolean $promoted Return the promoted role?
      * @return int
      */
-    public static function get_ta_role_id($promoted=false) {
+    public static function get_ta_role_id($promoted = false) {
         global $DB;
         static $roleids;
 
@@ -377,7 +371,7 @@ class block_ucla_tasites extends block_base {
 
         if (!isset($roleids[$tarsn])) {
             $roleids[$tarsn] = $DB->get_field('role', 'id',
-                array('shortname' => $tarsn));
+                    array('shortname' => $tarsn));
         }
 
         return $roleids[$tarsn];
@@ -389,7 +383,7 @@ class block_ucla_tasites extends block_base {
      * @param boolean $promoted Return the promoted role?
      * @return string
      */
-    public static function get_ta_role_shortname($promoted=false) {
+    public static function get_ta_role_shortname($promoted = false) {
         $rolesubstr = $promoted ? '_admin' : '';
         $rolestr = 'ta' . $rolesubstr;
 
@@ -415,7 +409,6 @@ class block_ucla_tasites extends block_base {
 
         return $fullname;
     }
-
 
     /**
      * Returns a mapping of discussion srs to TAs, if available.
@@ -449,11 +442,10 @@ class block_ucla_tasites extends block_base {
             $tasitemapping['term'] = $term;
             foreach ($termsrses as $termsrs) {
                 $sections = \registrar_query::run_registrar_query(
-                    'ccle_ta_sections',
-                    array(
-                        'term' => $termsrs->term,
-                        'srs' => $termsrs->srs
-                    ));
+                                'ccle_ta_sections', array(
+                            'term' => $termsrs->term,
+                            'srs' => $termsrs->srs
+                ));
                 if (!empty($sections)) {
                     foreach ($sections as $section) {
                         $fullname = self::get_tafullname($section['ucla_id']);
@@ -471,7 +463,7 @@ class block_ucla_tasites extends block_base {
 
                     // Get users with the role of TA and TA admin.
                     $tausers = self::get_tasite_users($courseid);
-                    foreach($tausers as $tauser) {
+                    foreach ($tausers as $tauser) {
                         $fullname = self::get_tafullname($tauser->idnumber);
                         $tasitemapping['byta'][$fullname]['ucla_id'] = $tauser->idnumber;
                     }
@@ -530,15 +522,12 @@ class block_ucla_tasites extends block_base {
 
         // Find all TA site meta enrolment instances.
         $enrols = $DB->get_records(
-            'enrol',
-            array(
-                'enrol' => 'meta',
-                'customint1' => $courseid,
-                'customint2' => self::get_ta_role_id(),
-                'customint3' => self::get_ta_admin_role_id()
-            ),
-            '',
-            'customint4 as ownerid, '
+                'enrol', array(
+            'enrol' => 'meta',
+            'customint1' => $courseid,
+            'customint2' => self::get_ta_role_id(),
+            'customint3' => self::get_ta_admin_role_id()
+                ), '', 'customint4 as ownerid, '
                 . 'courseid, '
                 . 'customint1 as parentcourseid, '
                 . 'customint2 as ta_roleid, '
@@ -569,7 +558,7 @@ class block_ucla_tasites extends block_base {
             FROM {role_assignments} ra
             JOIN {user} u ON ra.userid = u.id
             WHERE ra.contextid = ? AND (ra.roleid = ? OR ra.roleid = ?)",
-        array($context->id, $taroleid, $taadminroleid));
+                array($context->id, $taroleid, $taadminroleid));
     }
 
     /**
@@ -598,8 +587,7 @@ class block_ucla_tasites extends block_base {
             $course->enrol = $enrol;
 
             // Get default grouping for each course.
-            $course->defaultgroupingname =
-                    groups_get_grouping_name($course->defaultgroupingid);
+            $course->defaultgroupingname = groups_get_grouping_name($course->defaultgroupingid);
 
             $tacourses[$enrol->ownerid] = $course;
         }
@@ -636,11 +624,7 @@ class block_ucla_tasites extends block_base {
         static $cacheistasite;
         if (!empty($cacheistasite) || !isset($cacheistasite[$enrol->id])) {
             $result = true;
-            if (empty($enrol->customint2)
-                    || empty($enrol->customint3)
-                    || empty($enrol->customint4)
-                    || $enrol->customint2 != self::get_ta_role_id()
-                    || $enrol->customint3 != self::get_ta_admin_role_id()) {
+            if (empty($enrol->customint2) || empty($enrol->customint3) || empty($enrol->customint4) || $enrol->customint2 != self::get_ta_role_id() || $enrol->customint3 != self::get_ta_admin_role_id()) {
                 $result = false;
             }
             $cacheistasite[$enrol->id] = $result;
@@ -681,7 +665,7 @@ class block_ucla_tasites extends block_base {
      * @param int $cascade              Used if there is a name collision.
      * @return string
      */
-    public static function new_shortname($parentshortname, $typeinfo, $cascade=0) {
+    public static function new_shortname($parentshortname, $typeinfo, $cascade = 0) {
         global $DB;
 
         // Would use calculate_course_names but that adds "Copy" to shortname.
@@ -727,18 +711,16 @@ class block_ucla_tasites extends block_base {
 
         if ($tasites) {
             $fieldname = block_ucla_office_hours::blocks_process_displaykey(
-                'tasite', 'block_ucla_tasites'
+                            'tasite', 'block_ucla_tasites'
             );
 
             foreach ($instructors as $ik => $instructor) {
                 $iid = $instructor->id;
                 if (isset($tasites[$iid])) {
                     $appendedinstdata[$ik]['tasite'] = html_writer::link(
-                        new moodle_url(
-                            '/course/view.php',
-                            array('id' => $tasites[$iid]->id)
-                        ),
-                        get_string('view_tasite', 'block_ucla_tasites')
+                                    new moodle_url(
+                                    '/course/view.php', array('id' => $tasites[$iid]->id)
+                                    ), get_string('view_tasite', 'block_ucla_tasites')
                     );
                 } else {
                     $appendedinstdata[$ik]['tasite'] = '';
@@ -760,8 +742,7 @@ class block_ucla_tasites extends block_base {
         $course = $params['course'];
         $instructors = $params['instructors'];
 
-        if (($tasiteenrol = self::get_tasite_enrol_meta_instance($course->id))
-                && self::is_tasite_enrol_meta_instance($tasiteenrol)) {
+        if (($tasiteenrol = self::get_tasite_enrol_meta_instance($course->id)) && self::is_tasite_enrol_meta_instance($tasiteenrol)) {
 
             // Filter out all the people displayed in the office hours block
             // that is not the TA.
@@ -821,9 +802,7 @@ class block_ucla_tasites extends block_base {
 
         $accessible = false;
         try {
-            $accessible = self::check_access($courseid)
-                && self::get_tasite_users($courseid)
-                && !self::is_tasite($courseid);
+            $accessible = self::check_access($courseid) && self::get_tasite_users($courseid) && !self::is_tasite($courseid);
         } catch (moodle_exception $e) {
             // Do nothing.
             $accessible = false;
@@ -835,10 +814,9 @@ class block_ucla_tasites extends block_base {
                 array(
                     'item_name' => 'ucla_make_tasites',
                     'action' => new moodle_url(
-                        '/blocks/ucla_tasites/index.php',
-                        array(
-                            'courseid' => $course->id
-                        )
+                            '/blocks/ucla_tasites/index.php', array(
+                        'courseid' => $course->id
+                            )
                     ),
                     'tags' => array('ucla_cp_mod_other')
                 )
@@ -859,8 +837,7 @@ class block_ucla_tasites extends block_base {
         if (!enrol_is_enabled('meta')) {
             // Reference admin/enrol.php.
             try {
-                require_capability('moodle/site:config',
-                    context_system::instance());
+                require_capability('moodle/site:config', context_system::instance());
             } catch (moodle_exception $e) {
                 throw new block_ucla_tasites_exception('errsetupenrol');
             }
@@ -884,17 +861,16 @@ class block_ucla_tasites extends block_base {
      */
     public static function validate_roles() {
         if (!self::get_ta_role_id()) {
-            throw new block_ucla_tasites_exception('setuprole',
-                self::get_ta_role_shortname());
+            throw new block_ucla_tasites_exception('setuprole', self::get_ta_role_shortname());
         }
 
         if (!self::get_ta_admin_role_id()) {
-            throw new block_ucla_tasites_exception('setuprole',
-                self::get_ta_role_shortname(true));
+            throw new block_ucla_tasites_exception('setuprole', self::get_ta_role_shortname(true));
         }
 
         return true;
     }
+
 }
 
 /**
@@ -904,13 +880,15 @@ class block_ucla_tasites extends block_base {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_ucla_tasites_exception extends moodle_exception {
+
     /**
      * Constructor.
      *
      * @param string $errorcode
      * @param string $a
      */
-    public function __construct($errorcode, $a=null) {
+    public function __construct($errorcode, $a = null) {
         parent::__construct($errorcode, 'block_ucla_tasites', '', $a);
     }
+
 }

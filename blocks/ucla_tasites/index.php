@@ -52,27 +52,27 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);
 
+// Get TA mappings.
+$mapping = block_ucla_tasites::get_tasection_mapping($courseid);
+
 // Setup form.
 $formdata = array(
     'action' => $formaction,
-    'course' => $course
+    'course' => $course,
+    'mapping' => $mapping
 );
 $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
 
 $pagebody = '';
 if ($formaction == 'create') {
-    $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
     $typeinfo = array();
-
-
-
+    $newtasite = null;
     // User wants to create TA site.
     if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
 
         // User submitted form, so process it.
         
-        // What type of TA site does user want?
-        
+        // What type of TA site does user want?        
         if (isset($params->bysection)) {
             // What section is user building?
             if ($params->bysection == 'all') {
@@ -80,26 +80,34 @@ if ($formaction == 'create') {
             } else {
                 $typeinfo['bysection'] = array($mapping['bysection'][$params->bysection]);
             }
-        } 
+        } else if (isset($params->byta)) {
+            // Get TA to create TA site for.
+            $taidnumber = $params->byta;
+            $tauser = $DB->get_record('user', array('idnumber' => $taidnumber));
+            $tafullname = fullname($tauser);
+            $tasectionchoice = $params->tasectionchoice;
+
+            // Get TA info from mapping.
+            $typeinfo['byta'][$tafullname] = $mapping['byta'][$tafullname];
+
+            // Create TA site for entire course, so remove secsrs, if exists.
+            if ($tasectionchoice == 'all') {
+                if (!empty($typeinfo['byta'][$tafullname]['secsrs'])) {
+                    unset($typeinfo['byta'][$tafullname]['secsrs']);
+                }
+            }
+        }
         $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
-
-        // Save messages in flash and redirect user.
-        $redirect = new moodle_url('/blocks/ucla_tasites/index.php',
-                array('courseid' => $courseid));
-
-        //flash_redirect($redirect, $messages);
     } else {
+        // If course doesn't have section, then just create the TA site for
+        // the logged in TA.
         if(!empty($mapping['bysection']['all'])) {
             $taidfound = false;
             foreach($mapping['byta'] as $name=>$uid) {
                 if($USER->idnumber == $uid['ucla_id']) {
                     $taidfound = true;
                     $typeinfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
-                    $tasite = block_ucla_tasites::create_tasite($course, $typeinfo);
-                    $redirect = new moodle_url('/blocks/ucla_tasites/index.php',
-                            array('courseid' => $courseid));
-                    $message = get_string('succreatesite', 'block_ucla_tasites', $tasite->shortname);
-                    flash_redirect($redirect, $message);
+                    $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
                 }
             }
             if(!$taidfound) {
@@ -112,6 +120,14 @@ if ($formaction == 'create') {
         $tasitesform->display();
         $pagebody = ob_get_contents();
         ob_end_clean();
+    }
+
+    // If new TA site was created, then display success message.
+    if (!empty($newtasite)) {
+        $message = get_string('succreatesite', 'block_ucla_tasites', $newtasite->shortname);
+        $redirect = new moodle_url('/blocks/ucla_tasites/index.php',
+                array('courseid' => $courseid));
+        flash_redirect($redirect, $message);
     }
 
 } else if ($formaction == 'toggle') {

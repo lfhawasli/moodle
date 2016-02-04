@@ -77,7 +77,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
         // Display in a Bootstrap panel.
         $title = $this->output->heading($tasite->shortname, 3, array('panel-title'));
         $titlelink = html_writer::link(new moodle_url('/course/view.php',
-                array('courseid' => $tasite->courseid)), $title);
+                array('id' => $tasite->courseid)), $title);
         $titlediv = html_writer::div($titlelink, 'panel-heading');
         $contents = html_writer::div(implode('<br />', $lines), 'panel-body');
         $panel = html_writer::div($titlediv . $contents, 'panel panel-default');

@@ -50,6 +50,28 @@ class tasites_form extends moodleform {
         $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
+        $mapping = $this->_customdata['mapping'];
+
+        $mform->addElement('static', 'tasectiondesc', '',
+                get_string('tasectiondesc', 'block_ucla_tasites'));
+
+        $sections = array();
+        $fullname = fullname($USER);
+        $sections = array_keys($mapping['byta'][$fullname]['secsrs']);
+        $sections = array_map(array('block_ucla_tasites', 'format_sec_num'), $sections);
+
+        $choicearray=array();
+        $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
+                get_string('tasectionchoiceonly', 'block_ucla_tasites',
+                        implode(', ', $sections)), 'only');
+        $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
+                get_string('tasectionchoiceentire', 'block_ucla_tasites'), 'all');
+        $mform->addGroup($choicearray, 'tasectionchoicegroup', '', '<br />', false);
+        $mform->addRule('tasectionchoicegroup', null, 'required');
+
+        $mform->addElement('hidden', 'byta', $USER->idnumber);
+        $mform->setType('byta', PARAM_INT);
+
 //        $tasiteinfo = $this->_customdata['tasiteinfo'];
 
         // Get mapping of sections and TAs.
@@ -116,21 +138,21 @@ class tasites_form extends moodleform {
     public function validation($data, $files) {
         $retval = array();
 
-        // Check if at least one section is choosen for bysection and it is valid.
-        $mapping = block_ucla_tasites::get_tasection_mapping($data['courseid']);
-        $validsectionfound = false;
-        foreach ($data['bysection'] as $section => $value) {
-            if (!empty($value)) {
-                // Section choosen, now make sure it exists.
-                if (isset($mapping['bysection'][$section])) {
-                    $validsectionfound = true;
-                }
-            }
-        }
-
-        if (!$validsectionfound) {
-            $retval['sectionheader'] = get_string('errinvalidsetupselected', 'block_ucla_tasites');
-        }
+//        // Check if at least one section is choosen for bysection and it is valid.
+//        $mapping = block_ucla_tasites::get_tasection_mapping($data['courseid']);
+//        $validsectionfound = false;
+//        foreach ($data['bysection'] as $section => $value) {
+//            if (!empty($value)) {
+//                // Section choosen, now make sure it exists.
+//                if (isset($mapping['bysection'][$section])) {
+//                    $validsectionfound = true;
+//                }
+//            }
+//        }
+//
+//        if (!$validsectionfound) {
+//            $retval['sectionheader'] = get_string('errinvalidsetupselected', 'block_ucla_tasites');
+//        }
 
         return $retval;
     }
