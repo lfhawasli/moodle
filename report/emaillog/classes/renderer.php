@@ -153,6 +153,16 @@ class report_emaillog_renderer extends plugin_renderer_base {
             print_string('logtoomanyusers', 'moodle', $a);
         }
 
+        // Add forum selector.
+        $forums = $reportlog->get_forum_list();
+        echo html_writer::label(get_string('forum', 'report_emaillog'), 'menuforum', false, array('class' => 'accesshide'));
+        echo html_writer::select($forums, "forum", $reportlog->forum, get_string('allforums', 'report_emaillog'));
+
+        // Add discussion selector.
+        $discussions = $reportlog->get_discussion_list();
+        echo html_writer::label(get_string('discussion', 'report_emaillog'), 'menudiscussion', false, array('class' => 'accesshide'));
+        echo html_writer::select($discussions, "discussion", $reportlog->discussion, get_string('alldiscussions', 'report_emaillog'));
+
         // Add post selector.
         $posts = $reportlog->get_post_list();
         echo html_writer::label(get_string('post'), 'menupost', false, array('class' => 'accesshide'));

@@ -22,7 +22,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-use core\log\manager;
 
 /**
  * Report emaillog renderable class.
@@ -52,6 +51,12 @@ class report_emaillog_renderable implements renderable {
 
     /** @var int selected user id of recipient for which logs are displayed */
     public $recipient;
+
+    /** @var int selected discussion id for which logs are displayed */
+    public $discussion;
+
+    /** @var int selected forum id for which logs are displayed */
+    public $forum;
 
     /** @var int selected post id for which logs are displayed */
     public $post;
@@ -83,6 +88,8 @@ class report_emaillog_renderable implements renderable {
      * @param stdClass|int $course (optional) course record or id
      * @param int $sender (optional) id of sender to filter records for.
      * @param int $recipient (optional) id of recipient to filter records for.
+     * @param int $forum (optional) id of forum to filter records for.
+     * @param int $discussion (optional) id of discussion to filter records for.
      * @param int $post (optional) id of post to filter records for.
      * @param bool $showcourses (optional) show courses.
      * @param bool $showsenders (optional) show senders.
@@ -96,7 +103,7 @@ class report_emaillog_renderable implements renderable {
      * @param string $order (optional) sortorder of fetched records
      */
 
-    public function __construct($course = 0, $sender = 0,  $recipient = 0, $post = 0,
+    public function __construct($course = 0, $sender = 0,  $recipient = 0, $forum = 0, $discussion = 0, $post = 0,
             $showcourses = false, $showsenders = false, $showrecipients = false, $showreport = true, $showselectorform = true,
             $url = "", $date = 0, $page = 0, $perpage = 100, $order = "timestamp DESC") {
 
@@ -116,6 +123,8 @@ class report_emaillog_renderable implements renderable {
         $this->course = $course;
         $this->sender = $sender;
         $this->recipient = $recipient;
+        $this->forum = $forum;
+        $this->discussion = $discussion;
         $this->post = $post;
         $this->date = $date;
         $this->page = $page;
@@ -145,7 +154,7 @@ class report_emaillog_renderable implements renderable {
      * @return array list of courses the user has posted in.
      */
     public function get_course_list() {
-        global $DB, $SITE;
+        global $DB;
 
         $courses = array();
 
@@ -178,18 +187,14 @@ class report_emaillog_renderable implements renderable {
      * @return array list of users.
      */
     public function get_user_list($recipients = false) {
-        global $CFG, $SITE;
+        global $CFG;
 
         $showusers = $this->showsenders;
         if ($recipients) {
             $showusers = $this->showrecipients;
         }
 
-        $courseid = $SITE->id;
-        if (!empty($this->course)) {
-            $courseid = $this->course->id;
-        }
-        $context = context_course::instance($courseid);
+        $context = context_course::instance($this->course->id);
         $limitfrom = empty($showusers) ? 0 : '';
         $limitnum  = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
         $courseusers = get_enrolled_users($context, '', 0, 'u.id, ' . get_all_user_name_fields(true, 'u'),
@@ -216,13 +221,76 @@ class report_emaillog_renderable implements renderable {
         return $users;
     }
 
-    public function get_post_list() {
-        global $DB, $SITE;
 
-        $courseid = $SITE->id;
-        if (!empty($this->course)) {
-            $courseid = $this->course->id;
+    /**
+     * Return list of forum options.
+     *
+     * @return array forum options.
+     */
+    public function get_forum_list() {
+        global $DB;
+
+        $forumlist = $DB->get_records('forum', array('course' => $this->course->id));
+
+        $forums = array();
+        foreach ($forumlist as $forum) {
+            $forums[$forum->id] = self::get_truncated_name($forum->name);
         }
+        return $forums;
+    }
+
+    /**
+     * Return list of discussion options.
+     *
+     * @return array discussion options.
+     */
+    public function get_discussion_list() {
+        global $DB;
+
+        // If filtered by a specific forum, only show discussions from those forums.
+        $params = array();
+
+        if ($this->course) {
+            $params['course'] = $this->course->id;
+        }
+
+        if ($this->forum) {
+            $params['forum'] = $this->forum;
+        }
+
+        $discussionlist = $DB->get_records('forum_discussions', $params);
+        $discussions = array();
+        foreach ($discussionlist as $discussion) {
+            $discussions[$discussion->id] = self::get_truncated_name($discussion->name);
+        }
+        return $discussions;
+    }
+
+    /**
+     * Return list of post options.
+     *
+     * @return array post options.
+     */
+    public function get_post_list() {
+        global $DB;
+
+        // If filtered by a specific forum/discussion, only show posts from those forums/discussions.
+        $joins = array();
+        $params = array();
+
+        if ($this->course) {
+            $joins[] = "course = :course";
+            $params['course'] = $this->course->id;
+        }
+        if ($this->forum) {
+            $joins[] = "forum = :forum";
+            $params['forum'] = $this->forum;
+        }
+        if ($this->discussion) {
+            $joins[] = "discussion = :discussion";
+            $params['discussion'] = $this->discussion;
+        }
+        $where = implode(' AND ', $joins);
 
         $sql = "SELECT DISTINCT posts.id, subject
                            FROM {forum_posts} posts
@@ -230,17 +298,11 @@ class report_emaillog_renderable implements renderable {
                            JOIN {forum_discussions} forum ON posts.discussion = forum.id
                           WHERE mailed = 1 AND course = :course";
 
-        $postlist = $DB->get_records_sql($sql, array('course' => $courseid));
+        $postlist = $DB->get_records_sql($sql, $params);
 
         $posts = array();
         foreach ($postlist as $post) {
-            $subject = $post->subject;
-
-            $subjectwords = str_word_count($subject, 2);
-            // Show shortened subject title (only five words).
-            if (count($subjectwords) > EMAILLOG_MAX_SUBJECT_WORDS) {
-                $subject = implode(' ', array_slice($subjectwords, 0, EMAILLOG_MAX_SUBJECT_WORDS)) . '...';
-            }
+            $subject = self::get_truncated_name($post->subject);
             $posts[$post->id] = $subject . ' (ID: ' . $post->id .')';
         }
         return $posts;
@@ -302,11 +364,28 @@ class report_emaillog_renderable implements renderable {
 
         $filter->sender = $this->sender;
         $filter->recipient = $this->recipient;
+        $filter->forum = $this->forum;
+        $filter->discussion = $this->discussion;
         $filter->post = $this->post;
         $filter->date = $this->date;
         $filter->orderby = $this->order;
 
         $this->tablelog = new report_emaillog_table_log('report_emaillog', $filter);
         $this->tablelog->define_baseurl($this->url);
+    }
+
+    /*
+     * Truncates a string to 10 words if necessary.
+     *
+     * @param string $name the full subject/name
+     * @return string subject/name truncated to 10 words
+     */
+    static public function get_truncated_name($name) {
+        $namewords = str_word_count($name, 2);
+        // Show shortened subject title (only 10 words maximum).
+        if (count($namewords) > EMAILLOG_MAX_SUBJECT_WORDS) {
+            $name = implode(' ', array_slice($namewords, 0, EMAILLOG_MAX_SUBJECT_WORDS)) . '...';
+        }
+        return $name;
     }
 }

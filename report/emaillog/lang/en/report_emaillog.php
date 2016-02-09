@@ -23,15 +23,19 @@
  * @copyright  2015 UC Regents
  */
 
-$string['allrecipients'] = 'All recipients';
+$string['alldiscussions'] = 'All discussions';
+$string['allforums'] = 'All forums';
 $string['allposts'] = 'All posts';
+$string['allrecipients'] = 'All recipients';
 $string['allsenders'] = 'All senders';
 $string['chooseforumlogs'] = 'Choose which forum email logs you want to see from the past {$a} days';
 $string['daysexpire'] = 'Expiration';
 $string['daysexpire_desc'] = 'Number of days that forum email logs will be kept';
+$string['discussion'] = 'Discussion';
 $string['emaillog:view'] = 'View email logs';
 $string['enable'] = 'Enable';
 $string['enable_desc'] = 'Enable forum email logging';
+$string['forum'] = 'Forum';
 $string['message'] = 'Message';
 $string['page'] = 'Page {$a}';
 $string['pastdays'] = 'Past {$a} days';

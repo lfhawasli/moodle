@@ -30,7 +30,9 @@ $id             = optional_param('id', 0, PARAM_INT);// Course ID.
 $sender         = optional_param('sender', 0, PARAM_INT); // Sender to display.
 $recipient      = optional_param('recipient', 0, PARAM_INT); // Recipient to display.
 $date           = optional_param('date', 0, PARAM_INT); // Date to display.
-$post           = optional_param('post', 0, PARAM_INT); // Date to display.
+$forum          = optional_param('forum', 0, PARAM_INT); // Forum to display.
+$discussion     = optional_param('discussion', 0, PARAM_INT); // Discussion to display.
+$post           = optional_param('post', 0, PARAM_INT); // Post to display.
 $page           = optional_param('page', '0', PARAM_INT);     // Which page to show.
 $perpage        = optional_param('perpage', '100', PARAM_INT); // How many per page.
 $showcourses    = optional_param('showcourses', false, PARAM_BOOL); // Whether to show courses if we're over our limit.
@@ -55,6 +57,12 @@ if ($recipient !== 0) {
 
 if ($date !== 0) {
     $params['date'] = $date;
+}
+if ($forum !== 0) {
+    $params['forum'] = $forum;
+}
+if ($discussion !== 0) {
+    $params['discussion'] = $discussion;
 }
 if ($post !== 0) {
     $params['post'] = $post;
@@ -106,7 +114,7 @@ $PAGE->set_title($course->shortname .': '. $strlogs);
 $PAGE->set_heading($course->fullname);
 
 // Create table.
-$emaillog = new report_emaillog_renderable($course, $sender, $recipient, $post,
+$emaillog = new report_emaillog_renderable($course, $sender, $recipient, $forum, $discussion, $post,
         $showcourses, $showsenders, $showrecipients, $chooselog, true,
         $url, $date, $page, $perpage, 'timestamp DESC');
 

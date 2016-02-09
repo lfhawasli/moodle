@@ -48,6 +48,8 @@ class report_emaillog_table_log extends table_sql {
      *     - int courseid: id of course
      *     - int sender: id of sender
      *     - int recipient: id of recipient
+     *     - int forum: id of forum
+     *     - int discussion: id of discussion
      *     - int post: id of post
      *     - int date: Date from which logs to be viewed.
      */
@@ -128,13 +130,7 @@ class report_emaillog_table_log extends table_sql {
      */
     public function col_subject($log) {
         if (!empty($log->subject)) {
-            $title = $log->subject;
-
-            $subjectwords = str_word_count($title, 2);
-            // Show shortened subject title (only five words).
-            if (count($subjectwords) > EMAILLOG_MAX_SUBJECT_WORDS) {
-                $title = implode(' ', array_slice($subjectwords, 0, EMAILLOG_MAX_SUBJECT_WORDS)) . '...';
-            }
+            $title = report_emaillog_renderable::get_truncated_name($log->subject);
             $params['d'] = $log->discussion_id;
             $anchor = 'p' . $log->post_id;
             $subject = html_writer::link(new moodle_url('/mod/forum/discuss.php', $params, $anchor), $title);
@@ -170,6 +166,16 @@ class report_emaillog_table_log extends table_sql {
         if (!empty($this->filterparams->recipient)) {
             $joins[] = "recipient_id = :recipient";
             $params['recipient'] = $this->filterparams->recipient;
+        }
+
+        if (!empty($this->filterparams->forum)) {
+            $joins[] = "forum = :forum";
+            $params['forum'] = $this->filterparams->forum;
+        }
+
+        if (!empty($this->filterparams->discussion)) {
+            $joins[] = "discussions.id = :discussion";
+            $params['discussion'] = $this->filterparams->discussion;
         }
 
         if (!empty($this->filterparams->post)) {
