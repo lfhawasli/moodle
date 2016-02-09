@@ -386,29 +386,33 @@ function get_reserve_data($table) {
 
             $item->courseid = $shortnamewithlink;
         }
-        // Convert start/end date to standard format.
-        $item->start_date = userdate($item->start_date, $timeformat);
-        $item->stop_date = userdate($item->stop_date, $timeformat);
 
-        // Create source column.
-        if ($item->filename === '') {
-            $item->source = 'BruinMedia';
-        } else {
-            $item->source = 'Wowza';
+        // Special formatting for Video reserves.
+        if ($table == 'video_reserves') {
+            // Convert start/end date to standard format.
+            $item->start_date = userdate($item->start_date, $timeformat);
+            $item->stop_date = userdate($item->stop_date, $timeformat);
+
+            // Create source column.
+            if ($item->filename === '') {
+                $item->source = 'BruinMedia';
+            } else {
+                $item->source = 'Wowza';
+            }
+
+            // Reorder $item properties to render source before video_url.
+            $temp = (object) array('courseid' => $item->courseid,
+                                   'term' => $item->term,
+                                   'srs' => $item->srs,
+                                   'start_date' => $item->start_date,
+                                   'stop_date' => $item->stop_date,
+                                   'class' => $item->class,
+                                   'instructor' => $item->instructor,
+                                   'video_title' => $item->video_title,
+                                   'source' => $item->source,
+                                   'video_url' => $item->video_url);
+            $result[$index] = $temp;
         }
-
-        // Reorder $item properties to render source before video_url.
-        $temp = (object) array('courseid' => $item->courseid,
-                               'term' => $item->term,
-                               'srs' => $item->srs,
-                               'start_date' => $item->start_date,
-                               'stop_date' => $item->stop_date,
-                               'class' => $item->class,
-                               'instructor' => $item->instructor,
-                               'video_title' => $item->video_title,
-                               'source' => $item->source,
-                               'video_url' => $item->video_url);
-        $result[$index] = $temp;
 
     }
 
