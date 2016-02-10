@@ -125,7 +125,7 @@ class block_ucla_tasites extends block_base {
      * @return boolean
      */
     public static function check_access($courseid) {
-        return self::enabled() && self::can_access($courseid);
+        return self::enabled($courseid) && self::can_access($courseid);
     }
 
 //    /**
@@ -270,8 +270,12 @@ class block_ucla_tasites extends block_base {
      *
      * @return boolean
      */
-    public static function enabled() {
-        return self::validate_enrol_meta() && self::validate_roles();
+    public static function enabled($courseid) {
+        // See if the instructor has enabled TA site creation for this specific user.
+        $formatoptions = course_get_format($courseid)->get_format_options();
+        if ($formatoptions['createtasite'] == 1) {
+            return self::validate_enrol_meta() && self::validate_roles();
+        }
     }
 
     /**

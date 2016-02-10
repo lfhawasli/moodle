@@ -325,6 +325,10 @@ class format_ucla extends format_topics {
                 'coursedownload' => array(
                     'default' => 1,
                     'type' => PARAM_ALPHANUMEXT
+                ),
+                'createtasite' => array(
+                    'default' => 1,
+                    'type' => PARAM_ALPHANUMEXT
                 )
             );
             if (!is_collab_site($COURSE)) {
@@ -352,6 +356,17 @@ class format_ucla extends format_topics {
                 'coursedownload' => array(
                     'label' => get_string('coursedownload', 'format_ucla'),
                     'help' => 'coursedownload',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            1 => get_string('yes'),
+                            0 => get_string('no')
+                        )
+                    )
+                ),
+                'createtasite' => array(
+                    'label' => get_string('createtasite', 'format_ucla'),
+                    'help' => 'createtasite',
                     'element_type' => 'select',
                     'element_attributes' => array(
                         array(
