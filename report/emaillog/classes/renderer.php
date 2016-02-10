@@ -161,7 +161,7 @@ class report_emaillog_renderer extends plugin_renderer_base {
         // Add date selector.
         $dates = $reportlog->get_date_options();
         echo html_writer::label(get_string('date'), 'menudate', false, array('class' => 'accesshide'));
-        echo html_writer::select($dates, "date", $reportlog->date, get_string('pastsevendays', 'report_emaillog'));
+        echo html_writer::select($dates, "date", $reportlog->date, get_string('pastdays', 'report_emaillog', get_config('report_emaillog', 'daysexpire')));
 
         echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('gettheselogs')));
 

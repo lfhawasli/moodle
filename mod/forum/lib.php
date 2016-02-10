@@ -3458,6 +3458,9 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $cm->cache->caps['mod/forum:viewanyrating']    = has_capability('mod/forum:viewanyrating', $modcontext);
         $cm->cache->caps['mod/forum:exportpost']       = has_capability('mod/forum:exportpost', $modcontext);
         $cm->cache->caps['mod/forum:exportownpost']    = has_capability('mod/forum:exportownpost', $modcontext);
+        // START UCLA-MOD: CCLE-5671 Add email log quick link
+        $cm->cache->caps['report/emaillog:view']       = has_capability('report/emaillog:view', $modcontext);
+        // END UCLA-MOD: CCLE-5671 Add email log quick link
     }
 
     if (!isset($cm->uservisible)) {
@@ -3518,6 +3521,9 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $str->displaymode     = get_user_preferences('forum_displaymode', $CFG->forum_displaymode);
         $str->markread     = get_string('markread', 'forum');
         $str->markunread   = get_string('markunread', 'forum');
+        // START UCLA-MOD: CCLE-5671 Add email log quick link
+        $str->logs         = get_string('logs');
+        // END UCLA-MOD: CCLE-5671 Add email log quick link
     }
 
     $discussionlink = new moodle_url('/mod/forum/discuss.php', array('d'=>$post->discussion));
@@ -3608,6 +3614,14 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     if ($reply) {
         $commands[] = array('url'=>new moodle_url('/mod/forum/post.php#mformforum', array('reply'=>$post->id)), 'text'=>$str->reply);
     }
+
+    // START UCLA-MOD: CCLE-5671 Add email log quick link
+    // Only show link if user has capability to view logs and the post is a valid nubmer of days old (old posts are pruned from database).
+    $loglifetime = time() - DAYSECS * get_config('report_emaillog', 'daysexpire');
+    if ($cm->cache->caps['report/emaillog:view'] && $post->modified > $loglifetime) {
+        $commands[] = array('url'=>new moodle_url('/report/emaillog/index.php', array('id' => $course->id, 'post' => $post->id, 'chooselog' => 1)), 'text'=>$str->logs);
+    }
+    // END UCLA-MOD: CCLE-5671 Add email log quick link
 
     if ($CFG->enableportfolios && ($cm->cache->caps['mod/forum:exportpost'] || ($ownpost && $cm->cache->caps['mod/forum:exportownpost']))) {
         $p = array('postid' => $post->id);

@@ -226,6 +226,7 @@ class report_emaillog_renderable implements renderable {
 
         $sql = "SELECT DISTINCT posts.id, subject
                            FROM {forum_posts} posts
+                           JOIN {report_emaillog} log ON log.post = posts.id
                            JOIN {forum_discussions} forum ON posts.discussion = forum.id
                           WHERE mailed = 1 AND course = :course";
 
@@ -276,9 +277,9 @@ class report_emaillog_renderable implements renderable {
             $course->startdate = $course->timecreated;
         }
 
-        // Only show options for last 7 days, as the log is pruned after 7 days.
+        // Only show options for last {daysexpire} days, as the log is pruned after {daysexpire} days.
         $numdates = 1;
-        while ($timemidnight > $course->startdate and $numdates < 7) {
+        while ($timemidnight > $course->startdate and $numdates < get_config('report_emaillog', 'daysexpire')) {
             $timemidnight = $timemidnight - 86400;
             $timenow = $timenow - 86400;
             $dates["$timemidnight"] = userdate($timenow, $strftimedaydate);

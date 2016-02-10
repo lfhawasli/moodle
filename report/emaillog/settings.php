@@ -14,19 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Version info
+/*
+ * Helper class to log outgoing forum emails.
  *
- * This file contains information about the current version of report/emaillog
- * 
  * @package report_emaillog
  * @copyright  2015 UC Regents
  */
 
-defined('MOODLE_INTERNAL') || die;
-
-$plugin->version   = 2016021800;    // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2014050800;    // Requires this Moodle version.
-$plugin->component = 'report_emaillog';  // Full name of the plugin (used for diagnostics).
-
-
+$settings->add(new admin_setting_configtext('report_emaillog/daysexpire',
+        get_string('daysexpire', 'report_emaillog'),
+        get_string('daysexpire_desc', 'report_emaillog'), 7, PARAM_INT));

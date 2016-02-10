@@ -118,7 +118,7 @@ if (!empty($chooselog)) {
     // Delay creation of table, till called by user with filter.
     $emaillog->setup_table();
 } else {
-    echo $output->heading(get_string('chooseforumlogs', 'report_emaillog') .':');
+    echo $output->heading(get_string('chooseforumlogs', 'report_emaillog', get_config('report_emaillog', 'daysexpire')) .':');
 }
 
 echo $output->render($emaillog);

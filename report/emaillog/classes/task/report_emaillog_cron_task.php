@@ -43,7 +43,7 @@ class report_emaillog_cron_task extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $loglifetime = time() - WEEKSECS; // 7 days before current time.
+        $loglifetime = time() - DAYSECS * get_config('report_emaillog', 'daysexpire'); // {daysexpire} days before current time.
         $DB->delete_records_select("report_emaillog", "timestamp < ?", array($loglifetime));
 
         mtrace(" Deleted old log records from emaillog.");

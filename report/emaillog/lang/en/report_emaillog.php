@@ -26,12 +26,14 @@
 $string['allrecipients'] = 'All recipients';
 $string['allposts'] = 'All posts';
 $string['allsenders'] = 'All senders';
-$string['chooseforumlogs'] = 'Choose which forum email logs you want to see from the past 7 days';
+$string['chooseforumlogs'] = 'Choose which forum email logs you want to see from the past {$a} days';
+$string['daysexpire'] = 'Expiration';
+$string['daysexpire_desc'] = 'Number of days that forum email logs will be kept';
 $string['emaillog:view'] = 'View email logs';
 $string['message'] = 'Message';
 $string['page'] = 'Page {$a}';
+$string['pastdays'] = 'Past {$a} days';
 $string['pluginname'] = 'Forum email logs';
-$string['pastsevendays'] = 'Past 7 days';
 $string['recipient'] = 'Recipient full name';
 $string['recipient_email'] = 'Recipient email address';
 $string['sender'] = 'Sender full name';
