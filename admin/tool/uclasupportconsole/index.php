@@ -1579,11 +1579,11 @@ if ($displayforms) {
     // instances of this module in this course
     // count($course_indiv_module_counts[<course shortname>]) has 
     // the number kinds of modules used in this course
-    $course_indiv_module_counts = array();
+    $courseindivmodulecounts = array();
     
     // Mapping of course shortname => count of instances of 
     // all modules in this course
-    $course_total_module_counts = array();
+    $coursetotalmodulecounts = array();
     
     $params = array();
     $sql = "SELECT  cm.id,
@@ -1624,15 +1624,15 @@ if ($displayforms) {
         $mn = $result->modulename;
         $courseshortnames[$sn] = $result->shortname;
 
-        if (!isset($course_indiv_module_counts[$sn][$mn])) {
-            $course_indiv_module_counts[$sn][$mn] = 0;
+        if (!isset($courseindivmodulecounts[$sn][$mn])) {
+            $courseindivmodulecounts[$sn][$mn] = 0;
         }
 
-        $course_indiv_module_counts[$sn][$mn] += $result->cnt;
+        $courseindivmodulecounts[$sn][$mn] += $result->cnt;
     }
     
     $tabledata = array();
-    foreach ($course_indiv_module_counts as $courseid => $modulecounts) {
+    foreach ($courseindivmodulecounts as $courseid => $modulecounts) {
         $rowdata = array(
             'course' => html_writer::link(new moodle_url(
                     '/course/view.php', array('id' => $courseid)
@@ -1685,6 +1685,145 @@ if ($displayforms) {
              $tabledata, $params);
 
 
+}
+
+$consoles->push_console_html('modules', $title, $sectionhtml);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+$title = "modulespertacourse";
+$sectionhtml = '';
+
+if ($displayforms) {
+    // Add filter for term/subject area, because this table can get very big
+    // and the query get return a ton of data.
+    $input_html = get_term_selector($title);
+    $input_html .= get_subject_area_selector($title);
+
+    $sectionhtml = supportconsole_simple_form($title, $input_html);
+} else if ($consolecommand == "$title") {
+
+    // Get optional filters.
+    $term = optional_param('term', null, PARAM_ALPHANUM);
+    if (!ucla_validator('term', $term)) {
+        $term = null;
+    }
+    $subjarea = optional_param('subjarea', null, PARAM_NOTAGS);
+
+    // Mapping of [course shortname, module name] => count of
+    // instances of this module in this course
+    // count($courseindivmodulecounts[<course shortname>]) has
+    // the number kinds of modules used in this course.
+    $courseindivmodulecounts = array();
+
+    // Mapping of course shortname => count of instances of
+    // all modules in this course
+    $coursetotalmodulecounts = array();
+
+    // Return list of TA sites that match criteria.
+    $params = array();
+    $sql = "SELECT  cm.id,
+                    tasite.id AS courseid,
+                    tasite.shortname AS shortname,
+                    m.name AS modulename,
+                    count(*) AS cnt
+            FROM    {course} tasite
+            JOIN    {ucla_siteindicator} si ON 
+                    (si.courseid=tasite.id AND si.type='tasite')
+            JOIN    {course_modules} cm ON tasite.id = cm.course
+            JOIN    {modules} m ON cm.module = m.id";
+
+    // Handle term/subject area filter on parent course for TA site.
+    if (!empty($term) || !empty($subjarea)) {
+        // Need to join on meta enrollment plugin specific for TA sites.
+        $sql .= " JOIN {enrol} metaenrol ON
+                (metaenrol.enrol='meta' AND metaenrol.courseid=tasite.id)";
+        $sql .= " JOIN {course} parentsite ON (metaenrol.customint1=parentsite.id)";
+        $sql .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=parentsite.id)";
+    }
+    if (!empty($term) && !empty($subjarea)) {
+        $sql .= " WHERE urc.term=:term AND
+                        urc.department=:subjarea";
+        $params['term'] = $term;
+        $params['subjarea'] = $subjarea;
+    } else if (!empty($term)) {
+        $sql .= " WHERE urc.term=:term";
+        $params['term'] = $term;
+    } else if (!empty($subjarea)) {
+        $sql .= " WHERE urc.department=:subjarea";
+        $params['subjarea'] = $subjarea;
+    }
+
+    $sql .= " GROUP BY tasite.id, m.id
+             ORDER BY tasite.shortname";
+
+    $results = $DB->get_records_sql($sql, $params);
+
+    $courseshortnames = array();
+
+    foreach ($results as $result) {
+        $sn = $result->courseid;
+        $mn = $result->modulename;
+        $courseshortnames[$sn] = $result->shortname;
+
+        if (!isset($courseindivmodulecounts[$sn][$mn])) {
+            $courseindivmodulecounts[$sn][$mn] = 0;
+        }
+
+        $courseindivmodulecounts[$sn][$mn] += $result->cnt;
+    }
+
+    $tabledata = array();
+    foreach ($courseindivmodulecounts as $courseid => $modulecounts) {
+        $rowdata = array(
+            'TA site' => html_writer::link(new moodle_url(
+                    '/course/view.php', array('id' => $courseid)
+                ), $courseshortnames[$courseid]),
+            'total' => array_sum($modulecounts)
+        );
+
+
+        foreach ($modulecounts as $modulename => $moduleinst) {
+            $rowdata[$modulename] = $moduleinst;
+        }
+
+        $tabledata[] = $rowdata;
+    }
+
+    // Create an array with only the module names: $field.
+    $field = array();
+    $tempfield = array();
+
+    foreach ($tabledata as $tabledatum) {
+        foreach ($tabledatum as $tablef => $tablev) {
+            if ($tablef == 'id') {
+                continue;
+            }
+
+            if ($tablef == 'TA site' || $tablef == 'total') {
+                $field[$tablef] = $tablef;
+                continue;
+            }
+
+            $tempfield[$tablef] = $tablef;
+        }
+    }
+
+    asort($tempfield);
+    $field = array_merge($field, $tempfield);
+
+    foreach ($tabledata as & $courses) {
+        $tempfield = $field;
+        // Merge the courses array into the tempfield array.
+        $courses = array_merge($tempfield, $courses);
+        foreach ($courses as $module => & $count) {
+            // If course does not have the module, make its count = 0.
+            if ($module != 'TA site' && !is_numeric($count)) {
+                $count = NULL;
+            }
+        }
+    }
+    $sectionhtml .= supportconsole_render_section_shortcut($title,
+             $tabledata, $params);
 }
 
 $consoles->push_console_html('modules', $title, $sectionhtml);

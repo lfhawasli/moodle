@@ -93,5 +93,28 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015101600, 'tool', 'uclasupportconsole');
     }
 
+    if ($oldversion < 2016021900) {
+        // Add modulespertacourse to Module Data category.
+        $modulecat = null;
+
+        // Find it.
+        $categories = \local_ucla_support_tools_category::fetch_all();
+        foreach ($categories as $category) {
+            if (core_text::strtoupper($category->name) == 'MODULE DATA') {
+                $modulecat = $category;
+                break;
+            }
+        }
+
+        if (!empty($modulecat)) {
+            $data = array('url' => '/' . $CFG->admin . '/tool/uclasupportconsole/index.php#modulespertacourse',
+                'name' => get_string('modulespertacourse', 'tool_uclasupportconsole'));
+            $tool = \local_ucla_support_tools_tool::create($data);
+            $modulecat->add_tool($tool);
+        }
+
+        upgrade_plugin_savepoint(true, 2016021900, 'tool', 'uclasupportconsole');
+    }
+
     return true;
 }

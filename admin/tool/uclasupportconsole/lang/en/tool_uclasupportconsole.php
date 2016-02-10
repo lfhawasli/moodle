@@ -84,6 +84,7 @@ $string['showreopenedclasses'] = "Reopened classes per term";
 $string['assignmentquizzesduesoon'] = 'Show courses with assignments or quizzes due soon';
 $string['assignmentquizzesduesoonmoreinfo'] = 'From {$a->start} to {$a->end} ({$a->days} days)';
 $string['modulespercourse'] = 'Count module totals and module types per course';
+$string['modulespertacourse'] = 'Count module totals and module types per TA site';
 $string['syllabusreoport'] = 'Syllabus report by subject area';
 $string['syllabus_header_course'] = '{$a->term} Course ({$a->num_courses})';
 $string['syllabus_header_instructor'] = 'Instructors';
