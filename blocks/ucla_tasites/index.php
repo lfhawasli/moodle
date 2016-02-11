@@ -92,30 +92,28 @@ if ($formaction == 'create') {
 
         } else if (isset($params->bysection)) {
             // What section is user building?
-            if ($params->bysection == 'all') {
-                $typeinfo['bysection'] = $mapping['bysection'];
-            } else {
-                $typeinfo['bysection'] = array($mapping['bysection'][$params->bysection]);
+            foreach($params->bysection as $secnum => $val) {
+                $typeinfo['bysection'][$secnum] = $mapping['bysection'][$secnum];
             }
         } else if (isset($params->byta)) {
             // Get TA to create TA site for.
             $taidnumber = $params->byta;
             $tauser = $DB->get_record('user', array('idnumber' => $taidnumber));
             $tafullname = fullname($tauser);
-            $tasectionchoice = $params->tasectionchoice;
+            $tasectionchoice = isset($params->tasectionchoice) ? $params->tasectionchoice : '';
 
             // Get TA info from mapping.
             $typeinfo['byta'][$tafullname] = $mapping['byta'][$tafullname];
 
             // Create TA site for entire course, so remove secsrs, if exists.
-            if ($tasectionchoice == 'all') {
+            if ($tasectionchoice == 'all' || isset($params->tasectionchoiceentire)) {
                 if (!empty($typeinfo['byta'][$tafullname]['secsrs'])) {
                     unset($typeinfo['byta'][$tafullname]['secsrs']);
                 }
             }
         }
         $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
-    } 
+    }
 
     // If new TA site was created, then display success message.
     if (!empty($newtasite)) {

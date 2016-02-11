@@ -110,11 +110,14 @@ class block_ucla_tasites extends block_base {
                     return false;
                 }
             }
+            return true;
         } else {
-
-            return false;
+            $context = context_course::instance($courseid);
+            if (has_capability('moodle/course:update', $context)) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -174,17 +177,10 @@ class block_ucla_tasites extends block_base {
         $uidarray = array();
         $srsarray = array();
         if (isset($typeinfo['bysection'])) {
-            /* $type = 'section';
-              $sections = array();
-              if ($typeinfo['bysection'] == 'all') {
-              // Add all sections.
-              $sections = array_keys($mapping['bysection']);
-              } else {
-              $sections = $typeinfo['bysection'];
-              }
-              foreach ($typeinfo['bysection'] as $secnum) {
-              $idarray = array_merge($idarray, $mapping['bysection'][$secnum['secsrs']]);
-              } */
+            foreach ($typeinfo['bysection'] as $secinfo) {
+                $srsarray = array_merge($srsarray, $secinfo['secsrs']);
+                $uidarray = array_merge($uidarray, array_keys($secinfo['tas']));               
+            }
         } else if (isset($typeinfo['byta'])) {
             // Getting the TA's UID and section SRS numbers.
             foreach ($typeinfo['byta'] as $tainfo) {
@@ -541,12 +537,12 @@ class block_ucla_tasites extends block_base {
             'customint1' => $courseid,
             'customint2' => self::get_ta_role_id(),
             'customint3' => self::get_ta_admin_role_id()
-                ), '', 'customint4 as ownerid, '
+                ), '', 'customtext1 as ta_uclaids, '
                 . 'courseid, '
                 . 'customint1 as parentcourseid, '
                 . 'customint2 as ta_roleid, '
+                . 'customint4 as createrid, '
                 . 'customint3 as ta_admin_roleid, '
-                . 'customtext1 as ta_uclaids, '
                 . 'customtext2 as ta_secsrs'
         );
 
@@ -555,7 +551,6 @@ class block_ucla_tasites extends block_base {
 
     /**
      * Checks if there are any valid users that can have a TA-site.
-     *
      *
      * @param int $courseid
      * @return array    Role assignments for users that can have TA-sites.
@@ -605,10 +600,26 @@ class block_ucla_tasites extends block_base {
             // Get default grouping for each course.
             $course->defaultgroupingname = groups_get_grouping_name($course->defaultgroupingid);
 
-            $tacourses[$enrol->ownerid] = $course;
+            $tacourses[$enrol->ta_uclaids] = $course;
         }
 
         return $tacourses;
+    }
+
+    /**
+     * Checks if a given user has a TA site for given course.
+     *
+     * @param int $courseid
+     * @param string $uclaid
+     * @return boolean
+     */
+    public static function has_tasite($courseid, $uclaid) {
+        global $DB;
+        
+        $where = "customint1=:courseid AND enrol='meta' AND " .
+                $DB->sql_like('customtext1', ':uclaid');
+        return $DB->record_exists_select('enrol', $where,
+                array('courseid' => $courseid, 'uclaid' => '%'.$uclaid.'%'));
     }
 
     /**

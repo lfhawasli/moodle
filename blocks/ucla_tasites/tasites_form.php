@@ -35,6 +35,143 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  */
 class tasites_form extends moodleform {
 
+    private function define_admin_form() {
+        $mform =& $this->_form;
+        
+        // User is not a TA, but is an instructor or admin who can make TA
+        // sites for other TAs.
+        $course = $this->_customdata['course'];
+        $mapping = $this->_customdata['mapping'];
+
+        /*
+         * Do not display initial screen in the following scenario:
+         *  When there is no TAs or sections available for the course 
+         *  When TA sites are created for each TA/each Section accordingly.
+         * Do not show By TA option
+         *  When there is no atleast one TA available for the course OR
+         *  Wben all the TAs have their own TA site.
+         * Do not show By Section option
+         *  When there is no atleast one section available for the course OR
+         *  When all the sections have their own TA sites created.
+         */
+
+        // Display initial screen for instructors to choose byta or
+        // bysection.
+        $mform->addElement('static', 'tainitialdesc', '',
+            get_string('tainitialdesc', 'block_ucla_tasites'));
+
+        $choicearray = array();
+        $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
+                get_string('tainitialbyta', 'block_ucla_tasites'), 'byta');
+        $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
+                get_string('tainitialbysection', 'block_ucla_tasites'), 'bysection');
+        $mform->addGroup($choicearray, 'tainitialchoicegroup', '', '<br />', false);
+        $mform->addRule('tainitialchoicegroup', null, 'required');
+
+        $mform->addElement('header','bytaheader', get_string('bytaheader', 'block_ucla_tasites'));
+        $mform->addElement('static', 'bytadesc', '',
+            get_string('bytadesc', 'block_ucla_tasites'));
+        
+        $tachoicearray = array();
+        $sections = array();
+        foreach ($mapping['byta'] as $fullname => $tainfo) {
+            if (block_ucla_tasites::has_tasite($course->id, $tainfo['ucla_id'])) {
+                continue;
+            }
+
+            if(isset($tainfo['secsrs'])) {
+                $sections = array_keys($tainfo['secsrs']);
+                $sections = array_map(array('block_ucla_tasites', 'format_sec_num'), $sections);
+            }
+            $a = new stdClass();
+            $a->fullname = $fullname;
+            $a->sections = !empty($sections) ? implode(', ', $sections) : '0';
+            $tachoicearray[] = $mform->createElement('radio', 'byta', '',
+                    get_string('bytachoice', 'block_ucla_tasites', $a), $tainfo['ucla_id']);
+        }
+        if (!empty($tachoicearray)) {
+            // If there are no TAs with no TA sites, then don't list them.
+            $mform->addGroup($tachoicearray, 'bytachoicegroup', '', '<br />', false);
+            //$mform->addRule('bytachoicegroup', null, 'required');
+        }
+
+        $mform->addElement('checkbox', 'tasectionchoiceentire', '',
+                get_string('bytaentirecourse', 'block_ucla_tasites'));
+
+        $mform->addElement('header','bysectionheader', get_string('bysectionheader', 'block_ucla_tasites'));
+        $mform->addElement('static', 'bysectiondesc', '',
+            get_string('bysectiondesc', 'block_ucla_tasites'));
+        $mform->setExpanded('bysectionheader');
+
+        foreach($mapping['bysection'] as $secnum => $secinfo) {
+            if(isset($secinfo['tas'])) {
+                $canmaketasite = false;
+                foreach($secinfo['tas'] as $ucla_id => $taname) {
+                    if (!block_ucla_tasites::has_tasite($course->id, $ucla_id)) {
+                        $canmaketasite = true;
+                        break;
+                    }
+                }
+                if(!$canmaketasite) {
+                    continue;
+                }
+
+                $a = new stdClass();
+                $a->sec = block_ucla_tasites::format_sec_num($secnum);
+                $a->tas = implode(',', $secinfo['tas']);
+                $mform->addElement('checkbox', 'bysection['.$secnum.']', '',  get_string('bysectionchoice', 'block_ucla_tasites', $a));
+            }
+        }
+
+
+    }
+
+    private function define_agreement_form() {
+        $mform =& $this->_form;
+
+        // Policy agreement statement.
+        $mform->addElement('checkbox', 'confirmation', '',
+                get_string('tasitecreateconfirm', 'block_ucla_tasites'));
+        $mform->addRule('confirmation',
+                get_string('errconfirmation', 'block_ucla_tasites'),
+                'required', null, 'server');
+    }
+
+    private function define_ta_form() {
+        global $USER;
+
+        $mform =& $this->_form;
+
+        $mapping = $this->_customdata['mapping'];
+
+        $fullname = fullname($USER);
+        // Looking for a section that belongs to current user.
+        if (isset($mapping['byta'][$fullname]['secsrs'])) {
+            $mform->addElement('static', 'tasectiondesc', '',
+                get_string('tasectiondesc', 'block_ucla_tasites'));
+
+            $sections = array_keys($mapping['byta'][$fullname]['secsrs']);
+            $sections = array_map(array('block_ucla_tasites', 'format_sec_num'), $sections);
+
+            $choicearray = array();
+            $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
+                    get_string('tasectionchoiceonly', 'block_ucla_tasites',
+                            implode(', ', $sections)), 'only');
+            $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
+                    get_string('tasectionchoiceentire', 'block_ucla_tasites'), 'all');
+            $mform->addGroup($choicearray, 'tasectionchoicegroup', '', '<br />', false);
+            $mform->addRule('tasectionchoicegroup', null, 'required');
+        }
+
+        $mform->addElement('hidden', 'byta', $USER->idnumber);
+        $mform->setType('byta', PARAM_INT);
+
+        $mform->addElement('hidden', 'screen', 'byta');
+        $mform->setType('screen', PARAM_ALPHA);
+
+        $this->define_agreement_form();
+    }
+
     /**
      * Definition.
      */
@@ -49,84 +186,14 @@ class tasites_form extends moodleform {
         $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $mapping = $this->_customdata['mapping'];
-
         $mform->addElement('header','createheader', get_string('create', 'block_ucla_tasites'));
         
-        $sections = array();
-        $fullname = fullname($USER);
-        if (isset($mapping['byta'][$fullname]['secsrs'])) {
-            $mform->addElement('static', 'tasectiondesc', '',
-                get_string('tasectiondesc', 'block_ucla_tasites'));
-            
-            $sections = array_keys($mapping['byta'][$fullname]['secsrs']);
-            $sections = array_map(array('block_ucla_tasites', 'format_sec_num'), $sections);
-
-            $choicearray=array();
-            $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
-                    get_string('tasectionchoiceonly', 'block_ucla_tasites',
-                            implode(', ', $sections)), 'only');
-            $choicearray[] = $mform->createElement('radio', 'tasectionchoice', '',
-                    get_string('tasectionchoiceentire', 'block_ucla_tasites'), 'all');
-            $mform->addGroup($choicearray, 'tasectionchoicegroup', '', '<br />', false);
-            $mform->addRule('tasectionchoicegroup', null, 'required');
+        // If the user is a TA, display TA form.
+        if (block_ucla_tasites::can_have_tasite($USER, $course->id)) {
+            $this->define_ta_form();
+        } else {
+            $this->define_admin_form();
         }
-
-        $mform->addElement('hidden', 'byta', $USER->idnumber);
-        $mform->setType('byta', PARAM_INT);
-
-//        $tasiteinfo = $this->_customdata['tasiteinfo'];
-
-        // Get mapping of sections and TAs.
-        //$mapping = block_ucla_tasites::get_tasection_mapping($course->id);
-        
-
-        // Commented out temporarily 02/03/2016.
-        /*$mform->addElement('header', 'bysectionheader',
-                get_string('bysectionheader', 'block_ucla_tasites'));
-        $mform->addElement('static', 'bysection',
-                get_string('bysection', 'block_ucla_tasites'),
-                get_string('bysectiondesc', 'block_ucla_tasites'));
-
-        // Add options to create TA site by section.
-        $bysectionbox = array();
-        foreach ($mapping['bysection'] as $secnum => $sectioninfo) {
-            $a = new stdClass();
-            if ($secnum == 'all') {
-                // Course doesn't have sections.
-                $label = get_string('bysectionlabelall', 'block_ucla_tasites');
-            } else {
-                $a->sec = block_ucla_tasites::format_sec_num($secnum);
-                $label = get_string('bysectionlabel', 'block_ucla_tasites', $a);
-            }
-            if (!empty($sectioninfo['tas'])) {
-                $a->tas = implode(' / ', $sectioninfo['tas']);
-            } else {
-                $a->tas = 'N/A';
-            }
-            $text = get_string('bysectiontext', 'block_ucla_tasites', $a);
-            $mform->addElement('advcheckbox', 'bysection['.$secnum.']', $label,
-                    $text, array('group' => 1));
-        }
-        $this->add_checkbox_controller(1);
-*/
-        // Policy agreement statement.
-        $mform->addElement('checkbox', 'confirmation', '',
-                get_string('tasitecreateconfirm', 'block_ucla_tasites'));
-        $mform->addRule('confirmation',
-                get_string('errconfirmation', 'block_ucla_tasites'),
-                'required', null, 'server');
-/*
-        // Add advanced features, such as ability to edit shortname and title.
-        $mform->addElement('header', 'miscellaneoussettingshdr',
-                get_string('miscellaneoussettings', 'form'));
-        $mform->setAdvanced('miscellaneoussettingshdr');
-        $mform->addElement('static', 'coursename', '',
-                get_string('coursenamedesc', 'block_ucla_tasites'));
-        $mform->addElement('text', 'shortname', get_string('shortnamecourse'));
-        $mform->setType('shortname', PARAM_TEXT);
-        $mform->addElement('text', 'fullname', get_string('fullnamecourse'));
-        $mform->setType('fullname', PARAM_TEXT);*/
 
         $this->add_action_buttons(false, get_string('create', 'block_ucla_tasites'));
     }

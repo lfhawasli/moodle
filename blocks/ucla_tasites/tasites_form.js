@@ -13,4 +13,23 @@ $(function() {
     });
 });
 
+$(document).ready(function() {
+    if(!$('#id_tainitialchoice_byta').is(':checked')) {
+        $('#id_bytaheader').hide();
+    }
+    if(!$('#id_tainitialchoice_bysection').is(':checked')) {
+        $('#id_bysectionheader').hide();
+    }
+    
+    $('#id_tainitialchoice_byta').click(function() {
+       $('#id_bytaheader').show();
+       $('#id_bysectionheader').hide();
+    });
+    
+    $('#id_tainitialchoice_bysection').click(function() {
+       $('#id_bysectionheader').show();
+       $('#id_bytaheader').hide();
+    });
+});
+
 
