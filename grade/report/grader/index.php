@@ -28,11 +28,6 @@ require_once($CFG->dirroot.'/user/renderer.php');
 require_once($CFG->dirroot.'/grade/lib.php');
 require_once($CFG->dirroot.'/grade/report/grader/lib.php');
 
-// START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report
-require_once $CFG->dirroot.'/local/ucla/classes/local_ucla_grade_report_grader.php';
-$groupingid       = optional_param('grouping', NULL, PARAM_INT);  // group id
-// END UCLA MOD: CCLE-4295
-
 $courseid      = required_param('id', PARAM_INT);        // course id
 $page          = optional_param('page', 0, PARAM_INT);   // active page
 $edit          = optional_param('edit', -1, PARAM_BOOL); // sticky editting mode
@@ -140,6 +135,8 @@ print_grade_page_head($COURSE->id, 'report', 'grader', $reportname, false, $butt
 // Use the local grader report if config is set.
 // $report = new grade_report_grader($courseid, $gpr, $context, $page, $sortitemid);
 if (isset($CFG->grader_report_grouping_filter)) {
+    require_once $CFG->dirroot.'/local/ucla/classes/local_ucla_grade_report_grader.php';
+    $groupingid = optional_param('grouping', $course->defaultgroupingid, PARAM_INT);  // group id
     $report = new local_ucla_grade_report_grader($courseid, $gpr, $context, $page, $sortitemid, $groupingid);
 } else {
     $report = new grade_report_grader($courseid, $gpr, $context, $page, $sortitemid);
