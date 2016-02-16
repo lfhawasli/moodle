@@ -82,6 +82,22 @@
             padding: 3px 6px !important;
         }
     }
+
+    .reorder {
+        .pagecontent {
+            .question {
+                .content{
+                    height: 3em;
+
+                    .questioncontentcontainer {
+                        label {
+                            display: inline;
+                        }
+                    }
+                }      
+            }
+        }
+    }
 }
 
 // The quiz question (bank) page
