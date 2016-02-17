@@ -1215,9 +1215,9 @@ class enrol_database_plugin extends enrol_plugin {
             $url = new moodle_url('/course/view.php', array('id' => $course->id));
         }
         $a->courseurl = $url->out();
-
-        if (trim($instance->customtext1) !== '') {
-            $message = $instance->customtext1;
+        
+        $message = trim($instance->customtext1);
+        if ($message !== '') {
             $message = str_replace('{$a->coursename}', $a->coursename, $message);
             $message = str_replace('{$a->profileurl}', $a->profileurl, $message);
             $message = str_replace('{$a->courseurl}', $a->courseurl, $message);
@@ -1237,7 +1237,10 @@ class enrol_database_plugin extends enrol_plugin {
             $messagehtml = text_to_html($messagetext, null, false, true);
         }
 
-        $subject = get_string('welcometocourse', 'local_ucla', $course->fullname);
+        $subject = trim($instance->customchar2);
+        if ($subject == '') {
+            $subject = get_string('welcometocourse', 'local_ucla', $course->fullname);
+        }
         
         $rusers = array();
         if (!empty($CFG->coursecontact)) {
@@ -1245,14 +1248,18 @@ class enrol_database_plugin extends enrol_plugin {
             list($sort, $sortparams) = users_order_by_sql('u');
             $rusers = get_role_users($croles, $context, true, '', 'r.sortorder ASC, ' . $sort, null, '', '', '', '', $sortparams);
         }
-        if ($rusers) {
+        
+        $contact = trim($instance->customchar1);
+        if ($contact !== '') {
+            // Do nothing.
+        } else if ($rusers) {
             $contact = reset($rusers);
         } else {
             $contact = core_user::get_support_user();
         }
         
         // Directly emailing welcome message rather than using messaging.
-        email_to_user($user, $contact, $subject, $messagetext, $messagehtml);
+        email_to_user($user, $contact, $subject, $messagetext, $messagehtml, '', '', true, $contact);
     }
     // END UCLA MOD: CCLE-5486 - Enable welcome message for ucla registrar enrollment
 }

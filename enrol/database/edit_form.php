@@ -15,9 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Allow customize email message and send out email when
- * student enrol in a course through registrar.
- * 
+ * Allow customize email message when student enrol in a course through registrar.
+ *
  * @package    enrol_database
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,10 +26,19 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
+/**
+ * Edit form implementation.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class enrol_database_edit_form extends moodleform {
 
-    function definition() {
-        global $DB;
+    /**
+     * Form definition.
+     */
+    public function definition() {
+        global $COURSE, $DB;
 
         $mform = $this->_form;
 
@@ -38,12 +46,22 @@ class enrol_database_edit_form extends moodleform {
 
         $mform->addElement('header', 'header', get_string('pluginname', 'enrol_database'));
 
-        $mform->addElement('advcheckbox', 'customint4', 
+        $mform->addElement('advcheckbox', 'customint4',
                 get_string('sendcoursewelcomemessage', 'local_ucla'));
         $mform->addHelpButton('customint4', 'sendcoursewelcomemessage', 'local_ucla');
 
-        $mform->addElement('textarea', 'customtext1', 
-                get_string('customwelcomemessage', 'local_ucla'), array('cols'=>'60', 'rows'=>'8'));        
+        $mform->addElement('text', 'customchar1',
+                get_string('customwelcomemessagefrom', 'local_ucla'), array('size' => '60'));
+        $mform->setType('customchar1', PARAM_EMAIL);
+        $mform->addHelpButton('customchar1', 'customwelcomemessagefrom', 'local_ucla');
+
+        $mform->addElement('text', 'customchar2',
+                get_string('customwelcomemessagesubject', 'local_ucla'), array('size' => '60'));
+        $mform->setType('customchar2', PARAM_TEXT);
+        $mform->setDefault('customchar2', get_string('welcometocourse', 'local_ucla', $COURSE->fullname));
+
+        $mform->addElement('textarea', 'customtext1',
+                get_string('customwelcomemessage', 'local_ucla'), array('cols' => '60', 'rows' => '8'));
         $mform->setDefault('customtext1', get_string('welcometocoursetext', 'local_ucla'));
         $mform->addHelpButton('customtext1', 'customwelcomemessage', 'local_ucla');
 
@@ -56,5 +74,5 @@ class enrol_database_edit_form extends moodleform {
 
         $this->set_data($instance);
     }
-  
+
 }
