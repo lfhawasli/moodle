@@ -21,7 +21,6 @@
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 $string['build_tasites'] = 'Create TA sites';
 $string['build_tadesc'] = 'Create TA site for {$a->fullname}';
 $string['built_tasite'] = 'TA site <a href="{$a->courseurl}">{$a->courseshortname}</a> for {$a->fullname} was successfully built.';
@@ -39,6 +38,8 @@ $string['create'] = 'Create TA site';
 $string['delete_tasites'] = 'Delete existing TA sites';
 $string['delete_tadesc'] = 'Check to delete TA site <a href="{$a->courseurl}">{$a->courseshortname}</a> for {$a->fullname}.';
 $string['deleted_tasite'] = 'Deletion of TA sites by this interface has been disabled.';
+$string['enablebysection'] = 'Enable TA sites by sections';
+$string['enablebysection_desc'] = 'Enable TA sites creation based by section in addition to by TA.';
 $string['errbadresponse'] = 'Unknown action {$a}';
 $string['errcantcreatetasite'] = "Can't create a TA site.";
 $string['errconfirmation'] = 'Agreement is required.';
@@ -53,6 +54,8 @@ $string['listgrouping'] = 'Default grouping: {$a}';
 $string['liststatus'] = 'Status: {$a}';
 $string['listtaadmin'] = 'Owner: {$a}';
 $string['noexistingtasites'] = 'No existing TA sites.';
+$string['nosectionsexist'] = 'No valid sections exist to create a TA site.';
+$string['notaorsection'] = 'There are no eligible TAs or valid sections available to create a TA site.';
 $string['notasites'] = 'There is no eligible {$a} to make a site for.';
 $string['pluginname'] = 'TA sites';
 $string['returntocourse'] = 'Return to main course';

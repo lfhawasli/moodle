@@ -131,6 +131,21 @@ class block_ucla_tasites extends block_base {
         return self::enabled($courseid) && self::can_access($courseid);
     }
 
+    /**
+     * Checks if the current user can create TA-site by section.
+     *
+     * @param int $courseid
+     *
+     * @return boolean
+     */
+    public static function create_tasite_bysection_allowed($courseid) {
+        // See if the instructor has enabled TA site creation by section for this specific user.
+        $formatoptions = course_get_format($courseid)->get_format_options();
+        if ($formatoptions['enablebysection'] == 1) {
+            return self::validate_enrol_meta() && self::validate_roles();
+        }
+    }
+
 //    /**
 //     * Used to keep track of naming schemas used in the form.
 //     *
@@ -895,6 +910,15 @@ class block_ucla_tasites extends block_base {
             throw new block_ucla_tasites_exception('setuprole', self::get_ta_role_shortname(true));
         }
 
+        return true;
+    }
+
+    /**
+     * Returns true because block has a settings.php file.
+     *
+     * @return boolean
+     */
+    public function has_config() {
         return true;
     }
 

@@ -42,7 +42,8 @@ class tasites_form extends moodleform {
         // sites for other TAs.
         $course = $this->_customdata['course'];
         $mapping = $this->_customdata['mapping'];
-
+        $enablebysection = get_config('block_ucla_tasites', 'enablebysection');
+        
         /*
          * Do not display initial screen in the following scenario:
          *  When there is no TAs or sections available for the course 
@@ -55,20 +56,24 @@ class tasites_form extends moodleform {
          *  When all the sections have their own TA sites created.
          */
 
-        // Display initial screen for instructors to choose byta or
-        // bysection.
-        $mform->addElement('static', 'tainitialdesc', '',
+        // Display initial screen for instructors if we are allowing
+        // TA site creation by section.
+        if ($enablebysection) {
+            $mform->addElement('static', 'tainitialdesc', '',
             get_string('tainitialdesc', 'block_ucla_tasites'));
+            
+            $choicearray = array();
+            $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
+                    get_string('tainitialbyta', 'block_ucla_tasites'), 'byta');
+            $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
+                    get_string('tainitialbysection', 'block_ucla_tasites'), 'bysection');
+            $mform->addGroup($choicearray, 'tainitialchoicegroup', '', '<br />', false);
+            $mform->addRule('tainitialchoicegroup', null, 'required');
 
-        $choicearray = array();
-        $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
-                get_string('tainitialbyta', 'block_ucla_tasites'), 'byta');
-        $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
-                get_string('tainitialbysection', 'block_ucla_tasites'), 'bysection');
-        $mform->addGroup($choicearray, 'tainitialchoicegroup', '', '<br />', false);
-        $mform->addRule('tainitialchoicegroup', null, 'required');
-
-        $mform->addElement('header','bytaheader', get_string('bytaheader', 'block_ucla_tasites'));
+            $mform->addElement('header','bytaheader', get_string('bytaheader', 'block_ucla_tasites'));
+            $mform->setExpanded('bytaheader');
+        }
+        
         $mform->addElement('static', 'bytadesc', '',
             get_string('bytadesc', 'block_ucla_tasites'));
         
@@ -97,7 +102,7 @@ class tasites_form extends moodleform {
 
         $mform->addElement('checkbox', 'tasectionchoiceentire', '',
                 get_string('bytaentirecourse', 'block_ucla_tasites'));
-
+        
         $mform->addElement('header','bysectionheader', get_string('bysectionheader', 'block_ucla_tasites'));
         $mform->addElement('static', 'bysectiondesc', '',
             get_string('bysectiondesc', 'block_ucla_tasites'));
@@ -123,13 +128,14 @@ class tasites_form extends moodleform {
             }
         }
 
-
+        $this->define_agreement_form();
     }
 
     private function define_agreement_form() {
         $mform =& $this->_form;
 
         // Policy agreement statement.
+        $mform->addElement('header', 'confirmationheader', '');
         $mform->addElement('checkbox', 'confirmation', '',
                 get_string('tasitecreateconfirm', 'block_ucla_tasites'));
         $mform->addRule('confirmation',
@@ -141,7 +147,6 @@ class tasites_form extends moodleform {
         global $USER;
 
         $mform =& $this->_form;
-
         $mapping = $this->_customdata['mapping'];
 
         $fullname = fullname($USER);
@@ -177,7 +182,18 @@ class tasites_form extends moodleform {
      */
     public function definition() {
         global $USER;
+        $validationerror = null;
+
         $mform =& $this->_form;
+        $mapping = $this->_customdata['mapping'];
+
+        if (empty($mapping)) {
+            $validationerror = get_string('notaorsection', 'block_ucla_tasites');
+        } else if (empty($mapping['byta'])) {
+            $validationerror = get_string('notasites', 'block_ucla_tasites');
+        } else if (empty($mapping['bysection']) && block_ucla_tasites::create_tasite_bysection_allowed($course->id)) {
+            $validationerror = get_string('nosectionsexist', 'block_ucla_tasites');
+        }
 
         $mform->addElement('hidden', 'tasiteaction', 'create');
         $mform->setType('tasiteaction', PARAM_ALPHA);
@@ -194,7 +210,8 @@ class tasites_form extends moodleform {
         } else {
             $this->define_admin_form();
         }
-
+        
+        $this->validation($mapping);
         $this->add_action_buttons(false, get_string('create', 'block_ucla_tasites'));
     }
 
@@ -205,8 +222,16 @@ class tasites_form extends moodleform {
      * @param array $files
      * @return array
      */
-    public function validation($data, $files) {
-        $retval = array();
+    public function validation($data, $files=null) {
+        $errors = array();
+//        $course = $this->_customdata['course'];
+//
+//        //print_object($data);
+//        if (block_ucla_tasites::create_tasite_bysection_allowed($course->id) && !empty($data['byta'])) {
+//            return;
+//        } else {
+//           // $errors['notasitebysection'] = get_string('notasitebysection', 'block_ucla_tasites');
+//        }
 
 //        // Check if at least one section is choosen for bysection and it is valid.
 //        $mapping = block_ucla_tasites::get_tasection_mapping($data['courseid']);
@@ -224,6 +249,8 @@ class tasites_form extends moodleform {
 //            $retval['sectionheader'] = get_string('errinvalidsetupselected', 'block_ucla_tasites');
 //        }
 
-        return $retval;
+       // return $retval;
+        return $errors;
+
     }
 }
