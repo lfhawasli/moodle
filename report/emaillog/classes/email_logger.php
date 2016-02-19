@@ -39,6 +39,11 @@ class email_logger {
             return false;
         }
 
+        // Check if logging is enabled.
+        if (!get_config('report_emaillog', 'enable')) {
+            return false;
+        }
+
         // Create and insert database record.
         $record = new stdClass();
         $record->post = $post;
@@ -46,7 +51,7 @@ class email_logger {
         $record->recipient_email = $email;
         $record->timestamp = time();
 
-        $lastinsertid = $DB->insert_record('report_emaillog', $record);
+        $DB->insert_record('report_emaillog', $record);
         return true;
     }
 }

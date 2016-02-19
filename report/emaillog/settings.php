@@ -15,11 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
- * Helper class to log outgoing forum emails.
+ * Forum email logger plugin settings.
  *
  * @package report_emaillog
  * @copyright  2015 UC Regents
  */
+
+$settings->add(new admin_setting_configcheckbox('report_emaillog/enable',
+        get_string('enable', 'report_emaillog'),
+        get_string('enable_desc', 'report_emaillog'), '1'));
 
 $settings->add(new admin_setting_configtext('report_emaillog/daysexpire',
         get_string('daysexpire', 'report_emaillog'),
