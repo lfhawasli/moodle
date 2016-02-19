@@ -57,7 +57,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
         // Show default grouping and allow TA to change it.
         $defaultgrouping = $tasite->defaultgroupingname;
         $defaultgrouping .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
-                array('courseid' => $tasite->parentcourseid, 'action' => 'edit',
+                array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'edit',
                     'tasite' => $tasite->courseid)),
             new pix_icon('t/edit', get_string('edit')),
             null, array('title' => get_string('edit')));
@@ -68,7 +68,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
             get_string('hidden', 'block_ucla_tasites');
         $togglestr = $tasite->visible ? 'hide' : 'show';
         $visibility .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
-                array('courseid' => $tasite->parentcourseid, 'action' => 'toggle',
+                array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'toggle',
                     'tasite' => $tasite->courseid)),
             new pix_icon('t/'.$togglestr, get_string($togglestr)),
             null, array('title' => get_string($togglestr)));

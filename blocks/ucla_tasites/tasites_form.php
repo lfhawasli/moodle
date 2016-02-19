@@ -210,9 +210,9 @@ class tasites_form extends moodleform {
         } else {
             $this->define_admin_form();
         }
-        
-        $this->validation($mapping);
+
         $this->add_action_buttons(false, get_string('create', 'block_ucla_tasites'));
+        $mform->disable_form_change_checker();
     }
 
     /**
