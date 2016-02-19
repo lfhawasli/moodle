@@ -129,7 +129,7 @@ if ($formaction == 'create') {
         ob_end_clean();
     }
 
-} else if ($formaction == 'toggle') {
+} else if ($formaction == 'togglevisiblity') {
     // Show or hide given TA site.
     $tasiteid = required_param('tasite', PARAM_INT);
     $visiblity = block_ucla_tasites::toggle_visiblity($tasiteid);
@@ -145,6 +145,33 @@ if ($formaction == 'create') {
     }
 
     flash_redirect($redirect, $message);
+
+} else if ($formaction == 'togglegrouping') {
+    // Change the default grouping for a TA site to be either 
+    // "Private Course Material" or "TA Section Materials".
+    $tasiteid = required_param('tasite', PARAM_INT);
+
+    // Get groupings for course.
+    $tasite = get_course($tasiteid);
+    $privatematerialsgrouping = $tasite->groupingpublicprivate;
+    $tasitegrouping = $DB->get_field('groupings', 'id',
+            array('courseid' => $tasite->id, 'idnumber' => block_ucla_tasites::GROUPINGID));
+
+    $newgrouping = null;
+    if ($tasite->defaultgroupingid == $privatematerialsgrouping) {
+        $newgrouping = $tasitegrouping;
+        $message = get_string('succhangedgroupingta', 'block_ucla_tasites', $tasite->shortname);
+    } else if ($tasite->defaultgroupingid == $tasitegrouping) {
+        $newgrouping = $privatematerialsgrouping;
+        $message = get_string('succhangedgroupingpp', 'block_ucla_tasites', $tasite->shortname);
+    }
+
+    if (!empty($newgrouping)) {
+        block_ucla_tasites::change_default_grouping($tasite->id, $newgrouping);
+        $redirect = $url = new moodle_url('/blocks/ucla_tasites/index.php',
+                array('courseid' => $courseid));
+        flash_redirect($redirect, $message);
+    }
 
 } else {
     ob_start();

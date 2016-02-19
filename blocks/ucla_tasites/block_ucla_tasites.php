@@ -121,6 +121,54 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
+     * Changes the given TA site's default grouping to given new grouping.
+     *
+     * Also changes existing content that belonged to the old grouping to the
+     * new grouping.
+     *
+     * @param int $courseid
+     * @param int $newgroupingid
+     * @return boolean
+     */
+    public static function change_default_grouping($courseid, $newgroupingid) {
+        global $DB;
+
+        // Make sure course exists and get latest default grouping id.
+        $course = get_course($courseid);
+        if (empty($course)) {
+            return false;
+        }
+
+        // Make sure course is a TA site.
+        if (!self::is_tasite($course->id)) {
+            return false;
+        }
+
+        // Make sure given grouping exists and belongs to course.
+        $newgrouping = groups_get_grouping($newgroupingid);
+        if ($newgrouping->courseid != $course->id) {
+            return false;
+        }
+
+        // Get all content that belonged to the old grouping and set it to the
+        // new grouping.
+        $sql = "UPDATE {course_modules}
+                   SET groupingid=:newgroupingid
+                 WHERE course=:courseid
+                   AND groupingid=:oldgroupingid";
+        $DB->execute($sql, array('courseid' => $course->id,
+            'newgroupingid' => $newgroupingid,
+            'oldgroupingid' => $course->defaultgroupingid));
+
+        // Important to clear the cache so that new groupings are displayed.
+        rebuild_course_cache($course->id, true);
+
+        // Set course's default grouping to be the new grouping.
+        $course->defaultgroupingid = $newgroupingid;
+        $DB->update_record('course', $course);
+    }
+
+    /**
      * Checks if the current user can have TA-sites.
      *
      * @param int $courseid
@@ -232,7 +280,7 @@ class block_ucla_tasites extends block_base {
             // For the new TA site, create a special grouping based on sections.
             // Create grouping.
             $tasitegrouping = new stdClass();
-            $tasitegrouping->name = 'TA site grouping';
+            $tasitegrouping->name = get_string('tasitegroupingname', 'block_ucla_tasites');
             $tasitegrouping->idnumber = self::GROUPINGID;
             $tasitegrouping->courseid = $newcourse->id;
             $tasitegrouping->id = groups_create_grouping($tasitegrouping);
@@ -255,9 +303,7 @@ class block_ucla_tasites extends block_base {
                 groups_assign_grouping($tasitegrouping->id, $groupid);
             }
 
-            // Set default grouping to be this grouping.
-            $newcourse->defaultgroupingid = $tasitegrouping->id;
-            $DB->update_record('course', $newcourse);
+            self::change_default_grouping($newcourse->id, $tasitegrouping->id);
         }
 
         // Check if Announcements forum should be deleted for TA site. We only

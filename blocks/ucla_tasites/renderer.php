@@ -56,11 +56,14 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
     public function render_existing_tasite(existing_tasite $tasite) {
         // Show default grouping and allow TA to change it.
         $defaultgrouping = $tasite->defaultgroupingname;
-        $defaultgrouping .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
-                array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'edit',
-                    'tasite' => $tasite->courseid)),
-            new pix_icon('t/edit', get_string('edit')),
-            null, array('title' => get_string('edit')));
+        if ($defaultgrouping == get_string('publicprivategroupingname', 'local_publicprivate') ||
+                $defaultgrouping == get_string('tasitegroupingname', 'block_ucla_tasites')) {
+            $defaultgrouping .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
+                    array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'togglegrouping',
+                        'tasite' => $tasite->courseid)),
+                new pix_icon('t/edit', get_string('edit')),
+                null, array('title' => get_string('edit')));            
+        }
         $lines[] = get_string('listgrouping', 'block_ucla_tasites', $defaultgrouping);
 
         // Show visiblity status and allow TA to change it.
@@ -68,7 +71,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
             get_string('hidden', 'block_ucla_tasites');
         $togglestr = $tasite->visible ? 'hide' : 'show';
         $visibility .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
-                array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'toggle',
+                array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'togglevisiblity',
                     'tasite' => $tasite->courseid)),
             new pix_icon('t/'.$togglestr, get_string($togglestr)),
             null, array('title' => get_string($togglestr)));
@@ -97,7 +100,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
                     'block_ucla_tasites'), 'notifymessage');
         }
 
-        $retval .= $this->output->heading(get_string('view_tasites', 'block_ucla_tasites'), 3);
+        $retval .= $this->output->heading(get_string('viewtasites', 'block_ucla_tasites'), 3);
 
         foreach ($tasites as $tasite) {
             $template = new existing_tasite($tasite);
