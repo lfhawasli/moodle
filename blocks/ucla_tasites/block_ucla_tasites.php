@@ -111,10 +111,32 @@ class block_ucla_tasites extends block_base {
                 }
             }
             return true;
-        } else {
+        } else {            
             $context = context_course::instance($courseid);
             if (has_capability('moodle/course:update', $context)) {
-                return true;
+                // Check if every TA has a site already.
+                $mapping = self::get_tasection_mapping($courseid);
+                if (isset($mapping['byta'])) {
+                    // Loop through each TA.
+                    foreach ($mapping['byta'] as $tainfo) {
+                        if (!self::has_tasite($courseid, $tainfo['ucla_id'])) {
+                            // Found a TA without a TA site.
+                            return true;
+                        }
+                    }
+                } else if (isset($mapping['bysection'])) {
+                    if (get_config('block_ucla_tasites', 'enablebysection')) {
+                        // Loop through each section and make sure it doesn't exist.
+                        foreach ($mapping['bysection'] as $secinfo) {
+                            foreach ($secinfo['secsrs'] as $secsrs) {
+                                if (!self::has_sec_tasite($courseid, $secsrs)) {
+                                    // Found a section without a TA site.
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return false;
@@ -242,7 +264,7 @@ class block_ucla_tasites extends block_base {
         if (isset($typeinfo['bysection'])) {
             foreach ($typeinfo['bysection'] as $secinfo) {
                 $srsarray = array_merge($srsarray, $secinfo['secsrs']);
-                $uidarray = array_merge($uidarray, array_keys($secinfo['tas']));               
+                $uidarray = array_merge($uidarray, array_keys($secinfo['tas']));
             }
         } else if (isset($typeinfo['byta'])) {
             // Getting the TA's UID and section SRS numbers.
@@ -497,6 +519,7 @@ class block_ucla_tasites extends block_base {
     public static function get_tasection_mapping($courseid) {
         $cache = cache::make('block_ucla_tasites', 'tasitemapping');
         $tasitemapping = $cache->get($courseid);
+
         if (empty($tasitemapping)) {
             ucla_require_registrar();
 
@@ -519,14 +542,20 @@ class block_ucla_tasites extends block_base {
                 ));
                 if (!empty($sections)) {
                     foreach ($sections as $section) {
-                        $fullname = self::get_tafullname($section['ucla_id']);
+                        $fullname = '';
+                        if (!empty($section['ucla_id'])) {
+                            $fullname = self::get_tafullname($section['ucla_id']);
+                        }
 
                         // There might be multiple srs numbers for cross-listed sections.
-                        $tasitemapping['bysection'][$section['sect_no']]['secsrs'][] = $section['srs_crs_no'];
+                        $tasitemapping['bysection'][$section['sect_no']]['secsrs'][] = $section['srs_crs_no'];     
                         $tasitemapping['bysection'][$section['sect_no']]['tas'][$section['ucla_id']] = $fullname;
-
-                        $tasitemapping['byta'][$fullname]['secsrs'][$section['sect_no']][] = $section['srs_crs_no'];
-                        $tasitemapping['byta'][$fullname]['ucla_id'] = $section['ucla_id'];
+     
+                        // If a TA isn't assigned to a section yet, don't add it.
+                        if (!empty($fullname)) {
+                            $tasitemapping['byta'][$fullname]['secsrs'][$section['sect_no']][] = $section['srs_crs_no'];
+                            $tasitemapping['byta'][$fullname]['ucla_id'] = $section['ucla_id'];
+                        }
                     }
                 } else {
                     // No course sections found, so just use main lecture.
@@ -549,7 +578,9 @@ class block_ucla_tasites extends block_base {
             }
 
             // Sort the byta mapping by TAs.
-            ksort($tasitemapping['byta']);
+            if (isset($tasitemapping['byta'])) {
+                ksort($tasitemapping['byta']);
+            }
 
             $cache->set($courseid, $tasitemapping);
         }
@@ -598,12 +629,13 @@ class block_ucla_tasites extends block_base {
             'customint1' => $courseid,
             'customint2' => self::get_ta_role_id(),
             'customint3' => self::get_ta_admin_role_id()
-                ), '', 'customtext1 as ta_uclaids, '
+                ), '', 'id, '
                 . 'courseid, '
                 . 'customint1 as parentcourseid, '
                 . 'customint2 as ta_roleid, '
                 . 'customint4 as createrid, '
                 . 'customint3 as ta_admin_roleid, '
+                . 'customtext1 as ta_uclaids, '
                 . 'customtext2 as ta_secsrs'
         );
 
@@ -661,7 +693,7 @@ class block_ucla_tasites extends block_base {
             // Get default grouping for each course.
             $course->defaultgroupingname = groups_get_grouping_name($course->defaultgroupingid);
 
-            $tacourses[$enrol->ta_uclaids] = $course;
+            $tacourses[$enrol->id] = $course;
         }
 
         return $tacourses;
@@ -676,11 +708,27 @@ class block_ucla_tasites extends block_base {
      */
     public static function has_tasite($courseid, $uclaid) {
         global $DB;
-        
+
         $where = "customint1=:courseid AND enrol='meta' AND " .
                 $DB->sql_like('customtext1', ':uclaid');
         return $DB->record_exists_select('enrol', $where,
                 array('courseid' => $courseid, 'uclaid' => '%'.$uclaid.'%'));
+    }
+
+    /**
+     * Checks if a given section has a TA site for given course.
+     *
+     * @param int $courseid
+     * @param int $secsrs
+     * @return type
+     */
+    public static function has_sec_tasite($courseid, $secsrs) {
+        global $DB;
+
+        $where = "customint1=:courseid AND enrol='meta' AND " .
+                $DB->sql_like('customtext2', ':secsrs');
+        return $DB->record_exists_select('enrol', $where,
+                array('courseid' => $courseid, 'secsrs' => '%'.$secsrs.'%'));
     }
 
     /**
@@ -890,7 +938,11 @@ class block_ucla_tasites extends block_base {
 
         $accessible = false;
         try {
-            $accessible = self::check_access($courseid) && self::get_tasite_users($courseid) && !self::is_tasite($courseid);
+            // Can create a TA site if there are TAs or course has sections.
+            if (self::check_access($courseid) && !self::is_tasite($courseid)) {
+                $mapping = self::get_tasection_mapping($courseid);
+                $accessible = self::get_tasite_users($courseid) || isset($mapping['bysection']);
+            }
         } catch (moodle_exception $e) {
             // Do nothing.
             $accessible = false;

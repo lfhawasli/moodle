@@ -55,9 +55,6 @@ $PAGE->requires->jquery();
 
 // Get TA mappings.
 $mapping = block_ucla_tasites::get_tasection_mapping($courseid);
-if (empty($mapping['byta'])) {
-    throw new block_ucla_tasites_exception('errcantcreatetasite');
-}
 
 // Setup form.
 $formdata = array(
@@ -75,13 +72,13 @@ if ($formaction == 'create') {
     if (($params = $tasitesform->get_data()) && confirm_sesskey()) {
 
         // What type of TA site does user want?
-        
+
         // If course doesn't have section, then just create the TA site for
-        // the logged in TA.
-        if(!empty($mapping['bysection']['all'])) {
+        // a given TA.
+        if (!empty($mapping['bysection']['all'])) {
             $taidfound = false;
-            foreach($mapping['byta'] as $name=>$uid) {
-                if($USER->idnumber == $uid['ucla_id']) {
+            foreach($mapping['byta'] as $name => $uid) {
+                if($params->byta == $uid['ucla_id']) {
                     $taidfound = true;
                     $typeinfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
                 }
@@ -180,6 +177,7 @@ if ($formaction == 'create') {
 
     // Show existing TA sites.
     $tasites = block_ucla_tasites::get_tasites($courseid);
+
     $output = $PAGE->get_renderer('block_ucla_tasites');
     echo $output->render_tasites($tasites);
 
