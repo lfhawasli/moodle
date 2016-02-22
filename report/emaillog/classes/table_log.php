@@ -19,6 +19,7 @@
  *
  * @package    report_emaillog
  * @copyright  2016 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -26,8 +27,8 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Table log class for displaying logs.
  *
- * @package    report_emaillog
  * @copyright  2016 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_emaillog_table_log extends table_sql {
 

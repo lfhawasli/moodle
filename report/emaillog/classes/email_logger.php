@@ -14,16 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * Helper class to log outgoing forum emails.
  *
  * @package report_emaillog
  * @copyright  2015 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class implementation.
+ *
+ * @copyright  2015 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class email_logger {
-    /*
+    /**
      * Inserts a new email log record into the report_emaillog database.
      *
      * @param int $userid the recipient's user id

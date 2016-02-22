@@ -19,6 +19,7 @@
  *
  * @package report_emaillog
  * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');

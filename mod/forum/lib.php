@@ -26,9 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/eventslib.php');
 require_once($CFG->dirroot.'/user/selector/lib.php');
-// START UCLA-MOD: CCLE-5537 - Log forum emails
+// START UCLA MOD: CCLE-5537 - Log forum emails
 require_once($CFG->dirroot.'/report/emaillog/classes/email_logger.php');
-// END UCLA-MOD: CCLE-5537 - Log forum emails
+// END UCLA MOD: CCLE-5537 - Log forum emails
 
 /// CONSTANTS ///////////////////////////////////////////////////////////
 
@@ -36,9 +36,9 @@ define('FORUM_MODE_FLATOLDEST', 1);
 define('FORUM_MODE_FLATNEWEST', -1);
 define('FORUM_MODE_THREADED', 2);
 define('FORUM_MODE_NESTED', 3);
-// START UCLA-MOD: CCLE-4882 forum customization
+// START UCLA MOD: CCLE-4882 forum customization
 define('FORUM_MODE_PRINT', 4);
-// END UCLA-MOD: CCLE-4882 forum customization
+// END UCLA MOD: CCLE-4882 forum customization
 
 define('FORUM_CHOOSESUBSCRIBE', 0);
 define('FORUM_FORCESUBSCRIBE', 1);
@@ -792,9 +792,9 @@ function forum_cron() {
                 } else {
                     $mailcount[$post->id]++;
 
-                    // START UCLA-MOD: CCLE-5537 - Log forum emails
+                    // START UCLA MOD: CCLE-5537 - Log forum emails
                     email_logger::store_email_log($userto->id, $userto->email, $post->id);
-                    // END UCLA-MOD: CCLE-5537 - Log forum emails
+                    // END UCLA MOD: CCLE-5537 - Log forum emails
 
                 // Mark post as read if forum_usermarksread is set off
                     if (!$CFG->forum_usermarksread) {
@@ -1096,9 +1096,9 @@ function forum_cron() {
                     mtrace("success.");
                     $usermailcount++;
 
-                    // START UCLA-MOD: CCLE-5537 - Log forum emails
+                    // START UCLA MOD: CCLE-5537 - Log forum emails
                     email_logger::store_email_log($userto->id, $userto->email, $post->id);
-                    // END UCLA-MOD: CCLE-5537 - Log forum emails
+                    // END UCLA MOD: CCLE-5537 - Log forum emails
 
                     // Mark post as read if forum_usermarksread is set off
                     forum_tp_mark_posts_read($userto, $userto->markposts);
@@ -3413,14 +3413,14 @@ function forum_make_mail_post($course, $cm, $forum, $discussion, $post, $userfro
  * @return void
  */
 
-// START UCLA-MOD: CCLE-4882 forum customization
+// START UCLA MOD: CCLE-4882 forum customization
 /*
 function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=false, $reply=false, $link=false,
                           $footer="", $highlight="", $postisread=null, $dummyifcantsee=true, $istracked=null, $return=false) {
 */
 function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=false, $reply=false, $link=false,
                           $footer="", $highlight="", $postisread=null, $dummyifcantsee=true, $istracked=null, $return=false, $mode=null) {
-    // END UCLA-MOD: CCLE-4882 forum customization
+    // END UCLA MOD: CCLE-4882 forum customization
     global $USER, $CFG, $OUTPUT;
 
     require_once($CFG->libdir . '/filelib.php');
@@ -3458,9 +3458,9 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $cm->cache->caps['mod/forum:viewanyrating']    = has_capability('mod/forum:viewanyrating', $modcontext);
         $cm->cache->caps['mod/forum:exportpost']       = has_capability('mod/forum:exportpost', $modcontext);
         $cm->cache->caps['mod/forum:exportownpost']    = has_capability('mod/forum:exportownpost', $modcontext);
-        // START UCLA-MOD: CCLE-5671 Add email log quick link
+        // START UCLA MOD: CCLE-5671 Add email log quick link
         $cm->cache->caps['report/emaillog:view']       = has_capability('report/emaillog:view', $modcontext);
-        // END UCLA-MOD: CCLE-5671 Add email log quick link
+        // END UCLA MOD: CCLE-5671 Add email log quick link
     }
 
     if (!isset($cm->uservisible)) {
@@ -3521,9 +3521,9 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $str->displaymode     = get_user_preferences('forum_displaymode', $CFG->forum_displaymode);
         $str->markread     = get_string('markread', 'forum');
         $str->markunread   = get_string('markunread', 'forum');
-        // START UCLA-MOD: CCLE-5671 Add email log quick link
+        // START UCLA MOD: CCLE-5671 Add email log quick link
         $str->logs         = get_string('logs');
-        // END UCLA-MOD: CCLE-5671 Add email log quick link
+        // END UCLA MOD: CCLE-5671 Add email log quick link
     }
 
     $discussionlink = new moodle_url('/mod/forum/discuss.php', array('d'=>$post->discussion));
@@ -3615,13 +3615,13 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $commands[] = array('url'=>new moodle_url('/mod/forum/post.php#mformforum', array('reply'=>$post->id)), 'text'=>$str->reply);
     }
 
-    // START UCLA-MOD: CCLE-5671 Add email log quick link
+    // START UCLA MOD: CCLE-5671 Add email log quick link
     // Only show link if user has capability to view logs and the post is a valid nubmer of days old (old posts are pruned from database).
     $loglifetime = time() - DAYSECS * get_config('report_emaillog', 'daysexpire');
     if ($cm->cache->caps['report/emaillog:view'] && $post->modified > $loglifetime) {
         $commands[] = array('url'=>new moodle_url('/report/emaillog/index.php', array('id' => $course->id, 'post' => $post->id, 'chooselog' => 1)), 'text'=>$str->logs);
     }
-    // END UCLA-MOD: CCLE-5671 Add email log quick link
+    // END UCLA MOD: CCLE-5671 Add email log quick link
 
     if ($CFG->enableportfolios && ($cm->cache->caps['mod/forum:exportpost'] || ($ownpost && $cm->cache->caps['mod/forum:exportownpost']))) {
         $p = array('postid' => $post->id);
@@ -3669,7 +3669,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $discussionbyuser = get_string('postbyuser', 'forum', $postbyuser);
     $output .= html_writer::tag('a', '', array('id'=>'p'.$post->id));
 
-    // START UCLA-MOD: CCLE-4882 forum customization
+    // START UCLA MOD: CCLE-4882 forum customization
     /*
       $output .= html_writer::start_tag('div', array('class'=>'forumpost clearfix'.$forumpostclass.$topicclass,
                                                       'role' => 'region',
@@ -3695,7 +3695,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     }
 
   
-    // END UCLA-MOD: CCLE-4882 forum customization
+    // END UCLA MOD: CCLE-4882 forum customization
 
     $output .= html_writer::start_tag('div', array('class'=>'topic'.$topicclass));
 
@@ -3787,12 +3787,12 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         }
     }
     
-    // START UCLA-MOD:  CCLE-4882 forum customization
+    // START UCLA MOD:  CCLE-4882 forum customization
     // $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
     if ($mode != FORUM_MODE_PRINT) {
         $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
     }
-    // END UCLA-MOD:  CCLE-4882 forum customization
+    // END UCLA MOD:  CCLE-4882 forum customization
     
     // Output link to post if required
     if ($link && forum_user_can_post($forum, $discussion, $USER, $cm, $course, $modcontext)) {
@@ -6229,21 +6229,21 @@ function forum_print_discussion($course, $cm, $forum, $discussion, $post, $mode,
 
     $postread = !empty($post->postread);
 
-    // START UCLA-MOD: CCLE-4882 forum customization.
+    // START UCLA MOD: CCLE-4882 forum customization.
     /*
      forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, false,
                          '', '', $postread, true, $forumtracked);
      */
     forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, false,
                          '', '', $postread, true, $forumtracked, false, $mode);
-    // END UCLA-MOD: CCLE-4882 forum customization.
+    // END UCLA MOD: CCLE-4882 forum customization.
 
     switch ($mode) {
         case FORUM_MODE_FLATOLDEST :
         case FORUM_MODE_FLATNEWEST :
-        // START UCLA-MOD: CCLE-4882 forum customization
+        // START UCLA MOD: CCLE-4882 forum customization
         case FORUM_MODE_PRINT:
-        // END UCLA-MOD: CCLE-4882 forum customization
+        // END UCLA MOD: CCLE-4882 forum customization
         default:
             forum_print_posts_flat($course, $cm, $forum, $discussion, $post, $mode, $reply, $forumtracked, $posts);
             break;
@@ -6294,14 +6294,14 @@ function forum_print_posts_flat($course, &$cm, $forum, $discussion, $post, $mode
 
         $postread = !empty($post->postread);
 
-        // START UCLA-MOD: CCLE-4882 forum customization
+        // START UCLA MOD: CCLE-4882 forum customization
         /* 
            forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                              '', '', $postread, true, $forumtracked); 
          */
         forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                              '', '', $postread, true, $forumtracked, false, $mode); 
-        // END UCLA-MOD: CCLE-4882 forum customization
+        // END UCLA MOD: CCLE-4882 forum customization
     }
 }
 

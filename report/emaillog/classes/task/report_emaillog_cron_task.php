@@ -14,14 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace report_emaillog\task;
-
 /**
  * UCLA report_emaillog cron task runner.
  *
+ * @package    report_emaillog
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace report_emaillog\task;
+
+/**
  * Contains the settings for UCLA specific customizations.
  *
- * @package    report_emaillog
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,7 +48,8 @@ class report_emaillog_cron_task extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $loglifetime = time() - DAYSECS * get_config('report_emaillog', 'daysexpire'); // {daysexpire} days before current time.
+        // Value {daysexpire} is days before current time.
+        $loglifetime = time() - DAYSECS * get_config('report_emaillog', 'daysexpire');
         $DB->delete_records_select("report_emaillog", "timestamp < ?", array($loglifetime));
 
         mtrace(" Deleted old log records from emaillog.");

@@ -19,14 +19,15 @@
  *
  * @package    report_emaillog
  * @copyright  2016 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
 
 /**
  * Report log renderer's for printing reports.
  *
- * @package    report_emaillog
  * @copyright  2016 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_emaillog_renderer extends plugin_renderer_base {
 
@@ -128,7 +129,8 @@ class report_emaillog_renderer extends plugin_renderer_base {
 
         if ($reportlog->showrecipients) {
             echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
-            echo html_writer::select($recipients, "recipient", $reportlog->recipient, get_string('allrecipients', 'report_emaillog'));
+            echo html_writer::select($recipients, "recipient",
+                    $reportlog->recipient, get_string('allrecipients', 'report_emaillog'));
         } else {
             $recipients = array();
             if (!empty($reportlog->recipient)) {
@@ -160,8 +162,10 @@ class report_emaillog_renderer extends plugin_renderer_base {
 
         // Add discussion selector.
         $discussions = $reportlog->get_discussion_list();
-        echo html_writer::label(get_string('discussion', 'report_emaillog'), 'menudiscussion', false, array('class' => 'accesshide'));
-        echo html_writer::select($discussions, "discussion", $reportlog->discussion, get_string('alldiscussions', 'report_emaillog'));
+        echo html_writer::label(get_string('discussion', 'report_emaillog'),
+                'menudiscussion', false, array('class' => 'accesshide'));
+        echo html_writer::select($discussions, "discussion", $reportlog->discussion,
+                get_string('alldiscussions', 'report_emaillog'));
 
         // Add post selector.
         $posts = $reportlog->get_post_list();
@@ -171,7 +175,8 @@ class report_emaillog_renderer extends plugin_renderer_base {
         // Add date selector.
         $dates = $reportlog->get_date_options();
         echo html_writer::label(get_string('date'), 'menudate', false, array('class' => 'accesshide'));
-        echo html_writer::select($dates, "date", $reportlog->date, get_string('pastdays', 'report_emaillog', get_config('report_emaillog', 'daysexpire')));
+        echo html_writer::select($dates, "date", $reportlog->date,
+                get_string('pastdays', 'report_emaillog', get_config('report_emaillog', 'daysexpire')));
 
         echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('gettheselogs')));
 

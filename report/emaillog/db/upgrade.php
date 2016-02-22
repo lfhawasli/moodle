@@ -14,8 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade file.
+ *
+ * @package report_emaillog
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Processes upgrade code.
+ *
+ * @param int $oldversion
+ */
 function xmldb_report_emaillog_upgrade($oldversion) {
     global $CFG, $DB;
     $dbman = $DB->get_manager();

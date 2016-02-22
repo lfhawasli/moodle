@@ -17,8 +17,9 @@
 /**
  * Emaillog report renderer.
  *
- * @package    report_log
+ * @package    report_emaillog
  * @copyright  2016 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -26,8 +27,8 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Report emaillog renderable class.
  *
- * @package    report_log
  * @copyright  2016 UC Regents
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_emaillog_renderable implements renderable {
 
@@ -102,7 +103,6 @@ class report_emaillog_renderable implements renderable {
      * @param int $perpage (optional) number of records to show per page.
      * @param string $order (optional) sortorder of fetched records
      */
-
     public function __construct($course = 0, $sender = 0,  $recipient = 0, $forum = 0, $discussion = 0, $post = 0,
             $showcourses = false, $showsenders = false, $showrecipients = false, $showreport = true, $showselectorform = true,
             $url = "", $date = 0, $page = 0, $perpage = 100, $order = "timestamp DESC") {
@@ -141,6 +141,7 @@ class report_emaillog_renderable implements renderable {
     /**
      * Return selected user fullname.
      *
+     * @param int $userid
      * @return string user fullname.
      */
     public function get_selected_user_fullname($userid) {
@@ -184,6 +185,7 @@ class report_emaillog_renderable implements renderable {
     /**
      * Return list of users.
      *
+     * @param boolean $recipients
      * @return array list of users.
      */
     public function get_user_list($recipients = false) {
@@ -374,7 +376,7 @@ class report_emaillog_renderable implements renderable {
         $this->tablelog->define_baseurl($this->url);
     }
 
-    /*
+    /**
      * Truncates a string to 10 words if necessary.
      *
      * @param string $name the full subject/name
