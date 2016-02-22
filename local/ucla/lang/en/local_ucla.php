@@ -255,14 +255,14 @@ $string['errmissingemail'] = 'Because your email address is missing from your CC
 // CCLE-4329 - Handling public forums.
 $string['warningpublicforum'] = 'This forum is public and viewable by anyone, not just those enrolled in the site.';
 
-// SSC-966 - Change "Add a new discussion topic" wording
+// SSC-966 - Change "Add a new discussion topic" wording.
 $string['forumaddannouncement'] = 'Add an announcement';
 $string['forumyournewannoucement'] = 'Your new announcement';
 
-// CCLE-5316 - Checkbox to message students
+// CCLE-5316 - Checkbox to message students.
 $string['noselectedusers'] = 'No users selected.';
 
-// CCLE-5486 - Welcome message for registrar enrollment method
+// CCLE-5486 - Welcome message for registrar enrollment method.
 $string['sendcoursewelcomemessage'] = 'Send course welcome message';
 $string['sendcoursewelcomemessage_help'] = 'If enabled, users receive a welcome message via email when they enrol in a course.';
 $string['welcometocourse'] = 'Welcome to {$a}';
@@ -279,3 +279,7 @@ The following placeholders may be included in the message:
 * Link to course page {$a->courseurl}
 * Link to user\'s profile page {$a->profileurl}';
 
+// CCLE-5640 - Custom From field of welcome message for registrar enrollment method.
+$string['customwelcomemessagesubject'] = 'Subject';
+$string['customwelcomemessagefrom'] = 'From';
+$string['customwelcomemessagefrom_help'] = 'Please enter the email address you would like student to reply to.';
