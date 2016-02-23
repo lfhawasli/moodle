@@ -79,6 +79,7 @@ function handle_course_deleted($course) {
     $eventdata->courseid = $course->id;
     $eventdata->ucla_request_classes = $uclaclassinfo;
     $eventdata->ucla_reg_classinfo = $uclaclassinfo;
+    $eventdata->deleted_requests = $uclaclassinfo;
     events_trigger_legacy('ucla_course_deleted', $eventdata);
 
     return !$has_error;
