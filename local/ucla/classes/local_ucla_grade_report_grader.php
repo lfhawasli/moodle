@@ -33,8 +33,8 @@ class local_ucla_grade_report_grader extends grade_report_grader {
      * regardless of the course's groupmode.
      */
     protected function setup_groups() {
-        // Only filter if an active grouping is set.
-        if (isset($this->activegrouping)) {
+        // Only filter if an active grouping is set and nonzero.
+        if (isset($this->activegrouping) && $this->activegrouping) {
             $this->groupsql             = " JOIN {groups_members} gm ON gm.userid = u.id
                                             JOIN {groupings_groups} gg ON gg.groupid = gm.groupid";
             $this->groupwheresql        = " AND gg.groupingid = :grpng_id ";
