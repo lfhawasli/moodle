@@ -477,7 +477,9 @@ class grade_report_grader extends grade_report {
             $params = array_merge($gradebookrolesparams, $this->userwheresql_params, $this->groupwheresql_params, $enrolledparams, $relatedctxparams);
         }
 
-        $sql = "SELECT $userfields
+        // START UCLA MOD: CCLE-5732 - Grader report doesn't show full roster in large courses
+        //$sql = "SELECT $userfields
+        $sql = "SELECT DISTINCT $userfields        
                   FROM {user} u
                   JOIN ($enrolledsql) je ON je.id = u.id
                        $this->groupsql
@@ -492,6 +494,7 @@ class grade_report_grader extends grade_report {
                    $this->userwheresql
                    $this->groupwheresql
               ORDER BY $sort";
+        // END UCLA MOD: CCLE-5732
         $studentsperpage = $this->get_students_per_page();
         $this->users = $DB->get_records_sql($sql, $params, $studentsperpage * $this->page, $studentsperpage);
 
