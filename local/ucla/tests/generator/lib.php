@@ -370,6 +370,7 @@ class local_ucla_generator extends testing_data_generator {
                 $filepath = $CFG->dirroot . '/local/ucla/tests/fixtures/roles/' . $roletocreate . '.xml';
                 $xml = $this->check_and_get_file($filepath);
                 if (is_null($xml)) {
+                    debugging('Cannot find role preset at ' . $filepath);
                     continue;
                 }
                 $this->create_dummy_role($xml);

@@ -17,20 +17,20 @@
 /**
  * Generates the settings form for the UCLA course download block.
  *
- * @package     block_ucla_course_download
- * @copyright   2014 UC Regents
+ * @package     block_ucla_tasites
+ * @copyright   2016 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-if($hassiteconfig && $ADMIN->fulltree) {
+if ($hassiteconfig && $ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox(
                 'block_ucla_tasites/enablebysection',
-                new lang_string('enablebysection','block_ucla_tasites'),
-                new lang_string('enablebysection_desc','block_ucla_tasites'),
+                new lang_string('enablebysection', 'block_ucla_tasites'),
+                new lang_string('enablebysection_desc', 'block_ucla_tasites'),
                 1
             ));
-    
+
 }

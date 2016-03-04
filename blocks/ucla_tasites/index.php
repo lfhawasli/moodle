@@ -77,8 +77,8 @@ if ($formaction == 'create') {
         // a given TA.
         if (!empty($mapping['bysection']['all'])) {
             $taidfound = false;
-            foreach($mapping['byta'] as $name => $uid) {
-                if($params->byta == $uid['ucla_id']) {
+            foreach ($mapping['byta'] as $name => $uid) {
+                if ($params->byta == $uid['ucla_id']) {
                     $taidfound = true;
                     $typeinfo['byta'][$name]['ucla_id'] = $uid['ucla_id'];
                 }
@@ -153,7 +153,7 @@ if ($formaction == 'create') {
     flash_redirect($redirect, $message);
 
 } else if ($formaction == 'togglegrouping') {
-    // Change the default grouping for a TA site to be either 
+    // Change the default grouping for a TA site to be either
     // "Private Course Material" or "TA Section Materials".
     $tasiteid = required_param('tasite', PARAM_INT);
 

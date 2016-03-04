@@ -40,7 +40,7 @@ class tasites_form extends moodleform {
      */
     private function define_admin_form() {
         $mform =& $this->_form;
-        
+
         // User is not a TA, but is an instructor or admin who can make TA
         // sites for other TAs.
         $course = $this->_customdata['course'];
@@ -54,7 +54,7 @@ class tasites_form extends moodleform {
 
         /*
          * Do not display initial screen in the following scenario:
-         *  When there is no TAs or sections available for the course 
+         *  When there is no TAs or sections available for the course
          *  When TA sites are created for each TA/each Section accordingly.
          * Do not show By TA option
          *  When there is no atleast one TA available for the course OR
@@ -69,7 +69,7 @@ class tasites_form extends moodleform {
         if ($enablebysection && isset($mapping['byta'])) {
             $mform->addElement('static', 'tainitialdesc', '',
             get_string('tainitialdesc', 'block_ucla_tasites'));
-            
+
             $choicearray = array();
             $choicearray[] = $mform->createElement('radio', 'tainitialchoice', '',
                     get_string('tainitialbyta', 'block_ucla_tasites'), 'byta');
@@ -78,7 +78,7 @@ class tasites_form extends moodleform {
             $mform->addGroup($choicearray, 'tainitialchoicegroup', '', '<br />', false);
             $mform->addRule('tainitialchoicegroup', null, 'required');
 
-            $mform->addElement('header','bytaheader', get_string('bytaheader', 'block_ucla_tasites'));
+            $mform->addElement('header', 'bytaheader', get_string('bytaheader', 'block_ucla_tasites'));
             $mform->setExpanded('bytaheader');
         }
 
@@ -88,7 +88,7 @@ class tasites_form extends moodleform {
             // If there are no TAs, then don't need to show section header,
             // because there wouldn't be an option to choose between creating a
             // TA site based by TA or section.
-            $mform->addElement('header','bysectionheader', get_string('bysectionheader', 'block_ucla_tasites'));
+            $mform->addElement('header', 'bysectionheader', get_string('bysectionheader', 'block_ucla_tasites'));
             $mform->setExpanded('bysectionheader');
         }
 
@@ -114,13 +114,17 @@ class tasites_form extends moodleform {
                 if (!empty($a->tas)) {
                     $a->tas = '(TAs - ' . $a->tas . ')';
                 }
-                $mform->addElement('checkbox', 'bysection['.$secnum.']', '',  get_string('bysectionchoice', 'block_ucla_tasites', $a));
+                $mform->addElement('checkbox', 'bysection['.$secnum.']', '',
+                        get_string('bysectionchoice', 'block_ucla_tasites', $a));
             }
         }
 
         $this->define_agreement_form();
     }
 
+    /**
+     * Adds the checkbox agreement option.
+     */
     private function define_agreement_form() {
         $mform =& $this->_form;
 
@@ -206,7 +210,7 @@ class tasites_form extends moodleform {
                     $tachoice, $tainfo['ucla_id']);
         }
 
-        // If no TAs were avaialble, let's display a message and thing else.
+        // If no TAs were avaialble, then let's display a message and nothing else.
         if (!$availbletas) {
             $mform->addElement('static', 'bytadesc', '',
                     get_string('unavaibletas', 'block_ucla_tasites'));
@@ -244,7 +248,7 @@ class tasites_form extends moodleform {
             $validationerror = get_string('notaorsection', 'block_ucla_tasites');
         } else if (empty($mapping['byta'])) {
             $validationerror = get_string('notasites', 'block_ucla_tasites');
-        } else if (empty($mapping['bysection']) && block_ucla_tasites::create_tasite_bysection_allowed($course->id)) {
+        } else if (empty($mapping['bysection']) && get_config('block_ucla_tasites' , 'enablebysection')) {
             $validationerror = get_string('nosectionsexist', 'block_ucla_tasites');
         }
 
@@ -255,8 +259,8 @@ class tasites_form extends moodleform {
         $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('header','createheader', get_string('create', 'block_ucla_tasites'));
-        
+        $mform->addElement('header', 'createheader', get_string('create', 'block_ucla_tasites'));
+
         // If the user is a TA, display TA form.
         if (block_ucla_tasites::can_have_tasite($USER, $course->id)) {
             $this->define_ta_form();
@@ -266,44 +270,5 @@ class tasites_form extends moodleform {
 
         $this->add_action_buttons(false, get_string('create', 'block_ucla_tasites'));
         $mform->disable_form_change_checker();
-    }
-
-    /**
-     * Verifies that the form is ready to be processed.
-     *
-     * @param array $data
-     * @param array $files
-     * @return array
-     */
-    public function validation($data, $files=null) {
-        $errors = array();
-//        $course = $this->_customdata['course'];
-//
-//        //print_object($data);
-//        if (block_ucla_tasites::create_tasite_bysection_allowed($course->id) && !empty($data['byta'])) {
-//            return;
-//        } else {
-//           // $errors['notasitebysection'] = get_string('notasitebysection', 'block_ucla_tasites');
-//        }
-
-//        // Check if at least one section is choosen for bysection and it is valid.
-//        $mapping = block_ucla_tasites::get_tasection_mapping($data['courseid']);
-//        $validsectionfound = false;
-//        foreach ($data['bysection'] as $section => $value) {
-//            if (!empty($value)) {
-//                // Section choosen, now make sure it exists.
-//                if (isset($mapping['bysection'][$section])) {
-//                    $validsectionfound = true;
-//                }
-//            }
-//        }
-//
-//        if (!$validsectionfound) {
-//            $retval['sectionheader'] = get_string('errinvalidsetupselected', 'block_ucla_tasites');
-//        }
-
-       // return $retval;
-        return $errors;
-
     }
 }

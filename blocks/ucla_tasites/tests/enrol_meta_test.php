@@ -41,6 +41,9 @@ class enrol_meta_test extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    /**
+     * Tests that role promotion works as expected.
+     */
     public function test_get_role_promotion() {
         // TA site belongs to them.
         $ra = new stdClass();
