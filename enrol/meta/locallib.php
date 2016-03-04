@@ -487,12 +487,11 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
         $enrol->id = $ra->enrolid;
         $enrol->customint2 = $ra->promoroleid;
         $enrol->customint3 = $ra->promotoroleid;
-        $enrol->customint4 = $ra->promouserid;
-        $is_tasite = block_ucla_tasites::is_tasite_enrol_meta_instance($enrol);
-        if ($is_tasite) {
+        $istasite = block_ucla_tasites::is_tasite_enrol_meta_instance($enrol);
+        if ($istasite) {
+            // Only promote user if the TA site belongs to them.
             $oldrole = $ra->roleid;
             $ra->roleid = enrol_meta_plugin::get_role_promotion($ra);
-            // TODO add check to make sure not to reassign roles
         }
         // END UCLA MOD: CCLE-2386
 
@@ -536,10 +535,11 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
 //         LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = ra.userid AND ue.status = :activeuser)
 //             WHERE pra.id IS NULL OR ue.id IS NULL OR e.status <> :enabledinstance";
     $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid, e.courseid
-        , e.id AS enrolid, e.customint2 AS promoroleid, e.customint3 AS promotoroleid, e.customint4 AS promouserid, spra.roleid AS unpromoroleid
+        , e.id AS enrolid, e.customint2 AS promoroleid, e.customint3 AS promotoroleid, e.customint4 AS promouserid, spra.roleid AS unpromoroleid, e.customtext1 AS tasiteowners, u.idnumber
               FROM {role_assignments} ra
               JOIN {enrol} e ON (e.id = ra.itemid AND ra.component = 'enrol_meta' AND e.enrol = 'meta' $onecourse)
               JOIN {context} pc ON (pc.instanceid = e.customint1 AND pc.contextlevel = :coursecontext)
+              JOIN {user} u ON (u.id = ra.userid AND u.deleted = 0)
          LEFT JOIN {role_assignments} pra ON (pra.contextid = pc.id AND pra.userid = ra.userid AND pra.roleid = ra.roleid AND pra.component <> 'enrol_meta' $notignored)
          LEFT JOIN {role_assignments} spra ON (spra.contextid = pc.id AND spra.userid = ra.userid AND spra.roleid = e.customint2 AND spra.component <> 'enrol_meta' $notignored)
          LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = ra.userid AND ue.status = :activeuser)

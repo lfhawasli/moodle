@@ -151,10 +151,14 @@ class enrol_meta_plugin extends enrol_plugin {
 
     // START UCLA MOD: CCLE-2386 - TA Site Creator
     /**
-     *  API call - lib/enrollib.php.
-     *  UCLA MOD CCLE-2386 - TA sites
-     **/
-    function add_course_navigation($instancesnode, stdclass $instance) {
+     * Adds link to TA site in navigation.
+     *
+     * API call - lib/enrollib.php.
+     *
+     * @param stdClass $instancesnode
+     * @param stdClass $instance
+     */
+    public function add_course_navigation($instancesnode, stdClass $instance) {
         global $PAGE;
 
         // This is technically a hack, $instancenode provides us
@@ -180,58 +184,36 @@ class enrol_meta_plugin extends enrol_plugin {
     }
 
     /**
-     *  Returns which role to assign a user based on promotion rules.
-     *  UCLA MOD CCLE-2386 - TA sites
-     **/
-    static function get_target_role($roleid,
-                                    $promoroleid, $promotoroleid,
-                                    $userid=null, $promouserid=null) {
-        $toroleid = $roleid;
-        if ($roleid == $promoroleid) {
-            // If there is a specific user only
-            if ($promouserid) {
-                if ($userid == $promouserid) {
-                    $toroleid = $promotoroleid;
-                }
-            } else {
-                $toroleid = $promotoroleid;
-            }
-        }
-
-        return $toroleid;
-    }
-
-    /**
-     *  Convenience function.
-     *  UCLA MOD CCLE-2386
-     **/
-    static function get_role_promotion($ra) {
-        if (!isset($ra->roleid)
-                || !isset($ra->promoroleid)
-                || !isset($ra->promotoroleid)) {
+     * Returns what the promoted role should be.
+     *
+     * @param stdClass $ra  Expecting object with keys: tasiteowners, idnumber,
+     *                      roleid, promotoroleid
+     * @return int
+     */
+    public static function get_role_promotion($ra) {
+        if (!isset($ra->roleid) || !isset($ra->promotoroleid)) {
             return false;
         }
 
-        $userid = null;
-        $promouserid = null;
-
-        if (isset($ra->userid)) {
-            $userid = $ra->userid;
+        if (!empty($ra->tasiteowners) && !empty($ra->idnumber)) {
+            // Promote user if the TA site belongs to them.
+            if (strpos($ra->tasiteowners, $ra->idnumber) !== false) {
+                return $ra->promotoroleid;
+            }
         }
 
-        if (isset($ra->promouserid)) {
-            $promouserid = $ra->promouserid;
-        }
-
-        return self::get_target_role($ra->roleid, $ra->promoroleid,
-                $ra->promotoroleid, $userid, $promouserid);
+        return $ra->roleid;
     }
 
     /**
-     *  Check to see if this is an automatically created connection.
-     *  UCLA MOD CCLE-2386
-     **/
-    function instance_deleteable($instance) {
+     * Check to see if this is an automatically created connection.
+     *
+     * We do not want users to delete the Meta course instance for TA sites.
+     *
+     * @param stdClass $instance
+     * @return boolean
+     */
+    public function instance_deleteable($instance) {
         global $DB;
 
         if (isset($instance->customint2) 

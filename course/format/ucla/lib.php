@@ -189,6 +189,7 @@ class format_ucla extends format_topics {
                u.firstnamephonetic,
                u.middlename,
                u.alternatename,
+               u.idnumber,
                r.shortname,
                oh.officelocation,
                oh.officehours,

@@ -35,6 +35,9 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  */
 class tasites_form extends moodleform {
 
+    /**
+     * Defines the admin form elements.
+     */
     private function define_admin_form() {
         $mform =& $this->_form;
         
@@ -89,28 +92,30 @@ class tasites_form extends moodleform {
             $mform->setExpanded('bysectionheader');
         }
 
-        $mform->addElement('static', 'bysectiondesc', '',
-            get_string('bysectiondesc', 'block_ucla_tasites'));
+        if ($hassections && $enablebysection) {
+            $mform->addElement('static', 'bysectiondesc', '',
+                get_string('bysectiondesc', 'block_ucla_tasites'));
 
-        foreach ($mapping['bysection'] as $secnum => $secinfo) {
-            $canmaketasite = false;
-            foreach ($secinfo['secsrs'] as $secsrs) {
-                if (!block_ucla_tasites::has_sec_tasite($course->id, $secsrs)) {
-                    $canmaketasite = true;
-                    break;
+            foreach ($mapping['bysection'] as $secnum => $secinfo) {
+                $canmaketasite = false;
+                foreach ($secinfo['secsrs'] as $secsrs) {
+                    if (!block_ucla_tasites::has_sec_tasite($course->id, $secsrs)) {
+                        $canmaketasite = true;
+                        break;
+                    }
                 }
-            }
-            if (!$canmaketasite) {
-                continue;
-            }
+                if (!$canmaketasite) {
+                    continue;
+                }
 
-            $a = new stdClass();
-            $a->sec = block_ucla_tasites::format_sec_num($secnum);
-            $a->tas = implode(',', $secinfo['tas']);
-            if (!empty($a->tas)) {
-                $a->tas = '(TAs - ' . $a->tas . ')';
+                $a = new stdClass();
+                $a->sec = block_ucla_tasites::format_sec_num($secnum);
+                $a->tas = implode(',', $secinfo['tas']);
+                if (!empty($a->tas)) {
+                    $a->tas = '(TAs - ' . $a->tas . ')';
+                }
+                $mform->addElement('checkbox', 'bysection['.$secnum.']', '',  get_string('bysectionchoice', 'block_ucla_tasites', $a));
             }
-            $mform->addElement('checkbox', 'bysection['.$secnum.']', '',  get_string('bysectionchoice', 'block_ucla_tasites', $a));
         }
 
         $this->define_agreement_form();
@@ -177,12 +182,12 @@ class tasites_form extends moodleform {
         $tachoicearray = array();
         $sections = array();
 
-        $mform->addElement('static', 'bytadesc', '',
-            get_string('bytadesc', 'block_ucla_tasites'));
+        $availbletas = false;   // Do we have any TAs without TA sites?
         foreach ($mapping['byta'] as $fullname => $tainfo) {
             if (block_ucla_tasites::has_tasite($course->id, $tainfo['ucla_id'])) {
                 continue;
             }
+            $availbletas = true;
 
             if (isset($tainfo['secsrs'])) {
                 $sections = array_keys($tainfo['secsrs']);
@@ -200,10 +205,20 @@ class tasites_form extends moodleform {
             $tachoicearray[] = $mform->createElement('radio', 'byta', '',
                     $tachoice, $tainfo['ucla_id']);
         }
+
+        // If no TAs were avaialble, let's display a message and thing else.
+        if (!$availbletas) {
+            $mform->addElement('static', 'bytadesc', '',
+                    get_string('unavaibletas', 'block_ucla_tasites'));
+            return;
+        }
+
+        $mform->addElement('static', 'bytadesc', '',
+            get_string('bytadesc', 'block_ucla_tasites'));
+
         if (!empty($tachoicearray)) {
             // If there are no TAs with no TA sites, then don't list them.
             $mform->addGroup($tachoicearray, 'bytachoicegroup', '', '<br />', false);
-            //$mform->addRule('bytachoicegroup', null, 'required');
         }
 
         if ($hassections) {
