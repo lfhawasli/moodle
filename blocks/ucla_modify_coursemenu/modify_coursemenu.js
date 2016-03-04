@@ -150,7 +150,7 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
         }
 
         row_html += '<input class="hidden-checkbox" id="hidden-'
-            + sectionident +'" name="hidden-'+ sectionident 
+            + sectionident + '" name="hidden-' + sectionident
             + '" type="checkbox" ' + is_checked + ' />';
     }
     row_html += '</td>';
@@ -158,8 +158,8 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
     row_html += '<td class="col-section-delete">';
     if (sectiondata.no['delete'] == undefined) {
         row_html += '<input type="checkbox" class="delete-checkbox" '
-            + 'id="delete-' + sectionident 
-            + '" name="delete-' + sectionident + '" />';
+            + 'id="delete-' + sectionident + '" name="delete-' + sectionident
+            + '" />';
     }
     row_html += '</td>';
 
@@ -192,6 +192,24 @@ M.block_ucla_modify_coursemenu.attach_row_listeners = function(jq) {
         if (deleting) {
             parentjq.addClass(dclass);
         } else {
+            parentjq.removeClass(dclass);
+        }
+
+        M.block_ucla_modify_coursemenu.set_landingpageradio_visible(
+                parentjq
+            );
+
+        return true;
+    });
+
+    // If hidden is checked, disable delete.
+    $(jq).find(".hidden-checkbox").change(function() {
+        var hiding = this.checked;
+        var parentjq = $(this).parents('tr');
+
+        var dclass = 'delete-section';
+
+        if (hiding) {
             parentjq.removeClass(dclass);
         }
 
@@ -274,6 +292,16 @@ M.block_ucla_modify_coursemenu.set_landingpageradio_visible = function(
         lpr.removeAttr('disabled').show();
     }
 
+    // If hidden or delete are checked, the other is disabled.
+    $('[name^="hidden-"]').click(function() {
+        var id = $(this).attr('name').replace(/^hidden-/, '');
+        $('[name="delete-' + id + '"]').attr('checked', false);
+    });
+
+    $('[name^="delete-"]').click(function() {
+        var id = $(this).attr('name').replace(/^delete-/, '');
+        $('[name="hidden-' + id + '"]').attr('checked', false);
+    });
     M.block_ucla_modify_coursemenu.check_reset_landingpage();
 }
 
@@ -405,7 +433,7 @@ M.block_ucla_modify_coursemenu.start = function() {
             );
 
         return true;
-    });			
+    });
 }
 
 M.block_ucla_modify_coursemenu.parse_sectionid = function(section_dom, 
@@ -435,5 +463,5 @@ M.block_ucla_modify_coursemenu.get_sections_jq = function(jq) {
  *  $(document).ready() callback.
  **/
 M.block_ucla_modify_coursemenu.initialize = function() {
-    $(document).ready(function() {M.block_ucla_modify_coursemenu.start()});	
+    $(document).ready(function() {M.block_ucla_modify_coursemenu.start()});
 }
