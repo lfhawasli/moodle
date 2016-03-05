@@ -125,6 +125,7 @@ function xmldb_local_ucla_install() {
     $divisions[] = array('code' => 'LW', 'fullname' => 'LAW');
     $divisions[] = array('code' => 'MG', 'fullname' => 'MANAGEMENT');
     $divisions[] = array('code' => 'MN', 'fullname' => 'MEDICINE');
+    $divisions[] = array('code' => 'MU', 'fullname' => 'MUSIC');
     $divisions[] = array('code' => 'NS', 'fullname' => 'NURSING');
     $divisions[] = array('code' => 'PA', 'fullname' => 'PUBLIC AFFAIRS');
     $divisions[] = array('code' => 'PH', 'fullname' => 'PUBLIC HEALTH');
