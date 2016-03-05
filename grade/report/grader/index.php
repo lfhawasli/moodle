@@ -203,6 +203,10 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
     echo '<input type="hidden" value="'.$time.'" name="currenttime" />';
     // END UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
 
+    // START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report.
+    echo '<input type="hidden" value="'.$groupingid.'" name="grouping"/>';
+    // END UCLA MOD: CCLE-4295
+
     echo '<input type="hidden" value="'.s($courseid).'" name="id" />';
     echo '<input type="hidden" value="'.sesskey().'" name="sesskey" />';
     echo '<input type="hidden" value="'.time().'" name="timepageload" />';

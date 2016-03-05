@@ -613,6 +613,15 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2015071500, 'local', 'ucla');
     }
 
+    // CCLE-5700 - Add new MU (Music) division
+    if ($oldversion < 2016022300) {
+        if (!$DB->record_exists('ucla_reg_division', array('code' => 'MU'))) {
+            $DB->insert_record('ucla_reg_division',
+                array('code' => 'MU', 'fullname' => 'MUSIC'));
+        }
+        upgrade_plugin_savepoint(true, 2016022300, 'local', 'ucla');
+    }
+
     return $result;
 }
 
