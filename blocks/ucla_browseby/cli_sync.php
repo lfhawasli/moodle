@@ -14,6 +14,7 @@ list($ext_argv, $unrecog) = cli_get_params(
     array(
         'all' => false,
         'current-term' => false,
+        'subjarea' => false,
         'quiet' => false,
         'help' => false
     ),
@@ -53,13 +54,19 @@ if ($ext_argv['current-term']) {
     }
 }
 
+// Figure out which subject areas to run for.
+$subjareas = null;
+if ($ext_argv['subjarea']) {
+    $subjareas = explode(',', $ext_argv['subjarea']);
+}
+
 $q = $ext_argv['quiet'];
 if ($q) {
     ob_start();
 }
 
 if ($ext_argv['all']) {
-    run_browseby_sync(null, null, true);
+    run_browseby_sync(null, $subjareas, true);
 } else if (empty($termlist)) {
     echo "No terms specified!\n";
     $ext_argv['help'] = true;
@@ -70,14 +77,16 @@ if ($ext_argv['help']) {
 "Usage: " . exec("which php") . ' ' . $argv[0] . " TERM [ TERM ... ]
 
 Options:
+    --all           Run BrowseBy for all terms.
     --current-term  Automatically use current term.
+    --subjarea      Pass in a comma delinated list of subject areas to sync.
     -h, --help      Display this message.
     -q, --quiet     Make script say nothing. All output will be suppressed. 
 
 ");
 }
 
-run_browseby_sync($termlist);
+run_browseby_sync($termlist, $subjareas);
 
 if ($q) {
     ob_end_clean();
