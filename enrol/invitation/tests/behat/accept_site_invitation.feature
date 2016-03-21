@@ -29,12 +29,12 @@ Feature: Site invitations
     And I press "Invite users"
     And I log out
     And I log in as "receiver"
-    And I follow the link in the last invitation sent to "receiver" for ucla site "COURSE1"
+    And I follow the link in the last invitation sent to "receiver" for site "Course 1"
     Then I should see "receiv@asd.com"
     And I should see <rolename2>
     And I press "Accept invitation"
     Then I should see "Course 1"
-    When I follow the link in the last invitation sent to "receiver" for ucla site "COURSE1"
+    When I follow the link in the last invitation sent to "receiver" for site "Course 1"
     Then I should see "Site invitation token is expired or has already been used."
     
     Examples:

@@ -37,11 +37,11 @@ Feature: Invite history
     And I press "Invite users"
     And I log out
     And I log in as "receiver1"
-    And I follow the link in the last invitation sent to "receiver1" for ucla site "COURSE1"
+    And I follow the link in the last invitation sent to "receiver1" for site "Course 1"
     And I press "Accept invitation"
     And I log out
     And I log in as "receiver3"
-    And I follow the link in the last invitation sent to "receiver3" for ucla site "COURSE1"
+    And I follow the link in the last invitation sent to "receiver3" for site "Course 1"
     And I press "Accept invitation"
     And I log out
     And I log in as "sender"
@@ -59,5 +59,4 @@ Feature: Invite history
     
     Examples:
       | type | role | inviterole1 | inviterole2 | rolename1 | rolename2 | rolestring1 | rolestring2 |
-      | class | editingteacher | editor | instructional_assistant | Editor | Instructional Assistant | "Editor" | "Instructional Assistant" |
       | non_instruction | projectlead | projectparticipant | projectviewer | Project Participant | Project Viewer | "Project Participant" | "Project Viewer" |
