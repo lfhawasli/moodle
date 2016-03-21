@@ -198,11 +198,6 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
     echo '<form action="index.php" enctype="application/x-www-form-urlencoded" method="post" id="gradereport_grader">'; // Enforce compatibility with our max_input_vars hack.
     echo '<div>';
 
-    // START UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
-    $time = time(); // Mark the page loading time.
-    echo '<input type="hidden" value="'.$time.'" name="currenttime" />';
-    // END UCLA MOD: CCLE-4298 - Handing multiple people editing the grade report.
-
     // START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report.
     echo '<input type="hidden" value="'.$groupingid.'" name="grouping"/>';
     // END UCLA MOD: CCLE-4295

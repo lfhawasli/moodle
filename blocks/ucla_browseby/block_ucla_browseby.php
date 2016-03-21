@@ -167,21 +167,28 @@ class block_ucla_browseby extends block_navigation {
         list($sqlin, $params) = $this->get_in_or_equal($terms);
         $where = 'term ' . $sqlin;
 
-        if (!empty($subjareas)) {
-            list($sqlin, $saparams) = $this->get_in_or_equal($subjareas);
-            $where .= ' AND subjarea' . $sqlin;
-            $params = array_merge($params, $saparams);
+        $records = array();
+        if (empty($subjareas)) {
+            // No subject area passed, so get list of subject areas from built courses.
+            $records = $this->get_recordset_select('ucla_reg_classinfo',
+                $where, $params, '', 'DISTINCT CONCAT(term, subj_area), term, '
+                    . 'subj_area AS subjarea');
+            // Check that there are records
+            if (!($records && $records->valid())) {
+                return true;
+            }
+        } else {
+            // Subject areas passed. Use that in conjuction with terms.
+            foreach ($terms as $term) {
+                foreach ($subjareas as $subjarea) {
+                    $record = new stdClass();
+                    $record->term = $term;
+                    $record->subjarea = $subjarea;
+                    $records[] = $record;
+                }
+            }
         }
 
-        $records = $this->get_recordset_select('ucla_reg_classinfo',
-            $where, $params, '', 'DISTINCT CONCAT(term, subj_area), term, '
-                . 'subj_area AS subjarea');
-
-        // Check that there are records
-        if (!($records && $records->valid())) {
-            return true;
-        }
-   
         // Collect data from registrar, sync to local db
         foreach ($records as $record) {
             $term = $record->term;

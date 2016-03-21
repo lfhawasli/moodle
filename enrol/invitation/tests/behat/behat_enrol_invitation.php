@@ -37,12 +37,47 @@ use Behat\Mink\Exception\ExpectationException as ExpectationException,
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_enrol_invitation extends behat_base {
+    /**
+     * Attempts to navigate to access page that enrols user in a course.
+     * Equivalent to clicking ACCESS LINK in the last invite email to the user.
+     *
+     * @Then /^I follow the link in the last invitation sent to "(?P<username_string>(?:[^"]|\\")*)" for site "(?P<course_fullname_string>(?:[^"]|\\")*)"$/
+     *
+     * @param string $uname
+     * @param string $fullname
+     */
+    public function i_follow_link_in_last_invitation_sent_to_for_site($uname, $fullname) {
+        global $DB;
+
+        $sql = "SELECT e.token
+                  FROM {course} c
+                  JOIN {enrol_invitation} e ON e.courseid=c.id
+                  JOIN {user} u ON u.email=e.email
+                 WHERE c.fullname=:fullname
+                   AND u.username=:username
+              ORDER BY e.id DESC";
+
+        $params = array('fullname' => $fullname, 'username' => $uname);
+        if (!($token = $DB->get_field_sql($sql, $params, IGNORE_MULTIPLE))) {
+            $DB->set_debug(false);
+            throw new ElementNotFoundException($this->getSession(),
+                    'The user "' . $uname . '" does not have any pending invites for this course');
+        }
+
+        $inviteurl = new moodle_url('/enrol/invitation/enrol.php', array('token' => $token));
+        $inviteurl = $inviteurl->out(false);
+
+        $this->getSession()->visit($inviteurl);
+    }
 
     /**
      * Checks that a given message was in the last invitation sent to the user.
      * Note that this step requires the recipient to have an email.
      * 
      * @Then /^the last invite sent to "(?P<username_string>(?:[^"]|\\")*)" should contain "(?P<expected_message_string>(?:[^"]|\\")*)"$/
+     *
+     * @param string $uname
+     * @param string $message
      */
     public function the_last_invite_sent_to_should_contain($uname, $message) {
         global $DB;
