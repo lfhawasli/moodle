@@ -208,12 +208,6 @@ $string['cachedef_usermappings'] = 'UCLA user idnumber/username to Moodle users'
 $string['deletecoursewarning'] = 'WARNING<p>You are deleting a course for which content has been added.</p>';
 $string['deletecoursesafe'] = 'You are deleting a course for which no content has been added.';
 
-// CCLE-4298 - Handing multiple people editing the grade report.
-$string['errorsavegradestaled'] = '<h4>Your changes have not been saved</h4>' . 
-        'The gradebook was updated by another user while this page was open. ' .
-        'Your changes must be re-entered. You can hit the back button then ' .
-        'refresh your page to continue.';
-
 // CCLE-4416 - Prompt overwriting warning
 $string['deletecoursecontenttitle'] = 'Course deletion warning';
 $string['deletecoursecontentyes'] = 'Create backup';
