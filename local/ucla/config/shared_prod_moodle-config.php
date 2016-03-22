@@ -509,44 +509,6 @@ if (file_exists($_config_private_)) {
     require_once($_config_private_);
 }
 
-/** 
- *  Automatic Shibboleth configurations.
- *  Disabling in favor for GUI configurations.
- *  Keeping in code for sake of quick re-enabling and reference.
- *  To re-enable, add a '/' at the end of the following line.
- **/
-//$CFG->auth = 'shibboleth';
-//$CFG->alternateloginurl = $CFG->wwwroot . '/login/ucla_login.php?shibboleth';
-
-//$CFG->forced_plugin_settings['auth/shibboleth']['user_attribute'] = 'HTTP_SHIB_EDUPERSON_PRINCIPALNAME';
-//$CFG->forced_plugin_settings['auth/shibboleth']['convert_data'] = $_dirroot_ . '/shib_transform.php';
-//$CFG->forced_plugin_settings['auth/shibboleth']['logout_handler'] = $CFG->wwwroot . '/Shibboleth.sso/Logout';
-//$CFG->forced_plugin_settings['auth/shibboleth']['logout_return_url'] = 'https://shb.ais.ucla.edu/shibboleth-idp/Logout';
-//$CFG->forced_plugin_settings['auth/shibboleth']['login_name'] = 'Shibboleth Login';
-
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_map_firstname'] = 'HTTP_SHIB_GIVENNAME';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_firstname'] = 'onlogin';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_lock_firstname'] = 'locked';
-
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_map_lastname'] = 'HTTP_SHIB_PERSON_SURNAME';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_lastname'] = 'onlogin';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_lock_lastname'] = 'locked';
-
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_map_email'] = 'HTTP_SHIB_MAIL';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_mail'] = 'onlogin';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_lock_email'] = 'unlockedifempty';
-
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_map_idnumber'] = 'HTTP_SHIB_UID';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_idnumber'] = 'onlogin';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_lock_idnumber'] = 'locked';
-
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_map_institution'] = 'HTTP_SHIB_IDENTITY_PROVIDER';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_institution'] = 'onlogin';
-//$CFG->forced_plugin_settings['auth/shibboleth']['field_lock_institution'] = 'locked';
-/**
- *  End shibboleth configurations.
- **/
-
 // set external database connection settings after config_private.php has
 // been read for the Registrar connection details
 $CFG->forced_plugin_settings['enrol_database']['dbtype'] = $CFG->registrar_dbtype;

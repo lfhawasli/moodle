@@ -28,9 +28,9 @@ require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 // Handle suffix by appending it to last name.
-if (isset($_SERVER['HTTP_SHIB_UCLAPERSONNAMESUFFIX'])) {
+if (isset($_SERVER['SHIBUCLAPERSONNAMESUFFIX'])) {
     $suffix = $this->get_first_string(
-        $_SERVER['HTTP_SHIB_UCLAPERSONNAMESUFFIX']
+        $_SERVER['SHIBUCLAPERSONNAMESUFFIX']
     );
     $result['lastname'] .= ' ' . $suffix;
 }

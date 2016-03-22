@@ -92,7 +92,7 @@ $exportstring = "<Location /course>
     ShibRequestSetting requireSession 1
     ShibRequireSession On
     ShibUseHeaders On
-    require HTTP_SHIB_UCLALOGONID $uclalogonids
+    require SHIBUCLALOGONID $uclalogonids
 </Location>";
 
 // Write export file.
