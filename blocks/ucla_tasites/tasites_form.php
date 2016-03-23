@@ -52,18 +52,6 @@ class tasites_form extends moodleform {
         $enablebysection = get_config('block_ucla_tasites', 'enablebysection') &&
                 $hassections;
 
-        /*
-         * Do not display initial screen in the following scenario:
-         *  When there is no TAs or sections available for the course
-         *  When TA sites are created for each TA/each Section accordingly.
-         * Do not show By TA option
-         *  When there is no atleast one TA available for the course OR
-         *  Wben all the TAs have their own TA site.
-         * Do not show By Section option
-         *  When there is no atleast one section available for the course OR
-         *  When all the sections have their own TA sites created.
-         */
-
         // Display initial screen for instructors if we are allowing
         // TA site creation by section.
         if ($enablebysection && isset($mapping['byta'])) {

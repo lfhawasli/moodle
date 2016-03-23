@@ -312,19 +312,10 @@ class block_ucla_tasites extends block_base {
 
             self::change_default_grouping($newcourse->id, $tasitegrouping->id);
         }
-
-        // Check if Announcements forum should be deleted for TA site. We only
-        // want Annoucement forums if the TA site was created for a specific
-        // section and not all sections.
-        /*
-          if (isset($typeinfo['bysection'])) {
-          if ($typeinfo['bysection'] == 'all') {
-          $enabletasitenewsforum = !(get_config('format_ucla', 'disable_tasite_news_forum'));
-          if (!$enabletasitenewsforum) {
-          $newsforum = forum_get_course_forum($newcourse->id, 'news');
-          forum_delete_instance($newsforum->id);
-          }
-         */
+        
+        // Delete the Announcement forum for the TA site.
+        $newsforum = forum_get_course_forum($newcourse->id, 'news');
+        forum_delete_instance($newsforum->id);
 
         return $newcourse;
     }
