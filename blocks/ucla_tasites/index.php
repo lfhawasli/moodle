@@ -63,9 +63,15 @@ $formdata = array(
 );
 $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
 
+// TODO Fix this Prep for return
+$cpurl = new moodle_url('/blocks/ucla_control_panel/view.php',
+        array('course_id' => $courseid));
+
 $pagebody = '';
 
-if ($formaction == 'create') {
+if ($tasitesform->is_cancelled()) {
+    redirect($cpurl);
+} else if ($formaction == 'create') {
     $typeinfo = array();
     $newtasite = null;
     // User wants to create TA site.

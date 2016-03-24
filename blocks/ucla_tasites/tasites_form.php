@@ -98,7 +98,7 @@ class tasites_form extends moodleform {
 
                 $a = new stdClass();
                 $a->sec = block_ucla_tasites::format_sec_num($secnum);
-                $a->tas = implode(',', $secinfo['tas']);
+                $a->tas = implode(' / ', $secinfo['tas']);
                 if (!empty($a->tas)) {
                     $a->tas = '(TAs - ' . $a->tas . ')';
                 }
@@ -256,7 +256,7 @@ class tasites_form extends moodleform {
             $this->define_admin_form();
         }
 
-        $this->add_action_buttons(false, get_string('create', 'block_ucla_tasites'));
+        $this->add_action_buttons(true, get_string('create', 'block_ucla_tasites'));
         $mform->disable_form_change_checker();
     }
 }
