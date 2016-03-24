@@ -794,6 +794,11 @@ class block_ucla_tasites extends block_base {
                 $iid = $instructor->id;
                 $appendedinstdata[$ik]['tasite'] = '';
                 foreach ($tasites as $tasite) {
+                    if (empty($tasite->visible)) {
+                        // Do not show hidden TA sites.
+                        continue;
+                    }
+
                     $taowners = explode(',', $tasite->enrol->ta_uclaids);
                     if (in_array($instructor->idnumber, $taowners)) {
                         if (!empty($appendedinstdata[$ik]['tasite'])) {
