@@ -63,7 +63,7 @@ $formdata = array(
 );
 $tasitesform = new tasites_form(null, $formdata, 'post', '', array('class' => 'tasites_form'));
 
-// TODO Fix this Prep for return
+// Link source to control panel on cancel.
 $cpurl = new moodle_url('/blocks/ucla_control_panel/view.php',
         array('course_id' => $courseid));
 
