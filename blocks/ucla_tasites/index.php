@@ -75,6 +75,7 @@ if ($formaction == 'create') {
 
         // If course doesn't have section, then just create the TA site for
         // a given TA.
+        $restrictgrouping = true;   // Default to creating restricted TA sites.
         if (!empty($mapping['bysection']['all'])) {
             $taidfound = false;
             foreach ($mapping['byta'] as $name => $uid) {
@@ -108,16 +109,14 @@ if ($formaction == 'create') {
             // Get TA info from mapping.
             $typeinfo['byta'][$tafullname] = $mapping['byta'][$tafullname];
 
-            // Create TA site for entire course, so remove secsrs, if exists.
+            // Create TA site for entire course.
             if ($tasectionchoice == 'all' || isset($params->tasectionchoiceentire)) {
-                if (!empty($typeinfo['byta'][$tafullname]['secsrs'])) {
-                    unset($typeinfo['byta'][$tafullname]['secsrs']);
-                }
+                $restrictgrouping = false;
             }
         }
 
         if (!empty($typeinfo)) {
-            $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo);
+            $newtasite = block_ucla_tasites::create_tasite($course, $typeinfo, $restrictgrouping);
         }
     }
 
@@ -177,6 +176,9 @@ if ($formaction == 'create') {
         $redirect = $url = new moodle_url('/blocks/ucla_tasites/index.php',
                 array('courseid' => $courseid));
         flash_redirect($redirect, $message);
+    } else {
+        // No grouping to change, give error.
+        print_error('errtogglegrouping', 'block_ucla_tasites');
     }
 
 } else {

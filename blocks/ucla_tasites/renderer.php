@@ -43,6 +43,7 @@ class existing_tasite implements renderable {
         $this->courseid = $tasite->enrol->courseid;
         $this->parentcourseid = $tasite->enrol->parentcourseid;
         $this->visible = $tasite->visible;
+        $this->secnums = $tasite->enrol->secnums;
     }
 }
 
@@ -62,27 +63,54 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_existing_tasite(existing_tasite $tasite) {
-        // Show default grouping and allow TA to change it.
+        // Allow editing if user belongs to TA site or has admin access.
+        $allowediting = false;
+        $context = context_course::instance($tasite->courseid);
+        if (has_capability('moodle/course:manageactivities', $context)) {
+            $allowediting = true;
+        }
+
+        // Show site accessible grouping and allow TA to change it.
+        $accessiblestr = '';
         $defaultgrouping = $tasite->defaultgroupingname;
-        if ($defaultgrouping == get_string('publicprivategroupingname', 'local_publicprivate') ||
-                $defaultgrouping == get_string('tasitegroupingname', 'block_ucla_tasites')) {
-            $defaultgrouping .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
+
+        // If TA site is using a known grouping, then display friendly text.
+        $icon = false;
+        $icontext = '';
+        if ($defaultgrouping == get_string('publicprivategroupingname', 'local_publicprivate')) {
+            $accessiblestr = get_string('listaccessiblecourse', 'block_ucla_tasites');
+            $icon = 't/lock';
+            $icontext = get_string('togglegroupingsection', 'block_ucla_tasites');
+        } else if ($defaultgrouping == get_string('tasitegroupingname', 'block_ucla_tasites')) {
+            $accessiblestr = get_string('listaccessiblesections', 'block_ucla_tasites', $tasite->secnums);
+            $icon = 't/locked';
+            $icontext = get_string('togglegroupingcourse', 'block_ucla_tasites');
+        } else {
+            $accessiblestr = get_string('listgrouping', 'block_ucla_tasites',
+                    $tasite->defaultgroupingname);
+        }
+
+        // Only allow TA to change grouping if there exists a "TA Section Materials" grouping.
+        if ($allowediting && !empty($tasite->secnums) && !empty($icon)) {
+            $accessiblestr .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
                     array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'togglegrouping',
                         'tasite' => $tasite->courseid)),
-                new pix_icon('t/edit', get_string('edit')),
-                null, array('title' => get_string('edit')));
+                new pix_icon($icon, $icontext),
+                null, array('title' => $icontext));
         }
-        $lines[] = get_string('listgrouping', 'block_ucla_tasites', $defaultgrouping);
+        $lines[] = $accessiblestr;
 
         // Show visiblity status and allow TA to change it.
         $visibility = $tasite->visible ? get_string('visible') :
             get_string('hidden', 'block_ucla_tasites');
-        $togglestr = $tasite->visible ? 'hide' : 'show';
-        $visibility .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
-                array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'togglevisiblity',
-                    'tasite' => $tasite->courseid)),
-            new pix_icon('t/'.$togglestr, get_string($togglestr)),
-            null, array('title' => get_string($togglestr)));
+        if ($allowediting) {
+            $togglestr = $tasite->visible ? 'hide' : 'show';
+            $visibility .= $this->output->action_icon(new moodle_url('/blocks/ucla_tasites/index.php',
+                    array('courseid' => $tasite->parentcourseid, 'tasiteaction' => 'togglevisiblity',
+                        'tasite' => $tasite->courseid)),
+                new pix_icon('t/'.$togglestr, get_string($togglestr)),
+                null, array('title' => get_string($togglestr)));
+        }
         $lines[] = get_string('liststatus', 'block_ucla_tasites', $visibility);
 
         // Display in a Bootstrap panel.

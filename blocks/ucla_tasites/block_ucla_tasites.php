@@ -215,9 +215,13 @@ class block_ucla_tasites extends block_base {
      *                                          => [tas] => [array of uid => fullname]
      *                  [byta] => [fullname] => [ucla_id] => [uid]
      *                                       => [secsrs] => [secnum] => [srs numbers]
+     * @param boolean $restrictgrouping If true, and TA site has sections, will
+     *                                  change the default grouping to
+     *                                  "TA Section Materials". Default true.
+     *
      * @return stdClass          Returns created course.
      */
-    public static function create_tasite($parentcourse, $typeinfo) {
+    public static function create_tasite($parentcourse, $typeinfo, $restrictgrouping = true) {
         global $DB, $USER;
         $course = clone($parentcourse);
 
@@ -310,7 +314,10 @@ class block_ucla_tasites extends block_base {
                 groups_assign_grouping($tasitegrouping->id, $groupid);
             }
 
-            self::change_default_grouping($newcourse->id, $tasitegrouping->id);
+            // Do we need to restrict this site?
+            if ($restrictgrouping) {
+                self::change_default_grouping($newcourse->id, $tasitegrouping->id);
+            }            
         }
         
         // Delete the Announcement forum for the TA site.
@@ -792,12 +799,14 @@ class block_ucla_tasites extends block_base {
                         if (!empty($appendedinstdata[$ik]['tasite'])) {
                             $appendedinstdata[$ik]['tasite'] .= '<br />';
                         }
-                        // If there are section numbers, then put them in the link.
+                        // If TA site is open to all students, then use generic
+                        // "View site" link. Else, use sec numbers, if possible.
                         $link = '';
-                        if (!empty($tasite->enrol->secnums)) {
-                            $link = get_string('viewtasitesec', 'block_ucla_tasites', $tasite->enrol->secnums);
-                        } else {
+                        if ($tasite->groupingpublicprivate == $tasite->defaultgroupingid ||
+                                empty($tasite->enrol->secnums)) {
                             $link = get_string('viewtasite', 'block_ucla_tasites');
+                        } else {
+                            $link = get_string('viewtasitesec', 'block_ucla_tasites', $tasite->enrol->secnums);                            
                         }
 
                         $appendedinstdata[$ik]['tasite'] .= html_writer::link(
