@@ -82,6 +82,16 @@ class grade_export_form extends moodleform {
         }
         */
 
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        $groupingoptions = array();
+        $allgroupings = groups_get_all_groupings($COURSE->id);
+        foreach ($allgroupings as $grouping) {
+            $groupingoptions[$grouping->id] = $grouping->name;
+        }
+        $mform->addElement('select', 'grouping', get_string('groupings', 'gradeexport_myucla'), $groupingoptions);
+        $mform->setDefault('grouping', $COURSE->defaultgroupingid);
+        // END UCLA MOD: CCLE-5599
+
         if (!empty($features['includeseparator'])) {
             $radio = array();
             $radio[] = $mform->createElement('radio', 'separator', null, get_string('septab', 'grades'), 'tab');

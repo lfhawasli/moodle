@@ -21,6 +21,9 @@ require_once 'grade_export_txt.php';
 
 $id                = required_param('id', PARAM_INT); // course id
 $groupid           = optional_param('groupid', 0, PARAM_INT);
+// START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+$groupingid        = optional_param('groupingid', 0, PARAM_INT);
+// END UCLA MOD: CCLE-5599
 $itemids           = required_param('itemids', PARAM_RAW);
 $export_feedback   = optional_param('export_feedback', 0, PARAM_BOOL);
 $separator         = optional_param('separator', 'comma', PARAM_ALPHA);
@@ -54,7 +57,9 @@ $event->trigger();
 // END UCLA MOD: CCLE-4659
 
 // print all the exported data here
-$export = new grade_export_txt($course, $groupid, $itemids, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $separator, $onlyactive, true);
+// START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+$export = new grade_export_txt($course, $groupid, $groupingid, $itemids, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $separator, $onlyactive, true);
+// END UCLA MOD: CCLE-5599
 $export->print_grades();
 
 
