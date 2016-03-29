@@ -1406,7 +1406,9 @@ function notice_course_status($course) {
 
     // For matrix of status/message, please see
     // CCLE-3787 - Temporary participant role.
-    if (!$ispastcourse && !$ishidden && !$istemprole) {
+    // CCLE-5741 - Only show out of term message if it is enabled in course settings
+    if ((!$ispastcourse && !$ishidden && !$istemprole) ||
+            ($ispastcourse && !$course->enableoutoftermmessage)) {
         return;
     } else if ($ispastcourse && !$ishidden && !$istemprole) {
         $coursecontext = context_course::instance($course->id);

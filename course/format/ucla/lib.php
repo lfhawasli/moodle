@@ -307,6 +307,7 @@ class format_ucla extends format_topics {
      * @return array of options
      */
     public function course_format_options($foreditform = false) {
+        global $COURSE;
         $options = parent::course_format_options($foreditform);
         
         static $uclaoptions = false;
@@ -326,8 +327,14 @@ class format_ucla extends format_topics {
                     'type' => PARAM_ALPHANUMEXT
                 )
             );
+            if (!is_collab_site($COURSE)) {
+                $uclaoptions['enableoutoftermmessage'] = array(
+                    'default' => 1,
+                    'type' => PARAM_INT
+                );
+            }
         }
-        
+
         // Define preferences for course edit form.  Define them as 'hidden',
         // since modify_sections already provides this functionality
         if ($foreditform) {
@@ -354,7 +361,20 @@ class format_ucla extends format_topics {
                     )
                 )
             );
-            
+            if (!is_collab_site($COURSE)) {
+                $uclaoptionsedit['enableoutoftermmessage'] = array(
+                    'label' => get_string('enableoutoftermmessage', 'format_ucla'),
+                    'help' => 'enableoutoftermmessage',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            1 => get_string('yes'),
+                            0 => get_string('no')
+                        )
+                    )
+                );
+            }
+
             $uclaoptions = array_merge_recursive($uclaoptions, $uclaoptionsedit);
         }
         
