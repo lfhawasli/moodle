@@ -72,7 +72,7 @@ $string['subheading'] = 'Add subheading';
 $string['coursedownload'] = 'Download course materials';
 $string['coursedownload_help'] = 'Download is enabled by default. '
         . 'If you do not want the students to be able to download the files in a single zip file, '
-        . 'click "No". This feature is available to students as long as they have access to the course.';
+        . 'click "No". This feature is available to students beginning one week before the course ends.';
 
 // CCLE-5741 - Suppress out of term message for SRS courses
 $string['enableoutoftermmessage'] = 'Enable out of term message';

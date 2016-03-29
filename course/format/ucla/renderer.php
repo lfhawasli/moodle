@@ -258,7 +258,8 @@ class format_ucla_renderer extends format_topics_renderer {
         } else {
             // display message if user is viewing an old course
             $notice = notice_course_status($this->course);
-            if (!empty($notice)) {
+            // CCLE-5741 - Only show out of term message if it is enabled in course settings
+            if (!empty($notice) && $this->course->enableoutoftermmessage) {
                 echo $notice;
             } else {
                 // display public/private notice, if applicable
