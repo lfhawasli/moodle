@@ -62,7 +62,9 @@ if (!has_capability('moodle/course:viewsuspendedusers', $context)) {
     $status = ENROL_USER_ACTIVE;
 }
 
-$manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status);
+$grouping = optional_param('grouping', $course->defaultgroupingid, PARAM_INT);
+
+$manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status, $grouping);
 $table = new local_ucla_course_enrolment_users_table($manager, $PAGE);
 $initialparams = array('sifirst' => $firstinitial, 'silast' => $lastinitial);
 $PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+$initialparams);
@@ -239,6 +241,13 @@ foreach ($users as $userid=>&$user) {
     $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $manager->get_assignable_roles(), $canassign, $PAGE->url);
     $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'], $manager->get_all_groups(), has_capability('moodle/course:managegroups', $manager->get_context()), $PAGE->url);
     $user['enrol'] = $renderer->user_enrolments_and_actions($user['enrolments']);
+    // Add grouping information under groups information
+    $user['group'] .= '<br><br><strong>Groupings</strong><br>';
+    $groupingoutput = '';
+    foreach($user['groupings'] as $groupingid => $name) {
+        $groupingoutput .= html_writer::tag('div', $name, array('class'=>'grouping', 'rel'=>$groupingid));
+    }
+    $user['group'] = $user['group'].html_writer::tag('div', $groupingoutput, array('class'=>'groupings'));
 }
 
 // Determine fields to show in the table.

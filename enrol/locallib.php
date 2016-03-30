@@ -71,6 +71,13 @@ class course_enrolment_manager {
      * @var int
      */
     protected $statusfilter = -1;
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+    /**
+     * Limits the focus of the manager to users in specified grouping
+     * @var int
+     */
+    protected $groupingfilter = 0;
+    // END UCLA MOD: CCLE-5686
 
     /**
      * The total number of users enrolled in the course
@@ -133,8 +140,10 @@ class course_enrolment_manager {
      * @param int $groupfilter if non-zero, filter users with specified group
      * @param int $statusfilter if not -1, filter users with active/inactive enrollment.
      */
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
     public function __construct(moodle_page $moodlepage, $course, $instancefilter = null,
-            $rolefilter = 0, $searchfilter = '', $groupfilter = 0, $statusfilter = -1) {
+            $rolefilter = 0, $searchfilter = '', $groupfilter = 0, $statusfilter = -1, $groupingfilter = 0) {
+    // END UCLA MOD: CCLE-5686
         $this->moodlepage = $moodlepage;
         $this->context = context_course::instance($course->id);
         $this->course = $course;
@@ -143,6 +152,9 @@ class course_enrolment_manager {
         $this->searchfilter = $searchfilter;
         $this->groupfilter = $groupfilter;
         $this->statusfilter = $statusfilter;
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+        $this->groupingfilter = $groupingfilter;
+        // END UCLA MOD: CCLE-5686
     }
 
     /**
@@ -302,6 +314,17 @@ class course_enrolment_manager {
                              'now1' => $now,
                              'now2' => $now);
         }
+
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+        // Grouping condition.
+        if ($this->groupingfilter) {
+            $sql .= " AND u.id IN (SELECT DISTINCT userid 
+                                     FROM {groups_members} groups
+                                     JOIN {groupings_groups} groupings ON groupings.groupid = groups.groupid
+                                    WHERE groupings.groupingid = :groupingid)";
+            $params['groupingid'] = $this->groupingfilter;
+        }
+        // END UCLA MOD: CCLE-5686
 
         return array($sql, $params);
     }
@@ -893,6 +916,11 @@ class course_enrolment_manager {
         if ($this->statusfilter !== -1) {
             $args['status'] = $this->statusfilter;
         }
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+        if (!empty($this->groupingfilter)) {
+            $args['grouping'] = $this->groupingfilter;
+        }
+        // END UCLA MOD: CCLE-5686
         return $args;
     }
 

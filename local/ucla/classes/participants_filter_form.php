@@ -70,6 +70,16 @@ class local_ucla_participants_filter_form extends enrol_users_filter_form {
             if (count($groupsmenu) > 1) {
                 $mform->addElement('select', 'filtergroup', get_string('group'), $groupsmenu);
             }
+
+            $groupingoptions = array();
+            $course = $manager->get_course();
+            $allgroupings = groups_get_all_groupings($course->id);
+            $groupingoptions[0] = get_string('allgroupings', 'enrol');
+            foreach ($allgroupings as $grouping) {
+                $groupingoptions[$grouping->id] = $grouping->name;
+            }
+            $mform->addElement('select', 'grouping', get_string('grouping', 'enrol'), $groupingoptions);
+            $mform->setDefault('grouping', $course->defaultgroupingid);
         }
         // Status active/inactive.
         if (has_capability('moodle/course:viewsuspendedusers', $context)) {
