@@ -101,7 +101,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
         $lines[] = $accessiblestr;
 
         // Show visiblity status and allow TA to change it.
-        $visibility = $tasite->visible ? get_string('visible') :
+        $visibility = $tasite->visible ? get_string('show') :
             get_string('hidden', 'block_ucla_tasites');
         if ($allowediting) {
             $togglestr = $tasite->visible ? 'hide' : 'show';

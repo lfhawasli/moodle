@@ -804,15 +804,7 @@ class block_ucla_tasites extends block_base {
                         if (!empty($appendedinstdata[$ik]['tasite'])) {
                             $appendedinstdata[$ik]['tasite'] .= '<br />';
                         }
-                        // If TA site is open to all students, then use generic
-                        // "View site" link. Else, use sec numbers, if possible.
-                        $link = '';
-                        if ($tasite->groupingpublicprivate == $tasite->defaultgroupingid ||
-                                empty($tasite->enrol->secnums)) {
-                            $link = get_string('viewtasite', 'block_ucla_tasites');
-                        } else {
-                            $link = get_string('viewtasitesec', 'block_ucla_tasites', $tasite->enrol->secnums);                            
-                        }
+                        $link = get_string('viewtasite', 'block_ucla_tasites');
 
                         $appendedinstdata[$ik]['tasite'] .= html_writer::link(
                                 new moodle_url('/course/view.php',

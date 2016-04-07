@@ -106,8 +106,6 @@ class tasites_form extends moodleform {
                         get_string('bysectionchoice', 'block_ucla_tasites', $a));
             }
         }
-
-        $this->define_agreement_form();
     }
 
     /**
