@@ -195,6 +195,15 @@ if ($tasitesform->is_cancelled()) {
     // Show existing TA sites.
     $tasites = block_ucla_tasites::get_tasites($courseid);
 
+    // If user can have a TA site, only show their TA site, if any.
+    if (block_ucla_tasites::can_have_tasite($USER, $courseid)) {
+        foreach ($tasites as $index => $tasite) {
+            if (strpos($tasite->enrol->ta_uclaids, $USER->idnumber) === false) {
+                unset($tasites[$index]);
+            }
+        }
+    }
+
     $output = $PAGE->get_renderer('block_ucla_tasites');
     echo $output->render_tasites($tasites);
 
