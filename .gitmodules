@@ -154,3 +154,9 @@
 [submodule "local/mobile"]
 	path = local/mobile
 	url = git@github.com:jleyva/moodle-local_mobile.git
+[submodule "lib/editor/atto/plugins/chemrender"]
+	path = lib/editor/atto/plugins/chemrender
+	url = git@github.com:ucla/moodle-atto_chemrender.git 
+[submodule "filter/chemrender"]
+	path = filter/chemrender
+	url = git@github.com:ucla/moodle-filter-chemrender.git 
