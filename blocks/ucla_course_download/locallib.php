@@ -51,21 +51,6 @@ function student_zip_requestable($course) {
         return false;
     }
 
-    // Allow access for all summer sessions.
-    if (is_summer_term($courseinfo->term)) {
-        return true;
-    }
-
-    // Find out about where we are in the quarter calendar for this course.
-    $currentweek = get_config('local_ucla', 'current_week');
-    $totalweeks = 10;
-
-    // Now see if we are 1 week before the quarter ends.
-    if ($currentweek >= ($totalweeks - 1) ||
-            $currentweek === \block_ucla_weeksdisplay_session::WEEK_FINALS ||
-            $currentweek === \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
-        return true;
-    } else {
-        return false;
-    }
+    // CCLE-5595 - Allow access for entire term (including summer sessions)
+    return true;
 }

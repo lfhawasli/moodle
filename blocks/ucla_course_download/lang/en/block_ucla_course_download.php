@@ -15,7 +15,7 @@ $string['files'] = 'Files';
 $string['forums'] = 'Forum posts';
 $string['submissions'] = 'Assignment submissions';
 
-$string['request_available'] = 'Request a zip file containing all available course materials.';
+$string['request_available'] = 'Request a zip file containing all available course materials. Files are subject to change without notice.';
 $string['request_submitted'] = 'You have successfully submitted a request to create a zip file of course materials. You will be notified via email when it is available.';
 $string['request_in_progress'] = 'A zip file of all available course materials has been requested. You will be notified via email when it is available.';
 $string['request_completed'] = 'This zip file was last updated on <strong>{$a->timeupdated}</strong>.';
@@ -32,7 +32,7 @@ $string['request_unavailable'] = 'There are no <strong>{$a}</strong> available f
 $string['noaccess'] = 'You do not have access to view this page';
 
 /* alert notice */
-$string['alert_msg'] = 'Starting 1 week before the quarter ends, you can visit the Control Panel or click "Download course materials" below to request a zip file of your course materials.';
+$string['alert_msg'] = 'You can visit the Control Panel or click "Download course materials" below to request a zip file of your course materials. Files are subject to change without notice.';
 $string['alert_download'] = 'Download course materials';
 $string['alert_dismiss'] = 'Dismiss';
 $string['alert_dismiss_message'] = 'You will no longer be prompted to download course material. ' .
@@ -57,12 +57,10 @@ $string['settingsdisable'] = 'Disable feature for students';
 $string['allowstudentaccess'] = 'Allow students';
 $string['allowstudentaccess_desc'] = 'If enabled, will display alert and give ' .
         'students a link to "Download course materials" page in their Control ' .
-        'Panel. They will get access starting the week before the end of the ' . 
-        'term. For example, for regular terms, it will start 9th week (since ' .
-        'classes end 10th week). For summer sessions, if a course is a 6 week ' .
-        'class, it will display on 5th week. Students will continue to have ' .
-        'access to the "Download course materials" page until the course is ' .
-        'hidden or they lose access to the course site.';
+        'Panel. They will get access as soon as the site is available. ' .
+        'Students will continue to have access to the "Download course ' .
+        'materials" page until the course is hidden or they lose access to ' .
+        'the course site.';
 $string['ziplifetime'] = 'Keep zips for';
 $string['ziplifetime_desc'] = 'This specifies how long to keep zip files ' . 
         'after they have been requested. After the specified number of days, ' .
