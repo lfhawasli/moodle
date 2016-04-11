@@ -733,6 +733,12 @@ function ucla_validator($type, $value) {
         case 'uid':
             $result = preg_match('/^[0-9]{9}$/', $value);
             break;
+        case 'academicyear':
+            if (preg_match('/^20[0-9]{2}-20[0-9]{2}$/', $value) == 1 &&
+                    substr($value, 2, 2) + 1 == substr($value, 7, 2)) {
+                $result = 1;
+            }
+            break;
         default:
             throw new moodle_exception('invalid type', 'ucla_validator');
             break;

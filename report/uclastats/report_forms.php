@@ -107,6 +107,27 @@ class runreport_form extends moodleform {
                             // Default to 6 months ago, rounded to start of month.
                             $mform->setDefault('startdate', strtotime(date("F 1, Y", strtotime("-6 months"))));
                         }
+                        break;
+                    case 'academicyear':
+                        // Get terms.
+                        $terms = $DB->get_records_select_menu(
+                                'ucla_request_classes', '1=1', null, null,
+                                'DISTINCT term, term');
+                        // Map terms to academic years.
+                        $academicyears = array();
+                        foreach ($terms as $term => $value) {
+                            $academicyears[$this->get_academic_year($term)] = null;
+                        }
+                        // Format years.
+                        foreach ($academicyears as $year => $value) {
+                            $academicyears[$year] = $year;
+                        }
+                        arsort($academicyears);
+                        // Add element to form.
+                        $mform->addElement('select', 'academicyear', get_string('academicyear',
+                                'report_uclastats'), $academicyears);
+                        $currentacademicyear = $this->get_academic_year($CFG->currentterm);
+                        $mform->setDefault('academicyear', $currentacademicyear);
                 }
             }
         } else {
@@ -114,5 +135,29 @@ class runreport_form extends moodleform {
         }
         $this->add_action_buttons(false,
                 get_string('run_report', 'report_uclastats'));
+    }
+
+    /**
+     * Helper function to map a term to its associated academic year.
+     *
+     * @param string $term
+     * @return string
+     */
+    public function get_academic_year($term) {
+        $termstr = strval($term);
+        if (!ucla_validator('term', $termstr)) {
+            throw new moodle_exception('invalidterm', 'report_uclastats');
+        }
+        $termyear = substr($termstr, 0, 2);
+        switch (substr($termstr, 2, 1)) {
+            case '1':
+            case 'F':
+                $academicyear = '20' . $termyear . '-20' . ($termyear + 1);
+                break;
+            case 'W':
+            case 'S':
+                $academicyear = '20' . ($termyear - 1) . '-20' . $termyear;
+        }
+        return $academicyear;
     }
 }
