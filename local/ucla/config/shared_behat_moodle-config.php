@@ -359,7 +359,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     other = html, fullscreen
     style2 = strike, subscript, superscript
     align = align, table, bsgrid
-    insert = chemistry, computing, equation, poodll, charmap, clear, pastespecial
+    insert = chemrender, chemistry, computing, equation, poodll, charmap, clear, pastespecial
     accessibility = accessibilitychecker, accessibilityhelper';
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
