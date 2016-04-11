@@ -21,6 +21,9 @@ require_once 'grade_export_ods.php';
 
 $id                = required_param('id', PARAM_INT); // course id
 $groupid           = optional_param('groupid', 0, PARAM_INT);
+// START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+$groupingid        = optional_param('groupingid', 0, PARAM_INT);
+// End UCLA MOD: CCLE-5599
 $itemids           = required_param('itemids', PARAM_RAW);
 $export_feedback   = optional_param('export_feedback', 0, PARAM_BOOL);
 $updatedgradesonly = optional_param('updatedgradesonly', false, PARAM_BOOL);
@@ -53,7 +56,9 @@ $event->trigger();
 // END UCLA MOD: CCLE-4659
 
 // print all the exported data here
-$export = new grade_export_ods($course, $groupid, $itemids, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, true);
+// START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+$export = new grade_export_ods($course, $groupid, $groupingid, $itemids, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, true);
+//END UCLA MOD: CCLE-5599
 $export->print_grades();
 
 

@@ -111,9 +111,12 @@ class graded_users_iterator {
      * @param string $sortfield2 The second field of the users table by which the array of users will be sorted
      * @param string $sortorder2 The order in which the second sorting field will be sorted (ASC or DESC)
      */
-    public function __construct($course, $grade_items=null, $groupid=0,
+    // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+    public function __construct($course, $grade_items=null, $groupid=0, $groupingid=0,
                                           $sortfield1='lastname', $sortorder1='ASC',
                                           $sortfield2='firstname', $sortorder2='ASC') {
+    // END UCLA MOD: CCLE-5599
+
         $this->course      = $course;
         $this->grade_items = $grade_items;
         $this->groupid     = $groupid;
@@ -123,6 +126,10 @@ class graded_users_iterator {
         $this->sortorder2  = $sortorder2;
 
         $this->gradestack  = array();
+
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        $this->groupingid  = $groupingid;
+        // END UCLA MOD: CCLE-5599
     }
 
     /**
@@ -159,6 +166,16 @@ class graded_users_iterator {
             $groupsql = "";
             $groupwheresql = "";
         }
+
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        if ($this->groupingid) {
+            $groupsql = "INNER JOIN {groups_members} gm ON gm.userid = u.id";
+            $groupingwheresql = "AND gm.groupid IN (SELECT groupid FROM {groupings_groups} where groupingid = :groupingid)";
+            $params['groupingid'] = $this->groupingid;
+        } else {
+            $groupingwheresql = "";
+        }
+        // END UCLA MOD: CCLE-5599
 
         if (empty($this->sortfield1)) {
             // We must do some sorting even if not specified.
@@ -198,6 +215,7 @@ class graded_users_iterator {
             }
         }
 
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
         $users_sql = "SELECT $userfields $ofields
                         FROM {user} u
                         JOIN ($enrolledsql) je ON je.id = u.id
@@ -209,8 +227,9 @@ class graded_users_iterator {
                                      AND ra.contextid $relatedctxsql
                              ) rainner ON rainner.userid = u.id
                          WHERE u.deleted = 0
-                             $groupwheresql
+                             $groupwheresql $groupingwheresql
                     ORDER BY $order";
+        // END UCLA MOD: CCLE-5599
         $this->users_rs = $DB->get_recordset_sql($users_sql, $params);
 
         if (!$this->onlyactive) {
@@ -225,6 +244,7 @@ class graded_users_iterator {
             list($itemidsql, $grades_params) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED, 'items');
             $params = array_merge($params, $grades_params);
 
+            // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
             $grades_sql = "SELECT g.* $ofields
                              FROM {grade_grades} g
                              JOIN {user} u ON g.userid = u.id
@@ -238,8 +258,9 @@ class graded_users_iterator {
                                   ) rainner ON rainner.userid = u.id
                               WHERE u.deleted = 0
                               AND g.itemid $itemidsql
-                              $groupwheresql
+                              $groupwheresql $groupingwheresql
                          ORDER BY $order, g.itemid ASC";
+            // END UCLA MOD: CCLE-5599
             $this->grades_rs = $DB->get_recordset_sql($grades_sql, $params);
         } else {
             $this->grades_rs = false;

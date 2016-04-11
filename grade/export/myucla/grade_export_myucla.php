@@ -12,6 +12,7 @@ class grade_export_myucla extends grade_export {
      * Constructor should set up all the private variables ready to be pulled
      * @param object $course
      * @param int $groupid id of selected group, 0 means all
+     * @param int $grouping id of selected grouping, 0 means none selected
      * @param string $itemlist comma separated list of item ids, empty means all
      * @param boolean $export_feedback
      * @param boolean $export_letters
@@ -19,8 +20,8 @@ class grade_export_myucla extends grade_export {
      * @note Exporting as letters will lead to data loss if that exported set it re-imported.
      * @note If no grade items selected, only UID and name appear- different than parent
      */
-    function grade_export_myucla($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $filetype = 1) {
-        parent::grade_export($course, $groupid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints);
+    function grade_export_myucla($course, $groupid=0, $groupingid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $filetype = 1) {
+        parent::grade_export($course, $groupid, $groupingid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints);
         if (empty($itemlist)) {
             $this->columns = array();
         }
@@ -60,7 +61,7 @@ class grade_export_myucla extends grade_export {
         header("Content-Disposition: attachment; filename=\"$downloadfilename.$ext\"");
 
         $coursetotal = get_string("coursetotal", "grades");       
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
+        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
         $gui->init();
         $lines = array();
         while ($userdata = $gui->next_user()) {
@@ -184,7 +185,7 @@ class grade_export_myucla extends grade_export {
         //Parse all user data and sort them into the appropriate preview table accordingly.
         $valid_rows = array();
         $invalidids = array();
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
+        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
         $gui->init();        
        //For each user
         while ($userdata = $gui->next_user()) {

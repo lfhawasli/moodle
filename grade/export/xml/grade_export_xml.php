@@ -53,7 +53,9 @@ class grade_export_xml extends grade_export {
         $export_buffer = array();
 
         $geub = new grade_export_update_buffer();
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
+        // END UCLA MOD: CCLE-5599
         $gui->require_active_enrolment($this->onlyactive);
         $gui->init();
         while ($userdata = $gui->next_user()) {
