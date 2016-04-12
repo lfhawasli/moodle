@@ -354,6 +354,8 @@ $CFG->forced_plugin_settings['block_ucla_bruinmedia']['quiet_mode'] = 1;
 
 // Site administration > Plugins > Blocks > UCLA course download
 $CFG->forced_plugin_settings['block_ucla_course_download']['student_access_begins_week'] = 9;
+// CCLE-5582 - Decrease maxfile size to 250
+$CFG->forced_plugin_settings['block_ucla_course_download']['maxfilesize'] = 250;
 
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
