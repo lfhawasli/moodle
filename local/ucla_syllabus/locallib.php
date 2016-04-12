@@ -751,7 +751,8 @@ class ucla_private_syllabus extends ucla_syllabus {
             $coursecontext = context_course::instance($this->courseid);
         }
         return is_enrolled($coursecontext) ||
-                has_capability('local/ucla_syllabus:managesyllabus', $coursecontext);
+                has_capability('local/ucla_syllabus:managesyllabus', $coursecontext) ||
+                has_capability('moodle/course:view', $coursecontext);
     }
 }
 
