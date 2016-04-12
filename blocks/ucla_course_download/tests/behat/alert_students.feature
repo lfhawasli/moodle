@@ -16,12 +16,12 @@ Feature: Alert students about course download feature
       | user | course | role |
       | student1 | C1 | student |
 
-  Scenario: Alert students in a course during 9th week.
-    Given it is "9th" week
+  Scenario: Alert students in a course during 3rd week.
+    Given it is "3rd" week
     And I log in as "student1"
     When I follow "course 1"
     Then I should see "Download course materials" in the "region-main" "region"
-    # Verify that button brings you to appropiate page.
+    # Verify that button brings you to appropriate page.
     When I press "Download course materials"
     Then I should see "UCLA course download" in the "region-main" "region"
     # Verify that clicking on button doesn't display prompt anymore.
@@ -37,12 +37,6 @@ Feature: Alert students about course download feature
     Then I should see "Download course materials" in the "region-main" "region"
     And I follow "Download course materials"
     And I should see "UCLA course download" in the "region-main" "region"
-
-   Scenario: Do not alert students in a course during 6th week.
-     Given it is "6th" week
-     And I log in as "student1"
-     When I follow "course 1"
-     Then I should not see "Download course materials" in the "region-main" "region"
 
    Scenario: Alert students for an old course.
      # Default term that a course is built for is 14W.

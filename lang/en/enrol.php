@@ -25,6 +25,9 @@
  */
 
 $string['actenrolshhdr'] = 'Available course enrolment plugins';
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+$string['allgroupings'] = 'All Groupings';
+// END UCLA MOD: CCLE-5686
 $string['addinstance'] = 'Add method';
 $string['ajaxoneuserfound'] = '1 user found';
 $string['ajaxxusersfound'] = '{$a} users found';
@@ -82,6 +85,9 @@ $string['expirynotifyhour'] = 'Hour to send enrolment expiry notifications';
 $string['expirythreshold'] = 'Notification threshold';
 $string['expirythreshold_help'] = 'How long before enrolment expiry should users be notified?';
 $string['finishenrollingusers'] = 'Finish enrolling users';
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+$string['grouping'] = 'Grouping';
+// END UCLA MOD: CCLE-5686
 $string['instanceeditselfwarning'] = 'Warning:';
 $string['instanceeditselfwarningtext'] = 'You are enrolled into this course through this enrolment method, changes may affect your access to this course.';
 $string['invalidenrolinstance'] = 'Invalid enrolment instance';

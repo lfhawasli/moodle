@@ -66,6 +66,14 @@ class grade_export_form_myucla extends moodleform {
             $mform->setDefault('separator', 'comma');
         }
 
+        $groupingoptions = array();
+        $allgroupings = groups_get_all_groupings($COURSE->id);
+        foreach ($allgroupings as $grouping) {
+            $groupingoptions[$grouping->id] = $grouping->name;
+        }
+        $mform->addElement('select', 'grouping', get_string('groupings', 'gradeexport_myucla'), $groupingoptions);
+        $mform->setDefault('grouping', $COURSE->defaultgroupingid);
+
         if (!empty($CFG->gradepublishing) and !empty($features['publishing'])) {
             $mform->addElement('header', 'publishing', get_string('publishing', 'grades'));
             $options = array(get_string('nopublish', 'grades'), get_string('createnewkey', 'userkey'));

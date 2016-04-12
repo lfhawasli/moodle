@@ -77,6 +77,7 @@ class local_ucla_participants extends course_enrolment_manager {
      */
     public function get_users_for_display(course_enrolment_manager $manager,
             $sort, $direction, $page, $perpage, $firstinitial='', $lastinitial='') {
+        global $DB;
         $pageurl = $manager->get_moodlepage()->url;
         $users = $this->get_users($sort, $direction, $page, $perpage, $firstinitial, $lastinitial);
 
@@ -113,8 +114,14 @@ class local_ucla_participants extends course_enrolment_manager {
             // Users.
             $usergroups = $this->get_user_groups($user->id);
             $details['groups'] = array();
+            $details['groupings'] = array();
             foreach ($usergroups as $gid => $unused) {
                 $details['groups'][$gid] = $allgroups[$gid]->name;
+                $groupingids = $DB->get_records('groupings_groups', array('groupid'=>$gid), '', 'groupingid');
+                foreach ($groupingids as $groupingid=>$unused) {
+                    $grouping = groups_get_grouping($groupingid);
+                    $details['groupings'][$groupingid] = $grouping->name;
+                }
             }
 
             // Enrolments.

@@ -42,6 +42,10 @@ abstract class grade_export {
     public $onlyactive; // only include users with an active enrolment
     public $usercustomfields; // include users custom fields
 
+    // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+    public $groupingid; // grouping id, 0 means all groupings
+    // END UCLA MOD: CCLE-5599
+
     /**
      * Constructor should set up all the private variables ready to be pulled
      * @access public
@@ -56,10 +60,15 @@ abstract class grade_export {
      * @param boolean $usercustomfields include user custom field in export
      * @note Exporting as letters will lead to data loss if that exported set it re-imported.
      */
-    public function grade_export($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $onlyactive = false, $usercustomfields = false) {
+    // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+    public function grade_export($course, $groupid=0, $groupingid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $onlyactive = false, $usercustomfields = false) {
+    // END UCLA MOD: CCLE-5599
         $this->course = $course;
         $this->groupid = $groupid;
         $this->grade_items = grade_item::fetch_all(array('courseid'=>$this->course->id));
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        $this->groupingid = $groupingid;
+        // END UCLA MOD: CCLE-5599
 
         //Populating the columns here is required by /grade/export/(whatever)/export.php
         //however index.php, when the form is submitted, will construct the collection here
@@ -238,7 +247,9 @@ abstract class grade_export {
         echo '</tr>';
         /// Print all the lines of data.
         $i = 0;
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
+        // END UCLA MOD: CCLE-5599
         $gui->require_active_enrolment($this->onlyactive);
         $gui->allow_user_custom_fields($this->usercustomfields);
         $gui->init();
@@ -310,8 +321,10 @@ abstract class grade_export {
             $itemidsparam = '-1';
         }
 
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
         $params = array('id'                =>$this->course->id,
                         'groupid'           =>$this->groupid,
+                        'groupingid'        =>$this->groupingid,
                         'itemids'           =>$itemidsparam,
                         'export_letters'    =>$this->export_letters,
                         'export_feedback'   =>$this->export_feedback,
@@ -320,7 +333,8 @@ abstract class grade_export {
                         'decimalpoints'     =>$this->decimalpoints,
                         'export_onlyactive' =>$this->onlyactive,
                         'usercustomfields'  =>$this->usercustomfields);
-
+        // END UCLA MOD: CCLE-5599
+        
         return $params;
     }
 

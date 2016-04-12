@@ -36,8 +36,10 @@ class grade_export_txt extends grade_export {
      * @param boolean $onlyactive
      * @param boolean $usercustomfields include user custom field in export
      */
-    public function __construct($course, $groupid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $separator = 'comma', $onlyactive = false, $usercustomfields = false) {
-        parent::__construct($course, $groupid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, $usercustomfields);
+    // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+    public function __construct($course, $groupid=0, $groupingid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $separator = 'comma', $onlyactive = false, $usercustomfields = false) {
+        parent::__construct($course, $groupid, $groupingid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, $usercustomfields);
+    // END UCLA MOD: CCLE-5599
         $this->separator = $separator;
     }
 
@@ -81,7 +83,9 @@ class grade_export_txt extends grade_export {
 
         // Print all the lines of data.
         $geub = new grade_export_update_buffer();
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
+        // END UCLA MOD: CCLE-5599
         $gui->require_active_enrolment($this->onlyactive);
         $gui->allow_user_custom_fields($this->usercustomfields);
         $gui->init();

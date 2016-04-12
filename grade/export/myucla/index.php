@@ -40,7 +40,7 @@ $mform = new grade_export_form_myucla(null, array('publishing' => true));
 
 // process post information
 if ($data = $mform->get_data()) {
-    $export = new grade_export_myucla($course, groups_get_course_group($course), '', false, false, $data->display, $data->decimals);
+    $export = new grade_export_myucla($course, groups_get_course_group($course), $data->grouping, '', false, false, $data->display, $data->decimals);
 
     // print the grades on screen for feedbacks
     $export->process_form($data);

@@ -112,7 +112,7 @@ $string['course_grades'] = 'Grades';
 $string['course_grades_post'] = 'View your Moodle gradebook. Activate the advanced gradebook features to use grade weighting, letter grades, extra credit, etc. See the Gradebook Manual for more information.';
 
 $string['course_edit'] = 'Course settings';
-$string['course_edit_post'] = 'Edit the full name and description of the course or hide the course from students.';
+$string['course_edit_post'] = 'Edit the full name and description of the course, hide the course from students, or disable course downloads for students.';
 
 $string['logs'] = 'Logs';
 $string['logs_post'] = 'View logs to see course activity.';
