@@ -169,8 +169,10 @@ class graded_users_iterator {
 
         // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
         if ($this->groupingid) {
-            $groupsql = "INNER JOIN {groups_members} gm ON gm.userid = u.id";
-            $groupingwheresql = "AND gm.groupid IN (SELECT groupid FROM {groupings_groups} where groupingid = :groupingid)";
+            $groupingwheresql = "AND u.id IN (SELECT DISTINCT userid
+                                                FROM {groups_members} groups
+                                                JOIN {groupings_groups} groupings ON groupings.groupid = groups.groupid
+                                               WHERE groupings.groupingid = :groupingid)";
             $params['groupingid'] = $this->groupingid;
         } else {
             $groupingwheresql = "";
