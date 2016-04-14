@@ -117,7 +117,7 @@ class category_forum_usage extends uclastats_base {
 
         $resultstable = new html_table();
         $resultstable->id = 'uclastats-results-table';
-        $resultstable->attributes = array('class' => 'results-table ' .
+        $resultstable->attributes = array('class' => 'generaltable results-table ' .
             get_class($this));
 
         // Do not use uclastats_result's get_header() method.
@@ -138,8 +138,6 @@ class category_forum_usage extends uclastats_base {
             }
 
             $listingtable = new html_table();
-            $listingtable->attributes = array('class' => 'results-table ' .
-                get_class($this));
 
             $listingtable->head = $this->get_header($uclastatsresult);
             $listingtable->data = $course;
