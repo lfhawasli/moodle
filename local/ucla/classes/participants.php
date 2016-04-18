@@ -215,6 +215,8 @@ class local_ucla_participants extends course_enrolment_manager {
                 $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'lastcourseaccess') {
                 $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
+            } else if ($sort === 'idnumber') {
+                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, u.firstname $direction";
             }
             $input = $DB->get_records_sql($sql, $params);
             $this->users[$key] = array_slice($input, $page * $perpage, $perpage);
