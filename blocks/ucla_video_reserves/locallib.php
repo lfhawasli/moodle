@@ -60,10 +60,22 @@ function cmp_stop_date($a, $b) {
  * @return int
  */
 function cmp_title($a, $b) {
-    if ($a->video_title == $b->video_title) {
+    // CCLE-5813 - for sorting, ignore "The", "A", and "An" at the beginning
+    // of video titles.
+    if (preg_match('/^(?:The|A|An)\s(.*)/', $a->video_title, $matches)) {
+        $ta = $matches[1];
+    } else {
+        $ta = $a->video_title;
+    }
+    if (preg_match('/^(?:The|A|An)\s(.*)/', $b->video_title, $matches)) {
+        $tb = $matches[1];
+    } else {
+        $tb = $b->video_title;
+    }
+    if ($ta == $tb) {
         return 0;
     }
-    return ($a->video_title < $b->video_title) ? -1 : 1;
+    return ($ta < $tb) ? -1 : 1;
 }
 
 /**
