@@ -267,9 +267,6 @@ class grade_export_myucla extends grade_export {
                 $valid_rows[$user->idnumber] = $table_row;
             }
         }
-              
-        //Sort the list of valid table rows by user ID instead of name.
-        ksort($valid_rows, SORT_NUMERIC);
         
         //Add the valid rows to the table, stopping once you've reached the limit of preview rows allowed.
         $i = 0;
