@@ -78,11 +78,11 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
         $icon = false;
         $icontext = '';
         if ($defaultgrouping == get_string('publicprivategroupingname', 'local_publicprivate')) {
-            $accessiblestr = get_string('listaccessiblecourse', 'block_ucla_tasites');
+            $accessiblestr = get_string('listavailablecourse', 'block_ucla_tasites');
             $icon = 't/lock';
             $icontext = get_string('togglegroupingsection', 'block_ucla_tasites');
         } else if ($defaultgrouping == get_string('tasitegroupingname', 'block_ucla_tasites')) {
-            $accessiblestr = get_string('listaccessiblesections', 'block_ucla_tasites', $tasite->secnums);
+            $accessiblestr = get_string('listavailablesections', 'block_ucla_tasites', $tasite->secnums);
             $icon = 't/locked';
             $icontext = get_string('togglegroupingcourse', 'block_ucla_tasites');
         } else {
@@ -111,7 +111,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
                 new pix_icon('t/'.$togglestr, get_string($togglestr)),
                 null, array('title' => get_string($togglestr)));
         }
-        $lines[] = get_string('liststatus', 'block_ucla_tasites', $visibility);
+        $lines[] = get_string('listvisibility', 'block_ucla_tasites', $visibility);
 
         // Display in a Bootstrap panel.
         $title = $this->output->heading($tasite->shortname, 3, array('panel-title'));

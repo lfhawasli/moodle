@@ -334,6 +334,11 @@ class block_ucla_tasites extends block_base {
      * @return boolean
      */
     public static function enabled($courseid) {
+        // Do not allow collab sites to have TA sites.
+        if (is_collab_site($courseid)) {
+            return false;
+        }
+
         // See if the instructor has enabled TA site creation for this specific user.
         $formatoptions = course_get_format($courseid)->get_format_options();
         if ($formatoptions['createtasite'] == 1) {
@@ -458,6 +463,9 @@ class block_ucla_tasites extends block_base {
                 return null;
             }
 
+            // Get users with role of TA and TA admin, so we can filter list.
+            $tausers = self::get_tasite_users($courseid);
+
             // Get term, we need it later.
             $termsrs = reset($termsrses);
             $term = $termsrs->term;
@@ -474,6 +482,21 @@ class block_ucla_tasites extends block_base {
                     foreach ($sections as $section) {
                         $fullname = '';
                         if (!empty($section['ucla_id'])) {
+                            // Make sure user has TA role for course. Sometimes,
+                            // the people returned by SP are really the TA
+                            // instructor.
+                            $foundta = false;
+                            foreach ($tausers as $tauser) {
+                                if ($tauser->idnumber == $section['ucla_id']) {
+                                    $foundta = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (empty($foundta)) {
+                                continue;
+                            }
+
                             $fullname = self::get_tafullname($section['ucla_id']);
                         }
 
@@ -491,8 +514,7 @@ class block_ucla_tasites extends block_base {
                     // No course sections found, so just use main lecture.
                     $tasitemapping['bysection']['all']['secsrs'][] = $termsrs->srs;
 
-                    // Get users with the role of TA and TA admin.
-                    $tausers = self::get_tasite_users($courseid);
+                    // List the current TAs.
                     foreach ($tausers as $tauser) {
                         $fullname = self::get_tafullname($tauser->idnumber);
                         $tasitemapping['byta'][$fullname]['ucla_id'] = $tauser->idnumber;
@@ -577,10 +599,9 @@ class block_ucla_tasites extends block_base {
     public static function get_tasite_users($courseid) {
         global $DB;
 
-        // Allow ta and ta-admins to have ta sites.
-        $role = new object();
         $context = context_course::instance($courseid);
 
+        // Allow ta and ta_admins to have ta sites.
         $taroleid = self::get_ta_role_id();
         $taadminroleid = self::get_ta_admin_role_id();
 

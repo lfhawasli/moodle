@@ -312,6 +312,7 @@ class format_ucla extends format_topics {
         $options = parent::course_format_options($foreditform);
         
         static $uclaoptions = false;
+        $iscollabsite = is_collab_site($COURSE);
         
         if ($uclaoptions === false) {
             $uclaoptions = array(
@@ -324,18 +325,22 @@ class format_ucla extends format_topics {
                     'type' => PARAM_BOOL
                 ),
                 'coursedownload' => array(
-                    'default' => 1,
-                    'type' => PARAM_ALPHANUMEXT
+                    'default' => true,
+                    'type' => PARAM_BOOL
                 ),
                 'createtasite' => array(
-                    'default' => 1,
-                    'type' => PARAM_ALPHANUMEXT
+                    'default' => true,
+                    'type' => PARAM_BOOL
                 )
             );
-            if (!is_collab_site($COURSE)) {
+            if (!$iscollabsite) {
+                $uclaoptions['createtasite'] = array(
+                    'default' => true,
+                    'type' => PARAM_BOOL
+                );
                 $uclaoptions['enableoutoftermmessage'] = array(
-                    'default' => 1,
-                    'type' => PARAM_INT
+                    'default' => true,
+                    'type' => PARAM_BOOL
                 );
             }
         }
@@ -364,8 +369,11 @@ class format_ucla extends format_topics {
                             0 => get_string('no')
                         )
                     )
-                ),
-                'createtasite' => array(
+                )
+            );
+            
+            if (!$iscollabsite) {
+                $uclaoptionsedit['createtasite'] = array(
                     'label' => get_string('createtasite', 'format_ucla'),
                     'help' => 'createtasite',
                     'element_type' => 'select',
@@ -375,9 +383,7 @@ class format_ucla extends format_topics {
                             0 => get_string('no')
                         )
                     )
-                )
-            );
-            if (!is_collab_site($COURSE)) {
+                );
                 $uclaoptionsedit['enableoutoftermmessage'] = array(
                     'label' => get_string('enableoutoftermmessage', 'format_ucla'),
                     'help' => 'enableoutoftermmessage',

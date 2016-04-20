@@ -131,9 +131,13 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
 
         if (!empty($modulecat)) {
             $data = array('url' => '/' . $CFG->admin . '/tool/uclasupportconsole/index.php#ccle_ta_sections',
-                'name' => get_string('ccle_ta_sections', 'tool_uclasupportconsole'));
-            $tool = \local_ucla_support_tools_tool::create($data);
-            $modulecat->add_tool($tool);
+                'name' => get_string('ccle_ta_sections', 'tool_uclasupportconsole'));            
+            try {
+                $tool = \local_ucla_support_tools_tool::create($data);
+                $modulecat->add_tool($tool);
+            } catch (Exception $ex) {
+                // Tool was already created.
+            }
         }
 
         upgrade_plugin_savepoint(true, 2016030600, 'tool', 'uclasupportconsole');
