@@ -72,7 +72,23 @@ class block_ucla_course_download extends block_base {
                 $DB->delete_records('ucla_archives', array('id' => $request->id));
                 continue;
             }
-            $archive->process_request();
+
+            // Do not process requests for courses that have disabled course material download.
+            // Mark these requests as inactive.
+            $formatoptions = course_get_format($request->courseid)->get_format_options();
+            if ($formatoptions['coursedownload'] != 1) {
+                $trace->output('Course download disabled, marking as inactive', 1);
+                $request->timeupdated = time();
+                $request->active = 0;
+                $DB->update_record('ucla_archives', $request);
+                continue;
+            }
+
+            try {
+                $archive->process_request();
+            } catch (dml_exception $processfailed) {
+                $trace->output('Request failed to process', 1);
+            }
             unset($archive);
         }
         $requests->close();
