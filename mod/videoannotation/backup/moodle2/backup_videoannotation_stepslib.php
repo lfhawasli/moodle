@@ -56,14 +56,14 @@ class backup_videoannotation_activity_structure_step extends backup_activity_str
 
         $clips = new backup_nested_element('clips');
 
-        $clip = new backup_nested_element('clip', array('id'), array('userid', 'groupid', 'url', 'playtimestart', 'playtimeend',
-                'videowidth', 'videoheight', 'timecreated', 'timemodified'));
-        
+        $clip = new backup_nested_element('clip', array('id'), array('userid', 'groupid', 'url', 'playabletimestart',
+                'playabletimeend', 'videowidth', 'videoheight', 'timecreated', 'timemodified'));
+
         $submissions = new backup_nested_element('submissions');
 
         $submission = new backup_nested_element('submission', array('id'), array('userid', 'groupid', 'grade',
                 'gradecomment', 'timesubmitted', 'timegraded', 'timecreated', 'timemodified'));
-        
+
         $tags = new backup_nested_element('tags');
 
         $tag = new backup_nested_element('tag', array('id'), array('userid', 'groupid', 'name', 'color', 'sortorder', 
@@ -88,7 +88,7 @@ class backup_videoannotation_activity_structure_step extends backup_activity_str
 
         // Define data sources.
         $videoannotation->set_source_table('videoannotation', array('id' => backup::VAR_ACTIVITYID));
-        
+         
         if ($userinfo) {
             $lock->set_source_table('videoannotation_locks', array('videoannotationid' => backup::VAR_PARENTID));
             $clip->set_source_table('videoannotation_clips', array('videoannotationid' => backup::VAR_PARENTID));
@@ -96,6 +96,13 @@ class backup_videoannotation_activity_structure_step extends backup_activity_str
                     'clipid' => '../../id'));
             $tag->set_source_table('videoannotation_tags', array('clipid' => '../../id'));
             $event->set_source_table('videoannotation_events', array('tagid' => '../../id'));
+        } else {
+            $clip->set_source_sql('SELECT vac.*
+                                     FROM {videoannotation_clips} vac
+                                     JOIN {videoannotation} va ON va.id = vac.videoannotationid
+                                    WHERE va.clipselect = 1
+                                          AND vac.videoannotationid = ?',
+                                  array(backup::VAR_PARENTID));
         }
 
         // If we were referring to other tables, we would annotate the relation

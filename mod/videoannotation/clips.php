@@ -129,11 +129,6 @@ class clip_form extends moodleform{
 
         $mform->addElement('button', 'preview', get_string('preview', 'videoannotation'));
 
-        $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot .
-            '/mod/videoannotation/jwplayer-6.6/swfobject.js"></script>');
-        $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot .
-            '/mod/videoannotation/jquery-ui-1.8.2.custom/js/jquery-1.4.2.min.js"></script>');
-
         $mform->addElement('html', '<div id="flashPlayerArea1"></div>');
 
         $this->add_action_buttons(true, get_string('submit'));
@@ -144,7 +139,7 @@ class clip_form extends moodleform{
         $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot .
             '/mod/videoannotation/jquery-ui-1.8.2.custom/js/jquery-1.4.2.min.js"></script>');
         $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot .
-            '/mod/videoannotation/jwplayer-6.6/jwplayer.js"></script>' . "\n");
+            '/mod/videoannotation/jwplayer-6.12/jwplayer.js"></script>' . "\n");
         $mform->addElement('html', '<script type="text/javascript">wwwroot = "' . $CFG->wwwroot . '";</script>' . "\n");
         $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot .
             '/mod/videoannotation/mod_form_js.php"></script>' . "\n");

@@ -44,9 +44,9 @@ class restore_videoannotation_activity_structure_step extends restore_activity_s
         $userinfo = $this->get_setting_value('userinfo');
 
         $paths[] = new restore_path_element('videoannotation', '/activity/videoannotation');
+        $paths[] = new restore_path_element('videoannotation_clip', '/activity/videoannotation/clips/clip');
         if ($userinfo) {
             $paths[] = new restore_path_element('videoannotation_lock', '/activity/videoannotation/locks/lock');
-            $paths[] = new restore_path_element('videoannotation_clip', '/activity/videoannotation/clips/clip');
             $paths[] = new restore_path_element('videoannotation_submission', '/activity/videoannotation/clips/clip/submissions/submission');
             $paths[] = new restore_path_element('videoannotation_tag', '/activity/videoannotation/clips/clip/tags/tag');
             $paths[] = new restore_path_element('videoannotation_event', '/activity/videoannotation/clips/clip/tags/tag/events/event');

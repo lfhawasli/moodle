@@ -243,8 +243,7 @@ foreach ($CFG->tnapermalinkurl as $idx => $tnapermalinkurl) {
             $content = file_get_contents($CFG->tnawebserviceurl[$idx] . '?action=uuidToFileName&uuid=' . urlencode($uuid));
             $contentobj = json_decode($content);
             if (preg_match('/^(\d{4})\-(\d{2})\-(\d{2})_(\d{2})(\d{2})/', $contentobj->filename, $matches)) {
-                $rtmpurl = $CFG->tnastreamerurl . "/{$matches[1]}/{$matches[1]}-{$matches[2]}/
-                    {$matches[1]}-{$matches[2]}-{$matches[3]}/" . basename($contentobj->filename, '.txt') . '.mp4';
+                $rtmpurl = $CFG->tnastreamerurl . "/{$matches[1]}/{$matches[1]}-{$matches[2]}/{$matches[1]}-{$matches[2]}-{$matches[3]}/" . basename($contentobj->filename, '.txt') . '.mp4';
                 $clip->url = $rtmpurl;
                 break;
             }
@@ -497,7 +496,7 @@ if ($clip): ?>
     <script src="timeline.js" type="text/javascript"></script>
     <script src="jquery.validate.js" type="text/javascript"></script>
     <script src="jquery.text-overflow.min.js" type="text/javascript"></script>
-            <script type="text/javascript" src="jwplayer-6.6/jwplayer.js"></script>
+            <script type="text/javascript" src="jwplayer-6.12/jwplayer.js"></script>
 
     <script type="text/javascript">
     $(document).ready( function () {
@@ -838,20 +837,14 @@ if ($clip): ?>
         // Create JWPlayer's initialization parameters.
 
         var jwplayerParams = {
-            players: [
-                { type: "flash", src: "jwplayer-5.3/player.swf" }
-            ],
             height: <?php echo $clip->videoheight; ?>,
             width: <?php echo $clip->videowidth; ?>,
-            start: <?php echo $clip->playabletimestart; ?>,
-            duration: <?php echo $clip->playabletimeend; ?>,
-            controlbar: "none",
+            controls: true,
             autostart: true,
             allowscriptaccess: "always",
             allowfullscreen: "true",
             volume: 66,
             mute: false,
-            icons: false,
 
             events: {
                 onIdle: function(evt) {

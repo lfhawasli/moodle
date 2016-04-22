@@ -50,21 +50,16 @@ jQuery('#id_preview').click(function() {
 			}
             
             jwplayerParams = {
-                players: [
-                    { type: "flash", src: wwwroot + "/mod/videoannotation/jwplayer-6.6/player.swf" }
-                ],
                 height: Number(jQuery('#id_videoheight').val()),
                 width: Number(jQuery('#id_videowidth').val()),
-                start: Number(jQuery('#id_playabletimestart').val()),
-                duration: Number(jQuery('#id_playabletimeend').val()),
-                controlbar: "bottom",
+                controls: true,
                 autostart: true,
                 allowscriptaccess: "always",
                 allowfullscreen: "true",
                 volume: 66,
                 mute: false,
-                icons: false
             };
+
             if(jsonData[0]["file"].match(/youtube/g)) {
               jwplayerParams["file"] = jsonData[0]["file"];
               jwplayerParams["streamer"] = jsonData[0]["streamer"];

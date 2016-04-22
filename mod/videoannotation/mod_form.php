@@ -198,7 +198,7 @@ class mod_videoannotation_mod_form extends moodleform_mod {
         // Insert JavaScript code for JWPlayer and the preview logic into the form
 
         $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot . '/mod/videoannotation/jquery-ui-1.8.2.custom/js/jquery-1.4.2.min.js"></script>');
-        $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot . '/mod/videoannotation/jwplayer-6.6/jwplayer.js"></script>' . "\n");
+        $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot . '/mod/videoannotation/jwplayer-6.12/jwplayer.js"></script>' . "\n");
         $mform->addElement('html', '<script type="text/javascript">wwwroot = "' . $CFG->wwwroot . '";</script>' . "\n");
         $mform->addElement('html', '<script type="text/javascript" src="' . $CFG->wwwroot . '/mod/videoannotation/mod_form_js.php"></script>' . "\n");
     }

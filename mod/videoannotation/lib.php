@@ -415,7 +415,7 @@ function videoannotation_get_clip_info($clipurl) {
         if ($clipurl and stripos($clipurl, $tnapermalinkurl) === 0) {
             @list($uuid, $offset) = explode(',', substr($clipurl, strlen($tnapermalinkurl)));
             if ($uuid) {
-                $content = file_get_contents($CFG->tnawebservice_url[$idx] .
+                $content = file_get_contents($CFG->tnawebserviceurl[$idx] .
                     '?action=uuidToFileName&uuid=' . urlencode(trim($uuid)));
                 $contentobj = json_decode($content);
                 if (preg_match('/^(\d{4})\-(\d{2})\-(\d{2})_(\d{2})(\d{2})/', $contentobj->filename, $matches)) {
