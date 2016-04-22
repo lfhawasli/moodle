@@ -55,7 +55,7 @@ if($hassiteconfig && $ADMIN->fulltree) {
                 'block_ucla_course_download/maxfilesize',
                 new lang_string('maxfilesize','block_ucla_course_download'),
                 new lang_string('maxfilesize_desc','block_ucla_course_download'),
-                500,
+                250,
                 PARAM_INT,
                 4
             ));
