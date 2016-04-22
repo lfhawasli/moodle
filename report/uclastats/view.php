@@ -153,7 +153,7 @@ if (!empty($action) && !empty($resultid)) {
 
 // if user is viewing a result table, make it sortable
 if (!empty($resultid)) {
-    setup_js_tablesorter('uclastats-results-table');
+    setup_js_tablesorter('results-table', array(), 'class');
 }
 
 echo $OUTPUT->header();

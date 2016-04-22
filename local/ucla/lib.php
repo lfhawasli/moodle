@@ -1298,10 +1298,12 @@ function get_active_terms($descending = 'false') {
  *                          to initialize the tablesorter. Each element in the
  *                          array represents an option/value pair, e.g.
  *                          'debug: true'
+ * @param string $idorclass Default to id. If set to 'class', will apply table
+ *                          sorting to all tables with a given class.
  * @return string           Returns table id, either the one passed in or the
  *                          one auto-generated.
  */
-function setup_js_tablesorter($tableid = null, $options = array()) {
+function setup_js_tablesorter($tableid = null, $options = array(), $idorclass = 'id') {
     global $PAGE;
 
     $PAGE->requires->js('/local/ucla/tablesorter/jquery-latest.js');
@@ -1315,8 +1317,13 @@ function setup_js_tablesorter($tableid = null, $options = array()) {
     $options[] = 'widgets:["zebra"]';
     $optionsstring = '{' . implode(',', $options) . '}';
 
-    $PAGE->requires->js_init_code('$(document).ready(function() { $("#'
-        . $tableid . '").addClass("tablesorter").tablesorter('
+    $selectorstring = "$(\"#$tableid\")";
+    if ($idorclass == 'class') {
+        $selectorstring = "$(\".$tableid\")";
+    }
+
+    $PAGE->requires->js_init_code('$(document).ready(function() { ' .
+        $selectorstring . '.addClass("tablesorter").tablesorter('
         . $optionsstring . '); });');
 
     return $tableid;

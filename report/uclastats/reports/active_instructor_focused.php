@@ -130,7 +130,7 @@ class active_instructor_focused extends uclastats_base {
         // Aggregated results.
         $resultstable = new html_table();
         $resultstable->id = 'uclastats-results-table';
-        $resultstable->attributes = array('class' => 'results-table ' .
+        $resultstable->attributes = array('class' => 'generaltable results-table ' .
             get_class($this));
 
         $resultstable->head = $uclastats_result->get_header();
@@ -143,8 +143,6 @@ class active_instructor_focused extends uclastats_base {
         // Course listing.
         $listingtable = new html_table();
         $listingtable->id = 'uclastats-courselisting-table';
-        $listingtable->attributes = array('class' => 'results-table ' .
-            get_class($this));
 
         $listingtable->head = array(get_string('division', 'report_uclastats'),
                 get_string('course_shortname', 'report_uclastats'));

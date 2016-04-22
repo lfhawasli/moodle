@@ -24,7 +24,7 @@
 }
 
 .cached-results-table .editing_links a {
-    margin-left: 19px;
+    margin-right: 1.0em;
 }
 
 .cached-results-table .edit {
@@ -36,4 +36,8 @@
     border: 1px solid #B7AA96;
     padding: 0.5em;
     width: 65%;
+}
+
+#page-admin-report-uclastats-view table {
+    width: auto;
 }
