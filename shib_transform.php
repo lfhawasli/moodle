@@ -27,12 +27,47 @@
 require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
-// Handle suffix by appending it to last name.
-if (isset($_SERVER['SHIBUCLAPERSONNAMESUFFIX'])) {
-    $suffix = $this->get_first_string(
-        $_SERVER['SHIBUCLAPERSONNAMESUFFIX']
-    );
-    $result['lastname'] .= ' ' . $suffix;
+$pnaction = "None";
+
+$displayname = array();
+if (isset($_SERVER['SHIBDISPLAYNAME'])) {
+    $displayname = $this->get_first_string($_SERVER['SHIBDISPLAYNAME']);
+}
+
+if($result['alternatename']) {
+    // Handle suffix by appending it to last name.
+    if (isset($_SERVER['SHIBUCLAPERSONNAMESUFFIX'])) {
+        $suffix = $this->get_first_string(
+            $_SERVER['SHIBUCLAPERSONNAMESUFFIX']
+        );
+        $result['lastname'] .= ' ' . $suffix;
+    }
+    $pnaction = "set alternateName to preferredName";
+} else if(!empty($displayname)) {
+    // Handle user info when display name is chosen.
+    $formattedname = format_displayname($displayname);
+    $result['firstname'] = $formattedname['firstname'];
+    $result['lastname'] = $formattedname['lastname'];
+    unset($result['middlename']);
+
+    $pnaction = "set fn, ln to displayName and cleared mn";
+}
+
+if(!empty($CFG->namingdebugging)) {
+    $filename = $CFG->dataroot . "/namingdebugging.log";
+    $time = @date('[d/M/Y:H:i:s]');
+    
+    file_put_contents($filename,
+                "\n ". $time. " User info: "
+                . "\n fn     = ".(isset($result['firstname']) ? $result['firstname'] : 'N/A')
+                . "\n mn     = ".(isset($result['middlename']) ? $result['middlename'] : 'N/A')
+                . "\n ln     = ".(isset($result['lastname']) ? $result['lastname'] : 'N/A')
+                . "\n suffix = ".(!empty($suffix) ? $suffix : 'N/A')
+                . "\n pn     = ".(isset($result['alternatename']) ? $result['alternatename'] : 'N/A')
+                . "\n dn     = ".(!empty($displayname) ? $displayname : 'N/A')
+                . "\n Action = ".$pnaction
+                ."\n",
+                FILE_APPEND);
 }
 
 $result['institution'] = str_replace("urn:mace:incommon:","", $result['institution']);
