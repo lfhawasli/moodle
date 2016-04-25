@@ -73,3 +73,9 @@ $string['coursedownload'] = 'Download course materials';
 $string['coursedownload_help'] = 'Download is enabled by default. '
         . 'If you do not want the students to be able to download the files in a single zip file, '
         . 'click "No". This feature is available to students as long as they have access to the course.';
+
+// CCLE-5741 - Suppress out of term message for SRS courses
+$string['enableoutoftermmessage'] = 'Enable out of term message';
+$string['enableoutoftermmessage_help'] = 'Enable the message "You are now '
+        . 'viewing a course that is no longer in session" to display when a '
+        . 'course is out of session.';

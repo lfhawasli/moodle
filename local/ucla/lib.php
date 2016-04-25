@@ -733,6 +733,12 @@ function ucla_validator($type, $value) {
         case 'uid':
             $result = preg_match('/^[0-9]{9}$/', $value);
             break;
+        case 'academicyear':
+            if (preg_match('/^20[0-9]{2}-20[0-9]{2}$/', $value) == 1 &&
+                    substr($value, 2, 2) + 1 == substr($value, 7, 2)) {
+                $result = 1;
+            }
+            break;
         default:
             throw new moodle_exception('invalid type', 'ucla_validator');
             break;
@@ -1292,10 +1298,12 @@ function get_active_terms($descending = 'false') {
  *                          to initialize the tablesorter. Each element in the
  *                          array represents an option/value pair, e.g.
  *                          'debug: true'
+ * @param string $idorclass Default to id. If set to 'class', will apply table
+ *                          sorting to all tables with a given class.
  * @return string           Returns table id, either the one passed in or the
  *                          one auto-generated.
  */
-function setup_js_tablesorter($tableid = null, $options = array()) {
+function setup_js_tablesorter($tableid = null, $options = array(), $idorclass = 'id') {
     global $PAGE;
 
     $PAGE->requires->js('/local/ucla/tablesorter/jquery-latest.js');
@@ -1309,8 +1317,13 @@ function setup_js_tablesorter($tableid = null, $options = array()) {
     $options[] = 'widgets:["zebra"]';
     $optionsstring = '{' . implode(',', $options) . '}';
 
-    $PAGE->requires->js_init_code('$(document).ready(function() { $("#'
-        . $tableid . '").addClass("tablesorter").tablesorter('
+    $selectorstring = "$(\"#$tableid\")";
+    if ($idorclass == 'class') {
+        $selectorstring = "$(\".$tableid\")";
+    }
+
+    $PAGE->requires->js_init_code('$(document).ready(function() { ' .
+        $selectorstring . '.addClass("tablesorter").tablesorter('
         . $optionsstring . '); });');
 
     return $tableid;
@@ -1406,7 +1419,9 @@ function notice_course_status($course) {
 
     // For matrix of status/message, please see
     // CCLE-3787 - Temporary participant role.
-    if (!$ispastcourse && !$ishidden && !$istemprole) {
+    // CCLE-5741 - Only show out of term message if it is enabled in course settings
+    if ((!$ispastcourse && !$ishidden && !$istemprole) ||
+            ($ispastcourse && !$course->enableoutoftermmessage)) {
         return;
     } else if ($ispastcourse && !$ishidden && !$istemprole) {
         $coursecontext = context_course::instance($course->id);

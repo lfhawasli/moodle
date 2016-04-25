@@ -92,7 +92,7 @@ abstract class uclastats_base implements renderable {
             // now display results table
             $cached_table = new html_table();
             $cached_table->attributes = array('class' =>
-                'cached-results-table ' . get_class($this));
+                'generaltable cached-results-table ' . get_class($this));
 
             // get first element and get its array keys to generate header
             $header = array('header_param', 'header_results', 'header_lastrun',
@@ -485,7 +485,7 @@ abstract class uclastats_base implements renderable {
     protected function get_results_table(uclastats_result $uclastats_result) {
         $results_table = new html_table();
         $results_table->id = 'uclastats-results-table';
-        $results_table->attributes = array('class' => 'results-table ' .
+        $results_table->attributes = array('class' => 'generaltable results-table ' .
             get_class($this));
 
         $results_table->head = $uclastats_result->get_header();

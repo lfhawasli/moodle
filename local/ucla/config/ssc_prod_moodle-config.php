@@ -316,6 +316,10 @@ $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'hel
 $CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
 $CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'help@ssc.ucla.edu';
 
+// Site administration > Plugins > Blocks > UCLA course download
+// CCLE-5582 - Decrease maxfile size to 250
+$CFG->forced_plugin_settings['block_ucla_course_download']['maxfilesize'] = 250;
+
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 

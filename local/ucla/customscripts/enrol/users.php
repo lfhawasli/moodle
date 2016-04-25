@@ -306,7 +306,7 @@ if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
 $filterform = new local_ucla_participants_filter_form('users.php', array('manager' => $manager, 'id' => $id),
         'get', '', array('id' => 'filterform'));
 $filterform->set_data(array('search' => $search, 'ifilter' => $filter, 'role' => $role,
-    'filtergroup' => $fgroup, 'status' => $status, 'sifirst' => $firstinitial, 'silast' => $lastinitial));
+    'filtergroup' => $fgroup, 'grouping' => $grouping, 'status' => $status, 'sifirst' => $firstinitial, 'silast' => $lastinitial));
 
 $table->set_fields($fields, $renderer);
 

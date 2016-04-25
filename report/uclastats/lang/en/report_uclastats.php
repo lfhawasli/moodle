@@ -45,6 +45,7 @@ $string['subjarea'] = 'Subject area';
 $string['threshold'] = 'Threshold';
 $string['startdate'] = 'Start date';
 $string['enddate'] = 'End date';
+$string['academicyear'] = 'Academic year';
 
 // Cached results strings.
 $string['cached_results_table'] = 'Cached results';
@@ -305,10 +306,32 @@ $string['logins_by_division_help'] = 'Reports number of logins to IEI course ' .
         'out. Please see CCLE-4844 for more details.';
 $string['logins'] = 'Logins';
 
+// Strings for Top courses by divsion.
+$string['topcourses'] = 'Top courses (division)';
+$string['topcourses_help'] = 'Lists the top ten courses for each '
+        . 'division ranked by the number of student activity divided by the '
+        . 'number of students. For each of these courses, the number and types '
+        . 'of activities will be listed. Please see CCLE-5808 for more details.';
+
+// Strings for Moodle usage.
+$string['moodle_usage'] = 'Moodle usage';
+$string['moodle_usage_help'] = 'Reports number of courses for a full academic ' .
+        'year based on the four categories: Undergraduate, Graduate, Summer ' .
+        'Session, and Administrative. Each academic year runs from Summer to ' .
+        'Spring. Summer session courses are not included in either ' .
+        'Undergraduate or Graduate categories. Administrative courses are ' .
+        'included in the report if they were created either during or before ' .
+        'the given academic year.';
+$string['undergraduate'] = "Undergraduate";
+$string['graduate'] = "Graduate";
+$string['summer'] = "Summer Session";
+$string['administrative'] = "Administrative";
+
 // Error strings.
 $string['nocachedresults'] = 'No cached results found';
 $string['invalidterm'] = 'Invalid term';
 $string['invalidreport'] = 'Invalid report';
+$string['invalidacademicyear'] = 'Invalid academic year';
 $string['resultnotbelongtoreport'] = 'Requested result does not belong to current report';
 
 // Strings for unit testing.
