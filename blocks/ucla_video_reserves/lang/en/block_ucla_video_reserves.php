@@ -30,6 +30,7 @@ $string['errorinvalidvideo'] = 'Cannot find given video.';
 $string['errorpermission'] = 'You do not have permission to view this video.';
 $string['eventindexviewed'] = 'Index viewed';
 $string['eventvideoviewed'] = 'Video viewed';
+$string['fallbackurl'] = 'Click here if experiencing video playback issues';
 $string['futurevideo'] = 'Future videos';
 $string['futurevideo_info'] = 'Will be available on {$a}';
 $string['intro'] = 'Please note that this media is intended for on-campus use only.

@@ -54,7 +54,7 @@ class filter_oidwowza extends moodle_text_filter {
         $newtext = $text;
 
         if ($CFG->filter_oidwowza_enable_mp4) {
-            $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
+            $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
             $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_callback', $newtext);
         }
 
@@ -136,6 +136,10 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $file   = clean_param($link[3], PARAM_NOTAGS);
     $width  = clean_param($link[4], PARAM_INT);
     $height = clean_param($link[5], PARAM_INT);
+    $fallbackurl = clean_param($link[6], PARAM_TEXT);
+    if (!empty($fallbackurl)) {
+        $fallbackurl = urldecode($fallbackurl);
+    }
 
     $app = $COURSE->shortname; // Need to store videos by shortname.
 
@@ -280,6 +284,15 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
                   }]";
     }
 
+    // Provide URL (BruinMedia) fallback, if available.
+    if (!empty($fallbackurl)) {
+        $fallbackurl = html_writer::link($fallbackurl,
+                get_string('fallbackurl', 'block_ucla_video_reserves'),
+                array('class' => 'small'));
+        $fallbackurl = html_writer::div($fallbackurl, 'text-center',
+                array('style' => 'max-width: ' . $width . 'px'));
+    }
+
     // Print out the player output.
     return "
         <div id='player-$playerid'></div>
@@ -300,5 +313,5 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
                     }],
                 primary: 'html5'
 		});
-	</script>" . $timeline;
+	</script>" . $timeline . $fallbackurl;
 }
