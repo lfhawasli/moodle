@@ -69,9 +69,9 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     echo $OUTPUT->heading($video->video_title, 2, 'headingblock');
 
     // Try to embed video on page by calling filter.
-    $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d}',
+    $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
             'rtmpe://' . get_config('block_ucla_video_reserves', 'wowzaurl'),
-            $video->filename, $video->width, $video->height);
+            $video->filename, $video->width, $video->height, urlencode($video->video_url));
     $filter = new filter_oidwowza($context, array());
     $html = $filter->filter($filtertext);
     echo $html;
