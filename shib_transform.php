@@ -48,7 +48,7 @@ if($result['alternatename']) {
     $formattedname = format_displayname($displayname);
     $result['firstname'] = $formattedname['firstname'];
     $result['lastname'] = $formattedname['lastname'];
-    unset($result['middlename']);
+    $result['middlename'] = '';
 
     $pnaction = "set fn, ln to displayName and cleared mn";
 }
@@ -56,14 +56,14 @@ if($result['alternatename']) {
 if(!empty($CFG->namingdebugging)) {
     $filename = $CFG->dataroot . "/namingdebugging.log";
     $time = @date('[d/M/Y:H:i:s]');
-    
+
     file_put_contents($filename,
                 "\n ". $time. " User info: "
-                . "\n fn     = ".(isset($result['firstname']) ? $result['firstname'] : 'N/A')
-                . "\n mn     = ".(isset($result['middlename']) ? $result['middlename'] : 'N/A')
-                . "\n ln     = ".(isset($result['lastname']) ? $result['lastname'] : 'N/A')
+                . "\n fn     = ".(isset($_SERVER['SHIBGIVENNAME']) ? $_SERVER['SHIBGIVENNAME'] : 'N/A')
+                . "\n mn     = ".(isset($_SERVER['SHIBUCLAPERSONMIDDLENAME']) ? $_SERVER['SHIBUCLAPERSONMIDDLENAME'] : 'N/A')
+                . "\n ln     = ".(isset($_SERVER['SHIBSN']) ? $_SERVER['SHIBSN'] : 'N/A')
                 . "\n suffix = ".(!empty($suffix) ? $suffix : 'N/A')
-                . "\n pn     = ".(isset($result['alternatename']) ? $result['alternatename'] : 'N/A')
+                . "\n pn     = ".(isset($_SERVER['SHIBEDUPERSONNICKNAME']) ? $_SERVER['SHIBEDUPERSONNICKNAME'] : 'N/A')
                 . "\n dn     = ".(!empty($displayname) ? $displayname : 'N/A')
                 . "\n Action = ".$pnaction
                 ."\n",
