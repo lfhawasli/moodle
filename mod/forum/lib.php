@@ -3690,8 +3690,29 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
                                                       'aria-label' => $discussionbyuser));
        $output .= html_writer::start_tag('div', array('class'=>'row header clearfix'));
        $output .= html_writer::start_tag('div', array('class'=>'left picture'));
-       $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id));
-       $output .= html_writer::end_tag('div');
+        // START UCLA MOD: CCLE-5696 Enlarge forum profile pictures
+        //$output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id));
+        $devicetype = core_useragent::get_device_type();
+        if ($devicetype == 'mobile' || $devicetype == 'tablet') {
+            $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id, 'size'=>70));
+        } else {
+            $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id, 'size'=>105));
+        }
+
+        $output .= html_writer::start_tag('div', array('class'=>'left'));
+
+        $groupoutput = '';
+        if ($groups) {
+            $groupoutput = print_group_picture($groups, $course->id, false, true, true);
+        }
+        if (empty($groupoutput)) {
+            $groupoutput = '&nbsp;';
+        }
+        $output .= html_writer::tag('div', $groupoutput, array('class'=>'grouppictures'));
+
+        $output .= html_writer::end_tag('div'); // Left side.
+        // END UCLA MOD: CCLE-5696 Enlarge forum profile pictures
+        $output .= html_writer::end_tag('div');
     }
 
   
@@ -3718,6 +3739,10 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $output .= html_writer::end_tag('div'); //row
 
     $output .= html_writer::start_tag('div', array('class'=>'row maincontent clearfix'));
+    // START UCLA MOD: CCLE-5696 Enlarge forum profile pictures
+    // Moved code above so group pictures will still be displayed directly under
+    // the enlarged profile pictures.
+    /*
     $output .= html_writer::start_tag('div', array('class'=>'left'));
 
     $groupoutput = '';
@@ -3730,6 +3755,8 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $output .= html_writer::tag('div', $groupoutput, array('class'=>'grouppictures'));
 
     $output .= html_writer::end_tag('div'); //left side
+    */
+    // END UCLA MOD: CCLE-5696 Enlarge forum profile pictures
     $output .= html_writer::start_tag('div', array('class'=>'no-overflow'));
     $output .= html_writer::start_tag('div', array('class'=>'content'));
     if (!empty($attachments)) {
@@ -3769,7 +3796,9 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $output .= html_writer::end_tag('div'); // Row
 
     $output .= html_writer::start_tag('div', array('class'=>'row side'));
-    $output .= html_writer::tag('div','&nbsp;', array('class'=>'left'));
+    // START UCLA MOD: CCLE-5696 Enlarge forum profile pictures
+    //$output .= html_writer::tag('div','&nbsp;', array('class'=>'left'));
+    // END UCLA MOD: CCLE-5696 Enlarge forum profile pictures
     $output .= html_writer::start_tag('div', array('class'=>'options clearfix'));
 
     // Output ratings

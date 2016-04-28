@@ -28,10 +28,31 @@
     /*box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);*/
     @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
     
-        .row {
-            margin-left: 0;
-            margin-right: 0;
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+
+        .left {
+            width: 113px;
         }
+        .topic {
+            margin-left: 113px;
+        }
+        .options {
+            margin-left: 113px;
+        }
+        @media (max-width: 1000px) {
+            .left {
+            width: 78px;
+            }
+            .topic {
+                margin-left: 78px;
+            }
+            .options {
+                margin-left: 78px;
+            }
+        }
+    }
     // Modify the header
     .topic {
         padding: 8px;
@@ -53,7 +74,7 @@
     }
     .content {
         .posting {
-            padding: 0 8px;
+            padding: 0 16px;
         }
     }
     .options {
@@ -70,6 +91,10 @@
         
         .topic {
             background-color: white;
+            margin-left: 113px;
+            @media (max-width: 1000px) {
+                margin-left: 78px;
+            }
         }
         .subject {
             font-size: 2.5rem;
