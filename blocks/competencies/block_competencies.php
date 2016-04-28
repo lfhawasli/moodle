@@ -72,6 +72,15 @@ class block_competencies extends block_list {
     }
     
     /**
+     * Competencies block has configurable settings.
+     *
+     * @return boolean
+     */
+    function has_config() {
+        return true;
+    }
+
+    /**
      * Only allow one copy of this block per course.
      * 
      * @return false
