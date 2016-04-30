@@ -262,7 +262,7 @@ class block_ucla_tasites extends block_base {
                     foreach ($tainfo['secsrs'] as $secnum => $secinfo) {
                         $secnums[] = self::format_sec_num($secnum);
                         foreach ($secinfo as $srs) {
-                            $srsarray[$secnum] = $srs;
+                            $srsarray[] = $srs;
                         }
                     }
                 }
@@ -288,31 +288,8 @@ class block_ucla_tasites extends block_base {
         $trace->finished();
 
         if (!empty($srsarray)) {
-            // For the new TA site, create a special grouping based on sections.
-            // Create grouping.
-            $tasitegrouping = new stdClass();
-            $tasitegrouping->name = get_string('tasitegroupingname', 'block_ucla_tasites');
-            $tasitegrouping->idnumber = self::GROUPINGID;
-            $tasitegrouping->courseid = $newcourse->id;
-            $tasitegrouping->id = groups_create_grouping($tasitegrouping);
-
-            // Find matching groups in TA site matching section groups.
-            // The local_metagroups_sync function sets the idnumber for
-            // groups in the TA site to match the group ids in the parent.
-            list($sqlidnumber, $params) = $DB->get_in_or_equal($srsarray);
-            $params[] = $newcourse->id;
-            $sql = "SELECT child.id
-                       FROM {groups} parent
-                       JOIN {groups} child
-                      WHERE parent.idnumber $sqlidnumber
-                            AND child.idnumber=parent.id
-                            AND child.courseid=?";
-            $tasitegroups = $DB->get_fieldset_sql($sql, $params);
-
-            // Add these groups to the $tasitegrouping.
-            foreach ($tasitegroups as $groupid) {
-                groups_assign_grouping($tasitegrouping->id, $groupid);
-            }
+            $tasitegrouping = self::create_taspecificgrouping($parentcourse->id,
+                    $newcourse->id, $srsarray);
 
             // Do we need to restrict this site?
             if ($restrictgrouping) {
@@ -325,6 +302,48 @@ class block_ucla_tasites extends block_base {
         forum_delete_instance($newsforum->id);
 
         return $newcourse;
+    }
+
+    /**
+     * For TA site, create a special grouping based on sections.
+     *
+     * @param int $parentcourseid   Parent course id.
+     * @param int $childcourseid    TA course id.
+     * @param array $srsarray       Array of SRS numbers.
+     *
+     * return object    Returns the newly created grouping record.
+     */
+    public static function create_taspecificgrouping($parentcourseid, $childcourseid, $srsarray) {
+        global $DB;
+
+        // Create grouping.
+        $tasitegrouping = new stdClass();
+        $tasitegrouping->name = get_string('tasitegroupingname', 'block_ucla_tasites');
+        $tasitegrouping->idnumber = self::GROUPINGID;
+        $tasitegrouping->courseid = $childcourseid;
+        $tasitegrouping->id = groups_create_grouping($tasitegrouping);
+
+        // Find matching groups in TA site matching section groups.
+        // The local_metagroups_sync function sets the idnumber for
+        // groups in the TA site to match the group ids in the parent.
+        list($sqlidnumber, $params) = $DB->get_in_or_equal($srsarray);
+        $params[] = $childcourseid;
+        $params[] = $parentcourseid;
+        $sql = "SELECT child.id
+                   FROM {groups} parent
+                   JOIN {groups} child
+                  WHERE parent.idnumber $sqlidnumber
+                        AND child.idnumber=parent.id
+                        AND child.courseid=?
+                        AND parent.courseid=?";
+        $tasitegroups = $DB->get_fieldset_sql($sql, $params);
+
+        // Add these groups to the $tasitegrouping.
+        foreach ($tasitegroups as $groupid) {
+            groups_assign_grouping($tasitegrouping->id, $groupid);
+        }
+
+        return $tasitegrouping;
     }
 
     /**
@@ -820,8 +839,18 @@ class block_ucla_tasites extends block_base {
                         continue;
                     }
 
+                    $sitebelongstota = false;
                     $taowners = explode(',', $tasite->enrol->ta_uclaids);
                     if (in_array($instructor->idnumber, $taowners)) {
+                        $sitebelongstota = true;
+                    } else if (empty($tasite->enrol->ta_uclaids) &&
+                            $tasite->enrol->createrid == $iid) {
+                        // Used for legacy TA sites.
+                        $sitebelongstota = true;
+                    }
+
+                    // TA site belongs to user.
+                    if ($sitebelongstota) {
                         if (!empty($appendedinstdata[$ik]['tasite'])) {
                             $appendedinstdata[$ik]['tasite'] .= '<br />';
                         }
