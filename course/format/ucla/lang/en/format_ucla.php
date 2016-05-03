@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -72,18 +71,17 @@ $string['subheading'] = 'Add subheading';
 $string['coursedownload'] = 'Download course materials';
 $string['coursedownload_help'] = 'Download is enabled by default. '
         . 'If you do not want the students to be able to download the files in a single zip file, '
-        . 'click "No". This feature is available to students beginning one week before the course ends.';
+        . 'click "No". This feature is available to students as long as they have access to the course.';
 
 // CCLE-5741 - Suppress out of term message for SRS courses
 $string['enableoutoftermmessage'] = 'Enable out of term message';
 $string['enableoutoftermmessage_help'] = 'Enable the message "You are now '
         . 'viewing a course that is no longer in session" to display when a '
         . 'course is out of session.';
-        . 'click "No". This feature is available to students as long as they have access to the course.';
 
 // CCLE-5618 - TA site creation content configurable
 $string['createtasite'] = 'Enable TA site creation';
 $string['createtasite_help'] = 'TA site creation is enabled by default. '
         . 'If you do not want the TAs to be able to create the TA sites, '
         . 'click "No". This feature is available for TAs';
-        
+
