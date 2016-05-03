@@ -149,6 +149,9 @@ class tasites_form extends moodleform {
                     get_string('tasectionchoiceentire', 'block_ucla_tasites'), 'all');
             $mform->addGroup($choicearray, 'tasectionchoicegroup', '', '<br />', false);
             $mform->addRule('tasectionchoicegroup', null, 'required');
+        } else {
+            $mform->addElement('static', 'bytanosectionsnote', '',
+                get_string('bytanosectionsnote', 'block_ucla_tasites'));
         }
 
         $mform->addElement('hidden', 'byta', $USER->idnumber);

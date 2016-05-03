@@ -624,7 +624,7 @@ class block_ucla_tasites extends block_base {
         $taroleid = self::get_ta_role_id();
         $taadminroleid = self::get_ta_admin_role_id();
 
-        return $DB->get_records_sql("SELECT u.id, u.idnumber
+        return $DB->get_records_sql("SELECT DISTINCT u.id, u.idnumber
             FROM {role_assignments} ra
             JOIN {user} u ON ra.userid = u.id
             WHERE ra.contextid = ? AND (ra.roleid = ? OR ra.roleid = ?)",

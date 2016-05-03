@@ -206,11 +206,8 @@ if ($tasitesform->is_cancelled()) {
         }
     }
 
-    // Do not show "No existing TA sites." if user is TA.
-    if (!empty($tasites) && !$ista) {
-        $output = $PAGE->get_renderer('block_ucla_tasites');
-        echo $output->render_tasites($tasites);
-    }
+    $output = $PAGE->get_renderer('block_ucla_tasites');
+    echo $output->render_tasites($tasites);
 
     if (block_ucla_tasites::can_make_tasite($USER, $course->id)) {
         // Display form to process.

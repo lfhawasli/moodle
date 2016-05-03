@@ -132,8 +132,7 @@ class block_ucla_tasites_renderer extends plugin_renderer_base {
     public function render_tasites($tasites) {
         $retval = '';
         if (empty($tasites)) {
-            return $this->output->notification(get_string('noexistingtasites',
-                    'block_ucla_tasites'), 'notifymessage');
+            return $retval;
         }
 
         $retval .= $this->output->heading(get_string('viewtasites', 'block_ucla_tasites'), 3);
