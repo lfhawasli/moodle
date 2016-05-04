@@ -156,7 +156,7 @@ $('#adminsettings').submit(function(e){
         data: postData,
         cache: false
     }).done(function(response){
-        if(response == "true")
+        if(response == true)
             location.reload()
         else
             printMessage('error', 'ERROR: Could not save competencies. Please ensure that all keys are unique.')

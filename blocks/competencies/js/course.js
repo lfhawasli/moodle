@@ -35,7 +35,7 @@ $('.region-content form').submit(function(e){
         data: postData,
         cache: false
     }).done(function(response){
-        if(response == "true")
+        if(response == true)
             form.submit()
         else
             printMessage('error', 'ERROR: Could not save course competencies.')

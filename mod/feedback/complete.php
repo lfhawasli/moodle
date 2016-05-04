@@ -151,6 +151,9 @@ if ($course->id == SITEID) {
     $PAGE->set_pagelayout('incourse');
 }
 
+// START UCLA MOD: CCLE-5844 - Fix JQuery issues for competencies block
+$PAGE->requires->jquery();
+// END UCLA MOD: CCLE-5844
 $PAGE->navbar->add(get_string('feedback:complete', 'feedback'));
 $urlparams = array('id'=>$cm->id, 'gopage'=>$gopage, 'courseid'=>$course->id);
 $PAGE->set_url('/mod/feedback/complete.php', $urlparams);

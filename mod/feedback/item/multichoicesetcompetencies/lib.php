@@ -155,7 +155,7 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
         }
         $highlight = '';
         if ($highlightrequire AND $item->required) {
-            if (count($values) == 0 OR $values[0] == '' OR $values[0] == 0) {
+            if (count($values) == 0) {
                 $highlight = ' missingrequire';
             }
         }
@@ -200,7 +200,7 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
                         // if (!$value) {
                             // $checked = 'checked="checked"';
                         // }
-                        if (count($values) == 0 OR $values[0] == '' OR $values[0] == 0) {
+                        if (count($values) == 0) {
                             $checked = 'checked="checked"';
                         }
                         echo '<input type="radio" '.
@@ -226,7 +226,7 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
 
         }
         echo '</div>';
-        echo '<textarea name="'.$item->typ.'_'.$item->id.'" id="'.$item->typ.'_'.$item->id.'" style="display:none;"></textarea>';
+        echo '<textarea name="'.$item->typ.'_'.$item->id.'" id="'.$item->typ.'_'.$item->id.'" style="display:none;">'.json_encode($value, JSON_FORCE_OBJECT).'</textarea>';
         ?>
         <script type="text/javascript">
         $('#multichoice_set-<?php echo $item->id; ?> input').change(function(){
@@ -357,26 +357,28 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
     }
 
     public function clean_input_value($value) {
-        if ($value == '')
-            $value = array();
-
-        return clean_param_array($value, $this->value_type());
+        return clean_param_array(json_decode($value, true), $this->value_type());
     }
 
     public function check_value($value, $item) {
         global $COURSE;
 
-        if ($value == '')
+        $info = $this->get_info($item);
+        if ($item->required != 1) {
             return true;
+        }
 
-        $competencies = block_competencies_db::get_course_items($COURSE->id);
-        $obj = json_decode($value, true);
-
-        if (count(array_diff(array_keys($obj), array_keys($competencies)))) {
+        if (!$value) {
             return false;
         }
 
-        if (json_encode($obj) != $value) {
+        $competencies = block_competencies_db::get_course_items($COURSE->id);
+        $obj = $value;
+        if (count(array_diff(array_keys($competencies), array_keys($obj)))) {
+            return false;
+        }
+
+        if ($obj != $value) {
             return false;
         }
 
@@ -455,8 +457,8 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
         }
 
         foreach ($presentation as $radio) {
-            foreach ($values as $val) {
-                if ($val == $index) {
+            foreach ($values as $competencyid => $val) {
+                if ($competencyid == $competency->id && $val == $index) {
                     $checked = 'checked="checked"';
                     break;
                 } else {

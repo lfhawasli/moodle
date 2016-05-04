@@ -26,12 +26,17 @@ class block_competencies extends block_list {
     function init() {
         
         global $PAGE;
-        $PAGE->requires->js(new moodle_url('/blocks/competencies/js/jquery.js'));
         
         $this->title = get_string('title', 'block_competencies');
         
     }
     
+    function get_required_javascript() {
+        parent::get_required_javascript();
+
+        $this->page->requires->jquery();
+    }
+
     /**
      * Content generator for Competencies block
      * 
