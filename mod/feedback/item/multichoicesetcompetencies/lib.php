@@ -61,11 +61,12 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
         $align = right_to_left() ? 'right' : 'left';
 
         $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $requiredmarkstr = '<span class="feedback_required_mark">*</span>';
+        $strrequiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
+            get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
 
         // Test if required and no value is set so we have to mark this item
         // we have to differ check and the other subtypes.
-        $requiredmark = ($item->required == 1) ? $requiredmarkstr : '';
+        $requiredmark = ($item->required == 1) ? $strrequiredmark : '';
 
         // Print the question and label.
         echo '<div class="feedback_item_label_'.$align.'">';
@@ -143,45 +144,38 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
             $value = array();
         }
         $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $requiredmarkstr = '<span class="feedback_required_mark">*</span>';
+        $strrequiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
+            get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
 
         // Test if required and no value is set so we have to mark this item
         // we have to differ check and the other subtypes.
-        // if ($info->subtype == 'c') {
         if (is_array($value)) {
             $values = $value;
         } else {
             $values = explode(FEEDBACK_MULTICHOICE_LINE_SEP, $value);
         }
-        $highlight = '';
-        if ($highlightrequire AND $item->required) {
-            if (count($values) == 0) {
-                $highlight = ' missingrequire';
-            }
-        }
-        $requiredmark = ($item->required == 1) ? $requiredmarkstr : '';
-        // } else {
-            // if ($highlightrequire AND $item->required AND intval($value) <= 0) {
-                // $highlight = ' missingrequire';
-            // } else {
-                // $highlight = '';
-            // }
-            // $requiredmark = ($item->required == 1) ? $requiredmarkstr : '';
-        // }
+        $requiredmark = ($item->required == 1) ? $strrequiredmark : '';
 
         // Print the question and label.
-        echo '<div class="feedback_item_label_'.$align.$highlight.'">';
-            echo format_text($item->name.$requiredmark, true, false, false);
+        $inputname = $item->typ . '_' . $item->id;
+        echo '<div class="feedback_item_label_'.$align.'">';
+        echo format_text($item->name.$requiredmark, true, false, false);
         echo '</div>';
 
         echo '<div id="multichoice_set-'.$item->id.'">';
         foreach (block_competencies_db::get_course_items($COURSE->id) as $competency) {
             // Print the presentation.
-            echo '<div class="feedback_item_presentation_'.$align.$highlight.'" data-competency="'.$competency->id.'">';
+            echo '<div class="feedback_item_presentation_'.$align.'" data-competency="'.$competency->id.'">';
             echo '<div style="padding:6px 0 0 4px;">';
             echo '<strong>'.$competency->name.'</strong>';
-            echo '<a href="#!" data-tooltip="'.str_replace('"', '&quot;', $competency->description).'"><span class="tooltip-icon"></span></a>';
-            echo '<small class="tooltip-accessible"><br>'.$competency->description.'</small>';
+            echo '<small><br>'.$competency->description.'</small>';
+
+            if ($highlightrequire AND $item->required) {
+                if (count($values) == 0 || !array_key_exists($competency->id, $values)) {
+                    echo '<br class="error"><span id="id_error_'.$inputname.'" class="error"> '.get_string('err_required', 'form').
+                        '</span><br id="id_error_break_'.$inputname.'" class="error" >';
+                }
+            }
             echo '</div>';
 
             echo '<ul>';
@@ -197,10 +191,7 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
                     <span class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
                         <?php
                         $checked = '';
-                        // if (!$value) {
-                            // $checked = 'checked="checked"';
-                        // }
-                        if (count($values) == 0) {
+                        if (count($values) == 0 || !array_key_exists($competency->id, $values)) {
                             $checked = 'checked="checked"';
                         }
                         echo '<input type="radio" '.
@@ -239,7 +230,12 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
                 jsonObject = JSON.parse(textareaEle.val())
             }catch(e){}
             
-            jsonObject[competencyId] = value
+            if (value == "") {
+                delete jsonObject[competencyId];
+            }
+            else {
+                jsonObject[competencyId] = value
+            }
             textareaEle.val(JSON.stringify(jsonObject))
         })
         </script>
@@ -330,11 +326,14 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
     public function print_item_show_value($item, $value = '') {
         global $OUTPUT;
         $align = right_to_left() ? 'right' : 'left';
-        $requiredmarkstr = '<span class="feedback_required_mark">*</span>';
 
         $info = $this->get_info($item);
         $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $requiredmark = ($item->required == 1) ? $requiredmarkstr : '';
+        $requiredmark = '';
+        if ($item->required == 1) {
+            $requiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
+                get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
+        }
 
         // Print the question and label.
         echo '<div class="feedback_item_label_'.$align.'">';
