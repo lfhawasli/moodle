@@ -26,14 +26,13 @@
 require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
-$pnaction = '';
-$tempdispname = '';
+$pnaction = $tempdispname = '';
 $displayname = array();
 if (isset($_SERVER['SHIBDISPLAYNAME'])) {
     $displayname = $this->get_first_string($_SERVER['SHIBDISPLAYNAME']);
 }
 
-if ($result['alternatename']) {
+if (!empty($result['alternatename'])) {
     // Handle suffix by appending it to last name.
     if (isset($_SERVER['SHIBUCLAPERSONNAMESUFFIX'])) {
         $suffix = $this->get_first_string(
@@ -41,19 +40,49 @@ if ($result['alternatename']) {
         );
         $result['lastname'] .= ' ' . $suffix;
     }
-    $pnaction = "set alternateName to preferredName";
+    $pnaction = "set alternatename was set";
 } else if (!empty($displayname)) {
+    $firstname  = $result['firstname'];
+    $middlename = $result['middlename'];
+    $lastname   = $result['lastname'];
+
     // Handle user info when display name is chosen.
     $tempdispname = trim($result['lastname'] . ", " . $result['firstname'] . " " . $result['middlename']);
     if (core_text::strtoupper($displayname) !== core_text::strtoupper($tempdispname)) {
-        $formattedname = format_displayname($displayname);
-        $result['firstname'] = $formattedname['firstname'];
-        $result['lastname'] = $formattedname['lastname'];
-        $result['middlename'] = '';
+        $formattedname  = format_displayname($displayname);
+        $firstname      = $formattedname['firstname'];
+        $lastname       = $formattedname['lastname'];
+        $middlename     = '';
         $pnaction = "set fn, ln to displayName and cleared mn";
     } else {
         $pnaction = "displayName equals ln, fn mn. Name unchanged.";
     }
+
+    // Check special cases.
+    if (isset($result['idnumber']) && !empty($result['idnumber'])) {
+        $specialcase = false;
+        switch ($result['idnumber']) {
+            case '900804617':
+                $firstname = 'MI KYUNG';
+                $middlename = '';
+                $specialcase = true;
+                break;
+            case '902840840':
+                $firstname = 'SHAREE BANTAD';
+                $middlename = '';
+                $specialcase = true;
+                break;
+        }
+
+        if ($specialcase) {
+            $pnaction = 'Special case found';
+        }
+    }
+
+    // Set names.
+    $result['firstname'] = $firstname;
+    $result['middlename'] = $middlename;
+    $result['lastname'] = $lastname;
 }
 
 if (!empty($CFG->namingdebugging)) {
@@ -68,6 +97,7 @@ if (!empty($CFG->namingdebugging)) {
             . "\n pn     = " . (isset($_SERVER['SHIBEDUPERSONNICKNAME']) ? $_SERVER['SHIBEDUPERSONNICKNAME'] : 'N/A')
             . "\n dn     = " . (!empty($displayname) ? $displayname : 'N/A')
             . "\n tempdn = " . (!empty($tempdispname) ? $tempdispname : 'N/A')
+            . "\n result (ln,fn,mn) = " . trim('|' . $result['lastname'] . '|' . $result['firstname'] . '|' . $result['middlename'] . '|')
             . "\n Action = " . $pnaction
             . "\n", FILE_APPEND);
 }
