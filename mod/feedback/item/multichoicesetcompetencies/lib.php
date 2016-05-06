@@ -281,7 +281,7 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
                 $ans->answertext = $competency->name . ' - ' . trim($answers[$i - 1]);
                 $ans->answercount = 0;
                 foreach ($values as $value) {
-                    if ($value[$competency->id] == $i) {
+                    if (array_key_exists($competency->id, $value) && $value[$competency->id] == $i) {
                         $ans->answercount++;
                     }
                 }
