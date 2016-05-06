@@ -1,0 +1,104 @@
+.block_competencies .control {
+    display: block;
+}
+
+.block_competencies .control.edit {
+    font-style: italic;
+}
+
+.block_competencies .unlist li {
+    text-align: center;
+}
+
+.competency-edit-list.available .remove {
+    display: none;
+}
+
+.competency-edit-list.existing .add {
+    display: none;
+}
+
+#adminsettings .block_competencies_sets {
+     list-style: none;
+}
+
+#adminsettings .block_competencies_sets > li {
+     list-style: none;
+     margin-bottom: 10px;
+     padding-bottom: 10px;
+     border-bottom: 1px solid #bbb;
+}
+
+#adminsettings .block_competencies_sets > li > div > input {
+     margin-bottom: 10px;
+}
+
+#adminsettings .block_competencies_sets .block_competencies_items {
+     list-style: none;
+}
+
+#adminsettings .block_competencies_sets .block_competencies_items li {
+    overflow: auto;
+}
+
+#adminsettings .block_competencies_sets .block_competencies_items div div {
+    float: left;
+    padding-right: 10px;
+}
+
+#adminsettings .block_competencies_sets label, #adminsettings .block_competencies_sets .label {
+    display: block;
+    font-weight: bold;
+}
+
+#adminsettings .block_competencies_sets textarea {
+    width: 380px;
+    height: 40px;
+}
+
+#adminsettings .block_competencies_sets .controls {
+    position: relative;
+    padding-top: 15px;
+    width: 45px;
+    height: 15px;
+}
+
+#adminsettings .block_competencies_sets .controls > div, #adminsettings .block_competencies_sets .delete-category-control {
+    position: absolute;
+    cursor: pointer;
+}
+
+#adminsettings .block_competencies_sets .move_up {
+    left: 0;
+}
+
+#adminsettings .block_competencies_sets .move_down {
+    left: 15px;
+}
+
+#adminsettings .block_competencies_sets .delete {
+    font-size: 16px;
+    left: 30px;
+}
+
+#adminsettings .block_competencies_sets > li:first-child .block_competencies_items li:first-child .move_up,
+#adminsettings .block_competencies_sets > li:last-child .block_competencies_items li:last-child .move_down{
+    display: none;
+}
+
+#block_competencies_message {
+    text-align: center;
+    font-weight: bold;
+}
+
+#block_competencies_message.success {
+    color: #090;
+}
+
+#block_competencies_message.error {
+    color: #a00;
+}
+
+#adminsettings .block_competencies_sets .create-control, #adminsettings .create-category-control {
+    margin-left: 20px;
+}
