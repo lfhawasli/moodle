@@ -48,8 +48,8 @@
  * The week begins when instruction begins.  In Fall, we account for week 0.
  * The week can also be represented in some transient state. 
  * 
- *                      {winter}                                         {spring}
- *    | between_session | 1 | ... | 9 | finals_week | between_session | 1 | 2 | ...
+ *                      {winter}                                           {spring}
+ *    | between_session | 1 | ... | 9 | 10 | finals_week | between_session | 1 | 2 | ...
  * 
  * 
  * 
@@ -82,7 +82,7 @@ abstract class block_ucla_weeksdisplay_session {
         $this->quarter = substr($this->term, -1);
 
         // Format today's date to something like 2014-09-22.
-        $this->today = new DateTime();
+        $this->set_today(new DateTime());
         $this->clean_session_properties();
     }
 
@@ -115,15 +115,19 @@ abstract class block_ucla_weeksdisplay_session {
      * @return int number of weeks.
      */
     public function weeks_in_session() {
-
-        $start = new DateTime($this->session->session_start);
+        $start = new DateTime($this->session->instruction_start);
         $end = new DateTime($this->session->session_end);
+
+        // Count number of Mondays from instruction start to session end.
+        // Round start to next Monday, end to previous Monday.
+        $start->modify('Monday');
+        $end->modify('previous Monday');
 
         // Difference of days between session start and session end 
         // will tell us how many weeks for session.
         $diff = $end->diff($start);
 
-        $weeks = intval(floor($diff->days / 7));
+        $weeks = intval(round($diff->days / 7)) + 1;
 
         return $weeks;
     }
@@ -135,12 +139,16 @@ abstract class block_ucla_weeksdisplay_session {
      * @return type
      */
     protected function max_weeks_in_session() {
-        $start = new DateTime($this->session->session_start);
+        $start = new DateTime($this->session->instruction_start);
         $end = new DateTime($this->session->term_end);
+
+        // Count number of Mondays from instruction start to term end.
+        $start->modify('Monday');
+        $end->modify('previous Monday');
 
         $diff = $end->diff($start);
 
-        $weeks = intval(floor($diff->days / 7));
+        $weeks = intval(round($diff->days / 7)) + 1;
 
         return $weeks + 1;
     }
@@ -204,6 +212,7 @@ abstract class block_ucla_weeksdisplay_session {
      * @param type $today
      */
     public function set_today(DateTime $today) {
+        $today->setTime(0, 0, 0);
         $this->today = $today;
     }
 
@@ -233,7 +242,7 @@ abstract class block_ucla_weeksdisplay_session {
      */
     public function session_started() {
         $sessionstart = new DateTime($this->session->session_start);
-        return ($this->today > $sessionstart);
+        return ($this->today >= $sessionstart);
     }
 
     /**
@@ -264,7 +273,7 @@ abstract class block_ucla_weeksdisplay_session {
     public function in_session() {
         $sessionstart = new DateTime($this->session->session_start);
         $sessionend = new DateTime($this->session->session_end);
-        return ($this->today >= $sessionstart && $this->today < $sessionend);
+        return ($this->today >= $sessionstart && $this->today <= $sessionend);
     }
 
     /**
@@ -375,7 +384,7 @@ abstract class block_ucla_weeksdisplay_session {
                 return new \block_ucla_weeksdisplay_regular_session((object) $ses);
 
                 // Summer session.
-            } else if ($ses['session'] === '6A' || $ses['session'] === '6C' || $ses['session'] === '8A') {
+            } else if (in_array($ses['session'], \block_ucla_weeksdisplay_summer_session::$sessioncodes)) {
                 return new \block_ucla_weeksdisplay_summer_session($session);
             }
         }
@@ -384,9 +393,11 @@ abstract class block_ucla_weeksdisplay_session {
     }
 
     /**
-     * Saves configs to database.  Will update the week number, or set error flags.
-     * Will also roll over the term when current term ends.
-     * 
+     * Saves configs to database.  Will update the week number, or set error
+     * flags.
+     *
+     * Will also roll over the term when current session is over 1 week from
+     * when it ended.
      */
     public function save_configs() {
 
@@ -394,13 +405,18 @@ abstract class block_ucla_weeksdisplay_session {
         $this->save_current_week();
 
         // Check if we need to update term.
-        if ($this->term_ended() && $this->current_week() !== self::WEEK_ERR) {
+        if ($this->session_ended() && $this->current_week() !== self::WEEK_ERR) {
+            // We want to wait one week after a session has ended before
+            // switching current term to allow users to access their courses.
+            $sessionend = new DateTime($this->session->session_end);
+            $sessionend->modify('+1 week');
+            if ($this->today > $sessionend) {
+                // Roll over the term.
+                $this->save_next_term();
 
-            // Roll over the term.
-            $this->save_next_term();
-
-            // Update active terms.
-            $this->save_active_terms();
+                // Update active terms.
+                $this->save_active_terms();
+            }
         }
     }
 

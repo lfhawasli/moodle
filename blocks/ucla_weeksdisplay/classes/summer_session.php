@@ -26,19 +26,15 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
 
     private $summersessions = array();
 
-    public function __construct($session) {
+    public static $sessioncodes = array('6A', '8A', '1A', '6C');
 
+    public function __construct($session) {
         $this->summersessions = array();
 
         // Split sessions.  
         foreach ($session as $ses) {
-
-            if ($ses['session'] === '6A') {
-                $this->summersessions['6A'] = (object) $ses;
-            } else if ($ses['session'] === '6C') {
-                $this->summersessions['6C'] = (object) $ses;
-            } else if ($ses['session'] === '8A') {
-                $this->summersessions['8A'] = (object) $ses;
+            if (in_array($ses['session'], static::$sessioncodes)) {
+                $this->summersessions[$ses['session']] = (object) $ses;
             }
         }
 
@@ -47,14 +43,25 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
     }
 
     public function active_weeks() {
-
-        if ($this->session === $this->summersessions['6A']) {
-            return 6;
-        } else if ($this->session === $this->summersessions['6C']) {
-            return 8;
-        } else {
-            return 10;
+        switch (substr($this->session->session, 0, 1)) {
+            case '6': return 6;
+            case '8': return 8;
+            case '1': return 10;
+            default: return 0;
         }
+    }
+
+    /**
+     * No finals week in summer.
+     *
+     * @return string
+     */
+    public function current_week() {
+        $week = parent::current_week();
+        if ($week == \block_ucla_weeksdisplay_session::WEEK_FINALS) {
+            $week = parent::weeks_in_session();
+        }
+        return $week;
     }
 
     public function update_week_display() {
@@ -68,9 +75,14 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
 
         $out = array();
 
-        foreach ($this->summersessions as $session) {
+        // Loop through sessions in order.
+        foreach (static::$sessioncodes as $sessioncode) {
+            if (empty($this->summersessions[$sessioncode])) {
+                continue;
+            }
+
             // Switch the inner session.
-            $this->session = $session;
+            $this->session = $this->summersessions[$sessioncode];
 
             if ($this->in_session()) {
 
@@ -78,11 +90,13 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
                 $weekstring = $this->string_for_week();
 
                 $renderable = new ucla_week($termstring, $weekstring);
-                $out[] = $renderer->render($renderable);
+                $string = $renderer->render($renderable);
+                // Only display identical weekstrings once.
+                $out[$string] = 1;
             }
         }
 
-        $content = implode(' | ', $out);
+        $content = implode(' | ', array_keys($out));
         $this->renderedweek = $renderer->display_wrapper($content, $this->quarter_name());
 
         // Save to config.
@@ -98,16 +112,9 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
     public function string_for_quarter() {
         $quarter = parent::string_for_quarter();
 
-        $session = '';
-        if ($this->session === $this->summersessions['6A']) {
-            $session = 'Session A';
-        } else if ($this->session === $this->summersessions['6C']) {
-            $session = 'Session C';
-        } else {
-            $session = 'Session 8A'; // ???
-        }
+        $session = substr($this->session->session, 1, 1);
 
-        return $quarter . ' - ' . $session;
+        return $quarter . ' - Session ' . $session;
     }
 
     /**
@@ -116,16 +123,39 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
      *  Either "a" or "c". 
      */
     public function save_current_week() {
-        
-        parent::save_current_week();
-        
-        $session = 'c';
-        if ($this->session === $this->summersessions['6A']) {
-            $session = 'a';
-        } else if ($this->session === $this->summersessions['6C']) {
-            $session = 'c';
+        $currentweek = array(
+            'A' => \block_ucla_weeksdisplay_session::WEEK_ERR,
+            'C' => \block_ucla_weeksdisplay_session::WEEK_ERR
+        );
+        foreach ($this->summersessions as $session) {
+            $this->session = $session;
+            $week = &$currentweek[substr($session->session, 1, 1)];
+            $sessionweek = $this->current_week();
+
+            switch ($sessionweek) {
+                case \block_ucla_weeksdisplay_session::WEEK_ERR:
+                    break;
+
+                case \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION:
+                    if ($week == \block_ucla_weeksdisplay_session::WEEK_ERR) {
+                        $week = $sessionweek;
+                    }
+                    break;
+
+                default:
+                    $week = $sessionweek;
+            }
         }
-        
-        set_config('current_week_summer' . $session, $this->current_week(), 'local_ucla');
+
+        // CCLE-2307: "if weeks overlap, like in summer, choose highest number":
+        // use session A until it is over.
+        if ($currentweek['A'] != \block_ucla_weeksdisplay_session::WEEK_ERR
+                && $currentweek['A'] != \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
+            set_config('current_week', $currentweek['A'], 'local_ucla');
+        } else {
+            set_config('current_week', $currentweek['C'], 'local_ucla');
+        }
+        set_config('current_week_summera', $currentweek['A'], 'local_ucla');
+        set_config('current_week_summerc', $currentweek['C'], 'local_ucla');
     }
 }
