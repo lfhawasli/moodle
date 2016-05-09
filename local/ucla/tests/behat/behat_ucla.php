@@ -259,6 +259,12 @@ class behat_ucla extends behat_files {
                         $term = $elementdata['term'];
                     }
                     $param = array('term' => $term);
+
+                    // See if srs was specified.
+                    if (isset($elementdata['srs'])) {
+                        $param['srs'] = $elementdata['srs'];
+                    }
+
                     if (isset($elementdata['fullname'])) {
                         $param['fullname'] = $elementdata['fullname'];
                     }

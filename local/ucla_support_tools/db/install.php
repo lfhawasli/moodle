@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the UCLA support tools plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -128,6 +127,7 @@ function load_tool_uclasupportconsole() {
         5 => 'mediausage',
         6 => 'visiblecontentlist',
         7 => 'unhiddencourseslist',
+        8 => 'modulespertacourse'
     );
     $groups['srdb'] = array(
         0 => 'enrollview',
@@ -145,7 +145,8 @@ function load_tool_uclasupportconsole() {
         12 => 'courseregistrardifferences',
         13 => 'showreopenedclasses',
         14 => 'ccle_classcalendar',
-        15 => 'ucla_get_course_srs'
+        15 => 'ucla_get_course_srs',
+        16 => 'ccle_ta_sections'
     );
 
     // Should now have access to $consoles object.

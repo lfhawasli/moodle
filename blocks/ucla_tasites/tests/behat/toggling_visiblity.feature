@@ -1,10 +1,10 @@
-@ucla @block_ucla_tasites @tasite_link @javascript
+@ucla @block_ucla_tasites @tasite_toggling @javascript @testme
 Feature: Link to TA Site
     In order to get to a TA site
     As a user
     I want to find the link next to the TA's name in the office hours block
 
-Scenario: Check if link exists
+Scenario: Hide and show TA site
     Given I am in a ucla environment
     And the following "users" exist:
         | username | firstname | lastname | email       | idnumber  |
@@ -30,5 +30,7 @@ Scenario: Check if link exists
     And I click on "#id_confirmation" "css_element"
     And I press "id_submitbutton"
     And I should see "Successfully created TA site"
-    When I follow the "Site info" section in the ucla site menu
-    Then I should see "View site"
+    When I click on "Hide" "link"
+    Then I should see "Successfully changed visibility to HIDE"
+    When I click on "Show" "link"
+    Then I should see "Successfully changed visibility to VISIBLE"

@@ -35,11 +35,11 @@ require_once($CFG->dirroot . '/group/lib.php');
  */
 class ucla_synced_group {
     /**
-     * Contains term, srs, courseid.
+     * Internal caching mechanism, used when deleting group enrolments.
      *
      * @var array
      */
-    private $sectioninfo;
+    private $membershipids = array();
 
     /**
      * This is the tracked memberships.
@@ -49,18 +49,18 @@ class ucla_synced_group {
     public $memberships = array();
 
     /**
-     * Internal caching mechanism, used when deleting group enrolments.
-     *
-     * @var array
-     */
-    private $membershipids = array();
-
-    /**
      * Memberships that need to be removed.
      *
      * @var array
      */
     private $removedmemberships = array();
+    
+    /**
+     * Contains term, srs, courseid.
+     *
+     * @var array
+     */
+    private $sectioninfo;
 
     /**
      * Creates a new tracked group.
@@ -72,6 +72,7 @@ class ucla_synced_group {
         $this->term = $sectioninfo['term'];
         $this->srs = $sectioninfo['srs'];
         $this->courseid = $sectioninfo['courseid'];
+        $this->idnumber = $this->srs;
 
         $this->sectioninfo = $sectioninfo;
 
@@ -97,6 +98,162 @@ class ucla_synced_group {
     }
 
     /**
+     * Adds user to moodle group and returns ucla_group_members id or false
+     *
+     * @param int $moodleuserid
+     * @return int/bool Returns newly added record id or the existing id.
+     *                  Returns false on an error.
+     */
+    public function create_membership($moodleuserid) {
+        global $DB;
+
+        $groupid = $this->id;
+        groups_add_member($groupid, $moodleuserid);
+
+        // Since the above public function returns nothing, have to go in and
+        // find the group enrolment.
+        $groupmember = $DB->get_record('groups_members',
+            array('groupid' => $groupid, 'userid' => $moodleuserid));
+        if (!$groupmember) {
+            return false;
+        }
+
+        return self::new_membership($groupmember->id);
+    }
+
+    /**
+     * Delete member from group.
+     *
+     * @param int $membershipid
+     */
+    public static function delete_membership($membershipid) {
+        global $DB;
+
+        $DB->delete_records('ucla_group_members',
+            array('id' => $membershipid));
+    }
+
+    /**
+     * Gets all the tracked group info.
+     *
+     * @param int $courseid
+     * @return array
+     */
+    public static function get_tracked_groups($courseid) {
+        global $DB;
+
+        return $DB->get_records_sql('
+            SELECT ugs.*, g.name, g.courseid
+              FROM {ucla_group_sections} ugs
+        INNER JOIN {groups} g ON g.id = ugs.groupid
+             WHERE g.courseid = ?', array($courseid));
+    }
+    
+    /**
+     * Gets group memberships, but only those with data about ucla
+     * group membership tracking.
+     *
+     * @param int $groupid
+     * @return array
+     */
+    public static function get_tracked_memberships($groupid) {
+        global $DB;
+
+        return $DB->get_records_sql(
+            'SELECT u.*, ugm.id AS ucla_tracked_id
+               FROM {groups_members} gm
+              INNER JOIN {user} u
+                 ON u.id = gm.userid
+         INNER JOIN {ucla_group_members} ugm
+                 ON ugm.groups_membersid = gm.id
+              WHERE gm.groupid = ?', array($groupid)
+        );
+    }
+
+    /**
+     * Loads group membership.
+     *
+     * @return boolean
+     */
+    public function load() {
+        global $DB;
+
+        $params = array(
+                'term' => $this->term,
+                'srs' => $this->srs,
+                'courseid' => $this->courseid
+            );
+
+        $dbsaved = $DB->get_record_sql('
+            SELECT gr.*, ugs.id AS ucla_group_sections_id
+              FROM {groups} gr
+        INNER JOIN {ucla_group_sections} ugs
+                ON ugs.groupid = gr.id
+             WHERE ugs.term = :term AND
+                   ugs.srs = :srs AND
+                   gr.courseid = :courseid', $params);
+
+        if (!$dbsaved) {
+            return false;
+        }
+
+        foreach ($dbsaved as $field => $val) {
+            if ($field == 'idnumber') {
+                continue;
+            }
+            $this->{$field} = $val;
+        }
+
+        $this->load_members();
+    }
+
+    /**
+     * Loads group members.
+     */
+    public function load_members() {
+        if (!isset($this->id)) {
+            return;
+        }
+
+        $groupmembers = self::get_tracked_memberships($this->id);
+
+        foreach ($groupmembers as $groupmember) {
+            $this->add_membership($groupmember->id,
+                $groupmember->ucla_tracked_id);
+        }
+    }
+    
+    /**
+     * Ensures that record in ucla_group_members exists for given
+     * group member id.
+     *
+     * @param int $groupsmembersid
+     * @return int      Returns newly added record id or the existing id.
+     *                  Returns false on an error.
+     */
+    public static function new_membership($groupsmembersid) {
+        global $DB;
+        $retval = false;
+
+        $tracker = new object();
+        $tracker->groups_membersid = $groupsmembersid;
+
+        try {
+            $retval = $DB->insert_record('ucla_group_members', $tracker);
+        } catch (dml_write_exception $e) {
+            // Found a write exception, must be trying insert a duplicate row,
+            // so record already exists.
+            $record = $DB->get_record('ucla_group_members',
+                    array('groups_membersid' => $tracker->groups_membersid));
+            if (!empty($record)) {
+                $retval = $record->id;
+            }
+        }
+
+        return $retval;
+    }
+
+    /**
      * Remove user from group.
      *
      * @param int $moodleuserid
@@ -105,23 +262,6 @@ class ucla_synced_group {
         if (isset($this->memberships[$moodleuserid])) {
             unset($this->memberships[$moodleuserid]);
             $this->removedmemberships[$moodleuserid] = $moodleuserid;
-        }
-    }
-
-    /**
-     * Sychronize users.
-     *
-     * @param array $moodleusers
-     */
-    public function sync_members($moodleusers) {
-        foreach ($moodleusers as $moouid => $moodleuser) {
-            $this->add_membership($moouid);
-        }
-
-        foreach ($this->memberships as $membership) {
-            if (!isset($moodleusers[$membership])) {
-                $this->remove_membership($membership);
-            }
         }
     }
 
@@ -155,10 +295,9 @@ class ucla_synced_group {
 
             // The name of this won't change...
             $this->name = $namestr;
-
             $this->description = get_string('group_desc',
                 'block_ucla_group_manager', $tsi);
-
+            
             $this->id = groups_create_group($this);
 
             $uclagroupsection = new object();
@@ -209,69 +348,20 @@ class ucla_synced_group {
     }
 
     /**
-     * Delete member from group.
+     * Sychronize users.
      *
-     * @param int $membershipid
+     * @param array $moodleusers
      */
-    public static function delete_membership($membershipid) {
-        global $DB;
+    public function sync_members($moodleusers) {
+        foreach ($moodleusers as $moouid => $moodleuser) {
+            $this->add_membership($moouid);
+        }
 
-        $DB->delete_records('ucla_group_members',
-            array('id' => $membershipid));
-    }
-
-    /**
-     * Ensures that record in ucla_group_members exists for given
-     * group member id.
-     *
-     * @param int $groupsmembersid
-     * @return int      Returns newly added record id or the existing id.
-     *                  Returns false on an error.
-     */
-    public static function new_membership($groupsmembersid) {
-        global $DB;
-        $retval = false;
-
-        $tracker = new object();
-        $tracker->groups_membersid = $groupsmembersid;
-
-        try {
-            $retval = $DB->insert_record('ucla_group_members', $tracker);
-        } catch (dml_write_exception $e) {
-            // Found a write exception, must be trying insert a duplicate row,
-            // so record already exists.
-            $record = $DB->get_record('ucla_group_members',
-                    array('groups_membersid' => $tracker->groups_membersid));
-            if (!empty($record)) {
-                $retval = $record->id;
+        foreach ($this->memberships as $membership) {
+            if (!isset($moodleusers[$membership])) {
+                $this->remove_membership($membership);
             }
         }
-
-        return $retval;
-    }
-
-    /**
-     * Adds user to moodle group and returns ucla_group_members id or false
-     *
-     * @param int $moodleuserid
-     * @return int/bool Returns newly added record id or the existing id.
-     *                  Returns false on an error.
-     */
-    public function create_membership($moodleuserid) {
-        global $DB;
-
-        $groupid = $this->id;
-        groups_add_member($groupid, $moodleuserid);
-
-        // Since the above public function returns nothing, have to go in and
-        // find the group enrolment.
-        $groupmember = $DB->get_record('groups_members',
-            array('groupid' => $groupid, 'userid' => $moodleuserid));
-        if (!$groupmember) {
-            return false;
-        }
-
-        return self::new_membership($groupmember->id);
     }
 
     /**
@@ -282,92 +372,5 @@ class ucla_synced_group {
     public function update() {
         $this->save_memberships();
         return groups_update_group($this);
-    }
-
-    /**
-     * Loads group membership.
-     *
-     * @return boolean
-     */
-    public function load() {
-        global $DB;
-
-        $params = array(
-                'term' => $this->term,
-                'srs' => $this->srs,
-                'courseid' => $this->courseid
-            );
-
-        $dbsaved = $DB->get_record_sql('
-            SELECT gr.*, ugs.id AS ucla_group_sections_id
-              FROM {groups} gr
-        INNER JOIN {ucla_group_sections} ugs
-                ON ugs.groupid = gr.id
-             WHERE ugs.term = :term AND
-                   ugs.srs = :srs AND
-                   gr.courseid = :courseid', $params);
-
-        if (!$dbsaved) {
-            return false;
-        }
-
-        foreach ($dbsaved as $field => $val) {
-            $this->{$field} = $val;
-        }
-
-        $this->load_members();
-    }
-
-    /**
-     * Gets group memberships, but only those with data about ucla
-     * group membership tracking.
-     *
-     * @param int $groupid
-     * @return array
-     */
-    public static function get_tracked_memberships($groupid) {
-        global $DB;
-
-        return $DB->get_records_sql(
-            'SELECT u.*, ugm.id AS ucla_tracked_id
-               FROM {groups_members} gm
-              INNER JOIN {user} u
-                 ON u.id = gm.userid
-         INNER JOIN {ucla_group_members} ugm
-                 ON ugm.groups_membersid = gm.id
-              WHERE gm.groupid = ?', array($groupid)
-        );
-    }
-
-    /**
-     * Gets all the tracked group info.
-     *
-     * @param int $courseid
-     * @return array
-     */
-    public static function get_tracked_groups($courseid) {
-        global $DB;
-
-        return $DB->get_records_sql('
-            SELECT ugs.*, g.name, g.courseid
-              FROM {ucla_group_sections} ugs
-        INNER JOIN {groups} g ON g.id = ugs.groupid
-             WHERE g.courseid = ?', array($courseid));
-    }
-
-    /**
-     * Loads group members.
-     */
-    public function load_members() {
-        if (!isset($this->id)) {
-            return;
-        }
-
-        $groupmembers = self::get_tracked_memberships($this->id);
-
-        foreach ($groupmembers as $groupmember) {
-            $this->add_membership($groupmember->id,
-                $groupmember->ucla_tracked_id);
-        }
     }
 }

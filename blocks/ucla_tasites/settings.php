@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA group management plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA course download plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,19 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Events definitions.
+ * Generates the settings form for the UCLA course download block.
  *
- * @package    block_ucla_group_manager
- * @copyright  2016 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     block_ucla_tasites
+ * @copyright   2016 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$handlers = array(
-    'sync_enrolments_finished' => array(
-        'handlerfile'     => '/blocks/ucla_group_manager/eventslib.php',
-        'handlerfunction' => 'ucla_group_manager_sync_course_event',
-        'schedule'        => 'instant'
-    )
-);
+if ($hassiteconfig && $ADMIN->fulltree) {
+
+    $settings->add(new admin_setting_configcheckbox(
+                'block_ucla_tasites/enablebysection',
+                new lang_string('enablebysection', 'block_ucla_tasites'),
+                new lang_string('enablebysection_desc', 'block_ucla_tasites'),
+                1
+            ));
+
+}

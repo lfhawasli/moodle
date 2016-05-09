@@ -189,6 +189,7 @@ class format_ucla extends format_topics {
                u.firstnamephonetic,
                u.middlename,
                u.alternatename,
+               u.idnumber,
                r.shortname,
                oh.officelocation,
                oh.officehours,
@@ -311,6 +312,7 @@ class format_ucla extends format_topics {
         $options = parent::course_format_options($foreditform);
         
         static $uclaoptions = false;
+        $iscollabsite = is_collab_site($COURSE);
         
         if ($uclaoptions === false) {
             $uclaoptions = array(
@@ -323,14 +325,22 @@ class format_ucla extends format_topics {
                     'type' => PARAM_BOOL
                 ),
                 'coursedownload' => array(
-                    'default' => 1,
-                    'type' => PARAM_ALPHANUMEXT
+                    'default' => true,
+                    'type' => PARAM_BOOL
+                ),
+                'createtasite' => array(
+                    'default' => true,
+                    'type' => PARAM_BOOL
                 )
             );
-            if (!is_collab_site($COURSE)) {
+            if (!$iscollabsite) {
+                $uclaoptions['createtasite'] = array(
+                    'default' => true,
+                    'type' => PARAM_BOOL
+                );
                 $uclaoptions['enableoutoftermmessage'] = array(
-                    'default' => 1,
-                    'type' => PARAM_INT
+                    'default' => true,
+                    'type' => PARAM_BOOL
                 );
             }
         }
@@ -361,7 +371,19 @@ class format_ucla extends format_topics {
                     )
                 )
             );
-            if (!is_collab_site($COURSE)) {
+            
+            if (!$iscollabsite) {
+                $uclaoptionsedit['createtasite'] = array(
+                    'label' => get_string('createtasite', 'format_ucla'),
+                    'help' => 'createtasite',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            1 => get_string('yes'),
+                            0 => get_string('no')
+                        )
+                    )
+                );
                 $uclaoptionsedit['enableoutoftermmessage'] = array(
                     'label' => get_string('enableoutoftermmessage', 'format_ucla'),
                     'help' => 'enableoutoftermmessage',
@@ -421,7 +443,8 @@ class format_ucla extends format_topics {
             if (empty($sr) && !empty($sectionno)) {
                 // This section is needed for navigating back through breadcrumbs.
                 if (!empty($options['navigation'])) {
-                    $url->param('section', $sectionno);
+//                    $url->param('section', $sectionno);
+                    $url->set_anchor('section-'.$sectionno);
                     return $url;
                 }
                 // Return to "Show all" page.
