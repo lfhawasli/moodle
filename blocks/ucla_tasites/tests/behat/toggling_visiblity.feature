@@ -1,4 +1,4 @@
-@ucla @block_ucla_tasites @tasite_toggling @javascript @testme
+@ucla @block_ucla_tasites @tasite_toggling @javascript
 Feature: Link to TA Site
     In order to get to a TA site
     As a user
