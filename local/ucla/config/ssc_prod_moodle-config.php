@@ -323,6 +323,9 @@ $CFG->forced_plugin_settings['block_ucla_course_download']['maxfilesize'] = 250;
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 
+// Site administration > Plugins > Blocks > TA sites
+$CFG->forced_plugin_settings['block_ucla_tasites']['enablebysection'] = 0;
+
 // Site administration > Plugins > Blocks > UCLA video reserves
 $CFG->forced_plugin_settings['block_ucla_video_reserves']['sourceurl'] = 'ftp://guest:access270@164.67.141.31//Users/guest/Sites/MEDIA_LINKS.txt';
 

@@ -116,5 +116,32 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016021900, 'tool', 'uclasupportconsole');
     }
 
+    if ($oldversion < 2016030600) {
+        // Add SP ccle_ta_sections to support tools.
+        $modulecat = null;
+
+        // Find it.
+        $categories = \local_ucla_support_tools_category::fetch_all();
+        foreach ($categories as $category) {
+            if (core_text::strtoupper($category->name) == 'COURSE DATA') {
+                $modulecat = $category;
+                break;
+            }
+        }
+
+        if (!empty($modulecat)) {
+            $data = array('url' => '/' . $CFG->admin . '/tool/uclasupportconsole/index.php#ccle_ta_sections',
+                'name' => get_string('ccle_ta_sections', 'tool_uclasupportconsole'));            
+            try {
+                $tool = \local_ucla_support_tools_tool::create($data);
+                $modulecat->add_tool($tool);
+            } catch (Exception $ex) {
+                // Tool was already created.
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2016030600, 'tool', 'uclasupportconsole');
+    }
+
     return true;
 }

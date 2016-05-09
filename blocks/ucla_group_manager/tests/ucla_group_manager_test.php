@@ -46,12 +46,19 @@ class ucla_group_manager_testcase extends advanced_testcase {
     private $mockgroupmanager = null;
 
     /**
-     * Used by mocked_query_registrar to return data for a given stored 
+     * Used by mocked_query_registrar to return data for a given stored
      * procedure, term, and srs.
      *
      * @var array
      */
     private $mockregdata = array();
+
+    /**
+     * UCLA data generator.
+     *
+     * @var local_ucla_generator
+     */
+    private $uclagenerator = null;
 
     /**
      * Stubs the query_registrar method of ucla_group_manager class,
@@ -79,14 +86,18 @@ class ucla_group_manager_testcase extends advanced_testcase {
      * @param string $sp
      * @param string $term
      * @param string $srs
-     * @param array $results
+     * @param array $results    If null, will unset value.
      */
-    protected function set_mockregdata($sp, $term, $srs, array $results) {
-        $this->mockregdata[$sp][$term][$srs] = $results;
+    protected function set_mockregdata($sp, $term, $srs, $results) {
+        if (is_null($results)) {
+            unset($this->mockregdata[$sp][$term][$srs]);
+        } else {
+            $this->mockregdata[$sp][$term][$srs] = $results;
+        }
     }
 
     /**
-     * Set up registrar_query() stub. 
+     * Set up registrar_query() stub.
      */
     protected function setUp() {
         $this->resetAfterTest(true);
@@ -106,47 +117,27 @@ class ucla_group_manager_testcase extends advanced_testcase {
         // Remove any previous registrar data.
         unset($this->mockregdata);
         $this->mockregdata = array();
+
+        // Saves UCLA data generator.
+        $this->uclagenerator =
+                $this->getDataGenerator()->get_plugin_generator('local_ucla');
     }
 
     /**
-     * Test that student is unenrolled from previous section and enrolled
-     * in new section when student switches to another section via registrar.
-     * In this test case the registrar returns the student as having
-     * dropped the class with enrollment status 'D'.  Student A will start in
-     * section A and student B will begin in section B.  This will test that 
-     * student A can correctly transfer into section B.
+     * Tests that idnumber is properly set for group and groupings
      */
-    public function test_sync_course() {
-        // Create a non-crosslisted class.
-        $courses = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array());
-
+    public function test_idnumber_group() {
+        global $DB;
+        // Create course.
+        $courses = $this->uclagenerator->create_class(array());
         $class = array_pop($courses);
         $term = $class->term;
         $srs = $class->srs;
         $courseid = $class->courseid;
 
-        // Create students that will switch sections.
-        $studenta = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_user();
-        $studentb = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_user();
-
-        // Enroll students in the course.
-        $this->getDataGenerator()->enrol_user($studenta->id, $courseid);
-        $this->getDataGenerator()->enrol_user($studentb->id, $courseid);
-
         // Set up mock sections.
-        $students = array();
-        $students['studenta'] = $studenta;
-        $students['studentb'] = $studentb;
-
         $sections['001A'] = array('sect_no' => '001A',
             'srs_crs_no' => $srs - 800);
-
         $sections['001B'] = array('sect_no' => '001B',
             'srs_crs_no' => $srs - 700);
 
@@ -161,138 +152,33 @@ class ucla_group_manager_testcase extends advanced_testcase {
         $this->set_mockregdata('ccle_class_sections', $term, $srs,
                 $sectionresults);
 
-        // Set up mock data for ccle_roster_class for class.
-        $classroster = array();
-        foreach ($students as $bol => $student) {
-            $classroster[] = array('term_cd' => $term,
-                'stu_id' => $student->idnumber,
-                'full_name_person' => $student->firstname . ' ' . $student->lastname,
-                'enrl_stat_cd' => 'E',
-                'ss_email_addr' => $student->email,
-                'bolid' => $bol);
-        }
-        $this->set_mockregdata('ccle_roster_class', $term, $srs, $classroster);
-
-        // Set up mock data for ccle_roster_class for each section.
-        // Student A will be in section A.
-        $sectionrostera = array();
-        $sectionrostera[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
+        // Do not handle students in this test.
+        $this->set_mockregdata('ccle_roster_class', $term, $srs, array());
         $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001A']['srs_crs_no'], $sectionrostera);
-
-        // Student B will be in section B.
-        $sectionrosterb = array();
-        $sectionrosterb[0] = array('term_cd' => $term,
-            'stu_id' => $studentb->idnumber,
-            'full_name_person' => $studentb->firstname . ' ' . $studentb->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studentb->email,
-            'bolid' => 'studentb');
-
+                $sections['001A']['srs_crs_no'], array());
         $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001B']['srs_crs_no'], $sectionrosterb);
+                $sections['001B']['srs_crs_no'], array());
 
-        // Sync the groups and check that the rosters are correctly configured.
+        // Sync the groups and check that the idnumbers are correctly set.
         $sync = $this->mockgroupmanager->sync_course($courseid);
         $this->assertTrue($sync);
 
         $groupa = new ucla_synced_group(array('term' => $term,
             'srs' => $sections['001A']['srs_crs_no'],
             'courseid' => $courseid));
-
-        $this->assertEquals(array($studenta->id => $studenta->id),
-                $groupa->memberships);
+        $this->assertEquals($sections['001A']['srs_crs_no'], $groupa->idnumber);
 
         $groupb = new ucla_synced_group(array('term' => $term,
             'srs' => $sections['001B']['srs_crs_no'],
             'courseid' => $courseid));
+        $this->assertEquals($sections['001B']['srs_crs_no'], $groupb->idnumber);
 
-        $this->assertEquals(array($studentb->id => $studentb->id),
-                $groupb->memberships);
-
-        unset($groupa);
-        unset($groupb);
-
-        // Change student enrollments so that both are in section B.
-        // Set student A to have 'D' enrollment status in sectionA.
-        $sectionrostera[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'D',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
+        // Now change the SRS number and make sure it gets updated.
         $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001A']['srs_crs_no'], $sectionrostera);
-
-        // Add studenta to section B.
-        $sectionrosterb[1] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001B']['srs_crs_no'], $sectionrosterb);
-
-        // Sync changes to groups.
-        $sync = $this->mockgroupmanager->sync_course($courseid);
-        $this->assertTrue($sync);
-
-        $groupa = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections['001A']['srs_crs_no'],
-            'courseid' => $courseid));
-
-        // Check that section A is empty.
-        $this->assertEmpty($groupa->memberships);
-
-        $groupb = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections['001B']['srs_crs_no'],
-            'courseid' => $courseid));
-
-        // Check that section B has students A and B.
-        $this->assertEquals(array($studentb->id => $studentb->id,
-            $studenta->id => $studenta->id), $groupb->memberships);
-    }
-
-    /**
-     * Test that student is unenrolled from previous section when student 
-     * switches sections and eventually drops the course via registrar.
-     * In this test case the registrar does NOT return the student in the
-     * roster for the section or course which was dropped.
-     */
-    public function test_sync_course2() {
-        // Create a non-crosslisted class.
-        $course = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array());
-
-        $class = array_pop($course);
-        $term = $class->term;
-        $srs = $class->srs;
-        $courseid = $class->courseid;
-
-        // Create a student that will drop the class.
-        $studenta = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_user();
-
-        // Enroll student in the course.
-        $this->getDataGenerator()->enrol_user($studenta->id, $courseid);
-
-        // Set up mock sections.
+                $sections['001A']['srs_crs_no'], null);
+        $this->set_mockregdata('ccle_class_sections', $term, $srs, null);
         $sections['001A'] = array('sect_no' => '001A',
-            'srs_crs_no' => $srs - 800);
-
-        $sections['001B'] = array('sect_no' => '001B',
-            'srs_crs_no' => $srs - 700);
-
-        // Set up mock data for ccle_class_sections.
+            'srs_crs_no' => $srs - 500);
         $sectionresults = array();
         foreach ($sections as $section) {
             $sectionresults[] = array('sect_no' => $section['sect_no'],
@@ -302,336 +188,551 @@ class ucla_group_manager_testcase extends advanced_testcase {
         }
         $this->set_mockregdata('ccle_class_sections', $term, $srs,
                 $sectionresults);
-
-        // Set up mock data for ccle_roster_class for class.
-        $classroster = array();
-        $classroster[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term, $srs, $classroster);
-
-        // Set up mock data for ccle_roster_class for each section.
-        // Student A is enrolled in section A initially.
-        $sectionrostera = array();
-        $sectionrostera[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
         $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001A']['srs_crs_no'], $sectionrostera);
+                $sections['001A']['srs_crs_no'], array());
 
-        // Section B is empty.
-        $sectionrosterb = array();
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001B']['srs_crs_no'], $sectionrosterb);
-
-        // Sync the groups and check that the rosters are correctly configured.
         $sync = $this->mockgroupmanager->sync_course($courseid);
         $this->assertTrue($sync);
 
         $groupa = new ucla_synced_group(array('term' => $term,
             'srs' => $sections['001A']['srs_crs_no'],
             'courseid' => $courseid));
+        $this->assertEquals($sections['001A']['srs_crs_no'], $groupa->idnumber);
 
-        $this->assertEquals(array($studenta->id => $studenta->id),
-                $groupa->memberships);
+        $records = $DB->get_records('groups');
 
-        $groupb = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections['001B']['srs_crs_no'],
-            'courseid' => $courseid));
+        // Blank out the idnumber from the database and make sure it gets set.
+        $DB->set_field('groups', 'idnumber', '', array('id' => $groupa->id));
 
-        $this->assertEmpty($groupb->memberships);
+        $records = $DB->get_records('groups');
 
-        unset($groupa);
-        unset($groupb);
-
-        // Student A now switches frmom section A to B.
-        // Section A is empty.
-        unset($sectionrostera[0]);
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001A']['srs_crs_no'], $sectionrostera);
-
-        // Section B contains student A.
-        $sectionrosterb[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001B']['srs_crs_no'], $sectionrosterb);
-
-        // Sync the groups and check that the rosters are correctly configured.
         $sync = $this->mockgroupmanager->sync_course($courseid);
         $this->assertTrue($sync);
 
         $groupa = new ucla_synced_group(array('term' => $term,
             'srs' => $sections['001A']['srs_crs_no'],
             'courseid' => $courseid));
+        $this->assertEquals($sections['001A']['srs_crs_no'], $groupa->idnumber);
 
-        $this->assertEmpty($groupa->memberships);
-
-        $groupb = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections['001B']['srs_crs_no'],
-            'courseid' => $courseid));
-
-        $this->assertEquals(array($studenta->id => $studenta->id),
-                $groupb->memberships);
-
-        unset($groupa);
-        unset($groupb);
-
-        // Class roster is empty.
-        unset($classroster[0]);
-        $this->set_mockregdata('ccle_roster_class', $term, $srs, $classroster);
-
-        // Section rosters are now empty.
-        unset($sectionrosterb[0]);
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections['001B']['srs_crs_no'], $sectionrosterb);
-
-        // Sync the groups and check that the rosters are correctly configured.
-        $sync = $this->mockgroupmanager->sync_course($courseid);
-        $this->assertTrue($sync);
-
-        $groupa = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections['001A']['srs_crs_no'],
-            'courseid' => $courseid));
-
-        $this->assertEmpty($groupa->memberships);
-
-        $groupb = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections['001B']['srs_crs_no'],
-            'courseid' => $courseid));
-
-        $this->assertEmpty($groupb->memberships);
+        $records = $DB->get_records('groups');
     }
 
-    /**
-     * Tests that a student is able to switch sections within a crosslisted
-     * course. Student starts in section 1A and switches to section 2B where
-     * 1 and 2 are crosslisted courses.
-     */
-    public function test_sync_course_crosslisted() {
-        // Create crosslisted courses.
-        $crosslisted = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_class(array(
-            array(), array()));
-
-        // Pop classes from back of return array.
-        $class2 = array_pop($crosslisted);
-        $class1 = array_pop($crosslisted);
-
-        $term = $class1->term;
-        $srs1 = $class1->srs;
-        $courseid1 = $class1->courseid;
-
-        // Expect term to be the same for class 2.
-        $srs2 = $class2->srs;
-        $courseid2 = $class2->courseid;
-
-        // Create a student that will switch sections.
-        $studenta = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_user();
-
-        // Enroll student in class 1 initially.
-        $this->getDataGenerator()->enrol_user($studenta->id, $courseid1, null,
-                'manual');
-
-        // Set up mock sections.
-        // Class 1 sections.
-        $sections1 = array();
-        $sections1['001A'] = array('sect_no' => '001A',
-            'srs_crs_no' => $srs1 - 800);
-
-        $sections1['001B'] = array('sect_no' => '001B',
-            'srs_crs_no' => $srs1 - 700);
-
-        // Class 2 sections.
-        $sections2 = array();
-        $sections2['002A'] = array('sect_no' => '002A',
-            'srs_crs_no' => $srs2 - 800);
-
-        $sections2['002B'] = array('sect_no' => '002B',
-            'srs_crs_no' => $srs2 - 700);
-
-        // Set up mock data for ccle_class_sections for each class.
-        $sectionresults1 = array();
-        foreach ($sections1 as $section) {
-            $sectionresults1[] = array('sect_no' => $section['sect_no'],
-                'cls_act_typ_cd' => 'DIS',
-                'sect_enrl_stat_cd' => 'O',
-                'srs_crs_no' => $section['srs_crs_no']);
-        }
-        $this->set_mockregdata('ccle_class_sections', $term, $srs1,
-                $sectionresults1);
-
-        $sectionresults2 = array();
-        foreach ($sections2 as $section) {
-            $sectionresults2[] = array('sect_no' => $section['sect_no'],
-                'cls_act_typ_cd' => 'DIS',
-                'sect_enrl_stat_cd' => 'O',
-                'srs_crs_no' => $section['srs_crs_no']);
-        }
-        $this->set_mockregdata('ccle_class_sections', $term, $srs2,
-                $sectionresults2);
-
-        // Set up mock data for ccle_roster_class for each class.
-        $classroster1 = array();
-        $classroster1[] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term, $srs1, $classroster1);
-
-        $classroster2 = array();
-        $this->set_mockregdata('ccle_roster_class', $term, $srs2, $classroster2);
-
-        // Set up mock data for ccle_roster_class for each section.
-        $sectionroster1a = array();
-        $sectionroster1a[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections1['001A']['srs_crs_no'], $sectionroster1a);
-
-        $sectionroster1b = array();
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections1['001B']['srs_crs_no'], $sectionroster1b);
-
-        $sectionroster2a = array();
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections2['002A']['srs_crs_no'], $sectionroster2a);
-
-        $sectionroster2b = array();
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections2['002B']['srs_crs_no'], $sectionroster2b);
-
-        // Sync the groups and check that the rosters are correctly configured.
-        $sync1 = $this->mockgroupmanager->sync_course($courseid1);
-        $this->assertTrue($sync1);
-
-        $group1a = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections1['001A']['srs_crs_no'],
-            'courseid' => $courseid1));
-
-        // Student should be enrolled in section 1A.
-        $this->assertEquals(array($studenta->id => $studenta->id),
-                $group1a->memberships);
-
-        $group1b = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections1['001B']['srs_crs_no'],
-            'courseid' => $courseid1));
-
-        $this->assertEmpty($group1b->memberships);
-
-        $sync2 = $this->mockgroupmanager->sync_course($courseid2);
-        $this->assertTrue($sync2);
-
-        $group2a = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections2['002A']['srs_crs_no'],
-            'courseid' => $courseid2));
-
-        $this->assertEmpty($group2a->memberships);
-
-        $group2b = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections2['002B']['srs_crs_no'],
-            'courseid' => $courseid2));
-
-        $this->assertEmpty($group2b->memberships);
-
-        unset($group1a);
-        unset($group1b);
-        unset($group2a);
-        unset($group2b);
-
-        // Change student enrollments so that student is in class 2 section 2B.
-        // Unenroll student from class 1 and enroll them in class 2.
-        $enrol = enrol_get_plugin('manual');
-        $instances = enrol_get_instances($courseid1, true);
-        foreach ($instances as $instance) {
-            if ($instance->enrol == 'manual') {
-                $enrol->unenrol_user($instance, $studenta->id);
-                break;
-            }
-        }
-
-        $this->getDataGenerator()->enrol_user($studenta->id, $courseid2);
-
-        // Remove student from class 1 and section 1A in mock data.
-        unset($classroster1[0]);
-        $this->set_mockregdata('ccle_roster_class', $term, $srs1, $classroster1);
-        unset($sectionroster1a[0]);
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections1['001A']['srs_crs_no'], $sectionroster1a);
-
-        // Add student to class 2 and section 2B in mock data.
-        $classroster2[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term, $srs2, $classroster2);
-
-        $sectionroster2b[0] = array('term_cd' => $term,
-            'stu_id' => $studenta->idnumber,
-            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
-            'enrl_stat_cd' => 'E',
-            'ss_email_addr' => $studenta->email,
-            'bolid' => 'studenta');
-
-        $this->set_mockregdata('ccle_roster_class', $term,
-                $sections2['002B']['srs_crs_no'], $sectionroster2b);
-
-        // Sync the groups and check that the rosters are correctly configured.
-        $sync1 = $this->mockgroupmanager->sync_course($courseid1);
-        $this->assertTrue($sync1);
-
-        $group1a = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections1['001A']['srs_crs_no'],
-            'courseid' => $courseid1));
-
-        // Class 1 section A is now empty.
-        $this->assertEmpty($group1a->memberships);
-
-        $group1b = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections1['001B']['srs_crs_no'],
-            'courseid' => $courseid1));
-
-        $this->assertEmpty($group1b->memberships);
-
-        $sync2 = $this->mockgroupmanager->sync_course($courseid2);
-        $this->assertTrue($sync2);
-
-        $group2a = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections2['002A']['srs_crs_no'],
-            'courseid' => $courseid2));
-
-        $this->assertEmpty($group2a->memberships);
-
-        $group2b = new ucla_synced_group(array('term' => $term,
-            'srs' => $sections2['002B']['srs_crs_no'],
-            'courseid' => $courseid2));
-
-        // Class 2 section B now has a student.
-        $this->assertEquals(array($studenta->id => $studenta->id),
-                $group2b->memberships);
-    }
+//    /**
+//     * Test that student is unenrolled from previous section and enrolled
+//     * in new section when student switches to another section via registrar.
+//     * In this test case the registrar returns the student as having
+//     * dropped the class with enrollment status 'D'.  Student A will start in
+//     * section A and student B will begin in section B.  This will test that
+//     * student A can correctly transfer into section B.
+//     */
+//    public function test_sync_course() {
+//        // Create a non-crosslisted class.
+//        $courses = $this->uclagenerator->create_class(array());
+//
+//        $class = array_pop($courses);
+//        $term = $class->term;
+//        $srs = $class->srs;
+//        $courseid = $class->courseid;
+//
+//        // Create students that will switch sections.
+//        $studenta = $this->uclagenerator->create_user();
+//        $studentb = $this->uclagenerator->create_user();
+//
+//        // Enroll students in the course.
+//        $this->getDataGenerator()->enrol_user($studenta->id, $courseid);
+//        $this->getDataGenerator()->enrol_user($studentb->id, $courseid);
+//
+//        // Set up mock sections.
+//        $students = array();
+//        $students['studenta'] = $studenta;
+//        $students['studentb'] = $studentb;
+//
+//        $sections['001A'] = array('sect_no' => '001A',
+//            'srs_crs_no' => $srs - 800);
+//
+//        $sections['001B'] = array('sect_no' => '001B',
+//            'srs_crs_no' => $srs - 700);
+//
+//        // Set up mock data for ccle_class_sections.
+//        $sectionresults = array();
+//        foreach ($sections as $section) {
+//            $sectionresults[] = array('sect_no' => $section['sect_no'],
+//                'cls_act_typ_cd' => 'DIS',
+//                'sect_enrl_stat_cd' => 'O',
+//                'srs_crs_no' => $section['srs_crs_no']);
+//        }
+//        $this->set_mockregdata('ccle_class_sections', $term, $srs,
+//                $sectionresults);
+//
+//        // Set up mock data for ccle_roster_class for class.
+//        $classroster = array();
+//        foreach ($students as $bol => $student) {
+//            $classroster[] = array('term_cd' => $term,
+//                'stu_id' => $student->idnumber,
+//                'full_name_person' => $student->firstname . ' ' . $student->lastname,
+//                'enrl_stat_cd' => 'E',
+//                'ss_email_addr' => $student->email,
+//                'bolid' => $bol);
+//        }
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs, $classroster);
+//
+//        // Set up mock data for ccle_roster_class for each section.
+//        // Student A will be in section A.
+//        $sectionrostera = array();
+//        $sectionrostera[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001A']['srs_crs_no'], $sectionrostera);
+//
+//        // Student B will be in section B.
+//        $sectionrosterb = array();
+//        $sectionrosterb[0] = array('term_cd' => $term,
+//            'stu_id' => $studentb->idnumber,
+//            'full_name_person' => $studentb->firstname . ' ' . $studentb->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studentb->email,
+//            'bolid' => 'studentb');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001B']['srs_crs_no'], $sectionrosterb);
+//
+//        // Sync the groups and check that the rosters are correctly configured.
+//        $sync = $this->mockgroupmanager->sync_course($courseid);
+//        $this->assertTrue($sync);
+//
+//        $groupa = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001A']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEquals(array($studenta->id => $studenta->id),
+//                $groupa->memberships);
+//
+//        $groupb = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001B']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEquals(array($studentb->id => $studentb->id),
+//                $groupb->memberships);
+//
+//        unset($groupa);
+//        unset($groupb);
+//
+//        // Change student enrollments so that both are in section B.
+//        // Set student A to have 'D' enrollment status in sectionA.
+//        $sectionrostera[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'D',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001A']['srs_crs_no'], $sectionrostera);
+//
+//        // Add studenta to section B.
+//        $sectionrosterb[1] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001B']['srs_crs_no'], $sectionrosterb);
+//
+//        // Sync changes to groups.
+//        $sync = $this->mockgroupmanager->sync_course($courseid);
+//        $this->assertTrue($sync);
+//
+//        $groupa = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001A']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        // Check that section A is empty.
+//        $this->assertEmpty($groupa->memberships);
+//
+//        $groupb = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001B']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        // Check that section B has students A and B.
+//        $this->assertEquals(array($studentb->id => $studentb->id,
+//            $studenta->id => $studenta->id), $groupb->memberships);
+//    }
+//
+//    /**
+//     * Test that student is unenrolled from previous section when student
+//     * switches sections and eventually drops the course via registrar.
+//     * In this test case the registrar does NOT return the student in the
+//     * roster for the section or course which was dropped.
+//     */
+//    public function test_sync_course2() {
+//        // Create a non-crosslisted class.
+//        $course = $this->uclagenerator->create_class(array());
+//
+//        $class = array_pop($course);
+//        $term = $class->term;
+//        $srs = $class->srs;
+//        $courseid = $class->courseid;
+//
+//        // Create a student that will drop the class.
+//        $studenta = $this->uclagenerator->create_user();
+//
+//        // Enroll student in the course.
+//        $this->getDataGenerator()->enrol_user($studenta->id, $courseid);
+//
+//        // Set up mock sections.
+//        $sections['001A'] = array('sect_no' => '001A',
+//            'srs_crs_no' => $srs - 800);
+//
+//        $sections['001B'] = array('sect_no' => '001B',
+//            'srs_crs_no' => $srs - 700);
+//
+//        // Set up mock data for ccle_class_sections.
+//        $sectionresults = array();
+//        foreach ($sections as $section) {
+//            $sectionresults[] = array('sect_no' => $section['sect_no'],
+//                'cls_act_typ_cd' => 'DIS',
+//                'sect_enrl_stat_cd' => 'O',
+//                'srs_crs_no' => $section['srs_crs_no']);
+//        }
+//        $this->set_mockregdata('ccle_class_sections', $term, $srs,
+//                $sectionresults);
+//
+//        // Set up mock data for ccle_roster_class for class.
+//        $classroster = array();
+//        $classroster[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs, $classroster);
+//
+//        // Set up mock data for ccle_roster_class for each section.
+//        // Student A is enrolled in section A initially.
+//        $sectionrostera = array();
+//        $sectionrostera[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001A']['srs_crs_no'], $sectionrostera);
+//
+//        // Section B is empty.
+//        $sectionrosterb = array();
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001B']['srs_crs_no'], $sectionrosterb);
+//
+//        // Sync the groups and check that the rosters are correctly configured.
+//        $sync = $this->mockgroupmanager->sync_course($courseid);
+//        $this->assertTrue($sync);
+//
+//        $groupa = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001A']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEquals(array($studenta->id => $studenta->id),
+//                $groupa->memberships);
+//
+//        $groupb = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001B']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEmpty($groupb->memberships);
+//
+//        unset($groupa);
+//        unset($groupb);
+//
+//        // Student A now switches frmom section A to B.
+//        // Section A is empty.
+//        unset($sectionrostera[0]);
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001A']['srs_crs_no'], $sectionrostera);
+//
+//        // Section B contains student A.
+//        $sectionrosterb[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001B']['srs_crs_no'], $sectionrosterb);
+//
+//        // Sync the groups and check that the rosters are correctly configured.
+//        $sync = $this->mockgroupmanager->sync_course($courseid);
+//        $this->assertTrue($sync);
+//
+//        $groupa = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001A']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEmpty($groupa->memberships);
+//
+//        $groupb = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001B']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEquals(array($studenta->id => $studenta->id),
+//                $groupb->memberships);
+//
+//        unset($groupa);
+//        unset($groupb);
+//
+//        // Class roster is empty.
+//        unset($classroster[0]);
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs, $classroster);
+//
+//        // Section rosters are now empty.
+//        unset($sectionrosterb[0]);
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections['001B']['srs_crs_no'], $sectionrosterb);
+//
+//        // Sync the groups and check that the rosters are correctly configured.
+//        $sync = $this->mockgroupmanager->sync_course($courseid);
+//        $this->assertTrue($sync);
+//
+//        $groupa = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001A']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEmpty($groupa->memberships);
+//
+//        $groupb = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections['001B']['srs_crs_no'],
+//            'courseid' => $courseid));
+//
+//        $this->assertEmpty($groupb->memberships);
+//    }
+//
+//    /**
+//     * Tests that a student is able to switch sections within a crosslisted
+//     * course. Student starts in section 1A and switches to section 2B where
+//     * 1 and 2 are crosslisted courses.
+//     */
+//    public function test_sync_course_crosslisted() {
+//        // Create crosslisted courses.
+//        $crosslisted = $this->uclagenerator->create_class(array(
+//            array(), array()));
+//
+//        // Pop classes from back of return array.
+//        $class2 = array_pop($crosslisted);
+//        $class1 = array_pop($crosslisted);
+//
+//        $term = $class1->term;
+//        $srs1 = $class1->srs;
+//        $courseid1 = $class1->courseid;
+//
+//        // Expect term to be the same for class 2.
+//        $srs2 = $class2->srs;
+//        $courseid2 = $class2->courseid;
+//
+//        // Create a student that will switch sections.
+//        $studenta = $this->uclagenerator->create_user();
+//
+//        // Enroll student in class 1 initially.
+//        $this->getDataGenerator()->enrol_user($studenta->id, $courseid1, null,
+//                'manual');
+//
+//        // Set up mock sections.
+//        // Class 1 sections.
+//        $sections1 = array();
+//        $sections1['001A'] = array('sect_no' => '001A',
+//            'srs_crs_no' => $srs1 - 800);
+//
+//        $sections1['001B'] = array('sect_no' => '001B',
+//            'srs_crs_no' => $srs1 - 700);
+//
+//        // Class 2 sections.
+//        $sections2 = array();
+//        $sections2['002A'] = array('sect_no' => '002A',
+//            'srs_crs_no' => $srs2 - 800);
+//
+//        $sections2['002B'] = array('sect_no' => '002B',
+//            'srs_crs_no' => $srs2 - 700);
+//
+//        // Set up mock data for ccle_class_sections for each class.
+//        $sectionresults1 = array();
+//        foreach ($sections1 as $section) {
+//            $sectionresults1[] = array('sect_no' => $section['sect_no'],
+//                'cls_act_typ_cd' => 'DIS',
+//                'sect_enrl_stat_cd' => 'O',
+//                'srs_crs_no' => $section['srs_crs_no']);
+//        }
+//        $this->set_mockregdata('ccle_class_sections', $term, $srs1,
+//                $sectionresults1);
+//
+//        $sectionresults2 = array();
+//        foreach ($sections2 as $section) {
+//            $sectionresults2[] = array('sect_no' => $section['sect_no'],
+//                'cls_act_typ_cd' => 'DIS',
+//                'sect_enrl_stat_cd' => 'O',
+//                'srs_crs_no' => $section['srs_crs_no']);
+//        }
+//        $this->set_mockregdata('ccle_class_sections', $term, $srs2,
+//                $sectionresults2);
+//
+//        // Set up mock data for ccle_roster_class for each class.
+//        $classroster1 = array();
+//        $classroster1[] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs1, $classroster1);
+//
+//        $classroster2 = array();
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs2, $classroster2);
+//
+//        // Set up mock data for ccle_roster_class for each section.
+//        $sectionroster1a = array();
+//        $sectionroster1a[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections1['001A']['srs_crs_no'], $sectionroster1a);
+//
+//        $sectionroster1b = array();
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections1['001B']['srs_crs_no'], $sectionroster1b);
+//
+//        $sectionroster2a = array();
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections2['002A']['srs_crs_no'], $sectionroster2a);
+//
+//        $sectionroster2b = array();
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections2['002B']['srs_crs_no'], $sectionroster2b);
+//
+//        // Sync the groups and check that the rosters are correctly configured.
+//        $sync1 = $this->mockgroupmanager->sync_course($courseid1);
+//        $this->assertTrue($sync1);
+//
+//        $group1a = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections1['001A']['srs_crs_no'],
+//            'courseid' => $courseid1));
+//
+//        // Student should be enrolled in section 1A.
+//        $this->assertEquals(array($studenta->id => $studenta->id),
+//                $group1a->memberships);
+//
+//        $group1b = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections1['001B']['srs_crs_no'],
+//            'courseid' => $courseid1));
+//
+//        $this->assertEmpty($group1b->memberships);
+//
+//        $sync2 = $this->mockgroupmanager->sync_course($courseid2);
+//        $this->assertTrue($sync2);
+//
+//        $group2a = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections2['002A']['srs_crs_no'],
+//            'courseid' => $courseid2));
+//
+//        $this->assertEmpty($group2a->memberships);
+//
+//        $group2b = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections2['002B']['srs_crs_no'],
+//            'courseid' => $courseid2));
+//
+//        $this->assertEmpty($group2b->memberships);
+//
+//        unset($group1a);
+//        unset($group1b);
+//        unset($group2a);
+//        unset($group2b);
+//
+//        // Change student enrollments so that student is in class 2 section 2B.
+//        // Unenroll student from class 1 and enroll them in class 2.
+//        $enrol = enrol_get_plugin('manual');
+//        $instances = enrol_get_instances($courseid1, true);
+//        foreach ($instances as $instance) {
+//            if ($instance->enrol == 'manual') {
+//                $enrol->unenrol_user($instance, $studenta->id);
+//                break;
+//            }
+//        }
+//
+//        $this->getDataGenerator()->enrol_user($studenta->id, $courseid2);
+//
+//        // Remove student from class 1 and section 1A in mock data.
+//        unset($classroster1[0]);
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs1, $classroster1);
+//        unset($sectionroster1a[0]);
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections1['001A']['srs_crs_no'], $sectionroster1a);
+//
+//        // Add student to class 2 and section 2B in mock data.
+//        $classroster2[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term, $srs2, $classroster2);
+//
+//        $sectionroster2b[0] = array('term_cd' => $term,
+//            'stu_id' => $studenta->idnumber,
+//            'full_name_person' => $studenta->firstname . ' ' . $studenta->lastname,
+//            'enrl_stat_cd' => 'E',
+//            'ss_email_addr' => $studenta->email,
+//            'bolid' => 'studenta');
+//
+//        $this->set_mockregdata('ccle_roster_class', $term,
+//                $sections2['002B']['srs_crs_no'], $sectionroster2b);
+//
+//        // Sync the groups and check that the rosters are correctly configured.
+//        $sync1 = $this->mockgroupmanager->sync_course($courseid1);
+//        $this->assertTrue($sync1);
+//
+//        $group1a = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections1['001A']['srs_crs_no'],
+//            'courseid' => $courseid1));
+//
+//        // Class 1 section A is now empty.
+//        $this->assertEmpty($group1a->memberships);
+//
+//        $group1b = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections1['001B']['srs_crs_no'],
+//            'courseid' => $courseid1));
+//
+//        $this->assertEmpty($group1b->memberships);
+//
+//        $sync2 = $this->mockgroupmanager->sync_course($courseid2);
+//        $this->assertTrue($sync2);
+//
+//        $group2a = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections2['002A']['srs_crs_no'],
+//            'courseid' => $courseid2));
+//
+//        $this->assertEmpty($group2a->memberships);
+//
+//        $group2b = new ucla_synced_group(array('term' => $term,
+//            'srs' => $sections2['002B']['srs_crs_no'],
+//            'courseid' => $courseid2));
+//
+//        // Class 2 section B now has a student.
+//        $this->assertEquals(array($studenta->id => $studenta->id),
+//                $group2b->memberships);
+//    }
 
 }
 

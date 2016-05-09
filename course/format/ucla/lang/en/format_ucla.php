@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -79,3 +78,10 @@ $string['enableoutoftermmessage'] = 'Enable out of term message';
 $string['enableoutoftermmessage_help'] = 'Enable the message "You are now '
         . 'viewing a course that is no longer in session" to display when a '
         . 'course is out of session.';
+
+// CCLE-5618 - TA site creation content configurable
+$string['createtasite'] = 'Enable TA site creation';
+$string['createtasite_help'] = 'TA site creation is enabled by default. '
+        . 'If you do not want the TAs to be able to create the TA sites, '
+        . 'click "No". This feature is available for TAs';
+

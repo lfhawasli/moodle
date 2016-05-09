@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/rss_client/db" VERSION="20120122" COMMENT="XMLDB file for Moodle competencies block"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_competencies_sets" COMMENT="" NEXT="block_competencies_items">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" PREVIOUS="id"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_competencies_items" COMMENT="" PREVIOUS="block_competencies_sets" NEXT="block_competencies_courses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="set_id"/>
+        <FIELD NAME="set_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="ord"/>
+        <FIELD NAME="ord" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="set_id" NEXT="ref"/>
+        <FIELD NAME="ref" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" PREVIOUS="ord" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" PREVIOUS="ref" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="set_id"/>
+        <KEY NAME="set_id" TYPE="foreign" FIELDS="set_id" REFTABLE="block_competencies_sets" REFFIELDS="id" PREVIOUS="primary" NEXT="ref"/>
+        <KEY NAME="ref" TYPE="unique" FIELDS="ref" PREVIOUS="set_id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ord" UNIQUE="false" FIELDS="ord"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="block_competencies_courses" COMMENT="" PREVIOUS="block_competencies_items">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="item"/>
+        <FIELD NAME="item" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="course"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="course"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary" NEXT="item"/>
+        <KEY NAME="item" TYPE="foreign" FIELDS="item" REFTABLE="block_competencies_items" REFFIELDS="id" PREVIOUS="course"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

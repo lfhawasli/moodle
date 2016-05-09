@@ -23,51 +23,83 @@
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
-$pnaction = "None";
-
+$pnaction = $tempdispname = '';
 $displayname = array();
 if (isset($_SERVER['SHIBDISPLAYNAME'])) {
     $displayname = $this->get_first_string($_SERVER['SHIBDISPLAYNAME']);
 }
 
-if($result['alternatename']) {
+if (!empty($result['alternatename'])) {
     // Handle suffix by appending it to last name.
     if (isset($_SERVER['SHIBUCLAPERSONNAMESUFFIX'])) {
         $suffix = $this->get_first_string(
-            $_SERVER['SHIBUCLAPERSONNAMESUFFIX']
+                $_SERVER['SHIBUCLAPERSONNAMESUFFIX']
         );
         $result['lastname'] .= ' ' . $suffix;
     }
-    $pnaction = "set alternateName to preferredName";
-} else if(!empty($displayname)) {
-    // Handle user info when display name is chosen.
-    $formattedname = format_displayname($displayname);
-    $result['firstname'] = $formattedname['firstname'];
-    $result['lastname'] = $formattedname['lastname'];
-    $result['middlename'] = '';
+    $pnaction = "set alternatename was set";
+} else if (!empty($displayname)) {
+    $firstname  = $result['firstname'];
+    $middlename = $result['middlename'];
+    $lastname   = $result['lastname'];
 
-    $pnaction = "set fn, ln to displayName and cleared mn";
+    // Handle user info when display name is chosen.
+    $tempdispname = trim($result['lastname'] . ", " . $result['firstname'] . " " . $result['middlename']);
+    if (core_text::strtoupper($displayname) !== core_text::strtoupper($tempdispname)) {
+        $formattedname  = format_displayname($displayname);
+        $firstname      = $formattedname['firstname'];
+        $lastname       = $formattedname['lastname'];
+        $middlename     = '';
+        $pnaction = "set fn, ln to displayName and cleared mn";
+    } else {
+        $pnaction = "displayName equals ln, fn mn. Name unchanged.";
+    }
+
+    // Check special cases.
+    if (isset($result['idnumber']) && !empty($result['idnumber'])) {
+        $specialcase = false;
+        switch ($result['idnumber']) {
+            case '900804617':
+                $firstname = 'MI KYUNG';
+                $middlename = '';
+                $specialcase = true;
+                break;
+            case '902840840':
+                $firstname = 'SHAREE BANTAD';
+                $middlename = '';
+                $specialcase = true;
+                break;
+        }
+
+        if ($specialcase) {
+            $pnaction = 'Special case found';
+        }
+    }
+
+    // Set names.
+    $result['firstname'] = $firstname;
+    $result['middlename'] = $middlename;
+    $result['lastname'] = $lastname;
 }
 
-if(!empty($CFG->namingdebugging)) {
+if (!empty($CFG->namingdebugging)) {
     $filename = $CFG->dataroot . "/namingdebugging.log";
     $time = @date('[d/M/Y:H:i:s]');
 
-    file_put_contents($filename,
-                "\n ". $time. " User info: "
-                . "\n fn     = ".(isset($_SERVER['SHIBGIVENNAME']) ? $_SERVER['SHIBGIVENNAME'] : 'N/A')
-                . "\n mn     = ".(isset($_SERVER['SHIBUCLAPERSONMIDDLENAME']) ? $_SERVER['SHIBUCLAPERSONMIDDLENAME'] : 'N/A')
-                . "\n ln     = ".(isset($_SERVER['SHIBSN']) ? $_SERVER['SHIBSN'] : 'N/A')
-                . "\n suffix = ".(!empty($suffix) ? $suffix : 'N/A')
-                . "\n pn     = ".(isset($_SERVER['SHIBEDUPERSONNICKNAME']) ? $_SERVER['SHIBEDUPERSONNICKNAME'] : 'N/A')
-                . "\n dn     = ".(!empty($displayname) ? $displayname : 'N/A')
-                . "\n Action = ".$pnaction
-                ."\n",
-                FILE_APPEND);
+    file_put_contents($filename, "\n " . $time . " User info: "
+            . "\n fn     = " . (isset($_SERVER['SHIBGIVENNAME']) ? $_SERVER['SHIBGIVENNAME'] : 'N/A')
+            . "\n mn     = " . (isset($_SERVER['SHIBUCLAPERSONMIDDLENAME']) ? $_SERVER['SHIBUCLAPERSONMIDDLENAME'] : 'N/A')
+            . "\n ln     = " . (isset($_SERVER['SHIBSN']) ? $_SERVER['SHIBSN'] : 'N/A')
+            . "\n suffix = " . (!empty($suffix) ? $suffix : 'N/A')
+            . "\n pn     = " . (isset($_SERVER['SHIBEDUPERSONNICKNAME']) ? $_SERVER['SHIBEDUPERSONNICKNAME'] : 'N/A')
+            . "\n dn     = " . (!empty($displayname) ? $displayname : 'N/A')
+            . "\n tempdn = " . (!empty($tempdispname) ? $tempdispname : 'N/A')
+            . "\n result (ln,fn,mn) = " . trim('|' . $result['lastname'] . '|' . $result['firstname'] . '|' . $result['middlename'] . '|')
+            . "\n Action = " . $pnaction
+            . "\n", FILE_APPEND);
 }
 
-$result['institution'] = str_replace("urn:mace:incommon:","", $result['institution']);
+$result['institution'] = str_replace("urn:mace:incommon:", "", $result['institution']);

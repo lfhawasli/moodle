@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA TA site creator plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA TA sites block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,60 +49,49 @@ class block_ucla_tasites_generator extends testing_block_generator {
     public $taid = null;
 
     /**
+     * UCLA data generator.
+     * @var local_ucla_generator
+     */
+    public $ucladatagen = null;
+
+    /**
      * Create new TA site for given course record and user.
      * 
-     * @param stdClass $course  Parent course
-     * @param array $user       Owner of TA site
+     * @param stdClass $parentcourse   Parent class.
+     * @param array $typeinfo   This is a subset of what we get from
+     *                          get_tasection_mapping:
+     *                  [bysection] => [secnum] => [secsrs] => [array of srs numbers]
+     *                                          => [tas] => [array of uid => fullname]
+     *                  [byta] => [fullname] => [ucla_id] => [uid]
+     *                                       => [secsrs] => [secnum] => [srs numbers]
      * 
      * @return stdClass         Newly create TA site course record
      */
-    public function create_instance($course = null, array $user = null) {
-        if (empty($course)) {
-            $course = $this->datagenerator->create_course();
+    public function create_instance($parentcourse = null, array $typeinfo = null) {
+        if (empty($parentcourse)) {
+            // Create parent course.
+            $class = $this->ucladatagen->create_class();
+            $class = array_pop($class);
+            $parentcourse = get_course($class->courseid);
         }
-        if (empty($user)) {
-            $record = array('firstname'=>'afirstname', 'lastname'=>'alastname');
-            $user = $this->datagenerator->create_user($record);
+        // If typeinfo is empty, assume creating TA site with no sections for
+        // one TA.
+        if (empty($typeinfo)) {
+            $ta = $this->ucladatagen->create_user();
+
+            // Make sure that TA is role of TA in parent course.
+            $this->datagenerator->enrol_user($ta->id, $parentcourse->id, $this->taid);
+
+            $typeinfo = array();
+            $typeinfo['byta'][fullname($ta)] = array('ucla_id' => $ta->idnumber);
         }
-        $tasite = $this->create_instance_with_role($course, (array) $user, 'ta');
-        return $tasite;
-    }
-
-    /**
-     * Create new TA site for given course record. Will also make sure that user
-     * is a TA with given role for parent course.
-     * 
-     * @param stdClass $course  Parent course
-     * @param array $user       Owner of TA site
-     * @param string $role      Should be 'ta' or 'ta_admin', defaults to 'ta'.
-     * 
-     * @return stdClass         Newly create TA site course record
-     */
-    public function create_instance_with_role($course, array $user, $role = 'ta') {
-        global $DB;
-
-        // Make sure that user has given role in parent course.
-        $context = context_course::instance($course->id);
-        $roleid = $this->taid;
-        if ($role == 'ta_admin') {
-            $roleid = $this->taadminid;
-        }
-        $this->datagenerator->enrol_user($user['id'], $course->id, $roleid);
-
-        $tainfo = new stdClass();
-        $tainfo->parent_course = $course;
-        $tainfo->id = $user['id'];
-        $tainfo->firstname = $user['firstname'];
-        $tainfo->lastname = $user['lastname'];
-        $tainfo->fullname = fullname((object) $user);
-
-        $tasite = block_ucla_tasites::create_tasite($tainfo);
+        $tasite = block_ucla_tasites::create_tasite($parentcourse, $typeinfo);
 
         return $tasite;
     }
 
     /**
-     * Does al needed setup to get TA sites working in phpunit.
+     * Does all needed setup to get TA sites working in phpunit.
      *  - Creates TA and TA admin roles necessary to use the TA site block for 
      *    unit tests.
      *  - Enables meta enrollment plugin.
@@ -110,10 +99,10 @@ class block_ucla_tasites_generator extends testing_block_generator {
     public function setup() {
         global $DB;
 
+        $this->ucladatagen = $this->datagenerator->get_plugin_generator('local_ucla');
+
         // Create UCLA TA and TA admin roles.
-        $this->datagenerator
-                ->get_plugin_generator('local_ucla')
-                ->create_ucla_roles();
+        $this->ucladatagen->create_ucla_roles(array('ta', 'ta_admin'));
         $this->taadminid = $DB->get_field('role', 'id',
                 array('shortname' => 'ta_admin'));
         $this->taid = $DB->get_field('role', 'id', array('shortname' => 'ta'));

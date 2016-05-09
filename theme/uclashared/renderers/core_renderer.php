@@ -750,4 +750,21 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         return false;
     }
+    
+    /**
+     * Change "Update this module" button to "Edit settings".
+     *
+     * @param string $cmid the course_module id.
+     * @param string $modulename the module name, eg. "forum", "quiz" or "workshop"
+     * @return string  Empty string.
+     */
+    public function update_module_button($cmid, $modulename) {
+        global $OUTPUT;
+        if (has_capability('moodle/course:manageactivities', context_module::instance($cmid))) {
+            $url = new moodle_url("/course/mod.php", array('update' => $cmid, 'return' => true, 'sesskey' => sesskey()));
+            return $OUTPUT->single_button($url, get_string('editsettings', 'moodle'));
+        } else {
+            return '';
+        }
+    }
 }

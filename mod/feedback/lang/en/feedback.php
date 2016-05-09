@@ -177,6 +177,9 @@ $string['move_item'] = 'Move this question';
 $string['moveup_item'] = 'Move this question up';
 $string['multichoice'] = 'Multiple choice';
 $string['multichoicerated'] = 'Multiple choice (rated)';
+// START UCLA MOD: CCLE-5840 - Update Feedback Module for CTSI Competencies block
+$string['multichoicesetcompetencies'] = 'Multiple choice (per competency)';
+// END UCLA MOD: CCLE-5840
 $string['multichoicetype'] = 'Multiple choice type';
 $string['multichoice_values'] = 'Multiple choice values';
 $string['multiplesubmit'] = 'Allow multiple submissions';

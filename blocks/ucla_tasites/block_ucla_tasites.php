@@ -1,4 +1,26 @@
 <?php
+// This file is part of the UCLA TA sites block for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Control logic for TA-site functionality.
+ *
+ * @package    block_ucla_tasites
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -9,20 +31,21 @@ require_once($CFG->dirroot . '/enrol/meta/locallib.php');
 require_once($CFG->dirroot . '/local/metagroups/locallib.php');
 
 /**
- *  Class that contains the library of function calls that control logic
- *  for TA-site functionality.
- **/
+ * TA sites block.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_tasites extends block_base {
+
     /**
-     *  API call. Called when loading Moodle.
-     **/
-    function init() {
-        $this->title = get_string('pluginname', 'block_ucla_tasites');
-    }
+     * Grouping ID that TA section specific groups use.
+     */
+    const GROUPINGID = 'tasitegrouping';
 
     /**
      * Do not make this block available to add via "Add a block" dropdown.
-     * 
+     *
      * @return array
      */
     public function applicable_formats() {
@@ -35,57 +58,37 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
-     *  Semantic (currying?) function.
-     **/
-    static function get_ta_admin_role_id() {
-        return self::get_ta_role_id(true);
-    }
-
-    /**
-     *  Gets the role id of one of the roles that are relevant.
-     *  Cached using static.
+     * Checks if a user can create a specific or any TA-site.
      *
-     *  @param $promoted Return the promoted role?
-     **/
-    static function get_ta_role_id($promoted=false) {
-        global $CFG, $DB;
-        static $roleids;
+     * @param int $courseid
+     * @param stdClass $user    Optional.
+     *
+     * @return boolean
+     */
+    public static function can_access($courseid, $user = false) {
+        global $USER;
+        $user = $user ? $user : $USER;
 
-        $tarsn = self::get_ta_role_shortname($promoted);
-
-        if (!isset($roleids[$tarsn])) {
-            $roleids[$tarsn] = $DB->get_field('role', 'id', 
-                array('shortname' => $tarsn));
-        }
-
-        return $roleids[$tarsn];
+        return self::can_have_tasite($user, $courseid)
+                || has_capability('moodle/course:update',
+                        context_course::instance($courseid), $user)
+                || require_capability('moodle/site:config',
+                        context_system::instance(), $user);
     }
 
     /**
-     *  Gets the shortnames expected of the TA roles.
-     **/
-    static function get_ta_role_shortname($promoted=false) {
-        $role_substr = $promoted ? '_admin' : '';
-        $role_str = 'ta' . $role_substr;
-        $var_field = $role_str . '_role_shortname';
-
-        // Tarzan, but actually, TA role short-name
-        $tarsn = isset($CFG->{$var_field}) 
-            ? $CFG->{$var_field}
-            : $role_str;
-
-        return $tarsn; 
-    }
-
-    /**
-     *  Checks if a particular user can have a TA-site.
-     **/
-    static function can_have_tasite($user, $courseid) {
+     * Checks if a particular user can have a TA-site.
+     *
+     * @param stdClass $user
+     * @param int $courseid
+     *
+     * @return boolean
+     */
+    public static function can_have_tasite($user, $courseid) {
         $tas = self::get_tasite_users($courseid);
         foreach ($tas as $ta) {
-            // Check if I am one of the TAs, but this may NOT
-            // be the correct way
-            if ($ta->userid == $user->id) {
+            // Check if user is one of the TAs.
+            if ($ta->idnumber == $user->idnumber) {
                 return true;
             }
         }
@@ -94,55 +97,554 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
-     *  Checks if the TA-site can be made (does not exist).
-     *  @param $context Optimization if you already have a context instance.
-     **/
-    static function can_make_tasite($user, $courseid) {
-        // This might be a redundant check
-        // Maybe throw an exception if !self::can_have_tasite()?
-        return self::can_have_tasite($user, $courseid) 
-                && !self::get_tasite($courseid, $user);
+     * Checks if the TA-site can be made (does not exist).
+     *
+     * @param stdClass $user
+     * @param int $courseid
+     *
+     * @return boolean
+     */
+    public static function can_make_tasite($user, $courseid) {
+        if (self::can_have_tasite($user, $courseid)) {
+            // Make sure that TA site doesn't already exist.
+            $tasites = self::get_tasites($courseid);
+            foreach ($tasites as $tasite) {
+                if (strpos($tasite->enrol->ta_uclaids, $user->idnumber) !== false) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            $context = context_course::instance($courseid);
+            if (has_capability('moodle/course:update', $context)) {
+                // Check if every TA has a site already.
+                $mapping = self::get_tasection_mapping($courseid);
+                if (isset($mapping['byta'])) {
+                    // Loop through each TA.
+                    foreach ($mapping['byta'] as $tainfo) {
+                        if (!self::has_tasite($courseid, $tainfo['ucla_id'])) {
+                            // Found a TA without a TA site.
+                            return true;
+                        }
+                    }
+                }
+                if (isset($mapping['bysection'])) {
+                    if (get_config('block_ucla_tasites', 'enablebysection')) {
+                        // Loop through each section and make sure it doesn't exist.
+                        foreach ($mapping['bysection'] as $secinfo) {
+                            foreach ($secinfo['secsrs'] as $secsrs) {
+                                if (!self::has_sec_tasite($courseid, $secsrs)) {
+                                    // Found a section without a TA site.
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
-     *  Gets all the enrol_meta instances associated that signifies
-     *  that a course is a TA-site.
-     **/
-    static function get_tasite_enrolments($courseid) {
+     * Changes the given TA site's default grouping to given new grouping.
+     *
+     * Also changes existing content that belonged to the old grouping to the
+     * new grouping.
+     *
+     * @param int $courseid
+     * @param int $newgroupingid
+     * @return boolean
+     */
+    public static function change_default_grouping($courseid, $newgroupingid) {
         global $DB;
+
+        // Make sure course exists and get latest default grouping id.
+        $course = get_course($courseid);
+        if (empty($course)) {
+            return false;
+        }
+
+        // Make sure course is a TA site.
+        if (!self::is_tasite($course->id)) {
+            return false;
+        }
+
+        // Make sure given grouping exists and belongs to course.
+        $newgrouping = groups_get_grouping($newgroupingid);
+        if ($newgrouping->courseid != $course->id) {
+            return false;
+        }
+
+        // Get all content that belonged to the old grouping and set it to the
+        // new grouping.
+        $sql = "UPDATE {course_modules}
+                   SET groupingid=:newgroupingid
+                 WHERE course=:courseid
+                   AND groupingid=:oldgroupingid";
+        $DB->execute($sql, array('courseid' => $course->id,
+            'newgroupingid' => $newgroupingid,
+            'oldgroupingid' => $course->defaultgroupingid));
+
+        // Important to clear the cache so that new groupings are displayed.
+        rebuild_course_cache($course->id, true);
+
+        // Set course's default grouping to be the new grouping.
+        $course->defaultgroupingid = $newgroupingid;
+        return $DB->update_record('course', $course);
+    }
+
+    /**
+     * Checks if the current user can have TA-sites.
+     *
+     * @param int $courseid
+     *
+     * @return boolean
+     */
+    public static function check_access($courseid) {
+        return self::enabled($courseid) && self::can_access($courseid);
+    }
+
+    /**
+     * Creates a new course and assigns enrolments.
+     *
+     * @param stdClass $parentcourse
+     * @param array $typeinfo   This is a subset of what we get from
+     *                          get_tasection_mapping:
+     *                  [bysection] => [secnum] => [secsrs] => [array of srs numbers]
+     *                                          => [tas] => [array of uid => fullname]
+     *                  [byta] => [fullname] => [ucla_id] => [uid]
+     *                                       => [secsrs] => [secnum] => [srs numbers]
+     * @param boolean $restrictgrouping If true, and TA site has sections, will
+     *                                  change the default grouping to
+     *                                  "TA Section Materials". Default true.
+     *
+     * @return stdClass          Returns created course.
+     */
+    public static function create_tasite($parentcourse, $typeinfo, $restrictgrouping = true) {
+        global $DB, $USER;
+        $course = clone($parentcourse);
+
+        // Get default name for TA site.
+        $course->fullname = self::new_fullname($parentcourse->fullname, $typeinfo);
+        $course->shortname = self::new_shortname($parentcourse->shortname, $typeinfo);
+
+        // Hacks for public private.
+        unset($course->grouppublicprivate);
+        unset($course->groupingpublicprivate);
+
+        // Remove course description, because it doesn't make sense for tasites.
+        unset($course->summary);
+
+        $newcourse = create_course($course);
+
+        // Tag site as TA site.
+        self::set_site_indicator($newcourse);
+
+        // Map section numbers to SRS numbers.
+        $secnums = array();
+        $uidarray = array();
+        $srsarray = array();
+        if (isset($typeinfo['bysection'])) {
+            foreach ($typeinfo['bysection'] as $secnum => $secinfo) {
+                $secnums[] = self::format_sec_num($secnum);
+                $srsarray = array_merge($srsarray, $secinfo['secsrs']);
+                if (isset($secinfo['tas'])) {
+                    $uidarray = array_merge($uidarray, array_keys($secinfo['tas']));
+                }
+            }
+        } else if (isset($typeinfo['byta'])) {
+            // Getting the TA's UID and section SRS numbers.
+            foreach ($typeinfo['byta'] as $tainfo) {
+                $uidarray[] = $tainfo['ucla_id'];
+                if (!empty($tainfo['secsrs'])) {
+                    // If course has sections, then handle multiple srs numbers.
+                    foreach ($tainfo['secsrs'] as $secnum => $secinfo) {
+                        $secnums[] = self::format_sec_num($secnum);
+                        foreach ($secinfo as $srs) {
+                            $srsarray[] = $srs;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Setup meta enrolment plugin and sync enrolments.
+        $meta = new enrol_meta_plugin();
+        $meta->add_instance($newcourse, array(
+            'customint1'  => $parentcourse->id,
+            'customint2'  => self::get_ta_role_id(),
+            'customint3'  => self::get_ta_admin_role_id(),
+            'customint4'  => $USER->id,
+            'customchar1' => implode(',', $secnums),
+            'customtext1' => implode(',', $uidarray),
+            'customtext2' => implode(',', $srsarray),
+        ));
+        enrol_meta_sync($newcourse->id);
+
+        // Sync groups from course site.
+        $trace = new null_progress_trace();
+        local_metagroups_sync($trace, $newcourse->id);
+        $trace->finished();
+
+        if (!empty($srsarray)) {
+            $tasitegrouping = self::create_taspecificgrouping($parentcourse->id,
+                    $newcourse->id, $srsarray);
+
+            // Do we need to restrict this site?
+            if ($restrictgrouping) {
+                self::change_default_grouping($newcourse->id, $tasitegrouping->id);
+            }            
+        }
         
-        // Find all enrolments
-        $enrols = $DB->get_records(
-            'enrol', 
-            array(
-                'enrol' => 'meta',
-                'customint1' => $courseid,
-                'customint2' => self::get_ta_role_id(),
-                'customint3' => self::get_ta_admin_role_id()
-            ), 
-            '',
-            'customint4 as ownerid, '
-                . 'courseid, '
-                . 'customint1 as parentcourseid, '
-                . 'customint2 as ta_roleid, '
-                . 'customint3 as ta_admin_roleid'
-        );
+        // Delete the Announcement forum for the TA site.
+        $newsforum = forum_get_course_forum($newcourse->id, 'news');
+        forum_delete_instance($newsforum->id);
 
-        return $enrols; 
+        return $newcourse;
     }
 
     /**
-     *  Gets all the TA-sites that are associated with a course.
-     *  Optimization, uses SQL-layer logic.
-     *  @return Array enrol_meta instances, indexed-by customint4,
-     *      with course field pointing to relevant {course} row
-     **/
-    static function get_tasites($courseid) {
+     * For TA site, create a special grouping based on sections.
+     *
+     * @param int $parentcourseid   Parent course id.
+     * @param int $childcourseid    TA course id.
+     * @param array $srsarray       Array of SRS numbers.
+     *
+     * return object    Returns the newly created grouping record.
+     */
+    public static function create_taspecificgrouping($parentcourseid, $childcourseid, $srsarray) {
         global $DB;
+
+        // Create grouping.
+        $tasitegrouping = new stdClass();
+        $tasitegrouping->name = get_string('tasitegroupingname', 'block_ucla_tasites');
+        $tasitegrouping->idnumber = self::GROUPINGID;
+        $tasitegrouping->courseid = $childcourseid;
+        $tasitegrouping->id = groups_create_grouping($tasitegrouping);
+
+        // Find matching groups in TA site matching section groups.
+        // The local_metagroups_sync function sets the idnumber for
+        // groups in the TA site to match the group ids in the parent.
+        list($sqlidnumber, $params) = $DB->get_in_or_equal($srsarray);
+        $params[] = $childcourseid;
+        $params[] = $parentcourseid;
+        $sql = "SELECT child.id
+                   FROM {groups} parent
+                   JOIN {groups} child
+                  WHERE parent.idnumber $sqlidnumber
+                        AND child.idnumber=parent.id
+                        AND child.courseid=?
+                        AND parent.courseid=?";
+        $tasitegroups = $DB->get_fieldset_sql($sql, $params);
+
+        // Add these groups to the $tasitegrouping.
+        foreach ($tasitegroups as $groupid) {
+            groups_assign_grouping($tasitegrouping->id, $groupid);
+        }
+
+        return $tasitegrouping;
+    }
+
+    /**
+     * Checks if TA sites is supported.
+     *
+     * @param int $courseid
+     * @return boolean
+     */
+    public static function enabled($courseid) {
+        // Do not allow collab sites to have TA sites.
+        if (is_collab_site($courseid)) {
+            return false;
+        }
+
+        // See if the instructor has enabled TA site creation for this specific user.
+        $formatoptions = course_get_format($courseid)->get_format_options();
+        if ($formatoptions['createtasite'] == 1) {
+            return self::validate_enrol_meta() && self::validate_roles();
+        }
+    }
+
+    /**
+     * Section number is in this format:
+     *    P000SS -> P+CSTR(CINT(000))+SS    // Trim accordingly.
+     *
+     * @param string $secnum
+     * @return string            Returns formatted string
+     */
+    public static function format_sec_num($secnum) {
+        $retval = '';
+        if (strlen($secnum) <= 3) {
+            // If the string length is ~3, then just convert it to int.
+            $retval = intval($secnum);
+        } else if (strlen($secnum) <= 5) {
+            // Then maybe the last and/or first character doesn't exist; truncated.
+            $len    = strlen($secnum);
+            $num    = intval(substr($secnum, 1, 3));
+            $ss     = trim(substr($secnum, $len - 1, 1));
+            $retval = $num . $ss;
+        } else {
+            // All characters should be present.
+            $p      = trim(substr($secnum, 0, 1));
+            $num    = intval(substr($secnum, 1, 3));
+            $ss     = trim(substr($secnum, 4, 2));
+            $retval = $p . $num . $ss;
+        }
+        return $retval;
+    }
+
+    /**
+     * Returns the TA admin role id.
+     *
+     * @return int
+     */
+    public static function get_ta_admin_role_id() {
+        return self::get_ta_role_id(true);
+    }
+
+    /**
+     * Gets the role id of one of the roles that are relevant.
+     *
+     * Cached using static variables.
+     *
+     * @param boolean $promoted Return the promoted role?
+     * @return int
+     */
+    public static function get_ta_role_id($promoted = false) {
+        global $DB;
+        static $roleids;
+
+        $tarsn = self::get_ta_role_shortname($promoted);
+
+        if (!isset($roleids[$tarsn])) {
+            $roleids[$tarsn] = $DB->get_field('role', 'id',
+                    array('shortname' => $tarsn));
+        }
+
+        return $roleids[$tarsn];
+    }
+
+    /**
+     * Gets the shortnames expected of the TA roles.
+     *
+     * @param boolean $promoted Return the promoted role?
+     * @return string
+     */
+    public static function get_ta_role_shortname($promoted = false) {
+        $rolesubstr = $promoted ? '_admin' : '';
+        $rolestr = 'ta' . $rolesubstr;
+
+        return $rolestr;
+    }
+
+    /**
+     * Returns TA full name from UID.
+     *
+     * @param int $uid
+     * @return string
+     */
+    public static function get_tafullname($uid) {
+        static $tanamecache = array();
+        global $DB;
+
+        if (!isset($tanamecache[$uid])) {
+            $user = $DB->get_record('user', array('idnumber' => $uid));
+            $tanamecache[$uid] = fullname($user);
+        }
+
+        $fullname = $tanamecache[$uid];
+
+        return $fullname;
+    }
+
+    /**
+     * Returns a mapping of discussion srs to TAs, if available.
+     *
+     * Consolidates cross-listed sections as well.
+     *
+     * @param int $courseid
+     * @return array    Returns array in following format:
+     *                  [term]
+     *                  [bysection] => [secnum] => [secsrs] => [array of srs numbers]
+     *                                          => [tas] => [array of uid => fullname]
+     *                  [byta] => [fullname] => [ucla_id] => [uid]
+     *                                       => [secsrs] => [secnum] => [srs numbers]
+     */
+    public static function get_tasection_mapping($courseid) {
+        $cache = cache::make('block_ucla_tasites', 'tasitemapping');
+        $tasitemapping = $cache->get($courseid);
+
+        if (empty($tasitemapping)) {
+            ucla_require_registrar();
+
+            $termsrses = ucla_map_courseid_to_termsrses($courseid);
+            if (empty($termsrses)) {
+                return null;
+            }
+
+            // Get users with role of TA and TA admin, so we can filter list.
+            $tausers = self::get_tasite_users($courseid);
+
+            // Get term, we need it later.
+            $termsrs = reset($termsrses);
+            $term = $termsrs->term;
+
+            $tasitemapping = array();
+            $tasitemapping['term'] = $term;
+            foreach ($termsrses as $termsrs) {
+                $sections = \registrar_query::run_registrar_query(
+                                'ccle_ta_sections', array(
+                            'term' => $termsrs->term,
+                            'srs' => $termsrs->srs
+                ));
+                if (!empty($sections)) {
+                    foreach ($sections as $section) {
+                        $fullname = '';
+                        if (!empty($section['ucla_id'])) {
+                            // Make sure user has TA role for course. Sometimes,
+                            // the people returned by SP are really the TA
+                            // instructor.
+                            $foundta = false;
+                            foreach ($tausers as $tauser) {
+                                if ($tauser->idnumber == $section['ucla_id']) {
+                                    $foundta = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (empty($foundta)) {
+                                continue;
+                            }
+
+                            $fullname = self::get_tafullname($section['ucla_id']);
+                        }
+
+                        // There might be multiple srs numbers for cross-listed sections.
+                        $tasitemapping['bysection'][$section['sect_no']]['secsrs'][] = $section['srs_crs_no'];
+                        $tasitemapping['bysection'][$section['sect_no']]['tas'][$section['ucla_id']] = $fullname;
+
+                        // If a TA isn't assigned to a section yet, don't add it.
+                        if (!empty($fullname)) {
+                            $tasitemapping['byta'][$fullname]['secsrs'][$section['sect_no']][] = $section['srs_crs_no'];
+                            $tasitemapping['byta'][$fullname]['ucla_id'] = $section['ucla_id'];
+                        }
+                    }
+                } else {
+                    // No course sections found, so just use main lecture.
+                    $tasitemapping['bysection']['all']['secsrs'][] = $termsrs->srs;
+
+                    // List the current TAs.
+                    foreach ($tausers as $tauser) {
+                        $fullname = self::get_tafullname($tauser->idnumber);
+                        $tasitemapping['byta'][$fullname]['ucla_id'] = $tauser->idnumber;
+                    }
+                }
+            }
+
+            // Sort the TA names.
+            foreach ($tasitemapping['bysection'] as &$tasection) {
+                if (!empty($tasection['tas'])) {
+                    asort($tasection['tas']);
+                }
+            }
+
+            // Sort the byta mapping by TAs.
+            if (isset($tasitemapping['byta'])) {
+                ksort($tasitemapping['byta']);
+            }
+
+            $cache->set($courseid, $tasitemapping);
+        }
+
+        return $tasitemapping;
+    }
+
+    /**
+     * Returns the relevant enrollment entry that is related to the particular
+     * ta_site.
+     *
+     * @param int $courseid
+     * @return stdClass
+     */
+    public static function get_tasite_enrol_meta_instance($courseid) {
+        $tasiteenrol = false;
+        $instances = enrol_get_instances($courseid, true);
+        foreach ($instances as $instance) {
+            if ($instance->enrol == 'meta') {
+                // Check to see if instance is a tasite enrol meta instance.
+                if (self::is_tasite_enrol_meta_instance($instance)) {
+                    $tasiteenrol = $instance;
+                    // Small convenience naming.
+                    $tasiteenrol->ta_uclaids = $tasiteenrol->customtext1;
+                }
+            }
+        }
+
+        return $tasiteenrol;
+    }
+
+    /**
+     * Gets all the enrol_meta instances associated that signifies that a course
+     * is a TA-site.
+     *
+     * @param int $courseid
+     * return array
+     */
+    public static function get_tasite_enrolments($courseid) {
+        global $DB;
+
+        $fields = 'id, courseid, customint1 as parentcourseid, '
+                . 'customint2 as ta_roleid, customint4 as createrid, '
+                . 'customint3 as ta_admin_roleid, customtext1 as ta_uclaids, '
+                . 'customtext2 as ta_secsrs, customchar1 as secnums';
+        $where = array('enrol' => 'meta',
+            'customint1' => $courseid,
+            'customint2' => self::get_ta_role_id(),
+            'customint3' => self::get_ta_admin_role_id());
+        $sort = 'secnums';
+
+        // Find all TA site meta enrolment instances.
+        $enrols = $DB->get_records('enrol', $where, $sort, $fields);
+
+        return $enrols;
+    }
+
+    /**
+     * Checks if there are any valid users that can have a TA-site.
+     *
+     * @param int $courseid
+     * @return array    Role assignments for users that can have TA-sites.
+     */
+    public static function get_tasite_users($courseid) {
+        global $DB;
+
+        $context = context_course::instance($courseid);
+
+        // Allow ta and ta_admins to have ta sites.
+        $taroleid = self::get_ta_role_id();
+        $taadminroleid = self::get_ta_admin_role_id();
+
+        return $DB->get_records_sql("SELECT DISTINCT u.id, u.idnumber
+            FROM {role_assignments} ra
+            JOIN {user} u ON ra.userid = u.id
+            WHERE ra.contextid = ? AND (ra.roleid = ? OR ra.roleid = ?)",
+                array($context->id, $taroleid, $taadminroleid));
+    }
+
+    /**
+     * Gets all the TA-sites that are associated with a course.
+     *
+     * @param int $courseid
+     * @param boolean $onlyenrolled If true, only return TA sites that current
+     *                              user belongs to the default grouping.
+     * @return array    Enrol_meta instances.
+     */
+    public static function get_tasites($courseid, $onlyenrolled = false) {
+        global $DB, $USER;
 
         $enrols = self::get_tasite_enrolments($courseid);
 
-        // Find related courses
+        // Find related courses.
         $courseids = array();
         foreach ($enrols as $enrolkey => $enrol) {
             $courseids[$enrolkey] = $enrol->courseid;
@@ -150,128 +652,337 @@ class block_ucla_tasites extends block_base {
 
         $courses = $DB->get_records_list('course', 'id', $courseids);
 
-        // match users to courses
+        // Match users to courses.
         $tacourses = array();
         foreach ($enrols as $key => $enrol) {
             $course = $courses[$courseids[$key]];
             $course->enrol = $enrol;
 
-            // get default grouping for each course
-            $course->defaultgroupingname =
-                    groups_get_grouping_name($course->defaultgroupingid);
+            // Get default grouping for each course.
+            $course->defaultgroupingname = groups_get_grouping_name($course->defaultgroupingid);
 
-            $tacourses[$enrol->ownerid] = $course;
+            // Do we need to filter out sites?
+            if ($onlyenrolled) {
+                $members = groups_get_grouping_members($course->defaultgroupingid, 'u.id');
+                if (!in_array($USER->id, array_keys($members))) {
+                    continue;
+                }
+            }
+
+            $tacourses[$enrol->id] = $course;
         }
-    
+
         return $tacourses;
     }
 
     /**
-     *  Checks if there are any valid users that can have a TA-site.
-     *  Cached using static.
+     * Checks if a given user has a TA site for given course.
      *
-     *  @return Array of role_assignments for users that can have 
-     *      TA-sites.
-     **/
-    static function get_tasite_users($courseid) {
-        static $retrar;
+     * @param int $courseid
+     * @param string $uclaid
+     * @return boolean
+     */
+    public static function has_tasite($courseid, $uclaid) {
+        global $DB;
 
-        if (!isset($retrar[$courseid])) {
-            // allow ta and ta-admins to have ta sites
-            $role = new object();
-            $context = context_course::instance($courseid);
+        $where = "customint1=:courseid AND enrol='meta' AND " .
+                $DB->sql_like('customtext1', ':uclaid');
+        return $DB->record_exists_select('enrol', $where,
+                array('courseid' => $courseid, 'uclaid' => '%'.$uclaid.'%'));
+    }
 
-            $role->id = self::get_ta_role_id();
-            $tas = get_users_from_role_on_context($role, $context);
+    /**
+     * Checks if a given section has a TA site for given course.
+     *
+     * @param int $courseid
+     * @param int $secsrs
+     * @return boolean
+     */
+    public static function has_sec_tasite($courseid, $secsrs) {
+        global $DB;
 
-            $role->id = self::get_ta_admin_role_id();
-            $taadmins = get_users_from_role_on_context($role, $context);
+        $where = "customint1=:courseid AND enrol='meta' AND " .
+                $DB->sql_like('customtext2', ':secsrs');
+        return $DB->record_exists_select('enrol', $where,
+                array('courseid' => $courseid, 'secsrs' => '%'.$secsrs.'%'));
+    }
 
-            // merge both roles
-            $ta_users = $tas + $taadmins;
+    /**
+     * Block initializer.
+     */
+    public function init() {
+        $this->title = get_string('pluginname', 'block_ucla_tasites');
+    }
 
-            // then remove any duplicated users
-            $userids = array();
-            foreach ($ta_users as $index => $ta_user) {
-                if (in_array($ta_user->userid, $userids)) {
-                    // exist already, so unset it
-                    unset($ta_users[$index]);
-                } else {
-                    $userids[] = $ta_user->userid;
+    /**
+     * Checks if a site is a TA-site.
+     *
+     * @param int $courseid
+     * @return boolean
+     */
+    public static function is_tasite($courseid) {
+        return is_object(self::get_tasite_enrol_meta_instance($courseid));
+    }
+
+    /**
+     * Checks if the instance of enrol_meta is for a TA-site.
+     *
+     * Cached using static variables.
+     *
+     * @param stdClass $enrol   Enrol instance.
+     */
+    public static function is_tasite_enrol_meta_instance($enrol) {
+        // This can get called a lot from the meta sync.
+        static $cacheistasite;
+        if (!empty($cacheistasite) || !isset($cacheistasite[$enrol->id])) {
+            $result = true;
+            if ($enrol->customint2 != self::get_ta_role_id() ||
+                    $enrol->customint3 != self::get_ta_admin_role_id()) {
+                $result = false;
+            }
+            $cacheistasite[$enrol->id] = $result;
+        }
+        return $cacheistasite[$enrol->id];
+    }
+
+    /**
+     * Generates a fullname for the TA-site.
+     *
+     * @param string $parentfullname
+     * @param array $typeinfo           Indexed by the site type.
+     * @return string
+     */
+    public static function new_fullname($parentfullname, $typeinfo) {
+        $fullname = '';
+        $a = new stdClass();
+        $a->fullname = $parentfullname;
+
+        if (isset($typeinfo['bysection'])) {
+            $secnums = array_keys($typeinfo['bysection']);
+            // Format secnums.
+            $secnums = array_map(array('block_ucla_tasites', 'format_sec_num'), $secnums);
+            $a->text = implode(', ', $secnums);
+        } else if (isset($typeinfo['byta'])) {
+            $tanames = array_keys($typeinfo['byta']);
+            $a->text = implode(', ', $tanames);
+        }
+        $fullname = get_string('tasitefullname', 'block_ucla_tasites', $a);
+        return $fullname;
+    }
+
+    /**
+     * Generates a shortname for the TA-site.
+     *
+     * @param string $parentshortname
+     * @param array $typeinfo           Indexed by the site type.
+     * @param int $cascade              Used if there is a name collision.
+     * @return string
+     */
+    public static function new_shortname($parentshortname, $typeinfo, $cascade = 0) {
+        global $DB;
+
+        // Would use calculate_course_names but that adds "Copy" to shortname.
+        $shortname = $parentshortname . '-';
+        if (isset($typeinfo['bysection'])) {
+            $secnums = array_keys($typeinfo['bysection']);
+            // Format secnums.
+            $secnums = array_map(array('block_ucla_tasites', 'format_sec_num'), $secnums);
+            $shortname .= implode('-', $secnums);
+        } else if (isset($typeinfo['byta'])) {
+            $tanames = array_keys($typeinfo['byta']);
+
+            $shortname .= implode('-', $tanames);
+            $escchars = array(" ", ",", "'");
+            $shortname = str_replace($escchars, "", $shortname);
+        }
+
+        if ($cascade) {
+            // Name conflict, so try appending number.
+            $shortname .= '-' . $cascade;
+        }
+
+        if ($DB->record_exists('course', array('shortname' => $shortname))) {
+            $cascade++;
+            return self::new_shortname($parentshortname, $typeinfo, $cascade);
+        }
+
+        return $shortname;
+    }
+
+    /**
+     * Appends Office hours block results with links to TA sites.
+     *
+     * @param array $params
+     * @return array
+     */
+    public function office_hours_append($params) {
+        $instructors = $params['instructors'];
+        $course = $params['course'];
+
+        // If user is not a course admin, restrict which TA sites they can view.
+        $onlyenrolled = false;
+        $context = context_course::instance($course->id);
+        if (!has_capability('moodle/course:manageactivities', $context)) {
+            $onlyenrolled = true;
+        }
+        $tasites = self::get_tasites($course->id, $onlyenrolled);
+
+        $appendedinstdata = array();
+
+        if ($tasites) {
+            foreach ($instructors as $ik => $instructor) {
+                $iid = $instructor->id;
+                $appendedinstdata[$ik]['tasite'] = '';
+                foreach ($tasites as $tasite) {
+                    if (empty($tasite->visible)) {
+                        // Do not show hidden TA sites.
+                        continue;
+                    }
+
+                    $sitebelongstota = false;
+                    $taowners = explode(',', $tasite->enrol->ta_uclaids);
+                    if (in_array($instructor->idnumber, $taowners)) {
+                        $sitebelongstota = true;
+                    } else if (empty($tasite->enrol->ta_uclaids) &&
+                            $tasite->enrol->createrid == $iid) {
+                        // Used for legacy TA sites.
+                        $sitebelongstota = true;
+                    }
+
+                    // TA site belongs to user.
+                    if ($sitebelongstota) {
+                        if (!empty($appendedinstdata[$ik]['tasite'])) {
+                            $appendedinstdata[$ik]['tasite'] .= '<br />';
+                        }
+                        $link = get_string('viewtasite', 'block_ucla_tasites');
+
+                        $appendedinstdata[$ik]['tasite'] .= html_writer::link(
+                                new moodle_url('/course/view.php',
+                                        array('id' => $tasite->id)), $link
+                        );
+                    }
                 }
             }
-            $retrar[$courseid] = $ta_users;
         }
-
-        return $retrar[$courseid];
-    }
-   
-    /**
-     *  Checks if the current user can have TA-sites.
-     *  @throws 
-     **/
-    static function check_access($courseid) {
-        return self::enabled() && self::can_access($courseid);
-    }
-   
-    /**
-     *  Checks if a user can create a specific or any TA-site.
-     *  @throws
-     **/
-    static function can_access($courseid, $user=false) {
-        global $USER;
-        $user = $user ? $user : $USER;
-
-        return self::can_have_tasite($user, $courseid)
-            || has_capability('moodle/course:update', 
-                    context_course::instance($courseid), $user)
-            || require_capability('moodle/site:config', 
-                    context_system::instance(), $user);
-    }
-  
-    /**
-     *  Semantic function that checks if there is any point in doing 
-     *  anything.
-     *  @throws block_ucla_tasites_exception 
-     **/
-    static function enabled() {
-        return self::validate_enrol_meta() && self::validate_roles();
+        return $appendedinstdata;
     }
 
     /**
-     *  Checks that the roles have been correctly detected.
-     *  @throws block_ucla_tasites_exception 
-     **/
-    static function validate_roles() {
-        if (!self::get_ta_role_id()) {
-            throw new block_ucla_tasites_exception('setuprole', 
-                self::get_ta_role_shortname());
-        }
-
-        if (!self::get_ta_admin_role_id()) {
-            throw new block_ucla_tasites_exception('setuprole', 
-                self::get_ta_role_shortname(true));
-        }
-
-        return true;
-    }
-
-    /**
-     *  Checks that enrol_meta is enabled, and then enables the plugin
-     *  if possible. 
+     * Filters Office hours block results so that if the course is a TA site, we
+     * only want to display the valid TA.
      *
-     *  @throws block_ucla_tasites_exception
-     **/
-    static function validate_enrol_meta() {
-        if (!enrol_is_enabled('meta')) {
-            // Reference admin/enrol.php
-            try {
-                require_capability('moodle/site:config', 
-                    context_system::instance());
-            } catch (moodle_exception $e) {
-                throw new block_ucla_tasites_exception('setupenrol');
+     * @param array $params
+     * @return array            The filtered input array.
+     */
+    public function office_hours_filter_instructors($params) {
+        $filtered = array();
+        $course = $params['course'];
+        $instructors = $params['instructors'];
+
+        if (($tasiteenrol = self::get_tasite_enrol_meta_instance($course->id))) {
+            // Filter out all the people displayed in the office hours block
+            // that is not the TA.
+            foreach ($instructors as $key => $instructor) {
+                if (strpos($tasiteenrol->ta_uclaids, $instructor->idnumber) === false) {
+                    $filtered[] = $key;
+                }
             }
-       
+        }
+
+        return $filtered;
+    }
+
+    /**
+     * Sets site type for given course to be a TA site.
+     *
+     * @param stdClass $newcourse
+     */
+    public static function set_site_indicator($newcourse) {
+        global $CFG;
+        require_once($CFG->dirroot . '/' . $CFG->admin .
+                '/tool/uclasiteindicator/lib.php');
+        $sitetype = siteindicator_site::create($newcourse->id);
+        $sitetype->set_type('tasite');
+    }
+
+    /**
+     * Either shows or hides TA site, depending on current status.
+     *
+     * @param int $courseid
+     * @return int              Current visiblity of site.
+     */
+    public static function toggle_visiblity($courseid) {
+        // Make sure course is TA site.
+        if (!self::is_tasite($courseid)) {
+            throw new block_ucla_tasites_exception('errisnottasite');
+        }
+
+        $oldcourse = get_course($courseid);
+        course_change_visibility($courseid, !$oldcourse->visible);
+
+        return !$oldcourse->visible;
+    }
+
+    /**
+     * Adds link to block in Control Panel.
+     *
+     * @param stdClass $course
+     * @param context_course $context
+     *
+     * @return mixed    Returns array that can be parsed into Control Panel link
+     *                  or returns false if user cannot access TA sites.
+     */
+    public static function ucla_cp_hook($course, $context) {
+        $courseid = $course->id;
+        $cpmodule = false;
+
+        $accessible = false;
+        try {
+            // Can create a TA site if there are TAs or course has sections.
+            if (self::check_access($courseid) && !self::is_tasite($courseid)) {
+                $mapping = self::get_tasection_mapping($courseid);
+                $accessible = self::get_tasite_users($courseid) ||
+                        (isset($mapping['bysection']) && !isset($mapping['bysection']['all']));
+            }
+        } catch (moodle_exception $e) {
+            // Do nothing.
+            $accessible = false;
+        }
+
+        // User can access TA sites, so provide link.
+        if ($accessible) {
+            $cpmodule = array(
+                array(
+                    'item_name' => 'ucla_make_tasites',
+                    'action' => new moodle_url(
+                            '/blocks/ucla_tasites/index.php', array(
+                        'courseid' => $course->id
+                            )
+                    ),
+                    'tags' => array('ucla_cp_mod_other')
+                )
+            );
+        }
+
+        return $cpmodule;
+    }
+
+    /**
+     * Checks that enrol_meta is enabled, and then enables the plugin
+     * if possible.
+     *
+     * @throws block_ucla_tasites_exception
+     * @return boolean
+     */
+    public static function validate_enrol_meta() {
+        if (!enrol_is_enabled('meta')) {
+            // Reference admin/enrol.php.
+            try {
+                require_capability('moodle/site:config', context_system::instance());
+            } catch (moodle_exception $e) {
+                throw new block_ucla_tasites_exception('errsetupenrol');
+            }
+
             $enabled = array_keys(enrol_get_plugins(true));
             $enabled[] = 'meta';
             set_config('enrol_plugins_enabled', implode(',', $enabled));
@@ -284,280 +995,50 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
-     *  Checks if a site is a TA-site.
-     *  Essentially distinguishes between one type of enrol_meta.
-     *  A site is a TA-site if there is a specialized enrol_meta.
-     **/
-    static function is_tasite($courseid) {
-        return is_object(self::get_tasite_enrol_meta_instance($courseid));
+     * Checks that the roles have been correctly detected.
+     *
+     * @throws block_ucla_tasites_exception
+     * @return boolean
+     */
+    public static function validate_roles() {
+        if (!self::get_ta_role_id()) {
+            throw new block_ucla_tasites_exception('setuprole', self::get_ta_role_shortname());
+        }
+
+        if (!self::get_ta_admin_role_id()) {
+            throw new block_ucla_tasites_exception('setuprole', self::get_ta_role_shortname(true));
+        }
+
+        return true;
     }
 
     /**
-     *  Returns the relevant enrollment entry that is related to
-     *  the particular ta_site.
-     **/
-    static function get_tasite_enrol_meta_instance($courseid) {
-        $instances = enrol_get_instances($courseid, true);
-
-        $tasite_enrol = false;
-
-        // Do a search?
-        foreach ($instances as $instance) {
-            if ($instance->enrol == 'meta') {
-                // check to see if instance is a tasite enrol meta instance
-                if (self::is_tasite_enrol_meta_instance($instance)) {
-                    $tasite_enrol = $instance;
-                    // Small convenience naming
-                    $tasite_enrol->ownerid = $tasite_enrol->customint4;
-                }
-            }
-        }
-
-        return $tasite_enrol;
+     * Returns true because block has a settings.php file.
+     *
+     * @return boolean
+     */
+    public function has_config() {
+        return true;
     }
 
-    /**
-     *  Checks if the instance of enrol_meta is for a TA-site.
-     *  Maybe named is enrol meta instance for tasite?
-     **/
-    static function is_tasite_enrol_meta_instance($enrol) {
-        // this can get called a lot from the meta sync
-        static $cache_is_tasite;
-        if (!empty($cache_is_tasite) || !isset($cache_is_tasite[$enrol->id])) {
-            $result = true;
-            if (empty($enrol->customint2)
-                    || empty($enrol->customint3)
-                    || empty($enrol->customint4)
-                    || $enrol->customint2 != self::get_ta_role_id()
-                    || $enrol->customint3 != self::get_ta_admin_role_id()) {
-                $result = false;
-            }
-            $cache_is_tasite[$enrol->id] = $result;
-        }
-        return $cache_is_tasite[$enrol->id];
-    }
-
-    /**
-     *  Used to keep track of naming schemas used in the form.
-     **/
-    static function checkbox_naming($tainfo) {
-        return $tainfo->id . '-checkbox';
-    }
-
-    /**
-     *  Used to keep track of naming schemas used in the form.
-     **/
-    static function action_naming($tainfo) {
-        return $tainfo->id . '-action';
-    }
-
-    /**
-     *  Creates a new course, assigns enrolments.
-     **/
-    static function create_tasite($tainfo) {
-        $course = clone($tainfo->parent_course);
-
-        $course->shortname = self::new_name($tainfo);
-        
-        $fullnamedata = new object();
-        $fullnamedata->course_fullname = $course->fullname;
-        // This is the fullname of the TA, sorry
-        $fullnamedata->fullname = $tainfo->fullname;
-
-        $course->fullname = get_string('tasitefor', 'block_ucla_tasites',
-            $fullnamedata);
-
-        // Hacks for public private
-        unset($course->grouppublicprivate);
-        unset($course->groupingpublicprivate);
-
-        // remove course description, because it doesn't make sense for tasites
-        unset($course->summary);
-
-        // @throws
-        $newcourse = create_course($course);
-
-        self::set_site_indicator($newcourse);
-    
-        $course->id = $newcourse->id;
-
-        // TODO move into function?
-        $meta = new enrol_meta_plugin();
-        $meta->add_instance($course, array(
-            'customint1' => $tainfo->parent_course->id,
-            'customint2' => self::get_ta_role_id(),
-            'customint3' => self::get_ta_admin_role_id(),
-            'customint4' => $tainfo->id
-        ));
-
-        enrol_meta_sync($course->id);
-        
-        // Check if Announcements forum should be deleted for TA site.
-        $istasite = block_ucla_tasites::is_tasite($course->id);
-        if ($istasite) {
-            $enabletasitenewsforum = !(get_config('format_ucla', 'disable_tasite_news_forum'));
-            if (!$enabletasitenewsforum) {
-                $newsforum = forum_get_course_forum($course->id, 'news');
-                forum_delete_instance($newsforum->id);
-            }
-        }
-        
-        // Sync groups from course site.
-        $trace = new null_progress_trace();
-        local_metagroups_sync($trace, $course->id);
-        $trace->finished();
-
-        return $newcourse;
-    }
-
-    /**
-     *  Attempts to attach a site indicator.
-     **/
-    static function set_site_indicator($newcourse) {
-        global $CFG;
-        static $has_uclasiteindicator;
-
-        if (!isset($has_uclasiteindicator)) {
-            require_once($CFG->dirroot . '/lib/pluginlib.php');
-            $pm = plugin_manager::instance();
-            $plugins = $pm->get_plugins();
-            $has_uclasiteindicator = isset(
-                    $plugins['tool']['uclasiteindicator']
-                ); 
-        }
-
-        if ($has_uclasiteindicator) {
-            require_once($CFG->dirroot . '/' . $CFG->admin 
-                    . '/tool/uclasiteindicator/lib.php');
-            $sitetype = siteindicator_site::create($newcourse->id);
-            $sitetype->set_type('tasite');
-        }
-    }
-
-    /**
-     *  Generates a shortname for the TA-site.
-     **/
-    static function new_name($tainfo, $usefirstname=false, $cascade=0) {
-        global $DB;
-
-        // would use calculate_course_names but that adds "Copy" to shortname
-        $coursename = $tainfo->parent_course->shortname . '-' 
-            . $tainfo->lastname;
-
-        if ($usefirstname) {
-            $coursename .= '-' . $tainfo->firstname;
-        }
-
-        if ($cascade) {
-            // This will be epically confusing
-            $coursename .= '-' . $cascade;
-        }
-
-        if ($DB->record_exists('course', array('shortname' => $coursename))) {
-            if ($usefirstname) {
-                $cascade++;
-            }
-
-            return self::new_name($tainfo, true, $cascade);
-        }
-
-        return strtoupper($coursename);
-    }
-
-    /**
-     *  Hook API call for control panel.
-     **/
-    static function ucla_cp_hook($course, $context) {
-        $courseid = $course->id;
-        $cp_module = false;
-
-        $accessible = false;
-
-        try {
-            $accessible = self::check_access($courseid) 
-                && self::get_tasite_users($courseid)
-                && !self::is_tasite($courseid);
-        } catch (moodle_exception $e) {
-            // aka do nothing
-            $accessible = false;
-        }
-
-        if ($accessible) {
-            $cp_module = array(
-                array(
-                    'item_name' => 'ucla_make_tasites',
-                    'action' => new moodle_url(
-                        '/blocks/ucla_tasites/index.php',
-                        array(
-                            'courseid' => $course->id
-                        )
-                    ),
-                    'tags' => array('ucla_cp_mod_other')
-                )
-            );
-        }
-
-        return $cp_module;
-    }
-
-    /**
-     *  Reply to hook. 
-     *  If the course is a TA site, we only want to display the valid
-     *  TA.
-     **/
-    function office_hours_filter_instructors($params) {
-        $filtered = array();
-        $course = $params['course'];
-        $instructors = $params['instructors'];
-
-        if (($tasite_enrol = self::get_tasite_enrol_meta_instance($course->id))
-                && self::is_tasite_enrol_meta_instance($tasite_enrol)) {
-
-            // Filter out all the people displayed in the office hours block
-            // that is not the TA
-            foreach ($instructors as $key => $instructor) {
-                if ($tasite_enrol->ownerid != $instructor->id) {
-                    $filtered[] = $key;
-                }
-            }
-        }
-
-        return $filtered;
-    }
-
-    function office_hours_append($params) {
-        $instructors = $params['instructors'];
-        $course = $params['course'];
-        $tasites = self::get_tasites($course->id);
-
-        $appended_instdata = array();
-
-        if ($tasites) {
-            $fieldname = block_ucla_office_hours::blocks_process_displaykey(
-                'tasite', 'block_ucla_tasites'
-            );
-                
-            foreach ($instructors as $ik => $instructor) {
-                $iid = $instructor->id;
-                if (isset($tasites[$iid])) {
-                    $appended_instdata[$ik]['tasite'] = html_writer::link(
-                        new moodle_url(
-                            '/course/view.php',
-                            array('id' => $tasites[$iid]->id)
-                        ),
-                        get_string('view_tasite', 'block_ucla_tasites')
-                    );
-                } else {
-                    $appended_instdata[$ik]['tasite'] = '';
-                }
-            }
-        }
-        return $appended_instdata;
-    }
 }
 
+/**
+ * TA sites exception.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_tasites_exception extends moodle_exception {
-    function __construct($errorcode, $a=null) {
+
+    /**
+     * Constructor.
+     *
+     * @param string $errorcode
+     * @param string $a
+     */
+    public function __construct($errorcode, $a = null) {
         parent::__construct($errorcode, 'block_ucla_tasites', '', $a);
     }
+
 }

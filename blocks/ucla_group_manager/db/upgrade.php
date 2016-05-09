@@ -1,30 +1,58 @@
 <?php
+// This file is part of the UCLA group management plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade code.
+ *
+ * @package    block_ucla_group_manager
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Upgrade function.
+ *
+ * @param int $oldversion
+ * @return boolean
+ */
 function xmldb_block_ucla_group_manager_upgrade($oldversion=0) {
-    global $CFG, $DB;
+    global $DB;
 
-    $dbman = $DB->get_manager(); 
+    $dbman = $DB->get_manager();
     if ($oldversion < 2012060100) {
 
-        // Define table ucla_group_members to be created
+        // Define table ucla_group_members to be created.
         $table = new xmldb_table('ucla_group_members');
 
-        // Adding fields to table ucla_group_members
+        // Adding fields to table ucla_group_members.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('groups_membersid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
 
-        // Adding keys to table ucla_group_members
+        // Adding keys to table ucla_group_members.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-        // Adding indexes to table ucla_group_members
+        // Adding indexes to table ucla_group_members.
         $table->add_index('groupmembersindex', XMLDB_INDEX_NOTUNIQUE, array('groups_membersid'));
 
-        // Conditionally launch create table for ucla_group_members
+        // Conditionally launch create table for ucla_group_members.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-        // ucla_group_manager savepoint reached
+        // Savepoint reached.
         upgrade_block_savepoint(true, 2012060100, 'ucla_group_manager');
     }
 
@@ -50,9 +78,9 @@ function xmldb_block_ucla_group_manager_upgrade($oldversion=0) {
             // Display progress.
             $pbar = new progress_bar('ucla_group_members_upgrade', 500, true);
             $totalcount = $DB->count_records_select('ucla_group_members', '1=1',
-                    array(), $countitem="COUNT(DISTINCT groups_membersid)");
+                    array(), "COUNT(DISTINCT groups_membersid)");
             $i = 1;
-            
+
             foreach ($results as $result) {
                 $pbar->update($i, $totalcount, "Upgrading ucla_group_members table - $i/$totalcount.");
                 $DB->insert_record('ucla_group_members_new', $result, false, true);
