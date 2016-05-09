@@ -30,7 +30,5 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['language'] = 'Јазик';
-$string['next'] = 'Следно';
-$string['previous'] = 'Претходно';
-$string['reload'] = 'Вчитај повторно';
+$string['thisdirection'] = 'ltr';
+$string['thislanguage'] = 'Breizh';
