@@ -288,6 +288,7 @@ $string['ferpawaiverdesc'] = 'Before you may continue you must agree to the foll
 </ol>';
 $string['ferpawaiverdisagree'] = 'I disagree';
 $string['ferpawaivererror'] = 'FERPA waiver already signed.';
+$string['ferpawaiverfail'] = '<p>Please talk to your instructor about what options are available to you.</p>';
 $string['ferpawaiverheader'] = 'Privacy Waiver for {$a}';
 $string['ferpawaivermismatch'] = 'Given course and context do not match.';
 $string['ferpawaivermoreinfo'] = '(For more information on FERPA go to {$a})';

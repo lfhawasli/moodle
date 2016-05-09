@@ -28,6 +28,7 @@ require_once('../../config.php');
 $contextid = required_param('contextid', PARAM_INT);
 $returnurl = optional_param('return', null, PARAM_LOCALURL);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
+$disagree = optional_param('disagree', 0, PARAM_BOOL);
 
 // Validate variables.
 $context = context::instance_by_id($contextid);
@@ -56,6 +57,12 @@ if ($context->contextlevel == CONTEXT_MODULE) {
 
 require_login($course, false, $cm);
 
+// Check if user declined to sign the FERPA waiver.
+if (!empty($disagree) && confirm_sesskey()) {
+    $message = get_string('ferpawaiverfail', 'local_ucla');
+    redirect($returnurl, $message);
+}
+
 // Check if user is signing the FERPA waiver.
 if (!empty($confirm) && confirm_sesskey()) {
     if (local_ucla_ferpa_waiver::sign($course->id, $context->id, $USER->id)) {
@@ -71,7 +78,10 @@ $pageurl->param('sesskey', sesskey());
 $agreebutton = new single_button($pageurl, get_string('ferpawaiveragree', 'local_ucla'));
 
 // Create cancel/disagree button.
-$disagreebutton = new single_button($courselink, get_string('ferpawaiverdisagree', 'local_ucla'));
+$cancelurl = local_ucla_ferpa_waiver::get_link($context, $courselink);
+$cancelurl->param('disagree', 1);
+$cancelurl->param('sesskey', sesskey());
+$disagreebutton = new single_button($cancelurl, get_string('ferpawaiverdisagree', 'local_ucla'));
 
 // Display title of module or block in header.
 echo $OUTPUT->header();

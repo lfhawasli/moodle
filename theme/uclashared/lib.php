@@ -29,6 +29,7 @@
  * @param moodle_page $page
  */
 function theme_uclashared_page_init(moodle_page $page) {
+    global $USER;
     $context = $page->context;
     $url = $page->url;
     
