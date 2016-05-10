@@ -137,6 +137,8 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 $inviteurl = new moodle_url('/enrol/invitation/enrol.php',
                                 array('token' => $token));
                 $inviteurl = $inviteurl->out(false);
+                $sitelink = new moodle_url('/course/view.php', array('id' => $course->id));
+                $sitelink = $sitelink->out(false);
 
                 // Append privacy notice, if needed.
                 $privacynotice = $this->get_project_privacy_notice($course->id);
@@ -145,6 +147,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 }
 
                 $messageparams->inviteurl = $inviteurl;
+                $messageparams->sitelink = $sitelink;
                 $messageparams->seniorscholarsupportemail = get_config('tool_uclaseniorscholar', 'seniorscholarsupportemail');
                 $messagehtml .= get_string('emailmsghtml', 'tool_uclaseniorscholar', $messageparams);
                 $messagetxt .= get_string('emailmsgtxt', 'tool_uclaseniorscholar', $messageparams);
