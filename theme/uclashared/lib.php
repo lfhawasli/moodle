@@ -36,12 +36,6 @@ function theme_uclashared_page_init(moodle_page $page) {
     // Need to check for redirect layout or else we will end up in an infinite
     // loop, since the redirect() function calls page init again.
     if ($page->pagelayout != 'redirect' && isset($context) && isset($url)) {
-        // If true, then user needs to sign waiver.
-        if (local_ucla_ferpa_waiver::check($context, $url, $USER->id)) {
-            $redirecturl = local_ucla_ferpa_waiver::get_link($context, $url);
-            redirect($redirecturl, get_string('ferpawaiverrequired', 'local_ucla'), 0);
-        }
-
         // Do not attempt to autologin on login pages.
         $urlstring = $url->out();
         if (strpos($urlstring, '/login/') !== false ||

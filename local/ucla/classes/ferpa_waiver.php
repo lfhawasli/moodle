@@ -19,7 +19,7 @@
  *
  * @package     local_ucla
  * @copyright   2014 UC Regents
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package     local_ucla
  * @copyright   2014 UC Regents
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_ferpa_waiver {
     /**
@@ -74,18 +74,29 @@ class local_ucla_ferpa_waiver {
                     // If page is an LTI resource, ignore resources that are
                     // from UCLA.
                     if ($type == 'mod' && $name == 'lti') {
-                        // There isn't a simple way to get the data from the 
+                        // There isn't a simple way to get the data from the
                         // 'mdl_lti' table using core APIs, so using direct
                         // query.
-                        $sql = "SELECT l.toolurl
+                        $sql = "SELECT l.toolurl, l.typeid
                                   FROM {context} cxt
                                   JOIN {course_modules} cm ON (cxt.instanceid=cm.id)
                                   JOIN {lti} l ON (cm.instance=l.id)
                                  WHERE cxt.id=?";
-                        $toolurl = $DB->get_field_sql($sql, array($context->id));                        
-                        if (strpos($toolurl, 'ucla.edu') !== false) {
+                        $ltitool = $DB->get_record_sql($sql, array($context->id));
+                        if (strpos($ltitool->toolurl, 'ucla.edu') !== false) {
                             break;
-                        }                        
+                        }
+
+                        // Do not need to sign waiver for tools configured at site level.
+                        if ($ltitool->typeid != 0) {
+                            // If tool was configured at site level, then typeid will be nonzero
+                            // and the course will be set to 1. Also check that the configuration is active (state = 1).
+                            // i.e. Check that the tool still has a valid configuration at site level.
+                            $ltitype = $DB->get_record('lti_types', array('id' => $ltitool->typeid), 'state, course');
+                            if ($ltitype && ($ltitype->state == 1) && ($ltitype->course == 1)) {
+                                break;
+                            }
+                        }
                     }
                     $checkwaiver = true;
                     break;
