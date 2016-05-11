@@ -90,10 +90,10 @@ class local_ucla_ferpa_waiver {
                         // Do not need to sign waiver for tools configured at site level.
                         if ($ltitool->typeid != 0) {
                             // If tool was configured at site level, then typeid will be nonzero
-                            // and the course will be set to 1. Also check that the configuration is active (state = 1).
+                            // and the course will be set to SITEID. Also check that the configuration is active (state = 1).
                             // i.e. Check that the tool still has a valid configuration at site level.
                             $ltitype = $DB->get_record('lti_types', array('id' => $ltitool->typeid), 'state, course');
-                            if ($ltitype && ($ltitype->state == 1) && ($ltitype->course == 1)) {
+                            if ($ltitype && ($ltitype->state == 1) && ($ltitype->course == SITEID)) {
                                 break;
                             }
                         }
