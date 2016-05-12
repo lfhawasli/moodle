@@ -200,6 +200,9 @@ class enrol_meta_plugin extends enrol_plugin {
             if (strpos($ra->tasiteowners, $ra->idnumber) !== false) {
                 return $ra->promotoroleid;
             }
+        } else if ($ra->promouserid == $ra->userid) {
+            // Handle old TA sites.
+            return $ra->promotoroleid;
         }
 
         return $ra->roleid;
