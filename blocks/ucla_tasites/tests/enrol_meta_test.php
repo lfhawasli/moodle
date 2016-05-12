@@ -33,12 +33,32 @@ require_once($CFG->dirroot . '/enrol/meta/lib.php');
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class enrol_meta_test extends advanced_testcase {
+class enrol_meta_test extends basic_testcase {
+
     /**
-     * Setup.
+     * Tests that role promotion works as expected for old TA sites.
      */
-    protected function setUp() {
-        $this->resetAfterTest(true);
+    public function test_get_old_role_promotion() {
+        // TA site belongs to them.
+        $ra = new stdClass();
+        $ra->roleid = 16;
+        $ra->promotoroleid = 15;
+        $ra->userid = 100;
+        $ra->promouserid = 100;
+        $ra->tasiteowners = '';
+        $ra->idnumber = '';
+        $promotion = enrol_meta_plugin::get_role_promotion($ra);
+        $this->assertEquals($ra->promotoroleid, $promotion);
+
+        // TA site does not belongs to them.
+        $ra->promouserid = '200';
+        $promotion = enrol_meta_plugin::get_role_promotion($ra);
+        $this->assertEquals($ra->roleid, $promotion);
+
+        // TA site doesn't belong to user.
+        $ra->idnumber = '300';
+        $promotion = enrol_meta_plugin::get_role_promotion($ra);
+        $this->assertEquals($ra->roleid, $promotion);
     }
 
     /**
