@@ -19,7 +19,7 @@
  *
  * Can upgrade TA sites for entire system, term, or course.
  *
- * Upgrades TA sites to support TA specific groups, see CCLE-5715.
+ * Will not create TA section specific grouping, see CCLE-5715.
  *
  * @package    block_ucla_tasites
  * @copyright  2016 UC Regents
@@ -39,9 +39,11 @@ list($options, $unrecognized) = cli_get_params(array('help' => false),
         array('h' => 'help'));
 
 if ($options['help']) {
-    $help = "Upgrades TA sites to support TA specific groups, see CCLE-5715.
+    $help = "Upgrades TA sites to support new TA management code, see CCLE-5715.
 
 Can upgrade TA sites for entire system, term, or course.
+
+Will not create TA section specific grouping.
 
 Options:
 -h, --help            Print out this help
@@ -58,12 +60,11 @@ Example:
 set_time_limit(0);
 $trace = new text_progress_trace();
 
-// Get TA sites that aren't upgraded, meaning they have customtext1 and
-// customtext2 are NULL.
+// Get TA sites that aren't upgraded, meaning they have customtext1 is NULL.
 $sql = "SELECT e.*
-        FROM {course} c
-        JOIN {enrol} e ON (e.customint1=c.id AND e.customtext1 IS NULL AND e.customtext2 IS NULL)
-        JOIN {course} tasite ON (tasite.id=e.courseid)";
+         FROM {course} c
+         JOIN {enrol} e ON (e.customint1=c.id AND e.customtext1 IS NULL)
+         JOIN {ucla_siteindicator} tasite ON (tasite.courseid=e.courseid) ";
 
 // See if user passed in term or courseid.
 $params = array();
@@ -78,26 +79,19 @@ if ($unrecognized) {
         $params[] = $value;
     } else {
         cli_error('Invalid parameter passed. Must be term or courseid.');
-    }
+    }    
 }
 
+$sql .= " AND tasite.type='tasite'";
+
 $tasites = $DB->get_recordset_sql($sql, $params);
+$numrecords = 0;
 if ($tasites->valid()) {
-    $trace->output('Processing TA sites');
-    $numrecords = 0;
+    $trace->output('Processing TA sites');    
     $parentcourses = array();
     $groupmanager = new ucla_group_manager();
     foreach ($tasites as $tasite) {
         $trace->output('Processing enrol record ' . $tasite->id, 1);
-
-        // Make sure parent course has section groups updated and with idnumbers set.
-        if (!isset($parentcourses[$tasite->customint1])) {
-            $trace->output('Updating parent course groups ' . $tasite->customint1, 2);
-            ob_start(); // Don't want the output to clutter the screen.
-            $groupmanager->sync_course($tasite->customint1);
-            ob_clean();
-            $parentcourses[$tasite->customint1] = true;
-        }
 
         // Find UID of TA.
         $uid = $DB->get_field('user', 'idnumber', array('id' => $tasite->customint4));
@@ -113,36 +107,6 @@ if ($tasites->valid()) {
         $tasite->timemodified = time();
 
         $trace->output('Setting customtext1 to ' . $uid, 2);
-
-        // Create TA section specific grouping.
-        $mapping = block_ucla_tasites::get_tasection_mapping($tasite->customint1);
-
-        // Check if TA has any sections assigned to them.
-        $ta = $DB->get_record('user', array('id' => $tasite->customint4));
-        $fullname = fullname($ta);
-        if (!empty($mapping['byta'][$fullname]['secsrs'])) {
-            $secnums = $srsarray = array();
-            foreach ($mapping['byta'][$fullname]['secsrs'] as $secnum => $secinfo) {
-                $secnums[] = block_ucla_tasites::format_sec_num($secnum);
-                foreach ($secinfo as $srs) {
-                    $srsarray[] = $srs;
-                }
-            }
-
-            // Found sections, need to create TA specific grouping.
-            $grouping = block_ucla_tasites::create_taspecificgrouping(
-                    $tasite->customint1, $tasite->courseid, $srsarray);
-
-            $trace->output('Created grouping ' . $grouping->id, 2);
-
-            // Add sections SRSes to customtext2.
-            $tasite->customtext2 = implode(',', $srsarray);
-            $trace->output('Updated customtext2 to ' . $tasite->customtext2, 2);
-
-            // Add section numbers to customchar1.
-            $tasite->customchar1 = implode(',', $secnums);
-            $trace->output('Updated customchar1 to ' . $tasite->customchar1, 2);
-        }        
 
         try {
             $DB->update_record('enrol', $tasite);

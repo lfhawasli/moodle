@@ -88,7 +88,8 @@ class block_ucla_tasites extends block_base {
         $tas = self::get_tasite_users($courseid);
         foreach ($tas as $ta) {
             // Check if user is one of the TAs.
-            if ($ta->idnumber == $user->idnumber) {
+            if (!empty($ta->idnumber) &&
+                    $ta->idnumber == $user->idnumber) {
                 return true;
             }
         }
@@ -109,7 +110,8 @@ class block_ucla_tasites extends block_base {
             // Make sure that TA site doesn't already exist.
             $tasites = self::get_tasites($courseid);
             foreach ($tasites as $tasite) {
-                if (strpos($tasite->enrol->ta_uclaids, $user->idnumber) !== false) {
+                if (isset($tasite->enrol->ta_uclaids) &&
+                        strpos($tasite->enrol->ta_uclaids, $user->idnumber) !== false) {
                     return false;
                 }
             }
