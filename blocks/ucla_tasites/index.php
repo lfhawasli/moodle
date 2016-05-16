@@ -200,7 +200,8 @@ if ($tasitesform->is_cancelled()) {
     if (block_ucla_tasites::can_have_tasite($USER, $courseid)) {
         $ista = true;
         foreach ($tasites as $index => $tasite) {
-            if (strpos($tasite->enrol->ta_uclaids, $USER->idnumber) === false) {
+            if (isset($tasite->enrol->ta_uclaids) &&
+                    strpos($tasite->enrol->ta_uclaids, $USER->idnumber) === false) {
                 unset($tasites[$index]);
             }
         }
