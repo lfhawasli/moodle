@@ -279,18 +279,12 @@ $string['customwelcomemessagefrom'] = 'From';
 $string['customwelcomemessagefrom_help'] = 'Please enter the email address you would like student to reply to.';
 
 // CCLE-4863 - Prompt FERPA waiver for LTI/External Plugins
-$string['ferpawaiveragree'] = 'I agree';
 $string['ferpawaiverdesc'] = 'Before you may continue you must agree to the following statements.
 <ul>
 <li>I understand that by providing personal and academic information on this web site I am providing this information to third parties not affiliated with UCLA.</li>
 <li>By providing personal or academic information I understand that I am publicly acknowledging my status as a student and my association with UCLA.</li>
 <li>By providing personal or academic information on this web site I understand that I am waiving my FERPA rights to privacy.</li>
 </ol>';
-$string['ferpawaiverdisagree'] = 'I disagree';
 $string['ferpawaivererror'] = 'FERPA waiver already signed.';
-$string['ferpawaiverfail'] = '<p>Please talk to your instructor about what options are available to you.</p>';
-$string['ferpawaiverheader'] = 'Privacy Waiver for {$a}';
-$string['ferpawaivermismatch'] = 'Given course and context do not match.';
 $string['ferpawaivermoreinfo'] = '(For more information on FERPA go to {$a})';
 $string['ferpawaiverrequired'] = 'FERPA waiver needs to be signed for this course activity/resource.';
-$string['ferpawaivertitle'] = 'Privacy Waiver';

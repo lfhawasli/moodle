@@ -46,7 +46,7 @@ if (!empty($returnurl)) {
 $PAGE->set_context($context);
 $pageurl = local_ucla_ferpa_waiver::get_link($context, $returnurl);
 $PAGE->set_url($pageurl);
-$PAGE->set_title(get_string('ferpawaivertitle', 'local_ucla'));
+$PAGE->set_title(get_string('privacywaivertitle', 'mod_casa'));
 
 // Get course module, if context is a module.
 $cm = null;
@@ -59,13 +59,13 @@ require_login($course, false, $cm);
 
 // Check if user declined to sign the FERPA waiver.
 if (!empty($disagree) && confirm_sesskey()) {
-    $message = get_string('ferpawaiverfail', 'local_ucla');
+    $message = get_string('privacywaiverfail', 'mod_casa');
     redirect($returnurl, $message);
 }
 
 // Check if user is signing the FERPA waiver.
 if (!empty($confirm) && confirm_sesskey()) {
-    if (local_ucla_ferpa_waiver::sign($course->id, $context->id, $USER->id)) {
+    if (mod_casa_privacy_waiver::sign($course->id, $context->id, $USER->id)) {
         redirect($returnurl, 'Waiver signed', 0);
     } else {
         print_error('ferpawaivererror', 'local_ucla');
@@ -75,18 +75,18 @@ if (!empty($confirm) && confirm_sesskey()) {
 // Prepare agree button by adding confirm and sesskey.
 $pageurl->param('confirm', 1);
 $pageurl->param('sesskey', sesskey());
-$agreebutton = new single_button($pageurl, get_string('ferpawaiveragree', 'local_ucla'));
+$agreebutton = new single_button($pageurl, get_string('privacywaiveragree', 'mod_casa'));
 
 // Create cancel/disagree button.
 $cancelurl = local_ucla_ferpa_waiver::get_link($context, $courselink);
 $cancelurl->param('disagree', 1);
 $cancelurl->param('sesskey', sesskey());
-$disagreebutton = new single_button($cancelurl, get_string('ferpawaiverdisagree', 'local_ucla'));
+$disagreebutton = new single_button($cancelurl, get_string('privacywaiverdisagree', 'mod_casa'));
 
 // Display title of module or block in header.
 echo $OUTPUT->header();
 $headingname = $context->get_context_name(false);
-echo $OUTPUT->heading(get_string('ferpawaiverheader', 'local_ucla', $headingname));
+echo $OUTPUT->heading(get_string('privacywaiverheader', 'mod_casa', $headingname));
 
 // Output waiver text.
 echo $OUTPUT->confirm(get_string('ferpawaiverdesc', 'local_ucla'),

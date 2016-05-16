@@ -108,43 +108,13 @@ class local_ucla_ferpa_waiver {
         if (!empty($checkwaiver)) {
             // See if user needs to sign a waiver.
             $coursecontext = $context->get_course_context();
-            if (self::check_user($coursecontext, $userid)) {
+            if (mod_casa_privacy_waiver::check_user($coursecontext, $userid)) {
                 // See if user signed the waiver.
-                return !self::check_signed($coursecontext->instanceid, $context->id, $userid);
+                return !mod_casa_privacy_waiver::check_signed($coursecontext->instanceid, $context->id, $userid);
             }
         }
 
         return false;
-    }
-
-    /**
-     * Checks if there is already a signed waiver for user.
-     *
-     * @param int $courseid
-     * @param int $contextid
-     * @param int $userid
-     * @return boolean      Returns true if user signed waiver, otherwise false.
-     */
-    static public function check_signed($courseid, $contextid, $userid) {
-        global $DB;
-        return $DB->record_exists('lti_privacy_waiver',
-                    array('courseid'    => $courseid,
-                          'contextid'   => $contextid,
-                          'userid'      => $userid));
-    }
-
-    /**
-     * Checks if given user has a role that needs to sign a waiver.
-     *
-     * @param context_course $context
-     * @param int $userid
-     * @return boolean
-     */
-    static public function check_user(context_course $context, $userid) {
-        global $CFG;
-        require_once($CFG->dirroot . '/local/ucla/lib.php');
-
-        return has_role_in_context('student', $context);
     }
 
     /**
@@ -159,37 +129,5 @@ class local_ucla_ferpa_waiver {
         return new moodle_url('/local/ucla/ferpawaiver.php',
                 array('contextid'   => $context->id,
                       'return'      => $url->out_as_local_url()));
-    }
-
-    /**
-     * Signs FERPA waiver for given course, module, and user.
-     *
-     * @param int $courseid
-     * @param int $contextid
-     * @param int $userid
-     *
-     * @return boolean      Returns false if cannot sign waiver. Maybe because
-     *                      of duplicate entry.
-     * @throws dml_exception    Throws exception if cannot handle error.
-     */
-    static public function sign($courseid, $contextid, $userid) {
-        global $DB;
-
-        try {
-            $DB->insert_record('lti_privacy_waiver',
-                    array('courseid'    => $courseid,
-                          'contextid'   => $contextid,
-                          'userid'      => $userid,
-                          'timestamp'   => time()));
-        } catch (dml_exception $e) {
-            // Check if it is already signed.
-            if (self::check_signed($courseid, $contextid, $userid)) {
-                return false;
-            } else {
-                throw $e;   // Cannot handle error.
-            }
-        }
-
-        return true;
     }
 }

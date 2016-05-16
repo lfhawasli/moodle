@@ -70,16 +70,4 @@ $observers = array(
         'eventname'   => '\core\event\user_loggedout',
         'callback'    => 'local_ucla_autologin::clear',
     ),
-    array (
-        'eventname' => '\core\event\course_module_deleted',
-        'callback'  => 'local_ucla_ferpa_waiver_observer::deleted_mod',
-        'internal'  => false, // This means that we get events only after transaction commit.
-        'priority'  => 1000,
-    ),
-    array (
-        'eventname' => '\core\event\course_deleted',
-        'callback'  => 'local_ucla_ferpa_waiver_observer::deleted_course',
-        'internal'  => false, // This means that we get events only after transaction commit.
-        'priority'  => 1000,
-    ),
 );
