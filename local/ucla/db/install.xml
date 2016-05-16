@@ -112,7 +112,7 @@
         <INDEX NAME="param_index" UNIQUE="false" FIELDS="param_term, param_srs, expires_on"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="ucla_ferpa_waiver" COMMENT="Holds the signed waivers for course blocks/modules that send data to 3rd party services.">
+    <TABLE NAME="lti_privacy_waiver" COMMENT="Holds the signed waivers for course blocks/modules that send data to 3rd party services.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

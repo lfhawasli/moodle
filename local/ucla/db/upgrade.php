@@ -632,11 +632,11 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2016022300, 'local', 'ucla');
     }
 
-    // CCLE-4863 - Add ucla_ferpa_waiver table.
+    // CCLE-4863 - Add lti_privacy_waiver table.
     if ($oldversion < 2016050600) {
-        $table = new xmldb_table('ucla_ferpa_waiver');
+        $table = new xmldb_table('lti_privacy_waiver');
 
-        // Adding fields to table ucla_ferpa_waiver.
+        // Adding fields to table lti_privacy_waiver.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
                 XMLDB_SEQUENCE, null);
         $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null,
@@ -648,17 +648,17 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         $table->add_field('timestamp', XMLDB_TYPE_INTEGER, '10', null,
                 XMLDB_NOTNULL, null, null);
 
-        // Adding keys to table ucla_ferpa_waiver.
+        // Adding keys to table lti_privacy_waiver.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-        // Adding indexes to table ucla_ferpa_waiver.
+        // Adding indexes to table lti_privacy_waiver.
         $table->add_index('entry_idx', XMLDB_INDEX_UNIQUE,
                 array('courseid', 'contextid', 'userid'));
         $table->add_index('userwaiver_idx', XMLDB_INDEX_UNIQUE,
                 array('contextid', 'userid'));
         $table->add_index('user_idx', XMLDB_INDEX_NOTUNIQUE, array('userid'));
 
-        // Conditionally launch create table for ucla_ferpa_waiver.
+        // Conditionally launch create table for lti_privacy_waiver.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }

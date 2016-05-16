@@ -39,7 +39,7 @@ class local_ucla_ferpa_waiver_observer {
      */
     static public function deleted_mod(\core\event\course_module_deleted $event) {
         global $DB;
-        $DB->delete_records('ucla_ferpa_waiver',
+        $DB->delete_records('lti_privacy_waiver',
                 array('contextid' => $event->contextid));
     }
 
@@ -53,7 +53,7 @@ class local_ucla_ferpa_waiver_observer {
      */
     static public function deleted_course(\core\event\course_deleted $event) {
         global $DB;
-        $DB->delete_records('ucla_ferpa_waiver',
+        $DB->delete_records('lti_privacy_waiver',
                 array('courseid' => $event->courseid));
     }
 }

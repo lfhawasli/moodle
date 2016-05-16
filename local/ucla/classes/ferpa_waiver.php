@@ -127,7 +127,7 @@ class local_ucla_ferpa_waiver {
      */
     static public function check_signed($courseid, $contextid, $userid) {
         global $DB;
-        return $DB->record_exists('ucla_ferpa_waiver',
+        return $DB->record_exists('lti_privacy_waiver',
                     array('courseid'    => $courseid,
                           'contextid'   => $contextid,
                           'userid'      => $userid));
@@ -176,7 +176,7 @@ class local_ucla_ferpa_waiver {
         global $DB;
 
         try {
-            $DB->insert_record('ucla_ferpa_waiver',
+            $DB->insert_record('lti_privacy_waiver',
                     array('courseid'    => $courseid,
                           'contextid'   => $contextid,
                           'userid'      => $userid,
