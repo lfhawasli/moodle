@@ -521,7 +521,7 @@ if ($processrequests) {
 } 
 
 $registrar_link = new moodle_url(
-    'http://www.registrar.ucla.edu/schedule/');
+        get_config('local_ucla', 'registrarurl')) . '/ro/public/soc';
 
 // Start rendering
 echo $OUTPUT->header();

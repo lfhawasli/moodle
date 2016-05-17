@@ -138,7 +138,8 @@ class tool_supportconsole_manager {
 
             if ($groupname == 'srdb') {
                 // if displaying Registrar tools, give link to Registrar
-                $render .= html_writer::link('http://www.registrar.ucla.edu/schedule/', 
+                $render .= html_writer::link(
+                        get_config('local_ucla', 'registrarurl') . '/ro/public/soc',
                         get_string('srslookup', 'tool_uclasupportconsole'),
                         array('target' => '_blank'));
             }

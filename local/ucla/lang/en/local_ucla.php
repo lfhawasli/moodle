@@ -170,6 +170,8 @@ $string['logfiledeletion'] = 'Log file deletion';
 $string['logfiledeletiondesc'] = 'If enabled, will log the name and SHA1 hash when a file is deleted via the GUI.';
 $string['handlepreferredname'] = 'Enable preferred name';
 $string['handlepreferrednamedesc'] = 'If enabled, will use alternatename field as preferred name and change fullname display depending on course context for user.';
+$string['registrarurlconfig'] = 'Registrar URL';
+$string['registrarurlconfighelp'] = 'Set the URL for UCLA Registrar.';
 
 // Form submit login check
 $string['longincheck_login'] = 'Your session has timed out. In order to save 

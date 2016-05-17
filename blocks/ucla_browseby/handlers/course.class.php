@@ -432,21 +432,13 @@ class course_handler extends browseby_handler {
     }
 
     public static function registrar_url($course) {
-        $page = 'http://www.registrar.ucla.edu/schedule/detselect';
+        // CCLE-5854 - Use new registrar website.
+        $page = get_config('local_ucla', 'registrarurl');
+        $page .= '/ro/public/soc/Results?t=' . $course->term;
+        $page .= '&sBy=classidnumber&id=' . $course->srs;
+        $page .= '&btnIsInIndex=btn_inIndex';
 
-        $term = $course->term;
-
-        $issummerterm = is_summer_term($term);
-        $query = '.aspx?termsel=' . $term . '&subareasel='
-            . urlencode($course->subj_area) . '&idxcrs='
-            . urlencode($course->course_code);
-
-        if ($issummerterm) {
-            $page .= '_summer';
-            $query .= $course->session_group;
-        }
-
-        return $page . $query;
+        return $page;
     }
 
     protected function get_user($userid) {
