@@ -466,6 +466,9 @@ $CFG->theme = 'uclashared';
 // Site administration > Appearance > Themes > Theme settings
 $CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
+$CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
+    FAQs and Tutorials|https://moodle2.sscnet.ucla.edu/docs/Main_Page
+    Request a site|/course/request.php";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
