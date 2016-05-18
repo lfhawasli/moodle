@@ -160,3 +160,6 @@
 [submodule "filter/chemrender"]
 	path = filter/chemrender
 	url = git@github.com:ucla/moodle-filter-chemrender.git 
+[submodule "mod/casa"]
+	path = mod/casa
+	url = git@github.com:ucla/moodle-mod_casa.git
