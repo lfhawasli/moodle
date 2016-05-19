@@ -24,7 +24,6 @@
 
 /**
  * Called before theme outputs anything.
- * Inject a FERPA waiver for tools that send student data to a 3rd party.
  *
  * @param moodle_page $page
  */

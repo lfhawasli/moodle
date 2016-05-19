@@ -33,11 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class local_ucla_ferpa_waiver {
     /**
-     * Checks if user needs to sign FERPA waiver.
-     *
-     * We need this to be very fast with as few database calls as possible,
-     * because this method is called for every page load. We will try to do all
-     * the checks before we query for waiver information with existing data.
+     * Checks if user needs to sign FERPA waiver for the given LTI tool.
      *
      * @param context $context
      * @param moodle_url $url
@@ -53,64 +49,32 @@ class local_ucla_ferpa_waiver {
             return false;
         }
 
-        // Check URL if it is a module/block that needs a FERPA waiver.
-        $path = $url->get_path();
-        $type = $names = null;
-        if ($context->contextlevel == CONTEXT_MODULE) {
-            $names = array('elluminate', 'kalvidassign', 'kalvidpres', 'lti',
-                'mylabmastering', 'turnitintool');
-            $type = 'mod';
-            $page = 'view.php';
-        } else if ($context->contextlevel == CONTEXT_BLOCK) {
-            $names = array('mhaairs', 'mylabmastering');
-            $type = 'blocks';
-            // Need to protect all pages, since there isn't a single access
-            // point for blocks.
-            $page = '';
-        }
-        if (!empty($names)) {
-            foreach ($names as $name) {
-                if (strpos('/'.$path, '/'.$type.'/'.$name.'/'.$page) !== false) {
-                    // If page is an LTI resource, ignore resources that are
-                    // from UCLA.
-                    if ($type == 'mod' && $name == 'lti') {
-                        // There isn't a simple way to get the data from the
-                        // 'mdl_lti' table using core APIs, so using direct
-                        // query.
-                        $sql = "SELECT l.toolurl, l.typeid
-                                  FROM {context} cxt
-                                  JOIN {course_modules} cm ON (cxt.instanceid=cm.id)
-                                  JOIN {lti} l ON (cm.instance=l.id)
-                                 WHERE cxt.id=?";
-                        $ltitool = $DB->get_record_sql($sql, array($context->id));
-                        if (strpos($ltitool->toolurl, 'ucla.edu') !== false) {
-                            break;
-                        }
+        // There isn't a simple way to get the data from the 'mdl_lti' table
+        // using core APIs, so using direct query.
+        $sql = "SELECT l.toolurl, l.typeid
+                  FROM {context} cxt
+                  JOIN {course_modules} cm ON (cxt.instanceid=cm.id)
+                  JOIN {lti} l ON (cm.instance=l.id)
+                 WHERE cxt.id=?";
+        $ltitool = $DB->get_record_sql($sql, array($context->id));
 
-                        // Do not need to sign waiver for tools configured at site level.
-                        if ($ltitool->typeid != 0) {
-                            // If tool was configured at site level, then typeid will be nonzero
-                            // and the course will be set to SITEID. Also check that the configuration is active (state = 1).
-                            // i.e. Check that the tool still has a valid configuration at site level.
-                            $ltitype = $DB->get_record('lti_types', array('id' => $ltitool->typeid), 'state, course');
-                            if ($ltitype && ($ltitype->state == 1) && ($ltitype->course == SITEID)) {
-                                break;
-                            }
-                        }
-                    }
-                    $checkwaiver = true;
-                    break;
-                }
+        // Ignore resources that are from UCLA.
+        if (strpos($ltitool->toolurl, 'ucla.edu') === false) {
+            // Do not need to sign waiver for tools configured at site level.
+            $tool = lti_get_tool_by_url_match($ltitool->toolurl, SITEID);
+            if (empty($tool)) {
+                $checkwaiver = true;
             }
         }
 
-        // Is a page that needs a waiver.
+        // This is a resource that needs a waiver.
         if (!empty($checkwaiver)) {
             // See if user needs to sign a waiver.
             $coursecontext = $context->get_course_context();
             if (mod_casa_privacy_waiver::check_user($coursecontext, $userid)) {
                 // See if user signed the waiver.
-                return !mod_casa_privacy_waiver::check_signed($coursecontext->instanceid, $context->id, $userid);
+                return !mod_casa_privacy_waiver::check_signed($coursecontext->instanceid,
+                        $context->id, $userid);
             }
         }
 

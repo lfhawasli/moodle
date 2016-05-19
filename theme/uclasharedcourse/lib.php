@@ -25,7 +25,7 @@
 require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 
 /**
- * Call same method as parent theme in inject the waiver logic.
+ * Call same method as parent theme in inject preprocessing.
  *
  * @param moodle_page $page
  */
