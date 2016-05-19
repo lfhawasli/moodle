@@ -54,7 +54,7 @@ Scenario: Do not provide waiver for UCLA LTI resources.
     And I should not see "Before you may continue you must agree to the following statements."
     And I should see "LTI"
 
-@javascript @testme
+@javascript
 Scenario: Do not provide waiver for site configured LTI resources.
     Given I log out
     And I log in as "admin"
@@ -76,7 +76,6 @@ Scenario: Do not provide waiver for site configured LTI resources.
     When I log in as "student1"
     And I follow "Course 1"
     And I follow "Site LTI"
-    And I pause
     Then I should not see "Privacy Waiver for LTI"
     And I should not see "Before you may continue you must agree to the following statements."
     And I should see "Site LTI"

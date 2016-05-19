@@ -80,7 +80,7 @@ $url = new moodle_url('/mod/lti/view.php', array('id'=>$cm->id));
 
 // START UCLA MOD: CCLE-4863 - Sign FERPA waiver for external LTI
 // If true, then user needs to sign waiver.
-if (local_ucla_ferpa_waiver::check($context, $url, $USER->id)) {
+if (local_ucla_ferpa_waiver::check($context, $USER->id)) {
     $redirecturl = mod_casa_privacy_waiver::get_link($context, $url);
     redirect($redirecturl, get_string('privacywaiverrequired', 'mod_casa'), 0);
 }

@@ -36,11 +36,10 @@ class local_ucla_ferpa_waiver {
      * Checks if user needs to sign FERPA waiver for the given LTI tool.
      *
      * @param context $context
-     * @param moodle_url $url
      * @param int $userid
      * @return boolean  If true, then user needs to sign waiver.
      */
-    static public function check(context $context, moodle_url $url, $userid) {
+    static public function check(context $context, $userid) {
         global $DB;
         $checkwaiver = false;
 
@@ -58,8 +57,9 @@ class local_ucla_ferpa_waiver {
                  WHERE cxt.id=?";
         $ltitool = $DB->get_record_sql($sql, array($context->id));
 
-        // Ignore resources that are from UCLA.
-        if (strpos($ltitool->toolurl, 'ucla.edu') === false) {
+        // Ignore resources that are from UCLA or from Pearson MyLabMastering.
+        if (strpos($ltitool->toolurl, 'ucla.edu') === false &&
+                strpos($ltitool->toolurl, 'pearsoncmg.com') === false) {
             // Do not need to sign waiver for tools configured at site level.
             $tool = lti_get_tool_by_url_match($ltitool->toolurl, SITEID);
             if (empty($tool)) {
@@ -79,19 +79,5 @@ class local_ucla_ferpa_waiver {
         }
 
         return false;
-    }
-
-    /**
-     * Returns link to get to the FERPA waiver.
-     *
-     * @param context $context
-     * @param moodle_url $url   The URL that a user was on, so that we can
-     *                          redirect them back
-     * return moodle_url
-     */
-    static public function get_link(context $context, moodle_url $url) {
-        return new moodle_url('/local/ucla/ferpawaiver.php',
-                array('contextid'   => $context->id,
-                      'return'      => $url->out_as_local_url()));
     }
 }
