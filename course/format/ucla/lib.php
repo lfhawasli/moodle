@@ -443,8 +443,7 @@ class format_ucla extends format_topics {
             if (empty($sr) && !empty($sectionno)) {
                 // This section is needed for navigating back through breadcrumbs.
                 if (!empty($options['navigation'])) {
-//                    $url->param('section', $sectionno);
-                    $url->set_anchor('section-'.$sectionno);
+                    $url->param('section', $sectionno);
                     return $url;
                 }
                 // Return to "Show all" page.
