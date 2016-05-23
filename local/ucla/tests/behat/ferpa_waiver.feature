@@ -27,18 +27,31 @@ Scenario: Require students to sign waiver for LTI.
     When I log in as "student1"
     And I follow "Course 1"
     And I follow "LTI"
-    Then I should see "Privacy Waiver for LTI"
-    And I should see "Before you may continue you must agree to the following statements."
+    Then I should see "Privacy Waiver"
+    And I should see "By continuing to LTI, you will be sharing"
     When I press "I agree"
     Then I should see "LTI"
+
+Scenario: Allow students to not agree.
+    Given I turn editing mode on
+    And I add a "External tool" to section "0" and I fill the form with:
+        | Activity name | LTI |
+    And I log out
+    When I log in as "student1"
+    And I follow "Course 1"
+    And I follow "LTI"
+    Then I should see "Privacy Waiver"
+    And I should see "By continuing to LTI, you will be sharing"
+    When I press "I do not agree"
+    Then I should see "Please talk to your instructor about what options are available to you."
 
 Scenario: Do not require non-students to sign waiver for LTI.
     Given I turn editing mode on
     And I add a "External tool" to section "0" and I fill the form with:
         | Activity name | LTI |
     And I follow "LTI"
-    Then I should not see "Privacy Waiver for LTI"
-    And I should not see "Before you may continue you must agree to the following statements."
+    Then I should not see "Privacy Waiver"
+    And I should not see "By continuing to LTI, you will be sharing"
     And I should see "LTI"
 
 Scenario: Do not provide waiver for UCLA LTI resources.
@@ -50,8 +63,8 @@ Scenario: Do not provide waiver for UCLA LTI resources.
     When I log in as "student1"
     And I follow "Course 1"
     And I follow "LTI"
-    Then I should not see "Privacy Waiver for LTI"
-    And I should not see "Before you may continue you must agree to the following statements."
+    Then I should not see "Privacy Waiver"
+    And I should not see "By continuing to LTI, you will be sharing"
     And I should see "LTI"
 
 @javascript
@@ -76,7 +89,7 @@ Scenario: Do not provide waiver for site configured LTI resources.
     When I log in as "student1"
     And I follow "Course 1"
     And I follow "Site LTI"
-    Then I should not see "Privacy Waiver for LTI"
-    And I should not see "Before you may continue you must agree to the following statements."
+    Then I should not see "Privacy Waiver"
+    And I should not see "By continuing to LTI, you will be sharing"
     And I should see "Site LTI"
 
