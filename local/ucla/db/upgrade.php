@@ -14,11 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade code.
+ *
+ * @package     local_ucla
+ * @copyright   2014 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- *  Runs extra commands when upgrading.
+ * Runs extra commands when upgrading.
+ *
+ * @param int $oldversion
+ * @return boolean
  */
 function xmldb_local_ucla_upgrade($oldversion = 0) {
     global $CFG, $DB, $OUTPUT;

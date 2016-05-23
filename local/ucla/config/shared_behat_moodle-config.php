@@ -273,6 +273,23 @@ $CFG->forced_plugin_settings['url']['displayoptions'] = '0,1,2,3,4,5,6';    // a
 $CFG->forced_plugin_settings['url']['printheading'] = 1;
 $CFG->forced_plugin_settings['url']['display'] = 3; // RESOURCELIB_DISPLAY_NEW
 
+// Site administration > Plugins > Activity modules > Video Annotation
+$CFG->tnawebserviceurl = array("http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
+                               "http://tvnews.library.ucla.edu/util/webservice.php", 
+                               "http://newsscape.library.ucla.edu/util/webservice.php", 
+                               "https://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php");
+$CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,", 
+                              "http://www.sscnet.ucla.edu/tna/edge/video,", 
+                              "http://www.sscnet.ucla.edu/csa/search/video,", 
+                              "http://dcl.sscnet.ucla.edu/search/video,", 
+                              "http://tvnews.library.ucla.edu/video,", 
+                              "http://newsscape.library.ucla.edu/video,", 
+                              "https://tvnews.sscnet.ucla.edu/edge/video,");
+$CFG->tnastreamerurl = "rtmp://169.232.194.193/csa";
+
 // Site administration > Plugins > Assignment plugins > Submission plugins > File submissions
 $CFG->forced_plugin_settings['assignsubmission_file']['maxbytes'] = 10485760;
 

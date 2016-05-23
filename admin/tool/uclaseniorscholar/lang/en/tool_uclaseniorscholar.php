@@ -83,12 +83,15 @@ $string['message_help'] =
     'After clicking the ACCESS LINK below, you will need to log in ' .
     'using your UCLA logon ID and password, to confirm your access ' .
     'to the site. If you do not have a UCLA logon ID, please follow ' .
-    'the UCLALOGON instructions below to create one.<br />' .
+    'the instructions under UCLA LOGON below to create one.<br />' .
     'Be advised that by clicking on the site access link provided in this ' .
     'email you are acknowledging that:<br />' .
     ' --you are the person to whom this email was addressed and for whom this ' .
     '   invitation is intended;<br />' .
-    ' --the link below can be used only one time, and will expire on ([expiration date]).<br /><br />' .
+    ' --<strong>the ACCESS LINK below can be used only one time</strong>, ' . 
+    'and will expire on ([expiration date]).<br /><br />' .
+    '--After accepting the ACCESS LINK, for all future logins, '. 
+    'go directly to the class website: [site link].<br /><br />' .
     '<strong>ACCESS LINK:</strong>'.
     '<hr />'.
     '[invite url]<br /><br />'.
@@ -115,12 +118,15 @@ $string['emailmsghtml'] =
     'After clicking the ACCESS LINK below, you will need to log in ' .
     'using your UCLA logon ID and password, to confirm your access ' .
     'to the site. If you do not have a UCLA logon ID, please follow ' .
-    'the UCLALOGON instructions below to create one.' . "<br /><br />" .
+    'the instructions under UCLA LOGON below to create one.' . "<br /><br />" .
     'Be advised that by clicking on the site access link provided in this ' .
     'email you are acknowledging that:' . "<br />" .
     ' --you are the person to whom this email was addressed and for whom this ' .
     '   invitation is intended;' . "<br />" .
-    ' --the link below can be used only one time, and will expire on ({$a->expiration}).' . "<br /><br />" .
+    ' --<strong>the ACCESS LINK below can be used only one time</strong>, ' . 
+    'and will expire on ({$a->expiration}).' . "<br /><br />" .
+    '--After accepting the ACCESS LINK, for all future logins, ' .
+    'go directly to the class website: {$a->sitelink}. ' . "<br /><br />" .
     '<strong>ACCESS LINK:</strong>' . "<br />" .
     '------------------------------------------------------------' . "<br />" .
     '{$a->inviteurl}' . "<br /><br />" .
@@ -153,12 +159,15 @@ $string['emailmsgtxt'] =
     'After clicking the ACCESS LINK below, you will need to log in ' .
     'using your UCLA logon ID and password, to confirm your access ' .
     'to the site. If you do not have a UCLA logon ID, please follow ' .
-    'the UCLALOGON instructions below to create one.' . "\n\n" .
+    'the instructions under UCLA LOGON below to create one.' . "\n\n" .
     'Be advised that by clicking on the site access link provided in this ' .
     'email you are acknowledging that:' . "\n" .
     ' --you are the person to whom this email was addressed and for whom this ' .
     '   invitation is intended;' . "\n" .
-    ' --the link below can be used only one time, and will expire on ({$a->expiration}).' . "\n\n" .
+    ' --<strong>the ACCESS LINK below can be used only one time</strong>, ' .
+    'and will expire on ({$a->expiration}).' . "\n\n" .
+    '--After accepting the ACCESS LINK, for all future logins, ' . 
+    'go directly to the class website: {$a->sitelink}.' . "\n\n" .
     'ACCESS LINK:' . "\n" .
     '------------------------------------------------------------' . "\n" .
     '{$a->inviteurl}' . "\n\n" .

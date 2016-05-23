@@ -1131,32 +1131,22 @@ function is_engineering($courseid) {
 }
 
 /**
- *  Returns whether or not the user is the role specified by the role_shortname
- *  in the role table
- * 
- * @param $role_shortname   String or array. If string, then the role's 
- *                          shortname. Else if array, then an array of role 
- *                          shortnames
- * @param $context the context in which to check the roles.
- * 
- * @return boolean true if the user has the role in the context, false otherwise
- **/
-function has_role_in_context($role_shortname, $context) {
-    global $DB;
-    $does_role_exist = $DB->get_records('role', array('shortname'=>$role_shortname));
-    if (empty($does_role_exist)) {
-        debugging("Role shortname not found in database table.");
-        return false;
+ * Returns whether or not the user has the given role for a given context.
+ *
+ * @param string|array $shortname   If string, then the role's shortname. Else
+ *                                  if array, then an array of role shortnames.
+ * @param context $context          The context in which to check the roles.
+ *
+ * @return boolean True if user has the role in the context, false otherwise.
+ */
+function has_role_in_context($shortname, context $context) {
+    // Cast $role_shortname as array, if not already.
+    if (!is_array($shortname)) {
+        $shortname = array($shortname);
     }
- 
-    // cast $role_shortname as array, if not already
-    if (!is_array($role_shortname)) {
-        $role_shortname = array($role_shortname);
-    }
- 
-    $roles_result = get_user_roles($context);
-    foreach ($roles_result as $role) {
-        if (in_array($role->shortname, $role_shortname)) {
+    $roles = get_user_roles($context);
+    foreach ($roles as $role) {
+        if (in_array($role->shortname, $shortname)) {
             return true;
         }
     }

@@ -87,7 +87,7 @@
 	url = https://github.com/ccle/moodle-mod_oublog
 [submodule "mod/scheduler"]
 	path = mod/scheduler
-	url = https://github.com/bostelm/moodle-mod_scheduler.git
+	url = https://github.com/ccle/moodle-mod_scheduler.git
 [submodule "lib/editor/atto/plugins/fontfamily"]
 	path = lib/editor/atto/plugins/fontfamily
 	url = git@github.com:projectestac/moodle-atto_fontfamily.git
@@ -160,3 +160,6 @@
 [submodule "filter/chemrender"]
 	path = filter/chemrender
 	url = git@github.com:ucla/moodle-filter-chemrender.git 
+[submodule "mod/casa"]
+	path = mod/casa
+	url = git@github.com:ucla/moodle-mod_casa.git

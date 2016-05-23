@@ -28,6 +28,7 @@
  * @param moodle_page $page
  */
 function theme_uclashared_page_init(moodle_page $page) {
+    global $USER;
     $context = $page->context;
     $url = $page->url;
     
@@ -48,11 +49,11 @@ function theme_uclashared_page_init(moodle_page $page) {
 }
 
 /**
- * Process a CSS directive to load a font.  Currently works for Bootstrap3 glyphicons.
+ * Process a CSS directive to load a font. Currently works for Bootstrap3 glyphicons.
  * SSC-2778: This filter now also gives choice for the frontpage image! The image
  * is specified in the config file, where its title is set in the config variable
  * "$CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'];".
- * 
+ *
  * @global type $CFG
  * @param type $css
  * @param type $theme
