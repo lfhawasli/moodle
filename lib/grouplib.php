@@ -446,12 +446,20 @@ function groups_get_members($groupid, $fields='u.*', $sort='lastname ASC') {
 function groups_get_grouping_members($groupingid, $fields='u.*', $sort='lastname ASC') {
     global $DB;
 
-    return $DB->get_records_sql("SELECT $fields
+    // START UCLA MOD: CCLE-5790 - Allow user to be in multiple groups.
+//    return $DB->get_records_sql("SELECT $fields
+//                                   FROM {user} u
+//                                     INNER JOIN {groups_members} gm ON u.id = gm.userid
+//                                     INNER JOIN {groupings_groups} gg ON gm.groupid = gg.groupid
+//                                  WHERE  gg.groupingid = ?
+//                               ORDER BY $sort", array($groupingid));
+    return $DB->get_records_sql("SELECT DISTINCT $fields
                                    FROM {user} u
                                      INNER JOIN {groups_members} gm ON u.id = gm.userid
                                      INNER JOIN {groupings_groups} gg ON gm.groupid = gg.groupid
                                   WHERE  gg.groupingid = ?
                                ORDER BY $sort", array($groupingid));
+    // END UCLA MOD: CCLE-5790
 }
 
 /**
