@@ -152,6 +152,34 @@ if ($getsrs && $requests === null) {
     }
 }
 
+// Special catch for request viewer via paging links.
+$viewformparam = optional_param('requestor_view_form', false, PARAM_ALPHANUM);
+$termparam = optional_param('term', false, PARAM_TEXT);
+$departmentparam = optional_param('department', false, PARAM_TEXT);
+$actionparam = optional_param('action', false, PARAM_TEXT);
+
+if ($viewformparam && $termparam && $departmentparam && $actionparam) {
+    $requestorviewform = $cached_forms[UCLA_REQUESTOR_VIEW]['view'];
+    $requestviewobj = new object();
+    $requestviewobj->{$requestorviewform->groupname} = array(
+        'term' => $termparam,
+        'department' => $departmentparam,
+        'action' => $actionparam,
+        'submit' => get_string('viewcourses', 'tool_uclacourserequestor')
+    );
+
+    $requests = $requestorviewform->respond($requestviewobj);
+    $groupid = UCLA_REQUESTOR_VIEW;
+    $uclacrqs = new ucla_courserequests();
+    foreach ($requests as $request) {
+        $uclacrqs->add_set($request);
+    }
+} else if ($cached_forms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {
+    $viewformdata = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->get_data();
+    $termparam = urlencode($viewformdata->requestgroup['term']);
+    $departmentparam = urlencode($viewformdata->requestgroup['department']);
+    $actionparam = urlencode($viewformdata->requestgroup['action']);
+}
 
 // None of the forms took input, so maybe the center form?
 // In this situation, we are assuming all information is
@@ -665,7 +693,15 @@ if (!empty($requeststable->data)) {
         }
         echo html_writer::empty_tag('br');            
     }
-    
+
+    $page = optional_param('page', 0, PARAM_INT);
+    $baseurl = new moodle_url('/admin/tool/uclacourserequestor/index.php',
+            array('requestor_view_form' => '1', 'term' => $termparam,
+                  'department' => $departmentparam, 'action' => $actionparam));
+    $coursesperpage = 100;
+    echo $OUTPUT->paging_bar(count($requeststable->data), $page, $coursesperpage, $baseurl);
+    $requeststable->data = array_slice($requeststable->data,
+            $coursesperpage * $page, $coursesperpage);
     echo html_writer::table($requeststable);
 
     echo html_writer::tag('input', '', array(
