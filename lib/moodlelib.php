@@ -2839,6 +2839,20 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     }
 
     // Check visibility of activity to current user; includes visible flag, conditional availability, etc.
+    // START UCLA MOD: CCLE-3028 - Fix nonlogged users redirect on hidden content
+    if ($cm && !$cm->uservisible) {
+        if ($preventredirect) {
+            throw new require_login_exception('Activity is hidden');
+        }
+        // If a guest user tries to access private course information
+        if (isloggedin() && isguestuser()) {
+            require_once($CFG->dirroot . '/local/ucla/lib.php');
+            prompt_login($PAGE, $OUTPUT, $CFG, $course);
+        } else {
+            redirect($CFG->wwwroot, get_string('activityiscurrentlyhidden'));
+        }
+    }
+    /*
     if ($cm && !$cm->uservisible) {
         if ($preventredirect) {
             throw new require_login_exception('Activity is hidden');
@@ -2850,8 +2864,8 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         }
         redirect($url, get_string('activityiscurrentlyhidden'));
     }
-     *
      */
+    // END UCLA MOD: CCLE-3028
 
     // Set the global $COURSE.
     if ($cm) {
