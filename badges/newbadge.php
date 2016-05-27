@@ -47,7 +47,7 @@ if (($type == BADGE_TYPE_COURSE) && ($course = $DB->get_record('course', array('
     require_login($course);
     $coursecontext = context_course::instance($course->id);
     $PAGE->set_context($coursecontext);
-    $PAGE->set_pagelayout('course');
+    $PAGE->set_pagelayout('incourse');
     $PAGE->set_url('/badges/newbadge.php', array('type' => $type, 'id' => $course->id));
     $heading = format_string($course->fullname, true, array('context' => $coursecontext)) . ": " . $title;
     $PAGE->set_heading($heading);
@@ -91,7 +91,7 @@ if ($form->is_cancelled()) {
     $fordb->courseid = ($type == BADGE_TYPE_COURSE) ? $courseid : null;
     $fordb->messagesubject = get_string('messagesubject', 'badges');
     $fordb->message = get_string('messagebody', 'badges',
-            html_writer::link($CFG->wwwroot . '/badges/mybadges.php', get_string('mybadges', 'badges')));
+            html_writer::link($CFG->wwwroot . '/badges/mybadges.php', get_string('managebadges', 'badges')));
     $fordb->attachment = 1;
     $fordb->notification = BADGE_MESSAGE_NEVER;
     $fordb->status = BADGE_STATUS_INACTIVE;

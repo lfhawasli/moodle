@@ -76,6 +76,8 @@ define('AUTH_LOGIN_FAILED', 3);
 /** Can not login because user is locked out. */
 define('AUTH_LOGIN_LOCKOUT', 4);
 
+/** Can not login becauser user is not authorised. */
+define('AUTH_LOGIN_UNAUTHORISED', 5);
 
 /**
  * Abstract authentication plugin.
@@ -208,6 +210,15 @@ class auth_plugin_base {
     function is_internal() {
         //override if needed
         return true;
+    }
+
+    /**
+     * Returns false if this plugin is enabled but not configured.
+     *
+     * @return bool
+     */
+    public function is_configured() {
+        return false;
     }
 
     /**
@@ -434,6 +445,26 @@ class auth_plugin_base {
     }
 
     /**
+     * Hook for overriding behaviour before going to the login page.
+     *
+     * This method is called from require_login from potentially any page for
+     * all enabled auth plugins and gives each plugin a chance to redirect
+     * directly to an external login page, or to instantly login a user where
+     * possible.
+     *
+     * If an auth plugin implements this hook, it must not rely on ONLY this
+     * hook in order to work, as there are many ways a user can browse directly
+     * to the standard login page. As a general rule in this case you should
+     * also implement the loginpage_hook as well.
+     *
+     */
+    function pre_loginpage_hook() {
+        // override if needed, eg by redirecting to an external login page
+        // or logging in a user:
+        // complete_user_login($user);
+    }
+
+    /**
      * Post authentication hook.
      * This method is called from authenticate_user_login() for all enabled auth plugins.
      *
@@ -505,7 +536,7 @@ class auth_plugin_base {
     }
 
     /**
-     * Returns whether or not the captcha element is enabled, and the admin settings fulfil its requirements.
+     * Returns whether or not the captcha element is enabled.
      *
      * @abstract Implement in child classes
      * @return bool
@@ -569,6 +600,16 @@ class auth_plugin_base {
         unset($proffields);
 
         return $this->customfields;
+    }
+
+    /**
+     * Post logout hook.
+     *
+     * This method is used after moodle logout by auth classes to execute server logout.
+     *
+     * @param stdClass $user clone of USER object before the user session was terminated
+     */
+    public function postlogout_hook($user) {
     }
 }
 

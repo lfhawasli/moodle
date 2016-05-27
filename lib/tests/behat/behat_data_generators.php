@@ -116,6 +116,10 @@ class behat_data_generators extends behat_base {
             'required' => array('activity', 'idnumber', 'course'),
             'switchids' => array('course' => 'course', 'gradecategory' => 'gradecat')
         ),
+        'blocks' => array(
+            'datagenerator' => 'block_instance',
+            'required' => array('blockname', 'contextlevel', 'reference'),
+        ),
         'group members' => array(
             'datagenerator' => 'group_member',
             'required' => array('user', 'group'),
@@ -144,6 +148,22 @@ class behat_data_generators extends behat_base {
             'required' => array('fullname', 'course'),
             'switchids' => array('course' => 'courseid', 'gradecategory' => 'parent')
         ),
+        'grade items' => array(
+            'datagenerator' => 'grade_item',
+            'required' => array('course'),
+            'switchids' => array('scale' => 'scaleid', 'outcome' => 'outcomeid', 'course' => 'courseid',
+                                 'gradecategory' => 'categoryid')
+        ),
+        'grade outcomes' => array(
+            'datagenerator' => 'grade_outcome',
+            'required' => array('shortname', 'scale'),
+            'switchids' => array('course' => 'courseid', 'gradecategory' => 'categoryid', 'scale' => 'scaleid')
+        ),
+        'scales' => array(
+            'datagenerator' => 'scale',
+            'required' => array('name', 'scale'),
+            'switchids' => array('course' => 'courseid')
+        ),
         'question categories' => array(
             'datagenerator' => 'question_category',
             'required' => array('name', 'contextlevel', 'reference'),
@@ -153,6 +173,10 @@ class behat_data_generators extends behat_base {
             'datagenerator' => 'question',
             'required' => array('qtype', 'questioncategory', 'name'),
             'switchids' => array('questioncategory' => 'category', 'user' => 'createdby')
+        ),
+        'tags' => array(
+            'datagenerator' => 'tag',
+            'required' => array('name')
         ),
     );
 
@@ -263,17 +287,52 @@ class behat_data_generators extends behat_base {
     }
 
     /**
+     * Preprocesses the creation of a grade item. Converts gradetype text to a number.
+     * @param array $data
+     * @return array
+     */
+    protected function preprocess_grade_item($data) {
+        global $CFG;
+        require_once("$CFG->libdir/grade/constants.php");
+
+        if (isset($data['gradetype'])) {
+            $data['gradetype'] = constant("GRADE_TYPE_" . strtoupper($data['gradetype']));
+        }
+
+        if (!empty($data['category']) && !empty($data['courseid'])) {
+            $cat = grade_category::fetch(array('fullname' => $data['category'], 'courseid' => $data['courseid']));
+            if (!$cat) {
+                throw new Exception('Could not resolve category with name "' . $data['category'] . '"');
+            }
+            unset($data['category']);
+            $data['categoryid'] = $cat->id;
+        }
+
+        return $data;
+    }
+
+    /**
      * Adapter to modules generator
      * @throws Exception Custom exception for test writers
      * @param array $data
      * @return void
      */
     protected function process_activity($data) {
-        global $DB;
+        global $DB, $CFG;
 
         // The the_following_exists() method checks that the field exists.
         $activityname = $data['activity'];
         unset($data['activity']);
+
+        // Convert scale name into scale id (negative number indicates using scale).
+        if (isset($data['grade']) && strlen($data['grade']) && !is_number($data['grade'])) {
+            $data['grade'] = - $this->get_scale_id($data['grade']);
+            require_once("$CFG->libdir/grade/constants.php");
+
+            if (!isset($data['gradetype'])) {
+                $data['gradetype'] = GRADE_TYPE_SCALE;
+            }
+        }
 
         // We split $data in the activity $record and the course module $options.
         $cmoptions = array();
@@ -291,6 +350,39 @@ class behat_data_generators extends behat_base {
             throw new Exception('\'' . $activityname . '\' activity can not be added using this step,' .
                 ' use the step \'I add a "ACTIVITY_OR_RESOURCE_NAME_STRING" to section "SECTION_NUMBER"\' instead');
         }
+    }
+
+    /**
+     * Add a block to a page.
+     *
+     * @param array $data should mostly match the fields of the block_instances table.
+     *     The block type is specified by blockname.
+     *     The parentcontextid is set from contextlevel and reference.
+     *     Missing values are filled in by testing_block_generator::prepare_record.
+     *     $data is passed to create_block as both $record and $options. Normally
+     *     the keys are different, so this is a way to let people set values in either place.
+     */
+    protected function process_block_instance($data) {
+
+        if (empty($data['blockname'])) {
+            throw new Exception('\'blocks\' requires the field \'block\' type to be specified');
+        }
+
+        if (empty($data['contextlevel'])) {
+            throw new Exception('\'blocks\' requires the field \'contextlevel\' to be specified');
+        }
+
+        if (!isset($data['reference'])) {
+            throw new Exception('\'blocks\' requires the field \'reference\' to be specified');
+        }
+
+        $context = $this->get_context($data['contextlevel'], $data['reference']);
+        $data['parentcontextid'] = $context->id;
+
+        // Pass $data as both $record and $options. I think that is unlikely to
+        // cause problems since the relevant key names are different.
+        // $options is not used in most blocks I have seen, but where it is, it is necessary.
+        $this->datagenerator->create_block($data['blockname'], $data, $data);
     }
 
     /**
@@ -318,6 +410,18 @@ class behat_data_generators extends behat_base {
             $data['enrol'] = 'manual';
         }
 
+        if (!isset($data['timestart'])) {
+            $data['timestart'] = 0;
+        }
+
+        if (!isset($data['timeend'])) {
+            $data['timeend'] = 0;
+        }
+
+        if (!isset($data['status'])) {
+            $data['status'] = null;
+        }
+
         // If the provided course shortname is the site shortname we consider it a system role assign.
         if ($data['courseid'] == $SITE->id) {
             // Frontpage course assign.
@@ -326,7 +430,8 @@ class behat_data_generators extends behat_base {
 
         } else {
             // Course assign.
-            $this->datagenerator->enrol_user($data['userid'], $data['courseid'], $data['roleid'], $data['enrol']);
+            $this->datagenerator->enrol_user($data['userid'], $data['courseid'], $data['roleid'], $data['enrol'],
+                    $data['timestart'], $data['timeend'], $data['status']);
         }
 
     }
@@ -614,6 +719,35 @@ class behat_data_generators extends behat_base {
 
         if (!$id = $DB->get_field('cohort', 'id', array('idnumber' => $idnumber))) {
             throw new Exception('The specified cohort with idnumber "' . $idnumber . '" does not exist');
+        }
+        return $id;
+    }
+
+    /**
+     * Gets the outcome item id from its shortname.
+     * @throws Exception
+     * @param string $shortname
+     * @return int
+     */
+    protected function get_outcome_id($shortname) {
+        global $DB;
+
+        if (!$id = $DB->get_field('grade_outcomes', 'id', array('shortname' => $shortname))) {
+            throw new Exception('The specified outcome with shortname "' . $shortname . '" does not exist');
+        }
+        return $id;
+    }
+
+    /**
+     * Get the id of a named scale.
+     * @param string $name the name of the scale.
+     * @return int the scale id.
+     */
+    protected function get_scale_id($name) {
+        global $DB;
+
+        if (!$id = $DB->get_field('scale', 'id', array('name' => $name))) {
+            throw new Exception('The specified scale with name "' . $name . '" does not exist');
         }
         return $id;
     }

@@ -82,7 +82,7 @@ class workflow_state_updated extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has set the workflow state of the user with id '$this->relateduserid' " .
-            "to the state '{$this->other['newstate']}' for the assignment with the course module id '$this->contextinstanceid'.";
+            "to the state '{$this->other['newstate']}' for the assignment with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -137,5 +137,14 @@ class workflow_state_updated extends base {
         if (!isset($this->other['newstate'])) {
             throw new \coding_exception('The \'newstate\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign', 'restore' => 'assign');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

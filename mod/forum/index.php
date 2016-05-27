@@ -105,7 +105,8 @@ if ($usetracking = forum_tp_can_track_forums()) {
     $generaltable->align[] = 'center';
 }
 
-$subscribed_forums = forum_get_subscribed_forums($course);
+// Fill the subscription cache for this course and user combination.
+\mod_forum\subscriptions::fill_subscription_cache_for_course($course->id, $USER->id);
 
 $can_subscribe = is_enrolled($coursecontext);
 if ($can_subscribe) {
@@ -173,8 +174,13 @@ foreach ($modinfo->get_instances_of('forum') as $forumid=>$cm) {
 // Do course wide subscribe/unsubscribe if requested
 if (!is_null($subscribe)) {
     if (isguestuser() or !$can_subscribe) {
-        // there should not be any links leading to this place, just redirect
-        redirect(new moodle_url('/mod/forum/index.php', array('id' => $id)), get_string('subscribeenrolledonly', 'forum'));
+        // There should not be any links leading to this place, just redirect.
+        redirect(
+                new moodle_url('/mod/forum/index.php', array('id' => $id)),
+                get_string('subscribeenrolledonly', 'forum'),
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
     }
     // Can proceed now, the user is not guest and is enrolled
     foreach ($modinfo->get_instances_of('forum') as $forumid=>$cm) {
@@ -190,21 +196,32 @@ if (!is_null($subscribe)) {
         {
             $cansub = false;
         }
-        if (!forum_is_forcesubscribed($forum)) {
-            $subscribed = forum_is_subscribed($USER->id, $forum);
-            if ((has_capability('moodle/course:manageactivities', $coursecontext, $USER->id) || $forum->forcesubscribe != FORUM_DISALLOWSUBSCRIBE) && $subscribe && !$subscribed && $cansub) {
-                forum_subscribe($USER->id, $forumid, $modcontext);
+        if (!\mod_forum\subscriptions::is_forcesubscribed($forum)) {
+            $subscribed = \mod_forum\subscriptions::is_subscribed($USER->id, $forum, null, $cm);
+            $canmanageactivities = has_capability('moodle/course:manageactivities', $coursecontext, $USER->id);
+            if (($canmanageactivities || \mod_forum\subscriptions::is_subscribable($forum)) && $subscribe && !$subscribed && $cansub) {
+                \mod_forum\subscriptions::subscribe_user($USER->id, $forum, $modcontext, true);
             } else if (!$subscribe && $subscribed) {
-                forum_unsubscribe($USER->id, $forumid, $modcontext);
+                \mod_forum\subscriptions::unsubscribe_user($USER->id, $forum, $modcontext, true);
             }
         }
     }
-    $returnto = forum_go_back_to("index.php?id=$course->id");
+    $returnto = forum_go_back_to(new moodle_url('/mod/forum/index.php', array('id' => $course->id)));
     $shortname = format_string($course->shortname, true, array('context' => context_course::instance($course->id)));
     if ($subscribe) {
-        redirect($returnto, get_string('nowallsubscribed', 'forum', $shortname), 1);
+        redirect(
+                $returnto,
+                get_string('nowallsubscribed', 'forum', $shortname),
+                null,
+                \core\output\notification::NOTIFY_SUCCESS
+            );
     } else {
-        redirect($returnto, get_string('nowallunsubscribed', 'forum', $shortname), 1);
+        redirect(
+                $returnto,
+                get_string('nowallunsubscribed', 'forum', $shortname),
+                null,
+                \core\output\notification::NOTIFY_SUCCESS
+            );
     }
 }
 
@@ -417,7 +434,7 @@ if ($course->id != SITEID) {    // Only real courses have learning forums
             if ($can_subscribe) {
                 $row[] = forum_get_subscribe_link($forum, $context, array('subscribed' => $stryes,
                     'unsubscribed' => $strno, 'forcesubscribed' => $stryes,
-                    'cantsubscribe' => '-'), false, false, true, $subscribed_forums);
+                    'cantsubscribe' => '-'), false, false, true);
 
                 $digestoptions_selector->url->param('id', $forum->id);
                 if ($forum->maildigest === null) {

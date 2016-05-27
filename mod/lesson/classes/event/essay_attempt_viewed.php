@@ -71,7 +71,7 @@ class essay_attempt_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the essay grade for the user with id '$this->relateduserid' for " .
-            "the attempt with id '$this->objectid' for the lesson activity with the course module id '$this->contextinstanceid'.";
+            "the attempt with id '$this->objectid' for the lesson activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -96,5 +96,9 @@ class essay_attempt_viewed extends \core\event\base {
         if (!isset($this->relateduserid)) {
             throw new \coding_exception('The \'relateduserid\' must be set.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'lesson_attempts', 'restore' => 'lesson_attempt');
     }
 }

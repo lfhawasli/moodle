@@ -35,7 +35,7 @@ use core_availability\info_section;
  * @copyright 2014 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class info_testcase extends \advanced_testcase {
+class info_testcase extends advanced_testcase {
     public function setUp() {
         // Load the mock condition so that it can be used.
         require_once(__DIR__ . '/fixtures/mock_condition.php');
@@ -45,9 +45,10 @@ class info_testcase extends \advanced_testcase {
      * Tests the info_module class (is_available, get_full_information).
      */
     public function test_info_module() {
-        global $DB;
+        global $DB, $CFG;
 
         // Create a course and pages.
+        $CFG->enableavailability = 0;
         $this->setAdminUser();
         $this->resetAfterTest();
         $generator = $this->getDataGenerator();
@@ -87,8 +88,8 @@ class info_testcase extends \advanced_testcase {
         // Check invalid one.
         $info = new info_module($cm3);
         $this->assertFalse($info->is_available($information));
-        $debugging = phpunit_util::get_debugging_messages();
-        phpunit_util::reset_debugging();
+        $debugging = $this->getDebuggingMessages();
+        $this->resetDebugging();
         $this->assertEquals(1, count($debugging));
         $this->assertContains('Invalid availability', $debugging[0]->message);
 
@@ -141,8 +142,8 @@ class info_testcase extends \advanced_testcase {
         // Check invalid one.
         $info = new info_section($sections[3]);
         $this->assertFalse($info->is_available($information));
-        $debugging = phpunit_util::get_debugging_messages();
-        phpunit_util::reset_debugging();
+        $debugging = $this->getDebuggingMessages();
+        $this->resetDebugging();
         $this->assertEquals(1, count($debugging));
         $this->assertContains('Invalid availability', $debugging[0]->message);
 
@@ -160,13 +161,13 @@ class info_testcase extends \advanced_testcase {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/course/lib.php');
         $this->resetAfterTest();
+        $CFG->enableavailability = 0;
 
         // Create a course and some pages:
         // 0. Invisible due to visible=0.
         // 1. Availability restriction (mock, set to fail).
         // 2. Availability restriction on section (mock, set to fail).
         // 3. Actually visible.
-        // 4. With groupmembersonly flag.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
                 array('numsections' => 1), array('createsections' => true));
@@ -177,7 +178,6 @@ class info_testcase extends \advanced_testcase {
         $pages[1] = $pagegen->create_instance($rec);
         $pages[2] = $pagegen->create_instance($rec);
         $pages[3] = $pagegen->create_instance($rec);
-        $pages[4] = $pagegen->create_instance($rec, array('groupmembersonly' => 1));
         $modinfo = get_fast_modinfo($course);
         $section = $modinfo->get_section_info(1);
         $cm = $modinfo->get_cm($pages[2]->cmid);
@@ -250,18 +250,6 @@ class info_testcase extends \advanced_testcase {
         // section's availability.
         $this->assertFalse(info_module::is_user_visible($pages[1]->cmid, $student->id, false));
         $this->assertFalse(info_module::is_user_visible($pages[2]->cmid, $student->id, false));
-
-        // Groupmembersonly uses a different flag.
-        $CFG->enableavailability = false;
-        $this->assertTrue(info_module::is_user_visible($pages[4]->cmid, $student->id, false));
-        $CFG->enablegroupmembersonly = true;
-        $this->assertFalse(info_module::is_user_visible($pages[4]->cmid, $student->id, false));
-
-        // There is no way to clear a static cache used in grouplib, so test the
-        // positive case on an identical but different user.
-        $group = $generator->create_group(array('courseid' => $course->id));
-        groups_add_member($group, $student2);
-        $this->assertTrue(info_module::is_user_visible($pages[4]->cmid, $student2->id, false));
     }
 
     /**
@@ -278,18 +266,17 @@ class info_testcase extends \advanced_testcase {
                 '{"op":"&","showc":[false],"c":[{"type":"grouping","id":7}]}',
                 info::convert_legacy_fields($rec, true));
 
-        // Check groupmembersonly with grouping - only if flag enabled.
+        // Check groupmembersonly with grouping.
         $rec->groupmembersonly = 1;
         $this->assertEquals(
                 '{"op":"&","showc":[false],"c":[{"type":"grouping","id":7}]}',
-                info::convert_legacy_fields($rec, false, true));
-        $this->assertNull(info::convert_legacy_fields($rec, false));
+                info::convert_legacy_fields($rec, false));
 
         // Check groupmembersonly without grouping.
         $rec->groupingid = 0;
         $this->assertEquals(
                 '{"op":"&","showc":[false],"c":[{"type":"group"}]}',
-                info::convert_legacy_fields($rec, false, true));
+                info::convert_legacy_fields($rec, false));
 
         // Check start date.
         $rec->groupmembersonly = 0;
@@ -317,7 +304,8 @@ class info_testcase extends \advanced_testcase {
         $rec->groupmembersonly = 1;
         $rec->availablefrom = 123;
         $this->assertEquals(
-                '{"op":"&","showc":[true,false],"c":[' .
+                '{"op":"&","showc":[false,true,false],"c":[' .
+                '{"type":"grouping","id":7},' .
                 '{"type":"date","d":">=","t":123},' .
                 '{"type":"date","d":"<","t":456}' .
                 ']}',
@@ -405,9 +393,9 @@ class info_testcase extends \advanced_testcase {
     }
 
     /**
-     * Tests the filter_users() function.
+     * Tests the filter_user_list() and get_user_list_sql() functions.
      */
-    public function test_filter_users() {
+    public function test_filter_user_list() {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/course/lib.php');
         $this->resetAfterTest();
@@ -446,6 +434,7 @@ class info_testcase extends \advanced_testcase {
         $info = new info_module($modinfo->get_cm($page->cmid));
         $this->assertEquals(array($u1->id, $u2->id, $u3->id),
                 array_keys($info->filter_user_list($allusers)));
+        $this->assertEquals(array('', array()), $info->get_user_list_sql(true));
 
         // Set an availability restriction in database for section 1.
         // For the section we set it so it doesn't support filters; for the
@@ -461,29 +450,44 @@ class info_testcase extends \advanced_testcase {
 
         // Now it should work (for the module).
         $info = new info_module($modinfo->get_cm($page->cmid));
-        $this->assertEquals(array($u3->id),
+        $expected = array($u3->id);
+        $this->assertEquals($expected,
                 array_keys($info->filter_user_list($allusers)));
+        list ($sql, $params) = $info->get_user_list_sql();
+        $result = $DB->get_fieldset_sql($sql, $params);
+        sort($result);
+        $this->assertEquals($expected, $result);
         $info = new info_section($modinfo->get_section_info(1));
         $this->assertEquals(array($u1->id, $u2->id, $u3->id),
                 array_keys($info->filter_user_list($allusers)));
+        $this->assertEquals(array('', array()), $info->get_user_list_sql(true));
 
         // With availability disabled, module returns full list too.
         $CFG->enableavailability = false;
         $info = new info_module($modinfo->get_cm($page->cmid));
         $this->assertEquals(array($u1->id, $u2->id, $u3->id),
                 array_keys($info->filter_user_list($allusers)));
+        $this->assertEquals(array('', array()), $info->get_user_list_sql(true));
 
         // Check the other section...
         $CFG->enableavailability = true;
         $info = new info_section($modinfo->get_section_info(2));
-        $this->assertEquals(array($u1->id, $u2->id),
-                array_keys($info->filter_user_list($allusers)));
+        $expected = array($u1->id, $u2->id);
+        $this->assertEquals($expected, array_keys($info->filter_user_list($allusers)));
+        list ($sql, $params) = $info->get_user_list_sql(true);
+        $result = $DB->get_fieldset_sql($sql, $params);
+        sort($result);
+        $this->assertEquals($expected, $result);
 
         // And the module in that section - which has combined the section and
         // module restrictions.
         $info = new info_module($modinfo->get_cm($page2->cmid));
-        $this->assertEquals(array($u2->id),
-                array_keys($info->filter_user_list($allusers)));
+        $expected = array($u2->id);
+        $this->assertEquals($expected, array_keys($info->filter_user_list($allusers)));
+        list ($sql, $params) = $info->get_user_list_sql(true);
+        $result = $DB->get_fieldset_sql($sql, $params);
+        sort($result);
+        $this->assertEquals($expected, $result);
 
         // If the students have viewhiddenactivities, they get past the module
         // restriction.
@@ -491,6 +495,10 @@ class info_testcase extends \advanced_testcase {
                 'moodle/course:viewhiddenactivities', CAP_ALLOW);
         $expected = array($u1->id, $u2->id);
         $this->assertEquals($expected, array_keys($info->filter_user_list($allusers)));
+        list ($sql, $params) = $info->get_user_list_sql(true);
+        $result = $DB->get_fieldset_sql($sql, $params);
+        sort($result);
+        $this->assertEquals($expected, $result);
 
         // If they have viewhiddensections, they also get past the section
         // restriction.
@@ -498,5 +506,9 @@ class info_testcase extends \advanced_testcase {
                 'moodle/course:viewhiddensections', CAP_ALLOW);
         $expected = array($u1->id, $u2->id, $u3->id);
         $this->assertEquals($expected, array_keys($info->filter_user_list($allusers)));
+        list ($sql, $params) = $info->get_user_list_sql(true);
+        $result = $DB->get_fieldset_sql($sql, $params);
+        sort($result);
+        $this->assertEquals($expected, $result);
     }
 }

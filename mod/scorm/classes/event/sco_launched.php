@@ -58,7 +58,7 @@ class sco_launched extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' launched the sco with id '$this->objectid' for the scorm with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -101,5 +101,16 @@ class sco_launched extends \core\event\base {
         if (empty($this->other['loadedcontent'])) {
             throw new \coding_exception('The \'loadedcontent\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'scorm_scoes', 'restore' => 'scorm_sco');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['instanceid'] = array('db' => 'scorm', 'restore' => 'scorm');
+
+        return $othermapped;
     }
 }

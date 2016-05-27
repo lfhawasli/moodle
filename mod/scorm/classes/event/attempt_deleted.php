@@ -56,7 +56,7 @@ class attempt_deleted extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' deleted the attempt with id '{$this->other['attemptid']}' " .
-            "for the scorm activity with the course module id '$this->contextinstanceid'.";
+            "for the scorm activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -99,5 +99,10 @@ class attempt_deleted extends \core\event\base {
         if (empty($this->other['attemptid'])) {
             throw new \coding_exception('The \'attemptid\' must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

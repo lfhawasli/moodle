@@ -21,8 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 require_once($CFG->libdir.'/portfolio/plugin.php');
-require_once($CFG->libdir . '/google/Google_Client.php');
-require_once($CFG->libdir . '/google/contrib/Google_DriveService.php');
+require_once($CFG->libdir . '/google/lib.php');
 
 class portfolio_plugin_googledocs extends portfolio_plugin_push_base {
     /**
@@ -88,7 +87,7 @@ class portfolio_plugin_googledocs extends portfolio_plugin_push_base {
         foreach ($this->exporter->get_tempfiles() as $file) {
             try {
                 // Create drivefile object and fill it with data.
-                $drivefile = new Google_DriveFile();
+                $drivefile = new Google_Service_Drive_DriveFile();
                 $drivefile->setTitle($file->get_filename());
                 $drivefile->setMimeType($file->get_mimetype());
 
@@ -150,11 +149,6 @@ class portfolio_plugin_googledocs extends portfolio_plugin_push_base {
         }
         // Get the authentication code send by Google.
         $code = isset($params['oauth2code']) ? $params['oauth2code'] : null;
-        // Portfolio_exporter::rewaken_object does not 'wake' client properly
-        // ...auth is null after unserialize, therefore initialize again!!!
-        if (!$this->client->getAuth()) {
-            $this->initialize_oauth();
-        }
         // Try to authenticate (throws exception which is catched higher).
         $this->client->authenticate($code);
         // Make sure we accually have access token at this time
@@ -206,14 +200,15 @@ class portfolio_plugin_googledocs extends portfolio_plugin_push_base {
         $secret = $this->get_config('secret');
 
         // Setup Google client.
-        $this->client = new Google_Client();
+        $this->client = get_google_client();
         $this->client->setClientId($clientid);
         $this->client->setClientSecret($secret);
-        $this->client->setScopes(array('https://www.googleapis.com/auth/drive.file'));
+        $this->client->setScopes(array(Google_Service_Drive::DRIVE_FILE));
         $this->client->setRedirectUri($redirecturi->out(false));
         // URL to be called when redirecting from authentication.
         $this->client->setState($returnurl->out_as_local_url(false));
-        $this->service = new Google_DriveService($this->client);
+        // Setup drive upload service.
+        $this->service = new Google_Service_Drive($this->client);
 
     }
 

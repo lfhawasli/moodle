@@ -23,5 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Excel spreadsheet';
+$string['timeexported'] = 'Last downloaded from this course';
 $string['xls:publish'] = 'Publish XLS grade export';
 $string['xls:view'] = 'Use Excel grade export';

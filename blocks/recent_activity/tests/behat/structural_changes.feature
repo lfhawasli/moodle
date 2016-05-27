@@ -46,9 +46,7 @@ Feature: View structural changes in recent activity block
       | GG3      | G2    |
 
   Scenario: Check that Added module information is displayed respecting view capability
-    Given the following config values are set as admin:
-      | enablegroupmembersonly | 1 |
-    And I log in as "teacher1"
+    Given I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
     When I add a "Forum" to section "1" and I fill the form with:
@@ -68,29 +66,29 @@ Feature: View structural changes in recent activity block
       | Description | No description |
       | groupmode   | No groups      |
     And I add a "Forum" to section "2" and I fill the form with:
-      | name                             | ForumVisibleGroupsG1 |
-      | Description                      | No description       |
-      | groupmode                        | Visible groups       |
-      | Grouping                         | Grouping 1           |
-      | Available for group members only | 1                    |
+      | name                | ForumVisibleGroupsG1 |
+      | Description         | No description       |
+      | groupmode           | Visible groups       |
+      | Grouping            | Grouping 1           |
+      | Access restrictions | Grouping: Grouping 1 |
     And I add a "Forum" to section "2" and I fill the form with:
-      | name                             | ForumSeparateGroupsG1 |
-      | Description                      | No description        |
-      | groupmode                        | Separate groups       |
-      | Grouping                         | Grouping 1            |
-      | Available for group members only | 1                     |
+      | name                | ForumSeparateGroupsG1 |
+      | Description         | No description        |
+      | groupmode           | Separate groups       |
+      | Grouping            | Grouping 1            |
+      | Access restrictions | Grouping: Grouping 1  |
     And I add a "Forum" to section "3" and I fill the form with:
-      | name                             | ForumVisibleGroupsG2 |
-      | Description                      | No description       |
-      | groupmode                        | Visible groups       |
-      | Grouping                         | Grouping 2           |
-      | Available for group members only | 1                    |
+      | name                | ForumVisibleGroupsG2 |
+      | Description         | No description       |
+      | groupmode           | Visible groups       |
+      | Grouping            | Grouping 2           |
+      | Access restrictions | Grouping: Grouping 2 |
     And I add a "Forum" to section "3" and I fill the form with:
-      | name                             | ForumSeparateGroupsG2 |
-      | Description                      | No description        |
-      | groupmode                        | Separate groups       |
-      | Grouping                         | Grouping 2            |
-      | Available for group members only | 1                     |
+      | name                | ForumSeparateGroupsG2 |
+      | Description         | No description        |
+      | groupmode           | Separate groups       |
+      | Grouping            | Grouping 2            |
+      | Access restrictions | Grouping: Grouping 2  |
     Then I should see "ForumVisibleGroups" in the "Recent activity" "block"
     And I should see "ForumSeparateGroups" in the "Recent activity" "block"
     And I should see "ForumNoGroups" in the "Recent activity" "block"

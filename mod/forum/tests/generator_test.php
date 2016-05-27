@@ -35,6 +35,19 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_forum_generator_testcase extends advanced_testcase {
+
+    public function setUp() {
+        // We must clear the subscription caches. This has to be done both before each test, and after in case of other
+        // tests using these functions.
+        \mod_forum\subscriptions::reset_forum_cache();
+    }
+
+    public function tearDown() {
+        // We must clear the subscription caches. This has to be done both before each test, and after in case of other
+        // tests using these functions.
+        \mod_forum\subscriptions::reset_forum_cache();
+    }
+
     public function test_generator() {
         global $DB;
 
@@ -95,7 +108,9 @@ class mod_forum_generator_testcase extends advanced_testcase {
         $record['course'] = $course->id;
         $record['forum'] = $forum->id;
         $record['userid'] = $user->id;
+        $record['pinned'] = FORUM_DISCUSSION_PINNED; // Pin one discussion.
         self::getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+        $record['pinned'] = FORUM_DISCUSSION_UNPINNED; // No pin for others.
         self::getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
         self::getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
 
