@@ -129,9 +129,7 @@ class mod_kalvidres_mod_form extends moodleform_mod {
         $this->add_intro_editor(false);
 
         $mform->addElement('header', 'video', get_string('video_hdr', 'kalvidres'));
-        // START UCLA MOD: CCLE-5108 - Set the Video section to open when adding a Kaltura Media Resource
         $mform->setExpanded('video',true);
-        // END UCLA MOD: CCLE-5108 
         $this->add_video_definition($mform);
 
         $this->standard_coursemodule_elements();
