@@ -7,8 +7,7 @@
  * @copyright  
  * @license    
  */
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
+
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -378,6 +377,7 @@ function mylabmastering_is_student($courseid) {
 	$student = false;
 	require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
+	//TPLMS-2242
 	$role = lti_get_ims_role($USER, '' ,$courseid, false);
 
 	if (strcasecmp($role, 'learner') == 0) {
