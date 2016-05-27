@@ -43,9 +43,6 @@
 [submodule "grade/report/quick_edit"]
 	path = grade/report/quick_edit
 	url = git@github.com:ccle/quick_edit.git
-[submodule "grade/report/history"]
-	path = grade/report/history
-	url = https://github.com/ccle/moodle-gradereport_history.git
 [submodule "report/rolescapabilities"]
 	path = report/rolescapabilities
 	url = https://github.com/ccle/moodle-report-rolescapabilities.git
