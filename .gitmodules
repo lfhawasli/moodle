@@ -37,9 +37,6 @@
 [submodule "local/googleanalytics"]
 	path = local/googleanalytics
 	url = https://github.com/ccle/moodle-local_googleanalytics.git
-[submodule "grade/report/quick_edit"]
-	path = grade/report/quick_edit
-	url = git@github.com:ccle/quick_edit.git
 [submodule "lib/editor/atto/plugins/chemistry"]
 	path = lib/editor/atto/plugins/chemistry
 	url = git@github.com:geoffrowland/moodle-editor_atto-chemistry.git

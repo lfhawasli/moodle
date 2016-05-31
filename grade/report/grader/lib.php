@@ -25,11 +25,6 @@
 require_once($CFG->dirroot . '/grade/report/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
-// START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-require_once($CFG->dirroot . '/grade/report/quick_edit/classes/lib.php');
-require_once($CFG->dirroot . '/grade/report/quick_edit/screens/grade/lib.php');
-// END UCLA MOD: CCLE-3970
-
 /**
  * Class providing an API for the grader report building and displaying.
  * @uses grade_report
@@ -689,11 +684,6 @@ class grade_report_grader extends grade_report {
             if ($showuserimage) {
                 $usercell->text = $OUTPUT->user_picture($user, array('visibletoscreenreaders' => false));
             }
-            
-            // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
-            // Add link to Quick Edit.
-            $usercell->text .= html_writer::link(new moodle_url('/grade/report/quick_edit/index.php', array('id' => $this->course->id, 'item' => 'user','itemid' => $user->id, )), ' <span class="glyphicon glyphicon-pencil"></span>', array('class' => 'btn btn-link btn-xs', 'title' => get_string('pluginname', 'gradereport_quick_edit')));
-            // END UCLA MOD: CCLE-3970
 
             $fullname = fullname($user);
             $usercell->text .= html_writer::link(new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $this->course->id)), $fullname, array(
