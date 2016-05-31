@@ -370,24 +370,6 @@ abstract class info {
     }
 
     /**
-     * Gets the date offset (amount by which any date values should be
-     * adjusted) for the current restore.
-     *
-     * @param string $restoreid Restore identifier
-     * @return int Date offset (0 if none)
-     * @throws coding_exception If not in a restore (or not in that restore)
-     */
-    public static function get_restore_date_offset($restoreid) {
-        if (!self::$restoreinfo) {
-            throw new coding_exception('Only valid during restore');
-        }
-        if (self::$restoreinfo['restoreid'] !== $restoreid) {
-            throw new coding_exception('Data not available for that restore id');
-        }
-        return self::$restoreinfo['dateoffset'];
-    }
-
-    /**
      * Obtains the name of the item (cm_info or section_info, at present) that
      * this is controlling availability of. Name should be formatted ready
      * for on-screen display.

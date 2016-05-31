@@ -108,24 +108,6 @@ class MoodleQuickForm_filemanager extends HTML_QuickForm_element {
     }
 
     /**
-     * Called by HTML_QuickForm whenever form event is made on this element
-     *
-     * @param string $event Name of event
-     * @param mixed $arg event arguments
-     * @param object $caller calling object
-     * @return bool
-     */
-    function onQuickFormEvent($event, $arg, &$caller)
-    {
-        switch ($event) {
-            case 'createElement':
-                $caller->setType($arg[0], PARAM_INT);
-                break;
-        }
-        return parent::onQuickFormEvent($event, $arg, $caller);
-    }
-
-    /**
      * Sets name of filemanager
      *
      * @param string $name name of the filemanager

@@ -1963,54 +1963,6 @@ function calendar_add_event_allowed($event) {
 }
 
 /**
- * Convert region timezone to php supported timezone
- *
- * @param string $tz value from ical file
- * @return string $tz php supported timezone
- */
-function calendar_normalize_tz($tz) {
-    switch ($tz) {
-        case('CST'):
-        case('Central Time'):
-        case('Central Standard Time'):
-            $tz = 'America/Chicago';
-            break;
-        case('CET'):
-        case('Central European Time'):
-            $tz = 'Europe/Berlin';
-            break;
-        case('EST'):
-        case('Eastern Time'):
-        case('Eastern Standard Time'):
-            $tz = 'America/New_York';
-            break;
-        case('PST'):
-        case('Pacific Time'):
-        case('Pacific Standard Time'):
-            $tz = 'America/Los_Angeles';
-            break;
-        case('China Time'):
-        case('China Standard Time'):
-            $tz = 'Asia/Beijing';
-            break;
-        case('IST'):
-        case('India Time'):
-        case('India Standard Time'):
-            $tz = 'Asia/New_Delhi';
-            break;
-        case('JST');
-        case('Japan Time'):
-        case('Japan Standard Time'):
-            $tz = 'Asia/Tokyo';
-            break;
-        case('Romance Standard Time'):
-            $tz = 'Europe/Brussels';
-            break;
-    }
-    return $tz;
-}
-
-/**
  * Manage calendar events
  *
  * This class provides the required functionality in order to manage calendar events.

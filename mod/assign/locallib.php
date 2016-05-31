@@ -7541,46 +7541,6 @@ class assign {
     }
 
     /**
-     * If the requirements are met - reopen the submission for another attempt.
-     * Only call this function when grading the latest attempt.
-     *
-     * @param int $userid The userid.
-     * @param stdClass $submission The submission (may be a group submission).
-     * @param bool $addattempt - True if the "allow another attempt" checkbox was checked.
-     * @return bool - true if another attempt was added.
-     */
-    protected function reopen_submission_if_required($userid, $submission, $addattempt) {
-        $instance = $this->get_instance();
-        $submission = null;
-        if ($instance->teamsubmission) {
-            $submission = $this->get_group_submission($userid, 0, false, $data->attemptnumber);
-        } else {
-            $submission = $this->get_user_submission($userid, false, $data->attemptnumber);
-        }
-        if ($instance->teamsubmission && !empty($data->applytoall)) {
-            $groupid = 0;
-            if ($this->get_submission_group($userid)) {
-                $group = $this->get_submission_group($userid);
-                if ($group) {
-                    $groupid = $group->id;
-                }
-            }
-            $members = $this->get_submission_group_members($groupid, true, $this->show_only_active_users());
-            foreach ($members as $member) {
-                // User may exist in multple groups (which should put them in the default group).
-                $this->apply_grade_to_user($data, $member->id, $data->attemptnumber);
-                $this->process_outcomes($member->id, $data, $userid);
-            }
-        } else {
-            $this->apply_grade_to_user($data, $userid, $data->attemptnumber);
-
-            $this->process_outcomes($userid, $data);
-        }
-
-        return true;
-    }
-
-    /**
      * Save grade.
      *
      * @param  moodleform $mform
