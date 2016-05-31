@@ -23,8 +23,9 @@
  */
 
 // Replace turningtech with the name of your module and remove this line.
-
+use turningtech\event;
 require('../../config.php');
+require_once($CFG->dirroot . '/mod/turningtech/classes/event/ttlogs.php');
 require_once($CFG->dirroot . '/mod/turningtech/lib.php');
 global $DB;
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
@@ -68,8 +69,6 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-add_to_log($course->id, "turningtech", "view", "view.php?id=$cm->id", "$turningtech->id");
-
 // Print the page header.
 $strturningtechs = get_string('modulenameplural', 'turningtech');
 $strturningtech  = get_string('modulename', 'turningtech');
@@ -87,7 +86,7 @@ $strturningtech  = get_string('modulename', 'turningtech');
 
 // Print the main part of the page.
  */
-echo 'YOUR CODE GOES HERE';
+echo 'TurningTech Pluggin';
 
 
 // Finish the page

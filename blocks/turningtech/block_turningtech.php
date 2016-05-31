@@ -66,11 +66,14 @@ class block_turningtech extends block_base {
         // Verify the user is a student in the current course.
         $tooltip = get_string('managemydevicestool', 'block_turningtech');
         if (TurningTechMoodleHelper::isuserstudentincourse($USER, $COURSE)) {
+        error_log("Inside Block : user is a student");
             $devicemap = TurningTechTurningHelper::getdeviceidbycourseandstudent($COURSE, $USER);
             if ($devicemap) {
                 $link = $devicemap->displayLink();
+                error_log("Inside Block : user has a device assosciated");
                 $this->content->text = get_string('usingdeviceid', 'block_turningtech', $link);
             } else {
+                error_log("Inside Block : user does not have a device assosciated");
                 $this->content->text = get_string('nodeviceforthiscourse', 'block_turningtech');
             }
             $this->content->footer .= "<div class='homelink'>
@@ -83,11 +86,13 @@ class block_turningtech extends block_base {
             } else {
                 $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
             }
+            error_log("Inside Block : user is instructor");
             if (!has_capability('moodle/site:config', $context)) {
                 $this->content->text = "<a href='{$CFG->wwwroot}/mod/turningtech/device_lookup.php?id={$COURSE->id}'>" .
                  get_string('searchturningtechcourse', 'block_turningtech') .
                                                  "</a>\n";
             } else {
+            error_log("Inside Block : user is admin");
                 $this->content->text = "<a href='{$CFG->wwwroot}/mod/turningtech/search_device.php?id={$COURSE->id}'>" .
                  get_string('searchturningtechcourse', 'block_turningtech') .
                                                  "</a>\n";

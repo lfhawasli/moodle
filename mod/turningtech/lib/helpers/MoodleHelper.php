@@ -45,6 +45,7 @@ class TurningTechMoodleHelper {
      * @return object
      */
     public static function authenticateuser($username, $password) {
+
         $xx = authenticate_user_login($username, $password);
         $zz = false;
         if ($xx == null) {
@@ -57,6 +58,7 @@ class TurningTechMoodleHelper {
                 }
             }
             if ($zz) {
+            
                 // Cas function.
                 $cookiedir = tempnam ("/tmp", "CURLCOOKIE");
                 $authplug = get_auth_plugin('cas');
@@ -147,12 +149,15 @@ class TurningTechMoodleHelper {
                         $hauth = get_auth_plugin($hau);
                         $hauth->user_authenticated_hook($user, $username, $password);
                     }
+
                     return $user;
                 } else {
+
                     return $xx;
                 }
 
             } else if ($shib) { // Check for shiboleth.
+            
                 $cookiedir = tempnam ("/tmp", "CURLCOOKIE");
                 $authplug = get_config('moodle', null);
                 $url = $authplug->wwwroot . "/" .'auth/shibboleth/index.php';
@@ -254,9 +259,11 @@ class TurningTechMoodleHelper {
                 }
                 // End shiboleth.
             } else {
+
                 return $xx;
             }
         } else {
+
             return $xx;
         }
     }
