@@ -29,3 +29,4 @@
 //                  YYYYMMDDVV
 $plugin->version  = 2012041900;
 $plugin->requires = 2011022100;
+$plugin->component = 'tool_uclacourserequestor';
