@@ -54,6 +54,12 @@ if ($hassiteconfig) {
         get_string('handlepreferrednamedesc', 'local_ucla'),
         0));
 
+    $settings->add(new admin_setting_configtext(
+            'local_ucla/registrarurl',
+            get_string('registrarurlconfig', 'local_ucla'),
+            get_string('registrarurlconfighelp', 'local_ucla'),
+            'https://sa.ucla.edu', PARAM_URL));
+
     $ADMIN->add('localplugins', $settings);
 
     // Inject setting to turn on UCLA edits for enrol_database into

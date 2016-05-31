@@ -146,7 +146,6 @@ function is_course_cancelled($courseset) {
 
 /**
  *  Builds the URL for the Registrar's finals information page.
- *  TODO Make the URL a configuration variable.
  **/
 function build_registrar_finals_url($courseinfo) {
     if (!empty($courseinfo->term)
@@ -155,26 +154,41 @@ function build_registrar_finals_url($courseinfo) {
     } else {
         return false;
     }
-
     if (!empty($courseinfo->srs)
             && ucla_validator('srs', $courseinfo->srs)) {
         $srs = $courseinfo->srs;
     } else {
         return false;
     }
+    if (!empty($courseinfo->subj_area)) {
+        $subjarea = urlencode($courseinfo->subj_area);
+    } else {
+        return false;
+    }
+    if (!empty($courseinfo->crsidx)) {
+        $crsidx = urlencode($courseinfo->crsidx);
+    } else {
+        return false;
+    }
+    if (!empty($courseinfo->classidx)) {
+        $classidx = urlencode($courseinfo->classidx);
+    } else {
+        return false;
+    }
 
-    $regurl = 'http://www.registrar.ucla.edu/schedule/subdet.aspx';
-
+    $regurl = get_config('local_ucla', 'registrarurl');
     $params = array(
-        'term' => $term,
-        'srs' => $srs
+        'term_cd' => $term,
+        'subj_area_cd' => $subjarea,
+        'crs_catlg_no' => $crsidx,
+        'class_id' => $srs,
+        'class_no' => $classidx
     );
-
     foreach ($params as $param => $value) {
         $paramstrs[] = $param . '=' . $value;
     }
 
-    return $regurl . '?' . implode('&', $paramstrs);
+    return $regurl . '/ro/public/soc/Results/ClassDetail?' . implode('&', $paramstrs);
 }
 
 /**
@@ -286,6 +300,13 @@ function ucla_get_reg_classinfo($term, $srs) {
 
     $records = $DB->get_record('ucla_reg_classinfo',
             array('term' => $term, 'srs' => $srs));
+
+    // CCLE-5854 - Override registrar url with new website.
+    $page = get_config('local_ucla', 'registrarurl');
+    $page .= '/ro/public/soc/Results?t=' . $records->term;
+    $page .= '&sBy=classidnumber&id=' . $records->srs;
+    $page .= '&btnIsInIndex=btn_inIndex';
+    $records->url = $page;
 
     return $records;
 }

@@ -15,5 +15,5 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // Version         YYYYMMDDVV.
-$plugin->version = 2016050600;
+$plugin->version = 2016052300;
 $plugin->component = 'local_ucla';
