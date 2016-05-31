@@ -57,7 +57,7 @@ class submission_updated extends \mod_assign\event\submission_updated {
      */
     public function get_description() {
         $descriptionstring = "The user with id '$this->userid' updated a file submission and uploaded " .
-            "'{$this->other['filesubmissioncount']}' file/s in the assignment with the course module id " .
+            "'{$this->other['filesubmissioncount']}' file/s in the assignment with course module id " .
             "'$this->contextinstanceid'";
         if (!empty($this->other['groupid'])) {
             $descriptionstring .= " for the group with id '{$this->other['groupid']}'.";
@@ -79,5 +79,10 @@ class submission_updated extends \mod_assign\event\submission_updated {
         if (!isset($this->other['filesubmissioncount'])) {
             throw new \coding_exception('The \'filesubmissioncount\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        // No mapping available for 'assignsubmission_file'.
+        return array('db' => 'assignsubmission_file', 'restore' => \core\event\base::NOT_MAPPED);
     }
 }

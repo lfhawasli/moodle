@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2015 Respondus, Inc.  All Rights Reserved.
-// Date: July 15, 2015.
+// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
+// Date: May 13, 2016.
 
 $string['pluginname']      = 'Respondus LockDown Browser';
 $string['lockdownbrowser'] = 'Respondus LockDown Browser';
@@ -23,12 +23,12 @@ $string["authenticationsettingsheader"]     = "Authentication Settings";
 
 $string["authenticationsettingsheaderinfo"] =
     "These are the credentials for the user under which the Respondus LockDown Browser
-    and Respondus Monitor web services run. The user entered must be authorized to
-    view and modify activities for all users in all courses. This information is never
-    transmitted outside of this Moodle server and all Respondus Monitor web service
-    requests are authenticated using Hash-based Message Authentication Codes. If the
-    option \"Use HTTPS for logins\" in the Security->HTTP Security settings is selected,
-    all Respondus Monitor web service requests enforce the use of HTTPS.";
+    and Respondus Monitor web services run. The user entered must be a Moodle site
+    administrator listed in Site administration->Users->Permissions->Site administrators.
+    This information is never transmitted outside of this Moodle server and all Respondus
+    Monitor web service    requests are authenticated using Hash-based Message Authentication
+    Codes. If the option \"Use HTTPS for logins\" in the Security->HTTP Security settings
+    is selected, all Respondus Monitor web service requests enforce the use of HTTPS.";
 
 $string["password"]                         = "Password";
 $string["passwordinfo"]                     = "Password for the Respondus Monitor user.";
@@ -70,16 +70,21 @@ $string['todownload']        = ' to download the installer.';
 $string['requires_ldb']      = '- Requires Respondus LockDown Browser';
 $string['requires_webcam']   = '- Requires Respondus LockDown Browser + Webcam';
 $string['test_server']       = 'Test the server by requesting more tokens';
+$string['clear_tokens']      = 'Clear all sessions and tokens for the block'; // Trac #2544
 $string['tokens_free']       = 'Authentication tokens free';
 $string['count_tokens']      = 'Counting existing tokens';
 $string['purge_sessions']    = 'Purging stale sessions';
 $string['request_tokens']    = 'Requesting additional tokens from server';
+$string['reset_attempt']     = 'Attempting to truncate session and token tables for the block...';
 $string['added']             = 'Added';
 $string['tokensok']          = 'tokens, token server working';
+$string['resetok']           = 'Token and session tables successfully cleared.';
 $string['curlerror']         = 'extension_loaded claims curl is not loaded.  Giving up.';
 $string['mcrypterror']       = 'extension_loaded claims mcrypt is not loaded.  Giving up.';
 $string['token_limit_error'] = '10,000 or more free tokens already exist. No more can be requested. Please try again later.';
 $string['zero_tokens_free']  = '0 (is mcrypt enabled?)';
+
+$string['block_status_unknown'] = 'Block status is not currently available.';
 
 $string['module_installed_error']  =
     "Error: /mod/lockdown module has not been uninstalled. Please see the Administrator Guide for LockDown Browser - Moodle.";
@@ -105,6 +110,8 @@ $string["errtokendb"]   = "- token db empty, please have server admin check stat
 $string["errsessiondb"] = "- session db error, please have server admin check status.";
 $string["errdblook"]    = "- db lookup error, please have server admin check status.";
 $string["errdbupdate"]  = "- db update error, please have server admin check status.";
+$string["errdbgetlock"]  = "- db locking error, please have server admin check status.";
+$string["errdblocksupport"]  = "- db locking not supported, please have server admin check status.";
 
 $string['errcmid'] = 'There is no coursemodule with id {$a}';
 $string['errcourse'] = 'Course is misconfigured';

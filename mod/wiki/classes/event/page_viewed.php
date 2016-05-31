@@ -28,6 +28,15 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_wiki page viewed event class.
  *
+ * @property-read array $other {
+ *      Extra information about the event.
+ *
+ *      - string title: (optional) the wiki title
+ *      - int wid: (optional) the wiki id
+ *      - int group: (optional) the group id
+ *      - string groupanduser: (optional) the groupid-userid
+ * }
+ *
  * @package    mod_wiki
  * @since      Moodle 2.7
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
@@ -61,7 +70,7 @@ class page_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the page with id '$this->objectid' for the wiki with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -101,5 +110,17 @@ class page_viewed extends \core\event\base {
         } else {
             return new \moodle_url('/mod/wiki/view.php', array('pageid' => $this->objectid));
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'wiki_pages', 'restore' => 'wiki_page');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['wid'] = array('db' => 'wiki', 'restore' => 'wiki');
+        $othermapped['group'] = array('db' => 'groups', 'restore' => 'group');
+
+        return $othermapped;
     }
 }

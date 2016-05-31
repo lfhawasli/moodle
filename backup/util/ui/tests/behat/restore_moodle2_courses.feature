@@ -15,6 +15,7 @@ Feature: Restore Moodle 2 course backups
       | assign | C3 | assign1 | Test assign name | Assign description | 1 |
       | data | C3 | data1 | Test database name | Database description | 2 |
     And I log in as "admin"
+    And I am on site homepage
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
@@ -52,10 +53,8 @@ Feature: Restore Moodle 2 course backups
     When I backup "Course 3" course using this options:
       | Confirmation | Filename | test_backup.mbz |
     And I restore "test_backup.mbz" backup into "Course 2" course using this options:
-      | Schema | setting_section_section_3_included | 0 |
-      | Schema | setting_section_section_3_userinfo | 0 |
-      | Schema | setting_section_section_5_included | 0 |
-      | Schema | setting_section_section_5_userinfo | 0 |
+      | Schema | Test database name | 0 |
+      | Schema | Section 2 | 0 |
     Then I should see "Course 2"
     And I should see "Test assign name"
     And I should not see "Test database name"
@@ -70,8 +69,7 @@ Feature: Restore Moodle 2 course backups
       | Description | Test forum post backup description |
     And I follow "Restore"
     And I merge "test_backup.mbz" backup into the current course after deleting it's contents using this options:
-      | Schema | setting_section_section_8_userinfo | 0 |
-      | Schema | setting_section_section_8_included | 0 |
+      | Schema | Section 3 | 0 |
     Then I should see "Course 1"
     And I should not see "Section 3"
     And I should not see "Test forum post backup name"
@@ -93,7 +91,7 @@ Feature: Restore Moodle 2 course backups
       | id_startdate_month | January |
       | id_startdate_year | 2020 |
       | id_format | Weekly format |
-    And I press "Save changes"
+    And I press "Save and display"
     And I should see "1 January - 7 January"
     And I should see "Test forum name"
     And I click on "Edit settings" "link" in the "Administration" "block"
@@ -101,7 +99,7 @@ Feature: Restore Moodle 2 course backups
     And the field "id_format" matches value "Weekly format"
     And I set the following fields to these values:
       | id_format | Social format |
-    And I press "Save changes"
+    And I press "Save and display"
     And I should see "An open forum for chatting about anything you want to"
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I expand all fieldsets

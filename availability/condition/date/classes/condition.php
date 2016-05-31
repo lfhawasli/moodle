@@ -77,6 +77,20 @@ class condition extends \core_availability\condition {
                 'd' => $this->direction, 't' => $this->time);
     }
 
+    /**
+     * Returns a JSON object which corresponds to a condition of this type.
+     *
+     * Intended for unit testing, as normally the JSON values are constructed
+     * by JavaScript code.
+     *
+     * @param string $direction DIRECTION_xx constant
+     * @param int $time Time in epoch seconds
+     * @return stdClass Object representing condition
+     */
+    public static function get_json($direction, $time) {
+        return (object)array('type' => 'date', 'd' => $direction, 't' => (int)$time);
+    }
+
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
         return $this->is_available_for_all($not);
     }
@@ -219,5 +233,69 @@ class condition extends \core_availability\condition {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Changes all date restrictions on a course by the specified shift amount.
+     * Used by the course reset feature.
+     *
+     * @param int $courseid Course id
+     * @param int $timeshift Offset in seconds
+     */
+    public static function update_all_dates($courseid, $timeshift) {
+        global $DB;
+
+        $modinfo = get_fast_modinfo($courseid);
+        $anychanged = false;
+
+        // Adjust dates from all course modules.
+        foreach ($modinfo->cms as $cm) {
+            if (!$cm->availability) {
+                continue;
+            }
+            $info = new \core_availability\info_module($cm);
+            $tree = $info->get_availability_tree();
+            $dates = $tree->get_all_children('availability_date\condition');
+            $changed = false;
+            foreach ($dates as $date) {
+                $date->time += $timeshift;
+                $changed = true;
+            }
+
+            // Save the updated course module.
+            if ($changed) {
+                $DB->set_field('course_modules', 'availability', json_encode($tree->save()),
+                        array('id' => $cm->id));
+                $anychanged = true;
+            }
+        }
+
+        // Adjust dates from all course sections.
+        foreach ($modinfo->get_section_info_all() as $section) {
+            if (!$section->availability) {
+                continue;
+            }
+
+            $info = new \core_availability\info_section($section);
+            $tree = $info->get_availability_tree();
+            $dates = $tree->get_all_children('availability_date\condition');
+            $changed = false;
+            foreach ($dates as $date) {
+                $date->time += $timeshift;
+                $changed = true;
+            }
+
+            // Save the updated course module.
+            if ($changed) {
+                $DB->set_field('course_sections', 'availability', json_encode($tree->save()),
+                        array('id' => $section->id));
+                $anychanged = true;
+            }
+        }
+
+        // Ensure course cache is cleared if required.
+        if ($anychanged) {
+            rebuild_course_cache($courseid, true);
+        }
     }
 }

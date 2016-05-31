@@ -32,3 +32,4 @@ $plugin->dependencies = array(
     'local_ucla'  => 2012112800,
     'tool_uclasiteindicator' => 2013021900
 );
+$plugin->component = 'block_ucla_tasites';

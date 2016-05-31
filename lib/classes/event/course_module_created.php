@@ -98,7 +98,7 @@ class course_module_created extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' created the '{$this->other['modulename']}' activity with the " .
+        return "The user with id '$this->userid' created the '{$this->other['modulename']}' activity with " .
             "course module id '$this->contextinstanceid'.";
     }
 
@@ -164,6 +164,17 @@ class course_module_created extends base {
         if (!isset($this->other['name'])) {
             throw new \coding_exception('The \'name\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'course_modules', 'restore' => 'course_module');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['instanceid'] = base::NOT_MAPPED;
+
+        return $othermapped;
     }
 }
 

@@ -26,9 +26,10 @@ require('../config.php');
 require_once("$CFG->libdir/formslib.php");
 
 $id = required_param('id', PARAM_INT);
+$returnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
 
 if (!isloggedin()) {
-    $referer = clean_param(get_referer(), PARAM_LOCALURL);
+    $referer = get_local_referer();
     if (empty($referer)) {
         // A user that is not logged in has arrived directly on this page,
         // they should be redirected to the course page they are trying to enrol on after logging in.
@@ -52,7 +53,7 @@ if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', cont
 }
 
 $PAGE->set_course($course);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('incourse');
 $PAGE->set_url('/enrol/index.php', array('id'=>$course->id));
 
 // do not allow enrols when in login-as session
@@ -104,8 +105,14 @@ foreach ($forms as $form) {
 if (!$forms) {
     if (isguestuser()) {
         notice(get_string('noguestaccess', 'enrol'), get_login_url());
+    } else if ($returnurl) {
+        notice(get_string('notenrollable', 'enrol'), $returnurl);
     } else {
-        notice(get_string('notenrollable', 'enrol'), "$CFG->wwwroot/index.php");
+        $url = get_local_referer(false);
+        if (empty($url)) {
+            $url = new moodle_url('/index.php');
+        }
+        notice(get_string('notenrollable', 'enrol'), $url);
     }
 }
 

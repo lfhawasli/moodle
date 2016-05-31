@@ -23,8 +23,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2014041401; // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2011070100; // Requires this Moodle version
-$module->release  = '2.0+ (Build: 2013041901)';  // Human-friendly version name
-$module->cron     = 0; // Period for cron to check this module (secs).
+$plugin->version  = 2015093000; // The current module version (Date: YYYYMMDDXX)
+$plugin->component = 'mod_turningtech';
+$plugin->requires = 2011070100; // Requires this Moodle version
+$plugin->release  = '2.0+ (Build: 2013041901)';  // Human-friendly version name
+$plugin->cron     = 0; // Period for cron to check this module (secs).
 

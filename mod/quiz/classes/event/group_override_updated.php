@@ -66,7 +66,7 @@ class group_override_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' updated the override with id '$this->objectid' for the quiz with the " .
+        return "The user with id '$this->userid' updated the override with id '$this->objectid' for the quiz with " .
             "course module id '$this->contextinstanceid' for the group with id '{$this->other['groupid']}'.";
     }
 
@@ -105,5 +105,17 @@ class group_override_updated extends \core\event\base {
         if (!isset($this->other['groupid'])) {
             throw new \coding_exception('The \'groupid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'quiz_overrides', 'restore' => 'quiz_override');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['quizid'] = array('db' => 'quiz', 'restore' => 'quiz');
+        $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
+
+        return $othermapped;
     }
 }

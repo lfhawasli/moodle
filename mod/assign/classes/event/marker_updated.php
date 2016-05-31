@@ -83,7 +83,7 @@ class marker_updated extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has set the marker for the user with id '$this->relateduserid' to " .
-            "'{$this->other['markerid']}' for the assignment with the course module id '$this->contextinstanceid'.";
+            "'{$this->other['markerid']}' for the assignment with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -139,5 +139,16 @@ class marker_updated extends base {
         if (!isset($this->other['markerid'])) {
             throw new \coding_exception('The \'markerid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign', 'restore' => 'assign');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['markerid'] = array('db' => 'user', 'restore' => 'user');
+
+        return $othermapped;
     }
 }

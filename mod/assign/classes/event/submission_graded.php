@@ -72,7 +72,7 @@ class submission_graded extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has graded the submission '$this->objectid' for the user with " .
-            "id '$this->relateduserid' for the assignment with the course module id '$this->contextinstanceid'.";
+            "id '$this->relateduserid' for the assignment with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -122,5 +122,9 @@ class submission_graded extends base {
         if (!isset($this->relateduserid)) {
             throw new \coding_exception('The \'relateduserid\' must be set.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign_grades', 'restore' => 'grade');
     }
 }

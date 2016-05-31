@@ -91,7 +91,7 @@ class batch_set_marker_allocation_viewed extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the batch set marker allocation for the assignment with the course " .
+        return "The user with id '$this->userid' viewed the batch set marker allocation for the assignment with course " .
             "module id '$this->contextinstanceid'.";
     }
 
@@ -122,5 +122,12 @@ class batch_set_marker_allocation_viewed extends base {
         if (!isset($this->other['assignid'])) {
             throw new \coding_exception('The \'assignid\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['assignid'] = array('db' => 'assign', 'restore' => 'assign');
+
+        return $othermapped;
     }
 }

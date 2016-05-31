@@ -50,7 +50,6 @@ $PAGE->set_url('/mod/turningtech/index.php', array(
                 'id' => $id
 ));
 $PAGE->set_course($course);
-add_to_log($course->id, 'turningtech', 'view devices', "index.php?id=$course->id", '');
 global $USER, $CFG;
 if ($CFG->version >= '2013111800.00') {
     $context = context_course::instance($course->id);

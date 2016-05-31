@@ -58,7 +58,7 @@ class tracks_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the tracks for the user with id '$this->relateduserid' " .
-            "for the scorm activity with the course module id '$this->contextinstanceid'.";
+            "for the scorm activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -117,5 +117,13 @@ class tracks_viewed extends \core\event\base {
         if (empty($this->other['scoid'])) {
             throw new \coding_exception('The \'scoid\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['instanceid'] = array('db' => 'scorm', 'restore' => 'scorm');
+        $othermapped['scoid'] = array('db' => 'scorm_scoes', 'restore' => 'scorm_scoe');
+
+        return $othermapped;
     }
 }

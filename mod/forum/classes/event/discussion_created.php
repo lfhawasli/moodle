@@ -59,7 +59,7 @@ class discussion_created extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has created the discussion with id '$this->objectid' in the forum " .
-            "with the course module id '$this->contextinstanceid'.";
+            "with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -108,5 +108,16 @@ class discussion_created extends \core\event\base {
         if ($this->contextlevel != CONTEXT_MODULE) {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'forum_discussions', 'restore' => 'forum_discussion');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['forumid'] = array('db' => 'forum', 'restore' => 'forum');
+
+        return $othermapped;
     }
 }

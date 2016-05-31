@@ -176,7 +176,7 @@ abstract class testing_module_generator extends component_generator_base {
         // argument $options is being deprecated.
         // List excludes fields: instance (does not exist yet), course, module and idnumber (set above)
         $easymergefields = array('section', 'added', 'score', 'indent',
-            'visible', 'visibleold', 'groupmode', 'groupingid', 'groupmembersonly',
+            'visible', 'visibleold', 'groupmode', 'groupingid',
             'completion', 'completiongradeitemnumber', 'completionview', 'completionexpected',
             'availability', 'showdescription');
         foreach ($easymergefields as $key) {
@@ -192,7 +192,6 @@ abstract class testing_module_generator extends component_generator_base {
             'cmidnumber' => '',
             'groupmode' => 0,
             'groupingid' => 0,
-            'groupmembersonly' => 0,
             'availability' => null,
             'completion' => 0,
             'completionview' => 0,
@@ -249,6 +248,10 @@ abstract class testing_module_generator extends component_generator_base {
         }
         if (empty($record->introeditor) && empty($record->introformat)) {
             $record->introformat = FORMAT_MOODLE;
+        }
+
+        if (isset($record->tags) && !is_array($record->tags)) {
+            $record->tags = preg_split('/\s*,\s*/', trim($record->tags), -1, PREG_SPLIT_NO_EMPTY);
         }
 
         // Before Moodle 2.6 it was possible to create a module with completion tracking when

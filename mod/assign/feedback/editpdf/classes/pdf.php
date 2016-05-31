@@ -414,6 +414,8 @@ class pdf extends \FPDI {
      * @return string the filename of the generated image
      */
     public function get_image($pageno) {
+        global $CFG;
+
         if (!$this->filename) {
             throw new \coding_exception('Attempting to generate a page image without first setting the PDF filename');
         }
@@ -437,13 +439,13 @@ class pdf extends \FPDI {
 
         if ($generate) {
             // Use ghostscript to generate an image of the specified page.
-            $gsexec = \escapeshellarg(\get_config('assignfeedback_editpdf', 'gspath'));
+            $gsexec = \escapeshellarg($CFG->pathtogs);
             $imageres = \escapeshellarg(100);
             $imagefilearg = \escapeshellarg($imagefile);
             $filename = \escapeshellarg($this->filename);
             $pagenoinc = \escapeshellarg($pageno + 1);
             $command = "$gsexec -q -sDEVICE=png16m -dSAFER -dBATCH -dNOPAUSE -r$imageres -dFirstPage=$pagenoinc -dLastPage=$pagenoinc ".
-                "-dGraphicsAlphaBits=4 -dTextAlphaBits=4 -sOutputFile=$imagefilearg $filename";
+                "-dDOINTERPOLATE -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -sOutputFile=$imagefilearg $filename";
 
             $output = null;
             $result = exec($command, $output);
@@ -467,6 +469,8 @@ class pdf extends \FPDI {
      * @return string path to copy or converted pdf (false == fail)
      */
     public static function ensure_pdf_compatible(\stored_file $file) {
+        global $CFG;
+
         $temparea = \make_temp_directory('assignfeedback_editpdf');
         $hash = $file->get_contenthash(); // Use the contenthash to make sure the temp files have unique names.
         $tempsrc = $temparea . "/src-$hash.pdf";
@@ -481,14 +485,14 @@ class pdf extends \FPDI {
             // PDF was not valid - try running it through ghostscript to clean it up.
             $pagecount = 0;
         }
+        $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
 
         if ($pagecount > 0) {
             // Page is valid and can be read by tcpdf.
             return $tempsrc;
         }
 
-
-        $gsexec = \escapeshellarg(\get_config('assignfeedback_editpdf', 'gspath'));
+        $gsexec = \escapeshellarg($CFG->pathtogs);
         $tempdstarg = \escapeshellarg($tempdst);
         $tempsrcarg = \escapeshellarg($tempsrc);
         $command = "$gsexec -q -sDEVICE=pdfwrite -dBATCH -dNOPAUSE -sOutputFile=$tempdstarg $tempsrcarg";
@@ -507,6 +511,8 @@ class pdf extends \FPDI {
             // PDF was not valid - try running it through ghostscript to clean it up.
             $pagecount = 0;
         }
+        $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
+
         if ($pagecount <= 0) {
             @unlink($tempdst);
             // Could not parse the converted pdf.
@@ -528,7 +534,7 @@ class pdf extends \FPDI {
             'status' => self::GSPATH_OK,
             'message' => null,
         );
-        $gspath = \get_config('assignfeedback_editpdf', 'gspath');
+        $gspath = $CFG->pathtogs;
         if (empty($gspath)) {
             $ret->status = self::GSPATH_EMPTY;
             return $ret;
@@ -568,6 +574,7 @@ class pdf extends \FPDI {
             $ret->status = self::GSPATH_ERROR;
             $ret->message = $e->getMessage();
         }
+        $pdf->Close(); // PDF loaded and never saved/outputted needs to be closed.
 
         return $ret;
     }

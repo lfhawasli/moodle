@@ -4,9 +4,6 @@
 [submodule "blocks/quickmail"]
 	path = blocks/quickmail
 	url = git@github.com:ccle/quickmail.git
-[submodule "filter/rtmp"]
-	path = filter/rtmp
-	url = git@github.com:ccle/moodle-filter_rtmp.git
 [submodule "local/moodlecheck"]
 	path = local/moodlecheck
 	url = https://github.com/moodlehq/moodle-local_moodlecheck.git
@@ -40,15 +37,6 @@
 [submodule "local/googleanalytics"]
 	path = local/googleanalytics
 	url = https://github.com/ccle/moodle-local_googleanalytics.git
-[submodule "grade/report/quick_edit"]
-	path = grade/report/quick_edit
-	url = git@github.com:ccle/quick_edit.git
-[submodule "grade/report/history"]
-	path = grade/report/history
-	url = https://github.com/ccle/moodle-gradereport_history.git
-[submodule "report/rolescapabilities"]
-	path = report/rolescapabilities
-	url = https://github.com/ccle/moodle-report-rolescapabilities.git
 [submodule "lib/editor/atto/plugins/chemistry"]
 	path = lib/editor/atto/plugins/chemistry
 	url = git@github.com:geoffrowland/moodle-editor_atto-chemistry.git
@@ -127,9 +115,6 @@
 [submodule "filter/mediagallery"]
 	path = filter/mediagallery
 	url = https://github.com/netspotau/moodle-filter_mediagallery.git
-[submodule "local/ltiprovider"]
-	path = local/ltiprovider
-	url = git@github.com:ccle/moodle-local_ltiprovider.git 
 [submodule "lib/editor/atto/plugins/bsgrid"]
  	path = lib/editor/atto/plugins/bsgrid
 	url = git@github.com:academic-moodle-cooperation/moodle-atto_bsgrid.git

@@ -39,7 +39,17 @@ class mod_forum_events_testcase extends advanced_testcase {
      * Tests set up.
      */
     public function setUp() {
+        // We must clear the subscription caches. This has to be done both before each test, and after in case of other
+        // tests using these functions.
+        \mod_forum\subscriptions::reset_forum_cache();
+
         $this->resetAfterTest();
+    }
+
+    public function tearDown() {
+        // We must clear the subscription caches. This has to be done both before each test, and after in case of other
+        // tests using these functions.
+        \mod_forum\subscriptions::reset_forum_cache();
     }
 
     /**
@@ -1025,12 +1035,13 @@ class mod_forum_events_testcase extends advanced_testcase {
         $forum = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
 
         $params = array(
-            'context' => context_module::instance($forum->id),
+            'context' => context_module::instance($forum->cmid),
             'other' => array('reportmode' => 'posts'),
             'relateduserid' => $user->id,
         );
 
-        $this->setExpectedException('coding_exception', 'Context level must be either CONTEXT_SYSTEM or CONTEXT_COURSE.');
+        $this->setExpectedException('coding_exception',
+                'Context level must be either CONTEXT_SYSTEM, CONTEXT_COURSE or CONTEXT_USER.');
         \mod_forum\event\user_report_viewed::create($params);
     }
 
@@ -1487,10 +1498,13 @@ class mod_forum_events_testcase extends advanced_testcase {
      * Test post_deleted event.
      */
     public function test_post_deleted() {
+        global $DB;
+
         // Setup test data.
         $course = $this->getDataGenerator()->create_course();
         $forum = $this->getDataGenerator()->create_module('forum', array('course' => $course->id));
         $user = $this->getDataGenerator()->create_user();
+        $cm = get_coursemodule_from_instance('forum', $forum->id, $forum->course);
 
         // Add a discussion.
         $record = array();
@@ -1499,39 +1513,61 @@ class mod_forum_events_testcase extends advanced_testcase {
         $record['userid'] = $user->id;
         $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
 
-        // Add a post.
+        // When creating a discussion we also create a post, so get the post.
+        $discussionpost = $DB->get_records('forum_posts');
+        // Will only be one here.
+        $discussionpost = reset($discussionpost);
+
+        // Add a few posts.
         $record = array();
         $record['discussion'] = $discussion->id;
         $record['userid'] = $user->id;
-        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+        $posts = array();
+        $posts[$discussionpost->id] = $discussionpost;
+        for ($i = 0; $i < 3; $i++) {
+            $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+            $posts[$post->id] = $post;
+        }
 
-        $context = context_module::instance($forum->cmid);
-
-        $params = array(
-            'context' => $context,
-            'objectid' => $post->id,
-            'other' => array('discussionid' => $discussion->id, 'forumid' => $forum->id, 'forumtype' => $forum->type)
-        );
-
-        $event = \mod_forum\event\post_deleted::create($params);
-
-        // Trigger and capture the event.
+        // Delete the last post and capture the event.
+        $lastpost = end($posts);
         $sink = $this->redirectEvents();
-        $event->trigger();
+        forum_delete_post($lastpost, true, $course, $cm, $forum);
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $event = reset($events);
 
-        // Checking that the event contains the expected values.
+        // Check that the events contain the expected values.
         $this->assertInstanceOf('\mod_forum\event\post_deleted', $event);
-        $this->assertEquals($context, $event->get_context());
-        $expected = array($course->id, 'forum', 'delete post', "discuss.php?d={$discussion->id}", $post->id, $forum->cmid);
+        $this->assertEquals(context_module::instance($forum->cmid), $event->get_context());
+        $expected = array($course->id, 'forum', 'delete post', "discuss.php?d={$discussion->id}", $lastpost->id, $forum->cmid);
         $this->assertEventLegacyLogData($expected, $event);
         $url = new \moodle_url('/mod/forum/discuss.php', array('d' => $discussion->id));
         $this->assertEquals($url, $event->get_url());
         $this->assertEventContextNotUsed($event);
-
         $this->assertNotEmpty($event->get_name());
+
+        // Delete the whole discussion and capture the events.
+        $sink = $this->redirectEvents();
+        forum_delete_discussion($discussion, true, $course, $cm, $forum);
+        $events = $sink->get_events();
+        // We will have 3 events. One for the discussion (creating a discussion creates a post), and two for the posts.
+        $this->assertCount(3, $events);
+
+        // Loop through the events and check they are valid.
+        foreach ($events as $event) {
+            $post = $posts[$event->objectid];
+
+            // Check that the event contains the expected values.
+            $this->assertInstanceOf('\mod_forum\event\post_deleted', $event);
+            $this->assertEquals(context_module::instance($forum->cmid), $event->get_context());
+            $expected = array($course->id, 'forum', 'delete post', "discuss.php?d={$discussion->id}", $post->id, $forum->cmid);
+            $this->assertEventLegacyLogData($expected, $event);
+            $url = new \moodle_url('/mod/forum/discuss.php', array('d' => $discussion->id));
+            $this->assertEquals($url, $event->get_url());
+            $this->assertEventContextNotUsed($event);
+            $this->assertNotEmpty($event->get_name());
+        }
     }
 
     /**
@@ -1813,6 +1849,875 @@ class mod_forum_events_testcase extends advanced_testcase {
         $this->assertEventContextNotUsed($event);
 
         $this->assertNotEmpty($event->get_name());
+    }
+
+    /**
+     * Test discussion_subscription_created event.
+     */
+    public function test_discussion_subscription_created() {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // Trigger and capturing the event.
+        $sink = $this->redirectEvents();
+
+        // Trigger the event by subscribing the user to the forum discussion.
+        \mod_forum\subscriptions::subscribe_user_to_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_created', $event);
+
+
+        $cm = get_coursemodule_from_instance('forum', $discussion->forum);
+        $context = \context_module::instance($cm->id);
+        $this->assertEquals($context, $event->get_context());
+
+        $url = new \moodle_url('/mod/forum/subscribe.php', array(
+            'id' => $forum->id,
+            'd' => $discussion->id
+        ));
+
+        $this->assertEquals($url, $event->get_url());
+        $this->assertEventContextNotUsed($event);
+        $this->assertNotEmpty($event->get_name());
+    }
+
+    /**
+     * Test validation of discussion_subscription_created event.
+     */
+    public function test_discussion_subscription_created_validation() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        $context = context_module::instance($forum->cmid);
+
+        $params = array(
+            'context' => $context,
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'forumid' => $forum->id,
+                'discussion' => $discussion->id,
+            )
+        );
+
+        $event = \mod_forum\event\discussion_subscription_created::create($params);
+
+        // Trigger and capturing the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+    }
+
+    /**
+     * Test contextlevel validation of discussion_subscription_created event.
+     */
+    public function test_discussion_subscription_created_validation_contextlevel() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        $context = context_module::instance($forum->cmid);
+
+        $params = array(
+            'context' => \context_course::instance($course->id),
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'forumid' => $forum->id,
+                'discussion' => $discussion->id,
+            )
+        );
+
+        // Without an invalid context.
+        $this->setExpectedException('coding_exception', 'Context level must be CONTEXT_MODULE.');
+        \mod_forum\event\discussion_subscription_created::create($params);
+    }
+
+    /**
+     * Test discussion validation of discussion_subscription_created event.
+     */
+    public function test_discussion_subscription_created_validation_discussion() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        // Without the discussion.
+        $params = array(
+            'context' => context_module::instance($forum->cmid),
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'forumid' => $forum->id,
+            )
+        );
+
+        $this->setExpectedException('coding_exception', "The 'discussion' value must be set in other.");
+        \mod_forum\event\discussion_subscription_created::create($params);
+    }
+
+    /**
+     * Test forumid validation of discussion_subscription_created event.
+     */
+    public function test_discussion_subscription_created_validation_forumid() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        // Without the forumid.
+        $params = array(
+            'context' => context_module::instance($forum->cmid),
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'discussion' => $discussion->id,
+            )
+        );
+
+        $this->setExpectedException('coding_exception', "The 'forumid' value must be set in other.");
+        \mod_forum\event\discussion_subscription_created::create($params);
+    }
+
+    /**
+     * Test relateduserid validation of discussion_subscription_created event.
+     */
+    public function test_discussion_subscription_created_validation_relateduserid() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        $context = context_module::instance($forum->cmid);
+
+        // Without the relateduserid.
+        $params = array(
+            'context' => context_module::instance($forum->cmid),
+            'objectid' => $subscription->id,
+            'other' => array(
+                'forumid' => $forum->id,
+                'discussion' => $discussion->id,
+            )
+        );
+
+        $this->setExpectedException('coding_exception', "The 'relateduserid' must be set.");
+        \mod_forum\event\discussion_subscription_created::create($params);
+    }
+
+    /**
+     * Test discussion_subscription_deleted event.
+     */
+    public function test_discussion_subscription_deleted() {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_INITIALSUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // Trigger and capturing the event.
+        $sink = $this->redirectEvents();
+
+        // Trigger the event by unsubscribing the user to the forum discussion.
+        \mod_forum\subscriptions::unsubscribe_user_from_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_deleted', $event);
+
+
+        $cm = get_coursemodule_from_instance('forum', $discussion->forum);
+        $context = \context_module::instance($cm->id);
+        $this->assertEquals($context, $event->get_context());
+
+        $url = new \moodle_url('/mod/forum/subscribe.php', array(
+            'id' => $forum->id,
+            'd' => $discussion->id
+        ));
+
+        $this->assertEquals($url, $event->get_url());
+        $this->assertEventContextNotUsed($event);
+        $this->assertNotEmpty($event->get_name());
+    }
+
+    /**
+     * Test validation of discussion_subscription_deleted event.
+     */
+    public function test_discussion_subscription_deleted_validation() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_INITIALSUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = \mod_forum\subscriptions::FORUM_DISCUSSION_UNSUBSCRIBED;
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        $context = context_module::instance($forum->cmid);
+
+        $params = array(
+            'context' => $context,
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'forumid' => $forum->id,
+                'discussion' => $discussion->id,
+            )
+        );
+
+        $event = \mod_forum\event\discussion_subscription_deleted::create($params);
+
+        // Trigger and capturing the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Without an invalid context.
+        $params['context'] = \context_course::instance($course->id);
+        $this->setExpectedException('coding_exception', 'Context level must be CONTEXT_MODULE.');
+        \mod_forum\event\discussion_deleted::create($params);
+
+        // Without the discussion.
+        unset($params['discussion']);
+        $this->setExpectedException('coding_exception', 'The \'discussion\' value must be set in other.');
+        \mod_forum\event\discussion_deleted::create($params);
+
+        // Without the forumid.
+        unset($params['forumid']);
+        $this->setExpectedException('coding_exception', 'The \'forumid\' value must be set in other.');
+        \mod_forum\event\discussion_deleted::create($params);
+
+        // Without the relateduserid.
+        unset($params['relateduserid']);
+        $this->setExpectedException('coding_exception', 'The \'relateduserid\' value must be set in other.');
+        \mod_forum\event\discussion_deleted::create($params);
+    }
+
+    /**
+     * Test contextlevel validation of discussion_subscription_deleted event.
+     */
+    public function test_discussion_subscription_deleted_validation_contextlevel() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        $context = context_module::instance($forum->cmid);
+
+        $params = array(
+            'context' => \context_course::instance($course->id),
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'forumid' => $forum->id,
+                'discussion' => $discussion->id,
+            )
+        );
+
+        // Without an invalid context.
+        $this->setExpectedException('coding_exception', 'Context level must be CONTEXT_MODULE.');
+        \mod_forum\event\discussion_subscription_deleted::create($params);
+    }
+
+    /**
+     * Test discussion validation of discussion_subscription_deleted event.
+     */
+    public function test_discussion_subscription_deleted_validation_discussion() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        // Without the discussion.
+        $params = array(
+            'context' => context_module::instance($forum->cmid),
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'forumid' => $forum->id,
+            )
+        );
+
+        $this->setExpectedException('coding_exception', "The 'discussion' value must be set in other.");
+        \mod_forum\event\discussion_subscription_deleted::create($params);
+    }
+
+    /**
+     * Test forumid validation of discussion_subscription_deleted event.
+     */
+    public function test_discussion_subscription_deleted_validation_forumid() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        // Without the forumid.
+        $params = array(
+            'context' => context_module::instance($forum->cmid),
+            'objectid' => $subscription->id,
+            'relateduserid' => $user->id,
+            'other' => array(
+                'discussion' => $discussion->id,
+            )
+        );
+
+        $this->setExpectedException('coding_exception', "The 'forumid' value must be set in other.");
+        \mod_forum\event\discussion_subscription_deleted::create($params);
+    }
+
+    /**
+     * Test relateduserid validation of discussion_subscription_deleted event.
+     */
+    public function test_discussion_subscription_deleted_validation_relateduserid() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // The user is not subscribed to the forum. Insert a new discussion subscription.
+        $subscription = new \stdClass();
+        $subscription->userid  = $user->id;
+        $subscription->forum = $forum->id;
+        $subscription->discussion = $discussion->id;
+        $subscription->preference = time();
+
+        $subscription->id = $DB->insert_record('forum_discussion_subs', $subscription);
+
+        $context = context_module::instance($forum->cmid);
+
+        // Without the relateduserid.
+        $params = array(
+            'context' => context_module::instance($forum->cmid),
+            'objectid' => $subscription->id,
+            'other' => array(
+                'forumid' => $forum->id,
+                'discussion' => $discussion->id,
+            )
+        );
+
+        $this->setExpectedException('coding_exception', "The 'relateduserid' must be set.");
+        \mod_forum\event\discussion_subscription_deleted::create($params);
+    }
+
+    /**
+     * Test that the correct context is used in the events when subscribing
+     * users.
+     */
+    public function test_forum_subscription_page_context_valid() {
+        global $CFG, $PAGE;
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+
+        // Setup test data.
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_CHOOSESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+        $quiz = $this->getDataGenerator()->create_module('quiz', $options);
+
+        // Add a discussion.
+        $record = array();
+        $record['course'] = $course->id;
+        $record['forum'] = $forum->id;
+        $record['userid'] = $user->id;
+        $discussion = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
+
+        // Add a post.
+        $record = array();
+        $record['discussion'] = $discussion->id;
+        $record['userid'] = $user->id;
+        $post = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_post($record);
+
+        // Set up the default page event to use this forum.
+        $PAGE = new moodle_page();
+        $cm = get_coursemodule_from_instance('forum', $discussion->forum);
+        $context = \context_module::instance($cm->id);
+        $PAGE->set_context($context);
+        $PAGE->set_cm($cm, $course, $forum);
+
+        // Trigger and capturing the event.
+        $sink = $this->redirectEvents();
+
+        // Trigger the event by subscribing the user to the forum.
+        \mod_forum\subscriptions::subscribe_user($user->id, $forum);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\subscription_created', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by unsubscribing the user to the forum.
+        \mod_forum\subscriptions::unsubscribe_user($user->id, $forum);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\subscription_deleted', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by subscribing the user to the discussion.
+        \mod_forum\subscriptions::subscribe_user_to_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_created', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by unsubscribing the user from the discussion.
+        \mod_forum\subscriptions::unsubscribe_user_from_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_deleted', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Now try with the context for a different module (quiz).
+        $PAGE = new moodle_page();
+        $cm = get_coursemodule_from_instance('quiz', $quiz->id);
+        $quizcontext = \context_module::instance($cm->id);
+        $PAGE->set_context($quizcontext);
+        $PAGE->set_cm($cm, $course, $quiz);
+
+        // Trigger and capturing the event.
+        $sink = $this->redirectEvents();
+
+        // Trigger the event by subscribing the user to the forum.
+        \mod_forum\subscriptions::subscribe_user($user->id, $forum);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\subscription_created', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by unsubscribing the user to the forum.
+        \mod_forum\subscriptions::unsubscribe_user($user->id, $forum);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\subscription_deleted', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by subscribing the user to the discussion.
+        \mod_forum\subscriptions::subscribe_user_to_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_created', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by unsubscribing the user from the discussion.
+        \mod_forum\subscriptions::unsubscribe_user_from_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_deleted', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Now try with the course context - the module context should still be used.
+        $PAGE = new moodle_page();
+        $coursecontext = \context_course::instance($course->id);
+        $PAGE->set_context($coursecontext);
+
+        // Trigger the event by subscribing the user to the forum.
+        \mod_forum\subscriptions::subscribe_user($user->id, $forum);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\subscription_created', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by unsubscribing the user to the forum.
+        \mod_forum\subscriptions::unsubscribe_user($user->id, $forum);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\subscription_deleted', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by subscribing the user to the discussion.
+        \mod_forum\subscriptions::subscribe_user_to_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_created', $event);
+        $this->assertEquals($context, $event->get_context());
+
+        // Trigger the event by unsubscribing the user from the discussion.
+        \mod_forum\subscriptions::unsubscribe_user_from_discussion($user->id, $discussion);
+
+        $events = $sink->get_events();
+        $sink->clear();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_forum\event\discussion_subscription_deleted', $event);
+        $this->assertEquals($context, $event->get_context());
+
     }
 
     /**

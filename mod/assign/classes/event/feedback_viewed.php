@@ -89,7 +89,7 @@ class feedback_viewed extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the feedback for the user with id '$this->relateduserid' " .
-            "for the assignment with the course module id '$this->contextinstanceid'.";
+            "for the assignment with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -118,5 +118,16 @@ class feedback_viewed extends base {
         if (!isset($this->other['assignid'])) {
             throw new \coding_exception('The \'assignid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign_grades', 'restore' => 'grade');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['assignid'] = array('db' => 'assign', 'restore' => 'assign');
+
+        return $othermapped;
     }
 }

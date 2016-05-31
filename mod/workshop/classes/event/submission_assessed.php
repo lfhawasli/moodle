@@ -60,7 +60,7 @@ class submission_assessed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' assessed the submission with id '$this->objectid' for the user with " .
-            "id '$this->relateduserid' in the workshop with the course module id '$this->contextinstanceid'.";
+            "id '$this->relateduserid' in the workshop with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -107,5 +107,17 @@ class submission_assessed extends \core\event\base {
         if (!isset($this->other['submissionid'])) {
             throw new \coding_exception('The \'submissionid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'workshop_assessments', 'restore' => 'workshop_assessment');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['submissionid'] = array('db' => 'workshop_submissions', 'restore' => 'workshop_submission');
+        $othermapped['workshopid'] = array('db' => 'workshop', 'restore' => 'workshop');
+
+        return $othermapped;
     }
 }

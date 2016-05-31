@@ -42,7 +42,7 @@ class mod_assign_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $CFG, $DB, $PAGE;
+        global $CFG, $COURSE, $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -56,7 +56,12 @@ class mod_assign_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        $this->add_intro_editor(true, get_string('description', 'assign'));
+        $this->standard_intro_elements(get_string('description', 'assign'));
+
+        $mform->addElement('filemanager', 'introattachments',
+                            get_string('introattachments', 'assign'),
+                            null, array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes) );
+        $mform->addHelpButton('introattachments', 'introattachments', 'assign');
 
         $ctx = null;
         if ($this->current && $this->current->coursemodule) {
@@ -132,6 +137,14 @@ class mod_assign_mod_form extends moodleform_mod {
         if ($assignment->has_submissions_or_grades()) {
             $mform->freeze('teamsubmission');
         }
+
+        $name = get_string('preventsubmissionnotingroup', 'assign');
+        $mform->addElement('selectyesno', 'preventsubmissionnotingroup', $name);
+        $mform->addHelpButton('preventsubmissionnotingroup',
+            'preventsubmissionnotingroup',
+            'assign');
+        $mform->setType('preventsubmissionnotingroup', PARAM_BOOL);
+        $mform->disabledIf('preventsubmissionnotingroup', 'teamsubmission', 'eq', 0);
 
         $name = get_string('requireallteammemberssubmit', 'assign');
         $mform->addElement('selectyesno', 'requireallteammemberssubmit', $name);
@@ -247,6 +260,9 @@ class mod_assign_mod_form extends moodleform_mod {
                 $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
             }
         }
+        if ($data['blindmarking'] && $data['attemptreopenmethod'] == ASSIGN_ATTEMPT_REOPEN_METHOD_UNTILPASS) {
+            $errors['attemptreopenmethod'] = get_string('reopenuntilpassincompatiblewithblindmarking', 'assign');
+        }
 
         return $errors;
     }
@@ -272,6 +288,12 @@ class mod_assign_mod_form extends moodleform_mod {
             $course = $DB->get_record('course', array('id'=>$this->current->course), '*', MUST_EXIST);
             $assignment->set_course($course);
         }
+
+        $draftitemid = file_get_submitted_draft_itemid('introattachments');
+        file_prepare_draft_area($draftitemid, $ctx->id, 'mod_assign', ASSIGN_INTROATTACHMENT_FILEAREA,
+                                0, array('subdirs' => 0));
+        $defaultvalues['introattachments'] = $draftitemid;
+
         $assignment->plugin_data_preprocessing($defaultvalues);
     }
 

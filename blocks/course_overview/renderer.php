@@ -41,6 +41,10 @@ class block_course_overview_renderer extends plugin_renderer_base {
     public function course_overview($courses, $overviews) {
         $html = '';
         $config = get_config('block_course_overview');
+        if ($config->showcategories != BLOCKS_COURSE_OVERVIEW_SHOWCATEGORIES_NONE) {
+            global $CFG;
+            require_once($CFG->libdir.'/coursecatlib.php');
+        }
         $ismovingcourse = false;
         $courseordernumber = 0;
         $maxcourses = count($courses);
@@ -126,6 +130,24 @@ class block_course_overview_renderer extends plugin_renderer_base {
             // If user is moving courses, then down't show overview.
             if (isset($overviews[$course->id]) && !$ismovingcourse) {
                 $html .= $this->activity_display($course->id, $overviews[$course->id]);
+            }
+
+            if ($config->showcategories != BLOCKS_COURSE_OVERVIEW_SHOWCATEGORIES_NONE) {
+                // List category parent or categories path here.
+                $currentcategory = coursecat::get($course->category, IGNORE_MISSING);
+                if ($currentcategory !== null) {
+                    $html .= html_writer::start_tag('div', array('class' => 'categorypath'));
+                    if ($config->showcategories == BLOCKS_COURSE_OVERVIEW_SHOWCATEGORIES_FULL_PATH) {
+                        foreach ($currentcategory->get_parents() as $categoryid) {
+                            $category = coursecat::get($categoryid, IGNORE_MISSING);
+                            if ($category !== null) {
+                                $html .= $category->get_formatted_name().' / ';
+                            }
+                        }
+                    }
+                    $html .= $currentcategory->get_formatted_name();
+                    $html .= html_writer::end_tag('div');
+                }
             }
 
             $html .= $this->output->box('', 'flush');
@@ -303,7 +325,7 @@ class block_course_overview_renderer extends plugin_renderer_base {
      * @return string html string for welcome area.
      */
     public function welcome_area($msgcount) {
-        global $USER;
+        global $CFG, $USER;
         $output = $this->output->box_start('welcome_area');
 
         $picture = $this->output->user_picture($USER, array('size' => 75, 'class' => 'welcome_userpicture'));
@@ -312,16 +334,19 @@ class block_course_overview_renderer extends plugin_renderer_base {
         $output .= $this->output->box_start('welcome_message');
         $output .= $this->output->heading(get_string('welcome', 'block_course_overview', $USER->firstname));
 
-        $plural = 's';
-        if ($msgcount > 0) {
-            $output .= get_string('youhavemessages', 'block_course_overview', $msgcount);
-            if ($msgcount == 1) {
-                $plural = '';
+        if (!empty($CFG->messaging)) {
+            $plural = 's';
+            if ($msgcount > 0) {
+                $output .= get_string('youhavemessages', 'block_course_overview', $msgcount);
+                if ($msgcount == 1) {
+                    $plural = '';
+                }
+            } else {
+                $output .= get_string('youhavenomessages', 'block_course_overview');
             }
-        } else {
-            $output .= get_string('youhavenomessages', 'block_course_overview');
+            $output .= html_writer::link(new moodle_url('/message/index.php'),
+                    get_string('message'.$plural, 'block_course_overview'));
         }
-        $output .= html_writer::link(new moodle_url('/message/index.php'), get_string('message'.$plural, 'block_course_overview'));
         $output .= $this->output->box_end();
         $output .= $this->output->box('', 'flush');
         $output .= $this->output->box_end();

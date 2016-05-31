@@ -69,7 +69,7 @@ class lesson_started extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' started the lesson with the course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' started the lesson with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -80,5 +80,9 @@ class lesson_started extends \core\event\base {
     protected function get_legacy_logdata() {
         return array($this->courseid, 'lesson', 'start', 'view.php?id=' . $this->contextinstanceid,
             $this->objectid, $this->contextinstanceid);
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'lesson', 'restore' => 'lesson');
     }
 }

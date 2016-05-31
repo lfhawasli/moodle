@@ -30,3 +30,4 @@ $plugin->dependencies = array(
     'enrol_invitation' => 2014081300
 );
 $plugin->maturity = MATURITY_RC;
+$plugin->component = 'tool_uclaseniorscholar';

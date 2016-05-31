@@ -69,6 +69,16 @@ class atto_texteditor extends texteditor {
     /**
      * Use this editor for given element.
      *
+     * Available Atto-specific options:
+     *   atto:toolbar - set to a string to override the system config editor_atto/toolbar
+     *
+     * Available general options:
+     *   context - set to the current context object
+     *   enable_filemanagement - set false to get rid of the managefiles plugin
+     *   autosave - true/false to control autosave
+     *
+     * Options are also passed through to the plugins.
+     *
      * @param string $elementid
      * @param array $options
      * @param null $fpoptions
@@ -76,7 +86,11 @@ class atto_texteditor extends texteditor {
     public function use_editor($elementid, array $options=null, $fpoptions=null) {
         global $PAGE;
 
-        $configstr = get_config('editor_atto', 'toolbar');
+        if (array_key_exists('atto:toolbar', $options)) {
+            $configstr = $options['atto:toolbar'];
+        } else {
+            $configstr = get_config('editor_atto', 'toolbar');
+        }
 
         $grouplines = explode("\n", $configstr);
 
@@ -130,7 +144,15 @@ class atto_texteditor extends texteditor {
                 'editor_command_keycode',
                 'editor_control_keycode',
                 'plugin_title_shortcut',
+                'textrecovered',
+                'autosavefailed',
+                'autosavesucceeded',
+                'errortextrecovery'
             ), 'editor_atto');
+        $PAGE->requires->strings_for_js(array(
+                'warning',
+                'info'
+            ), 'moodle');
         $PAGE->requires->yui_module($modules,
                                     'Y.M.editor_atto.Editor.init',
                                     array($this->get_init_params($elementid, $options, $fpoptions, $jsplugins)));
@@ -151,15 +173,30 @@ class atto_texteditor extends texteditor {
         $strtime        = get_string('strftimetime');
         $strdate        = get_string('strftimedaydate');
         $lang           = current_language();
+        $autosave       = true;
+        $autosavefrequency = get_config('editor_atto', 'autosavefrequency');
+        if (isset($options['autosave'])) {
+            $autosave       = $options['autosave'];
+        }
         $contentcss     = $PAGE->theme->editor_css_url()->out(false);
 
+        // Autosave disabled for guests.
+        if (isguestuser()) {
+            $autosave = false;
+        }
+        // Note <> is a safe separator, because it will not appear in the output of s().
+        $pagehash = sha1($PAGE->url . '<>' . s($this->get_text()));
         $params = array(
             'elementid' => $elementid,
             'content_css' => $contentcss,
+            'contextid' => $options['context']->id,
+            'autosaveEnabled' => $autosave,
+            'autosaveFrequency' => $autosavefrequency,
             'language' => $lang,
             'directionality' => $directionality,
             'filepickeroptions' => array(),
-            'plugins' => $plugins
+            'plugins' => $plugins,
+            'pageHash' => $pagehash,
         );
         if ($fpoptions) {
             $params['filepickeroptions'] = $fpoptions;

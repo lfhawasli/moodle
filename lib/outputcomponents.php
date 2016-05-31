@@ -40,6 +40,28 @@ interface renderable {
 }
 
 /**
+ * Interface marking other classes having the ability to export their data for use by templates.
+ *
+ * @copyright 2015 Damyon Wiese
+ * @package core
+ * @category output
+ * @since 2.9
+ */
+interface templatable {
+
+    /**
+     * Function to export the renderer data in a format that is suitable for a
+     * mustache template. This means:
+     * 1. No complex types - only stdClass, array, int, string, float, bool
+     * 2. Any additional info that is required for the template is pre-calculated (e.g. capability checks).
+     *
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @return stdClass|array
+     */
+    public function export_for_template(renderer_base $output);
+}
+
+/**
  * Data structure representing a file picker.
  *
  * @copyright 2010 Dongsheng Cai
@@ -173,6 +195,11 @@ class user_picture implements renderable {
      * @var string Image class attribute
      */
     public $class = 'userpicture';
+
+    /**
+     * @var bool Whether to be visible to screen readers.
+     */
+    public $visibletoscreenreaders = true;
 
     /**
      * User picture constructor.
@@ -399,7 +426,7 @@ class user_picture implements renderable {
 
             // If the currently requested page is https then we'll return an
             // https gravatar page.
-            if (strpos($CFG->httpswwwroot, 'https:') === 0) {
+            if (is_https()) {
                 $gravatardefault = str_replace($CFG->wwwroot, $CFG->httpswwwroot, $gravatardefault); // Replace by secure url.
                 return new moodle_url("https://secure.gravatar.com/avatar/{$md5}", array('s' => $size, 'd' => $gravatardefault));
             } else {
@@ -476,7 +503,7 @@ class help_icon implements renderable {
  * @package core
  * @category output
  */
-class pix_icon implements renderable {
+class pix_icon implements renderable, templatable {
 
     /**
      * @var string The icon name
@@ -506,17 +533,45 @@ class pix_icon implements renderable {
         $this->component  = $component;
         $this->attributes = (array)$attributes;
 
-        $this->attributes['alt'] = $alt;
         if (empty($this->attributes['class'])) {
             $this->attributes['class'] = 'smallicon';
         }
-        if (!isset($this->attributes['title'])) {
-            $this->attributes['title'] = $this->attributes['alt'];
-        } else if (empty($this->attributes['title'])) {
+
+        // If the alt is empty, don't place it in the attributes, otherwise it will override parent alt text.
+        if (!is_null($alt)) {
+            $this->attributes['alt'] = $alt;
+
+            // If there is no title, set it to the attribute.
+            if (!isset($this->attributes['title'])) {
+                $this->attributes['title'] = $this->attributes['alt'];
+            }
+        } else {
+            unset($this->attributes['alt']);
+        }
+
+        if (empty($this->attributes['title'])) {
             // Remove the title attribute if empty, we probably want to use the parent node's title
             // and some browsers might overwrite it with an empty title.
             unset($this->attributes['title']);
         }
+    }
+
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @return array
+     */
+    public function export_for_template(renderer_base $output) {
+        $attributes = $this->attributes;
+        $attributes['src'] = $output->pix_url($this->pix, $this->component);
+        $templatecontext = array();
+        foreach ($attributes as $name => $value) {
+            $templatecontext[] = array('name' => $name, 'value' => $value);
+        }
+        $data = array('attributes' => $templatecontext);
+
+        return $data;
     }
 }
 
@@ -596,6 +651,16 @@ class single_button implements renderable {
      * @var array List of attached actions
      */
     var $actions = array();
+
+    /**
+     * @var array $params URL Params
+     */
+    var $params;
+
+    /**
+     * @var string Action id
+     */
+    var $actionid;
 
     /**
      * Constructor
@@ -1321,28 +1386,23 @@ class html_writer {
         if (!$currenttime) {
             $currenttime = time();
         }
-        $currentdate = usergetdate($currenttime);
+        $calendartype = \core_calendar\type_factory::get_calendar_instance();
+        $currentdate = $calendartype->timestamp_to_date_array($currenttime);
         $userdatetype = $type;
         $timeunits = array();
 
         switch ($type) {
             case 'years':
-                for ($i=1970; $i<=2020; $i++) {
-                    $timeunits[$i] = $i;
-                }
+                $timeunits = $calendartype->get_years();
                 $userdatetype = 'year';
                 break;
             case 'months':
-                for ($i=1; $i<=12; $i++) {
-                    $timeunits[$i] = userdate(gmmktime(12,0,0,$i,15,2000), "%B");
-                }
+                $timeunits = $calendartype->get_months();
                 $userdatetype = 'month';
                 $currentdate['month'] = (int)$currentdate['mon'];
                 break;
             case 'days':
-                for ($i=1; $i<=31; $i++) {
-                    $timeunits[$i] = $i;
-                }
+                $timeunits = $calendartype->get_days();
                 $userdatetype = 'mday';
                 break;
             case 'hours':
@@ -1442,9 +1502,6 @@ class html_writer {
      * method. In most cases this is not an issue at all so we do not clone by default for performance
      * and memory consumption reasons.
      *
-     * Please do not use .r0/.r1 for css, as they will be removed in Moodle 2.9.
-     * @todo MDL-43902 , remove r0 and r1 from tr classes.
-     *
      * @param html_table $table data to be rendered
      * @return string HTML code
      */
@@ -1511,6 +1568,19 @@ class html_writer {
 
         $countcols = 0;
 
+        // Output a caption if present.
+        if (!empty($table->caption)) {
+            $captionattributes = array();
+            if ($table->captionhide) {
+                $captionattributes['class'] = 'accesshide';
+            }
+            $output .= html_writer::tag(
+                'caption',
+                $table->caption,
+                $captionattributes
+            );
+        }
+
         if (!empty($table->head)) {
             $countcols = count($table->head);
 
@@ -1574,7 +1644,6 @@ class html_writer {
         }
 
         if (!empty($table->data)) {
-            $oddeven    = 1;
             $keys       = array_keys($table->data);
             $lastrowkey = end($keys);
             $output .= html_writer::start_tag('tbody', array());
@@ -1600,17 +1669,21 @@ class html_writer {
                         $row = $newrow;
                     }
 
-                    $oddeven = $oddeven ? 0 : 1;
                     if (isset($table->rowclasses[$key])) {
                         $row->attributes['class'] .= ' ' . $table->rowclasses[$key];
                     }
 
-                    $row->attributes['class'] .= ' r' . $oddeven;
                     if ($key == $lastrowkey) {
                         $row->attributes['class'] .= ' lastrow';
                     }
 
-                    $output .= html_writer::start_tag('tr', array('class' => trim($row->attributes['class']), 'style' => $row->style, 'id' => $row->id)) . "\n";
+                    // Explicitly assigned properties should override those defined in the attributes.
+                    $row->attributes['class'] = trim($row->attributes['class']);
+                    $trattributes = array_merge($row->attributes, array(
+                            'id'            => $row->id,
+                            'style'         => $row->style,
+                        ));
+                    $output .= html_writer::start_tag('tr', $trattributes) . "\n";
                     $keys2 = array_keys($row->cells);
                     $lastkey = end($keys2);
 
@@ -2070,9 +2143,7 @@ class html_table {
 
     /**
      * @var array Array of classes to add to particular rows, space-separated string.
-     * Classes 'r0' or 'r1' are added automatically for every odd or even row,
-     * respectively. Class 'lastrow' is added automatically for the last row
-     * in the table.
+     * Class 'lastrow' is added automatically for the last row in the table.
      *
      * Example of usage:
      * $t->rowclasses[9] = 'tenth'
@@ -2095,6 +2166,23 @@ class html_table {
      * @var string Description of the contents for screen readers.
      */
     public $summary;
+
+    /**
+     * @var string Caption for the table, typically a title.
+     *
+     * Example of usage:
+     * $t->caption = "TV Guide";
+     */
+    public $caption;
+
+    /**
+     * @var bool Whether to hide the table's caption from sighted users.
+     *
+     * Example of usage:
+     * $t->caption = "TV Guide";
+     * $t->captionhide = true;
+     */
+    public $captionhide = false;
 
     /**
      * Constructor
@@ -2375,7 +2463,7 @@ class paging_bar implements renderable {
 
             $pagenum = $this->page + 1;
 
-            if ($pagenum != $displaypage) {
+            if ($pagenum != $lastpage) {
                 $this->nextlink = html_writer::link(new moodle_url($this->baseurl, array($this->pagevar=>$pagenum)), get_string('next'), array('class'=>'next'));
             }
         }
@@ -2638,6 +2726,30 @@ class custom_menu_item implements renderable {
     }
 
     /**
+     * Removes a custom menu item that is a child or descendant to the current menu.
+     *
+     * Returns true if child was found and removed.
+     *
+     * @param custom_menu_item $menuitem
+     * @return bool
+     */
+    public function remove_child(custom_menu_item $menuitem) {
+        $removed = false;
+        if (($key = array_search($menuitem, $this->children)) !== false) {
+            unset($this->children[$key]);
+            $this->children = array_values($this->children);
+            $removed = true;
+        } else {
+            foreach ($this->children as $child) {
+                if ($removed = $child->remove_child($menuitem)) {
+                    break;
+                }
+            }
+        }
+        return $removed;
+    }
+
+    /**
      * Returns the text for this item
      * @return string
      */
@@ -2805,85 +2917,69 @@ class custom_menu extends custom_menu_item {
      * @return array
      */
     public static function convert_text_to_menu_nodes($text, $language = null) {
+        $root = new custom_menu();
+        $lastitem = $root;
+        $lastdepth = 0;
+        $hiddenitems = array();
         $lines = explode("\n", $text);
-        $children = array();
-        $lastchild = null;
-        $lastdepth = null;
-        $lastsort = 0;
-        foreach ($lines as $line) {
+        foreach ($lines as $linenumber => $line) {
             $line = trim($line);
-            $bits = explode('|', $line, 4);    // name|url|title|langs
-            if (!array_key_exists(0, $bits) or empty($bits[0])) {
-                // Every item must have a name to be valid
+            if (strlen($line) == 0) {
                 continue;
-            } else {
-                $bits[0] = ltrim($bits[0],'-');
             }
-            if (!array_key_exists(1, $bits) or empty($bits[1])) {
-                // Set the url to null
-                $bits[1] = null;
-            } else {
-                // Make sure the url is a moodle url
-                try {
-                    $bits[1] = new moodle_url(trim($bits[1]));
-                } catch (moodle_exception $exception) {
-                    // We're not actually worried about this, we don't want to mess up the display
-                    // just for a wrongly entered URL.
-                    $bits[1] = null;
-                }
-            }
-            if (!array_key_exists(2, $bits) or empty($bits[2])) {
-                // Set the title to null seeing as there isn't one
-                $bits[2] = $bits[0];
-            }
-            if (!array_key_exists(3, $bits) or empty($bits[3])) {
-                // The item is valid for all languages
-                $itemlangs = null;
-            } else {
-                $itemlangs = array_map('trim', explode(',', $bits[3]));
-            }
-            if (!empty($language) and !empty($itemlangs)) {
-                // check that the item is intended for the current language
-                if (!in_array($language, $itemlangs)) {
-                    continue;
-                }
-            }
-            // Set an incremental sort order to keep it simple.
-            $lastsort++;
-            if (preg_match('/^(\-*)/', $line, $match) && $lastchild != null && $lastdepth !== null) {
-                $depth = strlen($match[1]);
-                if ($depth < $lastdepth) {
-                    $difference = $lastdepth - $depth;
-                    if ($lastdepth > 1 && $lastdepth != $difference) {
-                        $tempchild = $lastchild->get_parent();
-                        for ($i =0; $i < $difference; $i++) {
-                            $tempchild = $tempchild->get_parent();
-                        }
-                        $lastchild = $tempchild->add($bits[0], $bits[1], $bits[2], $lastsort);
-                    } else {
-                        $depth = 0;
-                        $lastchild = new custom_menu_item($bits[0], $bits[1], $bits[2], $lastsort);
-                        $children[] = $lastchild;
-                    }
-                } else if ($depth > $lastdepth) {
-                    $depth = $lastdepth + 1;
-                    $lastchild = $lastchild->add($bits[0], $bits[1], $bits[2], $lastsort);
-                } else {
-                    if ($depth == 0) {
-                        $lastchild = new custom_menu_item($bits[0], $bits[1], $bits[2], $lastsort);
-                        $children[] = $lastchild;
-                    } else {
-                        $lastchild = $lastchild->get_parent()->add($bits[0], $bits[1], $bits[2], $lastsort);
+            // Parse item settings.
+            $itemtext = null;
+            $itemurl = null;
+            $itemtitle = null;
+            $itemvisible = true;
+            $settings = explode('|', $line);
+            foreach ($settings as $i => $setting) {
+                $setting = trim($setting);
+                if (!empty($setting)) {
+                    switch ($i) {
+                        case 0:
+                            $itemtext = ltrim($setting, '-');
+                            $itemtitle = $itemtext;
+                            break;
+                        case 1:
+                            try {
+                                $itemurl = new moodle_url($setting);
+                            } catch (moodle_exception $exception) {
+                                // We're not actually worried about this, we don't want to mess up the display
+                                // just for a wrongly entered URL.
+                                $itemurl = null;
+                            }
+                            break;
+                        case 2:
+                            $itemtitle = $setting;
+                            break;
+                        case 3:
+                            if (!empty($language)) {
+                                $itemlanguages = array_map('trim', explode(',', $setting));
+                                $itemvisible &= in_array($language, $itemlanguages);
+                            }
+                            break;
                     }
                 }
-            } else {
-                $depth = 0;
-                $lastchild = new custom_menu_item($bits[0], $bits[1], $bits[2], $lastsort);
-                $children[] = $lastchild;
             }
-            $lastdepth = $depth;
+            // Get depth of new item.
+            preg_match('/^(\-*)/', $line, $match);
+            $itemdepth = strlen($match[1]) + 1;
+            // Find parent item for new item.
+            while (($lastdepth - $itemdepth) >= 0) {
+                $lastitem = $lastitem->get_parent();
+                $lastdepth--;
+            }
+            $lastitem = $lastitem->add($itemtext, $itemurl, $itemtitle, $linenumber + 1);
+            $lastdepth++;
+            if (!$itemvisible) {
+                $hiddenitems[] = $lastitem;
+            }
         }
-        return $children;
+        foreach ($hiddenitems as $item) {
+            $item->parent->remove_child($item);
+        }
+        return $root->get_children();
     }
 
     /**
@@ -3002,6 +3098,86 @@ class tabobject implements renderable {
         $this->level = $level;
         foreach ($this->subtree as $tab) {
             $tab->set_level($level + 1);
+        }
+    }
+}
+
+/**
+ * Renderable for the main page header.
+ *
+ * @package core
+ * @category output
+ * @since 2.9
+ * @copyright 2015 Adrian Greeve <adrian@moodle.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class context_header implements renderable {
+
+    /**
+     * @var string $heading Main heading.
+     */
+    public $heading;
+    /**
+     * @var int $headinglevel Main heading 'h' tag level.
+     */
+    public $headinglevel;
+    /**
+     * @var string|null $imagedata HTML code for the picture in the page header.
+     */
+    public $imagedata;
+    /**
+     * @var array $additionalbuttons Additional buttons for the header e.g. Messaging button for the user header.
+     *      array elements - title => alternate text for the image, or if no image is available the button text.
+     *                       url => Link for the button to head to. Should be a moodle_url.
+     *                       image => location to the image, or name of the image in /pix/t/{image name}.
+     *                       linkattributes => additional attributes for the <a href> element.
+     *                       page => page object. Don't include if the image is an external image.
+     */
+    public $additionalbuttons;
+
+    /**
+     * Constructor.
+     *
+     * @param string $heading Main heading data.
+     * @param int $headinglevel Main heading 'h' tag level.
+     * @param string|null $imagedata HTML code for the picture in the page header.
+     * @param string $additionalbuttons Buttons for the header e.g. Messaging button for the user header.
+     */
+    public function __construct($heading = null, $headinglevel = 1, $imagedata = null, $additionalbuttons = null) {
+
+        $this->heading = $heading;
+        $this->headinglevel = $headinglevel;
+        $this->imagedata = $imagedata;
+        $this->additionalbuttons = $additionalbuttons;
+        // If we have buttons then format them.
+        if (isset($this->additionalbuttons)) {
+            $this->format_button_images();
+        }
+    }
+
+    /**
+     * Adds an array element for a formatted image.
+     */
+    protected function format_button_images() {
+
+        foreach ($this->additionalbuttons as $buttontype => $button) {
+            $page = $button['page'];
+            // If no image is provided then just use the title.
+            if (!isset($button['image'])) {
+                $this->additionalbuttons[$buttontype]['formattedimage'] = $button['title'];
+            } else {
+                // Check to see if this is an internal Moodle icon.
+                $internalimage = $page->theme->resolve_image_location('t/' . $button['image'], 'moodle');
+                if ($internalimage) {
+                    $this->additionalbuttons[$buttontype]['formattedimage'] = 't/' . $button['image'];
+                } else {
+                    // Treat as an external image.
+                    $this->additionalbuttons[$buttontype]['formattedimage'] = $button['image'];
+                }
+            }
+            // Add the bootstrap 'btn' class for formatting.
+            $this->additionalbuttons[$buttontype]['linkattributes'] = array_merge($button['linkattributes'],
+                    array('class' => 'btn'));
         }
     }
 }
@@ -3392,6 +3568,34 @@ class action_menu implements renderable {
     public function will_be_enhanced() {
         return isset($this->attributes['data-enhance']);
     }
+
+    /**
+     * Sets nowrap on items. If true menu items should not wrap lines if they are longer than the available space.
+     *
+     * This property can be useful when the action menu is displayed within a parent element that is either floated
+     * or relatively positioned.
+     * In that situation the width of the menu is determined by the width of the parent element which may not be large
+     * enough for the menu items without them wrapping.
+     * This disables the wrapping so that the menu takes on the width of the longest item.
+     *
+     * @param bool $value If true nowrap gets set, if false it gets removed. Defaults to true.
+     */
+    public function set_nowrap_on_items($value = true) {
+        $class = 'nowrap-items';
+        if (!empty($this->attributes['class'])) {
+            $pos = strpos($this->attributes['class'], $class);
+            if ($value === true && $pos === false) {
+                // The value is true and the class has not been set yet. Add it.
+                $this->attributes['class'] .= ' '.$class;
+            } else if ($value === false && $pos !== false) {
+                // The value is false and the class has been set. Remove it.
+                $this->attributes['class'] = substr($this->attributes['class'], $pos, strlen($class));
+            }
+        } else if ($value) {
+            // The value is true and the class has not been set yet. Add it.
+            $this->attributes['class'] = $class;
+        }
+    }
 }
 
 /**
@@ -3497,5 +3701,64 @@ class action_menu_link_secondary extends action_menu_link {
      */
     public function __construct(moodle_url $url, pix_icon $icon = null, $text, array $attributes = array()) {
         parent::__construct($url, $icon, $text, false, $attributes);
+    }
+}
+
+/**
+ * Represents a set of preferences groups.
+ *
+ * @package core
+ * @category output
+ * @copyright 2015 Frédéric Massart - FMCorz.net
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class preferences_groups implements renderable {
+
+    /**
+     * Array of preferences_group.
+     * @var array
+     */
+    public $groups;
+
+    /**
+     * Constructor.
+     * @param array $groups of preferences_group
+     */
+    public function __construct($groups) {
+        $this->groups = $groups;
+    }
+
+}
+
+/**
+ * Represents a group of preferences page link.
+ *
+ * @package core
+ * @category output
+ * @copyright 2015 Frédéric Massart - FMCorz.net
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class preferences_group implements renderable {
+
+    /**
+     * Title of the group.
+     * @var string
+     */
+    public $title;
+
+    /**
+     * Array of navigation_node.
+     * @var array
+     */
+    public $nodes;
+
+    /**
+     * Constructor.
+     * @param string $title The title.
+     * @param array $nodes of navigation_node.
+     */
+    public function __construct($title, $nodes) {
+        $this->title = $title;
+        $this->nodes = $nodes;
     }
 }

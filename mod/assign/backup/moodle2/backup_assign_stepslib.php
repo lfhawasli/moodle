@@ -67,7 +67,8 @@ class backup_assign_activity_structure_step extends backup_activity_structure_st
                                                   'attemptreopenmethod',
                                                   'maxattempts',
                                                   'markingworkflow',
-                                                  'markingallocation'));
+                                                  'markingallocation',
+                                                  'preventsubmissionnotingroup'));
 
         $userflags = new backup_nested_element('userflags');
 
@@ -88,7 +89,8 @@ class backup_assign_activity_structure_step extends backup_activity_structure_st
                                                       'timemodified',
                                                       'status',
                                                       'groupid',
-                                                      'attemptnumber'));
+                                                      'attemptnumber',
+                                                      'latest'));
 
         $grades = new backup_nested_element('grades');
 
@@ -148,8 +150,9 @@ class backup_assign_activity_structure_step extends backup_activity_structure_st
         $assign->annotate_ids('grouping', 'teamsubmissiongroupingid');
 
         // Define file annotations.
-        // This file area hasn't itemid.
+        // These file areas don't have an itemid.
         $assign->annotate_files('mod_assign', 'intro', null);
+        $assign->annotate_files('mod_assign', 'introattachment', null);
 
         // Return the root element (choice), wrapped into standard activity structure.
 

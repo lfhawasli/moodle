@@ -20,10 +20,10 @@ Feature: In a lesson activity, students can navigate through a series of pages i
     And I follow "Course 1"
     And I turn editing mode on
 
-  @javascript
   Scenario: Student navigation with pages and questions
     Given I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
+      | Description | Test lesson description |
     And I follow "Test lesson name"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -32,7 +32,7 @@ Feature: In a lesson activity, students can navigate through a series of pages i
       | id_answer_editor_0 | Next page |
       | id_jumpto_0 | Next page |
     And I press "Save page"
-    And I set the field "qtype" to "Add a content page"
+    And I select "Add a content page" from the "qtype" singleselect
     And I set the following fields to these values:
       | Page title | Second page name |
       | Page contents | Second page contents |
@@ -88,10 +88,10 @@ Feature: In a lesson activity, students can navigate through a series of pages i
     And I should see "Congratulations - end of lesson reached"
     And I should see "Your score is 0 (out of 1)."
 
-  @javascript
   Scenario: Student reattempts a question until out of attempts
     Given I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
+      | Description | Test lesson description |
       | id_review | Yes |
       | id_maxattempts | 3 |
     And I follow "Test lesson name"
