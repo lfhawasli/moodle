@@ -3,5 +3,8 @@
         "phpunit/phpunit": "4.8.*",
         "phpunit/dbUnit": "1.4.*",
         "moodlehq/behat-extension": "3.31.2"
+    },
+    "require": {
+        "ua-parser/uap-php": ">=3.4"
     }
 }

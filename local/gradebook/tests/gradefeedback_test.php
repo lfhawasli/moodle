@@ -44,7 +44,7 @@ class gradefeedback_test extends basic_testcase {
      * @return boolean
      */
     public function has_invalid_characters($string) {
-        $length = textlib::strlen($string);
+        $length = core_text::strlen($string);
         for ($i = 0; $i < $length; $i++) {
             $current = ord($string{$i});
             if (($current == 0x9) || ($current == 0xA) || ($current == 0xD) ||

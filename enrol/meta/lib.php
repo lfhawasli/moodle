@@ -468,4 +468,71 @@ class enrol_meta_plugin extends enrol_plugin {
         return;
     }
 
+    // START UCLA MOD: CCLE-2386 - TA Site Creator
+    /**
+     * Adds link to TA site in navigation.
+     *
+     * API call - lib/enrollib.php.
+     *
+     * @param stdClass $instancesnode
+     * @param stdClass $instance
+     */
+    public function add_course_navigation($instancesnode, stdClass $instance) {
+        global $PAGE;
+        // This is technically a hack, $instancenode provides us
+        // the node from settings_navigation, not global_navigation
+        if (!empty($instance->customint1)) {
+            $pcourseid = $instance->customint1;
+            $courseid = $instance->courseid;
+            $pcoursenode = $PAGE->navigation->find($pcourseid,
+                    navigation_node::TYPE_COURSE);
+            if (empty($pcoursenode)) {
+                return;
+            }
+            $coursenode = $PAGE->navigation->find($courseid,
+                    navigation_node::TYPE_COURSE);
+            $pcoursenode->set_parent($coursenode->parent);
+            $coursenode->set_parent($pcoursenode);
+        }
+    }
+    /**
+     * Returns what the promoted role should be.
+     *
+     * @param stdClass $ra  Expecting object with keys: tasiteowners, idnumber,
+     *                      roleid, promotoroleid
+     * @return int
+     */
+    public static function get_role_promotion($ra) {
+        if (!isset($ra->roleid) || !isset($ra->promotoroleid)) {
+            return false;
+        }
+        if (!empty($ra->tasiteowners) && !empty($ra->idnumber)) {
+            // Promote user if the TA site belongs to them.
+            if (strpos($ra->tasiteowners, $ra->idnumber) !== false) {
+                return $ra->promotoroleid;
+            }
+        } else if ($ra->promouserid == $ra->userid) {
+            // Handle old TA sites.
+            return $ra->promotoroleid;
+        }
+        return $ra->roleid;
+    }
+    /**
+     * Check to see if this is an automatically created connection.
+     *
+     * We do not want users to delete the Meta course instance for TA sites.
+     *
+     * @param stdClass $instance
+     * @return boolean
+     */
+    public function instance_deleteable($instance) {
+        global $DB;
+        if (isset($instance->customint2)
+                && $DB->get_record('course',
+                    array('id' => $instance->customint1))) {
+            return false;
+        }
+        return true;
+    }
+    // END UCLA MOD: CCLE-2386
 }

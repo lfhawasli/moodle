@@ -67,7 +67,7 @@ class block_ucla_tasites_generator extends testing_block_generator {
      * 
      * @return stdClass         Newly create TA site course record
      */
-    public function create_instance($parentcourse = null, array $typeinfo = null) {
+    public function create_instance($parentcourse = null, $typeinfo = array()) {
         if (empty($parentcourse)) {
             // Create parent course.
             $class = $this->ucladatagen->create_class();

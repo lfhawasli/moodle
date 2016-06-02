@@ -22,26 +22,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-echo $OUTPUT->doctype() ?>
-<html <?php echo $OUTPUT->htmlattributes() ?>>
-<head>
-    <title><?php echo $PAGE->title ?></title>
-    <link rel="shortcut icon" href="<?php echo $OUTPUT->pix_url('favicon', 'theme')?>" />
-    <?php echo $OUTPUT->standard_head_html() ?>
-</head>
-<body id="<?php p($PAGE->bodyid) ?>" class="<?php p($PAGE->bodyclasses) ?>">
-<?php echo $OUTPUT->standard_top_of_body_html() ?>
 
-<div id="page">
+defined('MOODLE_INTERNAL') || die();
 
-<!-- END OF HEADER -->
 
-    <div id="page-content" class="clearfix">
-        <?php echo $OUTPUT->main_content() ?>
-    </div>
+/**
+ * Code run after the assignfeedback_poodll module database tables have been created.
+ * Moves the feedback file plugin down
+ *
+ * @return bool
+ */
+function xmldb_assignfeedback_poodll_install() {
+    global $CFG;
 
-<!-- START OF FOOTER -->
-</div>
-<?php echo $OUTPUT->standard_end_of_body_html() ?>
-</body>
-</html>
+    // do the install
+
+    require_once($CFG->dirroot . '/mod/assign/adminlib.php');
+    // set the correct initial order for the plugins
+    $pluginmanager = new assign_plugin_manager('assignfeedback');
+
+    $pluginmanager->move_plugin('poodll', 'down');
+
+    // do the upgrades
+    return true;
+}
+
