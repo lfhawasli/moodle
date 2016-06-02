@@ -39,7 +39,7 @@ $string['foodis_school'] = 'UCLA';
 $string['foolin_school'] = 'http://www.ucla.edu/';
 
 $string['foodis_registrar'] = 'Registrar';
-$string['foolin_registrar'] = get_config('local_ucla', 'registrarurl');
+$string['foolin_registrar'] = 'http://www.registrar.ucla.edu/';
 
 $string['foodis_myucla'] = 'MyUCLA';
 $string['foolin_myucla'] = 'http://my.ucla.edu/';
