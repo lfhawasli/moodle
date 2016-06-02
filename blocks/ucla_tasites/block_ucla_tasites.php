@@ -44,6 +44,47 @@ class block_ucla_tasites extends block_base {
     const GROUPINGID = 'tasitegrouping';
 
     /**
+     * Group ID that contains the TA that will be added to the tasitegrouping.
+     */
+    const TAGROUPID = 'tagroup';
+
+    /**
+     * Find matching groups in TA site matching section groups.
+     *
+     * The local_metagroups_sync function sets the idnumber for groups in the TA
+     * site to match the group ids in the parent.
+     *
+     * @param int $parentcourseid
+     * @param int $childcourseid
+     * @param int $tagroupingid
+     * @param array $srsarray
+     *
+     * @return array    Returns array of groupids used.
+     */
+    private static function add_ta_groups($parentcourseid, $childcourseid, $tagroupingid, $srsarray) {
+        global $DB;
+
+        list($sqlidnumber, $params) = $DB->get_in_or_equal($srsarray);
+        $params[] = $childcourseid;
+        $params[] = $parentcourseid;
+        $sql = "SELECT child.id
+                  FROM {groups} parent
+                  JOIN {groups} child
+                 WHERE parent.idnumber $sqlidnumber
+                       AND child.idnumber=parent.id
+                       AND child.courseid=?
+                       AND parent.courseid=?";
+        $groups = $DB->get_fieldset_sql($sql, $params);
+
+        // Add these groups to the $tasitegrouping.
+        foreach ($groups as $groupid) {
+            groups_assign_grouping($tagroupingid, $groupid);
+        }
+
+        return $groups;
+    }
+
+    /**
      * Do not make this block available to add via "Add a block" dropdown.
      *
      * @return array
@@ -208,6 +249,54 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
+     * For TA site, create a special group containing the TA(s).
+     *
+     * @param int $tasitegroupingid
+     * @param array $uidsarray       Array of UIDs.
+     *
+     * return object    Returns the newly created group record.
+     */
+    public static function create_tagroup($tasitegroupingid, $uidsarray) {
+        global $DB;
+
+        // Create grouping.
+        $tasitegrouping = new stdClass();
+        $tasitegrouping->name = get_string('tagroupname', 'block_ucla_tasites');
+        $tasitegrouping->idnumber = self::GROUPINGID;
+        $tasitegrouping->courseid = $childcourseid;
+        $tasitegrouping->id = groups_create_grouping($tasitegrouping);
+
+        // Flatten $srsarray, because we just want srs numbers right now.
+        $flatsrsarray = array();
+        foreach ($srsarray as $srsvalues) {
+            $flatsrsarray = array_merge($flatsrsarray, $srsvalues);
+        }
+
+        // Add all section groups to overall grouping.
+        self::add_ta_groups($parentcourseid, $childcourseid, $tasitegrouping->id, $flatsrsarray);
+
+        // If there is more than one section, then create groupings for each
+        // section.
+        if (count($srsarray) > 1) {
+            foreach ($srsarray as $secnum => $srsvalues) {
+                $sec = self::format_sec_num($secnum);
+
+                // Create section grouping.
+                $secgrouping = new stdClass();
+                $secgrouping->name = get_string('viewtasitesec', 'block_ucla_tasites', $sec);
+                $secgrouping->idnumber = $secnum;
+                $secgrouping->courseid = $childcourseid;
+                $secgrouping->id = groups_create_grouping($secgrouping);
+
+                // Add single section groups to section grouping.
+                self::add_ta_groups($parentcourseid, $childcourseid, $secgrouping->id, $srsvalues);
+            }
+        }
+
+        return $tasitegrouping;
+    }
+
+    /**
      * Creates a new course and assigns enrolments.
      *
      * @param stdClass $parentcourse
@@ -250,7 +339,7 @@ class block_ucla_tasites extends block_base {
         if (isset($typeinfo['bysection'])) {
             foreach ($typeinfo['bysection'] as $secnum => $secinfo) {
                 $secnums[] = self::format_sec_num($secnum);
-                $srsarray = array_merge($srsarray, $secinfo['secsrs']);
+                $srsarray[$secnum] = $secinfo['secsrs'];
                 if (isset($secinfo['tas'])) {
                     $uidarray = array_merge($uidarray, array_keys($secinfo['tas']));
                 }
@@ -263,15 +352,14 @@ class block_ucla_tasites extends block_base {
                     // If course has sections, then handle multiple srs numbers.
                     foreach ($tainfo['secsrs'] as $secnum => $secinfo) {
                         $secnums[] = self::format_sec_num($secnum);
-                        foreach ($secinfo as $srs) {
-                            $srsarray[] = $srs;
-                        }
+                        $srsarray[$secnum] = $secinfo;
                     }
                 }
             }
         }
 
         // Setup meta enrolment plugin and sync enrolments.
+        $uidarray = array_unique($uidarray);    // TA might be in multiple secs.
         $meta = new enrol_meta_plugin();
         $meta->add_instance($newcourse, array(
             'customint1'  => $parentcourse->id,
@@ -280,7 +368,7 @@ class block_ucla_tasites extends block_base {
             'customint4'  => $USER->id,
             'customchar1' => implode(',', $secnums),
             'customtext1' => implode(',', $uidarray),
-            'customtext2' => implode(',', $srsarray),
+            'customtext2' => json_encode($srsarray),
         ));
         enrol_meta_sync($newcourse->id);
 
@@ -289,16 +377,17 @@ class block_ucla_tasites extends block_base {
         local_metagroups_sync($trace, $newcourse->id);
         $trace->finished();
 
+        // Add groupings, if applicable.
         if (!empty($srsarray)) {
             $tasitegrouping = self::create_taspecificgrouping($parentcourse->id,
-                    $newcourse->id, $srsarray);
+                    $newcourse->id, $srsarray, $uidarray);
 
             // Do we need to restrict this site?
             if ($restrictgrouping) {
                 self::change_default_grouping($newcourse->id, $tasitegrouping->id);
-            }            
+            }
         }
-        
+
         // Delete the Announcement forum for the TA site.
         $newsforum = forum_get_course_forum($newcourse->id, 'news');
         forum_delete_instance($newsforum->id);
@@ -315,7 +404,8 @@ class block_ucla_tasites extends block_base {
      *
      * return object    Returns the newly created grouping record.
      */
-    public static function create_taspecificgrouping($parentcourseid, $childcourseid, $srsarray) {
+    public static function create_taspecificgrouping($parentcourseid, 
+            $childcourseid, $srsarray, $uidarray) {
         global $DB;
 
         // Create grouping.
@@ -325,24 +415,49 @@ class block_ucla_tasites extends block_base {
         $tasitegrouping->courseid = $childcourseid;
         $tasitegrouping->id = groups_create_grouping($tasitegrouping);
 
-        // Find matching groups in TA site matching section groups.
-        // The local_metagroups_sync function sets the idnumber for
-        // groups in the TA site to match the group ids in the parent.
-        list($sqlidnumber, $params) = $DB->get_in_or_equal($srsarray);
-        $params[] = $childcourseid;
-        $params[] = $parentcourseid;
-        $sql = "SELECT child.id
-                   FROM {groups} parent
-                   JOIN {groups} child
-                  WHERE parent.idnumber $sqlidnumber
-                        AND child.idnumber=parent.id
-                        AND child.courseid=?
-                        AND parent.courseid=?";
-        $tasitegroups = $DB->get_fieldset_sql($sql, $params);
+        // Flatten $srsarray, because we just want srs numbers right now.
+        $flatsrsarray = array();
+        foreach ($srsarray as $srsvalues) {
+            $flatsrsarray = array_merge($flatsrsarray, $srsvalues);
+        }
 
-        // Add these groups to the $tasitegrouping.
-        foreach ($tasitegroups as $groupid) {
-            groups_assign_grouping($tasitegrouping->id, $groupid);
+        // Add all section groups to overall grouping.
+        $secgroups = self::add_ta_groups($parentcourseid, $childcourseid, $tasitegrouping->id, $flatsrsarray);
+
+        // Add TA to the section groups.
+        $tas = array();
+        if (!empty($uidarray)) {
+            foreach ($uidarray as $uid) {
+                if (empty($uid)) {
+                    continue;
+                }
+                $tas[] = $DB->get_field('user', 'id', array('idnumber' => $uid));
+            }
+        }
+        if (!empty($tas)) {
+            foreach ($secgroups as $groupid) {
+                foreach ($tas as $ta) {
+                    $result = groups_add_member($groupid, $ta);
+                }
+            }
+        }
+
+        // If there is more than one section, then create groupings for each
+        // section.
+        if (count($srsarray) > 1) {
+            foreach ($srsarray as $secnum => $srsvalues) {
+                $sec = self::format_sec_num($secnum);
+
+                // Create section grouping.
+                $secgrouping = new stdClass();
+                $secgrouping->name = get_string('viewtasitesec', 'block_ucla_tasites', $sec);
+                $secgrouping->idnumber = $secnum;
+                $secgrouping->courseid = $childcourseid;
+                $secgrouping->id = groups_create_grouping($secgrouping);
+
+                // Add single section groups to section grouping.
+                self::add_ta_groups($parentcourseid, $childcourseid, $secgrouping->id, $srsvalues);
+            }
         }
 
         return $tasitegrouping;
