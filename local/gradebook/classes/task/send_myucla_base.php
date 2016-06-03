@@ -313,15 +313,15 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
         // on website.
         $value = trim($value);  // Strip whitespace.
         $value = clean_param($value, PARAM_NOTAGS); // Also remove HTML tags.
-        if (\textlib::strlen($value) > self::MAXTEXTLENGTH) {
-            $value = \textlib::substr($value, 0,
+        if (\core_text::strlen($value) > self::MAXTEXTLENGTH) {
+            $value = \core_text::substr($value, 0,
                                     self::MAXTEXTLENGTH) .
                     get_string('continuecomments', 'local_gradebook');
         }
 
         // Strip out invalid characters that can break XML parsing for ASP.NET
         // webservices used by MyUCLA.
-        $length = \textlib::strlen($value);
+        $length = \core_text::strlen($value);
         for ($i = 0; $i < $length; $i++) {
             $current = ord($value{$i});
             if (($current == 0x9) ||

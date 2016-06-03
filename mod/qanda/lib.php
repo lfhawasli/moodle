@@ -695,7 +695,7 @@ function qanda_get_entries_search($question, $courseid) {
         $bypassteacher = 0; //This means YES
     }
 
-    $questionlower = textlib::strtolower(trim($question));
+    $questionlower = core_text::strtolower(trim($question));
 
     $params = array('courseid1' => $courseid, 'courseid2' => $courseid, 'questionlower' => $questionlower, 'question' => $question);
 
@@ -1612,9 +1612,9 @@ function qanda_print_sorting_links($cm, $mode, $sortkey = '', $sortorder = '') {
  */
 function qanda_sort_entries($entry0, $entry1) {
 
-    if (textlib::strtolower(ltrim($entry0->question)) < textlib::strtolower(ltrim($entry1->question))) {
+    if (core_text::strtolower(ltrim($entry0->question)) < core_text::strtolower(ltrim($entry1->question))) {
         return -1;
-    } elseif (textlib::strtolower(ltrim($entry0->question)) > textlib::strtolower(ltrim($entry1->question))) {
+    } elseif (core_text::strtolower(ltrim($entry0->question)) > core_text::strtolower(ltrim($entry1->question))) {
         return 1;
     } else {
         return 0;

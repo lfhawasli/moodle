@@ -773,7 +773,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
             return;
         }
         foreach ($diffconditions as $field) {
-            $diffuser->$field = textlib::strtoupper($diffuser->$field);
+            $diffuser->$field = core_text::strtoupper($diffuser->$field);
         }
 
         $enrollment = array('uid' => $diffuser->idnumber,

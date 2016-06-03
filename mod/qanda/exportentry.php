@@ -71,7 +71,7 @@ $entryexported = get_string('entryexported', 'qanda');
 if (!$mainqanda->allowduplicatedentries) {
     if ($DB->record_exists_select('qanda_entries', 'qandaid = :qandaid AND LOWER(question) = :question', array(
                 'qandaid' => $mainqanda->id,
-                'question' => textlib::strtolower($entry->question)))) {
+                'question' => core_text::strtolower($entry->question)))) {
         $PAGE->set_title(format_string($qanda->name));
         $PAGE->set_heading($course->fullname);
         echo $OUTPUT->header();
