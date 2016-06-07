@@ -224,12 +224,3 @@ $event = \gradereport_overview\event\grade_report_viewed::create(
 $event->trigger();
 
 echo $OUTPUT->footer();
-
-// START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$event = \local_gradebook\event\overview_grades_viewed::create(array(
-    'context' => $context,
-    'relateduserid' => $userid,
-    'other' => array('option' => 'overview')
-));
-$event->trigger();
-// END UCLA MOD: CCLE-3980
