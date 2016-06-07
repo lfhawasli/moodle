@@ -16,4 +16,5 @@
 
 // Version         YYYYMMDDVV.
 $plugin->version = 2016050600;
+$plugin->requires = 2013111800; // Moodle 2.6.
 $plugin->component = 'local_ucla';

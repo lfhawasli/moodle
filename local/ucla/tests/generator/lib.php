@@ -588,7 +588,7 @@ class local_ucla_generator extends testing_data_generator {
                           'expires_on'          => time()+get_config('local_ucla', 'registrar_cache_ttl'),
                           'term_cd'             => $regcourse->term,
                           'stu_id'              => $user->idnumber,
-                          'full_name_person'    => textlib::strtoupper(fullname($user)),
+                          'full_name_person'    => core_text::strtoupper(fullname($user)),
                           'enrl_stat_cd'        => 'E',
                           'ss_email_addr'       => $user->email,
                           'bolid'               => str_replace('@ucla.edu', '', $user->username)));

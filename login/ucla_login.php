@@ -118,7 +118,7 @@ if ($loginguest && !$frm) {
 }
 
 if ($frm !== false && isset($frm->username)) {
-    $frm->username = trim(textlib::strtolower($frm->username));
+    $frm->username = trim(core_text::strtolower($frm->username));
 
     if ($frm->username == 'guest' && empty($CFG->guestloginbutton)) {
         $user = false;

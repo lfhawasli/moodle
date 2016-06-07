@@ -23,4 +23,5 @@
  */
 
 $plugin->version = 2015050800;
+$plugin->requires = 2013111800; // Moodle 2.6.
 $plugin->component = 'local_gradebook';

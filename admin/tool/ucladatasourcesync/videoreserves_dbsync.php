@@ -258,7 +258,7 @@ function fix_data_format(&$row) {
     $dataobject['class']        = $row[4];
     $dataobject['instructor']   = $row[5];
     // Handle CCLE-3378 - Video reserves crashing on video title "ClŽo de 5 ˆ 7".
-    $dataobject['video_title']  = textlib::specialtoascii($row[6]);
+    $dataobject['video_title']  = core_text::specialtoascii($row[6]);
     $dataobject['video_url']    = $row[7];
     $dataobject['filename']     = $row[8];
     $dataobject['subtitle']     = $row[9];
