@@ -57,7 +57,7 @@
 	url = git@github.com:ccle/moodle-local_metagroups.git
 [submodule "filter/poodll"]
 	path = filter/poodll
-	url = git@github.com:justinhunt/moodle-filter_poodll.git
+	url = git@github.com:ccle/moodle-filter_poodll.git
 [submodule "question/type/poodllrecording"]
 	path = question/type/poodllrecording
 	url = git@github.com:justinhunt/moodle-qtype_poodllrecording.git
