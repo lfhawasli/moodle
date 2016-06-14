@@ -1590,6 +1590,8 @@ class grade_report_grader extends grade_report {
 
             $url = new moodle_url($this->gpr->get_return_url(null, array('target' => $element['eid'], 'sesskey' => sesskey())));
 
+            // START UCLA MOD: CCLE-4289 - Show All View Action Icons
+            /*
             if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
                 $url->param('action', 'switch_plus');
                 $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus), null, null);
@@ -1603,6 +1605,50 @@ class grade_report_grader extends grade_report {
                 $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus), null, null);
                 $showing = get_string('showingfullmode', 'grades');
             }
+            */
+
+            if (get_config('local_ucla', 'showallgraderviewactions')) {
+                if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
+                    $url->param('action', 'switch_plus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
+                    $url->param('action', 'switch_whole');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_whole',$strswitchwhole));
+                    $url->param('action', 'switch_minus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus), null, array('class'=>'action-icon selected'));
+                    $showing = get_string('showingaggregatesonly', 'grades');
+                } else if (in_array($element['object']->id, $this->collapsed['gradesonly'])) {
+                    $url->param('action', 'switch_plus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus), null, array('class'=>'action-icon selected'));
+                    $url->param('action', 'switch_whole');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_whole', $strswitchwhole));
+                    $url->param('action', 'switch_minus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
+                    $showing = get_string('showinggradesonly', 'grades');
+                } else {
+                    $url->param('action', 'switch_plus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
+                    $url->param('action', 'switch_whole');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_whole', $strswitchwhole), null, array('class'=>'action-icon selected'));
+                    $url->param('action', 'switch_minus');
+                    $icon .= $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
+                    $showing = get_string('showingfullmode', 'grades');
+                }
+            } else {
+                if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
+                    $url->param('action', 'switch_plus');
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus));
+                    $showing = get_string('showingaggregatesonly', 'grades');
+                } else if (in_array($element['object']->id, $this->collapsed['gradesonly'])) {
+                    $url->param('action', 'switch_whole');
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_whole', $strswitchwhole));
+                    $showing = get_string('showinggradesonly', 'grades');
+                } else {
+                    $url->param('action', 'switch_minus');
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_minus', $strswitchminus));
+                    $showing = get_string('showingfullmode', 'grades');
+                }
+            }
+            // END UCLA MOD: CCLE-4289
         }
 
         $name = shorten_text($element['object']->get_name());
@@ -1840,6 +1886,13 @@ class grade_report_grader extends grade_report {
                 if ($key !== false) {
                     unset($collapsed['gradesonly'][$key]);
                     static::set_collapsed_preferences($courseid, $collapsed);
+                }
+                
+                // START UCLA MOD: CCLE-4289 - Show All View Action Icons
+                $key = array_search($targetid, $collapsed['aggregatesonly']);
+                if ($key !== false) {
+                    unset($collapsed['aggregatesonly'][$key]);
+                    set_user_preference('grade_report_grader_collapsed_categories', serialize($collapsed));
                 }
                 // END UCLA MOD: CCLE-4289
 
