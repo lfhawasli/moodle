@@ -382,6 +382,7 @@ $CFG->block_iclicker_notify_emails = 'help@ssc.ucla.edu'; // due to bad coding, 
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
+$CFG->block_quickmail_addionalemail = 1;
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
