@@ -397,3 +397,63 @@ function display_copyright_status_contents($courseid, $filter) {
     echo $OUTPUT->footer();
     // End output screen.
 }
+
+/**
+ * Alert instructors to assign copyright status for files used in the course they haven't done so already.
+ * @param object $course Contains roles, and $courseinfo contains term.
+ *                          
+ */
+function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
+    global $CFG, $OUTPUT, $USER;
+    require_once($CFG->dirroot . '/blocks/ucla_copyright_status/alert_form.php');
+
+    // Ignore any old terms or if term is not set (meaning it is a collab site).
+    
+    if (isset($courseinfo) && (!isset($courseinfo->term) ||
+            term_cmp_fn($courseinfo->term, $CFG->currentterm) == -1)) {
+        // Important for event handlers to return true, because false indicates...
+        // ...error and event will be reprocessed on the next cron run.
+        return true;    
+    }
+     
+    // See if current user can manage copyright status for course.
+    $context =  context_course::instance($course->id);
+    
+    if (!has_capability('moodle/course:manageactivities', $context)) {
+        return true;
+    }
+
+    // Ignore alert if user cannot assign copyright status for the course...
+    // ...or if user can assign copyright status, but there is file has not assign...
+    // ...copyright status, give alert.
+    $a = sizeof(get_files_copyright_status_by_course($course->id,
+            $CFG->sitedefaultlicense));
+
+    if ($a==0) {
+        return true;
+    }
+
+    // But first, see if they turned off the copyright status alert for their account...
+    // ...ucla_copyright_status_noprompt_<courseid>.
+    $timestamp = get_user_preferences('ucla_copyright_status_noprompt_' .
+            $course->id, null, $USER->id);
+
+    // Do not display alert if user turned off copyright status alerts or if remind me...
+    // ...time has not passed.
+    if (!is_null($timestamp) && (intval($timestamp) === 0 ||
+            $timestamp > time())) {
+        return true;
+    }
+
+    // Now we can display the alert.
+    $alert_form = new copyright_alert_form(new moodle_url('/blocks/ucla_copyright_status/alert.php',
+            array('id' => $course->id)), $a, 'post', '',
+            array('class' => 'ucla-format-notice-box'));
+
+    // Unfortunately, the display function outputs HTML, rather than returning...
+    // ...it, so we need to capture it.
+    ob_start();
+    $alert_form->display();    
+    return true;
+}
+
