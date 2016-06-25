@@ -30,7 +30,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 // Moodle core API.
 
 /**
@@ -168,7 +167,7 @@ function local_ucla_syllabus_get_extra_capabilities() {
  */
 function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
     require_once(dirname(__FILE__).'/locallib.php');
-    global $DB, $CFG;
+    global $CFG;
 
     // First, get syllabus file.
     $syllabus = ucla_syllabus_manager::instance($args[0]);  // First argument should be syllabus ID.
@@ -191,3 +190,79 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
         print_error('err_syllabus_not_allowed', 'local_ucla_syllabus');
     }
 }
+
+/**
+ * Alert instructors to upload syllabus if they haven't done so already.
+ * 
+ * @param object $course for course information, $courseinfo for term.
+ *                          
+ */
+function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
+    global $CFG, $USER;
+    require_once($CFG->dirroot . '/local/ucla_syllabus/alert_form.php');
+
+    // Ignore any old terms or if term is not set (meaning it is a collab site).
+    if (!isset($courseinfo->term) ||
+            term_cmp_fn($courseinfo->term, $CFG->currentterm) == -1) {
+        // It is important for event handlers to return true, because false...
+        // ...indicates error and event will be reprocessed on the next cron run.
+        return true;
+    }
+
+    // See if current user can manage syllabi for course.
+    $syllabusmanager = new ucla_syllabus_manager($course);
+
+    // Ignore alert if user cannot upload syllabi or if course has one uploaded.
+    if (!$syllabusmanager->can_manage() ||
+            $syllabusmanager->has_syllabus()) {
+        return true;
+    }
+
+    $alertform = null;
+
+    // User can add syllabus, but course does not have syllabus. Check to see...
+    // ...if someone manually uploaded a syllabus.
+    $manuallysyllabi = $syllabusmanager->get_all_manual_syllabi();
+    if (!empty($manuallysyllabi)) {
+        // There might be multiple manually uploaded syllabus, and user might...
+        // ...choose to ignore some of them.
+        foreach ($manuallysyllabi as $syllabus) {
+            $noprompt = get_user_preferences('ucla_syllabus_noprompt_manual_' .
+                    $syllabus->cmid, null, $USER->id);
+            if (is_null($noprompt)) {
+                // Display form.
+                $alertform = new alert_form(new moodle_url('/local/ucla_syllabus/alert.php',
+                        array('id' => $course->id)),
+                        array('manualsyllabus' => $syllabus), 'post', '',
+                        array('class' => 'ucla-format-notice-box'));
+                // Only want one alert to be shown.
+                break;
+            }
+        }
+    }
+
+    if (empty($alertform)) {
+        // User can add syllabus, but course doesn't have syllabus, give alert.
+
+        // But first, see if they turned off the syllabus alert for their...
+        // ...account ucla_syllabus_noprompt_<courseid>.
+        $timestamp = get_user_preferences('ucla_syllabus_noprompt_' .
+                $course->id, null, $USER->id);
+
+        // Do not display alert if user turned off syllabus alerts or if remind...
+        // ...me time has not passed.
+        if (!is_null($timestamp) && (intval($timestamp) === 0 ||
+                $timestamp > time())) {
+            return true;
+        }
+
+        // Now we can display the alert.
+        $alertform = new alert_form(new moodle_url('/local/ucla_syllabus/alert.php',
+                array('id' => $course->id)), null, 'post', '',
+                array('class' => 'ucla-format-notice-box'));
+    }
+
+    $alertform->display();
+    return true;
+}
+

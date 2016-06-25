@@ -106,9 +106,6 @@ function block_ucla_course_download_ucla_format_notices($course) {
                 array('id' => $course->id)), null, 'post', '',
                 array('class' => 'ucla-format-notice-box'));
 
-    // Unfortunately, the display function outputs HTML, rather than returning...
-    // ...it, so we need to capture it.
-    ob_start();
     $alertform->display();
 
     return true;

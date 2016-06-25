@@ -404,7 +404,7 @@ function display_copyright_status_contents($courseid, $filter) {
  *                          
  */
 function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
-    global $CFG, $OUTPUT, $USER;
+    global $CFG, $USER;
     require_once($CFG->dirroot . '/blocks/ucla_copyright_status/alert_form.php');
 
     // Ignore any old terms or if term is not set (meaning it is a collab site).
@@ -450,9 +450,6 @@ function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
             array('id' => $course->id)), $a, 'post', '',
             array('class' => 'ucla-format-notice-box'));
 
-    // Unfortunately, the display function outputs HTML, rather than returning...
-    // ...it, so we need to capture it.
-    ob_start();
     $alert_form->display();    
     return true;
 }
