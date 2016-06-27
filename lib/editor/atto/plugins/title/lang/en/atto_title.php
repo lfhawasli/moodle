@@ -22,10 +22,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['h3'] = 'Heading (large)';
-$string['h4'] = 'Heading (medium)';
-$string['h5'] = 'Heading (small)';
-$string['p'] = 'Paragraph';
+// START UCLA MOD: CCLE-4848-Paragraph styles' drop-down does not show the current style for a selected text
+//$string['h3'] = 'Heading (large)';
+//$string['h4'] = 'Heading (medium)';
+//$string['h5'] = 'Heading (small)';
+$string['h1'] = '<h1 style="margin: 10px 0">Heading 1</h1>';
+$string['h2'] = '<h2 style="margin: 10px 0">Heading 2</h2>';
+$string['h3'] = '<h3 style="margin: 10px 0">Heading 3</h3>';
+$string['h4'] = '<h4>Heading 4</h4>';
+$string['h5'] = '<h5>Heading 5</h5>';
+$string['h6'] = '<h6>Heading 6</h6>';
+//$string['p'] = 'Paragraph';
+$string['p'] = '<p style="margin: 10px 0">Paragraph</p>';
 $string['pluginname'] = 'Paragraph styles';
 //$string['pre'] = 'Pre-formatted';
 $string['pre'] = '<pre style="margin: 10px 0">Pre-formatted</pre>';
