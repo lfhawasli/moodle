@@ -201,7 +201,7 @@ class ucla_group_manager {
                 // This is the course number.
                 $section['coursenum'] = ltrim($reqarr['coursenum'], '0');
 
-                $sectioninfo = new object();
+                $sectioninfo = new stdClass();
                 $sectioninfo->courseinfo = $section;
 
                 $termsrsarr = $section;
@@ -270,7 +270,7 @@ class ucla_group_manager {
                 // Otherwise, we need to treat the crosslist as a section of
                 // its own.
                 $outputstr .= "crosslist-forced ";
-                $fakesection = new object();
+                $fakesection = new stdClass();
 
                 $fakesection->roster = $reqinfo->roster;
                 $fakesection->courseinfo = $reqinfo->courseinfo;

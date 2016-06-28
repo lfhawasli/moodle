@@ -277,7 +277,7 @@ class block_ucla_office_hours extends block_base {
         foreach ($appended_info as $blockname => $instructor_data) {
             foreach ($instructor_data as $instkey => $instfields) {
                 if (!isset($instructors[$instkey])) {
-                    $instructors[$instkey] = new object();
+                    $instructors[$instkey] = new stdClass();
                 }
 
                 foreach ($instfields as $field => $value) {

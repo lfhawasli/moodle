@@ -235,7 +235,7 @@ class ucla_synced_group {
         global $DB;
         $retval = false;
 
-        $tracker = new object();
+        $tracker = new stdClass();
         $tracker->groups_membersid = $groupsmembersid;
 
         try {
@@ -300,7 +300,7 @@ class ucla_synced_group {
             
             $this->id = groups_create_group($this);
 
-            $uclagroupsection = new object();
+            $uclagroupsection = new stdClass();
             $uclagroupsection->groupid = $this->id;
             $uclagroupsection->term = $this->term;
             $uclagroupsection->srs = $this->srs;

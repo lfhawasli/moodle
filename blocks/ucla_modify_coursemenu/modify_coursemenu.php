@@ -283,7 +283,7 @@ if ($modify_coursemenu_form->is_cancelled()) {
         }
     }
 
-    $passthrudata = new object();
+    $passthrudata = new stdClass();
     $passthrudata->sections = $sections;
     $passthrudata->deletesectionids = $deletesectionids;
     $passthrudata->landingpage = $landingpage;

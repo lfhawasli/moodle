@@ -138,7 +138,7 @@ foreach ($top_forms as $gk => $group) {
 $getsrs = optional_param('srs', false, PARAM_ALPHANUM);
 if ($getsrs && $requests === null) {
     $termsrsform = $cached_forms[UCLA_REQUESTOR_VIEW]['hidden_srs_view'];
-    $termsrsobj = new object();
+    $termsrsobj = new stdClass();
     $termsrsobj->{$termsrsform->groupname} = array(
             'srs' => $getsrs,
             'term' => $selectedterm
