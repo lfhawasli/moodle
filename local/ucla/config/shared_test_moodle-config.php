@@ -206,6 +206,9 @@ $CFG->preventexecpath = 1;
 // CCLE-4686 - Enable Apache's X-sendfile.
 $CFG->xsendfile = 'X-Sendfile';
 
+// CCLE-5959 - Disable Web Installations of Plugins
+$CFG->disableupdateautodeploy = 1;
+
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;

@@ -199,6 +199,9 @@ $CFG->behat_prefix = 'bht_';
 // email address to notify in case of system problems
 $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ccle.ucla.edu';
 
+// CCLE-5959 - Disable Web Installations of Plugins
+$CFG->disableupdateautodeploy = 1;
+
 //$string['log_apache_error'] = 'Apache error';
 //$string['log_apache_access'] = 'Apache access';
 //$string['log_apache_ssl_access'] = 'Apache SSL access';
