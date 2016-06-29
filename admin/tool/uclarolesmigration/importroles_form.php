@@ -25,10 +25,9 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir.'/formslib.php');
-
 /**
  * Import roles moodleform class.
- * 
+ *
  * @package    tool_uclarolesmigration
  * @category   form
  * @copyright  2014 UC Regents
@@ -80,7 +79,7 @@ class import_roles_form extends moodleform {
     /**
      * Validates the form, ensuring that at least
      * one action is defined.
-     * 
+     *
      * @param array $data submitted data, not used
      * @param array $files not used
      * @return array $errors
@@ -98,7 +97,7 @@ class import_roles_form extends moodleform {
  * Import roles upload moodleform class.
  *
  * Accepts a zip file to import roles.
- * 
+ *
  * @package    tool_uclarolesmigration
  * @category   form
  * @copyright  2014 UC Regents
@@ -120,7 +119,7 @@ class import_roles_upload_form extends moodleform {
     /**
      * Validates the form, ensuring that the uploaded zip file is valid
      * and contains valid role XML files.
-     * 
+     *
      * @param array $data submitted data, not used
      * @param array $files not used
      * @return array $errors
@@ -147,7 +146,7 @@ class import_roles_upload_form extends moodleform {
                 while ($xmlfile = zip_read($zip)) {
                     if (zip_entry_open($zip, $xmlfile, "r")) {
                         $xmlstring = zip_entry_read($xmlfile, zip_entry_filesize($xmlfile));
-                        if (!core_role_preset::is_valid_preset($xmlstring)) {
+                        if (!tool_uclarolesmigration_cleanxml::is_valid_preset($xmlstring)) {
                             $errors['importfile'] = get_string('error_invalidxml', 'tool_uclarolesmigration');
                         }
                         zip_entry_close($xmlfile);
