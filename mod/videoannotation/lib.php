@@ -146,7 +146,7 @@ function videoannotation_update_instance($videoannotation) {
     }
 
     if ($videoannotation->clipselect == 1) {
-        $clip = new Object();
+        $clip = new stdClass();
         $clip->videoannotationid = $videoannotation->instance;
         $clip->userid = null;
         $clip->url = $videoannotation->clipurl;

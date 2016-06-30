@@ -233,7 +233,7 @@ class PublicPrivate_Course {
          * Create new publicprivategroupname group and publicprivategroupingname grouping.
          */
 
-        $data = new object();
+        $data = new stdClass();
         $data->courseid = $this->_course->id;
         $data->name = get_string('publicprivategroupname', 'local_publicprivate');
         $data->description = get_string('publicprivategroupdescription', 'local_publicprivate');
@@ -250,7 +250,7 @@ class PublicPrivate_Course {
          * Create new publicprivategroupingname grouping.
          */
 
-        $data = new object();
+        $data = new stdClass();
         $data->courseid = $this->_course->id;
         $data->name = get_string('publicprivategroupingname', 'local_publicprivate');
         $data->description = get_string('publicprivategroupingdescription', 'local_publicprivate');
@@ -496,7 +496,7 @@ class PublicPrivate_Course {
 
                     $seen[$row->userid] = true;
 
-                    $member = new object();
+                    $member = new stdClass();
                     $member->groupid = $this->_course->grouppublicprivate;
                     $member->userid = $row->userid;
                     $member->timeadded = time();
@@ -575,7 +575,7 @@ class PublicPrivate_Course {
          */
 
         try {
-            $member = new object();
+            $member = new stdClass();
             $member->groupid = $this->_course->grouppublicprivate;
             $member->userid = $userid;
             $member->timeadded = time();

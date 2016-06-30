@@ -1888,7 +1888,7 @@ if ($displayforms) {
     } else {
         // get siteadmins, they are a different breed
         $admin_cnt = count(explode(',', $admin_result));
-        $adminrow = new object();
+        $adminrow = new stdClass();
         $adminrow->name = 'Site administrators';
         $adminrow->contextlevel = CONTEXT_SYSTEM;
         $adminrow->component = 'admin';
@@ -2032,7 +2032,7 @@ if ($consolecommand == "$title") {
         }
 
         foreach ($results as $result) {
-            $modifiedrow = new object();
+            $modifiedrow = new stdClass();
             $modifiedrow->id = $result->id;
             $userurl = new moodle_url("/user/profile.php", array('id' => $result->uid));
             $modifiedrow->Name = "<a href=\"".$userurl->out()."\">$result->name</a>";

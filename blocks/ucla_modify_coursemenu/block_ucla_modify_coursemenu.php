@@ -24,7 +24,7 @@ class block_ucla_modify_coursemenu extends block_base {
             return $this->content;
         }
 
-        $this->content = new object();
+        $this->content = new stdClass();
 
         return $this->content;
     }
