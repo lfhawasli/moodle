@@ -434,38 +434,6 @@ class behat_backup extends behat_base {
 
 
     /**
-     * Get the options specific to this step of the backup/restore process.
-     *
-     * @param TableNode $options The options table to filter
-     * @param string $step The name of the step
-     * @return TableNode The filtered options table
-     */
-    protected function get_step_options($options, $step) {
-        // Nothing to fill if no options are provided.
-        if (!$options) {
-            return;
-        }
-
-        $pageoptions = clone $options;
-
-        $rows = $options->getRows();
-        $newrows = array();
-        foreach ($rows as $k => $data) {
-            if (count($data) !== 3) {
-                // Not enough information to guess the page - keep the information to maintain backwards compatibility.
-                $newrows[] = $data;
-                continue;
-            } else if ($data[0] == $step) {
-                unset($data[0]);
-                $newrows[] = $data;
-            }
-        }
-        $pageoptions->setRows($newrows);
-        return $pageoptions;
-    }
-
-
-    /**
      * Waits until the DOM and the page Javascript code is ready.
      *
      * @param int $timeout The number of seconds that we wait.

@@ -454,37 +454,6 @@ $CFG->behat_extraallowedsettings = array(
     'customscripts'
 );
 
-$CFG->behat_config = array(
-    'default' => array(
-        'formatter' => array(
-            'name' => 'pretty',
-            'parameters' => array(
-                'decorated' => true,
-                'verbose' => true
-            )
-        )
-    ),
-    'phantomjs' => array(
-        'filters' => array(
-            'tags' => '~@_file_upload&&~@_alert&&~@_bug_phantomjs'
-        ),
-        'extensions' => array(
-            'Behat\MinkExtension\Extension' => array(
-                'selenium2' => array(
-                    'browser' => 'phantomjs',
-                    'wd_host' => 'http://127.0.0.1:4444/wd/hub'
-                )
-            )
-        ),
-        'formatter' => array(
-            'name' => 'pretty',
-            'parameters' => array(
-                'decorated' => true,
-                'verbose' => true
-            )
-        )
-    ));
-
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later
 $_dirroot_ = dirname(realpath(__FILE__)) . '/../../..';
