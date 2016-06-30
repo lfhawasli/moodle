@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,7 +17,7 @@
 /**
  * Strings for component 'group', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package   group
+ * @package   core
  * @copyright 2006 The Open University
  * @author    J.White AT open.ac.uk
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -77,6 +76,8 @@ $string['eventgroupmemberremoved'] = 'Group member removed';
 $string['eventgroupupdated'] = 'Group updated';
 $string['eventgroupingcreated'] = 'Grouping created';
 $string['eventgroupingdeleted'] = 'Grouping deleted';
+$string['eventgroupinggroupassigned'] = 'Group assigned to grouping';
+$string['eventgroupinggroupunassigned'] = 'Group unassigned from grouping';
 $string['eventgroupingupdated'] = 'Grouping updated';
 $string['existingmembers'] = 'Existing members: {$a}';
 $string['filtergroups'] = 'Filter groups by:';
@@ -101,9 +102,6 @@ $string['groupingsonly'] = 'Groupings only';
 $string['groupmember'] = 'Group member';
 $string['groupmemberdesc'] = 'Standard role for a member of a group.';
 $string['groupmembers'] = 'Group members';
-$string['groupmembersonly'] = 'Available for group members only';
-$string['groupmembersonly_help'] = 'If this checkbox is ticked, the activity (or resource) will only be available to students assigned to groups within the selected grouping.';
-$string['groupmembersonlyerror'] = 'Sorry, you must be member of at least one group that is used in this activity.';
 $string['groupmemberssee'] = 'See group members';
 $string['groupmembersselected'] = 'Members of selected group';
 $string['groupmode'] = 'Group mode';
@@ -141,6 +139,8 @@ $string['importgroups_help'] = 'Groups may be imported via text file. The format
 * Required fieldname is groupname
 * Optional fieldnames are description, enrolmentkey, picture, hidepicture';
 $string['importgroups_link'] = 'group/import';
+$string['includeonlyactiveenrol'] = 'Include only active enrolments';
+$string['includeonlyactiveenrol_help'] = 'If enabled, suspended users will not be included in groups.';
 $string['javascriptrequired'] = 'This page requires JavaScript to be enabled.';
 $string['members'] = 'Members per group';
 $string['membersofselectedgroup'] = 'Members of:';
@@ -153,15 +153,21 @@ $string['newpicture'] = 'New picture';
 $string['newpicture_help'] = 'Select an image in JPG or PNG format. The image will be cropped to a square and resized to 100x100 pixels.';
 $string['noallocation'] = 'No allocation';
 $string['nogrouping'] = 'No grouping';
+$string['nogroup'] = 'No group';
+$string['nogrouping'] = 'No grouping';
 $string['nogroups'] = 'There are no groups set up in this course yet';
 $string['nogroupsassigned'] = 'No groups assigned';
 $string['nopermissionforcreation'] = 'Can\'t create group "{$a}" as you don\'t have the required permissions';
 $string['nosmallgroups'] = 'Prevent last small group';
+$string['notingroup'] = 'Ignore users in groups';
 $string['notingrouping'] = '[Not in a grouping]';
+$string['notingrouplist'] = '[Not in a group]';
 $string['nousersinrole'] = 'There are no suitable users in the selected role';
 $string['number'] = 'Group/member count';
 $string['numgroups'] = 'Number of groups';
 $string['nummembers'] = 'Members per group';
+$string['mygroups'] = 'My groups';
+$string['othergroups'] = 'Other groups';
 $string['overview'] = 'Overview';
 $string['potentialmembers'] = 'Potential members: {$a}';
 $string['potentialmembs'] = 'Potential members';
@@ -173,6 +179,8 @@ $string['removefromgroupconfirm'] = 'Do you really want to remove user "{$a->use
 $string['removegroupingsmembers'] = 'Remove all groups from groupings';
 $string['removegroupsmembers'] = 'Remove all group members';
 $string['removeselectedusers'] = 'Remove selected users';
+$string['selectfromgroup'] = 'Select members from group';
+$string['selectfromgrouping'] = 'Select members from grouping';
 $string['selectfromrole'] = 'Select members with role';
 $string['showgroupsingrouping'] = 'Show groups in grouping';
 $string['showmembersforgroup'] = 'Show members for group';

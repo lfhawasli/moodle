@@ -148,7 +148,7 @@ class core_grades_external_testcase extends externallib_advanced_testcase {
         $student2rawgrade = 20;
         list($course, $assignment, $student1, $student2, $teacher, $parent) =
             $this->load_test_data($assignmentname, $student1rawgrade, $student2rawgrade);
-        $assigmentcm = get_coursemodule_from_id('assign', $assignment->id, 0, false, MUST_EXIST);
+        $assigmentcm = get_coursemodule_from_id('assign', $assignment->cmid, 0, false, MUST_EXIST);
 
         // Teacher requesting a student grade for the assignment.
         $this->setUser($teacher);
@@ -403,7 +403,7 @@ class core_grades_external_testcase extends externallib_advanced_testcase {
         $student2rawgrade = 20;
         list($course, $assignment, $student1, $student2, $teacher, $parent) =
             $this->load_test_data($assignmentname, $student1rawgrade, $student2rawgrade);
-        $assigmentcm = get_coursemodule_from_id('assign', $assignment->id, 0, false, MUST_EXIST);
+        $assigmentcm = get_coursemodule_from_id('assign', $assignment->cmid, 0, false, MUST_EXIST);
 
         $this->setUser($teacher);
 

@@ -57,7 +57,6 @@ Feature: Organize students into groups
     And I should see "Student 3"
     And I should not see "Student 0"
 
-  @javascript
   Scenario: Create groups and groupings without the 'moodle/course:changeidnumber' capability
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
@@ -96,6 +95,7 @@ Feature: Organize students into groups
       | Course 1 | C1 | 0 | 1 |
       | Course 2 | C2 | 0 | 1 |
     And I log in as "admin"
+    And I am on site homepage
     And I follow "Course 1"
     And I expand "Users" node
     And I follow "Groups"
@@ -119,7 +119,7 @@ Feature: Organize students into groups
       | Enrolment key | Abcdef-2 |
     And I press "Save changes"
     And the "groups" select box should contain "Group B (0)"
-    And I am on homepage
+    And I am on site homepage
     And I follow "Course 2"
     And I expand "Users" node
     And I follow "Groups"

@@ -58,7 +58,7 @@ class phase_switched extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has switched the phase of the workshop with the course module id " .
+        return "The user with id '$this->userid' has switched the phase of the workshop with course module id " .
             "'$this->contextinstanceid' to '{$this->other['workshopphase']}'.";
     }
 
@@ -102,5 +102,14 @@ class phase_switched extends \core\event\base {
         if (!isset($this->other['workshopphase'])) {
             throw new \coding_exception('The \'workshopphase\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'workshop', 'restore' => 'workshop');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

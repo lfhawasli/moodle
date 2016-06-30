@@ -13,7 +13,7 @@ $redirect = optional_param('return', '', PARAM_URL);
 
 // Find out whether host supports https
 $protocol = 'http://';
-if ( isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'){
+if (is_https()) {
     $protocol = 'https://';
 }
 
@@ -23,6 +23,7 @@ if (!is_enabled_auth('shibboleth')) {
 }
 
 // Front channel logout.
+$inputstream = file_get_contents("php://input");
 if ($action == 'logout' && !empty($redirect)) {
 
     if ($USER->auth == 'shibboleth') {
@@ -32,7 +33,7 @@ if ($action == 'logout' && !empty($redirect)) {
         redirect($redirect);
     }
 
-} else if (!empty($HTTP_RAW_POST_DATA)) {
+} else if (!empty($inputstream)) {
 
     // Back channel logout.
     // Set SOAP header.

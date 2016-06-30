@@ -47,4 +47,3 @@ function xmldb_assignfeedback_poodll_install() {
     return true;
 }
 
-

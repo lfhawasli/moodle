@@ -23,5 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$module->version  = 2013110600;  // The current module version (Date: YYYYMMDDXX)
-$module->cron     = 0;           // Period for cron to check this module (secs)
+$plugin->version    = 2013110600;  // The current module version (Date: YYYYMMDDXX)
+$plugin->cron       = 0;           // Period for cron to check this module (secs)
+$plugin->component  = 'mod_videoannotation';

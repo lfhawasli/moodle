@@ -36,9 +36,6 @@ $page = optional_param('page', 0, PARAM_INT); // This represents which backup we
 // Required for constants in backup_cron_automated_helper
 require_once($CFG->dirroot.'/backup/util/helper/backup_cron_helper.class.php');
 
-// Required for constants in backup_cron_automated_helper
-require_once($CFG->dirroot.'/backup/util/helper/backup_cron_helper.class.php');
-
 admin_externalpage_setup('reportbackups', '', null, '', array('pagelayout'=>'report'));
 
 $strftimedatetime = get_string('strftimerecent');
@@ -119,7 +116,7 @@ if ($courseid) {
 $table = new html_table;
 $table->head = array(
     get_string("course"),
-    get_string("timetaken", "quiz"),
+    get_string("timetaken", "backup"),
     get_string("status"),
     get_string("backupnext")
 );

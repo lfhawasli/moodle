@@ -194,6 +194,9 @@ $CFG->preventexecpath = 1;
 // CCLE-4686 - Enable Apache's X-sendfile.
 $CFG->xsendfile = 'X-Sendfile';
 
+// CCLE-5959 - Disable Web Installations of Plugins
+$CFG->disableupdateautodeploy = 1;
+
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
@@ -329,6 +332,11 @@ $CFG->forced_plugin_settings['assignfeedback_file']['default'] = 1;
 // Site administration > Plugins > Admin tools > Merge user accounts
 $CFG->forced_plugin_settings['tool_mergeusers']['quizattemptsaction'] = 'renumber';
 
+// Site administration > Plugins > Admin tools > Recycle bin
+$CFG->forced_plugin_settings['tool_recyclebin']['coursebinexpiry'] = 1209600;
+$CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
+$CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
+
 // Site administration > Plugins > Admin tools > Manage senior scholars
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '003215880;303536506';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
@@ -382,6 +390,7 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
+$CFG->block_quickmail_addionalemail = 1;
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
@@ -460,10 +469,6 @@ $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-1.kaf.kaltur
 
 // Site administration > Plugins > Local plugins > Moodle Mobile additional features
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
-
-// Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 14;
-$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 14;
 
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.

@@ -67,7 +67,7 @@ class template_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the template for the data activity with the course module " .
+        return "The user with id '$this->userid' viewed the template for the data activity with course module " .
             "id '$this->contextinstanceid'.";
     }
 
@@ -102,5 +102,12 @@ class template_viewed extends \core\event\base {
         if (!isset($this->other['dataid'])) {
             throw new \coding_exception('The \'dataid\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['dataid'] = array('db' => 'data', 'restore' => 'data');
+
+        return $othermapped;
     }
 }

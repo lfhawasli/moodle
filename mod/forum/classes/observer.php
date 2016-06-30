@@ -41,8 +41,11 @@ class mod_forum_observer {
         // Get user enrolment info from event.
         $cp = (object)$event->other['userenrolment'];
         if ($cp->lastenrol) {
-            $params = array('userid' => $cp->userid, 'courseid' => $cp->courseid);
-            $forumselect = "IN (SELECT f.id FROM {forum} f WHERE f.course = :courseid)";
+            if (!$forums = $DB->get_records('forum', array('course' => $cp->courseid), '', 'id')) {
+                return;
+            }
+            list($forumselect, $params) = $DB->get_in_or_equal(array_keys($forums), SQL_PARAMS_NAMED);
+            $params['userid'] = $cp->userid;
 
             $DB->delete_records_select('forum_digests', 'userid = :userid AND forum '.$forumselect, $params);
             $DB->delete_records_select('forum_subscriptions', 'userid = :userid AND forum '.$forumselect, $params);
@@ -72,7 +75,7 @@ class mod_forum_observer {
         require_once($CFG->dirroot . '/mod/forum/lib.php');
 
         $userid = $event->relateduserid;
-        $sql = "SELECT f.id, cm.id AS cmid
+        $sql = "SELECT f.id, f.course as course, cm.id AS cmid, f.forcesubscribe
                   FROM {forum} f
                   JOIN {course_modules} cm ON (cm.instance = f.id)
                   JOIN {modules} m ON (m.id = cm.module)
@@ -88,7 +91,7 @@ class mod_forum_observer {
             // If user doesn't have allowforcesubscribe capability then don't subscribe.
             $modcontext = context_module::instance($forum->cmid);
             if (has_capability('mod/forum:allowforcesubscribe', $modcontext, $userid)) {
-                forum_subscribe($userid, $forum->id, $modcontext);
+                \mod_forum\subscriptions::subscribe_user($userid, $forum, $modcontext);
             }
         }
     }

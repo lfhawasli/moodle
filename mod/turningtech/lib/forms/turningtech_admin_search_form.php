@@ -27,6 +27,7 @@ class turningtech_admin_search_form extends moodleform {
         $mform->addElement('header', 'turningtechadminsearchheader', get_string('usersearch', 'turningtech'));
         $mform->setType('turningtechadminsearchheader', PARAM_RAW);
         $mform->addElement('text', 'searchstring', get_string('studentusername', 'turningtech'));
+        $mform->setType('searchstring', PARAM_TEXT);
         $mform->addElement('submit', 'submitbutton', get_string('search'));
         $mform->addRule('searchstring', NULL, 'required');
     }

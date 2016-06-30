@@ -39,11 +39,21 @@ class auth_plugin_cas extends auth_plugin_ldap {
     /**
      * Constructor.
      */
-    function auth_plugin_cas() {
+    public function __construct() {
         $this->authtype = 'cas';
         $this->roleauth = 'auth_cas';
         $this->errorlogtag = '[AUTH CAS] ';
         $this->init_plugin($this->authtype);
+    }
+
+    /**
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
+     */
+    public function auth_plugin_cas() {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        self::__construct();
     }
 
     function prevent_local_passwords() {
@@ -167,34 +177,6 @@ class auth_plugin_cas extends auth_plugin_ldap {
         }
     }
 
-    /**
-     * Logout from the CAS
-     *
-     */
-    function prelogout_hook() {
-        global $CFG, $USER, $DB;
-
-        if (!empty($this->config->logoutcas) && $USER->auth == $this->authtype) {
-            $backurl = !empty($this->config->logout_return_url) ? $this->config->logout_return_url : $CFG->wwwroot;
-            $this->connectCAS();
-            // Note: Hack to stable versions to trigger the event before it redirect to CAS logout.
-            $sid = session_id();
-            $event = \core\event\user_loggedout::create(
-                array(
-                    'userid' => $USER->id,
-                    'objectid' => $USER->id,
-                    'other' => array('sessionid' => $sid),
-                )
-            );
-            if ($session = $DB->get_record('sessions', array('sid' => $sid))) {
-                $event->add_record_snapshot('sessions', $session);
-            }
-            \core\session\manager::terminate_current();
-            $event->trigger();
-
-            phpCAS::logoutWithRedirectService($backurl);
-        }
-    }
 
     /**
      * Connect to the CAS (clientcas connection or proxycas connection)
@@ -211,11 +193,16 @@ class auth_plugin_cas extends auth_plugin_ldap {
             } else {
                 phpCAS::client($this->config->casversion, $this->config->hostname, (int) $this->config->port, $this->config->baseuri, false);
             }
+            // Some CAS installs require SSLv3 that should be explicitly set.
+            if (!empty($this->config->curl_ssl_version)) {
+                phpCAS::setExtraCurlOption(CURLOPT_SSLVERSION, $this->config->curl_ssl_version);
+            }
+
             $connected = true;
         }
 
         // If Moodle is configured to use a proxy, phpCAS needs some curl options set.
-        if (!empty($CFG->proxyhost) && !is_proxybypass($this->config->hostname)) {
+        if (!empty($CFG->proxyhost) && !is_proxybypass(phpCAS::getServerLoginURL())) {
             phpCAS::setExtraCurlOption(CURLOPT_PROXY, $CFG->proxyhost);
             if (!empty($CFG->proxyport)) {
                 phpCAS::setExtraCurlOption(CURLOPT_PROXYPORT, $CFG->proxyport);
@@ -330,6 +317,9 @@ class auth_plugin_cas extends auth_plugin_ldap {
         if (!isset($config->certificate_path)) {
             $config->certificate_path = '';
         }
+        if (!isset($config->curl_ssl_version)) {
+            $config->curl_ssl_version = '';
+        }
         if (!isset($config->logout_return_url)) {
             $config->logout_return_url = '';
         }
@@ -402,6 +392,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
         set_config('multiauth', $config->multiauth, $this->pluginconfig);
         set_config('certificate_check', $config->certificate_check, $this->pluginconfig);
         set_config('certificate_path', $config->certificate_path, $this->pluginconfig);
+        set_config('curl_ssl_version', $config->curl_ssl_version, $this->pluginconfig);
         set_config('logout_return_url', $config->logout_return_url, $this->pluginconfig);
 
         // save LDAP settings
@@ -528,6 +519,24 @@ class auth_plugin_cas extends auth_plugin_ldap {
                 // Set redirect to alternative return url
                 $redirect = $this->config->logout_return_url;
             }
+        }
+    }
+
+    /**
+     * Post logout hook.
+     *
+     * Note: this method replace the prelogout_hook method to avoid redirect to CAS logout
+     * before the event userlogout being triggered.
+     *
+     * @param stdClass $user clone of USER object object before the user session was terminated
+     */
+    public function postlogout_hook($user) {
+        global $CFG;
+        // Only redirect to CAS logout if the user is logged as a CAS user.
+        if (!empty($this->config->logoutcas) && $user->auth == $this->authtype) {
+            $backurl = !empty($this->config->logout_return_url) ? $this->config->logout_return_url : $CFG->wwwroot;
+            $this->connectCAS();
+            phpCAS::logoutWithRedirectService($backurl);
         }
     }
 }

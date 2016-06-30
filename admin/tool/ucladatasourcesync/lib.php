@@ -434,7 +434,7 @@ function log_ucla_data($func, $action, $notice, $error = '') {
     global $SITE;
 
     $log_message = empty($error) ? $notice : $notice . PHP_EOL . $error;
-    $log_message = textlib::substr($log_message, 0, 252) . '...';
+    $log_message = core_text::substr($log_message, 0, 252) . '...';
     $func = str_replace(' ', '', $func);
     $action = str_replace(' ', '', $action);
     $datasourceevent = \tool_ucladatasourcesync\event\ucladatasourcesync_event::datasource($func, $action);

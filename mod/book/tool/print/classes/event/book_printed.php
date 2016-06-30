@@ -60,7 +60,7 @@ class book_printed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has printed the book with the course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' has printed the book with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -102,4 +102,7 @@ class book_printed extends \core\event\base {
         $this->data['objecttable'] = 'book';
     }
 
+    public static function get_objectid_mapping() {
+        return array('db' => 'book', 'restore' => 'book');
+    }
 }

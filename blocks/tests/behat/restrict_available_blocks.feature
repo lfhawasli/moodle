@@ -24,12 +24,11 @@ Feature: Allowed blocks controls
     Then I should see "Activities" in the "Activities" "block"
     And I should see "Course completion status" in the "Course completion status" "block"
 
-  @javascript
   Scenario: Blocks can not be added when the admin restricts the permissions
     Given I log in as "admin"
     And I set the following system permissions of "Teacher" role:
       | block/activity_modules:addinstance | Prohibit |
-    And I am on homepage
+    And I am on site homepage
     And I follow "Course 1"
     And I expand "Users" node
     And I follow "Permissions"

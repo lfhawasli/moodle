@@ -1,7 +1,12 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2015 Respondus, Inc.  All Rights Reserved.
-// Date: July 15, 2015.
+// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
+// Date: May 13, 2016.
+
+// Set true to require per-session locking for access to unused token records;
+// requires Moodle 2.7+.
+$lockdownbrowser_require_db_locking = false;
+$lockdownbrowser_max_db_lock_time = 10; // seconds
 
 require_once(dirname(__FILE__) . "/locklibcfg.php");
 
@@ -26,7 +31,7 @@ function lockdownbrowser_get_quiz_options($quizid) {
             // positives (orphans that are false matches due to backup/restore)
             try {
                 lockdownbrowser_delete_options($quizid);
-            } catch (Exception $e) {
+            } catch (Exception $ex) {
                 // ignore possible multi-session conflicts
             }
             $ldbopt = false;
@@ -111,7 +116,7 @@ function lockdownbrowser_purge_sessions() { // Trac #2315
           "timeused < ?", array($min_session_start));
         $DB->delete_records_select("block_lockdownbrowser_toke",
           "timeused > 0 AND timeused < ?", array($min_session_start));
-    } catch (Exception $e) {
+    } catch (Exception $ex) {
         // ignore possible multi-session conflicts
     }
 }
@@ -129,7 +134,7 @@ function lockdownbrowser_purge_settings() {
             if ($DB->record_exists('quiz', array('id' => $settings->quizid)) === false) {
                 try {
                     lockdownbrowser_delete_options($settings->quizid);
-                } catch (Exception $e) {
+                } catch (Exception $ex) {
                     // ignore possible multi-session conflicts
                 }
             }
@@ -180,16 +185,22 @@ function lockdownbrowser_allocate_token1($sesskey, $url) {
     if ($rf < 1) {
         return get_string('errtokendb', 'block_lockdownbrowser');
     }
+    $locking_required = lockdownbrowser_db_locking_required();
     $timenow      = time();
     $use_existing = false;
     $existing     = $DB->get_record('block_lockdownbrowser_sess', array('sesskey' => $sesskey));
     if ($existing && strcmp($existing->sesskey, $sesskey) == 0) {
-        $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $existing->id));
+        if ($locking_required) {
+            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('sesskey' => $sesskey));
+        } else {
+            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $existing->id));
+        }
         if ($existobj1 && strcmp($existobj1->sesskey, $sesskey) == 0) {
             $obj1         = $existobj1;
             $use_existing = true;
         }
     }
+
     if (!$use_existing) {
         $obj2           = new stdClass;
         $obj2->sesskey  = $sesskey;
@@ -198,16 +209,24 @@ function lockdownbrowser_allocate_token1($sesskey, $url) {
         if (!$ix2) {
             return get_string('errsessiondb', 'block_lockdownbrowser');
         }
-
-        $obj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $ix2));
+        if ($locking_required) {
+            $obj1 = lockdownbrowser_update_unused_token_record_with_locking($sesskey, $timenow);
+        } else {
+            $obj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $ix2));
+        }
         if (!$obj1) {
             return get_string('errdblook', 'block_lockdownbrowser');
         }
-        $obj1->sesskey  = $sesskey;
-        $obj1->timeused = $timenow;
-        $ok             = $DB->update_record('block_lockdownbrowser_toke', $obj1);
-        if (!$ok) {
-            return get_string('errdbupdate', 'block_lockdownbrowser');
+        if (is_string($obj1)) {
+            return $obj1;
+        }
+        if (!$locking_required) {
+            $obj1->sesskey  = $sesskey;
+            $obj1->timeused = $timenow;
+            $ok             = $DB->update_record('block_lockdownbrowser_toke', $obj1);
+            if (!$ok) {
+                return get_string('errdbupdate', 'block_lockdownbrowser');
+            }
         }
     }
     $msg = '<script> document.location = \'' . $url . '&'
@@ -294,6 +313,8 @@ function lockdownbrowser_generate_tokens_debug($purge_sessions) {
     echo "<p>Moodle release: $CFG->release</p>";
     echo "<p>Moodle version: $CFG->version</p>";
 
+    $plugin = new stdClass;
+
     $lockdownbrowser_version_file = "$CFG->dirroot/blocks/lockdownbrowser/version.php";
     if (is_readable($lockdownbrowser_version_file)) {
         include($lockdownbrowser_version_file);
@@ -349,31 +370,6 @@ function lockdownbrowser_generate_tokens_debug($purge_sessions) {
         curl_setopt($ch, CURLOPT_POSTREDIR, 2);
         echo "<p>Proxy support enabled</p>";
     }
-
-    /***
-    // Moodle proxy support; needs to be tested.
-    if (!empty($CFG->proxyhost) &&! is_proxybypass($url)) {
-        if (empty($CFG->proxyport)) {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
-        } else {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost.':'.$CFG->proxyport);
-        }
-        if (!empty($CFG->proxyuser) && !empty($CFG->proxypassword)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
-            if (defined('CURLOPT_PROXYAUTH')) {
-                curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
-            }
-        }
-        if (!empty($CFG->proxytype)) {
-            if ($CFG->proxytype == 'SOCKS5' && defined('CURLPROXY_SOCKS5')) {
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-            } else {
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-                curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
-            }
-        }
-    }
-    ***/
 
     echo "<p>Contacting token server...</p>";
     flush();
@@ -482,31 +478,6 @@ function lockdownbrowser_generate_tokens($purge_sessions) {
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_POSTREDIR, 2);
     }
-
-    /***
-    // Moodle proxy support; needs to be tested.
-    if (!empty($CFG->proxyhost) && !is_proxybypass($url)) {
-        if (empty($CFG->proxyport)) {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
-        } else {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost.':'.$CFG->proxyport);
-        }
-        if (!empty($CFG->proxyuser) && !empty($CFG->proxypassword)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
-            if (defined('CURLOPT_PROXYAUTH')) {
-                curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
-            }
-        }
-        if (!empty($CFG->proxytype)) {
-            if ($CFG->proxytype == 'SOCKS5' && defined('CURLPROXY_SOCKS5')) {
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-            } else {
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-                curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
-            }
-        }
-    }
-    ***/
 
     $resp = curl_exec($ch);
     $info = curl_getinfo($ch);
@@ -696,7 +667,11 @@ function lockdownbrowser_check_for_lock() {
                     $existing     = $DB->get_record('block_lockdownbrowser_sess', array('sesskey' => $sesskey));
 
                     if ($existing && strcmp($existing->sesskey, $sesskey) == 0) {
-                        $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $existing->id));
+                        if (lockdownbrowser_db_locking_required()) {
+                            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('sesskey' => $sesskey));
+                        } else {
+                            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $existing->id));
+                        }
                         if ($existobj1 && strcmp($existobj1->sesskey, $sesskey) == 0) {
                             $obj1         = $existobj1;
                             $use_existing = true;
@@ -733,6 +708,64 @@ function lockdownbrowser_check_for_lock() {
     }
 }
 
+function lockdownbrowser_db_locking_required() {
+
+    global $CFG;
+    global $lockdownbrowser_require_db_locking;
+
+    if ($CFG->version < 2014051200) {
+        // Prior to Moodle 2.7.0
+        return false;
+    }
+    return $lockdownbrowser_require_db_locking;
+}
+
+function lockdownbrowser_update_unused_token_record_with_locking($sesskey, $timeused) {
+
+    global $DB;
+    global $lockdownbrowser_max_db_lock_time;
+
+    if (!lockdownbrowser_db_locking_required()) {
+        return get_string('errdblocksupport', 'block_lockdownbrowser');
+    }
+    $lockclass = "\\core\\lock\\db_record_lock_factory";
+    if (!class_exists($lockclass)) {
+        throw new \coding_exception('Lock factory class does not exist: ' . $lockclass);
+    }
+    $locktype = "block_lockdownbrowser_db";
+    $resource = "unused_token_records";
+    $lockfactory = new $lockclass($locktype);
+    $lock = $lockfactory->get_lock($resource, $lockdownbrowser_max_db_lock_time);
+    if ($lock === false) {
+        return get_string('errdbgetlock', 'block_lockdownbrowser');
+    }
+    try {
+        $obj1 = $DB->get_records('block_lockdownbrowser_toke', array('timeused' => 0), '', '*', 0, 1);
+    } catch (Exception $ex) {
+        $obj1 = false;
+    }
+    if (count($obj1) > 0) {
+        $obj1 = array_pop($obj1);
+    }
+    if ($obj1) {
+        $obj1->sesskey  = $sesskey;
+        $obj1->timeused = $timeused;
+        try {
+            $ok = $DB->update_record('block_lockdownbrowser_toke', $obj1);
+        } catch (Exception $ex) {
+            $ok = false;
+        }
+        if (!$ok) {
+            $obj1 = get_string('errdbupdate', 'block_lockdownbrowser');
+        }
+    } else {
+        $obj1 = get_string('errdblook', 'block_lockdownbrowser');
+    }
+    $lock->release();
+    return $obj1;
+}
+
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
 /**
  * Checks if the currently logged in user is the Respondus Monitor user.
  *
@@ -743,3 +776,4 @@ function lockdownbrowser_is_monitor_user() {
 
     return $CFG->block_lockdownbrowser_monitor_username == $USER->username;
 }
+// END UCLA MOD: CCLE-4027

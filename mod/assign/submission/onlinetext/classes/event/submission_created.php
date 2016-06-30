@@ -47,7 +47,7 @@ class submission_created extends \mod_assign\event\submission_created {
      */
     protected function init() {
         parent::init();
-        $this->data['objecttable'] = 'assignsubmission_file';
+        $this->data['objecttable'] = 'assignsubmission_onlinetext';
     }
 
     /**
@@ -57,7 +57,7 @@ class submission_created extends \mod_assign\event\submission_created {
      */
     public function get_description() {
         $descriptionstring = "The user with id '$this->userid' created an online text submission with " .
-            "'{$this->other['onlinetextwordcount']}' words in the assignment with the course module id " .
+            "'{$this->other['onlinetextwordcount']}' words in the assignment with course module id " .
             "'$this->contextinstanceid'";
         if (!empty($this->other['groupid'])) {
             $descriptionstring .= " for the group with id '{$this->other['groupid']}'.";
@@ -79,5 +79,10 @@ class submission_created extends \mod_assign\event\submission_created {
         if (!isset($this->other['onlinetextwordcount'])) {
             throw new \coding_exception('The \'onlinetextwordcount\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        // No mapping available for 'assignsubmission_onlinetext'.
+        return array('db' => 'assignsubmission_onlinetext', 'restore' => \core\event\base::NOT_MAPPED);
     }
 }

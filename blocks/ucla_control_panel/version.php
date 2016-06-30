@@ -18,5 +18,6 @@ $plugin->version = 2014080500;
 $plugin->dependencies = array(
     'local_ucla' => 2012041300,
 );
+$plugin->component = 'block_ucla_control_panel';
 
 /** eof **/

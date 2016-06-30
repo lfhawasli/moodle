@@ -49,7 +49,8 @@ class grade_grade extends grade_object {
      */
     public $required_fields = array('id', 'itemid', 'userid', 'rawgrade', 'rawgrademax', 'rawgrademin',
                                  'rawscaleid', 'usermodified', 'finalgrade', 'hidden', 'locked',
-                                 'locktime', 'exported', 'overridden', 'excluded', 'timecreated', 'timemodified');
+                                 'locktime', 'exported', 'overridden', 'excluded', 'timecreated',
+                                 'timemodified', 'aggregationstatus', 'aggregationweight');
 
     /**
      * Array of optional fields with default values (these should match db defaults)
@@ -159,6 +160,17 @@ class grade_grade extends grade_object {
      */
     public $timemodified = null;
 
+    /**
+     * Aggregation status flag. Can be one of 'unknown', 'dropped', 'novalue' or 'used'.
+     * @var string $aggregationstatus
+     */
+    public $aggregationstatus = 'unknown';
+
+    /**
+     * Aggregation weight is the specific weight used in the aggregation calculation for this grade.
+     * @var float $aggregationweight
+     */
+    public $aggregationweight = null;
 
     /**
      * Returns array of grades for given grade_item+users
@@ -243,11 +255,9 @@ class grade_grade extends grade_object {
             return false;
         }
 
-        // START UCLA MOD: CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
         if ($grade_item->is_course_item() or $grade_item->is_category_item()) {
             return (bool)get_config('moodle', 'grade_overridecat');
         }
-        // END UCLA MOD: CCLE-3970
 
         return true;
     }
@@ -285,6 +295,105 @@ class grade_grade extends grade_object {
     public function get_datesubmitted() {
         //TODO: HACK - create new fields (MDL-31379)
         return $this->timecreated;
+    }
+
+    /**
+     * Returns the weight this grade contributed to the aggregated grade
+     *
+     * @return float|null
+     */
+    public function get_aggregationweight() {
+        return $this->aggregationweight;
+    }
+
+    /**
+     * Set aggregationweight.
+     *
+     * @param float $aggregationweight
+     * @return void
+     */
+    public function set_aggregationweight($aggregationweight) {
+        $this->aggregationweight = $aggregationweight;
+        $this->update();
+    }
+
+    /**
+     * Returns the info on how this value was used in the aggregated grade
+     *
+     * @return string One of 'dropped', 'excluded', 'novalue', 'used' or 'extra'
+     */
+    public function get_aggregationstatus() {
+        return $this->aggregationstatus;
+    }
+
+    /**
+     * Set aggregationstatus flag
+     *
+     * @param string $aggregationstatus
+     * @return void
+     */
+    public function set_aggregationstatus($aggregationstatus) {
+        $this->aggregationstatus = $aggregationstatus;
+        $this->update();
+    }
+
+    /**
+     * Returns the minimum and maximum number of points this grade is graded with respect to.
+     *
+     * @since  Moodle 2.8.7, 2.9.1
+     * @return array A list containing, in order, the minimum and maximum number of points.
+     */
+    protected function get_grade_min_and_max() {
+        global $CFG;
+        $this->load_grade_item();
+
+        // When the following setting is turned on we use the grade_grade raw min and max values.
+        $minmaxtouse = grade_get_setting($this->grade_item->courseid, 'minmaxtouse', $CFG->grade_minmaxtouse);
+
+        // Check to see if the gradebook is frozen. This allows grades to not be altered at all until a user verifies that they
+        // wish to update the grades.
+        $gradebookcalculationsfreeze = get_config('core', 'gradebook_calculations_freeze_' . $this->grade_item->courseid);
+        // Gradebook is frozen, run through old code.
+        if ($gradebookcalculationsfreeze && (int)$gradebookcalculationsfreeze <= 20150627) {
+            // Only aggregate items use separate min grades.
+            if ($minmaxtouse == GRADE_MIN_MAX_FROM_GRADE_GRADE || $this->grade_item->is_aggregate_item()) {
+                return array($this->rawgrademin, $this->rawgrademax);
+            } else {
+                return array($this->grade_item->grademin, $this->grade_item->grademax);
+            }
+        } else {
+            // Only aggregate items use separate min grades, unless they are calculated grade items.
+            if (($this->grade_item->is_aggregate_item() && !$this->grade_item->is_calculated())
+                    || $minmaxtouse == GRADE_MIN_MAX_FROM_GRADE_GRADE) {
+                return array($this->rawgrademin, $this->rawgrademax);
+            } else {
+                return array($this->grade_item->grademin, $this->grade_item->grademax);
+            }
+        }
+    }
+
+    /**
+     * Returns the minimum number of points this grade is graded with.
+     *
+     * @since  Moodle 2.8.7, 2.9.1
+     * @return float The minimum number of points
+     */
+    public function get_grade_min() {
+        list($min, $max) = $this->get_grade_min_and_max();
+
+        return $min;
+    }
+
+    /**
+     * Returns the maximum number of points this grade is graded with respect to.
+     *
+     * @since  Moodle 2.8.7, 2.9.1
+     * @return float The maximum number of points
+     */
+    public function get_grade_max() {
+        list($min, $max) = $this->get_grade_min_and_max();
+
+        return $max;
     }
 
     /**
@@ -622,6 +731,9 @@ class grade_grade extends grade_object {
      *      unknown => list of item ids that may be affected by hiding (with the calculated grade as the value)
      *      altered => list of item ids that are definitely affected by hiding (with the calculated grade as the value)
      *      alteredgrademax => for each item in altered or unknown, the new value of the grademax
+     *      alteredgrademin => for each item in altered or unknown, the new value of the grademin
+     *      alteredgradestatus => for each item with a modified status - the value of the new status
+     *      alteredgradeweight => for each item with a modified weight - the value of the new weight
      */
     public static function get_hiding_affected(&$grade_grades, &$grade_items) {
         global $CFG;
@@ -636,6 +748,8 @@ class grade_grade extends grade_object {
         $altered = array();  // altered grades
         $alteredgrademax = array();  // Altered grade max values.
         $alteredgrademin = array();  // Altered grade min values.
+        $alteredaggregationstatus = array();  // Altered aggregation status.
+        $alteredaggregationweight = array();  // Altered aggregation weight.
         $dependencydepth = array();
 
         $hiddenfound = false;
@@ -648,6 +762,8 @@ class grade_grade extends grade_object {
             } else if ($grade_grade->is_hidden()) {
                 $hiddenfound = true;
                 $altered[$grade_grade->itemid] = null;
+                $alteredaggregationstatus[$grade_grade->itemid] = 'dropped';
+                $alteredaggregationweight[$grade_grade->itemid] = 0;
             } else if ($grade_grade->is_locked() or $grade_grade->is_overridden()) {
                 // no need to recalculate locked or overridden grades
             } else {
@@ -665,8 +781,12 @@ class grade_grade extends grade_object {
             return array('unknown' => array(),
                          'altered' => array(),
                          'alteredgrademax' => array(),
-                         'alteredgrademin' => array());
+                         'alteredgrademin' => array(),
+                         'alteredaggregationstatus' => array(),
+                         'alteredaggregationweight' => array());
         }
+        // This line ensures that $dependencydepth has the same number of items as $todo.
+        $dependencydepth = array_intersect_key($dependencydepth, array_flip($todo));
         // We need to resort the todo list by the dependency depth. This guarantees we process the leaves, then the branches.
         array_multisort($dependencydepth, $todo);
 
@@ -685,8 +805,18 @@ class grade_grade extends grade_object {
 
                 } else if (!array_intersect($dependson[$do], $todo)) {
                     $hidden_precursors = array_intersect($dependson[$do], array_keys($altered));
-                    if (!$hidden_precursors) {
-                        // hiding does not affect this grade
+                    // If the dependency is a sum aggregation, we need to process it as if it had hidden items.
+                    // The reason for this, is that the code will recalculate the maxgrade by removing ungraded
+                    // items and accounting for 'drop x grades' and then stored back in our virtual grade_items.
+                    // This recalculation is necessary because there will be a call to:
+                    //              $grade_category->aggregate_values_and_adjust_bounds
+                    // for the top level grade that will depend on knowing what that caclulated grademax is
+                    // and it finds that value by checking the virtual grade_items.
+                    $issumaggregate = false;
+                    if ($grade_items[$do]->itemtype == 'category') {
+                        $issumaggregate = $grade_items[$do]->load_item_category()->aggregation == GRADE_AGGREGATE_SUM;
+                    }
+                    if (!$hidden_precursors && !$issumaggregate) {
                         unset($todo[$key]);
                         $found = true;
                         continue;
@@ -726,6 +856,8 @@ class grade_grade extends grade_object {
                             foreach ($values as $itemid=>$value) {
                                 if ($grade_grades[$itemid]->is_excluded()) {
                                     unset($values[$itemid]);
+                                    $alteredaggregationstatus[$itemid] = 'excluded';
+                                    $alteredaggregationweight[$itemid] = null;
                                     continue;
                                 }
                                 // The grade min/max may have been altered by hiding.
@@ -744,6 +876,8 @@ class grade_grade extends grade_object {
                                 foreach ($values as $itemid=>$value) {
                                     if (is_null($value)) {
                                         unset($values[$itemid]);
+                                        $alteredaggregationstatus[$itemid] = 'novalue';
+                                        $alteredaggregationweight[$itemid] = null;
                                     }
                                 }
                             } else {
@@ -755,7 +889,21 @@ class grade_grade extends grade_object {
                             }
 
                             // limit and sort
+                            $allvalues = $values;
                             $grade_category->apply_limit_rules($values, $grade_items);
+
+                            $moredropped = array_diff($allvalues, $values);
+                            foreach ($moredropped as $drop => $unused) {
+                                $alteredaggregationstatus[$drop] = 'dropped';
+                                $alteredaggregationweight[$drop] = null;
+                            }
+
+                            foreach ($values as $itemid => $val) {
+                                if ($grade_category->is_extracredit_used() && ($grade_items[$itemid]->aggregationcoef > 0)) {
+                                    $alteredaggregationstatus[$itemid] = 'extra';
+                                }
+                            }
+
                             asort($values, SORT_NUMERIC);
 
                             // let's see we have still enough grades to do any statistics
@@ -767,7 +915,8 @@ class grade_grade extends grade_object {
                                 continue;
                             }
 
-                            $adjustedgrade = $grade_category->aggregate_values_and_adjust_bounds($values, $grade_items);
+                            $usedweights = array();
+                            $adjustedgrade = $grade_category->aggregate_values_and_adjust_bounds($values, $grade_items, $usedweights);
 
                             // recalculate the rawgrade back to requested range
                             $finalgrade = grade_grade::standardise_score($adjustedgrade['grade'],
@@ -775,6 +924,13 @@ class grade_grade extends grade_object {
                                                                          1,
                                                                          $adjustedgrade['grademin'],
                                                                          $adjustedgrade['grademax']);
+
+                            foreach ($usedweights as $itemid => $weight) {
+                                if (!isset($alteredaggregationstatus[$itemid])) {
+                                    $alteredaggregationstatus[$itemid] = 'used';
+                                }
+                                $alteredaggregationweight[$itemid] = $weight;
+                            }
 
                             $finalgrade = $grade_items[$do]->bounded_grade($finalgrade);
                             $alteredgrademin[$do] = $adjustedgrade['grademin'];
@@ -800,7 +956,9 @@ class grade_grade extends grade_object {
         return array('unknown' => $unknown,
                      'altered' => $altered,
                      'alteredgrademax' => $alteredgrademax,
-                     'alteredgrademin' => $alteredgrademin);
+                     'alteredgrademin' => $alteredgrademin,
+                     'alteredaggregationstatus' => $alteredaggregationstatus,
+                     'alteredaggregationweight' => $alteredaggregationweight);
     }
 
     /**
@@ -861,6 +1019,24 @@ class grade_grade extends grade_object {
         $this->rawgrademin = grade_floatval($this->rawgrademin);
         $this->rawgrademax = grade_floatval($this->rawgrademax);
         return parent::update($source);
+    }
+
+    /**
+     * Deletes the grade_grade instance from the database.
+     *
+     * @param string $source The location the deletion occurred (mod/forum, manual, etc.).
+     * @return bool Returns true if the deletion was successful, false otherwise.
+     */
+    public function delete($source = null) {
+        $success = parent::delete($source);
+
+        // If the grade was deleted successfully trigger a grade_deleted event.
+        if ($success) {
+            $this->load_grade_item();
+            \core\event\grade_deleted::create_from_grade($this)->trigger();
+        }
+
+        return $success;
     }
 
     /**
@@ -938,5 +1114,17 @@ class grade_grade extends grade_object {
 
         // Pass information on to completion system
         $completion->inform_grade_changed($cm, $this->grade_item, $this, $deleted);
-     }
+    }
+
+    /**
+     * Get some useful information about how this grade_grade is reflected in the aggregation
+     * for the grade_category. For example this could be an extra credit item, and it could be
+     * dropped because it's in the X lowest or highest.
+     *
+     * @return array(status, weight) - A keyword and a numerical weight that represents how this grade was included in the aggregation.
+     */
+    function get_aggregation_hint() {
+        return array('status' => $this->get_aggregationstatus(),
+                     'weight' => $this->get_aggregationweight());
+    }
 }

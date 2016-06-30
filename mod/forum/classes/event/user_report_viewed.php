@@ -49,7 +49,7 @@ class user_report_viewed extends \core\event\base {
      */
     protected function init() {
         $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
     /**
@@ -119,13 +119,17 @@ class user_report_viewed extends \core\event\base {
         {
             case CONTEXT_COURSE:
             case CONTEXT_SYSTEM:
+            case CONTEXT_USER:
                 // OK, expected context level.
                 break;
             default:
                 // Unexpected contextlevel.
-                throw new \coding_exception('Context level must be either CONTEXT_SYSTEM or CONTEXT_COURSE.');
+                throw new \coding_exception('Context level must be either CONTEXT_SYSTEM, CONTEXT_COURSE or CONTEXT_USER.');
         }
     }
 
+    public static function get_other_mapping() {
+        return false;
+    }
 }
 

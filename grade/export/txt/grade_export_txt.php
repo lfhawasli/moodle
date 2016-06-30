@@ -28,19 +28,14 @@ class grade_export_txt extends grade_export {
      * Constructor should set up all the private variables ready to be pulled
      * @param object $course
      * @param int $groupid id of selected group, 0 means all
-     * @param string $itemlist comma separated list of item ids, empty means all
-     * @param boolean $export_feedback
-     * @param boolean $updatedgradesonly
-     * @param string $displaytype
-     * @param int $decimalpoints
-     * @param boolean $onlyactive
-     * @param boolean $usercustomfields include user custom field in export
+     * @param stdClass $formdata The validated data from the grade export form.
      */
-    // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
-    public function __construct($course, $groupid=0, $groupingid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $separator = 'comma', $onlyactive = false, $usercustomfields = false) {
-        parent::__construct($course, $groupid, $groupingid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $onlyactive, $usercustomfields);
-    // END UCLA MOD: CCLE-5599
-        $this->separator = $separator;
+    public function __construct($course, $groupid, $formdata) {
+        parent::__construct($course, $groupid, $formdata);
+        $this->separator = $formdata->separator;
+
+        // Overrides.
+        $this->usercustomfields = true;
     }
 
     public function get_export_params() {
@@ -72,13 +67,17 @@ class grade_export_txt extends grade_export {
             $exporttitle[] = get_string("suspended");
         }
 
-        // Add a feedback column.
+        // Add grades and feedback columns.
         foreach ($this->columns as $grade_item) {
-            $exporttitle[] = $this->format_column_name($grade_item);
+            foreach ($this->displaytype as $gradedisplayname => $gradedisplayconst) {
+                $exporttitle[] = $this->format_column_name($grade_item, false, $gradedisplayname);
+            }
             if ($this->export_feedback) {
                 $exporttitle[] = $this->format_column_name($grade_item, true);
             }
         }
+        // Last downloaded column header.
+        $exporttitle[] = get_string('timeexported', 'gradeexport_txt');
         $csvexport->add_data($exporttitle);
 
         // Print all the lines of data.
@@ -107,12 +106,16 @@ class grade_export_txt extends grade_export {
                     $status = $geub->track($grade);
                 }
 
-                $exportdata[] = $this->format_grade($grade);
+                foreach ($this->displaytype as $gradedisplayconst) {
+                    $exportdata[] = $this->format_grade($grade, $gradedisplayconst);
+                }
 
                 if ($this->export_feedback) {
                     $exportdata[] = $this->format_feedback($userdata->feedbacks[$itemid]);
                 }
             }
+            // Time exported.
+            $exportdata[] = time();
             $csvexport->add_data($exportdata);
         }
         $gui->close();

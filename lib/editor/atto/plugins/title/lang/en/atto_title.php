@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// START UCLA MOD: CCLE-4848-Paragraph styles’ drop-down does not show the current style for a selected text.
+// START UCLA MOD: CCLE-4848-Paragraph styles' drop-down does not show the current style for a selected text
 //$string['h3'] = 'Heading (large)';
 //$string['h4'] = 'Heading (medium)';
 //$string['h5'] = 'Heading (small)';

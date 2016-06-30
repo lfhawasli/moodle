@@ -85,6 +85,28 @@ class condition extends \core_availability\condition {
         return $result;
     }
 
+    /**
+     * Returns a JSON object which corresponds to a condition of this type.
+     *
+     * Intended for unit testing, as normally the JSON values are constructed
+     * by JavaScript code.
+     *
+     * @param int $gradeitemid Grade item id
+     * @param number|null $min Min grade (or null if no min)
+     * @param number|null $max Max grade (or null if no max)
+     * @return stdClass Object representing condition
+     */
+    public static function get_json($gradeitemid, $min = null, $max = null) {
+        $result = (object)array('type' => 'grade', 'id' => (int)$gradeitemid);
+        if (!is_null($min)) {
+            $result->min = $min;
+        }
+        if (!is_null($max)) {
+            $result->max = $max;
+        }
+        return $result;
+    }
+
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
         $course = $info->get_course();
         $score = $this->get_cached_grade_score($this->gradeitemid, $course->id, $grabthelot, $userid);
@@ -206,7 +228,9 @@ class condition extends \core_availability\condition {
                         WHERE
                             gi.courseid = ?', array($userid, $courseid));
                 foreach ($rs as $record) {
-                    if (is_null($record->finalgrade)) {
+                    // This function produces division by zero error warnings when rawgrademax and rawgrademin
+                    // are equal. Below change does not affect function behavior, just avoids the warning.
+                    if (is_null($record->finalgrade) || $record->rawgrademax == $record->rawgrademin) {
                         // No grade = false.
                         $cachedgrades[$record->id] = false;
                     } else {
@@ -227,7 +251,9 @@ class condition extends \core_availability\condition {
                 // Just get current grade.
                 $record = $DB->get_record('grade_grades', array(
                     'userid' => $userid, 'itemid' => $gradeitemid));
-                if ($record && !is_null($record->finalgrade)) {
+                // This function produces division by zero error warnings when rawgrademax and rawgrademin
+                // are equal. Below change does not affect function behavior, just avoids the warning.
+                if ($record && !is_null($record->finalgrade) && $record->rawgrademax != $record->rawgrademin) {
                     $score = (($record->finalgrade - $record->rawgrademin) * 100) /
                         ($record->rawgrademax - $record->rawgrademin);
                 } else {

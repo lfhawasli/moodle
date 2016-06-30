@@ -59,8 +59,52 @@ switch ($service) {
 
 // The URL of the module.
 $url = $CFG->wwwroot . '/mod/turningtech';
+$urlfile = $url."/wsdl/".$filename;
+function file_get_contents_curl($url, $retries=5)
+{
+    $ua = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)';
 
-$contents = file_get_contents($filename);
+    if (extension_loaded('curl') === true)
+    {
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_USERAGENT, $ua);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_FAILONERROR, TRUE);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+
+        $result = trim(curl_exec($ch));
+
+        curl_close($ch);
+    }
+
+    else
+    {
+        $result = trim(file_get_contents($url));
+    }        
+
+    if (empty($result) === true)
+    {
+        $result = false;
+
+        if ($retries >= 1)
+        {
+            sleep(1);
+            return file_get_contents_curl($url, $retries--);
+        }
+    }    
+
+    return $result;
+}
+
+$contents = file_get_contents_curl($urlfile);
 
 header('Content-type: text/xml');
 

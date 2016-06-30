@@ -27,7 +27,6 @@ require_once("lib.php");
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->libdir.'/conditionlib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 
@@ -72,7 +71,6 @@ if (!empty($add)) {
     $data->modulename       = $module->name;
     $data->groupmode        = $course->groupmode;
     $data->groupingid       = $course->defaultgroupingid;
-    $data->groupmembersonly = 0;
     $data->id               = '';
     $data->instance         = '';
     $data->coursemodule     = '';
@@ -152,7 +150,6 @@ if (!empty($add)) {
     $data->cmidnumber         = $cm->idnumber;          // The cm IDnumber
     $data->groupmode          = groups_get_activity_groupmode($cm); // locked later if forced
     $data->groupingid         = $cm->groupingid;
-    $data->groupmembersonly   = $cm->groupmembersonly;
     $data->course             = $course->id;
     $data->module             = $module->id;
     $data->modulename         = $module->name;
@@ -165,6 +162,7 @@ if (!empty($add)) {
     $data->completionexpected = $cm->completionexpected;
     $data->completionusegrade = is_null($cm->completiongradeitemnumber) ? 0 : 1;
     $data->showdescription    = $cm->showdescription;
+    $data->tags               = core_tag_tag::get_item_tags_array('core', 'course_modules', $cm->id);
     if (!empty($CFG->enableavailability)) {
         $data->availabilityconditionsjson = $cm->availability;
     }
@@ -196,10 +194,13 @@ if (!empty($add)) {
 
     if ($items = grade_item::fetch_all(array('itemtype'=>'mod', 'itemmodule'=>$data->modulename,
                                              'iteminstance'=>$data->instance, 'courseid'=>$course->id))) {
-        // add existing outcomes
+        // Add existing outcomes.
         foreach ($items as $item) {
             if (!empty($item->outcomeid)) {
-                $data->{'outcome_'.$item->outcomeid} = 1;
+                $data->{'outcome_' . $item->outcomeid} = 1;
+            } else if (!empty($item->gradepass)) {
+                $decimalpoints = $item->get_decimals();
+                $data->gradepass = format_float($item->gradepass, $decimalpoints);
             }
         }
 
@@ -267,6 +268,12 @@ if ($mform->is_cancelled()) {
         redirect(course_get_url($course, $cw->section, array('sr' => $sectionreturn)));
     }
 } else if ($fromform = $mform->get_data()) {
+    // Convert the grade pass value - we may be using a language which uses commas,
+    // rather than decimal points, in numbers. These need to be converted so that
+    // they can be added to the DB.
+    if (isset($fromform->gradepass)) {
+        $fromform->gradepass = unformat_float($fromform->gradepass);
+    }
 
     if (!empty($fromform->update)) {
         list($cm, $fromform) = update_moduleinfo($cm, $fromform, $course, $mform);

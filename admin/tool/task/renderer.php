@@ -60,26 +60,11 @@ class tool_task_renderer extends plugin_renderer_base {
         $no = get_string('no');
         $never = get_string('never');
         $asap = get_string('asap', 'tool_task');
-        $disabled = get_string('disabled', 'tool_task');
+        $disabledstr = get_string('taskdisabled', 'tool_task');
+        $plugindisabledstr = get_string('plugindisabled', 'tool_task');
         foreach ($tasks as $task) {
             $customised = $task->is_customised() ? $no : $yes;
-            $lastrun = $task->get_last_run_time() ? userdate($task->get_last_run_time()) : $never;
-            $nextrun = $task->get_next_run_time();
-            if ($task->get_disabled()) {
-                $nextrun = $disabled;
-            } else if ($nextrun > time()) {
-                $nextrun = userdate($nextrun);
-            } else {
-                $nextrun = $asap;
-            }
-            // START UCLA MOD: CCLE-5104 - Monitor cron jobs
-            // Read-only access to the report.
-            if (has_capability('local/ucla:viewscheduledtasks', context_system::instance()) &&
-                    !has_capability('moodle/site:config', context_system::instance())) {
-                $editlink = $this->render(new pix_icon('t/locked', get_string('scheduledtaskchangesdisabled', 'tool_task')));
-            } else if (empty($CFG->preventscheduledtaskchanges)) {
-            //if (empty($CFG->preventscheduledtaskchanges)) {
-            // END UCLA MOD: CCLE-5104
+            if (empty($CFG->preventscheduledtaskchanges)) {
                 $configureurl = new moodle_url('/admin/tool/task/scheduledtasks.php', array('action'=>'edit', 'task' => get_class($task)));
                 $editlink = $this->action_icon($configureurl, new pix_icon('t/edit', get_string('edittaskschedule', 'tool_task', $task->get_name())));
             } else {
@@ -90,6 +75,7 @@ class tool_task_renderer extends plugin_renderer_base {
             $namecell->header = true;
 
             $component = $task->get_component();
+            $plugininfo = null;
             list($type, $plugin) = core_component::normalize_component($component);
             if ($type === 'core') {
                 $componentcell = new html_table_cell(get_string('corecomponent', 'tool_task'));
@@ -100,6 +86,21 @@ class tool_task_renderer extends plugin_renderer_base {
                 } else {
                     $componentcell = new html_table_cell($component);
                 }
+            }
+
+            $lastrun = $task->get_last_run_time() ? userdate($task->get_last_run_time()) : $never;
+            $nextrun = $task->get_next_run_time();
+            $disabled = false;
+            if ($plugininfo && $plugininfo->is_enabled() === false && !$task->get_run_if_component_disabled()) {
+                $disabled = true;
+                $nextrun = $plugindisabledstr;
+            } else if ($task->get_disabled()) {
+                $disabled = true;
+                $nextrun = $disabledstr;
+            } else if ($nextrun > time()) {
+                $nextrun = userdate($nextrun);
+            } else {
+                $nextrun = $asap;
             }
 
             $row = new html_table_row(array(
@@ -116,7 +117,7 @@ class tool_task_renderer extends plugin_renderer_base {
                         new html_table_cell($task->get_fail_delay()),
                         new html_table_cell($customised)));
 
-            if ($task->get_disabled()) {
+            if ($disabled) {
                 $row->attributes['class'] = 'disabled';
             }
             $data[] = $row;

@@ -244,30 +244,7 @@ class question_type {
     public function display_question_editing_page($mform, $question, $wizardnow) {
         global $OUTPUT;
         $heading = $this->get_heading(empty($question->id));
-
         echo $OUTPUT->heading_with_help($heading, 'pluginname', $this->plugin_name());
-
-        $permissionstrs = array();
-        if (!empty($question->id)) {
-            if ($question->formoptions->canedit) {
-                $permissionstrs[] = get_string('permissionedit', 'question');
-            }
-            if ($question->formoptions->canmove) {
-                $permissionstrs[] = get_string('permissionmove', 'question');
-            }
-            if ($question->formoptions->cansaveasnew) {
-                $permissionstrs[] = get_string('permissionsaveasnew', 'question');
-            }
-        }
-        if (count($permissionstrs)) {
-            echo $OUTPUT->heading(get_string('permissionto', 'question'), 3);
-            $html = '<ul>';
-            foreach ($permissionstrs as $permissionstr) {
-                $html .= '<li>'.$permissionstr.'</li>';
-            }
-            $html .= '</ul>';
-            echo $OUTPUT->box($html, 'boxwidthnarrow boxaligncenter generalbox');
-        }
         $mform->display();
     }
 
@@ -358,9 +335,9 @@ class question_type {
         $question->generalfeedbackformat = !empty($form->generalfeedback['format']) ?
                 $form->generalfeedback['format'] : 0;
 
-        if (empty($question->name)) {
+        if ($question->name === '') {
             $question->name = shorten_text(strip_tags($form->questiontext['text']), 15);
-            if (empty($question->name)) {
+            if ($question->name === '') {
                 $question->name = '-';
             }
         }
@@ -417,7 +394,7 @@ class question_type {
         }
 
         if (!empty($result->notice)) {
-            notice($result->notice, "question.php?id=$question->id");
+            notice($result->notice, "question.php?id={$question->id}");
         }
 
         if (!empty($result->noticeyesno)) {
@@ -1181,7 +1158,7 @@ class question_type {
         $expout='';
         foreach ($extraquestionfields as $field) {
             $exportedvalue = $format->xml_escape($question->options->$field);
-            $expout .= "    <$field>{$exportedvalue}</$field>\n";
+            $expout .= "    <{$field}>{$exportedvalue}</{$field}>\n";
         }
 
         $extraanswersfields = $this->extra_answer_fields();

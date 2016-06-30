@@ -21,6 +21,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I turn editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
+      | Description | Test lesson description |
     And I follow "Test lesson name"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -29,7 +30,7 @@ Feature: In a lesson activity, teacher can edit lesson's pages
       | id_answer_editor_0 | Next page |
       | id_jumpto_0 | Next page |
     And I press "Save page"
-    And I set the field "qtype" to "Add a content page"
+    And I select "Add a content page" from the "qtype" singleselect
     And I set the following fields to these values:
       | Page title | Second page name |
       | Page contents | Second page contents |
@@ -55,7 +56,6 @@ Feature: In a lesson activity, teacher can edit lesson's pages
       | id_score_1 | 0 |
     And I press "Save page"
 
-  @javascript
   Scenario: Edit lesson content page
     Given I click on "//th[normalize-space(.)='Second page name']/descendant::a[2]" "xpath_element"
     When I set the following fields to these values:
@@ -91,7 +91,6 @@ Feature: In a lesson activity, teacher can edit lesson's pages
     And I should see "Congratulations - end of lesson reached"
     And I should see "Your score is 1 (out of 1)."
 
-  @javascript
   Scenario: Edit lesson question page
     Given I click on "//th[normalize-space(.)='Hardest question ever']/descendant::a[2]" "xpath_element"
     When I set the following fields to these values:

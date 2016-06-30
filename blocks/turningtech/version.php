@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-$plugin->version  = 2014041401;
+$plugin->version  = 2014110400;
 $plugin->cron     = 0;
 $plugin->requires = 2011070110;
 $plugin->component = 'block_turningtech';  // Full name of the plugin (used for diagnostics).

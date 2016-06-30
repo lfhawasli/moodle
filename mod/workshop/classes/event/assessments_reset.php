@@ -57,7 +57,7 @@ class assessments_reset extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has reset the assessments for the workshop with the course module id " .
+        return "The user with id '$this->userid' has reset the assessments for the workshop with course module id " .
             "'$this->contextinstanceid'.";
     }
 
@@ -101,5 +101,12 @@ class assessments_reset extends \core\event\base {
         if (!isset($this->other['workshopid'])) {
             throw new \coding_exception('The \'workshopid\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['workshopid'] = array('db' => 'workshop', 'restore' => 'workshop');
+
+        return $othermapped;
     }
 }

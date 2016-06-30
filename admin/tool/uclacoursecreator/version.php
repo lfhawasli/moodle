@@ -16,5 +16,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version = 2015081800;
+$plugin->component = 'tool_uclacoursecreator';
 
 // EoF

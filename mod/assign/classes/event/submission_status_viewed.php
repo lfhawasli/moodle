@@ -93,7 +93,7 @@ class submission_status_viewed extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has viewed the submission status page for the assignment with the " .
+        return "The user with id '$this->userid' has viewed the submission status page for the assignment with " .
             "course module id '$this->contextinstanceid'.";
     }
 
@@ -123,5 +123,12 @@ class submission_status_viewed extends base {
         if (!isset($this->other['assignid'])) {
             throw new \coding_exception('The \'assignid\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['assignid'] = array('db' => 'assign', 'restore' => 'assign');
+
+        return $othermapped;
     }
 }
