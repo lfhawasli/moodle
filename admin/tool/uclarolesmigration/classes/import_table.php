@@ -42,7 +42,7 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
      * @param array $options describes fields we want to process
      */
     public function force_preset($xml, array $options) {
-        if (!$info = core_role_preset::parse_preset($xml)) {
+        if (!$info = tool_uclarolesmigration_cleanxml::parse_preset($xml)) {
             throw new coding_exception('Invalid role preset');
         }
 
