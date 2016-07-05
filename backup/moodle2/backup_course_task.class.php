@@ -87,7 +87,6 @@ class backup_course_task extends backup_task {
         if ($this->get_setting_value('groups')) {
             $this->add_step(new backup_annotate_course_groups_and_groupings('annotate_course_groups'));
         }
-
         // Annotate the groups used in already annotated groupings (note this may be
         // unnecessary now that we are annotating all the course groups and groupings in the
         // step above). This is here to support course->defaultgroupingid.

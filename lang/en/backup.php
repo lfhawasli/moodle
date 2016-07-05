@@ -152,9 +152,6 @@ $string['generalroleassignments'] = 'Include role assignments';
 $string['generalsettings'] = 'General backup settings';
 $string['generaluserscompletion'] = 'Include user completion information';
 $string['generalusers'] = 'Include users';
-// BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
-$string['groups'] = 'Restore groups and groupings';
-// END UCLA MOD: SSC-2572
 $string['hidetypes'] = 'Hide type options';
 $string['importgeneralsettings'] = 'General import defaults';
 $string['importgeneralmaxresults'] = 'Maximum number of courses listed for import';
