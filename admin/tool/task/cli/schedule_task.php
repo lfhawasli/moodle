@@ -29,8 +29,11 @@ require_once("$CFG->libdir/clilib.php");
 require_once("$CFG->libdir/cronlib.php");
 
 list($options, $unrecognized) = cli_get_params(
-    array('help' => false, 'list' => false, 'execute' => false),
+    // START UCLA MOD: CCLE-5926 Add option for debugging scheduled tasks.
+    // array('help' => false, 'list' => false, 'execute' => false, 'showsql' => false)
+    array('help' => false, 'list' => false, 'execute' => false, 'showsql' => false, 'showdebugging' => false),
     array('h' => 'help')
+    // END UCLA MOD: CCLE-5926 Add option for debugging scheduled tasks.
 );
 
 if ($unrecognized) {
@@ -45,6 +48,8 @@ if ($options['help'] or (!$options['list'] and !$options['execute'])) {
 Options:
 --execute=\\\\some\\\\task  Execute scheduled task manually
 --list                List all scheduled tasks
+--showsql             Shows sql queries before they are executed
+--showdebugging       Shows developer debugging info
 -h, --help            Print out this help
 
 Example:
@@ -55,7 +60,14 @@ Example:
     echo $help;
     die;
 }
-
+ // START UCLA MOD: CCLE-5926 Add option for debugging scheduled tasks.
+if ($options['showsql']) {
+        $DB->set_debug(true);
+}
+if ($options['showdebugging']) {
+        set_debugging(DEBUG_DEVELOPER, true);
+}
+// END UCLA MOD: CCLE-5926 Add option for debugging scheduled tasks.
 if ($options['list']) {
     cli_heading("List of scheduled tasks ($CFG->wwwroot)");
 
