@@ -2638,8 +2638,8 @@ class uclacoursecreator {
                     // table
                     $course = new stdClass();
                     $course->id = $failed_request->courseid;
-                    $this->debugln('Manually invoking the course_deleted event');
-                    events_trigger_legacy('course_deleted', $course);
+                    $this->debugln('Function delete_course returned false for' .
+                            $failed_request->courseid);
                 }
                 $this->debugln('Deleted courseid ' . $failed_request->courseid);
             } else {

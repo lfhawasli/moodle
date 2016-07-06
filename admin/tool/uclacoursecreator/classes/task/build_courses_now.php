@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA site indicator for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,18 +15,38 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Event handlers.
+ * Build courses now task.
  *
- * @package    tool_uclasiteindicator
+ * @package    tool_uclacoursecreator
  * @copyright  2016 UC Regent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_uclacoursecreator\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$observers = array(
-    array(
-        'eventname' => '\core\event\course_deleted',
-        'callback'  => 'tool_uclacoursecreator_observer::handle_course_deleted'
-    ),
-);
+/**
+ * Class file.
+ *
+ * @package    tool_uclacoursecreator
+ * @copyright  2016 UC Regent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class build_courses_now extends \core\task\adhoc_task {
+
+    /**
+     * Respond to events that require course creator to build now.
+     *
+     * @param array $terms  An array of terms to run course builder for
+     */
+    public function execute() {
+        $bcc = new \uclacoursecreator();
+
+        // This may take a while...
+        @set_time_limit(0);
+
+        $bcc->set_terms($this->get_custom_data());
+        $bcc->cron();
+    }
+}

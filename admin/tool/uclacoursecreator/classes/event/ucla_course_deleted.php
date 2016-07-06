@@ -36,14 +36,15 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2016 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_creator_finished extends \core\event\base {
+class ucla_course_deleted extends \core\event\base {
     /**
      * Get event description.
      *
      * @return string
      */
     public function get_description() {
-        return "Course creator finished execution.";
+        return sprintf('Deleted %d UCLA courses.',
+                count($this->get_requests()->deleted_requests));
     }
 
     /**
@@ -52,7 +53,7 @@ class course_creator_finished extends \core\event\base {
      * @return string legacy event name
      */
     public static function get_legacy_eventname() {
-        return 'course_creator_finished';
+        return 'ucla_course_deleted';
     }
 
     /**
@@ -61,13 +62,14 @@ class course_creator_finished extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventcoursecreatorfinished', 'tool_uclacoursecreator');
+        return get_string('eventuclacoursedeleted', 'tool_uclacoursecreator');
     }
 
     /**
-     * Get course requests.
+     * Get deleted requests.
      *
-     * @return array
+     * @return object   Contains ucla_request_classes, ucla_reg_classinfo, and
+     *                  deleted_requests.
      */
     public function get_requests() {
         return json_decode($this->other);
