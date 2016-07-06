@@ -113,30 +113,28 @@ class local_publicprivate_renderer extends core_course_renderer {
     }
 
     /**
-     * If a module is public, do not show the 'Private Course Material' label.
-     * 
+     * We are overriding this method because labels do not have grouping label
+     * by default.
+     *
      * @param cm_info $mod
-     * @param type $displayoptions
-     * @return type
+     * @param array $displayoptions
+     * @return string
      */
     public function course_section_cm_name(cm_info $mod, $displayoptions = array()) {
-
         if ($this->ppcourse->is_activated()) {
-
-            $ppmod = new PublicPrivate_Module($mod->id);
-            if ($ppmod->is_public()) {
-                $mod->groupingid = null;
-            }
-            
             // Get the context from this course module, used to identify if user is in managegroup.
             $context = context_module::instance($mod->id);
-            
+
             // Labels resources are not printed, so add the grouping name manually. Only instructors see the label
-            if (strtolower($mod->modfullname) === 'label' && !empty($mod->groupingid) && has_capability('moodle/course:managegroups', $context)) {
-                $groupings = groups_get_all_groupings($mod->course);
-                $pptext = html_writer::span('(' . $groupings[$mod->groupingid]->name . ')',
-                                'groupinglabel');
-                $mod->set_after_link($pptext);
+            if (strtolower($mod->modfullname) === 'label' && has_capability('moodle/course:managegroups', $context)) {
+                $ppmod = new PublicPrivate_Module($mod->id);
+                if ($ppmod->is_private()) {
+                    $groupingid = $ppmod->get_grouping();
+                    $groupings = groups_get_all_groupings($mod->course);
+                    $pptext = html_writer::span('(' . $groupings[$groupingid]->name . ')',
+                                    'groupinglabel');
+                    $mod->set_after_link($pptext);
+                }
             }
         }
 

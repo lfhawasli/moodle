@@ -37,6 +37,93 @@ require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
 class observers {
 
     /**
+     * Enables public/private for any newly built courses.
+     *
+     * @param \core\event\course_created $event
+     */
+    public static function course_created(\core\event\course_created $event) {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/publicprivate/lib/site.class.php');
+
+        if (\PublicPrivate_Site::is_enabled()) {
+            require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
+            $pubprivcourse = new \PublicPrivate_Course($event->courseid);
+            if (!$pubprivcourse->is_activated()) {
+                $pubprivcourse->activate();
+            }
+        }
+    }
+
+    /**
+     * Enables/disables public/private depending on $course->enablepublicprivate.
+     *
+     * For courses with public/private enabled:
+     *  - if hidden, then make sure guest enrollment plugin is disabled
+     *  - if visible, then make sure guest enrollment plugin is enabled
+     *
+     * @param \core\event\course_updated $event
+     */
+    public static function course_updated(\core\event\course_updated $event) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/local/publicprivate/lib/site.class.php');
+        if (!\PublicPrivate_Site::is_enabled()) {
+            return;
+        }
+
+        require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
+        $ppcourse = new \PublicPrivate_Course($event->courseid);
+        $course = $ppcourse->get_course();
+        $changehappened = false;
+
+        // Activate public/private if form has enabled set or creating a course
+        // not through the course edit form (i.e. collab site requestor)
+        if ($course->enablepublicprivate == 1 && !$ppcourse->is_activated()) {
+            $ppcourse->activate();
+            $changehappened = true;
+        } else if ($course->enablepublicprivate == 0 && $ppcourse->is_activated()) {
+            $ppcourse->deactivate();
+            $changehappened = true;
+        }
+
+        // If we enabled or disabled public/private, then guest enrollment 
+        // plugin was properly set anyways.
+        if (!$changehappened) {
+            if ($ppcourse->is_activated()) {
+                if ($course->visible == 0) {
+                    // Course is hidden, need to disable guest enrollment plugin.
+                    \PublicPrivate_Course::set_guest_plugin($course, ENROL_INSTANCE_DISABLED);
+                } else {
+                    // Course is visible, need to enable guest enrollment plugin.
+                    \PublicPrivate_Course::set_guest_plugin($course, ENROL_INSTANCE_ENABLED);
+                }
+            }
+        }
+    }
+
+    /**
+     * For newly created course modules, make sure they are private by default.
+     * @param \core\event\course_module_created $event
+     */
+    public static function course_module_created(\core\event\course_module_created $event) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/local/publicprivate/lib/site.class.php');
+        if (!\PublicPrivate_Site::is_enabled()) {
+            return;
+        }
+
+        if (!\PublicPrivate_Course::build($event->courseid)->is_activated()) {
+            return;
+        }
+
+        require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+
+        $ppmod = \PublicPrivate_Module::build($event->objectid);
+        $ppmod->enable();
+    }
+
+    /**
      * Role assigned.
      *
      * Called by Events API when a new role is assigned. Add user to private public group.

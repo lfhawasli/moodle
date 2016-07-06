@@ -22,38 +22,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$handlers = array (
-    'course_created' => array (
-        'handlerfile'      => '/local/publicprivate/lib.php',
-        'handlerfunction'  => 'handle_course_created',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'course_updated' => array (
-        'handlerfile'      => '/local/publicprivate/lib.php',
-        'handlerfunction'  => 'handle_course_updated',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'mod_created' => array (
-        'handlerfile'      => '/local/publicprivate/lib.php',
-        'handlerfunction'  => 'handle_mod',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'mod_updated' => array (
-        'handlerfile'      => '/local/publicprivate/lib.php',
-        'handlerfunction'  => 'handle_mod',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-);
-
 $observers = array(
-
+    array(
+        'eventname' => '\core\event\course_created',
+        'callback'  => '\local_publicprivate\observers::course_created'
+    ),
+    array(
+        'eventname' => '\core\event\course_updated',
+        'callback'  => '\local_publicprivate\observers::course_updated'
+    ),
+    array(
+        'eventname' => '\core\event\course_module_created',
+        'callback'  => '\local_publicprivate\observers::course_module_created'
+    ),
     array(
         'eventname' => '\block_ucla_group_manager\event\section_groups_synced',
         'callback'  => '\local_publicprivate\observers::section_groups_synced'

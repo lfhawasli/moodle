@@ -15,6 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // Version         YYYYMMDDVV
-$plugin->version = 2015052604;
+$plugin->version = 2016061700;
 $plugin->component = 'local_publicprivate';
 $plugin->cron = 86400;  // every 24 hours
