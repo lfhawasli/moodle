@@ -151,7 +151,7 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'dev';
 $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
-$CFG->cachejs = false;
+$CFG->cachejs = true;
 
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
@@ -518,7 +518,7 @@ $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
 $CFG->themelist = "uclashared,uclasharedcourse";
-$CFG->themedesignermode = 1;
+$CFG->themedesignermode = 0;
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     Request a site consult|https://goo.gl/forms/BvPHCYBg1HYH2buv2
