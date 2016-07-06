@@ -328,10 +328,6 @@ class format_ucla extends format_topics {
                     'default' => true,
                     'type' => PARAM_BOOL
                 ),
-                'createtasite' => array(
-                    'default' => true,
-                    'type' => PARAM_BOOL
-                )
             );
             if (!$iscollabsite) {
                 $uclaoptions['createtasite'] = array(
