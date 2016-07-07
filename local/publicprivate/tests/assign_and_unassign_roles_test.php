@@ -27,6 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/publicprivate/lib.php');
 
+/*
+ * Unit test file.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_publicprivate_assigned_and_unassigned_testcase extends advanced_testcase {
 
     /**
