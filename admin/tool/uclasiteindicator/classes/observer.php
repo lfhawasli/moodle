@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Event handler class.
  *
  * @package    tool_uclasiteindicator
  * @copyright  2016 UC Regent
@@ -23,6 +23,26 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.php');
 
-$plugin->version   = 2016070600;
-$plugin->component = 'tool_uclasiteindicator';
+/**
+ * When a course is deleted, also delete the site indicator entry.
+ *
+ * @copyright  2016 UC Regent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class tool_uclasiteindicator_observer {
+    /**
+     * Deletes associated site indicator for given course.
+     *
+     * @param \core\event\course_deleted $event
+     */
+    public static function delete_indicator(\core\event\course_deleted $event) {
+        global $OUTPUT;
+        if($indicator = siteindicator_site::load($event->courseid)) {
+            $indicator->delete();
+            echo $OUTPUT->notification(get_string('deleted').' - ' .
+                    get_string('del_msg', 'tool_uclasiteindicator'), 'notifysuccess');
+        }
+    }
+}
