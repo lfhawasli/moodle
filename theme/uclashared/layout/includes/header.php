@@ -48,6 +48,9 @@ $headerclasses = isset($OUTPUT->headerclasses) ? $OUTPUT->headerclasses : array(
                     if ($haslogininfo) {
                         echo $OUTPUT->login_info();
                     }
+                    if (isloggedin()) {
+                        echo $OUTPUT->user_menu();
+                    }
                     ?>
                 </div>
             </div>

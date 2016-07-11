@@ -164,91 +164,11 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         $loginstr = '';
 
         if (isloggedin()) {
-            $addlogouturl = true;
             $addloginurl = false;
-
-            $usermurl = new moodle_url('/user/profile.php', array(
-                'id' => $USER->id
-            ));
-
-            // In case of mnet login.
-            $mnetfrom = '';
-            if (is_mnet_remote_user($USER)) {
-                $idprovider = $DB->get_record('mnet_host', array(
-                    'id' => $USER->mnethostid
-                ));
-
-                if ($idprovider) {
-                    $mnetfrom = html_writer::link($idprovider->wwwroot, $idprovider->name);
-                }
-            }
-
-            $realuserinfo = '';
-            if (\core\session\manager::is_loggedinas()) {
-                $realuser = \core\session\manager::get_realuser();
-                $realfullname = fullname($realuser);
-                $dest = new moodle_url('/course/loginas.php', array(
-                    'id' => $course->id,
-                    'sesskey' => sesskey()
-                ));
-
-                $realuserlink = html_writer::link($dest, $realfullname, array('class' => 'btn-header real-user'));
-                $loginas = html_writer::span(get_string('loginas_as', 'theme_uclashared'), 'login-as');
-                $realuserinfo = $realuserlink . $loginas;
-            }
-
-            $fullname = fullname($USER);
-            $userlink = html_writer::link($usermurl, $fullname, array('class' => 'btn-header'));
-
-            $rolename = '';
-            // I guess only guests cannot switch roles.
-            if (isguestuser()) {
-                $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
-                $addloginurl = true;
-            } else if (is_role_switched($course->id)) {
-                $context = context_course::instance($course->id);
-
-                $role = $DB->get_record('role', array(
-                    'id' => $USER->access['rsw'][$context->path]
-                ));
-
-                if ($role) {
-                    $rolename = html_writer::span(format_string($role->name), 'role-name');
-                }
-            }
-
-            $loginstr = $realuserinfo . $rolename . $userlink;
         } else {
             $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
         }
-
-        if (isset($SESSION->justloggedin)) {
-            unset($SESSION->justloggedin);
-            if (!empty($CFG->displayloginfailures) && !isguestuser()) {
-                if ($count = count_login_failures($CFG->displayloginfailures,
-                        $USER->username, $USER->lastlogin)) {
-
-                    $loginstr .= '&nbsp;<div class="loginfailures">';
-
-                    if (empty($count->accounts)) {
-                        $loginstr .= get_string('failedloginattempts', '', $count);
-                    } else {
-                        $loginstr .= get_string('failedloginattemptsall', '', $count);
-                    }
-
-                    if (has_capability('coursereport/log:view', context_system::instance())) {
-                        $loginstr .= ' (' . html_writer::link(new moodle_url(
-                                        '/course/report/log/index.php', array(
-                                    'chooselog' => 1,
-                                    'id' => 1,
-                                    'modid' => 'site_errors'
-                                        )), get_string('logs')) . ')';
-                    }
-
-                    $loginstr .= '</div>';
-                }
-            }
-        }
+        
         // The help and feedback link.
         $fbl = $this->help_feedback_link();
         if ($fbl) {
@@ -261,14 +181,6 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             $logininfo[] = html_writer::link($loginurl,
                     get_string('login'),
                     array('class' => 'btn-header btn-login')
-            );
-        } else if ($addlogouturl) {
-            $icon = html_writer::tag('i', '', array('class' => 'fa fa-sign-out fa-fw visible-xs-inline'));
-            $text = html_writer::span(get_string('logout'), 'hidden-xs');
-            $logininfo[] = html_writer::link(
-                    new moodle_url('/login/logout.php', array('sesskey' => sesskey())),
-                    $text . $icon,
-                    array('class' => 'btn-header')
             );
         }
 
