@@ -26,11 +26,11 @@
 
 // Custom site logos.
 
-// First get site logo
+// First get site logo.
 $sitelogohtml = $OUTPUT->logo('ucla-logo', 'theme');
-// Get extra site logos
+// Get extra site logos.
 $extrasitelogos = $OUTPUT->course_logo();
-// Append custom logo classes
+// Append custom logo classes.
 $headerclasses = isset($OUTPUT->headerclasses) ? $OUTPUT->headerclasses : array();
 
 ?>
@@ -48,7 +48,7 @@ $headerclasses = isset($OUTPUT->headerclasses) ? $OUTPUT->headerclasses : array(
                     if ($haslogininfo) {
                         echo $OUTPUT->login_info();
                     }
-                    if (isloggedin()) {
+                    if (isloggedin() && !isguestuser()) {
                         echo $OUTPUT->user_menu();
                     }
                     ?>
@@ -65,7 +65,7 @@ $headerclasses = isset($OUTPUT->headerclasses) ? $OUTPUT->headerclasses : array(
         </div>
     </header>
 <?php
-} 
+}
 
 // Render extra site logos if available.
 if (!empty($extrasitelogos)) { ?>

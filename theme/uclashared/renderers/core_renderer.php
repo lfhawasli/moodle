@@ -46,8 +46,8 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Public theme name.
-     * 
-     * @var string 
+     *
+     * @var string
      */
     public $theme_name = 'uclashared';
 
@@ -165,10 +165,17 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         if (isloggedin()) {
             $addloginurl = false;
+
+            if (isguestuser()) {
+                 $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
+                 $addloginurl = true;
+                 $loginstr = $userlink;
+            }
+
         } else {
             $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
         }
-        
+
         // The help and feedback link.
         $fbl = $this->help_feedback_link();
         if ($fbl) {
@@ -191,7 +198,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Displays link to use to login or logout on frontpage.
-     * 
+     *
      * @return string
      */
     public function login_link() {
@@ -241,7 +248,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     /**
      * Renders the Help & Feedback dropdown menu using Moodle's own config.
      * The menu items can be modified in Appearance > Themes > Theme settings.
-     * 
+     *
      * @see $CFG->custommenuitems
      * @param custom_menu $menu
      * @return string HTML output
@@ -491,9 +498,9 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Shows sitewide 'alert' banner.
-     * 
+     *
      * @todo: right now it only works for 'red' alerts.
-     * 
+     *
      * @return string HTML
      */
     public function alert_banner() {
@@ -544,7 +551,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Set for custom course logos.  This is meant to be overridden by child themes.
-     * 
+     *
      * @return empty string
      */
     public function course_logo() {
@@ -554,7 +561,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     /**
      * Override confirmation dialog to be able to use different styles.
      * See documentation for confirm() in /lib/outputrenderers.php
-     * 
+     *
      * @param string $message
      * @param single_button|moodle_url|string $continue
      * @param single_button|moodle_url|string $cancel
@@ -662,7 +669,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         return false;
     }
-    
+
     /**
      * Change "Update this module" button to "Edit settings".
      *
