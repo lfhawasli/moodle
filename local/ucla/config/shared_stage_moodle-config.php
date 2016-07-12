@@ -524,6 +524,8 @@ $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     View self help articles|https://docs.ccle.ucla.edu/
     Read tips & updates|https://docs.ccle.ucla.edu/w/Tips_and_Updates
     Request a site|/course/request.php";
+$CFG->customusermenuitems = "grades,grades|/grade/report/mygrades.php|grades
+preferences,moodle|/user/preferences.php|preferences";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
