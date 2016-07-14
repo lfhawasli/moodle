@@ -2261,8 +2261,13 @@ class uclacoursecreator {
         $edata->completed_requests = $this->built_requests;
 
         $this->println('. Triggering event.');
-        events_trigger_legacy('course_creator_finished', $edata);
-        $this->debugln('Triggered event with ' 
+
+        $event = \tool_uclacoursecreator\event\course_creator_finished::create(array(
+            'other' => json_encode($edata)
+        ));
+        $event->trigger();
+
+        $this->debugln('Triggered event with '
             . count($edata->completed_requests) . ' requests.');
     }
 

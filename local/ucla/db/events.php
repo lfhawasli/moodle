@@ -25,11 +25,6 @@
  */
 
 $handlers = array(
-    'course_creator_finished' => array(
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction' => 'ucla_sync_built_courses',
-        'schedule'        => 'instant'
-    ),
     'course_restored' => array(
         'handlerfile'     => '/local/ucla/eventslib.php',
         'handlerfunction' => 'course_restored_enrol_check',
@@ -69,5 +64,9 @@ $observers = array(
     array(
         'eventname'   => '\core\event\user_loggedout',
         'callback'    => 'local_ucla_autologin::clear',
+    ),
+    array(
+        'eventname'   => '\tool_uclacoursecreator\event\course_creator_finished',
+        'callback'    => 'local_ucla_observer::ucla_sync_built_courses',
     ),
 );
