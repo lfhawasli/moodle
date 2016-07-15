@@ -286,13 +286,6 @@ abstract class moodleform_mod extends moodleform {
             }
         }
 
-        // START UCLA MOD: CCLE-3697
-        // disable groupmembersonly checkbox if "None" grouping is choosen
-        if ($CFG->enablegroupmembersonly) {
-            $mform->disabledIf('groupmembersonly', 'groupingid', 'eq', 0);
-        }
-        // END UCLA MOD: CCLE-3697
-
         // Completion: If necessary, freeze fields
         $completion = new completion_info($COURSE);
         if ($completion->is_enabled()) {
@@ -1052,5 +1045,4 @@ abstract class moodleform_mod extends moodleform {
         }
     }
 }
-
 
