@@ -114,6 +114,7 @@ $string['syllabusoverviewnotes'] = 'The preview syllabus percentage is counted a
 $string['syllabusreoportnotes'] = 'The manual syllabus column counts the number of manual syllabi in a course.';
 $string['syllabusieiwarning'] = 'Your query returned no results. '
         . 'Please note that this may be because IEI data for the quarter you requested has not yet been uploaded.';
+$string['tasites'] = 'TA sites by term';
 $string['mediausage'] = 'Media usage';
 $string['mediausage_help'] = 'Lists course with video content for a given term.';
 $string['syllabusrecentlinks'] = 'Recently updated syllabus links at Registrar';

@@ -2131,7 +2131,6 @@ if ($displayforms) {
 
 $consoles->push_console_html('users', $title, $sectionhtml);
 
-
 ////////////////////////////////////////////////////////////////////
 $title = "listdupusers";
 $sectionhtml = '';
@@ -2253,6 +2252,36 @@ if ($displayforms) {
 $consoles->push_console_html('users', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
+$title = "tasites";
+$sectionhtml = '';
+
+if ($displayforms) {
+    $sectionhtml = supportconsole_simple_form($title, get_term_selector($title));
+} else if ($consolecommand == "$title") {
+    $selectedterm = required_param('term', PARAM_ALPHANUM);
+    $sql = "SELECT DISTINCT tasite.id, tasite.shortname, tasite.fullname
+                       FROM {course} tasite
+                       JOIN {ucla_siteindicator} si ON si.courseid = tasite.id
+                       JOIN {enrol} meta ON meta.courseid = tasite.id
+                       JOIN {course} c ON c.id = meta.customint1
+                       JOIN {ucla_request_classes} urc ON urc.courseid = c.id
+                      WHERE si.type = 'tasite'
+                            AND urc.term = :selectedterm";
+    $results = $DB->get_records_sql($sql, array('selectedterm' => $selectedterm));
+    
+    $newresults = array();
+    foreach ($results as $k => $result) {
+        $result->shortname = html_writer::link(new moodle_url('/course/view.php',
+                array('id' => $result->id)), $result->shortname,
+                array('target' => '_blank'));
+        $newresults[$k] = $result;
+    }
+    
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $newresults);
+}
+$consoles->push_console_html('users', $title, $sectionhtml);
+
+////////////////////////////////////////////////////////////////////
 $title = "mediausage";
 $sectionhtml = '';
 if ($displayforms) {
@@ -2366,7 +2395,6 @@ if ($displayforms) {
                 $course->shortname,
                 array('target' => '_blank'));
     }
-
 
     unset($params['contextlevel']);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $results,
