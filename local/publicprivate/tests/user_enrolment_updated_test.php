@@ -74,6 +74,9 @@ class user_enrolment_updated_testcase extends advanced_testcase {
 
         // Enable each plugin and enrol the user in them.
         foreach ($enable as $eplugin) {
+            if ($eplugin == 'guest') {
+                continue;
+            }
             $params = array('courseid' => $this->class->courseid, 'enrol' => $eplugin);
             $instance = $DB->get_record('enrol', $params);
             $plugin = enrol_get_plugin($eplugin);
@@ -92,6 +95,9 @@ class user_enrolment_updated_testcase extends advanced_testcase {
 
         // Suspend user from the to suspend plugins.
         foreach ($suspend as $splugin) {
+            if ($splugin == 'guest') {
+                continue;
+            }
             $plugins[$splugin]->update_user_enrol($instances[$splugin], $user->id, ENROL_USER_SUSPENDED);
         }
 
