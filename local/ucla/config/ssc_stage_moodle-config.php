@@ -491,6 +491,8 @@ $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     FAQs and Tutorials|https://moodle2.sscnet.ucla.edu/docs/Main_Page
     Request a site|/course/request.php";
+$CFG->customusermenuitems = "grades,grades|/grade/report/mygrades.php|grades
+preferences,moodle|/user/preferences.php|preferences";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
