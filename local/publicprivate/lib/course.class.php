@@ -64,7 +64,7 @@ class PublicPrivate_Course {
 
         if (is_scalar($course)) {
             try {
-                $this->_course = get_course($course);
+                $this->_course =  $DB->get_record('course', array('id' => $course), '*', MUST_EXIST);
             } catch (DML_Exception $e) {
                 throw new PublicPrivate_Course_Exception('Database query failed for __construct.', 100, $e);
             }
