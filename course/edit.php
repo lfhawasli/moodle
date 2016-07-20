@@ -189,6 +189,15 @@ if ($editform->is_cancelled()) {
     } else {
         // Save any changes to the files used in the editor.
         update_course($data, $editoroptions);
+        
+        // START UCLA MOD CCLE-2389 - update site indicator
+        // CCLE-3402/CCLE-3401 - only update if non-srs course
+        $iscoursesite = ucla_map_courseid_to_termsrses($course->id);
+        if (empty($iscoursesite)) {
+            siteindicator_manager::update_site($data);
+        }
+        // END UCLA MOD CCLE-2389           
+        
         // Set the URL to take them too if they choose save and display.
         $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
     }
