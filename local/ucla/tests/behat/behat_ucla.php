@@ -178,13 +178,13 @@ class behat_ucla extends behat_files {
 
                 // Forward the data to Moodle's data generators.
                 $this->execute('behat_data_generators::the_following_exist',
-                        array('role assigns', new TableNode($data)));
+                        array('role assigns', $data));
                 break;
 
             case 'activities':
                 require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
                 $this->execute('behat_data_generators::the_following_exist',
-                        array('activities', new TableNode($data)));
+                        array('activities', $data));
                 // Make each activity either public or private (default).
                 foreach ($data->getHash() as $elementdata) {
                     if (!empty($elementdata['private'])) {
@@ -302,26 +302,27 @@ class behat_ucla extends behat_files {
     public function ucla_site_exist($site) {
         global $DB;
 
-        $data = "| fullname | shortname | type |
-                 | $site site | $site site | $site |";
+        $data = array();
+        $data[0] = array('fullname', 'shortname','type');
+        $data[1] = array("$site site", "$site site", $site);
         $this->generate_ucla_sites(new TableNode($data));
 
         // Call Moodle's own generator to create users and enrollments.
         // First create users.
-        $data = '| username | firstname | lastname | email |
-                | instructor | Editing | Instructor | instructor@asd.com |
-                | student | Stu | Dent | student1@asd.com |';
-
+        $data = array();
+        $data[0] = array('username', 'firstname', 'lastname', 'email');
+        $data[1] = array('instructor', 'Editing', 'Instructor', 'instructor@asd.com');
+        $data[2] = array('student', 'Stu', 'Dent', 'student1@asd.com');
         $this->execute('behat_data_generators::the_following_exist',
                 array('users', new TableNode($data)));
 
         // Now create enrollments.
         $shortnames = array_keys($this->courses);    // Use newly created course above.
         $shortname = reset($shortnames);
-        $data = "| user | course | role |
-                | instructor | {$shortname} | editinginstructor |
-                | student | {$shortname} | student |";
-
+        $data = array();
+        $data[0] = array('user', 'course', 'role');
+        $data[1] = array('instructor', $shortname, 'editinginstructor');
+        $data[2] = array('student', $shortname, 'student');
         $this->the_following_exist('course enrolments', new TableNode($data));
     }
 
