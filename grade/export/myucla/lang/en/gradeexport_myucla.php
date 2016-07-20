@@ -7,3 +7,4 @@ $string['invalididsexplanation'] = 'The students listed below do not have valid 
 $string['pluginname'] = 'MyUCLA Gradebook Express format';
 $string['myucla:view'] = 'Use MyUCLA Gradebook Express grade export';
 $string['myucla:publish'] = 'Publish MyUCLA Gradebook Express grade export';
+$string['doublecheckwarning'] = 'Please double check your grades before exporting. The grades calculated for this export are the grades AS IS. Empty item grades will not be filled with zero\'s.';
