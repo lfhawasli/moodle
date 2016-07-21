@@ -133,6 +133,9 @@ $string['defaultteam'] = 'Default group';
 $string['deleteallsubmissions'] = 'Delete all submissions';
 $string['description'] = 'Description';
 $string['downloadall'] = 'Download all submissions';
+// START UCLA MOD: CCLE-4953 - Assignment download file names
+$string['downloadalluid'] = 'Download all UID submissions';
+// END UCLA MOD: CCLE-4953
 $string['download all submissions'] = 'Download all submissions in a zip file.';
 $string['downloadselectedsubmissions'] = 'Download selected submissions';
 $string['duedate'] = 'Due date';
