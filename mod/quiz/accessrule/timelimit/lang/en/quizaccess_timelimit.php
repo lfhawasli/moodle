@@ -26,8 +26,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
-$string['confirmstartheader'] = 'Timed quiz';
-$string['confirmstart'] = 'The quiz has a time limit of {$a}. Time will count down from the moment you start your attempt and you must submit before it expires. Are you sure that you wish to start now?';
+// START UCLA MOD CCLE-5699 Fixed Quiz Confirmation.
+//$string['confirmstartheader'] = 'Timed quiz';
+//$string['confirmstart'] = 'The quiz has a time limit of {$a}. Time will count down from the moment you start your attempt and you must submit before it expires. Are you sure that you wish to start now?';
+$string['confirmstartheader'] = 'Warning: Timed Quiz';
+$string['confirmstart'] = '<i class="fa fa-arrow-right" aria-hidden="true"></i>
+ The quiz has a time limit of {$a->timelimit}.<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ You can ONLY attempt the quiz {$a->attempts} time(s).<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ Time will count down from the moment you start your attempt.<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ You must click the Submit button before time expires.<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ Are you sure that you wish to start now?';
+$string['confirmstartnolimit'] = '<i class="fa fa-arrow-right" aria-hidden="true"></i>
+ The quiz has a time limit of {$a}.<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ Time will count down from the moment you start your attempt.<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ You must click the Submit button before time expires.<br><i class="fa fa-arrow-right" aria-hidden="true"></i>
+ Are you sure that you wish to start now?';
+// END UCLA MOD CCLE-5699 Fixed Quiz Confirmation.
 $string['pluginname'] = 'Time limit quiz access rule';
 $string['quiztimelimit'] = 'Time limit: {$a}';

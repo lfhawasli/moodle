@@ -74,7 +74,15 @@ class quizaccess_timelimit extends quiz_access_rule_base {
             MoodleQuickForm $mform, $attemptid) {
         $mform->addElement('header', 'honestycheckheader',
                 get_string('confirmstartheader', 'quizaccess_timelimit'));
-        $mform->addElement('static', 'honestycheckmessage', '',
-                get_string('confirmstart', 'quizaccess_timelimit', format_time($this->quiz->timelimit)));
+        // START UCLA MOD CCLE-5699 Fixed Quiz Confirmation.
+        if ($this->quiz->attempts != 0) {
+            $a = (object)array('timelimit'=>format_time($this->quiz->timelimit), 'attempts'=>$this->quiz->attempts);
+            $mform->addElement('static', 'honestycheckmessage', '',
+                    get_string('confirmstart', 'quizaccess_timelimit', $a));
+        } else {
+            $mform->addElement('static', 'honestycheckmessage', '',
+                    get_string('confirmstartnolimit', 'quizaccess_timelimit', format_time($this->quiz->timelimit)));
+        }
+        // END UCLA MOD CCLE-5699 Fixed Quiz Confirmation.
     }
 }

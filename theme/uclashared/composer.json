@@ -17,11 +17,11 @@
             "package": {
                 "name" : "salvattore",
                 "minimum-stability": "dev",
-                "version": "dev-master",
+                "version": "1.0.9",
                 "source": {
                     "url": "git@github.com:rnmp/salvattore.git",
                     "type": "git",
-                    "reference": "dev-master"
+                    "reference": "v1.0.9"
                 }
             }
         }
@@ -31,7 +31,7 @@
         "twbs/bootstrap-sass": "3.2.0",
         "semantic/ui": "dev-master#b4d60ed52095ab923b81900337da7562470c20d2",
         "headroom.js": "0.7.0",
-        "salvattore": "dev-master#aae8f25c1e98a57d3b457e8095197ed9c1a9f659"
+        "salvattore": "1.0.9"
         
     }
 }
