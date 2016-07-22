@@ -90,6 +90,9 @@ $string['expirythreshold'] = 'Notification threshold';
 $string['expirythreshold_help'] = 'How long before enrolment expiry should users be notified?';
 $string['finishenrollingusers'] = 'Finish enrolling users';
 $string['foundxcohorts'] = 'Found {$a} cohorts';
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participants page
+$string['grouping'] = 'Grouping';
+// END UCLA MOD: CCLE-5686
 $string['instanceadded'] = 'Method added';
 $string['instanceeditselfwarning'] = 'Warning:';
 $string['instanceeditselfwarningtext'] = 'You are enrolled into this course through this enrolment method, changes may affect your access to this course.';
