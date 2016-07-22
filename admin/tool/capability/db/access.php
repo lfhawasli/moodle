@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// START UCLA MOD: CCLE-5917 - Grant access to capability overview.
+// This file is part of the Zoom plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,18 +16,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * A capability to view the capability overview.
  *
  * @package    tool_capability
- * @copyright  2011 Petr Skoda
+ * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// START UCLA MOD: CCLE-5917 - Grant access to capability overview.
-//$plugin->version   = 2016052300; // The current plugin version (Date: YYYYMMDDXX).
-$plugin->version   = 2016052301; // The current plugin version (Date: YYYYMMDDXX).
+$capabilities = array(
+    'tool/capability:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+    ),
+
+);
 // END UCLA MOD: CCLE-5917
-$plugin->requires  = 2016051900; // Requires this Moodle version.
-$plugin->component = 'tool_capability'; // Full name of the plugin (used for diagnostics).
