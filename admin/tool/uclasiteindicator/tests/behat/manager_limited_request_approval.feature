@@ -39,7 +39,7 @@ Feature: Approving collab sites as a Manager Limited
     And I should see "Test collab request course"
     And I press "Approve"
     And the field "Course category" matches value "Category 1"
-    And I press "Save changes"
+    And I press "Save and display"
     And I should see "Test collab request course"
 
   Scenario: Do not allow approval of a site-request when not a Manager of that category.

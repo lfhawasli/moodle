@@ -52,6 +52,9 @@ if (!empty($approve) and confirm_sesskey()) {
     $courseid = $course->approve();
 
     if ($courseid !== false) {
+        // START UCLA MOD: CCLE-2389 - Approving site indicator site, and sending 'approved' param.
+        siteindicator_manager::approve($courseid, $approve);
+        // END UCLA MOD: CCLE-2389
         redirect(new moodle_url('/course/edit.php', ['id' => $courseid, 'returnto' => 'pending']));
     } else {
         print_error('courseapprovedfailed');
