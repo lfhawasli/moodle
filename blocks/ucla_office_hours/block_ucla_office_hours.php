@@ -587,9 +587,21 @@ class block_ucla_office_hours extends block_base {
             $calendar['R'] = get_string('thursday', 'calendar');
             $calendar['F'] = get_string('friday', 'calendar');
             foreach ($decodedsections as $srs => $section) {
-                $sections = $sections.ltrim($section->sect_no, '0');
-                $sections .= ':<br/>';
-                foreach ($section->sect_hr_to_loc as $hr => $loc) {
+                $sections .= html_writer::tag('strong',
+                        ltrim($section->sect_no, '0') . ': ');
+
+                // If there are more than one section, the add a starting <br>.
+                $sectionhours = (array) $section->sect_hr_to_loc;
+                if (count($sectionhours) > 1) {
+                    $sections .= '<br/>';
+                }
+                foreach ($sectionhours as $hr => $loc) {
+                    // Have special case for online sections.
+                    if ($hr == 'VAR') {
+                        $sections .= $loc . '<br/>';
+                        continue;
+                    }
+
                     $sections .= $loc;
                     $sections .= ' / ';
                     // Process sections hours string.
@@ -709,7 +721,10 @@ class block_ucla_office_hours extends block_base {
                 }
                 $talocationandhour = array();
                 foreach ($tacalendar as $k => $v) {
-                    if (!isset($talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
+                    // Handle online sections as a special case.
+                    if ($v['day_of_wk_cd'] == 'VAR') {
+                        $talocationandhour[$v['day_of_wk_cd']] = $v['meet_bldg'];
+                    } else if (!isset($talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
                                                     '-'.$v['meet_stop_tm']])) {
                         $talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
                                         '-'.$v['meet_stop_tm']] = $v['meet_bldg'].' '.$v['meet_room'];
