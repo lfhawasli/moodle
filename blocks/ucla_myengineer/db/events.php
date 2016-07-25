@@ -16,18 +16,17 @@
 
 /**
  * Event handlers.
- * 
+ *
  * This file contains the event handlers for the Moodle event API.
- * 
+ *
  * @package block_ucla_myengineer
  * @copyright 2013 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$handlers = array(
-    'course_creator_finished' => array(
-        'handlerfile'     => '/blocks/ucla_myengineer/eventslib.php',
-        'handlerfunction' => 'set_engineering_default',
-        'schedule'        => 'instant'
+$observers = array(
+    array(
+        'eventname' => '\tool_uclacoursecreator\event\course_creator_finished',
+        'callback'  => 'block_ucla_myengineer_observer::set_engineering_default',
     ),
 );
