@@ -178,13 +178,13 @@ class behat_ucla extends behat_files {
 
                 // Forward the data to Moodle's data generators.
                 $this->execute('behat_data_generators::the_following_exist',
-                        array('role assigns', new TableNode($data)));
+                        array('role assigns', $data));
                 break;
 
             case 'activities':
                 require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
                 $this->execute('behat_data_generators::the_following_exist',
-                        array('activities', new TableNode($data)));
+                        array('activities', $data));
                 // Make each activity either public or private (default).
                 foreach ($data->getHash() as $elementdata) {
                     if (!empty($elementdata['private'])) {
@@ -193,7 +193,12 @@ class behat_ucla extends behat_files {
                                 array('idnumber' => $elementdata['idnumber']));
                         $ppmod = PublicPrivate_Module::build($cmid);
                         $ppmod->enable();
-                    }
+                    } else {
+                        $cmid = $DB->get_field('course_modules', 'id',
+                                array('idnumber' => $elementdata['idnumber']));
+                        $ppmod = PublicPrivate_Module::build($cmid);
+                        $ppmod->disable();
+                    } 
                 }
         }
     }
