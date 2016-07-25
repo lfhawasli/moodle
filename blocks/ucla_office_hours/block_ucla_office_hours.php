@@ -596,7 +596,7 @@ class block_ucla_office_hours extends block_base {
                     $sections .= '<br/>';
                 }
                 foreach ($sectionhours as $hr => $loc) {
-                    // Have special case for online sections.
+                    // Have special case for varies sections.
                     if ($hr == 'VAR') {
                         $sections .= $loc . '<br/>';
                         continue;
@@ -604,30 +604,34 @@ class block_ucla_office_hours extends block_base {
 
                     $sections .= $loc;
                     $sections .= ' / ';
-                    // Process sections hours string.
-                    $hour = str_replace('A', 'am', $hr);
-                    $hour = str_replace('P', 'pm', $hour);
-                    switch ($hour[0]) {
-                        case 'M':
-                            $hour = str_replace('M', $calendar['M'].' ', $hour);
-                            break;
-                        case 'T':
-                            $hour = str_replace('T', $calendar['T'].' ', $hour);
-                            break;
-                        case 'W':
-                            $hour = str_replace('W', $calendar['W'].' ', $hour);
-                            break;
-                        case 'R':
-                            $hour = str_replace('R', $calendar['R'].' ', $hour);
-                            break;
-                        case 'F':
-                            $hour = str_replace('F', $calendar['F'].' ', $hour);
-                            break;
-                        default:
-                            return 'Error';
-                            break;
+
+                    // Split $hr, because should be in <days>/<hours> format.
+                    $dayhours = explode('/', $hr);
+                    if (count($dayhours) == 1) {
+                        // This is for backwards compability for sites that had
+                        // office hours created before CCLE-5415 - Indicate
+                        // online sections.
+                        $days = substr($dayhours[0], 0, 1);
+                        $hours = substr($dayhours[0], 1);
+                    } else {
+                        $days = $dayhours[0];
+                        $hours = $dayhours[1];
                     }
-                    $sections .= $hour;
+
+                    // Process sections hours string.
+                    $hours = str_replace('A', 'am', $hours);
+                    $hours = str_replace('P', 'pm', $hours);
+
+                    // Process days string.
+                    $strlen = strlen($days);
+                    $daysarray = array();
+                    for ($i=0; $i<$strlen; $i++) {
+                        $daysarray[] = $calendar[$days[$i]];
+                    }
+
+                    // Combine everything together.
+                    $sections .= implode(', ', $daysarray);
+                    $sections .= ' / ' . $hours;
                     $sections .= '<br/>';
                 }
             }
@@ -721,13 +725,20 @@ class block_ucla_office_hours extends block_base {
                 }
                 $talocationandhour = array();
                 foreach ($tacalendar as $k => $v) {
-                    // Handle online sections as a special case.
                     if ($v['day_of_wk_cd'] == 'VAR') {
+                        // If day of week varies, just list building.
                         $talocationandhour[$v['day_of_wk_cd']] = $v['meet_bldg'];
-                    } else if (!isset($talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
+                    } else if (!isset($talocationandhour[$v['day_of_wk_cd'].'/'.$v['meet_strt_tm'].
                                                     '-'.$v['meet_stop_tm']])) {
-                        $talocationandhour[$v['day_of_wk_cd'].$v['meet_strt_tm'].
-                                        '-'.$v['meet_stop_tm']] = $v['meet_bldg'].' '.$v['meet_room'];
+                        // If section is online, ignore meet_room.
+                        $location = '';
+                        if ($v['meet_bldg'] == 'ONLINE') {
+                            $location = $v['meet_bldg'];
+                        } else {
+                            $location = $v['meet_bldg'].' '.$v['meet_room'];
+                        }
+                        $talocationandhour[$v['day_of_wk_cd'].'/'.$v['meet_strt_tm'].
+                                        '-'.$v['meet_stop_tm']] = $location;
                     }
                 }
                 $newrecord['sect_hr_to_loc'] = $talocationandhour;
