@@ -32,8 +32,8 @@ Feature: Adding a resource
         Then "Test glossary name" activity should be private
         And I add a "File" to section "1"
         And I set the following fields to these values:
-          | Name | Test file name |
-          | Description | Test file description |
+          | id_name | Test file name |
+          | id_introeditor | Test file description |
         And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
         And I press "Save and return to course"
         Then "Test file name" activity should be private
@@ -90,4 +90,4 @@ Feature: Adding a resource
           | Chat                | Name of this chat room   | Description       |
           | Page                | Name                     | Page content      |
           | Forum               | Forum name               | Description       |
-          | Quiz                | Name                     | Description       |
+          | Quiz                | id_name                  | id_introeditor    |

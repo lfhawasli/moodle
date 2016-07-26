@@ -193,7 +193,12 @@ class behat_ucla extends behat_files {
                                 array('idnumber' => $elementdata['idnumber']));
                         $ppmod = PublicPrivate_Module::build($cmid);
                         $ppmod->enable();
-                    }
+                    } else {
+                        $cmid = $DB->get_field('course_modules', 'id',
+                                array('idnumber' => $elementdata['idnumber']));
+                        $ppmod = PublicPrivate_Module::build($cmid);
+                        $ppmod->disable();
+                    } 
                 }
         }
     }
