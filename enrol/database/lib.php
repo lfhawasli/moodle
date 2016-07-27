@@ -272,6 +272,9 @@ class enrol_database_plugin extends enrol_plugin {
                 } else {
                     $roleid = reset($enrols[$courseid]);
                     $this->enrol_user($instance, $user->id, $roleid, 0, 0, ENROL_USER_ACTIVE);
+                    // START UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
+                    $this->email_welcome_message($instance, $user);
+                    // END UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
                 }
             }
 
@@ -615,7 +618,7 @@ class enrol_database_plugin extends enrol_plugin {
             //if ($rs = $extdb->Execute($sql)) {
             if ($overrideenroldatabase) {
                 $requestedroles = $this->enrollmenthelper->get_requested_roles($course);
-                
+                $requestedenrols = $requestedroles; // Enroll and give roles to same people.
                 $preventfullunenrol = $this->enrollmenthelper->get_preventfullunenrol($course, $requestedroles, $onecourse);
             } else if ($rs = $extdb->Execute($sql)) {
             // END UCLA MOD: CCLE-4061
@@ -670,6 +673,9 @@ class enrol_database_plugin extends enrol_plugin {
                 foreach ($userroles as $roleid) {
                     if (empty($currentenrols[$userid])) {
                         $this->enrol_user($instance, $userid, $roleid, 0, 0, ENROL_USER_ACTIVE);
+                        // START UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
+                        $this->email_welcome_message($instance, $userid);
+                        // END UCLA MOD: CCLE-5486 Welcome message for UCLA registrar method
                         $currentroles[$userid][$roleid] = $roleid;
                         $currentenrols[$userid][$roleid] = $roleid;
                         $currentstatus[$userid] = ENROL_USER_ACTIVE;
@@ -1286,20 +1292,24 @@ class enrol_database_plugin extends enrol_plugin {
         
         $rusers = array();
         if (!empty($CFG->coursecontact)) {
+            // If found more than 1 roleid, just use first one.
             $croles = explode(',', $CFG->coursecontact);
-            list($sort, $sortparams) = users_order_by_sql('u');
-            $rusers = get_role_users($croles, $context, true, '', 'r.sortorder ASC, ' . $sort, null, '', '', '', '', $sortparams);
+            $roleid = reset($croles);
+            $userfields = 'u.id, u.username, ' . get_all_user_name_fields(true, 'u');
+            $rusers = get_role_users($roleid, $context, false, $userfields);
         }
         
         $contact = trim($instance->customchar1);
         if ($contact !== '') {
             // Do nothing.
         } else if ($rusers) {
-            $contact = reset($rusers);
+            $ruser = reset($rusers);
+            $contact = $ruser->email;
         } else {
-            $contact = core_user::get_support_user();
+            $supportuser = core_user::get_support_user();
+            $contact = $supportuser->email;
         }
-        
+
         // Directly emailing welcome message rather than using messaging.
         email_to_user($user, $contact, $subject, $messagetext, $messagehtml, '', '', true, $contact);
     }
