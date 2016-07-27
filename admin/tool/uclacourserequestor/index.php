@@ -160,7 +160,7 @@ $actionparam = optional_param('action', false, PARAM_TEXT);
 
 if ($viewformparam && $termparam && $departmentparam && $actionparam) {
     $requestorviewform = $cached_forms[UCLA_REQUESTOR_VIEW]['view'];
-    $requestviewobj = new object();
+    $requestviewobj = new stdClass();
     $requestviewobj->{$requestorviewform->groupname} = array(
         'term' => $termparam,
         'department' => $departmentparam,

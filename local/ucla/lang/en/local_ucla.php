@@ -290,3 +290,5 @@ $string['ferpawaiverdesc'] = 'Before you may continue you must agree to the foll
 $string['ferpawaivererror'] = 'FERPA waiver already signed.';
 $string['ferpawaivermoreinfo'] = '(For more information on FERPA go to {$a})';
 $string['ferpawaiverrequired'] = 'FERPA waiver needs to be signed for this course activity/resource.';
+
+$string['eventsyncenrolmentsfinished'] = 'Enrol sync finished';

@@ -784,8 +784,9 @@ class local_ucla_enrollment_helper {
             // throw up a bunch of errors.
             return;
         }
-        $eventdata = new stdClass();
-        $eventdata->courses = $courses;
-        events_trigger_legacy('sync_enrolments_finished', $eventdata);
+        $event = \local_ucla\event\sync_enrolments_finished::create(array(
+            'other' => json_encode($courses)
+        ));
+        $event->trigger();
     }
 }
