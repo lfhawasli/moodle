@@ -510,7 +510,6 @@ M.core_filepicker.show = function(Y, options) {
         M.core_filepicker.init(Y, options);
     }
     M.core_filepicker.instances[options.client_id].show();
-    document.getElementById("filepicker-"+ options.client_id).focus();
 };
 
 M.core_filepicker.set_templates = function(Y, templates) {
@@ -714,9 +713,7 @@ M.core_filepicker.init = function(Y, options) {
                     }
                 }, false);
                 this.process_dlg.hide();
-                this.detachKeyDelegation(this.process_dlg);
                 this.selectui.hide();
-                this.detachKeyDelegation(this.selectui);
             }
             if (!this.process_dlg) {
                 this.process_dlg_node = Y.Node.createWithFilesSkin(M.core_filepicker.templates.processexistingfile);
@@ -744,7 +741,6 @@ M.core_filepicker.init = function(Y, options) {
             this.process_dlg.dialogdata = data;
             this.process_dlg_node.one('.fp-dlg-butrename').setContent(M.util.get_string('renameto', 'repository', data.newfile.filename));
             this.process_dlg.show();
-            this.keyDelegation(this.process_dlg);
         },
         /** displays error instead of filepicker contents */
         display_error: function(errortext, errorcode) {
@@ -775,7 +771,6 @@ M.core_filepicker.init = function(Y, options) {
                 this.msg_dlg_node.one('.fp-msg-butok').on('click', function(e) {
                     e.preventDefault();
                     this.msg_dlg.hide();
-                    this.detachKeyDelegation(this.msg_dlg);
                 }, this);
             }
 
@@ -783,7 +778,6 @@ M.core_filepicker.init = function(Y, options) {
             this.msg_dlg_node.removeClass('fp-msg-info').removeClass('fp-msg-error').addClass('fp-msg-'+type)
             this.msg_dlg_node.one('.fp-msg-text').setContent(Y.Escape.html(msg));
             this.msg_dlg.show();
-            this.keyDelegation(this.msg_dlg);
         },
         view_files: function(appenditems) {
             this.viewbar_set_enabled(true);
@@ -903,7 +897,7 @@ M.core_filepicker.init = function(Y, options) {
                 }
             }, false);
         },
-        classnamecallback : function(node) {
+       classnamecallback : function(node) {
             var classname = '';
             if (node.children) {
                 classname = classname + ' fp-folder';
@@ -1233,7 +1227,6 @@ M.core_filepicker.init = function(Y, options) {
             cancel.on('click', function(e) {
                 e.preventDefault();
                 this.selectui.hide();
-                this.detachKeyDelegation(this.selectui);
             }, this);
         },
         wait: function() {
@@ -1918,17 +1911,13 @@ M.core_filepicker.init = function(Y, options) {
         },
         hide: function() {
             this.selectui.hide();
-            this.detachKeyDelegation(this.selectui);
             if (this.process_dlg) {
                 this.process_dlg.hide();
-                this.detachKeyDelegation(this.process_dlg);
             }
             if (this.msg_dlg) {
                 this.msg_dlg.hide();
-                this.detachKeyDelegation(this.msg_dlg);
             }
             this.mainui.hide();
-            this.detachKeyDelegation(this.mainui);
         },
         show: function() {
             if (this.fpnode) {
@@ -1938,7 +1927,6 @@ M.core_filepicker.init = function(Y, options) {
             } else {
                 this.launch();
             }
-            this.keyDelegation(this.mainui);
         },
         launch: function() {
             this.render();
