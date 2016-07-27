@@ -1121,6 +1121,13 @@ class assign {
      */
     protected function add_plugin_settings(assign_plugin $plugin, MoodleQuickForm $mform, & $pluginsenabled) {
         global $CFG;
+
+        // START UCLA MOD: CCLE-5968 - Simplify assignment settings.
+        global $PAGE;
+        $PAGE->requires->yui_module('moodle-local_ucla-submissiontype',
+                'M.local_ucla.submissiontype.init');
+        // END UCLA MOD: CCLE-5968
+        
         if ($plugin->is_visible() && !$plugin->is_configurable() && $plugin->is_enabled()) {
             $name = $plugin->get_subtype() . '_' . $plugin->get_type() . '_enabled';
             $pluginsenabled[] = $mform->createElement('hidden', $name, 1);
