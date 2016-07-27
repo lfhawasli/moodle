@@ -18,11 +18,12 @@ class behat_course_download extends behat_base {
      */
     public function i_upload_file_to_section($filepath, $name, $section) {
 
-        $table = new TableNode('| Name | '.$name.' |
-                        | Description | '.$name.' description |');
+        $table = array();
+        $table[0] = array('Name', $name);
+        $table[1] = array('Description', "$name description");
         return array(
             new Given('I add a "File" to section "' . $section . '"'),
-            new Given('I set the following fields to these values:', $table),
+            new Given('I set the following fields to these values:', new TableNode($table)),
             new Given('I upload "'.$filepath.'" file to "Select files" filemanager'),
             new Given('I press "Save and return to course"')
         );

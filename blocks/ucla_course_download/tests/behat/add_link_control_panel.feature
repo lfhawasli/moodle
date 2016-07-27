@@ -29,7 +29,7 @@ Feature: Add link to Control Panel
     And I follow "Edit settings"
     And I expand all fieldsets
     When I set the field "Download course materials" to "No"
-    And I press "Save changes"
+    And I press "Save and display"
     And I press "Control Panel"
     Then I should see "Disabled for students" in the "region-main" "region"
     And I log out
@@ -45,7 +45,7 @@ Feature: Add link to Control Panel
     And I follow "Edit settings"
     And I expand all fieldsets
     When I set the field "Download course materials" to "Yes"
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
     And it is "3rd" week
     And I log in as "student1"
@@ -69,7 +69,7 @@ Feature: Add link to Control Panel
     And I follow "Edit settings"
     And I expand all fieldsets
     When I set the field "Download course materials" to "No"
-    And I press "Save changes"
+    And I press "Save and display"
     And I press "Control Panel"
     Then I should see "Disabled for students" in the "region-main" "region"
     When I log out
@@ -88,7 +88,7 @@ Feature: Add link to Control Panel
     And I follow "Edit settings"
     And I expand all fieldsets
     When I set the field "Download course materials" to "Yes"
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
     And I log in as "<student>"
     And I follow "collab test"
