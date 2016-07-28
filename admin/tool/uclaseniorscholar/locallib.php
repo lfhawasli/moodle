@@ -177,7 +177,7 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 $contactuser->firstname = '';
                 $contactuser->lastname = '';
                 $contactuser->maildisplay = true;
-                $contactuser->id = $this->get_invitee_id();
+                $contactuser->id = 0;
                 // Moodle 2.7 introduced new username fields.
                 $contactuser->alternatename = '';
                 $contactuser->firstnamephonetic = '';

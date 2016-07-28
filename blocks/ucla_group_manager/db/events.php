@@ -24,10 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$handlers = array(
-    'sync_enrolments_finished' => array(
-        'handlerfile'     => '/blocks/ucla_group_manager/eventslib.php',
-        'handlerfunction' => 'ucla_group_manager_sync_course_event',
-        'schedule'        => 'instant'
-    )
+$observers = array(
+    array(
+        'eventname'   => '\local_ucla\event\sync_enrolments_finished',
+        'callback'    => 'block_ucla_group_manager_observer::ucla_group_manager_sync_course_event',
+    ),
 );

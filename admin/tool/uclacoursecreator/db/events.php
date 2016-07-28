@@ -1,28 +1,32 @@
 <?php
-/*
- * Definition of event triggers related to course management (creating, building
- * and destroying).
+// This file is part of the UCLA site indicator for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Event handlers.
+ *
+ * @package    tool_uclasiteindicator
+ * @copyright  2016 UC Regent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* Build courses now:
- *  - For DEV/TEST/STAGE environments, trigger a course build at the next cron
- */
+defined('MOODLE_INTERNAL') || die();
 
-/* Course Deletion:
- *  - ensure that if a course has a My.UCLA url pointing to it, it should be
- *    cleared
- *  - ensure that entry in ucla_request_classes table is deleted
- */
-
-$handlers = array (
-    'build_courses_now' => array (
-         'handlerfile'      => '/admin/tool/uclacoursecreator/eventlib.php',
-         'handlerfunction'  => 'build_courses_now',
-         'schedule'         => 'cron'
-     ), 
-    'course_deleted' => array (
-         'handlerfile'      => '/admin/tool/uclacoursecreator/eventlib.php',
-         'handlerfunction'  => 'handle_course_deleted',
-         'schedule'         => 'instant'
-     ),
+$observers = array(
+    array(
+        'eventname' => '\core\event\course_deleted',
+        'callback'  => 'tool_uclacoursecreator_observer::handle_course_deleted'
+    ),
 );

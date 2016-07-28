@@ -15,32 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Events for group management block.
+ * Event handler class.
  *
  * @package    block_ucla_group_manager
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/ucla_group_manager/lib.php');
 
 /**
- * Updates the groups of the given courses.
+ * Event handler class file.
  *
- * Called when Registrar enrollment plugin runs.
- *
- * @param object $edata
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-function ucla_group_manager_sync_course_event($edata) {
-    // Extract out what enrolments got updates.
-    if (empty($edata->courses)) {
-        return true;
-    }
+class block_ucla_group_manager_observer {
+    /**
+     * Updates the groups of the given courses.
+     *
+     * Called when Registrar enrollment plugin runs.
+     *
+     * @param \local_ucla\event\sync_enrolments_finished $event
+     * @return boolean
+     */
+    public static function ucla_group_manager_sync_course_event(\local_ucla\event\sync_enrolments_finished $event) {
+        // Extract out what enrolments got updates.
+        $courses = $event->get_courses();
+        if (empty($courses)) {
+            return true;
+        }
 
-    foreach ($edata->courses as $courseid => $course) {
-        $uclagroupmanager = new ucla_group_manager();
-        $uclagroupmanager->sync_course($courseid);
+        foreach ($courses as $courseid => $course) {
+            $uclagroupmanager = new ucla_group_manager();
+            $uclagroupmanager->sync_course($courseid);
+        }
+        return true;
     }
 }

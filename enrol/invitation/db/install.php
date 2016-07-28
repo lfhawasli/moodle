@@ -23,7 +23,6 @@
  */
 
 global $CFG;
-require_once($CFG->dirroot . '/enrol/invitation/eventslib.php');
 require_once($CFG->libdir . '/enrollib.php');
 
 /**
@@ -48,6 +47,7 @@ function xmldb_enrol_invitation_install() {
     // very many courses and loading them all into memory would crash the system.
     // See http://docs.moodle.org/dev/Datalib_Notes
     // and http://docs.moodle.org/dev/Data_manipulation_API#Using_Recordsets.
+    $invitation = enrol_get_plugin('invitation');
     $courses_records = $DB->get_recordset('course');
     foreach ($courses_records as $course) {
         // Make sure that we aren't adding the SITEID.
@@ -55,7 +55,8 @@ function xmldb_enrol_invitation_install() {
             continue;
         }
 
-        if (!add_site_invitation_plugin($course)) {
+        $instanceid = $invitation->add_instance($course);
+        if (is_null($instanceid)) {
             debugging('Cannot add enrol plugin for courseid ' . $course->id);
         }
     }

@@ -238,6 +238,16 @@ class enrol_invitation_plugin extends enrol_plugin {
     }
 
     /**
+     * It is possible to hide/show enrol instance via standard UI.
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        return true;
+    }
+
+    /**
      * If site invite is using the Temporary Participant role, then need to
      * periodically check and remove the role if it is expired.
      *

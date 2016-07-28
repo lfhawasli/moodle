@@ -55,3 +55,5 @@ $string['cron_quit_out'] = 'This is most likely a moodle cron instance... Quitti
 $string['checklogs'] = 'Please check the logs for more details';
 $string['checkterms'] = 'Select the term to build courses';
 $string['cachedef_previouscourses'] = 'Stores instructors previous courses for course creator email templates';
+$string['eventcoursecreatorfinished'] = 'UCLA course creator finished';
+$string['eventuclacoursedeleted'] = 'UCLA course(s) deleted';
