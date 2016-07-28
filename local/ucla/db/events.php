@@ -25,16 +25,6 @@
  */
 
 $handlers = array(
-    'course_restored' => array(
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction' => 'course_restored_enrol_check',
-        'schedule'        => 'instant'
-    ),
-    'course_restored' => array(
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction' => 'course_restored_dedup_default_forums',
-        'schedule'        => 'instant'
-    ),
     'ucla_course_deleted' => array(
         'handlerfile'     => '/local/ucla/eventslib.php',
         'handlerfunction' => 'clear_srdb_ucla_syllabus',
@@ -61,6 +51,14 @@ $handlers = array(
 );
 
 $observers = array(
+    array(
+        'eventname'   => '\core\event\course_restored',
+        'callback'    => 'local_ucla_observer::course_restored_dedup_default_forums',
+    ),
+    array(
+        'eventname'   => '\core\event\course_restored',
+        'callback'    => 'local_ucla_observer::course_restored_enrol_check',
+    ),
     array(
         'eventname'   => '\core\event\user_loggedout',
         'callback'    => 'local_ucla_autologin::clear',

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Version         YYYYMMDDVV.
-$plugin->version = 2016071400;
-$plugin->requires = 2013111800; // Moodle 2.6.
-$plugin->component = 'local_ucla';
+// Version            YYYYMMDDVV.
+$plugin->version    = 2016072700;
+$plugin->requires   = 2014051200;   // Requires Moodle 2.7 or later.
+$plugin->component  = 'local_ucla';
