@@ -94,7 +94,7 @@ class PublicPrivate_Module {
         require_once("$CFG->libdir/db/upgradelib.php");
 
         $ppgrouping = $this->_publicprivate_course()->get_grouping();
-        $availability = json_decode($this->_course_module()->availability);
+        $availability = $this->_course_module()->availability;
         $newavailability = upgrade_group_members_only($ppgrouping, $availability);
         return $DB->set_field('course_modules', 'availability', $newavailability,
                 array('id' => $this->_course_module()->id));

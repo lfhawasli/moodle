@@ -28,7 +28,7 @@ class behat_publicprivate extends behat_base {
     public function activity_should_be_private($activityname) {
         $activitynode = $this->get_activity_node($activityname);
 
-        // Should have "Private Course Material" grouping label in the availability info div.
+        // Should have "Private Course Material" availability info.
         $exception = new ExpectationException('"' . $activityname . '" is not private', $this->getSession());
         $grouping = $this->find('css', 'div.availabilityinfo', $exception, $activitynode);
         
@@ -45,7 +45,7 @@ class behat_publicprivate extends behat_base {
     public function activity_should_be_public($activityname) {
         $activitynode = $this->get_activity_node($activityname);
 
-        // Should not have availability information.
+        // Should not have availability info.
         try {
             $this->find('css', 'div.availabilityinfo', false, $activitynode);
             throw new ExpectationException('"' . $activityname . '" is not public', $this->getSession());
