@@ -542,6 +542,8 @@ $string['sortbydiscussionname'] = 'title';
 $string['sortbytime'] = 'time';
 $string['sortbyuser'] = 'user';
 $string['modeprint'] = 'Printer-friendly version';
+$string['modeexport'] = 'Export the entire forum';
+$string['mustprovidediscussionorpostorforum'] = 'You must provide either a forum id, discussion id or post id to export';
 // END UCLA MOD: CCLE-4882 forum customization.
 
 // Deprecated since Moodle 3.0.
