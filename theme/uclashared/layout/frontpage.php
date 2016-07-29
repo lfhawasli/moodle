@@ -57,6 +57,9 @@ echo $OUTPUT->doctype() ?>
 <div id="page" class="env-<?php echo $envflag ?>">
 
     <header id="page-header" class="">
+        <div class="water-mark">
+            <?php    echo '<a href="http://www.owenweitzel.com" target="_blank">' . get_string('watermark', 'theme_uclashared') . '</a>'; ?>
+        </div>
         <div class="header-main">
             <div class="header-logo" >
                 <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
