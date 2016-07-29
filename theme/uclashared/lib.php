@@ -47,3 +47,26 @@ function theme_uclashared_page_init(moodle_page $page) {
         local_ucla_autologin::detect();
     }
 }
+
+/*
+ * Pulls random image for homepage background
+ * and saves it to session cache.
+ *
+ * Returns $image.
+ */
+function theme_uclashared_frontpageimage() {
+        global $CFG;
+        $frontpageimagecache = cache::make('theme_uclashared', 'frontpageimage');
+
+        if(!($frontpageimagecache->get('image'))) {
+            $imagedir = $CFG->dirroot . "/theme/uclashared/pix/frontpageimages";
+            $files = glob($imagedir . '/*.*');
+            $file = array_rand($files);
+            $filename = basename($files[$file]);
+            $image = $imagedir . "/" . $filename;
+            $frontpageimagecache->set('image', $image);
+        } else {
+            $image = $frontpageimagecache->get('image');
+        }
+        return $image;
+    }

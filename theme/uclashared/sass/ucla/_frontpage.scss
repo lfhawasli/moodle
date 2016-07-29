@@ -57,16 +57,17 @@ $frontpage-logo-bar-width:  175px;
             text-align: right;
             z-index: 100;
             
-            a:link {
+            p {
                 text-decoration: none;
-                background: #444;
-                color: #ddd;
-            }
-            
-            a:visited {
-                text-decoration: none;
-                color: #ddd;
-            }
+                font-weight: 300;
+                font-size: 1.4rem;
+                color: rgba(255,255,255,.65);
+ 
+                &:hover {
+                    text-decoration: none;
+                    color: #eee;
+                }
+            } 
         }
         .header-main {
             background: none;
