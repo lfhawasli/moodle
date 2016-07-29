@@ -6,21 +6,20 @@ Feature: Hidden section label
 
   Background: UCLA environment and srs site exists
     Given I am in a ucla environment
+    And the following ucla "sites" exist:
+      | fullname | shortname | type |
+      | Course 1 | C1 | srs |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
-    And the following ucla "sites" exist:
-      | fullname | shortname | type |
-      | course 1 | C1 | srs |
     And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
-
-  @javascript
-  Scenario: Verify visibility of 'hidden' label
     And I log in as "teacher1"
     And I browse to site "C1"
-    And I turn editing mode on
+
+  Scenario: Verify visibility of 'hidden' label
+    Given I turn editing mode on
     And I follow the "Week 3" section in the ucla site menu
     And I hide section "3"
     And I follow the "Week 2" section in the ucla site menu
