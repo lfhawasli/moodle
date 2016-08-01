@@ -53,7 +53,16 @@ if ($invalidinvite or $oldinvite) {
             'other' => $course->fullname
             ));
     $event->trigger();
-    throw new moodle_exception('expiredtoken', 'enrol_invitation');
+
+    // Create error page for expired enrol token.
+    $return = new moodle_url('/');
+    $PAGE->set_url('/admin/enrol.php');
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    echo $OUTPUT->notification(get_string('expiredtoken','enrol_invitation'), 'enrol_invitation');
+    echo $OUTPUT->continue_button($return);
+    echo $OUTPUT->footer();
+    exit;
 }
 
 // Set up page.
