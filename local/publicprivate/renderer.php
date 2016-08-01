@@ -141,4 +141,53 @@ class local_publicprivate_renderer extends core_course_renderer {
         return parent::course_section_cm_name($mod, $displayoptions);
     }
 
+    /**
+     * Renders html to display the module content on the course page (i.e. text of the labels)
+     *
+     * @param cm_info $mod
+     * @param array $displayoptions
+     * @return string
+     */
+    public function course_section_cm_text(cm_info $mod, $displayoptions = array()) {
+        $output = '';
+        if (!$mod->uservisible && empty($mod->availableinfo)) {
+            // Nothing to be displayed to the user.
+            return $output;
+        }
+        $content = $mod->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
+        $accesstext = '';
+        $textclasses = '';
+        if ($mod->uservisible) {
+            $conditionalhidden = $this->is_cm_conditionally_hidden($mod);
+            $accessiblebutdim = (!$mod->visible || $conditionalhidden) &&
+                has_capability('moodle/course:viewhiddenactivities', $mod->context);
+            if (!$mod->visible) {
+                $textclasses .= ' dimmed_text';
+            }
+            if ($accessiblebutdim) {
+                if ($conditionalhidden) {
+                    $textclasses .= ' conditionalhidden';
+                }
+                // Show accessibility note only if user can access the module himself.
+                $accesstext = get_accesshide(get_string('hiddenfromstudents').':'. $mod->modfullname);
+            }
+        } else {
+            $textclasses .= ' dimmed_text';
+        }
+        if ($mod->url) {
+            if ($content) {
+                // If specified, display extra content after link.
+                $output = html_writer::tag('div', $content, array('class' => 
+                        trim('contentafterlink ' . $textclasses)));
+            }
+        } else {
+            $groupinglabel = $mod->get_grouping_label($textclasses);
+
+            // No link, so display only content.
+            $output = html_writer::tag('div', $accesstext . $content . $groupinglabel,
+                    array('class' => 'contentwithoutlink ' . $textclasses));
+        }
+        return $output;
+    }
+
 }
