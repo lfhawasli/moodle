@@ -726,7 +726,10 @@ $string['multilangforceold'] = 'Force old multilang syntax: &lt;span&gt; without
 $string['mustenablestats'] = 'Statistics have not yet been enabled on this site.';
 $string['mycoursesperpage'] = 'Number of courses';
 $string['mydashboard'] = 'System default dashboard';
-$string['mymoodle'] = 'Dashboard';
+// START UCLA MOD: CCLE-6044 - Dashboard improvements aka "My Sites"
+// $string['mymoodle'] = 'Dashboard';
+$string['mymoodle'] = 'My sites';
+// END UCLA MOD: CCLE-6044
 $string['mymoodleredirect'] = 'Force users to use My Moodle';
 $string['mypage'] = 'Default Dashboard page';
 $string['myprofile'] = 'Default profile page';

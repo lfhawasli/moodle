@@ -1223,7 +1223,14 @@ $string['mycourses'] = 'My courses';
 $string['myfiles'] = 'My private files';
 $string['myfilesmanage'] = 'Manage my private files';
 $string['privatefilesmanage'] = 'Manage private files';
-$string['myhome'] = 'Dashboard';
+// START UCLA MOD: CCLE-6044 - Dashboard improvements aka "My Sites"
+// $string['myhome'] = 'Dashboard';
+if ($CFG->theme == 'uclashared' || $CFG->theme == 'uclasharedcourse') {
+    $string['myhome'] = 'My sites';
+} else {
+    $string['myhome'] = 'Dashboard';
+}
+// END UCLA MOD: CCLE-6044
 $string['mymoodledashboard'] = 'My Moodle dashboard';
 $string['myprofile'] = 'My profile';
 $string['name'] = 'Name';
