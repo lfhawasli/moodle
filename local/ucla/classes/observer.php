@@ -133,6 +133,64 @@ class local_ucla_observer {
     }
 
     /**
+     * Determines if, given current week, whether or not to hide the past term's
+     * courses. Uses local_ucla|student_access_ends_week to determine if courses
+     * should be hidden.
+     *
+     * If local_ucla|student_access_ends_week is 0, not set, or not equal to
+     * $weeknum then will do nothing.
+     *
+     * If local_ucla|student_access_ends_week is equal to $weeknum, then will hide
+     * the previous term's courses.
+     *
+     * @param \block_ucla_weeksdisplay\event\week_changed $event
+     */
+    public static function hide_past_courses(\block_ucla_weeksdisplay\event\week_changed $event) {
+        global $CFG;
+
+        $weeknum = $event->other['week'];
+        $configweek = get_config('local_ucla', 'student_access_ends_week');
+
+        // If local_ucla|student_access_ends_week is 0, not set, or not equal to
+        // $weeknum then will do nothing.
+        if (empty($configweek) || $configweek != $weeknum) {
+            return true;
+        }
+
+        // If local_ucla|student_access_ends_week is equal to $weeknum, then will
+        // hide the previous term's courses.
+        if (empty($CFG->currentterm)) {
+            // For some reason, currentterm is empty, just exit.
+            return true;
+        }
+
+        $pastterm = term_get_prev($CFG->currentterm);
+        if (!ucla_validator('term', $pastterm)) {
+            // Strange, cannot figure out past_term, just exit.
+            return true;
+        }
+
+        list($numhiddencourses, $numhiddentasites, $numproblemcourses,
+                $errormessages) = hide_courses($pastterm);
+
+        // Finished hiding courses, notify admins.
+        $to = get_config('local_ucla', 'admin_email');
+        if (empty($to)) {
+            // Did not have admin contact setup, just exit.
+            return true;
+        }
+
+        $subj = 'Hiding courses for ' . $pastterm;
+        $body = sprintf("Hid %d courses.\n\n", $numhiddencourses);
+        $body .= sprintf("Hid %d TA sites.\n\n", $numhiddentasites);
+        $body .= sprintf("Had %d problem courses.\n\n", $numproblemcourses);
+        $body .= $errormessages;
+        ucla_send_mail($to, $subj, $body);
+
+        return true;
+    }
+
+    /**
      * After courses are built, run prepop on them.
      *
      * @param \tool_uclacoursecreator\event\course_creator_finished $event

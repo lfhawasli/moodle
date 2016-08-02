@@ -52,6 +52,10 @@ $handlers = array(
 
 $observers = array(
     array(
+        'eventname'  => '\block_ucla_weeksdisplay\event\week_changed',
+        'callback'    => 'local_ucla_observer::hide_past_courses',
+    ),
+    array(
         'eventname'   => '\core\event\course_restored',
         'callback'    => 'local_ucla_observer::course_restored_dedup_default_forums',
     ),

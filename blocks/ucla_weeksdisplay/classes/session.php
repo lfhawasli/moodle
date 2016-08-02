@@ -432,7 +432,17 @@ abstract class block_ucla_weeksdisplay_session {
      * Saves the current week.
      */
     public function save_current_week() {
-        set_config('current_week', $this->current_week(), 'local_ucla');
+        // If week changed, trigger event.
+        $oldweek = get_config('local_ucla', 'current_week');
+        $currentweek = $this->current_week();
+        if ($oldweek != $currentweek) {
+            set_config('current_week', $currentweek, 'local_ucla');
+            $event = block_ucla_weeksdisplay\event\week_changed::create(
+                    array (
+                        'other' => array('week' => $currentweek)
+                        ));
+            $event->trigger();
+        }
     }
 
     /**
