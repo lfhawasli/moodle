@@ -1,5 +1,4 @@
 <?php
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/ucla/lib.php');
@@ -11,7 +10,7 @@ class block_ucla_bruincast extends block_base {
      */
     public function init() {
 
-        // initialize title and name
+        // Initialize title and name.
         $this->title = get_string('title', 'block_ucla_bruincast');
         $this->name = get_string('pluginname', 'block_ucla_bruincast');
     }
@@ -39,106 +38,19 @@ class block_ucla_bruincast extends block_base {
      */
     public static function get_navigation_nodes($course) {
         global $DB;
-
-        $courseid = $course['course']->id; // Course id from the hook function.
-
         $nodes = array();
+        $courseid = $course['course']->id;
 
-        // Links will be indexed as: [coursetitle][restriction] => url.
-        $links = array();
+        $recordsfound = $DB->record_exists('ucla_bruincast',
+                array('courseid' => $courseid));
 
-        if ($matchingcourses = $DB->get_records('ucla_bruincast', array('courseid' => $courseid))) {
-            // A course might have more than 1 Bruincast link. Some possible 
-            // reasons are if a course is cross-listed or if there are multiple
-            // restriction types, or both.
-            //
-            // Logic to decide how to display links in these different scenarios:
-            //
-            // 1) If links all have same restriction, then get last part of url,
-            //    which will be the course name and display it as:
-            //      Bruincast (<course title>)
-            // 2) If links have different restrictions, then display as:
-            //      Bruincast (<restriction type>)
-            // 3) If links have different restrictions and different course
-            //    titles, then display as:
-            //     Bruincast (<course title>/<restriction type>)
-            // 4) If there is only 1 url, then display as:
-            //     Bruincast (<restriction type>)
-            $titlesused = array();
-            $restrictionsused = array();
-            foreach ($matchingcourses as $matchingcourse) {
-                if (empty($matchingcourse->bruincast_url)) {
-                    continue;
-                }
-
-                $title = basename($matchingcourse->bruincast_url);
-                $title = core_text::strtoupper($title);
-
-                $restriction = 'node_' . core_text::strtolower($matchingcourse->restricted);
-                $restriction = str_replace(' ', '_', $restriction);                
-
-                $links[$title][$restriction] = $matchingcourse->bruincast_url;
-
-                $titlesused[] = $title;
-                $restrictionsused[] = $restriction;
-            }
-
-            // See what type of display scenario we are going to use.
-            $multipletitles = false;
-            $multiplerestrictions = false;
-            if (count(array_unique($titlesused)) > 1) {
-                $multipletitles = true;
-            }
-            if (count(array_unique($restrictionsused)) > 1) {
-                $multiplerestrictions = true;
-            }
-
-            foreach ($links as $title => $restrictions) {
-                foreach ($restrictions as $restriction => $url) {
-                    if ($multipletitles && !$multiplerestrictions) {
-                        // 1) If links all have same restriction, then get last
-                        //    part of url, which will be the course name and
-                        //    display it as:
-                        //      Bruincast (<course title>)
-                        $node = navigation_node::create(sprintf('%s (%s)',
-                                get_string('title', 'block_ucla_bruincast'), $title),
-                                new moodle_url($url));
-                    } else if (!$multipletitles && $multiplerestrictions) {
-                        // 2) If links have different restrictions, then display
-                        //    as:
-                        //      Bruincast (<restriction type>)
-                        $node = navigation_node::create(sprintf('%s (%s)',
-                                get_string('title', 'block_ucla_bruincast'),
-                                get_string($restriction, 'block_ucla_bruincast')),
-                                new moodle_url($url));
-                    } else if ($multipletitles && $multiplerestrictions) {
-                        // 3) If links have different restrictions and different
-                        //    course titles, then display as:
-                        //     Bruincast (<course title>/<restriction type>)
-                        $node = navigation_node::create(sprintf('%s (%s/%s)',
-                                get_string('title', 'block_ucla_bruincast'),
-                                $title,
-                                get_string($restriction, 'block_ucla_bruincast')),
-                                new moodle_url($url));
-                    } else if (!$multipletitles && !$multiplerestrictions) {
-                        // 4) If there is only 1 url, then display as:
-                        //     Bruincast (<restriction type>)
-                        $type = '';
-                        if ($restriction != 'node_open') {
-                            // Don't add restriction type text for open.
-                            $type = sprintf(' (%s)', get_string($restriction, 'block_ucla_bruincast'));
-                        }
-                        $node = navigation_node::create(
-                                get_string('title', 'block_ucla_bruincast') .
-                                $type,
-                                new moodle_url($url));
-                    }
-
-                    $node->add_class('bruincast-link');
-                    $nodes[] = $node;
-                }
-            }
+        if ($recordsfound) {
+            $node = navigation_node::create(get_string('title',
+                    'block_ucla_bruincast'), new moodle_url('/blocks/ucla_bruincast/index.php', array('courseid' => $courseid)));
+            $node->add_class('video-reserves-link');
+            $nodes[] = $node;
         }
+
         return $nodes;
     }
 
@@ -154,21 +66,21 @@ class block_ucla_bruincast extends block_base {
             'block-ucla_bruincast' => false,
             'not-really-applicable' => true
         );
-        // hack to make sure the block can never be instantiated
+        // Hack to make sure the block can never be instantiated.
     }
 
     /**
      *  Called by moodle
      */
     public function instance_allow_multiple() {
-        return false; // disables multiple block instances per page
+        return false; // Disables multiple block instances per page.
     }
 
     /**
      *  Called by moodle
      */
     public function instance_allow_config() {
-        return false; // disables instance configuration
+        return false; // Disables instance configuration.
     }
 
 }
