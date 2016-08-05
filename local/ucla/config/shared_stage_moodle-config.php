@@ -235,6 +235,7 @@ $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 
 // Site administration > Grades > Grade category settings
+$CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
 $CFG->grade_overridecat = 0;
 
 // Site administration > Grades > Report settings > Grader report
