@@ -1,0 +1,26 @@
+//
+// CCLE / profile page styling
+// --------------------------------------------------
+
+// CCLE-6023: Fix styling issue in User profile page (scrunched up text, bullet point)
+
+#page-user-profile .userprofile dt {
+    width: 100%;
+    overflow: initial;
+    text-overflow: initial;
+    white-space: initial;
+}
+
+#page-user-profile .userprofile dd {
+    margin-left: 10px;
+}
+
+#page-user-profile .userprofile ul {
+    margin-left: 0px;
+    margin-right: 0px;
+    list-style-type: none;
+}
+
+#page-user-profile .userprofile li {
+    line-height: 18px;
+}
