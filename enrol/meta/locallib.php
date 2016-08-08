@@ -368,7 +368,11 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
         $ue->timestart = ($ue->timestart == 9999999999) ? 0 : (int)$ue->timestart;
 
         $meta->enrol_user($instance, $ue->userid, null, $ue->timestart, $ue->timeend, $ue->status);
-        if ($instance->customint2) {
+        // START UCLA MOD: CCLE-6077 - Fix Behat tests for enrol_invitation
+        // Do not add a member and sync the groups if we are dealing with a TA site enrol plugin
+        // if ($instance->customint2) {
+        if ($instance->customint2 && !block_ucla_tasites::is_tasite_enrol_meta_instance($instance)) {
+        // END UCLA MOD: CCLE-6077
             groups_add_member($instance->customint2, $ue->userid, 'enrol_meta', $instance->id);
         }
         if ($verbose) {
