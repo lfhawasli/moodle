@@ -100,6 +100,7 @@ $string['setting_desc_disable_post_blocks'] = 'Disable courses from adding block
 $string['setting_title_running_environment'] = 'Server environment';
 $string['setting_desc_running_environment'] = 'This option will determine the color of the header to make it easier distinguish which server environment you are on. Default should be \'Production\'.';
 $string['setting_default_running_environment'] = 'prod';
+$string['watermark'] = "Owen Weitzel";
 $string['env_prod'] = 'Production';
 $string['env_stage'] = 'Stage';
 $string['env_test'] = 'Test';
