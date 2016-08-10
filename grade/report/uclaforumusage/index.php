@@ -132,6 +132,7 @@ $sql = "SELECT fp.parent, fp.userid, fp.id as post_id, fp.discussion as discussi
         ON fp.discussion = fd.id";
 
 // Default show all forums.
+$condition1 = 0;
 if (!empty($forums)) {
     $condition1 = implode(", ", $forums);
     $sql .= " WHERE fd.forum in ($condition1)";
@@ -177,7 +178,9 @@ if ($rs->valid()) {
     $statdisplay = get_stats($posts, $users, $tainstr);
 
     $table = new html_table();
+    $table->id = 'id_forumusagereport_table';
     $table->attributes['class'] = 'table table-striped table-bordered';
+    $table->attributes['name'] = 'forumusagereport_table';
     // Rows.
 
      // Row 1 and Row 2(header).
@@ -231,6 +234,7 @@ if ($rs->valid()) {
     }
 
     // Need to create all the rows.
+    // For simple view, only show response post number.
     foreach ($studentdisplay as $userid => $studentname) {
         $totalposts = 0;
         $row = new html_table_row();
@@ -241,6 +245,7 @@ if ($rs->valid()) {
             if (!$forumtype) {
                 // Initial post.
                 $cell = new html_table_cell();
+                $cell->id = 'id_' . str_replace(', ', '_', $studentname) . '_' . str_replace(' ', '_', $forumlist[$v]) . '_initial_posts';
                 if (isset($statdisplay[$userid][$v]['initial_posts'])) {
                     $cell->text = $statdisplay[$userid][$v]['initial_posts'];
                     $totalposts += $statdisplay[$userid][$v]['initial_posts'];
@@ -251,6 +256,7 @@ if ($rs->valid()) {
             }
             // Response.
             $cell = new html_table_cell();
+            $cell->id = 'id_' . str_replace(', ', '_', $studentname) . '_' . str_replace(' ', '_', $forumlist[$v]) . '_responses';
             if (isset($statdisplay[$userid][$v]['responses'])) {
                 $cell->text = $statdisplay[$userid][$v]['responses'];
                 $totalposts += $statdisplay[$userid][$v]['responses'];
@@ -262,6 +268,7 @@ if ($rs->valid()) {
             if (!$forumtype) {
                 // TA response.
                 $cell = new html_table_cell();
+                $cell->id = 'id_' . str_replace(', ', '_', $studentname) . '_' . str_replace(' ', '_', $forumlist[$v]) . '_ta_instr_resp';
                 if (isset($statdisplay[$userid][$v]['ta_instr_resp'])) {
                     $cell->text = $statdisplay[$userid][$v]['ta_instr_resp'];
                 } else {
@@ -273,6 +280,7 @@ if ($rs->valid()) {
         }// End forum.
         // Total post for user
         $cell = new html_table_cell();
+        $cell->id = 'id_' . str_replace(', ', '_', $studentname) . '_usertotalposts';
         $cell->text = $totalposts;
         $row->cells[] = $cell;
         $table->data[] = $row;
@@ -291,6 +299,9 @@ if ($rs->valid()) {
         echo html_writer::tag('div', html_writer::table($table), array('class' => 'flexible-wrap'));
     }
 } else {
-    echo get_string('noforumpost', 'gradereport_uclaforumusage');
+    print_grade_page_head($COURSE->id, 'report', 'uclaforumusage', $reportname, false);
+    echo $OUTPUT->box(get_string('description', 'gradereport_uclaforumusage'));
+    $mform->display();
+    echo html_writer::tag('p', get_string('noforumpost', 'gradereport_uclaforumusage'));
 }
 echo $OUTPUT->footer();
