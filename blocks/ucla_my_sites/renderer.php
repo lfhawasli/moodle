@@ -39,9 +39,11 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
      * @return array content to be displayed in ucla_my_sites block
      */
     public function class_sites_overview($classsites, $overviews) {
-        global $USER, $CFG, $OUTPUT;
+        global $USER, $CFG, $OUTPUT, $PAGE;
         $content = array();
+        $PAGE->requires->jquery();
 
+        $content[] = html_writer::start_tag('div', array('class' => 'my_sites_div'));
         foreach ($classsites as $class) {
             // Build class title in following format.
             // <subject area> <cat_num>, <activity_type e.g. Lec, Sem> <sec_num> (<term name e.g. Winter 2012>): <full name>.
@@ -99,13 +101,23 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
                     );
                 }
             }
+            // Add Activity Log under each course if notifications exist.
             if (property_exists($class, 'id') && isset($overviews[$class->id])) {
-                $classlink .= $this->activity_display_opt($class->id, $overviews[$class->id], false);
-            } else {
-                $classlink .= '<br>';
+                $alerts = count($overviews[$class->id]);
+                // Create Notification Icon with number of alerts.
+                $classlink .= html_writer::tag('a', html_writer::tag('span', $alerts,
+                    array('id' => 'expand_course', 'class' => 'alertCount')), array('href' => '#/'));
+                // Add activity display inside div so it can be expanded/collapsed
+                // by above icon.
+                $classlink .= html_writer::tag('div', $this->activity_display_opt
+                        ($class->id, $overviews[$class->id], false),
+                        array('class' => 'course_div'));
             }
+
+            $classlink .= '<br>';
             $content[] = $classlink;
         }
+        $content[] = html_writer::end_tag('div');
         // Add spacing between My sites & Collaboration sites sections.
         $content[] = '<br>';
         return implode($content);
@@ -121,27 +133,34 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
     public function collab_sites_overview($collaborationsites, $overviews) {
         global $USER, $CFG, $OUTPUT, $PAGE;
         $content = array();
-
         // Sort a bunch of collabortation sites via fullname.
         array_alphasort($collaborationsites, "fullname");
 
+        // Add Collab. sites title, and icon if there are notifications.
         $content[] = html_writer::tag('h3', get_string('collaborationsites',
                 'block_ucla_my_sites'), array('class' => 'mysitesdivider'));
 
+        $content[] = html_writer::start_tag('div', array('class' => 'sites_div'));
         foreach ($collaborationsites as $collab) {
             // Make link.
                 $collablink = html_writer::link(new moodle_url('/course/view.php',
                     array('id' => ($collab->id))), $collab->fullname);
 
-            // Append here to $class_link.
+            // Add Activity Log under each course if notifications exist.
             if (property_exists($collab, 'id') && isset($overviews[$collab->id])) {
-                $collablink .= $this->activity_display_opt($collab->id,
-                        $overviews[$collab->id], true);
-            } else {
-                $collablink .= '<br>';
+                $alerts = count($overviews[$collab->id]);
+                // Create Notification Icon with number of alerts.
+                $collablink .= html_writer::tag('a', html_writer::tag('span', $alerts,
+                    array('id' => 'expand_course', 'class' => 'alertCount')), array('href' => '#/'));
+                // Add activity display inside div so it can be expanded/collapsed
+                // by above icon.
+                $collablink .= html_writer::tag('div', $this->activity_display_opt($collab->id,
+                        $overviews[$collab->id], false), array('class' => 'course_div'));
             }
+            $collablink .= '<br>';
             $content[] = $collablink;
         }
+        $content[] = html_writer::end_tag('div');
         return implode($content);
     }
 

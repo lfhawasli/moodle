@@ -63,6 +63,10 @@ class block_ucla_my_sites extends block_base {
     public function get_content() {
         global $USER, $CFG, $OUTPUT, $PAGE, $DB;
 
+        // Include module.js.
+        $PAGE->requires->jquery();
+        $PAGE->requires->js('/blocks/ucla_my_sites/module.js', true);
+
         if ($this->content !== null) {
             return $this->content;
         }
@@ -325,8 +329,9 @@ class block_ucla_my_sites extends block_base {
 
         // Display Class sites.
         $content[] = html_writer::tag('h3',
-                get_string('classsites', 'block_ucla_my_sites'),
-                    array('class' => 'mysitesdivider'));
+            get_string('classsites', 'block_ucla_my_sites'),
+                array('class' => 'mysitesdivider'));
+
         $content[] = $termoptstr;
 
         $renderer = $PAGE->get_renderer('block_ucla_my_sites');
