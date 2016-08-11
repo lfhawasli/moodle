@@ -608,22 +608,38 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
             toggleclass = CSS.DIMMEDTEXT;
         }
 
-        // If activity is conditionally hidden, then don't toggle.
-        if (!dimarea.hasClass(CSS.CONDITIONALHIDDEN)) {
-            if (action === 'hide') {
-                // Change the UI.
-                dimarea.addClass(toggleclass);
-                // We need to toggle dimming on the description too.
-                activity.all(SELECTOR.CONTENTAFTERLINK).addClass(CSS.DIMMEDTEXT);
-                activity.all(SELECTOR.GROUPINGLABEL).addClass(CSS.DIMMEDTEXT);
-            } else {
-                // Change the UI.
-                dimarea.removeClass(toggleclass);
-                // We need to toggle dimming on the description too.
-                activity.all(SELECTOR.CONTENTAFTERLINK).removeClass(CSS.DIMMEDTEXT);
-                activity.all(SELECTOR.GROUPINGLABEL).removeClass(CSS.DIMMEDTEXT);
-            }
+        // START UCLA MOD: CCLE-6106 - Fix action menu AJAX calls for hide/show
+        //// If activity is conditionally hidden, then don't toggle.
+        //if (!dimarea.hasClass(CSS.CONDITIONALHIDDEN)) {
+        //    if (action === 'hide') {
+        //        // Change the UI.
+        //        dimarea.addClass(toggleclass);
+        //        // We need to toggle dimming on the description too.
+        //        activity.all(SELECTOR.CONTENTAFTERLINK).addClass(CSS.DIMMEDTEXT);
+        //        activity.all(SELECTOR.GROUPINGLABEL).addClass(CSS.DIMMEDTEXT);
+        //    } else {
+        //        // Change the UI.
+        //        dimarea.removeClass(toggleclass);
+        //        // We need to toggle dimming on the description too.
+        //        activity.all(SELECTOR.CONTENTAFTERLINK).removeClass(CSS.DIMMEDTEXT);
+        //        activity.all(SELECTOR.GROUPINGLABEL).removeClass(CSS.DIMMEDTEXT);
+        //    }
+        //}
+        // Whether or not an activity is conditionally hidden, then don't toggle.
+        if (action === 'hide') {
+            // Change the UI.
+            dimarea.addClass(toggleclass);
+            // We need to toggle dimming on the description too.
+            activity.all(SELECTOR.CONTENTAFTERLINK).addClass(CSS.DIMMEDTEXT);
+            activity.all(SELECTOR.GROUPINGLABEL).addClass(CSS.DIMMEDTEXT);
+        } else {
+            // Change the UI.
+            dimarea.removeClass(toggleclass);
+            // We need to toggle dimming on the description too.
+            activity.all(SELECTOR.CONTENTAFTERLINK).removeClass(CSS.DIMMEDTEXT);
+            activity.all(SELECTOR.GROUPINGLABEL).removeClass(CSS.DIMMEDTEXT);
         }
+        // END UCLA MOD: CCLE-6106
         // Toggle availablity info for conditional activities.
         if (availabilityinfo) {
             availabilityinfo.toggleClass(CSS.HIDE);
