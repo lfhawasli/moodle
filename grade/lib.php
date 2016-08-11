@@ -686,6 +686,19 @@ function print_natural_aggregation_upgrade_notice($courseid, $context, $thispage
             grade_regrade_final_grades($courseid);
 
             $html .= $OUTPUT->notification(get_string('gradebookcalculationsuptodate', 'grades'), 'notifysuccess');
+        // START UCLA MOD: CCLE-6081 - Freeze grades for existing gradebooks
+        } else if ($gradebookcalculationsfreeze == 20140512) {
+            $message = get_string('freezegradebookwarning', 'local_gradebook');
+            $fixmessage = get_string('freezegradebookwarningbutton', 'local_gradebook');
+            $urlparams = array('id' => $courseid,
+                'acceptgradebookchanges' => true,
+                'sesskey' => sesskey());
+            $fixurl = new moodle_url($thispage, $urlparams);
+            $fixbutton = $OUTPUT->single_button($fixurl, $fixmessage, 'get');
+
+            $html .= $OUTPUT->notification($message);
+            $html .= $fixbutton;
+        // END UCLA MOD: CCLE-6081
         } else {
             // Show the warning that there may be extra credit weights problems.
             $a = new stdClass();
