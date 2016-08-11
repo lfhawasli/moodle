@@ -38,13 +38,6 @@ if (empty($video)) {
 require_login($course);
 $context = context_course::instance($video->courseid, MUST_EXIST);
 
-// See if we need to embed video or redirect user to the video url.
-if (empty($video->title) && !empty($video->bruincast_url)) {
-    redirect($video->bruincast_url);
-} else if (empty($video->title) && empty($video->bruincast_url)) {
-    // No video to embed and no url. Invalid entry.
-    print_error('errorinvalidvideo', 'block_ucla_video_reserves');
-}
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_bruincast/view.php',
@@ -55,11 +48,11 @@ echo $OUTPUT->header();
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
   
 
-    echo $OUTPUT->heading($video->title, 2, 'headingblock');
+    echo $OUTPUT->heading($video->name, 2, 'headingblock');
     // Try to embed video on page by calling filter.
     $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
             'rtmpe://' . '164.67.141.72:1935',
-            $video->title, 640, 720, urlencode($video->bruincast_url));
+            $video->name, 640, 720, urlencode($video->bruincast_url));
     $filter = new filter_oidwowza($context, array());
     $html = $filter->filter($filtertext);
     echo $html;
