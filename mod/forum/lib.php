@@ -35,6 +35,7 @@ define('FORUM_MODE_THREADED', 2);
 define('FORUM_MODE_NESTED', 3);
 // START UCLA MOD: CCLE-4882 forum customization
 define('FORUM_MODE_PRINT', 4);
+define('FORUM_MODE_EXPORT', 5);
 // END UCLA MOD: CCLE-4882 forum customization
 
 define('FORUM_CHOOSESUBSCRIBE', 0);
@@ -3106,7 +3107,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
 */
 function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=false, $reply=false, $link=false,
                           $footer="", $highlight="", $postisread=null, $dummyifcantsee=true, $istracked=null, $return=false, $mode=null) {
-    // END UCLA MOD: CCLE-4882 forum customization
+// END UCLA MOD: CCLE-4882 forum customization
     global $USER, $CFG, $OUTPUT;
 
     require_once($CFG->libdir . '/filelib.php');
@@ -5840,6 +5841,9 @@ function forum_print_posts_flat($course, &$cm, $forum, $discussion, $post, $mode
            forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                              '', '', $postread, true, $forumtracked); 
          */
+        if ($mode == FORUM_MODE_EXPORT) {
+            $return = true;
+        }
         forum_print_post($post, $discussion, $forum, $cm, $course, $ownpost, $reply, $link,
                              '', '', $postread, true, $forumtracked, false, $mode); 
         // END UCLA MOD: CCLE-4882 forum customization
