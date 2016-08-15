@@ -16,3 +16,6 @@ $string['node_restricted'] = 'Private';
 $string['node_open'] = 'Open';
 $string['node_see_instructor'] = 'See Instructor';
 $string['node_online'] = 'E-Lecture';
+$string['currentvideo'] = 'Current videos';
+$string['header'] = 'Bruincast: {$a}';
+$string['intro'] = 'Please note that this media is intended for on-campus use only. Off-campus use is possible in certain circumstances, but it is not supported, dependable, or recommended. In order to view the video streams, you may need to download and install the Silverlight plugin.';

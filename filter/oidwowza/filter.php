@@ -71,9 +71,9 @@ class filter_oidwowza extends moodle_text_filter {
 
         return $newtext;
     }
-    
+
     /**
-     * Generates the SecureToken described in: 
+     * Generates the SecureToken described in:
      * http://www.wowza.com/forums/content.php?620-How-to-protect-streaming-using-SecureToken-in-Wowza-Streaming-Engine
      * http://www.wowza.com/forums/showthread.php?38768-Hash-generation-using-SecureToken-version-2
      *
@@ -185,7 +185,11 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     }
 
     // Generate SecureToken hash.
-    $contentpath = $app . '/' . $format . $file;
+    if (strpos($url, get_config('block_ucla_video_reserves', 'wowzaurl')) !== false) {
+        $contentpath = $app . '/' . $format . $file;
+    } else {
+        $contentpath = 'CCLEtest1/Vtest1/'. $format . $file;
+    }
     $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
     $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
     $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
