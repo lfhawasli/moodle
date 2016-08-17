@@ -145,3 +145,6 @@
 [submodule "mod/casa"]
 	path = mod/casa
 	url = git@github.com:ucla/moodle-mod_casa.git
+[submodule "question/type/ordering"]
+	path = question/type/ordering
+	url = https://github.com/gbateson/moodle-qtype_ordering.git
