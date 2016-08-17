@@ -43,7 +43,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         $content = array();
         $PAGE->requires->jquery();
 
-        $content[] = html_writer::start_tag('div', array('class' => 'my_sites_div'));
+        $content[] = html_writer::start_tag('div', array('class' => 'sites_div'));
         foreach ($classsites as $class) {
             // Build class title in following format.
             // <subject area> <cat_num>, <activity_type e.g. Lec, Sem> <sec_num> (<term name e.g. Winter 2012>): <full name>.
@@ -137,8 +137,11 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         array_alphasort($collaborationsites, "fullname");
 
         // Add Collab. sites title, and icon if there are notifications.
+        $collapser = html_writer::tag('img', '', array('src' =>
+                new moodle_url('/blocks/ucla_my_sites/expanded.svg'),
+                'class' => 'course_expand'));
         $content[] = html_writer::tag('h3', get_string('collaborationsites',
-                'block_ucla_my_sites'), array('class' => 'mysitesdivider'));
+                'block_ucla_my_sites').$collapser, array('class' => 'mysitesdivider'));
 
         $content[] = html_writer::start_tag('div', array('class' => 'sites_div'));
         foreach ($collaborationsites as $collab) {
