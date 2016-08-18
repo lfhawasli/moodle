@@ -67,19 +67,15 @@
     padding-left: 25px;
 }
 
+
 .block_ucla_my_sites.block .collapsibleregioncaption img{
-    margin-right: 25px;
+    margin-right: 10px;
 }
 
-.block_ucla_my_sites.block .alertCount {
-    display: inline-block;
-    vertical-align: text-top;
-    margin-left: 2px;
-    padding: 0px 5px;
-    line-height: 16px;
-    font-size: 11px;
-    color: #FFF;
-    text-shadow: 0px 1px #902A27;
-    background: #E93631;
-    border-radius: 50%;
+.block_ucla_my_sites.block .assign {
+    margin-left: 50px;
+}
+
+.block_ucla_my_sites.block .course_title {
+    font-size: 15px;
 }

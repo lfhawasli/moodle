@@ -78,7 +78,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             if (!empty($class->url)) {
                 $classlink = ucla_html_writer::external_link(
                     new moodle_url($class->url),
-                    $title);
+                    $title, array('class' => 'course_title'));
             } else {
                 // Courses without urls should not have information
                 // stating that they are crosslisted.
@@ -119,7 +119,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         }
         $content[] = html_writer::end_tag('div');
         // Add spacing between My sites & Collaboration sites sections.
-        $content[] = '<br>';
+        $content[] = '<br><br>';
         return implode($content);
     }
 
@@ -143,8 +143,9 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         $content[] = html_writer::start_tag('div', array('class' => 'sites_div'));
         foreach ($collaborationsites as $collab) {
             // Make link.
-                $collablink = html_writer::link(new moodle_url('/course/view.php',
-                    array('id' => ($collab->id))), $collab->fullname);
+            $collablink = html_writer::link(new moodle_url('/course/view.php',
+                    array('id' => ($collab->id))), $collab->fullname,
+                    array('class' => 'course_title'));
 
             // Add Activity Log under each course if notifications exist.
             if (property_exists($collab, 'id') && isset($overviews[$collab->id])) {

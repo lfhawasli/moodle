@@ -327,17 +327,20 @@ class block_ucla_my_sites extends block_base {
         $termoptstr = html_writer::tag('div', $termoptstr,
             array('class' => 'termselector'));
 
-        // Display Class sites.
-        $content[] = html_writer::tag('h3',
-            get_string('classsites', 'block_ucla_my_sites'),
-                array('class' => 'mysitesdivider'));
-
-        $content[] = $termoptstr;
+        if (empty($classsites) && empty($collaborationsites)) {
+            $content[] = html_writer::tag('p', get_string('notenrolled', 'block_ucla_my_sites'));
+            $this->content->text = implode($content);
+            return $this->content;
+        }
 
         $renderer = $PAGE->get_renderer('block_ucla_my_sites');
-
         // Write Class info if class_sites & collaboration_site are not empty.
         if (!empty($classsites)) {
+            // Display Class sites.
+            $content[] = html_writer::tag('h3',
+                    get_string('classsites', 'block_ucla_my_sites'),
+                    array('class' => 'mysitesdivider'));
+            $content[] = $termoptstr;
             $content[] = $renderer->class_sites_overview($classsites, $overviews);
         } else {
             if (!isset($noclasssitesoverride)) {
