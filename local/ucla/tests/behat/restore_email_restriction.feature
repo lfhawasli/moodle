@@ -1,4 +1,4 @@
-@ucla @core_backup @core_edit @CCLE-4929
+@ucla @local_ucla @core_backup @core_edit @CCLE-4929
 Feature: Remove email restriction from restore/import
   In order to restore a course
   As an admin
@@ -22,6 +22,7 @@ Feature: Remove email restriction from restore/import
     # Add course content as a admin, so that the firstaccess is unchanged.
     # Add content as teacher.
     Given I log in as "admin"
+    And I follow "Courses"
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
@@ -43,6 +44,7 @@ Feature: Remove email restriction from restore/import
     And I log out  
     # Backup the course.
     Given I log in as "admin"
+    And I follow "Courses"
     And I follow "Course 1"
     And I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
@@ -64,6 +66,7 @@ Feature: Remove email restriction from restore/import
     And I log in as "admin"
     # Restore the course.
     When I am on homepage
+    And I follow "Courses"
     And I follow "Course 1"
     And I follow "Restore"
     And I restore "test_backup.mbz" backup into a new course using this options:

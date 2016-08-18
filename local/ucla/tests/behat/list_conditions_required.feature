@@ -1,4 +1,4 @@
-@core @core_availability @ucla @core_edit @CCLE-5329 @SSC-2155
+@core @core_availability @ucla @local_ucla @core_edit @CCLE-5329 @SSC-2155
 Feature: Conditional restricted section lists conditions required
   In order to see required conditions
   As a user

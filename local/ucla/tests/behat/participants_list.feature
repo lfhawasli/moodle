@@ -1,4 +1,4 @@
-@ucla @enrol @core_edit @CCLE-5251
+@ucla @local_ucla @enrol @core_edit @CCLE-5251
 Feature: Combine "Enrolled Users" and "Participants" pages
   As an instructor
   I want to list participant information on one page

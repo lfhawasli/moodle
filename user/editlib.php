@@ -289,12 +289,22 @@ function useredit_shared_definition(&$mform, $editoroptions, $filemanageroptions
     // Add the necessary names.
     foreach (useredit_get_required_name_fields() as $fullname) {
         $mform->addElement('text', $fullname,  get_string($fullname),  'maxlength="100" size="30"');
-        if ($stringman->string_exists('missing'.$fullname, 'core')) {
-            $strmissingfield = get_string('missing'.$fullname, 'core');
-        } else {
-            $strmissingfield = $strrequired;
+        // START UCLA MOD: CCLE-4437 - Make first name a non-required field
+        //if ($stringman->string_exists('missing'.$fullname, 'core')) {
+        //    $strmissingfield = get_string('missing'.$fullname, 'core');
+        //} else {
+        //    $strmissingfield = $strrequired;
+        //}
+        //$mform->addRule($fullname, $strmissingfield, 'required', null, 'client');
+        if ($fullname == 'lastname') {
+            if ($stringman->string_exists('missing'.$fullname, 'core')) {
+                $strmissingfield = get_string('missing'.$fullname, 'core');
+            } else {
+                $strmissingfield = $strrequired;
+            }
+            $mform->addRule($fullname, $strmissingfield, 'required', null, 'client');
         }
-        $mform->addRule($fullname, $strmissingfield, 'required', null, 'client');
+        // END UCLA MOD: CCLE-4437
         $mform->setType($fullname, PARAM_NOTAGS);
     }
 

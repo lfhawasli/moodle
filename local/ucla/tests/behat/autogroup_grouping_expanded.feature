@@ -1,4 +1,4 @@
-@core @core_group @core_edit @ucla @CCLE-4742
+@core @core_group @core_edit @ucla @local_ucla @CCLE-4742
 Feature: Grouping in auto-create groups is automatically expanded
   In order to quickly create groups
   As a teacher

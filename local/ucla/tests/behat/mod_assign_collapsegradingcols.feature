@@ -1,4 +1,4 @@
-@ucla @mod_assign @core_edit @CCLE-4292
+@ucla @local_ucla @mod_assign @core_edit @CCLE-4292
 Feature: Collapse some columns for assignment grading
   As an instructor
   I want some columns collapsed by default
@@ -32,7 +32,7 @@ Scenario: View assignment submissions table with collapsed columns
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
     And I follow "Test assignment name"
-    When I follow "View/grade all submissions"
+    When I follow "View all submissions"
     Then I should not see "User picture"
     And I should not see "ID number"
     And I should not see "Email address"

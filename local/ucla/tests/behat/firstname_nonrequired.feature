@@ -1,4 +1,4 @@
-@ucla @core_edit @CCLE-4437
+@ucla @local_ucla @core_edit @CCLE-4437
 Feature: First name is non-required
   In order to see that first name is not required
   As any user, possibly without a first name when created,
@@ -17,8 +17,7 @@ Feature: First name is non-required
       | user | course | role |
       | manager1 | C1 | manager |
     And I log in as "manager1"
-    And I follow "Course 1"
-    And I expand "My profile settings" node
+    And I follow "Profile" in the user menu
     And I follow "Edit profile"
     When I set the field "First name" to "Firstname"
     And I press "Update profile"
