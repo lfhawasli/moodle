@@ -264,7 +264,7 @@ function handle_command($input, $commandnum) {
             do {
                 // Get tags
 
-                $sql = "SELECT t.id, t.name, t.color, t.timecreated, t.timemodified
+                $sql = "SELECT t.id, t.name, t.color, t.timecreated, t.timemodified, t.level
                           FROM {videoannotation_tags} t
                          WHERE t.clipid = " . (int) $input['clipid'] . '
                                AND ' . $tagusergroupclause;
@@ -287,7 +287,7 @@ function handle_command($input, $commandnum) {
 
                 // Get events
 
-                $sql = "SELECT e.id, e.tagid, e.starttime, e.endtime, e.content, e.timecreated, e.timemodified, e.latitude, e.longitude, e.scope
+                $sql = "SELECT e.id, e.tagid, e.starttime, e.endtime, e.content, e.timecreated, e.timemodified, e.latitude, e.longitude, e.scope, e.level
                           FROM {videoannotation_events} e
                           JOIN {videoannotation_tags} t ON e.tagid = t.id
                          WHERE t.clipid = " . (int) $input['clipid'] . '
@@ -515,6 +515,9 @@ function handle_command($input, $commandnum) {
             if (isset($input['color'])) {
                 $data->color = $input['color'];
             }
+            if (isset($input['level'])) {
+                $data->level = $input['level']; 
+            }
             $lastid = $DB->insert_record('videoannotation_tags', $data);
             if ($lastid !== false) {
                 return array("success" => true, "id" => $lastid);
@@ -577,7 +580,7 @@ function handle_command($input, $commandnum) {
                                   FROM {videoannotation_tags} vt
                                   JOIN {groups_members} gm ON vt.groupid = gm.groupid
                                   JOIN {groups} g ON gm.groupid = g.id
-                                 WHERE vt.id = " . (int) $input['id'] . "AND gm.userid = " . $USER->id;
+                                 WHERE vt.id = " . (int) $input['id'] . " AND gm.userid = " . $USER->id;
                         if (in_array($videoannotation->groupmode, array(VIDEOANNOTATION_GROUPMODE_USER_USER, VIDEOANNOTATION_GROUPMODE_ALL_USER))) {
                             $sql .= " AND vt.userid = " . $USER->id;
                         }
@@ -612,6 +615,9 @@ function handle_command($input, $commandnum) {
             }
             if (isset($input['color'])) {
                 $dataobject->color = $input['color'];
+            }
+            if (isset($input['level'])) {
+                $dataobject->level = $input['level'];
             }
             try {
                 $rs = $DB->update_record('videoannotation_tags', $dataobject);
@@ -917,6 +923,9 @@ function handle_command($input, $commandnum) {
             if (isset($input['scope'])) {
                 $data->scope = $input['scope'];
             }
+            if (isset($input['level'])) {
+                $data->level = $input['level'];
+            }
 
             $lastid = $DB->insert_record('videoannotation_events', $data);
             if ($lastid !== false) {
@@ -1030,6 +1039,10 @@ function handle_command($input, $commandnum) {
             if (isset($input['scope'])) {
                 $dataobject->scope = $input['scope'];
             }
+            if (isset($input['level'])) {
+                $dataobject->level = $input['level'];
+            }
+
             $dataobject->id = $input['id'];
             try {
                 $rs = $DB->update_record('videoannotation_events', (object) $dataobject);

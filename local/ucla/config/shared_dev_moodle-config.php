@@ -324,19 +324,20 @@ $CFG->forced_plugin_settings['url']['display'] = 3; // RESOURCELIB_DISPLAY_NEW
 $CFG->forced_plugin_settings['url']['enableuservar'] = 0;
 
 // Site administration > Plugins > Activity modules > Video Annotation
-$CFG->tnawebserviceurl = array("http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://tvnews.library.ucla.edu/util/webservice.php", 
-                               "http://newsscape.library.ucla.edu/util/webservice.php", 
+// You will need to have the same number of elements in tnawebserviceurl as tnapermalinkurl.
+$CFG->tnawebserviceurl = array("http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
+                               "http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
+                               "http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
+                               "http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
+                               "http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
+                               "http://newsscape.library.ucla.edu/util/webservice.php",
                                "https://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php");
-$CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,", 
-                              "http://www.sscnet.ucla.edu/tna/edge/video,", 
-                              "http://www.sscnet.ucla.edu/csa/search/video,", 
-                              "http://dcl.sscnet.ucla.edu/search/video,", 
-                              "http://tvnews.library.ucla.edu/video,", 
-                              "http://newsscape.library.ucla.edu/video,", 
+$CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
+                              "http://www.sscnet.ucla.edu/tna/edge/video,",
+                              "http://www.sscnet.ucla.edu/csa/search/video,",
+                              "http://dcl.sscnet.ucla.edu/search/video,",
+                              "http://tvnews.library.ucla.edu/video,",
+                              "http://newsscape.library.ucla.edu/video,",
                               "https://tvnews.sscnet.ucla.edu/edge/video,");
 $CFG->tnastreamerurl = "rtmp://169.232.194.193/csa";
 

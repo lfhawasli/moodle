@@ -1,6 +1,6 @@
 /* Tag */
 //Use this global variable to keep track of event label whenever showMap() is called
-var newContent;
+var savedNewContent;
 var sameTag = undefined;
 CSAVTimelineTag = function(params) {
     var requiredFieldNames = ["timeline", "name"];
@@ -11,7 +11,7 @@ CSAVTimelineTag = function(params) {
             throw "CSAVTimelineTag: Parameter \"" + requiredFieldNames[idx] + "\" is required."
     }
     
-    var optionalFieldNames = ["id", "color"];
+    var optionalFieldNames = ["id", "color", "level"];
     for (var idx = 0; idx < optionalFieldNames.length; idx++) {
         this[optionalFieldNames[idx]] = params[optionalFieldNames[idx]];
     }
@@ -33,6 +33,10 @@ CSAVTimelineTag.prototype.getColor = function() {
     return this.color;
 }
 
+CSAVTimelineTag.prototype.getLevel = function () {
+    return this.level;
+}
+
 CSAVTimelineTag.prototype.setId = function(id) {
     this.id = id;
 }
@@ -43,6 +47,10 @@ CSAVTimelineTag.prototype.setName = function(name) {
 
 CSAVTimelineTag.prototype.setColor = function(color) {
     this.color = color;
+}
+
+CSAVTimelineTag.prototype.setLevel = function(level) {
+    this.level = level;
 }
 
 /* Event */
@@ -56,7 +64,7 @@ CSAVTimelineEvent = function(params) {
             throw "CSAVTimelineEvent: Parameter \"" + requiredFieldNames[idx] + "\" is required."
     }
     
-    var optionalFieldNames = ["id", "comment", "latitude", "longitude", "scope"];
+    var optionalFieldNames = ["id", "comment", "latitude", "longitude", "scope","level"];
     for (var idx = 0; idx < optionalFieldNames.length; idx++) {
         this[optionalFieldNames[idx]] = params[optionalFieldNames[idx]];
     }
@@ -72,7 +80,8 @@ CSAVTimelineEvent.prototype.deepCopy = function() {
         comment: event.comment,
         latitude: event.latitude,
         longitude: event.longitude,
-        scope: event.scope
+        scope: event.scope,
+        level: event.level
     });
 }
 
@@ -137,6 +146,14 @@ CSAVTimelineEvent.prototype.setScope = function(scope) {
     
 CSAVTimelineEvent.prototype.getLng = function() {
     return this.longitude;
+}
+
+CSAVTimelineEvent.prototype.getLevel = function () {
+    return this.level;
+}
+
+CSAVTimelineEvent.prototype.setLevel = function (level) {
+    this.level = level;
 }
 
 CSAVTimeline = function(params) {
@@ -207,7 +224,6 @@ CSAVTimeline = function(params) {
 
 CSAVTimeline.prototype.fetchData = function() {
     var timeline = this;
-
 
     //SSC-1191: Detect changes to the clip
     var clipData = {
@@ -305,9 +321,9 @@ CSAVTimeline.prototype.fetchData = function() {
                 var tagData = jsonData[0]["tags"][idx];
                 var tagObj = timeline.findTag(Number(tagData.id));
                 if (tagObj)
-                    timeline.editTag(Number(tagData["id"]), undefined, undefined, tagData["name"], tagData["color"], false);
+                    timeline.editTag(Number(tagData["id"]), undefined, undefined, tagData["name"], tagData["color"], false, Number(tagData["level"]));
                 else 
-                    timeline.addTag(Number(tagData["id"]), tagData["name"], tagData["color"], false);
+                    timeline.addTag(Number(tagData["id"]), tagData["name"], tagData["color"], false, Number(tagData["level"]));
                 changed = true;
             }
             
@@ -318,11 +334,11 @@ CSAVTimeline.prototype.fetchData = function() {
                 {
                     if (eventData["latitude"] && eventData["longitude"])
                     {
-                        timeline.editEvent(Number(eventData["id"]), undefined, undefined, undefined, Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, Number(eventData["latitude"]), Number(eventData["longitude"]), eventData["scope"]);
+                        timeline.editEvent(Number(eventData["id"]), undefined, undefined, undefined, Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, Number(eventData["latitude"]), Number(eventData["longitude"]), eventData["scope"], Number(eventData["level"]));
                     }
                     else
                     {
-                        timeline.editEvent(Number(eventData["id"]), undefined, undefined, undefined, Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, undefined, undefined, undefined);
+                        timeline.editEvent(Number(eventData["id"]), undefined, undefined, undefined, Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, undefined, undefined, undefined, Number(eventData["level"]));
                     }
                 }
 
@@ -330,14 +346,13 @@ CSAVTimeline.prototype.fetchData = function() {
                 {
                     if (eventData["latitude"] && eventData["longitude"])
                     {
-                        timeline.addEvent(Number(eventData["id"]), Number(eventData["tagid"]), Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, Number(eventData["latitude"]), Number(eventData["longitude"]), eventData["scope"]);
+                        timeline.addEvent(Number(eventData["id"]), Number(eventData["tagid"]), Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, Number(eventData["latitude"]), Number(eventData["longitude"]), eventData["scope"], Number(eventData["level"]));
                     }
                     else
                     {
-                        timeline.addEvent(Number(eventData["id"]), Number(eventData["tagid"]), Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, undefined, undefined, undefined);
+                        timeline.addEvent(Number(eventData["id"]), Number(eventData["tagid"]), Number(eventData["starttime"]), Number(eventData["endtime"]), eventData["content"], false, undefined, undefined, undefined, Number(eventData["level"]));
                     }
                 }
-
                 changed = true;
             }
             
@@ -381,10 +396,10 @@ CSAVTimeline.prototype.handleError = function(err) {
                 alert("FinishGroupModeASAPErrorMessage: " + err.message);
                 break;
             default:
-                alert("erorr: " + err.message);
+                alert("error: " + err.message);
         }
     } else {
-        alert("erorr: " + err.message);
+        alert("error: " + err.message);
     }
 }
 
@@ -398,7 +413,7 @@ CSAVTimeline.prototype.inArray = function(needle, haystack, comparator) {
 
 CSAVTimeline.prototype.redraw = function(forceRedraw) {
     var timeline = this;
-    
+
     // Create the timeline base if it doesn't exist
 
 	if (typeof this.noRedraw === 'undefined' || !this.noRedraw) {
@@ -790,9 +805,17 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
             
             // Set the tag ID so that sortable can use it to update the order
             
-            jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId);
+            jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('oldlevel', this.findTag(tagId).getLevel());
             jQuery('#EventBand_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId);
-            
+
+            // Set the initial height of the EventBand_Tag and TagEventBand_Tag.
+            console.log("setting initial height");
+            var EventBandTag = jQuery('#EventBand_Tag' + tagId + '_Timeline' + this.id);
+            var level = this.findTag(tagId).getLevel();
+            var baseHeight = 22; 
+            EventBandTag.css('height', level * baseHeight);
+            EventBandTag.parent().css('height', level * baseHeight);
+ 
             // If the event band is clicked, go to the time corresponding to the position clicked
             
             jQuery('#EventBand_Tag' + tagId + '_Timeline' + this.id).click(function(clickEvent) {
@@ -932,7 +955,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                 
                 
                 
-                jQuery('#EditTagDialogSaveButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId);
+                jQuery('#EditTagDialogSaveButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('timeline', timeline);
                 jQuery('#EditTagDialogCancelButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId);
                 jQuery('#EditTagDialogDeleteButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId);
                 
@@ -959,8 +982,9 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                     }
                     var newColor = jQuery('#EditTagDialogColor_Tag' + tagId + '_Timeline' + timeline.id).val();
                     try {
-                        timeline.editTag(tagId, oldName, oldColor, newName, newColor, true);
+                        timeline.editTag(tagId, oldName, oldColor, newName, newColor, true, timeline.findTag(tagId).getLevel());
                         delete timeline.editTagDialogOpen[tagId];
+                        savedNewContent = undefined;
                         timeline.redraw();
                     } catch (err) {
                         timeline.handleError(err);
@@ -1010,21 +1034,20 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
             var dialogHeight = jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).height();  
             jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().height(dialogHeight); 
             //If there is an editTag dialog opening when there is an EditEvent Dialog open (meaning the eventBand is already larger than it would be just opening an editTag band) dont change the size. Otherwise there is only an editTag opening and you should change the size
-            if(jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().parent().height() < dialogHeight) {
+            if (jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().parent().height() < dialogHeight) {
                 jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().parent().height(dialogHeight);
             }
 
-//When the textarea is expanded and an editTagDialog is opened, make sure the TagEventBand remains the same size (editTagDialog < expanded textarea)
-            if(eventband == 150) {
+            // When the textarea is expanded and an editTagDialog is opened, make sure the TagEventBand remains the
+            // same size (editTagDialog < expanded textarea).
+            if (eventband == 150) {
                 jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + timeline.id).height(eventband+50);
             } else { 
                 jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + timeline.id).height(dialogHeight);
             }
-        }
-        
-        // If tag dialog not requested, show the tag name, start/stop buttons, checkbox (if bulk mode is on)
-        
-        else {
+
+        // If tag dialog not requested, show the tag name, start/stop buttons, checkbox (if bulk mode is on).
+        } else {
             if (jQuery('#TagControls_Tag' + tagId + '_Timeline' + this.id).size() == 0) {
                 var str = '';
                 str += '<div id="TagControls_Tag' + tagId + '_Timeline' + this.id + '" class="TagControls"></div>';
@@ -1146,11 +1169,14 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
             
             // Remove any existing Edit Tag dialog
             // Show the tag controls
+           
+            var level = this.findTag(tagId).getLevel();
+            var baseHeight = 22; 
             
             var dialogHeight = jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).height();
             var editDialog = jQuery('#EditEventDialog_Tag' + tagId + '_Timeline' + this.id);
             jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().height('');
-            jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().parent().height('');
+            jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).parent().parent().css('height', baseHeight * level);
             jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id).remove();
             jQuery('#TagControls_Tag' + tagId + '_Timeline' + this.id).show();
             //If there is an editEventDialog open, and you are closing and editTagDialog, make sure the eventBand stays large enough
@@ -1191,8 +1217,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                 }
             }
             
-            // Set the tag label's background color to the tag's color or (if the color not defined) the default color
-            
+            // Set the tag label's background color to the tag's color or (if the color not defined) the default color.
             var tagColor = this.findTag(tagId).getColor();
             if (tagSelected) {
                 //jQuery('#TagLabel_Tag' + tagId + '_Timeline' + this.id).css('border-color', '');
@@ -1310,7 +1335,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                 var color = jQuery('#AddTagDialogColor_Timeline' + timeline.id).val();
                 
                 try {
-                    timeline.addTag(timeline.randomId(), name, color, true);
+                    timeline.addTag(timeline.randomId(), name, color, true, 1);
                     delete timeline.addTagDialogOpen;
                     timeline.redraw();
                 } catch (err) {
@@ -1343,22 +1368,18 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
     }
     
     // Event bands
-    
     for (var tagIdx in this.tags) {
         var tagId = this.tags[tagIdx].getId();
-        
-        // If Edit Event dialog requested for this tag, open it
-        
-        if (typeof this.editEventDialogOpen !== "undefined"
-        && typeof this.editEventDialogOpen[tagId] !== "undefined"
-        && !this.readOnly) {
+
+        // If Edit Event dialog requested for this tag, open it.
+        if (typeof this.editEventDialogOpen !== "undefined" &&
+                typeof this.editEventDialogOpen[tagId] !== "undefined" &&
+                !this.readOnly) {
             var eventId = this.editEventDialogOpen[tagId];
-            
-            //check if the map has been requested
+            // Check if the map has been requested.
             var drawMap = false;
-            if ( typeof this.editEventDialogMapOpen !== "undefined"
-        && typeof this.editEventDialogMapOpen[tagId] !== "undefined" )
-            {
+            if ( typeof this.editEventDialogMapOpen !== "undefined" &&
+                    typeof this.editEventDialogMapOpen[tagId] !== "undefined" ) {
                 drawMap = true;
             }
             console.log("drawMap", drawMap, "tagId", tagId);
@@ -1375,7 +1396,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                 // Create dialog
                 
                 var str = '';
-                str += '<table id="EditEventDialog_Tag' + tagId + '_Timeline' + this.id + '" class="EditEventDialog" title="Modify event; move to another event">';
+                str += '<table id="EditEventDialog_Tag' + tagId + '_Timeline' + this.id + '" class="EditEventDialog" title="Modify event; move to another event" style="z-index: 1000">';
                 str += '    <tr valign="top">';
                 str += '        <td style="padding: 5px 5px 5px 5px; width: 1%; white-space: nowrap; font-weight: bold">Label event:</td>';
                 str += '        <td style="padding: 5px 0 5px 0;"><textarea id="EditEventDialogContent_Tag' + tagId + '_Timeline' + this.id + '" class="EditEventDialogContent" name="content" title="Double click here to enlarge textbox"></textarea><input id="EditEventDialogOldContent_Tag' + tagId + '_Timeline' + this.id + '" type="hidden" /></td>';
@@ -1410,7 +1431,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                 str += '        </td>';
                 str += '    </tr>';
                 str += '    <tr>';
-                str += '        <td></td><td colspan =2>';
+                str += '        <td></td><td colspan=5>';
                 str += '            <label>Address</label><input id="address' + tagId + '" type="textbox" style="width: 200px">';
                 str += '            <input id="geocodeAddress' + tagId + '" type="submit" value="Geocode">';
                 str += '            <label>Scope</label><select id="scope' + tagId + '"></select>';
@@ -1500,46 +1521,50 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                 }
                 function showMap() {
                     var eventObj = timeline.findEvent(eid);
-                    if (jwplayer().getState() == "PLAYING")
+                    if (jwplayer().getState() == "PLAYING") {
                         jwplayer().pause();
-		    if(eventObj !== null && eventObj !== undefined) {
-			eventObj.setLat(jQuery('#lat'+tid).val());
-			eventObj.setLng(jQuery('#lng'+tid).val());
-			eventObj.setScope(jQuery('#scope'+tid+' option:selected').val());
                     }
-                        //If the label has been changed but not saved, save the changed text so when the event is removed and then redrawn, the changed text is set in the label box rather than the previously saved text (basically prevents label from always resetting when showing map
-                        newContent = jQuery('#EditEventDialogContent_Tag' + tid + '_Timeline' + timeline.id).val();
-			if ( typeof timeline.editEventDialogMapOpen == "undefined" ||
-			    typeof  timeline.editEventDialogMapOpen[tid] == "undefined")
-			{
-			    timeline.editEventDialogMapOpen = {};
-			    timeline.editEventDialogMapOpen[tid] = true;
+                    if (eventObj !== null && eventObj !== undefined) {
+                        eventObj.setLat(jQuery('#lat'+tid).val());
+                        eventObj.setLng(jQuery('#lng'+tid).val());
+                        eventObj.setScope(jQuery('#scope'+tid+' option:selected').val());
+                    }
+                    // If the label has been changed but not saved, save the changed text so when the event is removed
+                    // and then redrawn, the changed text is set in the label box rather than the previously saved text
+                    // (basically prevents label from always resetting when showing map.
+                    savedNewContent = jQuery('#EditEventDialogContent_Tag' + tid + '_Timeline' + timeline.id).val();
+			        if ( typeof timeline.editEventDialogMapOpen == "undefined" ||
+			                typeof  timeline.editEventDialogMapOpen[tid] == "undefined") {
+                        timeline.editEventDialogMapOpen = {};
+                        timeline.editEventDialogMapOpen[tid] = true;
+			        } else {
+                        delete timeline.editEventDialogMapOpen[tid];
+                        delete timeline.editEventDialogMapOpen;
+			        }
+			        console.log("map",  typeof timeline.editEventDialogMapOpen);
 
-			}
-			else
-			{
-			    delete timeline.editEventDialogMapOpen[tid];
-			    delete timeline.editEventDialogMapOpen;
-			}
-			console.log("map",  typeof timeline.editEventDialogMapOpen);
-			//ensure the timeline gets redrawn
+			        // Ensure the timeline gets redrawn.
 
-			// Remove the dialog to ensure it gets redrawn
-			var editEventDialog = jQuery('#EditEventDialog_Tag' + tid + '_Timeline' + timeline.id);
-			editEventDialog.parent().parent().css('height', '');
-			editEventDialog.parent().css('height', '');
-			editEventDialog.remove();
-			jQuery('#EventBand_Tag' + tid + '_Timeline' + timeline.id).find('.EventBar').show();
-			timeline.redraw();
-		    }
-                //add functionality to geocode buttons
+                    // Remove the dialog to ensure it gets redrawn.
+                    var level = timeline.findTag(tagId).getLevel();
+                    var baseHeight = 22;
+
+                    var editEventDialog = jQuery('#EditEventDialog_Tag' + tid + '_Timeline' + timeline.id);
+                    editEventDialog.parent().parent().css('height', level * baseHeight);
+                    editEventDialog.parent().css('height', level * baseHeight);
+                    editEventDialog.remove();
+                    jQuery('#EventBand_Tag' + tid + '_Timeline' + timeline.id).find('.EventBar').show();
+                    timeline.redraw();
+                }
+
+                // Add functionality to geocode buttons.
 
                 jQuery('#geocodeLatLng' + tagId).click(function(event) {
-                    codeLocation('latlng', latId, lngId, addressId, scopeId, eid);
+                    codeLocation('latlng', latId, lngId, addressId, scopeId, eid, 0);
                     showMap();
                 });
                 jQuery('#geocodeAddress' + tagId).click(function(event) {
-                    codeLocation('address', latId, lngId, addressId, scopeId, eid);
+                    codeLocation('address', latId, lngId, addressId, scopeId, eid, 0);
                     showMap();
                 });
                 jQuery('#showMap' + tagId).click(function(event) {
@@ -1585,8 +1610,9 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                     jQuery('#EditEventDialogTitle_Tag' + tagId + '_Timeline' + this.id).text('Edit Event');
                     
                     jQuery('#EditEventDialogOldContent_Tag' + tagId + '_Timeline' + this.id).val(eventObj.getComment());
-                    if(newContent != undefined && sameTag === undefined) {
-                        jQuery('#EditEventDialogContent_Tag' + tagId + '_Timeline' + this.id).val(newContent);
+                    if(savedNewContent !== undefined && sameTag === undefined ) {
+                        jQuery('#EditEventDialogContent_Tag' + tagId + '_Timeline' + this.id).val(savedNewContent);
+                        savedNewContent = undefined;
                     } else {
                         jQuery('#EditEventDialogContent_Tag' + tagId + '_Timeline' + this.id).val(eventObj.getComment());
                     }
@@ -1607,7 +1633,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                    
                     jQuery('#EditEventDialogSaveButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
                     jQuery('#EditEventDialogCancelButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
-                    jQuery('#EditEventDialogDeleteButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
+                    jQuery('#EditEventDialogDeleteButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId).data('timeline', this);
                     jQuery('#EditEventDialogPreviousButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
                     jQuery('#EditEventDialogNextButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
 
@@ -1629,7 +1655,7 @@ jQuery('#TimelineBase_Timeline' + this.id).append('<div id="test"></div>');
                     jQuery('#lng' + tagId).val() != "" &&
                     jQuery('#lng' + tagId).val() != 0 )
                 {
-                    codeLocation('latlng', latId, lngId, addressId, scopeId, eid);
+                    codeLocation('latlng', latId, lngId, addressId, scopeId, eid, 0);
                     if ( typeof eventObj.getScope() != "undefined" ) {
 
 console.log("scope=%s", eventObj.getScope());
@@ -1679,9 +1705,9 @@ console.log("scope=%s", eventObj.getScope());
                                 var lat = jQuery('#lat' + tagId).val(); 
                                 var lng = jQuery('#lng' + tagId).val();
                                 var scope = jQuery('#scope' + tagId + ' option:selected').val();
-                                timeline.addEvent(newEventId, tagId, startTime, startTime + 1, content, true, lat, lng, scope);
+                                timeline.addEvent(newEventId, tagId, startTime, startTime + 1, content, true, lat, lng, scope, this.findEvent(eventId).getLevel());
                             } else {
-                                timeline.addEvent(newEventId, tagId, startTime, startTime + 1, content, true, undefined, undefined, undefined);
+                                timeline.addEvent(newEventId, tagId, startTime, startTime + 1, content, true, undefined, undefined, undefined, this.findEvent(eventId).getLevel());
                             }
                         }  
                         delete timeline.editEventDialogOpen[tagId];
@@ -1705,66 +1731,80 @@ console.log("scope=%s", eventObj.getScope());
                     }
                 });
                 
-                // If Cancel button clicked,
-                // hide tag dialog and show tag controls
-                
+                // If Cancel button clicked, hide tag dialog and show tag controls.
                 jQuery('#EditEventDialogCancelButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    
+
                     var tagId = jQuery(event.target).data('tagId');
                     delete timeline.editEventDialogOpen[tagId];
                     delete timeline.noRedraw.currentTime;
-                    //close the map
+                    // Close the map.
                     if ( typeof timeline.editEventDialogMapOpen != "undefined" &&
-                    typeof timeline.editEventDialogMapOpen[tid] != "undefined" )
-                    {
+                            typeof timeline.editEventDialogMapOpen[tid] != "undefined" ) {
                         delete timeline.editEventDialogMapOpen[tid];
                         delete timeline.editEventDialogMapOpen;
                     }
-                    //ensure tag bands are sortable
+                    // Ensure tag bands are sortable.
                     jQuery('#TimelineBase_Timeline' + timeline.id).sortable({
                         disabled: false 
                     });
 
-                    newContent = undefined;
+                    savedNewContent = undefined;
                     timeline.redraw();
                 });
                 
-                // If Delete button clicked
-                // delete the tag and remove the tag event band
-                
+                // If Delete button clicked, delete the tag and remove the tag event band.
                 jQuery('#EditEventDialogDeleteButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    
+
+                    var timeline = jQuery(this).data('timeline');
                     var tagId = jQuery(event.target).data('tagId');
                     var eventId = jQuery(event.target).data('eventId');
+
+                    // Adjust the videoannotation_tags level according to the retainedEvents with the largest level.
+                    var newLevel = 1;
+                    if (timeline.findEvent(eventId).getLevel() == (timeline.findTag(tagId).getLevel() - 1)  &&  Number(timeline.findTag(tagId).getLevel()) !== 1) {
+                       for (keptEvent in timeline.events) {
+                            var keptEvent_TagId = timeline.events[keptEvent].getTag().getId();
+                            if (keptEvent_TagId == tagId  &&  timeline.events[keptEvent].getId() !== eventId) {
+                                var keptLevel = timeline.events[keptEvent].getLevel(); 
+                                if (keptLevel > newLevel) {
+                                    newLevel = keptLevel;
+                                }
+                            }
+                        }
+                        newLevel++;
+                        var tagObj = timeline.findTag(tagId);
+                        console.log("new level afteremoving is", newLevel);
+                        timeline.editTag(tagId, tagObj.getName(), tagObj.getColor(), tagObj.getName(), tagObj.getColor(), true, newLevel);
+                    } 
+
                     timeline.removeEvent(eventId, true);
                     jQuery('#EventBar_Event' + eventId + '_Timeline' + timeline.id).remove();
                     delete timeline.editEventDialogOpen[tagId];
                     delete timeline.noRedraw.currentTime;
-                    //close the map
+                    // Close the map.
                     if ( typeof timeline.editEventDialogMapOpen != "undefined" &&
-                    typeof timeline.editEventDialogMapOpen[tid] != "undefined" )
-                    {
+                            typeof timeline.editEventDialogMapOpen[tid] != "undefined" ) {
                         delete timeline.editEventDialogMapOpen[tid];
                         delete timeline.editEventDialogMapOpen;
                     }
-                    //ensure tag bands are sortable
+                    // Ensure tag bands are sortable.
                     jQuery('#TimelineBase_Timeline' + timeline.id).sortable({
                         disabled: false 
                     });
-                   newContent = undefined;
-                   timeline.redraw();
+
+                    savedNewContent = undefined;
+                    timeline.redraw();
                 });
                 
-                // If Previous button clicked
-                // save current event, delete the dialog, set the event ID and redraw
-                
+                // If Previous button clicked, save current event, delete the dialog, set the event ID and redraw.
                 jQuery('#EditEventDialogPreviousButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
                     event.preventDefault();
                     event.stopPropagation();
+
                     var eventsForThisTag = {list: []};
                     var prevEventId = {id : undefined};
                     var nextEventId = {id : undefined};
@@ -1793,15 +1833,14 @@ console.log("scope=%s", eventObj.getScope());
                     }
                 });
                 
-                // If Next button clicked
-                // save current event, delete the dialog, set the event ID and redraw
-                
+                // If Next button clicked, save current event, delete the dialog, set the event ID and redraw.
                 jQuery('#EditEventDialogNextButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
                     event.preventDefault();
                     event.stopPropagation();
-                  var eventsForThisTag = {list: []};
-                var prevEventId = {id : undefined};
-                var nextEventId = {id : undefined};
+
+                    var eventsForThisTag = {list: []};
+                    var prevEventId = {id : undefined};
+                    var nextEventId = {id : undefined};
                  
                     var eventId = jQuery(event.target).data('eventId');
                     var tagId = jQuery(event.target).data('tagId');
@@ -1827,15 +1866,21 @@ console.log("scope=%s", eventObj.getScope());
                     }
                 });
                 
-                // Show the dialog
+                // Show the dialog.
 
                 var eventBandHeight = jQuery('#TimeMarkerDigitPanel_Timeline' + this.id).height();
                 var editEventDialog = jQuery('#EditEventDialog_Tag' + tagId + '_Timeline' + this.id);
-                editEventDialog.show().css("top", eventBandHeight);
-                editEventDialog.parent().height(eventBandHeight + editEventDialog.height());
-                editEventDialog.parent().parent().height(eventBandHeight + editEventDialog.height());
 
-//When an editEventDialog is opening, check to see if there is an editTagDialog open. If one is, make sure the TagEventBand is big enough for the editTagDialog (which is > editEventDialog)
+                var level = this.findEvent(eventId).getLevel() + 1;
+                var tagLevel = this.findTag(tagId).getLevel();
+                var baseHeight = 22; 
+                var editDialogTop = level * baseHeight;
+                editEventDialog.css('top', editDialogTop);
+                editEventDialog.parent().css('height', editDialogTop + editEventDialog.height());
+                editEventDialog.parent().parent().css('height', editDialogTop + editEventDialog.height());
+ 
+                // When an editEventDialog is opening, check to see if there is an editTagDialog open. If one is, make
+                // sure the TagEventBand is big enough for the editTagDialog (which is > editEventDialog).
                 var editTag = jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + timeline.id)
                 if(editTag.height() !== null || editTag.height() !== undefined) {
                     jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + timeline.id).height(parseInt(editTag.height(),10));
@@ -1845,8 +1890,10 @@ console.log("scope=%s", eventObj.getScope());
             // Remove the dialog
 
             var editEventDialog = jQuery('#EditEventDialog_Tag' + tagId + '_Timeline' + this.id);
-            editEventDialog.parent().parent().css('height', '');
-            editEventDialog.parent().css('height', '');
+            var baseHeight = 22; 
+            var level = this.findTag(tagId).getLevel();
+            editEventDialog.parent().parent().css('height', baseHeight * level);
+            editEventDialog.parent().css('height', baseHeight * level);
             editEventDialog.remove();
             jQuery('#EventBand_Tag' + tagId + '_Timeline' + this.id).find('.EventBar').show();
             //If an editTag dialog is opened, then when the editEventDialog is closing, make sure the event band stays large enough for the editTag
@@ -1855,9 +1902,256 @@ console.log("scope=%s", eventObj.getScope());
                 jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + timeline.id).height(parseInt(editTag.height(), 10));
             }
         } 
-        
+
+        // View Event dialog requested.
+        if (typeof this.viewEventDialogOpen !== "undefined" &&
+                typeof this.viewEventDialogOpen[tagId] !== "undefined" &&
+                this.readOnly) {
+            var eventId = this.viewEventDialogOpen[tagId];
+            var eventObj = this.findEvent(eventId);
+
+            if (jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + this.id).size() == 0 ||
+                    (sameTag !== undefined && timeline.findEvent(sameTag).getTag().getId() == tagId)) {
+                var eventsForThisTag = {list: []};
+                var prevEventId = {id : undefined};
+                var nextEventId = {id : undefined};
+                timeline.sortEvent(eventsForThisTag, prevEventId, nextEventId, eventId, tagId);                
+                var str = '';
+
+                str += '<table id="ViewEventDialog_Tag' + tagId + '_Timeline' + this.id + '" class="EditEventDialog">';
+                str += '    <tr valign="top">';
+                str += '        <td width="50%" style="padding: 5px; white-space: nowrap; font-weight: bold; text-align: right">Event Summary</td>';
+                str += '        <td width="50%" style="padding-top: 5px; padding-bottom: 10px; padding-right: 5px">';
+                str += '            <input id="ViewEventDialogCloseButton_Tag' + tagId + '_Timeline' + this.id +'" type="button" value="Close" style="float: right"/>';
+                if (nextEventId.id !== undefined) {
+                    str += '        <input id="ViewEventDialogNextButton_Tag' + tagId + '_Timeline' + this.id + '" type="button" value="Next" style="float:right"/>';
+                }
+                if (prevEventId.id !== undefined) {
+                    str += '        <input id="ViewEventDialogPreviousButton_Tag' + tagId + '_Timeline' + this.id + '" type="button" value="Previous" style="float:right"/>';
+                }
+                str += '        </td>';
+                str += '    </tr>';
+                str += '    <tr>';
+                str += '        <td style="padding-left: 5px; text-align:center">Event Label: </td>';
+                str += '        <td id="view_label' + tagId +'" style="padding-left: 5px"> N/A </td>';
+                str += '    </tr>';
+                str += '    <tr>';
+                str += '        <td style="padding-left: 5px; text-align:center"> Latitude: </td>';
+                str += '        <td id="view_lat' + tagId + '"style="padding-left: 5px"></td>';
+                str += '        <td> <input id="oldview_lat' + tagId +'" type="hidden"></td>';
+                str += '    <tr>';
+                str += '        <td style="padding-left: 5px; text-align:center"> Longitude: </td>';
+                str += '        <td id="view_lng' + tagId + '" style="padding-left: 5px"></td>';
+                str += '        <td> <input id="oldview_lng' + tagId +'" type="hidden"></td>';
+                str += '    </tr>';
+                str += '    <tr>';
+                str += '        <td style="padding-left: 5px; text-align:center"> Address: </td>';
+                str += '        <td id="view_address' + tagId + '"style="padding-left: 5px"> </td>';
+                str += '    </tr>';
+                str += '    <tr>';
+                str += '        <td colspan=2 style="text-align:center">';
+                str += '            <label>Scope</label><select id="view_scope' + tagId + '"></select>';
+                str += '            <input id="view_showMap' + tagId + '" type="submit" value="Show Map">';
+                str += '        </td>';
+                str += '    </tr>';
+                str += '    <tr>';
+                str += '        <td colspan=2>';
+                str += '            <div id="view_map_canvas'+tagId+'" style="margin: auto; width: 90%; height: 350px; display: none;"></div>';
+                str += '        </td>';
+                str += '    </tr>';
+                str += '</table>';
+
+                if(sameTag !== undefined) {
+                    jQuery('#EventBand_Tag' + tagId + '_Timeline' + this.id).empty();
+                }
+                jQuery('#EventBand_Tag' + tagId + '_Timeline' + this.id).append(str);
+                jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
+                    if (event.shiftKey)
+                        event.stopPropagation();
+                });
+                var showMapButton = jQuery('#view_showMap' + tagId);
+                var viewMapCanvas = jQuery('#view_map_canvas' + tagId);
+                var viewEventDialog = jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + tagId); 
+
+                // Prevent sortable tag bands, shouldn't be able to edit tag bands in view mode.
+                jQuery('#TimelineBase_Timeline' + timeline.id).sortable({
+                    disabled: true
+                }); 
+               
+                /***** geotagging ****/
+                var latId = 'oldview_lat'+tagId;
+                var lngId = 'oldview_lng'+tagId;
+                var addressId = 'view_address'+tagId;
+                var scopeId = 'view_scope'+tagId;
+                var canvasId = 'view_map_canvas'+tagId;
+                var eid = eventId;
+               
+                // Toggle map.
+                jQuery('#view_showMap' + tagId).data('tagId', tagId).data('tId',this.id);
+
+                jQuery('#view_showMap' + tagId).click(function(event) {
+                    event.stopPropagation();
+                    var eventObj = jQuery(this).data('eventObj');
+                    var tagId = jQuery(this).data('tagId');
+                    var tId = jQuery(this).data('tId');
+                    var viewEventDialog = jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + tId); 
+                    var showMapButton = jQuery('#view_showMap' + tagId);
+                    var viewMapCanvas = jQuery('#view_map_canvas' + tagId);
+                    const spacing = 5; // Extra height from last <tr>.
+
+                    if (viewMapCanvas.css('display') == 'none') {
+                        // Re-adjust height of viewEventDialog box.
+                        viewEventDialog.css('height', viewEventDialog.height() + spacing + viewMapCanvas.height());
+                        viewEventDialog.parent().css('height', viewEventDialog.parent().height() + spacing + viewMapCanvas.height());
+                        viewEventDialog.parent().parent().css('height', viewEventDialog.parent().height() + 1); //+1 accounts for uneven heights
+                        viewMapCanvas.css('display', 'block');
+                        showMapButton.val('Hide Map');
+    
+                        // Initialize map after resizing in order to map sure everything is centered and loaded.
+                        initializeGeotag("view_map_canvas"+tagId);
+                        var latId = 'oldview_lat'+tagId;
+                        var lngId = 'oldview_lng'+tagId;
+                        var addressId = 'view_address'+tagId;
+                        var scopeId = 'view_scope'+tagId;
+                        var canvasId = 'view_map_canvas'+tagId;
+                        var eid = eventId;
+                    // Get the address by reverse geocoding to re-center the map.
+                    if (jQuery('#view_lat' + tagId).html() != "" &&
+                        jQuery('#view_lat' + tagId).html() != 0 &&
+                        jQuery('#view_lng' + tagId).html() != "" &&
+                        jQuery('#view_lng' + tagId).html() != 0 ) {
+                            // Must call again in order to recenter map.
+                            codeLocation('latlng', latId, lngId, addressId, scopeId, eid, 1);
+                        }
+                  } else {
+                       viewEventDialog.css('height', viewEventDialog.height() - spacing - viewMapCanvas.height());
+                       viewEventDialog.parent().css('height', viewEventDialog.parent().height() - spacing - viewMapCanvas.height());
+                       viewEventDialog.parent().parent().css('height', viewEventDialog.parent().parent().height() - spacing - viewMapCanvas.height());
+                       viewMapCanvas.css('display', 'none'); 
+                       showMapButton.val('Show Map'); 
+                   } 
+                });
+
+                // Populate geotagging info.
+                if (!isNaN(eventObj.getLat()) && !isNaN(eventObj.getLng())) {
+                    jQuery('#view_lat'+tagId).html(eventObj.getLat());
+                    jQuery('#view_lng'+tagId).html(eventObj.getLng());
+                    jQuery('#oldview_lat' + tagId).val(eventObj.getLat());
+                    jQuery('#oldview_lng' + tagId).val(eventObj.getLng());
+
+                    // Get the address by reverse geocoding the latitude and longitude.
+                    if (jQuery('#view_lat' + tagId).html() != "" &&
+                            jQuery('#view_lat' + tagId).html() != 0 &&
+                            jQuery('#view_lng' + tagId).html() != "" &&
+                            jQuery('#view_lng' + tagId).html() != 0 ) {
+                        codeLocation('latlng', latId, lngId, addressId, scopeId, eid, 1);
+                        jQuery('#view_address' + tagId).html(jQuery('#oldview_address' + tagId).val());
+
+                        if ( typeof eventObj.getScope() != "undefined" ) {
+                            console.log("scope=%s", eventObj.getScope());
+                            jQuery('#scope' + tagId + ' option[value="'+eventObj.getScope()+'"]').attr('selected', 'selected');
+                        } else {
+                            jQuery('#scope' + tagId).removeAttr('options')
+                            jQuery('#scope' + tagId).val('[Empty]');
+                        }
+                    }
+                } else {
+                    console.log('No geotag information available');
+                }
+
+                /***** end geotagging ****/
+
+                jQuery('#view_label' + tagId).html(eventObj.getComment());
+
+                // Attach listeners.
+                jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                });
+
+                // If Close button clicked, delete the dialog.
+                jQuery('#ViewEventDialogCloseButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
+
+                jQuery('#ViewEventDialogCloseButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) { 
+                    event.stopPropagation();
+                    event.preventDefault();
+                    var tagId = jQuery(event.target).data('tagId');
+                    delete timeline.viewEventDialogOpen[tagId];
+                    timeline.redraw();
+                });
+ 
+                // If Previous button clicked, delete the dialog, set the event ID and redraw.
+                jQuery('#ViewEventDialogPreviousButton_Tag' + tagId + '_Timeline' + this.id).data('tagId', tagId).data('eventId', eventId);
+                jQuery('#ViewEventDialogPreviousButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    var eventsForThisTag = {list: []};
+                    var prevEventId = {id : undefined};
+                    var nextEventId = {id : undefined};
+                    var eventId = jQuery(event.target).data('eventId');
+                    var tagId = jQuery(event.target).data('tagId');
+                    console.log(eventId, tagId);
+ 
+                    try {
+                        timeline.sortEvent(eventsForThisTag, prevEventId, nextEventId, eventId, tagId);
+                        timeline.viewEventDialogOpen[tagId] = prevEventId.id;
+                        jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + timeline.id).remove();
+                        timeline.selectEvent(timeline.findEvent(prevEventId.id));
+                        timeline.redraw();
+                    } catch (err) {
+                        timeline.handleError(err);
+                    }
+                });
+                
+                // If Next button clicked, delete the dialog, set the event ID and redraw.
+                jQuery('#ViewEventDialogNextButton_Tag' + tagId + '_Timeline' + this.id).data('tagId',tagId).data('eventId', eventId);           
+                jQuery('#ViewEventDialogNextButton_Tag' + tagId + '_Timeline' + this.id).click(function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    var eventsForThisTag = {list: []};
+                    var prevEventId = {id : undefined};
+                    var nextEventId = {id : undefined};                 
+                    var eventId = jQuery(event.target).data('eventId');
+                    var tagId = jQuery(event.target).data('tagId');
+                    try {
+                        timeline.sortEvent(eventsForThisTag, prevEventId, nextEventId, eventId, tagId); 
+                        timeline.viewEventDialogOpen[tagId] = nextEventId.id;
+                        jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + timeline.id).remove();
+                        timeline.selectEvent(timeline.findEvent(nextEventId.id));
+                        timeline.redraw();
+                    } catch (err) {
+                        timeline.handleError(err);
+                    }
+                });
+              
+                // Show view dialog box by changing parent heights to accommodate it.
+                var viewEventDialog = jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + this.id);
+                var level = this.findEvent(eventId).getLevel() + 1;
+                var tagLevel = this.findTag(tagId).getLevel();
+                var baseHeight = 22; 
+                var viewDialogTop = level * baseHeight;
+                viewEventDialog.css('top', viewDialogTop);
+                viewEventDialog.parent().css('height', viewDialogTop  +  viewEventDialog.height());
+                viewEventDialog.parent().parent().css('height', viewDialogTop  +  viewEventDialog.height());
+            }
+        } else {
+            // Remove viewEventDialog box.
+            var viewEventDialog = jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + this.id);
+            var baseHeight = 22; 
+            var level = this.findTag(tagId).getLevel();
+            viewEventDialog.parent().css('height', baseHeight * level);
+            viewEventDialog.parent().parent().css('height', baseHeight * level);     
+            viewEventDialog.remove();
+            var editTag = jQuery('#EditTagDialog_Tag' + tagId + '_Timeline' + this.id);
+            if (editTag.height() !== null || editTag.height() !== undefined) {
+                jQuery('#TagEventBand_Tag' + tagId + '_Timeline' + timeline.id).height(parseInt(editTag.height(), 10));                    
+            }
+        }
+
         // Process each event
-        
+
         var allEvents = jQuery.merge([], this.events);
         for (var tid in this.recordingEvents)
             allEvents.push(this.recordingEvents[tid]);
@@ -1937,16 +2231,27 @@ console.log("scope=%s", eventObj.getScope());
                     event.preventDefault();
                     event.stopPropagation();
                     console.log("click on eventbar_event");
-                    
-                    if (timeline.readOnly) {
-                        if(timeline.readOnlyGroup) {
-                            alert("You cannot edit another group's annotation."); 
-                        } else {
-                            alert("The annotation can not be changed after it has been submitted.");
+                   
+                    // If a submission has already been made, replace Edit Event dialog with View Event dialog.
+                    if (timeline.readOnly || timeline.readOnlyGroup) {
+                        if (jwplayer().getState() == "PLAYING") {
+                            jwplayer().pause();
                         }
-                        return;
-                    }
 
+                        var eventId = jQuery(this).data('eventId');
+                        var eventObj = timeline.findEvent(eventId);
+                        var viewEventDialog = jQuery('#ViewEventDialogTag_Tag' + tagId + '_Timeline' + this.id);
+                        if (typeof timeline.viewEventDialogOpen === 'undefined') {
+                            timeline.viewEventDialogOpen = {};
+                        }
+                        if (jQuery('#ViewEventDialog_Tag' + eventObj.getTag().getId() + '_Timeline' + timeline.id).size() !== 0) {
+                            sameTag = timeline.viewEventDialogOpen[eventObj.getTag().getId()];
+                        }
+                        timeline.viewEventDialogOpen[eventObj.getTag().getId()] = eventId;
+                        timeline.setTimelineMarker();
+                        timeline.redraw(); 
+                    }                        
+                 
                     if (clicks == 0 || clicks%2 == 2 || true) {
                         
                         if (jwplayer().getState() == "PLAYING")
@@ -1971,7 +2276,7 @@ console.log("scope=%s", eventObj.getScope());
                     //sameTag = undefined;
                 });
             }
-            // Set the left position and with of both event bar containment and event bar
+            // Set the left position and width of both event bar containment and event bar
 
             var startTime = allEvents[eventIdx].getStartTime();
             var duration = allEvents[eventIdx].getEndTime() - allEvents[eventIdx].getStartTime();
@@ -1979,7 +2284,19 @@ console.log("scope=%s", eventObj.getScope());
             .css('left', this.secondToPixel(startTime))
             .css('width', this.secondToPixel(duration, true));
             jQuery('#EventBarText_Event' + eventId + '_Timeline' + this.id).text(allEvents[eventIdx].getComment());
+
+            // Set the vertical position of the EventBar.
+            var eventBar = jQuery('#EventBar_Event' + eventId + '_Timeline' + this.id);
+            var level = this.findTag(tagId).getLevel();
+            var baseHeight = 22; 
+            eventBar.css('top', baseHeight * allEvents[eventIdx].getLevel());
             
+            if (eventBar.parent().parent().data('oldlevel') !== level) {
+                eventBar.parent().css('height', level * baseHeight); 
+                eventBar.parent().parent().css('height', level * baseHeight);
+                eventBar.parent().parent().data('oldlevel', level);
+            }
+
             // Set background color (depending on whether the event is selected)
             
             var eventSelected = false;
@@ -2064,20 +2381,20 @@ CSAVTimeline.prototype.setTimelineMarker = function() {
     this.noRedraw.currentTime = true;
 }
 
-CSAVTimeline.prototype.addTag = function(id, tag, color, useAJAX) {
+CSAVTimeline.prototype.addTag = function(id, tag, color, useAJAX, level) {
     var tagObj = this.findTag(tag);
-    if (tagObj !== undefined)
+    if (tagObj !== undefined) {
         throw "CSAVTimeline.prototype.addTag: Tag \"" + tag + "\" already exists.";
-    
-    if (tag instanceof CSAVTimelineTag)
+    }
+    if (tag instanceof CSAVTimelineTag) {
         tagObj = tag;
-    else if (typeof tag === "string")
-        tagObj = new CSAVTimelineTag({"id": id, "timeline": this, "name": tag, "color": color});
-    else
+    } else if (typeof tag === "string") {
+        tagObj = new CSAVTimelineTag({"id": id, "timeline": this, "name": tag, "color": color, "level": level});
+    } else {
         throw "CSAVTimeline.prototype.addTag: Tag \"" + tag + "\" is invalid.";
-    
-    // Add a tag into the database via AJAX
-    
+    }
+
+    // Add a tag into the database via AJAX.
     if (useAJAX) {
         var error = undefined;
         jQuery.ajax({
@@ -2089,7 +2406,8 @@ CSAVTimeline.prototype.addTag = function(id, tag, color, useAJAX) {
         		"c1_name": tagObj.getName(),
                 "c1_color": tagObj.getColor(),
                 "c1_userid": this.userId,
-                "c1_groupid": this.groupId
+                "c1_groupid": this.groupId,
+                "c1_level": tagObj.getLevel()
         	},
             dataType: "json",
             async: false,
@@ -2102,24 +2420,24 @@ CSAVTimeline.prototype.addTag = function(id, tag, color, useAJAX) {
                 
                 if (jsonData[0]["success"] !== true) {
                     error = new Error();
-                    if (typeof jsonData[0]["errortype"] != "undefined")
+                    if (typeof jsonData[0]["errortype"] != "undefined") {
                         error.errortype = jsonData[0]["errortype"];
-                    if (typeof jsonData[0]["message"] != "undefined")
+                    }
+                    if (typeof jsonData[0]["message"] != "undefined") {
                         error.message = jsonData[0]["message"];
+                    }
                     return;
                 }
-                
+
                 tagObj.setId(Number(jsonData[0]["id"]));
             }
         });
         if (typeof error != "undefined")
             throw error;
     }
-    
-    //
-    
+
     this.tags.push(tagObj);
-    
+
     //this.redrawTag(tagObj);
     
     //this.adjustRightPanelHeight();
@@ -2129,11 +2447,12 @@ CSAVTimeline.prototype.addTag = function(id, tag, color, useAJAX) {
     return tagObj;
 }
 
-CSAVTimeline.prototype.addEvent = function(id, tag, startTime, endTime, comment, useAJAX, latitude, longitude, scope) {
+CSAVTimeline.prototype.addEvent = function(id, tag, startTime, endTime, comment, useAJAX, latitude, longitude, scope, level) {
     var tagObj = this.findTag(tag);
     if (tagObj === undefined) {
         throw "CSAVTimeline.prototype.addEvent: Tag \"" + tagObj + "\" does not exist";
     }
+
     console.log("adding event lat=%d lng=%d", latitude, longitude);
     var newEvent = new CSAVTimelineEvent({
     "id": id,
@@ -2143,7 +2462,8 @@ CSAVTimeline.prototype.addEvent = function(id, tag, startTime, endTime, comment,
     "comment": comment,
     "latitude": Number(latitude),
     "longitude": Number(longitude),
-    "scope": scope
+    "scope": scope,
+    "level": level
     });
     
     //
@@ -2163,7 +2483,8 @@ CSAVTimeline.prototype.addEvent = function(id, tag, startTime, endTime, comment,
                 "c1_groupid": this.groupId,
                 "c1_latitude": latitude,
                 "c1_longitude": longitude,
-                "c1_scope": scope
+                "c1_scope": scope,
+                "c1_level": level
             }, 
             dataType: "json",
             async: false,
@@ -2197,7 +2518,7 @@ CSAVTimeline.prototype.addEvent = function(id, tag, startTime, endTime, comment,
     //this.redrawEvent(newEvent);
     
     this.sendMessage(this, "eventAdded", newEvent);
-    
+
     return newEvent;
 }
 
@@ -2208,10 +2529,11 @@ CSAVTimeline.prototype.addListener = function(action, listener) {
     this.listeners[action].push(listener);
 }
 
-CSAVTimeline.prototype.editTag = function(tag, oldName, oldColor, newName, newColor, sendUpdate) {
+CSAVTimeline.prototype.editTag = function(tag, oldName, oldColor, newName, newColor, sendUpdate, level) {
     var tagObj = this.findTag(Number(tag));
-    if (tagObj === undefined)
+    if (tagObj === undefined) {
         throw "Tag \"" + tag + "\" does not exist.";
+    }
     
     for (var idx in this.tags) {
         if (this.tags[idx].getId() != tagObj.getId() && this.tags[idx].getName() == tagObj.getName()) {
@@ -2224,19 +2546,22 @@ CSAVTimeline.prototype.editTag = function(tag, oldName, oldColor, newName, newCo
         "c1_command": "edittag",
         "c1_id": tagObj.getId()
     };
-    if (typeof newName != "undefined") {
+    if (typeof newName !== "undefined") {
         data["c1_name"] = newName;
         data["c1_oldname"] = oldName;
         changed = true;
     }
-    if (typeof newColor != "undefined") {
+    if (typeof newColor !== "undefined") {
         data["c1_color"] = newColor;
         data["c1_oldcolor"] = oldColor;
         changed = true;
     }
+    if (typeof level !== "undefined") {
+        data["c1_level"] = level;
+        changed = true;
+    }   
     
-    // Update the database via AJAX
-    
+    // Update the database via AJAX.
     if (changed && sendUpdate) {
         var error = undefined;
         jQuery.ajax({
@@ -2245,7 +2570,7 @@ CSAVTimeline.prototype.editTag = function(tag, oldName, oldColor, newName, newCo
             data: data, 
             dataType: "json",
             async: false,
-            success: function(jsonData, textStatus) {
+            success: function(jsonData, textStatus, xhr) {
                 if (!jsonData instanceof Array) {
                     error = new Error();
                     error.message = "error when receiving data from server";
@@ -2254,36 +2579,45 @@ CSAVTimeline.prototype.editTag = function(tag, oldName, oldColor, newName, newCo
                 
                 if (jsonData[0]["success"] !== true) {
                     error = new Error();
-                    if (typeof jsonData[0]["errortype"] != "undefined")
+                    if (typeof jsonData[0]["errortype"] != "undefined") {
                         error.errortype = jsonData[0]["errortype"];
-                    if (typeof jsonData[0]["message"] != "undefined")
+                    }
+                    if (typeof jsonData[0]["message"] != "undefined") {
                         error.message = jsonData[0]["message"];
+                    }
                     return;
                 }
+            },
+            error: function(xhr, status, error) {
+                    console.log(xhr);
+                    console.log("Details: " + status + "\nError:" + error);
             }
         });
-        if (typeof error != "undefined")
+        if (typeof error != "undefined") {
             throw error;
+        }
     }
     
-    if (typeof newName != "undefined")
+    if (typeof newName != "undefined") {
         tagObj.setName(newName);
-    if (typeof newColor != "undefined")
+    }
+    if (typeof newColor != "undefined") {
         tagObj.setColor(newColor);
-    
-    //
+    }
+    if (typeof level != "undefined") {
+        tagObj.setLevel(level);
+    }
     
     this.sendMessage(this, "tagEdited", tagObj);
     
     return tagObj;
 }
 
-CSAVTimeline.prototype.editEvent = function(event, oldStartTime, oldEndTime, oldComment, newStartTime, newEndTime, newComment, sendUpdate, latitude, longitude, scope) {    
+CSAVTimeline.prototype.editEvent = function(event, oldStartTime, oldEndTime, oldComment, newStartTime, newEndTime, newComment, sendUpdate, latitude, longitude, scope, level) {    
     var eventObj = this.findEvent(event);
-    if (eventObj === undefined)
+    if (eventObj === undefined) {
         throw "Event \"" + event + "\" does not exist.";
-    
-    //
+    }
     
     var changed = false;
     var data = {
@@ -2313,10 +2647,12 @@ CSAVTimeline.prototype.editEvent = function(event, oldStartTime, oldEndTime, old
     }
     if (typeof scope != "undefined") {
         data["c1_scope"] = scope;
+    } 
+    if (typeof level != "undefined") {
+        data["c1_level"] = level;
     }
-    
-    // Update the database via AJAX
-    
+
+    // Update the database via AJAX.
     if (changed && sendUpdate) {
         var error = undefined;
         jQuery.ajax({
@@ -2334,52 +2670,62 @@ CSAVTimeline.prototype.editEvent = function(event, oldStartTime, oldEndTime, old
                 
                 if (jsonData[0]["success"] !== true) {
                     error = new Error();
-                    if (typeof jsonData[0]["errortype"] != "undefined")
+                    if (typeof jsonData[0]["errortype"] != "undefined") {
                         error.errortype = jsonData[0]["errortype"];
-                    if (typeof jsonData[0]["message"] != "undefined")
+                    }
+                    if (typeof jsonData[0]["message"] != "undefined") {
                         error.message = jsonData[0]["message"];
+                    }
                     return;
                 }
             }
         });
-        if (typeof error != "undefined")
+        if (typeof error != "undefined") {
             throw error;
+        }
     }
-    
-    //
-    
-    if (typeof newTagObj != "undefined")
+
+    if (typeof newTagObj != "undefined") {
         eventObj.setTag(newTagObj);
-    if (typeof newStartTime != "undefined")
+    }
+    if (typeof newStartTime != "undefined") {
         eventObj.setStartTime(newStartTime);
-    if (typeof newEndTime != "undefined")
+    }
+    if (typeof newEndTime != "undefined") {
         eventObj.setEndTime(newEndTime);
-    if (typeof newComment != "undefined")
+    }
+    if (typeof newComment != "undefined") {
         eventObj.setComment(newComment);
-    if (typeof latitude != "undefined")
+    }
+    if (typeof latitude != "undefined") {
         eventObj.setLat(latitude);
-    if (typeof longitude != "undefined")
+    }
+    if (typeof longitude != "undefined") {
         eventObj.setLng(longitude);
-    if (typeof scope != "undefined")
+    }
+    if (typeof scope != "undefined") {
         eventObj.setScope(scope);
-    
-    //
-    
+    }
+    if (typeof level != "undefined") {
+        eventObj.setLevel(level);
+    }
+
     this.sendMessage(this, "eventEdited", eventObj);
-    
+
     return eventObj;
 }
 
 CSAVTimeline.prototype.findTag = function(tag) {
     for (var idx in this.tags) {
-        if (tag instanceof CSAVTimelineTag && this.tags[idx].getId() == tag.getId())
+        if (tag instanceof CSAVTimelineTag && this.tags[idx].getId() == tag.getId()) {
             return this.tags[idx];
-        
-        if (typeof tag === "number" && this.tags[idx].getId() == tag)
+        }
+        if (typeof tag === "number" && this.tags[idx].getId() == tag) {
             return this.tags[idx];
-        
-        if (typeof tag === "string" && this.tags[idx].getName().toLowerCase() === tag.toLowerCase())
+        }
+        if (typeof tag === "string" && this.tags[idx].getName().toLowerCase() === tag.toLowerCase()) {
             return this.tags[idx];
+        }
     }
     
     return undefined;
@@ -2491,19 +2837,16 @@ CSAVTimeline.prototype.removeTags = function(compare, sendUpdate) {
 
 	var tagName = tag.name;
         var conflict = false;
-        if(this.recordingEvents[tag.getId()] !== undefined)
+        if (this.recordingEvents[tag.getId()] !== undefined) {
             conflict = true;
-        
-        //
-        
+        }
+
         this.removeEvents(function(idx, event) {
             return event.getTag().getId() === tag.getId();
         });
         jQuery("#TagBand_Tag" + tag.getId()).remove();
         jQuery("#EventBand_Tag" + tag.getId()).remove();
-        
-        //
-        
+
         if (sendUpdate) {
             var timeline = this;
             var error = undefined;
@@ -2525,10 +2868,12 @@ CSAVTimeline.prototype.removeTags = function(compare, sendUpdate) {
 
                     if (jsonData[0]["success"] !== true) {
                         error = new Error();
-                        if (typeof jsonData[0]["errortype"] != "undefined")
+                        if (typeof jsonData[0]["errortype"] != "undefined") {
                             error.errortype = jsonData[0]["errortype"];
-                        if (typeof jsonData[0]["message"] != "undefined")
+                        }
+                        if (typeof jsonData[0]["message"] != "undefined") {
                             error.message = jsonData[0]["message"];
+                        }
                         return;
                     }
                                     
@@ -2556,7 +2901,7 @@ CSAVTimeline.prototype.removeEvent = function(id, sendUpdate) {
 CSAVTimeline.prototype.removeEvents = function(compare, sendUpdate) {
     var removedEvents = [];
     var retainedEvents = [];
-    
+
     for (var idx in this.events) {
         var event = this.events[idx];
         if (compare(idx, event)) {
@@ -2565,16 +2910,11 @@ CSAVTimeline.prototype.removeEvents = function(compare, sendUpdate) {
             retainedEvents.push(event);
         }
     }
-    
-    
+
     for (var idx in removedEvents) {
         var event = removedEvents[idx];
         
-        //
-        
         jQuery("#EventBar_" + event.getId()).remove();
-        
-        //
         
         if (sendUpdate) {
             var timeline = this;
@@ -2607,11 +2947,12 @@ CSAVTimeline.prototype.removeEvents = function(compare, sendUpdate) {
                     timeline.sendMessage(timeline, "eventRemoved", event);
                 }
             });
-            if (typeof error != "undefined")
+            if (typeof error != "undefined") {
                 throw error;
+            }
         }
     }
-    
+
     this.events = retainedEvents;
 }
 
@@ -2675,13 +3016,12 @@ CSAVTimeline.prototype.selectNoEvent = function() {
 CSAVTimeline.prototype.setCurrentTime = function(currentTime, internal) {
     var prevTime = this.currentTime;
 
-    //
-    
     if (currentTime >= 0 || currentTime < 0) {
-        if (currentTime < this.minTime)
+        if (currentTime < this.minTime) {
             currentTime = this.minTime;
-        else if (currentTime > this.maxTime)
+        } else if (currentTime > this.maxTime) {
             currentTime = this.maxTime;
+        }
         
         currentTime = Math.round(currentTime * 1000) / 1000;
         
@@ -2690,11 +3030,9 @@ CSAVTimeline.prototype.setCurrentTime = function(currentTime, internal) {
         for (var tagId in this.recordingEvents) {
             this.recordingEvents[tagId].setEndTime(currentTime);
         }
-    }
-    
-    // If the time given is not a number, set our current time to undefined, and do not show the current time bar
-    
-    else {
+
+    // If the time given is not a number, set our current time to undefined, and do not show the current time bar.
+    } else {
         this.currentTime = undefined;
         
         for (var idx in this.tags) {
@@ -2710,16 +3048,19 @@ CSAVTimeline.prototype.startRecording = function(tags) {
 
     for (var idx in tags) {
         var tagObj = this.findTag(tags[idx]);
-        if (tagObj === undefined)
+        if (tagObj === undefined) {
             continue;
-        if (typeof this.recordingEvents[tagObj.getId()] !== "undefined")
+        }
+        if (typeof this.recordingEvents[tagObj.getId()] !== "undefined") {
             continue;
+        }
         try {
             this.recordingEvents[tagObj.getId()] = new CSAVTimelineEvent({
                 id: this.randomId(),
                 tag: tagObj,
                 startTime: effectiveStartTime,
-                endTime: effectiveStartTime
+                endTime: effectiveStartTime,
+                level: 0
             });
         } catch (err) {
             timeline.handleError(err);
@@ -2734,31 +3075,119 @@ CSAVTimeline.prototype.stopRecording = function(tags) {
     
     for (var idx in tags) {
         var tagObj = this.findTag(tags[idx]);
-        if (tagObj === undefined)
+        if (tagObj === undefined) {
             continue;
-        if (typeof this.recordingEvents[tagObj.getId()] === "undefined")
+        }
+        if (typeof this.recordingEvents[tagObj.getId()] === "undefined") {
             continue;
+        }
         var event = this.recordingEvents[tagObj.getId()];
+        var tagId = tagObj.getId();
         delete this.recordingEvents[tagObj.getId()];
         jQuery("#EventBar_Event" + event.getId() + "_Timeline" + this.id).remove();
         try {
-            this.addEvent(undefined, tagObj.getName(), event.getStartTime(), effectiveEndTime, undefined, true, undefined, undefined, undefined);
+            event = this.addEvent(undefined, tagObj.getName(), event.getStartTime(), effectiveEndTime, undefined, true, undefined, undefined, undefined, event.getLevel());
+            this.assignLevel(tagId, event.getStartTime(), effectiveEndTime, event.getId());
         } catch (err) {
             timeline.handleError(err);
         }
     }
 }
 
+CSAVTimeline.prototype.sortEventByLevel = function (eventsForThisTag, prevEventId, nextEventId, eventId, tagId, level) {
+    for (var idx in this.events) {
+        if (this.events[idx].getTag().getId() == tagId  &&  this.events[idx].getLevel() == level) {
+            eventsForThisTag.list.push(this.events[idx]);
+        }
+    }
+    eventsForThisTag.list.sort(function(a, b) {
+        return (a.getStartTime() - b.getStartTime()) || (a.getEndTime() - b.getEndTime());
+    });
+    for (var idx in eventsForThisTag.list) {
+        if (eventsForThisTag.list[idx].getId() == eventId) {
+            if (idx > 0) {
+                prevEventId.id = eventsForThisTag.list[Number(idx) - 1].getId();
+            }
+            if (idx < eventsForThisTag.list.length - 1) {
+                nextEventId.id = eventsForThisTag.list[Number(idx) + 1].getId();
+            }
+        }
+    }
+}
+
+CSAVTimeline.prototype.assignLevel = function (tagId, startTime, endTime, eventId) {
+    var level;
+    var tagObj = this.findTag(tagId);
+    var eventObj = this.findEvent(eventId);
+  
+    for (level = 1;; level++) {
+        var eventsForThisTag = {list: []};
+        var prevEventId = {id: undefined};
+        var nextEventId = {id: undefined};
+        timeline.sortEventByLevel(eventsForThisTag, prevEventId, nextEventId, eventId, tagId, level);
+
+        // Case when the previous event overlaps with the new event.
+        if (prevEventId.id !== undefined) {
+            var prevEndTime = timeline.findEvent(prevEventId.id).getEndTime();
+            var prevEventLevel = this.findEvent(prevEventId.id).getLevel();
+            if (prevEndTime >= startTime && level == prevEventLevel) {
+                eventObj.setLevel(level + 1);
+                continue;
+
+            // Case when the the previous event doesn't overlap but the next event does.
+            } else if (nextEventId.id !== undefined) {
+                var nextStartTime = timeline.findEvent(nextEventId.id).getStartTime();
+                var nextEventLevel = this.findEvent(nextEventId.id).getLevel();
+                if (nextStartTime <= endTime && level == nextEventLevel) {
+                    eventObj.setLevel(level + 1);
+                    continue;
+                } else {
+                    break;
+                }
+
+            } else {
+                break;
+            }
+
+        // Case when the next even overlaps with the new event and a previous event doesn't exist.
+        } else if (nextEventId.id !== undefined) {
+            var nextStartTime = timeline.findEvent(nextEventId.id).getStartTime();
+            var nextEventLevel = this.findEvent(nextEventId.id).getLevel();
+            if (nextStartTime <= endTime && level == nextEventLevel) {
+                eventObj.setLevel(level + 1);
+                continue;
+            } else {
+                break;
+            }
+
+        } else {
+            break;
+        }
+    }
+
+    this.editEvent(eventId, startTime, endTime, undefined, startTime, endTime, undefined, true, undefined, undefined, undefined, level);
+    if (level >= tagObj.getLevel()) {
+        var name = tagObj.getName();
+        var color = tagObj.getColor();
+        this.editTag(tagId, name, color, name, color, true, level + 1);
+    }
+}
+
 CSAVTimeline.prototype.sendMessage = function(sender, action) {
     var params = [];
-    for (var i = 2; i < arguments.length; i++)
+    for (var i = 2; i < arguments.length; i++) {
         params.push(arguments[i]);
+    }
     
-    if (this.listeners[action] !== undefined)
-        for (var idx in this.listeners[action])
+    if (this.listeners[action] !== undefined) {
+        for (var idx in this.listeners[action]) {
             this.listeners[action][idx].apply(sender, params);
+        }
+    }
         
-    if (this.listeners[""] !== undefined)
-        for (var idx in this.listeners[""])
+    if (this.listeners[""] !== undefined) {
+        for (var idx in this.listeners[""]) {
             this.listeners[""][idx].apply(sender, params);
+        }
+    }
 }
