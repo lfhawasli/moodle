@@ -43,8 +43,8 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         $content = array();
         $PAGE->requires->jquery();
 
-        $content[] = html_writer::start_tag('div', array('class' => 'sites_div'));
-        foreach ($classsites as $class) {
+        $content[] = html_writer::start_tag('div', array('class' => 'class_sites_div'));
+        foreach ($classsites as $x => $class) {
             // Build class title in following format.
             // <subject area> <cat_num>, <activity_type e.g. Lec, Sem> <sec_num> (<term name e.g. Winter 2012>): <full name>.
 
@@ -105,8 +105,12 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             if (property_exists($class, 'id') && isset($overviews[$class->id])) {
                 $alerts = count($overviews[$class->id]);
                 // Create Notification Icon with number of alerts.
-                $classlink .= html_writer::tag('a', html_writer::tag('span', $alerts,
-                    array('id' => 'expand_course', 'class' => 'alertCount')), array('href' => '#/'));
+                $classlink .= html_writer::tag('a', $alerts, array(
+                        'href' => '#/', 'class' => 'alertCount',
+                        'id' => 'expand_course', 'style' => 'background-image: url("'.
+                        new moodle_url('/blocks/ucla_my_sites/img/message.png').'")',
+                        'title' => get_string('clicktohideshow')));
+
                 // Add activity display inside div so it can be expanded/collapsed
                 // by above icon.
                 $classlink .= html_writer::tag('div', $this->activity_display_opt
@@ -116,6 +120,9 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
 
             $classlink .= '<br>';
             $content[] = $classlink;
+            if ($x < count($classsites)-1) {
+                $content[] = '<hr>';
+            }
         }
         $content[] = html_writer::end_tag('div');
         // Add spacing between My sites & Collaboration sites sections.
@@ -136,15 +143,30 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         // Sort a bunch of collabortation sites via fullname.
         array_alphasort($collaborationsites, "fullname");
 
-        // Add Collab. sites title, and icon if there are notifications.
-        $collapser = html_writer::tag('img', '', array('src' =>
-                new moodle_url('/blocks/ucla_my_sites/expanded.svg'),
-                'class' => 'course_expand'));
+        $collapser = '';
+        // Add a collapse/expand icon if any class sites have notifications.
+        foreach ($overviews as $id => $value) {
+            foreach ($collaborationsites as $collabsite) {
+                if ($collabsite->id == $id) {
+                    $collapser = 'T';
+                    break;
+                }
+            }
+            if ($collapser == 'T') {
+                break;
+            }
+        }
+        if ($collapser == 'T') {
+            $collapser = html_writer::tag('a', html_writer::tag('img', '', array('src'
+                    => new moodle_url('/blocks/ucla_my_sites/img/expanded.svg'),
+                    'class' => 'collab_course_expand')), array('href' => '#/'));
+        }
+
         $content[] = html_writer::tag('h3', get_string('collaborationsites',
                 'block_ucla_my_sites').$collapser, array('class' => 'mysitesdivider'));
 
-        $content[] = html_writer::start_tag('div', array('class' => 'sites_div'));
-        foreach ($collaborationsites as $collab) {
+        $content[] = html_writer::start_tag('div', array('class' => 'collab_sites_div'));
+        foreach ($collaborationsites as $x => $collab) {
             // Make link.
             $collablink = html_writer::link(new moodle_url('/course/view.php',
                     array('id' => ($collab->id))), $collab->fullname,
@@ -154,8 +176,11 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             if (property_exists($collab, 'id') && isset($overviews[$collab->id])) {
                 $alerts = count($overviews[$collab->id]);
                 // Create Notification Icon with number of alerts.
-                $collablink .= html_writer::tag('a', html_writer::tag('span', $alerts,
-                    array('id' => 'expand_course', 'class' => 'alertCount')), array('href' => '#/'));
+                $collablink .= html_writer::tag('a', $alerts, array(
+                        'href' => '#/', 'class' => 'alertCount',
+                        'id' => 'expand_course', 'style' => 'background-image: url("'.
+                        new moodle_url('/blocks/ucla_my_sites/img/message.png').'")',
+                        'title' => get_string('clicktohideshow')));
                 // Add activity display inside div so it can be expanded/collapsed
                 // by above icon.
                 $collablink .= html_writer::tag('div', $this->activity_display_opt($collab->id,
@@ -163,6 +188,9 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             }
             $collablink .= '<br>';
             $content[] = $collablink;
+            if ($x < count($collaborationsites)-1) {
+                $content[] = '<hr>';
+            }
         }
         $content[] = html_writer::end_tag('div');
         return implode($content);
