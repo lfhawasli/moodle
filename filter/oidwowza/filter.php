@@ -140,9 +140,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     if (!empty($fallbackurl)) {
         $fallbackurl = urldecode($fallbackurl);
     }
-
-    $app = $COURSE->shortname; // Need to store videos by shortname.
-
+    $app = $COURSE->shortname;
     // Handle VOD and Live streams.
     $timeline = '';
     $srtjs = '';
@@ -186,6 +184,8 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
 
     // Generate SecureToken hash.
     if (strpos($url, get_config('block_ucla_video_reserves', 'wowzaurl')) !== false) {
+        // Specifying application name and defining a default instance of the application.
+        $app = 'IMCS/_definst_';
         $contentpath = $app . '/' . $format . $file;
     } else {
         $contentpath = 'CCLEtest1/Vtest1/'. $format . $file;
@@ -291,7 +291,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     // Provide URL (BruinMedia) fallback, if available.
     if (!empty($fallbackurl)) {
         $fallbackurl = html_writer::link($fallbackurl,
-                get_string('fallbackurl', 'block_ucla_video_reserves'),
+                get_string('fallbackurl', 'block_ucla_media'),
                 array('class' => 'small'));
         $fallbackurl = html_writer::div($fallbackurl, 'text-center',
                 array('style' => 'max-width: ' . $width . 'px'));
