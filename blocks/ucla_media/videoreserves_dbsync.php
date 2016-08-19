@@ -29,16 +29,12 @@
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(__FILE__) . '/../../../config.php');
+require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
 require_once($CFG->libdir. '/clilib.php');
 
-// Get video reserves. Dies if there are any problems.
-$videoreserves = get_videoreserves();
 
-// Begin database update.
-update_videoreserves_db($videoreserves);
 
 /**
  * Returns array detailing the different expected fields.
