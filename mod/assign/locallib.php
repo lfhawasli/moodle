@@ -1127,7 +1127,12 @@ class assign {
         $PAGE->requires->yui_module('moodle-local_ucla-submissiontype',
                 'M.local_ucla.submissiontype.init');
         // END UCLA MOD: CCLE-5968
-        
+
+        // START UCLA MOD: CCLE-6085 - Simplify assignment feedback type.
+        $PAGE->requires->yui_module('moodle-local_ucla-feedbacktype',
+                'M.local_ucla.feedbacktype.init');
+        // END UCLA MOD: CCLE-6085.
+
         if ($plugin->is_visible() && !$plugin->is_configurable() && $plugin->is_enabled()) {
             $name = $plugin->get_subtype() . '_' . $plugin->get_type() . '_enabled';
             $pluginsenabled[] = $mform->createElement('hidden', $name, 1);
