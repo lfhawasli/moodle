@@ -39,7 +39,7 @@ Feature: Backup and restore Q&A
     When I press "Continue"
     And I click on "Restore" "link" in the "#region-main" "css_element"
     And I press "Continue"
-    And I click on "targetid" "radio" in the ".r1" "css_element"
+    And I click on "targetid" "radio" in the ".rcs-course.lastrow" "css_element"
     And I press "Continue"
     And I press "Next"
     And I press "Next"
@@ -57,7 +57,7 @@ Feature: Backup and restore Q&A
     And I upload "mod/qanda/tests/fixtures/qanda_backup.mbz" file to "Files" filemanager
     And I press "Restore"
     And I press "Continue"
-    And I click on "targetid" "radio" in the ".r0" "css_element"
+    And I click on "targetid" "radio" in the ".rcs-course.lastrow" "css_element"
     And I press "Continue"
     And I press "Next"
     And I press "Next"
