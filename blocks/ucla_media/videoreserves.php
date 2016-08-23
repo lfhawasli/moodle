@@ -19,7 +19,6 @@
  *
  * @package    block_ucla_media
  * @copyright  2016 UC Regents
- * @author Anant Mahajan
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA video reserves block for Moodle - http://moodle.org/
+// This file is part of the UCLA Media block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Specifies current version number for Block UCLA Media.
+ * Version number.
  *
  * @package    block_ucla_media
- * @author     Anant Mahajan
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$plugin->version    = 2016081300;
+$plugin->version    = 2016082300;
 $plugin->component = 'block_ucla_media';

@@ -25,8 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Upgrade function.
+ *
+ * @param int $oldversion
+ * @return boolean
+ */
 function xmldb_block_ucla_media_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
     if ($oldversion < 2016081300) {
@@ -44,4 +50,5 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2016081300, 'ucla_library_reserves');
     }
 
+    return true;
 }

@@ -18,17 +18,13 @@
  * Lang strings for the UCLA Media Block
  *
  * @package    block_ucla_media
- * @author     Anant Mahajan
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-$string['pluginname'] = 'UCLA Media';
-$string['title'] = 'Video Resources';
 $string['headerbcast'] = 'Bruincast: {$a}';
-$string['headervidres'] = 'Video Reserves: {$a}';
-$string['title'] = "Media";
+$string['headervidres'] = 'Video reserves: {$a}';
+$string['title'] = 'Media resources';
 $string['intro'] = 'Please note that this media is intended for on-campus use only. Off-campus use is possible in certain circumstances, but it is not supported, dependable, or recommended. In order to view the video streams, you may need to download and install the Silverlight plugin.';
 $string['availability'] = 'Available: ';
 $string['back'] = 'Back to video listing';
@@ -48,8 +44,10 @@ $string['intro'] = 'Please note that this media is intended for on-campus use on
 $string['novideo'] = 'No videos available';
 $string['pastvideo'] = 'Past videos';
 $string['pastvideo_info'] = 'No longer available as of {$a}';
-$string['pluginname'] = 'UCLA video reserves';
+$string['pluginname'] = 'UCLA Media';
 $string['sourceurl'] = 'Source URL';
 $string['sourceurl_desc'] = 'TSV source URL for video reserves data';
+$string['taskupdatebcast'] = 'Update Bruincast';
+$string['taskupdatevidreserves'] = 'Update video reserves';
 $string['wowzaurl'] = 'Wowza server';
 $string['wowzaurl_desc'] = 'The address and port for the Wowza streaming server. Do not include a protocol prefix.';

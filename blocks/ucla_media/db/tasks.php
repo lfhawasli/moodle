@@ -18,34 +18,29 @@
  * Upgrades database for bruincast
  *
  * @package    block_ucla_media
- * @author     Anant Mahajan
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 $tasks = array(
+    // Run at 10:30 am and 8:30 pm.
     array(
         'classname' => 'block_ucla_media\task\update_bcast',
         'blocking' => 0,
-        'minute' => '0',
-        'hour' => '17',
-        'day' => '*/7',
-        'dayofweek' => '6',
+        'minute' => '30',
+        'hour' => '10,20',
+        'day' => '*',
+        'dayofweek' => '*',
         'month' => '*'
     ),
+    // Run at 10:15 am and 8:15 pm.
     array(
         'classname' => 'block_ucla_media\task\update_vidreserves',
         'blocking' => 0,
-        'minute' => '0',
-        'hour' => '18',
-        'day' => '*/7',
-        'dayofweek' => '6',
+        'minute' => '15',
+        'hour' => '10,20',
+        'day' => '*',
+        'dayofweek' => '*',
         'month' => '*'
     )
 );
