@@ -745,7 +745,10 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
  * @return object {@link $COURSE} records
  */
 function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$totalcount,
-                            $requiredcapabilities = array()) {
+    // START UCLA MOD: CCLE-6118 - Error when searching.
+    //                        $requiredcapabilities = array()) {
+                              $requiredcapabilities = array(), $otherargs = null) {
+    // END UCLA MOD: CCLE-6118
     global $CFG, $DB;
     
     // START UCLA MOD CCLE-2309
