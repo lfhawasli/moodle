@@ -63,6 +63,10 @@ class block_ucla_my_sites extends block_base {
     public function get_content() {
         global $USER, $CFG, $OUTPUT, $PAGE, $DB;
 
+        // Include module.js.
+        $PAGE->requires->jquery();
+        $PAGE->requires->js('/blocks/ucla_my_sites/module.js', true);
+
         if ($this->content !== null) {
             return $this->content;
         }
@@ -319,33 +323,50 @@ class block_ucla_my_sites extends block_base {
         } else {
             $noclasssitesoverride = 'noclasssitesatall';
         }
-
         $termoptstr = html_writer::tag('div', $termoptstr,
-            array('class' => 'termselector'));
+                array('class' => 'termselector'));
 
-        // Display Class sites.
-        $content[] = html_writer::tag('h3',
-                get_string('classsites', 'block_ucla_my_sites'),
-                    array('class' => 'mysitesdivider'));
-        $content[] = $termoptstr;
+        // Add a collapse/expand icon if any class sites have notifications.
+        $collapser = '';
+        foreach ($overviews as $id => $value) {
+            foreach ($classsites as $classsite) {
+                if (property_exists($classsite, 'id') && $classsite->id == $id) {
+                    $collapser = html_writer::tag('a', html_writer::tag('img', '', array(
+                        'src' => new moodle_url('/blocks/ucla_my_sites/img/expanded.svg'),
+                        'class' => 'class_course_expand')), array('href' => '#/'));
+                    break;
+                }
+            }
+            if ($collapser != '') {
+                break;
+            }
+        }
 
         $renderer = $PAGE->get_renderer('block_ucla_my_sites');
 
-        // Write Class info if class_sites & collaboration_site are not empty.
-        if (!empty($classsites)) {
-            $content[] = $renderer->class_sites_overview($classsites, $overviews);
-        } else {
-            if (!isset($noclasssitesoverride)) {
-                $ncsstr = 'noclasssites';
+        // Display Class sites.
+        if (!isset($noclasssitesoverride)) {
+            $content[] = html_writer::tag('h3',
+                    get_string('classsites', 'block_ucla_my_sites').$collapser,
+                    array('class' => 'mysitesdivider'));
+            $content[] = $termoptstr;
+            if (!empty($classsites)) {
+                $content[] = $renderer->class_sites_overview($classsites, $overviews);
             } else {
-                $ncsstr = $noclasssitesoverride;
+                $content[] = html_writer::tag('p', get_string('noclasssites',
+                        'block_ucla_my_sites', ucla_term_to_text($showterm)));
             }
-
-            $content[] = html_writer::tag('p', get_string($ncsstr,
-                    'block_ucla_my_sites', ucla_term_to_text($showterm)));
         }
+
+        // Display Collaboration sites.
         if (!empty($collaborationsites)) {
             $content[] = $renderer->collab_sites_overview($collaborationsites, $overviews);
+        } else {
+            // If there are no enrolled srs courses in any term and no sites, print msg.
+            if (isset($noclasssitesoverride)) {
+                $content[] = html_writer::tag('p', get_string('notenrolled',
+                        'block_ucla_my_sites'));
+            }
         }
 
         $this->content->text = implode($content);
