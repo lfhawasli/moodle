@@ -84,3 +84,4 @@ $string['errvrfileopen'] = "ERROR: Problem accessing data URL";
 // Notification messages.
 $string['vrstartnoti'] = "Starting video reserves DB update:";
 $string['vrsuccessnoti'] = 'Inserted: {$a->inserted}, Updated: {$a->updated}, Deleted: {$a->deleted} records.';
+$string['vrnoentries'] = 'No video reserve entries found.';

@@ -23,10 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
+// Run at 7:45 am and 7:45 pm.
 $tasks = array(
     array(
-        'classname' => 'block_ucla_library_reserves\task\update_videos',
+        'classname' => 'block_ucla_library_reserves\task\update',
         'blocking' => 0,
         'minute' => '0',
         'hour' => '19',

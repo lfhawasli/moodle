@@ -52,6 +52,12 @@ function cmp_stop_date($a, $b) {
     return ($a->stop_date < $b->stop_date) ? 1 : -1;
 }
 
+/**
+ * Queries for video reserves for a given course.
+ *
+ * @param int $courseid
+ * @return array
+ */
 function get_video_data($courseid) {
     global $DB;
 
@@ -121,7 +127,6 @@ function cmp_title($a, $b) {
  */
 function display_video_reserves($course) {
       global $OUTPUT;
-      global $DB;
 
     // Adding GROUP BY to the where clause of the database query ensures no
     // duplicate videos are displayed for crosslisted courses.
@@ -150,10 +155,7 @@ function display_video_reserves($course) {
     echo html_writer::end_tag('div');
 
     echo html_writer::end_tag('div');
-
 }
-
-
 
 /**
  * Initializes all $PAGE variables.
@@ -220,6 +222,12 @@ function print_video_list($videolist, $headertitle) {
     echo html_writer::end_tag('div');
 }
 
+/**
+ * Prints tabs.
+ *
+ * @param string $activetab
+ * @param int $courseid
+ */
 function print_page_tabs($activetab, $courseid) {
     global $CFG, $COURSE, $DB;
     $videos = $DB->get_records_select('ucla_bruincast',
