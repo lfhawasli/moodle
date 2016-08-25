@@ -42,7 +42,7 @@ function xmldb_workshopform_rubric_upgrade($oldversion) {
     // Moodle v3.0.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Moodle v2.7.0 release upgrade line.
+    // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;
