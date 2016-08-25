@@ -59,13 +59,13 @@ Feature: Average grade handles suspended enrolments properly.
     And I log out
     When I log in as "teacher1"
     And I follow "Course 1"
-    And I follow "Grades"
+    And I navigate to "Grades" node in "Course administration"
     And I turn editing mode on
     # Do not assign grade to student 4 to ensure the average is calculated correctly.
     And I give the grade "100.00" to the user "Student 1" for the grade item "Test assignment name 1"
     And I give the grade "100.00" to the user "Student 2" for the grade item "Test assignment name 1"
     And I give the grade "100.00" to the user "Student 3" for the grade item "Test assignment name 1"
-    And I press "Update"
+    And I press "Save changes"
     Then I should see "100.00" in the "Overall average" "table_row"
     And I follow "Course 1"
     And I expand "Users" node
@@ -75,15 +75,17 @@ Feature: Average grade handles suspended enrolments properly.
     And I set the field "Status" to "Suspended"
     And I press "Save changes"
     And I follow "Course 1"
-    And I follow "Grades"
+    And I navigate to "Grades" node in "Course administration"
     And I should see "100.00" in the "Overall average" "table_row"
     # User grade report preference set show only active enrollment to Yes.
-    And I click on "Grader report" "option" in the "//optgroup[contains(@label,'My preferences')]" "xpath_element"
+    And I expand "Setup" node
+    And I follow "Preferences: Grader report"
     And I set the field "grade_report_showonlyactiveenrol" to "Yes"
     And I press "Save changes"
     And I should see "100.00" in the "Overall average" "table_row"
     # User grade report preference set show only active enrollment to No.
-    And I click on "Grader report" "option" in the "//optgroup[contains(@label,'My preferences')]" "xpath_element"
+    And I expand "Setup" node
+    And I follow "Preferences: Grader report"
     And I set the field "grade_report_showonlyactiveenrol" to "No"
     And I press "Save changes"
     And I should see "100.00" in the "Overall average" "table_row"
