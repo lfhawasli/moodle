@@ -199,7 +199,9 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
     echo '<div>';
 
     // START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report.
-    echo '<input type="hidden" value="'.$groupingid.'" name="grouping"/>';
+    if (isset($groupingid)) {
+        echo '<input type="hidden" value="'.$groupingid.'" name="grouping"/>';
+    }
     // END UCLA MOD: CCLE-4295
 
     echo '<input type="hidden" value="'.s($courseid).'" name="id" />';
