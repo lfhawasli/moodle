@@ -197,49 +197,8 @@ function xmldb_assign_upgrade($oldversion) {
     // Moodle v3.0.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Moodle v2.7.0 release upgrade line.
+    // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
-
-    if ($oldversion < 2014051201) {
-
-        // Cleanup bad database records where assignid is missing.
-
-        $DB->delete_records('assign_user_mapping', array('assignment'=>0));
-        // Assign savepoint reached.
-        upgrade_mod_savepoint(true, 2014051201, 'assign');
-    }
-
-    if ($oldversion < 2014051202) {
-        // Delete any entries from the assign_user_flags and assign_user_mapping that are no longer required.
-        if ($DB->get_dbfamily() === 'mysql') {
-            $sql1 = "DELETE {assign_user_flags}
-                       FROM {assign_user_flags}
-                  LEFT JOIN {assign}
-                         ON {assign_user_flags}.assignment = {assign}.id
-                      WHERE {assign}.id IS NULL";
-
-            $sql2 = "DELETE {assign_user_mapping}
-                       FROM {assign_user_mapping}
-                  LEFT JOIN {assign}
-                         ON {assign_user_mapping}.assignment = {assign}.id
-                      WHERE {assign}.id IS NULL";
-        } else {
-            $sql1 = "DELETE FROM {assign_user_flags}
-                WHERE NOT EXISTS (
-                          SELECT 'x' FROM {assign}
-                           WHERE {assign_user_flags}.assignment = {assign}.id)";
-
-            $sql2 = "DELETE FROM {assign_user_mapping}
-                WHERE NOT EXISTS (
-                          SELECT 'x' FROM {assign}
-                           WHERE {assign_user_mapping}.assignment = {assign}.id)";
-        }
-
-        $DB->execute($sql1);
-        $DB->execute($sql2);
-
-        upgrade_mod_savepoint(true, 2014051202, 'assign');
-    }
 
     return true;
 }
