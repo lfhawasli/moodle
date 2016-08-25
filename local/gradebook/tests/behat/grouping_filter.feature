@@ -44,7 +44,7 @@ Feature: Grader Report Grouping filter
   Scenario: View different groupings in grader report
     Given I log in as "instructor"
     When I follow "Course 1"
-    And I follow "Grades"
+    And I navigate to "Grades" node in "Course administration"
     Then I should see "Grader report"
     And I should see "View grouping"
     And the "grouping" select box should contain "All"
@@ -70,7 +70,7 @@ Feature: Grader Report Grouping filter
   Scenario: Use ordering tools with grouping filter
     Given I log in as "instructor"
     When I follow "Course 1"
-    And I follow "Grades"
+    And I navigate to "Grades" node in "Course administration"
     And I set the field "grouping" to "C1Section 1"
     Then "C1user1@asd.com" "table_row" should appear before "C1user2@asd.com" "table_row"
     When I follow "Email address"
@@ -106,7 +106,7 @@ Feature: Grader Report Grouping filter
       | C1user4 | G3 |
     Given I log in as "instructor"
     When I follow "Course 1"
-    And I follow "Grades"
+    And I navigate to "Grades" node in "Course administration"
     Then I should see "Grader report"
     And I should see "View grouping"
     And the "grouping" select box should contain "All"
