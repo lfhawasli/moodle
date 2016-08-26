@@ -25,6 +25,9 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__).'/import_form.php');
 
+// CCLE-5955 - Work around to make the file picker load.
+$USER->editing = 0;
+
 // Needs user to be logged in.
 require_login();
 $context = context_system::instance();
