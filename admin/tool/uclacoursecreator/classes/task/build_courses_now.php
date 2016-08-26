@@ -25,6 +25,7 @@
 namespace tool_uclacoursecreator\task;
 
 defined('MOODLE_INTERNAL') || die();
+require_once(dirname(__FILE__) . '/../../uclacoursecreator.class.php');
 
 /**
  * Class file.
