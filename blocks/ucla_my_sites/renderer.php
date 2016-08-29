@@ -70,7 +70,9 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             $subjareafull = $this->get_registrar_translation('ucla_reg_subjectarea',
                     $reginfo->subj_area, 'subjarea', 'subj_area_full');
             $reginfo = reset($class->reg_info);
-            $title = sprintf('%s %s: %s', $subjareafull[1], $reginfo->coursenum, $class->fullname);
+            $title = sprintf('%s<br>%s, %s %s - %s', $subjareafull[1],
+                    $reginfo->coursenum, $reginfo->acttype,
+                    $reginfo->sectnum, $class->fullname);
 
             // Add link.
             if (!empty($class->url)) {
@@ -119,7 +121,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             $classlink .= '<br>';
             $content[] = $classlink;
             if ($x < count($classsites) - 1) {
-                $content[] = '<hr>';
+                $content[] = '<hr class="course_divider">';
             }
         }
         $content[] = html_writer::end_tag('div');
@@ -187,7 +189,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             $collablink .= '<br>';
             $content[] = $collablink;
             if ($x < count($collaborationsites) - 1) {
-                $content[] = '<hr>';
+                $content[] = '<hr class="course_divider">';
             }
         }
         $content[] = html_writer::end_tag('div');
