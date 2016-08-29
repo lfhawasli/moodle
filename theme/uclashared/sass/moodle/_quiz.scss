@@ -98,6 +98,11 @@
             }
         }
     }
+
+    // Make a larger box when editing max marks for a question.
+    ul.slots li.section li.activity .instancemaxmarkcontainer form input {
+        height: 1.5em;
+    }
 }
 
 // The quiz question (bank) page
