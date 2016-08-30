@@ -67,10 +67,13 @@ class help_form extends moodleform {
 
         // Only allow logged in users to upload attachments.
         if (isloggedin() && !isguestuser()) {
-            $mform->addElement('filepicker', 'ucla_help_attachment',
-                    get_string('helpform_upload', 'block_ucla_help'), null,
-                    array('maxbytes' => get_config('block_ucla_help', 'maxfilesize'),
-                    'accepted_types' => '*'));
+            // Temporarily hides the file picker for CCLE in all cases.
+            if (get_config('block_ucla_help', 'enablefileuploads')) {
+                $mform->addElement('filepicker', 'ucla_help_attachment',
+                        get_string('helpform_upload', 'block_ucla_help'), null,
+                        array('maxbytes' => get_config('block_ucla_help', 'maxfilesize'),
+                        'accepted_types' => '*'));
+            }
         }
 
         // no point in having a cancel option
