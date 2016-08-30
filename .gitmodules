@@ -84,7 +84,7 @@
 	url = https://github.com/andrewnicols/moodle-atto_htmlplus.git
 [submodule "mod/assign/submission/onlinepoodll"]
 	path = mod/assign/submission/onlinepoodll
-	url = https://github.com/justinhunt/moodle-assign_submission_onlinepoodll.git
+	url = git@github.com:ccle/moodle-assign_submission_onlinepoodll.git
 [submodule "mod/zoom"]
 	path = mod/zoom
 	url = git@github.com:ucla/moodle-mod_zoom.git
