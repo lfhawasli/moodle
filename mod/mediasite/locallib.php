@@ -3,15 +3,24 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 
 global $CFG;
-require_once("$CFG->dirroot/mod/mediasite/mediasiteclientfactory.php");
+require_once("$CFG->dirroot/mod/mediasite/lib.php");
 require_once("$CFG->dirroot/mod/mediasite/mediasitesite.php");
 require_once("$CFG->dirroot/mod/mediasite/mediasiteresource.php");
-require_once("$CFG->dirroot/mod/mediasite/progress.php");
-require_once("$CFG->dirroot/mod/mediasite/searchoptions.php");
-require_once("$CFG->dirroot/mod/mediasite/presentation.php");
-require_once("$CFG->dirroot/mod/mediasite/catalog.php");
+
+defined('MOODLE_INTERNAL') || die();
 
 define("MEDIASITE_MOODLE_TIMEOUT", 25);
+
+function is_local_mediasite_courses_installed() {
+    // Extend settings for each local plugin. Note that their settings may be in any part of the
+    // settings tree and may be visible not only for administrators.
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('local') as $plugin) {
+        if (strcmp($plugin->component, 'local_mediasite_courses') === 0) {
+            return true;
+        }
+    }
+    return false;
+}
 
 function mediasite_get_version () {
     global $DB;
@@ -202,6 +211,10 @@ function mediasite_get_playback_url(Sonicfoundry\MediasiteResource $mediasitelin
 function mediasite_get_editor_options($context) {
     global $CFG;
     return array('subdirs'=>1, 'maxbytes'=>$CFG->maxbytes, 'maxfiles'=>-1, 'changeformat'=>1, 'context'=>$context, 'noclean'=>1, 'trusttext'=>0);
+}
+
+function mediasite_has_value($value) {
+    return isset($value) && !is_null($value);
 }
 
 ?>

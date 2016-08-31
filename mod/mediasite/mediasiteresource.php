@@ -2,6 +2,8 @@
 
 namespace Sonicfoundry;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class MediasiteResource
  * @package Sonicfoundry
@@ -16,10 +18,12 @@ class MediasiteResource {
             $this->resourceid = $record->resourceid;
             $this->resourcetype = $record->resourcetype;
             $this->openaspopup = $record->openaspopup;
-            $this->duration = $record->duration;
             $this->restrictip = $record->restrictip;
-            $this->timecreated = $record->timecreated;
-            $this->timemodified = $record->timemodified;
+            $this->recorddateutc = $record->recorddateutc;
+            $this->presenters = $record->presenters;
+            $this->tags = $record->tags;
+            $this->mode = $record->mode;
+            $this->launchurl = $record->launchurl;
             $this->siteid = $record->siteid;
         }
     }
@@ -30,9 +34,11 @@ class MediasiteResource {
     public $resourceid;
     public $resourcetype;
     public $openaspopup;
-    public $duration;
     public $restrictip;
-    public $timecreated;
-    public $timemodified;
+    public $recorddateutc;
+    public $presenters;
+    public $tags;
+    public $mode;
+    public $launchurl;
     public $siteid;
 } 

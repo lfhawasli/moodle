@@ -1,5 +1,7 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+
 namespace Sonicfoundry;
 
 class Cipher {

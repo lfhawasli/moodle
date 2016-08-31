@@ -16,12 +16,19 @@ $PAGE->set_url($CFG->wwwroot . '/mod/mediasite/site/edit.php');
 
 require_login();
 require_capability('mod/mediasite:addinstance', $context);
+admin_externalpage_setup('activitysettingmediasite');
+
+$PAGE->set_pagelayout('admin');
+$PAGE->requires->js(new moodle_url('/mod/mediasite/js/mod_mediasite_site_form.js'), true);
 
 global $DB;
 
 $record = $DB->get_record('mediasite_sites', array('id'=>$siteid));
 
 $site = new Sonicfoundry\MediasiteSite($record);
+
+$PAGE->set_title($site->get_sitename());
+
 $editform = new mod_mediasite_site_form($site);
 $mform =& $editform;
 if ($mform->is_cancelled()) {
@@ -30,55 +37,38 @@ if ($mform->is_cancelled()) {
 }
 $data = $mform->get_data();
 if($data) {
+    $navInstalled = $mform->is_navigation_installed();
     // Save edited data
     $site->set_sitename($data->sitename);
     $site->set_endpoint($data->siteurl);
-    $site->set_username($data->siteusername);
-    $site->set_password($data->sitepassword);
-    $site->set_passthru($data->sitepassthru);
-    if(preg_match('%\bhttps:\/\/%si',$data->siteurl)) {
-        $site->set_sslselect(1);
-    } else {
-        $site->set_sslselect(0);
+    $site->set_lti_consumer_key($data->sitelti_consumer_key);
+    $site->set_lti_consumer_secret($data->sitelti_consumer_secret);
+    $site->set_lti_custom_parameters($data->sitelti_custom_parameters);
+    if ($navInstalled) {
+        $site->set_show_integration_catalog($data->show_integration_catalog);
+        $site->set_integration_catalog_title($data->integration_catalog_title);
+        $site->set_openpopup_integration_catalog($data->openpopup_integration_catalog);
+        $site->set_show_my_mediasite($data->show_my_mediasite);
+        $site->set_my_mediasite_title($data->my_mediasite_title);
+        $site->set_my_mediasite_placement($data->my_mediasite_placement);
+        $site->set_openaspopup_my_mediasite($data->openaspopup_my_mediasite);
     }
-    if($site->get_sslselect()) {
-        $certcontent = $mform->get_file_content('cert');
-        $site->set_cert($certcontent);
-    }
-    $url = $data->siteurl;
-    if(substr($url, - 1) !== '/') {
-        $url .= '/';
-    }
-    $soapclient = Sonicfoundry\MediasiteClientFactory::MediasiteClient('soap',  $url, $data->siteusername, $data->sitepassword);
-    $siteproperties = $soapclient->QuerySiteProperties();
-    $version = $siteproperties->SiteVersion;
-    $soapclient->Logout();
-    $matches = array();
-    if(preg_match('/(6|7)\.(\d+)\.(\d+)/i', $version, $matches)) {
-        if($matches[1] == 6) {
-            $site->set_siteclient('soap');
-        }
-        elseif($matches[1] == 7) {
-            $site->set_siteclient('odata');
-        }
+    $site->set_lti_debug_launch($data->lti_debug_launch);
+    $site->set_lti_embed_type_thumbnail($data->lti_embed_type_thumbnail);
+    $site->set_lti_embed_type_abstract_only($data->lti_embed_type_abstract_only);
+    $site->set_lti_embed_type_abstract_plus_player($data->lti_embed_type_abstract_plus_player);
+    $site->set_lti_embed_type_link($data->lti_embed_type_link);
+    $site->set_lti_embed_type_embed($data->lti_embed_type_embed);
+    $site->set_lti_embed_type_presentation_link($data->lti_embed_type_presentation_link);
+    $site->set_lti_embed_type_player_only($data->lti_embed_type_player_only);
+
+    $lastChar = substr($site->get_endpoint(), -1);
+    if (strcmp($lastChar, '/') === 0) {
+        $url = rtrim($site->get_endpoint(), '/');
+        $site->set_endpoint($url);
     }
 
     $site->update_database();
-    if($site->get_siteclient() === 'odata') {
-        if($site->get_sslselect()) {
-            if(!file_exists($CFG->dirroot.'/mod/mediasite/cert')) {
-                if(!mkdir($CFG->dirroot.'/mod/mediasite/cert', 0777, true)) {
-                    die('Failed to create cert folder');
-                }
-            }
-            $certhandle = @fopen($CFG->dirroot.'/mod/mediasite/cert/'.'site'.$siteid.'.crt','x');
-            if($certhandle) {
-                $byteswritten = fwrite($certhandle, $certcontent);
-                fflush($certhandle);
-                fclose($certhandle);
-            }
-        }
-    }
     // Go home
     redirect("configuration.php");
 }

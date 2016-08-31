@@ -1,13 +1,12 @@
 <?php
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once("$CFG->dirroot/mod/mediasite/navigation.php");
+
 require_once("$CFG->dirroot/lib/formslib.php");
 require_once("$CFG->dirroot/mod/mediasite/mediasitesite.php");
-require_once("$CFG->dirroot/mod/mediasite/mediasiteclientfactory.php");
-require_once("$CFG->dirroot/mod/mediasite/presentation.php");
-require_once("$CFG->dirroot/mod/mediasite/presenter.php");
-require_once("$CFG->dirroot/mod/mediasite/thumbnailcontent.php");
-require_once("$CFG->dirroot/mod/mediasite/slidecontent.php");
 require_once("$CFG->dirroot/mod/mediasite/exceptions.php");
+
+defined('MOODLE_INTERNAL') || die();
 
 function mediasite_supports($feature) {
     switch($feature) {
@@ -65,131 +64,30 @@ function mediasite_delete_instance($mediasiteId) {
 function mediasite_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    if ($mediasite = $DB->get_record('mediasite', array('id'=>$coursemodule->instance), 'id, course, name, description, resourceid, resourcetype, duration, restrictip, timecreated, siteid')) {
-        if (empty($mediasite->name)) {
-            // mediasite name missing, fix it
-            $mediasite->name = "label{$mediasite->id}";
-            $DB->set_field('mediasite', 'name', $mediasite->name, array('id'=>$mediasite->id));
-        }
-        if(!$record = $DB->get_record("mediasite_sites", array('id' => $mediasite->siteid))) {
-            mediasite_delete_instance($mediasite->id);
+    if ($mediasite = $DB->get_record('mediasite', array('id'=>$coursemodule->instance), 'id, course, name, description, resourceid, resourcetype, FROM_UNIXTIME(recorddateutc) AS recorddate, recorddateutc, presenters, LENGTH(LTRIM(RTRIM(presenters))) AS presenters_length, tags, LENGTH(LTRIM(RTRIM(tags))) AS tags_length, mode, launchurl, siteid')) {
+
+        $lti = $DB->get_record('mediasite_sites', array('id' => $mediasite->siteid), $fields='*', $strictness=MUST_EXIST);
+        // on upgrade, the lti consumer key must be set to allow a successful post. Only show this if the configuration is valid
+        if (isset($lti->lti_consumer_key)) {
+            if (empty($mediasite->name)) {
+                // mediasite name missing, fix it
+                $mediasite->name = "label{$mediasite->id}";
+                $DB->set_field('mediasite', 'name', $mediasite->name, array('id'=>$mediasite->id));
+            }
+            if(!$record = $DB->get_record("mediasite_sites", array('id' => $mediasite->siteid))) {
+                mediasite_delete_instance($mediasite->id);
+                return null;
+            }
+
+            $info = new cached_cm_info();
+            // $info->content = format_module_intro('mediasite', $mediasite, $coursemodule->id, false);
+            $info->content = render_mediasite_resource($mediasite, $coursemodule, $lti);
+
+            return $info;
+        } else {
             return null;
         }
 
-        $site = new Sonicfoundry\MediasiteSite($record);
-        $info = new cached_cm_info();
-        // Convert intro to html. Do not filter cached version, filters run at display time.
-        // $info->content = format_module_intro('mediasite', $mediasite, $coursemodule->id, false);
-      try { // 2015-12-14: Fix the problem where course view crashes when Mediasite service is down.
-        if($site->get_passthru() == 1) {
-            global $USER;
-            if($site->get_sslselect()) {
-                global $CFG;
-                $path = $CFG->dirroot.'/mod/mediasite/cert/site'.$site->get_siteid().'.crt';
-                $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(), $site->get_username(), $site->get_password(), $site->get_apikey(), $USER->username, $path);
-            } else {
-                $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(), $site->get_username(), $site->get_password(), $site->get_apikey(), $USER->username);
-            }
-        } else {
-            // Force traffic through Fiddler proxy
-            //$client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(),$site->get_username(),$site->get_password(), $site->get_apikey(), false, null, Sonicfoundry\WebApiExternalAccessClient::PROXY);
-            if($site->get_sslselect()) {
-                global $CFG;
-                $path = $CFG->dirroot.'/mod/mediasite/cert/site'.$site->get_siteid().'.crt';
-                $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(), $site->get_username(), $site->get_password(), $site->get_apikey(), false, $path);
-            } else {
-                // Force traffic through Fiddler proxy
-                //$client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(),$site->get_username(),$site->get_password(), $site->get_apikey(), false, null, Sonicfoundry\WebApiExternalAccessClient::PROXY);
-                $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(), $site->get_username(), $site->get_password(), $site->get_apikey());
-            }
-        }
-      }
-      catch (Exception $ex) {
-          $info->name  = $mediasite->name;
-          return $info;
-      }
-        try {
-            if($mediasite->resourcetype == get_string('presentation', 'mediasite')) {
-                $presentation = $client->QueryPresentationById($mediasite->resourceid);
-                try {
-                    $layout = $client->GetLayoutOptionsForPresentation($mediasite->resourceid);
-                } catch(Exception $ex) {
-                    $layout = null;
-                }
-                $presenters = $client->GetPresentersForPresentation($mediasite->resourceid);
-                $thumbnails = $client->GetThumbnailContentForPresentation($mediasite->resourceid, rawurlencode('StreamType eq \'Presentation\''));
-                
-                global $DB;
-                $recordtime = strtotime($presentation->RecordDate);  
-                $mediasite->timecreated = $recordtime;
-                $mediasite->resourcetype = 'Presentation';
-                $DB->update_record('mediasite', $mediasite);
-                
-                //$slides = $client->GetSlideContentForPresentation($mediasite->resourceid);
-                if(count($thumbnails) > 1) {
-                    usort($thumbnails, function($a, $b) {
-                        if($a->ContentRevision == $b->ContentRevision) {
-                            return 0;
-                        }
-                        return ($a->ContentRevision < $b->ContentRevision) ? 1 : -1;
-                    });
-                }
-                if(!is_null($presentation)) {
-                    global $CFG;
-                    $content = html_writer::start_tag('div', array('class' => 'sofo-details'));
-                    if(!is_null($thumbnails) && count($thumbnails) > 0) {
-                        $content .= html_writer::tag('img', '', array('align' => 'right',
-                                                                'class' => 'sofo-thumbnail',
-                                                                'onerror' => 'this.style.display="none"',
-                                                                'onload' => 'this.style.display="block"',
-                                                                'src' => "$CFG->wwwroot/mod/mediasite".'/thumbnail.php?site='.$mediasite->siteid.'&resource='.$mediasite->resourceid.'&duration='.$mediasite->duration.'&restrictip='.$mediasite->restrictip.'&url='.$thumbnails[0]->ThumbnailUrl));
-                    }
-
-                    if(is_null($layout) || (isset($layout->ShowDateTime) && !is_null($layout->ShowDateTime) && $layout->ShowDateTime->Value)) {      
-                        $content .= html_writer::tag('span', userdate($mediasite->timecreated, get_string('strftimedate')), array('class' => 'sofo-air-date'));
-                    }
-                    if(count($presenters) > 1) {
-                        $content .= html_writer::start_tag('span', array('class' => 'sofo-presenter'));
-                        $content .= html_writer::start_tag('ul', array('class' => 'sofo-presenter-list'));
-                        for($i = 0; $i < count($presenters); $i++) {
-                            $content .= html_writer::tag('li', ($presenters[$i]->DisplayName ? $presenters[$i]->DisplayName  . ' ' : ''));
-                        }
-                        $content .= html_writer::end_tag('ul');
-                        $content .= html_writer::end_tag('span');
-                    } elseif(count($presenters) == 1) {
-                        $content .= html_writer::start_tag('span', array('class' => 'sofo-presenter'));
-                        $content .= ($presenters[0]->DisplayName ? $presenters[0]->DisplayName  . ' ' : '');
-                        $content .= html_writer::end_tag('span');
-                    }
-                    //$content .= html_writer::end_tag('div');
-                    //$content .= html_writer::start_tag('div', array('class' => 'sofo-description-block'));
-                    if(isset($mediasite->description) && !is_null($mediasite->description)) {
-                        $content .= html_writer::tag('div', $mediasite->description, array('class' => 'sofo-description'));
-                    }
-                    $content .= html_writer::end_tag('div');
-                    $info->content = $content;
-                }
-                $info->name  = $mediasite->name;
-                return $info;
-            } else {
-                $catalog = $client->QueryCatalogById($mediasite->resourceid);
-                global $DB;
-                $mediasite->resourcetype = 'Catalog';
-                $DB->update_record('mediasite', $mediasite);
-                
-                if(!is_null($catalog)) {
-                    $content = html_writer::start_tag('div', array('class' => 'sofo-details'));
-                    $content .= html_writer::tag('div', $mediasite->description, array('class' => 'sofo-description'));
-                    $content .= html_writer::end_tag('div');
-                    $info->content = $content;
-                }
-                $info->name  = $mediasite->name;             
-                return $info;
-            }
-        } catch(Exception $ex) {
-            $info->name  = $mediasite->name;
-            return $info;
-        }
     } else {
         return null;
     }
@@ -206,4 +104,144 @@ function mediasite_cron($mediasite) {
 function mediasite_print_recent_activity($mediasite) {
 }
 
+function render_mediasite_resource($mediasite, $coursemodule, $lti) {
+    if ($mediasite->mode == 'BasicLTI') {
+       return;
+    }
+
+    if ($mediasite->resourcetype == 'Presentation') {
+        switch ($mediasite->mode) {
+            case 'MetadataLight' :
+            case 'MetadataOnly' :
+                return render_mediasite_presentation_metadata($mediasite, $coursemodule, $lti);
+            break;
+            case 'MetadataPlusPlayer' :
+                $content = render_mediasite_presentation_metadata($mediasite, $coursemodule, $lti);
+                $content .= generate_mediasite_iframe($mediasite, $coursemodule);
+                return $content;
+            break;
+            case 'iFrame' :
+                $content = generate_mediasite_iframe($mediasite, $coursemodule);
+                return $content;
+            break;
+            case 'PlayerOnly' :
+                $content = generate_mediasite_iframe($mediasite, $coursemodule);
+                return $content;
+            break;
+            case 'PresentationLink' :
+                return '';
+            break;
+            default :
+                return render_mediasite_presentation_metadata($mediasite, $coursemodule, $lti);
+        }
+    } else {
+        switch ($mediasite->mode) {
+            case 'iFrame' :
+                $content = render_mediasite_catalog_metadata($mediasite, $coursemodule->showdescription);
+                $content .= generate_mediasite_iframe($mediasite, $coursemodule);
+                return $content;
+            break;
+            default : 
+                return render_mediasite_catalog_metadata($mediasite, $coursemodule->showdescription);
+        }
+    }
+}
+
+function render_mediasite_catalog_metadata($mediasite, $showdescription) {
+    if (!($showdescription)) {
+        return null;
+    }
+    $content = html_writer::start_tag('div', array('class' => 'sofo-detail')); // 1
+    if (isset($mediasite->description) && !is_null($mediasite->description)) {
+        $content .= html_writer::tag('div', $mediasite->description, array('class' => 'sofo-description')); // 2\
+
+    }
+    $content .= html_writer::end_tag('div'); // 1
+    return $content;
+}
+
+function render_mediasite_presentation_metadata($mediasite, $coursemodule, $lti) {
+    $showdescription = $coursemodule->showdescription;
+    if (!($showdescription)) {
+        return null;
+    }
+
+    global $CFG;
+
+    $lightMode = ($mediasite->mode == 'MetadataLight');
+    $hideThumbnail = ($mediasite->mode == 'MetadataPlusPlayer');
+
+    $content = html_writer::start_tag('div', array('class' => 'sofo-detail')); // 1
+
+    if (!$hideThumbnail) {
+        $content .= html_writer::tag('img', '', array('align' => 'right',
+                                                      'class' => 'sofo-thumbnail',
+                                                      'onerror' => 'this.style.display="none"',
+                                                      'onload' => 'this.style.display="block"',
+                                                      'onclick' => 'window.location.href="'.$CFG->wwwroot.'/mod/mediasite/view.php?id='.$coursemodule->id.'";',
+                                                      'src' => generate_mediasite_presentation_thumbnail_url($mediasite, $lti))); // 2
+    }
+    if (isset($mediasite->recorddateutc) && !is_null($mediasite->recorddateutc)) {
+        $content .= html_writer::tag('span', userdate($mediasite->recorddateutc, get_string('strftimedate')), array('class' => 'sofo-air-date')); // 3
+    }
+    if (!$lightMode && isset($mediasite->description) && !is_null($mediasite->description)) {
+        $content .= html_writer::tag('div', $mediasite->description, array('class' => 'sofo-description')); // 4
+    }
+    if (!$lightMode) {
+        $content .= generate_mediasite_presenters($mediasite); // 5
+        $content .= generate_mediasite_tags($mediasite); // 6
+    }
+    $content .= html_writer::end_tag('div'); // 1
+
+    return $content;
+}
+
+function generate_mediasite_presenters($mediasite) {
+    $content = '';
+    if (isset($mediasite->presenters) && !is_null($mediasite->presenters) && $mediasite->presenters_length > 0) {
+        // split on the delimiter ~!~
+        $presenters = explode('~!~', $mediasite->presenters);
+        if (count($presenters) > 0) {
+            $content = html_writer::tag('div', get_string('presenters', 'mediasite'), array('class' => 'sofo-presenter-header'));
+            $content .= html_writer::start_tag('ul', array('class' => 'sofo-presenter-list')); // 1
+            foreach ($presenters as $presenter) {
+                $content .= html_writer::tag('li', $presenter, array('class' => 'sofo-presenter')); // 2
+            }
+            $content .= html_writer::end_tag('ul'); // 1
+        }
+    }
+    return $content;
+}
+
+function generate_mediasite_tags($mediasite) {
+    $content = '';
+    if (isset($mediasite->tags) && !is_null($mediasite->tags) && $mediasite->tags_length > 0) {
+        // split on the delimiter ~!~
+        $tags = explode('~!~', $mediasite->tags);
+        if (count($tags) > 0) {
+            $content = html_writer::tag('div', get_string('tags', 'mediasite'), array('class' => 'sofo-tags-header'));
+            $content .= html_writer::tag('div', implode(', ', $tags), array('class' => 'sofo-tags'));
+        }
+    }
+    return $content;
+}
+
+function generate_mediasite_presentation_thumbnail_url($mediasite, $lti) {
+    return $lti->endpoint.'/LTI/Thumbnail?id='.$mediasite->resourceid.'&tck='.base64_encode(mb_convert_encoding($lti->lti_consumer_key, 'UTF-16LE', 'UTF-8')).'&height=168&width=300';
+}
+
+function generate_mediasite_iframe($mediasite, $coursemodule) {
+    $coverplay = $mediasite->resourcetype == 'Presentation' ? '1' : '0';
+    $css = 'sofo-content-iframe';
+    if ($mediasite->resourcetype == 'CatalogFolderDetails') {
+        $css .= ' sofo-content-iframe-catalog';
+    }
+    $url = new moodle_url('/mod/mediasite/content_launch.php', array('id' => $coursemodule->id, 'coverplay' => $coverplay));
+    $content = html_writer::tag('iframe', null, array('id' => 'mod-mediasite-view-'.$coursemodule->id, 'class' => $css, 'src' => $url));
+    return $content;
+}
+
+function mediasite_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $context) {
+    return mediasite_extend_navigation_course_settings($parentnode, $context);
+}
 ?>

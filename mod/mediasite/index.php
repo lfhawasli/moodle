@@ -14,6 +14,8 @@
     $context = context_course::instance($course->id);
     require_login($course->id);
 
+    require_once("$CFG->dirroot/mod/mediasite/navigation.php");
+
 //  add_to_log($course->id, "mediasite", "view all", "index.php?id=$course->id", "");
     $event = \mod_mediasite\event\course_module_instance_list_viewed::create(array(
         'context' => $context

@@ -3,10 +3,7 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once("$CFG->dirroot/course/moodleform_mod.php");
 require_once("$CFG->dirroot/mod/mediasite/locallib.php");
-require_once("$CFG->dirroot/mod/mediasite/search_form.php");
-require_once("$CFG->dirroot/mod/mediasite/mediasiteclientfactory.php");
 require_once("$CFG->dirroot/mod/mediasite/mediasitesite.php");
-require_once("$CFG->dirroot/mod/mediasite/presentation.php");
 require_once("$CFG->dirroot/mod/mediasite/exceptions.php");
 
 defined('MOODLE_INTERNAL') || die();
@@ -25,12 +22,13 @@ class mod_mediasite_mod_form extends moodleform_mod {
             print_error(get_string('incompleteconfiguration', 'mediasite'));
             redirect($CFG->wwwroot);
         }
-        $PAGE->requires->js(new moodle_url('/mod/mediasite/js/load.js'), true);
+        $PAGE->requires->js(new moodle_url('/mod/mediasite/js/basiclti_callback.js'), true);
     }
 
     function definition()
     {
         $mform = $this->_form;
+        $cm = $this->_cm;
 
 //-------------------------------------------------------------------------------
 
@@ -42,79 +40,78 @@ class mod_mediasite_mod_form extends moodleform_mod {
 
         global $CFG,$COURSE;
 
-        $searchbutton = $mform->addElement('button', 'searchbutton', get_string('opensearchwindow', 'mediasite'));
-        $buttonattributes = array('title'=>get_string('searchsubmit', 'mediasite'), 'onclick'=>"return window.open('"
-            . "$CFG->wwwroot/mod/mediasite/search.php?course=". strval($COURSE->id)
-            . "', 'mediasitesearch', 'menubar=1,location=1,directories=1,toolbar=1,scrollbars,resizable,width=800,height=600');");
-        $searchbutton->updateAttributes($buttonattributes);
+        if (!is_object($cm) || !isset($cm->id) || !($cm->id > 0)) {
+            if (count($this->mediasite_get_lti_sites(false)) > 0) {
+                $ltiUrl = "$CFG->wwwroot/mod/mediasite/lti_site_selection.php?course=". strval($COURSE->id)."&cm=".strval($this->current->instance);
+                $mform->addElement('html', '<div id="mediasite_lti_content"><iframe id="mediasite_lti_content_iframe" src="'.$ltiUrl.'"></iframe></div>');
 
-        $mform->addElement('text', 'name', get_string('resourcetitle', 'mediasite'), array('size' => '97'));
+            } else {
+                // display an error
+                throw new moodle_exception('generalexceptionmessage', 'error', '', 'Plugin configuration is incomplete. Please contact the administrator and request sites be added to the Mediasite Activity Plugin.');
+            }
+        }
+
+        if (isset($cm->id)) {
+            global $DB;
+            $mediasite = $DB->get_record("mediasite", array("id" => $cm->instance));
+            $site = new Sonicfoundry\MediasiteSite($DB->get_record("mediasite_sites", array("id" => $mediasite->siteid)));
+            $supportedEmbedTypes = $site->get_embed_capabilities(false, $mediasite->resourcetype);
+            $formOptions = array();
+            foreach($supportedEmbedTypes as $s) {
+                $formOptions[$s->formatType] = get_string($s->formatType, 'mediasite');
+            }
+            $mform->addElement('select', 'mode', get_string('mode', 'mediasite'), $formOptions, array('onchange' => 'javascript:toggleEmbedModeChange(this.value);'));
+            $mform->setType('mode', PARAM_TEXT);
+            $mform->setDefault('mode', $mediasite->mode);
+            $mform->addRule('mode', null, 'required', null, 'server');
+
+            $tags = str_replace('~!~', ', ', $mediasite->tags);
+            $presenters = str_replace('~!~', '\n\n', $mediasite->presenters);
+        
+            $mform->addElement('html', '<script type="text/javascript">setTimeout(function () { toggleEmbedModeChange("'.$mediasite->mode.'") }, 50);</script>');
+        
+        } else {
+            $mform->addElement('hidden', 'mode', '', array('id' => 'id_mode'));
+            $mform->setType('mode', PARAM_TEXT);
+        }
+
+
+        // the following fields are using css classes in conjunction with javascript to toggle their 
+        // visibility as the display mode changes.
+        $mform->addElement('text', 'name', get_string('resourcetitle', 'mediasite'), array('size' => '97', 'class' => 'sofo-embed sofo-embed-type-PresentationLink  sofo-embed-type-PlayerOnly sofo-embed-type-MetadataLight sofo-embed-type-MetadataOnly sofo-embed-type-MetadataPlusPlayer sofo-embed-type-BasicLTI sofo-embed-type-iFrame'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'server');
 
-        $mform->addElement('textarea', 'description', get_string('description', 'mediasite'), array('wrap' => "virtual",
-                                                                                                    'rows' => 20,  'cols' => 100 ));
-        $mform->setType('description', PARAM_TEXT);
-//        $mform->disabledIf('description', 'gate', 'eq', 0);
-//
-//        $mform->addElement('editor', 'description', get_string('description', 'mediasite'));
-//        $mform->setType('description', PARAM_RAW);
 
-        if(isset($this->current->resourceid)) {
-            $condition = array('id' => $this->current->siteid);
-            global$DB;
-            if($DB->record_exists("mediasite_sites", $condition)) {
-                $record = $DB->get_record("mediasite_sites", $condition);
-                $site = new Sonicfoundry\MediasiteSite($record);
-                if($site->get_passthru()) {
-                    global $USER;
-                    if($site->get_sslselect()) {
-                        global $CFG;
-                        $path = $CFG->dirroot.'/mod/mediasite/cert/site'.$site->get_siteid().'.crt';
-                        $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(),
-                            $site->get_username(),
-                            $site->get_password(),
-                            $site->get_apikey(),
-                            $USER->username,
-                            $path);
-                    } else {
-                        $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(),
-                            $site->get_username(),
-                            $site->get_password(),
-                            $site->get_apikey(),
-                            $USER->username);
-                    }
-                } else {
-                    if($site->get_sslselect()) {
-                        global $CFG;
-                        $path = $CFG->dirroot.'/mod/mediasite/cert/site'.$site->get_siteid().'.crt';
-                        $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(),
-                            $site->get_username(),
-                            $site->get_password(),
-                            $site->get_apikey(),
-                            false,
-                            $path);
-                    } else {
-                        $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($site->get_siteclient(),$site->get_endpoint(),
-                            $site->get_username(),
-                            $site->get_password(),
-                            $site->get_apikey());
-                    }
-                }
-                if($this->current->resourcetype == 'Presentaion') {
-                    $presentation = $client->QueryPresentationById($this->current->resourceid);
-                    $mform->setDefault('description', $presentation->Description);
-                } else if($this->current->resourcetype == get_string('catalog', 'mediasite')) {
-                    $catalog = $client->QueryCatalogById($this->current->resourceid);
-                    $mform->setDefault('description', $catalog->Description);
-                }
-            }
-        }
+        $mform->addElement('textarea', 'description', get_string('description', 'mediasite'), array('wrap' => "virtual",
+                                                                                                    'rows' => 20, 
+                                                                                                    'cols' => 100,
+                                                                                                    'class' => 'sofo-embed sofo-embed-type-MetadataOnly sofo-embed-type-MetadataPlusPlayer sofo-embed-type-iFrame' ));
+        $mform->setType('description', PARAM_TEXT);
+
+        $mform->addElement('textarea', 'presenters_display', get_string('presenters', 'mediasite'), array('wrap' => "virtual",
+                                                                                              'rows' => 15, 
+                                                                                              'cols' => 100,
+                                                                                              'class' => 'sofo-embed sofo-readonly sofo-embed-type-MetadataOnly sofo-embed-type-MetadataPlusPlayer',
+                                                                                              'onfocus' => 'this.blur();'));
+        $mform->setType('presenters_display', PARAM_TEXT);
+
+        $mform->addElement('textarea', 'tags_display', get_string('tags', 'mediasite'), array('class' => 'sofo-embed sofo-readonly sofo-embed-type-MetadataOnly sofo-embed-type-MetadataPlusPlayer',
+                                                                                  'wrap' => "virtual",
+                                                                                  'rows' => 3, 
+                                                                                  'cols' => 100,
+                                                                                  'onfocus' => 'this.blur();'));
+        $mform->setType('tags_display', PARAM_TEXT);
+
+        // $mform->addElement('advcheckbox', 'showdescription', get_string('showdescription', 'mediasite'), null, null, array(0, 1));
+        $mform->addElement('hidden', 'showdescription');
+        $mform->setType('showdescription', PARAM_INT);
+        $mform->setDefault('showdescription', 1);
+
         $context = context_course::instance($COURSE->id);
 
         if(has_capability('mod/mediasite:overridedefaults', $context)) {
-            $mform->addElement('advcheckbox', 'openaspopup', null, \get_string('openaspopup', 'mediasite'));
-            $mform->addHelpButton('openaspopup', 'openaspopup', 'mediasite');
+            $mform->addElement('advcheckbox', 'openaspopup', get_string('openaspopup', 'mediasite'), null);
             $mform->setDefault('openaspopup', 1);
         } else {
             $mform->addElement('hidden', 'openaspopup');
@@ -144,12 +141,19 @@ class mod_mediasite_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'resourceid', '', array('id' => 'id_resourceid'));
         $mform->setType('resourceid', PARAM_TEXT);
 
+        $mform->addElement('hidden', 'recorddateutc', '', array('id' => 'id_recorddateutc'));
+        $mform->setType('recorddateutc', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'presenters', '', array('id' => 'id_presenters'));
+        $mform->setType('presenters', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'tags', '', array('id' => 'id_tags'));
+        $mform->setType('tags', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'launchurl', '', array('id' => 'id_launchurl'));
+        $mform->setType('launchurl', PARAM_TEXT);
+
         global $COURSE,$CFG;
-        $mform->addElement('hidden',
-            'searchurl',
-            "$CFG->wwwroot/mod/mediasite/search.php?" . 'course=' . strval($COURSE->id),
-            array('id' => 'id_searchurl'));
-        $mform->setType('searchurl', PARAM_TEXT);
 
         if(method_exists($mform,'setExpanded')) {
             $mform->setExpanded('modstandardelshdr', false);
@@ -157,26 +161,6 @@ class mod_mediasite_mod_form extends moodleform_mod {
 
     }
 
-//    function data_preprocessing(&$default_values) {
-//        if ($this->current->instance) {
-//            $draftitemid = file_get_submitted_draft_itemid('mediasite');
-//            $default_values['mediasite']['format'] = $default_values['contentformat'];
-//            $default_values['mediasite']['text']   = file_prepare_draft_area($draftitemid, $this->context->id, 'mod_page', 'content', 0, mediasite_get_editor_options($this->context), $default_values['content']);
-//            $default_values['mediasite']['itemid'] = $draftitemid;
-//        }
-//        if (!empty($default_values['displayoptions'])) {
-//            $displayoptions = unserialize($default_values['displayoptions']);
-//            if (isset($displayoptions['printintro'])) {
-//                $default_values['printintro'] = $displayoptions['printintro'];
-//            }
-//            if (!empty($displayoptions['popupwidth'])) {
-//                $default_values['popupwidth'] = $displayoptions['popupwidth'];
-//            }
-//            if (!empty($displayoptions['popupheight'])) {
-//                $default_values['popupheight'] = $displayoptions['popupheight'];
-//            }
-//        }
-//    }
 
     function mediasite_get_editor_options($context) {
 
@@ -188,6 +172,18 @@ class mod_mediasite_mod_form extends moodleform_mod {
         //$roles = get_all_roles();
         //$roles = get_user_roles(context_course::instance($this->_courseid));
         parent::definition_after_data();
+        $mform = $this->_form;
+        $cm = $this->_cm;
+        if (isset($cm->id)) {
+            global $DB;
+            $mediasite = $DB->get_record("mediasite", array("id" => $cm->instance));
+
+            $tags = str_replace('~!~', ', ', $mediasite->tags);
+            $presenters = str_replace('~!~', "\r\n\r\n", $mediasite->presenters);
+
+            $mform->setDefault('tags_display', $tags);
+            $mform->setDefault('presenters_display', $presenters);
+        }
     }
 
     function validation($data, $files)
@@ -195,10 +191,11 @@ class mod_mediasite_mod_form extends moodleform_mod {
         $errors = parent::validation($data, $files);
         global $USER;
 
-        if(!isset($data['resourceid']) || is_null($data['resourceid']) || !isset($data['siteid']) || $data['siteid'] < 0 || !isset($data['resourcetype']) ||
-            ($data['resourcetype'] != get_string('presentation', 'mediasite') && $data['resourcetype'] != get_string('catalog', 'mediasite'))) {
-                $errors['name'] = 'This form should only be used after a resource has been selected by the search form.';
-                return $errors;
+        if (mediasite_has_value($data['resourceid']) && mediasite_has_value($data['siteid']) && mediasite_has_value($data['resourcetype']) && mediasite_has_value($data['mode'])) {
+            // good, proceed
+        } else {
+            // bad, blow up
+            $errors['name'] = get_string('form_data_invalid', 'mediasite');
         }
         try {
             //validate the current user has access to the selected resource
@@ -213,6 +210,16 @@ class mod_mediasite_mod_form extends moodleform_mod {
         }
 
         return $errors;
+    }
+
+    function mediasite_get_lti_sites($onlyShowIntegrationCatalogEnabled = false) {
+        global $DB;
+        if ($onlyShowIntegrationCatalogEnabled) {
+            $records = $DB->get_records('mediasite_sites', array('show_integration_catalog' => true));
+        } else {
+            $records = $DB->get_records('mediasite_sites');
+        }
+        return $records;
     }
 }
 
