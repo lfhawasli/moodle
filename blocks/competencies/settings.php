@@ -11,5 +11,7 @@
 
 require_once(dirname(__FILE__).'/lib.php');
 
-$PAGE->requires->jquery();
+if (!$PAGE->headerprinted) {
+    $PAGE->requires->jquery();
+}
 $settings->add(new block_competencies_admin_setting_manager('competencies/competencies'));
