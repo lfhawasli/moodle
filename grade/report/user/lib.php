@@ -811,7 +811,7 @@ class grade_report_user extends grade_report {
 
         // START UCLA MOD CCLE-4433 - striping Moodle styles in favor of Bootstrap tables.
         global $CFG;
-        if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+        if (local_ucla_core_edit::using_ucla_theme()) {
             $html = "
                 <table cellspacing='0'
                        cellpadding='0'
