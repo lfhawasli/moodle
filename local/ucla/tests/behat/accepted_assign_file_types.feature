@@ -1,4 +1,4 @@
-@ucla @mod_assign @core_edit @CCLE-4413
+@ucla @local_ucla @mod_assign @core_edit @CCLE-4413
 Feature: Restricting assignment submissions to certain file types.
     In order to make certain only certain file types are submitted
     As a teacher

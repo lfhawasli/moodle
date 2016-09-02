@@ -1,4 +1,4 @@
-@core_edit @core_admin @CCLE-3773
+@ucla @local_ucla @core_edit @core_admin @CCLE-3773
 Feature: Access Course and category management page
   In order to manage courses and/or categories
   As a user

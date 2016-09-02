@@ -67,6 +67,11 @@ class user_filtering {
                                 'confirmed' => 1, 'suspended' => 1, 'profile' => 1, 'courserole' => 1, 'systemrole' => 1,
                                 'cohort' => 1, 'firstaccess' => 1, 'lastaccess' => 1, 'neveraccessed' => 1, 'timemodified' => 1,
                                 'nevermodified' => 1, 'auth' => 1, 'mnethostid' => 1, 'idnumber' => 1);
+            // START UCLA MOD: CCLE-3783 - Improve default filter on "Browse list of users" screen
+            // Set email and UID to be a default filter (non-advanced).
+            $fieldnames['email'] = 0;
+            $fieldnames['idnumber'] = 0;
+            // END UCLA MOD: CCLE-3783
         }
 
         $this->_fields  = array();

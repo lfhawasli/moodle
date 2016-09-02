@@ -1,4 +1,4 @@
-@core_user @ucla @core_edit @CCLE-3783
+@core_user @ucla @local_ucla @core_edit @CCLE-3783
 Feature: Add email address and id number to default user filters
   In order to more easily filter through students
   As a user
@@ -8,7 +8,6 @@ Feature: Add email address and id number to default user filters
     Given I am in a ucla environment
     And I log in as "admin"
     And I expand "Site administration" node
-    And I expand "Users" node
     And I expand "Users" node
     And I expand "Accounts" node
 

@@ -352,11 +352,7 @@ function videoannotation_scale_used($videoannotationid, $scaleid) {
  * @return boolean True if the scale is used by any videoannotation
  */
 function videoannotation_scale_used_anywhere($scaleid) {
-    if ($scaleid and $DB->record_exists('videoannotation', array('grade' => -$scaleid))) {
-        return true;
-    } else {
-        return false;
-    }
+    return false;
 }
 
 /**

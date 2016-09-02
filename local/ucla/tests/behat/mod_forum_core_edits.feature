@@ -1,4 +1,4 @@
-@ucla @mod_forum @core_edit
+@ucla @local_ucla @mod_forum @core_edit
 Feature: Forum core edits
     We have made several core edits to the forum
     In order to make the interface better for our users

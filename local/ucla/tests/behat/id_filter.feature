@@ -1,4 +1,4 @@
-@ucla @core_edit @CCLE-4534
+@ucla @local_ucla @core_edit @CCLE-4534
 Feature: Filter users by idnumber
   As a system administrator
   I need to be able to filter users by their ID number

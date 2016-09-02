@@ -1,4 +1,4 @@
-@ucla @core_edit @CCLE-3797
+@ucla @local_ucla @core_edit @CCLE-3797
 Feature: Allow course sections to be hidden upon course import (CCLE-3797)
   In order to move and copy contents between courses
   As a teacher
@@ -34,7 +34,7 @@ Feature: Allow course sections to be hidden upon course import (CCLE-3797)
     And I add a "Label" to section "4" and I fill the form with:
       | Label text | Test label text |
     When I import "Course 1" course into "Course 2" course using this options:
-      | Hide all course sections after import/restore | Yes |
+      | Schema | Hide all course sections after import/restore | Yes |
     Then the "Week 1" section in the ucla site menu is hidden
     And the "Week 2" section in the ucla site menu is hidden
     And the "Week 3" section in the ucla site menu is hidden

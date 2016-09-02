@@ -1,4 +1,4 @@
-@ucla @mod_assign @core_edit @CCLE-4291
+@ucla @local_ucla @mod_assign @core_edit @CCLE-4291
 Feature: Have "quick grading" turned on by default
   As an instructor
   I want to see the "Options" for filtering submissions at the top
@@ -28,5 +28,5 @@ Scenario: Check "Options" is at the top of the page
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
     And I follow "Test assignment name"
-    When I follow "View/grade all submissions"
+    When I follow "View all submissions"
     Then "Options" "fieldset" should appear before ".gradingtable" "css_element"

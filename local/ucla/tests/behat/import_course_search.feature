@@ -1,4 +1,4 @@
-@ucla @core_backup @core_edit @CCLE-5328 @SSC-2576
+@ucla @local_ucla @core_backup @core_edit @CCLE-5328 @SSC-2576
 Feature: Search and filter by instructor in the Import Course Search feature.
   In order to search for courses to import effectively 
   As an instructor
