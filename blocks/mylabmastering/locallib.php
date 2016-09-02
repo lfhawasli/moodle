@@ -161,7 +161,7 @@ function mylabmastering_delete_highlander_link($id) {
 		foreach ($coursemodules as $cm) {
 			if ($cm->idnumber === $id) {
 				delete_mod_from_section($cm->id, $cm->section);
-				delete_course_module($cm->id);
+				course_delete_module($cm->id);
 			}
 		}
 	}
@@ -366,7 +366,7 @@ function mylabmastering_handle_code_change($courseid) {
 		foreach ($coursemodules as $cm) {
 			if (!strncmp($cm->idnumber, 'mm:', strlen('mm:'))) {
 				delete_mod_from_section($cm->id, $cm->section);
-				delete_course_module($cm->id);
+				course_delete_module($cm->id);
 			}
 		}
 	}
