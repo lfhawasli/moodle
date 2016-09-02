@@ -64,7 +64,7 @@ class PublicPrivate_Module {
 
     /**
      * Constructor for a PublicPrivate_Module object bound to $course_module.
-     * 
+     *
      * @global Moodle_Database $DB
      * @param int|object|array $course_module
      */
@@ -84,7 +84,7 @@ class PublicPrivate_Module {
 
     /**
      * Adds grouping conditional activity using public/private grouping.
-     * 
+     *
      * Uses code from upgrade_group_members_only() in lib/db/upgradelib.php.
      *
      * @return boolean
@@ -128,7 +128,7 @@ class PublicPrivate_Module {
                 if ($groupingfound) {
                     $newavailability = json_encode($availability);
                     if (count($availability->c == 1)) {
-                        // If there is only one condition and we found the 
+                        // If there is only one condition and we found the
                         // public/private grouping, then just clear it.
                         $newavailability = null;
                     }
@@ -164,7 +164,7 @@ class PublicPrivate_Module {
     /**
      * Returns true if course module is private, meaning that it is restricted
      * to a grouping.
-     * 
+     *
      * @return boolean
      */
     public function is_private() {
@@ -192,14 +192,13 @@ class PublicPrivate_Module {
      */
     public function enable() {
         try {
-            $conditions = array('id' => $this->get_id());
             $grouping = $this->get_grouping();
             if (empty($grouping)) {
                 // Add new grouping conditional availablity.
                 $this->add_grouping_condition();
                 rebuild_course_cache($this->get_course(), true);
 
-                $context = context_module::instance($conditions['id']);
+                $context = context_module::instance($this->_course_module_obj->id);
                 $event = \local_publicprivate\event\private_used::create(array('context' => $context));
                 $event->trigger();
             }
