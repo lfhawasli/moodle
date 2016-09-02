@@ -42,6 +42,10 @@ $string['settings_jira_user'] = 'JIRA user';
 $string['settings_jira_password'] = 'JIRA password';
 $string['settings_jira_pid'] = 'JIRA PID';
 
+$string['settings_enablefileuploads'] = 'Enable file uploads';
+$string['settings_enablefileuploads_description'] = 'Enable the file attachement uploads for help ticket.';
+$string['settings_upload_header'] = 'File Upload settings';
+
 $string['settings_support_contacts_header'] = 'Support contacts';
 $string['settings_support_contacts_description'] = '<p>If a user clicks on a "Help & Feedback" link while in a course, admins ' . 
         'can define a support contact based on context levels.</p><p>For example, if a user is in English 1 (shortname=eng1, category=English) ' . 
