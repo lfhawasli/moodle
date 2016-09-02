@@ -848,7 +848,7 @@ $string['fullnamecourse'] = 'Course full name';
 $string['fullnamecourse_help'] = 'The full name of the course is displayed at the top of each page in the course and in the list of courses.';
 // BEGIN UCLA MOD: CCLE-2550 - Lastname, Firstname sorting
 //$string['fullnamedisplay'] = '{$a->firstname} {$a->lastname}';
-if ($CFG->theme == 'uclashared' || $CFG->theme == 'uclasharedcourse') {
+if (local_ucla_core_edit::using_ucla_theme()) {
     $string['fullnamedisplay'] = '{$a->lastname}, {$a->firstname}';
 } else {
     $string['fullnamedisplay'] = '{$a->firstname} {$a->lastname}';
@@ -1225,7 +1225,7 @@ $string['myfilesmanage'] = 'Manage my private files';
 $string['privatefilesmanage'] = 'Manage private files';
 // START UCLA MOD: CCLE-6044 - Dashboard improvements aka "My Sites"
 // $string['myhome'] = 'Dashboard';
-if ($CFG->theme == 'uclashared' || $CFG->theme == 'uclasharedcourse') {
+if (local_ucla_core_edit::using_ucla_theme()) {
     $string['myhome'] = 'My sites';
 } else {
     $string['myhome'] = 'Dashboard';

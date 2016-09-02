@@ -409,7 +409,7 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
                 has_capability('moodle/course:viewparticipants', $coursecontext)) {
             $url = new moodle_url('/enrol/users.php', array('id'=>$course->id));
             //$usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
-            if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+            if (local_ucla_core_edit::using_ucla_theme()) {
                 $usersnode->add(get_string('participants'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
             } else {
                 $usersnode->add(get_string('enrolledusers', 'enrol'), $url, navigation_node::TYPE_SETTING, null, 'review', new pix_icon('i/enrolusers', ''));
