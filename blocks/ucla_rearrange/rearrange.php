@@ -112,7 +112,7 @@ foreach ($sectionnodeshtml as $section => $snh) {
     $is_hidden_text = '';
     if (!$sectionvisibility[$section]) {
         $is_hidden_text = ' ' . html_writer::tag('span',
-                        '(' . get_string('hidden', 'calendar') . ')',
+                        '(' . get_string('hidden', 'block_ucla_rearrange') . ')',
                         array('class' => block_ucla_rearrange::hiddenclass));
     }
 
