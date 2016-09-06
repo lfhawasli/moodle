@@ -686,4 +686,20 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             return '';
         }
     }
+
+    /**
+     * Force addition of our footer, which includes javascript to make toggling public/private
+     * make dynamic changes in the page.
+     *
+     * @return string HTML that you must output this, preferably immediately.
+     */
+    public function header() {
+        // If this theme version is below 2.4 release and this is a course view page.
+
+        if ($this->page->pagelayout === 'course' && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+            // Check if course content header/footer have not been output during render of theme layout.
+            $coursecontentfooter = $this->course_content_footer(true);
+        }
+        return  parent::header();
+    }
 }

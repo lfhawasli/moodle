@@ -193,8 +193,7 @@ class theme_uclashared_core_course_renderer extends core_course_renderer {
                 'class' => 'iconlarge activityicon', 'alt' => ' ', 'role' => 'presentation')) . $accesstext .
                 html_writer::tag('span', $instancename . $altname, array('class' => 'instancename'));
         if ($mod->uservisible) {
-            $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .
-                    $groupinglabel;
+            $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick));
         } else {
             // We may be displaying this just in order to show information
             // about visibility, without the actual link ($mod->uservisible).
