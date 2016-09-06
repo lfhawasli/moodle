@@ -67,12 +67,12 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
                         $reginfo->sectnum);
                 ++$numentries;
             }
-
+            $subjareafull = $this->get_registrar_translation('ucla_reg_subjectarea',
+                    $reginfo->subj_area, 'subjarea', 'subj_area_full');
             $reginfo = reset($class->reg_info);
-            $title = sprintf('%s (%s): %s',
-                    $classtitle,
-                    ucla_term_to_text($reginfo->term,
-                        $reginfo->session_group), $class->fullname);
+            $title = sprintf('%s<br>%s, %s %s - %s', $subjareafull[1],
+                    $reginfo->coursenum, $reginfo->acttype,
+                    $reginfo->sectnum, $class->fullname);
 
             // Add link.
             if (!empty($class->url)) {
@@ -120,8 +120,8 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
 
             $classlink .= '<br>';
             $content[] = $classlink;
-            if ($x < count($classsites)-1) {
-                $content[] = '<hr>';
+            if ($x < count($classsites) - 1) {
+                $content[] = '<hr class="course_divider">';
             }
         }
         $content[] = html_writer::end_tag('div');
@@ -188,8 +188,8 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             }
             $collablink .= '<br>';
             $content[] = $collablink;
-            if ($x < count($collaborationsites)-1) {
-                $content[] = '<hr>';
+            if ($x < count($collaborationsites) - 1) {
+                $content[] = '<hr class="course_divider">';
             }
         }
         $content[] = html_writer::end_tag('div');
@@ -244,5 +244,49 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         // Expand by default.
         $expand = false;
         return print_collapsible_region_start($classes, $id, $caption, $userpref, $default, true);
+    }
+
+    /**
+     *  Returns the long name of the target if found.
+     *
+     *  This is used for getting the long name for divisions and
+     *  subject areas.
+     *
+     *  May alter the state of the object.
+     *
+     * @param string $table        The table to use.
+     * @param string $target       The string we are translating.
+     * @param string $fromfield   The field that we are using to search if the
+     *                             target exists.
+     * @param string $to_field     The field that we are going to return if we
+     *                             find the target entry.
+     * @return An array containing both the short and long name of the target.
+     *         If a long name was not found, will return the short name again.
+     */
+    private function get_registrar_translation($table, $target, $fromfield,
+            $tofield) {
+        global $DB;
+
+        if (!isset($this->reg_trans[$table]) || $this->reg_trans == null) {
+            $this->reg_trans = array();
+
+            $indexedsa = array();
+
+            $translations = $DB->get_records($table);
+
+            foreach ($translations as $translate) {
+                $indexedsa[$translate->$fromfield] = $translate->$tofield;
+            }
+
+            $this->reg_trans[$table] = $indexedsa;
+        }
+
+        if (!isset($this->reg_trans[$table][$target])) {
+            return array($target, $target);
+        }
+
+        // Format result nicely, not in all caps.
+        return array($target,
+                ucla_format_name($this->reg_trans[$table][$target], true));
     }
 }

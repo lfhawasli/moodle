@@ -1,10 +1,10 @@
 .block_ucla_my_sites.block .mysitesdivider {
     display: block;
     margin: 8px 0;
-    border-bottom: 1px solid #536895;
+    border-bottom: 2px solid #536895;
     font-weight: bold;
     color: #394A6E;
-    padding-bottom: 1px;
+    padding-bottom: 2px;
 }
 
 .block_ucla_my_sites.block .termselector {
@@ -93,4 +93,26 @@
 
 .block_ucla_my_sites.block .course_title {
     font-size: 15px;
+}
+
+.block_ucla_my_sites.block .overview {
+    margin-left: 12px;
+}
+
+.block_ucla_my_sites.block .name {
+    margin-left: -11px;
+}
+
+.block_ucla_my_sites.block .name:before {
+    content: "• ";
+}
+
+.block_ucla_my_sites.block .box.info {
+    margin-left: 12px;
+}
+
+.block_ucla_my_sites.block .course_divider {
+    border-width: 1px 0px 0px;
+    border-color: #ccc;
+    margin-right: 25%;
 }
