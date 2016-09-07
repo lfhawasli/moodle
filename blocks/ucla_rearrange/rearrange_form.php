@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -10,15 +10,15 @@ class ucla_rearrange_form extends moodleform {
         $mform =& $this->_form;
 
         $courseid  = $this->_customdata['courseid'];
-        $section      = $this->_customdata['section'];        
+        $section      = $this->_customdata['section'];
         $sections   = $this->_customdata['sections'];
 
         $mform->addElement('hidden', 'courseid', $courseid);
         $mform->setType('courseid', PARAM_INT);
-        
-        $mform->addElement('hidden', 'section', $section);        
+
+        $mform->addElement('hidden', 'section', $section);
         $mform->setType('section', PARAM_INT);
-        
+
         $mform->addElement('hidden', 'serialized', '',
                 array('id' => 'serialized'));
         $mform->setType('serialized', PARAM_RAW);
@@ -36,30 +36,29 @@ class ucla_rearrange_form extends moodleform {
 
         $mform->addElement('header', 'header', get_string('sections'));
 
-        $classset = array('class' => 'expandall');
-        
-        $mform->addElement('button', 'mass-expander-top', $eall, $classset);
+        $classset1 = array('class' => 'expandall', 'id' => 'mass-expander-top',
+                           'type' => 'button');
+
+        $mform->addElement('html', html_writer::tag('input', '', $classset1));
 
         $mform->addElement('html', html_writer::tag('div',
-            get_string('javascriptrequired', 'group'), array('id' => 
+            get_string('javascriptrequired', 'group'), array('id' =>
                 block_ucla_rearrange::primary_domnode)));
 
-        $mform->addElement('button', 'mass-expander-bot', $eall, $classset);
-        
         $this->add_action_buttons();
     }
-    
+
     /**
      * If user hits cancel, rather than reset the form, redirect them to the
-     * section that they were previously on. 
+     * section that they were previously on.
      */
     function is_cancelled() {
         $result = parent::is_cancelled();
-        
+
         if (!empty($result)) {
             $courseid = $this->_customdata['courseid'];
-            $section  = $this->_customdata['section'];             
-            
+            $section  = $this->_customdata['section'];
+
             redirect(new moodle_url('/course/view.php',
                 array('id' => $courseid, 'section' => $section)));
         }
