@@ -50,9 +50,17 @@ function xmldb_local_gradebook_upgrade($oldversion) {
     if ($oldversion < 2016080800) {
         $pbar = new progress_bar('freezegradebooks', 500, true);
 
-        // Find all courses using the gradebook.
-        $total = $DB->count_records('grade_items', array('itemtype' => 'course'));
-        $gradebooks = $DB->get_recordset('grade_items', array('itemtype' => 'course'), 'id,courseid');
+        // Find all courses with grades.
+        $sql = "SELECT COUNT(DISTINCT gi.courseid)
+                  FROM {grade_items} gi
+                  JOIN {grade_grades} gg ON (gg.itemid=gi.id)
+                 WHERE gg.rawgrade IS NOT NULL";
+        $total = $DB->count_records_sql($sql);
+        $sql = "SELECT DISTINCT gi.courseid
+                  FROM {grade_items} gi
+                  JOIN {grade_grades} gg ON (gg.itemid=gi.id)
+                 WHERE gg.rawgrade IS NOT NULL";
+        $gradebooks = $DB->get_recordset_sql($sql);
         $i = 0;
         foreach ($gradebooks as $gradebook) {
             // Freeze gradebook.
