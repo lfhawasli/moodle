@@ -402,18 +402,28 @@ function useredit_shared_definition(&$mform, $editoroptions, $filemanageroptions
 
     }
 
+    // START UCLA MOD: CCLE-6256 - Remove "Additional names" from Edit Profile.
     // Display user name fields that are not currenlty enabled here if there are any.
-    $disabledusernamefields = useredit_get_disabled_name_fields($enabledusernamefields);
-    if (count($disabledusernamefields) > 0) {
-        $mform->addElement('header', 'moodle_additional_names', get_string('additionalnames'));
-        foreach ($disabledusernamefields as $allname) {
-            $mform->addElement('text', $allname, get_string($allname), 'maxlength="100" size="30"');
-            // START UCLA MOD: CCLE-4874 - Make "Additional Names" fields readonly.
-            $mform->hardFreeze($allname);
-            // END UCLA MOD: CCLE-4874.
-            $mform->setType($allname, PARAM_NOTAGS);
+    // $disabledusernamefields = useredit_get_disabled_name_fields($enabledusernamefields);
+    // if (count($disabledusernamefields) > 0) {
+    //     $mform->addElement('header', 'moodle_additional_names', get_string('additionalnames'));
+    //     foreach ($disabledusernamefields as $allname) {
+    //         $mform->addElement('text', $allname, get_string($allname), 'maxlength="100" size="30"');
+    //         $mform->setType($allname, PARAM_NOTAGS);
+    //     }
+    // }
+    if (!local_ucla_core_edit::using_ucla_theme()) {
+        // Display user name fields that are not currenlty enabled here if there are any.
+        $disabledusernamefields = useredit_get_disabled_name_fields($enabledusernamefields);
+        if (count($disabledusernamefields) > 0) {
+            $mform->addElement('header', 'moodle_additional_names', get_string('additionalnames'));
+            foreach ($disabledusernamefields as $allname) {
+                $mform->addElement('text', $allname, get_string($allname), 'maxlength="100" size="30"');
+                $mform->setType($allname, PARAM_NOTAGS);
+            }
         }
     }
+    // END UCLA MOD: CCLE-6256.
 
     if (core_tag_tag::is_enabled('core', 'user') and empty($USER->newadminuser)) {
         $mform->addElement('header', 'moodle_interests', get_string('interests'));
