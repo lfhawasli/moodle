@@ -3818,7 +3818,7 @@ class assign {
                 $markingallocationoptions[$marker->id] = fullname($marker);
             }
         }
-        
+
         $markingworkflow = $this->get_instance()->markingworkflow;
         // Get marking states to show in form.
         $markingworkflowoptions = array();
@@ -3891,7 +3891,7 @@ class assign {
                                       'M.mod_assign.init_grading_options');
         $o .= $this->get_renderer()->render($assignform);
         // END UCLA MOD: CCLE-4291
-        
+
         $o .= groups_print_activity_menu($this->get_course_module(), $currenturl, true);
 
         // Plagiarism update status apearring in the grading book.
@@ -3935,13 +3935,13 @@ class assign {
             $assignform = new assign_form('gradingbatchoperationsform', $gradingbatchoperationsform);
             $o .= $this->get_renderer()->render($assignform);
         }
-        
+
         // START UCLA MOD: CCLE-4291 - Moving "Option box" to top of the page
         // $assignform = new assign_form('gradingoptionsform',
         //                              $gradingoptionsform,
         //                              'M.mod_assign.init_grading_options');
-        // $o .= $this->get_renderer()->render($assignform); 
-        // END UCLA MOD: CCLE-4291 
+        // $o .= $this->get_renderer()->render($assignform);
+        // END UCLA MOD: CCLE-4291
         return $o;
     }
 
@@ -7570,6 +7570,48 @@ class assign {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Save grade update.
+     *
+     * @param int $userid
+     * @param  stdClass $data
+     * @return bool - was the grade saved
+     */
+    public function save_grade($userid, $data) {
+
+        // Need grade permission.
+        require_capability('mod/assign:grade', $this->context);
+
+        $instance = $this->get_instance();
+        $submission = null;
+        if ($instance->teamsubmission) {
+            $submission = $this->get_group_submission($userid, 0, false, $data->attemptnumber);
+        } else {
+            $submission = $this->get_user_submission($userid, false, $data->attemptnumber);
+        }
+        if ($instance->teamsubmission && !empty($data->applytoall)) {
+            $groupid = 0;
+            if ($this->get_submission_group($userid)) {
+                $group = $this->get_submission_group($userid);
+                if ($group) {
+                    $groupid = $group->id;
+                }
+            }
+            $members = $this->get_submission_group_members($groupid, true, $this->show_only_active_users());
+            foreach ($members as $member) {
+                // User may exist in multple groups (which should put them in the default group).
+                $this->apply_grade_to_user($data, $member->id, $data->attemptnumber);
+                $this->process_outcomes($member->id, $data, $userid);
+            }
+        } else {
+            $this->apply_grade_to_user($data, $userid, $data->attemptnumber);
+
+            $this->process_outcomes($userid, $data);
+        }
+
+        return true;
     }
 
     /**
