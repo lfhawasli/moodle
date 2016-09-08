@@ -468,8 +468,6 @@ $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4
 $CFG->grader_report_grouping_filter = 1;
 // CCLE-4292 - Collapse Default Columns for Assignment Grading
 $CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
-// CCLE-4299 - Improve Assignment Grading Screen
-$CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 // CCLE-4297 - Have "quick grading" turned on by default
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
 // CCLE-4289 - Show All View Action Icons
