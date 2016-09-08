@@ -26,4 +26,6 @@ $string['rearrangemore'] = 'Rearrange more materials';
 
 $string['eventrearrange'] = 'Rearranged course materials';
 
+$string['hidden'] = 'hidden';
+
 // EoF
