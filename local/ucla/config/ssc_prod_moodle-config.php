@@ -375,9 +375,6 @@ $CFG->block_quickmail_addionalemail = 1;
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
 
-// Site administration > Plugins > Filters > MathJax
-$CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.mathjax.org/mathjax/2.3-latest/MathJax.js';
-
 // Site administration > Plugins > Filters > PoodLL Filter
 //$CFG->filter_poodll_download_media_ok = '1';
 $CFG->filter_poodll_miccanpause = '1';
