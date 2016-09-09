@@ -403,7 +403,6 @@ $CFG->block_quickmail_addionalemail = 1;
 $CFG->sitedefaultlicense = 'tbd';
 
 // Site administration > Plugins > Filters > MathJax
-$CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.mathjax.org/mathjax/2.3-latest/MathJax.js';
 $CFG->forced_plugin_settings['filter_mathjaxloader']['texfiltercompatibility'] = 1;
 $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
     MathJax.Hub.Config({
