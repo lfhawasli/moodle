@@ -114,7 +114,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
                 // Add activity display inside div so it can be expanded/collapsed
                 // by above icon.
                 $classlink .= html_writer::tag('div', $this->activity_display_opt
-                        ($class->id, $overviews[$class->id], false),
+                        ($class->id, $overviews[$class->id], true),
                         array('class' => 'course_div'));
             }
 
@@ -184,7 +184,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
                 // Add activity display inside div so it can be expanded/collapsed
                 // by above icon.
                 $collablink .= html_writer::tag('div', $this->activity_display_opt($collab->id,
-                        $overviews[$collab->id], false), array('class' => 'course_div'));
+                        $overviews[$collab->id], true), array('class' => 'course_div'));
             }
             $collablink .= '<br>';
             $content[] = $collablink;
