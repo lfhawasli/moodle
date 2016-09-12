@@ -431,8 +431,6 @@ $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4
 // Grading config variables.
 // CCLE-4295 - Add Grouping Filter for the Grader Report
 $CFG->grader_report_grouping_filter = 1;
-// CCLE-4292 - Collapse Default Columns for Assignment Grading
-$CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
 // CCLE-4297 - Have "quick grading" turned on by default
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
 // CCLE-3511 - Set defaults for new assignment module
