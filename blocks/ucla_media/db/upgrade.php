@@ -35,7 +35,7 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
-    if ($oldversion < 2016081300) {
+    if ($oldversion < 2016082300) {
         $table = new xmldb_table('ucla_bruincast');
         $indexes[] = new xmldb_field('audio_url', XMLDB_TYPE_TEXT, null, null, null, null, null, 'bruincast_url');
         $indexes[] = new xmldb_field('podcast_url', XMLDB_TYPE_TEXT, null, null, null, null, null, 'audio_url');
@@ -47,7 +47,7 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
                 $dbman->add_field($table, $index);
             }
         }
-        upgrade_block_savepoint(true, 2016081300, 'ucla_library_reserves');
+        upgrade_block_savepoint(true, 2016082300, 'block_ucla_media');
     }
 
     return true;

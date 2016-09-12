@@ -41,24 +41,34 @@ echo $OUTPUT->header();
 
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
-      print_page_tabs('Bruincast', $course->id);
-    display_all($course);
+    $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
+    $count = count($videos);
+    if ($count != 0) {
+        print_page_tabs('Bruincast', $course->id);
+        display_all($course);
 
-            $event = \block_ucla_media\event\index_viewed::create(
+        $event = \block_ucla_media\event\index_viewed::create(
             array('context' => $context, 'other' => array(
                 'page' => "Bruincast"
                     )));
-            $event->trigger();
-
+        $event->trigger();
+    } else {
+        echo get_string('bcastnotavailable', 'block_ucla_media');
+    }
 } else {
     echo get_string('guestsarenotallowed', 'error');
 }
 
 echo $OUTPUT->footer();
 
+/**
+ * Outputs Bruincast content for given course.
+ *
+ * @param object $course
+ */
 function display_all($course) {
-    global $OUTPUT;
-    global $DB;
+    global $DB, $OUTPUT;
+
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
     $courseid = $course->id;
     echo $OUTPUT->heading(get_string('headerbcast', 'block_ucla_media',
@@ -68,27 +78,109 @@ function display_all($course) {
             array('id' => 'videoreserves-intro'));
     echo "<br>";
 
-    for ($i = 1; $i <= 10; $i++) {
-        echo html_writer::start_div('Week '.$i);
-        if ($DB->record_exists('ucla_bruincast',  array('courseid' => $courseid))) {
-            $vids = get_videos($courseid);
-            print_bcast($vids, $i);
-        }
-        echo html_writer::end_div('Week '.$i);
+    // Later this will be replaced with a table listing of videos by week.
+    $content = get_videos($course->id);
+    foreach ($content as $link) {
+        echo $link . '<br>';
     }
 
     echo html_writer::end_div('div');
 }
 
-
+/**
+ * A course might have more than 1 Bruincast link. Some possible reasons are if
+ * a course is cross-listed or if there are multiple restriction types, or both.
+ *
+ * Logic to decide how to display links in these different scenarios:
+ *
+ * 1) If links all have same restriction, then get last part of url, which will
+ *    be the course name and display it as: Bruincast (<course title>)
+ * 2) If links have different restrictions, then display as:
+ *    Bruincast (<restriction type>) 
+ * 3) If links have different restrictions and different course titles, then
+ *    display as: Bruincast (<course title>/<restriction type>)
+ * 4) If there is only 1 url, then display as: Bruincast (<restriction type>)
+ *
+ * This will be replaced later when the new web service that we use to get
+ * Bruincast videos is done via CCLE-6263.
+ */
 function get_videos($courseid) {
     global $DB;
 
-    // Adding GROUP BY to the where clause of the database query ensures no
-    // duplicate videos are displayed for crosslisted courses.
-    $videos = $DB->get_records_select('ucla_bruincast',
-            "courseid = ? ", array($courseid));
+    $videos = array();
 
+    // Links will be indexed as: [coursetitle][restriction] => url.
+    $links = array();
+
+    if ($matchingcourses = $DB->get_records('ucla_bruincast',
+            array('courseid' => $courseid))) {
+        $titlesused = array();
+        $restrictionsused = array();
+        foreach ($matchingcourses as $matchingcourse) {
+            if (empty($matchingcourse->bruincast_url)) {
+                continue;
+            }
+
+            $title = basename($matchingcourse->bruincast_url);
+            $title = core_text::strtoupper($title);
+
+            $restriction = 'node_' . core_text::strtolower($matchingcourse->restricted);
+            $restriction = str_replace(' ', '_', $restriction);
+
+            $links[$title][$restriction] = $matchingcourse->bruincast_url;
+
+            $titlesused[] = $title;
+            $restrictionsused[] = $restriction;
+        }
+
+        // See what type of display scenario we are going to use.
+        $multipletitles = false;
+        $multiplerestrictions = false;
+        if (count(array_unique($titlesused)) > 1) {
+            $multipletitles = true;
+        }
+        if (count(array_unique($restrictionsused)) > 1) {
+            $multiplerestrictions = true;
+        }
+
+        foreach ($links as $title => $restrictions) {
+            foreach ($restrictions as $restriction => $url) {
+                if ($multipletitles && !$multiplerestrictions) {
+                    // 1) If links all have same restriction, then get last
+                    //    part of url, which will be the course name and
+                    //    display it as:
+                    //      Bruincast (<course title>)
+                    $videos[] = html_writer::link($url, sprintf('%s (%s)',
+                            get_string('titlebcast', 'block_ucla_media'), $title));
+                } else if (!$multipletitles && $multiplerestrictions) {
+                    // 2) If links have different restrictions, then display
+                    //    as:
+                    //      Bruincast (<restriction type>)
+                    $videos[] = html_writer::link($url, sprintf('%s (%s)',
+                            get_string('titlebcast', 'block_ucla_media'),
+                            get_string($restriction, 'block_ucla_media')));
+                } else if ($multipletitles && $multiplerestrictions) {
+                    // 3) If links have different restrictions and different
+                    //    course titles, then display as:
+                    //     Bruincast (<course title>/<restriction type>)
+                    $videos[] = html_writer::link($url, sprintf('%s (%s/%s)',
+                            get_string('titlebcast', 'block_ucla_media'),
+                            $title,
+                            get_string($restriction, 'block_ucla_media')));
+                } else if (!$multipletitles && !$multiplerestrictions) {
+                    // 4) If there is only 1 url, then display as:
+                    //     Bruincast (<restriction type>)
+                    $type = '';
+                    if ($restriction != 'node_open') {
+                        // Don't add restriction type text for open.
+                        $type = sprintf(' (%s)', get_string($restriction, 'block_ucla_media'));
+                    }
+                    $videos[] = html_writer::link($url,
+                            get_string('titlebcast', 'block_ucla_media') . $type);
+                }
+            }
+        }
+    }
     return $videos;
 }
 

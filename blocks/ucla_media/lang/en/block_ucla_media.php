@@ -51,3 +51,15 @@ $string['taskupdatebcast'] = 'Update Bruincast';
 $string['taskupdatevidreserves'] = 'Update video reserves';
 $string['wowzaurl'] = 'Wowza server';
 $string['wowzaurl_desc'] = 'The address and port for the Wowza streaming server. Do not include a protocol prefix.';
+$string['bcast_tab'] = 'Bruincast ({$a})';
+$string['vidreserves_tab'] = 'Video reserves ({$a})';
+$string['libraryreserves_tab'] = 'Library reserves ({$a})';
+$string['bcastnotavailable'] = "There are no bruincast resources available for this course.";
+$string['vidresnotavailable'] = "There are no media resources for this course.";
+
+// Types of bruincasts. To be removed once new web service is done: CCLE-6263.
+$string['titlebcast'] = 'Bruincast';
+$string['node_restricted'] = 'Private';
+$string['node_open'] = 'Open';
+$string['node_see_instructor'] = 'See Instructor';
+$string['node_online'] = 'E-Lecture';

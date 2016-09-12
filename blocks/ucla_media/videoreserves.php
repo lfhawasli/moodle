@@ -34,21 +34,26 @@ require_login($course);
 $context = context_course::instance($courseid, MUST_EXIST);
 
 init_page($course, $context,
-        new moodle_url('/blocks/ucla_media/index.php',
-                array('courseid' => $courseid, 'mode' => 2)));
+        new moodle_url('/blocks/ucla_media/videoreserves.php',
+                array('courseid' => $courseid)));
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
-    display_video_reserves($course);
+    $videos = $DB->get_records('ucla_video_reserves', array('courseid' => $courseid));
+    if (!empty($videos)) {
+        display_video_reserves($course);
 
-    // Log that user viewed index.
-    $event = \block_ucla_media\event\index_viewed::create(
-            array('context' => $context,
-                'other' => array(
-                'page' => "Video Reserves"
-                    )));
-                $event->trigger();
+        // Log that user viewed index.
+        $event = \block_ucla_media\event\index_viewed::create(
+                array('context' => $context,
+                    'other' => array(
+                    'page' => "Video Reserves"
+                        )));
+        $event->trigger();
+    } else {
+        echo get_string('vidresnotavailable', 'block_ucla_media');
+    }
 } else {
     echo get_string('guestsarenotallowed', 'error');
 }
