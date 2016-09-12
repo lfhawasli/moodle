@@ -134,3 +134,11 @@ input[type="checkbox"] + label {
     display: inline;
     padding-left: 0.2em;
 }
+
+// Backup and Restore checkbox aligns the texts to left and blocks them.
+#page-backup-backup, #page-backup-restore, #page-backup-import {
+    .fitem, .fitemtitle, .felement {
+        text-align: left;
+        display: block;
+    }
+}

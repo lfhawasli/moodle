@@ -1,4 +1,4 @@
-@ucla @core_grades @core_edit @CCLE-4289
+@ucla @local_ucla @core_grades @core_edit @CCLE-4289
 Feature: Viewing grade categories
   As an instructor
   I want to see all 3 possible view states for categories
@@ -33,10 +33,7 @@ Scenario: View grader report
       | Assignment name | Homework 2 |
       | Description | Test assignment description |
     And I should see "Homework 2"
-    And I follow "Grades"
-    And I press "Administration"
-    And I expand "Categories and items" node
-    And I follow "Simple view"
+    And I navigate to "Gradebook setup" node in "Course administration"
     And I press "Add category"
     And I set the following fields to these values:
       | Category name | Homework |
@@ -46,12 +43,10 @@ Scenario: View grader report
     And I set the field "Move selected items to" to "Homework"
     And I navigate to "Grades" node in "Course administration"
     # Make sure 3 icons appear in "Course 1" cell.
-    And "Grades only" "link" should exist in the ".category.catlevel1" "css_element"
-    And "Full view" "link" should exist in the ".category.catlevel1" "css_element"
-    And "Aggregates only" "link" should exist in the ".category.catlevel1" "css_element"
+    And "Change to grades only" "link" should exist in the ".category.catlevel1" "css_element"
+    And "Change to full view" "link" should exist in the ".category.catlevel1" "css_element"
+    And "Change to aggregates only" "link" should exist in the ".category.catlevel1" "css_element"
     # Make sure 3 icons appear in "Homework" cell.
-    And "Grades only" "link" should exist in the ".category.catlevel2" "css_element"
-    And "Full view" "link" should exist in the ".category.catlevel2" "css_element"
-    And "Aggregates only" "link" should exist in the ".category.catlevel2" "css_element"
-
-
+    And "Change to grades only" "link" should exist in the ".category.catlevel2" "css_element"
+    And "Change to full view" "link" should exist in the ".category.catlevel2" "css_element"
+    And "Change to aggregates only" "link" should exist in the ".category.catlevel2" "css_element"

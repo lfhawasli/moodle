@@ -44,7 +44,9 @@ Feature: Invitation form
       | user | course | role |
       | testuser | COURSE1 | editingteacher |
     And the following ucla "roles" exist:
-      | grader |
+      | role     |
+      | testuser |
+      | grader   |
     When I log in as "testuser"
     And I follow "Course 1"
     And I press "Control Panel"

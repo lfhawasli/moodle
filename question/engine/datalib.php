@@ -17,27 +17,29 @@
 /**
  * Code for loading and saving question attempts to and from the database.
  *
- * A note for future reference. This code is pretty efficient but there are two
+ * Note that many of the methods of this class should be considered private to
+ * the question engine. They should be accessed through the
+ * {@link question_engine} class. For example, you should call
+ * {@link question_engine::save_questions_usage_by_activity()} rather than
+ * {@link question_engine_data_mapper::insert_questions_usage_by_activity()}.
+ * The exception to this is some of the reporting methods, like
+ * {@link question_engine_data_mapper::load_attempts_at_question()}.
+ *
+ * (TODO, probably we should split this class up, so that it has no public
+ * methods. They should all be moved to a new public class.)
+ *
+ * A note for future reference. This code is pretty efficient but there are some
  * potential optimisations that could be contemplated, at the cost of making the
  * code more complex:
  *
- * 1. (This is the easier one, but probably not worth doing.) In the unit-of-work
- *    save method, we could get all the ids for steps due to be deleted or modified,
+ * 1. (This is probably not worth doing.) In the unit-of-work save method, we
+ *    could get all the ids for steps due to be deleted or modified,
  *    and delete all the question_attempt_step_data for all of those steps in one
  *    query. That would save one DB query for each ->stepsupdated. However that number
  *    is 0 except when re-grading, and when regrading, there are many more inserts
  *    into question_attempt_step_data than deletes, so it is really hardly worth it.
  *
- * 2. A more significant optimisation would be to write an efficient
- *    $DB->insert_records($arrayofrecords) method (for example using functions
- *    like pg_copy_from) and then whenever we save stuff (unit_of_work->save and
- *    insert_questions_usage_by_activity) collect together all the records that
- *    need to be inserted into question_attempt_step_data, and insert them with
- *    a single call to $DB->insert_records. This is likely to be the biggest win.
- *    We do a lot of separate inserts into question_attempt_step_data.
- *
- * @package    moodlecore
- * @subpackage questionengine
+ * @package    core_question
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -75,6 +77,10 @@ class question_engine_data_mapper {
     /**
      * Store an entire {@link question_usage_by_activity} in the database,
      * including all the question_attempts that comprise it.
+     *
+     * You should not call this method directly. You should use
+     * @link question_engine::save_questions_usage_by_activity()}.
+     *
      * @param question_usage_by_activity $quba the usage to store.
      */
     public function insert_questions_usage_by_activity(question_usage_by_activity $quba) {
@@ -86,16 +92,30 @@ class question_engine_data_mapper {
         $newid = $this->db->insert_record('question_usages', $record);
         $quba->set_id_from_database($newid);
 
+        // Initially an array of array of question_attempt_step_objects.
+        // Built as a nested array for efficiency, then flattened.
+        $stepdata = array();
+
         foreach ($quba->get_attempt_iterator() as $qa) {
-            $this->insert_question_attempt($qa, $quba->get_owning_context());
+            $stepdata[] = $this->insert_question_attempt($qa, $quba->get_owning_context());
+        }
+
+        $stepdata = call_user_func_array('array_merge', $stepdata);
+        if ($stepdata) {
+            $this->insert_all_step_data($stepdata);
         }
     }
 
     /**
      * Store an entire {@link question_attempt} in the database,
      * including all the question_attempt_steps that comprise it.
+     *
+     * You should not call this method directly. You should use
+     * @link question_engine::save_questions_usage_by_activity()}.
+     *
      * @param question_attempt $qa the question attempt to store.
      * @param context $context the context of the owning question_usage_by_activity.
+     * @return array of question_attempt_step_data rows, that still need to be inserted.
      */
     public function insert_question_attempt(question_attempt $qa, $context) {
         $record = new stdClass();
@@ -120,9 +140,15 @@ class question_engine_data_mapper {
         $record->id = $this->db->insert_record('question_attempts', $record);
         $qa->set_database_id($record->id);
 
+        // Initially an array of array of question_attempt_step_objects.
+        // Built as a nested array for efficiency, then flattened.
+        $stepdata = array();
+
         foreach ($qa->get_step_iterator() as $seq => $step) {
-            $this->insert_question_attempt_step($step, $record->id, $seq, $context);
+            $stepdata[] = $this->insert_question_attempt_step($step, $record->id, $seq, $context);
         }
+
+        return call_user_func_array('array_merge', $stepdata);
     }
 
     /**
@@ -148,8 +174,10 @@ class question_engine_data_mapper {
      * @param question_attempt_step $step the step to store.
      * @param int $stepid the id of the step.
      * @param context $context the context of the owning question_usage_by_activity.
+     * @return array of question_attempt_step_data rows, that still need to be inserted.
      */
-    protected function insert_step_data(question_attempt_step $step, $stepid, $context) {
+    protected function prepare_step_data(question_attempt_step $step, $stepid, $context) {
+        $rows = array();
         foreach ($step->get_all_data() as $name => $value) {
             if ($value instanceof question_file_saver) {
                 $value->save_files($stepid, $context);
@@ -162,16 +190,35 @@ class question_engine_data_mapper {
             $data->attemptstepid = $stepid;
             $data->name = $name;
             $data->value = $value;
-            $this->db->insert_record('question_attempt_step_data', $data, false);
+            $rows[] = $data;
         }
+        return $rows;
+    }
+
+    /**
+     * Insert a lot of records into question_attempt_step_data in one go.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
+     * @param array $rows the rows to insert.
+     */
+    public function insert_all_step_data(array $rows) {
+        if (!$rows) {
+            return;
+        }
+        $this->db->insert_records('question_attempt_step_data', $rows);
     }
 
     /**
      * Store a {@link question_attempt_step} in the database.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
      * @param question_attempt_step $step the step to store.
      * @param int $questionattemptid the question attept id this step belongs to.
      * @param int $seq the sequence number of this stop.
      * @param context $context the context of the owning question_usage_by_activity.
+     * @return array of question_attempt_step_data rows, that still need to be inserted.
      */
     public function insert_question_attempt_step(question_attempt_step $step,
             $questionattemptid, $seq, $context) {
@@ -179,15 +226,19 @@ class question_engine_data_mapper {
         $record = $this->make_step_record($step, $questionattemptid, $seq);
         $record->id = $this->db->insert_record('question_attempt_steps', $record);
 
-        $this->insert_step_data($step, $record->id, $context);
+        return $this->prepare_step_data($step, $record->id, $context);
     }
 
     /**
      * Update a {@link question_attempt_step} in the database.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
      * @param question_attempt_step $qa the step to store.
      * @param int $questionattemptid the question attept id this step belongs to.
      * @param int $seq the sequence number of this stop.
      * @param context $context the context of the owning question_usage_by_activity.
+     * @return array of question_attempt_step_data rows, that still need to be inserted.
      */
     public function update_question_attempt_step(question_attempt_step $step,
             $questionattemptid, $seq, $context) {
@@ -198,11 +249,56 @@ class question_engine_data_mapper {
 
         $this->db->delete_records('question_attempt_step_data',
                 array('attemptstepid' => $record->id));
-        $this->insert_step_data($step, $record->id, $context);
+        return $this->prepare_step_data($step, $record->id, $context);
+    }
+
+    /**
+     * Store new metadata for an existing {@link question_attempt} in the database.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
+     * @param question_attempt $qa the question attempt to store meta data for.
+     * @param array $names the names of the metadata variables to store.
+     * @return array of question_attempt_step_data rows, that still need to be inserted.
+     */
+    public function insert_question_attempt_metadata(question_attempt $qa, array $names) {
+        $firststep = $qa->get_step(0);
+
+        $rows = array();
+        foreach ($names as $name) {
+            $data = new stdClass();
+            $data->attemptstepid = $firststep->get_id();
+            $data->name = ':_' . $name;
+            $data->value = $firststep->get_metadata_var($name);
+            $rows[] = $data;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Updates existing metadata for an existing {@link question_attempt} in the database.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
+     * @param question_attempt $qa the question attempt to store meta data for.
+     * @param array $names the names of the metadata variables to store.
+     * @return array of question_attempt_step_data rows, that still need to be inserted.
+     */
+    public function update_question_attempt_metadata(question_attempt $qa, array $names) {
+        global $DB;
+        list($condition, $params) = $DB->get_in_or_equal($names);
+        $params[] = $qa->get_step(0)->get_id();
+        $DB->delete_records_select('question_attempt_step_data',
+                'name ' . $condition . ' AND attemptstepid = ?', $params);
+        return $this->insert_question_attempt_metadata($qa, $names);
     }
 
     /**
      * Load a {@link question_attempt_step} from the database.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
      * @param int $stepid the id of the step to load.
      * @param question_attempt_step the step that was loaded.
      */
@@ -210,7 +306,7 @@ class question_engine_data_mapper {
         $records = $this->db->get_recordset_sql("
 SELECT
     quba.contextid,
-    COALLESCE(q.qtype, 'missingtype') AS qtype,
+    COALESCE(q.qtype, 'missingtype') AS qtype,
     qas.id AS attemptstepid,
     qas.questionattemptid,
     qas.sequencenumber,
@@ -244,6 +340,11 @@ WHERE
     /**
      * Load a {@link question_attempt} from the database, including all its
      * steps.
+     *
+     * Normally, you should use {@link question_engine::load_questions_usage_by_activity()}
+     * but there may be rare occasions where for performance reasons, you only
+     * wish to load one qa, in which case you may call this method.
+     *
      * @param int $questionattemptid the id of the question attempt to load.
      * @param question_attempt the question attempt that was loaded.
      */
@@ -302,6 +403,10 @@ ORDER BY
     /**
      * Load a {@link question_usage_by_activity} from the database, including
      * all its {@link question_attempt}s and all their steps.
+     *
+     * You should call {@link question_engine::load_questions_usage_by_activity()}
+     * rather than calling this method directly.
+     *
      * @param int $qubaid the id of the usage to load.
      * @param question_usage_by_activity the usage that was loaded.
      */
@@ -361,6 +466,9 @@ ORDER BY
     /**
      * Load all {@link question_usage_by_activity} from the database for one qubaid_condition
      * Include all its {@link question_attempt}s and all their steps.
+     *
+     * This method may be called publicly.
+     *
      * @param qubaid_condition $qubaids the condition that tells us which usages to load.
      * @return question_usage_by_activity[] the usages that were loaded.
      */
@@ -426,6 +534,8 @@ ORDER BY
     /**
      * Load information about the latest state of each question from the database.
      *
+     * This method may be called publicly.
+     *
      * @param qubaid_condition $qubaids used to restrict which usages are included
      *                                  in the query. See {@link qubaid_condition}.
      * @param array            $slots   A list of slots for the questions you want to know about.
@@ -480,6 +590,8 @@ WHERE
      * Load summary information about the state of each question in a group of
      * attempts. This is used, for example, by the quiz manual grading report,
      * to show how many attempts at each question need to be graded.
+     *
+     * This method may be called publicly.
      *
      * @param qubaid_condition $qubaids used to restrict which usages are included
      * in the query. See {@link qubaid_condition}.
@@ -561,6 +673,8 @@ ORDER BY
      * $limitnum. A special value 'random' can be passed as $orderby, in which case
      * $limitfrom is ignored.
      *
+     * This method may be called publicly.
+     *
      * @param qubaid_condition $qubaids used to restrict which usages are included
      * in the query. See {@link qubaid_condition}.
      * @param int $slot The slot for the questions you want to konw about.
@@ -640,18 +754,22 @@ $sqlorderby
     }
 
     /**
-     * Load a {@link question_usage_by_activity} from the database, including
-     * all its {@link question_attempt}s and all their steps.
+     * Load the average mark, and number of attempts, for each slot in a set of
+     * question usages..
+     *
+     * This method may be called publicly.
+     *
      * @param qubaid_condition $qubaids used to restrict which usages are included
      * in the query. See {@link qubaid_condition}.
      * @param array $slots if null, load info for all quesitions, otherwise only
      * load the averages for the specified questions.
+     * @return array of objects with fields ->slot, ->averagefraction and ->numaveraged.
      */
     public function load_average_marks(qubaid_condition $qubaids, $slots = null) {
         if (!empty($slots)) {
             list($slottest, $slotsparams) = $this->db->get_in_or_equal(
                     $slots, SQL_PARAMS_NAMED, 'slot');
-            $slotwhere = " AND qa.slot $slottest";
+            $slotwhere = " AND qa.slot {$slottest}";
         } else {
             $slotwhere = '';
             $slotsparams = array();
@@ -689,8 +807,10 @@ ORDER BY qa.slot
     }
 
     /**
-     * Load a {@link question_attempt} from the database, including all its
+     * Load all the attempts at a given queston from a set of question_usages.
      * steps.
+     *
+     * This method may be called publicly.
      *
      * @param int $questionid the question to load all the attempts fors.
      * @param qubaid_condition $qubaids used to restrict which usages are included
@@ -761,6 +881,10 @@ ORDER BY
     /**
      * Update a question_usages row to refect any changes in a usage (but not
      * any of its question_attempts.
+     *
+     * You should not call this method directly. You should use
+     * @link question_engine::save_questions_usage_by_activity()}.
+     *
      * @param question_usage_by_activity $quba the usage that has changed.
      */
     public function update_questions_usage_by_activity(question_usage_by_activity $quba) {
@@ -776,11 +900,16 @@ ORDER BY
     /**
      * Update a question_attempts row to refect any changes in a question_attempt
      * (but not any of its steps).
+     *
+     * You should not call this method directly. You should use
+     * @link question_engine::save_questions_usage_by_activity()}.
+     *
      * @param question_attempt $qa the question attempt that has changed.
      */
     public function update_question_attempt(question_attempt $qa) {
         $record = new stdClass();
         $record->id = $qa->get_database_id();
+        $record->slot = $qa->get_slot();
         $record->variant = $qa->get_variant();
         $record->maxmark = $qa->get_max_mark();
         $record->minfraction = $qa->get_min_fraction();
@@ -796,6 +925,10 @@ ORDER BY
 
     /**
      * Delete a question_usage_by_activity and all its associated
+     *
+     * You should not call this method directly. You should use
+     * @link question_engine::delete_questions_usage_by_activities()}.
+     *
      * {@link question_attempts} and {@link question_attempt_steps} from the
      * database.
      * @param qubaid_condition $qubaids identifies which question useages to delete.
@@ -847,27 +980,31 @@ ORDER BY
      * @param qubaid_condition $qubaids identifies which question useages to delete.
      */
     protected function delete_usage_records_for_mysql(qubaid_condition $qubaids) {
-        $qubaidtest = $qubaids->usage_id_in();
-        if (strpos($qubaidtest, 'question_usages') !== false &&
-                strpos($qubaidtest, 'IN (SELECT') === 0) {
-            // This horrible hack is required by MDL-29847. It comes from
-            // http://www.xaprb.com/blog/2006/06/23/how-to-select-from-an-update-target-in-mysql/
-            $qubaidtest = 'IN (SELECT * FROM ' . substr($qubaidtest, 3) . ' AS hack_subquery_alias)';
-        }
-
-        // TODO once MDL-29589 is fixed, eliminate this method, and instead use the new $DB API.
-        $this->db->execute('
-                DELETE qu, qa, qas, qasd
-                  FROM {question_usages}            qu
-                  JOIN {question_attempts}          qa   ON qa.questionusageid = qu.id
-             LEFT JOIN {question_attempt_steps}     qas  ON qas.questionattemptid = qa.id
-             LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id
-                 WHERE qu.id ' . $qubaidtest,
+        // Get the list of question attempts to delete and delete them in chunks.
+        $allids = $this->db->get_records_sql_menu("
+                SELECT DISTINCT id, id AS id2
+                  FROM {question_usages}
+                 WHERE id " . $qubaids->usage_id_in(),
                 $qubaids->usage_id_in_params());
+
+        foreach (array_chunk($allids, 1000) as $todelete) {
+            list($idsql, $idparams) = $this->db->get_in_or_equal($todelete);
+            $this->db->execute('
+                    DELETE qu, qa, qas, qasd
+                      FROM {question_usages}            qu
+                      JOIN {question_attempts}          qa   ON qa.questionusageid = qu.id
+                 LEFT JOIN {question_attempt_steps}     qas  ON qas.questionattemptid = qa.id
+                 LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id
+                     WHERE qu.id ' . $idsql,
+                    $idparams);
+        }
     }
 
     /**
      * Delete all the steps for a question attempt.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
      * @param int $qaids question_attempt id.
      * @param context $context the context that the $quba belongs to.
      */
@@ -880,9 +1017,9 @@ ORDER BY
         $this->delete_response_files($context->id, $test, $params);
 
         $this->db->delete_records_select('question_attempt_step_data',
-                "attemptstepid $test", $params);
+                "attemptstepid {$test}", $params);
         $this->db->delete_records_select('question_attempt_steps',
-                "id $test", $params);
+                "id {$test}", $params);
     }
 
     /**
@@ -903,6 +1040,9 @@ ORDER BY
 
     /**
      * Delete all the previews for a given question.
+     *
+     * Private method, only for use by other parts of the question engine.
+     *
      * @param int $questionid question id.
      */
     public function delete_previews($questionid) {
@@ -920,6 +1060,10 @@ ORDER BY
 
     /**
      * Update the flagged state of a question in the database.
+     *
+     * You should call {@link question_engine::update_flag()()}
+     * rather than calling this method directly.
+     *
      * @param int $qubaid the question usage id.
      * @param int $questionid the question id.
      * @param int $sessionid the question_attempt id.
@@ -943,7 +1087,7 @@ ORDER BY
     protected function full_states_to_summary_state_sql() {
         $sql = '';
         foreach (question_state::get_all() as $state) {
-            $sql .= "WHEN '$state' THEN '{$state->get_summary_state()}'\n";
+            $sql .= "WHEN '{$state}' THEN '{$state->get_summary_state()}'\n";
         }
         return $sql;
     }
@@ -951,6 +1095,9 @@ ORDER BY
     /**
      * Get the SQL needed to test that question_attempt_steps.state is in a
      * state corresponding to $summarystate.
+     *
+     * This method may be called publicly.
+     *
      * @param string $summarystate one of
      * inprogress, needsgrading, manuallygraded or autograded
      * @param bool $equal if false, do a NOT IN test. Default true.
@@ -965,6 +1112,10 @@ ORDER BY
     /**
      * Change the maxmark for the question_attempt with number in usage $slot
      * for all the specified question_attempts.
+     *
+     * You should call {@link question_engine::set_max_mark_in_attempts()}
+     * rather than calling this method directly.
+     *
      * @param qubaid_condition $qubaids Selects which usages are updated.
      * @param int $slot the number is usage to affect.
      * @param number $newmaxmark the new max mark to set.
@@ -997,6 +1148,8 @@ ORDER BY
      * See {@link quiz_update_all_attempt_sumgrades()} for an example of the usage of
      * this method.
      *
+     * This method may be called publicly.
+     *
      * @param string $qubaid SQL fragment that controls which usage is summed.
      * This will normally be the name of a column in the outer query. Not that this
      * SQL fragment must not contain any placeholders.
@@ -1026,6 +1179,9 @@ ORDER BY
      * Get a subquery that returns the latest step of every qa in some qubas.
      * Currently, this is only used by the quiz reports. See
      * {@link quiz_attempts_report_table::add_latest_state_join()}.
+     *
+     * This method may be called publicly.
+     *
      * @param string $alias alias to use for this inline-view.
      * @param qubaid_condition $qubaids restriction on which question_usages we
      *      are interested in. This is important for performance.
@@ -1058,7 +1214,7 @@ ORDER BY
                   JOIN {question_attempt_steps} {$alias}qas ON {$alias}qas.questionattemptid = {$alias}qa.id
                             AND {$alias}qas.sequencenumber = {$this->latest_step_for_qa_subquery($alias . 'qa.id')}
                  WHERE {$qubaids->where()}
-            ) $alias", $qubaids->from_where_params());
+            ) {$alias}", $qubaids->from_where_params());
     }
 
     protected function latest_step_for_qa_subquery($questionattemptid = 'qa.id') {
@@ -1070,9 +1226,14 @@ ORDER BY
     }
 
     /**
+     * Are any of these questions are currently in use?
+     *
+     * You should call {@link question_engine::questions_in_use()}
+     * rather than calling this method directly.
+     *
      * @param array $questionids of question ids.
      * @param qubaid_condition $qubaids ids of the usages to consider.
-     * @return boolean whether any of these questions are being used by any of
+     * @return bool whether any of these questions are being used by any of
      *      those usages.
      */
     public function questions_in_use(array $questionids, qubaid_condition $qubaids) {
@@ -1080,6 +1241,32 @@ ORDER BY
         return $this->db->record_exists_select('question_attempts',
                 'questionid ' . $test . ' AND questionusageid ' .
                 $qubaids->usage_id_in(), $params + $qubaids->usage_id_in_params());
+    }
+
+    /**
+     * Get the number of times each variant has been used for each question in a list
+     * in a set of usages.
+     * @param array $questionids of question ids.
+     * @param qubaid_condition $qubaids ids of the usages to consider.
+     * @return array questionid => variant number => num uses.
+     */
+    public function load_used_variants(array $questionids, qubaid_condition $qubaids) {
+        list($test, $params) = $this->db->get_in_or_equal($questionids, SQL_PARAMS_NAMED, 'qid');
+        $recordset = $this->db->get_recordset_sql("
+                SELECT qa.questionid, qa.variant, COUNT(1) AS usescount
+                  FROM " . $qubaids->from_question_attempts('qa') . "
+                 WHERE qa.questionid $test
+                   AND " . $qubaids->where() . "
+              GROUP BY qa.questionid, qa.variant
+              ORDER BY COUNT(1) ASC
+                ", $params + $qubaids->from_where_params());
+
+        $usedvariants = array_combine($questionids, array_fill(0, count($questionids), array()));
+        foreach ($recordset as $row) {
+            $usedvariants[$row->questionid][$row->variant] = $row->usescount;
+        }
+        $recordset->close();
+        return $usedvariants;
     }
 }
 
@@ -1103,15 +1290,15 @@ class question_engine_unit_of_work implements question_usage_observer {
 
     /**
      * @var array list of slot => {@link question_attempt}s that
-     * were already in the usage, and which have been modified.
-     */
-    protected $attemptsmodified = array();
-
-    /**
-     * @var array list of slot => {@link question_attempt}s that
      * have been added to the usage.
      */
     protected $attemptsadded = array();
+
+    /**
+     * @var array list of slot => {@link question_attempt}s that
+     * were already in the usage, and which have been modified.
+     */
+    protected $attemptsmodified = array();
 
     /**
      * @var array of array(question_attempt_step, question_attempt id, seq number)
@@ -1132,6 +1319,16 @@ class question_engine_unit_of_work implements question_usage_observer {
     protected $stepsdeleted = array();
 
     /**
+     * @var array int slot => string name => question_attempt.
+     */
+    protected $metadataadded = array();
+
+    /**
+     * @var array int slot => string name => question_attempt.
+     */
+    protected $metadatamodified = array();
+
+    /**
      * Constructor.
      * @param question_usage_by_activity $quba the usage to track.
      */
@@ -1143,6 +1340,10 @@ class question_engine_unit_of_work implements question_usage_observer {
         $this->modified = true;
     }
 
+    public function notify_attempt_added(question_attempt $qa) {
+        $this->attemptsadded[$qa->get_slot()] = $qa;
+    }
+
     public function notify_attempt_modified(question_attempt $qa) {
         $slot = $qa->get_slot();
         if (!array_key_exists($slot, $this->attemptsadded)) {
@@ -1150,8 +1351,28 @@ class question_engine_unit_of_work implements question_usage_observer {
         }
     }
 
-    public function notify_attempt_added(question_attempt $qa) {
-        $this->attemptsadded[$qa->get_slot()] = $qa;
+    public function notify_attempt_moved(question_attempt $qa, $oldslot) {
+        $newslot = $qa->get_slot();
+
+        if (array_key_exists($oldslot, $this->attemptsadded)) {
+            unset($this->attemptsadded[$oldslot]);
+            $this->attemptsadded[$newslot] = $qa;
+            return;
+        }
+
+        if (array_key_exists($oldslot, $this->attemptsmodified)) {
+            unset($this->attemptsmodified[$oldslot]);
+        }
+        $this->attemptsmodified[$newslot] = $qa;
+
+        if (array_key_exists($oldslot, $this->metadataadded)) {
+            $this->metadataadded[$newslot] = $this->metadataadded[$oldslot];
+            unset($this->metadataadded[$oldslot]);
+        }
+        if (array_key_exists($oldslot, $this->metadatamodified)) {
+            $this->metadatamodified[$newslot] = $this->metadatamodified[$oldslot];
+            unset($this->metadatamodified[$oldslot]);
+        }
     }
 
     public function notify_step_added(question_attempt_step $step, question_attempt $qa, $seq) {
@@ -1228,6 +1449,42 @@ class question_engine_unit_of_work implements question_usage_observer {
         $this->stepsdeleted[$stepid] = $step;
     }
 
+    public function notify_metadata_added(question_attempt $qa, $name) {
+        if (array_key_exists($qa->get_slot(), $this->attemptsadded)) {
+            return;
+        }
+
+        if ($this->is_step_added($qa->get_step(0)) !== false) {
+            return;
+        }
+
+        if (isset($this->metadataadded[$qa->get_slot()][$name])) {
+            return;
+        }
+
+        $this->metadataadded[$qa->get_slot()][$name] = $qa;
+    }
+
+    public function notify_metadata_modified(question_attempt $qa, $name) {
+        if (array_key_exists($qa->get_slot(), $this->attemptsadded)) {
+            return;
+        }
+
+        if ($this->is_step_added($qa->get_step(0)) !== false) {
+            return;
+        }
+
+        if (isset($this->metadataadded[$qa->get_slot()][$name])) {
+            return;
+        }
+
+        if (isset($this->metadatamodified[$qa->get_slot()][$name])) {
+            return;
+        }
+
+        $this->metadatamodified[$qa->get_slot()][$name] = $qa;
+    }
+
     /**
      * @param question_attempt_step $step a step
      * @return int|false if the step is in the list of steps to be added, return
@@ -1278,29 +1535,56 @@ class question_engine_unit_of_work implements question_usage_observer {
     public function save(question_engine_data_mapper $dm) {
         $dm->delete_steps(array_keys($this->stepsdeleted), $this->quba->get_owning_context());
 
+        // Initially an array of array of question_attempt_step_objects.
+        // Built as a nested array for efficiency, then flattened.
+        $stepdata = array();
+
         foreach ($this->stepsmodified as $stepinfo) {
             list($step, $questionattemptid, $seq) = $stepinfo;
-            $dm->update_question_attempt_step($step, $questionattemptid, $seq,
-                    $this->quba->get_owning_context());
+            $stepdata[] = $dm->update_question_attempt_step(
+                    $step, $questionattemptid, $seq, $this->quba->get_owning_context());
         }
 
         foreach ($this->stepsadded as $stepinfo) {
             list($step, $questionattemptid, $seq) = $stepinfo;
-            $dm->insert_question_attempt_step($step, $questionattemptid, $seq,
-                    $this->quba->get_owning_context());
-        }
-
-        foreach ($this->attemptsadded as $qa) {
-            $dm->insert_question_attempt($qa, $this->quba->get_owning_context());
+            $stepdata[] = $dm->insert_question_attempt_step(
+                    $step, $questionattemptid, $seq, $this->quba->get_owning_context());
         }
 
         foreach ($this->attemptsmodified as $qa) {
             $dm->update_question_attempt($qa);
         }
 
+        foreach ($this->attemptsadded as $qa) {
+            $stepdata[] = $dm->insert_question_attempt(
+                    $qa, $this->quba->get_owning_context());
+        }
+
+        foreach ($this->metadataadded as $info) {
+            $qa = reset($info);
+            $stepdata[] = $dm->insert_question_attempt_metadata($qa, array_keys($info));
+        }
+
+        foreach ($this->metadatamodified as $info) {
+            $qa = reset($info);
+            $stepdata[] = $dm->update_question_attempt_metadata($qa, array_keys($info));
+        }
+
         if ($this->modified) {
             $dm->update_questions_usage_by_activity($this->quba);
         }
+
+        if ($stepdata) {
+            $dm->insert_all_step_data(call_user_func_array('array_merge', $stepdata));
+        }
+
+        $this->stepsdeleted = array();
+        $this->stepsmodified = array();
+        $this->stepsadded = array();
+        $this->attemptsdeleted = array();
+        $this->attemptsadded = array();
+        $this->attemptsmodified = array();
+        $this->modified = false;
     }
 }
 
@@ -1445,9 +1729,9 @@ class question_file_loader implements question_response_files {
     protected $name;
 
     /**
-    * @var string the value to stored in the question_attempt_step_data to
+     * @var string the value to stored in the question_attempt_step_data to
      * represent these files.
-    */
+     */
     protected $value;
 
     /** @var int the context id that the files belong to. */
@@ -1673,7 +1957,7 @@ class qubaid_join extends qubaid_condition {
     }
 
     public function from_question_attempts($alias) {
-        return "$this->from
+        return "{$this->from}
                 JOIN {question_attempts} {$alias} ON " .
                         "{$alias}.questionusageid = $this->usageidcolumn";
     }
@@ -1687,7 +1971,7 @@ class qubaid_join extends qubaid_condition {
     }
 
     public function usage_id_in() {
-        return "IN (SELECT $this->usageidcolumn FROM $this->from WHERE $this->where)";
+        return "IN (SELECT {$this->usageidcolumn} FROM {$this->from} WHERE {$this->where})";
     }
 
     public function usage_id_in_params() {

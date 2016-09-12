@@ -161,7 +161,7 @@ class instructor_handler extends browseby_handler {
             }
 
             $user->fullname = fullname($user);
-            $lnletter = textlib::strtoupper(substr($user->lastname, 0, 1));
+            $lnletter = core_text::strtoupper(substr($user->lastname, 0, 1));
 
             // If a term is selected and we need to limit instructor last 
             // name letter choices

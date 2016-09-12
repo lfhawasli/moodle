@@ -4,7 +4,7 @@ require_once $CFG->libdir.'/formslib.php';
 
 class grade_export_form_myucla extends moodleform {
     function definition() {
-        global $CFG, $COURSE, $USER;
+        global $CFG, $COURSE, $USER, $OUTPUT;
 
         $mform =& $this->_form;
         if (isset($this->_customdata)) {  // hardcoding plugin names here is hacky
@@ -136,6 +136,9 @@ class grade_export_form_myucla extends moodleform {
         }
         $mform->addElement('static', 'expresswarning', '<br />Note: Express only allows '.get_string('coursetotal', 'grades'));
         
+        // Warning message so instructors can doublecheck their grades before submitting.
+        echo $OUTPUT->notification(get_string('doublecheckwarning','gradeexport_myucla'),'notifyproblem');
+
         $mform->addElement('hidden', 'id', $COURSE->id);
         $mform->setType('id', PARAM_INT);
         $this->add_action_buttons(false, get_string('submit'));

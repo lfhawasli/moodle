@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015081800;
+$plugin->version   = 2016051800;
 $plugin->requires  = 2013051408;
 $plugin->component = 'gradeimport_kioskpearsonjson'; // Full name of the plugin (used for diagnostics)

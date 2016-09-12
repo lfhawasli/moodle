@@ -87,7 +87,6 @@ class behat_ucla extends behat_files {
         // Grading config variables.
         set_config('grader_report_grouping_filter', 1);
         set_config('collapsedefaultcolumns', 1, 'local_ucla');
-        set_config('collapsesubmissionstatus', 1, 'local_ucla');
         set_config('defaultassignquickgrading', 1, 'local_ucla');
         set_config('showallgraderviewactions', 1, 'local_ucla');
 
@@ -138,25 +137,24 @@ class behat_ucla extends behat_files {
                     $this->getSession());
                 }
 
-                // Need to set proper course shortname so that Moodle's generator
-                // knows what to reference.  In this case, I have to regenerate the
-                // table as text because I can't modify the TableNode obj directly.
-                $table = "| user | course | role |";
+                // Create table node to pass to Moodle's Behat step.
+                $table = array();
+                $table[] = array('user', 'course', 'role');
 
                 $roles = array();
                 foreach ($data->getHash() as $elementdata) {
                     $roles[] = $elementdata['role'];
-                    $table .= "\n| {$elementdata['user']} | " .
-                            "{$this->courses[$elementdata['course']]->shortname} | " .
-                            "{$elementdata['role']} |";
+                    $table[] = array($elementdata['user'],
+                        $this->courses[$elementdata['course']]->shortname,
+                        $elementdata['role']);
                 }
 
                 // Make sure that the proper UCLA roles exists.
                 $this->get_data_generator()->create_ucla_roles($roles);
 
-                // Forward the work to Moodle's data generators.
-                $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exist('course enrolments', new TableNode($table));
+                // Forward the work to Moodle's Behat data generators.
+                $this->execute('behat_data_generators::the_following_exist',
+                        array('course enrolments', new TableNode($table)));
 
                 break;
 
@@ -178,14 +176,14 @@ class behat_ucla extends behat_files {
                 $this->get_data_generator()->create_ucla_roles($roles);
 
                 // Forward the data to Moodle's data generators.
-                $this->getMainContext()->getSubcontext('behat_data_generators')
-                    ->the_following_exist('role assigns', new TableNode($data));
+                $this->execute('behat_data_generators::the_following_exist',
+                        array('role assigns', $data));
                 break;
 
             case 'activities':
                 require_once(__DIR__ . '/../../../../local/publicprivate/lib/module.class.php');
-                $this->getMainContext()->getSubcontext('behat_data_generators')
-                        ->the_following_exist('activities', $data);
+                $this->execute('behat_data_generators::the_following_exist',
+                        array('activities', $data));
                 // Make each activity either public or private (default).
                 foreach ($data->getHash() as $elementdata) {
                     if (!empty($elementdata['private'])) {
@@ -194,7 +192,12 @@ class behat_ucla extends behat_files {
                                 array('idnumber' => $elementdata['idnumber']));
                         $ppmod = PublicPrivate_Module::build($cmid);
                         $ppmod->enable();
-                    }
+                    } else {
+                        $cmid = $DB->get_field('course_modules', 'id',
+                                array('idnumber' => $elementdata['idnumber']));
+                        $ppmod = PublicPrivate_Module::build($cmid);
+                        $ppmod->disable();
+                    } 
                 }
         }
     }
@@ -303,26 +306,27 @@ class behat_ucla extends behat_files {
     public function ucla_site_exist($site) {
         global $DB;
 
-        $data = "| fullname | shortname | type |
-                 | $site site | $site site | $site |";
+        $data = array();
+        $data[0] = array('fullname', 'shortname','type');
+        $data[1] = array("$site site", "$site site", $site);
         $this->generate_ucla_sites(new TableNode($data));
 
         // Call Moodle's own generator to create users and enrollments.
         // First create users.
-        $data = '| username | firstname | lastname | email |
-                | instructor | Editing | Instructor | instructor@asd.com |
-                | student | Stu | Dent | student1@asd.com |';
-
-        $this->getMainContext()->getSubcontext('behat_data_generators')
-                ->the_following_exist('users', new TableNode($data));
+        $data = array();
+        $data[0] = array('username', 'firstname', 'lastname', 'email');
+        $data[1] = array('instructor', 'Editing', 'Instructor', 'instructor@asd.com');
+        $data[2] = array('student', 'Stu', 'Dent', 'student1@asd.com');
+        $this->execute('behat_data_generators::the_following_exist',
+                array('users', new TableNode($data)));
 
         // Now create enrollments.
         $shortnames = array_keys($this->courses);    // Use newly created course above.
         $shortname = reset($shortnames);
-        $data = "| user | course | role |
-                | instructor | {$shortname} | editinginstructor |
-                | student | {$shortname} | student |";
-
+        $data = array();
+        $data[0] = array('user', 'course', 'role');
+        $data[1] = array('instructor', $shortname, 'editinginstructor');
+        $data[2] = array('student', $shortname, 'student');
         $this->the_following_exist('course enrolments', new TableNode($data));
     }
 

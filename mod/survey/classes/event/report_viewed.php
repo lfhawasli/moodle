@@ -49,7 +49,7 @@ class report_viewed extends \core\event\base {
     protected function init() {
         $this->data['objecttable'] = 'survey';
         $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 
     /**
@@ -92,5 +92,16 @@ class report_viewed extends \core\event\base {
     protected function get_legacy_logdata() {
         return array($this->courseid, "survey", "view report", "report.php?id=" . $this->contextinstanceid, $this->objectid,
                      $this->contextinstanceid);
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'survey', 'restore' => 'survey');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
+
+        return $othermapped;
     }
 }

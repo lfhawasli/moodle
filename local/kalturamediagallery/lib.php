@@ -29,8 +29,8 @@
  */
 // START UCLA MOD: CCLE-4908 - local_kaltura: Upgrade to Kaltura KAF
 // Display link to course media gallery in Administration > Course administration.
-//function local_kalturamediagallery_extends_navigation($navigation) {
-function local_kalturamediagallery_extends_settings_navigation($navigation) {
+//function local_kalturamediagallery_extend_navigation($navigation) {
+function local_kalturamediagallery_extend_settings_navigation($navigation) {
 // END UCLA MOD: CCLE-4908
     global $USER, $PAGE, $DB;
 

@@ -48,7 +48,7 @@ Feature: "Other" collab sites
     And I should see "Warning: collaboration site is in the default category for uncategorized sites."
     And I set the following fields to these values:
       | Course category  | Category 1 |
-    And I press "Save changes"
+    And I press "Save and display"
     And I navigate to "Edit settings" node in "Course administration"
     And I should not see "Warning: collaboration site is in the default category for uncategorized sites."
     And the field "Course category" matches value "Category 1"

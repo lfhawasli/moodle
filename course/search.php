@@ -136,7 +136,7 @@ if (file_exists($ucla_search) && empty($modulelist)) {
     // Get course/collab IDs which meet search criteria.
     $courses = get_courses_search($searchcriteria, "fullname ASC",
                                   $page, $perpage, $totalcount,
-                                  $searchtype);
+                                  array(), $searchtype);
 
     // If there are no courses which match our search, display appropriate
     // message.

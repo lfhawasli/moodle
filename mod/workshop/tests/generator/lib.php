@@ -48,11 +48,13 @@ class mod_workshop_generator extends testing_module_generator {
             'gradinggrade' => $workshopconfig->gradinggrade,
             'gradedecimals' => $workshopconfig->gradedecimals,
             'nattachments' => 1,
+            'submissionfiletypes' => null,
             'maxbytes' => $workshopconfig->maxbytes,
             'latesubmissions' => 0,
             'useselfassessment' => 0,
             'overallfeedbackmode' => 1,
             'overallfeedbackfiles' => 0,
+            'overallfeedbackfiletypes' => null,
             'overallfeedbackmaxbytes' => $workshopconfig->maxbytes,
             'useexamples' => 0,
             'examplesmode' => $workshopconfig->examplesmode,
@@ -101,8 +103,6 @@ class mod_workshop_generator extends testing_module_generator {
     /**
      * Generates a submission authored by the given user.
      *
-     * @since Moodle 2.6.6, 2.7.3
-     *
      * @param int $workshopid Workshop instance id.
      * @param int $authorid Author user id.
      * @param stdClass|array $options Optional explicit properties.
@@ -133,8 +133,6 @@ class mod_workshop_generator extends testing_module_generator {
 
     /**
      * Generates an allocation of the given submission for peer-assessment by the given user
-     *
-     * @since Moodle 2.6.6, 2.7.3
      *
      * @param int $submissionid Submission id.
      * @param int $reviewerid Reviewer's user id.

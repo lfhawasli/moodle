@@ -58,6 +58,11 @@ class auth_plugin_db extends auth_plugin_base {
     function user_login($username, $password) {
         global $CFG, $DB;
 
+        if ($this->is_configured() === false) {
+            debugging(get_string('auth_notconfigured', 'auth', $this->authtype));
+            return false;
+        }
+
         $extusername = core_text::convert($username, 'utf-8', $this->config->extencoding);
         $extpassword = core_text::convert($password, 'utf-8', $this->config->extencoding);
 
@@ -105,29 +110,35 @@ class auth_plugin_db extends auth_plugin_base {
 
             $authdb = $this->db_init();
 
-            if ($this->config->passtype === 'md5') {   // Re-format password accordingly.
-                $extpassword = md5($extpassword);
-            } else if ($this->config->passtype === 'sha1') {
-                $extpassword = sha1($extpassword);
-            }
-
-            $rs = $authdb->Execute("SELECT *
+            $rs = $authdb->Execute("SELECT {$this->config->fieldpass}
                                       FROM {$this->config->table}
-                                     WHERE {$this->config->fielduser} = '".$this->ext_addslashes($extusername)."'
-                                           AND {$this->config->fieldpass} = '".$this->ext_addslashes($extpassword)."'");
+                                     WHERE {$this->config->fielduser} = '".$this->ext_addslashes($extusername)."'");
             if (!$rs) {
                 $authdb->Close();
                 debugging(get_string('auth_dbcantconnect','auth_db'));
                 return false;
             }
 
-            if (!$rs->EOF) {
-                $rs->Close();
+            if ($rs->EOF) {
                 $authdb->Close();
-                return true;
+                return false;
+            }
+
+            $fields = array_change_key_case($rs->fields, CASE_LOWER);
+            $fromdb = $fields[strtolower($this->config->fieldpass)];
+            $rs->Close();
+            $authdb->Close();
+
+            if ($this->config->passtype === 'plaintext') {
+                return ($fromdb == $extpassword);
+            } else if ($this->config->passtype === 'md5') {
+                return (strtolower($fromdb) == md5($extpassword));
+            } else if ($this->config->passtype === 'sha1') {
+                return (strtolower($fromdb) == sha1($extpassword));
+            } else if ($this->config->passtype === 'saltedcrypt') {
+                require_once($CFG->libdir.'/password_compat/lib/password.php');
+                return password_verify($extpassword, $fromdb);
             } else {
-                $rs->Close();
-                $authdb->Close();
                 return false;
             }
 
@@ -138,8 +149,13 @@ class auth_plugin_db extends auth_plugin_base {
      * Connect to external database.
      *
      * @return ADOConnection
+     * @throws moodle_exception
      */
     function db_init() {
+        if ($this->is_configured() === false) {
+            throw new moodle_exception('auth_dbcantconnect', 'auth_db');
+        }
+
         // Connect to the external database (forcing new connection).
         $authdb = ADONewConnection($this->config->type);
         if (!empty($this->config->debugauthdb)) {
@@ -162,7 +178,15 @@ class auth_plugin_db extends auth_plugin_base {
      */
     function db_attributes() {
         $moodleattributes = array();
-        foreach ($this->userfields as $field) {
+        // If we have custom fields then merge them with user fields.
+        $customfields = $this->get_custom_user_profile_fields();
+        if (!empty($customfields) && !empty($this->userfields)) {
+            $userfields = array_merge($this->userfields, $customfields);
+        } else {
+            $userfields = $this->userfields;
+        }
+
+        foreach ($userfields as $field) {
             if (!empty($this->config->{"field_map_$field"})) {
                 $moodleattributes[$field] = $this->config->{"field_map_$field"};
             }
@@ -193,18 +217,21 @@ class auth_plugin_db extends auth_plugin_base {
         if ($selectfields) {
             $select = array();
             foreach ($selectfields as $localname=>$externalname) {
-                $select[] = "$externalname AS $localname";
+                $select[] = "$externalname";
             }
             $select = implode(', ', $select);
             $sql = "SELECT $select
                       FROM {$this->config->table}
                      WHERE {$this->config->fielduser} = '".$this->ext_addslashes($extusername)."'";
+
             if ($rs = $authdb->Execute($sql)) {
                 if (!$rs->EOF) {
-                    $fields_obj = $rs->FetchObj();
-                    $fields_obj = (object)array_change_key_case((array)$fields_obj , CASE_LOWER);
-                    foreach ($selectfields as $localname=>$externalname) {
-                        $result[$localname] = core_text::convert($fields_obj->{$localname}, $this->config->extencoding, 'utf-8');
+                    $fields = $rs->FetchRow();
+                    // Convert the associative array to an array of its values so we don't have to worry about the case of its keys.
+                    $fields = array_values($fields);
+                    foreach (array_keys($selectfields) as $index => $localname) {
+                        $value = $fields[$index];
+                        $result[$localname] = core_text::convert($value, $this->config->extencoding, 'utf-8');
                      }
                  }
                  $rs->Close();
@@ -260,6 +287,8 @@ class auth_plugin_db extends auth_plugin_base {
     function sync_users(progress_trace $trace, $do_updates=false) {
         global $CFG, $DB;
 
+        require_once($CFG->dirroot . '/user/lib.php');
+
         // List external users.
         $userlist = $this->get_userlist();
 
@@ -273,23 +302,29 @@ class auth_plugin_db extends auth_plugin_base {
 
             // Find obsolete users.
             if (count($userlist)) {
-                list($notin_sql, $params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED, 'u', false);
-                $params['authtype'] = $this->authtype;
-                $sql = "SELECT u.*
+                $remove_users = array();
+                // All the drivers can cope with chunks of 10,000. See line 4491 of lib/dml/tests/dml_est.php
+                $userlistchunks = array_chunk($userlist , 10000);
+                foreach($userlistchunks as $userlistchunk) {
+                    list($notin_sql, $params) = $DB->get_in_or_equal($userlistchunk, SQL_PARAMS_NAMED, 'u', false);
+                    $params['authtype'] = $this->authtype;
+                    $sql = "SELECT u.id, u.username
                           FROM {user} u
                          WHERE u.auth=:authtype AND u.deleted=0 AND u.mnethostid=:mnethostid $suspendselect AND u.username $notin_sql";
+                    $params['mnethostid'] = $CFG->mnet_localhost_id;
+                    $remove_users = $remove_users + $DB->get_records_sql($sql, $params);
+                }
             } else {
-                $sql = "SELECT u.*
+                $sql = "SELECT u.id, u.username
                           FROM {user} u
                          WHERE u.auth=:authtype AND u.deleted=0 AND u.mnethostid=:mnethostid $suspendselect";
                 $params = array();
                 $params['authtype'] = $this->authtype;
+                $params['mnethostid'] = $CFG->mnet_localhost_id;
+                $remove_users = $DB->get_records_sql($sql, $params);
             }
-            $params['mnethostid'] = $CFG->mnet_localhost_id;
-            $remove_users = $DB->get_records_sql($sql, $params);
 
             if (!empty($remove_users)) {
-                require_once($CFG->dirroot.'/user/lib.php');
                 $trace->output(get_string('auth_dbuserstoremove','auth_db', count($remove_users)));
 
                 foreach ($remove_users as $user) {
@@ -331,12 +366,20 @@ class auth_plugin_db extends auth_plugin_base {
 
             // Only go ahead if we actually have fields to update locally.
             if (!empty($updatekeys)) {
-                list($in_sql, $params) = $DB->get_in_or_equal($userlist, SQL_PARAMS_NAMED, 'u', true);
-                $params['authtype'] = $this->authtype;
-                $sql = "SELECT u.id, u.username
+                $update_users = array();
+                // All the drivers can cope with chunks of 10,000. See line 4491 of lib/dml/tests/dml_est.php
+                $userlistchunks = array_chunk($userlist , 10000);
+                foreach($userlistchunks as $userlistchunk) {
+                    list($in_sql, $params) = $DB->get_in_or_equal($userlistchunk, SQL_PARAMS_NAMED, 'u', true);
+                    $params['authtype'] = $this->authtype;
+                    $params['mnethostid'] = $CFG->mnet_localhost_id;
+                    $sql = "SELECT u.id, u.username
                           FROM {user} u
-                         WHERE u.auth=:authtype AND u.deleted=0 AND u.username {$in_sql}";
-                if ($update_users = $DB->get_records_sql($sql, $params)) {
+                         WHERE u.auth = :authtype AND u.deleted = 0 AND u.mnethostid = :mnethostid AND u.username {$in_sql}";
+                    $update_users = $update_users + $DB->get_records_sql($sql, $params);
+                }
+
+                if ($update_users) {
                     $trace->output("User entries to update: ".count($update_users));
 
                     foreach ($update_users as $user) {
@@ -382,14 +425,14 @@ class auth_plugin_db extends auth_plugin_base {
             foreach($add_users as $user) {
                 $username = $user;
                 if ($this->config->removeuser == AUTH_REMOVEUSER_SUSPEND) {
-
-                    if ($old_user = $DB->get_record('user', array('username'=>$username, 'deleted'=>0, 'suspended'=>1, 'mnethostid'=>$CFG->mnet_localhost_id, 'auth'=>$this->authtype))) {
-                        $DB->set_field('user', 'suspended', 0, array('id'=>$old_user->id));
-                        $trace->output(get_string('auth_dbreviveduser', 'auth_db', array('name'=>$username, 'id'=>$old_user->id)), 1);
-
-                        // Trigger user_updated event.
-                        \core\event\user_updated::create_from_userid($old_user->id)->trigger();
-
+                    if ($olduser = $DB->get_record('user', array('username' => $username, 'deleted' => 0, 'suspended' => 1,
+                            'mnethostid' => $CFG->mnet_localhost_id, 'auth' => $this->authtype))) {
+                        $updateuser = new stdClass();
+                        $updateuser->id = $olduser->id;
+                        $updateuser->suspended = 0;
+                        user_update_user($updateuser);
+                        $trace->output(get_string('auth_dbreviveduser', 'auth_db', array('name' => $username,
+                            'id' => $olduser->id)), 1);
                         continue;
                     }
                 }
@@ -405,22 +448,13 @@ class auth_plugin_db extends auth_plugin_base {
                 if (empty($user->lang)) {
                     $user->lang = $CFG->lang;
                 }
-                if (empty($user->calendartype)) {
-                    $user->calendartype = $CFG->calendartype;
-                }
-                $user->timecreated = time();
-                $user->timemodified = $user->timecreated;
                 if ($collision = $DB->get_record_select('user', "username = :username AND mnethostid = :mnethostid AND auth <> :auth", array('username'=>$user->username, 'mnethostid'=>$CFG->mnet_localhost_id, 'auth'=>$this->authtype), 'id,username,auth')) {
                     $trace->output(get_string('auth_dbinsertuserduplicate', 'auth_db', array('username'=>$user->username, 'auth'=>$collision->auth)), 1);
                     continue;
                 }
                 $user = $this->clean_data($user);
                 try {
-                    $id = $DB->insert_record ('user', $user); // it is truly a new user
-
-                    // Trigger user_created event.
-                    \core\event\user_created::create_from_userid($id)->trigger();
-
+                    $id = user_create_user($user, false); // It is truly a new user.
                     $trace->output(get_string('auth_dbinsertuser', 'auth_db', array('name'=>$user->username, 'id'=>$id)), 1);
                 } catch (moodle_exception $e) {
                     $trace->output(get_string('auth_dbinsertusererror', 'auth_db', $user->username), 1);
@@ -473,15 +507,15 @@ class auth_plugin_db extends auth_plugin_base {
         $authdb = $this->db_init();
 
         // Fetch userlist.
-        $rs = $authdb->Execute("SELECT {$this->config->fielduser} AS username
+        $rs = $authdb->Execute("SELECT {$this->config->fielduser}
                                   FROM {$this->config->table} ");
 
         if (!$rs) {
             print_error('auth_dbcantconnect','auth_db');
         } else if (!$rs->EOF) {
             while ($rec = $rs->FetchRow()) {
-                $rec = (object)array_change_key_case((array)$rec , CASE_LOWER);
-                array_push($result, $rec->username);
+                $rec = array_change_key_case((array)$rec, CASE_LOWER);
+                array_push($result, $rec[strtolower($this->config->fielduser)]);
             }
         }
 
@@ -532,8 +566,10 @@ class auth_plugin_db extends auth_plugin_base {
 
         // Ensure userid is not overwritten.
         $userid = $user->id;
-        $updated = false;
+        $needsupdate = false;
 
+        $updateuser = new stdClass();
+        $updateuser->id = $userid;
         if ($newinfo = $this->get_userinfo($username)) {
             $newinfo = truncate_userinfo($newinfo);
 
@@ -550,18 +586,15 @@ class auth_plugin_db extends auth_plugin_base {
 
                 if (!empty($this->config->{'field_updatelocal_' . $key})) {
                     if (isset($user->{$key}) and $user->{$key} != $value) { // Only update if it's changed.
-                        $DB->set_field('user', $key, $value, array('id'=>$userid));
-                        $updated = true;
+                        $needsupdate = true;
+                        $updateuser->$key = $value;
                     }
                 }
             }
         }
-
-        if ($updated) {
-            $DB->set_field('user', 'timemodified', time(), array('id'=>$userid));
-
-            // Trigger user_updated event.
-            \core\event\user_updated::create_from_userid($userid)->trigger();
+        if ($needsupdate) {
+            require_once($CFG->dirroot . '/user/lib.php');
+            user_update_user($updateuser);
         }
         return $DB->get_record('user', array('id'=>$userid, 'deleted'=>0));
     }
@@ -608,6 +641,10 @@ class auth_plugin_db extends auth_plugin_base {
                 continue;
             }
             $nuvalue = $newuser->$key;
+            // Support for textarea fields.
+            if (isset($nuvalue['text'])) {
+                $nuvalue = $nuvalue['text'];
+            }
             if ($nuvalue != $value) {
                 $update[] = $this->config->{"field_map_$key"}."='".$this->ext_addslashes(core_text::convert($nuvalue, 'utf-8', $this->config->extencoding))."'";
             }
@@ -652,6 +689,18 @@ class auth_plugin_db extends auth_plugin_base {
             return true;
         }
         return ($this->config->passtype === 'internal');
+    }
+
+    /**
+     * Returns false if this plugin is enabled but not configured.
+     *
+     * @return bool
+     */
+    public function is_configured() {
+        if (!empty($this->config->type)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -877,26 +926,14 @@ class auth_plugin_db extends auth_plugin_base {
 
     /**
      * Clean the user data that comes from an external database.
-     *
+     * @deprecated since 3.1, please use core_user::clean_data() instead.
      * @param array $user the user data to be validated against properties definition.
      * @return stdClass $user the cleaned user data.
      */
     public function clean_data($user) {
-        if (empty($user)) {
-            return $user;
-        }
-
-        foreach ($user as $field => $value) {
-            // Get the property parameter type and do the cleaning.
-            try {
-                $property = core_user::get_property_definition($field);
-                $user->$field = clean_param($value, $property['type']);
-            } catch (coding_exception $e) {
-                debugging("The property '$field' could not be cleaned.", DEBUG_DEVELOPER);
-            }
-        }
-
-        return $user;
+        debugging('The method clean_data() has been deprecated, please use core_user::clean_data() instead.',
+            DEBUG_DEVELOPER);
+        return core_user::clean_data($user);
     }
 }
 

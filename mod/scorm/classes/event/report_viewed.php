@@ -57,7 +57,7 @@ class report_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the scorm report '{$this->other['mode']}' for the scorm with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -104,5 +104,12 @@ class report_viewed extends \core\event\base {
         if (empty($this->other['mode'])) {
             throw new \coding_exception('The \'mode\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['scormid'] = array('db' => 'scorm', 'restore' => 'scorm');
+
+        return $othermapped;
     }
 }

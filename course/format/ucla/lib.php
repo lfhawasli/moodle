@@ -112,7 +112,7 @@ class format_ucla extends format_topics {
 
         if (!$forsection) {
             $category = $mform->getElement('category');
-            if (get_class($category) != 'HTML_QuickForm_Error') {
+            if (get_class($category) != 'HTML_QuickForm_Error' && get_class($category) != 'MoodleQuickForm_hidden') {
                 $mform->addRule('category', get_string('req_category_error', 'tool_uclasiteindicator'), 'required', null, 'client');
             }
         }
@@ -328,10 +328,6 @@ class format_ucla extends format_topics {
                     'default' => true,
                     'type' => PARAM_BOOL
                 ),
-                'createtasite' => array(
-                    'default' => true,
-                    'type' => PARAM_BOOL
-                )
             );
             if (!$iscollabsite) {
                 $uclaoptions['createtasite'] = array(

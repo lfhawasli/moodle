@@ -102,6 +102,9 @@ class data_advanced_search_sql_test extends advanced_testcase {
 
 
         // we already have 2 users, we need 98 more - let's ignore the fact that guest can not post anywhere
+        // We reset the user sequence here to ensure we get the expected numbers.
+        // TODO: Invent a better way for managing data file input against database sequence id's.
+        $DB->get_manager()->reset_sequence('user');
         for($i=3;$i<=100;$i++) {
             $this->getDataGenerator()->create_user();
         }
@@ -118,6 +121,9 @@ class data_advanced_search_sql_test extends advanced_testcase {
             'data_content' => __DIR__.'/fixtures/test_data_content.csv',
         );
         $this->loadDataSet($this->createCsvDataSet($files));
+        // Set dataid to the correct value now the data has been inserted by csv file.
+        $DB->execute('UPDATE {data_fields} SET dataid = ?', array($data->id));
+        $DB->execute('UPDATE {data_records} SET dataid = ?', array($data->id));
 
         // Create the search array which contains our advanced search criteria.
         $fieldinfo = array('0' => new stdClass(),
@@ -166,6 +172,9 @@ class data_advanced_search_sql_test extends advanced_testcase {
         $this->finalrecord[6]->lastnamephonetic = $user->lastnamephonetic;
         $this->finalrecord[6]->middlename = $user->middlename;
         $this->finalrecord[6]->alternatename = $user->alternatename;
+        $this->finalrecord[6]->picture = $user->picture;
+        $this->finalrecord[6]->imagealt = $user->imagealt;
+        $this->finalrecord[6]->email = $user->email;
     }
 
     /**
@@ -179,6 +188,9 @@ class data_advanced_search_sql_test extends advanced_testcase {
      * function (@see data_get_advance_search_ids). This function takes a couple of
      * extra parameters. $alias is the field alias used in the sql query and $commaid
      * is a comma seperated string of record IDs.
+     *
+     * Test 3.1: This tests that if no recordids are provided (In a situation where a search is done on an empty database)
+     * That an empty array is returned.
      *
      * Test 4: data_get_advanced_search_sql provides an array which contains an sql string to be used for displaying records
      * to the user when they use the advanced search criteria and the parameters that go with the sql statement. This test
@@ -207,6 +219,10 @@ class data_advanced_search_sql_test extends advanced_testcase {
         // Test 3
         $newrecordids = data_get_advance_search_ids($recordids, $this->recordsearcharray, $this->recorddata->id);
         $this->assertEquals($this->datarecordset, $newrecordids);
+
+        // Test 3.1
+        $resultrecordids = data_get_advance_search_ids(array(), $this->recordsearcharray, $this->recorddata->id);
+        $this->assertEmpty($resultrecordids);
 
         // Test 4
         $sortorder = 'ORDER BY r.timecreated ASC , r.id ASC';

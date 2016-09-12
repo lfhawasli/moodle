@@ -195,6 +195,9 @@ $CFG->preventexecpath = 1;
 // CCLE-4686 - Enable Apache's X-sendfile.
 $CFG->xsendfile = 'X-Sendfile';
 
+// CCLE-5959 - Disable Web Installations of Plugins
+$CFG->disableupdateautodeploy = 1;
+
 // Site administration > Advanced features
 $CFG->usetags = 0;
 $CFG->enablenotes = 0;
@@ -234,6 +237,8 @@ $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 
 // Site administration > Grades > Grade category settings
+$CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
+$CFG->grade_aggregations_visible = '0,10,11,12,2,4,6,8,13'; // Enables all aggregation types.
 $CFG->grade_overridecat = 0;
 
 // CCLE-5445 - Default city and country
@@ -244,6 +249,9 @@ $CFG->country = 'US';
 // Site administration > Plugins > Activity modules > Assignment
 $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 $CFG->forced_plugin_settings['assign']['submissiondrafts'] = 0;
+
+// Site administration > Plugins > Activity modules > Assignment > Submission plugins > Online PoodLL submissions
+$CFG->forced_plugin_settings['assignsubmission_onlinepoodll']['allowedrecorders'] = '0,2';    // Allow only MP3 voice recorder and Video recorder.
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
@@ -325,6 +333,11 @@ $CFG->forced_plugin_settings['assignfeedback_file']['default'] = 1;
 // Site administration > Plugins > Admin tools > Merge user accounts
 $CFG->forced_plugin_settings['tool_mergeusers']['quizattemptsaction'] = 'renumber';
 
+// Site administration > Plugins > Admin tools > Recycle bin
+$CFG->forced_plugin_settings['tool_recyclebin']['coursebinexpiry'] = 1209600;
+$CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
+$CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
+
 // Site administration > Plugins > Admin tools > Manage senior scholars
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '003215880;303536506';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
@@ -377,12 +390,10 @@ $CFG->block_iclicker_notify_emails = 'help@ssc.ucla.edu'; // due to bad coding, 
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
+$CFG->block_quickmail_addionalemail = 1;
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';
-
-// Site administration > Plugins > Filters > MathJax
-$CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.mathjax.org/mathjax/2.3-latest/MathJax.js';
 
 // Site administration > Plugins > Filters > PoodLL Filter
 //$CFG->filter_poodll_download_media_ok = '1';
@@ -428,10 +439,6 @@ $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-3.kaf.kaltur
 // Site administration > Plugins > Local plugins > Moodle Mobile additional features
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
 
-// Site administration > Plugins > Local plugins > Recycle Bin
-$CFG->forced_plugin_settings['local_recyclebin']['expiry'] = 14;
-$CFG->forced_plugin_settings['local_recyclebin']['course_expiry'] = 14;
-
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
@@ -443,8 +450,6 @@ $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4
 $CFG->grader_report_grouping_filter = 1;
 // CCLE-4292 - Collapse Default Columns for Assignment Grading
 $CFG->forced_plugin_settings['local_ucla']['collapsedefaultcolumns'] = 1;
-// CCLE-4299 - Improve Assignment Grading Screen
-$CFG->forced_plugin_settings['local_ucla']['collapsesubmissionstatus'] = 1;
 // CCLE-4297 - Have "quick grading" turned on by default
 $CFG->forced_plugin_settings['local_ucla']['defaultassignquickgrading'] = 1;
 // CCLE-3511 - Set defaults for new assignment module
@@ -486,6 +491,8 @@ $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     FAQs and Tutorials|https://moodle2.sscnet.ucla.edu/docs/Main_Page
     Request a site|/course/request.php";
+$CFG->customusermenuitems = "grades,grades|/grade/report/mygrades.php|grades
+preferences,moodle|/user/preferences.php|preferences";
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)

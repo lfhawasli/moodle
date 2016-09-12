@@ -55,7 +55,7 @@ if (!empty($approve) and confirm_sesskey()) {
         // START UCLA MOD: CCLE-2389 - Approving site indicator site, and sending 'approved' param.
         siteindicator_manager::approve($courseid, $approve);
         // END UCLA MOD: CCLE-2389
-        redirect($CFG->wwwroot.'/course/edit.php?id=' . $courseid);
+        redirect(new moodle_url('/course/edit.php', ['id' => $courseid, 'returnto' => 'pending']));
     } else {
         print_error('courseapprovedfailed');
     }
@@ -111,8 +111,9 @@ if(!empty($request)) {
 if (empty($pending)) {
     echo $OUTPUT->heading(get_string('nopendingcourses', 'tool_uclasiteindicator'));
 } else {
-    echo $OUTPUT->heading(get_string('coursespending', 'tool_uclasiteindicator'));
-    echo $OUTPUT->notification(get_string('approvalmessage', 'tool_uclasiteindicator'), 'notifymessage');
+    echo $OUTPUT->heading(get_string('coursespending'));
+    $role = $DB->get_record('role', array('id' => $CFG->creatornewroleid), '*', MUST_EXIST);
+    echo $OUTPUT->notification(get_string('courserequestwarning', 'core', role_get_name($role)), 'notifyproblem');
 
 /// Build a table of all the requests.
     $table = new html_table();
@@ -146,15 +147,8 @@ if (empty($pending)) {
         $row[] = format_string($course->fullname);
         $row[] = fullname($course->get_requester());
         $row[] = format_text($course->summary, $course->summaryformat);
-        // Set site type and requested category
-//        $row[] = $category->get_formatted_name();
-//        $row[] = format_string($course->reason);
-        $row[] = siteindicator_manager::get_categories_list($request->request->categoryid);
-        $row[] = html_writer::tag('strong',  get_string('req_type', 'tool_uclasiteindicator') . ': ') .
-                siteindicator_manager::get_types_list($request->request->type) .
-                html_writer::empty_tag('br') .
-                format_string($course->reason);
-        // END UCLA MOD CCLE-2389
+        $row[] = $category->get_formatted_name();
+        $row[] = format_string($course->reason);
         $row[] = $OUTPUT->single_button(new moodle_url($baseurl, array('approve' => $course->id, 'sesskey' => sesskey())), get_string('approve'), 'get') .
                  $OUTPUT->single_button(new moodle_url($baseurl, array('reject' => $course->id)), get_string('rejectdots'), 'get');
 

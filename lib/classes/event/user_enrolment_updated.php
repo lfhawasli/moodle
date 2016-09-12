@@ -65,8 +65,8 @@ class user_enrolment_updated extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' updated the enrolment for the user with id '$this->relateduserid' in " .
-            "the course with id '$this->courseid'.";
+        return "The user with id '$this->userid' updated the enrolment for the user with id '$this->relateduserid' using the " .
+            "enrolment method '{$this->other['enrol']}' in the course with id '$this->courseid'.";
     }
 
     /**
@@ -113,5 +113,14 @@ class user_enrolment_updated extends base {
         if (!isset($this->relateduserid)) {
             throw new \coding_exception('The \'relateduserid\' must be set.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        // User enrolments table is not mappable.
+        return array('db' => 'user_enrolments', 'restore' => base::NOT_MAPPED);
+    }
+
+    public static function get_other_mapping() {
+        return false;
     }
 }

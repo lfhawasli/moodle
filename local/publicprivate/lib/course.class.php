@@ -14,7 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Public/Private module class file.
+ *
+ * @package    local_publicprivate
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 include_once($CFG->dirroot.'/local/publicprivate/lib/course_exception.class.php');
+include_once($CFG->dirroot.'/local/publicprivate/lib/module.class.php');
 include_once($CFG->dirroot.'/local/publicprivate/lib/site.class.php');
 include_once($CFG->dirroot.'/group/lib.php');
 include_once($CFG->dirroot . '/lib/enrollib.php');
@@ -30,12 +41,8 @@ require_once($CFG->dirroot.'/group/lib.php');
  * removing users from the public/private group, and checking if a user is a
  * member of the public/private group.
  *
- * @author ebollens
- * @version 20110719
- *
- * @uses PublicPrivate_Course_Exception
- * @uses $DB
- * @uses $CFG
+ * @package    local_publicprivate
+ * @copyright  2016 UC Regents
  */
 
 class PublicPrivate_Course {
@@ -57,7 +64,7 @@ class PublicPrivate_Course {
 
         if (is_scalar($course)) {
             try {
-                $this->_course = get_course($course);
+                $this->_course =  $DB->get_record('course', array('id' => $course), '*', MUST_EXIST);
             } catch (DML_Exception $e) {
                 throw new PublicPrivate_Course_Exception('Database query failed for __construct.', 100, $e);
             }
@@ -73,7 +80,7 @@ class PublicPrivate_Course {
         }
     }
 
-    /** 
+    /**
      * Returns if the course is capable of public private functionality.
      *
      * @param object $course
@@ -97,12 +104,12 @@ class PublicPrivate_Course {
     }
 
     /**
-     * Get the id of the course that this object is bound to.
+     * Get the course that this object is bound to.
      *
-     * @return int
+     * @return object
      */
     public function get_course() {
-        return $this->_course->id;
+        return $this->_course;
     }
 
     /**
@@ -171,7 +178,6 @@ class PublicPrivate_Course {
      * Activates public/private for a course that does not already have public/
      * private enabled.
      *
-     * @global Moodle_Database $DB
      * @throws PublicPrivate_Course_Exception
      */
     public function activate() {
@@ -233,7 +239,7 @@ class PublicPrivate_Course {
          * Create new publicprivategroupname group and publicprivategroupingname grouping.
          */
 
-        $data = new object();
+        $data = new stdClass();
         $data->courseid = $this->_course->id;
         $data->name = get_string('publicprivategroupname', 'local_publicprivate');
         $data->description = get_string('publicprivategroupdescription', 'local_publicprivate');
@@ -250,7 +256,7 @@ class PublicPrivate_Course {
          * Create new publicprivategroupingname grouping.
          */
 
-        $data = new object();
+        $data = new stdClass();
         $data->courseid = $this->_course->id;
         $data->name = get_string('publicprivategroupingname', 'local_publicprivate');
         $data->description = get_string('publicprivategroupingdescription', 'local_publicprivate');
@@ -286,11 +292,11 @@ class PublicPrivate_Course {
         $this->_course->defaultgroupingid = $newgroupingid;
 
         try {
-            // update_course($this->_course);
-            // used to call update_course(), but may lead to recusion problems
-            // when we start using the course_updated/course_added events, so
-            // just update database directly
+            // We used to call update_course(), but may lead to recusion
+            // problems when we start using the course_updated/course_added
+            // events, so just update database directly.
             $DB->update_record('course', $this->_course);
+            rebuild_course_cache($this->_course->id, true);
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to update course settings for public/private.', 206, $e);
         }
@@ -300,11 +306,13 @@ class PublicPrivate_Course {
          */
 
         try {
-            $conditions = array('course' => $this->_course->id, 'groupmembersonly' => 0, 'groupingid' => 0);
-            $DB->set_field('course_modules', 'groupingid', $newgroupingid, $conditions);
-
-            $conditions['groupingid'] = $newgroupingid;
-            $DB->set_field('course_modules', 'groupmembersonly', 1, $conditions);
+            // Get all course modules.
+            $modinfo = get_fast_modinfo($this->_course);
+            $mods = $modinfo->get_cms();
+            foreach ($mods as $mod) {
+                $ppmod = PublicPrivate_Module::build($mod);
+                $ppmod->enable();
+            }
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to set public modules private on activation.', 207, $e);
         }
@@ -323,14 +331,11 @@ class PublicPrivate_Course {
          * Make sure guest access enrolment plugin is installed and enabled
          */
         self::set_guest_plugin($this->_course, ENROL_INSTANCE_ENABLED);
-
-        rebuild_course_cache($this->_course->id);
     }
 
     /**
      * Deactivates public/private for a course that has public/private enabled.
      *
-     * @global Moodle_Database $DB
      * @throws PublicPrivate_Course_Exception
      */
     public function deactivate() {
@@ -345,9 +350,23 @@ class PublicPrivate_Course {
         }
 
         /*
+         * Unset public/private module conditions.
+         */
+        try {
+            // Get all course modules.
+            $modinfo = get_fast_modinfo($this->_course);
+            $mods = $modinfo->get_cms();
+            foreach ($mods as $mod) {
+                $ppmod = PublicPrivate_Module::build($mod);
+                $ppmod->disable();
+            }
+        } catch (DML_Exception $e) {
+            throw new PublicPrivate_Course_Exception('Failed to unset public/private module visibilities.', 302, $e);
+        }
+
+        /*
          * Update course to no longer have an public/private group or grouping setting.
          */
-
         $oldgrouppublicprivate = $this->_course->grouppublicprivate;
         $oldgroupingpublicprivate = $this->_course->groupingpublicprivate;
         $this->_course->enablepublicprivate = 0;
@@ -356,33 +375,19 @@ class PublicPrivate_Course {
         $this->_course->defaultgroupingid = 0;
 
         try {
-            // update_course($this->_course);
-            // used to call update_course(), but may lead to recusion problems
-            // when we start using the course_updated/course_added events, so
-            // just update database directly.
+            // We used to call update_course(), but may lead to recusion
+            // problems when we start using the course_updated/course_added
+            // events, so just update database directly.
             $DB->update_record('course', $this->_course);
+            rebuild_course_cache($this->_course->id, true);
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to update course settings to disable public/private.', 301, $e);
         }
 
         /*
-         * Unset public/private module visibilities.
-         */
-
-        try {
-            $conditions = array('course' => $this->_course->id, 'groupmembersonly' => 1, 'groupingid' => $oldgroupingpublicprivate);
-            $DB->set_field('course_modules', 'groupmembersonly', 0, $conditions);
-
-            unset($conditions['groupmembersonly']);
-            $DB->set_field('course_modules', 'groupingid', 0, $conditions);
-        } catch (DML_Exception $e) {
-            throw new PublicPrivate_Course_Exception('Failed to unset public/private module visibilities.', 302, $e);
-        }
-
-        /*
          * Delete public/private group and grouping.
          */
-
+        
         try {
             groups_delete_group($oldgrouppublicprivate);
             groups_delete_grouping($oldgroupingpublicprivate);
@@ -394,14 +399,12 @@ class PublicPrivate_Course {
          * Deactivate guest enrollment plugin (if any)
          */
         self::set_guest_plugin($this->_course, ENROL_INSTANCE_DISABLED);
-
-        rebuild_course_cache($this->_course->id);
     }
 
     /**
      * Helper method to make sure guest enrollment plugin is enabled or disabled
      * for given course.
-     * 
+     *
      * @param object $course    Course record.
      * @param int $enrolstatus
      *
@@ -452,8 +455,6 @@ class PublicPrivate_Course {
      * public/private group if they're not already in the public/private
      * group.
      *
-     * @global object $CFG
-     * @global Moodle_Database $DB
      * @throws PublicPrivate_Course_Exception
      */
     public function add_enrolled_users() {
@@ -496,7 +497,7 @@ class PublicPrivate_Course {
 
                     $seen[$row->userid] = true;
 
-                    $member = new object();
+                    $member = new stdClass();
                     $member->groupid = $this->_course->grouppublicprivate;
                     $member->userid = $row->userid;
                     $member->timeadded = time();
@@ -575,7 +576,7 @@ class PublicPrivate_Course {
          */
 
         try {
-            $member = new object();
+            $member = new stdClass();
             $member->groupid = $this->_course->grouppublicprivate;
             $member->userid = $userid;
             $member->timeadded = time();
@@ -677,7 +678,7 @@ class PublicPrivate_Course {
     /**
      * Check the user's enrolment. If not active, then remove from all groups
      * in course.
-     * 
+     *
      * If they are enrolled, make sure they are in the group.
      *
      * @param int $userid

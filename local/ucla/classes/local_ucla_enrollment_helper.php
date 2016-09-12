@@ -299,7 +299,7 @@ class local_ucla_enrollment_helper {
                         $needsupdating = false;
                         break;
                     }
-                } else if (textlib::strtolower($enrollment[$field]) !== textlib::strtolower($user->$field)) {
+                } else if (core_text::strtolower($enrollment[$field]) !== core_text::strtolower($user->$field)) {
                     $needsupdating = true;
 
                     if (empty($user->$field) && !empty($enrollment[$field])) {
@@ -741,8 +741,8 @@ class local_ucla_enrollment_helper {
     public function translate_ccle_course_instructorsget(array $regdata) {
         return array(
             $this->remoteuserfield => trim($regdata['ucla_id']),
-            'firstname' => textlib::strtoupper(trim($regdata['first_name_person'])),
-            'lastname' => textlib::strtoupper(trim($regdata['last_name_person'])),
+            'firstname' => core_text::strtoupper(trim($regdata['first_name_person'])),
+            'lastname' => core_text::strtoupper(trim($regdata['last_name_person'])),
             'email' => trim($regdata['ursa_email']),
             'username' => $this->normalize_bolid($regdata['bolid'])
         );
@@ -784,8 +784,9 @@ class local_ucla_enrollment_helper {
             // throw up a bunch of errors.
             return;
         }
-        $eventdata = new object();
-        $eventdata->courses = $courses;
-        events_trigger_legacy('sync_enrolments_finished', $eventdata);
+        $event = \local_ucla\event\sync_enrolments_finished::create(array(
+            'other' => json_encode($courses)
+        ));
+        $event->trigger();
     }
 }

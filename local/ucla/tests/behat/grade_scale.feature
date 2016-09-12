@@ -1,4 +1,4 @@
-@ucla @mod_elluminate @core_grades @core_edit @CCLE-4465
+@ucla @local_ucla @mod_elluminate @core_grades @core_edit @CCLE-4465
 Feature: Accessing scales
   In order to use scales in my class
   As an instructor
@@ -16,8 +16,8 @@ Feature: Accessing scales
       | teacher | course1 | editingteacher |
     And I log in as "teacher"
     And I follow "Course 1"
-    And I follow "Grades"
-    When I follow "Scales"
+    And I navigate to "Grades" node in "Course administration"
+    And I navigate to "Scales" node in "Grade administration"
     Then I should see "Course scales"
     When I press "Add a new scale"
     And I set the following fields to these values:

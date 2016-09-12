@@ -595,8 +595,8 @@ class ucla_courserequests {
                 }
 
                 // Don't go over character limit for instructors (CCLE-4189).
-                if (textlib::strlen($request[$i]) > 255) {
-                    $request[$i] = trim(textlib::substr($request[$i], 0, 254));
+                if (core_text::strlen($request[$i]) > 255) {
+                    $request[$i] = trim(core_text::substr($request[$i], 0, 254));
                 }
 
                 try {

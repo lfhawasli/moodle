@@ -57,7 +57,7 @@ class submission_updated extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' updated the submission with id '$this->objectid' for the workshop " .
-            "with the course module id '$this->contextinstanceid'.";
+            "with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -87,5 +87,14 @@ class submission_updated extends \core\event\base {
         return array($this->courseid, 'workshop', 'update submission',
             'submission.php?cmid=' . $this->contextinstanceid . '&id=' . $this->objectid,
             $this->objectid, $this->contextinstanceid);
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'workshop_submissions', 'restore' => 'workshop_submission');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

@@ -18,6 +18,7 @@
  * The mod_lesson highscore added event.
  *
  * @package    mod_lesson
+ * @deprecated since Moodle 3.0
  * @copyright  2013 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
@@ -26,6 +27,8 @@ namespace mod_lesson\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+debugging('mod_lesson\event\highscore_added has been deprecated. Since the functionality no longer resides in the lesson module.',
+        DEBUG_DEVELOPER);
 /**
  * The mod_lesson highscore added event class.
  *
@@ -77,7 +80,7 @@ class highscore_added extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' added a new highscore to the lesson activity with the course module " .
+        return "The user with id '$this->userid' added a new highscore to the lesson activity with course module " .
             "id '$this->contextinstanceid'.";
     }
 
@@ -107,5 +110,15 @@ class highscore_added extends \core\event\base {
         if (!isset($this->other['nickname'])) {
             throw new \coding_exception('The \'nickname\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        // The 'highscore' functionality was removed from core.
+        return false;
+    }
+
+    public static function get_other_mapping() {
+        // The 'highscore' functionality was removed from core.
+        return false;
     }
 }

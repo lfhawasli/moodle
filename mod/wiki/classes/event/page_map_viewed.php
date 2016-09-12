@@ -67,7 +67,7 @@ class page_map_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the wiki map for the page with id '$this->objectid' for the wiki with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -100,5 +100,14 @@ class page_map_viewed extends \core\event\base {
         if (!isset($this->other['option'])) {
             throw new \coding_exception('The \'option\' value must be set in other, even if 0.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'wiki_pages', 'restore' => 'wiki_page');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

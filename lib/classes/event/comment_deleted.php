@@ -71,7 +71,7 @@ abstract class comment_deleted extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' deleted the comment with id '$this->objectid' from the '$this->component' " .
-            "with the course module id '$this->contextinstanceid'.";
+            "with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -99,5 +99,16 @@ abstract class comment_deleted extends base {
         if (!isset($this->other['itemid'])) {
             throw new \coding_exception('The \'itemid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'comments', 'restore' => 'comment');
+    }
+
+    public static function get_other_mapping() {
+        // We cannot map fields that do not have a 1:1 mapping.
+        $othermapped = array();
+        $othermapped['itemid'] = base::NOT_MAPPED;
+        return $othermapped;
     }
 }

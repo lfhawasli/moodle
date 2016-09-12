@@ -163,6 +163,9 @@ abstract class restore_activity_task extends restore_task {
         // Advanced grading methods attached to the module
         $this->add_step(new restore_activity_grading_structure_step('activity_grading', 'grading.xml'));
 
+        // Grade history. The setting 'grade_history' is handled in the step.
+        $this->add_step(new restore_activity_grade_history_structure_step('activity_grade_history', 'grade_history.xml'));
+
         // Userscompletion (conditionally)
         if ($this->get_setting_value('userscompletion')) {
             $this->add_step(new restore_userscompletion_structure_step('activity_userscompletion', 'completion.xml'));
@@ -170,8 +173,14 @@ abstract class restore_activity_task extends restore_task {
 
         // Logs (conditionally)
         if ($this->get_setting_value('logs')) {
+            // Legacy logs.
             $this->add_step(new restore_activity_logs_structure_step('activity_logs', 'logs.xml'));
+            // New log stores.
+            $this->add_step(new restore_activity_logstores_structure_step('activity_logstores', 'logstores.xml'));
         }
+
+        // Activity competencies.
+        $this->add_step(new restore_activity_competencies_structure_step('activity_competencies', 'competencies.xml'));
 
         // At the end, mark it as built
         $this->built = true;
@@ -277,14 +286,7 @@ abstract class restore_activity_task extends restore_task {
         // - activities root setting
         // - section_included setting (if exists)
         $settingname = $settingprefix . 'included';
-        // START UCLA MOD: CCLE-4447 - Prevent restore of announcements and discussion forums by default
-        $include = true;
-        if ($this->name == 'Announcements' || $this->name == 'Discussion forum') {
-            $include = false;
-        }
-        $activity_included = new restore_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, $include);
-        //$activity_included = new restore_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
-        // END UCLA MOD: CCLE-4447
+        $activity_included = new restore_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
         $activity_included->get_ui()->set_icon(new pix_icon('icon', get_string('pluginname', $this->modulename),
             $this->modulename, array('class' => 'iconlarge icon-post')));
         $this->add_setting($activity_included);

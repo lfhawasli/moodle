@@ -7,8 +7,7 @@
  * @copyright  
  * @license    
  */
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
+
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -162,7 +161,7 @@ function mylabmastering_delete_highlander_link($id) {
 		foreach ($coursemodules as $cm) {
 			if ($cm->idnumber === $id) {
 				delete_mod_from_section($cm->id, $cm->section);
-				delete_course_module($cm->id);
+				course_delete_module($cm->id);
 			}
 		}
 	}
@@ -367,7 +366,7 @@ function mylabmastering_handle_code_change($courseid) {
 		foreach ($coursemodules as $cm) {
 			if (!strncmp($cm->idnumber, 'mm:', strlen('mm:'))) {
 				delete_mod_from_section($cm->id, $cm->section);
-				delete_course_module($cm->id);
+				course_delete_module($cm->id);
 			}
 		}
 	}
@@ -378,6 +377,7 @@ function mylabmastering_is_student($courseid) {
 	$student = false;
 	require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
+	//TPLMS-2242
 	$role = lti_get_ims_role($USER, '' ,$courseid, false);
 
 	if (strcasecmp($role, 'learner') == 0) {

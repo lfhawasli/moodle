@@ -1,4 +1,4 @@
-@ucla @report @report_eventlist @core_edit @CCLE-4671
+@ucla @local_ucla @report @report_eventlist @core_edit @CCLE-4671
 Feature: Capability to view Events list page
 
   @javascript
@@ -11,7 +11,6 @@ Feature: Capability to view Events list page
         | testmanager | manager | System       |           |
     And I log in as "testmanager"
     And I expand "Site administration" node
-    And I expand "Reports" node
     And I expand "Reports" node
     Then I should see "Events list"
     And I navigate to "Define roles" node in "Site administration > Users > Permissions"

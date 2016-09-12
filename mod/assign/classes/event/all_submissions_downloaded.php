@@ -69,7 +69,7 @@ class all_submissions_downloaded extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has downloaded all the submissions for the assignment " .
-            "with the course module id '$this->contextinstanceid'.";
+            "with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -114,5 +114,9 @@ class all_submissions_downloaded extends base {
         }
 
         parent::validate_data();
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign', 'restore' => 'assign');
     }
 }

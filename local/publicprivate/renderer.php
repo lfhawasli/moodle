@@ -113,34 +113,81 @@ class local_publicprivate_renderer extends core_course_renderer {
     }
 
     /**
-     * If a module is public, do not show the 'Private Course Material' label.
-     * 
+     * We are overriding this method because labels do not have grouping label
+     * by default.
+     *
      * @param cm_info $mod
-     * @param type $displayoptions
-     * @return type
+     * @param array $displayoptions
+     * @return string
      */
     public function course_section_cm_name(cm_info $mod, $displayoptions = array()) {
-
         if ($this->ppcourse->is_activated()) {
-
-            $ppmod = new PublicPrivate_Module($mod->id);
-            if ($ppmod->is_public()) {
-                $mod->groupingid = null;
-            }
-            
             // Get the context from this course module, used to identify if user is in managegroup.
             $context = context_module::instance($mod->id);
-            
+
             // Labels resources are not printed, so add the grouping name manually. Only instructors see the label
-            if (strtolower($mod->modfullname) === 'label' && !empty($mod->groupingid) && has_capability('moodle/course:managegroups', $context)) {
-                $groupings = groups_get_all_groupings($mod->course);
-                $pptext = html_writer::span('(' . $groupings[$mod->groupingid]->name . ')',
-                                'groupinglabel');
-                $mod->set_after_link($pptext);
+            if (strtolower($mod->modfullname) === 'label' && has_capability('moodle/course:managegroups', $context)) {
+                $ppmod = new PublicPrivate_Module($mod->id);
+                if ($ppmod->is_private()) {
+                    $groupingid = $ppmod->get_grouping();
+                    $groupings = groups_get_all_groupings($mod->course);
+                    $pptext = html_writer::span('(' . $groupings[$groupingid]->name . ')',
+                                    'groupinglabel');
+                    $mod->set_after_link($pptext);
+                }
             }
         }
 
         return parent::course_section_cm_name($mod, $displayoptions);
+    }
+
+    /**
+     * Renders html to display the module content on the course page (i.e. text of the labels)
+     *
+     * @param cm_info $mod
+     * @param array $displayoptions
+     * @return string
+     */
+    public function course_section_cm_text(cm_info $mod, $displayoptions = array()) {
+        $output = '';
+        if (!$mod->uservisible && empty($mod->availableinfo)) {
+            // Nothing to be displayed to the user.
+            return $output;
+        }
+        $content = $mod->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
+        $accesstext = '';
+        $textclasses = '';
+        if ($mod->uservisible) {
+            $conditionalhidden = $this->is_cm_conditionally_hidden($mod);
+            $accessiblebutdim = (!$mod->visible || $conditionalhidden) &&
+                has_capability('moodle/course:viewhiddenactivities', $mod->context);
+            if (!$mod->visible) {
+                $textclasses .= ' dimmed_text';
+            }
+            if ($accessiblebutdim) {
+                if ($conditionalhidden) {
+                    $textclasses .= ' conditionalhidden';
+                }
+                // Show accessibility note only if user can access the module himself.
+                $accesstext = get_accesshide(get_string('hiddenfromstudents').':'. $mod->modfullname);
+            }
+        } else {
+            $textclasses .= ' dimmed_text';
+        }
+        if ($mod->url) {
+            if ($content) {
+                // If specified, display extra content after link.
+                $output = html_writer::tag('div', $content, array('class' => 
+                        trim('contentafterlink ' . $textclasses)));
+            }
+        } else {
+            $groupinglabel = $mod->get_grouping_label($textclasses);
+
+            // No link, so display only content.
+            $output = html_writer::tag('div', $accesstext . $content . $groupinglabel,
+                    array('class' => 'contentwithoutlink ' . $textclasses));
+        }
+        return $output;
     }
 
 }

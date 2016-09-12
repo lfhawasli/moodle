@@ -4,10 +4,7 @@
 .edit-controls {
     margin-bottom: 12px;
     text-align: center;
-    
-    @include respond-to(wide-handhelds) {
-        width: 100%;
-    }
+    width: 100%;
 }
 
 // Control link fixes

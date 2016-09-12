@@ -72,9 +72,9 @@ class block_ucla_bruinmedia extends block_base {
                 }
 
                 $title = basename($matchingcourse->bruincast_url);
-                $title = textlib::strtoupper($title);
+                $title = core_text::strtoupper($title);
 
-                $restriction = 'node_' . textlib::strtolower($matchingcourse->restricted);
+                $restriction = 'node_' . core_text::strtolower($matchingcourse->restricted);
                 $restriction = str_replace(' ', '_', $restriction);                
 
                 $links[$title][$restriction] = $matchingcourse->bruincast_url;

@@ -858,6 +858,7 @@ class core_dml_testcase extends database_driver_testcase {
         $tablename2 = $table2->getName();
         $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table2->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table2->add_field('onetext', XMLDB_TYPE_TEXT, 'big', null, null, null);
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $dbman->create_table($table2);
 
@@ -904,6 +905,30 @@ class core_dml_testcase extends database_driver_testcase {
                   FROM {{$tablename1}}";
         $this->assertTrue($DB->execute($sql));
         $this->assertEquals(4, $DB->count_records($tablename2));
+
+        // Insert a TEXT with raw SQL, binding TEXT params.
+        $course = 9999;
+        $onetext = file_get_contents(__DIR__ . '/fixtures/clob.txt');
+        $sql = "INSERT INTO {{$tablename2}} (course, onetext)
+                VALUES (:course, :onetext)";
+        $DB->execute($sql, array('course' => $course, 'onetext' => $onetext));
+        $records = $DB->get_records($tablename2, array('course' => $course));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($onetext, $record->onetext);
+
+        // Update a TEXT with raw SQL, binding TEXT params.
+        $newcourse = 10000;
+        $newonetext = file_get_contents(__DIR__ . '/fixtures/clob.txt') . '- updated';
+        $sql = "UPDATE {{$tablename2}} SET course = :newcourse, onetext = :newonetext
+                WHERE course = :oldcourse";
+        $DB->execute($sql, array('oldcourse' => $course, 'newcourse' => $newcourse, 'newonetext' => $newonetext));
+        $records = $DB->get_records($tablename2, array('course' => $course));
+        $this->assertCount(0, $records);
+        $records = $DB->get_records($tablename2, array('course' => $newcourse));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($newonetext, $record->onetext);
     }
 
     public function test_get_recordset() {
@@ -1407,9 +1432,9 @@ class core_dml_testcase extends database_driver_testcase {
                 $this->assertSame('ddltablenotexist', $e->errorcode);
             }
         }
-        // And without params.
+
         try {
-            $records = $DB->get_records('xxxx', array());
+            $records = $DB->get_records('xxxx', array('id' => '1'));
             $this->fail('An Exception is missing, expected due to query against non-existing table');
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('dml_exception', $e);
@@ -3645,7 +3670,7 @@ class core_dml_testcase extends database_driver_testcase {
 
         $DB->insert_record($tablename, array('name'=>'10.10', 'nametext'=>'10.10', 'res'=>5.1));
         $DB->insert_record($tablename, array('name'=>'91.10', 'nametext'=>'91.10', 'res'=>666));
-        $DB->insert_record($tablename, array('name'=>'011.10', 'nametext'=>'011.10', 'res'=>10.1));
+        $DB->insert_record($tablename, array('name'=>'011.13333333', 'nametext'=>'011.13333333', 'res'=>10.1));
 
         // Casting varchar field.
         $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_cast_char2real('name')." > res";
@@ -3656,8 +3681,11 @@ class core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertSame('10.10', reset($records)->name);
-        $this->assertSame('011.10', next($records)->name);
+        $this->assertSame('011.13333333', next($records)->name);
         $this->assertSame('91.10', next($records)->name);
+        // And verify we can operate with them without too much problem with at least 6 decimals scale accuracy.
+        $sql = "SELECT AVG(" . $DB->sql_cast_char2real('name') . ") FROM {{$tablename}}";
+        $this->assertEquals(37.44444443333333, (float)$DB->get_field_sql($sql), '', 1.0E-6);
 
         // Casting text field.
         $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_cast_char2real('nametext', true)." > res";
@@ -3668,8 +3696,19 @@ class core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertSame('10.10', reset($records)->nametext);
-        $this->assertSame('011.10', next($records)->nametext);
+        $this->assertSame('011.13333333', next($records)->nametext);
         $this->assertSame('91.10', next($records)->nametext);
+        // And verify we can operate with them without too much problem with at least 6 decimals scale accuracy.
+        $sql = "SELECT AVG(" . $DB->sql_cast_char2real('nametext', true) . ") FROM {{$tablename}}";
+        $this->assertEquals(37.44444443333333, (float)$DB->get_field_sql($sql), '', 1.0E-6);
+
+        // Check it works with values passed as param.
+        $sql = "SELECT name FROM {{$tablename}} WHERE FLOOR(res - " . $DB->sql_cast_char2real(':param') . ") = 0";
+        $this->assertEquals('011.13333333', $DB->get_field_sql($sql, array('param' => '10.09999')));
+
+        // And also, although not recommended, with directly passed values.
+        $sql = "SELECT name FROM {{$tablename}} WHERE FLOOR(res - " . $DB->sql_cast_char2real('10.09999') . ") = 0";
+        $this->assertEquals('011.13333333', $DB->get_field_sql($sql));
     }
 
     public function test_sql_compare_text() {
@@ -3724,6 +3763,15 @@ class core_dml_testcase extends database_driver_testcase {
             $this->assertCount(1, $records);
         }
 
+        // Now test the function with really big content and params.
+        $clob = file_get_contents(__DIR__ . '/fixtures/clob.txt');
+        $DB->insert_record($tablename, array('name' => 'zzzz', 'description' => $clob));
+        $sql = "SELECT * FROM {{$tablename}}
+                 WHERE " . $DB->sql_compare_text('description') . " = " . $DB->sql_compare_text(':clob');
+        $records = $DB->get_records_sql($sql, array('clob' => $clob));
+        $this->assertCount(1, $records);
+        $record = reset($records);
+        $this->assertSame($clob, $record->description);
     }
 
     public function test_unique_index_collation_trouble() {
@@ -3835,6 +3883,11 @@ class core_dml_testcase extends database_driver_testcase {
         $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?', true, true);
         $records = $DB->get_records_sql($sql, array('aui'));
         $this->assertCount(1, $records);
+
+        // Test LIKE under unusual collations.
+        $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?', false, false);
+        $records = $DB->get_records_sql($sql, array("%dup_r%"));
+        $this->assertCount(2, $records);
 
         $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_like('name', '?', true, true, true); // NOT LIKE.
         $records = $DB->get_records_sql($sql, array("%o%"));
@@ -3954,12 +4007,65 @@ class core_dml_testcase extends database_driver_testcase {
 
     }
 
-    public function test_concat_join() {
+    public function sql_concat_join_provider() {
+        return array(
+            // All strings.
+            array(
+                "' '",
+                array("'name'", "'name2'", "'name3'"),
+                array(),
+                'name name2 name3',
+            ),
+            // All strings using placeholders
+            array(
+                "' '",
+                array("?", "?", "?"),
+                array('name', 'name2', 'name3'),
+                'name name2 name3',
+            ),
+            // All integers.
+            array(
+                "' '",
+                array(1, 2, 3),
+                array(),
+                '1 2 3',
+            ),
+            // All integers using placeholders
+            array(
+                "' '",
+                array("?", "?", "?"),
+                array(1, 2, 3),
+                '1 2 3',
+            ),
+            // Mix of strings and integers.
+            array(
+                "' '",
+                array(1, "'2'", 3),
+                array(),
+                '1 2 3',
+            ),
+            // Mix of strings and integers using placeholders.
+            array(
+                "' '",
+                array(1, '2', 3),
+                array(),
+                '1 2 3',
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider sql_concat_join_provider
+     * @param string $concat The string to use when concatanating.
+     * @param array $fields The fields to concatanate
+     * @param array $params Any parameters to provide to the query
+     * @param @string $expected The expected result
+     */
+    public function test_concat_join($concat, $fields, $params, $expected) {
         $DB = $this->tdb;
-        $sql = "SELECT ".$DB->sql_concat_join("' '", array("?", "?", "?"))." AS fullname ".$DB->sql_null_from_clause();
-        $params = array("name", "name2", "name3");
+        $sql = "SELECT " . $DB->sql_concat_join($concat, $fields) . " AS result" . $DB->sql_null_from_clause();
         $result = $DB->get_field_sql($sql, $params);
-        $this->assertEquals("name name2 name3", $result);
+        $this->assertEquals($expected, $result);
     }
 
     public function test_sql_fullname() {
@@ -4222,6 +4328,35 @@ class core_dml_testcase extends database_driver_testcase {
         } else {
             $this->assertTrue(true, 'Regexp operations not supported. Test skipped');
         }
+
+    }
+
+    /**
+     * Test some complicated variations of set_field_select.
+     */
+    public function test_set_field_select_complicated() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('content', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $DB->insert_record($tablename, array('course' => 3, 'content' => 'hello', 'name'=>'xyz'));
+        $DB->insert_record($tablename, array('course' => 3, 'content' => 'world', 'name'=>'abc'));
+        $DB->insert_record($tablename, array('course' => 5, 'content' => 'hello', 'name'=>'def'));
+        $DB->insert_record($tablename, array('course' => 2, 'content' => 'universe', 'name'=>'abc'));
+        // This SQL is a tricky case because we are selecting from the same table we are updating.
+        $sql = 'id IN (SELECT outerq.id from (SELECT innerq.id from {' . $tablename . '} innerq WHERE course = 3) outerq)';
+        $DB->set_field_select($tablename, 'name', 'ghi', $sql);
+
+        $this->assertSame(2, $DB->count_records_select($tablename, 'name = ?', array('ghi')));
 
     }
 
@@ -5226,7 +5361,7 @@ class core_dml_testcase extends database_driver_testcase {
 
         // The get_records() method generates 2 queries the first time is called
         // as it is fetching the table structure.
-        $whatever = $DB->get_records($tablename);
+        $whatever = $DB->get_records($tablename, array('id' => '1'));
         $this->assertEquals($initreads + 3, $DB->perf_get_reads());
         $this->assertEquals($initwrites, $DB->perf_get_writes());
 
@@ -5277,6 +5412,88 @@ class core_dml_testcase extends database_driver_testcase {
         $totaldbqueries = $DB->perf_get_reads() + $DB->perf_get_writes();
         $this->assertEquals($totaldbqueries, $DB->perf_get_queries());
     }
+
+    public function test_sql_intersect() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $tables = array();
+        for ($i = 0; $i < 3; $i++) {
+            $table = $this->get_test_table('i'.$i);
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('ival', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, '0');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $dbman->create_table($table);
+            $tables[$i] = $table;
+        }
+        $DB->insert_record($tables[0]->getName(), array('ival' => 1, 'name' => 'One'), false);
+        $DB->insert_record($tables[0]->getName(), array('ival' => 2, 'name' => 'Two'), false);
+        $DB->insert_record($tables[0]->getName(), array('ival' => 3, 'name' => 'Three'), false);
+        $DB->insert_record($tables[0]->getName(), array('ival' => 4, 'name' => 'Four'), false);
+
+        $DB->insert_record($tables[1]->getName(), array('ival' => 1, 'name' => 'One'), false);
+        $DB->insert_record($tables[1]->getName(), array('ival' => 2, 'name' => 'Two'), false);
+        $DB->insert_record($tables[1]->getName(), array('ival' => 3, 'name' => 'Three'), false);
+
+        $DB->insert_record($tables[2]->getName(), array('ival' => 1, 'name' => 'One'), false);
+        $DB->insert_record($tables[2]->getName(), array('ival' => 2, 'name' => 'Two'), false);
+        $DB->insert_record($tables[2]->getName(), array('ival' => 5, 'name' => 'Five'), false);
+
+        // Intersection on the int column.
+        $params = array('excludename' => 'Two');
+        $sql1 = 'SELECT ival FROM {'.$tables[0]->getName().'}';
+        $sql2 = 'SELECT ival FROM {'.$tables[1]->getName().'} WHERE name <> :excludename';
+        $sql3 = 'SELECT ival FROM {'.$tables[2]->getName().'}';
+
+        $sql = $DB->sql_intersect(array($sql1), 'ival') . ' ORDER BY ival';
+        $this->assertEquals(array(1, 2, 3, 4), $DB->get_fieldset_sql($sql, $params));
+
+        $sql = $DB->sql_intersect(array($sql1, $sql2), 'ival') . ' ORDER BY ival';
+        $this->assertEquals(array(1, 3), $DB->get_fieldset_sql($sql, $params));
+
+        $sql = $DB->sql_intersect(array($sql1, $sql2, $sql3), 'ival') . ' ORDER BY ival';
+        $this->assertEquals(array(1),
+            $DB->get_fieldset_sql($sql, $params));
+
+        // Intersection on the char column.
+        $params = array('excludeival' => 2);
+        $sql1 = 'SELECT name FROM {'.$tables[0]->getName().'}';
+        $sql2 = 'SELECT name FROM {'.$tables[1]->getName().'} WHERE ival <> :excludeival';
+        $sql3 = 'SELECT name FROM {'.$tables[2]->getName().'}';
+
+        $sql = $DB->sql_intersect(array($sql1), 'name') . ' ORDER BY name';
+        $this->assertEquals(array('Four', 'One', 'Three', 'Two'), $DB->get_fieldset_sql($sql, $params));
+
+        $sql = $DB->sql_intersect(array($sql1, $sql2), 'name') . ' ORDER BY name';
+        $this->assertEquals(array('One', 'Three'), $DB->get_fieldset_sql($sql, $params));
+
+        $sql = $DB->sql_intersect(array($sql1, $sql2, $sql3), 'name') . ' ORDER BY name';
+        $this->assertEquals(array('One'), $DB->get_fieldset_sql($sql, $params));
+
+        // Intersection on the several columns.
+        $params = array('excludename' => 'Two');
+        $sql1 = 'SELECT ival, name FROM {'.$tables[0]->getName().'}';
+        $sql2 = 'SELECT ival, name FROM {'.$tables[1]->getName().'} WHERE name <> :excludename';
+        $sql3 = 'SELECT ival, name FROM {'.$tables[2]->getName().'}';
+
+        $sql = $DB->sql_intersect(array($sql1), 'ival, name') . ' ORDER BY ival';
+        $this->assertEquals(array(1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four'),
+            $DB->get_records_sql_menu($sql, $params));
+
+        $sql = $DB->sql_intersect(array($sql1, $sql2), 'ival, name') . ' ORDER BY ival';
+        $this->assertEquals(array(1 => 'One', 3 => 'Three'),
+            $DB->get_records_sql_menu($sql, $params));
+
+        $sql = $DB->sql_intersect(array($sql1, $sql2, $sql3), 'ival, name') . ' ORDER BY ival';
+        $this->assertEquals(array(1 => 'One'),
+            $DB->get_records_sql_menu($sql, $params));
+
+        // Drop temporary tables.
+        foreach ($tables as $table) {
+            $dbman->drop_table($table);
+        }
+    }
 }
 
 /**
@@ -5307,8 +5524,7 @@ class moodle_database_for_testing extends moodle_database {
     protected function normalise_value($column, $value) {}
     public function set_debug($state) {}
     public function get_debug() {}
-    public function set_logging($state) {}
-    public function change_database_structure($sql) {}
+    public function change_database_structure($sql, $tablenames = null) {}
     public function execute($sql, array $params=null) {}
     public function get_recordset_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {}
     public function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {}

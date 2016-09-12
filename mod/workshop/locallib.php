@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -58,7 +57,7 @@ class workshop {
     const EXAMPLES_BEFORE_SUBMISSION    = 1;
     const EXAMPLES_BEFORE_ASSESSMENT    = 2;
 
-    /** @var stdclass course module record */
+    /** @var cm_info course module record */
     public $cm;
 
     /** @var stdclass course record */
@@ -124,6 +123,9 @@ class workshop {
     /** @var int number of allowed submission attachments and the files embedded into submission */
     public $nattachments;
 
+     /** @var string list of allowed file types that are allowed to be embedded into submission */
+    public $submissionfiletypes = null;
+
     /** @var bool allow submitting the work after the deadline */
     public $latesubmissions;
 
@@ -160,6 +162,9 @@ class workshop {
     /** @var int maximum number of overall feedback attachments */
     public $overallfeedbackfiles;
 
+    /** @var string list of allowed file types that can be attached to the overall feedback */
+    public $overallfeedbackfiletypes = null;
+
     /** @var int maximum size of one file attached to the overall feedback */
     public $overallfeedbackmaxbytes;
 
@@ -178,22 +183,33 @@ class workshop {
     /**
      * Initializes the workshop API instance using the data from DB
      *
-     * Makes deep copy of all passed records properties. Replaces integer $course attribute
-     * with a full database record (course should not be stored in instances table anyway).
+     * Makes deep copy of all passed records properties.
+     *
+     * For unit testing only, $cm and $course may be set to null. This is so that
+     * you can test without having any real database objects if you like. Not all
+     * functions will work in this situation.
      *
      * @param stdClass $dbrecord Workshop instance data from {workshop} table
-     * @param stdClass $cm       Course module record as returned by {@link get_coursemodule_from_id()}
-     * @param stdClass $course   Course record from {course} table
-     * @param stdClass $context  The context of the workshop instance
+     * @param stdClass|cm_info $cm Course module record
+     * @param stdClass $course Course record from {course} table
+     * @param stdClass $context The context of the workshop instance
      */
-    public function __construct(stdclass $dbrecord, stdclass $cm, stdclass $course, stdclass $context=null) {
+    public function __construct(stdclass $dbrecord, $cm, $course, stdclass $context=null) {
         foreach ($dbrecord as $field => $value) {
             if (property_exists('workshop', $field)) {
                 $this->{$field} = $value;
             }
         }
-        $this->cm           = $cm;
-        $this->course       = $course;
+        if (is_null($cm) || is_null($course)) {
+            throw new coding_exception('Must specify $cm and $course');
+        }
+        $this->course = $course;
+        if ($cm instanceof cm_info) {
+            $this->cm = $cm;
+        } else {
+            $modinfo = get_fast_modinfo($course);
+            $this->cm = $modinfo->get_cm($cm->id);
+        }
         if (is_null($context)) {
             $this->context = context_module::instance($this->cm->id);
         } else {
@@ -401,6 +417,119 @@ class workshop {
         return $a;
     }
 
+    /**
+     * Converts the argument into an array (list) of file extensions.
+     *
+     * The list can be separated by whitespace, end of lines, commas colons and semicolons.
+     * Empty values are not returned. Values are converted to lowercase.
+     * Duplicates are removed. Glob evaluation is not supported.
+     *
+     * @param string|array $extensions list of file extensions
+     * @return array of strings
+     */
+    public static function normalize_file_extensions($extensions) {
+
+        if ($extensions === '') {
+            return array();
+        }
+
+        if (!is_array($extensions)) {
+            $extensions = preg_split('/[\s,;:"\']+/', $extensions, null, PREG_SPLIT_NO_EMPTY);
+        }
+
+        foreach ($extensions as $i => $extension) {
+            $extension = str_replace('*.', '', $extension);
+            $extension = strtolower($extension);
+            $extension = ltrim($extension, '.');
+            $extension = trim($extension);
+            $extensions[$i] = $extension;
+        }
+
+        foreach ($extensions as $i => $extension) {
+            if (strpos($extension, '*') !== false or strpos($extension, '?') !== false) {
+                unset($extensions[$i]);
+            }
+        }
+
+        $extensions = array_filter($extensions, 'strlen');
+        $extensions = array_keys(array_flip($extensions));
+
+        foreach ($extensions as $i => $extension) {
+            $extensions[$i] = '.'.$extension;
+        }
+
+        return $extensions;
+    }
+
+    /**
+     * Cleans the user provided list of file extensions.
+     *
+     * @param string $extensions
+     * @return string
+     */
+    public static function clean_file_extensions($extensions) {
+
+        $extensions = self::normalize_file_extensions($extensions);
+
+        foreach ($extensions as $i => $extension) {
+            $extensions[$i] = ltrim($extension, '.');
+        }
+
+        return implode(', ', $extensions);
+    }
+
+    /**
+     * Check given file types and return invalid/unknown ones.
+     *
+     * Empty whitelist is interpretted as "any extension is valid".
+     *
+     * @param string|array $extensions list of file extensions
+     * @param string|array $whitelist list of valid extensions
+     * @return array list of invalid extensions not found in the whitelist
+     */
+    public static function invalid_file_extensions($extensions, $whitelist) {
+
+        $extensions = self::normalize_file_extensions($extensions);
+        $whitelist = self::normalize_file_extensions($whitelist);
+
+        if (empty($extensions) or empty($whitelist)) {
+            return array();
+        }
+
+        // Return those items from $extensions that are not present in $whitelist.
+        return array_keys(array_diff_key(array_flip($extensions), array_flip($whitelist)));
+    }
+
+    /**
+     * Is the file have allowed to be uploaded to the workshop?
+     *
+     * Empty whitelist is interpretted as "any file type is allowed" rather
+     * than "no file can be uploaded".
+     *
+     * @param string $filename the file name
+     * @param string|array $whitelist list of allowed file extensions
+     * @return false
+     */
+    public static function is_allowed_file_type($filename, $whitelist) {
+
+        $whitelist = self::normalize_file_extensions($whitelist);
+
+        if (empty($whitelist)) {
+            return true;
+        }
+
+        $haystack = strrev(trim(strtolower($filename)));
+
+        foreach ($whitelist as $extension) {
+            if (strpos($haystack, strrev($extension)) === 0) {
+                // The file name ends with the extension.
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     // Workshop API                                                               //
     ////////////////////////////////////////////////////////////////////////////////
@@ -595,9 +724,9 @@ class workshop {
     /**
      * Groups the given users by the group membership
      *
-     * This takes the module grouping settings into account. If "Available for group members only"
-     * is set, returns only groups withing the course module grouping. Always returns group [0] with
-     * all the given users.
+     * This takes the module grouping settings into account. If a grouping is
+     * set, returns only groups withing the course module grouping. Always
+     * returns group [0] with all the given users.
      *
      * @param array $users array[userid] => stdclass{->id ->lastname ->firstname}
      * @return array array[groupid][userid] => stdclass{->id ->lastname ->firstname}
@@ -610,10 +739,10 @@ class workshop {
         if (empty($users)) {
             return $grouped;
         }
-        if (!empty($CFG->enablegroupmembersonly) and $this->cm->groupmembersonly) {
-            // Available for group members only - the workshop is available only
-            // to users assigned to groups within the selected grouping, or to
-            // any group if no grouping is selected.
+        if ($this->cm->groupingid) {
+            // Group workshop set to specified grouping - only consider groups
+            // within this grouping, and leave out users who aren't members of
+            // this grouping.
             $groupingid = $this->cm->groupingid;
             // All users that are members of at least one group will be
             // added into a virtual group id 0
@@ -1771,7 +1900,8 @@ class workshop {
             return array();
         }
 
-        if (!in_array($sortby, array('lastname','firstname','submissiontitle','submissiongrade','gradinggrade'))) {
+        if (!in_array($sortby, array('lastname', 'firstname', 'submissiontitle', 'submissionmodified',
+                'submissiongrade', 'gradinggrade'))) {
             $sortby = 'lastname';
         }
 
@@ -1802,7 +1932,8 @@ class workshop {
             }
             $sqlsort = implode(',', $sqlsort);
             $picturefields = user_picture::fields('u', array(), 'userid');
-            $sql = "SELECT $picturefields, s.title AS submissiontitle, s.grade AS submissiongrade, ag.gradinggrade
+            $sql = "SELECT $picturefields, s.title AS submissiontitle, s.timemodified AS submissionmodified,
+                           s.grade AS submissiongrade, ag.gradinggrade
                       FROM {user} u
                  LEFT JOIN {workshop_submissions} s ON (s.authorid = u.id AND s.workshopid = :workshopid1 AND s.example = 0)
                  LEFT JOIN {workshop_aggregations} ag ON (ag.userid = u.id AND ag.workshopid = :workshopid2)
@@ -2350,6 +2481,43 @@ class workshop {
     }
 
     /**
+     * Return the editor options for the submission content field.
+     *
+     * @return array
+     */
+    public function submission_content_options() {
+        return array(
+            'trusttext' => true,
+            'subdirs' => false,
+            'maxfiles' => $this->nattachments,
+            'maxbytes' => $this->maxbytes,
+            'context' => $this->context,
+            'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
+          );
+    }
+
+    /**
+     * Return the filemanager options for the submission attachments field.
+     *
+     * @return array
+     */
+    public function submission_attachment_options() {
+
+        $options = array(
+            'subdirs' => true,
+            'maxfiles' => $this->nattachments,
+            'maxbytes' => $this->maxbytes,
+            'return_types' => FILE_INTERNAL,
+        );
+
+        if ($acceptedtypes = self::normalize_file_extensions($this->submissionfiletypes)) {
+            $options['accepted_types'] = $acceptedtypes;
+        }
+
+        return $options;
+    }
+
+    /**
      * Return the editor options for the overall feedback for the author.
      *
      * @return array
@@ -2370,18 +2538,23 @@ class workshop {
      * @return array
      */
     public function overall_feedback_attachment_options() {
-        return array(
+
+        $options = array(
             'subdirs' => 1,
             'maxbytes' => $this->overallfeedbackmaxbytes,
             'maxfiles' => $this->overallfeedbackfiles,
             'return_types' => FILE_INTERNAL,
         );
+
+        if ($acceptedtypes = self::normalize_file_extensions($this->overallfeedbackfiletypes)) {
+            $options['accepted_types'] = $acceptedtypes;
+        }
+
+        return $options;
     }
 
     /**
      * Performs the reset of this workshop instance.
-     *
-     * @since Moodle 2.6.6, 2.7.3
      *
      * @param stdClass $data The actual course reset settings.
      * @return array List of results, each being array[(string)component, (string)item, (string)error]
@@ -2594,7 +2767,10 @@ class workshop {
      * Returns SQL to fetch all enrolled users with the given capability in the current workshop
      *
      * The returned array consists of string $sql and the $params array. Note that the $sql can be
-     * empty if groupmembersonly is enabled and the associated grouping is empty.
+     * empty if a grouping is selected and it has no groups.
+     *
+     * The list is automatically restricted according to any availability restrictions
+     * that apply to user lists (e.g. group, grouping restrictions).
      *
      * @param string $capability the name of the capability
      * @param bool $musthavesubmission ff true, return only users who have already submitted
@@ -2607,9 +2783,10 @@ class workshop {
         static $inc = 0;
         $inc++;
 
-        // if the caller requests all groups and we are in groupmembersonly mode, use the
-        // recursive call of itself to get users from all groups in the grouping
-        if (empty($groupid) and !empty($CFG->enablegroupmembersonly) and $this->cm->groupmembersonly) {
+        // If the caller requests all groups and we are using a selected grouping,
+        // recursively call this function for each group in the grouping (this is
+        // needed because get_enrolled_sql only supports a single group).
+        if (empty($groupid) and $this->cm->groupingid) {
             $groupingid = $this->cm->groupingid;
             $groupinggroupids = array_keys(groups_get_all_groups($this->cm->course, 0, $this->cm->groupingid, 'g.id'));
             $sql = array();
@@ -2636,6 +2813,15 @@ class workshop {
         if ($musthavesubmission) {
             $sql .= " JOIN {workshop_submissions} ws ON (ws.authorid = u.id AND ws.example = 0 AND ws.workshopid = :workshopid{$inc}) ";
             $params['workshopid'.$inc] = $this->id;
+        }
+
+        // If the activity is restricted so that only certain users should appear
+        // in user lists, integrate this into the same SQL.
+        $info = new \core_availability\info_module($this->cm);
+        list ($listsql, $listparams) = $info->get_user_list_sql(false);
+        if ($listsql) {
+            $sql .= " JOIN ($listsql) restricted ON restricted.id = u.id ";
+            $params = array_merge($params, $listparams);
         }
 
         return array($sql, $params);
@@ -2707,8 +2893,6 @@ class workshop {
      * This includes assessments of example submissions as long as they are not
      * referential assessments.
      *
-     * @since Moodle 2.6.6, 2.7.3
-     *
      * @param stdClass $data The actual course reset settings.
      * @return bool|string True on success, error message otherwise.
      */
@@ -2732,8 +2916,6 @@ class workshop {
     /**
      * Removes all user data related to participants' submissions.
      *
-     * @since Moodle 2.6.6, 2.7.3
-     *
      * @param stdClass $data The actual course reset settings.
      * @return bool|string True on success, error message otherwise.
      */
@@ -2750,8 +2932,6 @@ class workshop {
 
     /**
      * Hard set the workshop phase to the setup one.
-     *
-     * @since Moodle 2.6.6, 2.7.3
      */
     protected function reset_phase() {
         global $DB;

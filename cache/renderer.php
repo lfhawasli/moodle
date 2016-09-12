@@ -53,7 +53,7 @@ class core_cache_renderer extends plugin_renderer_base {
             get_string('mappings', 'cache'),
             get_string('modes', 'cache'),
             get_string('supports', 'cache'),
-            get_string('lockingmeans', 'cache'),
+            get_string('locking', 'cache') . ' ' . $this->output->help_icon('locking', 'cache'),
             get_string('actions', 'cache'),
         );
         $table->colclasses = array(
@@ -234,6 +234,8 @@ class core_cache_renderer extends plugin_renderer_base {
             'actions'
         );
         $table->data = array();
+
+        core_collator::asort_array_of_arrays_by_key($definitions, 'name');
 
         $none = new lang_string('none', 'cache');
         foreach ($definitions as $id => $definition) {

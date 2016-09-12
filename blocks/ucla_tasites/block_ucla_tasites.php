@@ -854,7 +854,9 @@ class block_ucla_tasites extends block_base {
         if (!empty($cacheistasite) || !isset($cacheistasite[$enrol->id])) {
             $result = true;
             if ($enrol->customint2 != self::get_ta_role_id() ||
-                    $enrol->customint3 != self::get_ta_admin_role_id()) {
+                    $enrol->customint3 != self::get_ta_admin_role_id() ||
+                    self::get_ta_admin_role_id() == NULL ||
+                    self::get_ta_role_id() == NULL) {
                 $result = false;
             }
             $cacheistasite[$enrol->id] = $result;

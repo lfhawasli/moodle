@@ -26,9 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-//Get our poodll resource handling lib
-require_once($CFG->dirroot . '/filter/poodll/poodllresourcelib.php');
-
 if(!defined('FP_REPLYVOICE')){
  /**
  * File areas for PoodLL feedback
@@ -319,13 +316,13 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		switch($this->get_config('recordertype')){
 			
 			case FP_REPLYVOICE:
-				$mediadata= fetchAudioRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL, 
+				$mediadata= \filter_poodll\poodlltools::fetchAudioRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL,
 						$usercontextid ,'user','draft',$draftitemid,$timelimit);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 				
 			case FP_REPLYMP3VOICE:
-				$mediadata= fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
+				$mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 				
@@ -342,19 +339,19 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
 				
 				$imageurl="";
-				$mediadata= fetchWhiteboardForSubmission(FP_FILENAMECONTROL, 
+				$mediadata= \filter_poodll\poodlltools::fetchWhiteboardForSubmission(FP_FILENAMECONTROL,
 						$usercontextid ,'user','draft',$draftitemid, $width, $height, $imageurl);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 			
 			case FP_REPLYSNAPSHOT:
-				$mediadata= fetchSnapshotCameraForSubmission(FP_FILENAMECONTROL,
+				$mediadata= \filter_poodll\poodlltools::fetchSnapshotCameraforSubmission(FP_FILENAMECONTROL,
 						"snap.jpg" ,350,400,$usercontextid ,'user','draft',$draftitemid);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 
 			case FP_REPLYVIDEO:
-				$mediadata= fetchVideoRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL, 
+				$mediadata= \filter_poodll\poodlltools::fetchVideoRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL,
 						$usercontextid ,'user','draft',$draftitemid,$timelimit);
 				$mform->addElement('static', 'description',$displayname,$mediadata);			
 									

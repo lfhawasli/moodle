@@ -1,4 +1,4 @@
-@ucla @mod_assign @core_edit @CCLE-4297
+@ucla @local_ucla @mod_assign @core_edit @CCLE-4297
 Feature: Have "quick grading" turned on by default
   As an instructor
   I want to have "Quick edit" turned on
@@ -29,7 +29,7 @@ Scenario: Check "quick grading" is enabled
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
     And I follow "Test assignment name"
-    When I follow "View/grade all submissions"
+    When I follow "View all submissions"
     Then the field "Quick grading" matches value "1"
     When I set the field "Quick grading" to ""
     #The default table settings are updated automatically/responsively

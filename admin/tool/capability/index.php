@@ -33,7 +33,10 @@ $contextid = optional_param('context', $systemcontext->id, PARAM_INT);
 // Check permissions.
 list($context, $course, $cm) = get_context_info_array($contextid);
 require_login($course, false, $cm);
-require_capability('moodle/role:manage', $context);
+// START UCLA MOD: CCLE-5917 - Grant access to capability overview.
+//require_capability('moodle/role:manage', $context);
+require_capability('tool/capability:view', $context);
+// END UCLA MOD: CCLE-5917
 
 // Print the header.
 admin_externalpage_setup('toolcapability');

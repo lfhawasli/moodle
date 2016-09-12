@@ -20,12 +20,12 @@ class block_ucla_office_hours extends block_base {
         if($this->content !== null) {
             return $this->content;
         }
-        
+
         $this->content = new stdClass;
-        
+
         return $this->content;
     }
-    
+
     public function applicable_formats() {
         return array(
             'site-index' => false,
@@ -35,55 +35,55 @@ class block_ucla_office_hours extends block_base {
             'not-really-applicable' => true
         );
     }
-    
+
     /**
      * Adds link to control panel.
-     * 
+     *
      * @param mixed $course
      * @param mixed $context
-     * @return type 
+     * @return type
      */
     public static function ucla_cp_hook($course, $context) {
         global $USER;
-        
+
         // display office hours link if user has ability to edit office hours
         if (block_ucla_office_hours::allow_editing($context, $USER->id)) {
             return array(array(
-                'item_name' => 'edit_office_hours', 
+                'item_name' => 'edit_office_hours',
                 'action' => new moodle_url(
-                        '/blocks/ucla_office_hours/officehours.php', 
+                        '/blocks/ucla_office_hours/officehours.php',
                         array('courseid' => $course->id, 'editid' => $USER->id)
                     ),
                 'tags' => array('ucla_cp_mod_common', 'ucla_cp_mod_other'),
                 'required_cap' => null,
                 'options' => array('post' => true)
-            ));            
-        }        
+            ));
+        }
     }
-    
+
     /**
-    * Makes sure that $edit_user is an instructing role for $course. Also makes 
+    * Makes sure that $edit_user is an instructing role for $course. Also makes
     * sure that user initializing editing has the ability to edit office hours.
-    * 
+    *
     * @param mixed $course_context  Course context
     * @param mixed $edit_user_id    User id we are editing
-    * 
+    *
     * @return boolean
     */
     public static function allow_editing($course_context, $edit_user_id) {
         global $CFG, $USER;
 
         // do capability check (but always let user edit their own entry)
-        if ($edit_user_id != $USER->id  && 
+        if ($edit_user_id != $USER->id  &&
                 !has_capability('block/ucla_office_hours:editothers', $course_context)) {
             //debugging('failed capability check');
             return false;
         }
 
         /**
-        * Course and edit_user must be in the same course and must be one of the 
+        * Course and edit_user must be in the same course and must be one of the
         * roles defined in $CFG->instructor_levels_roles, which is currently:
-        * 
+        *
         * $CFG->instructor_levels_roles = array(
         *   'Instructor' => array(
         *       'editinginstructor',
@@ -94,7 +94,7 @@ class block_ucla_office_hours extends block_base {
         *       'ta_admin'
         *   )
         * );
-        */    
+        */
 
         // format $CFG->instructor_levels_roles so it is easier to search
         $allowed_roles = array_merge($CFG->instructor_levels_roles['Instructor'],
@@ -103,38 +103,38 @@ class block_ucla_office_hours extends block_base {
         // get user's roles
         $roles = get_user_roles($course_context, $edit_user_id);
 
-        // now see if any of those roles match anything in 
+        // now see if any of those roles match anything in
         // $CFG->instructor_levels_roles
         foreach ($roles as $role) {
             if (in_array($role->shortname, $allowed_roles)) {
                 return true;
-            }        
+            }
         }
 
-        //debugging('role not in instructor_levels_roles');    
+        //debugging('role not in instructor_levels_roles');
         return false;
     }
-    
+
     /**
      * Renders the office hours and contact information table to be displayed
      * on the course webpage.
-     * 
+     *
      * @param array     $instructors        Array of instructors
      * @param mixed     $course             Current course
      * @param mixed     $context            Course context
-     * 
+     *
      * @return string HTML code
      */
-    public static function render_office_hours_table($instructors, 
+    public static function render_office_hours_table($instructors,
                                                      $course, $context) {
         global $DB, $OUTPUT, $PAGE, $USER, $CFG;
 
         $instr_info_table = '';
 
-        $appended_info = self::blocks_office_hours_append($instructors, 
+        $appended_info = self::blocks_office_hours_append($instructors,
                 $course, $context);
 
-        list($table_headers, $ohinstructors) = 
+        list($table_headers, $ohinstructors) =
             self::combine_blocks_office_hours($appended_info);
 
         // Optionally remove some instructors from display
@@ -160,7 +160,7 @@ class block_ucla_office_hours extends block_base {
          * Filter and organize users here.
          *
          * This code includes logic that allows renamed roles to appear in
-         * office hour blocks. This will rename the roles for the role 
+         * office hour blocks. This will rename the roles for the role
          * groups, depending on the renamed name of the Instructor, the
          * Teaching Assistant, and the Student Facilitator.
          *
@@ -205,8 +205,8 @@ class block_ucla_office_hours extends block_base {
 
             $table->align = $aligns;
 
-            $table->attributes['class'] = 
-                    'boxalignleft generaltable cellborderless office-hours-table ' . 
+            $table->attributes['class'] =
+                    'boxalignleft generaltable cellborderless office-hours-table ' .
                     $rolenames[0]; // This appendation allows Behat testing to work
 
             $table->head = array();
@@ -234,9 +234,12 @@ class block_ucla_office_hours extends block_base {
                     $value = '';
                     if (isset($user->{$field})) {
                         $value = $user->{$field};
+                        if ($header == 'Email' && validate_email($value) != 0) {
+                            $value = html_writer::link("mailto:" . $value, $value);
+                        }
                     }
 
-                    // We need to attach attribute in order to make 
+                    // We need to attach attribute in order to make
                     // this table responsive
                     $cell = new html_table_cell($value);
                     if ($header == self::TITLE_FLAG) {
@@ -250,8 +253,8 @@ class block_ucla_office_hours extends block_base {
 
                 $table->data[] = $user_row;
             }
-            
-            // use array_values, to remove array keys, which are 
+
+            // use array_values, to remove array keys, which are
             // mistaken as another css class for given column
             foreach ($type_table_headers as $table_header) {
                 if ($table_header == self::TITLE_FLAG) {
@@ -268,7 +271,7 @@ class block_ucla_office_hours extends block_base {
     }
 
     /**
-     *  Turns a set of combined instructor informations and 
+     *  Turns a set of combined instructor informations and
      *  detemines potential headers.
      **/
     static function combine_blocks_office_hours($appended_info) {
@@ -277,7 +280,7 @@ class block_ucla_office_hours extends block_base {
         foreach ($appended_info as $blockname => $instructor_data) {
             foreach ($instructor_data as $instkey => $instfields) {
                 if (!isset($instructors[$instkey])) {
-                    $instructors[$instkey] = new object();
+                    $instructors[$instkey] = new stdClass();
                 }
 
                 foreach ($instfields as $field => $value) {
@@ -299,19 +302,19 @@ class block_ucla_office_hours extends block_base {
 
                         $desired_info[$fieldname] = $infoheader;
                     }
-                    
+
                     if (empty($instructors[$instkey])) {
                         debugging('got a custom office hours field'
                             . ' for non-existant instructor: ' . $instkey);
                     }
-                    
+
                     $instructors[$instkey]->{
                             self::blocks_strip_displaykey_sort($fieldname)
                         } = $value;
                 }
             }
         }
-        
+
         ksort($desired_info);
 
         $table_headers = array();
@@ -337,7 +340,7 @@ class block_ucla_office_hours extends block_base {
     /**
      *  Maybe move this somewhere more useful?
      **/
-    static function all_blocks_method_results($function, $param, 
+    static function all_blocks_method_results($function, $param,
                                               $filter=array()) {
         $blocks = self::load_blocks();
         $blockresults = array();
@@ -358,11 +361,11 @@ class block_ucla_office_hours extends block_base {
     /**
      *  Polling Hook API.
      *  Calls block::office_hours_append()
-     *  
+     *
      *  Allows blocks to specify arbitrary fields to add onto the display
      *      in section 0 of the course site.
      *  @param Array(
-     *      'instructors' => array the instructors that have been selected 
+     *      'instructors' => array the instructors that have been selected
      *          to be in the office hours,
      *      'course'  => object the course,
      *      'context' => object the context
@@ -377,25 +380,25 @@ class block_ucla_office_hours extends block_base {
      *      entry with a field name will result in the field name displayed
      *      in the table header, while the other users without a value for
      *      said field will have no value for said field.
-     *  NOTE: Use blocks_process_displaykey() to set 
+     *  NOTE: Use blocks_process_displaykey() to set
      *      <field name to be appended>.
-     *  NOTE: You can force sorting by APPENDING a 2-digit integer to the 
+     *  NOTE: You can force sorting by APPENDING a 2-digit integer to the
      *      name of the key.
-     *      
+     *
      **/
-    static function blocks_office_hours_append($instructors, $course, 
+    static function blocks_office_hours_append($instructors, $course,
                                                $context) {
         return self::all_blocks_method_results('office_hours_append',
             array(
-                'instructors' => $instructors, 
-                'course' => $course, 
+                'instructors' => $instructors,
+                'course' => $course,
                 'context' => $context
             ));
     }
 
     /**
      *  Calculates the field in $instructor that is displayed per
-     *  display field in a block. Blocks implementing 
+     *  display field in a block. Blocks implementing
      *  office_hours_append() should use this function.
      **/
     static function blocks_process_displaykey($displaykey, $blockname) {
@@ -405,9 +408,9 @@ class block_ucla_office_hours extends block_base {
     static function blocks_strip_displaykey_sort($displaykey) {
         $retval = $displaykey;
         if (preg_match(self::DISPLAYKEY_PREG, $displaykey)) {
-            $retval = preg_replace(self::DISPLAYKEY_PREG, '$2', 
+            $retval = preg_replace(self::DISPLAYKEY_PREG, '$2',
                     $displaykey);
-        } 
+        }
 
         return $retval;
     }
@@ -426,8 +429,8 @@ class block_ucla_office_hours extends block_base {
         return self::all_blocks_method_results(
             'office_hours_filter_instructors',
             array(
-                'instructors' => $instructors, 
-                'course' => $course, 
+                'instructors' => $instructors,
+                'course' => $course,
                 'context' => $context
             ));
     }
@@ -442,11 +445,11 @@ class block_ucla_office_hours extends block_base {
                 'block/ucla_office_hours:editothers', $context);
         $editing = $PAGE->user_is_editing();
         $editing_office_hours = $editing && $has_capability_edit_office_hours;
-        
+
         // Determine if the user is enrolled in the course or is an admin
-        // Assuming 'moodle/course:update' is a sufficient capability to 
+        // Assuming 'moodle/course:update' is a sufficient capability to
         // to determine if a user is an admin or not
-        $enrolled_or_admin = is_enrolled($context, $USER) 
+        $enrolled_or_admin = is_enrolled($context, $USER)
                 || has_capability('moodle/course:update', $context);
 
         $streditsummary     = get_string('update', 'block_ucla_office_hours');
@@ -473,12 +476,12 @@ class block_ucla_office_hours extends block_base {
 
         $defaults = array();
         foreach ($defaultinfo as $defaultdata) {
-            $defaults[self::blocks_strip_displaykey_sort($defaultdata)] = 
+            $defaults[self::blocks_strip_displaykey_sort($defaultdata)] =
                 $defaultdata;
         }
 
         // custom hack for fullname
-        $defaults[self::blocks_strip_displaykey_sort($fullname)] = 
+        $defaults[self::blocks_strip_displaykey_sort($fullname)] =
             self::TITLE_FLAG;
 
         // calculate invariants, and locally dependent data
@@ -520,7 +523,7 @@ class block_ucla_office_hours extends block_base {
                                 )
                             ),
                             new pix_icon(
-                                't/edit', 
+                                't/edit',
                                 $link_options['title'],
                                 'moodle',
                                 array(
@@ -535,7 +538,7 @@ class block_ucla_office_hours extends block_base {
                     array('class' => 'editbutton')
                 );
             }
-            
+
             // Determine if we should display the instructor's email:
             // 2 - Allow only other course members to see my email address
             // 1 - Allow everyone to see my email address

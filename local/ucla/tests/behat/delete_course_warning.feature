@@ -1,4 +1,4 @@
-@ucla @core_course @core_edit @CCLE-4415
+@ucla @local_ucla @core_course @core_edit @CCLE-4415
 Feature: Deleting a course with additional course content
   In order to delete a course
   As a moodle admin
@@ -27,7 +27,10 @@ Feature: Deleting a course with additional course content
   @javascript
   Scenario: Deleting a course with a block for all 3 course formats
     # UCLA format.
-    When I follow "Course 1"
+    When I follow "Courses"
+    And I follow "Category 1"
+    And I follow "Category 2"
+    And I follow "Course 1"
     And I press "Turn editing on"
     And I reload the page
     And I add the "Calendar" block
@@ -41,7 +44,12 @@ Feature: Deleting a course with additional course content
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
     And I am on homepage
     # Topics format.
-    When I follow "Course 2"
+    And I follow "Courses"
+    And I follow "Category 1"
+    And I follow "Category 2"
+    And I follow "Course 2"
+    And I press "Turn editing on"
+    And I reload the page
     And I add the "Calendar" block
     Then I should see "Events key" in the ".block_calendar_month" "css_element"
     When I expand "Site administration" node
@@ -52,7 +60,12 @@ Feature: Deleting a course with additional course content
     And I should see "You are deleting a course for which content has been added." in the "region-main" "region"
     And I am on homepage
     # Weeks format.
-    When I follow "Course 3"
+    And I follow "Courses"
+    And I follow "Category 1"
+    And I follow "Category 2"
+    And I follow "Course 3"
+    And I press "Turn editing on"
+    And I reload the page
     And I add the "Calendar" block
     Then I should see "Events key" in the ".block_calendar_month" "css_element"
     When I expand "Site administration" node
@@ -138,8 +151,7 @@ Feature: Deleting a course with additional course content
   @javascript
   Scenario: Deleting a course with no additional course content for all 3 formats.
     # UCLA format.
-    When I follow "Course 1"
-    And I expand "Site administration" node
+    When I expand "Site administration" node
     And I go to the courses management page
     And I follow "Expand Category 1"
     And I follow "Category 2"
@@ -147,7 +159,6 @@ Feature: Deleting a course with additional course content
     Then I should see "You are deleting a course for which no content has been added." in the "region-main" "region"
     And I am on homepage
     # Topics format.
-    When I follow "Course 2"
     And I expand "Site administration" node
     And I go to the courses management page
     And I follow "Category 2"
@@ -155,7 +166,6 @@ Feature: Deleting a course with additional course content
     Then I should see "You are deleting a course for which no content has been added." in the "region-main" "region"
     And I am on homepage
     # Weeks format.
-    When I follow "Course 3"
     And I expand "Site administration" node
     And I go to the courses management page
     And I follow "Category 2"

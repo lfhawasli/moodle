@@ -16,6 +16,7 @@ Feature: Add a link
          | user | course | role |
          | teacher1 | C1 | editingteacher |
 
+   @javascript
    Scenario: Adding a private link
       Given I log in as "teacher1"
       And I follow "Course 1"

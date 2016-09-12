@@ -1,10 +1,10 @@
 .block_ucla_my_sites.block .mysitesdivider {
     display: block;
     margin: 8px 0;
-    border-bottom: 1px solid #536895;
+    border-bottom: 2px solid #536895;
     font-weight: bold;
     color: #394A6E;
-    padding-bottom: 1px;
+    padding-bottom: 2px;
 }
 
 .block_ucla_my_sites.block .termselector {
@@ -63,3 +63,56 @@
     text-transform: uppercase;
 }
 
+.block_ucla_my_sites.block .collapsibleregion {
+    padding-left: 25px;
+}
+
+.block_ucla_my_sites.block .collapsibleregioncaption img {
+    margin-right: 25px;
+}
+
+.block_ucla_my_sites.block .alertCount {
+    background-repeat: no-repeat;
+    background-position: 2px 0px;;
+    background-size: 20px auto;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 5px;
+    font-size: 13px;
+    color: white;
+    margin-left: 3px;
+}
+
+.block_ucla_my_sites.block .collapsibleregioncaption img{
+    margin-right: 10px;
+}
+
+.block_ucla_my_sites.block .collapsibleregioninner {
+    margin-left: 50px;
+}
+
+.block_ucla_my_sites.block .course_title {
+    font-size: 15px;
+}
+
+.block_ucla_my_sites.block .overview {
+    margin-left: 12px;
+}
+
+.block_ucla_my_sites.block .name {
+    margin-left: -11px;
+}
+
+.block_ucla_my_sites.block .name:before {
+    content: "• ";
+}
+
+.block_ucla_my_sites.block .box.info {
+    margin-left: 12px;
+}
+
+.block_ucla_my_sites.block .course_divider {
+    border-width: 1px 0px 0px;
+    border-color: #ccc;
+    margin-right: 25%;
+}

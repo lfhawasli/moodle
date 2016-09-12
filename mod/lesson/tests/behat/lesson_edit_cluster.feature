@@ -21,6 +21,7 @@ Feature: In a lesson activity, teacher can edit a cluster page
     And I turn editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Lesson with cluster |
+      | Description | Test lesson description |
     And I follow "Lesson with cluster"
     And I follow "Add a content page"
     And I set the following fields to these values:
@@ -70,7 +71,6 @@ Feature: In a lesson activity, teacher can edit a cluster page
       | id_jumpto_0 | Next page |
     And I press "Save page"
 
-  @javascript
   Scenario: Edit lesson cluster page
     Given I click on "//th[normalize-space(.)='Cluster']/descendant::a[2]" "xpath_element"
     When I set the following fields to these values:

@@ -51,6 +51,7 @@ class grade_import_form extends moodleform {
         $mform->addRule('userfile', null, 'required');
         $encodings = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $encodings);
+        $mform->addHelpButton('encoding', 'encoding', 'grades');
 
         if (!empty($features['includeseparator'])) {
             $radio = array();
@@ -59,17 +60,24 @@ class grade_import_form extends moodleform {
             $radio[] = $mform->createElement('radio', 'separator', null, get_string('sepcolon', 'grades'), 'colon');
             $radio[] = $mform->createElement('radio', 'separator', null, get_string('sepsemicolon', 'grades'), 'semicolon');
             $mform->addGroup($radio, 'separator', get_string('separator', 'grades'), ' ', false);
+            $mform->addHelpButton('separator', 'separator', 'grades');
             $mform->setDefault('separator', 'comma');
         }
 
         if (!empty($features['verbosescales'])) {
             $options = array(1=>get_string('yes'), 0=>get_string('no'));
             $mform->addElement('select', 'verbosescales', get_string('verbosescales', 'grades'), $options);
+            $mform->addHelpButton('verbosescales', 'verbosescales', 'grades');
         }
 
         $options = array('10'=>10, '20'=>20, '100'=>100, '1000'=>1000, '100000'=>100000);
         $mform->addElement('select', 'previewrows', get_string('rowpreviewnum', 'grades'), $options); // TODO: localize
+        $mform->addHelpButton('previewrows', 'rowpreviewnum', 'grades');
         $mform->setType('previewrows', PARAM_INT);
+        $mform->addElement('checkbox', 'forceimport', get_string('forceimport', 'grades'));
+        $mform->addHelpButton('forceimport', 'forceimport', 'grades');
+        $mform->setDefault('forceimport', false);
+        $mform->setType('forceimport', PARAM_BOOL);
         $mform->addElement('hidden', 'groupid', groups_get_course_group($COURSE));
         $mform->setType('groupid', PARAM_INT);
         $this->add_action_buttons(false, get_string('uploadgrades', 'grades'));
@@ -95,6 +103,7 @@ class grade_import_mapping_form extends moodleform {
             }
         }
         $mform->addElement('select', 'mapfrom', get_string('mapfrom', 'grades'), $mapfromoptions);
+        $mform->addHelpButton('mapfrom', 'mapfrom', 'grades');
 
         $maptooptions = array(
             'userid'       => get_string('userid', 'grades'),
@@ -104,13 +113,10 @@ class grade_import_mapping_form extends moodleform {
             '0'            => get_string('ignore', 'grades')
         );
         $mform->addElement('select', 'mapto', get_string('mapto', 'grades'), $maptooptions);
-        
-        // START UCLA MOD: CCLE-5067 - Set default to "User IDnumber" for Grades Import
-        // Set default mapping to ID number instead of User ID
-        $mform->setDefault('mapto', 'useridnumber');
-        // END UCLA MOD: CCLE-5067
-        
-        $mform->addElement('header', 'general', get_string('mappings', 'grades'));
+
+        $mform->addHelpButton('mapto', 'mapto', 'grades');
+        $mform->addElement('header', 'general_map', get_string('mappings', 'grades'));
+        $mform->addHelpButton('general_map', 'mappings', 'grades');
 
         // Add a feedback option.
         $feedbacks = array();
@@ -141,16 +147,25 @@ class grade_import_mapping_form extends moodleform {
         // course id needs to be passed for auth purposes
         $mform->addElement('hidden', 'map', 1);
         $mform->setType('map', PARAM_INT);
-        $mform->addElement('hidden', 'id');
+        $mform->setConstant('map', 1);
+        $mform->addElement('hidden', 'id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'iid');
+        $mform->setConstant('id', $this->_customdata['id']);
+        $mform->addElement('hidden', 'iid', $this->_customdata['iid']);
         $mform->setType('iid', PARAM_INT);
-        $mform->addElement('hidden', 'importcode');
+        $mform->setConstant('iid', $this->_customdata['iid']);
+        $mform->addElement('hidden', 'importcode', $this->_customdata['importcode']);
         $mform->setType('importcode', PARAM_FILE);
+        $mform->setConstant('importcode', $this->_customdata['importcode']);
         $mform->addElement('hidden', 'verbosescales', 1);
         $mform->setType('verbosescales', PARAM_INT);
+        $mform->setConstant('verbosescales', $this->_customdata['verbosescales']);
         $mform->addElement('hidden', 'groupid', groups_get_course_group($COURSE));
         $mform->setType('groupid', PARAM_INT);
+        $mform->setConstant('groupid', groups_get_course_group($COURSE));
+        $mform->addElement('hidden', 'forceimport', $this->_customdata['forceimport']);
+        $mform->setType('forceimport', PARAM_BOOL);
+        $mform->setConstant('forceimport', $this->_customdata['forceimport']);
         $this->add_action_buttons(false, get_string('uploadgrades', 'grades'));
 
     }

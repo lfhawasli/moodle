@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,7 +17,7 @@
 /**
  * This file contains the strings used by backup
  *
- * @package   moodlecore
+ * @package   core
  * @copyright 2010 Eloy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,6 +30,11 @@ $string['automatedbackupschedule'] = 'Schedule';
 $string['automatedbackupschedulehelp'] = 'Choose which days of the week to perform automated backups.';
 $string['automatedbackupsinactive'] = 'Automated backups haven\'t been enabled by the site admin';
 $string['automatedbackupstatus'] = 'Automated backup status';
+$string['automateddeletedays'] = 'Delete backups older than';
+$string['automatedmaxkept'] = 'Maximum number of backups kept';
+$string['automatedmaxkepthelp'] = 'This specifies the maximum number of recent automated backups to be kept for each course. Older backups will be deleted automatically.';
+$string['automatedminkept'] = 'Minimum number of backups kept';
+$string['automatedminkepthelp'] = 'If backups older than a specified number of days are deleted, it can happen that an inactive course ends up with no backup. To prevent this, a minimum number of backups kept should be specified.';
 $string['automatedsetup'] = 'Automated backup setup';
 $string['automatedsettings'] = 'Automated backup settings';
 $string['automatedstorage'] = 'Automated backup storage';
@@ -75,11 +79,11 @@ $string['backuptypesection'] = 'Section';
 $string['backupversion'] = 'Backup version';
 $string['cannotfindassignablerole'] = 'The {$a} role in the backup file cannot be mapped to any of the roles that you are allowed to assign.';
 $string['choosefilefromcoursebackup'] = 'Course backup area';
-$string['choosefilefromcoursebackup_help'] = 'When backup courses using default settings, backup files will be stored here';
+$string['choosefilefromcoursebackup_help'] = 'Course backups made using default settings are stored here.';
 $string['choosefilefromuserbackup'] = 'User private backup area';
-$string['choosefilefromuserbackup_help'] = 'When backup courses with "Anonymize user information" option ticked, backup files will be stored here';
+$string['choosefilefromuserbackup_help'] = 'Backup files with anonymized user information are stored here.';
 $string['choosefilefromactivitybackup'] = 'Activity backup area';
-$string['choosefilefromactivitybackup_help'] = 'When backup activities using default settings, backup files will be stored here';
+$string['choosefilefromactivitybackup_help'] = 'Activity backups made using default settings are stored here.';
 $string['choosefilefromautomatedbackup'] = 'Automated backups';
 $string['choosefilefromautomatedbackup_help'] = 'Contains automatically generated backups.';
 $string['configgeneralactivities'] = 'Sets the default for including activities in a backup.';
@@ -91,6 +95,7 @@ $string['configgeneralfilters'] = 'Sets the default for including filters in a b
 $string['configgeneralhistories'] = 'Sets the default for including user history within a backup.';
 $string['configgenerallogs'] = 'If enabled logs will be included in backups by default.';
 $string['configgeneralquestionbank'] = 'If enabled the question bank will be included in backups by default. PLEASE NOTE: Disabling this setting will disable the backup of activities which use the question bank, such as the quiz.';
+$string['configgeneralgroups'] = 'Sets the default for including groups and groupings in a backup.';
 $string['configgeneralroleassignments'] = 'If enabled by default roles assignments will also be backed up.';
 $string['configgeneraluserscompletion'] = 'If enabled user completion information will be included in backups by default.';
 $string['configgeneralusers'] = 'Sets the default for whether to include users in backups.';
@@ -117,9 +122,9 @@ $string['error_course_module_not_found'] = 'Orphan course module (id: {$a}) foun
 $string['errorfilenamerequired'] = 'You must enter a valid filename for this backup';
 $string['errorfilenamemustbezip'] = 'The filename you enter must be a ZIP file and have the .mbz extension';
 $string['errorminbackup20version'] = 'This backup file has been created with one development version of Moodle backup ({$a->backup}). Minimum required is {$a->min}. Cannot be restored.';
-$string['errorrestorefrontpage'] = 'Restoring over front page is not allowed.';
 $string['errorinvalidformat'] = 'Unknown backup format';
 $string['errorinvalidformatinfo'] = 'The selected file is not a valid Moodle backup file and can\'t be restored.';
+$string['errorrestorefrontpagebackup'] = 'You can only restore front page backups on the front page';
 $string['executionsuccess'] = 'The backup file was successfully created.';
 $string['filename'] = 'Filename';
 $string['filealiasesrestorefailures'] = 'Aliases restore failures';
@@ -128,9 +133,9 @@ $string['filealiasesrestorefailures_help'] = 'Aliases are symbolic links to othe
 
 More details and the actual reason of the failure can be found in the restore log file.';
 $string['filealiasesrestorefailures_link'] = 'restore/filealiases';
-$string['filereferencesincluded'] = 'File references to external contents included in backup package, they won\'t work on other sites.';
-$string['filereferencessamesite'] = 'Backup is from the same site, file references can be restored';
-$string['filereferencesnotsamesite'] = 'Backup is from other site, file references cannot be restored';
+$string['filereferencesincluded'] = 'File references to external contents are included in the backup file. These won\'t work if the backup is restored on a different site.';
+$string['filereferencessamesite'] = 'The backup file is from this site, and so file references can be restored.';
+$string['filereferencesnotsamesite'] = 'The backup file is from a different site, and so file references cannot be restored.';
 $string['generalactivities'] = 'Include activities and resources';
 $string['generalanonymize'] = 'Anonymise information';
 $string['generalbackdefaults'] = 'General backup defaults';
@@ -142,17 +147,17 @@ $string['generalhistories'] = 'Include histories';
 $string['generalgradehistories'] = 'Include histories';
 $string['generallogs'] = 'Include logs';
 $string['generalquestionbank'] = 'Include question bank';
+$string['generalgroups'] = 'Include groups and groupings';
 $string['generalroleassignments'] = 'Include role assignments';
 $string['generalsettings'] = 'General backup settings';
 $string['generaluserscompletion'] = 'Include user completion information';
 $string['generalusers'] = 'Include users';
-// BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
-$string['groups'] = 'Restore groups and groupings';
-// END UCLA MOD: SSC-2572
 $string['hidetypes'] = 'Hide type options';
 $string['importgeneralsettings'] = 'General import defaults';
 $string['importgeneralmaxresults'] = 'Maximum number of courses listed for import';
 $string['importgeneralmaxresults_desc'] = 'This controls the number of courses that are listed during the first step of the import process';
+$string['importgeneralduplicateadminallowed'] = 'Allow admin conflict resolution';
+$string['importgeneralduplicateadminallowed_desc'] = 'If the site has an account with username \'admin\', then attempting to restore a backup file containing an account with username \'admin\' can cause a conflict. If this setting is enabled, the conflict will be resolved by changing the username in the backup file to \'admin_xyz\'.';
 $string['importfile'] = 'Import a backup file';
 $string['importbackupstage1action'] = 'Next';
 $string['importbackupstage2action'] = 'Next';
@@ -170,14 +175,15 @@ $string['includeactivities'] = 'Include:';
 $string['includeditems'] = 'Included items:';
 $string['includesection'] = 'Section {$a}';
 $string['includeuserinfo'] = 'User data';
-$string['loglifetime'] = 'Keep logs for';
 $string['includefilereferences'] = 'File references to external contents';
+$string['jumptofinalstep'] = 'Jump to final step';
 $string['locked'] = 'Locked';
 $string['lockedbypermission'] = 'You don\'t have sufficient permissions to change this setting';
 $string['lockedbyconfig'] = 'This setting has been locked by the default backup settings';
 $string['lockedbyhierarchy'] = 'Locked by dependencies';
+$string['loglifetime'] = 'Keep logs for';
 $string['managefiles'] = 'Manage backup files';
-$string['missingfilesinpool'] = 'Some files could not be saved during the backup, it won\'t be possible to restore them.';
+$string['missingfilesinpool'] = 'Some files could not be saved during the backup, and so it will not be possible to restore them.';
 $string['moodleversion'] = 'Moodle version';
 $string['moreresults'] = 'There are too many results, enter a more specific search.';
 $string['nomatchingcourses'] = 'There are no courses to display';
@@ -234,6 +240,7 @@ $string['rootsettingroleassignments'] = 'Include user role assignments';
 $string['rootsettingactivities'] = 'Include activities and resources';
 $string['rootsettingbadges'] = 'Include badges';
 $string['rootsettingblocks'] = 'Include blocks';
+$string['rootsettingcompetencies'] = 'Include competencies';
 $string['rootsettingfilters'] = 'Include filters';
 $string['rootsettingcomments'] = 'Include comments';
 $string['rootsettingcalendarevents'] = 'Include calendar events';
@@ -241,8 +248,10 @@ $string['rootsettinguserscompletion'] = 'Include user completion details';
 $string['rootsettingquestionbank'] = 'Include question bank';
 $string['rootsettinglogs'] = 'Include course logs';
 $string['rootsettinggradehistories'] = 'Include grade history';
+$string['rootsettinggroups'] = 'Include groups and groupings';
 $string['rootsettingimscc1'] = 'Convert to IMS Common Cartridge 1.0';
 $string['rootsettingimscc11'] = 'Convert to IMS Common Cartridge 1.1';
+$string['sitecourseformatwarning'] = 'This is a front page backup, note that they can only be restored on the front page';
 $string['storagecourseonly'] = 'Course backup filearea';
 $string['storagecourseandexternal'] = 'Course backup filearea and the specified directory';
 $string['storageexternalonly'] = 'Specified directory for automated backups';
@@ -267,6 +276,7 @@ $string['skipmodifdays'] = 'Skip courses not modified since';
 $string['skipmodifdayshelp'] = 'Choose to skip courses that have not been modified since a number of days';
 $string['skipmodifprev'] = 'Skip courses not modified since previous backup';
 $string['skipmodifprevhelp'] = 'Choose whether to skip courses that have not been modified since the last automatic backup. This requires logging to be enabled.';
+$string['timetaken'] = 'Time taken';
 $string['title'] = 'Title';
 $string['totalcategorysearchresults'] = 'Total categories: {$a}';
 $string['totalcoursesearchresults'] = 'Total courses: {$a}';

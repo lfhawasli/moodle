@@ -45,7 +45,7 @@ $string['foodis_myucla'] = 'MyUCLA';
 $string['foolin_myucla'] = 'http://my.ucla.edu/';
 
 $string['foodis_disability'] = 'Disability';
-$string['foolin_disability'] = 'http://www.osd.ucla.edu/';
+$string['foolin_disability'] = 'http://www.cae.ucla.edu/';
 
 $string['foodis_caps'] = 'Couns/PsychSvc (CAPS)';
 $string['foolin_caps'] = 'http://www.counseling.ucla.edu/';
@@ -100,6 +100,7 @@ $string['setting_desc_disable_post_blocks'] = 'Disable courses from adding block
 $string['setting_title_running_environment'] = 'Server environment';
 $string['setting_desc_running_environment'] = 'This option will determine the color of the header to make it easier distinguish which server environment you are on. Default should be \'Production\'.';
 $string['setting_default_running_environment'] = 'prod';
+$string['watermark'] = "Owen Weitzel";
 $string['env_prod'] = 'Production';
 $string['env_stage'] = 'Stage';
 $string['env_test'] = 'Test';

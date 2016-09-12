@@ -46,5 +46,37 @@ function xmldb_local_gradebook_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2012110700, 'local', 'gradebook');
     }
 
+    // Freeze grades for existing gradebooks.
+    if ($oldversion < 2016080800) {
+        $pbar = new progress_bar('freezegradebooks', 500, true);
+
+        // Find all courses with grades.
+        $sql = "SELECT COUNT(DISTINCT gi.courseid)
+                  FROM {grade_items} gi
+                  JOIN {grade_grades} gg ON (gg.itemid=gi.id)
+                 WHERE gg.rawgrade IS NOT NULL";
+        $total = $DB->count_records_sql($sql);
+        $sql = "SELECT DISTINCT gi.courseid
+                  FROM {grade_items} gi
+                  JOIN {grade_grades} gg ON (gg.itemid=gi.id)
+                 WHERE gg.rawgrade IS NOT NULL";
+        $gradebooks = $DB->get_recordset_sql($sql);
+        $i = 0;
+        foreach ($gradebooks as $gradebook) {
+            // Freeze gradebook.
+            $gradebookfreeze = get_config('core', 'gradebook_calculations_freeze_' . $gradebook->courseid);
+            if (!$gradebookfreeze) {
+                // We were using the Gradebook from 2.7.
+                set_config('gradebook_calculations_freeze_' . $gradebook->courseid, 20140512);
+            }
+
+            // Update progress.
+            $i++;
+            $pbar->update($i, $total, "Freezing gradebooks - $i/$total.");
+        }
+        $gradebooks->close();
+        upgrade_plugin_savepoint(true, 2016080800, 'local', 'gradebook');
+    }
+
     return true;
 }

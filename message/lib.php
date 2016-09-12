@@ -135,9 +135,6 @@ function message_print_contact_selector($countunreadtotal, $viewing, $user1, $us
         echo html_writer::start_tag('form', array('action' => 'index.php','method' => 'GET'));
         echo html_writer::start_tag('fieldset');
         $managebuttonclass = 'visible';
-        if ($viewing == MESSAGE_VIEW_SEARCH) {
-            $managebuttonclass = 'hiddenelement';
-        }
         $strmanagecontacts = get_string('search','message');
         echo html_writer::empty_tag('input', array('type' => 'hidden','name' => 'viewing','value' => MESSAGE_VIEW_SEARCH));
         echo html_writer::empty_tag('input', array('type' => 'submit','value' => $strmanagecontacts,'class' => $managebuttonclass));
@@ -182,14 +179,14 @@ function message_print_participants($context, $courseid, $contactselecturl=null,
     $participants = $DB->get_records_sql($sql, $params, $page * MESSAGE_CONTACTS_PER_PAGE, MESSAGE_CONTACTS_PER_PAGE);
 
     $pagingbar = new paging_bar($countparticipants, $page, MESSAGE_CONTACTS_PER_PAGE, $PAGE->url, 'page');
+    $pagingbar->maxdisplay = 4;
     echo $OUTPUT->render($pagingbar);
 
-    echo html_writer::start_tag('table', array('id' => 'message_participants', 'class' => 'boxaligncenter', 'cellspacing' => '2', 'cellpadding' => '0', 'border' => '0'));
+    echo html_writer::start_tag('div', array('id' => 'message_participants', 'class' => 'boxaligncenter'));
 
-    echo html_writer::start_tag('tr');
-    echo html_writer::tag('td', $titletodisplay, array('colspan' => 3, 'class' => 'heading'));
-    echo html_writer::end_tag('tr');
+    echo html_writer::tag('div' , $titletodisplay, array('class' => 'heading'));
 
+    $users = '';
     foreach ($participants as $participant) {
         if ($participant->id != $USER->id) {
 
@@ -208,11 +205,16 @@ function message_print_participants($context, $courseid, $contactselecturl=null,
             }
 
             $participant->messagecount = 0;//todo it would be nice if the course participant could report new messages
-            message_print_contactlist_user($participant, $iscontact, $isblocked, $contactselecturl, $showactionlinks, $user2);
+            $content = message_print_contactlist_user($participant, $iscontact, $isblocked,
+                $contactselecturl, $showactionlinks, $user2);
+            $users .= html_writer::tag('li', $content);
         }
     }
+    if (strlen($users) > 0) {
+        echo html_writer::tag('ul', $users, array('id' => 'message-courseparticipants', 'class' => 'message-contacts'));
+    }
 
-    echo html_writer::end_tag('table');
+    echo html_writer::end_tag('div');
 }
 
 /**
@@ -241,7 +243,7 @@ function message_get_blocked_users($user1=null, $user2=null) {
                           FROM {message_contacts} mc
                           JOIN {user} u ON u.id = mc.contactid
                           LEFT OUTER JOIN {message} m ON m.useridfrom = mc.contactid AND m.useridto = :user1id1
-                         WHERE mc.userid = :user1id2 AND mc.blocked = 1
+                         WHERE u.deleted = 0 AND mc.userid = :user1id2 AND mc.blocked = 1
                       GROUP BY $userfields
                       ORDER BY u.firstname ASC";
     $rs =  $DB->get_recordset_sql($blockeduserssql, array('user1id1' => $user1->id, 'user1id2' => $user1->id));
@@ -269,31 +271,31 @@ function message_get_blocked_users($user1=null, $user2=null) {
  * @return void
  */
 function message_print_blocked_users($blockedusers, $contactselecturl=null, $showactionlinks=true, $titletodisplay=null, $user2=null) {
-    global $DB, $USER;
+    global $OUTPUT;
 
     $countblocked = count($blockedusers);
 
-    echo html_writer::start_tag('table', array('id' => 'message_contacts', 'class' => 'boxaligncenter'));
+    echo html_writer::start_tag('div', array('id' => 'message_contacts', 'class' => 'boxaligncenter'));
 
     if (!empty($titletodisplay)) {
-        echo html_writer::start_tag('tr');
-        echo html_writer::tag('td', $titletodisplay, array('colspan' => 3, 'class' => 'heading'));
-        echo html_writer::end_tag('tr');
+        echo html_writer::tag('div', $titletodisplay, array('class' => 'heading'));
     }
 
     if ($countblocked) {
-        echo html_writer::start_tag('tr');
-        echo html_writer::tag('td', get_string('blockedusers', 'message', $countblocked), array('colspan' => 3, 'class' => 'heading'));
-        echo html_writer::end_tag('tr');
+        echo html_writer::tag('div', get_string('blockedusers', 'message', $countblocked), array('class' => 'heading'));
 
         $isuserblocked = true;
         $isusercontact = false;
+        $blockeduserslist = '';
         foreach ($blockedusers as $blockeduser) {
-            message_print_contactlist_user($blockeduser, $isusercontact, $isuserblocked, $contactselecturl, $showactionlinks, $user2);
+            $content = message_print_contactlist_user($blockeduser, $isusercontact, $isuserblocked,
+                $contactselecturl, $showactionlinks, $user2);
+            $blockeduserslist .= html_writer::tag('li', $content);
         }
+        echo html_writer::tag('ul', $blockeduserslist, array('id' => 'message-blockedusers', 'class' => 'message-contacts'));
     }
 
-    echo html_writer::end_tag('table');
+    echo html_writer::end_tag('div');
 }
 
 /**
@@ -338,7 +340,7 @@ function message_get_contacts($user1=null, $user2=null) {
                      FROM {message_contacts} mc
                      JOIN {user} u ON u.id = mc.contactid
                      LEFT OUTER JOIN {message} m ON m.useridfrom = mc.contactid AND m.useridto = ?
-                    WHERE mc.userid = ? AND mc.blocked = 0
+                    WHERE u.deleted = 0 AND mc.userid = ? AND mc.blocked = 0
                  GROUP BY $userfields
                  ORDER BY u.firstname ASC";
 
@@ -364,7 +366,7 @@ function message_get_contacts($user1=null, $user2=null) {
                       FROM {message} m
                       JOIN {user} u  ON u.id = m.useridfrom
                       LEFT OUTER JOIN {message_contacts} mc ON mc.contactid = m.useridfrom AND mc.userid = m.useridto
-                     WHERE mc.id IS NULL AND m.useridto = ?
+                     WHERE u.deleted = 0 AND mc.id IS NULL AND m.useridto = ?
                   GROUP BY $userfields
                   ORDER BY u.firstname ASC";
 
@@ -420,25 +422,31 @@ function message_print_contacts($onlinecontacts, $offlinecontacts, $strangers, $
         echo html_writer::tag('div', get_string('contactlistempty', 'message'), array('class' => 'heading'));
     }
 
-    echo html_writer::start_tag('table', array('id' => 'message_contacts', 'class' => 'boxaligncenter'));
-
     if (!empty($titletodisplay)) {
-        message_print_heading($titletodisplay);
+        echo html_writer::tag('div', $titletodisplay, array('class' => 'heading'));
     }
 
     if($countonlinecontacts) {
         // Print out list of online contacts.
 
         if (empty($titletodisplay)) {
-            message_print_heading(get_string('onlinecontacts', 'message', $countonlinecontacts));
+            echo html_writer::tag('div',
+                get_string('onlinecontacts', 'message', $countonlinecontacts),
+                array('class' => 'heading'));
         }
 
         $isuserblocked = false;
         $isusercontact = true;
+        $contacts = '';
         foreach ($onlinecontacts as $contact) {
             if ($minmessages == 0 || $contact->messagecount >= $minmessages) {
-                message_print_contactlist_user($contact, $isusercontact, $isuserblocked, $contactselecturl, $showactionlinks, $user2);
+                $content = message_print_contactlist_user($contact, $isusercontact, $isuserblocked,
+                    $contactselecturl, $showactionlinks, $user2);
+                $contacts .= html_writer::tag('li', $content);
             }
+        }
+        if (strlen($contacts) > 0) {
+            echo html_writer::tag('ul', $contacts, array('id' => 'message-onlinecontacts', 'class' => 'message-contacts'));
         }
     }
 
@@ -446,33 +454,46 @@ function message_print_contacts($onlinecontacts, $offlinecontacts, $strangers, $
         // Print out list of offline contacts.
 
         if (empty($titletodisplay)) {
-            message_print_heading(get_string('offlinecontacts', 'message', $countofflinecontacts));
+            echo html_writer::tag('div',
+                get_string('offlinecontacts', 'message', $countofflinecontacts),
+                array('class' => 'heading'));
         }
 
         $isuserblocked = false;
         $isusercontact = true;
+        $contacts = '';
         foreach ($offlinecontacts as $contact) {
             if ($minmessages == 0 || $contact->messagecount >= $minmessages) {
-                message_print_contactlist_user($contact, $isusercontact, $isuserblocked, $contactselecturl, $showactionlinks, $user2);
+                $content = message_print_contactlist_user($contact, $isusercontact, $isuserblocked,
+                    $contactselecturl, $showactionlinks, $user2);
+                $contacts .= html_writer::tag('li', $content);
             }
+        }
+        if (strlen($contacts) > 0) {
+            echo html_writer::tag('ul', $contacts, array('id' => 'message-offlinecontacts', 'class' => 'message-contacts'));
         }
 
     }
 
     // Print out list of incoming contacts.
     if ($countstrangers) {
-        message_print_heading(get_string('incomingcontacts', 'message', $countstrangers));
+        echo html_writer::tag('div', get_string('incomingcontacts', 'message', $countstrangers), array('class' => 'heading'));
 
         $isuserblocked = false;
         $isusercontact = false;
+        $contacts = '';
         foreach ($strangers as $stranger) {
             if ($minmessages == 0 || $stranger->messagecount >= $minmessages) {
-                message_print_contactlist_user($stranger, $isusercontact, $isuserblocked, $contactselecturl, $showactionlinks, $user2);
+                $content = message_print_contactlist_user($stranger, $isusercontact, $isuserblocked,
+                    $contactselecturl, $showactionlinks, $user2);
+                $contacts .= html_writer::tag('li', $content);
             }
         }
-    }
+        if (strlen($contacts) > 0) {
+            echo html_writer::tag('ul', $contacts, array('id' => 'message-incommingcontacts', 'class' => 'message-contacts'));
+        }
 
-    echo html_writer::end_tag('table');
+    }
 
     if ($countstrangers && ($countonlinecontacts + $countofflinecontacts == 0)) {  // Extra help
         echo html_writer::tag('div','('.get_string('addsomecontactsincoming', 'message').')',array('class' => 'note'));
@@ -711,32 +732,50 @@ function message_get_recent_conversations($user, $limitfrom=0, $limitto=100) {
     // There is a separate query for read and unread messages as they are stored
     // in different tables. They were originally retrieved in one query but it
     // was so large that it was difficult to be confident in its correctness.
-    $sql = "SELECT $userfields,
+    $uniquefield = $DB->sql_concat('message.useridfrom', "'-'", 'message.useridto');
+    $sql = "SELECT $uniquefield, $userfields,
                    message.id as mid, message.notification, message.smallmessage, message.fullmessage,
                    message.fullmessagehtml, message.fullmessageformat, message.timecreated,
                    contact.id as contactlistid, contact.blocked
-
               FROM {message_read} message
-              JOIN {user} otheruser ON otheruser.id = CASE
-                                WHEN message.useridto = :userid1 THEN message.useridfrom
-                                                                 ELSE message.useridto END
-         LEFT JOIN {message_contacts} contact ON contact.userid = :userid2 AND contact.contactid = otheruser.id
-
-             WHERE otheruser.deleted = 0
-               AND (message.useridto = :userid3 OR message.useridfrom = :userid4)
-               AND message.notification = 0
-               AND NOT EXISTS (
-                        SELECT 1
-                          FROM {message_read} othermessage
-                         WHERE ((othermessage.useridto = :userid5 AND othermessage.useridfrom = otheruser.id) OR
-                                (othermessage.useridfrom = :userid6 AND othermessage.useridto = otheruser.id))
-                           AND (othermessage.timecreated > message.timecreated OR (
-                                othermessage.timecreated = message.timecreated AND othermessage.id > message.id))
-                   )
-
+              JOIN (
+                        SELECT MAX(id) AS messageid,
+                               matchedmessage.useridto,
+                               matchedmessage.useridfrom
+                         FROM {message_read} matchedmessage
+                   INNER JOIN (
+                               SELECT MAX(recentmessages.timecreated) timecreated,
+                                      recentmessages.useridfrom,
+                                      recentmessages.useridto
+                                 FROM {message_read} recentmessages
+                                WHERE (
+                                      (recentmessages.useridfrom = :userid1 AND recentmessages.timeuserfromdeleted = 0) OR
+                                      (recentmessages.useridto = :userid2   AND recentmessages.timeusertodeleted = 0)
+                                      )
+                             GROUP BY recentmessages.useridfrom, recentmessages.useridto
+                              ) recent ON matchedmessage.useridto     = recent.useridto
+                           AND matchedmessage.useridfrom   = recent.useridfrom
+                           AND matchedmessage.timecreated  = recent.timecreated
+                           WHERE (
+                                 (matchedmessage.useridfrom = :userid6 AND matchedmessage.timeuserfromdeleted = 0) OR
+                                 (matchedmessage.useridto = :userid7   AND matchedmessage.timeusertodeleted = 0)
+                                 )
+                      GROUP BY matchedmessage.useridto, matchedmessage.useridfrom
+                   ) messagesubset ON messagesubset.messageid = message.id
+              JOIN {user} otheruser ON (message.useridfrom = :userid4 AND message.useridto = otheruser.id)
+                OR (message.useridto   = :userid5 AND message.useridfrom   = otheruser.id)
+         LEFT JOIN {message_contacts} contact ON contact.userid  = :userid3 AND contact.contactid = otheruser.id
+             WHERE otheruser.deleted = 0 AND message.notification = 0
           ORDER BY message.timecreated DESC";
-    $params = array('userid1' => $user->id, 'userid2' => $user->id, 'userid3' => $user->id,
-            'userid4' => $user->id, 'userid5' => $user->id, 'userid6' => $user->id);
+    $params = array(
+            'userid1' => $user->id,
+            'userid2' => $user->id,
+            'userid3' => $user->id,
+            'userid4' => $user->id,
+            'userid5' => $user->id,
+            'userid6' => $user->id,
+            'userid7' => $user->id
+        );
     $read = $DB->get_records_sql($sql, $params, $limitfrom, $limitto);
 
     // We want to get the messages that have not been read. These are stored in the 'message' table. It is the
@@ -745,16 +784,24 @@ function message_get_recent_conversations($user, $limitfrom=0, $limitto=100) {
     $sql = str_replace('{message_read}', '{message}', $sql);
     $unread = $DB->get_records_sql($sql, $params, $limitfrom, $limitto);
 
-    $conversations = array();
-
     // Union the 2 result sets together looking for the message with the most
     // recent timecreated for each other user.
     // $conversation->id (the array key) is the other user's ID.
+    $conversations = array();
     $conversation_arrays = array($unread, $read);
     foreach ($conversation_arrays as $conversation_array) {
         foreach ($conversation_array as $conversation) {
-            if (empty($conversations[$conversation->id]) || $conversations[$conversation->id]->timecreated < $conversation->timecreated ) {
+            if (!isset($conversations[$conversation->id])) {
                 $conversations[$conversation->id] = $conversation;
+            } else {
+                $current = $conversations[$conversation->id];
+                if ($current->timecreated < $conversation->timecreated) {
+                    $conversations[$conversation->id] = $conversation;
+                } else if ($current->timecreated == $conversation->timecreated) {
+                    if ($current->mid < $conversation->mid) {
+                        $conversations[$conversation->id] = $conversation;
+                    }
+                }
             }
         }
     }
@@ -936,19 +983,20 @@ function message_format_message_text($message, $forcetexttohtml = false) {
 
     $options = new stdClass();
     $options->para = false;
+    $options->blanktarget = true;
 
     $format = $message->fullmessageformat;
 
-    if ($message->smallmessage !== '') {
+    if (strval($message->smallmessage) !== '') {
         if ($message->notification == 1) {
-            if ($message->fullmessagehtml !== '' or $message->fullmessage !== '') {
+            if (strval($message->fullmessagehtml) !== '' or strval($message->fullmessage) !== '') {
                 $format = FORMAT_PLAIN;
             }
         }
         $messagetext = $message->smallmessage;
 
     } else if ($message->fullmessageformat == FORMAT_HTML) {
-        if ($message->fullmessagehtml !== '') {
+        if (strval($message->fullmessagehtml) !== '') {
             $messagetext = $message->fullmessagehtml;
         } else {
             $messagetext = $message->fullmessage;
@@ -956,7 +1004,7 @@ function message_format_message_text($message, $forcetexttohtml = false) {
         }
 
     } else {
-        if ($message->fullmessage !== '') {
+        if (strval($message->fullmessage) !== '') {
             $messagetext = $message->fullmessage;
         } else {
             $messagetext = $message->fullmessagehtml;
@@ -991,7 +1039,7 @@ function message_add_contact($contactid, $blocked=0) {
     // Check if a record already exists as we may be changing blocking status.
     if (($contact = $DB->get_record('message_contacts', array('userid' => $USER->id, 'contactid' => $contactid))) !== false) {
         // Check if blocking status has been changed.
-        if ($contact->blocked !== $blocked) {
+        if ($contact->blocked != $blocked) {
             $contact->blocked = $blocked;
             $DB->update_record('message_contacts', $contact);
 
@@ -1096,6 +1144,86 @@ function message_unblock_contact($contactid) {
  */
 function message_block_contact($contactid) {
     return message_add_contact($contactid, 1);
+}
+
+/**
+ * Checks if a user can delete a message.
+ *
+ * @param stdClass $message the message to delete
+ * @param string $userid the user id of who we want to delete the message for (this may be done by the admin
+ *  but will still seem as if it was by the user)
+ * @return bool Returns true if a user can delete the message, false otherwise.
+ */
+function message_can_delete_message($message, $userid) {
+    global $USER;
+
+    if ($message->useridfrom == $userid) {
+        $userdeleting = 'useridfrom';
+    } else if ($message->useridto == $userid) {
+        $userdeleting = 'useridto';
+    } else {
+        return false;
+    }
+
+    $systemcontext = context_system::instance();
+
+    // Let's check if the user is allowed to delete this message.
+    if (has_capability('moodle/site:deleteanymessage', $systemcontext) ||
+        ((has_capability('moodle/site:deleteownmessage', $systemcontext) &&
+            $USER->id == $message->$userdeleting))) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Deletes a message.
+ *
+ * This function does not verify any permissions.
+ *
+ * @param stdClass $message the message to delete
+ * @param string $userid the user id of who we want to delete the message for (this may be done by the admin
+ *  but will still seem as if it was by the user)
+ * @return bool
+ */
+function message_delete_message($message, $userid) {
+    global $DB;
+
+    // The column we want to alter.
+    if ($message->useridfrom == $userid) {
+        $coltimedeleted = 'timeuserfromdeleted';
+    } else if ($message->useridto == $userid) {
+        $coltimedeleted = 'timeusertodeleted';
+    } else {
+        return false;
+    }
+
+    // Don't update it if it's already been deleted.
+    if ($message->$coltimedeleted > 0) {
+        return false;
+    }
+
+    // Get the table we want to update.
+    if (isset($message->timeread)) {
+        $messagetable = 'message_read';
+    } else {
+        $messagetable = 'message';
+    }
+
+    // Mark the message as deleted.
+    $updatemessage = new stdClass();
+    $updatemessage->id = $message->id;
+    $updatemessage->$coltimedeleted = time();
+    $success = $DB->update_record($messagetable, $updatemessage);
+
+    if ($success) {
+        // Trigger event for deleting a message.
+        \core\event\message_deleted::create_from_ids($message->useridfrom, $message->useridto,
+            $userid, $messagetable, $message->id)->trigger();
+    }
+
+    return $success;
 }
 
 /**
@@ -1302,6 +1430,9 @@ function message_print_search_results($frm, $showicontext=false, $currentuser=nu
                 // Load user-to record.
                 if ($message->useridto !== $USER->id) {
                     $userto = core_user::get_user($message->useridto);
+                    if ($userto === false) {
+                        $userto = core_user::get_noreply_user();
+                    }
                     $tocontact = (array_key_exists($message->useridto, $contacts) and
                                     ($contacts[$message->useridto]->blocked == 0) );
                     $toblocked = (array_key_exists($message->useridto, $contacts) and
@@ -1315,6 +1446,9 @@ function message_print_search_results($frm, $showicontext=false, $currentuser=nu
                 // Load user-from record.
                 if ($message->useridfrom !== $USER->id) {
                     $userfrom = core_user::get_user($message->useridfrom);
+                    if ($userfrom === false) {
+                        $userfrom = core_user::get_noreply_user();
+                    }
                     $fromcontact = (array_key_exists($message->useridfrom, $contacts) and
                                     ($contacts[$message->useridfrom]->blocked == 0) );
                     $fromblocked = (array_key_exists($message->useridfrom, $contacts) and
@@ -1401,11 +1535,7 @@ function message_print_user ($user=false, $iscontact=false, $isblocked=false, $i
 
     if ($user === false) {
         echo $OUTPUT->user_picture($USER, $userpictureparams);
-    } else if (core_user::is_real_user($user->id)) { // If not real user, then don't show any links.
-        $userpictureparams['link'] = false;
-        echo $OUTPUT->user_picture($USER, $userpictureparams);
-        echo fullname($user);
-    } else {
+    } else if (core_user::is_real_user($user->id)) {
         echo $OUTPUT->user_picture($user, $userpictureparams);
 
         $link = new moodle_url("/message/index.php?id=$user->id");
@@ -1425,6 +1555,11 @@ function message_print_user ($user=false, $iscontact=false, $isblocked=false, $i
         } else {
             message_contact_link($user->id, 'block', $return, $script, $includeicontext);
         }
+    } else {
+        // If not real user, then don't show any links.
+        $userpictureparams['link'] = false;
+        // Stock profile picture should be displayed.
+        echo $OUTPUT->user_picture($user, $userpictureparams);
     }
 }
 
@@ -1753,6 +1888,18 @@ function message_search($searchterms, $fromme=true, $tome=true, $courseid='none'
     //    b.  Messages to user
     //    c.  Messages to and from user
 
+    if ($fromme && $tome) {
+        $searchcond .= " AND ((useridto = :useridto AND timeusertodeleted = 0) OR
+            (useridfrom = :useridfrom AND timeuserfromdeleted = 0))";
+        $params['useridto'] = $userid;
+        $params['useridfrom'] = $userid;
+    } else if ($fromme) {
+        $searchcond .= " AND (useridfrom = :useridfrom AND timeuserfromdeleted = 0)";
+        $params['useridfrom'] = $userid;
+    } else if ($tome) {
+        $searchcond .= " AND (useridto = :useridto AND timeusertodeleted = 0)";
+        $params['useridto'] = $userid;
+    }
     if ($courseid == SITEID) { // Admin is searching all messages.
         $m_read   = $DB->get_records_sql("SELECT m.id, m.useridto, m.useridfrom, m.smallmessage, m.fullmessage, m.timecreated
                                             FROM {message_read} m
@@ -1939,16 +2086,16 @@ function message_get_history($user1, $user2, $limitnum=0, $viewingnewmessages=fa
     //prevent notifications of your own actions appearing in your own message history
     $ownnotificationwhere = ' AND NOT (useridfrom=? AND notification=1)';
 
-    if ($messages_read = $DB->get_records_select('message_read', "((useridto = ? AND useridfrom = ?) OR
-                                                    (useridto = ? AND useridfrom = ?)) $notificationswhere $ownnotificationwhere",
+    $sql = "((useridto = ? AND useridfrom = ? AND timeusertodeleted = 0) OR
+        (useridto = ? AND useridfrom = ? AND timeuserfromdeleted = 0))";
+    if ($messages_read = $DB->get_records_select('message_read', $sql . $notificationswhere . $ownnotificationwhere,
                                                     array($user1->id, $user2->id, $user2->id, $user1->id, $user1->id),
                                                     "timecreated $sort", '*', 0, $limitnum)) {
         foreach ($messages_read as $message) {
             $messages[] = $message;
         }
     }
-    if ($messages_new =  $DB->get_records_select('message', "((useridto = ? AND useridfrom = ?) OR
-                                                    (useridto = ? AND useridfrom = ?)) $ownnotificationwhere",
+    if ($messages_new = $DB->get_records_select('message', $sql . $ownnotificationwhere,
                                                     array($user1->id, $user2->id, $user2->id, $user1->id, $user1->id),
                                                     "timecreated $sort", '*', 0, $limitnum)) {
         foreach ($messages_new as $message) {
@@ -1978,22 +2125,27 @@ function message_get_history($user1, $user2, $limitnum=0, $viewingnewmessages=fa
  * @param bool $viewingnewmessages are we currently viewing new messages?
  */
 function message_print_message_history($user1, $user2 ,$search = '', $messagelimit = 0, $messagehistorylink = false, $viewingnewmessages = false, $showactionlinks = true) {
-    global $CFG, $OUTPUT;
+    global $OUTPUT, $PAGE;
 
-    echo $OUTPUT->box_start('center');
-    echo html_writer::start_tag('table', array('cellpadding' => '10', 'class' => 'message_user_pictures'));
-    echo html_writer::start_tag('tr');
+    $PAGE->requires->yui_module(
+        array('moodle-core_message-toolbox'),
+        'M.core_message.toolbox.deletemsg.init',
+        array(array())
+    );
 
-    echo html_writer::start_tag('td', array('align' => 'center', 'id' => 'user1'));
+    echo $OUTPUT->box_start('center', 'message_user_pictures');
+    echo $OUTPUT->box_start('user');
+    echo $OUTPUT->box_start('generalbox', 'user1');
     echo $OUTPUT->user_picture($user1, array('size' => 100, 'courseid' => SITEID));
     echo html_writer::tag('div', fullname($user1), array('class' => 'heading'));
-    echo html_writer::end_tag('td');
+    echo $OUTPUT->box_end();
+    echo $OUTPUT->box_end();
 
-    echo html_writer::start_tag('td', array('align' => 'center'));
-    echo html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('i/twoway'), 'alt' => ''));
-    echo html_writer::end_tag('td');
+    $imgattr = array('src' => $OUTPUT->pix_url('i/twoway'), 'alt' => '', 'width' => 16, 'height' => 16);
+    echo $OUTPUT->box(html_writer::empty_tag('img', $imgattr), 'between');
 
-    echo html_writer::start_tag('td', array('align' => 'center', 'id' => 'user2'));
+    echo $OUTPUT->box_start('user');
+    echo $OUTPUT->box_start('generalbox', 'user2');
     // Show user picture with link is real user else without link.
     if (core_user::is_real_user($user2->id)) {
         echo $OUTPUT->user_picture($user2, array('size' => 100, 'courseid' => SITEID));
@@ -2010,14 +2162,12 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
 
         $strcontact = message_get_contact_add_remove_link($user2->iscontact, $user2->isblocked, $user2, $script, $text, $icon);
         $strblock   = message_get_contact_block_link($user2->iscontact, $user2->isblocked, $user2, $script, $text, $icon);
-        $useractionlinks = $strcontact.'&nbsp;|'.$strblock;
+        $useractionlinks = $strcontact.'&nbsp;|&nbsp;'.$strblock;
 
         echo html_writer::tag('div', $useractionlinks, array('class' => 'useractionlinks'));
     }
-
-    echo html_writer::end_tag('td');
-    echo html_writer::end_tag('tr');
-    echo html_writer::end_tag('table');
+    echo $OUTPUT->box_end();
+    echo $OUTPUT->box_end();
     echo $OUTPUT->box_end();
 
     if (!empty($messagehistorylink)) {
@@ -2034,7 +2184,9 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
         $current->year = '';
         $messagedate = get_string('strftimetime');
         $blockdate   = get_string('strftimedaydate');
+        $messagenumber = 0;
         foreach ($messages as $message) {
+            $messagenumber++;
             if ($message->notification) {
                 $notificationclass = ' notification';
             } else {
@@ -2052,7 +2204,6 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
                 $tablecontents .= $OUTPUT->heading(userdate($message->timecreated, $blockdate), 4, 'mdl-align');
             }
 
-            $formatted_message = $side = null;
             if ($message->useridfrom == $user1->id) {
                 $formatted_message = message_format_message($message, $messagedate, $search, 'me');
                 $side = 'left';
@@ -2060,7 +2211,28 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
                 $formatted_message = message_format_message($message, $messagedate, $search, 'other');
                 $side = 'right';
             }
-            $tablecontents .= html_writer::tag('div', $formatted_message, array('class' => "mdl-left $side $notificationclass"));
+
+            // Check if it is a read message or not.
+            if (isset($message->timeread)) {
+                $type = 'message_read';
+            } else {
+                $type = 'message';
+            }
+
+            if (message_can_delete_message($message, $user1->id)) {
+                $usergroup = optional_param('usergroup', MESSAGE_VIEW_UNREAD_MESSAGES, PARAM_ALPHANUMEXT);
+                $viewing = optional_param('viewing', $usergroup, PARAM_ALPHANUMEXT);
+                $deleteurl = new moodle_url('/message/index.php', array('user1' => $user1->id, 'user2' => $user2->id,
+                    'viewing' => $viewing, 'deletemessageid' => $message->id, 'deletemessagetype' => $type,
+                    'sesskey' => sesskey()));
+
+                $deleteicon = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
+                $deleteicon = html_writer::tag('div', $deleteicon, array('class' => 'deleteicon accesshide'));
+                $formatted_message .= $deleteicon;
+            }
+
+            $tablecontents .= html_writer::tag('div', $formatted_message, array('class' => "mdl-left messagecontent
+                $side $notificationclass", 'id' => 'message_' . $messagenumber));
         }
 
         echo html_writer::nonempty_tag('div', $tablecontents, array('class' => 'mdl-left messagehistory'));
@@ -2201,6 +2373,7 @@ function message_print_contactlist_user($contact, $incontactlist = true, $isbloc
     global $OUTPUT, $USER, $COURSE;
     $fullname  = fullname($contact);
     $fullnamelink  = $fullname;
+    $output = '';
 
     $linkclass = '';
     if (!empty($selecteduser) && $contact->id == $selecteduser->id) {
@@ -2223,12 +2396,9 @@ function message_print_contactlist_user($contact, $incontactlist = true, $isbloc
         $strhistory = message_history_link($USER->id, $contact->id, true, '', '', 'icon');
     }
 
-    echo html_writer::start_tag('tr');
-    echo html_writer::start_tag('td', array('class' => 'pix'));
-    echo $OUTPUT->user_picture($contact, array('size' => 20, 'courseid' => $COURSE->id));
-    echo html_writer::end_tag('td');
-
-    echo html_writer::start_tag('td', array('class' => 'contact'));
+    $output .= html_writer::start_tag('div', array('class' => 'pix'));
+    $output .= $OUTPUT->user_picture($contact, array('size' => 20, 'courseid' => $COURSE->id));
+    $output .= html_writer::end_tag('div');
 
     $popupoptions = array(
             'height' => MESSAGE_DISCUSSION_HEIGHT,
@@ -2247,13 +2417,23 @@ function message_print_contactlist_user($contact, $incontactlist = true, $isbloc
         $link = new moodle_url("/message/index.php?id=$contact->id");
         $action = new popup_action('click', $link, "message_$contact->id", $popupoptions);
     }
-    echo $OUTPUT->action_link($link, $fullnamelink, $action, array('class' => $linkclass,'title' => get_string('sendmessageto', 'message', $fullname)));
 
-    echo html_writer::end_tag('td');
 
-    echo html_writer::tag('td', '&nbsp;'.$strcontact.$strblock.'&nbsp;'.$strhistory, array('class' => 'link'));
+    if (strlen($strcontact . $strblock . $strhistory) > 0) {
+        $output .= html_writer::tag('div', $strcontact . $strblock . $strhistory, array('class' => 'link'));
 
-    echo html_writer::end_tag('tr');
+        $output .= html_writer::start_tag('div', array('class' => 'contact'));
+        $linkattr = array('class' => $linkclass, 'title' => get_string('sendmessageto', 'message', $fullname));
+        $output .= $OUTPUT->action_link($link, $fullnamelink, $action, $linkattr);
+        $output .= html_writer::end_tag('div');
+    } else {
+        $output .= html_writer::start_tag('div', array('class' => 'contact nolinks'));
+        $linkattr = array('class' => $linkclass, 'title' => get_string('sendmessageto', 'message', $fullname));
+        $output .= $OUTPUT->action_link($link, $fullnamelink, $action, $linkattr);
+        $output .= html_writer::end_tag('div');
+    }
+
+    return $output;
 }
 
 /**
@@ -2300,9 +2480,9 @@ function message_get_contact_block_link($incontactlist, $isblocked, $contact, $s
         //$strblock = '';
     } else*/
     if ($isblocked) {
-        $strblock   = '&nbsp;'.message_contact_link($contact->id, 'unblock', true, $script, $text, $icon);
+        $strblock   = message_contact_link($contact->id, 'unblock', true, $script, $text, $icon);
     } else{
-        $strblock   = '&nbsp;'.message_contact_link($contact->id, 'block', true, $script, $text, $icon);
+        $strblock   = message_contact_link($contact->id, 'block', true, $script, $text, $icon);
     }
 
     return $strblock;
@@ -2334,7 +2514,7 @@ function message_move_userfrom_unread2read($userid) {
  * @param int $fromuserid the id of the message sender
  * @return void
  */
-function message_mark_messages_read($touserid, $fromuserid){
+function message_mark_messages_read($touserid, $fromuserid) {
     global $DB;
 
     $sql = 'SELECT m.* FROM {message} m WHERE m.useridto=:useridto AND m.useridfrom=:useridfrom';
@@ -2394,32 +2574,24 @@ function message_mark_message_read($message, $timeread, $messageworkingempty=fal
 }
 
 /**
- * A helper function that prints a formatted heading
- *
- * @param string $title the heading to display
- * @param int $colspan
- * @return void
- */
-function message_print_heading($title, $colspan=3) {
-    echo html_writer::start_tag('tr');
-    echo html_writer::tag('td', $title, array('colspan' => $colspan, 'class' => 'heading'));
-    echo html_writer::end_tag('tr');
-}
-
-/**
  * Get all message processors, validate corresponding plugin existance and
  * system configuration
  *
  * @param bool $ready only return ready-to-use processors
  * @param bool $reset Reset list of message processors (used in unit tests)
+ * @param bool $resetonly Just reset, then exit
  * @return mixed $processors array of objects containing information on message processors
  */
-function get_message_processors($ready = false, $reset = false) {
+function get_message_processors($ready = false, $reset = false, $resetonly = false) {
     global $DB, $CFG;
 
     static $processors;
     if ($reset) {
         $processors = array();
+
+        if ($resetonly) {
+            return $processors;
+        }
     }
 
     if (empty($processors)) {
@@ -2590,23 +2762,215 @@ function message_page_type_list($pagetype, $parentcontext, $currentcontext) {
 }
 
 /**
- * Is $USER one of the supplied users?
+ * Get messages sent or/and received by the specified users.
+ * Please note that this function return deleted messages too.
  *
- * $user2 will be null if viewing a user's recent conversations
- *
- * @param stdClass the first user
- * @param stdClass the second user or null
- * @return bool True if the current user is one of either $user1 or $user2
+ * @param  int      $useridto       the user id who received the message
+ * @param  int      $useridfrom     the user id who sent the message. -10 or -20 for no-reply or support user
+ * @param  int      $notifications  1 for retrieving notifications, 0 for messages, -1 for both
+ * @param  bool     $read           true for retrieving read messages, false for unread
+ * @param  string   $sort           the column name to order by including optionally direction
+ * @param  int      $limitfrom      limit from
+ * @param  int      $limitnum       limit num
+ * @return external_description
+ * @since  2.8
  */
-function message_current_user_is_involved($user1, $user2) {
-    global $USER;
+function message_get_messages($useridto, $useridfrom = 0, $notifications = -1, $read = true,
+                                $sort = 'mr.timecreated DESC', $limitfrom = 0, $limitnum = 0) {
+    global $DB;
 
-    if (empty($user1->id) || (!empty($user2) && empty($user2->id))) {
-        throw new coding_exception('Invalid user object detected. Missing id.');
+    $messagetable = $read ? '{message_read}' : '{message}';
+    $params = array('deleted' => 0);
+
+    // Empty useridto means that we are going to retrieve messages send by the useridfrom to any user.
+    if (empty($useridto)) {
+        $userfields = get_all_user_name_fields(true, 'u', '', 'userto');
+        $joinsql = "JOIN {user} u ON u.id = mr.useridto";
+        $usersql = "mr.useridfrom = :useridfrom AND u.deleted = :deleted";
+        $params['useridfrom'] = $useridfrom;
+    } else {
+        $userfields = get_all_user_name_fields(true, 'u', '', 'userfrom');
+        // Left join because useridfrom may be -10 or -20 (no-reply and support users).
+        $joinsql = "LEFT JOIN {user} u ON u.id = mr.useridfrom";
+        $usersql = "mr.useridto = :useridto AND (u.deleted IS NULL OR u.deleted = :deleted)";
+        $params['useridto'] = $useridto;
+        if (!empty($useridfrom)) {
+            $usersql .= " AND mr.useridfrom = :useridfrom";
+            $params['useridfrom'] = $useridfrom;
+        }
     }
 
-    if ($user1->id != $USER->id && (empty($user2) || $user2->id != $USER->id)) {
+    // Now, if retrieve notifications, conversations or both.
+    $typesql = "";
+    if ($notifications !== -1) {
+        $typesql = "AND mr.notification = :notification";
+        $params['notification'] = ($notifications) ? 1 : 0;
+    }
+
+    $sql = "SELECT mr.*, $userfields
+              FROM $messagetable mr
+                   $joinsql
+             WHERE $usersql
+                   $typesql
+             ORDER BY $sort";
+
+    $messages = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+    return $messages;
+}
+
+/**
+ * Requires the JS libraries to send a message using a dialog.
+ *
+ * @return void
+ */
+function message_messenger_requirejs() {
+    global $PAGE;
+
+    static $done = false;
+    if ($done) {
+        return;
+    }
+
+    $PAGE->requires->yui_module(
+        array('moodle-core_message-messenger'),
+        'Y.M.core_message.messenger.init',
+        array(array())
+    );
+    $PAGE->requires->strings_for_js(array(
+        'errorwhilesendingmessage',
+        'messagesent',
+        'messagetosend',
+        'sendingmessage',
+        'sendmessage',
+        'viewconversation',
+    ), 'core_message');
+    $PAGE->requires->strings_for_js(array(
+        'userisblockingyou',
+        'userisblockingyounoncontact'
+    ), 'message');
+    $PAGE->requires->string_for_js('error', 'core');
+
+    $done = true;
+}
+
+/**
+ * Returns the attributes to place on a link to open the 'Send message' dialog.
+ *
+ * @param object $user User object.
+ * @return void
+ */
+function message_messenger_sendmessage_link_params($user) {
+    $params = array(
+        'data-trigger' => 'core_message-messenger::sendmessage',
+        'data-fullname' => fullname($user),
+        'data-userid' => $user->id,
+        'role' => 'button'
+    );
+
+    if (message_is_user_non_contact_blocked($user)) {
+        $params['data-blocked-string'] = 'userisblockingyounoncontact';
+    } else if (message_is_user_blocked($user)) {
+        $params['data-blocked-string'] = 'userisblockingyou';
+    }
+
+    return $params;
+}
+
+/**
+ * Determines if a user is permitted to send another user a private message.
+ * If no sender is provided then it defaults to the logged in user.
+ *
+ * @param object $recipient User object.
+ * @param object $sender User object.
+ * @return bool true if user is permitted, false otherwise.
+ */
+function message_can_post_message($recipient, $sender = null) {
+    global $USER, $DB;
+
+    if (is_null($sender)) {
+        // The message is from the logged in user, unless otherwise specified.
+        $sender = $USER;
+    }
+
+    if (!has_capability('moodle/site:sendmessage', context_system::instance(), $sender)) {
         return false;
     }
+
+    // The recipient blocks messages from non-contacts and the
+    // sender isn't a contact.
+    if (message_is_user_non_contact_blocked($recipient, $sender)) {
+        return false;
+    }
+
+    // The recipient has specifically blocked this sender.
+    if (message_is_user_blocked($recipient, $sender)) {
+        return false;
+    }
+
     return true;
+}
+
+/**
+ * Checks if the recipient is allowing messages from users that aren't a
+ * contact. If not then it checks to make sure the sender is in the
+ * recipient's contacts.
+ *
+ * @param object $recipient User object.
+ * @param object $sender User object.
+ * @return bool true if $sender is blocked, false otherwise.
+ */
+function message_is_user_non_contact_blocked($recipient, $sender = null) {
+    global $USER, $DB;
+
+    if (is_null($sender)) {
+        // The message is from the logged in user, unless otherwise specified.
+        $sender = $USER;
+    }
+
+    $blockednoncontacts = get_user_preferences('message_blocknoncontacts', '', $recipient->id);
+    if (!empty($blockednoncontacts)) {
+        // Confirm the sender is a contact of the recipient.
+        $exists = $DB->record_exists('message_contacts', array('userid' => $recipient->id, 'contactid' => $sender->id));
+        if ($exists) {
+            // All good, the recipient is a contact of the sender.
+            return false;
+        } else {
+            // Oh no, the recipient is not a contact. Looks like we can't send the message.
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Checks if the recipient has specifically blocked the sending user.
+ *
+ * Note: This function will always return false if the sender has the
+ * readallmessages capability at the system context level.
+ *
+ * @param object $recipient User object.
+ * @param object $sender User object.
+ * @return bool true if $sender is blocked, false otherwise.
+ */
+function message_is_user_blocked($recipient, $sender = null) {
+    global $USER, $DB;
+
+    if (is_null($sender)) {
+        // The message is from the logged in user, unless otherwise specified.
+        $sender = $USER;
+    }
+
+    $systemcontext = context_system::instance();
+    if (has_capability('moodle/site:readallmessages', $systemcontext, $sender)) {
+        return false;
+    }
+
+    if ($contact = $DB->get_record('message_contacts', array('userid' => $recipient->id, 'contactid' => $sender->id))) {
+        if ($contact->blocked) {
+            return true;
+        }
+    }
+
+    return false;
 }

@@ -100,8 +100,8 @@ $courses[$SITE->id] = get_string('no_course', 'block_ucla_help');
 $maxlength = 40;
 foreach ($user_courses as $crs) {
     $course_name = $crs->shortname . ' ' . $crs->fullname;
-    $courses[$crs->id] = textlib::strlen($course_name) < $maxlength ? 
-            $course_name : textlib::substr($course_name, 0, $maxlength);
+    $courses[$crs->id] = core_text::strlen($course_name) < $maxlength ?
+            $course_name : core_text::substr($course_name, 0, $maxlength);
 }
 $user_courses[] = $SITE;    // Include the site default.
 

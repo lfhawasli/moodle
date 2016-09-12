@@ -69,9 +69,13 @@ class core_course_renderer extends plugin_renderer_base {
      */
     protected function add_modchoosertoggle() {
         global $CFG;
-        static $modchoosertoggleadded = false;
-        // Add the module chooser toggle to the course page
-        if ($modchoosertoggleadded || $this->page->state > moodle_page::STATE_PRINTING_HEADER ||
+
+        // Only needs to be done once per page.
+        if (!$this->page->requires->should_create_one_time_item_now('core_course_modchoosertoggle')) {
+            return;
+        }
+
+        if ($this->page->state > moodle_page::STATE_PRINTING_HEADER ||
                 $this->page->course->id == SITEID ||
                 !$this->page->user_is_editing() ||
                 !($context = context_course::instance($this->page->course->id)) ||
@@ -79,11 +83,11 @@ class core_course_renderer extends plugin_renderer_base {
                 !course_ajax_enabled($this->page->course) ||
                 !($coursenode = $this->page->settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) ||
                 !($turneditingnode = $coursenode->get('turneditingonoff'))) {
-            // too late or we are on site page or we could not find the adjacent nodes in course settings menu
-            // or we are not allowed to edit
+            // Too late, or we are on site page, or we could not find the
+            // adjacent nodes in course settings menu, or we are not allowed to edit.
             return;
         }
-        $modchoosertoggleadded = true;
+
         if ($this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
             // We are on the course page, retain the current page params e.g. section.
             $modchoosertoggleurl = clone($this->page->url);
@@ -168,11 +172,9 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string The composed HTML for the module
      */
     public function course_modchooser($modules, $course) {
-        static $isdisplayed = false;
-        if ($isdisplayed) {
+        if (!$this->page->requires->should_create_one_time_item_now('core_course_modchooser')) {
             return '';
         }
-        $isdisplayed = true;
 
         // Add the module chooser
         $this->page->requires->yui_module('moodle-course-modchooser',
@@ -250,14 +252,7 @@ class core_course_renderer extends plugin_renderer_base {
     protected function course_modchooser_module_types($modules) {
         $return = '';
         foreach ($modules as $module) {
-            if (!isset($module->types)) {
-                $return .= $this->course_modchooser_module($module);
-            } else {
-                $return .= $this->course_modchooser_module($module, array('nonoption'));
-                foreach ($module->types as $type) {
-                    $return .= $this->course_modchooser_module($type, array('option', 'subtype'));
-                }
-            }
+            $return .= $this->course_modchooser_module($module);
         }
         return $return;
     }
@@ -441,39 +436,15 @@ class core_course_renderer extends plugin_renderer_base {
         $activities = array(MOD_CLASS_ACTIVITY => array(), MOD_CLASS_RESOURCE => array());
 
         foreach ($modules as $module) {
-            if (isset($module->types)) {
-                // This module has a subtype
-                // NOTE: this is legacy stuff, module subtypes are very strongly discouraged!!
-                $subtypes = array();
-                foreach ($module->types as $subtype) {
-                    $link = $subtype->link->out(true, $urlparams);
-                    $subtypes[$link] = $subtype->title;
-                }
-
-                // Sort module subtypes into the list
-                $activityclass = MOD_CLASS_ACTIVITY;
-                if ($module->archetype == MOD_CLASS_RESOURCE) {
-                    $activityclass = MOD_CLASS_RESOURCE;
-                }
-                if (!empty($module->title)) {
-                    // This grouping has a name
-                    $activities[$activityclass][] = array($module->title => $subtypes);
-                } else {
-                    // This grouping does not have a name
-                    $activities[$activityclass] = array_merge($activities[$activityclass], $subtypes);
-                }
-            } else {
-                // This module has no subtypes
-                $activityclass = MOD_CLASS_ACTIVITY;
-                if ($module->archetype == MOD_ARCHETYPE_RESOURCE) {
-                    $activityclass = MOD_CLASS_RESOURCE;
-                } else if ($module->archetype === MOD_ARCHETYPE_SYSTEM) {
-                    // System modules cannot be added by user, do not add to dropdown
-                    continue;
-                }
-                $link = $module->link->out(true, $urlparams);
-                $activities[$activityclass][$link] = $module->title;
+            $activityclass = MOD_CLASS_ACTIVITY;
+            if ($module->archetype == MOD_ARCHETYPE_RESOURCE) {
+                $activityclass = MOD_CLASS_RESOURCE;
+            } else if ($module->archetype === MOD_ARCHETYPE_SYSTEM) {
+                // System modules cannot be added by user, do not add to dropdown.
+                continue;
             }
+            $link = $module->link->out(true, $urlparams);
+            $activities[$activityclass][$link] = $module->title;
         }
 
         $straddactivity = get_string('addactivity');
@@ -731,10 +702,34 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_section_cm_name(cm_info $mod, $displayoptions = array()) {
-        global $CFG;
+        if ((!$mod->uservisible && empty($mod->availableinfo)) || !$mod->url) {
+            // Nothing to be displayed to the user.
+            return '';
+        }
+
+        // Render element that allows to edit activity name inline. It calls {@link course_section_cm_name_title()}
+        // to get the display title of the activity.
+        $tmpl = new \core_course\output\course_module_name($mod, $this->page->user_is_editing(), $displayoptions);
+        return $this->output->render_from_template('core/inplace_editable', $tmpl->export_for_template($this->output));
+    }
+
+    /**
+     * Renders html to display a name with the link to the course module on a course page
+     *
+     * If module is unavailable for user but still needs to be displayed
+     * in the list, just the name is returned without a link
+     *
+     * Note, that for course modules that never have separate pages (i.e. labels)
+     * this function return an empty string
+     *
+     * @param cm_info $mod
+     * @param array $displayoptions
+     * @return string
+     */
+    public function course_section_cm_name_title(cm_info $mod, $displayoptions = array()) {
         $output = '';
         if (!$mod->uservisible && empty($mod->availableinfo)) {
-            // nothing to be displayed to the user
+            // Nothing to be displayed to the user.
             return $output;
         }
         $url = $mod->url;
@@ -788,12 +783,7 @@ class core_course_renderer extends plugin_renderer_base {
         // has already been encoded for display (puke).
         $onclick = htmlspecialchars_decode($mod->onclick, ENT_QUOTES);
 
-        $groupinglabel = '';
-        if (!empty($mod->groupingid) && has_capability('moodle/course:managegroups', context_course::instance($mod->course))) {
-            $groupings = groups_get_all_groupings($mod->course);
-            $groupinglabel = html_writer::tag('span', '('.format_string($groupings[$mod->groupingid]->name).')',
-                    array('class' => 'groupinglabel '.$textclasses));
-        }
+        $groupinglabel = $mod->get_grouping_label($textclasses);
 
         // Display link itself.
         $activitylink = html_writer::empty_tag('img', array('src' => $mod->get_icon_url(),
@@ -849,12 +839,7 @@ class core_course_renderer extends plugin_renderer_base {
                         trim('contentafterlink ' . $textclasses)));
             }
         } else {
-            $groupinglabel = '';
-            if (!empty($mod->groupingid) && has_capability('moodle/course:managegroups', context_course::instance($mod->course))) {
-                $groupings = groups_get_all_groupings($mod->course);
-                $groupinglabel = html_writer::tag('span', '('.format_string($groupings[$mod->groupingid]->name).')',
-                        array('class' => 'groupinglabel '.$textclasses));
-            }
+            $groupinglabel = $mod->get_grouping_label($textclasses);
 
             // No link, so display only content.
             $output = html_writer::tag('div', $accesstext . $content . $groupinglabel,
@@ -992,10 +977,6 @@ class core_course_renderer extends plugin_renderer_base {
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
             $output .= $cmname;
 
-
-            if ($this->page->user_is_editing()) {
-                $output .= ' ' . course_get_cm_rename_action($mod, $sectionreturn);
-            }
 
             // Module can put text after the link (e.g. forum unread)
             $output .= $mod->afterlink;
@@ -1440,7 +1421,7 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $totalcount = $coursecat->get_children_count();
         if (!$totalcount) {
-            // Note that we call get_child_categories_count() AFTER get_child_categories() to avoid extra DB requests.
+            // Note that we call coursecat::get_children_count() AFTER coursecat::get_children() to avoid extra DB requests.
             // Categories count is cached during children categories retrieval.
             return '';
         }
@@ -1500,14 +1481,13 @@ class core_course_renderer extends plugin_renderer_base {
      * Make sure that javascript file for AJAX expanding of courses and categories content is included
      */
     protected function coursecat_include_js() {
-        global $CFG;
-        static $jsloaded = false;
-        if (!$jsloaded) {
-            // We must only load this module once.
-            $this->page->requires->yui_module('moodle-course-categoryexpander',
-                    'Y.Moodle.course.categoryexpander.init');
-            $jsloaded = true;
+        if (!$this->page->requires->should_create_one_time_item_now('core_course_categoryexpanderjsinit')) {
+            return;
         }
+
+        // We must only load this module once.
+        $this->page->requires->yui_module('moodle-course-categoryexpander',
+                'Y.Moodle.course.categoryexpander.init');
     }
 
     /**
@@ -1682,9 +1662,10 @@ class core_course_renderer extends plugin_renderer_base {
         $site = get_site();
         $output = '';
 
-        if (can_edit_in_category($category)) {
+        if (can_edit_in_category($coursecat->id)) {
             // Add 'Manage' button if user has permissions to edit this category.
-            $managebutton = $this->single_button(new moodle_url('/course/management.php'), get_string('managecourses'), 'get');
+            $managebutton = $this->single_button(new moodle_url('/course/management.php',
+                array('categoryid' => $coursecat->id)), get_string('managecourses'), 'get');
             $this->page->set_button($managebutton);
         }
         if (!$coursecat->id) {
@@ -1906,29 +1887,52 @@ class core_course_renderer extends plugin_renderer_base {
      * Renders html to print list of courses tagged with particular tag
      *
      * @param int $tagid id of the tag
+     * @param bool $exclusivemode if set to true it means that no other entities tagged with this tag
+     *             are displayed on the page and the per-page limit may be bigger
+     * @param int $fromctx context id where the link was displayed, may be used by callbacks
+     *            to display items in the same context first
+     * @param int $ctx context id where to search for records
+     * @param bool $rec search in subcontexts as well
+     * @param array $displayoptions
      * @return string empty string if no courses are marked with this tag or rendered list of courses
      */
-    public function tagged_courses($tagid) {
+    public function tagged_courses($tagid, $exclusivemode = true, $ctx = 0, $rec = true, $displayoptions = null) {
         global $CFG;
-        require_once($CFG->libdir. '/coursecatlib.php');
-        $displayoptions = array('limit' => $CFG->coursesperpage);
-        $displayoptions['viewmoreurl'] = new moodle_url('/course/search.php',
-                array('tagid' => $tagid, 'page' => 1, 'perpage' => $CFG->coursesperpage));
-        $displayoptions['viewmoretext'] = new lang_string('findmorecourses');
+        require_once($CFG->libdir . '/coursecatlib.php');
+        if (empty($displayoptions)) {
+            $displayoptions = array();
+        }
+        $showcategories = coursecat::count_all() > 1;
+        $displayoptions += array('limit' => $CFG->coursesperpage, 'offset' => 0);
         $chelper = new coursecat_helper();
-        $searchcriteria = array('tagid' => $tagid);
-        $chelper->set_show_courses(self::COURSECAT_SHOW_COURSES_EXPANDED_WITH_CAT)->
-                set_search_criteria(array('tagid' => $tagid))->
+        $searchcriteria = array('tagid' => $tagid, 'ctx' => $ctx, 'rec' => $rec);
+        $chelper->set_show_courses($showcategories ? self::COURSECAT_SHOW_COURSES_EXPANDED_WITH_CAT :
+                    self::COURSECAT_SHOW_COURSES_EXPANDED)->
+                set_search_criteria($searchcriteria)->
                 set_courses_display_options($displayoptions)->
                 set_attributes(array('class' => 'course-search-result course-search-result-tagid'));
                 // (we set the same css class as in search results by tagid)
-        $courses = coursecat::search_courses($searchcriteria, $chelper->get_courses_display_options());
-        $totalcount = coursecat::search_courses_count($searchcriteria);
-        $content = $this->coursecat_courses($chelper, $courses, $totalcount);
-        if ($totalcount) {
-            require_once $CFG->dirroot.'/tag/lib.php';
-            $heading = get_string('courses') . ' ' . get_string('taggedwith', 'tag', tag_get_name($tagid)) .': '. $totalcount;
-            return $this->heading($heading, 3). $content;
+        if ($totalcount = coursecat::search_courses_count($searchcriteria)) {
+            $courses = coursecat::search_courses($searchcriteria, $chelper->get_courses_display_options());
+            if ($exclusivemode) {
+                return $this->coursecat_courses($chelper, $courses, $totalcount);
+            } else {
+                $tagfeed = new core_tag\output\tagfeed();
+                $img = $this->output->pix_icon('i/course', '');
+                foreach ($courses as $course) {
+                    $url = course_get_url($course);
+                    $imgwithlink = html_writer::link($url, $img);
+                    $coursename = html_writer::link($url, $course->get_formatted_name());
+                    $details = '';
+                    if ($showcategories && ($cat = coursecat::get($course->category, IGNORE_MISSING))) {
+                        $details = get_string('category').': '.
+                                html_writer::link(new moodle_url('/course/index.php', array('categoryid' => $cat->id)),
+                                        $cat->get_formatted_name(), array('class' => $cat->visible ? '' : 'dimmed'));
+                    }
+                    $tagfeed->add($imgwithlink, $coursename, $details);
+                }
+                return $this->output->render_from_template('core_tag/tagfeed', $tagfeed->export_for_template($this->output));
+            }
         }
         return '';
     }

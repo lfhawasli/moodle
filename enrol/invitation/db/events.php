@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Event registration .
+ * Event registration.
  *
  * @package    enrol_invitation
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$handlers = array(
-    // Add site invitation plugin when courses are created. Note that only
-    // managers can manage/configure enrollment plugin, so we need to add it
-    // automatically for instructors. Instructors can hide or delete plugin.
-    'course_created' => array(
-        'handlerfile'     => '/enrol/invitation/eventslib.php',
-        'handlerfunction' => 'add_site_invitation_plugin',
-        'schedule'        => 'instant'
+defined('MOODLE_INTERNAL') || die();
+
+// Add site invitation plugin when courses are created. Note that only managers
+// can manage/configure enrollment plugin, so we need to add it automatically
+// for instructors. Instructors can hide or delete plugin.
+$observers = array(
+    array(
+        'eventname' => '\core\event\course_created',
+        'callback'  => 'enrol_invitation_observer::add_site_invitation_plugin'
     ),
-    'course_restored' => array (
-         'handlerfile'      => '/enrol/invitation/eventslib.php',
-         'handlerfunction'  => 'add_site_invitation_plugin',
-         'schedule'         => 'instant'
-     ),
+    array(
+        'eventname' => '\core\event\course_restored',
+        'callback'  => 'enrol_invitation_observer::add_site_invitation_plugin'
+    ),
 );

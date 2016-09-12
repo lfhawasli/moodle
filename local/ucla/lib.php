@@ -484,7 +484,7 @@ function is_summer_term($term) {
  * @return string                       Name in proper format.
  */
 function ucla_format_name($name=null, $handleconjunctions=false) {
-    $name = ucfirst(textlib::strtolower(trim($name)));
+    $name = ucfirst(core_text::strtolower(trim($name)));
 
     if (empty($name)) {
         return '';
@@ -521,7 +521,7 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
         $replacementcount = 0;
         foreach ($multipartnames as $multipartname) {
             $name = preg_replace("/^$multipartname /",
-                    textlib::strtolower($multipartname) . ' ', $name, 1,
+                    core_text::strtolower($multipartname) . ' ', $name, 1,
                     $replacementcount);
             if ($replacementcount > 0) {
                 // Should only have 1 type of multipart name, exit early.
@@ -562,14 +562,14 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
     }
 
     // Starts with MC (and is more than 2 characters)?
-    if (textlib::strlen($name)>2 && (0 == strncasecmp($name, 'mc', 2))) {
-        $name[2] = textlib::strtoupper($name[2]);    // Make 3rd character uppercase.
+    if (core_text::strlen($name)>2 && (0 == strncasecmp($name, 'mc', 2))) {
+        $name[2] = core_text::strtoupper($name[2]);    // Make 3rd character uppercase.
     }
 
     // If name has conjunctions, e.g. "and", "of", "the", "as", "a".
     if ($handleconjunctions &&
-            in_array(textlib::strtolower($name), array('and', 'of', 'the', 'as', 'a'))) {
-        $name = textlib::strtolower($name);
+            in_array(core_text::strtolower($name), array('and', 'of', 'the', 'as', 'a'))) {
+        $name = core_text::strtolower($name);
     }
 
     // If name has initials. Should be capital if exactly 1 letter is followed
@@ -577,8 +577,8 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
     $namearray = explode(".", $name);
     if (count($namearray) > 1) {
         foreach ($namearray as $key => $element) {
-            if (textlib::strlen($element) == 1) {
-                $namearray[$key] = textlib::strtoupper($element);
+            if (core_text::strlen($element) == 1) {
+                $namearray[$key] = core_text::strtoupper($element);
             }
         }
         $name = implode(".", $namearray);  // Combine elements back.
@@ -1625,7 +1625,7 @@ function format_displayname($displayname) {
     $retval = array('firstname' => '', 'lastname' => '');
 
     // Make sure the name is all capitalized.
-    $displayname = textlib::strtoupper($displayname);
+    $displayname = core_text::strtoupper($displayname);
 
     // Expecting name in following format: LAST, FIRST MIDDLE, SUFFIX.
     $names = explode(',',  $displayname);

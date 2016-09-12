@@ -78,7 +78,7 @@ class assessable_submitted extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has submitted the submission with id '$this->objectid' " .
-            "for the assignment with the course module id '$this->contextinstanceid'.";
+            "for the assignment with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -149,5 +149,14 @@ class assessable_submitted extends base {
         if (!isset($this->other['submission_editable'])) {
             throw new \coding_exception('The \'submission_editable\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign_submission', 'restore' => 'submission');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

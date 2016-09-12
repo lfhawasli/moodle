@@ -46,6 +46,12 @@ $callbackcomponent = optional_param('callbackcomponent', null, PARAM_PATH); // C
 $callbackclass = optional_param('callbackclass', null, PARAM_ALPHAEXT); // Callback class eg forum_portfolio_caller - the class to handle the exporting content.
 $callerformats = optional_param('callerformats', null, PARAM_TAGLIST); // Comma separated list of formats the specific place exporting content supports.
 
+// START UCLA-MOD: CCLE-4882 forum customization
+$forumid = optional_param('forumid', 0, PARAM_INT);        // Forum id.
+$print = optional_param('print', false, PARAM_INT);        // Print to screen (print) = 1 Print to file (Export) = 2
+$sortparam = optional_param('sort', 'd.timemodified DESC', PARAM_TEXT);            // Sorting for discussion output
+// END UCLA-MOD: CCLE-4882 forum customization
+
 require_login();  // this is selectively called again with $course later when we know for sure which one we're in.
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/portfolio/add.php', array('id' => $dataid, 'sesskey' => sesskey()));

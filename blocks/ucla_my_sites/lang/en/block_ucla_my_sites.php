@@ -24,3 +24,5 @@ $string['changeemail'] = 'You have set an alternative email ({$a}). To change it
 
 $string['dismiss'] = 'Dismiss';
 $string['dismissed'] = 'You have successfully dismissed the notification.';
+
+$string['notenrolled'] = 'You are currently not assigned to any courses or collaboration sites on this system.';

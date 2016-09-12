@@ -36,12 +36,16 @@ Feature: Filter content visibility by groups
         And I log in as "teacher1"
         And I follow "Course 1"
         And I turn editing mode on
-        And I add a "<Activity>" to section "1" and I fill the form with:
-          | <Name field>                    | Test <Activity> name |
-          | <Description field>             | Test description     |
-          | Grouping                        | Grouping             |
-          | Available for group members only| 1                    |
-        Then I should see "(Grouping 1)"
+        And I add a "<Activity>" to section "1" 
+        And I set the following fields to these values:
+          | <Name field> | Test <Activity> name |
+          | <Description field> | Test description |
+        And I press "Add restriction..."
+        And I press "Grouping"
+        And I set the following fields to these values:
+          | id        | Grouping 1           |
+        And I press "Save and return to course"
+        Then I should see "Grouping 1"
         And I log out
         And I log in as "student1"
         And I follow "Course 1"
@@ -49,7 +53,7 @@ Feature: Filter content visibility by groups
         And I log out
         And I log in as "student2"
         And I follow "Course 1"
-        Then I should not see "Test <Activity> name"
+        Then I should see "Grouping 1"
         Examples:
           | Activity            | Name field               | Description field |
           | Chat                | Name of this chat room   | Description       |

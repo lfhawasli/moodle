@@ -57,7 +57,7 @@ class interactions_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the interactions for the user with id '$this->relateduserid' " .
-            "for the scorm activity with the course module id '$this->contextinstanceid'.";
+            "for the scorm activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -114,5 +114,12 @@ class interactions_viewed extends \core\event\base {
         if (empty($this->other['instanceid'])) {
             throw new \coding_exception('The \'instanceid\' must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['instanceid'] = array('db' => 'scorm', 'restore' => 'scorm');
+
+        return $othermapped;
     }
 }

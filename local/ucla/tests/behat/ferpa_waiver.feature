@@ -57,8 +57,8 @@ Scenario: Do not require non-students to sign waiver for LTI.
 Scenario: Do not provide waiver for UCLA LTI resources.
     Given I turn editing mode on
     And I add a "External tool" to section "0" and I fill the form with:
-        | Activity name | LTI                         |
-        | Launch URL    | https://d3.sscnet.ucla.edu/ |
+        | Activity name        | LTI                         |
+        | Launch/cartridge URL | https://d3.sscnet.ucla.edu/ |
     And I log out
     When I log in as "student1"
     And I follow "Course 1"
@@ -71,10 +71,10 @@ Scenario: Do not provide waiver for UCLA LTI resources.
 Scenario: Do not provide waiver for site configured LTI resources.
     Given I log out
     And I log in as "admin"
-    And I navigate to "LTI" node in "Site administration > Plugins > Activity modules"
-    And I follow "Add external tool configuration"
+    And I navigate to "Manage tools" node in "Site administration > Plugins > Activity modules > External tool"
+    And I follow "configure a tool manually"
     And I set the field "Tool name" to "Site configured LTI"
-    And I set the field "Tool base URL" to "http://lti.tools/test/tp.php"
+    And I set the field "Tool base URL/cartridge URL" to "http://lti.tools/test/tp.php"
     And I set the field "Consumer key" to "jisc.ac.uk"
     And I set the field "Shared secret" to "secret"
     And I press "Save changes"
@@ -83,8 +83,8 @@ Scenario: Do not provide waiver for site configured LTI resources.
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "External tool" to section "0" and I fill the form with:
-        | Activity name | Site LTI                     |
-        | Launch URL    | http://lti.tools/test/tp.php |
+        | Activity name        | Site LTI                     |
+        | Launch/cartridge URL | http://lti.tools/test/tp.php |
     And I log out
     When I log in as "student1"
     And I follow "Course 1"

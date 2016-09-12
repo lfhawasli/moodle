@@ -58,7 +58,7 @@ class subscribers_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has viewed the subscribers list for the forum with the course " .
+        return "The user with id '$this->userid' has viewed the subscribers list for the forum with course " .
             "module id '$this->contextinstanceid'.";
     }
 
@@ -108,5 +108,11 @@ class subscribers_viewed extends \core\event\base {
         }
     }
 
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['forumid'] = array('db' => 'forum', 'restore' => 'forum');
+
+        return $othermapped;
+    }
 }
 

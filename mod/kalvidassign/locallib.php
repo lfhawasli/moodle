@@ -56,7 +56,7 @@ function kalvidassign_assignemnt_submission_expired($kalvidassign) {
 
 /**
  * Retrieve a list of users who have submitted assignments
- * 
+ *
  * @param int $kalvidassignid The assignment id.
  * @param string $filter Filter results by assignments that have been submitted or
  * assignment that need to be graded or no filter at all.

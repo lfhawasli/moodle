@@ -24,5 +24,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2015061700;
-$plugin->requires  = 2011092100;
+$plugin->requires = 2013111800; // Moodle 2.6.
 $plugin->component = 'tool_ucladatasourcesync';

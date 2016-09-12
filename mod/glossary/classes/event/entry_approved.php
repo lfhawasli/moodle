@@ -59,7 +59,7 @@ class entry_approved extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has approved the glossary entry with id '$this->objectid' for " .
-            "the glossary activity with the course module id '$this->contextinstanceid'.";
+            "the glossary activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -97,6 +97,10 @@ class entry_approved extends \core\event\base {
         if (!$this->contextlevel === CONTEXT_MODULE) {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'glossary_entries', 'restore' => 'glossary_entry');
     }
 }
 

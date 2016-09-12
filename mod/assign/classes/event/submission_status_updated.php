@@ -73,7 +73,7 @@ class submission_status_updated extends base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has updated the status of the submission with id '$this->objectid' for " .
-            "the assignment with the course module id '$this->contextinstanceid' to the status '{$this->other['newstatus']}'.";
+            "the assignment with course module id '$this->contextinstanceid' to the status '{$this->other['newstatus']}'.";
     }
 
     /**
@@ -120,5 +120,14 @@ class submission_status_updated extends base {
         if (!isset($this->other['newstatus'])) {
             throw new \coding_exception('The \'newstatus\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign_submission', 'restore' => 'submission');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

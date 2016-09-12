@@ -411,7 +411,7 @@ class assign_events_testcase extends mod_assign_base_testcase {
         $assign->testable_apply_grade_to_user($data, $this->students[0]->id, 0);
 
         $events = $sink->get_events();
-        $this->assertCount(2, $events);
+        $this->assertCount(4, $events);
         $event = reset($events);
         $this->assertInstanceOf('\mod_assign\event\workflow_state_updated', $event);
         $this->assertEquals($assign->get_context(), $event->get_context());
@@ -436,13 +436,14 @@ class assign_events_testcase extends mod_assign_base_testcase {
 
         $data = array(
             'grademodified_' . $this->students[0]->id => time(),
+            'gradeattempt_' . $this->students[0]->id => '',
             'quickgrade_' . $this->students[0]->id => '60.0',
             'quickgrade_' . $this->students[0]->id . '_workflowstate' => 'inmarking'
         );
         $assign->testable_process_save_quick_grades($data);
 
         $events = $sink->get_events();
-        $this->assertCount(2, $events);
+        $this->assertCount(4, $events);
         $event = reset($events);
         $this->assertInstanceOf('\mod_assign\event\workflow_state_updated', $event);
         $this->assertEquals($assign->get_context(), $event->get_context());
@@ -545,8 +546,8 @@ class assign_events_testcase extends mod_assign_base_testcase {
         $grade = $assign->get_user_grade($this->students[0]->id, false, 0);
 
         $events = $sink->get_events();
-        $this->assertCount(1, $events);
-        $event = reset($events);
+        $this->assertCount(3, $events);
+        $event = $events[2];
         $this->assertInstanceOf('\mod_assign\event\submission_graded', $event);
         $this->assertEquals($assign->get_context(), $event->get_context());
         $this->assertEquals($grade->id, $event->objectid);
@@ -565,8 +566,10 @@ class assign_events_testcase extends mod_assign_base_testcase {
         // Test process_save_quick_grades.
         $sink = $this->redirectEvents();
 
+        $grade = $assign->get_user_grade($this->students[0]->id, false);
         $data = array(
             'grademodified_' . $this->students[0]->id => time(),
+            'gradeattempt_' . $this->students[0]->id => $grade->attemptnumber,
             'quickgrade_' . $this->students[0]->id => '60.0'
         );
         $assign->testable_process_save_quick_grades($data);
@@ -574,8 +577,8 @@ class assign_events_testcase extends mod_assign_base_testcase {
         $this->assertEquals('60.0', $grade->grade);
 
         $events = $sink->get_events();
-        $this->assertCount(1, $events);
-        $event = reset($events);
+        $this->assertCount(3, $events);
+        $event = $events[2];
         $this->assertInstanceOf('\mod_assign\event\submission_graded', $event);
         $this->assertEquals($assign->get_context(), $event->get_context());
         $this->assertEquals($grade->id, $event->objectid);
@@ -600,8 +603,8 @@ class assign_events_testcase extends mod_assign_base_testcase {
         $this->assertEquals('50.0', $grade->grade);
         $events = $sink->get_events();
 
-        $this->assertCount(1, $events);
-        $event = reset($events);
+        $this->assertCount(3, $events);
+        $event = $events[2];
         $this->assertInstanceOf('\mod_assign\event\submission_graded', $event);
         $this->assertEquals($assign->get_context(), $event->get_context());
         $this->assertEquals($grade->id, $event->objectid);
@@ -675,7 +678,7 @@ class assign_events_testcase extends mod_assign_base_testcase {
 
         // Insert a grade for this submission.
         $grade = new stdClass();
-        $grade->assignment = 1;
+        $grade->assignment = $assign->get_instance()->id;
         $grade->userid = $this->students[0]->id;
         $gradeid = $DB->insert_record('assign_grades', $grade);
 

@@ -52,7 +52,7 @@ if (isset($graderreportsilast)) {
 }
 
 $PAGE->set_url(new moodle_url('/grade/report/grader/index.php', array('id'=>$courseid)));
-$PAGE->requires->yui_module('moodle-gradereport_grader-scrollview', 'M.gradereport_grader.scrollview.init');
+$PAGE->requires->yui_module('moodle-gradereport_grader-gradereporttable', 'Y.M.gradereport_grader.init', null, null, true);
 
 // basic access checks
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -115,15 +115,15 @@ if (!is_null($toggle) && !empty($toggle_type)) {
     set_user_preferences(array('grade_report_show'.$toggle_type => $toggle));
 }
 
-//first make sure we have proper final grades - this must be done before constructing of the grade tree
-grade_regrade_final_grades($courseid);
-
 // Perform actions
 if (!empty($target) && !empty($action) && confirm_sesskey()) {
     grade_report_grader::do_process_action($target, $action, $courseid);
 }
 
 $reportname = get_string('pluginname', 'gradereport_grader');
+
+// Do this check just before printing the grade header (and only do it once).
+grade_regrade_final_grades_if_required($course);
 
 // Print header
 print_grade_page_head($COURSE->id, 'report', 'grader', $reportname, false, $buttons);
@@ -199,7 +199,9 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
     echo '<div>';
 
     // START UCLA MOD: CCLE-4295 - Add Group Filter for Grader Report.
-    echo '<input type="hidden" value="'.$groupingid.'" name="grouping"/>';
+    if (isset($groupingid)) {
+        echo '<input type="hidden" value="'.$groupingid.'" name="grouping"/>';
+    }
     // END UCLA MOD: CCLE-4295
 
     echo '<input type="hidden" value="'.s($courseid).'" name="id" />';
@@ -208,7 +210,7 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
     echo '<input type="hidden" value="grader" name="report"/>';
     echo '<input type="hidden" value="'.$page.'" name="page"/>';
     echo $reporthtml;
-    echo '<div class="submit"><input type="submit" id="gradersubmit" value="'.s(get_string('update')).'" /></div>';
+    echo '<div class="submit"><input type="submit" id="gradersubmit" value="'.s(get_string('savechanges')).'" /></div>';
     echo '</div></form>';
 } else {
     echo $reporthtml;
@@ -219,34 +221,23 @@ if (!empty($studentsperpage) && $studentsperpage >= 20) {
     echo $OUTPUT->paging_bar($numusers, $report->page, $studentsperpage, $report->pbarurl);
 }
 
-// START UCLA MOD: CCLE-4168
-if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
-    // Adding sticky table headers and sidebar help support
-    require_once($CFG->dirroot . '/blocks/ucla_help/locallib.php');
-    $PAGE->requires->yui_module('moodle-local_ucla-gradebooktable', 'M.local_ucla.gradebook.init', array());
+$event = \gradereport_grader\event\grade_report_viewed::create(
+    array(
+        'context' => $context,
+        'courseid' => $courseid,
+    )
+);
+$event->trigger();
 
+// START UCLA MOD: CCLE-4168 - General gradebook improvements.
+if (local_ucla_core_edit::using_ucla_theme()) {
     // Render a help sidebar.
     echo ucla_sidebar::help(array(
         new sidebar_file('/blocks/ucla_help/topics/gradebook/color_legend.php'),
         new sidebar_docs('Gradebook'),
         new sidebar_feedback()
     ));
-
-    // Render a loading screen.
-    echo html_writer::div(
-            html_writer::div(
-                '<i></i><i></i><i></i><i></i>', 'gradebook-loading'
-            ), 'gradebook-loading-screen', array('aria-hidden' => 'true')
-        );
 }
 // END UCLA MOD: CCLE-4168
 
 echo $OUTPUT->footer();
-
-// START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$event = \local_gradebook\event\grader_grades_viewed::create(array(
-    'context' => $context,
-    'other' => array('option' => 'grader')
-));
-$event->trigger();
-// END UCLA MOD: CCLE-3980

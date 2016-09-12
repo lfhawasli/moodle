@@ -220,7 +220,7 @@ if (!$turningtechdevice || $disableflag) {
     echo get_string('responsecardheadertext', 'turningtech');
     ?>
            </p>
-              <div class="responsecard-group">
+              <div class="responsecard-group" id="responsecardgroupid">
                   <table>
                       <tr>
                           <td>
@@ -268,7 +268,7 @@ if (!$turningtechresponseware) {
     echo get_string('responsewareheadertext', 'turningtech');
     ?>
            </p>
-              <div class="responseware-group">
+              <div class="responseware-group" id="responsewaregroupid">
     <?php
     if ($CFG->turningtech_device_selection != TURNINGTECH_CUSTOM_RESPONSEWARE) {
         $rwform->display();

@@ -57,7 +57,7 @@ class attempt_abandoned extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->relateduserid' has had their attempt with id '$this->objectid' marked as abandoned " .
-            "for the quiz with the course module id '$this->contextinstanceid'.";
+            "for the quiz with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -125,5 +125,17 @@ class attempt_abandoned extends \core\event\base {
         if (!array_key_exists('submitterid', $this->other)) {
             throw new \coding_exception('The \'submitterid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'quiz_attempts', 'restore' => 'quiz_attempt');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['submitterid'] = array('db' => 'user', 'restore' => 'user');
+        $othermapped['quizid'] = array('db' => 'quiz', 'restore' => 'quiz');
+
+        return $othermapped;
     }
 }

@@ -27,6 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/publicprivate/lib.php');
 
+/*
+ * Unit test file.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_publicprivate_assigned_and_unassigned_testcase extends advanced_testcase {
 
     /**
@@ -75,14 +81,14 @@ class local_publicprivate_assigned_and_unassigned_testcase extends advanced_test
         $ppcourse = PublicPrivate_Course::build($this->course->id);
         // Test whether user belongs to group PublicPrivate.
         $this->assertTrue(groups_is_member($ppcourse->get_group(), $this->user->id));
-        $context = context_course::instance($ppcourse->get_course());
+        $context = context_course::instance($ppcourse->get_course()->id);
         $param = array('roleid' => $this->roles['student'],
                      'userid' => $this->user->id, 'contextid' => $context->id);
         // Unassign role 'student' from user.
         role_unassign_all($param);
         $this->assertFalse(groups_is_member($ppcourse->get_group(), $this->user->id));
         // Assign role ' editinginstructor' to user.
-        $context = context_course::instance($ppcourse->get_course());
+        $context = context_course::instance($ppcourse->get_course()->id);
         role_assign($this->roles['editinginstructor'], $this->user->id, $context->id);
         $this->assertTrue(groups_is_member($ppcourse->get_group(), $this->user->id));
     }
@@ -90,7 +96,7 @@ class local_publicprivate_assigned_and_unassigned_testcase extends advanced_test
     public function test_mult_roles_assigned_and_unassigned() {
         $ppcourse = PublicPrivate_Course::build($this->course->id);
         $this->assertTrue(groups_is_member($ppcourse->get_group(), $this->user->id));
-        $context = context_course::instance($ppcourse->get_course());
+        $context = context_course::instance($ppcourse->get_course()->id);
         // Assign another role ' editinginstructor' to user.
         role_assign($this->roles['editinginstructor'], $this->user->id, $context->id);
         $this->assertTrue(groups_is_member($ppcourse->get_group(), $this->user->id));

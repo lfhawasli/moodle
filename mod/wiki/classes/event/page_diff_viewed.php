@@ -68,7 +68,7 @@ class page_diff_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the diff for the page with id '$this->objectid' for the wiki with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -109,5 +109,14 @@ class page_diff_viewed extends \core\event\base {
         if (!isset($this->other['compare'])) {
             throw new \coding_exception('The \'compare\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'wiki_pages', 'restore' => 'wiki_page');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

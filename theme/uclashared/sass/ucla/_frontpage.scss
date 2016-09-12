@@ -7,7 +7,7 @@ $frontpage-logo-bar-width:  175px;
     
     // Embed the image on the #page wrapper element
     #page {
-        background: url([[pix:theme|frontpage-image]]) no-repeat;
+        background: url(../../../../theme/uclashared/frontpageimage.php) no-repeat;
         background-position: 0 20%;
         /*background-size: 100% auto;*/
         height: 100%;
@@ -24,7 +24,7 @@ $frontpage-logo-bar-width:  175px;
             background-size: 100% auto;
         }
     }
-    
+ 
     header {
         .logo-ucla {
             width: 44px;
@@ -42,7 +42,33 @@ $frontpage-logo-bar-width:  175px;
     header {
         z-index: 999;
         margin-bottom: 0;
-
+        
+        .water-mark {
+            -moz-transition: all,.15s,ease-in-out;
+            -o-transition: all,.15s,ease-in-out;
+            transition: all .15s ease-in-out;
+            bottom: 0;
+            float: right;
+            height: 80px;
+            line-height: 50px;
+            padding: 30px 0 0;
+            position: absolute;
+            right: 20px;
+            text-align: right;
+            z-index: 100;
+            
+            p {
+                text-decoration: none;
+                font-weight: 300;
+                font-size: 1.4rem;
+                color: rgba(255,255,255,.65);
+ 
+                &:hover {
+                    text-decoration: none;
+                    color: #eee;
+                }
+            } 
+        }
         .header-main {
             background: none;
             position: relative;
@@ -134,6 +160,9 @@ $frontpage-logo-bar-width:  175px;
     // Reflow for tiny screens
     @include respond-xs {
         header {
+            .water-mark {
+                display: none;
+            }
             .header-main {
                 display: block;
             }

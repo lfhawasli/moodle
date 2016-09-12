@@ -24,6 +24,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Include lib file.
+require_once($CFG->dirroot . '/theme/uclashared/lib.php');
+
+// Include frontpage.js.
+$PAGE->requires->jquery();
+$PAGE->requires->js("/theme/uclashared/javascript/frontpage.js", true);
+
 // Process and simplify all the options.
 $hasfooter = (empty($PAGE->layout_options['nofooter']));
 $hassidepre = (empty($PAGE->layout_options['noblocks']) && $PAGE->blocks->region_has_content('side-pre', $OUTPUT));
@@ -57,6 +64,14 @@ echo $OUTPUT->doctype() ?>
 <div id="page" class="env-<?php echo $envflag ?>">
 
     <header id="page-header" class="">
+        <div class="water-mark">
+            <?php
+            // Retrieving current background image displayed from session cache.
+            $filename = theme_uclashared_frontpageimage();
+            $image = explode(".", basename($filename));
+            ?>
+            <p> <?php echo $image[0]; ?> </p>
+        </div>
         <div class="header-main">
             <div class="header-logo" >
                 <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>

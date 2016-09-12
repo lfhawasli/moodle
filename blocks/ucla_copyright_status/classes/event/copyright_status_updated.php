@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains the event class for when a course module is converted into a
- * syllabus.
+ * Contains the event class for when a course module has updated the
+ * copyright status for file(s).
  *
  * @package    block_ucla_copyright_status
- * @copyright  2014 UC Regents
+ * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -40,7 +40,7 @@ class copyright_status_updated extends \core\event\base {
      * Creates the event.
      */
     protected function init() {
-        $this->data['crud'] = 'u'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'u'; // Note: c(reate), r(ead), u(pdate), d(elete).
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 

@@ -98,12 +98,7 @@ class restore_course_task extends restore_task {
         }
 
         // Populate groups, this must be done after enrolments because only enrolled users may be in groups.
-        // BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
-        //$this->add_step(new restore_groups_members_structure_step('create_groups_members', '../groups.xml'));
-        if ($this->plan->get_mode() != backup::MODE_IMPORT) {
-            $this->add_step(new restore_groups_members_structure_step('create_groups_members', '../groups.xml'));
-        }
-        // END UCLA MOD: SSC-2572
+        $this->add_step(new restore_groups_members_structure_step('create_groups_members', '../groups.xml'));
 
         // Restore course role assignments and overrides (internally will observe the role_assignments setting),
         // this must be done after all users are enrolled.
@@ -123,6 +118,9 @@ class restore_course_task extends restore_task {
         if ($this->get_setting_value('calendarevents')) {
             $this->add_step(new restore_calendarevents_structure_step('course_calendar', 'calendar.xml'));
         }
+
+        // Course competencies.
+        $this->add_step(new restore_course_competencies_structure_step('course_competencies', 'competencies.xml'));
 
         // At the end, mark it as built
         $this->built = true;
@@ -221,14 +219,5 @@ class restore_course_task extends restore_task {
         $hidesectionsetting->set_value(false);
         $this->add_setting($hidesectionsetting);
         // END UCLA MOD: CCLE-3797
-        
-        // BEGIN UCLA MOD: SSC-2572 - Prevent import of groups and groupings
-        // But allow groups and groupings to be restored
-        $groups = new restore_generic_setting('groups', base_setting::IS_BOOLEAN, false);
-        $groups->set_ui(
-                new backup_setting_ui_checkbox($groups, get_string('groups', 'backup')));
-        $groups->get_ui()->set_label(get_string('groups', 'backup'));
-        $this->add_setting($groups);
-        // END UCLA MOD: SSC-2572
     }
 }

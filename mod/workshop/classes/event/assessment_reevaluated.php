@@ -60,7 +60,7 @@ class assessment_reevaluated extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has had their assessment attempt reevaluated for the workshop with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -89,5 +89,14 @@ class assessment_reevaluated extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/workshop/view.php', array('id' => $this->contextinstanceid));
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'workshop_aggregations', 'restore' => 'workshop_aggregation');
+    }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
     }
 }

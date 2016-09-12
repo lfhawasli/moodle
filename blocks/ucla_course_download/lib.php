@@ -63,3 +63,50 @@ function block_ucla_course_download_pluginfile($course, $cm, $context, $filearea
 
     $coursecontentclass->download_zip();
 }
+
+/**
+ * Alert students that course content archives are available for download.
+ * 
+ * @param object $course to get course information and $courseinfo default to null.
+ * @return boolean              Returns early if we don't want to show alert
+ *                              to user.
+ */
+
+function block_ucla_course_download_ucla_format_notices($course) {
+    global $CFG, $USER;
+    require_once($CFG->dirroot . '/blocks/ucla_course_download/alert_form.php');
+    require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
+
+    // Make sure this is a course site.
+    if (is_collab_site($course)) {
+        return true;
+    }
+
+    // Check if this is a student that can download the archive.
+    $coursecontext = context_course::instance($course->id);
+    $isinstructor = has_capability('moodle/course:manageactivities', $coursecontext);
+    $canrequest = has_capability('block/ucla_course_download:requestzip', $coursecontext);
+
+    // Don't show alert if user is an course admin, cannot get download archives,...
+    // ...or it isn't time to show alert for students.
+    if ($isinstructor || !$canrequest || !student_zip_requestable($course)) {
+        return true;
+    }
+
+    // Check if the user chose to dismiss the alert before.
+    $noprompt = get_user_preferences('ucla_course_download_noprompt_' .
+                $course->id, null, $USER->id);
+
+    if(!is_null($noprompt) && (intval($noprompt) === 0)) {
+        return true;
+    }
+
+    // Render the alert.
+    $alertform = new course_download_alert_form(new moodle_url('/blocks/ucla_course_download/alert.php',
+                array('id' => $course->id)), null, 'post', '',
+                array('class' => 'ucla-format-notice-box'));
+
+    $alertform->display();
+
+    return true;
+}

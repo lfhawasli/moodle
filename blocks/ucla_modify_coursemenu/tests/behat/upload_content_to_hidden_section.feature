@@ -71,9 +71,9 @@ Feature: Uploading content to sections
     And I press "Save changes"
     Then I should see "Successfully added file to section." in the "region-main" "region"
     When I press "Return to section"
+    And I turn editing mode on
     And "visible_file" activity should be visible
     And I follow "Show all"
-    And I turn editing mode on
     And I show section "11"
     And I log out
 

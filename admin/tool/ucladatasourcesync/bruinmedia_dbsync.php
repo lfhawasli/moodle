@@ -63,6 +63,9 @@ function update_bruinmedia_db($source_url) {
     echo get_string('bmstartnoti', 'tool_ucladatasourcesync') . "\n";
 
     $csv_data = get_csv_data($source_url);
+    if (empty($csv_data)) {
+        return false;
+    }
     $fields = define_data_source();
 
     // We know for the bruinmedia DATA that the first two rows are a

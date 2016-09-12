@@ -187,7 +187,7 @@ if ($xml = qanda_read_imported_file($result)) {
                 } else {
                     $dupentry = $DB->record_exists_select('qanda_entries', 'qandaid = :qandaid AND LOWER(question) = :question', array(
                         'qandaid' => $qanda->id,
-                        'question' => textlib::strtolower($newentry->question)));
+                        'question' => core_text::strtolower($newentry->question)));
                 }
                 if ($dupentry) {
                     $permissiongranted = 0;

@@ -23,5 +23,5 @@
  */
 
 $plugin->version  = 2014081900;
-$plugin->requires = 2010090501;
+$plugin->requires = 2013111800; // Moodle 2.6.
 $plugin->component = 'tool_uclarolesmigration';

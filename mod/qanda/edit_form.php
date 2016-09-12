@@ -170,11 +170,11 @@ class mod_qanda_entry_form extends moodleform {
             if (!$qanda->allowduplicatedentries) {
                 if ($DB->record_exists_select('qanda_entries', 'qandaid = :qandaid AND LOWER(question) = :question AND id != :id', array(
                             'qandaid' => $qanda->id,
-                            'question' => textlib::strtolower($temp_question),
+                            'question' => core_text::strtolower($temp_question),
                             'id' => $id))) {
                     $result = $DB->get_record_select('qanda_entries', 'qandaid = :qandaid AND LOWER(question) = :question AND id != :id', array(
                         'qandaid' => $qanda->id,
-                        'question' => textlib::strtolower($temp_question),
+                        'question' => core_text::strtolower($temp_question),
                         'id' => $id), 'id,approved');
                     if ($result->approved == '1') {
                         $link = "view.php?id=$cm->id&mode=entry&hook=" . urlencode($result->id);
@@ -189,10 +189,10 @@ class mod_qanda_entry_form extends moodleform {
             if (!$qanda->allowduplicatedentries) {
                 if ($DB->record_exists_select('qanda_entries', 'qandaid = :qandaid AND LOWER(question) = :question', array(
                             'qandaid' => $qanda->id,
-                            'question' => textlib::strtolower($temp_question)))) {
+                            'question' => core_text::strtolower($temp_question)))) {
                     $result = $DB->get_record_select('qanda_entries', 'qandaid = :qandaid AND LOWER(question) = :question AND id != :id', array(
                         'qandaid' => $qanda->id,
-                        'question' => textlib::strtolower($temp_question),
+                        'question' => core_text::strtolower($temp_question),
                         'id' => $id), 'id,approved');
                     if ($result->approved == '1') {
                         $link = "view.php?id=$cm->id&mode=entry&hook=" . urlencode($result->id);

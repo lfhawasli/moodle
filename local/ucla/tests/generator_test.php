@@ -388,8 +388,8 @@ class local_ucla_generator_testcase extends advanced_testcase {
         // array for us to check with $createdroles.
         foreach (glob($CFG->dirroot. '/local/ucla/tests/fixtures/roles/*.xml') as $file) {
             $xml = file_get_contents($file);
-            if ($this->assertTrue(core_role_preset::is_valid_preset($xml))) {
-                $info = core_role_preset::parse_preset($xml);
+            if ($this->assertTrue(tool_uclarolesmigration_cleanxml::is_valid_preset($xml))) {
+                $info = tool_uclarolesmigration_cleanxml::parse_preset($xml);
                 $shortnames[] = $info['shortname'];
             }
         }

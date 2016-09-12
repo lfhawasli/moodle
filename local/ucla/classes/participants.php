@@ -197,7 +197,7 @@ class local_ucla_participants extends course_enrolment_manager {
             $extrafields = get_extra_user_fields($this->get_context());
             $extrafields[] = 'lastaccess';
             $ufields = user_picture::fields('u', $extrafields);
-            $filtersql .= " AND u.firstname LIKE '$firstinitial%' AND .u.lastname LIKE '$lastinitial%'";
+            $filtersql .= " AND IFNULL(u.alternatename, u.firstname) LIKE '$firstinitial%' AND .u.lastname LIKE '$lastinitial%'";
             $sql = "SELECT DISTINCT $ufields, ul.timeaccess AS lastseen
                       FROM {user} u
                       JOIN {user_enrolments} ue ON (ue.userid = u.id  AND ue.enrolid $instancessql)

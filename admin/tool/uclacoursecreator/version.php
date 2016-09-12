@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2015081800;
+$plugin->version = 2016072500;
+$plugin->component = 'tool_uclacoursecreator';
 
 // EoF

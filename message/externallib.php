@@ -25,6 +25,7 @@
  */
 
 require_once("$CFG->libdir/externallib.php");
+require_once($CFG->dirroot . "/message/lib.php");
 
 /**
  * Message external functions
@@ -69,7 +70,6 @@ class core_message_external extends external_api {
      */
     public static function send_instant_messages($messages = array()) {
         global $CFG, $USER, $DB;
-        require_once($CFG->dirroot . "/message/lib.php");
 
         // Check if messaging is enabled.
         if (!$CFG->messaging) {
@@ -137,7 +137,8 @@ class core_message_external extends external_api {
             if ($success && empty($contactlist[$message['touserid']]) && !empty($blocknoncontacts)) {
                 // The user isn't a contact and they have selected to block non contacts so this message won't be sent.
                 $success = false;
-                $errormessage = get_string('userisblockingyounoncontact', 'message');
+                $errormessage = get_string('userisblockingyounoncontact', 'message',
+                        fullname(core_user::get_user($message['touserid'])));
             }
 
             //now we can send the message (at least try)
@@ -425,7 +426,7 @@ class core_message_external extends external_api {
      * @since Moodle 2.5
      */
     public static function get_contacts() {
-        global $CFG;
+        global $CFG, $PAGE;
 
         // Check if messaging is enabled.
         if (!$CFG->messaging) {
@@ -444,12 +445,11 @@ class core_message_external extends external_api {
                     'unread' => $contact->messagecount
                 );
 
-                // Try to get the user picture, but sometimes this method can return null.
-                $userdetails = user_get_user_details($contact, null, array('profileimageurl', 'profileimageurlsmall'));
-                if (!empty($userdetails)) {
-                    $newcontact['profileimageurl'] = $userdetails['profileimageurl'];
-                    $newcontact['profileimageurlsmall'] = $userdetails['profileimageurlsmall'];
-                }
+                $userpicture = new user_picture($contact);
+                $userpicture->size = 1; // Size f1.
+                $newcontact['profileimageurl'] = $userpicture->get_url($PAGE)->out(false);
+                $userpicture->size = 0; // Size f2.
+                $newcontact['profileimageurlsmall'] = $userpicture->get_url($PAGE)->out(false);
 
                 $allcontacts[$mode][$key] = $newcontact;
             }
@@ -531,7 +531,7 @@ class core_message_external extends external_api {
      * @since Moodle 2.5
      */
     public static function search_contacts($searchtext, $onlymycourses = false) {
-        global $CFG, $USER;
+        global $CFG, $USER, $PAGE;
         require_once($CFG->dirroot . '/user/lib.php');
 
         // Check if messaging is enabled.
@@ -577,12 +577,11 @@ class core_message_external extends external_api {
             $user->phone1 = null;
             $user->phone2 = null;
 
-            // Try to get the user picture, but sometimes this method can return null.
-            $userdetails = user_get_user_details($user, null, array('profileimageurl', 'profileimageurlsmall'));
-            if (!empty($userdetails)) {
-                $newuser['profileimageurl'] = $userdetails['profileimageurl'];
-                $newuser['profileimageurlsmall'] = $userdetails['profileimageurlsmall'];
-            }
+            $userpicture = new user_picture($user);
+            $userpicture->size = 1; // Size f1.
+            $newuser['profileimageurl'] = $userpicture->get_url($PAGE)->out(false);
+            $userpicture->size = 0; // Size f2.
+            $newuser['profileimageurlsmall'] = $userpicture->get_url($PAGE)->out(false);
 
             $user = $newuser;
         }
@@ -609,55 +608,494 @@ class core_message_external extends external_api {
             'List of contacts'
         );
     }
-}
 
-/**
- * Deprecated message external functions
- *
- * @package    core_message
- * @copyright  2011 Jerome Mouneyrac
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 2.1
- * @deprecated Moodle 2.2 MDL-29106 - Please do not use this class any more.
- * @see core_notes_external
- */
-class moodle_message_external extends external_api {
+    /**
+     * Get messages parameters description.
+     *
+     * @return external_function_parameters
+     * @since 2.8
+     */
+    public static function get_messages_parameters() {
+        return new external_function_parameters(
+            array(
+                'useridto' => new external_value(PARAM_INT, 'the user id who received the message, 0 for any user', VALUE_REQUIRED),
+                'useridfrom' => new external_value(
+                    PARAM_INT, 'the user id who send the message, 0 for any user. -10 or -20 for no-reply or support user',
+                    VALUE_DEFAULT, 0),
+                'type' => new external_value(
+                    PARAM_ALPHA, 'type of message to return, expected values are: notifications, conversations and both',
+                    VALUE_DEFAULT, 'both'),
+                'read' => new external_value(PARAM_BOOL, 'true for getting read messages, false for unread', VALUE_DEFAULT, true),
+                'newestfirst' => new external_value(
+                    PARAM_BOOL, 'true for ordering by newest first, false for oldest first',
+                    VALUE_DEFAULT, true),
+                'limitfrom' => new external_value(PARAM_INT, 'limit from', VALUE_DEFAULT, 0),
+                'limitnum' => new external_value(PARAM_INT, 'limit number', VALUE_DEFAULT, 0)
+            )
+        );
+    }
+
+    /**
+     * Get messages function implementation.
+     *
+     * @since  2.8
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @param  int      $useridto       the user id who received the message
+     * @param  int      $useridfrom     the user id who send the message. -10 or -20 for no-reply or support user
+     * @param  string   $type           type of message to return, expected values: notifications, conversations and both
+     * @param  bool     $read           true for retreiving read messages, false for unread
+     * @param  bool     $newestfirst    true for ordering by newest first, false for oldest first
+     * @param  int      $limitfrom      limit from
+     * @param  int      $limitnum       limit num
+     * @return external_description
+     */
+    public static function get_messages($useridto, $useridfrom = 0, $type = 'both', $read = true,
+                                        $newestfirst = true, $limitfrom = 0, $limitnum = 0) {
+        global $CFG, $USER;
+
+        $warnings = array();
+
+        $params = array(
+            'useridto' => $useridto,
+            'useridfrom' => $useridfrom,
+            'type' => $type,
+            'read' => $read,
+            'newestfirst' => $newestfirst,
+            'limitfrom' => $limitfrom,
+            'limitnum' => $limitnum
+        );
+
+        $params = self::validate_parameters(self::get_messages_parameters(), $params);
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $useridto = $params['useridto'];
+        $useridfrom = $params['useridfrom'];
+        $type = $params['type'];
+        $read = $params['read'];
+        $newestfirst = $params['newestfirst'];
+        $limitfrom = $params['limitfrom'];
+        $limitnum = $params['limitnum'];
+
+        $allowedvalues = array('notifications', 'conversations', 'both');
+        if (!in_array($type, $allowedvalues)) {
+            throw new invalid_parameter_exception('Invalid value for type parameter (value: ' . $type . '),' .
+                'allowed values are: ' . implode(',', $allowedvalues));
+        }
+
+        // Check if private messaging between users is allowed.
+        if (empty($CFG->messaging)) {
+            // If we are retreiving only conversations, and messaging is disabled, throw an exception.
+            if ($type == "conversations") {
+                throw new moodle_exception('disabled', 'message');
+            }
+            if ($type == "both") {
+                $warning = array();
+                $warning['item'] = 'message';
+                $warning['itemid'] = $USER->id;
+                $warning['warningcode'] = '1';
+                $warning['message'] = 'Private messages (conversations) are not enabled in this site.
+                    Only notifications will be returned';
+                $warnings[] = $warning;
+            }
+        }
+
+        if (!empty($useridto)) {
+            if (core_user::is_real_user($useridto)) {
+                $userto = core_user::get_user($useridto, '*', MUST_EXIST);
+            } else {
+                throw new moodle_exception('invaliduser');
+            }
+        }
+
+        if (!empty($useridfrom)) {
+            // We use get_user here because the from user can be the noreply or support user.
+            $userfrom = core_user::get_user($useridfrom, '*', MUST_EXIST);
+        }
+
+        // Check if the current user is the sender/receiver or just a privileged user.
+        if ($useridto != $USER->id and $useridfrom != $USER->id and
+             !has_capability('moodle/site:readallmessages', $context)) {
+            throw new moodle_exception('accessdenied', 'admin');
+        }
+
+        // Which type of messages to retrieve.
+        $notifications = -1;
+        if ($type != 'both') {
+            $notifications = ($type == 'notifications') ? 1 : 0;
+        }
+
+        $orderdirection = $newestfirst ? 'DESC' : 'ASC';
+        $sort = "mr.timecreated $orderdirection";
+
+        if ($messages = message_get_messages($useridto, $useridfrom, $notifications, $read, $sort, $limitfrom, $limitnum)) {
+            $canviewfullname = has_capability('moodle/site:viewfullnames', $context);
+
+            // In some cases, we don't need to get the to/from user objects from the sql query.
+            $userfromfullname = '';
+            $usertofullname = '';
+
+            // In this case, the useridto field is not empty, so we can get the user destinatary fullname from there.
+            if (!empty($useridto)) {
+                $usertofullname = fullname($userto, $canviewfullname);
+                // The user from may or may not be filled.
+                if (!empty($useridfrom)) {
+                    $userfromfullname = fullname($userfrom, $canviewfullname);
+                }
+            } else {
+                // If the useridto field is empty, the useridfrom must be filled.
+                $userfromfullname = fullname($userfrom, $canviewfullname);
+            }
+            foreach ($messages as $mid => $message) {
+
+                // Do not return deleted messages.
+                if (($useridto == $USER->id and $message->timeusertodeleted) or
+                        ($useridfrom == $USER->id and $message->timeuserfromdeleted)) {
+
+                    unset($messages[$mid]);
+                    continue;
+                }
+
+                // We need to get the user from the query.
+                if (empty($userfromfullname)) {
+                    // Check for non-reply and support users.
+                    if (core_user::is_real_user($message->useridfrom)) {
+                        $user = new stdClass();
+                        $user = username_load_fields_from_object($user, $message, 'userfrom');
+                        $message->userfromfullname = fullname($user, $canviewfullname);
+                    } else {
+                        $user = core_user::get_user($message->useridfrom);
+                        $message->userfromfullname = fullname($user, $canviewfullname);
+                    }
+                } else {
+                    $message->userfromfullname = $userfromfullname;
+                }
+
+                // We need to get the user from the query.
+                if (empty($usertofullname)) {
+                    $user = new stdClass();
+                    $user = username_load_fields_from_object($user, $message, 'userto');
+                    $message->usertofullname = fullname($user, $canviewfullname);
+                } else {
+                    $message->usertofullname = $usertofullname;
+                }
+
+                // This field is only available in the message_read table.
+                if (!isset($message->timeread)) {
+                    $message->timeread = 0;
+                }
+
+                $message->text = message_format_message_text($message);
+                $messages[$mid] = (array) $message;
+            }
+        }
+
+        $results = array(
+            'messages' => $messages,
+            'warnings' => $warnings
+        );
+
+        return $results;
+    }
+
+    /**
+     * Get messages return description.
+     *
+     * @return external_single_structure
+     * @since 2.8
+     */
+    public static function get_messages_returns() {
+        return new external_single_structure(
+            array(
+                'messages' => new external_multiple_structure(
+                    new external_single_structure(
+                        array(
+                            'id' => new external_value(PARAM_INT, 'Message id'),
+                            'useridfrom' => new external_value(PARAM_INT, 'User from id'),
+                            'useridto' => new external_value(PARAM_INT, 'User to id'),
+                            'subject' => new external_value(PARAM_TEXT, 'The message subject'),
+                            'text' => new external_value(PARAM_RAW, 'The message text formated'),
+                            'fullmessage' => new external_value(PARAM_RAW, 'The message'),
+                            'fullmessageformat' => new external_format_value('fullmessage'),
+                            'fullmessagehtml' => new external_value(PARAM_RAW, 'The message in html'),
+                            'smallmessage' => new external_value(PARAM_RAW, 'The shorten message'),
+                            'notification' => new external_value(PARAM_INT, 'Is a notification?'),
+                            'contexturl' => new external_value(PARAM_RAW, 'Context URL'),
+                            'contexturlname' => new external_value(PARAM_TEXT, 'Context URL link name'),
+                            'timecreated' => new external_value(PARAM_INT, 'Time created'),
+                            'timeread' => new external_value(PARAM_INT, 'Time read'),
+                            'usertofullname' => new external_value(PARAM_TEXT, 'User to full name'),
+                            'userfromfullname' => new external_value(PARAM_TEXT, 'User from full name')
+                        ), 'message'
+                    )
+                ),
+                'warnings' => new external_warnings()
+            )
+        );
+    }
+
+    /**
+     * Get blocked users parameters description.
+     *
+     * @return external_function_parameters
+     * @since 2.9
+     */
+    public static function get_blocked_users_parameters() {
+        return new external_function_parameters(
+            array(
+                'userid' => new external_value(PARAM_INT,
+                                'the user whose blocked users we want to retrieve',
+                                VALUE_REQUIRED),
+            )
+        );
+    }
+
+    /**
+     * Retrieve a list of users blocked
+     *
+     * @param  int $userid the user whose blocked users we want to retrieve
+     * @return external_description
+     * @since 2.9
+     */
+    public static function get_blocked_users($userid) {
+        global $CFG, $USER, $PAGE;
+
+        // Warnings array, it can be empty at the end but is mandatory.
+        $warnings = array();
+
+        // Validate params.
+        $params = array(
+            'userid' => $userid
+        );
+        $params = self::validate_parameters(self::get_blocked_users_parameters(), $params);
+        $userid = $params['userid'];
+
+        // Validate context.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // Check if private messaging between users is allowed.
+        if (empty($CFG->messaging)) {
+            throw new moodle_exception('disabled', 'message');
+        }
+
+        $user = core_user::get_user($userid, '*', MUST_EXIST);
+        core_user::require_active_user($user);
+
+        // Check if we have permissions for retrieve the information.
+        if ($userid != $USER->id and !has_capability('moodle/site:readallmessages', $context)) {
+            throw new moodle_exception('accessdenied', 'admin');
+        }
+
+        // Now, we can get safely all the blocked users.
+        $users = message_get_blocked_users($user);
+
+        $blockedusers = array();
+        foreach ($users as $user) {
+            $newuser = array(
+                'id' => $user->id,
+                'fullname' => fullname($user),
+            );
+
+            $userpicture = new user_picture($user);
+            $userpicture->size = 1; // Size f1.
+            $newuser['profileimageurl'] = $userpicture->get_url($PAGE)->out(false);
+
+            $blockedusers[] = $newuser;
+        }
+
+        $results = array(
+            'users' => $blockedusers,
+            'warnings' => $warnings
+        );
+        return $results;
+    }
+
+    /**
+     * Get blocked users return description.
+     *
+     * @return external_single_structure
+     * @since 2.9
+     */
+    public static function get_blocked_users_returns() {
+        return new external_single_structure(
+            array(
+                'users' => new external_multiple_structure(
+                    new external_single_structure(
+                        array(
+                            'id' => new external_value(PARAM_INT, 'User ID'),
+                            'fullname' => new external_value(PARAM_NOTAGS, 'User full name'),
+                            'profileimageurl' => new external_value(PARAM_URL, 'User picture URL', VALUE_OPTIONAL)
+                        )
+                    ),
+                    'List of blocked users'
+                ),
+                'warnings' => new external_warnings()
+            )
+        );
+    }
 
     /**
      * Returns description of method parameters
      *
      * @return external_function_parameters
-     * @since Moodle 2.1
-     * @deprecated Moodle 2.2 MDL-29106 - Please do not call this function any more.
-     * @see core_message_external::send_instant_messages_parameters()
+     * @since 2.9
      */
-    public static function send_instantmessages_parameters() {
-        return core_message_external::send_instant_messages_parameters();
+    public static function mark_message_read_parameters() {
+        return new external_function_parameters(
+            array(
+                'messageid' => new external_value(PARAM_INT, 'id of the message (in the message table)'),
+                'timeread' => new external_value(PARAM_INT, 'timestamp for when the message should be marked read')
+            )
+        );
     }
 
     /**
-     * Send private messages from the current USER to other users
+     * Mark a single message as read, trigger message_viewed event
      *
-     * @param array $messages An array of message to send.
-     * @return array
-     * @since Moodle 2.1
-     * @deprecated Moodle 2.2 MDL-29106 - Please do not call this function any more.
-     * @see core_message_external::send_instant_messages()
+     * @param  int $messageid id of the message (in the message table)
+     * @param  int $timeread timestamp for when the message should be marked read
+     * @return external_description
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @since 2.9
      */
-    public static function send_instantmessages($messages = array()) {
-        return core_message_external::send_instant_messages($messages);
+    public static function mark_message_read($messageid, $timeread) {
+        global $CFG, $DB, $USER;
+
+        // Check if private messaging between users is allowed.
+        if (empty($CFG->messaging)) {
+            throw new moodle_exception('disabled', 'message');
+        }
+
+        // Warnings array, it can be empty at the end but is mandatory.
+        $warnings = array();
+
+        // Validate params.
+        $params = array(
+            'messageid' => $messageid,
+            'timeread' => $timeread
+        );
+        $params = self::validate_parameters(self::mark_message_read_parameters(), $params);
+
+        // Validate context.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $message = $DB->get_record('message', array('id' => $params['messageid']), '*', MUST_EXIST);
+
+        if ($message->useridto != $USER->id) {
+            throw new invalid_parameter_exception('Invalid messageid, you don\'t have permissions to mark this message as read');
+        }
+
+        $messageid = message_mark_message_read($message, $params['timeread']);
+
+        $results = array(
+            'messageid' => $messageid,
+            'warnings' => $warnings
+        );
+        return $results;
     }
 
     /**
      * Returns description of method result value
      *
      * @return external_description
-     * @since Moodle 2.1
-     * @deprecated Moodle 2.2 MDL-29106 - Please do not call this function any more.
-     * @see core_message_external::send_instant_messages_returns()
+     * @since 2.9
      */
-    public static function send_instantmessages_returns() {
-        return core_message_external::send_instant_messages_returns();
+    public static function mark_message_read_returns() {
+        return new external_single_structure(
+            array(
+                'messageid' => new external_value(PARAM_INT, 'the id of the message in the message_read table'),
+                'warnings' => new external_warnings()
+            )
+        );
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     * @since 3.1
+     */
+    public static function delete_message_parameters() {
+        return new external_function_parameters(
+            array(
+                'messageid' => new external_value(PARAM_INT, 'The message id'),
+                'userid' => new external_value(PARAM_INT, 'The user id of who we want to delete the message for'),
+                'read' => new external_value(PARAM_BOOL, 'If is a message read', VALUE_DEFAULT, true)
+            )
+        );
+    }
+
+    /**
+     * Deletes a message
+     *
+     * @param  int $messageid the message id
+     * @param  int $userid the user id of who we want to delete the message for
+     * @param  bool $read if is a message read (default to true)
+     * @return external_description
+     * @throws moodle_exception
+     * @since 3.1
+     */
+    public static function delete_message($messageid, $userid, $read = true) {
+        global $CFG, $DB;
+
+        // Check if private messaging between users is allowed.
+        if (empty($CFG->messaging)) {
+            throw new moodle_exception('disabled', 'message');
+        }
+
+        // Warnings array, it can be empty at the end but is mandatory.
+        $warnings = array();
+
+        // Validate params.
+        $params = array(
+            'messageid' => $messageid,
+            'userid' => $userid,
+            'read' => $read
+        );
+        $params = self::validate_parameters(self::delete_message_parameters(), $params);
+
+        // Validate context.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $messagestable = $params['read'] ? 'message_read' : 'message';
+        $message = $DB->get_record($messagestable, array('id' => $params['messageid']), '*', MUST_EXIST);
+
+        $user = core_user::get_user($params['userid'], '*', MUST_EXIST);
+        core_user::require_active_user($user);
+
+        $status = false;
+        if (message_can_delete_message($message, $user->id)) {
+            $status = message_delete_message($message, $user->id);;
+        } else {
+            throw new moodle_exception('You do not have permission to delete this message');
+        }
+
+        $results = array(
+            'status' => $status,
+            'warnings' => $warnings
+        );
+        return $results;
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     * @since 3.1
+     */
+    public static function delete_message_returns() {
+        return new external_single_structure(
+            array(
+                'status' => new external_value(PARAM_BOOL, 'True if the message was deleted, false otherwise'),
+                'warnings' => new external_warnings()
+            )
+        );
     }
 
 }

@@ -773,7 +773,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
             return;
         }
         foreach ($diffconditions as $field) {
-            $diffuser->$field = textlib::strtoupper($diffuser->$field);
+            $diffuser->$field = core_text::strtoupper($diffuser->$field);
         }
 
         $enrollment = array('uid' => $diffuser->idnumber,
@@ -862,7 +862,9 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
         $this->assertTrue(strpos($parsedemail->body, $coursefullname) !== false);
         $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);
 
-        // Test custom welcome message.
+        // Test custom welcome message, subject, and from email.
+        $enrolplugin->customchar1 = 'joebruin@ucla.edu';
+        $enrolplugin->customchar2 = 'Customized subject line';
         $enrolplugin->customtext1 = 'Welcome to {$a->coursename}, and the link to the '
                 . 'course is {$a->courseurl}. See you soon!';
         $DB->update_record('enrol', $enrolplugin);
@@ -882,7 +884,10 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
         $sink->clear();
         $parsedemail = array_pop($messages);
 
-        // Since we are sending email, we need to do quoted-printable format.
+        // Make sure custom subject, replyto, message was emailed.
+        $this->assertTrue(strpos($parsedemail->header, 
+                'Reply-To: ' . $enrolplugin->customchar1) !== false);
+        $this->assertEquals($parsedemail->subject, $enrolplugin->customchar2);
         $this->assertTrue(strpos($parsedemail->body, 'Welcome to ' . 
                 $coursefullname) !== false);        
         $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);

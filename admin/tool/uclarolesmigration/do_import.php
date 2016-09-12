@@ -52,8 +52,8 @@ foreach ($importxmls as $importxml) {
             if (!array_key_exists($importshortname, $roles['createshortname'])) {
                 print_error('new_shortname_undefined');
             }
-            $newshortname = textlib::specialtoascii($roles['createshortname'][$importshortname]);
-            $newshortname = textlib::strtolower(clean_param($newshortname, PARAM_ALPHANUMEXT));
+            $newshortname = core_text::specialtoascii($roles['createshortname'][$importshortname]);
+            $newshortname = core_text::strtolower(clean_param($newshortname, PARAM_ALPHANUMEXT));
             $newrolename = $roles['createname'][$importshortname];
 
             // Code to make new role name/short name if same role name or shortname exists.

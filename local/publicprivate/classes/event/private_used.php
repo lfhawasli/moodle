@@ -16,7 +16,7 @@
 
 /**
  * Contains the event class for when a course module is set to private.
- * 
+ *
  * @package    local_publicprivate
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -64,7 +64,11 @@ class private_used extends \core\event\base {
      * @return moodle_url
      */
     public function get_url() {
-        return new \moodle_url($this->get_context()->get_url());
+        $context = $this->get_context();
+        if (!empty($context)) {
+            return new \moodle_url($context->get_url());
+        }
+        return "";
     }
 
     /**

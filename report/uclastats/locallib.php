@@ -35,7 +35,7 @@ function get_all_reports() {
         $ret_val[$report_class] = get_string($report_class, 'report_uclastats');
     }
 
-    collatorlib::asort($ret_val);
+    core_collator::asort($ret_val);
     return $ret_val;
 }
 

@@ -24,4 +24,5 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2015052601;
+$plugin->version = 2016072700;
+$plugin->component = 'block_ucla_group_manager';

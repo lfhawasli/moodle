@@ -199,6 +199,9 @@ $CFG->behat_prefix = 'bht_';
 // email address to notify in case of system problems
 $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ccle.ucla.edu';
 
+// CCLE-5959 - Disable Web Installations of Plugins
+$CFG->disableupdateautodeploy = 1;
+
 //$string['log_apache_error'] = 'Apache error';
 //$string['log_apache_access'] = 'Apache access';
 //$string['log_apache_ssl_access'] = 'Apache SSL access';
@@ -320,10 +323,6 @@ $CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://ww
 $CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 $CFG->forced_plugin_settings['block_ucla_bruinmedia']['quiet_mode'] = 1;
 
-// Site administration > Plugins > Blocks > UCLA course download
-// CCLE-5582 - Decrease maxfile size to 250
-$CFG->forced_plugin_settings['block_ucla_course_download']['maxfilesize'] = 250;
-
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
 
@@ -341,7 +340,6 @@ $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due t
 $CFG->sitedefaultlicense = 'tbd';
 
 // Site administration > Plugins > Filters > MathJax
-$CFG->forced_plugin_settings['filter_mathjaxloader']['httpsurl'] = 'https://cdn.mathjax.org/mathjax/2.3-latest/MathJax.js';
 $CFG->forced_plugin_settings['filter_mathjaxloader']['texfiltercompatibility'] = 1;
 $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
     MathJax.Hub.Config({
@@ -450,37 +448,6 @@ $CFG->behat_extraallowedsettings = array(
     'debugdisplay',
     'customscripts'
 );
-
-$CFG->behat_config = array(
-    'default' => array(
-        'formatter' => array(
-            'name' => 'pretty',
-            'parameters' => array(
-                'decorated' => true,
-                'verbose' => true
-            )
-        )
-    ),
-    'phantomjs' => array(
-        'filters' => array(
-            'tags' => '~@_file_upload&&~@_alert&&~@_bug_phantomjs'
-        ),
-        'extensions' => array(
-            'Behat\MinkExtension\Extension' => array(
-                'selenium2' => array(
-                    'browser' => 'phantomjs',
-                    'wd_host' => 'http://127.0.0.1:4444/wd/hub'
-                )
-            )
-        ),
-        'formatter' => array(
-            'name' => 'pretty',
-            'parameters' => array(
-                'decorated' => true,
-                'verbose' => true
-            )
-        )
-    ));
 
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later

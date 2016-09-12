@@ -280,8 +280,8 @@ class local_ucla_generator extends testing_data_generator {
      */
     protected function create_dummy_role($xml) {
         global $DB;
-        if (core_role_preset::is_valid_preset($xml)) {
-            $info = core_role_preset::parse_preset($xml);
+        if (tool_uclarolesmigration_cleanxml::is_valid_preset($xml)) {
+            $info =  tool_uclarolesmigration_cleanxml::parse_preset($xml);
             if (!$DB->get_record('role', array('shortname' => $info['shortname']))) {
                 create_role($info['name'], $info['shortname'], $info['description'], $info['archetype']);
             }
@@ -357,7 +357,7 @@ class local_ucla_generator extends testing_data_generator {
             // Process each file with the *.xml extension and update/define each role.
             foreach ($xmlfiles as $file) {
                 $xml = file_get_contents($file);
-                if (core_role_preset::is_valid_preset($xml)) {
+                if (tool_uclarolesmigration_cleanxml::is_valid_preset($xml)) {
                     $shortname = basename($file, '.xml');
                     $role = $this->define_role_from_xml($xml, $shortname);
                     $retval[$role->shortname] = $role->id;
@@ -382,7 +382,7 @@ class local_ucla_generator extends testing_data_generator {
                 $xml = $this->check_and_get_file($filepath);
                 if (is_null($xml)) {
                     continue;
-                } else if (core_role_preset::is_valid_preset($xml)) {
+                } else if (tool_uclarolesmigration_cleanxml::is_valid_preset($xml)) {
                     $shortname = $roletocreate;
                     $role = $this->define_role_from_xml($xml, $shortname);
                     $retval[$role->shortname] = $role->id;
@@ -588,7 +588,7 @@ class local_ucla_generator extends testing_data_generator {
                           'expires_on'          => time()+get_config('local_ucla', 'registrar_cache_ttl'),
                           'term_cd'             => $regcourse->term,
                           'stu_id'              => $user->idnumber,
-                          'full_name_person'    => textlib::strtoupper(fullname($user)),
+                          'full_name_person'    => core_text::strtoupper(fullname($user)),
                           'enrl_stat_cd'        => 'E',
                           'ss_email_addr'       => $user->email,
                           'bolid'               => str_replace('@ucla.edu', '', $user->username)));

@@ -68,7 +68,8 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
      * Read in an IMS Enterprise file.
      * Originally designed to handle v1.1 files but should be able to handle
      * earlier types as well, I believe.
-     *
+     * This cron feature has been converted to a scheduled task and it can now be scheduled
+     * from the UI.
      */
     public function cron() {
         global $CFG;
@@ -280,6 +281,7 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
         if ($createnewcourses) {
             require_once("$CFG->dirroot/course/lib.php");
         }
+
         // Process tag contents.
         $group = new stdClass();
         if (preg_match('{<sourcedid>.*?<id>(.+?)</id>.*?</sourcedid>}is', $tagcontents, $matches)) {
@@ -462,7 +464,7 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
 
             if ($imsdeleteusers) { // If we're allowed to delete user records.
                 // Do not dare to hack the user.deleted field directly in database!!!
-                $params = array('username' => $person->username, 'mnethostid' => $CFG->mnet_localhost_id, 'deleted ' => 0);
+                $params = array('username' => $person->username, 'mnethostid' => $CFG->mnet_localhost_id, 'deleted' => 0);
                 if ($user = $DB->get_record('user', $params)) {
                     if (delete_user($user)) {
                         $this->log_line("Deleted user '$person->username' (ID number $person->idnumber).");
@@ -790,5 +792,27 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
         }
 
         return $defaultcategoryid;
+    }
+
+    /**
+     * Is it possible to delete enrol instance via standard UI?
+     *
+     * @param object $instance
+     * @return bool
+     */
+    public function can_delete_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('enrol/imsenterprise:config', $context);
+    }
+
+    /**
+     * Is it possible to hide/show enrol instance via standard UI?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('enrol/imsenterprise:config', $context);
     }
 }

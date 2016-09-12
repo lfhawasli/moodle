@@ -1,4 +1,4 @@
-@ucla @core_backup @CCLE-4808 @CCLE-3483 @core_edit
+@ucla @local_ucla @core_backup @CCLE-4808 @CCLE-3483 @core_edit
 Feature: Restoring a course and keeping section names from backup
   In order to retain course information I'm importing into a new course
   As a course instructor
@@ -25,13 +25,15 @@ Feature: Restoring a course and keeping section names from backup
     And I follow "Source"
     And I turn editing mode on
     And I follow the "Week 1" section in the ucla site menu
-    And I click on "Edit section" "link"
+    And I click on "Edit" "link"
+    And I follow "Edit section"
     And I set the following fields to these values:
       | Use default section name | 0 |
       | id_name | testsection1 |
     And I press "Save changes"
     And I follow the "Week 2" section in the ucla site menu
-    And I click on "Edit section" "link"
+    And I click on "Edit" "link"
+    And I follow "Edit section"
     And I set the following fields to these values:
       | Use default section name | 0 |
       | id_name | testsection2 |

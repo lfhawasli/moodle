@@ -46,8 +46,8 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Public theme name.
-     * 
-     * @var string 
+     *
+     * @var string
      */
     public $theme_name = 'uclashared';
 
@@ -164,91 +164,18 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         $loginstr = '';
 
         if (isloggedin()) {
-            $addlogouturl = true;
             $addloginurl = false;
 
-            $usermurl = new moodle_url('/user/profile.php', array(
-                'id' => $USER->id
-            ));
-
-            // In case of mnet login.
-            $mnetfrom = '';
-            if (is_mnet_remote_user($USER)) {
-                $idprovider = $DB->get_record('mnet_host', array(
-                    'id' => $USER->mnethostid
-                ));
-
-                if ($idprovider) {
-                    $mnetfrom = html_writer::link($idprovider->wwwroot, $idprovider->name);
-                }
-            }
-
-            $realuserinfo = '';
-            if (\core\session\manager::is_loggedinas()) {
-                $realuser = \core\session\manager::get_realuser();
-                $realfullname = fullname($realuser);
-                $dest = new moodle_url('/course/loginas.php', array(
-                    'id' => $course->id,
-                    'sesskey' => sesskey()
-                ));
-
-                $realuserlink = html_writer::link($dest, $realfullname, array('class' => 'btn-header real-user'));
-                $loginas = html_writer::span(get_string('loginas_as', 'theme_uclashared'), 'login-as');
-                $realuserinfo = $realuserlink . $loginas;
-            }
-
-            $fullname = fullname($USER);
-            $userlink = html_writer::link($usermurl, $fullname, array('class' => 'btn-header'));
-
-            $rolename = '';
-            // I guess only guests cannot switch roles.
             if (isguestuser()) {
-                $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
-                $addloginurl = true;
-            } else if (is_role_switched($course->id)) {
-                $context = context_course::instance($course->id);
-
-                $role = $DB->get_record('role', array(
-                    'id' => $USER->access['rsw'][$context->path]
-                ));
-
-                if ($role) {
-                    $rolename = html_writer::span(format_string($role->name), 'role-name');
-                }
+                 $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
+                 $addloginurl = true;
+                 $loginstr = $userlink;
             }
 
-            $loginstr = $realuserinfo . $rolename . $userlink;
         } else {
             $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
         }
 
-        if (isset($SESSION->justloggedin)) {
-            unset($SESSION->justloggedin);
-            if (!empty($CFG->displayloginfailures) && !isguestuser()) {
-                if ($count = count_login_failures($CFG->displayloginfailures,
-                        $USER->username, $USER->lastlogin)) {
-
-                    $loginstr .= '&nbsp;<div class="loginfailures">';
-
-                    if (empty($count->accounts)) {
-                        $loginstr .= get_string('failedloginattempts', '', $count);
-                    } else {
-                        $loginstr .= get_string('failedloginattemptsall', '', $count);
-                    }
-
-                    if (has_capability('coursereport/log:view', context_system::instance())) {
-                        $loginstr .= ' (' . html_writer::link(new moodle_url(
-                                        '/course/report/log/index.php', array(
-                                    'chooselog' => 1,
-                                    'id' => 1,
-                                    'modid' => 'site_errors'
-                                        )), get_string('logs')) . ')';
-                    }
-
-                    $loginstr .= '</div>';
-                }
-            }
-        }
         // The help and feedback link.
         $fbl = $this->help_feedback_link();
         if ($fbl) {
@@ -262,14 +189,6 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                     get_string('login'),
                     array('class' => 'btn-header btn-login')
             );
-        } else if ($addlogouturl) {
-            $icon = html_writer::tag('i', '', array('class' => 'fa fa-sign-out fa-fw visible-xs-inline'));
-            $text = html_writer::span(get_string('logout'), 'hidden-xs');
-            $logininfo[] = html_writer::link(
-                    new moodle_url('/login/logout.php', array('sesskey' => sesskey())),
-                    $text . $icon,
-                    array('class' => 'btn-header')
-            );
         }
 
         $loginstring = implode('', $logininfo);
@@ -279,7 +198,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Displays link to use to login or logout on frontpage.
-     * 
+     *
      * @return string
      */
     public function login_link() {
@@ -329,7 +248,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     /**
      * Renders the Help & Feedback dropdown menu using Moodle's own config.
      * The menu items can be modified in Appearance > Themes > Theme settings.
-     * 
+     *
      * @see $CFG->custommenuitems
      * @param custom_menu $menu
      * @return string HTML output
@@ -579,9 +498,9 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Shows sitewide 'alert' banner.
-     * 
+     *
      * @todo: right now it only works for 'red' alerts.
-     * 
+     *
      * @return string HTML
      */
     public function alert_banner() {
@@ -632,7 +551,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
     /**
      * Set for custom course logos.  This is meant to be overridden by child themes.
-     * 
+     *
      * @return empty string
      */
     public function course_logo() {
@@ -642,7 +561,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     /**
      * Override confirmation dialog to be able to use different styles.
      * See documentation for confirm() in /lib/outputrenderers.php
-     * 
+     *
      * @param string $message
      * @param single_button|moodle_url|string $continue
      * @param single_button|moodle_url|string $cancel
@@ -750,7 +669,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         return false;
     }
-    
+
     /**
      * Change "Update this module" button to "Edit settings".
      *
@@ -766,5 +685,21 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         } else {
             return '';
         }
+    }
+
+    /**
+     * Force addition of our footer, which includes javascript to make toggling public/private
+     * make dynamic changes in the page.
+     *
+     * @return string HTML that you must output this, preferably immediately.
+     */
+    public function header() {
+        // If this theme version is below 2.4 release and this is a course view page.
+
+        if ($this->page->pagelayout === 'course' && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+            // Check if course content header/footer have not been output during render of theme layout.
+            $coursecontentfooter = $this->course_content_footer(true);
+        }
+        return  parent::header();
     }
 }

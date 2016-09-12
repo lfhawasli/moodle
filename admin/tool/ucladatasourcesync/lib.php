@@ -22,26 +22,26 @@ require_once($CFG->dirroot . '/lib/moodlelib.php');
 /**
  * Returns an array of raw CSV data from the CSV file at datasource_url.
  *
- * @param $datasource_url The URL of the CSV data to attempt to retrieve.
+ * @param $datasourceurl The URL of the CSV data to attempt to retrieve.
+ * @return mixed    Returns array of lines from data. Else returns false.
  */
-function get_csv_data($datasource_url) {
+function get_csv_data($datasourceurl) {
 
     $lines = array();
-    $fp = fopen($datasource_url, 'r');
+    $fp = fopen($datasourceurl, 'r');
 
     if ($fp) {
-
         while (!feof($fp)) {
             $lines[] = fgetcsv($fp);
         }
     }
 
     if (empty($lines)) {
-        $csverror = "... ERROR: Could not open $datasource_url!";
+        $csverror = "... ERROR: Could not open $datasourceurl!";
         log_ucla_data('bruincast', 'parsing data', 'CSV data retrieval', $csverror);
 
         echo "\n$csverror\n";
-        exit(5);
+        return false;
     }
 
     return $lines;
@@ -434,7 +434,7 @@ function log_ucla_data($func, $action, $notice, $error = '') {
     global $SITE;
 
     $log_message = empty($error) ? $notice : $notice . PHP_EOL . $error;
-    $log_message = textlib::substr($log_message, 0, 252) . '...';
+    $log_message = core_text::substr($log_message, 0, 252) . '...';
     $func = str_replace(' ', '', $func);
     $action = str_replace(' ', '', $action);
     $datasourceevent = \tool_ucladatasourcesync\event\ucladatasourcesync_event::datasource($func, $action);

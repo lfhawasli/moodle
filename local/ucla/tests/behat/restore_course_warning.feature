@@ -1,4 +1,4 @@
-@ucla @CCLE-4416
+@ucla @local_ucla @CCLE-4416
 Feature: Overwriting a course with via a restore
    In order to prevent losing data while restoring a course
    As a moodle admin
@@ -15,9 +15,9 @@ Feature: Overwriting a course with via a restore
          | Target | target | ucla |
       And I log in as "admin"
       And I backup "Source" course using this options:
-         | Filename | source.mbz |
+         | Confirmation | Filename | source.mbz |
 
-  @javascript
+   @javascript
    Scenario: Restoring into this course with no content
       When I click on "Restore" "link" in the "source.mbz" "table_row"
       And I press "Continue"
@@ -28,9 +28,10 @@ Feature: Overwriting a course with via a restore
       And I click on "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-current-course')]/descendant::input[@type='radio'][@name='target'][@value='0']" "xpath_element"
       Then I should not see "Course deletion warning"
 
-  @javascript
+   @javascript
    Scenario: Restoring into this course with content
       Given I am on homepage
+      And I follow "Courses"
       And I follow "Source"
       And I turn editing mode on
       And I follow the "Week 1" section in the ucla site menu
@@ -49,7 +50,7 @@ Feature: Overwriting a course with via a restore
       And I click on "Continue" "button" in the ".confirmation-dialogue" "css_element"
       And I should see "Restore settings"
 
-  @javascript
+   @javascript
    Scenario: Restoring into existing course with no content
       When I click on "Restore" "link" in the "source.mbz" "table_row"
       And I press "Continue"
@@ -60,10 +61,11 @@ Feature: Overwriting a course with via a restore
       And I click on "targetid" "radio" in the "Target" "table_row"
       Then I should not see "Course deletion warning"
 
-  @javascript
+   @javascript
    Scenario: Restoring into existing course with content
         # First go to target course and add content.
       Given I am on homepage
+      And I follow "Courses"
       And I follow "Target"
       And I turn editing mode on
       And I follow the "Week 1" section in the ucla site menu
@@ -71,6 +73,7 @@ Feature: Overwriting a course with via a restore
          | Name | Page |
          | Page content | Some text |
       And I am on homepage
+      And I follow "Courses"
       And I follow "Source"
       And I follow "Restore"
       And I click on "Restore" "link" in the "source.mbz" "table_row"

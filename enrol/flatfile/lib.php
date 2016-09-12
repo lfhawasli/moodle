@@ -101,8 +101,20 @@ class enrol_flatfile_plugin extends enrol_plugin {
      * @param object $instance
      * @return bool
      */
-    public function instance_deleteable($instance) {
-        return true;
+    public function can_delete_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('enrol/flatfile:manage', $context);
+    }
+
+    /**
+     * Is it possible to hide/show enrol instance via standard UI?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('enrol/flatfile:manage', $context);
     }
 
     /**
@@ -147,11 +159,6 @@ class enrol_flatfile_plugin extends enrol_plugin {
             $context = context_course::instance($instance->courseid, MUST_EXIST);
             role_assign($roleid, $userid, $context->id, 'enrol_'.$this->get_name(), $instance->id);
         }
-    }
-
-    public function cron() {
-        $trace = new text_progress_trace();
-        $this->sync($trace);
     }
 
     /**
@@ -434,7 +441,7 @@ class enrol_flatfile_plugin extends enrol_plugin {
             $notify = false;
             if ($ue = $DB->get_record('user_enrolments', array('enrolid'=>$instance->id, 'userid'=>$user->id))) {
                 // Update only.
-                $this->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE, $roleid, $timestart, $timeend);
+                $this->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE, $timestart, $timeend);
                 if (!$DB->record_exists('role_assignments', array('contextid'=>$context->id, 'roleid'=>$roleid, 'userid'=>$user->id, 'component'=>'enrol_flatfile', 'itemid'=>$instance->id))) {
                     role_assign($roleid, $user->id, $context->id, 'enrol_flatfile', $instance->id);
                 }

@@ -345,7 +345,7 @@ abstract class registrar_query {
                 $text[$k] = self::db_encode($value);
             }
         } else {
-            $text = textlib::convert($text, self::DEFAULT_ENCODING, $dbenc);
+            $text = core_text::convert($text, self::DEFAULT_ENCODING, $dbenc);
         }
 
         return $text;
@@ -365,7 +365,7 @@ abstract class registrar_query {
                 $text[$k] = self::db_decode($value);
             }
         } else {
-            $text = textlib::convert($text, $dbenc, self::DEFAULT_ENCODING);
+            $text = core_text::convert($text, $dbenc, self::DEFAULT_ENCODING);
         }
 
         return $text;

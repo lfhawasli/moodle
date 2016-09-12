@@ -1,9 +1,8 @@
-@mod @mod_lesson
+@mod @mod_lesson @_file_upload
 Feature: In a lesson activity, teacher can add an essay question
   As a teacher
   I need to add an essay question in a lesson and grade student attempts
 
-  @javascript
   Scenario: questions with essay question
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -17,11 +16,11 @@ Feature: In a lesson activity, teacher can add an essay question
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    When I am on homepage
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
+      | Description | Test lesson description |
       | Use default feedback | Yes |
     And I follow "Test lesson name"
     And I follow "Add a question page"
@@ -57,7 +56,15 @@ Feature: In a lesson activity, teacher can add an essay question
     And I should see "Student 1's response"
     And I should see "Once upon a time there was a little green frog."
     And I set the following fields to these values:
-      | Your comments | Well done. |
+      | Your comments | <p>Well <b>done</b>.</p> |
       | Essay score | 1 |
     And I press "Save changes"
     And I should see "Changes saved"
+    And I follow "Reports"
+    And I should see "Student 1"
+    And I click on ".lesson-attempt-link" "css_element" in the "Student 1" "table_row"
+    And I should see "Essay: Essay question"
+    And I should see "Please write a story about a frog."
+    And I should see "Once upon a time there was a little green frog."
+    And I should see "Well done."
+    And I should not see "&lt;b&gt;"

@@ -918,6 +918,73 @@ class uclacoursecreator {
 
         $this->cron_term_cache['term_rci'] = $rci;
     }
+    
+    /**
+     * Returns a sorted list of categories.
+     *
+     * When asking for $parent='none' it will return all the categories, regardless
+     * of depth. Wheen asking for a specific parent, the default is to return
+     * a "shallow" resultset. Pass false to $shallow and it will return all
+     * the child categories as well.
+     *
+     * @param string $parent The parent category if any
+     * @param string $sort the sortorder
+     * @param bool   $shallow - set to false to get the children too
+     * @return array of categories
+     */
+    public function get_categories($parent='none', $sort=NULL, $shallow=true) {
+        global $DB;
+
+        if ($sort === NULL) {
+            $sort = 'ORDER BY cc.sortorder ASC';
+        } else if ($sort ==='') {
+            // leave it as empty
+        } else {
+            $sort = "ORDER BY $sort";
+        }
+
+        // list($ccselect, $ccjoin) = context_instance_preload_sql('cc.id', CONTEXT_COURSECAT, 'ctx');
+        $select = ", " . context_helper::get_preload_record_columns_sql('ctx');
+        $join = "LEFT JOIN {context} ctx ON (ctx.instanceid = cc.id AND ctx.contextlevel = " . CONTEXT_COURSECAT . ")";
+        
+        if ($parent === 'none') {
+            $sql = "SELECT cc.* $select
+                      FROM {course_categories} cc
+                    $join
+                    $sort";
+            $params = array();
+
+        } else if ($shallow) {
+            $sql = "SELECT cc.* $select
+                      FROM {course_categories} cc
+                    $join
+                     WHERE cc.parent=?
+                    $sort";
+            $params = array($parent);
+
+        } else {
+            $sql = "SELECT cc.* $select
+                      FROM {course_categories} cc
+                    $join
+                      JOIN {course_categories} ccp
+                           ON ((cc.parent = ccp.id) OR (cc.path LIKE ".$DB->sql_concat('ccp.path',"'/%'")."))
+                     WHERE ccp.id=?
+                    $sort";
+            $params = array($parent);
+        }
+        $categories = array();
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $cat) {
+            context_helper::preload_from_record($cat);
+            $catcontext = context_coursecat::instance($cat->id);
+            if ($cat->visible || has_capability('moodle/category:viewhiddencategories', $catcontext)) {
+                $categories[$cat->id] = $cat;
+            }
+        }
+        $rs->close();
+        return $categories;
+    }
 
     /**
      *  Makes categories.
@@ -944,7 +1011,7 @@ class uclacoursecreator {
         $rci_courses =& $this->cron_term_cache['term_rci'];
    
         // Get all categories and index them
-        $id_categories = get_categories();
+        $id_categories = $this->get_categories();
         
         // Add "root" to available categories
         $fakeroot = new stdclass();
@@ -2194,8 +2261,13 @@ class uclacoursecreator {
         $edata->completed_requests = $this->built_requests;
 
         $this->println('. Triggering event.');
-        events_trigger_legacy('course_creator_finished', $edata);
-        $this->debugln('Triggered event with ' 
+
+        $event = \tool_uclacoursecreator\event\course_creator_finished::create(array(
+            'other' => json_encode($edata)
+        ));
+        $event->trigger();
+
+        $this->debugln('Triggered event with '
             . count($edata->completed_requests) . ' requests.');
     }
 
@@ -2566,8 +2638,8 @@ class uclacoursecreator {
                     // table
                     $course = new stdClass();
                     $course->id = $failed_request->courseid;
-                    $this->debugln('Manually invoking the course_deleted event');
-                    events_trigger_legacy('course_deleted', $course);
+                    $this->debugln('Function delete_course returned false for' .
+                            $failed_request->courseid);
                 }
                 $this->debugln('Deleted courseid ' . $failed_request->courseid);
             } else {

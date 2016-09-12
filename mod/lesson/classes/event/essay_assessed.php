@@ -61,7 +61,7 @@ class essay_assessed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has marked the essay with id '{$this->other['attemptid']}' and " .
-            "recorded a mark '$this->objectid' in the lesson with the course module id '$this->contextinstanceid'.";
+            "recorded a mark '$this->objectid' in the lesson with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -110,5 +110,17 @@ class essay_assessed extends \core\event\base {
         if (!isset($this->other['attemptid'])) {
             throw new \coding_exception('The \'attemptid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'lesson_grades', 'restore' => 'lesson_grade');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['lessonid'] = array('db' => 'lesson', 'restore' => 'lesson');
+        $othermapped['attemptid'] = array('db' => 'lesson_attempts', 'restore' => 'lesson_attept');
+
+        return $othermapped;
     }
 }

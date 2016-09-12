@@ -1,4 +1,4 @@
-@ucla @collabsitetheme
+@ucla @local_ucla @collabsitetheme
 Feature: Restrict theme for collab site
   In order to change theme for collaboration site
   As a manager/admin

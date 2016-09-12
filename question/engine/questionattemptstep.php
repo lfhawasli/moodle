@@ -362,12 +362,54 @@ class question_attempt_step {
      * Get all the data. behaviour variables have the - at the start of
      * their name. This is only intended for internal use, for example by
      * {@link question_engine_data_mapper::insert_question_attempt_step()},
-     * however, it can ocasionally be useful in test code. It should not be
+     * however, it can occasionally be useful in test code. It should not be
      * considered part of the public API of this class.
      * @param array name => value pairs.
      */
     public function get_all_data() {
         return $this->data;
+    }
+
+    /**
+     * Set a metadata variable.
+     *
+     * Do not call this method directly from  your code. It is for internal
+     * use only. You should call {@link question_usage::set_question_attempt_metadata()}.
+     *
+     * @param string $name the name of the variable to set. [a-z][a-z0-9]*.
+     * @param string $value the value to set.
+     */
+    public function set_metadata_var($name, $value) {
+        $this->data[':_' . $name] = $value;
+    }
+
+    /**
+     * Whether this step has a metadata variable.
+     *
+     * Do not call this method directly from  your code. It is for internal
+     * use only. You should call {@link question_usage::get_question_attempt_metadata()}.
+     *
+     * @param string $name the name of the variable to set. [a-z][a-z0-9]*.
+     * @return bool the value to set previously, or null if this variable was never set.
+     */
+    public function has_metadata_var($name) {
+        return isset($this->data[':_' . $name]);
+    }
+
+    /**
+     * Get a metadata variable.
+     *
+     * Do not call this method directly from  your code. It is for internal
+     * use only. You should call {@link question_usage::get_question_attempt_metadata()}.
+     *
+     * @param string $name the name of the variable to set. [a-z][a-z0-9]*.
+     * @return string the value to set previously, or null if this variable was never set.
+     */
+    public function get_metadata_var($name) {
+        if (!$this->has_metadata_var($name)) {
+            return null;
+        }
+        return $this->data[':_' . $name];
     }
 
     /**

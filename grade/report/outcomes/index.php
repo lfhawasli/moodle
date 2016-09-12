@@ -40,7 +40,7 @@ $context = context_course::instance($course->id);
 require_capability('gradereport/outcomes:view', $context);
 
 // First make sure we have proper final grades.
-grade_regrade_final_grades($courseid);
+grade_regrade_final_grades_if_required($course);
 
 // Grab all outcomes used in course.
 $report_info = array();
@@ -170,20 +170,18 @@ foreach ($report_info as $outcomeid => $outcomedata) {
     $row++;
 }
 
-
-
 $html .= '</table>';
 
 print_grade_page_head($courseid, 'report', 'outcomes');
 
-
 echo $html;
-echo $OUTPUT->footer();
 
-// START UCLA MOD: CCLE-3980 - Add logging to Gradebook & Export to MyUCLA format pages
-$event = \local_gradebook\event\outcomes_grades_viewed::create(array(
-    'context' => $context,
-    'other' => array('option' => 'outcomes')
-));
+$event = \gradereport_outcomes\event\grade_report_viewed::create(
+    array(
+        'context' => $context,
+        'courseid' => $courseid,
+    )
+);
 $event->trigger();
-// END UCLA MOD: CCLE-3980
+
+echo $OUTPUT->footer();

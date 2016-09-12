@@ -41,7 +41,7 @@ class message_sent extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->relateduserid' has sent a message in the chat with the course module id
+        return "The user with id '$this->relateduserid' has sent a message in the chat with course module id
             '$this->contextinstanceid'.";
     }
 
@@ -96,5 +96,9 @@ class message_sent extends \core\event\base {
         if (!isset($this->relateduserid)) {
             throw new \coding_exception('The \'relateduserid\' must be set.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'chat_messages', 'restore' => 'chat_message');
     }
 }

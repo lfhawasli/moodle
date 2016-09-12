@@ -48,7 +48,7 @@ class report_viewed extends \core\event\base {
      */
     protected function init() {
         $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 
     /**
@@ -105,4 +105,10 @@ class report_viewed extends \core\event\base {
             throw new \coding_exception('The \'relateduserid\' must be set.');
         }
     }
+
+    public static function get_other_mapping() {
+        // Nothing to map.
+        return false;
+    }
+
 }

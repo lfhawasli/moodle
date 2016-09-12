@@ -72,7 +72,7 @@ $strqanda     = get_string("modulename", "qanda");
 $PAGE->navbar->add($strqandas, new moodle_url('/mod/qanda/index.php', array('id'=>$course->id)));
 $PAGE->navbar->add(get_string("categories","qanda"));
 if (!empty($action)) {
-    $navaction = get_string($action). " " . textlib::strtolower(get_string("category","qanda"));
+    $navaction = get_string($action). " " . core_text::strtolower(get_string("category","qanda"));
     $PAGE->navbar->add($navaction);
 }
 $PAGE->set_title(format_string($qanda->name));

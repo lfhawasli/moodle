@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -59,7 +58,7 @@ $string['chat:exportsession'] = 'Export any chat session';
 $string['chat:chat'] = 'Access a chat room';
 $string['chatintro'] = 'Description';
 $string['chatname'] = 'Name of this chat room';
-$string['chat:readlog'] = 'Read chat logs';
+$string['chat:readlog'] = 'View chat logs';
 $string['chatreport'] = 'Chat sessions';
 $string['chat:talk'] = 'Talk in a chat';
 $string['chattime'] = 'Next chat time';
@@ -124,6 +123,7 @@ $string['repeatweekly'] = 'At the same time every week';
 $string['saidto'] = 'said to';
 $string['savemessages'] = 'Save past sessions';
 $string['seesession'] = 'See this session';
+$string['search:activity'] = 'Chat - activity information';
 $string['send'] = 'Send';
 $string['sending'] = 'Sending';
 $string['serverhost'] = 'Server name';

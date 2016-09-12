@@ -1,4 +1,4 @@
-@ucla @core_user @core_edit @CCLE-4874
+@ucla @local_ucla @core_user @core_edit @CCLE-4874
 Feature: Freeze "Additional names" field
     In order to accept preferred names from the Registrar
     As a user
@@ -11,8 +11,7 @@ Scenario: Checking that "Additional names" are non-editable.
         | username | firstname | lastname | email           |
         | student  | Student   | 1        | student@asd.com |
     And I log in as "student"
-    And I expand "My profile" node
-    When I follow "View profile"
+    And I follow "Profile" in the user menu
     And I follow "Edit profile"
     And I expand all fieldsets
     Then the "firstnamephonetic" "field" should be readonly

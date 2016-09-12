@@ -105,7 +105,7 @@ class behat_ucla_course_menu extends behat_base {
     public function the_site_menu_section_hidden($section) {
 
         // Find the hidden section containing the section name text.
-        $xpath = "//*[contains(@class, 'block_ucla_course_menu_hidden')]/*[text()[contains(.,'$section')]]";
+        $xpath = "//*[contains(@class, 'block_ucla_course_menu_hidden')]/*[contains(.,'$section')]";
 
         $hiddensections = $this->find('xpath', $xpath);
 

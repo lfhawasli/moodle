@@ -52,6 +52,11 @@ require_login($course, false, $cm);
 $contextmodule = context_module::instance($cm->id);
 require_capability('mod/scorm:viewreport', $contextmodule);
 
+// Check user has group access.
+if (!groups_user_groups_visible($course, $userid, $cm)) {
+    throw new moodle_exception('nopermissiontoshow');
+}
+
 // Trigger a user interactions viewed event.
 $event = \mod_scorm\event\interactions_viewed::create(array(
     'context' => $contextmodule,
@@ -108,7 +113,7 @@ $table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthw
 $table->show_download_buttons_at(array(TABLE_P_BOTTOM));
 $table->setup();
 
-for ($i=0; $i < $questioncount; $i++) {
+for ($i = 0; $i < $questioncount; $i++) {
     $row = array();
     $element = 'cmi.interactions_'.$i.'.id';
     if (isset($usertrack->$element)) {
@@ -121,12 +126,12 @@ for ($i=0; $i < $questioncount; $i++) {
             $row[] = '&nbsp;';
         }
 
-        $j=0;
+        $j = 0;
         $element = 'cmi.interactions_'.$i.'.correct_responses_'.$j.'.pattern';
         $rightans = '';
         if (isset($usertrack->$element)) {
             while (isset($usertrack->$element)) {
-                if ($j>0) {
+                if ($j > 0) {
                     $rightans .= ',';
                 }
                 $rightans .= s($usertrack->$element);

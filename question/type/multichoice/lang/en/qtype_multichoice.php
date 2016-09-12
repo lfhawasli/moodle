@@ -41,6 +41,7 @@ $string['correctansweris'] = 'The correct answer is: {$a}';
 $string['correctanswersare'] = 'The correct answers are: {$a}';
 // END UCLA MOD: CCLE-5503
 $string['correctfeedback'] = 'For any correct response';
+$string['deletedchoice'] = 'This choice was deleted after the attempt was started.';
 $string['errgradesetanswerblank'] = 'Grade set, but the Answer is blank';
 $string['errfractionsaddwrong'] = 'The positive grades you have chosen do not add up to 100%<br />Instead, they add up to {$a}%';
 $string['errfractionsnomax'] = 'One of the choices should be 100%, so that it is<br />possible to get a full grade for this question.';

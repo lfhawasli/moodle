@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015120700;
-$plugin->requires = 2011070100;   // Requires Moodle 2.1 or later.
-
+$plugin->version    = 2016072700;
+$plugin->requires   = 2014051200;   // Requires Moodle 2.7 or later.
+$plugin->component  = 'enrol_invitation';
 $plugin->cron = 86400;  // Only check once a day.
 
 $plugin->dependencies = array(
@@ -36,4 +36,4 @@ $plugin->dependencies = array(
     'tool_uclaroles' => ANY_VERSION
 );
 
-$plugin->maturity = MATURITY_RC;
+$plugin->maturity = MATURITY_STABLE;

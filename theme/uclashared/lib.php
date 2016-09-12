@@ -48,21 +48,25 @@ function theme_uclashared_page_init(moodle_page $page) {
     }
 }
 
-/**
- * Process a CSS directive to load a font. Currently works for Bootstrap3 glyphicons.
- * SSC-2778: This filter now also gives choice for the frontpage image! The image
- * is specified in the config file, where its title is set in the config variable
- * "$CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'];".
+/*
+ * Pulls random image for homepage background
+ * and saves it to session cache.
  *
- * @global type $CFG
- * @param type $css
- * @param type $theme
- * @return type
+ * Returns $image.
  */
-function uclashared_process_css($css, $theme) {
-    
-    $tag = 'frontpage-image';
-    $replacement = get_config('theme_uclashared', 'frontpage_image');
-    $css = str_replace($tag, $replacement, $css);
-    return $css;
-}
+function theme_uclashared_frontpageimage() {
+        global $CFG;
+        $frontpageimagecache = cache::make('theme_uclashared', 'frontpageimage');
+
+        if(!($frontpageimagecache->get('image'))) {
+            $imagedir = $CFG->dirroot . "/theme/uclashared/pix/frontpageimages";
+            $files = glob($imagedir . '/*.*');
+            $file = array_rand($files);
+            $filename = basename($files[$file]);
+            $image = $imagedir . "/" . $filename;
+            $frontpageimagecache->set('image', $image);
+        } else {
+            $image = $frontpageimagecache->get('image');
+        }
+        return $image;
+    }

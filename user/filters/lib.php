@@ -55,7 +55,7 @@ class user_filtering {
      * @param string $baseurl base url used for submission/return, null if the same of current page
      * @param array $extraparams extra page parameters
      */
-    public function user_filtering($fieldnames = null, $baseurl = null, $extraparams = null) {
+    public function __construct($fieldnames = null, $baseurl = null, $extraparams = null) {
         global $SESSION;
 
         if (!isset($SESSION->user_filtering)) {
@@ -63,15 +63,10 @@ class user_filtering {
         }
 
         if (empty($fieldnames)) {
-            $fieldnames = array('realname' => 0, 'lastname' => 1, 'firstname' => 1, 'email' => 1, 'city' => 1, 'country' => 1,
+            $fieldnames = array('realname' => 0, 'lastname' => 1, 'firstname' => 1, 'username' => 1, 'email' => 1, 'city' => 1, 'country' => 1,
                                 'confirmed' => 1, 'suspended' => 1, 'profile' => 1, 'courserole' => 1, 'systemrole' => 1,
                                 'cohort' => 1, 'firstaccess' => 1, 'lastaccess' => 1, 'neveraccessed' => 1, 'timemodified' => 1,
-                                // START CORE EDIT UCLA MOD CCLE-4534 - add-id-filter
-                                // Allow the user to filter out users according to their registered ID number.
-                                // 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1);
-                                'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1, 'idnumber'=>1);
-                                // END UCLA MOD CCLE-4534-add-id-filter
-
+                                'nevermodified' => 1, 'auth' => 1, 'mnethostid' => 1, 'idnumber' => 1);
             // START UCLA MOD: CCLE-3783 - Improve default filter on "Browse list of users" screen
             // Set email and UID to be a default filter (non-advanced).
             $fieldnames['email'] = 0;
@@ -159,10 +154,7 @@ class user_filtering {
             case 'timemodified': return new user_filter_date('timemodified', get_string('lastmodified'), $advanced, 'timemodified');
             case 'nevermodified': return new user_filter_checkbox('nevermodified', get_string('nevermodified', 'filters'), $advanced, array('timemodified', 'timecreated'), array('timemodified_sck', 'timemodified_eck'));
             case 'cohort':      return new user_filter_cohort($advanced);
-            // START UCLA MOD CCLE-4534
-            // Allow the user to filter out users according to their registered ID number.
-            case 'idnumber': return new user_filter_text('idnumber', get_string('idnumber'), $advanced, 'idnumber');
-            // END UCLA MOD CCLE-4534
+            case 'idnumber':    return new user_filter_text('idnumber', get_string('idnumber'), $advanced, 'idnumber');
             case 'auth':
                 $plugins = core_component::get_plugin_list('auth');
                 $choices = array();
@@ -288,10 +280,20 @@ class user_filter_type {
      * @param string $label the label of the filter instance
      * @param boolean $advanced advanced form element flag
      */
-    public function user_filter_type($name, $label, $advanced) {
+    public function __construct($name, $label, $advanced) {
         $this->_name     = $name;
         $this->_label    = $label;
         $this->_advanced = $advanced;
+    }
+
+    /**
+     * Old syntax of class constructor. Deprecated in PHP7.
+     *
+     * @deprecated since Moodle 3.1
+     */
+    public function user_filter_type($name, $label, $advanced) {
+        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
+        self::__construct($name, $label, $advanced);
     }
 
     /**

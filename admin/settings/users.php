@@ -61,13 +61,11 @@ if ($hassiteconfig
         $temp->add(new admin_setting_configselect('defaultpreference_autosubscribe', new lang_string('autosubscribe'),
             '', 1, $choices));
 
-        if (!empty($CFG->forum_trackreadposts)) {
-            $choices = array();
-            $choices['0'] = new lang_string('trackforumsno');
-            $choices['1'] = new lang_string('trackforumsyes');
-            $temp->add(new admin_setting_configselect('defaultpreference_trackforums', new lang_string('trackforums'),
-                '', 0, $choices));
-        }
+        $choices = array();
+        $choices['0'] = new lang_string('trackforumsno');
+        $choices['1'] = new lang_string('trackforumsyes');
+        $temp->add(new admin_setting_configselect('defaultpreference_trackforums', new lang_string('trackforums'),
+            '', 0, $choices));
     }
     $ADMIN->add('accounts', $temp);
 
@@ -166,6 +164,7 @@ if ($hassiteconfig
                        array('description' => new lang_string('description'),
                              'city' => new lang_string('city'),
                              'country' => new lang_string('country'),
+                             'timezone' => new lang_string('timezone'),
                              'webpage' => new lang_string('webpage'),
                              'icqnumber' => new lang_string('icqnumber'),
                              'skypeid' => new lang_string('skypeid'),
@@ -193,12 +192,15 @@ if ($hassiteconfig
                 new lang_string('showuseridentity_desc', 'admin'), array('email' => 1), array(
                     'idnumber'    => new lang_string('idnumber'),
                     'email'       => new lang_string('email'),
-                    'phone1'      => new lang_string('phone'),
+                    'phone1'      => new lang_string('phone1'),
                     'phone2'      => new lang_string('phone2'),
                     'department'  => new lang_string('department'),
                     'institution' => new lang_string('institution'),
                 )));
         $temp->add(new admin_setting_configtext('fullnamedisplay', new lang_string('fullnamedisplay', 'admin'), new lang_string('configfullnamedisplay', 'admin'), 'language', PARAM_TEXT, 50));
+        $temp->add(new admin_setting_configtext('alternativefullnameformat', new lang_string('alternativefullnameformat', 'admin'),
+                new lang_string('alternativefullnameformat_desc', 'admin'),
+                'language', PARAM_RAW, 50));
         $temp->add(new admin_setting_configtext('maxusersperpage', new lang_string('maxusersperpage','admin'), new lang_string('configmaxusersperpage','admin'), 100, PARAM_INT));
         $temp->add(new admin_setting_configcheckbox('enablegravatar', new lang_string('enablegravatar', 'admin'), new lang_string('enablegravatar_help', 'admin'), 0));
         $temp->add(new admin_setting_configtext('gravatardefaulturl', new lang_string('gravatardefaulturl', 'admin'), new lang_string('gravatardefaulturl_help', 'admin'), 'mm'));

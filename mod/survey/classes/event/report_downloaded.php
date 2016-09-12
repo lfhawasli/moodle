@@ -49,7 +49,7 @@ class report_downloaded extends \core\event\base {
     protected function init() {
         $this->data['objecttable'] = 'survey';
         $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 
     /**
@@ -103,5 +103,16 @@ class report_downloaded extends \core\event\base {
         if (empty($this->other['type'])) {
             throw new \coding_exception('The \'type\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'survey', 'restore' => 'survey');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
+
+        return $othermapped;
     }
 }

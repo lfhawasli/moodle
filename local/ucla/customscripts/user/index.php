@@ -22,7 +22,7 @@
  * @package local_ucla
  */
 
-if ($CFG->theme == 'uclashared' || $CFG->theme == ' uclasharedcourse') {
+if (local_ucla_core_edit::using_ucla_theme()) {
     $contextid    = optional_param('contextid', 0, PARAM_INT); // One of this or.
     $courseid     = optional_param('id', 0, PARAM_INT); // This are required.
 

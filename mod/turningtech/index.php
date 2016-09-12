@@ -22,6 +22,7 @@
  */
 require_once('../../config.php');
 require_once('../../course/lib.php');
+require_once($CFG->dirroot . '/mod/turningtech/classes/event/ttlogs.php');
 require_once($CFG->dirroot . '/mod/turningtech/lib.php');
 require_once($CFG->dirroot . '/mod/turningtech/lib/forms/turningtech_device_form.php');
 require_once($CFG->dirroot . '/mod/turningtech/lib/forms/turningtech_responseware_form.php');
@@ -52,7 +53,6 @@ $PAGE->set_url('/mod/turningtech/index.php', array(
                 'id' => $id
 ));
 $PAGE->set_course($course);
-add_to_log($course->id, 'turningtech', 'view devices', "index.php?id=$course->id", '');
 
 global $USER;
 if ($CFG->version >= '2013111800.00') {
@@ -70,6 +70,7 @@ $PAGE->requires->css('/mod/turningtech/css/style.css');
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
 // Determine if this is a student or instructor?
+error_log(print_r($USER,true));
 if (TurningTechMoodleHelper::isUserStudentInCourse($USER, $course)) {
     // Initializing the Response Card Form Opening as false.
     $leavereswarefrmopen = false;
@@ -162,6 +163,7 @@ if (TurningTechMoodleHelper::isUserStudentInCourse($USER, $course)) {
 } else {
     // So user is a member of course, but not a student.  Let's make sure they have
     // Permission to manage devices.
+    error_log("User is member of course but no student");
     require_capability('mod/turningtech:manage', $context);
     $action = optional_param('action', 'deviceid', PARAM_ALPHA);
     echo turningtech_show_messages();
@@ -297,6 +299,12 @@ if (TurningTechMoodleHelper::isUserStudentInCourse($USER, $course)) {
            <?php 
 }
            ?>
+           
+            <?php if ($modlver == '2.8') { ?>
+             $jtt('#mform1').css('width', '600px');
+             $jtt('#mform2').css('width', '600px');
+            <?php } ?>
+            
             if(btype==2) {
                 $jtt('#id_deviceid').parent('div:last').css('width', '50%').css('margin-left', '10px');
                 $jtt('#mform2').find('#fitem_id_deviceid').children('div:first').css('width', '48%');

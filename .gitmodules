@@ -37,15 +37,6 @@
 [submodule "local/googleanalytics"]
 	path = local/googleanalytics
 	url = https://github.com/ccle/moodle-local_googleanalytics.git
-[submodule "grade/report/quick_edit"]
-	path = grade/report/quick_edit
-	url = git@github.com:ccle/quick_edit.git
-[submodule "grade/report/history"]
-	path = grade/report/history
-	url = https://github.com/ccle/moodle-gradereport_history.git
-[submodule "report/rolescapabilities"]
-	path = report/rolescapabilities
-	url = https://github.com/ccle/moodle-report-rolescapabilities.git
 [submodule "lib/editor/atto/plugins/chemistry"]
 	path = lib/editor/atto/plugins/chemistry
 	url = git@github.com:geoffrowland/moodle-editor_atto-chemistry.git
@@ -66,7 +57,7 @@
 	url = git@github.com:ccle/moodle-local_metagroups.git
 [submodule "filter/poodll"]
 	path = filter/poodll
-	url = git@github.com:justinhunt/moodle-filter_poodll.git
+	url = git@github.com:ccle/moodle-filter_poodll.git
 [submodule "question/type/poodllrecording"]
 	path = question/type/poodllrecording
 	url = git@github.com:justinhunt/moodle-qtype_poodllrecording.git
@@ -88,15 +79,12 @@
 [submodule "lib/editor/atto/plugins/fontfamily"]
 	path = lib/editor/atto/plugins/fontfamily
 	url = git@github.com:projectestac/moodle-atto_fontfamily.git
-[submodule "local/recyclebin"]
-	path = local/recyclebin
-	url = git@github.com:ccle/moodle-local_recyclebin.git 
 [submodule "lib/editor/atto/plugins/htmlplus"]
 	path = lib/editor/atto/plugins/htmlplus
 	url = https://github.com/andrewnicols/moodle-atto_htmlplus.git
 [submodule "mod/assign/submission/onlinepoodll"]
 	path = mod/assign/submission/onlinepoodll
-	url = https://github.com/justinhunt/moodle-assign_submission_onlinepoodll.git
+	url = git@github.com:ccle/moodle-assign_submission_onlinepoodll.git
 [submodule "mod/zoom"]
 	path = mod/zoom
 	url = git@github.com:ucla/moodle-mod_zoom.git
@@ -124,9 +112,6 @@
 [submodule "filter/mediagallery"]
 	path = filter/mediagallery
 	url = https://github.com/netspotau/moodle-filter_mediagallery.git
-[submodule "local/ltiprovider"]
-	path = local/ltiprovider
-	url = git@github.com:ccle/moodle-local_ltiprovider.git 
 [submodule "lib/editor/atto/plugins/bsgrid"]
  	path = lib/editor/atto/plugins/bsgrid
 	url = git@github.com:academic-moodle-cooperation/moodle-atto_bsgrid.git
@@ -160,3 +145,6 @@
 [submodule "mod/casa"]
 	path = mod/casa
 	url = git@github.com:ucla/moodle-mod_casa.git
+[submodule "question/type/ordering"]
+	path = question/type/ordering
+	url = https://github.com/gbateson/moodle-qtype_ordering.git

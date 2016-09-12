@@ -28,5 +28,6 @@ Scenario: Upload file with copyright status not yet identified will display aler
     And I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager
     And I press "Save and return to course"
     And I browse to site "C1"
-    And I press "Ask me later"
     And I should see "Your site has 1 piece(s) of content without a copyright status assigned. Would you like to assign copyright status now?"
+    And I press "Ask me later"
+    And I should see "Assign copyright status reminder set."

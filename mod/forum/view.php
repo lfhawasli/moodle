@@ -100,10 +100,6 @@
         rss_add_http_header($context, 'mod_forum', $forum, $rsstitle);
     }
 
-    // Mark viewed if required
-    $completion = new completion_info($course);
-    $completion->set_module_viewed($cm);
-
 /// Print header.
      // START UCLA MOD: CCLE-4003/SSC-1805 - Can't sort discussion forum posts
      require_once($CFG->dirroot . '/local/ucla/lib.php');
@@ -114,8 +110,6 @@
     $PAGE->add_body_class('forumtype-'.$forum->type);
     $PAGE->set_heading($course->fullname);
 
-    echo $OUTPUT->header();
-
 /// Some capability checks.
     if (empty($cm->visible) and !has_capability('moodle/course:viewhiddenactivities', $context)) {
         notice(get_string("activityiscurrentlyhidden"));
@@ -125,14 +119,11 @@
         notice(get_string('noviewdiscussionspermission', 'forum'));
     }
 
-    // START UCLA MOD: CCLE-4329 Handling public forums.
-    require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
-    $ppmodule = PublicPrivate_Module::build($cm);
-    if (!$ppmodule->is_private()) {
-        $warningpublicforummsg = get_string('warningpublicforum', 'local_ucla');
-        echo $OUTPUT->notification($warningpublicforummsg, 'notifywarning');
-    }
-    // END UCLA MOD: CCLE-4329 Handling public forums.
+    // Mark viewed and trigger the course_module_viewed event.
+    forum_view($forum, $course, $cm, $context);
+
+    echo $OUTPUT->header();
+
     echo $OUTPUT->heading(format_string($forum->name), 2);
     if (!empty($forum->intro) && $forum->type != 'single' && $forum->type != 'teacher') {
 
@@ -155,16 +146,6 @@
 
 /// find out current groups mode
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/forum/view.php?id=' . $cm->id);
-
-    $params = array(
-        'context' => $context,
-        'objectid' => $forum->id
-    );
-    $event = \mod_forum\event\course_module_viewed::create($params);
-    $event->add_record_snapshot('course_modules', $cm);
-    $event->add_record_snapshot('course', $course);
-    $event->add_record_snapshot('forum', $forum);
-    $event->trigger();
 
     $SESSION->fromdiscussion = qualified_me();   // Return here if we post or set subscription etc
 
@@ -245,9 +226,10 @@
         case 'blog':
             echo '<br />';
             if (!empty($showall)) {
-                forum_print_latest_discussions($course, $forum, 0, 'plain', '', -1, -1, -1, 0, $cm);
+                forum_print_latest_discussions($course, $forum, 0, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, -1, 0, $cm);
             } else {
-                forum_print_latest_discussions($course, $forum, -1, 'plain', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+                forum_print_latest_discussions($course, $forum, -1, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, $page,
+                    $CFG->forum_manydiscussions, $cm);
             }
             break;
 
@@ -263,6 +245,7 @@
             break;
     }
 
+    // Add the subscription toggle JS.
+    $PAGE->requires->yui_module('moodle-mod_forum-subscriptiontoggle', 'Y.M.mod_forum.subscriptiontoggle.init');
+
     echo $OUTPUT->footer($course);
-
-

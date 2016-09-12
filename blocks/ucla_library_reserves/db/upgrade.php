@@ -46,4 +46,6 @@ function xmldb_block_ucla_library_reserves_upgrade($oldversion) {
         // ucla_library_reserves savepoint reached
         upgrade_block_savepoint(true, 2012060300, 'ucla_library_reserves');        
     }
+
+    return true;
 }

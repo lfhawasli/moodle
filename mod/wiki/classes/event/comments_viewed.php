@@ -52,7 +52,7 @@ class comments_viewed extends \core\event\comments_viewed {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the comments for the page with id '$this->objectid' for the wiki " .
-            "with the course module id '$this->contextinstanceid'.";
+            "with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -72,5 +72,9 @@ class comments_viewed extends \core\event\comments_viewed {
      */
     public function get_url() {
         return new \moodle_url('/mod/wiki/comments.php', array('pageid' => $this->objectid));
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'wiki_pages', 'restore' => 'wiki_page');
     }
 }

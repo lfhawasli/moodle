@@ -193,7 +193,7 @@ if ($wizardnow !== '') {
     $mform = $qtypeobj->create_editing_form('question.php', $question, $category, $contexts, $formeditable);
 }
 $toform = fullclone($question); // send the question object and a few more parameters to the form
-$toform->category = "$category->id,$category->contextid";
+$toform->category = "{$category->id},{$category->contextid}";
 $toform->scrollpos = $scrollpos;
 if ($formeditable && $id){
     $toform->categorymoveto = $toform->category;
@@ -262,11 +262,9 @@ if ($mform->is_cancelled()) {
         }
     }
     $question = $qtypeobj->save_question($question, $fromform);
-    if (!empty($CFG->usetags) && isset($fromform->tags)) {
-        // A wizardpage from multipe pages questiontype like calculated may not
-        // allow editing the question tags, hence the isset($fromform->tags) test.
-        require_once($CFG->dirroot.'/tag/lib.php');
-        tag_set('question', $question->id, $fromform->tags, 'core_question', $contextid);
+    if (isset($fromform->tags)) {
+        core_tag_tag::set_item_tags('core_question', 'question', $question->id,
+                context::instance_by_id($contextid), $fromform->tags);
     }
 
     // Purge this question from the cache.

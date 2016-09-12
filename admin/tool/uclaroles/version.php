@@ -32,3 +32,4 @@ $plugin->dependencies = array(
     'tool_uclasiteindicator' => ANY_VERSION,    
     'local_ucla' => ANY_VERSION
 );
+$plugin->component = 'tool_uclaroles';

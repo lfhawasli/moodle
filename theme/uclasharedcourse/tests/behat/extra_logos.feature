@@ -22,16 +22,21 @@ Feature: Extra logos for collaboration sites.
       | user    | course | role |
       | student | C1     | student |
     And I log in as "admin"
-    And I follow "Course 1"
+    And I go to the courses management page
+    And I click on category "Management" in the management interface
+    And I click on category "Centers" in the management interface
+    And I click on category "Executive Education Program" in the management interface
+    And I click on course "Course 1" in the management interface
+    And I follow "View"
     # First need to enable course theme before can upload logos.
     And I follow "Edit settings"
     And I set the following fields to these values:
       | Force theme | UCLA course theme |
-    And I press "Save changes"
+    And I press "Save and display"
     And I follow "Edit settings"
     And I expand all fieldsets
     And I upload "pix/moodlelogo.png" file to "Additional header logos" filemanager
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
 
   Scenario: Extra logos visible to enrolled users
@@ -41,5 +46,9 @@ Feature: Extra logos for collaboration sites.
 
   Scenario: Extra logos not visible no non-enrolled users
     Given I log in as "nobody"
+    And I follow "Courses"
+    And I follow "Management"
+    And I follow "Centers"
+    And I follow "Education Program"
     When I follow "Course 1"
     And I should not see image "moodlelogo.png" in the ".course-logo-image" "css_element"

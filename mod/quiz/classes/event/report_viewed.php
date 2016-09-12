@@ -69,7 +69,7 @@ class report_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' viewed the report '" . s($this->other['reportname']) . "' for the quiz with " .
-            "the course module id '$this->contextinstanceid'.";
+            "course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -108,5 +108,12 @@ class report_viewed extends \core\event\base {
         if (!isset($this->other['reportname'])) {
             throw new \coding_exception('The \'reportname\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['quizid'] = array('db' => 'quiz', 'restore' => 'quiz');
+
+        return $othermapped;
     }
 }

@@ -90,17 +90,17 @@ class submission_form_viewed extends base {
 
     /**
      * Returns description of what happened.
-     *the course module id '$this->contextinstanceid'
+     *
      * @return string
      */
     public function get_description() {
         if ($this->userid != $this->relateduserid) {
             return "The user with id '$this->userid' viewed the submission form for the user with id '$this->relateduserid' " .
-                "for the assignment with the course module id '$this->contextinstanceid'.";
+                "for the assignment with course module id '$this->contextinstanceid'.";
         }
 
-        return "The user with id '$this->userid' viewed their submission for the assignment with the course " .
-            "module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' viewed their submission for the assignment with course module id " .
+            "'$this->contextinstanceid'.";
     }
 
     /**
@@ -138,5 +138,12 @@ class submission_form_viewed extends base {
         if (!isset($this->other['assignid'])) {
             throw new \coding_exception('The \'assignid\' value must be set in other.');
         }
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['assignid'] = array('db' => 'assign', 'restore' => 'assign');
+
+        return $othermapped;
     }
 }

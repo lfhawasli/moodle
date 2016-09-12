@@ -1,4 +1,4 @@
-@mod @mod_assign @ucla @core_edit @CCLE-4770
+@mod @mod_assign @ucla @local_ucla @core_edit @CCLE-4770
 Feature: Restrict grader drop down list to course members with grading permissions
   In order to be able to properly assign graders
   As an instructor
@@ -44,7 +44,7 @@ Feature: Restrict grader drop down list to course members with grading permissio
     And I log in as "teacher1"
     And I follow "course 1"
     And I follow "Test assignment name"
-    And I follow "View/grade all submissions"
+    And I follow "View all submissions"
     # Make sure filter dropdown only shows local graders.
     Then "Grader" "text" should exist in the "markerfilter" "select"
     And "Teacher" "text" should exist in the "markerfilter" "select"

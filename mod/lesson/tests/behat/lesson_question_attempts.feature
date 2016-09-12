@@ -21,6 +21,7 @@ Feature: In a lesson activity, students can not re-attempt a question more than 
     And I add a "Lesson" to section "1"
     And I set the following fields to these values:
       | Name | Test lesson name |
+      | Description | Test lesson description |
       | Re-takes allowed | Yes |
       | Minimum number of questions | 3 |
     And I press "Save and return to course"

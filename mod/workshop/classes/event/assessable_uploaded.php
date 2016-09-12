@@ -50,7 +50,7 @@ class assessable_uploaded extends \core\event\assessable_uploaded {
      */
     public function get_description() {
         return "The user with id '$this->userid' has uploaded the submission with id '$this->objectid' " .
-            "to the workshop activity with the course module id '$this->contextinstanceid'.";
+            "to the workshop activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -127,5 +127,9 @@ class assessable_uploaded extends \core\event\assessable_uploaded {
      */
     public function set_legacy_logdata($legacylogdata) {
         $this->legacylogdata = $legacylogdata;
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'workshop_submissions', 'restore' => 'workshop_submission');
     }
 }

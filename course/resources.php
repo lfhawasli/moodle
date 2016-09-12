@@ -29,7 +29,7 @@ require_once("$CFG->libdir/resourcelib.php");
 $id = required_param('id', PARAM_INT); // course id
 
 $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('incourse');
 require_course_login($course, true);
 
 // get list of all resource-like modules
@@ -134,7 +134,7 @@ foreach ($cms as $cm) {
     $icon = '<img src="'.$cm->get_icon_url().'" class="activityicon" alt="'.$cm->get_module_type_name().'" /> ';
 
     if (isset($resource->intro) && isset($resource->introformat)) {
-        $intro = format_module_intro('resource', $resource, $cm->id);
+        $intro = format_module_intro($cm->modname, $resource, $cm->id);
     } else {
         $intro = '';
     }

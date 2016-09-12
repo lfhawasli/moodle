@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014051200;
-$plugin->requires  = 2014050800;
+$plugin->version   = 2016052300;
+$plugin->requires  = 2016051900;
 $plugin->component = 'theme_more';
 $plugin->dependencies = array(
-    'theme_bootstrapbase'  => 2014050800,
-    'theme_clean'  => 2014050800,
+    'theme_bootstrapbase'  => 2016051900,
+    'theme_clean'  => 2016051900,
 );

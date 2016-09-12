@@ -21,7 +21,6 @@
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 /**
  * Accepts a role xml file with a role definition and returns the role
  * shortname.
@@ -30,6 +29,9 @@
  * @return string the role's shortname
  */
 function get_shortname($xml) {
+    $oldstring = "&nbsp;";
+    $newstring = "&#160;";
+    $xml = str_replace($oldstring , $newstring, $xml);
     $dom = new DOMDocument();
     $dom->loadXML($xml);
     return get_node_value($dom, '/role/shortname');
@@ -94,7 +96,7 @@ function import_config_table($incomingrolexmls, $actions) {
 
     $incomingroles = array();
     foreach ($incomingrolexmls as $rolexml) {
-        $incomingroles[] = core_role_preset::parse_preset($rolexml);
+        $incomingroles[] = tool_uclarolesmigration_cleanxml::parse_preset($rolexml);
     }
 
     $table = new html_table();

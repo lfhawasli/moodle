@@ -41,7 +41,6 @@
 #page-mod-scorm-player #scormnav {
     position: absolute;
     right: 5px;
-    top: 0px;
     text-align: center;
     top: 3px;
     width: 100%;
@@ -159,6 +158,10 @@
     white-space: nowrap;
 }
 
+#page-mod-scorm-view .exceededmaxattempts {
+    color: #cc0000;
+}
+
 #page-mod-scorm-player #altfinishlink {
     font-size: 140%;
     border: 0px;
@@ -221,6 +224,13 @@
     word-break: break-all;
 }
 
+#page-mod-scorm-report .scormattemptcounts {
+    clear: left;
+    text-align: center;
+    display:inline;
+    margin-left:20%;
+}
+
 #page-mod-scorm-player #scormpage span.yui3-treeview-icon {
     display: none;
 }
@@ -272,3 +282,5 @@
 #page-mod-scorm-player #scormpage div.yui3-g-r img {
     max-width: 100%;
 }
+
+.dir-rtl#page-mod-scorm-player #scormpage span.yui3-treeview-icon {float:right;}

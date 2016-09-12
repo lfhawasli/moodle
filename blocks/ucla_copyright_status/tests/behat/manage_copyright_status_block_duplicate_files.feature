@@ -37,8 +37,8 @@ Scenario: Upload same file twice and copyright status drop down only show once f
     And I press "Save and return to course"
     And I follow "Manage copyright"
     And I set the field "filter_copyright" to "All"
-    And I should see "Test file1" in the "//tr[contains(@class, 'r0')]/descendant::td[contains(@class, 'c1')]" "xpath_element"
-    And I should see "Test file2" in the "//tr[contains(@class, 'r0')]/descendant::td[contains(@class, 'c1')]" "xpath_element"
-    And "//tr[contains(@class, 'r0')]/descendant::td[contains(@class, 'c1')]/descendant::select[contains(@name,'filecopyright_')]" "xpath_element" should exist
+    And I should see "Test file1" in the "//tr[contains(@class, ' ')]/descendant::td[contains(@class, 'c1')]" "xpath_element"
+    And I should see "Test file2" in the "//tr[contains(@class, ' ')]/descendant::td[contains(@class, 'c1')]" "xpath_element"
+    And "//tr[contains(@class, ' ')]/descendant::td[contains(@class, 'c1')]/descendant::select[contains(@name,'filecopyright_')]" "xpath_element" should exist
     And "Test file1" "link" should appear before "//select[contains(@name,'filecopyright_')]" "xpath_element"
     And "Test file2" "link" should appear before "//select[contains(@name,'filecopyright_')]" "xpath_element"

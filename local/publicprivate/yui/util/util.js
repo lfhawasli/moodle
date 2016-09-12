@@ -35,13 +35,13 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             var mod = e.target.ancestor(CSS.ACTIVITYLI);
             
             var field = '';
-            var instance = mod.one('.activityinstance');
+            var instance = mod.one('.mod-indent-outer');
             // If an activity instance is not found, see if a  resource instance
             // exists (e.g. label, folder)
             if (!instance) {
                 instance = mod.one('.contentwithoutlink');
             }
-            var public = instance.one('.groupinglabel');
+            var public = instance.one('.availabilityinfo');
             
             if (public) {
                 public.remove();
@@ -59,7 +59,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             } else {
                 // Add label
                 instance.insert(
-                    Y.Node.create('<span class="groupinglabel">(' + M.util.get_string('publicprivategroupingname', 'local_publicprivate') + ')</span>')
+                    Y.Node.create('<div class="availabilityinfo">Not available unless: You belong to a group in <strong>Private Course Material</strong> (hidden otherwise)</div>')
                 );
                 
                 // Swap icon

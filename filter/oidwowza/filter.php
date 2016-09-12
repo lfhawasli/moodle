@@ -71,9 +71,9 @@ class filter_oidwowza extends moodle_text_filter {
 
         return $newtext;
     }
-    
+
     /**
-     * Generates the SecureToken described in: 
+     * Generates the SecureToken described in:
      * http://www.wowza.com/forums/content.php?620-How-to-protect-streaming-using-SecureToken-in-Wowza-Streaming-Engine
      * http://www.wowza.com/forums/showthread.php?38768-Hash-generation-using-SecureToken-version-2
      *
@@ -140,9 +140,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     if (!empty($fallbackurl)) {
         $fallbackurl = urldecode($fallbackurl);
     }
-
-    $app = $COURSE->shortname; // Need to store videos by shortname.
-
+    $app = $COURSE->shortname;
     // Handle VOD and Live streams.
     $timeline = '';
     $srtjs = '';
@@ -185,7 +183,13 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     }
 
     // Generate SecureToken hash.
-    $contentpath = $app . '/' . $format . $file;
+    if (strpos($url, get_config('block_ucla_video_reserves', 'wowzaurl')) !== false) {
+        // Specifying application name and defining a default instance of the application.
+        $app = 'IMCS/_definst_';
+        $contentpath = $app . '/' . $format . $file;
+    } else {
+        $contentpath = 'CCLEtest1/Vtest1/'. $format . $file;
+    }
     $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
     $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
     $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
@@ -287,7 +291,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     // Provide URL (BruinMedia) fallback, if available.
     if (!empty($fallbackurl)) {
         $fallbackurl = html_writer::link($fallbackurl,
-                get_string('fallbackurl', 'block_ucla_video_reserves'),
+                get_string('fallbackurl', 'block_ucla_media'),
                 array('class' => 'small'));
         $fallbackurl = html_writer::div($fallbackurl, 'text-center',
                 array('style' => 'max-width: ' . $width . 'px'));

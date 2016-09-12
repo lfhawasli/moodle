@@ -283,7 +283,7 @@ if ($modify_coursemenu_form->is_cancelled()) {
         }
     }
 
-    $passthrudata = new object();
+    $passthrudata = new stdClass();
     $passthrudata->sections = $sections;
     $passthrudata->deletesectionids = $deletesectionids;
     $passthrudata->landingpage = $landingpage;
@@ -473,6 +473,9 @@ if ($passthrudata || $verifydata) {
                     $DB->update_record('course_sections', $section);
                     $updatedrecords[] = $section->id;
                 } else {
+                    // Set summaryformat to FORMAT_HTML so that new sections have the
+                    // editor set to HTML by default.
+                    $section->summaryformat = FORMAT_HTML;
                     $newid = $DB->insert_record('course_sections', $section);
                     $updatedrecords[] = $newid;
                 }

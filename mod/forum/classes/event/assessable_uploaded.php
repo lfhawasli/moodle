@@ -50,7 +50,7 @@ class assessable_uploaded extends \core\event\assessable_uploaded {
      */
     public function get_description() {
         return "The user with id '$this->userid' has posted content in the forum post with id '$this->objectid' " .
-            "in the discussion '{$this->other['discussionid']}' located in the forum with the course module id " .
+            "in the discussion '{$this->other['discussionid']}' located in the forum with course module id " .
             "'$this->contextinstanceid'.";
     }
 
@@ -125,5 +125,16 @@ class assessable_uploaded extends \core\event\assessable_uploaded {
         } else if (!isset($this->other['triggeredfrom'])) {
             throw new \coding_exception('The \'triggeredfrom\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'forum_posts', 'restore' => 'forum_post');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['discussionid'] = array('db' => 'forum_discussions', 'restore' => 'forum_discussion');
+
+        return $othermapped;
     }
 }

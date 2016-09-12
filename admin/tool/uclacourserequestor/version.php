@@ -28,4 +28,5 @@
 // This is needed to allow moodle to update the module
 //                  YYYYMMDDVV
 $plugin->version  = 2012041900;
-$plugin->requires = 2011022100;
+$plugin->requires = 2013111800; // Moodle 2.6.
+$plugin->component = 'tool_uclacourserequestor';

@@ -62,7 +62,7 @@ class chapter_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' deleted the chapter with id '$this->objectid' for the book with the " .
+        return "The user with id '$this->userid' deleted the chapter with id '$this->objectid' for the book with " .
             "course module id '$this->contextinstanceid'.";
     }
 
@@ -103,5 +103,9 @@ class chapter_deleted extends \core\event\base {
         $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'book_chapters';
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'book_chapters', 'restore' => 'book_chapter');
     }
 }

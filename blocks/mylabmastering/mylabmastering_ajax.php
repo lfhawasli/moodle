@@ -24,19 +24,10 @@ require_once(dirname(__FILE__) . '/locallib.php');
 $err = new stdClass();
 
 // Parameters
-$course_id = 0;
-if (isset($_GET['course_id'])) {
-    $course_id = $_GET['course_id'];
-} else {
-    // Raise an error here.
-}
+// If not found, an error is thrown (Ref: lib/moodlelib.php, line: 522)
+$course_id = required_param('course_id', PARAM_TEXT);
+$user_id = required_param('user_id', PARAM_TEXT);
 
-$user_id = 0;
-if (isset($GET['user_id'])) {
-    $user_id = $_GET['user_id'];
-} else {
-    // Raise an error
-}
 
 // Send the AJAX headers
 echo($OUTPUT->header());

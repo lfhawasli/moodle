@@ -32,6 +32,11 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
     protected $postid;
     protected $discussionid;
     protected $attachment;
+    // START UCLA MOD: CCLE-4882 forum customization
+    protected $forumid;
+    protected $courseid;
+    protected $sortparam;
+    // END UCLA MOD: CCLE-4882 forum customization
 
     private $post;
     private $forum;
@@ -47,6 +52,9 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
             'postid'       => false,
             'discussionid' => false,
             'attachment'   => false,
+            // START UCLA MOD: feature/CCLE-4882-forum-customization.
+            'forumid'      => false,
+            // END UCLA MOD: feature/CCLE-4882-forum-customization.
         );
     }
     /**
@@ -54,9 +62,17 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
      */
     function __construct($callbackargs) {
         parent::__construct($callbackargs);
+        // START UCLA MOD: feature/CCLE-4882-forum-customization.
+        /*
         if (!$this->postid && !$this->discussionid) {
             throw new portfolio_caller_exception('mustprovidediscussionorpost', 'forum');
         }
+         * 
+         */
+        if (!$this->postid && !$this->discussionid && !$this->forumid) {
+            throw new portfolio_caller_exception('mustprovidediscussionorpost', 'forum');
+        }
+        // END UCLA MOD: feature/CCLE-4882-forum-customization.
     }
     /**
      * @global object
@@ -71,6 +87,10 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
         }
 
         $dparams = array();
+        
+        // START UCLA MOD: CCLE-4882 forum customization.
+        /*
+         * 
         if ($this->discussionid) {
             $dbparams = array('id' => $this->discussionid);
         } else if ($this->post) {
@@ -78,7 +98,21 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
         } else {
             throw new portfolio_caller_exception('mustprovidediscussionorpost', 'forum');
         }
-
+         * 
+         */
+        
+        if ($this->discussionid) {
+            $dbparams = array('id' => $this->discussionid);
+        } else if ($this->post) {
+            $dbparams = array('id' => $this->post->discussion);
+        } else if ($this->forumid) {
+            $dbparams = array('id' => $this->forumid);
+        } else {
+            throw new portfolio_caller_exception('mustprovidediscussionorpostorforum', 'forum');
+        }
+        
+        /*
+         *
         if (!$this->discussion = $DB->get_record('forum_discussions', $dbparams)) {
             throw new portfolio_caller_exception('invaliddiscussionid', 'forum');
         }
@@ -86,7 +120,16 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
         if (!$this->forum = $DB->get_record('forum', array('id' => $this->discussion->forum))) {
             throw new portfolio_caller_exception('invalidforumid', 'forum');
         }
-
+         * 
+         */
+        
+        $this->discussion = $DB->get_record('forum_discussions', $dbparams);
+        $this->forum = $DB->get_record('forum', array('id' => $this->forumid));
+        if ($this->discussion && !$this->forum) {
+            throw new portfolio_caller_exception('mustprovidediscussionorpostorforum', 'forum');
+        }
+        // END UCLA MOD: CCLE-4882 forum customization.
+        
         if (!$this->cm = get_coursemodule_from_instance('forum', $this->forum->id)) {
             throw new portfolio_caller_exception('invalidcoursemodule');
         }
@@ -107,6 +150,26 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
             } else if (!empty($this->singlefile)) {
                 $this->keyedfiles[$this->post->id] = array($this->singlefile);
             }
+        // START UCLA MOD: CCLE-4882 forum customization
+        } else if ($this->forumid) {
+            $discussions = forum_get_discussions($this->cm, $this->sortparam);
+            foreach ($discussions as $discussion) {
+                 $fs = get_file_storage();
+                $this->posts = forum_get_all_discussion_posts($discussion->id, 'p.created ASC');
+                $this->multifiles = array();
+                foreach ($this->posts as $post) {
+                    $attach = $fs->get_area_files($this->modcontext->id, 'mod_forum', 'attachment', $post->id, 'timemodified', false);
+                    $embed  = $fs->get_area_files($this->modcontext->id, 'mod_forum', 'post', $post->id, 'timemodified', false);
+                    $files = array_merge($attach, $embed);
+                    if ($files) {
+                        $this->keyedfiles[$post->id] = $files;
+                    } else {
+                        continue;
+                    }
+                    $this->multifiles = array_merge($this->multifiles, array_values($this->keyedfiles[$post->id]));
+                }
+            }
+        // END UCLA MOD: CCLE-4882 forum customization.
         } else { // whole thread
             $fs = get_file_storage();
             $this->posts = forum_get_all_discussion_posts($this->discussion->id, 'p.created ASC');
@@ -142,7 +205,17 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
      */
     function get_return_url() {
         global $CFG;
+        // START UCLA MOD: CCLE-4882 forum customization.
+        /*
         return $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $this->discussion->id;
+         * 
+         */
+        if ($this->forumid) {
+            return $CFG->wwwroot . '/mod/forum/allpost.php?d=' . $this->forumid;
+        } else {
+            return $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $this->discussion->id;
+        }
+        // END UCLA MOD: CCLE-4882 forum customization.
     }
     /**
      * @global object
@@ -152,11 +225,30 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
         global $CFG;
 
         $navlinks = array();
+        // START UCLA MOD: CCLE-4882 forum customization.
+        /*
         $navlinks[] = array(
             'name' => format_string($this->discussion->name),
             'link' => $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $this->discussion->id,
             'type' => 'title'
         );
+         * 
+         */
+        
+        if ($this->forumid) {
+             $navlinks[] = array(
+                'name' => format_string($this->forumid),
+                'link' => $CFG->wwwroot . '/mod/forum/allposts.php?forumid=' . $this->forumid, // ucla mod
+                'type' => 'title'
+            );
+        } else if ($this->discussion->id) {
+            $navlinks[] = array(
+                'name' => format_string($this->discussion->name),
+                'link' => $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $this->discussion->id,
+                'type' => 'title'
+            );
+        }
+        // END UCLA MOD: CCLE-4882 forum customization.
         return array($navlinks, $this->cm);
     }
     /**
@@ -171,6 +263,9 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
      */
     function prepare_package() {
         global $CFG;
+        // START UCLA MOD: CCLE-4882 forum customization
+        global $DB;
+        // END UCLA MOD: CCLE-4882 forum customization
 
         // set up the leap2a writer if we need it
         $writingleap = false;
@@ -185,8 +280,12 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
                 $leapwriter->add_entry($entry);
                 return $this->exporter->write_new_file($leapwriter->to_xml(), $this->exporter->get('format')->manifest_name(), true);
             }
-
-        } else if (empty($this->post)) {  // exporting whole discussion
+            
+        // START UCLA MOD: CCLE-4882 forum customization.
+        // } else if (empty($this->post)) {  // exporting whole discussion
+           } else if (empty($this->post) && !$this->forumid) {  // exporting whole discussion
+        // END UCLA MOD: CCLE-4882 forum customization
+               
             $content = ''; // if we're just writing HTML, start a string to add each post to
             $ids = array(); // if we're writing leap2a, keep track of all entryids so we can add a selection element
             foreach ($this->posts as $post) {
@@ -211,6 +310,45 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
             }
             $this->get('exporter')->write_new_file($content, $name, $manifest);
 
+        // START UCLA MOD: CCLE-4882 forum customization
+        } else if ($this->forumid) {
+            // exporting the whole forum
+            $content = ''; // if we're just writing HTML, start a string to add each post to
+            $ids = array(); // if we're writing leap2a, keep track of all entryids so we can add a selection element
+            $cm = get_coursemodule_from_instance('forum', $this->forumid, $this->courseid, false, MUST_EXIST);
+            $discussions = forum_get_discussions($cm, $this->sortparam); // use default value
+            $forum = $DB->get_record('forum', array('id' => $this->forumid));
+            $course = get_course($forum->course);
+            $options = portfolio_format_text_options();
+            $format = $this->get('exporter')->get('format');
+            foreach ($discussions as $discussion) {
+                $parent = $discussion->id;
+                $post = forum_get_post_full($parent);
+                // The id is post id, need to have discussion id as attribute id.
+                $discussion->id = $discussion->discussion;
+                $discussioncontent = forum_print_discussion($course, $cm, $forum, $discussion, $post, FORUM_MODE_EXPORT);
+                $posthtml = format_text($discussioncontent, $format, $options, $this->courseid);
+                if ($writingleap) {
+                    $ids[] = $this->prepare_post_leap2a($leapwriter, $post, $posthtml);
+                } else {
+                    $content .= $posthtml . '<br /><br />';
+                }
+            }
+            $this->copy_files($this->multifiles);
+            $name = 'forum.html';
+            $manifest = ($this->exporter->get('format') instanceof PORTFOLIO_FORMAT_RICH);
+            if ($writingleap) {
+                // add on an extra 'selection' entry
+                $selection = new portfolio_format_leap2a_entry('forumdiscussion' . $this->discussionid,
+                    get_string('discussion', 'forum') . ': ' . $this->discussion->name, 'selection');
+                $leapwriter->add_entry($selection);
+                $leapwriter->make_selection($selection, $ids, 'Grouping');
+                $content = $leapwriter->to_xml();
+                $name = $this->get('exporter')->get('format')->manifest_name();
+            }
+            $this->get('exporter')->write_new_file($content, $name, $manifest);
+        // END UCLA MOD: CCLE-4882 forum customization
+            
         } else { // exporting a single post
             $posthtml = $this->prepare_post($this->post);
 
@@ -313,7 +451,7 @@ class forum_portfolio_caller extends portfolio_module_caller_base {
         $fullname = fullname($users[$post->userid], $viewfullnames);
         $by = new stdClass();
         $by->name = $fullname;
-        $by->date = userdate($post->modified, '', $this->user->timezone);
+        $by->date = userdate($post->modified, '', core_date::get_user_timezone($this->user));
         $output .= '<div class="author">'.get_string('bynameondate', 'forum', $by).'</div>';
 
         $output .= '</td></tr>';

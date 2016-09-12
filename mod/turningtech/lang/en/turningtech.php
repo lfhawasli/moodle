@@ -212,3 +212,4 @@ $string['numberdevicespurged']   = 'Successfully purged {$a} Device IDs';
 /********* Support info page *************/
 $string['supportinfo']   = 'Support Information';
 $string['moduleversion'] = 'Module Version';
+$string['eventttlogs'] = 'Logging TT Logs';

@@ -9,7 +9,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015081800;
+$plugin->version   = 2016051800;
 $plugin->requires  = 2013051408;
 $plugin->cron      = 0;
 $plugin->component = 'block_mylabmastering';

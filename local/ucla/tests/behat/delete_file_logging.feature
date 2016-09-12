@@ -1,4 +1,4 @@
-@ucla @core_edit @CCLE-3843
+@ucla @local_ucla @core_edit @CCLE-3843
 Feature: Logging file deletion
   In order to recover a file
   As a system administrator

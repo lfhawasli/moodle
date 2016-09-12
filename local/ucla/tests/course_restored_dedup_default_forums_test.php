@@ -49,6 +49,26 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
     private $_defaultforums = array();
 
     /**
+     * Helper function to call local_ucla_observer::course_restored_dedup_default_forums().
+     * 
+     * @param string $type  backup::TYPE_1COURSE or backup::TYPE_1ACTIVITY.
+     */
+    private function call_course_restored_dedup_default_forums($type) {
+        global $USER;
+        $event = \core\event\course_restored::create(array(
+            'objectid' => $this->_courseid,
+            'userid' => $USER->id,
+            'context' => context_course::instance($this->_courseid),
+            'other' => array('type' => $type,
+                             'target' => backup::TARGET_NEW_COURSE,
+                             'mode' => backup::MODE_GENERAL,
+                             'operation' => backup::OPERATION_RESTORE,
+                             'samesite' => backup::MODE_SAMESITE)
+        ));
+        local_ucla_observer::course_restored_dedup_default_forums($event);
+    }
+
+    /**
      * Helper method to count the number of forums with the given type for the
      * test site.
      *
@@ -125,10 +145,7 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             $this->assertEquals($typecount, count($forums['typeforums']));
 
             // Run function and make sure it deletes the copy.
-            $data = new stdClass();
-            $data->courseid = $this->_courseid;
-            $data->type = backup::TYPE_1COURSE;
-            course_restored_dedup_default_forums($data);
+            $this->call_course_restored_dedup_default_forums(backup::TYPE_1COURSE);
             --$totalforums;
             --$typecount;
 
@@ -165,11 +182,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             $this->assertEquals($totalforums, $forums['totalforums']);
             $this->assertEquals($typecount, count($forums['typeforums']));
 
-            // Run function and make sure it deletes the origina, empty forum.
-            $data = new stdClass();
-            $data->courseid = $this->_courseid;
-            $data->type = backup::TYPE_1COURSE;
-            course_restored_dedup_default_forums($data);
+            // Run function and make sure it deletes the original, empty forum.
+            $this->call_course_restored_dedup_default_forums(backup::TYPE_1COURSE);
             --$totalforums;
             --$typecount;
 
@@ -181,7 +195,6 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             $this->assertEquals($defaultchanged->id, $tocheck->id);
         }
     }
-
 
     /**
      * Make sure that forums with content are not deleted.
@@ -213,11 +226,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             $discussion->userid = $USER->id;
             $forumgenerator->create_discussion($discussion);
 
-            // Run function and make sure it deletes the origina, empty forum.
-            $data = new stdClass();
-            $data->courseid = $this->_courseid;
-            $data->type = backup::TYPE_1COURSE;
-            course_restored_dedup_default_forums($data);
+            // Run function and make sure it deletes the original, empty forum.
+            $this->call_course_restored_dedup_default_forums(backup::TYPE_1COURSE);
             --$totalforums;
             --$typecount;
 
@@ -255,10 +265,7 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             $this->assertEquals($typecount, count($forums['typeforums']));
 
             // Run function and make sure nothing happens.
-            $data = new stdClass();
-            $data->courseid = $this->_courseid;
-            $data->type = backup::TYPE_1ACTIVITY;
-            course_restored_dedup_default_forums($data);
+            $this->call_course_restored_dedup_default_forums(backup::TYPE_1ACTIVITY);
 
             $forums = $this->get_by_forums_type($type);
             $this->assertEquals($totalforums, $forums['totalforums']);

@@ -39,9 +39,6 @@ class message_output_email extends message_output {
     function send_message($eventdata) {
         global $CFG;
 
-        // Ignore $CFG->noemailever here because we want to test this code,
-        // the message sending fails later in email_to_user().
-
         // skip any messaging suspended and deleted users
         if ($eventdata->userto->auth === 'nologin' or $eventdata->userto->suspended or $eventdata->userto->deleted) {
             return true;
@@ -83,8 +80,18 @@ class message_output_email extends message_output {
             }
         }
 
+        // Configure mail replies - this is used for incoming mail replies.
+        $replyto = '';
+        $replytoname = '';
+        if (isset($eventdata->replyto)) {
+            $replyto = $eventdata->replyto;
+            if (isset($eventdata->replytoname)) {
+                $replytoname = $eventdata->replytoname;
+            }
+        }
+
         $result = email_to_user($recipient, $eventdata->userfrom, $eventdata->subject, $eventdata->fullmessage,
-                                $eventdata->fullmessagehtml, $attachment, $attachname);
+                                $eventdata->fullmessagehtml, $attachment, $attachname, true, $replyto, $replytoname);
 
         // Remove an attachment file if any.
         if (!empty($attachment) && file_exists($attachment)) {
@@ -101,23 +108,46 @@ class message_output_email extends message_output {
      */
     function config_form($preferences){
         global $USER, $OUTPUT, $CFG;
-        // START UCLA MOD: CCLE-5181-Users are unable to unsubscribe from Announcement forums through user Profile settings.
-        // Causes users to only be able to edit the email address they will receieve email notifications from if they have instructing roles.
-        // if (empty($CFG->messagingallowemailoverride)) {
-        if (empty($CFG->messagingallowemailoverride) || (local_ucla_core_edit::is_instructor($USER) == false)) {
-        // END UCLA MOD: CCLE-5181
-            return null;
+        $string = '';
+
+        $choices = array();
+        $choices['0'] = get_string('textformat');
+        $choices['1'] = get_string('htmlformat');
+        $current = $preferences->mailformat;
+        $string .= $OUTPUT->container(html_writer::label(get_string('emailformat'), 'mailformat'));
+        $string .= $OUTPUT->container(html_writer::select($choices, 'mailformat', $current, false, array('id' => 'mailformat')));
+
+        if (!empty($CFG->allowusermailcharset)) {
+            $choices = array();
+            $charsets = get_list_of_charsets();
+            if (!empty($CFG->sitemailcharset)) {
+                $choices['0'] = get_string('site').' ('.$CFG->sitemailcharset.')';
+            } else {
+                $choices['0'] = get_string('site').' (UTF-8)';
+            }
+            $choices = array_merge($choices, $charsets);
+            $current = $preferences->mailcharset;
+            $string .= $OUTPUT->container(html_writer::label(get_string('emailcharset'), 'mailcharset'));
+            $string .= $OUTPUT->container(
+                html_writer::select($choices, 'preference_mailcharset', $current, false, array('id' => 'mailcharset'))
+            );
         }
 
-        $inputattributes = array('size'=>'30', 'name'=>'email_email', 'value'=>$preferences->email_email);
-        $string = get_string('email','message_email') . ': ' . html_writer::empty_tag('input', $inputattributes);
+        if (!empty($CFG->messagingallowemailoverride)) {
+            $inputattributes = array('size' => '30', 'name' => 'email_email', 'value' => $preferences->email_email,
+                    'id' => 'email_email');
+            $string .= html_writer::label(get_string('email', 'message_email'), 'email_email');
+            $string .= $OUTPUT->container(html_writer::empty_tag('input', $inputattributes));
 
-        if (empty($preferences->email_email) && !empty($preferences->userdefaultemail)) {
-            $string .= get_string('ifemailleftempty', 'message_email', $preferences->userdefaultemail);
-        }
+            if (empty($preferences->email_email) && !empty($preferences->userdefaultemail)) {
+                $string .= $OUTPUT->container(get_string('ifemailleftempty', 'message_email', $preferences->userdefaultemail));
+            }
 
-        if (!empty($preferences->email_email) && !validate_email($preferences->email_email)) {
-            $string .= $OUTPUT->container(get_string('invalidemail'), 'error');
+            if (!empty($preferences->email_email) && !validate_email($preferences->email_email)) {
+                $string .= $OUTPUT->container(get_string('invalidemail'), 'error');
+            }
+
+            $string .= '<br/>';
         }
 
         return $string;
@@ -132,6 +162,9 @@ class message_output_email extends message_output {
     function process_form($form, &$preferences){
         if (isset($form->email_email)) {
             $preferences['message_processor_email_email'] = $form->email_email;
+        }
+        if (isset($form->preference_mailcharset)) {
+            $preferences['mailcharset'] = $form->preference_mailcharset;
         }
     }
 

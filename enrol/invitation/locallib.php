@@ -260,17 +260,7 @@ class invitation_manager {
                 $fromuser->middlename = '';
 
                 // Send invitation to the user.
-                $contactuser = new stdClass();
-                $contactuser->email = $invitation->email;
-                $contactuser->firstname = ''; 
-                $contactuser->lastname = ''; 
-                $contactuser->maildisplay = true;
-                $contactuser->id = $this->get_invitee_id();
-                // Moodle 2.7 introduced new username fields.
-                $contactuser->alternatename = '';
-                $contactuser->firstnamephonetic = '';
-                $contactuser->lastnamephonetic = '';
-                $contactuser->middlename = '';
+                $contactuser = $this->get_contact_user($invitation->email);
 
                 email_to_user($contactuser, $fromuser, $invitation->subject, $message);
 
@@ -336,17 +326,7 @@ class invitation_manager {
             $inviter = $DB->get_record('user', array('id' => $invitation->inviterid));
 
             // This is inviter's information.
-            $contactuser = new object;
-            $contactuser->email = $inviter->email;
-            $contactuser->firstname = $inviter->firstname;
-            $contactuser->lastname = $inviter->lastname;
-            $contactuser->maildisplay = true;
-            $contactuser->id = $inviter->id;
-            // Moodle 2.7 introduced new username fields.
-            $contactuser->alternatename = '';
-            $contactuser->firstnamephonetic = '';
-            $contactuser->lastnamephonetic = '';
-            $contactuser->middlename = '';
+            $contactuser = $this->get_contact_user($inviter->email);
 
             $emailinfo = prepare_notice_object($invitation);
             $emailinfo->userfullname = trim($USER->firstname . ' ' . $USER->lastname);
@@ -421,6 +401,27 @@ class invitation_manager {
                     'enrol_invitation', date('M j, Y', $timeend));
         }
         return $expiration;
+    }
+
+    /**
+     * Given an email address, will return a user object that can be used in 
+     * email_to_user().
+     *
+     * @param string $email
+     * @return object
+     */
+    protected function get_contact_user($email) {
+        global $CFG, $DB;
+        // There might be multiple users with the same email, but we just pick
+        // the first one.
+        $user = $DB->get_record('user', array('email' => $email), '*', IGNORE_MULTIPLE);
+        if (empty($user)) {
+            // Create our own user using guestid as base.
+            $user = $DB->get_record('user', array('username' => 'guest',
+                'mnethostid' => $CFG->mnet_localhost_id));
+            $user->email = $email;
+        }
+        return $user;
     }
 
     /**
@@ -587,24 +588,6 @@ class invitation_manager {
 
         return $ret_val;
     }
-
-    /**
-     * Set temporary id for invitee.  Use Moodle guest id.
-     */
-    public function get_invitee_id(){
-        global $CFG;
-        if (empty($CFG->siteguest)) {
-            $guestid = $DB->get_field('user', 'id', array('username'=>'guest', 'mnethostid'=>$CFG->mnet_localhost_id));
-            if (!$guestid) {
-                return 0; // If no Id, still need to assign one.
-            } else{
-                set_config('siteguest', $guestid);
-                return $guestid;
-            }
-        } 
-        return $CFG->siteguest;
-    }
-
 }
 
 /**

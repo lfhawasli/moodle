@@ -72,7 +72,7 @@ class logging_test extends advanced_testcase {
         $notice = 'Initializing cfg variables';
         $error = get_string('errbcmsglocation','tool_ucladatasourcesync');
         $logmessage = $notice . PHP_EOL . $error;
-        $logmessage = textlib::substr($logmessage, 0, 252) . '...';
+        $logmessage = core_text::substr($logmessage, 0, 252) . '...';
         
         // Verify target, action, event name, and log message.
         $this->assertEquals('bruincast' ,$log1->target);
@@ -87,7 +87,7 @@ class logging_test extends advanced_testcase {
         $notice = 'Inserting library reserve data';
         $error = get_string('errbcinsert', 'tool_ucladatasourcesync');
         $logmessage = $notice . PHP_EOL . $error;
-        $logmessage = textlib::substr($logmessage, 0, 252) . '...';
+        $logmessage = core_text::substr($logmessage, 0, 252) . '...';
         
         // Verify target, action, event name, and log message.
         $this->assertEquals('libraryreserves' ,$log3->target);

@@ -72,23 +72,24 @@ class assign_submission_usqfiletypes extends assign_submission_plugin {
      * @return void
      */
     public function get_settings(MoodleQuickForm $mform) {
-        global $CFG, $COURSE, $PAGE;
-		$PAGE->requires->js('/mod/assign/submission/usqfiletypes/view.js');
+        global $CFG, $COURSE;
+
         $groupels = array();
         foreach ($this->get_all_typesets() as $k => $v) {
             $elem = $mform->createElement('checkbox', $k, '', $v);
             $groupels[] = $elem;
         }
-		// if Accepted file types checkbox checked, show below
+
+        // if Accepted file types checkbox checked, show below
         $name = get_string('acceptedfiletypes', 'assignsubmission_usqfiletypes');
         $mform->addGroup($groupels, 'assignsubmission_usqfiletypes_filetypes', $name, '<br/>');
-       // $mform->disabledIf('assignsubmission_usqfiletypes_filetypes', 'assignsubmission_usqfiletypes_enabled', 'notchecked');
+        // $mform->disabledIf('assignsubmission_usqfiletypes_filetypes', 'assignsubmission_usqfiletypes_enabled', 'notchecked');
 
         $name = get_string('filetypesother', 'assignsubmission_usqfiletypes');
         $mform->addElement('text', 'assignsubmission_usqfiletypes_filetypesother', $name, 'size="30"');
         $mform->setType('assignsubmission_usqfiletypes_filetypesother', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('assignsubmission_usqfiletypes_filetypesother', 'filetypesother', 'assignsubmission_usqfiletypes');
-      //  $mform->disabledIf('assignsubmission_usqfiletypes_filetypesother', 'assignsubmission_usqfiletypes_enabled', 'notchecked');
+        // $mform->disabledIf('assignsubmission_usqfiletypes_filetypesother', 'assignsubmission_usqfiletypes_enabled', 'notchecked');
     }
 
     /**

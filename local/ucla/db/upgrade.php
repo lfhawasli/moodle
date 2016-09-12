@@ -474,7 +474,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
                 // Some subj_area_full have different subjarea (e.g. EAST ASIAN
                 // STUDIES E A STD vs EA STDS). Choose newest subjarea.
                 $subjectareas = $DB->get_records('ucla_reg_subjectarea',
-                        array('subj_area_full' => textlib::strtoupper($child->name)),
+                        array('subj_area_full' => core_text::strtoupper($child->name)),
                         'modified DESC');
                 $subjectarea = reset($subjectareas);
                 if (!empty($subjectarea)) {

@@ -69,7 +69,7 @@ class attempt_summary_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has viewed the summary for the attempt with id '$this->objectid' belonging " .
-            "to the user with id '$this->relateduserid' for the quiz with the course module id '$this->contextinstanceid'.";
+            "to the user with id '$this->relateduserid' for the quiz with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -107,5 +107,16 @@ class attempt_summary_viewed extends \core\event\base {
         if (!isset($this->other['quizid'])) {
             throw new \coding_exception('The \'quizid\' must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'quiz_attempts', 'restore' => 'quiz_attempt');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['quizid'] = array('db' => 'quiz', 'restore' => 'quiz');
+
+        return $othermapped;
     }
 }

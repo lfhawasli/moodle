@@ -68,7 +68,7 @@ class cache_config_writer extends cache_config {
      */
     protected function config_save() {
         global $CFG;
-        $cachefile = self::get_config_file_path();
+        $cachefile = static::get_config_file_path();
         $directory = dirname($cachefile);
         if ($directory !== $CFG->dataroot && !file_exists($directory)) {
             $result = make_writable_directory($directory, false);
@@ -806,6 +806,7 @@ abstract class cache_administration_helper extends cache_helper {
                 'component' => $definition->get_component(),
                 'area' => $definition->get_area(),
                 'mappings' => $mappings,
+                'canuselocalstore' => $definition->can_use_localstore(),
                 'sharingoptions' => self::get_definition_sharing_options($definition->get_sharing_options(), false),
                 'selectedsharingoption' => self::get_definition_sharing_options($definition->get_selected_sharing_option(), true),
                 'userinputsharingkey' => $definition->get_user_input_sharing_key()

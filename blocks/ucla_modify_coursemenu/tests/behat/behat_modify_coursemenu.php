@@ -26,34 +26,11 @@ class behat_modify_coursemenu extends behat_base {
     public function i_should_be_on_section($section) {
         
         $givens = array(
-            new Given('I should see "' . $section . '" in the "li.current_branch" "css_element"')
+            new Given('I should see "' . $section . '" in the "li.current_branch" "css_element"'),
+            // look for highlighting in the menu block
+            new Given('I should see "' . $section . '" highlighted in the ucla site menu')
         );
-        
-        // Need course title
-        $coursetitle = '';
-        
-        $courses = $this->getMainContext()->getSubcontext('behat_ucla')->courses;
-        if (!empty($courses)) {
-            $coursetitle = array_shift($courses)->fullname;
-        }
-        
-        switch ($section) {
-            case 'Syllabus':
-                $givens[] = new Given('I should see "Syllabus manager" in the ".headingblock" "css_element"');
-                break;
-            case 'Site info':
-                $givens[] = new Given('I should see "' . $coursetitle .'" in the ".site-title" "css_element"');
-                break;
-            case 'Show all':
-                $givens[] = new Given('I should see "' . $coursetitle .'" in the ".site-title" "css_element"');
-                $week = rand(1, 10);
-                $givens[] = new Given('I should see "Week ' . $week . '" in the "#section-'. $week .'" "css_element"');
-                break;
-            default:
-                $givens[] = new Given('I should see "' . $section . '" in the ".sectionheader" "css_element"');
-                
-        }
-        
+
         return $givens;
         
     }

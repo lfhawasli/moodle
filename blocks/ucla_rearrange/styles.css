@@ -48,7 +48,7 @@
 }
 
 .section-item {
-    border: 1px solid #A8A8A8;    
+    border: 1px solid #A8A8A8;
     margin: 4px;
     background-color: #FEFCF6;
     padding: 0px 0px 4px 0px;
@@ -87,6 +87,7 @@
 }
 
 .ucla_rearrange_form .expandall {
-    margin-right: 0;
+    margin-top: -40px;
+    margin-right: 12px;
     float: right;
 }

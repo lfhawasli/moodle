@@ -431,6 +431,62 @@ class ucla_weeksdisplay_test extends advanced_testcase {
     }
 
     /**
+     * Test that a log event is triggered when the week changes.
+     */
+    public function test_logging() {
+        // Build Summer course so that we can test hidden courses later.
+        $class = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_class(
+                array('term' => '141'));
+        $course = array_pop($class);
+        // Make sure course is visible.
+        $checkcourse = get_course($course->courseid);
+        $this->assertEquals(1, $checkcourse->visible);
+
+        // Track all events triggered.
+        $sink = $this->redirectEvents();
+
+        // Set Fall.
+        $query = $this->registrar_query('14F');
+        $fall = \block_ucla_weeksdisplay_session::create($query);
+        $today = new DateTime('2014-10-06');
+        $fall->set_today($today);
+        $fall->update_week_display();
+        $result = $sink->get_events();
+        $event = reset($result);
+        $this->assertEquals(1, $event->other['week']);
+        $sink->clear(); // Clear events.
+
+        // Should be no change next day.
+        $today->modify('+1 days');
+        $fall->set_today($today);    
+        $fall->update_week_display();
+        $this->assertEquals(0, $sink->count());
+
+        // Go to next week.
+        $today->modify('+6 days');
+        $fall->set_today($today);
+        $fall->update_week_display();
+        $this->assertEquals(1, $sink->count());
+        $result = $sink->get_events();
+        $event = reset($result);
+        $this->assertTrue(!empty($event));
+        $this->assertEquals(2, $event->other['week']);
+
+        $sink->close(); // Close sink to test event handlers.
+
+        // Go to 3rd week, that's when courses from previous terms should be
+        // hidden.
+        set_config('currentterm', '14F');
+        set_config('student_access_ends_week', 3, 'local_ucla');
+        $today->modify('+7 days');
+        $fall->set_today($today);
+        $fall->update_week_display();
+        // Make sure course is hidden.
+        $checkcourse = get_course($course->courseid);
+        $this->assertEquals(0, $checkcourse->visible);
+    }
+
+    /**
      * Tests that Monday - Sunday remain same week.
      */
     public function test_session_monday_start() {

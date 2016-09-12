@@ -37,7 +37,13 @@
 @import "moodle/chat";
 @import "moodle/filepicker";
 @import "moodle/dialog";
+@import "moodle/navigation";
+@import "moodle/usermenu";
+@import "moodle/preferences";
+@import "moodle/userprofile";
+@import "moodle/availability_conditions";
 
 // Moodle activities/resources
+@import "moodle/mod_choice";
 @import "moodle/mod_label";
 @import "moodle/atto";

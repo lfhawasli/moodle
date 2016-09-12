@@ -1,7 +1,7 @@
 <?php
 
 $string['pluginname'] = 'UCLA browse-by';
-$string['displayname'] = 'Browse by:';
+$string['displayname'] = 'Browse by';
 $string['ucla_browseby:addinstance'] = 'Add Browseby block';
 $string['ucla_browseby:myaddinstance'] = 'Add Browseby block to My home';
 

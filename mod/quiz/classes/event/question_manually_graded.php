@@ -68,7 +68,7 @@ class question_manually_graded extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' manually graded the question with id '$this->objectid' for the attempt " .
-            "with id '{$this->other['attemptid']}' for the quiz with the course module id '$this->contextinstanceid'.";
+            "with id '{$this->other['attemptid']}' for the quiz with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -111,6 +111,17 @@ class question_manually_graded extends \core\event\base {
         if (!isset($this->other['slot'])) {
             throw new \coding_exception('The \'slot\' value must be set in other.');
         }
+    }
 
+    public static function get_objectid_mapping() {
+        return array('db' => 'question', 'restore' => 'question');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['quizid'] = array('db' => 'quiz', 'restore' => 'quiz');
+        $othermapped['attemptid'] = array('db' => 'quiz_attempts', 'restore' => 'quiz_attempt');
+
+        return $othermapped;
     }
 }

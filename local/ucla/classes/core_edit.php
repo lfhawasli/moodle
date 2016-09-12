@@ -335,4 +335,22 @@ class local_ucla_core_edit {
         // Sort collaboration sites via title.
         ksort(self::$profilecollabsites);
     }
+
+    /**
+     * Function will return true if theme is uclashared/uclasharedcourse.
+     *
+     * @return boolean
+     */
+    public static function using_ucla_theme() {
+        global $CFG;
+        // Checks if $CFG->theme is set.
+        if (isset($CFG->theme)) {
+            // Checks if theme is uclashared/uclasharedcourse.
+            if ($CFG->theme == 'uclashared' ||
+                $CFG->theme == 'uclasharedcourse') {
+                return true;
+            }
+        }
+        return false;
+    }
 }

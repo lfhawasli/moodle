@@ -1,4 +1,4 @@
-@ucla @local_ucla_syllabus 
+@ucla @local_ucla_syllabus
 Feature: Viewing a public or private syllabus
   As a member of the UCLA community or an enrolled student
   I want to be able to view a course syllabus
@@ -17,6 +17,7 @@ Background:
     And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
     And I follow "Course 1"

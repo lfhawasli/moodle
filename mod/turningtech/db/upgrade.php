@@ -101,6 +101,27 @@ function xmldb_turningtech_upgrade($oldversion = 0) {
         // Turningtech savepoint reached.
         upgrade_mod_savepoint(true, 2012101223, 'turningtech');
     }
+    
+    if ($oldversion < 2015082602) {
+        // Define field intro to be added to newmodule.
+        $table = new xmldb_table('turningtech');
+        $field = new xmldb_field('intro', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
+        // Add field intro.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field introformat to be added to newmodule.
+        $table = new xmldb_table('turningtech');
+        $field = new xmldb_field('introformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0',
+            'intro');
+        // Add field introformat.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Once we reach this point, we can store the new version and consider the module
+        // ... upgraded to the version 2007040100 so the next time this block is skipped.
+        upgrade_mod_savepoint(true, 2015082602, 'turningtech');
+    }
     return true;
     // And upgrade begins here. For each one, you'll need one
     // block of code similar to the next one. Please, delete

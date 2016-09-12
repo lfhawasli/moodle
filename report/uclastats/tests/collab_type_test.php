@@ -65,10 +65,10 @@ class collab_types_test extends advanced_testcase {
         // are entered into table as all caps.
         $record = new stdClass();
         $record->code = 'PC';
-        $record->fullname = textlib::strtoupper($parentcategory->name);
+        $record->fullname = core_text::strtoupper($parentcategory->name);
         $DB->insert_record('ucla_reg_division', $record);
         $record->code = 'CC';
-        $record->fullname = textlib::strtoupper($childcategory->name);
+        $record->fullname = core_text::strtoupper($childcategory->name);
         $DB->insert_record('ucla_reg_division', $record);
 
         $divs = $DB->get_records('ucla_reg_division');

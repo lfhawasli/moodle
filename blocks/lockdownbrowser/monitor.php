@@ -1,12 +1,13 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2015 Respondus, Inc.  All Rights Reserved.
-// Date: July 15, 2015.
+// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
+// Date: May 13, 2016.
 
 // production flags
-// - should all default to false
-// - set to TRUE only for exceptional environments
+// - should all default to false or 0
+// - change only for exceptional environments
 $lockdownbrowser_ignore_https_login = false; // set true to ignore $CFG->loginhttps
+$lockdownbrowser_script_time_limit = 0; // set > 0 to override default set in php.ini
 
 // debug-only flags
 // - should always be false for production environments
@@ -54,15 +55,15 @@ if (!empty($CFG->maintenance_enabled)
 
 raise_memory_limit(MEMORY_EXTRA);
 
-/*** Use this if we exceed the default script time limit.
-if ($CFG->version >= 2014051200) {
-    // Moodle 2.7.0+.
-    core_php_time_limit::raise(300);
-} else {
-    // Prior to Moodle 2.7.0.
-    set_time_limit(300);
+if ($lockdownbrowser_script_time_limit > 0) {
+    if ($CFG->version >= 2014051200) {
+        // Moodle 2.7.0+.
+        core_php_time_limit::raise($lockdownbrowser_script_time_limit);
+    } else {
+        // Prior to Moodle 2.7.0.
+        set_time_limit($lockdownbrowser_script_time_limit);
+    }
 }
-***/
 
 set_exception_handler("lockdownbrowser_monitorexceptionhandler");
 
@@ -555,7 +556,8 @@ function lockdownbrowser_monitorredeemtoken($parameters) {
     $server_name = $CFG->block_lockdownbrowser_ldb_servername;
 
     $redeem_time = time();
-        $redeem_mac  = lockdownbrowser_monitorgeneratemac2(
+
+    $redeem_mac  = lockdownbrowser_monitorgeneratemac2(
         urldecode($institution_id) . urldecode($server_name) . $token . $redeem_time,
         1 // server request hash needs leading underscore
     );
@@ -580,30 +582,7 @@ function lockdownbrowser_monitorredeemtoken($parameters) {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    /***
-    // Moodle proxy support; needs to be tested.
-    if (!empty($CFG->proxyhost) && !is_proxybypass($url)) {
-        if (empty($CFG->proxyport)) {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
-        } else {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost.':'.$CFG->proxyport);
-        }
-        if (!empty($CFG->proxyuser) && !empty($CFG->proxypassword)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
-            if (defined('CURLOPT_PROXYAUTH')) {
-                curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
-            }
-        }
-        if (!empty($CFG->proxytype)) {
-            if ($CFG->proxytype == 'SOCKS5' && defined('CURLPROXY_SOCKS5')) {
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-            } else {
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-                curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
-            }
-        }
-    }
-    ***/
+
     $result = curl_exec($ch);
     $info   = curl_getinfo($ch);
     curl_close($ch);

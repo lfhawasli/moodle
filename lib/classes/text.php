@@ -249,6 +249,30 @@ class core_text {
     }
 
     /**
+     * Truncates a string to no more than a certain number of bytes in a multi-byte safe manner.
+     * UTF-8 only!
+     *
+     * Many of the other charsets we test for (like ISO-2022-JP and EUC-JP) are not supported
+     * by typo3, and will give invalid results, so we are supporting UTF-8 only.
+     *
+     * @param string $string String to truncate
+     * @param int $bytes Maximum length of bytes in the result
+     * @return string Portion of string specified by $bytes
+     * @since Moodle 3.1
+     */
+    public static function str_max_bytes($string, $bytes) {
+        if (function_exists('mb_strcut')) {
+            return mb_strcut($string, 0, $bytes, 'UTF-8');
+        }
+
+        $oldlevel = error_reporting(E_PARSE);
+        $result = self::typo3()->strtrunc('utf-8', $string, $bytes);
+        error_reporting($oldlevel);
+
+        return $result;
+    }
+
+    /**
      * Finds the last occurrence of a character in a string within another.
      * UTF-8 ONLY safe mb_strrchr().
      *
@@ -706,23 +730,5 @@ class core_text {
             }
         }
         return implode(' ', $words);
-    }
-}
-
-/**
- * Legacy tectlib.
- * @deprecated since 2.6, use core_text:: instead.
- */
-class textlib extends core_text {
-    /**
-     * Locale aware sorting, the key associations are kept, values are sorted alphabetically.
-     *
-     * @param array $arr array to be sorted (reference)
-     * @param int $sortflag One of Collator::SORT_REGULAR, Collator::SORT_NUMERIC, Collator::SORT_STRING
-     * @return void modifies parameter
-     */
-    public static function asort(array &$arr, $sortflag = null) {
-        debugging('textlib::asort has been superseeded by collatorlib::asort please upgrade your code to use that', DEBUG_DEVELOPER);
-        collatorlib::asort($arr, $sortflag);
     }
 }

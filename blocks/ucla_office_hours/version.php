@@ -23,3 +23,4 @@
  */
 
 $plugin->version = 2015081500;
+$plugin->component = 'block_ucla_office_hours';

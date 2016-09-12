@@ -98,6 +98,11 @@
             }
         }
     }
+
+    // Make a larger box when editing max marks for a question.
+    ul.slots li.section li.activity .instancemaxmarkcontainer form input {
+        height: 1.5em;
+    }
 }
 
 // The quiz question (bank) page
@@ -146,4 +151,46 @@
 // This is a <select> element that must have it's width as 100% instead of 'auto'
 #id_movetocategory {
     width: 100%;
+}
+
+.mod_quiz_preflight_popup {
+        .moodle-dialogue-wrap  {
+            border: 3px solid #D9534F;
+            
+            // Header.
+            .moodle-dialogue-hd.yui3-widget-hd {
+                background-image: none;
+                background-color: #D9534F;
+                text-shadow: 0 0 0;
+                border-radius: 0 0 0 0;
+                color: white;
+                font-size: large;
+            }
+                
+        }
+        
+            // Body.
+            .moodle-dialogue-bd {
+                
+                #mod_quiz_preflight_form .fitem{
+                    font-size: medium;
+                }
+                // Make 'Start attempt' dangerous.
+                input[value="Start attempt"] {
+                    @extend .btn;
+                    @extend .btn-danger;
+                    margin-right: 8px;
+                }
+                input[value="Cancel"] {
+                    @extend .btn;
+                    @extend .btn-link;
+                    
+                    border: 1px solid #ccc;
+                    @include border-radius(4px);
+                    
+                    &:hover {
+                        border: 1px solid #ccc;
+                    }
+                }
+            }
 }

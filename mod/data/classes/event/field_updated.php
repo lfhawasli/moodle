@@ -70,7 +70,7 @@ class field_updated extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' updated the field with id '$this->objectid' in the data activity " .
-            "with the course module id '$this->contextinstanceid'.";
+            "with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -108,5 +108,16 @@ class field_updated extends \core\event\base {
         if (!isset($this->other['dataid'])) {
             throw new \coding_exception('The \'dataid\' value must be set in other.');
         }
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'data_fields', 'restore' => 'data_field');
+    }
+
+    public static function get_other_mapping() {
+        $othermapped = array();
+        $othermapped['dataid'] = array('db' => 'data', 'restore' => 'data');
+
+        return $othermapped;
     }
 }

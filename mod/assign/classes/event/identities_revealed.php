@@ -68,7 +68,7 @@ class identities_revealed extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has revealed identities in the assignment with the course module " .
+        return "The user with id '$this->userid' has revealed identities in the assignment with course module " .
             "id '$this->contextinstanceid'.";
     }
 
@@ -114,5 +114,9 @@ class identities_revealed extends base {
         }
 
         parent::validate_data();
+    }
+
+    public static function get_objectid_mapping() {
+        return array('db' => 'assign', 'restore' => 'assign');
     }
 }

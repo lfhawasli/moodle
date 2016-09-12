@@ -42,7 +42,6 @@ $PAGE->set_url('/mod/turningtech/search_device.php', array(
     'id' => $id
 ));
 $PAGE->set_course($course);
-add_to_log($course->id, 'turningtech', 'view devices', "index.php?id=$course->id", '');
 global $USER;
 if ($CFG->version >= '2013111800.00') {
     $context = context_course::instance($course->id);
@@ -73,7 +72,7 @@ echo $title1;
 <?php
 if (!$deviceid) {
     ?>
-    <div id="divEnterId" style="margin-top:20px; text-align:center;">
+    <div id="divEnterId" style="margin-top:20px; text-align:left;">
     <p><i><?php
     echo get_string('devicesearchhead', 'turningtech');
     ?></i></p>
@@ -96,7 +95,7 @@ if ($dsform->is_cancelled()) {
     $variable = turningtech_list_search_devices($deviceid, $course);
 }
     ?>
-<table align="center" width="900" cell-padding=0 cell-spacing=0 style="padding:0px;margin-left:25%;">
+<table align="center" width="900" cell-padding=0 cell-spacing=0 style="padding:0px;margin-left:25%;" id="tbldevicesearch">
 <tr><td style="padding:0px;">
 <?php
 $dsform->display();
@@ -282,6 +281,21 @@ jQuery(document).ready(function(){
 					jQuery('.divDeviceSearch').children('table').css('width','100%').css('margin-left','0%');
 					jQuery('#fitem_id_deviceid').css('margin-left','20%');
 					jQuery('#id_submitbutton').css('margin-left','28%');
+					
+            <?php 
+}
+            ?>
+            
+             <?php if ($modlver == '2.8') { ?>
+					jQuery('.divDeviceSearch').css('width','80%').css('margin-left','10%').css('margin-right','10%');
+					jQuery('#tbldevicesearch').css('width','100%').css('margin','auto');
+					
+            <?php 
+}
+            ?>
+            <?php if ($modlver == '3.0') { ?>
+					jQuery('.divDeviceSearch').css('width','80%').css('margin-left','10%').css('margin-right','10%');
+					jQuery('#tbldevicesearch').css('width','100%').css('margin','auto');
 					
             <?php 
 }

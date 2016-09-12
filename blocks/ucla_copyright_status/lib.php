@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Library file for UCLA Manage copyright status
  *
@@ -7,6 +22,7 @@
  * @copyright  2012 UC Regents
  * @author     Jun Wan <jwan@humnet.ucla.edu>
  */
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/licenselib.php');
 
@@ -16,13 +32,13 @@ require_once($CFG->libdir . '/licenselib.php');
 function init_copyright_page($course, $courseid, $context) {
     global $PAGE;
     $PAGE->set_url('/blocks/ucla_copyright_status/view.php',
-            array('courseid' => $courseid));
+        array('courseid' => $courseid));
 
-    $page_title = $course->shortname . ': ' . get_string('pluginname',
-                    'block_ucla_copyright_status');
+    $pagetitle = $course->shortname . ': ' . get_string('pluginname',
+        'block_ucla_copyright_status');
 
     $PAGE->set_context($context);
-    $PAGE->set_title($page_title);
+    $PAGE->set_title($pagetitle);
 
     $PAGE->set_heading($course->fullname);
 
@@ -105,12 +121,13 @@ function get_files_copyright_status_by_course($courseid, $filter = 'all') {
  * return a data structure for display
  *
  * @param array $filelist
- * @return array            Returns an array indexed by content hash
+ * @return array
+ * Returns an array indexed by content hash
  */
 function process_files_list($filelist) {
-    $result_array = array();
+    $resultarray = array();
     foreach ($filelist as $result) {
-        $result_array[$result->contenthash][$result->id] =
+        $resultarray[$result->contenthash][$result->id] =
                 array('license' => $result->license,
                     'timemodified' => $result->timemodified,
                     'author' => $result->author,
@@ -122,7 +139,7 @@ function process_files_list($filelist) {
                     'module' => $result->module,
                     'resourcename' => $result->rname);
     }
-    return $result_array;
+    return $resultarray;
 }
 
 /*
@@ -134,18 +151,18 @@ function process_files_list($filelist) {
  */
 function calculate_copyright_status_statistics($filelist) {
     global $CFG;
-    $sum_array = array(); // array stored license type and its quantity
+    $sumarray = array(); // Array stored license type and its quantity.
     $total = 0;
     foreach ($filelist as $record) {
-        // include null license as not yet identified statistics
+        // Include null license as not yet identified statistics.
         $license = !empty($record->license) ? $record->license : $CFG->sitedefaultlicense;
-        // initialize
-        $sum_array[$license] = isset($sum_array[$license]) ? $sum_array[$license] : 0;
-        $sum_array[$license]++; // calculate each type total
+        // Initialize.
+        $sumarray[$license] = isset($sumarray[$license]) ? $sumarray[$license] : 0;
+        $sumarray[$license]++; // Calculate each type total.
         $total++;
     }
-    $sum_array['total'] = $total;
-    return $sum_array;
+    $sumarray['total'] = $total;
+    return $sumarray;
 }
 
 /*
@@ -155,11 +172,11 @@ function calculate_copyright_status_statistics($filelist) {
  */
 function get_file_ids($fileid) {
     global $DB;
-    $res_contenthash = $DB->get_records('files', array('id' => $fileid), null,
+    $rescontenthash = $DB->get_records('files', array('id' => $fileid), null,
             'id, contenthash');
-    $sql_get_fileids = "SELECT f.id FROM {files} f where f.contenthash = ?";
-    return $DB->get_records_sql($sql_get_fileids,
-                    array($res_contenthash[$fileid]->contenthash));
+    $sqlgetfileids = "SELECT f.id FROM {files} f where f.contenthash = ?";
+    return $DB->get_records_sql($sqlgetfileids,
+                    array($rescontenthash[$fileid]->contenthash));
 }
 
 /*
@@ -168,14 +185,13 @@ function get_file_ids($fileid) {
  * @param $user
  */
 function update_copyright_status($data) {
-    // loop through submitted data
+    // Loop through submitted data.
     global $DB, $USER;
-   // $data_array = explode('|', $data);
     foreach ($data as $key => $value) {
-        // If bulk assign
-        if (!empty($data->bulkassign) && preg_match('/^checkbox/',$key) && !empty($value)) {
+        // If bulk assign.
+        if (!empty($data->bulkassign) && preg_match('/^checkbox/', $key) && !empty($value)) {
             $license = $data->bulkassign;
-        } else if (empty($data->bulkassign) && !empty($value) && preg_match('/^file/',$key)) {
+        } else if (empty($data->bulkassign) && !empty($value) && preg_match('/^file/', $key)) {
             $license = $value;
         } else {
             continue;
@@ -183,9 +199,9 @@ function update_copyright_status($data) {
         $a = explode('_', $key);
         $id = trim($a[1]);
         if (isset($id)) {
-            $id_array_with_same_contenthash = get_file_ids($id);
-            // loop through all files with same contenthash
-            foreach ($id_array_with_same_contenthash as $fid => $other) {
+            $idarraywithsamecontenthash = get_file_ids($id);
+            // Loop through all files with same contenthash.
+            foreach ($idarraywithsamecontenthash as $fid => $other) {
                 $params = array('id' => $fid, 'license' => $license, 'timemodified' => time());
                 $DB->update_record('files', $params);
             }
@@ -197,7 +213,8 @@ function update_copyright_status($data) {
  * Display file list with copyright status associated with the file for a course
  *
  * @param int $courseid
- * @param string $filter    Should be copyright license shortname.
+ * @param string $filter
+ * Should be copyright license shortname.
  *
  * @return void
  */
@@ -206,48 +223,48 @@ function display_copyright_status_contents($courseid, $filter) {
     global $CFG, $COURSE, $OUTPUT, $PAGE;
 
     $url = '/blocks/ucla_copyright_status/view.php';
-    $PAGE->set_url($url, array('courseid' => $courseid));   // get copyright data
+    $PAGE->set_url($url, array('courseid' => $courseid));   // Get copyright data.
     $PAGE->requires->js('/blocks/ucla_copyright_status/view.js');
 
     // Get license types.
     $licensemanager = new license_manager();
     $licenses = $licensemanager->get_licenses(array('enabled' => 1));
-    $license_options = array();
-    $license_options['all'] = 'All';
+    $licenseoptions = array();
+    $licenseoptions['all'] = 'All';
     foreach ($licenses as $license) {
-        $license_options[$license->shortname] = $license->fullname;
+        $licenseoptions[$license->shortname] = $license->fullname;
     }
 
     // Display statistics.
-    $all_copyrights = get_files_copyright_status_by_course($courseid);
-    $stat_array = calculate_copyright_status_statistics($all_copyrights);
+    $allcopyrights = get_files_copyright_status_by_course($courseid);
+    $statarray = calculate_copyright_status_statistics($allcopyrights);
     // If no files, do not calculate.
-    if ($stat_array['total'] > 0) {
+    if ($statarray['total'] > 0) {
         echo html_writer::start_tag('fieldset',
                 array('id' => 'block_ucla_copyright_status_stat'));
         echo html_writer::tag('legend',
                 get_string('statistics', 'block_ucla_copyright_status'));
         echo html_writer::start_tag('ul');
-        foreach ($license_options as $k => $v) {
+        foreach ($licenseoptions as $k => $v) {
             if ($k != 'all') {
                 // If tbd, shown in red.
-                $text_style_class = 'block-ucla-copyright-status-stat-num';
+                $textstyleclass = 'block-ucla-copyright-status-stat-num';
                 if ($k == $CFG->sitedefaultlicense) {
-                    $text_style_class = 'block-ucla-copyright-status-stat-num-red';
+                    $textstyleclass = 'block-ucla-copyright-status-stat-num-red';
                 }
-                $stat_count = isset($stat_array[$k]) ? $stat_array[$k] : 0;
+                $statcount = isset($statarray[$k]) ? $statarray[$k] : 0;
                 echo html_writer::tag('li',
                         $v . ':' . html_writer::start_tag('span',
-                                array('class' => $text_style_class)) .
-                        '(' . $stat_count . '/' . $stat_array['total'] . ', ' .
-                        number_format($stat_count * 100 / $stat_array['total'],
+                                array('class' => $textstyleclass)) .
+                        '(' . $statcount . '/' . $statarray['total'] . ', ' .
+                        number_format($statcount * 100 / $statarray['total'],
                                 0, '', '') . '%)' . html_writer::end_tag('span'));
             }
         }
         echo html_writer::end_tag('ul');
         echo html_writer::end_tag('fieldset');
     }
-    // end display statistics
+    // End display statistics.
 
     echo html_writer::start_tag('div',
             array('id' => 'block_ucla_copyright_status_cp'));
@@ -255,22 +272,22 @@ function display_copyright_status_contents($courseid, $filter) {
             array('id' => 'block_ucla_copyright_status_form_copyright_status_list',
                   'action' => $PAGE->url->out(), 'method' => 'post'));
 
-    // display copyright filter
+    // Display copyright filter.
     echo html_writer::start_tag('div',
             array('id' => 'block_ucla_copyright_status_filter'));
     echo html_writer::tag('span',
             get_string('copyright_status', 'block_ucla_copyright_status'),
             array('id' => 'block_ucla_copyright_status_t1'));
-    echo html_writer::select($license_options, 'filter_copyright', $filter, false,
+    echo html_writer::select($licenseoptions, 'filter_copyright', $filter, false,
             array('id' => 'block_ucla_copyright_status_id_filter_copyright', 'class' => 'autosubmit'));
     $PAGE->requires->yui_module('moodle-core-formautosubmit',
            'M.core.init_formautosubmit',
            array(array('selectid' => 'block_ucla_copyright_status_id_filter_copyright', 'nothing' => false))
            );
     echo html_writer::end_tag('div');
-    // end display copyright filter
-    // display copyright status list
-    unset($license_options['all']);
+    // End display copyright filter.
+    // Display copyright status list.
+    unset($licenseoptions['all']);
     $t = new html_table();
     $t->id = 'copyright_status_table';
     $helpicon = html_writer::link(new moodle_url('/help.php',
@@ -287,21 +304,21 @@ function display_copyright_status_contents($courseid, $filter) {
         get_string('author', 'block_ucla_copyright_status'));
     $t->attributes[] = 'generaltable';
 
-    $course_copyright_status_list = get_files_copyright_status_by_course($courseid,
+    $coursecopyrightstatuslist = get_files_copyright_status_by_course($courseid,
             $filter);
-    $files_list = process_files_list($course_copyright_status_list);
-    foreach ($files_list as $contenthash_record) {
-        $file_names = array();
-        $file_sections = array();
-        $file_dates = array();
-        $file_authors = array();
-        $select_copyright = null;
+    $fileslist = process_files_list($coursecopyrightstatuslist);
+    foreach ($fileslist as $contenthashrecord) {
+        $filenames = array();
+        $filesections = array();
+        $filedates = array();
+        $fileauthors = array();
+        $selectcopyright = null;
 
-        // Loop through all the files with the same content hash,
-        // which we assume to have the same copyright status.
-        foreach ($contenthash_record as $id => $record) {
-            $file_checkbox = html_writer::checkbox('checkbox_' . $id, $id, false, $label= '', array('class' => 'usercheckbox'));
-            $select_copyright = html_writer::select($license_options,
+        // Loop through all the files with the same content hash,...
+        // ...which we assume to have the same copyright status.
+        foreach ($contenthashrecord as $id => $record) {
+            $filecheckbox = html_writer::checkbox('checkbox_' . $id, $id, false, $label = '', array('class' => 'usercheckbox'));
+            $selectcopyright = html_writer::select($licenseoptions,
                             'filecopyright_' . $id, $record['license']);
 
             $resourceinfo = html_writer::link(
@@ -312,57 +329,57 @@ function display_copyright_status_contents($courseid, $filter) {
             }
             $name = $record['filename'] . ' (' . $resourceinfo . ')';
 
-            $file_names[] = $name;
+            $filenames[] = $name;
             $sectionurl = course_get_url($COURSE->id, $record['sectionid']);
-            $file_sections[] = html_writer::link($sectionurl, $record['sectionname']);
+            $filesections[] = html_writer::link($sectionurl, $record['sectionname']);
             // Hack to sort by date properly: insert a hidden timestamp at the beginning.
-            $file_dates[] = html_writer::tag('span', $record['timemodified'], array('hidden' => 'hidden'))
+            $filedates[] = html_writer::tag('span', $record['timemodified'], array('hidden' => 'hidden'))
                     . strftime("%B %d %Y %r", $record['timemodified']);
-            $file_authors[] = $record['author'];
+            $fileauthors[] = $record['author'];
         }
 
-        // If there are multiple records for a given contenthash, then display
-        // then in a ordered list.
-        if (count($contenthash_record) > 1) {
-            $file_names = html_writer::alist($file_names, null, 'ol');
-            $file_sections = html_writer::alist($file_sections, null, 'ol');
-            $file_dates = html_writer::alist($file_dates, null, 'ol');
-            $file_authors = html_writer::alist($file_authors, null, 'ol');
+        // If there are multiple records for a given contenthash, then display...
+        // ...then in a ordered list.
+        if (count($contenthashrecord) > 1) {
+            $filenames = html_writer::alist($filenames, null, 'ol');
+            $filesections = html_writer::alist($filesections, null, 'ol');
+            $filedates = html_writer::alist($filedates, null, 'ol');
+            $fileauthors = html_writer::alist($fileauthors, null, 'ol');
         } else {
             // Only one file, so just show information normally.
-            $file_names = array_pop($file_names);
-            $file_sections = array_pop($file_sections);
-            $file_dates = array_pop($file_dates);
-            $file_authors = array_pop($file_authors);
+            $filenames = array_pop($filenames);
+            $filesections = array_pop($filesections);
+            $filedates = array_pop($filedates);
+            $fileauthors = array_pop($fileauthors);
         }
 
-        $t->data[] = array($file_checkbox, $file_names .
-            html_writer::tag('div', $select_copyright,
+        $t->data[] = array($filecheckbox, $filenames .
+            html_writer::tag('div', $selectcopyright,
                     array('class' => 'block-ucla-copyright-status-list')),
-            $file_sections, $file_dates, $file_authors);
+            $filesections, $filedates, $fileauthors);
     }
     echo html_writer::start_tag('div',
             array('id' => 'block_ucla_copyright_status_id_cp_list'));
-    if (count($course_copyright_status_list) > 0) {
+    if (count($coursecopyrightstatuslist) > 0) {
         echo html_writer::table($t);
     } else {
         echo $OUTPUT->notification(get_string('no_files',
                         'block_ucla_copyright_status'));
     }
     echo html_writer::end_tag('div');
-    // end display copyright status list
-    // display save changes button, hidden field data and submit form
-    if (count($course_copyright_status_list) > 0) {
-        $selectall =  html_writer::tag('button', get_string('selectall'),
+    // End display copyright status list.
+    // Display save changes button, hidden field data and submit form.
+    if (count($coursecopyrightstatuslist) > 0) {
+        $selectall = html_writer::tag('button', get_string('selectall'),
                                        array('id' => 'checkall',
                                              'class' => 'btn btn-default',
                                              'type' => 'button'));
-        $selectnone =  html_writer::tag('button', get_string('deselectall'),
+        $selectnone = html_writer::tag('button', get_string('deselectall'),
                                         array('id' => 'checknone',
                                               'class' => 'btn btn-default',
                                               'type' => 'button'));
         $label = get_string('withselected', 'block_ucla_copyright_status') . "&nbsp;&nbsp;";
-        $bulkassign = html_writer::select($license_options, 'bulkassign');
+        $bulkassign = html_writer::select($licenseoptions, 'bulkassign');
         $savebtn = html_writer::tag('button', get_string('savechanges'),
                                      array('class' => 'btn btn-primary',
                                            'name' => 'action_edit',
@@ -374,9 +391,66 @@ function display_copyright_status_contents($courseid, $filter) {
         echo html_writer::tag('div', $selectall . $selectnone . $label . $bulkassign . $savebtn . $cancelbtn,
                               array('class' => 'mform'));
     }
-    // end display save changes button
+    // End display save changes button.
     echo html_writer::end_tag('form');
     echo html_writer::end_tag('div');
     echo $OUTPUT->footer();
-    // end output screen
+    // End output screen.
 }
+
+/**
+ * Alert instructors to assign copyright status for files used in the course they haven't done so already.
+ * @param object $course Contains roles, and $courseinfo contains term.
+ *                          
+ */
+function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
+    global $CFG, $USER;
+    require_once($CFG->dirroot . '/blocks/ucla_copyright_status/alert_form.php');
+
+    // Ignore any old terms or if term is not set (meaning it is a collab site).
+    
+    if (isset($courseinfo) && (!isset($courseinfo->term) ||
+            term_cmp_fn($courseinfo->term, $CFG->currentterm) == -1)) {
+        // Important for event handlers to return true, because false indicates...
+        // ...error and event will be reprocessed on the next cron run.
+        return true;    
+    }
+     
+    // See if current user can manage copyright status for course.
+    $context =  context_course::instance($course->id);
+    
+    if (!has_capability('moodle/course:manageactivities', $context)) {
+        return true;
+    }
+
+    // Ignore alert if user cannot assign copyright status for the course...
+    // ...or if user can assign copyright status, but there is file has not assign...
+    // ...copyright status, give alert.
+    $a = sizeof(get_files_copyright_status_by_course($course->id,
+            $CFG->sitedefaultlicense));
+
+    if ($a==0) {
+        return true;
+    }
+
+    // But first, see if they turned off the copyright status alert for their account...
+    // ...ucla_copyright_status_noprompt_<courseid>.
+    $timestamp = get_user_preferences('ucla_copyright_status_noprompt_' .
+            $course->id, null, $USER->id);
+
+    // Do not display alert if user turned off copyright status alerts or if remind me...
+    // ...time has not passed.
+    if (!is_null($timestamp) && (intval($timestamp) === 0 ||
+            $timestamp > time())) {
+        return true;
+    }
+
+    // Now we can display the alert.
+    $alert_form = new copyright_alert_form(new moodle_url('/blocks/ucla_copyright_status/alert.php',
+            array('id' => $course->id)), $a, 'post', '',
+            array('class' => 'ucla-format-notice-box'));
+
+    $alert_form->display();    
+    return true;
+}
+

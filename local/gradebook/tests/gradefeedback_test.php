@@ -44,7 +44,7 @@ class gradefeedback_test extends basic_testcase {
      * @return boolean
      */
     public function has_invalid_characters($string) {
-        $length = textlib::strlen($string);
+        $length = core_text::strlen($string);
         for ($i = 0; $i < $length; $i++) {
             $current = ord($string{$i});
             if (($current == 0x9) || ($current == 0xA) || ($current == 0xD) ||
@@ -147,17 +147,17 @@ class gradefeedback_test extends basic_testcase {
         // Create super long feedback, over grade_reporter::MAX_COMMENT_LENGTH.
         $maxtextlength = \local_gradebook\task\send_myucla_grade::MAXTEXTLENGTH;
         $feedback = $this->rand_string($maxtextlength + 100);
-        $feedbacklength = textlib::strlen($feedback);
+        $feedbacklength = core_text::strlen($feedback);
         $this->assertTrue($feedbacklength > $maxtextlength);
 
         // Make sure feedback is trimed.
         $task = new \local_gradebook\task\send_myucla_grade();
         $processedfeedback = $task->trim_and_strip($feedback);
 
-        $processedlength = textlib::strlen($processedfeedback);
+        $processedlength = core_text::strlen($processedfeedback);
         $this->assertLessThan($feedbacklength, $processedlength);
-        $endswithellipses = textlib::substr($processedfeedback,
-                -textlib::strlen(get_string('continuecomments', 'local_gradebook')))
+        $endswithellipses = core_text::substr($processedfeedback,
+                -core_text::strlen(get_string('continuecomments', 'local_gradebook')))
                 == get_string('continuecomments', 'local_gradebook');
         $this->assertTrue($endswithellipses);
     }

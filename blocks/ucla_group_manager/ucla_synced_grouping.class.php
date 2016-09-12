@@ -82,7 +82,7 @@ class ucla_synced_grouping {
      * @return object
      */
     public static function get_groupingdata($name, $courseid) {
-        $groupingdata = new object();
+        $groupingdata = new stdClass();
         $groupingdata->name = $name;
         $groupingdata->courseid = $courseid;
 
@@ -156,7 +156,7 @@ class ucla_synced_grouping {
     public static function track_new_grouping($groupingid) {
         global $DB;
 
-        $dbobj = new object();
+        $dbobj = new stdClass();
         $dbobj->groupingid = $groupingid;
 
         $DB->insert_record('ucla_group_groupings', $dbobj);

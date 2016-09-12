@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the local_ucla_ferpa_waiver_observer class.
+ * Tests the mod_casa_privacy_waiver_observer class.
  *
  * @package    local_ucla
  * @category   test
@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @group ucla
  * @group local_ucla
  */
-class local_ucla_ferpa_waiver_observer_testcase extends advanced_testcase {
+class mod_casa_privacy_waiver_observer_testcase extends advanced_testcase {
 
     /**
      * Makes sure that waiver information is deleted if a related course is 
@@ -43,35 +43,27 @@ class local_ucla_ferpa_waiver_observer_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        // Create course, user, module, and block.
+        // Create course, user, and module.
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_user();
         $this->setUser($student);
         $this->getDataGenerator()->enrol_user($student->id, $course->id);
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_lti');
         $cm = $generator->create_instance(array('course' => $course->id));
-        $page = new moodle_page();
-        $page->set_context(context_course::instance($course->id));
-        $blockmanager = new block_manager($page);
-        $blockmanager->add_regions(array('side-pre', 'side-post'), false);
-        $blockmanager->add_block('mhaairs', 'side-post', 0, false);
-        $blockinstance = $DB->get_record('block_instances', array('blockname' => 'mhaairs'));
 
-        // Create waiver entries
+        // Create waiver entry.
         $context = context_module::instance($cm->cmid);
-        local_ucla_ferpa_waiver::sign($course->id, $context->id, $student->id);
-        $context = context_block::instance($blockinstance->id);
-        local_ucla_ferpa_waiver::sign($course->id, $context->id, $student->id);
+        mod_casa_privacy_waiver::sign($course->id, $context->id, $student->id);
         
         // Make sure entry exists.
-        $numwaivers = $DB->count_records('ucla_ferpa_waiver');
-        $this->assertEquals(2, $numwaivers);
+        $numwaivers = $DB->count_records('lti_privacy_waiver');
+        $this->assertEquals(1, $numwaivers);
 
         // Delete course.
         delete_course($course->id);
 
         // Make sure no entries exists.
-        $numwaivers = $DB->count_records('ucla_ferpa_waiver');
+        $numwaivers = $DB->count_records('lti_privacy_waiver');
         $this->assertEquals(0, $numwaivers);
     }    
     
@@ -94,17 +86,17 @@ class local_ucla_ferpa_waiver_observer_testcase extends advanced_testcase {
 
         // Create waiver entry.
         $context = context_module::instance($cm->cmid);
-        local_ucla_ferpa_waiver::sign($course->id, $context->id, $student->id);
+        mod_casa_privacy_waiver::sign($course->id, $context->id, $student->id);
 
         // Make sure entry exists.
-        $numwaivers = $DB->count_records('ucla_ferpa_waiver');
+        $numwaivers = $DB->count_records('lti_privacy_waiver');
         $this->assertEquals(1, $numwaivers);
 
         // Delete course module.
         course_delete_module($cm->cmid);
 
         // Make sure no entries exists.
-        $numwaivers = $DB->count_records('ucla_ferpa_waiver');
+        $numwaivers = $DB->count_records('lti_privacy_waiver');
         $this->assertEquals(0, $numwaivers);
     }
 }

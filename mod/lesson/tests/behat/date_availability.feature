@@ -20,13 +20,13 @@ Feature: A teacher can set available from and deadline dates to access a lesson
     And I follow "Course 1"
     And I turn editing mode on
 
-  @javascript
   Scenario: Forbidding lesson accesses until a specified date
     Given I add a "Lesson" to section "1"
     And I expand all fieldsets
-    And I click on "id_available_enabled" "checkbox"
+    And I set the field "id_available_enabled" to "1"
     And I set the following fields to these values:
       | Name | Test lesson |
+      | Description | Test lesson description |
       | available[day] | 1 |
       | available[month] | January |
       | available[year] | 2020 |
@@ -47,13 +47,12 @@ Feature: A teacher can set available from and deadline dates to access a lesson
     Then I should see "This lesson will be open on Wednesday, 1 January 2020, 8:00"
     And I should not see "First page contents"
 
-  @javascript
   Scenario: Forbidding lesson accesses until a specified date
     Given I add a "Lesson" to section "1"
-    And I expand all fieldsets
-    And I click on "id_deadline_enabled" "checkbox"
+    And I set the field "id_deadline_enabled" to "1"
     And I set the following fields to these values:
       | Name | Test lesson |
+      | Description | Test lesson description |
       | deadline[day] | 1 |
       | deadline[month] | January |
       | deadline[year] | 2000 |

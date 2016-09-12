@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the UCLA Site Invitation Plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -83,6 +82,9 @@ class enrol_invitation_events_testcase extends advanced_testcase {
 
         // Create manager that we want to test.
         $this->invitationmanager = new invitation_manager($this->testcourse->id);
+
+        // Make sure we don't send out email.
+        set_config('noemailever', 1);
     }
 
     /**

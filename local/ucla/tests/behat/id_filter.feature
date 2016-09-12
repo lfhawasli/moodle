@@ -1,4 +1,4 @@
-@ucla @core_edit @CCLE-4534
+@ucla @local_ucla @core_edit @CCLE-4534
 Feature: Filter users by idnumber
   As a system administrator
   I need to be able to filter users by their ID number
@@ -13,8 +13,6 @@ Feature: Filter users by idnumber
       | student3 | Student3 | 1 | student3@asd.com | 3000000 |
     And I log in as "admin"
     And I expand "Site administration" node
-    # Front page settings also has a "Users" node.
-    And I expand "Users" node
     And I expand "Users" node
     And I expand "Accounts" node
     When I follow "Browse list of users"

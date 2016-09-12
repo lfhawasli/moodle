@@ -222,12 +222,12 @@ class qformat_default {
         $importerrorquestion = get_string('importerrorquestion', 'question');
 
         echo "<div class=\"importerror\">\n";
-        echo "<strong>$importerrorquestion $questionname</strong>";
+        echo "<strong>{$importerrorquestion} {$questionname}</strong>";
         if (!empty($text)) {
             $text = s($text);
-            echo "<blockquote>$text</blockquote>\n";
+            echo "<blockquote>{$text}</blockquote>\n";
         }
-        echo "<strong>$message</strong>\n";
+        echo "<strong>{$message}</strong>\n";
         echo "</div>";
 
         $this->importerrors++;
@@ -247,7 +247,7 @@ class qformat_default {
 
         // work out what format we are using
         $formatname = substr(get_class($this), strlen('qformat_'));
-        $methodname = "import_from_$formatname";
+        $methodname = "import_from_{$formatname}";
 
         //first try importing using a hint from format
         if (!empty($qtypehint)) {
@@ -289,8 +289,9 @@ class qformat_default {
     public function importprocess($category) {
         global $USER, $CFG, $DB, $OUTPUT;
 
-        // reset the timer in case file upload was slow
+        // Raise time and memory, as importing can be quite intensive.
         core_php_time_limit::raise();
+        raise_memory_limit(MEMORY_EXTRA);
 
         // STAGE 1: Parse the file
         echo $OUTPUT->notification(get_string('parsingquestions', 'question'), 'notifysuccess');
@@ -379,7 +380,7 @@ class qformat_default {
 
             $count++;
 
-            echo "<hr /><p><b>$count</b>. ".$this->format_question_text($question)."</p>";
+            echo "<hr /><p><b>{$count}</b>. ".$this->format_question_text($question)."</p>";
 
             $question->category = $this->category->id;
             $question->stamp = make_unique_id_code();  // Set the unique code (not to be changed)
@@ -424,9 +425,8 @@ class qformat_default {
 
             $result = question_bank::get_qtype($question->qtype)->save_question_options($question);
 
-            if (!empty($CFG->usetags) && isset($question->tags)) {
-                require_once($CFG->dirroot . '/tag/lib.php');
-                tag_set('question', $question->id, $question->tags, 'core_question', $question->context->id);
+            if (isset($question->tags)) {
+                core_tag_tag::set_item_tags('core_question', 'question', $question->id, $question->context, $question->tags);
             }
 
             if (!empty($result->error)) {
@@ -725,7 +725,7 @@ class qformat_default {
     protected function try_exporting_using_qtypes($name, $question, $extra=null) {
         // work out the name of format in use
         $formatname = substr(get_class($this), strlen('qformat_'));
-        $methodname = "export_to_$formatname";
+        $methodname = "export_to_{$formatname}";
 
         $qtype = question_bank::get_qtype($name, false);
         if (method_exists($qtype, $methodname)) {
@@ -825,7 +825,7 @@ class qformat_default {
 
         // continue path for following error checks
         $course = $this->course;
-        $continuepath = "$CFG->wwwroot/question/export.php?courseid=$course->id";
+        $continuepath = "{$CFG->wwwroot}/question/export.php?courseid={$course->id}";
 
         // did we actually process anything
         if ($count==0) {

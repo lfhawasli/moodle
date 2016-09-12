@@ -4,7 +4,6 @@ Feature: A teacher can password protect a lesson
   As a teacher
   I need to set a password to access the lesson
 
-  @javascript
   Scenario: Accessing as student to a protected lesson
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -22,6 +21,7 @@ Feature: A teacher can password protect a lesson
     And I turn editing mode on
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson |
+      | Description | Test lesson description |
       | Password protected lesson | Yes |
       | id_password | moodle_rules |
     And I follow "Test lesson"
