@@ -39,15 +39,10 @@ class enrol_invitation_user_enrolment_form extends moodleform {
      * Form definition.
      */
     public function definition() {
-        global $CFG, $DB;
 
         $mform = $this->_form;
 
-        $user   = $this->_customdata['user'];
-        $course = $this->_customdata['course'];
         $ue     = $this->_customdata['ue'];
-
-        $mform->addElement('header', 'general', '');
 
         $options = array(ENROL_USER_ACTIVE    => get_string('participationactive', 'enrol'),
                          ENROL_USER_SUSPENDED => get_string('participationsuspended', 'enrol'));

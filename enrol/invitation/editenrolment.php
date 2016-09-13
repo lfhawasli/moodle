@@ -22,25 +22,27 @@
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require('../../config.php');
 require_once("$CFG->dirroot/enrol/locallib.php");
 require_once("$CFG->dirroot/enrol/renderer.php"); // Required for the course enrolment manager table.
 require_once("$CFG->dirroot/enrol/invitation/editenrolment_form.php");
 
-$ueid   = required_param('ue', PARAM_INT); // User enrolment id.
+$ueid = required_param('ue', PARAM_INT); // User enrolment id.
 $filter = optional_param('ifilter', 0, PARAM_INT);
 
 // Get the user enrolment object.
-$ue     = $DB->get_record('user_enrolments', array('id' => $ueid), '*', MUST_EXIST);
+$ue = $DB->get_record('user_enrolments', array('id' => $ueid), '*', MUST_EXIST);
+
 // Get the user for whom the enrolment is.
-$user   = $DB->get_record('user', array('id'=>$ue->userid), '*', MUST_EXIST);
+$user = $DB->get_record('user', array('id' => $ue->userid), '*', MUST_EXIST);
+
 // Get the course the enrolment is to.
-list($ctxsql, $ctxjoin) = context_instance_preload_sql('c.id', CONTEXT_COURSE, 'ctx');
-$sql = "SELECT c.* $ctxsql FROM {course} c LEFT JOIN {enrol} e ON e.courseid = c.id $ctxjoin WHERE e.id = :enrolid";
+$sql = "SELECT c.*
+          FROM {course} c
+     LEFT JOIN {enrol} e ON e.courseid = c.id
+         WHERE e.id = :enrolid";
 $params = array('enrolid' => $ue->enrolid);
 $course = $DB->get_record_sql($sql, $params, MUST_EXIST);
-context_instance_preload($course);
 
 // Make sure its not the front page course.
 if ($course->id == SITEID) {
@@ -62,7 +64,7 @@ $table = new course_enrolment_users_table($manager, $PAGE);
 // The URL of the enrolled users page for the course.
 $usersurl = new moodle_url('/enrol/users.php', array('id' => $course->id));
 // The URl to return the user too after this screen.
-$returnurl = new moodle_url($usersurl, $manager->get_url_params()+$table->get_url_params());
+$returnurl = new moodle_url($usersurl, $manager->get_url_params() + $table->get_url_params());
 // The URL of this page.
 $url = new moodle_url('/enrol/invitation/editenrolment.php', $returnurl->params());
 
@@ -75,7 +77,7 @@ if (!$plugin->allow_manage($instance) || $instance->enrol != 'invitation' || !($
     print_error('erroreditenrolment', 'enrol');
 }
 
-$mform = new enrol_invitation_user_enrolment_form($url, array('user'=>$user, 'course'=>$course, 'ue'=>$ue));
+$mform = new enrol_invitation_user_enrolment_form($url, array('ue' => $ue));
 $mform->set_data($PAGE->url->params());
 
 // Check the form hasn't been cancelled.

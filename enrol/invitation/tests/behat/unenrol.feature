@@ -1,0 +1,50 @@
+@ucla @enrol_invitation @CCLE-6283
+Feature: Site invitations
+  In order to remove past invited users
+  As an instructor
+  I want to be able to unenrol them from my course
+
+  Scenario Outline:
+    Given I am in a ucla environment
+    And the following ucla "sites" exist:
+      | shortname | fullname | type |
+      | COURSE1 | Course 1 | <type> |
+    And the following "users" exist:
+      | username | firstname | lastname | email          |
+      | sender   | Sender    | Lastname | send@asd.com   |
+      | receiver | Receiver  | Lastname | receiv@asd.com |
+    And the following ucla "course enrolments" exist:
+      | user | course | role |
+      | sender | COURSE1 | <role> |
+    And the following ucla "roles" exist:
+      | role |
+      | <inviterole> |
+    And I log in as "sender"
+    And I follow "Course 1"
+    And I press "Control Panel"
+    And I follow "Invite users"
+    And I set the following fields to these values:
+      | <rolename> | 1 |
+      | Email address | receiv@asd.com |
+    And I press "Invite users"
+    And I log out
+    And I log in as "receiver"
+    And I follow the link in the last invitation sent to "receiver" for site "Course 1"
+    And I should see "receiv@asd.com"
+    And I should see <rolename2>
+    And I press "Accept invitation"
+    And I log out
+    And I log in as "sender"
+    And I follow "Course 1"
+    And I expand "Users" node
+    And I follow "Participants"
+    And I should see "Receiver"
+    When I click on "Unenrol" "link" in the "Lastname, Receiver" "table_row"
+    Then I should see "Do you really want to unenroll \"Lastname, Receiver\""
+    And I press "Continue"
+    And I should not see "Receiver"
+    
+    Examples:
+      | type | role | inviterole | rolename | rolename2 |
+      | class | editingteacher | editor | Editor | "Editor" |
+      | non_instruction | projectlead | projectparticipant | Project Participant | "Project Participant" |
