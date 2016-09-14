@@ -178,6 +178,7 @@ class local_ucla_enrollment_helper {
                 $retval = $DB->get_record('user',
                         array($this->localuserfield => $enrollment[$this->remoteuserfield],
                               'mnethostid' => $CFG->mnet_localhost_id,
+                              'suspended' => 0,
                               'auth' => 'shibboleth'), '*', MUST_EXIST);
             } catch (dml_missing_record_exception $notfound) {
                 // This is okay and expected, so just continue along.
@@ -201,6 +202,7 @@ class local_ucla_enrollment_helper {
                 $retval = $DB->get_record('user',
                         array('username' => $enrollment['username'],
                               'mnethostid' => $CFG->mnet_localhost_id,
+                              'suspended' => 0,
                               'auth' => 'shibboleth'), '*', MUST_EXIST);
             } catch (dml_missing_record_exception $notfound) {
                 // This is okay and expected, so just continue along.
