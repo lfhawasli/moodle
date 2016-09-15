@@ -19,7 +19,6 @@
  * plugins.
  *
  * @package    local_ucla
- * @category   phpunit
  * @copyright  2013 UC Regents
  */
 defined('MOODLE_INTERNAL') || die();
@@ -44,8 +43,12 @@ class local_ucla_course_section_fixer {
 
         $sections = $DB->get_records('course_sections',
                 array('course' => $course->id));
-        
-        $numsections = course_get_format($course)->get_course()->numsections;
+
+        $numsections = $DB->get_field('course_format_options', 'value',
+                array('courseid' => $course->id, 'name' => 'numsections'));
+        if (empty($numsections)) {
+            return true;
+        }
         foreach ($sections as $section) {
             if ($section->section > $numsections) {
                 if (empty($section->sequence) && empty($section->summary)) {
@@ -91,6 +94,37 @@ class local_ucla_course_section_fixer {
     }
 
     /**
+     * Check that all sections mentioned in course_modules table exist in
+     * course_sections table.
+     *
+     * @param stdClass $course
+     * @return boolean
+     */
+    static public function check_sections_exist(stdClass $course) {
+        global $DB;
+
+        // Get all sections.
+        $sections = $DB->get_records('course_sections', array('course' => $course->id));
+
+        // Get all sections that course modules belong to and see if they exist.
+        $cms = $DB->get_records('course_modules', array('course' => $course->id),
+                null, 'id,section');
+        foreach ($cms as $cm) {
+            if (!array_key_exists($cm->section, $sections)) {
+                // Section doesn't exist.
+                return false;
+            } else {
+                // Make sure course module exists in section.
+                if (strpos($sections[$cm->section]->sequence, $cm->id) === false) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Counts the number of sections a course has and compares it against the
      * format's numsections value. Then will either just detect or fix the
      * number to match the database depending on the $adjustnum parameter.
@@ -117,6 +151,9 @@ class local_ucla_course_section_fixer {
     static public function detect_numsections(stdClass $course, $adjustnum = false) {
         global $DB;
 
+        if (!isset(course_get_format($course)->get_course()->numsections)) {
+            return false;
+        }
         $numsections = course_get_format($course)->get_course()->numsections;
         $actualcount = $DB->count_records('course_sections', array('course' => $course->id));
 
@@ -144,7 +181,7 @@ class local_ucla_course_section_fixer {
                 $sections = $DB->get_records_select('course_sections',
                         'course=:course AND section>:numsection',
                         array('course' => $course->id, 'numsection' => $numsections),
-                        'section', 'section,name');                
+                        'section', 'section,name');
                 foreach ($sections as $section) {
                     if ($section->section > $numsections) {
                         $retval[] = $section->name;
@@ -174,7 +211,7 @@ class local_ucla_course_section_fixer {
             return $retval;
         }
 
-        // Fix problems and keep tally. 
+        // Fix problems and keep tally.
         $methods = get_class_methods(get_called_class());
         foreach ($methods as $method) {
             if (strpos($method, 'handle_') === 0) {
@@ -210,7 +247,11 @@ class local_ucla_course_section_fixer {
 
         $sections = $DB->get_records('course_sections',
                 array('course' => $course->id));
-        $numsections = course_get_format($course)->get_course()->numsections;
+        $numsections = $DB->get_field('course_format_options', 'value',
+                array('courseid' => $course->id, 'name' => 'numsections'));
+        if (empty($numsections)) {
+            return $retval;
+        }
 
         foreach ($sections as $section) {
             if ($section->section > $numsections) {
@@ -238,7 +279,7 @@ class local_ucla_course_section_fixer {
      * Renumbers course sections so that they are sequential.
      *
      * @param stdClass $course
-     * 
+     *
      * @return array            Returns an array of number of sections that were
      *                          added, deleted, or updated.
      */
@@ -261,6 +302,85 @@ class local_ucla_course_section_fixer {
         }
 
         // Do we need to adjust numsections?
+
+        return $retval;
+    }
+
+    /**
+     * Adds sections that belong to course modules, but are now missing.
+     *
+     * Missing sections are hidden and added to the end of the section list with
+     * the title "Recovered section".
+     *
+     * @param stdClass $course
+     *
+     * @return array            Returns an array of number of sections that were
+     *                          added, deleted, or updated.
+     */
+    static public function handle_sections_exist(stdClass $course) {
+        global $DB;
+        $retval = array('added' => 0, 'deleted' => 0, 'updated' => 0);
+
+        // Get all sections.
+        $sections = $DB->get_records('course_sections', array('course' => $course->id));
+
+        // Get all sections that course modules belong to and see if they exist.
+        $cmsections = $DB->get_fieldset_select('course_modules', 'DISTINCT section', 'course = ?', array($course->id));
+        foreach ($cmsections as $cmsection) {
+            // We need to create a section before we can use the Moodle API to
+            // delete it and all other course modules.
+            if (!array_key_exists($cmsection, $sections)) {
+                // Found missing section. Add it.
+                $section = new stdClass();
+                $section->id = $cmsection;
+                $section->course = $course->id;
+                $section->name = 'Recovered section';
+                $section->visible = 1;  // Visible so that we can hide it later.
+
+                // Add section to last section number.
+                $maxsection = $DB->get_field('course_sections', 'MAX(section)',
+                        array('course' => $course->id));
+                $section->section = $maxsection+1;
+
+                // Find all course modules for this section and add them.
+                $cmids = $DB->get_fieldset_select('course_modules', 'id',
+                        'course = ? AND section = ?', array($course->id, $section->id));
+                $section->sequence = implode(',', $cmids);
+
+                // Need to use insert raw so that id can be specified.
+                try {
+                    $DB->insert_record_raw('course_sections', $section, false, false, true);
+                } catch (Exception $ex) {
+                    // And error can result if trying to add a section that
+                    // already exists. That happens if section belonged to
+                    // another course.
+                    // Add new section and set section to newly created section
+                    // id.
+                    $section->id = $DB->insert_record('course_sections', $section);
+                    $sql = "UPDATE {course_modules}
+                               SET section=:newsectionid
+                             WHERE course=:course
+                               AND section=:oldsectionid";
+                    $DB->execute($sql, array('newsectionid' => $section->id,
+                        'course' => $course->id, 'oldsectionid' => $cmsection));
+                }
+                rebuild_course_cache($course->id, true);  // Since we added section.
+
+                // Now delete section.
+                try {
+                    course_delete_section($course, $section);
+                    ++$retval['deleted'];
+                } catch (Exception $ex) {
+                    // One reason why a section cannot be deleted is because it
+                    // has invalid course modules with an instance id of 0.
+                    // We cannot delete the module.                    
+                    
+                    // Hide section and the modules inside.
+                    course_update_section($course->id, $section, array('visible' => 0));
+                    ++$retval['added'];
+                }
+            }
+        }
 
         return $retval;
     }

@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_course_section_fixer.php');
 
 /**
  * PHPunit testcase class.
@@ -39,12 +38,13 @@ class course_section_fixer_test extends advanced_testcase {
 
     /**
      * Add a course section to a given course, but bypass the course cache.
-     * 
+     *
      * In order to do that, we will directly manipulate the DB.
      *
      * @param object $course
      * @param array $section    If passed, then will be used to create new
      *                          section.
+     * @return int              Returns id of newly created section.
      */
     private function add_section($course, $section = null) {
         global $DB;
@@ -80,7 +80,7 @@ class course_section_fixer_test extends advanced_testcase {
             $section['section'] = $nextnum;
         }
 
-        $DB->insert_record('course_sections', $section);
+        return $DB->insert_record('course_sections', $section);
     }
 
     /**
@@ -123,17 +123,32 @@ class course_section_fixer_test extends advanced_testcase {
      * Delete course section for a given course by directly manipulating the DB.
      *
      * @param object $course
+     * @param boolean $withcontent  Default false. If true, will make sure
+     *                              deleted section has a course module.
+     *
+     * @return boolean              Return false if error. Otherwise true.
      */
-    private function delete_section($course) {
+    private function delete_section($course, $withcontent = false) {
         global $DB;
 
-        // Get a random section to delete.
-        $sections = $DB->get_records('course_sections',
-                array('course' => $course->id));
-        shuffle($sections);
-        $section = array_pop($sections);
+        if ($withcontent) {
+            // We need to find a section with a course module.
+            $sectionid = $DB->get_field('course_modules', 'section',
+                    array('course' => $course->id), IGNORE_MULTIPLE);
+            if (empty($sectionid)) {
+                return false;
+            }
+        } else {
+            // Get a random section to delete.
+            $sections = $DB->get_records('course_sections',
+                    array('course' => $course->id));
+            shuffle($sections);
+            $section = array_pop($sections);
+            $sectionid = $section->id;
+        }
 
-        $DB->delete_records('course_sections', array('id' => $section->id));
+        $DB->delete_records('course_sections', array('id' => $sectionid));
+        return true;
     }
 
     /**
@@ -249,6 +264,21 @@ class course_section_fixer_test extends advanced_testcase {
     }
 
     /**
+     * Make sure check_sections_exist returns false when a course module belongs
+     * to a non-existent section.
+     */
+    public function test_check_sections_exist() {
+        $course = $this->create_course_with_content();
+        $result = local_ucla_course_section_fixer::check_sections_exist($course);
+        $this->assertTrue($result);
+
+        // Delete section but not the course modules.
+        $this->delete_section($course, true);
+        $result = local_ucla_course_section_fixer::check_sections_exist($course);
+        $this->assertFalse($result);
+    }
+
+    /**
      * Make sure that detect_numsections properly detects and then fixes the
      * number of sections.
      */
@@ -296,7 +326,7 @@ class course_section_fixer_test extends advanced_testcase {
 
         $this->add_section($course);
         $this->add_section($course);
-        $this->delete_section($course);
+        $this->delete_section($course, true);
         $this->delete_section($course);
         $this->replace_section($course);
 
@@ -304,6 +334,7 @@ class course_section_fixer_test extends advanced_testcase {
 
         // With the amount of changes we are doing, we should have a return of
         // more than zero on these changes.
+        $this->assertEquals(0, $result['added']);
         $this->assertGreaterThan(0, $result['deleted']);
         $this->assertGreaterThan(0, $result['updated']);
 
@@ -402,6 +433,81 @@ class course_section_fixer_test extends advanced_testcase {
         $this->assertEquals(0, $result['added']);
         $this->assertEquals(0, $result['deleted']);
         $this->assertGreaterThan(0, $result['updated']);
+    }
+
+    /**
+     * Make sure handle_sections_exist deletes missing sections.
+     */
+    public function test_handle_sections_exist() {
+        global $DB;
+        $course = $this->create_course_with_content();
+        $result = local_ucla_course_section_fixer::handle_sections_exist($course);
+
+        $this->assertEquals(0, $result['added']);
+        $this->assertEquals(0, $result['deleted']);
+        $this->assertEquals(0, $result['updated']);
+
+        // Delete section with course modules.
+        $sql = $DB->get_field('course_modules', 'section', array('course' => $course->id), IGNORE_MULTIPLE);
+        $this->delete_section($course, true);
+
+        // Count number of course modules before.
+        $beforecount = $DB->count_records('course_modules', array('course' => $course->id));
+        $result = local_ucla_course_section_fixer::handle_sections_exist($course);
+        $aftercount = $DB->count_records('course_modules', array('course' => $course->id));
+
+        // Course module was deleted.
+        $this->assertLessThan($beforecount, $aftercount);
+        $this->assertEquals(0, $result['added']);
+        // One section with content was deleted.
+        $this->assertEquals(1, $result['deleted']);
+        $this->assertEquals(0, $result['updated']);
+    }
+
+    /**
+     * Make sure handle_sections_exist hides sections with invalid course
+     * modules.
+     */
+    public function test_handle_sections_exist_error() {
+        global $DB;
+        $course = $this->create_course_with_content();
+        $result = local_ucla_course_section_fixer::handle_sections_exist($course);
+
+        $this->assertEquals(0, $result['added']);
+        $this->assertEquals(0, $result['deleted']);
+        $this->assertEquals(0, $result['updated']);
+
+        // Create new section.
+        $sectionid = $this->add_section($course);
+
+        // Create course modules with 0 for instance id.
+        $urlid = $DB->get_field('modules', 'id', array('name' => 'url'));
+        $module = new stdClass();
+        $module->course = $course->id;
+        $module->module = $urlid;
+        $module->instance = 0;
+        $module->section = $sectionid;
+        $module->added = time();
+        $moduleid = $DB->insert_record('course_modules', $module);
+
+        // Delete section.
+        $DB->delete_records('course_sections', array('id' => $sectionid));
+        rebuild_course_cache($course->id);
+
+        // Count number of course modules before.
+        $beforecount = $DB->count_records('course_modules', array('course' => $course->id));
+        $result = local_ucla_course_section_fixer::handle_sections_exist($course);
+        $aftercount = $DB->count_records('course_modules', array('course' => $course->id));
+
+        // Course section was added.
+        $this->assertEquals(1, $result['added']);
+        $this->assertEquals(0, $result['deleted']);
+        $this->assertEquals(0, $result['updated']);
+
+        // Course section is hidden.
+        $hashiddensection = $DB->record_exists('course_sections',
+                array('course' => $course->id, 'visible' => 0));
+        $this->assertTrue($hashiddensection);
     }
 
     /**
