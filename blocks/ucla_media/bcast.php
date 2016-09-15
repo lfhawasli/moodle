@@ -44,16 +44,16 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
     $count = count($videos);
     if ($count != 0) {
-        print_page_tabs('Bruincast', $course->id);
+        print_page_tabs(get_string('headerbcast', 'block_ucla_media'), $course->id);
         display_all($course);
 
         $event = \block_ucla_media\event\index_viewed::create(
             array('context' => $context, 'other' => array(
-                'page' => "Bruincast"
+                'page' => get_string('headerbcast', 'block_ucla_media')
                     )));
         $event->trigger();
     } else {
-        echo get_string('bcastnotavailable', 'block_ucla_media');
+        echo get_string('mediaresnotavailable', 'block_ucla_media');
     }
 } else {
     echo get_string('guestsarenotallowed', 'error');
@@ -67,12 +67,11 @@ echo $OUTPUT->footer();
  * @param object $course
  */
 function display_all($course) {
-    global $DB, $OUTPUT;
+    global $OUTPUT;
 
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
-    $courseid = $course->id;
-    echo $OUTPUT->heading(get_string('headerbcast', 'block_ucla_media',
-            $course->fullname), 2, 'headingblock');
+    echo $OUTPUT->heading(get_string('headerbcast', 'block_ucla_media') .
+            ": $course->fullname", 2, 'headingblock');
 
     echo html_writer::tag('p', get_string('intro', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));

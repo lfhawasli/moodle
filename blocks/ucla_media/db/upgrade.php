@@ -47,8 +47,61 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
                 $dbman->add_field($table, $index);
             }
         }
-        upgrade_block_savepoint(true, 2016082300, 'block_ucla_media');
+        upgrade_block_savepoint(true, 2016082300, 'ucla_media');
     }
+    if ($oldversion < 2016090800) {
+        // Define table ucla_library_audio_reserves to be created.
+        $table = new xmldb_table('ucla_library_music_reserves');
 
+        // Adding fields to table ucla_library_audio_reserves.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('term', XMLDB_TYPE_CHAR, null, null, null, null, null);
+        $table->add_field('srs', XMLDB_TYPE_CHAR, '9', null, null, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('title', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('videohttp', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('videortmp', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('audiohttp', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('audiortmp', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table ucla_library_audio_reserves.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table ucla_library_audio_reserves.
+        $table->add_index('termsrs', XMLDB_INDEX_NOTUNIQUE, array('term', 'srs'));
+
+        // Conditionally launch create table for ucla_library_audio_reserves.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Ucla_media savepoint reached.
+
+        upgrade_block_savepoint(true, 2016090800, 'ucla_media');
+    }
+    if ($oldversion < 2016091200) {
+        $table = new xmldb_table('ucla_library_music_reserves');
+        $fields[] = new xmldb_field('videohttp');
+        $fields[] = new xmldb_field('videortmp');
+        $fields[] = new xmldb_field('audiohttp');
+        $fields[] = new xmldb_field('audiortmp');
+
+        foreach ($fields as $field) {
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        $addfields[] = new xmldb_field('httpurl', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $addfields[] = new xmldb_field('rtmpurl', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $addfields[] = new xmldb_field('isvideo', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        
+        foreach ($addfields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_block_savepoint(true, 2016091200, 'ucla_media');
+    }
     return true;
 }

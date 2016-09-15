@@ -131,11 +131,11 @@ function display_video_reserves($course) {
     // Adding GROUP BY to the where clause of the database query ensures no
     // duplicate videos are displayed for crosslisted courses.
     $videos = get_video_data($course->id);
-      print_page_tabs('Video Reserves', $course->id);
+    print_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
 
-    echo $OUTPUT->heading(get_string('headervidres', 'block_ucla_media',
-            $course->fullname), 2, 'headingblock');
+    echo $OUTPUT->heading(get_string('headervidres', 'block_ucla_media') .
+            ": $course->fullname", 2, 'headingblock');
 
     echo html_writer::tag('p', get_string('intro', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));
@@ -233,7 +233,7 @@ function print_page_tabs($activetab, $courseid) {
     $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
     $count = count($videos);
     if ($count != 0) {
-        $tabs[] = new tabobject('Bruincast',
+        $tabs[] = new tabobject(get_string('headerbcast', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/bcast.php',
                                 array('courseid' => $courseid)),
                                     get_string('bcast_tab', 'block_ucla_media', $count));
@@ -250,20 +250,19 @@ function print_page_tabs($activetab, $courseid) {
         $count = $count + count($videos['future']);
     }
     if ($count != 0) {
-        $tabs[] = new tabobject('Video Reserves',
+        $tabs[] = new tabobject(get_string('headervidres', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/videoreserves.php',
                                 array('courseid' => $courseid)),
                                     get_string('vidreserves_tab', 'block_ucla_media', $count));
     }
-    // Uncomment when CCLE-6231 is done.
-//    $videos = $DB->get_records('ucla_library_music_reserves', array('courseid' => $courseid));
-//    $count = count($videos);
-//    if ($count != 0) {
-//        $tabs[] = new tabobject('Library music reserves',
-//                        new moodle_url('/blocks/ucla_media/libreserves.php',
-//                                array('courseid' => $COURSE->id)),
-//                                    get_string('libraryreserves_tab', 'block_ucla_media', $count));
-//    }
+    $videos = $DB->get_records('ucla_library_music_reserves', array('courseid' => $courseid));
+    $count = count($videos);
+    if ($count != 0) {
+       $tabs[] = new tabobject(get_string('headerlibres', 'block_ucla_media'),
+                        new moodle_url('/blocks/ucla_media/libreserves.php',
+                                array('courseid' => $courseid)),
+                                    get_string('libraryreserves_tab', 'block_ucla_media', $count));
+    }
     // Display tabs here.
     print_tabs(array($tabs), $activetab);
 }

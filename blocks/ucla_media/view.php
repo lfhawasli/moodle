@@ -43,6 +43,13 @@ if ($mode == 1) {
     } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
         print_error('coursemisconf');
     }
+} else if ($mode == 3) {
+    $video = $DB->get_record('ucla_library_music_reserves', array('id' => $videoid));
+    if (empty($video)) {
+        print_error('errorinvalidvideo', 'block_ucla_media');
+    } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
+        print_error('coursemisconf');
+    }
 }
 require_login($course);
 $context = context_course::instance($video->courseid, MUST_EXIST);
@@ -74,7 +81,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
             'objectid' => $video->id,
             'other' => array(
                 'name' => $video->name,
-                'type' => "Bruincast"
+                'type' => get_string('headerbcast', 'block_ucla_media')
             )));
         $event->trigger();
     } else if ($mode == 2) {
@@ -112,7 +119,31 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
             'objectid' => $video->id,
             'other' => array(
                 'name' => $video->video_title,
-                'type' => "Video Reserves"
+                'type' => get_string('headervidres', 'block_ucla_media')
+            )));
+        $event->trigger();
+    } elseif ($mode == 3) {
+        echo $OUTPUT->heading($video->title, 2, 'headingblock');
+        // Try to embed video on page by calling filter.
+        $filtertext = sprintf('{lib:jw,"%s",%s,%s,%s}',
+                addslashes($video->title), urlencode($video->httpurl),
+                urlencode($video->rtmpurl), $video->isvideo);
+        $filter = new filter_oidwowza($context, array());
+        $html = $filter->filter($filtertext);
+        echo $html;
+        echo html_writer::empty_tag('br');
+        echo $OUTPUT->container(html_writer::link(
+                new moodle_url('/blocks/ucla_media/libreserves.php',
+                    array('courseid' => $course->id)),
+                get_string('back', 'block_ucla_media')));
+        
+        // Log the video the user is viewing.
+        $event = \block_ucla_media\event\video_viewed::create(array(
+            'context' => $context,
+            'objectid' => $video->id,
+            'other' => array(
+                'name' => $video->title,
+                'type' => get_string('headerlibres', 'block_ucla_media')
             )));
         $event->trigger();
     }

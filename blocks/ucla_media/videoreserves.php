@@ -48,11 +48,11 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         $event = \block_ucla_media\event\index_viewed::create(
                 array('context' => $context,
                     'other' => array(
-                    'page' => "Video Reserves"
+                    'page' => get_string('headervidres', 'block_ucla_media')
                         )));
         $event->trigger();
     } else {
-        echo get_string('vidresnotavailable', 'block_ucla_media');
+        echo get_string('mediaresnotavailable', 'block_ucla_media');
     }
 } else {
     echo get_string('guestsarenotallowed', 'error');
