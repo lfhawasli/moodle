@@ -29,21 +29,24 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 $videoid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
 // Try to find corresponding course for given video.
-if ($mode == 1) {
+if ($mode == MEDIA_BCAST) {
     $video = $DB->get_record('ucla_bruincast', array('id' => $videoid));
     if (empty($video)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
     } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
         print_error('coursemisconf');
     }
-} else if ($mode == 2) {
+} else if ($mode == MEDIA_VIDEORESERVES) {
     $video = $DB->get_record('ucla_video_reserves', array('id' => $videoid));
+    if (($video->filename == null) && !empty($video->video_url)) {
+        redirect($video->video_url);
+    }
     if (empty($video)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
     } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
         print_error('coursemisconf');
     }
-} else if ($mode == 3) {
+} else if ($mode == MEDIA_LIBRARYMUSIC) {
     $video = $DB->get_record('ucla_library_music_reserves', array('id' => $videoid));
     if (empty($video)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
@@ -62,7 +65,7 @@ echo $OUTPUT->header();
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
-    if ($mode == 1) {
+    if ($mode == MEDIA_BCAST) {
         echo $OUTPUT->heading($video->name, 2, 'headingblock');
         // Try to embed video on page by calling filter.
         $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
@@ -84,7 +87,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                 'type' => get_string('headerbcast', 'block_ucla_media')
             )));
         $event->trigger();
-    } else if ($mode == 2) {
+    } else if ($mode == MEDIA_VIDEORESERVES) {
         $currentdate = time();
         $timeformat = get_string('strftimedate', 'langconfig');
         if ($currentdate > $video->stop_date) {
@@ -98,7 +101,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         }
 
         echo $OUTPUT->heading($video->video_title, 2, 'headingblock');
-
+        
         // Try to embed video on page by calling filter.
         $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
                 'rtmpe://' . get_config('block_ucla_video_reserves', 'wowzaurl'),
@@ -122,7 +125,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                 'type' => get_string('headervidres', 'block_ucla_media')
             )));
         $event->trigger();
-    } elseif ($mode == 3) {
+    } elseif ($mode == MEDIA_LIBRARYMUSIC) {
         echo $OUTPUT->heading($video->title, 2, 'headingblock');
         // Try to embed video on page by calling filter.
         $filtertext = sprintf('{lib:jw,"%s",%s,%s,%s}',

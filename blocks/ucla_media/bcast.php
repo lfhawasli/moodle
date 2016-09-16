@@ -197,7 +197,7 @@ function print_bcast($videolist, $i) {
             if ($video->bruincast_url != null) {
                 $vidurl = html_writer::link(
                 new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $video->id, 'mode' => 1)), "Video");
+                array('id' => $video->id, 'mode' => MEDIA_BCAST)), "Video");
             }
             if ($video->audio_url != null) {
                 $audurl = $video->audio_url;

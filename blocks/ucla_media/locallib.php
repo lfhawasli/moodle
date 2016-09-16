@@ -23,6 +23,9 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+define('MEDIA_BCAST', 1);
+define('MEDIA_VIDEORESERVES', 2);
+define('MEDIA_LIBRARYMUSIC', 3);
 
 /**
  * Sorts start date from least recent to most recent.
@@ -205,7 +208,7 @@ function print_video_list($videolist, $headertitle) {
         } else {
             $outputstr = html_writer::link(
                     new moodle_url('/blocks/ucla_media/view.php',
-                            array('id' => $video->id, 'mode' => 2)), $video->video_title);
+                            array('id' => $video->id, 'mode' => MEDIA_VIDEORESERVES)), $video->video_title);
             // Append available dates to each link.
             if ($video->start_date != null && $video->stop_date != null) {
                 $start = userdate($video->start_date, get_string('strftimedatefullshort'));

@@ -81,7 +81,7 @@ function display_page($course) {
         $outputstr = '';
         $outputstr = html_writer::link(
                         new moodle_url('/blocks/ucla_media/view.php',
-                        array('id' => $video->id, 'mode' => 3)), $video->title); 
+                        array('id' => $video->id, 'mode' => MEDIA_LIBRARYMUSIC)), $video->title); 
         $output[] = $outputstr;
         
     }
