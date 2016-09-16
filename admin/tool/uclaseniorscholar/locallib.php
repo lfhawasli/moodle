@@ -172,19 +172,8 @@ class seniorscholar_invitation_manager extends invitation_manager {
                 $fromuser->middlename = '';
 
                 // Send invitation to the user.
-                $contactuser = new stdClass();
-                $contactuser->email = $invitation->email;
-                $contactuser->firstname = '';
-                $contactuser->lastname = '';
-                $contactuser->maildisplay = true;
-                $contactuser->id = 0;
-                // Moodle 2.7 introduced new username fields.
-                $contactuser->alternatename = '';
-                $contactuser->firstnamephonetic = '';
-                $contactuser->lastnamephonetic = '';
-                $contactuser->middlename = '';
-                $contactuser->mailformat = 1;
-
+                $contactuser = $this->get_contact_user($invitation->email);
+                
                 email_to_user($contactuser, $fromuser, $invitation->subject, $messagetxt, $messagehtml);
 
                 // Log activity after sending the email.
