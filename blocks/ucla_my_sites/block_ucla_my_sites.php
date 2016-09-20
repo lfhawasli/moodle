@@ -395,10 +395,13 @@ class block_ucla_my_sites extends block_base {
             foreach ($batches as $courses) {
                 foreach ($modules as $fname) {
                     try {
+                        // Might throw error. Related to CCLE-6291. Course
+                        // module belongs to non-existent section.
                         $fname($courses, $htmlarray);
-                    } catch (Exception $ex) {
-                        // Ignore. Related to CCLE-6291. Course module belongs
-                        // to non-existent section.
+                    } catch (Throwable $t) {
+                        // Executed only in PHP 7, will not match in PHP 5.x.
+                    } catch (Exception $e) {
+                        // Executed only in PHP 5.x, will not be reached in PHP 7.
                     }
                 }
             }
