@@ -42,5 +42,15 @@ $tasks = array(
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
+    ),
+    // Run at 10:45 am and 8:45 pm.
+    array(
+        'classname' => 'block_ucla_media\task\update_librarymusicreserves',
+        'blocking' => 0,
+        'minute' => '45',
+        'hour' => '10,20',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
     )
 );

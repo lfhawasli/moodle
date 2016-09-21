@@ -56,6 +56,8 @@ class filter_oidwowza extends moodle_text_filter {
         if ($CFG->filter_oidwowza_enable_mp4) {
             $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
             $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_callback', $newtext);
+            $search = '/\{lib:jw,"(.*?)",(.*?),(.*?),(.*?)\}/';
+            $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_lib_callback', $newtext);   
         }
 
         if (empty($CFG->filter_oidwowza_enable_mp4) || is_null($newtext) ||
@@ -318,4 +320,68 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
                 primary: 'html5'
 		});
 	</script>" . $timeline . $fallbackurl;
+}
+
+/**
+ * Replaces WOWZA link with media player.
+ *
+ * @param array $link   Consisting of name, httpurl, rtmpurl and if isvideo.
+ * @param boolean $autostart    Unused.
+ * @return string       HTML fragment to display video player.
+ */
+function oidwowza_filter_mp4_lib_callback($link, $autostart = false) {
+    global $COURSE, $USER;
+    
+    $title   = clean_param($link[1], PARAM_NOTAGS);
+    $httpurl = clean_param($link[2], PARAM_TEXT);
+    $rtmpurl = clean_param($link[3], PARAM_TEXT);
+    $isvideo = clean_param($link[4], PARAM_INT);
+    
+    if (!empty($httpurl)) {
+        $httpurl = urldecode($httpurl);
+    }
+    if (!empty($rtmpurl)) {
+        $rtmpurl = urldecode($rtmpurl);
+    }
+    $height = 720;
+    $width = 640;
+    
+    $playerid = uniqid();
+    if ($isvideo == 1) {
+        return "
+        <div id='player-$playerid'></div>
+	<script type='text/javascript'>
+	jwplayer('player-$playerid').setup({
+		width: $width,
+		height: $height,
+		playlist: [{
+                    sources :
+                        [
+                            {file: '$httpurl'},
+                            {file: '$rtmpurl'}
+                        ]
+                    }],
+                primary: 'html5'
+		});
+	</script>";
+    } else {
+        return "
+            <div id='player-$playerid'></div>
+            <script type='text/javascript'>
+            jwplayer('player-$playerid').setup({
+	    sources: [
+		    {file: '$rtmpurl'},
+		    {file: '$httpurl'}
+            ],
+		rtmp: {
+			bufferlength: 3
+		},
+            modes: [
+                { type: 'html5' },
+                { type: 'flash' }
+            ],
+	    height: 30,
+        }) </script>";
+    }
+
 }

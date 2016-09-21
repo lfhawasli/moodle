@@ -62,7 +62,7 @@ class block_ucla_media extends block_base {
         $videoreservesfound = $DB->record_exists('ucla_video_reserves',
                 array('courseid' => $courseid));
 
-        $libraryreservesfound = $DB->get_records('ucla_library_reserves',
+        $libraryreservesfound = $DB->get_records('ucla_library_music_reserves',
                 array('courseid' => $courseid));
 
         if ($bruincastfound) {
@@ -79,7 +79,7 @@ class block_ucla_media extends block_base {
             $nodes[] = $node;
         } else if ($libraryreservesfound) {
             $node = navigation_node::create(get_string('title',
-                    'block_ucla_media'), new moodle_url('/blocks/ucla_media/videoreserves.php',
+                    'block_ucla_media'), new moodle_url('/blocks/ucla_media/libreserves.php',
                             array('courseid' => $courseid)));
             $node->add_class('video-reserves-link');
             $nodes[] = $node;
@@ -101,4 +101,7 @@ class block_ucla_media extends block_base {
         );
     }
 
+    public function has_config() {
+        return true;
+    }
 }
