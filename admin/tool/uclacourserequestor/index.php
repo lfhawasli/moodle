@@ -159,6 +159,7 @@ $departmentparam = optional_param('department', false, PARAM_TEXT);
 $actionparam = optional_param('action', false, PARAM_TEXT);
 
 if ($viewformparam && $termparam && $departmentparam && $actionparam) {
+    // If user clicked on a page, we need to setup data.
     $requestorviewform = $cached_forms[UCLA_REQUESTOR_VIEW]['view'];
     $requestviewobj = new stdClass();
     $requestviewobj->{$requestorviewform->groupname} = array(
@@ -175,6 +176,7 @@ if ($viewformparam && $termparam && $departmentparam && $actionparam) {
         $uclacrqs->add_set($request);
     }
 } else if ($cached_forms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {
+    // User clicked on "View/Edit existing requests".
     $viewformdata = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->get_data();
     $termparam = urlencode($viewformdata->requestgroup['term']);
     $departmentparam = urlencode($viewformdata->requestgroup['department']);
@@ -698,14 +700,16 @@ if (!empty($requeststable->data)) {
         echo html_writer::empty_tag('br');
     }
 
-    $page = optional_param('page', 0, PARAM_INT);
-    $baseurl = new moodle_url('/admin/tool/uclacourserequestor/index.php',
-            array('requestor_view_form' => '1', 'term' => $termparam,
-                  'department' => $departmentparam, 'action' => $actionparam));
-    $coursesperpage = 100;
-    echo $OUTPUT->paging_bar(count($requeststable->data), $page, $coursesperpage, $baseurl);
-    $requeststable->data = array_slice($requeststable->data,
-            $coursesperpage * $page, $coursesperpage);
+    // Only display paging bar for requested courses.
+    if ($viewformparam || $cached_forms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {        
+        $baseurl = new moodle_url('/admin/tool/uclacourserequestor/index.php',
+                array('requestor_view_form' => '1', 'term' => $termparam,
+                      'department' => $departmentparam, 'action' => $actionparam));
+        $coursesperpage = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->coursesperpage;
+        $page = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->page;
+        echo $OUTPUT->paging_bar($cached_forms[UCLA_REQUESTOR_VIEW]['view']->totalcourses,
+                $page, $coursesperpage, $baseurl);     
+    }
     echo html_writer::table($requeststable);
 
     echo html_writer::tag('input', '', array(
