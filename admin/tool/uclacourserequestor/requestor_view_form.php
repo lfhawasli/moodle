@@ -7,6 +7,9 @@ require_once(dirname(__FILE__) . '/requestor_shared_form.php');
 class requestor_view_form extends requestor_shared_form {
     var $type = 'viewcourses';
     var $noterm = true;
+    var $page = 0;
+    var $coursesperpage = 100;
+    var $totalcourses = null;
 
     const noviewcourses = 'noviewcourses';
 
@@ -60,6 +63,8 @@ class requestor_view_form extends requestor_shared_form {
                 self::noviewcourses);
         }
 
+        $this->page = optional_param('page', 0, PARAM_INT);
+
         return $group;
     }
 
@@ -98,8 +103,7 @@ class requestor_view_form extends requestor_shared_form {
 
         // try to sort on ucla_reg_classinfo's crsidx/secidx columns, since they
         // allow us to properly sort courses
-        $sql = "SELECT  urc.*
-                FROM    {ucla_request_classes} AS urc
+        $sql = "FROM    {ucla_request_classes} AS urc
                 LEFT JOIN   {ucla_reg_classinfo} AS urci ON (
                             urc.term=urci.term AND
                             urc.srs=urci.srs
@@ -114,7 +118,14 @@ class requestor_view_form extends requestor_shared_form {
 
         $sql .= ' ORDER BY urc.department, urci.crsidx, urci.secidx';
 
-        $reqs = $DB->get_records_sql($sql);
+        $countsql = "SELECT  COUNT(urc.id) " . $sql;
+        $this->totalcourses = $DB->count_records_sql($countsql);
+
+        // Setup query to only return current page.
+        $querysql = "SELECT  urc.* " . $sql;
+        $reqs = $DB->get_records_sql($querysql, array(),
+                $this->page*$this->coursesperpage,
+                $this->coursesperpage);
 
         $sets = array();
         foreach ($reqs as $req) {
