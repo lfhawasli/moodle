@@ -34,12 +34,12 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
     /**
      * Construct contents of course_overview block
      *
-     * @param array     $courses list of courses in sorted order
-     * @param array     $overviews list of course overviews
+     * @param array $classsites List of courses in sorted order
+     * @param array $overviews  List of course overviews
      * @return array content to be displayed in ucla_my_sites block
      */
     public function class_sites_overview($classsites, $overviews) {
-        global $USER, $CFG, $OUTPUT, $PAGE;
+        global $PAGE;
         $content = array();
         $PAGE->requires->jquery();
 
@@ -197,7 +197,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
     }
 
     /**
-     * Coustuct activities overview for a course
+     * Construct activities overview for a course.
      *
      * @param int $cid course id
      * @param array $overview overview of activities in course

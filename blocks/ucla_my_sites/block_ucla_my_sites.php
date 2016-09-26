@@ -146,7 +146,8 @@ class block_ucla_my_sites extends block_base {
         }
 
         // Check for Course Overview alerts/notifications.
-        $overviews = $this->get_overviews($courses);
+        //$overviews = $this->get_overviews($courses);
+        $overviews = array();   // Temporarily turn off overviews.
 
         // These are all the terms in the dropdown.
         $availableterms = array();
