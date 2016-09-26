@@ -1,18 +1,12 @@
-<?php  
+<?php
 
 require_once '../../../config.php';
 require_once $CFG->dirroot.'/grade/export/lib.php';
 require_once 'grade_export_myucla.php';
+require_once 'grade_export_form_myucla.php';
 
 $id                = required_param('id', PARAM_INT); // course id
-$groupid           = optional_param('groupid', 0, PARAM_INT);
-$groupingid        = optional_param('groupingid', 0, PARAM_INT);
-$itemids           = required_param('itemids', PARAM_RAW);
-$export_feedback   = optional_param('export_feedback', 0, PARAM_BOOL);
-$updatedgradesonly = optional_param('updatedgradesonly', false, PARAM_BOOL);
-$displaytype       = optional_param('displaytype', $CFG->grade_export_displaytype, PARAM_INT);
-$decimalpoints     = optional_param('decimalpoints', $CFG->grade_export_decimalpoints, PARAM_INT);
-$filetype          = optional_param('filetype', 'csv', PARAM_FILE);
+$PAGE->set_url('/grade/export/myucla/export.php', array('id'=>$id));
 
 if (!$course = $DB->get_record('course', array('id'=>$id))) {
     print_error('nocourseid');
@@ -20,19 +14,39 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
 
 require_login($course);
 $context = context_course::instance($id);
+$groupid = groups_get_course_group($course, true);
 
 require_capability('moodle/grade:export', $context);
 require_capability('gradeexport/myucla:view', $context);
 
-// START UCLA MOD: CCLE-4659 - Migrate add to log calls for grade export
-$event = \local_gradebook\event\grades_exported_myucla::create(array(
-    'context' => $context,
-    'other' => array('type' => 'myucla')    
-));
-$event->trigger();
-// END UCLA MOD: CCLE-4659
+// We need to call this method here before any print otherwise the menu won't display.
+// If you use this method without this check, will break the direct grade exporting (without publishing).
+$key = optional_param('key', '', PARAM_RAW);
+if (!empty($CFG->gradepublishing) && !empty($key)) {
+    print_grade_page_head($COURSE->id, 'export', 'myucla', get_string('exportto', 'grades') . ' ' . get_string('pluginname', 'gradeexport_myucla'));
+}
 
-// print all the exported data here
-$export = new grade_export_myucla($course, $groupid, $groupingid, $itemids, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints, $filetype);
-$export->print_grades();
+if (groups_get_course_groupmode($COURSE) == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
+    if (!groups_is_member($groupid, $USER->id)) {
+        print_error('cannotaccessgroup', 'grades');
+    }
+}
 
+$params = array(
+    'includeseparator'=>true,
+    'publishing' => true,
+    'simpleui' => true,
+    'multipledisplaytypes' => true
+);
+$mform = new grade_export_form_myucla(null, $params);
+$data = $mform->get_data();
+$export = new grade_export_myucla($course, $groupid, $data);
+
+// If the gradepublishing is enabled and user key is selected print the grade publishing link.
+if (!empty($CFG->gradepublishing) && !empty($key)) {
+    groups_print_course_menu($course, 'index.php?id='.$id);
+    echo $export->get_grade_publishing_url();
+    echo $OUTPUT->footer();
+} else {
+    $export->print_grades();
+}

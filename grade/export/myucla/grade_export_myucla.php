@@ -2,36 +2,32 @@
 
 require_once($CFG->dirroot.'/grade/export/lib.php');
 require_once($CFG->dirroot.'/local/ucla/lib.php'); //Uses the ucla_validator function in order to determine whether or not a UID is valid
+require_once($CFG->libdir . '/csvlib.class.php');
 
 class grade_export_myucla extends grade_export {
 
     public $plugin = 'myucla';
-    public $delim = ",";
+    public $separator;
 
     /**
      * Constructor should set up all the private variables ready to be pulled
      * @param object $course
      * @param int $groupid id of selected group, 0 means all
      * @param int $grouping id of selected grouping, 0 means none selected
-     * @param string $itemlist comma separated list of item ids, empty means all
-     * @param boolean $export_feedback
-     * @param boolean $export_letters
-     * @param string $filetype
-     * @note Exporting as letters will lead to data loss if that exported set it re-imported.
-     * @note If no grade items selected, only UID and name appear- different than parent
+     * @param stdClass $formdata The validated data from the grade export form.
      */
-    function grade_export_myucla($course, $groupid=0, $groupingid=0, $itemlist='', $export_feedback=false, $updatedgradesonly = false, $displaytype = GRADE_DISPLAY_TYPE_REAL, $decimalpoints = 2, $filetype = 1) {
-        parent::grade_export($course, $groupid, $groupingid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints);
-        if (empty($itemlist)) {
-            $this->columns = array();
-        }
-        
-        if ($filetype === "txt") {
-            $this->set_delimiter("\t");
-        }
-        else {
-            $this->set_delimiter(',');
-        }
+    public function __construct($course, $groupid, $formdata) {
+        parent::__construct($course, $groupid, $formdata);
+        $this->separator = $formdata->separator;
+
+        // Overrides.
+        $this->usercustomfields = true;
+    }
+
+    public function get_export_params() {
+        $params = parent::get_export_params();
+        $params['separator'] = $this->separator;
+        return $params;
     }
     
     /**
@@ -39,291 +35,84 @@ class grade_export_myucla extends grade_export {
 	 *
 	 * @return none
      */
-    function print_grades() {
+    public function print_grades() {
         global $CFG;
 
         $export_tracking = $this->track_exports();
 
         $strgrades = get_string('grades');
-        /// Print header to force download
-        @header('Cache-Control: private, must-revalidate, pre-check=0, post-check=0, max-age=0');
-        @header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
-        @header('Pragma: no-cache');
-        header("Content-Type: application/download\n");
-        $downloadfilename = clean_filename("{$this->course->shortname} $strgrades");
-        
-        if ($this->get_delimiter() === ',') {
-            $ext = 'csv';
-        }
-        else {
-            $ext = 'txt';
-        }
-        header("Content-Disposition: attachment; filename=\"$downloadfilename.$ext\"");
+        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
 
-        $coursetotal = get_string("coursetotal", "grades");       
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
-        $gui->init();
-        $lines = array();
-        while ($userdata = $gui->next_user()) {
-            $user = $userdata->user;
-            // if (empty($user->idnumber)) {   // Not sure why this was here, ccommented out for MDL-13722
-            //     continue;
-            // }
-            
-            $gradeupdated = false; // if no grade is update at all for this user, do not display this row
-            $rowstr = '';
-            $delim = $this->delim;  //shorthand
-            foreach ($this->columns as $itemid=>$grade_item) {
-                $gradetxt = $this->format_grade($userdata->grades[$itemid]);
-                
-                // get the status of this grade, and put it through track to get the status
-                $g = new grade_export_update_buffer();
-                $grade_grade = new grade_grade(array('itemid'=>$itemid, 'userid'=>$user->id));
-                $status = $g->track($grade_grade);
+        $shortname = format_string($this->course->shortname, true, array('context' => context_course::instance($this->course->id)));
+        $downloadfilename = clean_filename("$shortname $strgrades");
+        $csvexport = new csv_export_writer($this->separator);
+        $csvexport->set_filename($downloadfilename);
 
-                if ($this->updatedgradesonly && ($status == 'nochange' || $status == 'unknown')) {
-                    $rowstr .= $delim.$this->fix_delims(get_string('unchangedgrade', 'grades'));
-                } else {
-                    $rowstr .= $delim.$this->fix_delims($gradetxt);
-                    $gradeupdated = true;
-                }
-                
-                //Remark- Leave it blank, since can't be added in Moodle
-                if ($grade_item->get_name() === $coursetotal) {
-                    $rowstr .= $delim;
-                }
-                
-                //Feedback is optional, delimiter is required
-                $rowstr .= $delim;
-                if ($this->export_feedback) {
-                    $feedback_str = $this->fix_delims($this->format_feedback($userdata->feedbacks[$itemid])); 
-                    //Replace all newlines and carriage returns in the string with whitespace 
-                    //to prevent weird formatting issues. Replace \r\n with a single whitespace.
-                    $feedback_str = str_replace(array("\r\n", "\n", "\r"), ' ', $feedback_str);
-                    $rowstr .= $feedback_str;
-                }
-            }
-
-            // if we are requesting updated grades only, we are not interested in this user at all            
-            if (!$gradeupdated && $this->updatedgradesonly) {
-                continue; 
-            }
-
-            //Don't use lang file for lastname, firstname.  This is tied to MyUCLA, not Moodle
-            $output = ''; 
-            $output .= $user->idnumber.$delim.$this->fix_delims("$user->lastname, $user->firstname");           
-            $output .= $rowstr;
-            $output .= "\n";
-
-            //Check for valid UID's
-            if (isset($user->idnumber) && isset($lines[$user->idnumber])) {
-                //Duplicate ID number
-                //Delete the first entry too, it's not unique either
-                unset($lines[$user->idnumber]);
-            }
-            else if (isset($user->idnumber) && $user->idnumber != '') { 
-                $lines[$user->idnumber] = $output;
-            }
-            //else missing ID number
+        // Print names of all the fields
+        $exporttitle = array();
+        foreach ($profilefields as $field) {
+            $exporttitle[] = $field->fullname;
         }
 
-		ob_start();
-		ksort($lines, SORT_NUMERIC);
-		foreach ($lines as $line) {
-			echo $line;
-		}
-		ob_end_flush();
-			
-		exit;
-    }
-    	 
-   /**
-     * Returns an html table with it's column header row filled out in the format
-     * specified for displaying a preview.
-     * Meant to be used with the display_preview function.
-     * @return html_table
-     */    
-    function init_preview_table_with_headers(){
-        //Initialize the table
-        $preview_rows_table = new html_table();
-        $preview_rows_table->attributes = array('class' => 'gradeexportpreview');
-        
-        //Generate the table's column headers based on the number of grade items.
-        $preview_rows_table->head = array( get_string("idnumber"),  get_string("name"));
+        if (!$this->onlyactive) {
+            $exporttitle[] = get_string("suspended");
+        }
+
+        // Add grades and feedback columns.
         foreach ($this->columns as $grade_item) {
-
-            $grade_header = new html_table_cell($this->format_column_name($grade_item));
-            $grade_header->attributes['class'] = 'grade';
-            $preview_rows_table->head[] = $grade_header;
-
-            //Add a remark about final grade
-            if ($grade_item->get_name() === get_string("coursetotal", "grades")) {
-            $preview_rows_table->head[] = 'Remark';
+            foreach ($this->displaytype as $gradedisplayname => $gradedisplayconst) {
+                $exporttitle[] = $this->format_column_name($grade_item, false, $gradedisplayname);
             }
-            /// add a column_feedback column
             if ($this->export_feedback) {
-                $preview_rows_table->head[] = $this->format_column_name($grade_item, true);
+                $exporttitle[] = $this->format_column_name($grade_item, true);
             }
         }
-        return $preview_rows_table;
-    }
-    
-    /**
-     * Prints preview of exported grades on screen as a feedback mechanism
-     * @param bool $require_user_idnumber true means skip users without idnumber
-     * @return none
-     */	
-    public function display_preview($require_user_idnumber=false) {
-        //Override parent function in grade_export (see /moodle/grade/export/lib.php  
-        global $OUTPUT; 
-        echo $OUTPUT->heading(get_string('previewrows', 'grades'));   
-        
-        //Initialize the table
+        // Last downloaded column header.
+        $exporttitle[] = get_string('timeexported', 'gradeexport_myucla');
+        $csvexport->add_data($exporttitle);
 
-        $preview_rows_table = $this->init_preview_table_with_headers();
-        
-        //Parse all user data and sort them into the appropriate preview table accordingly.
-        $valid_rows = array();
-        $invalidids = array();
+        // Print all the lines of data.
+        $geub = new grade_export_update_buffer();
         $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid, $this->groupingid);
-        $gui->init();        
-       //For each user
+        $gui->require_active_enrolment($this->onlyactive);
+        $gui->allow_user_custom_fields($this->usercustomfields);
+        $gui->init();
         while ($userdata = $gui->next_user()) {
-            // Since we need to sort later, keep all rows (don't break early)
-                        
+
+            $exportdata = array();
             $user = $userdata->user;
-            if ($require_user_idnumber && empty($user->idnumber)) {
-                // some exports require user idnumber
-                continue;
-            }
-            
-            $gradeupdated = false; // if no grade is update at all for this user, do not display this row
-            //
-            //Initialize the table row that represents this user's data.
-            $table_row = new html_table_row();
-            $table_row->cells[] = new html_table_cell($user->idnumber);
-            $table_row->cells[] = new html_table_cell($user->lastname.", ".$user->firstname);    
-            
-            //Fill in the row's columns.
-            foreach ($this->columns as $itemid=>$grade_item) {
-                $gradetxt = $this->format_grade($userdata->grades[$itemid]);
-                
-                // get the status of this grade, and put it through track to get the status
-                $g = new grade_export_update_buffer();
-                $grade_grade = new grade_grade(array('itemid'=>$itemid, 'userid'=>$user->id));
-                $status = $g->track($grade_grade);
 
-                 //Set the grade cell  
-                $table_grade_cell = new html_table_cell();
-                if ($this->updatedgradesonly && ($status == 'nochange' || $status == 'unknown')) {
-                    $table_grade_cell->text = get_string('unchangedgrade', 'grades');
-                } else {
-                    $table_grade_cell->text = $gradetxt;
-                    $gradeupdated = true;
-                }                
-                
-                //Real/percent should align-right, Letter grade should align left
-                if ($this->displaytype != GRADE_DISPLAY_TYPE_LETTER) {
-                    $table_grade_cell->attributes['class'] = 'grade';
+            foreach ($profilefields as $field) {
+                $fieldvalue = grade_helper::get_user_field_value($user, $field);
+                $exportdata[] = $fieldvalue;
+            }
+            if (!$this->onlyactive) {
+                $issuspended = ($user->suspendedenrolment) ? get_string('yes') : '';
+                $exportdata[] = $issuspended;
+            }
+            foreach ($userdata->grades as $itemid => $grade) {
+                if ($export_tracking) {
+                    $status = $geub->track($grade);
                 }
-                //Table cell classes are initialized to '', so this else statement is implicitly executed.
-                //Comment is here for reference.
-                /*else {
-                    $table_grade_cell->attributes['class'] = '';
-                }*/
-                
-                $table_row->cells[] = $table_grade_cell; //Add the grade cell to the table row.
-                
-                //Add an empty cell for coursetotal.
-                if ($grade_item->get_name() === get_string("coursetotal", "grades")) {
-                     $table_row->cells[] = new html_table_cell();
+
+                foreach ($this->displaytype as $gradedisplayconst) {
+                    $exportdata[] = $this->format_grade($grade, $gradedisplayconst);
                 }
-                
-                //Feedback cell
+
                 if ($this->export_feedback) {
-                    $table_row->cells[] = new html_table_cell($this->format_feedback($userdata->feedbacks[$itemid]));
+                    $exportdata[] = $this->format_feedback($userdata->feedbacks[$itemid]);
                 }
             }
-
-            // if we are requesting updated grades only, we are not interested in this user at all            
-            if (!$gradeupdated && $this->updatedgradesonly) {
-                continue; 
-            }
-
-            //If a user's UID is invalid, add it to the array of invalid ids.
-            if ( !(ucla_validator('uid', $user->idnumber)) ) {
-                $invalidids[] = $table_row;
-            }
-            //If a user's UID is already in the valid rows array, remove that user from the array.
-            else if (isset($valid_rows[$user->idnumber])) {
-                $invalidids[] = $table_row;
-
-                //Delete the first entry, it's not unique either
-                $invalidids[] = $valid_rows[$user->idnumber];
-                unset($valid_rows[$user->idnumber]);
-            }
-            //If a user's UID is valid, add the user to the list of valid rows.
-            else {
-                $valid_rows[$user->idnumber] = $table_row;
-            }
+            // Time exported.
+            $exportdata[] = time();
+            $csvexport->add_data($exportdata);
         }
-        
-        //Add the valid rows to the table, stopping once you've reached the limit of preview rows allowed.
-        $i = 0;
-        foreach ($valid_rows as $row) {
-            //Use !== false, because 0 evaluates to false too
-            if ($this->previewrows !== false and $this->previewrows <= $i) {
-                //Limit to the number of preview rows
-                break;
-            }
-            $preview_rows_table->data[] = $row;
-            $i++;
-        }
-        echo html_writer::table($preview_rows_table); //Print out the entire preview rows table.
-        
         $gui->close();
-
-        //Check for duplicate ID numbers
-        if (!empty($invalidids)) {
-            $numduplicates = count($invalidids);
-
-            echo $OUTPUT->heading(get_string('invalidids', 'gradeexport_myucla'));
-
-            // Print out the number of students not listed due to not enough previewrows
-            $OUTPUT->box_start('generalbox', 'notice');
-            echo html_writer::start_tag('p').get_string('invalididsexplanation', 'gradeexport_myucla').html_writer::end_tag('p');
-            //Use !== false, because 0 evaluates to false too
-            if ($this->previewrows !== false) {
-                //Sanity check- negatives mess up calculations!
-                $previewrows = $this->previewrows >= 0 ? $this->previewrows : 0;
-
-                $numskipped = ($numduplicates - $previewrows);
-                if ($numskipped >= 1) {
-                    echo html_writer::start_tag('p').$numskipped.' additional student';
-                    if ($numskipped > 1) {
-                        echo 's';   //Make it plural
-                    }
-                    echo ' not listed.';
-                }
-            }
-            $OUTPUT->box_end();
-
-            //Initialize the table
-            $invalid_rows_table = $this->init_preview_table_with_headers();
-            
-            //Add the invalid rows to the table, stopping once you've reached the limit of preview rows allowed.
-            ksort($invalidids, SORT_NUMERIC);
-            for ($j = 0; $j < $numduplicates; ++$j) {
-                if ($this->previewrows !== false and $this->previewrows <= $j) {
-                    //Limit to the number of preview rows
-                    break;
-                }
-                $invalid_rows_table->data[] = $invalidids[$j];
-            }
-            echo html_writer::table($invalid_rows_table); //Print students which were skipped
-        }
+        $geub->close();
+        $csvexport->download_file();
+        exit;
     }
-    
+
     /**
      * Init object based using data from form
      * @param object $formdata
@@ -331,66 +120,5 @@ class grade_export_myucla extends grade_export {
     function process_form($formdata) {
         //Overrides parent function
         parent::process_form($formdata);
-        $this->filetype = $formdata->filetype;
-    }
-
-    /**
-     * Returns array of parameters used by dump.php and export.php.
-     * @return array
-     */
-    function get_export_params() {
-        //Overrride parent function
-        
-        $params = parent::get_export_params();
-        $params['filetype'] = $this->filetype;
-        return $params;
-    }
-    
-    /*
-     * Returns the delimiter being used
-     *
-     * @return string delimiter
-     */
-    function get_delimiter() {
-        return $this->delim;
-    }
-    
-    /*
-     * Sets the delimiter being used
-     * The delimiter is only changed if the new delimiter is valid
-     *
-     * @return string The new value of the delimiter
-     */
-    function set_delimiter($newdelim) {
-        if ($newdelim === "\t" || $newdelim === ',') {
-            $this->delim = $newdelim;
-        }
-        return $this->delim;
-    }
-    
-    /*
-     * Changes instances of the delimiter in field text with appropriate values
-     *   Replaces tabs with 4 spaces
-     *   Encloses strings with commas inside quotes
-     */
-    function fix_delims($string) {
-        $findtext = $this->delim;
-        $replacetext = $this->delim;
-        if ($this->delim === "\t") {
-            $replacetext = '    ';  //4 spaces
-        }
-        else if ($this->delim === ',') {
-            if (strpos($string, $this->delim) === FALSE) {
-                return $string;
-            }
-            else {
-                $findtext =  '"';   //double quote
-                $replacetext = "'"; //single quote
-                return '"'.str_replace($findtext, $replacetext, $string).'"';
-            }
-        }
-        
-        //Missing case!
-        return str_replace($findtext, $replacetext, $string);
     }
 }
