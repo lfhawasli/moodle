@@ -36,7 +36,7 @@ class report_emaillog_renderer extends plugin_renderer_base {
      *
      * @param report_emaillog_renderable $reportlog object of report_emaillog.
      */
-    public function render_report_emaillog_renderable(report_emaillog_renderable $reportlog) {
+    public function render_report_emaillog(report_emaillog_renderable $reportlog) {
         if ($reportlog->showselectorform) {
             $this->report_selector_form($reportlog);
         }
