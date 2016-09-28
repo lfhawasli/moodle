@@ -551,7 +551,7 @@ if ($pageid != LESSON_EOL) {
                     $grade->id = $oldgrade->id;
                     $DB->update_record("lesson_grades", $grade);
                 } else {
-                    $lessoncontent .= $OUTPUT->box(get_string("displayscorewithoutessays", "lesson", $a), 'center');
+                    $newgradeid = $DB->insert_record("lesson_grades", $grade);
                 }
             } else {
                 if ($lesson->timelimit) {
