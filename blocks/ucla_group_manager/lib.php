@@ -247,7 +247,6 @@ class ucla_group_manager {
 
         $reqsecinfos = self::course_sectionroster($courseid);
         if ($reqsecinfos === false) {
-            $this->trace->output("Not a real course $courseid!");
             return true;
         }
 
