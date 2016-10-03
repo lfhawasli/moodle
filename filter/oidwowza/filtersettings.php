@@ -36,3 +36,11 @@ $settings->add(new admin_setting_configtext('filter_oidwowza_minutesexpire',
 $settings->add(new admin_setting_configtext('filter_oidwowza_sharedsecret',
         get_string('filter_oidwowza_sharedsecret', 'filter_oidwowza'),
         get_string('filter_oidwowza_sharedsecret_desc', 'filter_oidwowza'), '', PARAM_ALPHANUMEXT));
+
+$settings->add(new admin_setting_configtext(
+            'filter_oidwowza/video_reserves_url',
+            get_string('headerwowzaurl', 'filter_oidwowza'),
+            get_string('descwowzaurl', 'filter_oidwowza'),
+            'oid-as-wowza.oid.ucla.edu:1935',
+            PARAM_URL
+        ));

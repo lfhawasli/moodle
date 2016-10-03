@@ -142,7 +142,8 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     if (!empty($fallbackurl)) {
         $fallbackurl = urldecode($fallbackurl);
     }
-    $app = $COURSE->shortname;
+    $app = 'IMCS';
+    $url = get_config('filter_oidwowza', 'video_reserves_url');
     // Handle VOD and Live streams.
     $timeline = '';
     $srtjs = '';
@@ -184,24 +185,19 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
             break;
     }
 
+    $contentpath = $app . '/_definst_/' . $format . $file;
+   
     // Generate SecureToken hash.
-    if (strpos($url, get_config('block_ucla_video_reserves', 'wowzaurl')) !== false) {
-        // Specifying application name and defining a default instance of the application.
-        $app = 'IMCS/_definst_';
-        $contentpath = $app . '/' . $format . $file;
-    } else {
-        $contentpath = 'CCLEtest1/Vtest1/'. $format . $file;
-    }
     $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
     $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
     $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
 
     // Streaming paths.
-    $srtpath = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' . $app . '/' . $srt;
-    $html5path = 'http://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
+    $srtpath = 'http://' . $url . '/' . $app . '/' . $srt;
+    $html5path = 'http://' . $url . '/' .
             $contentpath . '/playlist.m3u8' . $additionalparams;
 
-    $rtmppath = $url . '/' . $contentpath . $additionalparams;
+    $rtmppath = 'rtmp://'.$url . '/' . $contentpath . $additionalparams;
 
     // Set playerid, so that we can support multiple video embeds.
     $playerid = uniqid();
