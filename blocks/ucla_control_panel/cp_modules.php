@@ -82,9 +82,6 @@ if (!empty($course_info)) {
         $myucla_row->add_element(new ucla_cp_module('myucla_gradebook',
                         new moodle_url("https://be.my.ucla.edu/login/directLink.aspx?featureID=75&term="
                                 . $course_term . "&srs=" . $course_srs), $temptag, $ta_cap));
-        $myucla_row->add_element(new ucla_cp_module('turn_it_in',
-                        new moodle_url("https://be.my.ucla.edu/login/directLink.aspx?featureID=48&term="
-                                . $course_term . "&srs=" . $course_srs), $temptag, $ta_cap));
         $myucla_row->add_element(new ucla_cp_module('email_roster',
                         new moodle_url("https://be.my.ucla.edu/login/directLink.aspx?featureID=73&term="
                                 . $course_term . "&srs=" . $course_srs), $temptag, $ta_cap));
