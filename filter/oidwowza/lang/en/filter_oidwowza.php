@@ -30,3 +30,5 @@ $string['filter_oidwowza_minutesexpire'] = 'Expiration';
 $string['filter_oidwowza_minutesexpire_desc'] = 'Number of minutes before video link expires';
 $string['filter_oidwowza_sharedsecret'] = 'Shared secret';
 $string['filter_oidwowza_sharedsecret_desc'] = 'Used to generate SecureToken for Wowza. Must match same token on Wowza server.';
+$string['headerwowzaurl'] = 'Source URL';
+$string['descwowzaurl'] = 'Source website for wowza server';

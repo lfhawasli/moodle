@@ -206,9 +206,14 @@ function print_video_list($videolist, $headertitle) {
                     get_string('futurevideo_info', 'block_ucla_media',
                                userdate($video->start_date, get_string('strftimedatefullshort'))) . ')';
         } else {
-            $outputstr = html_writer::link(
-                    new moodle_url('/blocks/ucla_media/view.php',
-                            array('id' => $video->id, 'mode' => MEDIA_VIDEORESERVES)), $video->video_title);
+            if ($video->video_url && !empty($video->filename)) {
+                $outputstr = html_writer::link(
+                        new moodle_url('/blocks/ucla_media/view.php',
+                                array('id' => $video->id, 'mode' => MEDIA_VIDEORESERVES)), $video->video_title);
+            } else {
+                $outputstr = html_writer::link(
+                        new moodle_url($video->video_url), $video->video_title);
+            }
             // Append available dates to each link.
             if ($video->start_date != null && $video->stop_date != null) {
                 $start = userdate($video->start_date, get_string('strftimedatefullshort'));

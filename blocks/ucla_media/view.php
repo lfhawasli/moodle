@@ -112,7 +112,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
         echo html_writer::empty_tag('br');
         echo $OUTPUT->container(html_writer::link(
-                new moodle_url('/blocks/ucla_media/index.php',
+                new moodle_url('/blocks/ucla_media/videoreserves.php',
                     array('courseid' => $course->id)),
                 get_string('back', 'block_ucla_media')));
 
