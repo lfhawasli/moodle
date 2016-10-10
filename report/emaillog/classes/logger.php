@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class email_logger {
+class report_emaillog_logger {
     /**
      * Inserts a new email log record into the report_emaillog database.
      *
