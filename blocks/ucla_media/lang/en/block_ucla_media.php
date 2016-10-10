@@ -68,3 +68,6 @@ $string['node_restricted'] = 'Private';
 $string['node_open'] = 'Open';
 $string['node_see_instructor'] = 'See Instructor';
 $string['node_online'] = 'E-Lecture';
+
+$string['videoreservesipwarning'] = 'You are accessing this content from off-campus. If the content does not load, you will need to use the UCLA VPN to obtain an on-campus internet address.</br>
+BOL VPN instructions: <a target="_blank" href="https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients">https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients</a>.';

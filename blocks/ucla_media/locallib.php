@@ -124,6 +124,35 @@ function cmp_title($a, $b) {
 }
 
 /**
+ * Check if a given ip is in the UCLA network.
+ * 
+ * From https://gist.github.com/tott/7684443
+ * 
+ * @return boolean true if the ip is a ucla campus ip
+ */
+function is_on_campus_ip() {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    // List of acceptable ip addresses obtained from https://kb.ucla.edu/articles/list-of-uc-related-ip-addresses. This specifies ip ranges belonging to UCLA.
+    $acceptableips = array('128.97.0.0/16', '131.179.0.0/16', '149.142.0.0/16', '164.67.0.0/16', '169.232.0.0/16', '172.16.0.0/12', '192.35.210.0/24', '192.35.225.0/24', '192.154.2.0/24');
+    foreach ($acceptableips as $range) {
+	if (strpos($range, '/') == false) {
+            $range .= '/32';
+	}
+	// $range is in IP/CIDR format eg 127.0.0.1/24.
+	list($range, $netmask) = explode('/', $range, 2);
+	$rangedecimal = ip2long($range);
+	$ipdecimal = ip2long($ip);
+	$wildcarddecimal = pow(2, (32 - $netmask)) - 1;
+	$netmaskdecimal = ~ $wildcarddecimal;
+	$inrange = (($ipdecimal & $netmaskdecimal) == ($rangedecimal & $netmaskecimal));
+        if ($inrange == true) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Prints out all of the html for displaying the video reserves page contents.
  *
  * @param object $course
@@ -135,6 +164,7 @@ function display_video_reserves($course) {
     // duplicate videos are displayed for crosslisted courses.
     $videos = get_video_data($course->id);
     print_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
+        
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
 
     echo $OUTPUT->heading(get_string('headervidres', 'block_ucla_media') .
@@ -142,7 +172,9 @@ function display_video_reserves($course) {
 
     echo html_writer::tag('p', get_string('intro', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));
-
+    if (is_on_campus_ip() === false) {
+        echo $OUTPUT->notification(get_string('videoreservesipwarning', 'block_ucla_media'));
+    }
     echo html_writer::start_tag('div', array('id' => 'vidreserves-content'));
     if (!empty($videos['current'])) {
         print_video_list($videos['current'], get_string('currentvideo', 'block_ucla_media'));
