@@ -250,14 +250,8 @@ function kalvidassign_email_teachers($cm, $name, $submission, $context) {
  */
 function kalvidassign_get_graders($cm, $user, $context) {
     // Potential graders.
-    // START UCLA MOD: CCLE-5309 -  "Email alert to teacher" sent to site managers.
-    //$potgraders = get_users_by_capability($context, 'mod/kalvidassign:gradesubmission', '', '', '', '', '', '', false, false);
-    $coursecxt = $context->get_course_context();
-    $course = get_course($coursecxt->instanceid);
-    $potgraders = \local_ucla_core_edit::get_course_graders($course, '',
-            'mod/kalvidassign:gradesubmission');
-    // END UCLA MOD: CCLE-5309
-
+    $potgraders = get_users_by_capability($context, 'mod/kalvidassign:gradesubmission', '', '', '', '', '', '', false, false);
+    
     $graders = array();
     // Separate groups are being used.
     if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {

@@ -55,12 +55,12 @@ Feature: Restrict grader drop down list to course members with grading permissio
     And "Teacher" "text" should exist in the "#mod_assign_grading_r0_c5 select" "css_element"
     And "Manager" "text" should not exist in the "#mod_assign_grading_r0_c5 select" "css_element"
     # Make sure that the edit grade screen only lists local graders.
-    When I click on "img[alt='Grade Student 1']" "css_element"
+    And I click on "Grade" "link" in the "Student 1" "table_row"
     Then "Grader" "text" should exist in the "allocatedmarker" "select"
     And "Teacher" "text" should exist in the "allocatedmarker" "select"
     And "Manager" "text" should not exist in the "allocatedmarker" "select"
     # Make sure bulk operations filter only shows local graders.
-    When I press "Cancel"
+    When I press the "back" button in the browser
     And I click on "Select all" "checkbox"
     And I click on "Set allocated marker" "option" in the "select#id_operation" "css_element"
     And I click on "Go" "button" confirming the dialogue
