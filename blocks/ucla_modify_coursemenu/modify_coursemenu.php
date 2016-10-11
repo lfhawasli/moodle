@@ -421,8 +421,10 @@ if ($passthrudata || $verifydata) {
 
     $deletesectionids = $passthrudata->deletesectionids;
     if (!empty($deletesectionids)) {
-        $DB->delete_records_list('course_sections', 'id',
-            $deletesectionids);
+        foreach($deletesectionids as &$sectionidstodelete) {
+            $sectiontodelete = $DB->get_record('course_sections', array('id' => $sectionidstodelete));
+            course_delete_section($courseid, $sectiontodelete, true);
+        }
     }
 
     // Sections that were modified.

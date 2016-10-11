@@ -10,7 +10,7 @@ YUI().add('moodle-local_ucla-feedbacktype', function (Y) {
     // Attach script.
     M.local_ucla.feedbacktype = {
         init: function() {
-            var feedbackcomments = Y.one('#fitem_id_assignfeedback_comments_commentinline');
+            var feedbackcommentsinline = Y.one('#fitem_id_assignfeedback_comments_commentinline');
             var feedbackcommentscheck = Y.one('#id_assignfeedback_comments_enabled');
 
             var feedbackPoodllrecorder = Y.one('#fitem_id_assignfeedback_poodll_recordertype');
@@ -18,27 +18,31 @@ YUI().add('moodle-local_ucla-feedbacktype', function (Y) {
             var feedbackPoodllcheck = Y.one('#id_assignfeedback_poodll_enabled');
 
             // Handle visibility of sub options when Feedback comments type checked.
-            if (feedbackcommentscheck.get('checked')) {
-                feedbackcomments.show();
-            } else {
-                feedbackcomments.hide();
+            if (feedbackcommentscheck != null) {
+                if (feedbackcommentscheck.get('checked')) {
+                    feedbackcommentsinline.show();
+                } else {
+                    feedbackcommentsinline.hide();
+                }
+                feedbackcommentscheck.on('change', function (e) {
+                    feedbackcommentsinline.toggleView();
+                });
             }
-            feedbackcommentscheck.on('change', function (e) {
-                feedbackcomments.toggleView();
-            });
 
             // Handle visibility of sub options when Feedback PoodLL type checked.
-            if (feedbackPoodllcheck.get('checked')) {
-                feedbackPoodllrecorder.show();
-                feedbackPoodlldownload.show();
-            } else {
-                feedbackPoodllrecorder.hide();
-                feedbackPoodlldownload.hide();
+            if (feedbackPoodllcheck != null) {
+                if (feedbackPoodllcheck.get('checked')) {
+                    feedbackPoodllrecorder.show();
+                    feedbackPoodlldownload.show();
+                } else {
+                    feedbackPoodllrecorder.hide();
+                    feedbackPoodlldownload.hide();
+                }
+                feedbackPoodllcheck.on('change', function (e) {
+                    feedbackPoodllrecorder.toggleView();
+                    feedbackPoodlldownload.toggleView();
+                });
             }
-            feedbackPoodllcheck.on('change', function (e) {
-                feedbackPoodllrecorder.toggleView();
-                feedbackPoodlldownload.toggleView();
-            });
         },
     };
 }, '@VERSION@', {'requires':['node','event']});
