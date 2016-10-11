@@ -121,3 +121,6 @@ $string['calsyncnotice'] = 'Syncing with external calendar applications is not n
 
 // SSC-2576 - Import Search Scrolling
 $string['instructorcourse'] = 'Instructors';
+
+// Caches.
+$string['cachedef_frontpageimage'] = 'Frontpage image';
