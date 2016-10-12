@@ -148,6 +148,15 @@
 [submodule "question/type/ordering"]
 	path = question/type/ordering
 	url = https://github.com/gbateson/moodle-qtype_ordering.git
+[submodule "mod/data/field/poodll"]
+	path = mod/data/field/poodll
+	url = git@github.com:justinhunt/moodle-mod_data_field_poodll.git
+[submodule "repository/poodll"]
+	path = repository/poodll
+	url = git@github.com:justinhunt/moodle-repository_poodll.git
+[submodule "mod/assign/feedback/poodll"]
+	path = mod/assign/feedback/poodll
+	url = git@github.com:justinhunt/moodle-assignfeedback_poodll.git
 [submodule "lib/editor/atto/plugins/count"]
 	path = lib/editor/atto/plugins/count
 	url = git@github.com:damyon/moodle-atto_count.git
