@@ -62,44 +62,38 @@ class block_ucla_library_portal extends block_base {
         $course = $courseinfo['course'];
         $retval = array();
 
+        $libraryurl = get_config('block_ucla_library_portal', 'url');
+
         // Check to see if course is non-srs.
-        if (is_collab_site($course)) {
+        if (is_collab_site($course) || empty($libraryurl)) {
             return $retval;
         }
 
-        $libraryurl = get_config('block_ucla_library_portal', 'url');
         $params = array();
+        
+        $reginfos = ucla_get_course_info($course->id);
+        // Serious error if no results were returned.
+        $coursedetails = array();
 
-        if (empty($libraryurl)) {
-            // No URL set, so just send user to the default library portal.
-            $libraryurl = 'http://www.library.ucla.edu/library-research-portal';
-        } else {
-            $reginfos = ucla_get_course_info($course->id);
-            // Serious error if no results were returned.
-            $coursedetails = array();
+        if (!empty($reginfos)) {
+            // Let's make an array of term, subject area, unformatted
+            // catalog and section numbers.
+            $maxrecords = get_config('block_ucla_library_portal', 'maxrecords');
+            $count = 0;
+            foreach ($reginfos as $index => $reginfo) {
+                $coursedetails[$index]['t'] = $reginfo->term;
+                $coursedetails[$index]['sub'] = $reginfo->subj_area;
+                $coursedetails[$index]['cat'] = $reginfo->crsidx;
+                $coursedetails[$index]['sec'] = $reginfo->classidx;
 
-            if (!empty($reginfos)) {
-                // Let's make an array of term, subject area, unformatted
-                // catalog and section numbers.
-                $maxrecords = get_config('block_ucla_library_portal', 'maxrecords');
-                $count = 0;
-                foreach ($reginfos as $index => $reginfo) {
-                    $coursedetails[$index]['t'] = $reginfo->term;
-                    $coursedetails[$index]['sub'] = $reginfo->subj_area;
-                    $coursedetails[$index]['cat'] = $reginfo->crsidx;
-                    $coursedetails[$index]['sec'] = $reginfo->classidx;
-
-                    // Make sure we don't go over the max records limit.
-                    ++$count;
-                    if ($count >= $maxrecords) {
-                        break;
-                    }
+                // Make sure we don't go over the max records limit.
+                ++$count;
+                if ($count >= $maxrecords) {
+                    break;
                 }
             }
-            //$params['c'] = urlencode(serialize($coursedetails));
-            //$params['c'] = http_build_query($coursedetails);
-            $libraryurl .= '?'.http_build_query($coursedetails, 'c');
         }
+        $libraryurl .= '?'.http_build_query($coursedetails, 'c');        
         
         $urlobj = new moodle_url($libraryurl, $params);
         $node = navigation_node::create(get_string('portalname', 'block_ucla_library_portal'), $urlobj);
