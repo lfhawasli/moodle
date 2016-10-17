@@ -185,6 +185,10 @@ class core_course_renderer extends plugin_renderer_base {
                 'addresourceoractivity',
                 'modchooserenable',
                 'modchooserdisable',
+                // START UCLA MOD: CCLE-6378 - Show only top tools
+                'showall',
+                'showcategory'
+                // END UCLA MOD: CCLE-6378
         ), 'moodle');
 
         // Add the header
@@ -207,11 +211,15 @@ class core_course_renderer extends plugin_renderer_base {
         // Put all options into one tag 'alloptions' to allow us to handle scrolling
         $formcontent .= html_writer::start_tag('div', array('class' => 'alloptions'));
 
-         // Activities
+        // Activities
         $activities = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
         if (count($activities)) {
             $formcontent .= $this->course_modchooser_title('activities');
             $formcontent .= $this->course_modchooser_module_types($activities);
+            // START UCLA MOD: CCLE-6378 - Show only top tools
+            $showall = html_writer::link('#', get_string('showall', 'moodle', 'activities'), array('id' => 'showallactivities'));
+            $formcontent .= html_writer::div($showall, 'nonoption');
+            // END UCLA MOD: CCLE-6378
         }
 
         // Resources
@@ -219,6 +227,10 @@ class core_course_renderer extends plugin_renderer_base {
         if (count($resources)) {
             $formcontent .= $this->course_modchooser_title('resources');
             $formcontent .= $this->course_modchooser_module_types($resources);
+            // START UCLA MOD: CCLE-6378 - Show only top tools
+            $showall = html_writer::link('#', get_string('showall', 'moodle', 'resources'), array('id' => 'showallresources'));
+            $formcontent .= html_writer::div($showall, 'nonoption');
+            // END UCLA MOD: CCLE-6378
         }
 
         $formcontent .= html_writer::end_tag('div'); // modoptions
@@ -251,9 +263,17 @@ class core_course_renderer extends plugin_renderer_base {
      */
     protected function course_modchooser_module_types($modules) {
         $return = '';
+        // START UCLA MOD: CCLE-6378 - Show only top tools
+        $toptools = ['File', 'Label', 'Forum', 'URL', 'Assignment', 'Quiz', 'Kaltura Video Resource', 'Folder', 'Page', 'Turnitin Assignment 2'];
         foreach ($modules as $module) {
-            $return .= $this->course_modchooser_module($module);
+            // $return .= $this->course_modchooser_module($module);
+            if (in_array($module->title, $toptools)) {
+                $return .= $this->course_modchooser_module($module, array('option', 'top-tool'));
+            } else {
+                $return .= $this->course_modchooser_module($module, array('option', 'tool', "mod-$module->archetype"));
+            }
         }
+        // END UCLA MOD: CCLE-6378
         return $return;
     }
 
@@ -270,7 +290,14 @@ class core_course_renderer extends plugin_renderer_base {
      */
     protected function course_modchooser_module($module, $classes = array('option')) {
         $output = '';
-        $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes)));
+        // START UCLA MOD: CCLE-6378 - Show only top tools
+        if (in_array('tool', $classes)) {
+            $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes), 'style' => 'display: none;'));
+        } else {
+            $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes)));
+        }
+        // END UCLA MOD: CCLE-6378
+
         $output .= html_writer::start_tag('label', array('for' => 'module_' . $module->name));
         if (!isset($module->types)) {
             $output .= html_writer::tag('input', '', array('type' => 'radio',

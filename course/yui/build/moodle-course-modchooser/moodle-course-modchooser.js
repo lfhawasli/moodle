@@ -130,6 +130,46 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             this.sectionid = 0;
         }
         this.display_chooser(e);
+
+        // START UCLA MOD: CCLE-6378 - Show only top tools
+        var activitytoggle = this.container.one('#showallactivities');
+        var resourcetoggle = this.container.one('#showallresources');
+
+        // Toggle between top activities or all activities
+        var thisevent = activitytoggle.on('click', function(e){
+            // Toggle visibility of regular tools
+            this.container.all(".tool.mod-0").each(function(tool) {
+                tool.toggleView();
+            });
+
+            // Change link text to show all activities or show top activities
+            if (this.container.one(".tool.mod-0").getAttribute('hidden') === 'hidden') {
+                activitytoggle.setContent(M.util.get_string('showall', 'moodle', 'activities'));
+            } else {
+                activitytoggle.setContent(M.util.get_string('showcategory', 'moodle', 'top activities'));
+            }
+
+            e.preventDefault();
+        }, this);
+        this.listenevents.push(thisevent);
+
+        // Toggle between top resources or all resources
+        thisevent = resourcetoggle.on('click', function(e){
+            this.container.all(".tool.mod-1").each(function(tool) {
+                tool.toggleView();
+            });
+
+            // Change link text to show all resources or show top resources
+            if (this.container.one(".tool.mod-1").getAttribute('hidden') === 'hidden') {
+                resourcetoggle.setContent(M.util.get_string('showall', 'moodle', 'resources'));
+            } else {
+                resourcetoggle.setContent(M.util.get_string('showcategory', 'moodle', 'top resources'));
+            }
+
+            e.preventDefault();
+        }, this);
+        this.listenevents.push(thisevent);
+        // END UCLA MOD: CCLE-6378
     },
 
     /**
