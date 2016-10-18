@@ -102,6 +102,10 @@ if (empty($id)) {
 }
 require_capability('report/emaillog:view', $context);
 
+if (!get_config('report_emaillog', 'enable')) {
+    print_error('disabled', 'report_emaillog');
+}
+
 $PAGE->set_url('/report/emaillog/index.php', array('id' => $id));
 $PAGE->set_pagelayout('report');
 

@@ -35,7 +35,7 @@ define('EMAILLOG_MAX_SUBJECT_WORDS', 10);
  * @param stdClass $context The context of the course
  */
 function report_emaillog_extend_navigation_course($navigation, $course, $context) {
-    if (has_capability('report/emaillog:view', $context)) {
+    if (has_capability('report/emaillog:view', $context) && get_config('report_emaillog', 'enable')) {
         $url = new moodle_url('/report/emaillog/index.php', array('id' => $course->id));
         $navigation->add(get_string('pluginname', 'report_emaillog'), $url,
                 navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
