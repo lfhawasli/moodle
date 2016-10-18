@@ -32,6 +32,7 @@ $string['allsenders'] = 'All senders';
 $string['chooseforumlogs'] = 'Choose which forum email logs you want to see from the past {$a} days';
 $string['daysexpire'] = 'Expiration';
 $string['daysexpire_desc'] = 'Number of days that forum email logs will be kept';
+$string['disabled'] = 'Forum email logging disabled';
 $string['discussion'] = 'Discussion';
 $string['emaillog:view'] = 'View email logs';
 $string['enable'] = 'Enable';
