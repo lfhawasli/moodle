@@ -1,0 +1,3 @@
+<?php
+$handlers = array ();
+?>

@@ -28,7 +28,7 @@
 /**
  * Define all the restore steps that will be used by the restore_mediasite_activity_task
  */
-
+defined('MOODLE_INTERNAL') || die();
 /**
  * Structure step to restore one mediasite activity
  */
@@ -49,7 +49,6 @@ class restore_mediasite_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
         $data->course = $this->get_courseid();
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         // insert the mediasite record
         $newitemid = $DB->insert_record('mediasite', $data);

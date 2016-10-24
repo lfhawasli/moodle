@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../config.php');
-require_once("$CFG->dirroot/mod/mediasite/mediasiteclientfactory.php");
+require_once($CFG->libdir . '/adminlib.php');
 require_once("mod_mediasite_site_form.php");
 require_once("$CFG->dirroot/mod/mediasite/exceptions.php");
 
@@ -8,11 +8,15 @@ $context = context_system::instance();
 
 require_login();
 require_capability('mod/mediasite:addinstance', $context);
+admin_externalpage_setup('activitysettingmediasite');
 
 global $PAGE;
 
 $PAGE->set_context($context);
 $PAGE->set_url($CFG->wwwroot . '/mod/mediasite/site/add.php');
+$PAGE->set_pagelayout('admin');
+$PAGE->requires->js(new moodle_url('/mod/mediasite/js/mod_mediasite_site_form.js'), true);
+
 $addform = new mod_mediasite_site_form();
 $mform =& $addform;
 
@@ -21,80 +25,38 @@ if ($mform->is_cancelled()) {
 }
 $data = $mform->get_data();
 if($data) {
+    $navInstalled = $mform->is_navigation_installed();
     $record = new stdClass();
     $url = $data->siteurl;
-    if(substr($url, - 1) !== '/') {
-        $url .= '/';
-    }
-    $soapclient = Sonicfoundry\MediasiteClientFactory::MediasiteClient('soap', $url, $data->siteusername, $data->sitepassword);
-    $siteproperties = $soapclient->QuerySiteProperties();
-    $version = $siteproperties->SiteVersion;
-    $soapclient->Logout();
-    $matches = array();
-    if(preg_match('/(6|7)\.(\d+)\.(\d+)/i', $version, $matches)) {
-        if($matches[1] == 6) {
-            $record->siteclient = 'soap';
-        }
-        elseif($matches[1] == 7) {
-            $record->siteclient = 'odata';
-        }
-    }
-    $apikeyId = null;
-    try {
-        $client = Sonicfoundry\MediasiteClientFactory::MediasiteClient($record->siteclient, $url, $data->siteusername, $data->sitepassword);
-        $apikeyId = $client->get_apikey();
-        $record->apikey = is_null($apikeyId) ? '' : $apikeyId;
-    } catch(\Sonicfoundry\SonicfoundryException $se) {
-        try {
-            if(isset($client) && !is_null($client)) {
-                if(is_null($apikeyId)) {
-                    $apikey = $client->CreateApiKey();
-                    $record->apikey = $apikey->Id;
-                }
-            } else {
-                throw new Exception("No client at ".$data->siteurl." Previous exception ".$se->getMessage()." ".$se->getTraceAsString());
-            }
-        } catch(\Sonicfoundry\SonicfoundryException $e) {
-            redirect("configuration.php");
-            // Go home on error
-            throw $e;
-        }
-    }
     $record->sitename = $data->sitename;
     if(!preg_match('%\bhttps?:\/\/%si',$data->siteurl)) {
         $data->siteurl = 'http://'.$data->siteurl;
     }
     $record->endpoint = $data->siteurl;
-    $record->username = $data->siteusername;
-    $record->password = $data->sitepassword;
-    $record->passthru = $data->sitepassthru;
-    if(preg_match('%\bhttps:\/\/%si',$data->siteurl)) {
-        $record->sslselect = 1;
-    } else {
-        $record->sslselect = 0;
+    $record->lti_consumer_key = $data->sitelti_consumer_key;
+    $record->lti_consumer_secret = $data->sitelti_consumer_secret;
+    $record->lti_custom_parameters = $data->sitelti_custom_parameters;
+    if ($navInstalled) {
+        $record->show_integration_catalog = $data->show_integration_catalog;
+        $record->integration_catalog_title = $data->integration_catalog_title;
+        $record->openpopup_integration_catalog = $data->openpopup_integration_catalog;
+        $record->show_my_mediasite = $data->show_my_mediasite;
+        $record->my_mediasite_title = $data->my_mediasite_title;
+        $record->my_mediasite_placement = $data->my_mediasite_placement;
+        $record->openaspopup_my_mediasite = $data->openaspopup_my_mediasite;
     }
-
-    if($record->sslselect) {
-        $certcontent = $mform->get_file_content('cert');
-        $record->cert = $certcontent;
-    }
+    $record->lti_debug_launch = $data->lti_debug_launch;
+    // embed_formats is a bitmask
+    $record->embed_formats = $data->lti_embed_type_thumbnail;
+    $record->embed_formats |= $data->lti_embed_type_abstract_only;
+    $record->embed_formats |= $data->lti_embed_type_abstract_plus_player;
+    $record->embed_formats |= $data->lti_embed_type_link;
+    $record->embed_formats |= $data->lti_embed_type_embed;
+    $record->embed_formats |= $data->lti_embed_type_presentation_link;
+    $record->embed_formats |= $data->lti_embed_type_player_only;
     global $DB;
     // Add new record
     $siteid = $DB->insert_record('mediasite_sites', $record);
-
-    if($record->sslselect) {
-        if(!file_exists($CFG->dirroot.'/mod/mediasite/cert')) {
-           if(!mkdir($CFG->dirroot.'/mod/mediasite/cert', 0777, true)) {
-               die('Failed to create cert folder');
-           }
-        }
-        $certhandle = @fopen($CFG->dirroot.'/mod/mediasite/cert/'.'site'.$siteid.'.crt','x');
-        if($certhandle) {
-            $byteswritten = fwrite($certhandle, $certcontent);
-            fflush($certhandle);
-            fclose($certhandle);
-        }
-    }
 
     // Go home
     redirect("configuration.php");

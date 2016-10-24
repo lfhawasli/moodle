@@ -2,6 +2,8 @@
 
 namespace Sonicfoundry;
 
+defined('MOODLE_INTERNAL') || die();
+
 function EndsWith($str, $needle)
 {
     $length = strlen($needle);
