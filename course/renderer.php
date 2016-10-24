@@ -179,7 +179,11 @@ class core_course_renderer extends plugin_renderer_base {
         // Add the module chooser
         $this->page->requires->yui_module('moodle-course-modchooser',
         'M.course.init_chooser',
-        array(array('courseid' => $course->id, 'closeButtonTitle' => get_string('close', 'editor')))
+        array(array('courseid' => $course->id, 'closeButtonTitle' => get_string('close', 'editor'),
+                    // START UCLA MOD: CCLE-6379 - Add ability to pin tools
+                    'userpinnedtools' => get_user_preferences('pinnedtools'),
+                    'unpinnedtoptools' => get_user_preferences('unpinnedtop')))
+                    // END UCLA MOD: CCLE-6379
         );
         $this->page->requires->strings_for_js(array(
                 'addresourceoractivity',
@@ -190,6 +194,11 @@ class core_course_renderer extends plugin_renderer_base {
                 'showcategory'
                 // END UCLA MOD: CCLE-6378
         ), 'moodle');
+
+        // START UCLA MOD: CCLE-6379 - Add ability to pin tools
+        user_preference_allow_ajax_update('pinnedtools', PARAM_RAW);
+        user_preference_allow_ajax_update('unpinnedtop', PARAM_RAW);
+        // END UCLA MOD: CCLE-6379
 
         // Add the header
         $header = html_writer::tag('div', get_string('addresourceoractivity', 'moodle'),
@@ -263,17 +272,29 @@ class core_course_renderer extends plugin_renderer_base {
      */
     protected function course_modchooser_module_types($modules) {
         $return = '';
-        // START UCLA MOD: CCLE-6378 - Show only top tools
+        // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6379 - Add ability to pin tools
+        $pinnedtools = explode(',', get_user_preferences('pinnedtools'));
+        $unpinnedtop = explode(',', get_user_preferences('unpinnedtop'));
+
         $toptools = ['File', 'Label', 'Forum', 'URL', 'Assignment', 'Quiz', 'Kaltura Video Resource', 'Folder', 'Page', 'Turnitin Assignment 2'];
         foreach ($modules as $module) {
             // $return .= $this->course_modchooser_module($module);
             if (in_array($module->title, $toptools)) {
-                $return .= $this->course_modchooser_module($module, array('option', 'top-tool'));
+                // Top tool - check if unpinned by user
+                if (in_array($module->title, $unpinnedtop)) {
+                    $return .= $this->course_modchooser_module($module, array('option', 'top-tool', "mod-$module->archetype"));
+                } else {
+                    $return .= $this->course_modchooser_module($module, array('option', 'pinned', 'top-tool', "mod-$module->archetype"));
+                }
+            } else if (in_array($module->title, $pinnedtools)) {
+                // Pinned tool
+                $return .= $this->course_modchooser_module($module, array('option', 'pinned', "mod-$module->archetype"));
             } else {
+                // Unpinned tool
                 $return .= $this->course_modchooser_module($module, array('option', 'tool', "mod-$module->archetype"));
             }
         }
-        // END UCLA MOD: CCLE-6378
+        // END UCLA MOD: CCLE-6378 / CCLE-6379
         return $return;
     }
 
@@ -291,7 +312,7 @@ class core_course_renderer extends plugin_renderer_base {
     protected function course_modchooser_module($module, $classes = array('option')) {
         $output = '';
         // START UCLA MOD: CCLE-6378 - Show only top tools
-        if (in_array('tool', $classes)) {
+        if (!in_array('pinned', $classes) && !in_array('moduletypetitle', $classes)) {
             $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes), 'style' => 'display: none;'));
         } else {
             $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes)));
@@ -311,7 +332,24 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $output .= html_writer::end_tag('span');
 
-        $output .= html_writer::tag('span', $module->title, array('class' => 'typename'));
+        // START UCLA MOD: CCLE-6379 - Add ability to pin tools
+        $title = html_writer::span($module->title, 'moduletitle');
+
+        // Add pin/unpin links for tools not in the top 10 tools
+        // Also do not add link if module is "moduletypetitle"
+        if (!in_array('moduletypetitle', $classes)) {
+            if (in_array('pinned', $classes)) {
+                // Add option to unpin tool
+                $title .= html_writer::link('#', 'unpin',
+                        array('class'=> 'unpin-link', 'style' => 'float:right;margin-right:-15px;display:none;'));
+            } else {
+                // Add option to pin tool
+                $title .= html_writer::link('#', 'pin', array('class'=> 'pin-link', 'style' => 'float:right;margin-right:-15px;display:none;'));
+            }
+        }
+        $output .= html_writer::tag('span', $title, array('class' => 'typename'));
+        // END UCLA MOD: CCLE-6379
+
         if (!isset($module->help)) {
             // Add help if found
             $module->help = get_string('nohelpforactivityorresource', 'moodle');
