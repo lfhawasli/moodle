@@ -181,10 +181,8 @@ class local_publicprivate_renderer extends core_course_renderer {
                         trim('contentafterlink ' . $textclasses)));
             }
         } else {
-            $groupinglabel = $mod->get_grouping_label($textclasses);
-
             // No link, so display only content.
-            $output = html_writer::tag('div', $accesstext . $content . $groupinglabel,
+            $output = html_writer::tag('div', $accesstext . $content,
                     array('class' => 'contentwithoutlink ' . $textclasses));
         }
         return $output;

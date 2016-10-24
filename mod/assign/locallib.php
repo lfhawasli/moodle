@@ -1486,7 +1486,8 @@ class assign {
         $params['assignmentid1'] = $assignid;
         $params['assignmentid2'] = $assignid;
 
-        $sql = 'SELECT u.id, s.status, s.timemodified AS stime, g.timemodified AS gtime, g.grade FROM {user} u
+        $fields = 'SELECT u.id, s.status, s.timemodified AS stime, g.timemodified AS gtime, g.grade';
+        $from = ' FROM {user} u
                          LEFT JOIN {assign_submission} s
                                 ON u.id = s.userid
                                AND s.assignment = :assignmentid1
@@ -1495,7 +1496,18 @@ class assign {
                                 ON u.id = g.userid
                                AND g.assignment = :assignmentid2
                                AND g.attemptnumber = s.attemptnumber
-                         WHERE u.id ' . $insql;
+            ';
+        $where = ' WHERE u.id ' . $insql;
+
+        if (!empty($this->get_instance()->blindmarking)) {
+            $from .= 'LEFT JOIN {assign_user_mapping} um
+                             ON u.id = um.userid
+                            AND um.assignment = :assignmentid3 ';
+            $params['assignmentid3'] = $assignid;
+            $fields .= ', um.id as recordid ';
+        }
+
+        $sql = "$fields $from $where";
 
         $records = $DB->get_records_sql($sql, $params);
 
@@ -1915,13 +1927,14 @@ class assign {
         //   - If marking workflow is not enabled, the grade was updated in the past 24 hours, or
         //     if marking workflow is enabled, the workflow state is at 'released'.
         $sql = "SELECT g.id as gradeid, a.course, a.name, a.blindmarking, a.revealidentities,
-                       g.*, g.timemodified as lastmodified, cm.id as cmid
+                       g.*, g.timemodified as lastmodified, cm.id as cmid, um.id as recordid
                  FROM {assign} a
                  JOIN {assign_grades} g ON g.assignment = a.id
             LEFT JOIN {assign_user_flags} uf ON uf.assignment = a.id AND uf.userid = g.userid
                  JOIN {course_modules} cm ON cm.course = a.course AND cm.instance = a.id
                  JOIN {modules} md ON md.id = cm.module AND md.name = 'assign'
                  JOIN {grade_items} gri ON gri.iteminstance = a.id AND gri.courseid = a.course AND gri.itemmodule = md.name
+            LEFT JOIN {assign_user_mapping} um ON g.id = um.userid AND um.assignment = a.id
                  WHERE ((a.markingworkflow = 0 AND g.timemodified >= :yesterday AND g.timemodified <= :today) OR
                         (a.markingworkflow = 1 AND uf.workflowstate = :wfreleased)) AND
                        uf.mailed = 0 AND gri.hidden = 0
@@ -2021,7 +2034,11 @@ class assign {
 
                 $uniqueid = 0;
                 if ($submission->blindmarking && !$submission->revealidentities) {
-                    $uniqueid = self::get_uniqueid_for_user_static($submission->assignment, $user->id);
+                    if (empty($submission->recordid)) {
+                        $uniqueid = self::get_uniqueid_for_user_static($submission->assignment, $user->id);
+                    } else {
+                        $uniqueid = $submission->recordid;
+                    }
                 }
                 $showusers = $submission->blindmarking && !$submission->revealidentities;
                 self::send_assignment_notification($grader,
@@ -2484,7 +2501,7 @@ class assign {
                 $grade = '-';
             }
 
-            $courseindexsummary->add_assign_info($cm->id, $cm->name, $sectionname, $timedue, $submitted, $grade);
+            $courseindexsummary->add_assign_info($cm->id, $cm->get_formatted_name(), $sectionname, $timedue, $submitted, $grade);
 
         }
 
@@ -4062,7 +4079,11 @@ class assign {
     public function fullname($user) {
         if ($this->is_blind_marking()) {
             $hasviewblind = has_capability('mod/assign:viewblinddetails', $this->get_context());
-            $uniqueid = $this->get_uniqueid_for_user($user->id);
+            if (empty($user->recordid)) {
+                $uniqueid = $this->get_uniqueid_for_user($user->id);
+            } else {
+                $uniqueid = $user->recordid;
+            }
             if ($hasviewblind) {
                 return get_string('participant', 'assign') . ' ' . $uniqueid . ' (' . fullname($user) . ')';
             } else {
@@ -8097,6 +8118,10 @@ class assign {
 
         // Check if default gradebook feedback is visible and enabled.
         $gradebookfeedbackplugin = $this->get_feedback_plugin_by_type($gradebookplugin);
+
+        if (empty($gradebookfeedbackplugin)) {
+            return false;
+        }
 
         if ($gradebookfeedbackplugin->is_visible() && $gradebookfeedbackplugin->is_enabled()) {
             return true;

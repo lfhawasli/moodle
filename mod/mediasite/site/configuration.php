@@ -20,7 +20,12 @@ $PAGE->requires->yui_module('moodle-mod_mediasite-configure', 'M.mod_mediasite.c
 
 global $DB;
 // Get the list of configured engines.
-$sites = $DB->get_records('mediasite_sites');
+// $sites = $DB->get_records('mediasite_sites');
+$sql = '
+SELECT MS.*, (SELECT COUNT(*) FROM {mediasite} M WHERE M.siteid = MS.id) AS usage_count
+  FROM {mediasite_sites} MS
+';
+$sites = $DB->get_records_sql($sql);
 $siteselectionform = new Sonicfoundry\mod_mediasite_siteselection_form($sites);
 $mform =& $siteselectionform;
 if ($mform->is_cancelled()) {
@@ -37,8 +42,6 @@ if($data) {
 		$record->siteid = $data->sites;
 	}
 	$record->openaspopup = $data->openaspopup;
-	$record->duration = $data->duration;
-	$record->restrictip = $data->restrictip;
     $ids = $DB->get_records('mediasite_config', null, '', "id");
 	if(!is_null($ids) && count($ids) > 0) {
 		$record->id = reset($ids)->id;
@@ -50,7 +53,7 @@ if($data) {
     redirect($CFG->wwwroot);
 }
 
-global $OUTPUT;
+global $OUTPUT, $ADMIN;
 
 echo $OUTPUT->header();
 

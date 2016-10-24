@@ -257,7 +257,7 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
                         }
                     }
                 }
-            } else {
+            } else if (!empty($courseinstrs)) {
                 // Fetch all the instructors for the regular sites.
                 foreach ($courseinstrs as $instr) {
                     if (in_array($instr->shortname, $CFG->instructor_levels_roles['Instructor']) ||
@@ -268,7 +268,7 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
             }
 
             // Sort the course instructors list to display using separator '/'.
-            if (empty($courseinstrs)) {
+            if (empty($course->instructors)) {
                 $instructors = 'N/A';
             } else {
                 $instructors = implode('/', $course->instructors);

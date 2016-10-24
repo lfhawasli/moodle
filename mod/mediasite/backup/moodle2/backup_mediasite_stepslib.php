@@ -28,7 +28,8 @@
 /**
  * Define all the backup steps that will be used by the backup_mediasite_activity_task
  */
- 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Define the complete mediasite structure for backup, with file and id annotations
  */
@@ -41,8 +42,7 @@ class backup_mediasite_activity_structure_step extends backup_activity_structure
         
         //Define each element separated
         $mediasite = new backup_nested_element('mediasite', array(id), array(
-            'course', 'name', 'description', 'resourceid', 'resourcetype', 'openaspopup',
-            'duration', 'restrictip', 'timecreated', 'timemodified', 'siteid'
+            'id','course','name','description','resourceid','resourcetype','openaspopup','siteid','recorddateutc','presenters','tags','mode','launchurl'
         ));
         
         // Build the tree

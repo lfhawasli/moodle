@@ -22,16 +22,40 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW
         ),
     ),
-  'mod/mediasite:overridedefaults' => array (
-      'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
-      'captype' => 'write',
-      'contextlevel' => CONTEXT_COURSE,
-      'archetypes' => array (
+	'mod/mediasite:overridedefaults' => array (
+		'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
+		'captype' => 'write',
+		'contextlevel' => CONTEXT_COURSE,
+		'archetypes' => array (
+			'teacher' => CAP_ALLOW,
+			'editingteacher' => CAP_ALLOW,
+			'manager' => CAP_ALLOW,
+			'coursecreator' => CAP_ALLOW
+      	),
+  	),
+  	'mod/mediasite:mymediasite' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => array (
+          'student' => CAP_ALLOW,
           'teacher' => CAP_ALLOW,
           'editingteacher' => CAP_ALLOW,
           'manager' => CAP_ALLOW,
-          'coursecreator' => CAP_ALLOW
-      )
-  )
+          'coursecreator' => CAP_ALLOW,
+          'user' => CAP_ALLOW
+        ),
+  		),
+  	'mod/mediasite:courses7' => array (
+  		'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_CONFIG,
+  		'captype' => 'read',
+  		'contextlevel' => CONTEXT_COURSE,
+  		'archetypes' => array (
+  			'student' => CAP_ALLOW,
+  			'teacher' => CAP_ALLOW,
+  			'editingteacher' => CAP_ALLOW,
+  			'manager' => CAP_ALLOW,
+  			'coursecreator' => CAP_ALLOW
+  			),
+  		)
 )
 ?>

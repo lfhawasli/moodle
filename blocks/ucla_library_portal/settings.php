@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('block_ucla_library_portal/url',
-            get_string('url', 'block_ucla_library_portal'), '', ''));
+            get_string('url', 'block_ucla_library_portal'), '', 'http://www.library.ucla.edu/redirect/ccle', PARAM_URL));
     $settings->add(new admin_setting_configtext('block_ucla_library_portal/maxrecords', new lang_string('maxrecords', 'block_ucla_library_portal'),
         new lang_string('maxrecordsdesc', 'block_ucla_library_portal'), 10, PARAM_INT));
 }
