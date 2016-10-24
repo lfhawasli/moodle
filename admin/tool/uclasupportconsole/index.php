@@ -1529,6 +1529,16 @@ if ($displayforms) {
             JOIN {turnitintool_parts} ON tiit.id = turnitintoolid
             WHERE dtdue
             BETWEEN {$timefrom} AND {$timeto}
+        ) UNION (
+            SELECT
+                'turnitintooltwo' AS modtype,
+                tiit2.course,
+                CONCAT_WS(' ', tiit2.name, partname) AS name,
+            FROM_UNIXTIME(dtdue) AS Due_Date
+            FROM {turnitintooltwo} tiit2
+            JOIN {turnitintooltwo_parts} ON tiit2.id = turnitintooltwoid
+            WHERE dtdue
+            BETWEEN {$timefrom} AND {$timeto}
         )) AS m
         JOIN (SELECT @s := 0) AS increment
         INNER JOIN {course} c ON c.id = m.course
