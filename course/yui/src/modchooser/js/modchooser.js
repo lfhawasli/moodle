@@ -46,16 +46,6 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @default empty array
      */
     userpinnedtools : [],
-
-    /**
-     * The user preferences for unpinned top tools.
-     *
-     * @property unpinnedtoptools
-     * @private
-     * @type array
-     * @default empty array
-     */
-    unpinnedtoptools : [],
     // END UCLA MOD: CCLE-6379
 
     /**
@@ -83,11 +73,6 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         // Save preferences for pinned tools
         if (config.userpinnedtools) {
             this.userpinnedtools = config.userpinnedtools.split(",");
-        }
-
-        // Save preferences for unpinned top tools
-        if (config.unpinnedtoptools) {
-            this.unpinnedtoptools = config.unpinnedtoptools.split(",");
         }
         // END UCLA MOD: CCLE-6379
 
@@ -225,7 +210,6 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         // START UCLA MOD: CCLE-6379 - Add ability to pin tools
         // Create variable for click callback functions to access.
         var pinnedtools = this.userpinnedtools;
-        var unpinnedtop = this.unpinnedtoptools;
 
         // Listen to pin links.
         thisevent = this.container.delegate('click', function(e) {
@@ -237,22 +221,11 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             var module = this.ancestor('.mod-0, .mod-1');
             var moduletitle = this.previous().getContent();
 
-            if (module.hasClass('top-tool')) {
-                // Remove module from unpinned top tools.
-                unpinnedtop = unpinnedtop.filter(function(tool) {
-                    return tool !== moduletitle;
-                });
+            // Add module to pinned tools preference.
+            pinnedtools.push(moduletitle);
 
-                // Update user preferences.
-                M.util.set_user_preference('unpinnedtop', unpinnedtop.join(','));
-
-            } else {
-                // Add module to pinned tools preference.
-                pinnedtools.push(moduletitle);
-
-                // Update user preferences.
-                M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
-            }
+            // Update user preferences.
+            M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
 
             // Add pinned class.
             module.addClass('pinned');
@@ -260,7 +233,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // Change pin link to unpin link.
             this.removeClass('pin-link');
             this.addClass('unpin-link');
-            this.setContent('unpin');
+            this.setAttribute('src', M.util.image_url('t/less', 'core'));
+            this.setAttribute('alt', 'unpin');
         }, '.pin-link');
         this.listenevents.push(thisevent);
 
@@ -274,21 +248,13 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             var module = this.ancestor('.pinned');
             var moduletitle = this.previous().getContent();
 
-            if (module.hasClass('top-tool')) {
-                // Add module to unpinned top tools.
-                unpinnedtop.push(moduletitle);
+            // Remove module from pinned tools preference.
+            pinnedtools = pinnedtools.filter(function(tool) {
+                return tool !== moduletitle;
+            });
 
-                // Update user preferences.
-                M.util.set_user_preference('unpinnedtop', unpinnedtop.join(','));
-            } else {
-                // Remove module from pinned tools preference.
-                pinnedtools = pinnedtools.filter(function(tool) {
-                    return tool !== moduletitle;
-                });
-
-                // Update user preferences.
-                M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
-            }
+            // Update user preferences.
+            M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
 
             // Remove pinned class, add tool class to allow hiding on toggle.
             module.removeClass('pinned');
@@ -296,8 +262,53 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // Change unpin link to pin link
             this.removeClass('unpin-link');
             this.addClass('pin-link');
-            this.setContent('pin');
+            this.setAttribute('src', M.util.image_url('t/more', 'core'));
+            this.setAttribute('alt', 'pin');
         }, '.unpin-link');
+        this.listenevents.push(thisevent);
+
+        // Listen to reset tools link.
+        thisevent = Y.one("#resettools").on('click', function (e) {
+            // Stop link redirection and any further propagation.
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            // Update user preferences to defaults.
+            var defaulttools = ['File', 'Label', 'Forum', 'URL', 'Assignment',
+                'Quiz', 'Kaltura Video Resource', 'Folder', 'Page', 'Turnitin Assignment 2'];
+            M.util.set_user_preference('pinnedtools', defaulttools.join(','));
+
+            // Pin/show default tools. Unpin nondefault tools.
+            Y.all(".tool").each(function(tool) {
+                var moduletitle = tool.one('.moduletitle').getContent();
+                var link;
+                if (defaulttools.indexOf(moduletitle) !== -1) {
+                    // Pin default tool.
+                    tool.addClass('pinned');
+                    tool.show();
+
+                    // Change link to unpin link.
+                    link = tool.one('.unpin-link, .pin-link');
+                    link.setAttribute('class', 'unpin-link');
+                    link.setAttribute('src', M.util.image_url('t/less', 'core'));
+                    link.setAttribute('alt', 'unpin');
+                } else {
+                    // Unpin nondefault tool.
+                    tool.removeClass('pinned');
+
+                    link = tool.one('.unpin-link, .pin-link');
+                    if (link.getAttribute('hidden') === 'hidden') {
+                        // Hide tool if not in show all mode.
+                        tool.hide();
+                    }
+
+                    // Change link to pin link.
+                    link.setAttribute('class', 'pin-link');
+                    link.setAttribute('src', M.util.image_url('t/more', 'core'));
+                    link.setAttribute('alt', 'pin');
+                }
+            });
+        });
         this.listenevents.push(thisevent);
         // END UCLA MOD: CCLE-6379
     },
