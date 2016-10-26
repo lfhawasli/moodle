@@ -325,7 +325,7 @@ $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
 // Site administration > Plugins > Admin tools > Manage senior scholars
-$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '003215880;303536506';
+$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '003215880;303536506;904106809';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Enrollments > UCLA registrar
