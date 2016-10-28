@@ -155,20 +155,21 @@ class update_vidreserves extends \core\task\scheduled_task {
                     // Get video titles as keys, so that we can check if video exists.
                     $results = $DB->get_records_menu('ucla_video_reserves',
                             array('term' => $rowdata['term'], 'srs' => $rowdata['srs']),
-                            '', 'video_title, id');
+                            '', 'UPPER(video_title), id');
                     $existingvideos[$rowdata['term']][$rowdata['srs']] = $results;
                 }
 
                 // Check if video currently exists.
-                if (isset($existingvideos[$rowdata['term']][$rowdata['srs']][$rowdata['video_title']])) {
-                    $id = $existingvideos[$rowdata['term']][$rowdata['srs']][$rowdata['video_title']];
+                $uppercasetitle = \core_text::strtoupper($rowdata['video_title']);
+                if (isset($existingvideos[$rowdata['term']][$rowdata['srs']][$uppercasetitle])) {
+                    $id = $existingvideos[$rowdata['term']][$rowdata['srs']][$uppercasetitle];
 
                     // Update record.
                     $rowdata['id'] = $id;
                     $DB->update_record('ucla_video_reserves', $rowdata);
 
                     // Unset it. We will be deleting any remaining videos later.
-                    unset($existingvideos[$rowdata['term']][$rowdata['srs']][$rowdata['video_title']]);
+                    unset($existingvideos[$rowdata['term']][$rowdata['srs']][$uppercasetitle]);
 
                     $updatecount++;
                     echo '.';   // Give process bar.
@@ -206,9 +207,6 @@ class update_vidreserves extends \core\task\scheduled_task {
         $logstring = get_string('vrsuccessnoti', 'tool_ucladatasourcesync', $counts);
         log_ucla_data('video reserves', 'update', $logstring);
         echo "\n" . $logstring . "\n";
-
-        // Save current timestamp so we don't do unncessary updates.
-        set_config('lastruntime', time(), 'block_ucla_video_reserves');
     }
 
     /**
