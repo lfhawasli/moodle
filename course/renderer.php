@@ -223,27 +223,29 @@ class core_course_renderer extends plugin_renderer_base {
         // Put all options into one tag 'alloptions' to allow us to handle scrolling
         $formcontent .= html_writer::start_tag('div', array('class' => 'alloptions'));
 
-        // Activities
-        $activities = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
-        if (count($activities)) {
-            $formcontent .= $this->course_modchooser_title('activities');
-            $formcontent .= $this->course_modchooser_module_types($activities);
-            // START UCLA MOD: CCLE-6378 - Show only top tools
-            $showall = html_writer::link('#', get_string('showall', 'moodle', 'activities'), array('id' => 'showallactivities'));
+        // START UCLA MOD: CCLE-6380 - Combine activity/resource listing
+        // Tools
+        $tools = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
+        if (count($tools)) {
+            $formcontent .= $this->course_modchooser_title();
+            $formcontent .= $this->course_modchooser_module_types($tools);
+            $showall = html_writer::link('#', get_string('showall', 'moodle', 'tools'), array('id' => 'showalltools'));
             $formcontent .= html_writer::div($showall, 'nonoption');
-            // END UCLA MOD: CCLE-6378
         }
-
-        // Resources
-        $resources = array_filter($modules, create_function('$mod', 'return ($mod->archetype === MOD_ARCHETYPE_RESOURCE);'));
-        if (count($resources)) {
-            $formcontent .= $this->course_modchooser_title('resources');
-            $formcontent .= $this->course_modchooser_module_types($resources);
-            // START UCLA MOD: CCLE-6378 - Show only top tools
-            $showall = html_writer::link('#', get_string('showall', 'moodle', 'resources'), array('id' => 'showallresources'));
-            $formcontent .= html_writer::div($showall, 'nonoption');
-            // END UCLA MOD: CCLE-6378
-        }
+        // END UCLA MOD: CCLE-6378
+//        // Activities
+//        $activities = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
+//        if (count($activities)) {
+//            $formcontent .= $this->course_modchooser_title('activities');
+//            $formcontent .= $this->course_modchooser_module_types($activities);
+//        }
+//
+//        // Resources
+//        $resources = array_filter($modules, create_function('$mod', 'return ($mod->archetype === MOD_ARCHETYPE_RESOURCE);'));
+//        if (count($resources)) {
+//            $formcontent .= $this->course_modchooser_title('resources');
+//            $formcontent .= $this->course_modchooser_module_types($resources);
+//        }
 
         $formcontent .= html_writer::end_tag('div'); // modoptions
 
@@ -288,10 +290,10 @@ class core_course_renderer extends plugin_renderer_base {
             // $return .= $this->course_modchooser_module($module);
             if (in_array($module->title, $pinnedtools)) {
                 // Pinned tool
-                $return .= $this->course_modchooser_module($module, array('option', 'pinned', 'tool', "mod-$module->archetype"));
+                $return .= $this->course_modchooser_module($module, array('option', 'pinned', 'tool'));
             } else {
                 // Unpinned tool
-                $return .= $this->course_modchooser_module($module, array('option', 'tool', "mod-$module->archetype"));
+                $return .= $this->course_modchooser_module($module, array('option', 'tool'));
             }
         }
         // END UCLA MOD: CCLE-6378 / CCLE-6379
@@ -342,11 +344,11 @@ class core_course_renderer extends plugin_renderer_base {
         if (!in_array('moduletypetitle', $classes)) {
             if (in_array('pinned', $classes)) {
                 // Add option to unpin tool
-                 $title .= html_writer::img($OUTPUT->pix_url('t/less', 'core'), 'pin', 
+                $title .= html_writer::img($OUTPUT->pix_url('t/less', 'core'), 'pin',
                         array('class'=> 'unpin-link', 'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;'));
             } else {
                 // Add option to pin tool
-                $title .= html_writer::img($OUTPUT->pix_url('t/more', 'core'), 'pin', 
+                $title .= html_writer::img($OUTPUT->pix_url('t/more', 'core'), 'pin',
                         array('class'=> 'pin-link', 'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;'));
             }
         }
@@ -375,11 +377,19 @@ class core_course_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    protected function course_modchooser_title($title, $identifier = null) {
+    protected function course_modchooser_title($title = null, $identifier = null) {
         $module = new stdClass();
-        $module->name = $title;
+        // BEGIN UCLA MOD: CCLE-6380 - Combine activity/resource listing.
+//        $module->name = $title;
         $module->types = array();
-        $module->title = get_string($title, $identifier);
+        if ($title) {
+            $module->name = $title;
+            $module->title = get_string($title, $identifier);
+        } else {
+            $module->title = get_string('activities') . '/' . get_string('resources');
+            $module->name = 'activitiesresources';
+        }
+        // END UCLA MOD: CCLE-6380
         $module->help = '';
         return $this->course_modchooser_module($module, array('moduletypetitle'));
     }

@@ -152,62 +152,35 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         }
         this.display_chooser(e);
 
-        // START UCLA MOD: CCLE-6378 - Show only top tools
-        var activitytoggle = this.container.one('#showallactivities');
-        var resourcetoggle = this.container.one('#showallresources');
+        // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6380 - Combine activity/resource listing
+        var tooltoggle = this.container.one('#showalltools');
 
         // Toggle between top activities or all activities.
-        var thisevent = activitytoggle.on('click', function(e){
+        var thisevent = tooltoggle.on('click', function(e){
             // Show/hide unpinned tools.
-            this.container.all(".mod-0:not(.pinned)").each(function(tool) {
+            this.container.all(".tool:not(.pinned)").each(function(tool) {
                 tool.toggleView();
             });
 
             // Show/hide pin links. Only display links when in view all mode.
-            this.container.all(".mod-0 .unpin-link, .mod-0 .pin-link").each(function(link) {
+            this.container.all(".unpin-link, .pin-link").each(function(link) {
                 link.toggleView();
             });
 
-            var showtopactivities = M.util.get_string('showcategory', 'moodle', 'top activities');
-            var showallactivities = M.util.get_string('showall', 'moodle', 'activities');
+            var showtoptools = M.util.get_string('showcategory', 'moodle', 'top tools');
+            var showalltools = M.util.get_string('showall', 'moodle', 'tools');
 
             // Change link text to show all activities or show top activities.
-            if (activitytoggle.getContent() === showtopactivities) {
-                activitytoggle.setContent(showallactivities);
+            if (tooltoggle.getContent() === showtoptools) {
+                tooltoggle.setContent(showalltools);
             } else {
-                activitytoggle.setContent(showtopactivities);
+                tooltoggle.setContent(showtoptools);
             }
 
             e.preventDefault();
         }, this);
         this.listenevents.push(thisevent);
-
-        // Toggle between top resources or all resources.
-        thisevent = resourcetoggle.on('click', function(e){
-            // Show/hide unpinned tools.
-            this.container.all(".mod-1:not(.pinned)").each(function(tool) {
-                tool.toggleView();
-            });
-
-            // Show/hide pin links. Only display links when in view all mode.
-            this.container.all(".mod-1 .unpin-link, .mod-1 .pin-link").each(function(link) {
-                link.toggleView();
-            });
-
-            var showtopresources = M.util.get_string('showcategory', 'moodle', 'top resources');
-            var showallresources = M.util.get_string('showall', 'moodle', 'resources');
-
-            // Change link text to show all resources or show top resources.
-            if (resourcetoggle.getContent() === showtopresources) {
-                resourcetoggle.setContent(showallresources);
-            } else {
-                resourcetoggle.setContent(showtopresources);
-            }
-
-            e.preventDefault();
-        }, this);
-        this.listenevents.push(thisevent);
-        // END UCLA MOD: CCLE-6378
+        // END UCLA MOD: CCLE-6378 / CCLE-6380
 
         // START UCLA MOD: CCLE-6379 - Add ability to pin tools
         // Create variable for click callback functions to access.
@@ -220,7 +193,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             e.stopImmediatePropagation();
 
             // Get module details.
-            var module = this.ancestor('.mod-0, .mod-1');
+            var module = this.ancestor('.tool');
             var moduletitle = this.previous().getContent();
 
             // Add module to pinned tools preference.
