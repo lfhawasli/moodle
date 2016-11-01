@@ -524,7 +524,6 @@ $CFG->theme = 'uclashared';
 $CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
-    Request a site consult|https://goo.gl/forms/BvPHCYBg1HYH2buv2
     View self help articles|https://docs.ccle.ucla.edu/
     Read tips & updates|https://docs.ccle.ucla.edu/w/Tips_and_Updates
     Request a site|/course/request.php";
