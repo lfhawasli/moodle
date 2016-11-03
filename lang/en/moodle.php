@@ -1544,6 +1544,9 @@ $string['requirespayment'] = 'This course requires payment for access';
 $string['reset'] = 'Reset';
 $string['resetcomponent'] = 'Component';
 $string['resetcourse'] = 'Reset course';
+// BEGIN UCLA MOD: CCLE-6379 - Add ability to pin tools
+$string['resetfavoritetools'] = 'Reset favorite tools';
+// END UCLA MOD
 $string['resetinfo'] = 'This page allows you to empty a course of user data, while retaining the activities and other settings.  Please be warned that by choosing items below and submitting this page you will delete your chosen user data from this course forever!';
 $string['resetnotimplemented'] = 'Reset not implemented';
 $string['resetrecordexpired'] = 'The password reset link you used is more than {$a} minutes old and has expired. Please initiate a new password reset.';

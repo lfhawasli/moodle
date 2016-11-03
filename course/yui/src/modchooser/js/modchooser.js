@@ -160,12 +160,15 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                 tool.toggleView();
             });
 
-            // Show/hide pin links. Only display links when in view all mode.
-            this.container.all(".unpin-link, .pin-link").each(function(link) {
+            // Show/hide favorite stars. Only display links when in view all mode.
+            this.container.all("i").each(function(link) {
                 link.toggleView();
             });
 
-            var showtoptools = M.util.get_string('showcategory', 'moodle', 'top tools');
+            // Show/hide reset tools link. Only display when in view all mode.
+            this.container.one("#resettools").toggleView();
+
+            var showtoptools = M.util.get_string('showcategory', 'moodle', 'favorite tools');
             var showalltools = M.util.get_string('showall', 'moodle', 'tools');
 
             // Change link text to show all activities or show top activities.
@@ -203,12 +206,10 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // Add pinned class.
             module.addClass('pinned');
 
-            // Change pin link to unpin link.
-            this.removeClass('pin-link');
-            this.addClass('unpin-link');
-            this.setAttribute('src', M.util.image_url('t/less', 'core'));
-            this.setAttribute('alt', 'unpin');
-        }, '.pin-link');
+            // Change empty star to filled star.
+            this.removeClass('fa-star-o');
+            this.addClass('fa-star');
+        }, '.fa-star-o');
         this.listenevents.push(thisevent);
 
         // Listen to unpin links.
@@ -229,15 +230,13 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // Update user preferences.
             M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
 
-            // Remove pinned class, add tool class to allow hiding on toggle.
+            // Remove pinned class.
             module.removeClass('pinned');
 
-            // Change unpin link to pin link
-            this.removeClass('unpin-link');
-            this.addClass('pin-link');
-            this.setAttribute('src', M.util.image_url('t/more', 'core'));
-            this.setAttribute('alt', 'pin');
-        }, '.unpin-link');
+            // Change filled star to empty star.
+            this.removeClass('fa-star');
+            this.addClass('fa-star-o');
+        }, '.fa-star');
         this.listenevents.push(thisevent);
 
         // Listen to reset tools link.
@@ -260,25 +259,18 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                     tool.addClass('pinned');
                     tool.show();
 
-                    // Change link to unpin link.
-                    link = tool.one('.unpin-link, .pin-link');
-                    link.setAttribute('class', 'unpin-link');
-                    link.setAttribute('src', M.util.image_url('t/less', 'core'));
-                    link.setAttribute('alt', 'unpin');
+                    // Change empty star to filled star.
+                    link = tool.one('i');
+                    link.removeClass('fa-star-o');
+                    link.addClass('fa-star');
                 } else {
                     // Unpin nondefault tool.
                     tool.removeClass('pinned');
 
-                    link = tool.one('.unpin-link, .pin-link');
-                    if (link.getAttribute('hidden') === 'hidden') {
-                        // Hide tool if not in show all mode.
-                        tool.hide();
-                    }
-
-                    // Change link to pin link.
-                    link.setAttribute('class', 'pin-link');
-                    link.setAttribute('src', M.util.image_url('t/more', 'core'));
-                    link.setAttribute('alt', 'pin');
+                    // Change filled star to empty star.
+                    link = tool.one('i');
+                    link.removeClass('fa-star');
+                    link.addClass('fa-star-o');
                 }
             });
         });

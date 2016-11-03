@@ -231,6 +231,8 @@ class core_course_renderer extends plugin_renderer_base {
             $formcontent .= $this->course_modchooser_module_types($tools);
             $showall = html_writer::link('#', get_string('showall', 'moodle', 'tools'), array('id' => 'showalltools'));
             $formcontent .= html_writer::div($showall, 'nonoption');
+            $reset = html_writer::link('#', get_string('resetfavoritetools'), array('id' => 'resettools', 'style' => 'display:none'));
+            $formcontent .= html_writer::div($reset, 'nonoption');
         }
         // END UCLA MOD: CCLE-6378
 //        // Activities
@@ -248,11 +250,6 @@ class core_course_renderer extends plugin_renderer_base {
 //        }
 
         $formcontent .= html_writer::end_tag('div'); // modoptions
-
-        // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-        $reset = html_writer::link('#', get_string('resettodefaults', 'moodle'), array('id' => 'resettools'));
-        $formcontent .= html_writer::div($reset, 'option');
-        // END UCLA MOD: CCLE-6379
         $formcontent .= html_writer::end_tag('div'); // types
 
         $formcontent .= html_writer::start_tag('div', array('class' => 'submitbuttons'));
@@ -343,13 +340,17 @@ class core_course_renderer extends plugin_renderer_base {
         // Also do not add link if module is "moduletypetitle"
         if (!in_array('moduletypetitle', $classes)) {
             if (in_array('pinned', $classes)) {
-                // Add option to unpin tool
-                $title .= html_writer::img($OUTPUT->pix_url('t/less', 'core'), 'pin',
-                        array('class'=> 'unpin-link', 'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;'));
+                // Show filled star for favorited tool.
+                $title .= html_writer::tag('i', '', array(
+                    'class'=> 'fa fa-star',
+                    'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;',
+                    'aria-hidden' => 'true'));
             } else {
-                // Add option to pin tool
-                $title .= html_writer::img($OUTPUT->pix_url('t/more', 'core'), 'pin',
-                        array('class'=> 'pin-link', 'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;'));
+                // Show empty star.
+                $title .= html_writer::tag('i', '', array(
+                    'class'=> 'fa fa-star-o',
+                    'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;',
+                    'aria-hidden' => 'true'));
             }
         }
         $output .= html_writer::tag('span', $title, array('class' => 'typename'));
