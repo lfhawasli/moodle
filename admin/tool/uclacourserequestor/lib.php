@@ -339,8 +339,9 @@ function extract_term_srs_xml($xml) {
             return false;
         }
 
-        if (!empty($xml->{$k}->{0})) {
-            $r[$k] = sprintf('%s', $xml->{$k}->{0});
+        $value = $xml->{$k}->__toString();
+        if (!empty($value)) {
+            $r[$k] = $value;
         }
     }
 
