@@ -343,7 +343,7 @@ class core_course_renderer extends plugin_renderer_base {
                 // Show filled star for favorited tool.
                 $title .= html_writer::tag('i', '', array(
                     'class'=> 'fa fa-star',
-                    'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;',
+                    'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;color:#f29644;font-size:103%;',
                     'aria-hidden' => 'true'));
             } else {
                 // Show empty star.

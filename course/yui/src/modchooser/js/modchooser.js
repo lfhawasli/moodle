@@ -209,6 +209,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // Change empty star to filled star.
             this.removeClass('fa-star-o');
             this.addClass('fa-star');
+            this.setStyle('color', '#f29644');
+            this.setStyle('font-size', '103%');
         }, '.fa-star-o');
         this.listenevents.push(thisevent);
 
@@ -236,6 +238,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // Change filled star to empty star.
             this.removeClass('fa-star');
             this.addClass('fa-star-o');
+            this.setStyle('color', '#555');
+            this.setStyle('font-size', '100%');
         }, '.fa-star');
         this.listenevents.push(thisevent);
 
@@ -263,6 +267,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                     link = tool.one('i');
                     link.removeClass('fa-star-o');
                     link.addClass('fa-star');
+                    link.setStyle('color', '#f29644');
+                    link.setStyle('font-size', '103%');
                 } else {
                     // Unpin nondefault tool.
                     tool.removeClass('pinned');
@@ -271,6 +277,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                     link = tool.one('i');
                     link.removeClass('fa-star');
                     link.addClass('fa-star-o');
+                    link.setStyle('color', '#555');
+                    link.setStyle('font-size', '100%');
                 }
             });
         });
