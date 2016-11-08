@@ -483,7 +483,6 @@ $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
 
 // Site administration > Plugins > Local plugins > UCLA configurations
-$CFG->forced_plugin_settings['local_ucla']['logfiledeletion'] = 1; // CCLE-3843 - Log file deletions.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
 $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4521 - Handle "preferred name".
@@ -523,7 +522,6 @@ $CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->themedesignermode = 0;
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
-    Request a site consult|https://goo.gl/forms/BvPHCYBg1HYH2buv2
     View self help articles|https://docs.ccle.ucla.edu/
     Read tips & updates|https://docs.ccle.ucla.edu/w/Tips_and_Updates
     Request a site|/course/request.php";
