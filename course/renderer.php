@@ -176,18 +176,22 @@ class core_course_renderer extends plugin_renderer_base {
             return '';
         }
 
-        // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-        $defaulttools = 'File,Label,Forum,URL,Assignment,Quiz,Kaltura Video Resource,Folder,Page,Turnitin Assignment 2';
+        // START UCLA MOD: CCLE-6379 - Add ability to pin tools / CCLE-6398 - Have top modules be configurable
+        $defaulttools = get_config('moodlecourse', 'modchooserdefaults');
         $pinnedtools = get_user_preferences('pinnedtools', $defaulttools);
-        // END UCLA MOD: CCLE-6379
+        // END UCLA MOD: CCLE-6379 / CCLE-6398
 
         // Add the module chooser
         $this->page->requires->yui_module('moodle-course-modchooser',
         'M.course.init_chooser',
         array(array('courseid' => $course->id, 'closeButtonTitle' => get_string('close', 'editor'),
                     // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-                    'userpinnedtools' => $pinnedtools))
+                    'userpinnedtools' => $pinnedtools,
                     // END UCLA MOD: CCLE-6379
+                    // START UCLA MOD: CCLE-6398 - Have top modules be configurable
+                    'defaulttools' => $defaulttools
+                    // END UCLA MOD: CCLE-6398
+            ))
         );
         $this->page->requires->strings_for_js(array(
                 'addresourceoractivity',
@@ -280,12 +284,12 @@ class core_course_renderer extends plugin_renderer_base {
     protected function course_modchooser_module_types($modules) {
         $return = '';
         // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6379 - Add ability to pin tools
-        $defaulttools = 'File,Label,Forum,URL,Assignment,Quiz,Kaltura Video Resource,Folder,Page,Turnitin Assignment 2';
+        $defaulttools = get_config('moodlecourse', 'modchooserdefaults');
         $pinnedtools = explode(',', get_user_preferences('pinnedtools', $defaulttools));
 
         foreach ($modules as $module) {
             // $return .= $this->course_modchooser_module($module);
-            if (in_array($module->title, $pinnedtools)) {
+            if (in_array($module->name, $pinnedtools)) {
                 // Pinned tool
                 $return .= $this->course_modchooser_module($module, array('option', 'pinned', 'tool'));
             } else {

@@ -50,6 +50,18 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
     userpinnedtools : [],
     // END UCLA MOD: CCLE-6379
 
+    // START UCLA MOD: CCLE-6398 - Have top modules be configurable
+    /**
+     * Default top tools.
+     *
+     * @property defaulttools
+     * @private
+     * @type string
+     * @default empty string
+     */
+    defaulttools : '',
+    // END UCLA MOD: CCLE-6398
+
     /**
      * Set up the activity chooser.
      *
@@ -77,6 +89,13 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             this.userpinnedtools = config.userpinnedtools.split(",");
         }
         // END UCLA MOD: CCLE-6379
+
+        // START UCLA MOD: CCLE-6398 - Have top modules be configurable
+        // Save default tools
+        if (config.defaulttools) {
+            this.defaulttools = config.defaulttools;
+        }
+        // END UCLA MOD: CCLE-6398
 
         // Catch the page toggle
         Y.all('.block_settings #settingsnav .type_course .modchoosertoggle a').on('click', this.toggle_mod_chooser, this);
@@ -197,10 +216,10 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
 
             // Get module details.
             var module = this.ancestor('.tool');
-            var moduletitle = this.previous().getContent();
+            var moduleid = this.ancestor().previous('input').getAttribute('id').split("module_")[1];
 
             // Add module to pinned tools preference.
-            pinnedtools.push(moduletitle);
+            pinnedtools.push(moduleid);
 
             // Update user preferences.
             M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
@@ -224,11 +243,11 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
 
             // Get module details.
             var module = this.ancestor('.pinned');
-            var moduletitle = this.previous().getContent();
+            var moduleid = this.ancestor().previous('input').getAttribute('id').split("module_")[1];
 
             // Remove module from pinned tools preference.
             pinnedtools = pinnedtools.filter(function(tool) {
-                return tool !== moduletitle;
+                return tool !== moduleid;
             });
 
             // Update user preferences.
@@ -246,21 +265,21 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         this.listenevents.push(thisevent);
 
         // Listen to reset tools link.
+        var defaulttools = this.defaulttools;
         thisevent = Y.one("#resettools").on('click', function (e) {
             // Stop link redirection and any further propagation.
             e.preventDefault();
             e.stopImmediatePropagation();
 
             // Update user preferences to defaults.
-            var defaulttools = ['File', 'Label', 'Forum', 'URL', 'Assignment',
-                'Quiz', 'Kaltura Video Resource', 'Folder', 'Page', 'Turnitin Assignment 2'];
-            M.util.set_user_preference('pinnedtools', defaulttools.join(','));
+            M.util.set_user_preference('pinnedtools', defaulttools);
 
+            var defaultarray = defaulttools.split(',');
             // Pin/show default tools. Unpin nondefault tools.
             Y.all(".tool").each(function(tool) {
-                var moduletitle = tool.one('.moduletitle').getContent();
+                var moduleid = tool.one('input').getAttribute('id').split("module_")[1];
                 var link;
-                if (defaulttools.indexOf(moduletitle) !== -1) {
+                if (defaultarray.indexOf(moduleid) !== -1) {
                     // Pin default tool.
                     tool.addClass('pinned');
                     tool.show();
