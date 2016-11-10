@@ -181,6 +181,10 @@ class core_course_renderer extends plugin_renderer_base {
         $pinnedtools = get_user_preferences('pinnedtools', $defaulttools);
         // END UCLA MOD: CCLE-6379 / CCLE-6398
 
+        // START UCLA MOD: CCLE-6385 - Ability to display new activity chooser as user preference option
+        $newmodchooser = get_user_preferences('modchoosersetting', 0);
+        // END UCLA MOD: CCLE-6385
+
         // Add the module chooser
         $this->page->requires->yui_module('moodle-course-modchooser',
         'M.course.init_chooser',
@@ -189,8 +193,11 @@ class core_course_renderer extends plugin_renderer_base {
                     'userpinnedtools' => $pinnedtools,
                     // END UCLA MOD: CCLE-6379
                     // START UCLA MOD: CCLE-6398 - Have top modules be configurable
-                    'defaulttools' => $defaulttools
+                    'defaulttools' => $defaulttools,
                     // END UCLA MOD: CCLE-6398
+                    // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
+                    'newmodchooser' => $newmodchooser
+                    // END UCLA MOD: CCLE-6385
             ))
         );
         $this->page->requires->strings_for_js(array(
@@ -227,31 +234,36 @@ class core_course_renderer extends plugin_renderer_base {
         // Put all options into one tag 'alloptions' to allow us to handle scrolling
         $formcontent .= html_writer::start_tag('div', array('class' => 'alloptions'));
 
-        // START UCLA MOD: CCLE-6380 - Combine activity/resource listing
-        // Tools
-        $tools = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
-        if (count($tools)) {
-            $formcontent .= $this->course_modchooser_title();
-            $formcontent .= $this->course_modchooser_module_types($tools);
-            $showall = html_writer::link('#', get_string('showall', 'moodle', 'tools'), array('id' => 'showalltools'));
-            $formcontent .= html_writer::div($showall, 'nonoption');
-            $reset = html_writer::link('#', get_string('resetfavoritetools'), array('id' => 'resettools', 'style' => 'display:none'));
-            $formcontent .= html_writer::div($reset, 'nonoption');
+        // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
+        if ($newmodchooser) {
+            // START UCLA MOD: CCLE-6380 - Combine activity/resource listing
+            // Tools
+            $tools = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
+            if (count($tools)) {
+                $formcontent .= $this->course_modchooser_title();
+                $formcontent .= $this->course_modchooser_module_types($tools);
+                $showall = html_writer::link('#', get_string('showall', 'moodle', 'tools'), array('id' => 'showalltools'));
+                $formcontent .= html_writer::div($showall, 'nonoption');
+                $reset = html_writer::link('#', get_string('resetfavoritetools'), array('id' => 'resettools', 'style' => 'display:none'));
+                $formcontent .= html_writer::div($reset, 'nonoption');
+            }
+            // END UCLA MOD: CCLE-6378
+        } else {
+            // Activities
+            $activities = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
+            if (count($activities)) {
+                $formcontent .= $this->course_modchooser_title('activities');
+                $formcontent .= $this->course_modchooser_module_types($activities);
+            }
+
+            // Resources
+            $resources = array_filter($modules, create_function('$mod', 'return ($mod->archetype === MOD_ARCHETYPE_RESOURCE);'));
+            if (count($resources)) {
+                $formcontent .= $this->course_modchooser_title('resources');
+                $formcontent .= $this->course_modchooser_module_types($resources);
+            }
         }
-        // END UCLA MOD: CCLE-6378
-//        // Activities
-//        $activities = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
-//        if (count($activities)) {
-//            $formcontent .= $this->course_modchooser_title('activities');
-//            $formcontent .= $this->course_modchooser_module_types($activities);
-//        }
-//
-//        // Resources
-//        $resources = array_filter($modules, create_function('$mod', 'return ($mod->archetype === MOD_ARCHETYPE_RESOURCE);'));
-//        if (count($resources)) {
-//            $formcontent .= $this->course_modchooser_title('resources');
-//            $formcontent .= $this->course_modchooser_module_types($resources);
-//        }
+        // END UCLA MOD: CCLE-6385
 
         $formcontent .= html_writer::end_tag('div'); // modoptions
         $formcontent .= html_writer::end_tag('div'); // types
@@ -283,21 +295,29 @@ class core_course_renderer extends plugin_renderer_base {
      */
     protected function course_modchooser_module_types($modules) {
         $return = '';
-        // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6379 - Add ability to pin tools
-        $defaulttools = get_config('moodlecourse', 'modchooserdefaults');
-        $pinnedtools = explode(',', get_user_preferences('pinnedtools', $defaulttools));
+        // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
+        $newmodchooser = get_user_preferences('modchoosersetting', 0);
+        if ($newmodchooser) {
+            // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6379 - Add ability to pin tools
+            $defaulttools = get_config('moodlecourse', 'modchooserdefaults');
+            $pinnedtools = explode(',', get_user_preferences('pinnedtools', $defaulttools));
 
-        foreach ($modules as $module) {
-            // $return .= $this->course_modchooser_module($module);
-            if (in_array($module->name, $pinnedtools)) {
-                // Pinned tool
-                $return .= $this->course_modchooser_module($module, array('option', 'pinned', 'tool'));
-            } else {
-                // Unpinned tool
-                $return .= $this->course_modchooser_module($module, array('option', 'tool'));
+            foreach ($modules as $module) {
+                if (in_array($module->name, $pinnedtools)) {
+                    // Pinned tool
+                    $return .= $this->course_modchooser_module($module, array('option', 'pinned', 'tool'));
+                } else {
+                    // Unpinned tool
+                    $return .= $this->course_modchooser_module($module, array('option', 'tool'));
+                }
+            }
+            // END UCLA MOD: CCLE-6378 / CCLE-6379
+        } else {
+            foreach ($modules as $module) {
+                $return .= $this->course_modchooser_module($module);
             }
         }
-        // END UCLA MOD: CCLE-6378 / CCLE-6379
+        // END UCLA MOD: CCLE-6385
         return $return;
     }
 
@@ -316,13 +336,15 @@ class core_course_renderer extends plugin_renderer_base {
         global $OUTPUT;
 
         $output = '';
-        // START UCLA MOD: CCLE-6378 - Show only top tools
-        if (!in_array('pinned', $classes) && !in_array('moduletypetitle', $classes)) {
+        // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6385 - Ability to display new activity chosoer as user preference option
+        $newmodchooser = get_user_preferences('modchoosersetting', 0);
+
+        if ($newmodchooser && !in_array('pinned', $classes) && !in_array('moduletypetitle', $classes)) {
             $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes), 'style' => 'display: none;'));
         } else {
             $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes)));
         }
-        // END UCLA MOD: CCLE-6378
+        // END UCLA MOD: CCLE-6378 / CCLE-6385
 
         $output .= html_writer::start_tag('label', array('for' => 'module_' . $module->name));
         if (!isset($module->types)) {
@@ -337,12 +359,12 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $output .= html_writer::end_tag('span');
 
-        // START UCLA MOD: CCLE-6379 - Add ability to pin tools
+        // START UCLA MOD: CCLE-6379 - Add ability to pin tools / CCLE-6385 - Ability to display new activity chosoer as user preference option
         $title = html_writer::span($module->title, 'moduletitle');
 
         // Add pin/unpin links for tools not in the top 10 tools
         // Also do not add link if module is "moduletypetitle"
-        if (!in_array('moduletypetitle', $classes)) {
+        if ($newmodchooser && !in_array('moduletypetitle', $classes)) {
             if (in_array('pinned', $classes)) {
                 // Show filled star for favorited tool.
                 $title .= html_writer::tag('i', '', array(
@@ -358,7 +380,7 @@ class core_course_renderer extends plugin_renderer_base {
             }
         }
         $output .= html_writer::tag('span', $title, array('class' => 'typename'));
-        // END UCLA MOD: CCLE-6379
+        // END UCLA MOD: CCLE-6379 / CCLE-6385
 
         if (!isset($module->help)) {
             // Add help if found

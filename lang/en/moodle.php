@@ -1186,6 +1186,15 @@ $string['modchooser'] = 'Activity chooser';
 //END UCLA MOD: CCLE-6398
 $string['modchooserenable'] = 'Activity chooser on';
 $string['modchooserdisable'] = 'Activity chooser off';
+// BEGIN UCLA MOD: CCLE-6385 - Ability to display new activity chooser as user preference option
+$string['modchooserpreferences'] = 'Activity chooser preferences';
+$string['modchoosersetting'] = 'Activity chooser settings';
+$string['modchoosersetting_str'] = 'Use the new activity chooser';
+$string['modchoosersetting_help'] = 'This setting allows you to use the new activity chooser.
+
+The new activity chooser allows you to pin favorite tools and hide infrequently used tools.
+';
+// END UCLA MODL CCLE-6385
 $string['moduleintro'] = 'Description';
 $string['modulesetup'] = 'Setting up module tables';
 $string['modulesuccess'] = '{$a} tables have been set up correctly';
