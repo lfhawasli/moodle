@@ -141,6 +141,8 @@ $string['downloadall'] = 'Download all submissions';
 $string['downloadalluid'] = 'Download all UID submissions';
 // END UCLA MOD: CCLE-4953
 $string['download all submissions'] = 'Download all submissions in a zip file.';
+$string['downloadasfolders'] = 'Download submissions in folders';
+$string['downloadasfolders_help'] = 'If the assignment submission is more than a single file, then submissions may be downloaded in folders. Each submission is put in a separate folder, with the folder structure kept for any subfolders, and files are not renamed.';
 $string['downloadselectedsubmissions'] = 'Download selected submissions';
 $string['duedate'] = 'Due date';
 $string['duedatecolon'] = 'Due date: {$a}';
