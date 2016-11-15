@@ -1859,6 +1859,9 @@ $string['thiscategory'] = 'This category';
 $string['thiscategorycontains'] = 'This category contains';
 $string['time'] = 'Time';
 $string['timecreatedcourse'] = 'Course time created';
+// START UCLA MOD: CCLE-6383 - Collab site requests need timestamp
+$string['timerequestedcourse'] = 'Course time requested';
+// END UCLA MOD: CCLE-6383
 $string['timezone'] = 'Timezone';
 $string['to'] = 'To';
 $string['tocreatenewaccount'] = 'Skip to create new account';
