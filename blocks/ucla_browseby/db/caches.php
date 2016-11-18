@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA browseby block for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,17 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Browse By caches
  *
- * @package    block_ucla_browseby
- * @copyright  2016 UC Regent
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2017011200;
-$plugin->requires = 2013111800; // Moodle 2.6.
-$plugin->component = 'block_ucla_browseby';
-$plugin->cron = 86400;  // (60 * 60 * 24), once a day
-$plugin->dependencies = array('local_ucla' => 2012020100);
+ * @package   blocks_ucla_browseby
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+$definitions = array(
+    'browsebycache' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' =>true,
+    )
+);
