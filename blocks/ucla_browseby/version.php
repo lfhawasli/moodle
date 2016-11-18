@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2016070600;
+$plugin->version = 2016111800;
 $plugin->requires = 2013111800; // Moodle 2.6.
 $plugin->component = 'block_ucla_browseby';
 $plugin->cron = 86400;  // (60 * 60 * 24), once a day
