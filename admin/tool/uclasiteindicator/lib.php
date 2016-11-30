@@ -185,6 +185,7 @@ class siteindicator_request {
         $this->request->requester = $request->requester;    // User who requested the course
         $this->request->type = $request->type;
         $this->request->courseid = $request->courseid;
+        $this->request->timerequested = $request->timerequested;
     }
  
     function approve($courseid) {

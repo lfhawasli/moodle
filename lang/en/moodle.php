@@ -74,6 +74,7 @@ $string['addresource'] = 'Add a resource...';
 $string['addresourceoractivity'] = 'Add an activity or resource';
 $string['addresourcetosection'] = 'Add a resource to section \'{$a}\'';
 $string['address'] = 'Address';
+$string['addressedto'] = 'To';
 $string['addstudent'] = 'Add student';
 $string['addsubcategory'] = 'Add a subcategory';
 $string['addteacher'] = 'Add teacher';
@@ -751,6 +752,9 @@ $string['eventcoursesectionupdated'] = 'Course section updated';
 $string['eventcoursemoduleinstancelistviewed'] = 'Course module instance list viewed';
 $string['eventcourseuserreportviewed'] = 'Course user report viewed';
 $string['eventcourseviewed'] = 'Course viewed';
+$string['eventdashboardreset'] = 'Dashboard reset';
+$string['eventdashboardsreset'] = 'Dashboards reset';
+$string['eventdashboardviewed'] = 'Dashboard viewed';
 $string['eventemailfailed'] = 'Email failed to send';
 $string['eventname'] = 'Event name';
 $string['eventrecentactivityviewed'] = 'Recent activity viewed';
@@ -1859,6 +1863,9 @@ $string['thiscategory'] = 'This category';
 $string['thiscategorycontains'] = 'This category contains';
 $string['time'] = 'Time';
 $string['timecreatedcourse'] = 'Course time created';
+// START UCLA MOD: CCLE-6383 - Collab site requests need timestamp
+$string['timerequestedcourse'] = 'Course time requested';
+// END UCLA MOD: CCLE-6383
 $string['timezone'] = 'Timezone';
 $string['to'] = 'To';
 $string['tocreatenewaccount'] = 'Skip to create new account';

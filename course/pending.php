@@ -119,7 +119,9 @@ if (empty($pending)) {
     $table = new html_table();
     $table->attributes['class'] = 'pendingcourserequests generaltable';
     $table->align = array('center', 'center', 'center', 'center', 'center', 'center');
-    $table->head = array(get_string('shortnamecourse'), get_string('fullnamecourse'), get_string('requestedby'),
+    // START UCLA MOD: CCLE-6383 - Collab site requests need timestamp
+    $table->head = array(get_string('timerequestedcourse'), get_string('shortnamecourse'), get_string('fullnamecourse'), get_string('requestedby'),
+    // END UCLA MOD: CCLE-6383
             get_string('summary'), get_string('category'), get_string('requestreason'), get_string('action'));
 
     foreach ($pending as $course) {
@@ -143,6 +145,9 @@ if (empty($pending)) {
         $category = $course->get_category();
 
         $row = array();
+        // START UCLA MOD: CCLE-6383 - Collab site requests need timestamp
+        $row[] = !empty($request->request->timerequested) ? userdate($request->request->timerequested) : '';
+        // END UCLA MOD: CCLE-6383
         $row[] = format_string($course->shortname);
         $row[] = format_string($course->fullname);
         $row[] = fullname($course->get_requester());
