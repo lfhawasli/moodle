@@ -25,6 +25,13 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('classes/modchooser_preferences_form.php');
 
+$returnto = optional_param('returnto', 0, PARAM_ALPHANUM); // Course to return to. 0 means return to user preferences.
+
+$returnurl = new moodle_url($CFG->wwwroot . '/user/preferences.php');
+if ($returnto !== 0) {
+    $returnurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $returnto));
+}
+
 $url = new moodle_url('/local/ucla/modchooser_preferences.php');
 
 require_login();
@@ -32,16 +39,25 @@ $PAGE->set_context(context_user::instance($USER->id));
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('standard');
 
-$mform = new local_ucla_modchooser_preferences_form();
+$args = array(
+    'returnto' => $returnto
+);
+$mform = new local_ucla_modchooser_preferences_form(null, $args);
 $mform->set_data(array('modchoosersetting' => get_user_preferences('modchoosersetting')));
 
 if (!$mform->is_cancelled() && $data = $mform->get_data()) {
     $setting = $data->modchoosersetting;
     set_user_preference('modchoosersetting', $setting);
+    if ($data->returnto != 0) {
+        $returnurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $data->returnto));
+    } else {
+        $returnurl = new moodle_url($CFG->wwwroot . '/user/preferences.php');
+    }
+    redirect($returnurl, get_string('modchooserpreferencesupdate'), null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 if ($mform->is_cancelled()) {
-    redirect($CFG->wwwroot . '/user/preferences.php');
+    redirect($returnurl);
 }
 
 $strpreferences = get_string('preferences');

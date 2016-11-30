@@ -69,8 +69,10 @@ if (!$currentuser) {
 
 // START UCLA MOD: CCLE-6385 - Ability to display new activity chooser as user preference option
 $url = new moodle_url('/local/ucla/modchooser_preferences.php');
-$subnode = navigation_node::create(get_string('modchooserpreferences'), $url, navigation_node::TYPE_SETTING,'modchooserpreference','modchooserpreference');
-$settings->add_node($subnode);
+$container = navigation_node::create(get_string('editinga', 'moodle', 'options'), null, navigation_node::TYPE_CATEGORY );
+$subnode = navigation_node::create(get_string('modchooser'), $url, navigation_node::TYPE_SETTING,'modchooser','modchooser');
+$container->add_node($subnode);
+$settings->add_node($container);
 // END UCLA MOD: CCLE-6385
 
 // Identifying the nodes.

@@ -202,10 +202,16 @@ class core_course_renderer extends plugin_renderer_base {
         );
         $this->page->requires->strings_for_js(array(
                 'addresourceoractivity',
+                // START UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
+                'addtool',
+                // END UCLA MOD: CCLE-6443
                 'modchooserenable',
                 'modchooserdisable',
+                // START UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
+                'removetool',
+                // END UCLA MOD: CCLE-6443
                 // START UCLA MOD: CCLE-6378 - Show only top tools
-                'showall',
+                'setfavoritetools',
                 'showcategory'
                 // END UCLA MOD: CCLE-6378
         ), 'moodle');
@@ -229,7 +235,15 @@ class core_course_renderer extends plugin_renderer_base {
 
         // Put everything into one tag 'options'
         $formcontent .= html_writer::start_tag('div', array('class' => 'options'));
-        $formcontent .= html_writer::tag('div', get_string('selectmoduletoviewhelp', 'moodle'),
+        $helpdisplay = get_string('selectmoduletoviewhelp', 'moodle');
+
+        if ($newmodchooser) {
+            $helpdisplay .= get_string('custommodchooserhelp', 'moodle');
+        } else {
+            $helpdisplay .= html_writer::link(new moodle_url('/local/ucla/modchooser_preferences.php', array('returnto' => $course->id)),
+                    get_string('customizemodchooser', 'moodle'));
+        }
+        $formcontent .= html_writer::tag('div', $helpdisplay,
                 array('class' => 'instruction'));
         // Put all options into one tag 'alloptions' to allow us to handle scrolling
         $formcontent .= html_writer::start_tag('div', array('class' => 'alloptions'));
@@ -241,10 +255,12 @@ class core_course_renderer extends plugin_renderer_base {
             $tools = array_filter($modules, create_function('$mod', 'return ($mod->archetype !== MOD_ARCHETYPE_SYSTEM);'));
             if (count($tools)) {
                 $formcontent .= $this->course_modchooser_title();
-                $formcontent .= $this->course_modchooser_module_types($tools);
-                $showall = html_writer::link('#', get_string('showall', 'moodle', 'tools'), array('id' => 'showalltools'));
+                $showall = html_writer::link('#', get_string('setfavoritetools', 'moodle'), array('class' => 'tooltoggle'));
                 $formcontent .= html_writer::div($showall, 'nonoption');
-                $reset = html_writer::link('#', get_string('resetfavoritetools'), array('id' => 'resettools', 'style' => 'display:none'));
+                $reset = html_writer::link('#', get_string('resetfavoritetools'), array('class' => 'resettools', 'style' => 'display:none'));
+                $formcontent .= html_writer::div($reset, 'nonoption');
+                $formcontent .= $this->course_modchooser_module_types($tools);
+                $formcontent .= html_writer::div($showall, 'nonoption');
                 $formcontent .= html_writer::div($reset, 'nonoption');
             }
             // END UCLA MOD: CCLE-6378
@@ -369,13 +385,15 @@ class core_course_renderer extends plugin_renderer_base {
                 // Show filled star for favorited tool.
                 $title .= html_writer::tag('i', '', array(
                     'class'=> 'fa fa-star',
-                    'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;color:#f29644;font-size:103%;',
+                    'style' => 'float:right;margin: 5px -15px 0 0;display:none;cursor:pointer;color:#f29644;font-size:103%;',
+                    'title' => get_string('removetool'),
                     'aria-hidden' => 'true'));
             } else {
                 // Show empty star.
                 $title .= html_writer::tag('i', '', array(
                     'class'=> 'fa fa-star-o',
-                    'style' => 'float:right;margin-right:-15px;display:none;cursor:pointer;',
+                    'style' => 'float:right;margin: 5px -15px 0 0;display:none;cursor:pointer;',
+                    'title' => get_string('addtool'),
                     'aria-hidden' => 'true'));
             }
         }

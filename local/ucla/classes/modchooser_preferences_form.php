@@ -34,11 +34,17 @@ class local_ucla_modchooser_preferences_form extends moodleform {
 
         $mform =& $this->_form;
 
+        $returnto = $this->_customdata['returnto'];
+
         $mform->addElement('header', 'modchooser', get_string('modchoosersetting'));
         $mform->addElement('advcheckbox', 'modchoosersetting', '', get_string('modchoosersetting_str'));
         $mform->setType('modchoosersetting', PARAM_INT);
         $mform->setDefault('modchoosersetting', 0);
         $mform->addHelpButton('modchooser', 'modchoosersetting');
+
+        $mform->addElement('hidden', 'returnto', null);
+        $mform->setType('returnto', PARAM_ALPHANUM);
+        $mform->setConstant('returnto', $returnto);
 
         $this->add_action_buttons();
     }

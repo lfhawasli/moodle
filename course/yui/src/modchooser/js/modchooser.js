@@ -191,10 +191,9 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
         if (this.newmodchooser) {
             // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6380 - Combine activity/resource listing
-            var tooltoggle = this.container.one('#showalltools');
 
             // Toggle between top activities or all activities.
-            var thisevent = tooltoggle.on('click', function(e){
+            var thisevent = this.container.delegate('click', function(e) {
                 // Show/hide unpinned tools.
                 this.container.all(".tool:not(.pinned)").each(function(tool) {
                     tool.toggleView();
@@ -206,20 +205,20 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                 });
 
                 // Show/hide reset tools link. Only display when in view all mode.
-                this.container.one("#resettools").toggleView();
+                this.container.all(".resettools").toggleView();
 
                 var showtoptools = M.util.get_string('showcategory', 'moodle', 'favorite tools');
-                var showalltools = M.util.get_string('showall', 'moodle', 'tools');
-
-                // Change link text to show all activities or show top activities.
-                if (tooltoggle.getContent() === showtoptools) {
-                    tooltoggle.setContent(showalltools);
-                } else {
-                    tooltoggle.setContent(showtoptools);
-                }
-
+                var showalltools = M.util.get_string('setfavoritetools', 'moodle');
+                Y.all(".tooltoggle").each(function(tooltoggle) {
+                    // Change link text to show all activities or show top activities.
+                    if (tooltoggle.getContent() === showtoptools) {
+                        tooltoggle.setContent(showalltools);
+                    } else {
+                        tooltoggle.setContent(showtoptools);
+                    }
+                });
                 e.preventDefault();
-            }, this);
+            }, '.tooltoggle', this);
             this.listenevents.push(thisevent);
             // END UCLA MOD: CCLE-6378 / CCLE-6380
 
@@ -251,6 +250,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                 this.addClass('fa-star');
                 this.setStyle('color', '#f29644');
                 this.setStyle('font-size', '103%');
+                this.setAttribute('title', M.util.get_string('removetool', 'moodle'));
             }, '.fa-star-o');
             this.listenevents.push(thisevent);
 
@@ -280,12 +280,13 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                 this.addClass('fa-star-o');
                 this.setStyle('color', '#555');
                 this.setStyle('font-size', '100%');
+                this.setAttribute('title', M.util.get_string('addtool', 'moodle'));
             }, '.fa-star');
             this.listenevents.push(thisevent);
 
             // Listen to reset tools link.
             var defaulttools = this.defaulttools;
-            thisevent = Y.one("#resettools").on('click', function (e) {
+            thisevent = this.container.delegate('click', function (e) {
                 // Stop link redirection and any further propagation.
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -309,6 +310,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                         link.addClass('fa-star');
                         link.setStyle('color', '#f29644');
                         link.setStyle('font-size', '103%');
+                        link.setAttribute('title', M.util.get_string('removetool', 'moodle'));
                     } else {
                         // Unpin nondefault tool.
                         tool.removeClass('pinned');
@@ -319,9 +321,10 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
                         link.addClass('fa-star-o');
                         link.setStyle('color', '#555');
                         link.setStyle('font-size', '100%');
+                        link.setAttribute('title', M.util.get_string('addtool', 'moodle'));
                     }
                 });
-            });
+            }, '.resettools');
             this.listenevents.push(thisevent);
             // END UCLA MOD: CCLE-6379
         }
