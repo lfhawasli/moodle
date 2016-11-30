@@ -318,8 +318,8 @@ function get_crosslisted_courses($term, $srs) {
             if (!$ext) {
                 continue;
             }
-
-            $exts[] = $ext;
+            // Web service can return duplicate info.
+            $exts[make_idnumber($ext)] = $ext;
         }
     }
 
