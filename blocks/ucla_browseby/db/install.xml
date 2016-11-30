@@ -22,7 +22,8 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="termsrsuid" UNIQUE="true" FIELDS="term, srs, uid" NEXT="termsubjarea"/>
-        <INDEX NAME="termsubjarea" UNIQUE="false" FIELDS="term, subjarea" PREVIOUS="termsrsuid"/>
+        <INDEX NAME="termsubjarea" UNIQUE="false" FIELDS="term, subjarea" NEXT="uid"/>
+        <INDEX NAME="uid" UNIQUE="false" FIELDS="uid" PREVIOUS="termsubjarea"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="ucla_browseall_classinfo" COMMENT="Classes information cached from the Registrar via ccle_getcoursesall." PREVIOUS="ucla_browseall_instrinfo">
