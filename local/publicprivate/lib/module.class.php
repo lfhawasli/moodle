@@ -115,22 +115,28 @@ class PublicPrivate_Module {
         $ppgrouping = $this->_publicprivate_course()->get_grouping();
         if (!empty($availability)) {
             if (isset($availability->c)) {
+                $groupingfound = false;
                 foreach ($availability->c as $index => $condition) {
                     if ($condition->type == 'grouping') {
-                        $groupingfound = $condition->id;
-                        if ($groupingfound == $ppgrouping) {
+                        if ($condition->id == $ppgrouping) {
+                            $groupingfound = true;
                             // Matched public/private grouping, so unset it.
                             unset($availability->c[$index]);
+                            unset($availability->showc[$index]);
                             break;
                         }
                     }
                 }
                 if ($groupingfound) {
-                    $newavailability = json_encode($availability);
-                    if (count($availability->c == 1)) {
-                        // If there is only one condition and we found the
-                        // public/private grouping, then just clear it.
+                    // Reset array indexes
+                    $availability->c = array_values($availability->c);
+                    $availability->showc = array_values($availability->showc);
+                    // If we found the public/private grouping and removed the only condition,
+                    // then just clear the availability conditions.
+                    if (count($availability->c) == 0) {
                         $newavailability = null;
+                    } else {
+                        $newavailability = json_encode($availability);
                     }
                     return $DB->set_field('course_modules', 'availability', $newavailability,
                             array('id' => $this->_course_module()->id));
