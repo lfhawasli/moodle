@@ -35,16 +35,16 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             var mod = e.target.ancestor(CSS.ACTIVITYLI);
             
             var field = '';
-            var instance = mod.one('.mod-indent-outer');
-            // If an activity instance is not found, see if a  resource instance
-            // exists (e.g. label, folder)
+            var instance = mod.one('.activityinstance');
+            // If an activity instance is not found, use the div enclosing the entire module
             if (!instance) {
-                instance = mod.one('.contentwithoutlink');
+                instance = mod.one('.mod-indent-outer');
             }
-            var public = instance.one('.availabilityinfo');
+            // TODO This currently won't work if there are conditions besides the publicprivate one
+            var privateGrouping = instance.one('.availabilitypopup');
             
-            if (public) {
-                public.remove();
+            if (privateGrouping) {
+                privateGrouping.remove();
                 field = 'public';
 
                 // Swap icon
@@ -57,10 +57,10 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
                     mod.one(CSS.PUBLICPRIVATETEXT).set('text', M.util.get_string('publicprivatemakeprivate', 'local_publicprivate'));
                 }
             } else {
-                // Add label
-                instance.insert(
-                    Y.Node.create('<div class="availabilityinfo">Not available unless: You belong to a group in <strong>Private Course Material</strong> (hidden otherwise)</div>')
-                );
+                // Add popup
+                var popupContents = Y.Escape.html('<div class=\"availabilityinfo\">Not available unless: You belong to a group in <strong>Private Course Material</strong> (hidden otherwise)</div>');
+                var popup = '<span class="groupinglabel availabilitypopup" data-availabilityconditions="' + popupContents + '"><a aria-haspopup="true" href="#">Access restrictions</a></span>';
+                instance.insert(Y.Node.create(popup));
                 
                 // Swap icon
                 mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({

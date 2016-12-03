@@ -1,0 +1,7 @@
+{
+  "moodle-local_ucla-availabilityconditions": {
+    "requires": [
+        "moodle-core-tooltip"
+    ]
+  }
+}
