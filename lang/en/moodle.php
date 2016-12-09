@@ -1724,7 +1724,7 @@ $string['servererror'] = 'An error occurred whilst communicating with the server
 $string['serverlocaltime'] = 'Server\'s local time';
 $string['setcategorytheme'] = 'Set category theme';
 // BEGIN UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
-$string['setfavoritetools'] = 'Set favorite tools';
+$string['setfavoritetools'] = 'Show all tools/Set favorite tools';
 //END UCLA MOD: CCLE-6443
 $string['setpassword'] = 'Set password';
 $string['setpasswordinstructions'] = 'Please enter and repeat your new password below, then click "Set password". <br />Your new password will be saved, and you will be logged in.';

@@ -235,6 +235,10 @@ class core_course_renderer extends plugin_renderer_base {
 
         // Put everything into one tag 'options'
         $formcontent .= html_writer::start_tag('div', array('class' => 'options'));
+        
+        // START UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser.
+        // $formcontent .= html_writer::tag('div', get_string('selectmoduletoviewhelp', 'moodle'),
+        //     array('class' => 'instruction'));        
         $helpdisplay = get_string('selectmoduletoviewhelp', 'moodle');
 
         if ($newmodchooser) {
@@ -245,6 +249,8 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $formcontent .= html_writer::tag('div', $helpdisplay,
                 array('class' => 'instruction'));
+        // END UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser.
+        
         // Put all options into one tag 'alloptions' to allow us to handle scrolling
         $formcontent .= html_writer::start_tag('div', array('class' => 'alloptions'));
 
