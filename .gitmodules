@@ -148,3 +148,6 @@
 [submodule "question/type/ordering"]
 	path = question/type/ordering
 	url = https://github.com/gbateson/moodle-qtype_ordering.git
+[submodule "mod/hvp"]
+        path = mod/hvp
+        url = git@github.com:ccle/h5p-moodle-plugin.git 
