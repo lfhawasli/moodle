@@ -148,3 +148,6 @@
 [submodule "question/type/ordering"]
 	path = question/type/ordering
 	url = https://github.com/gbateson/moodle-qtype_ordering.git
+[submodule "lib/editor/atto/plugins/count"]
+	path = lib/editor/atto/plugins/count
+	url = git@github.com:damyon/moodle-atto_count.git
