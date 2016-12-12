@@ -260,24 +260,20 @@ class block_ucla_my_sites extends block_base {
 
                 $rclass->reg_info = array($rreginfo);
 
-                // If this particular course already exists locally, then
-                // Overwrite the roles with the registrar's data.
+                // If this particular course already exists locally, try to find
+                // section that user is enrolled in.
                 $key = make_idnumber($rreginfo);
                 $localexists = false;
                 foreach ($classsites as $k => $classsite) {
-                    foreach ($classsite->reg_info as $reginfo) {
+                    foreach ($classsite->reg_info as &$reginfo) {
                         if ($key == make_idnumber($reginfo)) {
-                            if (!is_array($classsites[$k]->roles)) {
-                                $classsites[$k]->roles = array();
-                            }
-                            $classsites[$k]->roles[] = $rrole->name;
                             $localexists = true;
+                            $reginfo->enrolled = 1;
                         }
                     }
                 }
 
                 if (!$localexists) {
-                    $rclass->roles = $rrole->name;
                     $classsites[] = $rclass;
                 }
             }
@@ -292,11 +288,6 @@ class block_ucla_my_sites extends block_base {
                 unset($classsites[$k]);
                 continue;
             }
-        }
-
-        // Figure out what to display in the Roles column.
-        foreach ($classsites as $k => $classsite) {
-            $classsite->rolestr = $this->format_roles($classsite->roles);
         }
 
         if (!empty($classsites)) {
@@ -496,11 +487,6 @@ class block_ucla_my_sites extends block_base {
         $termcmp = term_cmp_fn($areginfo->term, $breginfo->term);
         if ($termcmp != 0) {
             return $termcmp * -1;
-        }
-        // Compare roles.
-        $rolenamecmp = strcmp($areginfo->rolestr, $breginfo->rolestr);
-        if ($rolenamecmp != 0) {
-            return $rolenamecmp;
         }
         // This is an array of fields to compare by after the off-set
         // term and role.
