@@ -45,34 +45,35 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
 
         $content[] = html_writer::start_tag('div', array('class' => 'class_sites_div'));
         foreach ($classsites as $x => $class) {
-            // Build class title in following format.
-            // <subject area> <cat_num>, <activity_type e.g. Lec, Sem> <sec_num> (<term name e.g. Winter 2012>): <full name>.
+            // Build class title.
 
-            // There might be multiple reg_info records for cross-listed courses.
-            $classtitle = ''; $firstentry = true; $numentries = 0;
-            $maxcrosslistshown = get_config('local_ucla', 'maxcrosslistshown');
+            // There might be multiple reg_info records for cross-listed 
+            // courses, so find section user is enrolled in or use hostcourse.
+            $hostreginfo = null; $enrolledreginfo = null;
+            $numenrolledfound = 0;
+            $titlereginfo = null;   // Which reginfo to use to create title.
             foreach ($class->reg_info as $reginfo) {
-                $firstentry ? $firstentry = false : $classtitle .= '/';
-
-                // Don't show too many cross-listed entries.
-                if ($numentries >= $maxcrosslistshown) {
-                    $classtitle .= '...';
-                    break;
+                if (isset($reginfo->enrolled) && $reginfo->enrolled) {
+                    $enrolledreginfo = $reginfo;
+                    ++$numenrolledfound;    // Instructors would have multiple.
                 }
-
-                $classtitle .= sprintf('%s %s, %s %s',
-                        $reginfo->subj_area,
-                        $reginfo->coursenum,
-                        $reginfo->acttype,
-                        $reginfo->sectnum);
-                ++$numentries;
+                if ($reginfo->hostcourse) {
+                    $hostreginfo = $reginfo;
+                }
+            }
+            // If found multiple enrolled or did not find enrolled course, just 
+            // use hostcourse.
+            if ($numenrolledfound > 1 || empty($enrolledreginfo)) {
+                $titlereginfo = $hostreginfo;
+            } else {
+                $titlereginfo = $enrolledreginfo;
             }
             $subjareafull = $this->get_registrar_translation('ucla_reg_subjectarea',
-                    $reginfo->subj_area, 'subjarea', 'subj_area_full');
-            $reginfo = reset($class->reg_info);
+                    $titlereginfo->subj_area, 'subjarea', 'subj_area_full');
             $title = sprintf('%s<br>%s, %s %s - %s', $subjareafull[1],
-                    $reginfo->coursenum, $reginfo->acttype,
-                    $reginfo->sectnum, $class->fullname);
+                    $titlereginfo->coursenum, $titlereginfo->acttype,
+                    $titlereginfo->sectnum, $class->fullname);
+
 
             // Add link.
             if (!empty($class->url)) {
