@@ -78,6 +78,9 @@ $string['addressedto'] = 'To';
 $string['addstudent'] = 'Add student';
 $string['addsubcategory'] = 'Add a subcategory';
 $string['addteacher'] = 'Add teacher';
+// START UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
+$string['addtool'] = 'Add tool to favorites';
+// END UCLA MOD: CCLE-6443
 $string['admin'] = 'Admin';
 $string['adminhelpaddnewuser'] = 'To manually create a new user account';
 $string['adminhelpassignadmins'] = 'Admins can do anything and go anywhere in the site';
@@ -428,6 +431,17 @@ $string['currentlyselectedusers'] = 'Currently selected users';
 $string['currentpicture'] = 'Current picture';
 $string['currentrelease'] = 'Current release information';
 $string['currentversion'] = 'Current version';
+// BEGIN UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
+$string['customizemodchooser'] = '
+<br><br>
+Try the customizable Activities/Resources chooser.';
+$string['custommodchooserhelp'] = '
+<br><br>
+New layout - same great tools.
+<br><br>
+Don\'t see what you\'re looking for? Click \'Set favorite tools\' to see more.
+';
+// END UCLA MOD: CCLE-6443
 $string['databasechecking'] = 'Upgrading Moodle database from version {$a->oldversion} to {$a->newversion}';
 $string['databaseperformance'] = 'Database performance';
 $string['databasesetup'] = 'Setting up database';
@@ -1181,8 +1195,21 @@ $string['moodlelogo'] = 'Moodle logo';
 $string['month'] = 'Month';
 $string['months'] = 'Months';
 $string['modified'] = 'Modified';
+// BEGIN UCLA MOD: CCLE-6398 - Have top tools be configurable
+$string['modchooser'] = 'Activities/Resources chooser';
+//END UCLA MOD: CCLE-6398
 $string['modchooserenable'] = 'Activity chooser on';
 $string['modchooserdisable'] = 'Activity chooser off';
+// BEGIN UCLA MOD: CCLE-6385 - Ability to display new activity chooser as user preference option
+$string['modchooserpreferences'] = 'Activities/Resources chooser preferences';
+$string['modchooserpreferencesupdate'] = 'Successfully updated activities/resources chooser preferences.';
+$string['modchoosersetting'] = 'Activities/Resources chooser settings';
+$string['modchoosersetting_str'] = 'Use the customizable activities/resources chooser';
+$string['modchoosersetting_help'] = 'This setting allows you to use the new activity chooser.
+
+The new activity chooser allows you to pin favorite tools and hide infrequently used tools.
+';
+// END UCLA MOD: CCLE-6385
 $string['moduleintro'] = 'Description';
 $string['modulesetup'] = 'Setting up module tables';
 $string['modulesuccess'] = '{$a} tables have been set up correctly';
@@ -1530,6 +1557,9 @@ $string['removeadmin'] = 'Remove admin';
 $string['removecreator'] = 'Remove course creator';
 $string['removestudent'] = 'Remove student';
 $string['removeteacher'] = 'Remove teacher';
+// BEGIN UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
+$string['removetool'] = 'Remove tool from favorites';
+// END UCLA MOD: CCLE-6443
 $string['rename'] = 'Rename';
 $string['renamefileto'] = 'Rename <b>{$a}</b> to';
 $string['report'] = 'Report';
@@ -1544,6 +1574,9 @@ $string['requirespayment'] = 'This course requires payment for access';
 $string['reset'] = 'Reset';
 $string['resetcomponent'] = 'Component';
 $string['resetcourse'] = 'Reset course';
+// BEGIN UCLA MOD: CCLE-6379 - Add ability to pin tools
+$string['resetfavoritetools'] = 'Reset favorite tools';
+// END UCLA MOD
 $string['resetinfo'] = 'This page allows you to empty a course of user data, while retaining the activities and other settings.  Please be warned that by choosing items below and submitting this page you will delete your chosen user data from this course forever!';
 $string['resetnotimplemented'] = 'Reset not implemented';
 $string['resetrecordexpired'] = 'The password reset link you used is more than {$a} minutes old and has expired. Please initiate a new password reset.';
@@ -1690,6 +1723,9 @@ $string['separateandconnectedinfo'] = 'The scale based on the theory of separate
 $string['servererror'] = 'An error occurred whilst communicating with the server';
 $string['serverlocaltime'] = 'Server\'s local time';
 $string['setcategorytheme'] = 'Set category theme';
+// BEGIN UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
+$string['setfavoritetools'] = 'Show all tools/Set favorite tools';
+//END UCLA MOD: CCLE-6443
 $string['setpassword'] = 'Set password';
 $string['setpasswordinstructions'] = 'Please enter and repeat your new password below, then click "Set password". <br />Your new password will be saved, and you will be logged in.';
 $string['settings'] = 'Settings';

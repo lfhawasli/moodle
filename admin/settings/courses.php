@@ -157,6 +157,14 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $temp->add(new admin_setting_configselect('moodlecourse/groupmode', new lang_string('groupmode'), '', key($choices),$choices));
     $temp->add(new admin_setting_configselect('moodlecourse/groupmodeforce', new lang_string('force'), new lang_string('coursehelpforce'), 0,array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
 
+    // START UCLA MOD: CCLE-6398 - Have top modules be configurable
+    $temp->add(new admin_setting_heading('modchooser', new lang_string('modchooser', 'moodle'), ''));
+    $defaultmodules = array('resource' => 1, 'label' => 1, 'forum' => 1, 'url' => 1, 'assign' => 1,
+        'quiz' => 1, 'kalvidres' => 1, 'folder' => 1, 'page' => 1, 'turnitintooltwo' => 1, 'zoom' => 1);
+    $modules = get_module_types_names();
+    $temp->add(new admin_setting_configmulticheckbox('moodlecourse/modchooserdefaults', 'Favorite Tools',
+            'Default favorite tools for the activity chooser', $defaultmodules, $modules));
+    // END UCLA MOD: CCLE-6398
     $ADMIN->add('courses', $temp);
 
 
