@@ -151,3 +151,6 @@
 [submodule "lib/editor/atto/plugins/count"]
 	path = lib/editor/atto/plugins/count
 	url = git@github.com:damyon/moodle-atto_count.git
+[submodule "mod/hvp"]
+        path = mod/hvp
+        url = git@github.com:ccle/h5p-moodle-plugin.git 
