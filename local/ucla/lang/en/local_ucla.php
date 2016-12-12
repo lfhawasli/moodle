@@ -290,3 +290,6 @@ $string['ferpawaivermoreinfo'] = '(For more information on FERPA go to {$a})';
 $string['ferpawaiverrequired'] = 'FERPA waiver needs to be signed for this course activity/resource.';
 
 $string['eventsyncenrolmentsfinished'] = 'Enrol sync finished';
+
+// CCLE-5989 - Activity availability conditions popup
+$string['availabilityconditions'] = 'Access restrictions';

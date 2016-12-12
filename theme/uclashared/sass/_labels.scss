@@ -103,8 +103,8 @@
     @extend .label-pp;
     display: inline-block;
 
-    // Whenever label next to a link, add some space
-    a + & {
+    // Whenever label next to a link or editable span, add some space
+    a + &, span.inplaceeditable + & {
         margin-left: 12px;
     }
 }
