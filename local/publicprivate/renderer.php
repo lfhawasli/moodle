@@ -188,4 +188,109 @@ class local_publicprivate_renderer extends core_course_renderer {
         return $output;
     }
 
+    // See course/renderer.php
+    public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
+        $output = '';
+        // We return empty string (because course module will not be displayed at all)
+        // if:
+        // 1) The activity is not visible to users
+        // and
+        // 2) The 'availableinfo' is empty, i.e. the activity was
+        //     hidden in a way that leaves no info, such as using the
+        //     eye icon.
+        if (!$mod->uservisible && empty($mod->availableinfo)) {
+            return $output;
+        }
+
+        $indentclasses = 'mod-indent';
+        if (!empty($mod->indent)) {
+            $indentclasses .= ' mod-indent-'.$mod->indent;
+            if ($mod->indent > 15) {
+                $indentclasses .= ' mod-indent-huge';
+            }
+        }
+
+        $output .= html_writer::start_tag('div');
+
+        if ($this->page->user_is_editing()) {
+            $output .= course_get_cm_move($mod, $sectionreturn);
+        }
+
+        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
+
+        // This div is used to indent the content.
+        $output .= html_writer::div('', $indentclasses);
+
+        // Start a wrapper for the actual content to keep the indentation consistent
+        $output .= html_writer::start_tag('div');
+
+        // Display the link to the module (or do nothing if module has no url)
+        $cmname = $this->course_section_cm_name($mod, $displayoptions);
+
+        // CCLE-5989 - Create availability conditions popup
+        $availabilityhtml = $this->course_section_cm_availability($mod, $displayoptions);
+        $availabilitypopup = '';
+        if (!empty($availabilityhtml)) {
+            $this->page->requires->yui_module('moodle-local_ucla-availabilityconditions', 'M.local_ucla.init_availabilityconditions');
+            $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
+            $availabilitypopup = html_writer::span($link, 'groupinglabel availabilitypopup',
+                array('data-availabilityconditions' => $availabilityhtml));
+        }
+
+        if (!empty($cmname)) {
+            // Start the div for the activity title, excluding the edit icons.
+            $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
+            $output .= $cmname;
+
+            // Module can put text after the link (e.g. forum unread)
+            $output .= $mod->afterlink;
+
+            // CCLE-5989
+            $output .= $availabilitypopup;
+
+            // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
+            $output .= html_writer::end_tag('div'); // .activityinstance
+        }
+
+        // If there is content but NO link (eg label), then display the
+        // content here (BEFORE any icons). In this case cons must be
+        // displayed after the content so that it makes more sense visually
+        // and for accessibility reasons, e.g. if you have a one-line label
+        // it should work similarly (at least in terms of ordering) to an
+        // activity.
+        $contentpart = $this->course_section_cm_text($mod, $displayoptions);
+        $url = $mod->url;
+        if (empty($url)) {
+            $output .= $contentpart;
+            // CCLE-5989
+            $output .= $availabilitypopup;
+        }
+
+        $modicons = '';
+        if ($this->page->user_is_editing()) {
+            $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
+            $modicons .= ' '. $this->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
+            $modicons .= $mod->afterediticons;
+        }
+
+        $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
+
+        if (!empty($modicons)) {
+            $output .= html_writer::span($modicons, 'actions');
+        }
+
+        // If there is content AND a link, then display the content here
+        // (AFTER any icons). Otherwise it was displayed before
+        if (!empty($url)) {
+            $output .= $contentpart;
+        }
+
+        $output .= html_writer::end_tag('div'); // $indentclasses
+
+        // End of indentation div.
+        $output .= html_writer::end_tag('div');
+
+        $output .= html_writer::end_tag('div');
+        return $output;
+    }
 }

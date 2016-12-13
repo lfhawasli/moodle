@@ -1,0 +1,10 @@
+{
+  "name": "moodle-local_ucla-availabilityconditions",
+  "builds": {
+    "moodle-local_ucla-availabilityconditions": {
+      "jsfiles": [
+        "availabilityconditions.js"
+      ]
+    }
+  }
+}

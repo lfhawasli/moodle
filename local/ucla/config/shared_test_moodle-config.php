@@ -450,7 +450,7 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     collapse = collapse
-    style1 = fontfamily, title, bold, italic, underline, backcolor, fontcolor
+    style1 = fontfamily, title, bold, italic, underline, backcolor, fontcolor, count
     list = unorderedlist, orderedlist
     indent = indent
     undo = undo

@@ -80,11 +80,17 @@ $hostcourses = $DB->get_records_select('ucla_request_classes',
 $nummissing = 0;
 $numfixed = 0;
 foreach ($hostcourses as $hostcourse) {
-    // Get crosslists that are listed at the Registrar.
-    $remotecrosslists = get_crosslisted_courses($hostcourse->term, $hostcourse->srs);
-    if (empty($remotecrosslists)) {
-        continue;   // No need to check.
-    }
+    try {
+        // Get crosslists that are listed at the Registrar.
+        $remotecrosslists = get_crosslisted_courses($hostcourse->term, $hostcourse->srs);
+        if (empty($remotecrosslists)) {
+            continue;   // No need to check.
+        }
+    } catch (Exception $e) {
+        // Sometimes the web service can spit out an error.
+        $trace->output('Exception, skipping: ' . $e->getMessage(), 2);
+        continue;
+    }    
 
     $trace->output(sprintf('Checking %s %s (%s)', $hostcourse->department, 
             $hostcourse->course, $hostcourse->srs));
