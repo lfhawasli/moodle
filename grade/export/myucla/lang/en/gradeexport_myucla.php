@@ -30,3 +30,4 @@ $string['invalididsexplanation'] = 'The students listed below do not have valid 
 $string['myucla:publish'] = 'Publish MyUCLA Gradebook Express grade export';
 $string['myucla:view'] = 'Use MyUCLA Gradebook Express grade export';
 $string['pluginname'] = 'MyUCLA Gradebook Express format';
+$string['timeexported'] = 'Last downloaded from this course';

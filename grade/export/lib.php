@@ -82,9 +82,6 @@ abstract class grade_export {
         $this->groupid = $groupid;
 
         $this->grade_items = grade_item::fetch_all(array('courseid'=>$this->course->id));
-        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
-        $this->groupingid = $groupingid;
-        // END UCLA MOD: CCLE-5599
 
         $this->process_form($formdata);
     }
@@ -212,6 +209,13 @@ abstract class grade_export {
         if (isset($formdata->updatedgradesonly)) {
             $this->updatedgradesonly = $formdata->updatedgradesonly;
         }
+
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export
+        if (isset($formdata->groupingid)) {
+            $this->groupingid = $formdata->groupingid;
+        }
+        // END UCLA MOD: CCLE-5599
+
     }
 
     /**
@@ -422,6 +426,19 @@ abstract class grade_export {
         } else {
             $updatedgradesonly = 0;
         }
+
+        // START UCLA MOD: CCLE-5599 - Add grouping filter to grade export.
+        //$params = array('id'                => $this->course->id,
+        //                'groupid'           => $this->groupid,
+        //                'itemids'           => $itemidsparam,
+        //                'export_letters'    => $this->export_letters,
+        //                'export_feedback'   => $this->export_feedback,
+        //                'updatedgradesonly' => $updatedgradesonly,
+        //                'decimalpoints'     => $this->decimalpoints,
+        //                'export_onlyactive' => $this->onlyactive,
+        //                'usercustomfields'  => $this->usercustomfields,
+        //                'displaytype'       => $displaytypes,
+        //                'key'               => $this->userkey);
         $params = array('id'                => $this->course->id,
                         'groupid'           => $this->groupid,
                         'itemids'           => $itemidsparam,
@@ -432,7 +449,9 @@ abstract class grade_export {
                         'export_onlyactive' => $this->onlyactive,
                         'usercustomfields'  => $this->usercustomfields,
                         'displaytype'       => $displaytypes,
-                        'key'               => $this->userkey);
+                        'key'               => $this->userkey,
+                        'groupingid'        => $this->groupingid);
+        // END UCLA MOD: CCLE-5599
 
         return $params;
     }
@@ -600,8 +619,14 @@ abstract class grade_export {
      *
      * @return stdClass $formdata
      */
+
+    // START UCLA MOD: CCLE-5599  - Add grouping filter to grade export.
+    //public static function export_bulk_export_data($id, $itemids, $exportfeedback, $onlyactive, $displaytype,
+    //      $decimalpoints, $updatedgradesonly = null, $separator = null) {
     public static function export_bulk_export_data($id, $itemids, $exportfeedback, $onlyactive, $displaytype,
-                                                   $decimalpoints, $updatedgradesonly = null, $separator = null) {
+                                                   $decimalpoints, $updatedgradesonly = null, $separator = null,
+                                                   $groupingid = 0) {
+    // END UCLA MOD: CCLE-5599
 
         $formdata = new \stdClass();
         $formdata->id = $id;
@@ -610,6 +635,9 @@ abstract class grade_export {
         $formdata->export_onlyactive = $onlyactive;
         $formdata->display = self::convert_flat_displaytypes_to_array($displaytype);
         $formdata->decimals = $decimalpoints;
+        // START UCLA MOD: CCLE-5599  - Add grouping filter to grade export.
+        $formdata->groupingid = $groupingid;
+        // END UCLA MOD: CCLE-5599
 
         if (!empty($updatedgradesonly)) {
             $formdata->updatedgradesonly = $updatedgradesonly;

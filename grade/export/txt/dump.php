@@ -21,6 +21,9 @@ require_once($CFG->dirroot.'/grade/export/txt/grade_export_txt.php');
 
 $id                 = required_param('id', PARAM_INT);
 $groupid            = optional_param('groupid', 0, PARAM_INT);
+// START UCLA MOD: CCLE-5599 - Add grouping filter to grade export.
+$groupingid         = optional_param('groupingid', 0, PARAM_INT);
+// END UCLA MOD: CCLE-5599
 $itemids            = required_param('itemids', PARAM_RAW);
 $exportfeedback     = optional_param('export_feedback', 0, PARAM_BOOL);
 $separator          = optional_param('separator', 'comma', PARAM_ALPHA);
@@ -48,8 +51,12 @@ if (!groups_group_visible($groupid, $COURSE)) {
 }
 
 // Get all url parameters and create an object to simulate a form submission.
+// START UCLA MOD: CCLE-5599 - Add grouping filter to grade export.
+//$formdata = grade_export::export_bulk_export_data($id, $itemids, $exportfeedback, $onlyactive, $displaytype,
+//        $decimalpoints, null, $separator);
 $formdata = grade_export::export_bulk_export_data($id, $itemids, $exportfeedback, $onlyactive, $displaytype,
-        $decimalpoints, null, $separator);
+        $decimalpoints, null, $separator, $groupingid);
+// END UCLA MOD: CCLE-5599
 
 $export = new grade_export_txt($course, $groupid, $formdata);
 $export->print_grades();

@@ -1,7 +1,7 @@
 <?PHP 
 
-$plugin->version  = 2012011900;
-$plugin->requires = 2011112900;
+$plugin->version  = 2016052300;
+$plugin->requires = 2016051900;
 $plugin->component = 'gradeexport_myucla'; // Full name of the plugin (used for diagnostics)
 
 $plugin->dependencies = array( 
