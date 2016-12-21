@@ -119,5 +119,22 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         }
         upgrade_block_savepoint(true, 2016110800, 'ucla_media');
     }
+    
+    if ($oldversion < 2017051500) {
+        $table = new xmldb_table('ucla_bruincast');
+        $field = new xmldb_field('week');
+        if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+            
+        $index = new xmldb_field('date', XMLDB_TYPE_INTEGER, 10, null, null, null, null, 'podcast_url');
+
+       
+            if (!$dbman->field_exists($table, $index)) {
+                $dbman->add_field($table, $index);
+            }
+        
+        upgrade_block_savepoint(true, 2017051500, 'ucla_media');
+    }
     return true;
 }

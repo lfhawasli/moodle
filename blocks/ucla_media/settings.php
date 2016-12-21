@@ -32,5 +32,47 @@ if ($ADMIN->fulltree) {
             'https://webservices-test.library.ucla.edu/music/v2/classes',
             PARAM_URL
         ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_login_url',
+            get_string('headerbruincastloginurl', 'block_ucla_media'),
+            get_string('descbruincastloginurl', 'block_ucla_media'),
+            'http://qa-md-ucla-bc-a.pantheonsite.io/api/v1/user/login',
+            PARAM_URL
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_url',
+            get_string('headerbruincasturl', 'block_ucla_media'),
+            get_string('descbruincasturl', 'block_ucla_media'),
+            'http://qa-md-ucla-bc-a.pantheonsite.io/api/v1/views/ccle_api',
+            PARAM_URL
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_http_user',
+            get_string('headerbruincasthttpuser', 'block_ucla_media'),
+            get_string('descbruincasthttpuser', 'block_ucla_media'),
+            'ucla-bc',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_http_pass',
+            get_string('headerbruincasthttppass', 'block_ucla_media'),
+            get_string('descbruincasthttppass', 'block_ucla_media'),
+            'f4u-7',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_user',
+            get_string('headerbruincastuser', 'block_ucla_media'),
+            get_string('descbruincastuser', 'block_ucla_media'),
+            'CCLE',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_pass',
+            get_string('headerbruincastpass', 'block_ucla_media'),
+            get_string('descbruincastpass', 'block_ucla_media'),
+            'test',
+            PARAM_TEXT
+        ));
 
 }

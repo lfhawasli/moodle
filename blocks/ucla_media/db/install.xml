@@ -12,6 +12,10 @@
         <FIELD NAME="srs" TYPE="char" LENGTH="9" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="restricted" TYPE="char" LENGTH="12" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="bruincast_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="audio_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="podcast_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="date" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

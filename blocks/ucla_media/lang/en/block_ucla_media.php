@@ -64,6 +64,19 @@ $string['mediaresnotavailable'] = "There are no media resources for this course.
 
 // Types of bruincasts. To be removed once new web service is done: CCLE-6263.
 $string['titlebcast'] = 'Bruincast';
+$string['headerbruincastloginurl'] = 'Bruincast Login Source URL';
+$string['descbruincastloginurl'] = 'Bruincast login URL to obtain a session from Bruincast datasource';
+$string['headerbruincastuser'] = 'Bruincast access Username';
+$string['descbruincastuser'] = 'Bruincast access Username to obtain data';
+$string['headerbruincastpass'] = 'Bruincast access Password';
+$string['descbruincastpass'] = 'Bruincast access Password to obtain data';
+$string['headerbruincasturl'] = 'Bruincast Datasource URL';
+$string['headerbruincasthttpuser'] = 'Bruincast HTTP access Username';
+$string['descbruincasthttpuser'] = 'Bruincast HTTP access Username to obtain a HTTP session';
+$string['headerbruincasthttppass'] = 'Bruincast HTTP access Password';
+$string['descbruincasthttppass'] = 'Bruincast HTTP access Password to obtain a HTTP session';
+$string['headerbruincasturl'] = 'Bruincast Datasource URL';
+$string['descbruincasturl'] = 'Bruincast URL to obtain data from Bruincast datasource API';
 $string['node_restricted'] = 'Private';
 $string['node_open'] = 'Open';
 $string['node_see_instructor'] = 'See Instructor';
