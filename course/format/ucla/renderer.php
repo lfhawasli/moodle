@@ -82,11 +82,14 @@ class format_ucla_renderer extends format_topics_renderer {
         $this->context =& $page->context;
 
         // CCLE-2800 - cache strings for JIT links
-        $this->jit_links = array('file' => get_string('file', 'format_ucla'),
-                                 'link' => get_string('link', 'format_ucla'),
-                                 'text' => get_string('text', 'format_ucla'),
-                                 'subheading' => get_string('subheading', 'format_ucla'));
-
+        $this->jit_links = array('file' => get_string('file', 'format_ucla'));
+        if (has_capability('mod/turnitintooltwo:addinstance', context_system::instance())) {
+            $this->jit_links += array('turnitin' => get_string('turnitin', 'format_ucla'));
+        }
+        $this->jit_links += array('link' => get_string('link', 'format_ucla'),
+                                  'text' => get_string('text', 'format_ucla'),
+                                  'subheading' => get_string('subheading', 'format_ucla'));
+        
         // Use the public/private renderer.  This will permit us to override the
         // way we render course modules
         $this->courserenderer = $this->page->get_renderer('local_publicprivate');
@@ -464,6 +467,21 @@ class format_ucla_renderer extends format_topics_renderer {
                 $OUTPUT->render(new action_link($moodle_url,
                     $innards, null, $link_options)),
                 array('class' => 'editbutton'));
+            
+            // Add Turnitin Assignment
+            $turnitin = get_string('turnitin', 'format_ucla');
+            $turnitinurloptions = array(
+                'add' => 'turnitintooltwo',
+                'course' => $this->course->id,
+                'section' => 0                
+            );
+
+            $turnitinlinkoptions = array('title' => $turnitin, 'class' => 'edit_course_summary');
+            $turnitinmoodleurl = new moodle_url('modedit.php', $turnitinurloptions);
+            $center_content .= html_writer::tag('span',
+                $OUTPUT->render(new action_link($turnitinmoodleurl,
+                    null, null, $turnitinlinkoptions)),
+                array('class' => 'editbutton'));
         }
 
         $center_content .= html_writer::start_tag('div', array('class' => 'summary'));
@@ -698,10 +716,17 @@ class format_ucla_renderer extends format_topics_renderer {
                 array('class' => 'jit-links '));
 
         foreach ($this->jit_links as $jit_type => $jit_string) {
-            $link = new moodle_url('/blocks/ucla_easyupload/upload.php',
-                    array('course_id' => $this->course->id,
-                          'type' => $jit_type,
-                          'section' => $section));
+            if ($jit_type == 'turnitin') {
+                $link = new moodle_url('/course/modedit.php',
+                        array('add' => 'turnitintooltwo',
+                              'course' => $this->course->id,
+                              'section' => $section));
+            } else {
+                $link = new moodle_url('/blocks/ucla_easyupload/upload.php',
+                        array('course_id' => $this->course->id,
+                              'type' => $jit_type,
+                              'section' => $section));
+            }
             $ret_val .= html_writer::link($link, $jit_string, array('class' => ''));
         }
 

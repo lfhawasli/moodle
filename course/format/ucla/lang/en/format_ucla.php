@@ -66,6 +66,7 @@ $string['file'] = 'Upload file';
 $string['link'] = 'Add link';
 $string['text'] = 'Add text';
 $string['subheading'] = 'Add subheading';
+$string['turnitin'] = 'Add Turnitin Assignment';
 
 // CCLE-5098 - Download course content configurable
 $string['coursedownload'] = 'Download course materials';

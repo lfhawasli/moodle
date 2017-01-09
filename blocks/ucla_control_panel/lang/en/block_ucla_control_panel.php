@@ -34,13 +34,17 @@ $string['email_students_hidden_pre'] = 'Email students is disabled when the Anno
 $string['email_students_hidden'] = 'Make Announcements forum visible';
 
 $string['invitation'] = 'Invite users';
-$string['invitation_post'] = 'Invite a user into your site by email.';
+$string['invitation_post'] = '(Invite a user into your site by email)';
 
 $string['modify_sections'] = 'Modify course menu sections';
 $string['modify_sections_post'] = '';
 
 $string['turn_editing_on'] = 'Delete or update materials';
 $string['turn_editing_on_post'] = '(or duplicate, hide, make public)';
+
+$string['turnitin'] = 'Add a Turnitin Assignment to Site info';
+$string['turnitin_post'] = '(' . '<a href = "https://docs.ccle.ucla.edu/w/Turnitin_Assignment_v2" target = "_blank">'
+    . 'Learn how to create a Turnitin Assignment</a>' . ')';
 
 /** Stuff from myucla functions **/
 $string['ucla_cp_mod_myucla'] = 'MyUCLA functions';
