@@ -49,6 +49,14 @@ $modules[] = new ucla_cp_module('turn_editing_on', new moodle_url(
                         array('id' => $course->id, 'edit' => 'on', 'sesskey' => sesskey())),
                 $temptag, $tempcap, $spec_ops);
 
+
+// Turnitin V2 Assignment (Instructor).
+$modules[] = new ucla_cp_module('turnitin', new moodle_url(
+                        $CFG->wwwroot . '/course/modedit.php', array('add' => 'turnitintooltwo', 'course' => $course->id,
+                            'section' => 0)),
+                $temptag, 'mod/turnitintooltwo:addinstance');
+
+
 /******************************** MyUCLA Functions *********************/
 
 $course_info = ucla_get_course_info($course->id);
