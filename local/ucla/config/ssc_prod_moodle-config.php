@@ -274,6 +274,7 @@ $CFG->turnitin_tutoremail = 0;
 // Site administration > Plugins > Activity modules > Turnitin Assignment 2
 $CFG->forced_plugin_settings['turnitintooltwo']['useerater'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['useanon'] = 1;
+$CFG->forced_plugin_settings['turnitintooltwo']['inboxlayout'] = 1;
 
 // Site administration > Plugins > Activity modules > URL
 $CFG->forced_plugin_settings['url']['requiremodintro'] = 0;
