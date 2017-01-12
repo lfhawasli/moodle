@@ -30,8 +30,7 @@ if ($search) {
 
 // Limit the amount of results we can get
 $limit = $limit > SEARCH_MAX_LIMIT ? SEARCH_MAX_LIMIT : $limit;
-
-$courses = get_courses_search($searchterms, 'fullname ASC', 0, $limit + 1, $totalcount, 
+$courses = get_courses_search($searchterms, 'fullname ASC', 0, $limit + 1, $totalcount, array(),
         array('collab' => $collab_param, 'course' => $course_param, 'bytitle' => $title_param, 'bydescription' => $desc_param));
 
 $totalcount = count($courses);
