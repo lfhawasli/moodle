@@ -91,23 +91,19 @@ class convert_submissions extends scheduled_task {
             }
 
             mtrace('Convert ' . count($users) . ' submission attempt(s) for assignment ' . $assignmentid);
-            // START UCLA MOD: CCLE-6413 - Submissions with non-enrolled students breaks editpdf cron
-            $coursecontext = $context->get_course_context();
-            // END UCLA MOD: CCLE-6413
             foreach ($users as $userid) {
-                // START UCLA MOD: CCLE-6413 - Submissions with non-enrolled students breaks editpdf cron
-                if (!is_enrolled($coursecontext, $userid)) {
-                    continue;
+                try {
+                    document_services::get_page_images_for_attempt($assignment,
+                                                                   $userid,
+                                                                   $attemptnumber,
+                                                                   true);
+                    document_services::get_page_images_for_attempt($assignment,
+                                                                   $userid,
+                                                                   $attemptnumber,
+                                                                   false);
+                } catch (\moodle_exception $e) {
+                    mtrace('Conversion failed with error:' . $e->errorcode);
                 }
-                // END UCLA MOD: CCLE-6413
-                document_services::get_page_images_for_attempt($assignment,
-                                                               $userid,
-                                                               $attemptnumber,
-                                                               true);
-                document_services::get_page_images_for_attempt($assignment,
-                                                               $userid,
-                                                               $attemptnumber,
-                                                               false);
             }
 
             $DB->delete_records('assignfeedback_editpdf_queue', array('id' => $record->id));
