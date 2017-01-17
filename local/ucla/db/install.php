@@ -35,10 +35,7 @@ function xmldb_local_ucla_install() {
     $license->version = '2012060400';
     license_manager::add($license);
     license_manager::enable($license->shortname);
-    $default = get_config('', 'sitedefaultlicense');
-    if (empty($default)) {
-        set_config('sitedefaultlicense', 'tbd');
-    }
+    set_config('sitedefaultlicense', 'tbd');
 
     // Disable existing licenses.
     license_manager::disable('allrightsreserved');
