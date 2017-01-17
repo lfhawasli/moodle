@@ -270,6 +270,11 @@ $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
 $CFG->turnitin_studentemail = 0;
 $CFG->turnitin_tutoremail = 0;
 
+// Site administration > Plugins > Activity modules > Turnitin Assignment 2
+$CFG->forced_plugin_settings['turnitintooltwo']['useerater'] = 1;
+$CFG->forced_plugin_settings['turnitintooltwo']['useanon'] = 1;
+$CFG->forced_plugin_settings['turnitintooltwo']['inboxlayout'] = 1;
+
 // Site administration > Plugins > Activity modules > URL
 $CFG->forced_plugin_settings['url']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['url']['displayoptions'] = '0,1,2,3,4,5,6';    // allow every option
