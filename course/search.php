@@ -129,7 +129,7 @@ if (file_exists($ucla_search) && empty($modulelist)) {
     // Load and display the advanced search bar.
     require_once($ucla_search);
     $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
-                        array(array('name' => 'frontpage-search')));
+                        array(array('name' => 'course-search')));
                        
     echo block_ucla_search::search_form('course-search', $searchcriteria + $searchtype);
 
