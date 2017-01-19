@@ -11,8 +11,6 @@ require_once($CFG->dirroot . '/blocks/ucla_search/block_ucla_search.php');
 $type = required_param('type', PARAM_TEXT);
 $term = optional_param('term', $CFG->currentterm, PARAM_TEXT);
 
-$cache = cache::make('block_ucla_browseby', 'browsebycache');
-
 $argvls = array('term' => $term, 'type' => $type);
 
 $handler_factory = new browseby_handler_factory();
@@ -39,29 +37,8 @@ $PAGE->set_course($SITE);
 $PAGE->set_pagetype('site-index');
 $PAGE->set_pagelayout('coursecategory');
 
-// Check cache for title and contents.
-$cachekey = str_replace(' ', '_', implode('_', $argvls));
-$title = $cache->get('title_' . $cachekey);
-$innercontents = $cache->get('contents_' . $cachekey);
-
-// If not in cache, then query DB.
-if (!$title || !$innercontents) {
-    // This function will alter the $PAGE->navbar object.
-    list($title, $innercontents) = $handler->run_handler($argvls);
-    $data = array(
-        'title_' . $cachekey => $title,
-        'contents_' . $cachekey => $innercontents
-    );
-    // Cache the title and returned contents.
-    $cache->set_many($data);
-} else {
-    // If contents have been cached, manually load the autosubmit module for the term selector.
-    $selectid = preg_replace('/.*select id=\"(url_select\w*).*/','$1', $innercontents);
-    $PAGE->requires->yui_module('moodle-core-formautosubmit',
-        'M.core.init_formautosubmit',
-        array(array('selectid' => $selectid, 'nothing' => ''))
-    );
-}
+// This function will alter the $PAGE->navbar object
+list($title, $innercontents) = $handler->run_handler($argvls);
 if (!$title) {
     print_error('illegaltype', 'block_ucla_browseby', '', $type);
 }

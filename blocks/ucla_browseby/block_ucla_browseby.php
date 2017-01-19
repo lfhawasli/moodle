@@ -247,9 +247,6 @@ class block_ucla_browseby extends block_navigation {
             echo "done.\n";
         }
 
-        // Purge the browse by cache.
-        $cache = cache::make('block_ucla_browseby', 'browsebycache');
-        $cache->purge();
 
         echo "Finished sync.\n";
             

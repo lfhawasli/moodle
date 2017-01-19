@@ -1,6 +1,5 @@
 <?php
 
-$string['cachedef_browsebycache'] = 'Cache for Browse by results';
 $string['pluginname'] = 'UCLA browse-by';
 $string['displayname'] = 'Browse by';
 $string['ucla_browseby:addinstance'] = 'Add Browseby block';
