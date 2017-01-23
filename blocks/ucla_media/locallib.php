@@ -127,24 +127,25 @@ function cmp_title($a, $b) {
  * Check if a given ip is in the UCLA network.
  * 
  * From https://gist.github.com/tott/7684443
- * 
+ * @param a ip in the form of "x.x.x.x" where x can be numbers between 0 to 255
  * @return boolean true if the ip is a ucla campus ip
  */
-function is_on_campus_ip() {
-    $ip = $_SERVER['REMOTE_ADDR'];
-    // List of acceptable ip addresses obtained from https://kb.ucla.edu/articles/list-of-uc-related-ip-addresses. This specifies ip ranges belonging to UCLA.
-    $acceptableips = array('128.97.0.0/16', '131.179.0.0/16', '149.142.0.0/16', '164.67.0.0/16', '169.232.0.0/16', '172.16.0.0/12', '192.35.210.0/24', '192.35.225.0/24', '192.154.2.0/24');
+function is_on_campus_ip($ip) {
+    // List of acceptable ip addresses obtained from https://kb.ucla.edu/articles/list-of-uc-related-ip-addresses. 
+    // This specifies ip ranges belonging to UCLA.
+    $acceptableips = array('128.97.0.0/16', '131.179.0.0/16', '149.142.0.0/16', '164.67.0.0/16', '169.232.0.0/16', 
+                            '172.16.0.0/12', '192.35.210.0/24', '192.35.225.0/24', '192.154.2.0/24');
     foreach ($acceptableips as $range) {
-	if (strpos($range, '/') == false) {
+        if (strpos($range, '/') == false) {
             $range .= '/32';
-	}
+        }
 	// $range is in IP/CIDR format eg 127.0.0.1/24.
-	list($range, $netmask) = explode('/', $range, 2);
-	$rangedecimal = ip2long($range);
-	$ipdecimal = ip2long($ip);
-	$wildcarddecimal = pow(2, (32 - $netmask)) - 1;
-	$netmaskdecimal = ~ $wildcarddecimal;
-	$inrange = (($ipdecimal & $netmaskdecimal) == ($rangedecimal & $netmaskecimal));
+        list($range, $netmask) = explode('/', $range, 2);
+        $rangedecimal = ip2long($range);
+        $ipdecimal = ip2long($ip);
+        $wildcarddecimal = pow(2, (32 - $netmask)) - 1;
+        $netmaskdecimal = ~ $wildcarddecimal;
+        $inrange = (($ipdecimal & $netmaskdecimal) == ($rangedecimal & $netmaskdecimal));
         if ($inrange == true) {
             return true;
         }
@@ -172,7 +173,8 @@ function display_video_reserves($course) {
 
     echo html_writer::tag('p', get_string('intro', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));
-    if (is_on_campus_ip() === false) {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    if (is_on_campus_ip($ip) === false) {
         echo $OUTPUT->notification(get_string('videoreservesipwarning', 'block_ucla_media'));
     }
     echo html_writer::start_tag('div', array('id' => 'vidreserves-content'));
