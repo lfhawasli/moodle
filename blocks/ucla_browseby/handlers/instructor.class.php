@@ -51,7 +51,7 @@ class instructor_handler extends browseby_handler {
      **/
     function handle($args) {
         global $OUTPUT, $PAGE;
-
+        $cache = cache::make('block_ucla_browseby', 'browsebycache');
         $s = '';
 
         $params = array();
@@ -95,39 +95,48 @@ class instructor_handler extends browseby_handler {
             $t = get_string('instructorsall', 'block_ucla_browseby');
         }
 
-        ucla_require_db_helper();
+        // Check cache for title and contents.
+        $cachekey = str_replace(' ', '_', implode('_', $args));
+        $users = $cache->get('users_' . $cachekey);
 
-        // Show all users form local and browseall tables
-        // CCLE-3989 - Supervising Instructor Shown On Course List:
-        // Filter out instructors of type '03' (supervising instructor)
-        // in WHERE clause.
-        $sql = "
-            SELECT
-                CONCAT(
-                    ubi.userid, '-', ubi.term, '-', ubi.srs
-                ) AS rsid,
-                ubi.userid,
-                ubi.term,
-                ubi.srs,
-                ubi.firstname,
-                ubi.lastname,
-                ubi.alternatename,
-                ubi.firstnamephonetic,
-                ubi.lastnamephonetic,
-                ubi.middlename,
-                ubci.catlg_no AS course_code,
-                ubci.activitytype,
-                ubci.subjarea
-            FROM " . self::combined_select_sql_helper() . " ubi
-            JOIN {ucla_browseall_classinfo} ubci 
-                USING (term, srs)
-            $termwhere
-            AND ubi.profcode != '03'
+        if (!$users) {
+            ucla_require_db_helper();
+
+            // Show all users form local and browseall tables
+            // CCLE-3989 - Supervising Instructor Shown On Course List:
+            // Filter out instructors of type '03' (supervising instructor)
+            // in WHERE clause.
+            $sql = "
+                SELECT
+                    CONCAT(
+                        ubi.userid, '-', ubi.term, '-', ubi.srs
+                    ) AS rsid,
+                    ubi.userid,
+                    ubi.term,
+                    ubi.srs,
+                    ubi.firstname,
+                    ubi.lastname,
+                    ubi.alternatename,
+                    ubi.firstnamephonetic,
+                    ubi.lastnamephonetic,
+                    ubi.middlename,
+                    ubci.catlg_no AS course_code,
+                    ubci.activitytype,
+                    ubci.subjarea
+                FROM " . self::combined_select_sql_helper() . " ubi
+                JOIN {ucla_browseall_classinfo} ubci 
+                    USING (term, srs)
+                $termwhere
+                AND ubi.profcode != '03'
+
+                ORDER BY ubi.lastname, ubi.firstname
+            ";
+
+            $users = $this->get_records_sql($sql, $params);
             
-            ORDER BY ubi.lastname, ubi.firstname
-        ";
-
-        $users = $this->get_records_sql($sql, $params);
+            // Cache instructors
+            $cache->set('users_' . $cachekey, $users);
+        }
 
         // Decide which users to have the ability to display in the 
         // chart
