@@ -13,7 +13,6 @@ require_once($CFG->dirroot . $thispath . '/block_ucla_rearrange.php');
 require_once($CFG->dirroot . $thispath . '/rearrange_form.php');
 
 require_once($CFG->dirroot . '/local/ucla/lib.php');
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_course_section_fixer.php');
 
 global $CFG, $PAGE, $OUTPUT;
 
