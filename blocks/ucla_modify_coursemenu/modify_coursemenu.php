@@ -26,7 +26,6 @@ require_once($CFG->dirroot . $thispath . '/modify_coursemenu_form.php');
 require_once($CFG->dirroot . $thispath . '/verify_modification_form.php');
 
 require_once($CFG->dirroot . '/local/ucla/lib.php');
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_course_section_fixer.php');
 
 global $CFG, $PAGE, $OUTPUT;
 
