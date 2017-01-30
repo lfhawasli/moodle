@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/ucla/eventslib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/local/ucla/tests/generator/lib.php');
 
@@ -76,7 +75,7 @@ class past_course_access_test extends advanced_testcase {
                     $enrolguestplugin->add_instance($course);
                     $count = $DB->count_records('enrol',
                             array('enrol' => 'guest', 'courseid' => $course->id));
-                    $this->assertEquals(2, intval($count));
+                    $this->assertGreaterThan(1, intval($count));
                     break;
                 // Site with TA site.
                 case 2:
@@ -88,10 +87,12 @@ class past_course_access_test extends advanced_testcase {
                     break;
                 // Site with no guest enrollment plugin.
                 case 3:
-                    $guestplugin = $DB->get_record('enrol',
+                    $guestplugins = $DB->get_records('enrol',
                             array('enrol' => 'guest',
                         'courseid' => $course->id));
-                    $enrolguestplugin->delete_instance($guestplugin);
+                    foreach ($guestplugins as $guestplugin) {
+                        $enrolguestplugin->delete_instance($guestplugin);                        
+                    }
                     break;
                 // Regular, default site.
                 default:
@@ -101,15 +102,20 @@ class past_course_access_test extends advanced_testcase {
 
         // Verify that guest enrollment plugins are active.
         $firstentry = true;
-        foreach ($summercourseids as $courseid) {
+        foreach ($summercourseids as $index => $courseid) {
             $guestplugins = $DB->get_records('enrol',
                     array('enrol' => 'guest',
                 'courseid' => $courseid));
             if (!empty($guestplugins)) {
+                // Check that at least one plugin is enabled.
+                $enabled = ENROL_INSTANCE_DISABLED;
                 foreach ($guestplugins as $guestplugin) {
-                    $this->assertEquals($guestplugin->status,
-                            ENROL_INSTANCE_ENABLED);
+                    if ($guestplugin->status == ENROL_INSTANCE_ENABLED) {
+                        $enabled = ENROL_INSTANCE_ENABLED;
+                        break;
+                    }
                 }
+                $this->assertEquals(ENROL_INSTANCE_ENABLED, $enabled);                
             }
         }
 
@@ -132,11 +138,21 @@ class past_course_access_test extends advanced_testcase {
         // Make sure that other terms were not affected.
         $fallcourses = ucla_get_courses_by_terms(array('13F'));
         foreach ($fallcourses as $courseid => $courseinfo) {
-            $guestplugin = $DB->get_record('enrol',
+            $guestplugins = $DB->get_records('enrol',
                     array('enrol' => 'guest',
                 'courseid' => $courseid));
-            $this->assertTrue(!empty($guestplugin));
-            $this->assertEquals($guestplugin->status, ENROL_INSTANCE_ENABLED);
+            foreach ($guestplugins as $guestplugin) {
+                $this->assertTrue(!empty($guestplugin));
+                // Check that at least one plugin is enabled.
+                $enabled = ENROL_INSTANCE_DISABLED;
+                foreach ($guestplugins as $guestplugin) {
+                    if ($guestplugin->status == ENROL_INSTANCE_ENABLED) {
+                        $enabled = ENROL_INSTANCE_ENABLED;
+                        break;
+                    }
+                }
+                $this->assertEquals(ENROL_INSTANCE_ENABLED, $enabled);                     
+            }
         }
     }
 
@@ -156,7 +172,9 @@ class past_course_access_test extends advanced_testcase {
         // Call method to auto hide courses for every week possible.
         $weeks = range(0, 11);
         foreach ($weeks as $week) {
-            hide_past_courses($week);
+            $event = block_ucla_weeksdisplay\event\week_changed::create(
+                    array('other' => array('week' => $week)));
+            $event->trigger();
             $this->assertDebuggingNotCalled();
         }
 
@@ -190,7 +208,9 @@ class past_course_access_test extends advanced_testcase {
         $this->assertFalse($anyhidden);
 
         // Now try week 3 and make sure that Summer 2013 TA sites are hidden.
-        hide_past_courses(3);
+        $event = block_ucla_weeksdisplay\event\week_changed::create(
+                array ('other' => array('week' => 3)));
+        $event->trigger();
         $email = $this->getDebuggingMessages();
         $this->assertContains('Hid 3 TA sites', $email[0]->message);
         $this->assertDebuggingCalled();
@@ -231,7 +251,9 @@ class past_course_access_test extends advanced_testcase {
         // Make sure that week 0, 1, 2.
         $weeks = array(0, 1, 2);
         foreach ($weeks as $week) {
-            hide_past_courses($week);
+            $event = block_ucla_weeksdisplay\event\week_changed::create(
+                    array ('other' => array('week' => $week)));
+            $event->trigger();
             $this->assertDebuggingNotCalled();
         }
 
@@ -240,7 +262,9 @@ class past_course_access_test extends advanced_testcase {
         $this->assertFalse($anyhidden);
 
         // Now try week 3 and make sure that only Summer 2013 courses are hidden.
-        hide_past_courses(3);
+        $event = block_ucla_weeksdisplay\event\week_changed::create(
+                array('other' => array('week' => 3)));
+        $event->trigger();
         $email = $this->getDebuggingMessages();
         $this->assertContains('Hiding courses for 131', $email[0]->message);
         $this->assertContains('Hid 3 courses', $email[0]->message);
@@ -269,7 +293,9 @@ class past_course_access_test extends advanced_testcase {
                 array(end($summercourses), key($summercourses));
         $DB->set_field('course', 'visible', 1, array('id' => $courseid));
 
-        hide_past_courses(4);
+        $event = block_ucla_weeksdisplay\event\week_changed::create(
+                array('other' => array('week' => 4)));
+        $event->trigger();
         $this->assertDebuggingNotCalled();
         $ishidden = $DB->record_exists('course',
                 array('id' => $courseid, 'visible' => 0));
@@ -299,8 +325,8 @@ class past_course_access_test extends advanced_testcase {
                     ->create_class(array('term' => $term));
         }
 
-        // Function hide_past_courses will attempt to send email, but will
-        // output debugging messages instead. We will use
+        // Function local_ucla_observer::hide_past_courses will attempt to send 
+        // email, but will output debugging messages instead. We will use
         // assertDebuggingCalled() and getDebuggingMessages() to verify
         // email message.
         unset_config('noemailever');
