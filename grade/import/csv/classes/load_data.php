@@ -296,7 +296,11 @@ class gradeimport_csv_load_data {
         $newgrade->itemid = $gradeitem->id;
         if ($gradeitem->gradetype == GRADE_TYPE_SCALE and $verbosescales) {
             if ($value === '' or $value == '-') {
-                $value = null; // No grade.
+                // START UCLA MOD: CCLE-6451 - Prevent grade import from overriding grade with blank.
+                // Do nothing when the value is a blank or dash.
+                // $value = null; // No grade.
+                return $this->newgrades;
+                // END UCLA MOD: CCLE-6451.
             } else {
                 $scale = $gradeitem->load_scale();
                 $scales = explode(',', $scale->scale);
@@ -312,7 +316,11 @@ class gradeimport_csv_load_data {
             $newgrade->finalgrade = $value;
         } else {
             if ($value === '' or $value == '-') {
-                $value = null; // No grade.
+                // START UCLA MOD: CCLE-6451 - Prevent grade import from overriding grade with blank.
+                // Do nothing when the value is a blank or dash.
+                // $value = null; // No grade.
+                return $this->newgrades;
+                // END UCLA MOD: CCLE-6451.
             } else {
                 // If the value has a local decimal or can correctly be unformatted, do it.
                 $validvalue = unformat_float($value, true);
