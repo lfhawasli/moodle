@@ -52,7 +52,7 @@ $string['exportroles'] = 'Export';
 $string['countnewusers'] = 'Most recently created users';
 $string['pushgrades'] = 'Manually push grades to MyUCLA';
 $string['noenrollments'] = 'There are no enrollments';
-$string['usersdescription'] ='Users with role: {$a->role}, Context: {$a->contextlevel} and Component: {$a->component}';
+$string['usersdescription'] ='Users with role: {$a->role}, Context: {$a->contextlevel}, Component: {$a->component}, and Type: {$a->type}';
 $string['listdupusers'] = "Users with multiple ccle accounts";
 // The SRDB
 $string['enrollview'] = 'Enrollment history per UID (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3318">enroll2</a>)';

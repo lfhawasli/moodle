@@ -1859,7 +1859,7 @@ if ($displayforms) {
             LEFT JOIN   {ucla_siteindicator} si ON 
                         (c.instanceid=si.courseid AND
                          c.contextlevel=50)
-            GROUP BY contextlevel, ra.component, r.id
+            GROUP BY contextlevel, ra.component, r.id, si.type
             ORDER BY c.contextlevel ASC, r.sortorder ASC";
     $results = $DB->get_records_sql($sql);
     
@@ -1887,6 +1887,11 @@ if ($displayforms) {
                     'type' => 'hidden',
                     'name' => 'component',
                     'value' => $result->component,
+                ))
+                .html_writer::empty_tag('input', array(
+                    'type' => 'hidden',
+                    'name' => 'type',
+                    'value' => $result->type,
                 )), ($result->count==1) ? get_string('viewrole', 'tool_uclasupportconsole') :
             get_string('viewroles', 'tool_uclasupportconsole', $result->count));
         }
@@ -1954,6 +1959,7 @@ if ($consolecommand == "$title") {
     $componentparam = optional_param('component', null, PARAM_ALPHAEXT);
     $contextlevelparam = optional_param('contextlevel', null, PARAM_INT);
     $countparam = optional_param('count', null, PARAM_INT);
+    $typeparam = optional_param('type', null, PARAM_ALPHAEXT);
     $pageparam = optional_param('page', null, PARAM_INT);
 
     if (!isset($pageparam)) {
@@ -1999,19 +2005,23 @@ if ($consolecommand == "$title") {
                       JOIN    {context} c ON 
                                (c.id = ra.contextid AND
                                 c.contextlevel = :contextlevel_param) ";
-        
+        if ($typeparam && ($contextlevelparam == CONTEXT_COURSE)) {
+            $middlesql .= "JOIN {ucla_siteindicator} si ON
+                                   (c.instanceid = si.courseid AND
+                                    si.type = :type_param) ";
+        }
         if ($contextlevelparam == CONTEXT_COURSECAT) {
             $contexttablename = '{course_categories}';
             $contextnamecolumn = 'name';
             $contextname = "Category_Name";
-            $contexturl = "/course/category.php?id=";
+            $contexturl = "/course/index.php?categoryid=";
             $lookup = "cid";
         } else if ($contextlevelparam == CONTEXT_COURSE) {
             $contexttablename = '{course}';
             $contextnamecolumn = 'shortname';
             $contextname = "Course_Name";
-            $contexturl = "/course/view/";
-            $lookup = "cname";
+            $contexturl = "/course/view.php?id=";
+            $lookup = "cid";
         }
         
         if ($contextlevelparam != CONTEXT_COURSE && $contextlevelparam != CONTEXT_COURSECAT) {
@@ -2033,7 +2043,7 @@ if ($consolecommand == "$title") {
                     ORDER BY name";
         }
         $params = array('role_param' => $roleparam, 'component_param'=>$componentparam,
-                        'contextlevel_param'=>$contextlevelparam);
+                        'contextlevel_param'=>$contextlevelparam, 'type_param'=>$typeparam);
         if (!empty($exportoption)) {
             // Do not limit Excel download results.
             $results = $DB->get_records_sql($sql, $params);
@@ -2070,12 +2080,16 @@ if ($consolecommand == "$title") {
         $componentparam = "manual";
     }
 
+    if ($typeparam == "") {
+        $typeparam = "N/A";
+    }
+
     $inputs = array('role' => $roleparam, 'contextlevel' => $contextlevelparam,
-                    'component' => $componentparam);
+                    'component' => $componentparam, 'type' => $typeparam);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $modifiedresults, $inputs,
             get_string('usersdescription', 'tool_uclasupportconsole', (object) $inputs));
     $pageurl = new moodle_url( $PAGE->url, array('role' => $roleparam, 'component' => $componentparam, 
-        'contextlevel' => $contextlevelparam, 'count' => $countparam, 'console' => $title));
+        'contextlevel' => $contextlevelparam, 'count' => $countparam, 'type' => $typeparam, 'console' => $title));
     
     $sectionhtml .= $OUTPUT->paging_bar($countparam, $pageparam, RESULTS_PER_PAGE, $pageurl->out());
     

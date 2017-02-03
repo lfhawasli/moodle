@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2016030600;
+$plugin->version    = 2017020600;
 $plugin->requires   = 2011022100;
 $plugin->component  = 'tool_uclasupportconsole'; // Full name of the plugin (used for diagnostics).
 $plugin->cron       = 86400;                     // Period for cron to check plugin (24 hours - in seconds).
