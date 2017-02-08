@@ -356,7 +356,8 @@ function validate_field($type, $field, $minsize=0, $maxsize=100) {
  * video reserves.
  *
  * @param string $table The type of table you want to get information for.
- *                      Options: "bruincast", "library_reserves", "video_reserves"
+ *                      Options: "bruincast", "library_reserves", 
+ *                      "video_reserves", "library_music_reserves"
  *
  * @return array
  */
