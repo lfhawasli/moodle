@@ -297,7 +297,7 @@ function print_page_tabs($activetab, $courseid) {
                                 array('courseid' => $courseid)),
                                     get_string('vidreserves_tab', 'block_ucla_media', $count));
     }
-    $videos = $DB->get_records('ucla_library_music_reserves', array('courseid' => $courseid));
+    $videos = $DB->get_records_sql('SELECT DISTINCT albumtitle FROM {ucla_library_music_reserves} WHERE courseid=?', array($courseid));
     $count = count($videos);
     if ($count != 0) {
        $tabs[] = new tabobject(get_string('headerlibres', 'block_ucla_media'),

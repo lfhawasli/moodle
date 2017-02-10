@@ -545,6 +545,23 @@ if ($displayforms) {
 $consoles->push_console_html('logs', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
+$title = "moodledigitalmediareserveslist";
+$sectionhtml = '';
+
+if ($displayforms) {
+    $sectionhtml = supportconsole_simple_form($title);
+} else if ($consolecommand == "$title") {
+    $result = get_reserve_data('library_music_reserves');
+    
+    $sourcelocation = get_config('block_ucla_media', 'library_source_url');
+    $sourcelink = html_writer::link($sourcelocation, $sourcelocation, array('target' => '_blank'));
+    $sourcefile = get_string('sourcefile', 'tool_uclasupportconsole', $sourcelink);    
+    
+    $sectionhtml = supportconsole_render_section_shortcut($title, $result, array(), $sourcefile);
+}
+$consoles->push_console_html('logs', $title, $sectionhtml);
+
+////////////////////////////////////////////////////////////////////
 // Date selector for both Syllabus overview and Syllabus report
 $syllabusdateselector = html_writer::label('Start date ("MM/DD/YYYY")', 'startdate') .
             html_writer::empty_tag('input', array(
