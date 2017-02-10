@@ -221,6 +221,9 @@ $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted
 $CFG->grade_aggregations_visible = '0,10,11,12,2,4,6,8,13'; // Enables all aggregation types.
 $CFG->grade_overridecat = 0;
 
+// Site administration > Grades > Report settings > Grader report
+$CFG->grade_report_showcalculations = 1;
+
 // CCLE-5445 - Default city and country
 // Site administration > Location > Location settings
 $CFG->defaultcity = 'Los Angeles';
