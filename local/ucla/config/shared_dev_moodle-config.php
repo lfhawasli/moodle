@@ -257,6 +257,7 @@ $CFG->grade_overridecat = 0;
 $CFG->grade_report_showeyecons = 0;
 $CFG->grade_report_showanalysisicon = 0;
 $CFG->grade_report_showuserimage = 0;
+$CFG->grade_report_showcalculations = 1;
 
 // CCLE-5445 - Default city and country
 // Site administration > Location > Location settings
@@ -412,6 +413,9 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
 $CFG->block_quickmail_addionalemail = 1;
+
+// Site administration > Plugins > Blocks > UCLA Media
+$CFG->forced_plugin_settings['block_ucla_media']['library_source_url'] = 'https://webservices-test.library.ucla.edu/music/v2/classes';
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';

@@ -339,8 +339,8 @@ function oidwowza_filter_mp4_lib_callback($link, $autostart = false) {
     if (!empty($rtmpurl)) {
         $rtmpurl = urldecode($rtmpurl);
     }
-    $height = 720;
-    $width = 640;
+    $height = 480;
+    $width = 720;
     
     $playerid = uniqid();
     if ($isvideo == 1) {

@@ -40,7 +40,7 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-        
+
         $url = get_config('block_ucla_media', 'library_source_url');
         $json = file_get_contents($url);
         $json = json_decode($json);
@@ -52,6 +52,7 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
         if (empty($courses)) {
             return false;
         }
+
         // Drop table if we are processing new entries.
         $DB->delete_records('ucla_library_music_reserves');
         foreach ($courses as $course) {
@@ -65,15 +66,27 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                 } else {
                     $entry->courseid = null;
                 }
-                $entry->title = $work->display;
-                $entry->httpurl = $work->httpURL;
-                $entry->rtmpurl = $work->rtmpURL;
+                $entry->albumtitle = $work->title;
                 if ($work->isVideo) {
                     $entry->isvideo = 1;
                 } else {
                     $entry->isvideo = 0;
                 }
-                $DB->insert_record('ucla_library_music_reserves', $entry);
+                $entry->composer = $work->composer;
+                $entry->performers = $work->performers;
+                $entry->metadata = "Note1:" + $work->noteOne + " Note2:" + $work->noteTwo;                
+                foreach ($work->items as $item) {                    
+                    if (!empty($item->trackTitle) || $item->trackTitle == 'N/A') {
+                        // If track doesn't have title, just use work title.
+                        $entry->title = $work->title;
+
+                    } else {
+                        $entry->title = $item->trackTitle;
+                    }                                   
+                    $entry->httpurl = $item->httpURL;
+                    $entry->rtmpurl =  $item->rtmpURL;
+                    $DB->insert_record('ucla_library_music_reserves', $entry);
+                }
             }
         }
         return true;

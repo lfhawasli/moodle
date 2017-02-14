@@ -1,4 +1,4 @@
-<?php
+ <?php
 // This file is part of the UCLA Media block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -41,13 +41,6 @@ if ($mode == MEDIA_BCAST) {
     if (($video->filename == null) && !empty($video->video_url)) {
         redirect($video->video_url);
     }
-    if (empty($video)) {
-        print_error('errorinvalidvideo', 'block_ucla_media');
-    } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
-        print_error('coursemisconf');
-    }
-} else if ($mode == MEDIA_LIBRARYMUSIC) {
-    $video = $DB->get_record('ucla_library_music_reserves', array('id' => $videoid));
     if (empty($video)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
     } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
@@ -125,31 +118,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                 'type' => get_string('headervidres', 'block_ucla_media')
             )));
         $event->trigger();
-    } elseif ($mode == MEDIA_LIBRARYMUSIC) {
-        echo $OUTPUT->heading($video->title, 2, 'headingblock');
-        // Try to embed video on page by calling filter.
-        $filtertext = sprintf('{lib:jw,"%s",%s,%s,%s}',
-                addslashes($video->title), urlencode($video->httpurl),
-                urlencode($video->rtmpurl), $video->isvideo);
-        $filter = new filter_oidwowza($context, array());
-        $html = $filter->filter($filtertext);
-        echo $html;
-        echo html_writer::empty_tag('br');
-        echo $OUTPUT->container(html_writer::link(
-                new moodle_url('/blocks/ucla_media/libreserves.php',
-                    array('courseid' => $course->id)),
-                get_string('back', 'block_ucla_media')));
-        
-        // Log the video the user is viewing.
-        $event = \block_ucla_media\event\video_viewed::create(array(
-            'context' => $context,
-            'objectid' => $video->id,
-            'other' => array(
-                'name' => $video->title,
-                'type' => get_string('headerlibres', 'block_ucla_media')
-            )));
-        $event->trigger();
-    }
+    } 
 } else {
     echo get_string('guestsarenotallowed', 'error');
 }

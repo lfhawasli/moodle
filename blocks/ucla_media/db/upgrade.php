@@ -103,5 +103,21 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         }
         upgrade_block_savepoint(true, 2016091200, 'ucla_media');
     }
+    
+    if ($oldversion < 2016110800) {
+        $table = new xmldb_table('ucla_library_music_reserves');
+        
+        $addfields[] = new xmldb_field('metadata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $addfields[] = new xmldb_field('performers', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $addfields[] = new xmldb_field('albumtitle', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $addfields[] = new xmldb_field('composer', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        
+        foreach ($addfields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_block_savepoint(true, 2016110800, 'ucla_media');
+    }
     return true;
 }

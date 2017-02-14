@@ -241,6 +241,9 @@ $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted
 $CFG->grade_aggregations_visible = '0,10,11,12,2,4,6,8,13'; // Enables all aggregation types.
 $CFG->grade_overridecat = 0;
 
+// Site administration > Grades > Report settings > Grader report
+$CFG->grade_report_showcalculations = 1;
+
 // CCLE-5445 - Default city and country
 // Site administration > Location > Location settings
 $CFG->defaultcity = 'Los Angeles';
@@ -394,8 +397,8 @@ $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
 $CFG->block_quickmail_addionalemail = 1;
 
-// Site administration > Plugins > Blocks > UCLA media
-$CFG->forced_plugin_settings['block_ucla_media']['library_source_url'] = 'https://webservices.library.ucla.edu/music/classes';
+// Site administration > Plugins > Blocks > UCLA Media
+$CFG->forced_plugin_settings['block_ucla_media']['library_source_url'] = 'https://webservices-test.library.ucla.edu/music/v2/classes';
 
 // Site administration > Plugins > Licences > Manage licences
 $CFG->sitedefaultlicense = 'tbd';

@@ -481,6 +481,12 @@ if ($passthrudata || $verifydata) {
                     $updatedrecords[] = $newid;
                 }
             } else {
+                // Set section content visibility ONLY if section has content
+                // and its visibility was updated.
+                if (!empty($section->sequence) && ($originalsections[$section->id]->visible != $section->visible)) {
+                    set_section_visible($courseid, -$section->section, $section->visible);
+                }
+                // Update section number
                 $DB->update_record('course_sections', $section);
                 $updatedrecords[] = $section->id;
             }
@@ -494,12 +500,6 @@ if ($passthrudata || $verifydata) {
             // Fix section #
             $s->section = -$s->section;
             $DB->update_record('course_sections', $s);
-
-            // Set section content visibility ONLY if section has content
-            // and its visibility was updated.
-            if (!empty($s->sequence) && $originalsections[$s->id]->visible != $s->visible) {
-                set_section_visible($courseid, $s->section, $s->visible);
-            }
         }
 
     } catch (Exception $e) {
