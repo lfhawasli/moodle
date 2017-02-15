@@ -59,8 +59,9 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
         $format = course_get_format($this->course);
         $modinfo = new course_modinfo($this->course, $this->userid);
         $resourcemods = $modinfo->get_instances_of('resource');
+        $folders = $modinfo->get_instances_of('folder');
 
-        if (empty($resourcemods)) {
+        if (empty($resourcemods) && empty($folders)) {
             return $this->content;
         }
 
@@ -100,6 +101,34 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
             }
         }
 
+        foreach ($folders as $folder) {
+            // Do not include hidden or inaccessible folders.
+            if (!$folder->uservisible) {
+                continue;
+            }
+
+            if (!array_key_exists($folder->section, $sectionnames)) {
+                $section = $DB->get_record('course_sections',
+                        array('id' => $folder->section));
+                $sectionnames[$folder->section] = $format->get_section_name($section->section);
+            }
+
+            $context = context_module::instance($folder->id);
+            $fsfiles = $fs->get_area_files($context->id, 'mod_folder',
+                    'content', 0, 'sortorder DESC, id ASC', false);
+
+            // Iterate through folder and add all files in subfolders.
+            foreach ($fsfiles as $file) {
+                if ($file->get_filesize() <= $maxsize) {
+                    // Saving contenthash, because it will be used in checking
+                    // if the contents of the zip changed.
+                    $file->contenthash = $file->get_contenthash();
+                    $index = $sectionnames[$folder->section].'/'.$folder->name.$file->get_filepath().$file->get_filename();
+                    $this->content[$index] = $file;
+                }
+            }
+        }
+
         return $this->content;
     }
     
@@ -116,7 +145,8 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
         // Get files (resources)
         $modinfo = get_fast_modinfo($this->course);
         $resources = $modinfo->get_instances_of('resource');
-        
+        $folders = $modinfo->get_instances_of('folder');
+
         // Need file storage to get file size.
         $fs = get_file_storage();
                 
@@ -124,6 +154,7 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
         foreach ($sections as $section) {
 
             $files = array();
+            $folderfiles = array();
 
             // Get files for section
             foreach ($resources as $resource) {
@@ -148,10 +179,32 @@ class block_ucla_course_download_files extends block_ucla_course_download_base {
                 }
             }
 
+            // Get folders for section.
+            foreach ($folders as $folder) {
+                // Report filesize.
+                $filesize = 0;
+
+                $context = context_module::instance($folder->id);
+                $fsfiles = $fs->get_area_files($context->id, 'mod_folder',
+                        'content', 0, 'sortorder DESC, id ASC', false);
+                foreach ($fsfiles as $file) {
+                    $filesize = $file->get_filesize();
+
+                    // Save file info when file belongs to section.
+                    if ($section->id == $folder->section) {
+                        $folderfiles[] = array(
+                            'name' => $folder->name.$file->get_filepath().$file->get_filename(),
+                            'visible' => $folder->visible,
+                            'size' => $filesize,
+                        );
+                    }
+                }
+            }
             $out[$section->id] = array(
                 'name' => $section->name,
                 'visible' => $section->visible,
                 'files' => $files,
+                'folders' => $folderfiles
             );
             
         }

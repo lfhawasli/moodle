@@ -220,9 +220,10 @@ END;
 
             // List of files in section.
             $files = $section['files'];
+            $folders = $section['folders'];
 
             // Only print sections with content.
-            if (empty($files)) {
+            if (empty($files) && empty($folders)) {
                 continue;
             }
 
@@ -246,6 +247,19 @@ END;
                                 'filesize');
 
                 $buffer .= html_writer::tag('li', $icon . $file['name'] . $size,
+                                array('class' => $classes));
+            }
+            foreach ($folders as $folderfile) {
+
+                // File will be excluded when it's hidden, or larger than allowed max size.
+                $visible = empty($folderfile['visible']) || $folderfile['size'] > $maxsize;
+                $classes = $visible ? 'omitted' : '';
+                $glyph = $visible ? 'glyphicon glyphicon-remove' : 'glyphicon glyphicon-ok';
+                $icon = html_writer::span('', $glyph);
+                $size = html_writer::span(display_size($folderfile['size']),
+                                'filesize');
+
+                $buffer .= html_writer::tag('li', $icon . $folderfile['name'] . $size,
                                 array('class' => $classes));
             }
             $buffer .= html_writer::end_tag('ul');
