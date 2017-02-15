@@ -154,7 +154,7 @@ class block_ucla_course_menu extends block_navigation {
      **/
     function create_section_elements() {
         global $CFG;
-        $course_id = $this->page->course->id;
+        $courseid = $this->page->course->id;
 
         // Create section links
         $modinfo = get_fast_modinfo($this->page->course);
@@ -165,22 +165,20 @@ class block_ucla_course_menu extends block_navigation {
 
         // for "Show all"
         $showallurlparams = array(
-            'id' => $course_id,
+            'id' => $courseid,
             'show_all' => 1
         );              
 
-        // Special case for meta-sites
-        $enrols = enrol_get_instances($course_id, true);
-        foreach ($enrols as $enrol) {
-            if ($enrol->enrol == 'meta') {
-                $elements['parent-course'] = navigation_node::create(
-                    get_string('parentcourse', 'block_ucla_course_menu'),
-                    new moodle_url('/course/view.php', array(
-                            'id' => $enrol->customint1
-                        )),
-                    navigation_node::TYPE_SECTION
-                );
-            }
+        // Special case for TA sites.
+        $tasiteenrol = block_ucla_tasites::get_tasite_enrol_meta_instance($courseid);
+        if (!empty($tasiteenrol)) {
+            $elements['parent-course'] = navigation_node::create(
+                get_string('parentcourse', 'block_ucla_course_menu'),
+                new moodle_url('/course/view.php', array(
+                        'id' => $tasiteenrol->customint1
+                    )),
+                navigation_node::TYPE_SECTION
+            );            
         }
 
         // add node for syllabus (if needed)
@@ -212,7 +210,7 @@ class block_ucla_course_menu extends block_navigation {
                         '/local/ucla_syllabus/') === false) {
                     navigation_node::override_active_url(
                         new moodle_url('/course/view.php', 
-                                array('id' => $course_id, 'section' => $this->displaysection))
+                                array('id' => $courseid, 'section' => $this->displaysection))
                     );   
                 }
             }
@@ -252,7 +250,7 @@ class block_ucla_course_menu extends block_navigation {
             $key = 'section-' . $sectnum;
             $elements[$key] = navigation_node::create($sectionname,
                 new moodle_url('/course/view.php', array(
-                    'id' => $course_id,
+                    'id' => $courseid,
                     'section' => $sectnum
                 )), navigation_node::TYPE_SECTION
             );
