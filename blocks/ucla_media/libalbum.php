@@ -43,7 +43,8 @@ echo $OUTPUT->header();
 
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
-    $videos = $DB->get_records('ucla_library_music_reserves', array('courseid' => $courseid));
+    $videos = $DB->get_records_select('ucla_library_music_reserves',
+            "courseid = ? GROUP BY title", array($courseid));
     $count = count($videos);
     if ($count != 0) {
         print_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
@@ -81,7 +82,9 @@ function display_page_album($course,$title) {
     echo html_writer::tag('p', get_string('intromusic', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));
     echo "<br>";
-    $videos = $DB->get_records_sql('SELECT * FROM {ucla_library_music_reserves} WHERE courseid=? AND albumtitle=?', array($courseid,$title));
+    $videos = $DB->get_records_select('ucla_library_music_reserves', 
+            'courseid=? AND albumtitle=? GROUP BY title', 
+            array($courseid, $title));
     
     $samplevideo = reset($videos);
     if ($samplevideo->composer != NULL) {
