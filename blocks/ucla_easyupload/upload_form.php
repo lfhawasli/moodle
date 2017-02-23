@@ -112,6 +112,8 @@ abstract class easy_upload_form extends moodleform {
 
             $mform->addElement('editor', 'introeditor', get_string('description'), array('rows' => 3), array('maxfiles' => EDITOR_UNLIMITED_FILES,
             'noclean' => true, 'context' => $this->context, 'collapsed' => true));
+            $mform->addElement('checkbox', 'showdescription', get_string('showdescription'));
+            $mform->addHelpButton('showdescription', 'showdescription');
         }
 
         if (class_exists('PublicPrivate_Site') && $this->allow_publicprivate) {
@@ -216,7 +218,6 @@ abstract class easy_upload_form extends moodleform {
             \core_availability\frontend::include_all_javascript($course);
         }
         // END code from /course/moodleform_mod.php to display availability restrictions
-
         $this->add_action_buttons();
     }
 
