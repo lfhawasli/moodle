@@ -352,6 +352,39 @@ function validate_field($type, $field, $minsize=0, $maxsize=100) {
 }
 
 /**
+ * Comparison function for the terms and class titles.
+ *  
+ * @param object    $a Contains term and class or srs 
+ * @param object    $b Contains term and class or srs
+ * @return int      More recent term is larger. If terms match, then alphabetic
+ *                  order by class, if exists. Else order by srs, if exists.
+ */
+function term_title_cmp_fn($a, $b) {
+    // Library reserves calls term => quarter.
+    $termparam = 'term';
+    if (isset($a->quarter)) {
+        $termparam = 'quarter';
+    }    
+    // Variables $a and $b are switched such that the sort order is recent terms 
+    // first and older ones last.
+    $termcmp = term_cmp_fn($b->$termparam, $a->$termparam);
+    
+    if ($termcmp == 0) {        
+        $classparam = 'class';
+        if (isset($a->course_title)) {
+            // Library reserves calls class => course_title.
+            $classparam = 'course_title';
+        }
+        // Bruincast does not have course title, only srs.
+        if (!isset($a->$classparam)) {
+            $classparam = 'srs';
+        }        
+        return strnatcmp($a->$classparam, $b->$classparam);              
+    }
+    return $termcmp;
+}
+
+/**
  * Gets table information from database for: bruincast, library reserves, and
  * video reserves.
  *
@@ -416,6 +449,7 @@ function get_reserve_data($table) {
         }
 
     }
+    usort($result, 'term_title_cmp_fn');
 
     return $result;
 }
