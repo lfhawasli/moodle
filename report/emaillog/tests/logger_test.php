@@ -183,5 +183,45 @@ class report_emaillog_logger_testcase extends advanced_testcase {
         foreach($logs as $log) {
             $this->assertEquals($recipient->id, $log->recipient_id);
         }
-     }
+    }
+
+    public function test_logging_user_notification_off() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        // Create a course, with a forum.
+        $course = $this->getDataGenerator()->create_course();
+
+        // All users subscribed initially.
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_INITIALSUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Create two users enrolled in the course as students.
+        list($author, $recipient) = $this->helper_create_users($course, 2);
+
+        // Turn off all email notifications for 'author' user.
+        $DB->set_field('user', 'emailstop', 1, array("id"=>$author->id));
+
+        // Post a discussion to the forum.
+        list($discussion, $post) = $this->helper_post_to_forum($forum, $author);
+
+        // Cron daily uses mtrace, turn on buffering to silence output.
+        $this->expectOutputRegex("/\d users were sent post {$post->id}, '{$post->subject}'/");
+        forum_cron();
+
+        // Get forum email logs from database.
+        $logs = $DB->get_records('report_emaillog', array('post'=>$post->id));
+
+        // We expect only one user to receive this post.
+        $expected = 1;
+
+        // Check that one email was logged.
+        $this->assertCount($expected, $logs);
+
+        // Check that the the recipient is correct.
+        foreach($logs as $log) {
+            $this->assertEquals($recipient->id, $log->recipient_id);
+        }
+    }
 }
