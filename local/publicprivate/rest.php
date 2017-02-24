@@ -17,10 +17,8 @@ $PAGE->set_url('/local/publicprivate/rest.php', array('courseId'=>$courseid,'cla
 
 //NOTE: when making any changes here please make sure it is using the same access control as course/mod.php !!
 
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+list($course, $cm) = get_course_and_cm_from_cmid($id, '', $courseid);
 $coursecontext = context_course::instance($course->id);
-
-$cm = get_coursemodule_from_id(null, $id, $course->id, false, MUST_EXIST);
 $modcontext = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
@@ -57,6 +55,14 @@ if ($class === 'resource') {
 
             break;
     }
+
+    // Refresh cm_info.
+    list($course, $cm) = get_course_and_cm_from_cmid($id, '', $courseid);
+
+    // Get new availability HTML.
+    $courserenderer = $PAGE->get_renderer('core', 'course');
+    $availability = $courserenderer->course_section_cm_availability($cm);
+    echo json_encode($availability);
 }
 
 

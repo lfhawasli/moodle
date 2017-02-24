@@ -101,8 +101,7 @@ class PublicPrivate_Module {
     }
 
     /**
-     * Finds and removes the grouping conditional activity using public/private
-     * grouping.
+     * Finds and removes all grouping conditions.
      *
      * @return boolean
      */
@@ -110,42 +109,22 @@ class PublicPrivate_Module {
         global $DB;
         $availability = json_decode($this->_course_module()->availability);
 
-        // With the grouping availability plugin there might be multiple
-        // groupings.
         $ppgrouping = $this->_publicprivate_course()->get_grouping();
-        if (!empty($availability)) {
-            if (isset($availability->c)) {
-                $groupingfound = false;
-                foreach ($availability->c as $index => $condition) {
-                    if ($condition->type == 'grouping') {
-                        if ($condition->id == $ppgrouping) {
-                            $groupingfound = true;
-                            // Matched public/private grouping, so unset it.
-                            unset($availability->c[$index]);
-                            unset($availability->showc[$index]);
-                            break;
-                        }
-                    }
-                }
-                if ($groupingfound) {
-                    // Reset array indexes
-                    $availability->c = array_values($availability->c);
-                    $availability->showc = array_values($availability->showc);
-                    // If we found the public/private grouping and removed the only condition,
-                    // then just clear the availability conditions.
-                    if (count($availability->c) == 0) {
-                        $newavailability = null;
-                    } else {
-                        $newavailability = json_encode($availability);
-                    }
-                    return $DB->set_field('course_modules', 'availability', $newavailability,
-                            array('id' => $this->_course_module()->id));
-                }
-            }
-            return false;   // No grouping conditions set.
-        }
+        if (!empty($availability) && isset($availability->c)) {
+            // This function recurses into subtrees for us.
+            $this->search_grouping_conditions($availability, $ppgrouping, true);
 
-        return true;
+            // If there are no more conditions, just set availability to null.
+            if (count($availability->c) == 0) {
+                $newavailability = null;
+            } else {
+                $newavailability = json_encode($availability);
+            }
+
+            return $DB->set_field('course_modules', 'availability', $newavailability,
+                    array('id' => $this->_course_module()->id));
+        }
+        return false;   // No grouping conditions set.
     }
 
     /**
@@ -255,31 +234,75 @@ class PublicPrivate_Module {
     }
 
     /**
-     * Returns `course_module`.`groupingid`.
+     * Returns `course_module`.`groupingid`, preferring the public-private grouping if found.
      *
      * @throws PublicPrivate_Module_Exception
      * @return int  Returns 0 if no grouping is found.
      */
     public function get_grouping() {
         $availability = json_decode($this->_course_module()->availability);
-
-        // With the grouping availability plugin there might be multiple
-        // groupings, so try to find the grouping with public/private, else
-        // return the last grouping found.
-        $groupingfound = 0;
         $ppgrouping = $this->_publicprivate_course()->get_grouping();
-        if (!empty($availability)) {
-            if (isset($availability->c)) {
-                foreach ($availability->c as $condition) {
-                    if ($condition->type == 'grouping') {
-                        $groupingfound = $condition->id;
-                        if ($groupingfound == $ppgrouping) {
-                            // Matched public/private grouping.
-                            break;
-                        }
-                    }
+        if (!empty($availability) && isset($availability->c)) {
+            return $this->search_grouping_conditions($availability, $ppgrouping);
+        }
+        return 0;
+    }
+
+    /**
+     * Check for grouping conditions, recursing into subtrees.
+     *
+     * If the public-private grouping condition is found, return its grouping id.
+     * Otherwise, return the grouping id of the last grouping condition, or 0 if there are none.
+     *
+     * If $delete is true, delete all grouping conditions.
+     *
+     * @param object &$availability Non-empty availability tree.
+     * @param int $ppgrouping Public-private grouping id.
+     * @param boolean $delete Optional.
+     * @return int
+     */
+    private function search_grouping_conditions(&$availability, $ppgrouping, $delete = false) {
+        $groupingfound = 0;
+        $useshowc = !empty($availability->showc);
+
+        foreach ($availability->c as $index => &$child) {
+            if (empty($child)) {
+                continue;
+            }
+
+            $deletechild = false;
+            $temp = $groupingfound;
+            if (isset($child->c)) {
+                // $child is a tree.
+                $temp = $this->search_grouping_conditions($child, $ppgrouping, $delete);
+                // Delete the child if it is now empty.
+                $deletechild = (count($child->c) == 0);
+            } else {
+                // $child is a condition.
+                if ($child->type == 'grouping') {
+                    $temp = $child->id;
+                    // Delete the child if we are deleting all grouping conditions.
+                    $deletechild = $delete;
                 }
             }
+            if ($deletechild) {
+                unset($availability->c[$index]);
+                if ($useshowc) {
+                    unset($availability->showc[$index]);
+                }
+            }
+
+            // With the grouping availability plugin there might be multiple
+            // groupings, so try to find the grouping with public/private, else
+            // return the last grouping found.
+            if ($groupingfound != $ppgrouping) {
+                $groupingfound = $temp;
+            }
+        }
+
+        $availability->c = array_values($availability->c);
+        if ($useshowc) {
+            $availability->showc = array_values($availability->showc);
         }
 
         return $groupingfound;
