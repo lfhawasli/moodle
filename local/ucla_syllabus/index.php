@@ -43,9 +43,8 @@ $canmanagesyllabus = $syllabusmanager->can_manage();
 $action = optional_param('action', null, PARAM_ALPHA);
 $type = optional_param('type', null, PARAM_ALPHA);
 
-require_course_login($course);
-
 // Set up page.
+$PAGE->set_course($course);
 $PAGE->set_url('/local/ucla_syllabus/index.php', array('id' => $id));
 $PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading(format_string($course->fullname));
@@ -240,8 +239,11 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
 
     $syllabustodisplay = null;
     if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]) &&
-            $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view()) {
+            $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view() &&
+            $course->visible) {
+        require_course_login($course);
         // See if logged in user can view private syllabus.
+        // Only show private syllabus if course is visible.
         $syllabustodisplay = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE];
     } else if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) &&
             $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]->can_view()) {
