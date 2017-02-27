@@ -113,35 +113,6 @@ class local_publicprivate_renderer extends core_course_renderer {
     }
 
     /**
-     * We are overriding this method because labels do not have grouping label
-     * by default.
-     *
-     * @param cm_info $mod
-     * @param array $displayoptions
-     * @return string
-     */
-    public function course_section_cm_name(cm_info $mod, $displayoptions = array()) {
-        if ($this->ppcourse->is_activated()) {
-            // Get the context from this course module, used to identify if user is in managegroup.
-            $context = context_module::instance($mod->id);
-
-            // Labels resources are not printed, so add the grouping name manually. Only instructors see the label
-            if (strtolower($mod->modfullname) === 'label' && has_capability('moodle/course:managegroups', $context)) {
-                $ppmod = new PublicPrivate_Module($mod->id);
-                if ($ppmod->is_private()) {
-                    $groupingid = $ppmod->get_grouping();
-                    $groupings = groups_get_all_groupings($mod->course);
-                    $pptext = html_writer::span('(' . $groupings[$groupingid]->name . ')',
-                                    'groupinglabel');
-                    $mod->set_after_link($pptext);
-                }
-            }
-        }
-
-        return parent::course_section_cm_name($mod, $displayoptions);
-    }
-
-    /**
      * Renders html to display the module content on the course page (i.e. text of the labels)
      *
      * @param cm_info $mod
@@ -227,15 +198,21 @@ class local_publicprivate_renderer extends core_course_renderer {
         // Display the link to the module (or do nothing if module has no url)
         $cmname = $this->course_section_cm_name($mod, $displayoptions);
 
-        // CCLE-5989 - Create availability conditions popup
+        // Create availability conditions popup.
+        $this->page->requires->yui_module('moodle-local_ucla-availabilityconditions', 'M.local_ucla.init_availabilityconditions');
         $availabilityhtml = $this->course_section_cm_availability($mod, $displayoptions);
-        $availabilitypopup = '';
-        if (!empty($availabilityhtml)) {
-            $this->page->requires->yui_module('moodle-local_ucla-availabilityconditions', 'M.local_ucla.init_availabilityconditions');
-            $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
-            $availabilitypopup = html_writer::span($link, 'groupinglabel availabilitypopup',
-                array('data-availabilityconditions' => $availabilityhtml));
+        $ppmodule = PublicPrivate_Module::build($mod);
+        $ppstate = $ppmodule->is_private() ? 'private' : 'public';
+
+        $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
+        $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
+        if (empty($availabilityhtml)) {
+            $classes .= ' hide';
         }
+        $availabilitypopup = html_writer::span($link, $classes, array(
+            'data-availabilityconditions' => $availabilityhtml,
+            'data-ppstate' => $ppstate
+        ));
 
         if (!empty($cmname)) {
             // Start the div for the activity title, excluding the edit icons.
