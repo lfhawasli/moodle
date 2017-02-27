@@ -76,7 +76,7 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                 $entry->performers = $work->performers;
                 $entry->metadata = "Note1:" + $work->noteOne + " Note2:" + $work->noteTwo;                
                 foreach ($work->items as $item) {                    
-                    if (!empty($item->trackTitle) || $item->trackTitle == 'N/A') {
+                    if (empty($item->trackTitle) || $item->trackTitle == 'N/A') {
                         // If track doesn't have title, just use work title.
                         $entry->title = $work->title;
 

@@ -36,10 +36,16 @@ class report_emaillog_logger {
      * @param int $userid the recipient's user id
      * @param string $email the recipient's email address
      * @param int $post post id
+     * @param boolean $emailstop indicated whether recipient has notifications off
      * @return boolean true on success
      */
-    static public function store_email_log($userid, $email, $post) {
+    static public function store_email_log($userid, $email, $post, $emailstop) {
         global $DB;
+
+        // The user has email notifications turned off.
+        if ($emailstop) {
+            return false;
+        }
 
         // Sanity check on inputs.
         if (empty($userid) || empty($email) || is_null($post)) {

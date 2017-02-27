@@ -80,13 +80,13 @@ if (!empty($options['all'])) {
         $courses = array();
     }
 } else if (!empty($unrecognized)) {
-    
+
     $argument = (array_pop($unrecognized));
-    
+
     // Check if someone is passing in a term.
     if (ucla_validator('term', $argument)) {
         // Get all courses for that term.
-        $sql = "SELECT DISTINT c.*
+        $sql = "SELECT DISTINCT c.*
                   FROM {course} c
                   JOIN {ucla_request_classes} urc ON (urc.courseid=c.id)
                  WHERE urc.term=:term";
@@ -106,8 +106,8 @@ if (!empty($options['all'])) {
              LEFT JOIN {ucla_request_classes} urc  ON (urc.courseid=c.id)
                  WHERE urc.id IS NULL
                    AND c.id!=:siteid";
-        $courses = $DB->get_records_sql($sql, array('term' => $argument, 
-            'siteid' => SITEID));        
+        $courses = $DB->get_records_sql($sql, array('term' => $argument,
+            'siteid' => SITEID));
     } else {
         cli_error('Invalid argument passed in.');
     }
@@ -153,8 +153,8 @@ foreach ($courses as $course) {
                 $trace->output(sprintf('%s returned problem for course %s (%d), rerun script with --fix to fix it',
                         $checkmethod, $course->shortname, $course->id));
             }
-            $problemfound = true;            
-        }        
+            $problemfound = true;
+        }
     }
     if ($problemfound) {
         ++$problemcourses;

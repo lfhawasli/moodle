@@ -23,10 +23,10 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
 
     Y.extend(PUBLICPRIVATE, Y.Base, {
         initializer : function(config) {
-            // Set event listeners
+            // Set event listeners.
             Y.delegate('click', this.toggle, CSS.PAGECONTENT, CSS.COMMANDDIV + ' a.publicprivate', this);
 
-            // Let moodle know we exist
+            // Let moodle know we exist.
             M.course.coursebase.register_module(this);
         },
         toggle : function(e) {
@@ -34,61 +34,56 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
     
             var mod = e.target.ancestor(CSS.ACTIVITYLI);
             
-            var field = '';
             var instance = mod.one('.activityinstance');
-            // If an activity instance is not found, use the div enclosing the entire module
+            // If an activity instance is not found, use the div enclosing the entire module.
             if (!instance) {
                 instance = mod.one('.mod-indent-outer');
             }
-            // TODO This currently won't work if there are conditions besides the publicprivate one
-            var privateGrouping = instance.one('.availabilitypopup');
-            
-            if (privateGrouping) {
-                privateGrouping.remove();
-                field = 'public';
+            // DOM node for the popup span.
+            var availabilityPopup = instance.one('.availabilitypopup');
+            // Current activity public/private state.
+            var current = availabilityPopup.getData('ppstate');
+            // Activity state after toggling.
+            var next = (current == 'public') ? 'private' : 'public';
 
-                // Swap icon
-                mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({
-                    'src' : M.util.image_url(this.get('publicpix'), this.get('component')),
-                    'alt' : M.util.get_string('publicprivatemakeprivate', 'local_publicprivate')
-                })
-                // Change text
-                if(mod.one(CSS.PUBLICPRIVATETEXT)) {
-                    mod.one(CSS.PUBLICPRIVATETEXT).set('text', M.util.get_string('publicprivatemakeprivate', 'local_publicprivate'));
-                }
-            } else {
-                // Add popup
-                var popupContents = Y.Escape.html('<div class=\"availabilityinfo\">Not available unless: You belong to a group in <strong>Private Course Material</strong> (hidden otherwise)</div>');
-                var popup = '<span class="groupinglabel availabilitypopup" data-availabilityconditions="' + popupContents + '"><a aria-haspopup="true" href="#">Access restrictions</a></span>';
-                instance.insert(Y.Node.create(popup));
-                
-                // Swap icon
-                mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({
-                    'src' : M.util.image_url(this.get('privatepix'), this.get('component')),
-                    'alt' : M.util.get_string('publicprivatemakepublic', 'local_publicprivate')
-                });
-                // Change text
-                if(mod.one(CSS.PUBLICPRIVATETEXT)) {
-                    mod.one(CSS.PUBLICPRIVATETEXT).set('text', M.util.get_string('publicprivatemakepublic', 'local_publicprivate'));
-                }
-                field = 'private'; 
+            // Swap icon.
+            mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({
+                // After we toggle, the activity's state will be 'next'. So the 'src' uses next.
+                'src' : M.util.image_url(this.get(next + 'pix'), this.get('component')),
+                // The text will allow the user to toggle again, which will bring the state back to 'current'.
+                'alt' : M.util.get_string('publicprivatemake' + current, 'local_publicprivate')
+            });
+
+            // Change text: after this toggle (to 'next'), the following toggle makes the state 'current'.
+            if (mod.one(CSS.PUBLICPRIVATETEXT)) {
+                mod.one(CSS.PUBLICPRIVATETEXT).set('text', M.util.get_string('publicprivatemake' + current, 'local_publicprivate'));
             }
-            
-            // Prepare ajax data
+
+            // Prepare ajax data.
             var data = {
                 'class' : 'resource',
-                'field' : field,
+                'field' : next,
                 'id'    : mod.get('id').replace(CSS.MODULEIDPREFIX, '')
             };
             
-            // Get spinner
+            // Get spinner.
             var spinner = M.util.add_spinner(Y, mod.one(CSS.SPINNERCOMMANDDIV));
 
-            // Send request
-            this.send_request(data, spinner);
+            // Send request and get updated availability conditions.
+            var newAvailability = this.send_request(data, spinner);
+
+            // Set new availability conditions html and state.
+            availabilityPopup.setData('availabilityconditions', newAvailability);
+            availabilityPopup.setData('ppstate', next);
+            // Hide/unhide the popup.
+            if (newAvailability.length == 0) {
+                availabilityPopup.addClass('hide');
+            } else {
+                availabilityPopup.removeClass('hide');
+            }
         },
         send_request : function(data, statusspinner) {
-            // Default data structure
+            // Default data structure.
             if (!data) {
                 data = {};
             }
@@ -98,7 +93,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
 
             var uri = M.cfg.wwwroot + '/local/publicprivate/rest.php';
 
-            // Define the configuration to send with the request
+            // Define the configuration to send with the request.
             var responsetext = [];
             var config = {
                 method: 'POST',
@@ -132,7 +127,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
                 statusspinner.show();
             }
 
-            // Send the request
+            // Send the request.
             Y.io(uri, config);
             return responsetext;
         },
@@ -189,7 +184,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
     M.local_publicprivate = M.local_publicprivate || {};
     
     M.local_publicprivate.init = function (params) {
-        // Load module
+        // Load module.
         return new PUBLICPRIVATE(params);
     }
     

@@ -28,10 +28,8 @@ if (!empty($CFG->gradepublishing)) {
 
 $actionurl = new moodle_url('/grade/export/myucla/export.php');
 $formoptions = array(
-    'includeseparator'=>true,
     'publishing' => true,
-    'simpleui' => true,
-    'multipledisplaytypes' => true
+    'simpleui' => true
 );
 
 $mform = new grade_export_form_myucla($actionurl, $formoptions);

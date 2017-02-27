@@ -32,49 +32,28 @@ class grade_export_form_myucla extends moodleform {
         $gseq = new grade_seq($COURSE->id, $switch);
 
         if ($grade_items = $gseq->items) {
-            $needs_multiselect = false;
             $coursetotal = get_string('coursetotal', 'grades');
             $canviewhidden = has_capability('moodle/grade:viewhidden', context_course::instance($COURSE->id));
 
             foreach ($grade_items as $grade_item) {
-                // Is the grade_item hidden? If so, can the user see hidden grade_items?
-                if ($grade_item->is_hidden() && !$canviewhidden) {
-                    continue;
-                }
-
                 if (!empty($features['idnumberrequired']) and empty($grade_item->idnumber)) {
                     $mform->addElement('advcheckbox', 'itemids['.$grade_item->id.']', $grade_item->get_name(), get_string('noidnumber', 'grades'));
                     $mform->hardFreeze('itemids['.$grade_item->id.']');
-                } else {
-                    //Don't automatically add
-                    //$mform->addElement('advcheckbox', 'itemids['.$grade_item->id.']', $grade_item->get_name(), null, array('group' => 1));
-                    if ($grade_item->get_name() !== $coursetotal) {
-                        //Don't add these, they don't make sense for Gradebook Express
-                        //$mform->setDefault('itemids['.$grade_item->id.']', 0);
-                    }
-                    else {
-                        //Course total (final grade)
-                        $mform->addElement('advcheckbox', 'itemids['.$grade_item->id.']', $grade_item->get_name(), null, array('group' => 1));
-                        $mform->setDefault('itemids['.$grade_item->id.']', 1);
-                    }
-                    $needs_multiselect = false;
+                } else  if ($grade_item->get_name() == $coursetotal) {
+                    //Course total (final grade)
+                    $mform->addElement('advcheckbox', 'itemids['.$grade_item->id.']', $grade_item->get_name(), null, array('group' => 1));
+                    $mform->setDefault('itemids['.$grade_item->id.']', 1);
+                    $mform->hardFreeze('itemids['.$grade_item->id.']');
                 }
             }
-
-            if ($needs_multiselect) {
-                //Doesn't make sense for Gradebook Express (only 1 item)
-                //$this->add_checkbox_controller(1, null, null, 1); // 1st argument is group name, 2nd is link text, 3rd is attributes and 4th is original value
-            }
         }
-        $mform->addElement('static', 'expresswarning', '<br />Note: Express only allows '.get_string('coursetotal', 'grades'));
+        $mform->addElement('static', 'expressgradeitemsnote', '', get_string('expressgradeitemsnote', 'gradeexport_myucla'));
 
         $mform->addElement('header', 'options', get_string('exportformatoptions', 'grades'));
         if (!empty($features['simpleui'])) {
             $mform->setExpanded('options', true);
         }
 
-        $mform->addElement('advcheckbox', 'export_feedback', get_string('exportfeedback', 'grades'));
-        $mform->setDefault('export_feedback', 1);
         $coursecontext = context_course::instance($COURSE->id);
         if (has_capability('moodle/course:viewsuspendedusers', $coursecontext)) {
             $mform->addElement('advcheckbox', 'export_onlyactive', get_string('exportonlyactive', 'grades'));
@@ -95,29 +74,6 @@ class grade_export_form_myucla extends moodleform {
         if (!empty($features['updategradesonly'])) {
             $mform->addElement('advcheckbox', 'updatedgradesonly', get_string('updatedgradesonly', 'grades'));
         }
-        /// selections for decimal points and format, MDL-11667, defaults to site settings, if set
-        //$default_gradedisplaytype = $CFG->grade_export_displaytype;
-        $options = array(GRADE_DISPLAY_TYPE_LETTER     => get_string('letter', 'grades'));
-
-        if ($features['multipledisplaytypes']) {
-            /*
-             * Using advcheckbox because we need the grade display type (name) as key and grade display type (constant) as value.
-             * The method format_column_name requires the lang file string and the format_grade method requires the constant.
-             */
-            $checkboxes = array();
-            $checkboxes[] = $mform->createElement('advcheckbox', 'display[letter]', null, get_string('letter', 'grades'), null, array(0, GRADE_DISPLAY_TYPE_LETTER));
-            $mform->addGroup($checkboxes, 'displaytypes', get_string('gradeexportdisplaytypes', 'grades'), ' ', false);
-            $mform->setDefault('display[letter]', GRADE_DISPLAY_TYPE_LETTER);
-        } else {
-            // Only used by XML grade export format.
-            $mform->addElement('select', 'display', get_string('gradeexportdisplaytype', 'grades'), $options);
-            $mform->setDefault('display', $CFG->grade_export_displaytype);
-        }
-        //$default_gradedecimals = $CFG->grade_export_decimalpoints;
-        $options = array(0=>0, 1=>1, 2=>2, 3=>3, 4=>4, 5=>5);
-        $mform->addElement('select', 'decimals', get_string('gradeexportdecimalpoints', 'grades'), $options);
-        $mform->setDefault('decimals', $CFG->grade_export_decimalpoints);
-        $mform->disabledIf('decimals', 'display', 'eq', GRADE_DISPLAY_TYPE_LETTER);
 
         $groupingoptions = array();
         $allgroupings = groups_get_all_groupings($COURSE->id);
@@ -126,14 +82,6 @@ class grade_export_form_myucla extends moodleform {
         }
         $mform->addElement('select', 'groupingid', get_string('groupings', 'gradeexport_myucla'), $groupingoptions);
         $mform->setDefault('groupingid', $COURSE->defaultgroupingid);
-
-        if (!empty($features['includeseparator'])) {
-            $radio = array();
-            $radio[] = $mform->createElement('radio', 'separator', null, get_string('septab', 'grades'), 'tab');
-            $radio[] = $mform->createElement('radio', 'separator', null, get_string('sepcomma', 'grades'), 'comma');
-            $mform->addGroup($radio, 'separator', get_string('separator', 'grades'), ' ', false);
-            $mform->setDefault('separator', 'comma');
-        }
 
         if (!empty($CFG->gradepublishing) and !empty($features['publishing'])) {
             $mform->addElement('header', 'publishing', get_string('publishingoptions', 'grades'));

@@ -23,6 +23,11 @@
  */
 
 $string['doublecheckwarning'] = 'Please review your grades before exporting. The grades calculated for this export are the grades AS IS. Empty grade items will not default to zero.';
+$string['expressgradeitemsnote'] = 'Note: Express format only allows Course total';
+$string['fieldgrade'] = 'Grade';
+$string['fieldidnumber'] = 'UID';
+$string['fieldname'] = 'Name';
+$string['fieldremark'] = 'Remark';
 $string['filetype'] = 'File type';
 $string['groupings'] = 'Groupings';
 $string['invalidids'] = 'Invalid IDs';
@@ -30,4 +35,3 @@ $string['invalididsexplanation'] = 'The students listed below do not have valid 
 $string['myucla:publish'] = 'Publish MyUCLA Gradebook Express grade export';
 $string['myucla:view'] = 'Use MyUCLA Gradebook Express grade export';
 $string['pluginname'] = 'MyUCLA Gradebook Express format';
-$string['timeexported'] = 'Last downloaded from this course';

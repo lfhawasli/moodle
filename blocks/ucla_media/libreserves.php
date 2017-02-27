@@ -76,6 +76,7 @@ function display_page($course) {
             array('id' => 'videoreserves-intro'));
     echo "<br>";
     $videos = $DB->get_records_sql('SELECT * FROM {ucla_library_music_reserves} WHERE courseid=? GROUP BY albumtitle', array($courseid));
+    $titles = array();
     $output = array();
     foreach ($videos as $video) {
         if ($video->composer != '') {
@@ -83,12 +84,14 @@ function display_page($course) {
         } else {
             $title = $video->albumtitle;
         }
-        $outputstr = '';
+        $titles[] = $title;
+    }
+    natsort($titles);
+    foreach ($titles as $title) {
         $outputstr = html_writer::link(
                         new moodle_url('/blocks/ucla_media/libalbum.php',
                         array('courseid'=> $courseid,'title' => $video->albumtitle)), $title); 
         $output[] = $outputstr;
-        
     }
     echo html_writer::alist($output);
     echo html_writer::end_div('div');

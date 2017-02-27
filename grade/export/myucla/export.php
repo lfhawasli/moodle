@@ -33,10 +33,8 @@ if (groups_get_course_groupmode($COURSE) == SEPARATEGROUPS and !has_capability('
 }
 
 $params = array(
-    'includeseparator'=>true,
     'publishing' => true,
-    'simpleui' => true,
-    'multipledisplaytypes' => true
+    'simpleui' => true
 );
 $mform = new grade_export_form_myucla(null, $params);
 $data = $mform->get_data();
