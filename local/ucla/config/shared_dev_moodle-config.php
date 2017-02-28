@@ -416,6 +416,10 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] =
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
 
+// Site administration > Plugins > Blocks > Panopto
+$CFG->forced_plugin_settings['block_panopto']['instance_name'] = 'CCLE-Shared-DEV';
+$CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'ucla.hosted.panopto.com';
+
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
@@ -470,7 +474,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     undo = undo
     pastespecial = pastespecial
     links = link
-    files = image, media, managefiles, kalturamedia, mediagallery
+    files = image, media, managefiles, kalturamedia, mediagallery, panoptobutton
     other = htmlplus, fullscreen
     style2 = strike, subscript, superscript
     align = align, table, bsgrid
@@ -489,10 +493,12 @@ $CFG->forced_plugin_settings['atto_fontfamily']['fontselectlist'] = '
     Georgia=Georgia, Times New Roman, Times, serif;
     Verdana=Verdana, Geneva, sans-serif;
     Trebuchet=Trebuchet MS, Helvetica, sans-serif;';
+// Site administration > Plugins > Text editors > Atto HTML editor > Panopto
+$CFG->forced_plugin_settings['atto_panoptobutton']['defaultserver'] = 'ucla.hosted.panopto.com';
 
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > General settings
 $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
-    wrap,formatselect,wrap,bold,italic,wrap,bullist,numlist,wrap,link,unlink,wrap,image, mediagallery
+    wrap,formatselect,wrap,bold,italic,wrap,bullist,numlist,wrap,link,unlink,wrap,image, mediagallery, panoptobutton
 
     undo,redo,wrap,underline,strikethrough,sub,sup,wrap,justifyleft,justifycenter,justifyright,wrap,outdent,indent,wrap,forecolor,backcolor,wrap,ltr,rtl,
 
@@ -503,6 +509,10 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Insert equation
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 
+// Site administration > Plugins > Text editors > TinyMCE HTML editor > Add Panopto Video
+$CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'https://ucla.hosted.panopto.com';
+
+// Site administration > Plugins > Local plugins > Moodle Mobile additional features
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
 
