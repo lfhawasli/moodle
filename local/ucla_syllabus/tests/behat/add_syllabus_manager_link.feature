@@ -38,7 +38,7 @@ Background:
     Then I should see "Public Syllabus" in the "region-main" "region"
 
   @javascript
-  Scenario: Upload a public syllabus through the syllabus manager link in Control Panel
+  Scenario: Upload a private syllabus through the syllabus manager link in Control Panel
     Given I follow "Add restricted syllabus"
     And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I set the field "Display name" to "Private Syllabus"

@@ -148,7 +148,7 @@ $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
 // UCLA Theme settings
-$CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'dev';
+$CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat';
 $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 $CFG->cachejs = false;
