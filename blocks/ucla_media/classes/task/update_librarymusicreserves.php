@@ -79,7 +79,6 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                     if (empty($item->trackTitle) || $item->trackTitle == 'N/A') {
                         // If track doesn't have title, just use work title.
                         $entry->title = $work->title;
-
                     } else {
                         $entry->title = $item->trackTitle;
                     }                                   

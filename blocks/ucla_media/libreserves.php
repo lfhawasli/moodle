@@ -75,22 +75,23 @@ function display_page($course) {
     echo html_writer::tag('p', get_string('intromusic', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));
     echo "<br>";
-    $videos = $DB->get_records_sql('SELECT * FROM {ucla_library_music_reserves} WHERE courseid=? GROUP BY albumtitle', array($courseid));
+    $reserves = $DB->get_records_sql('SELECT * FROM {ucla_library_music_reserves} WHERE courseid=? GROUP BY albumtitle', array($courseid));
     $titles = array();
     $output = array();
-    foreach ($videos as $video) {
-        if ($video->composer != '') {
-            $title = $video->composer.' - '.$video->albumtitle;
+    foreach ($reserves as $reserve) {
+        if ($reserve->composer != '') {
+            $title = $reserve->composer.' - '.$reserve->albumtitle;
         } else {
-            $title = $video->albumtitle;
+            $title = $reserve->albumtitle;
         }
-        $titles[] = $title;
+        $titles[$reserve->id] = $title;
     }
-    natsort($titles);
-    foreach ($titles as $title) {
+    natsort($titles);    
+    foreach ($titles as $id => $title) {
         $outputstr = html_writer::link(
                         new moodle_url('/blocks/ucla_media/libalbum.php',
-                        array('courseid'=> $courseid,'title' => $video->albumtitle)), $title); 
+                        array('courseid'=> $courseid, 'albumid' => $id, 
+                              'title' => $title)), $title); 
         $output[] = $outputstr;
     }
     echo html_writer::alist($output);
