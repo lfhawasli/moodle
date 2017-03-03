@@ -29,6 +29,7 @@ $PAGE->requires->jquery();
 
 $courseid= required_param('courseid', PARAM_INT);
 $title = required_param('title', PARAM_TEXT);
+$albumid = required_param('albumid', PARAM_INT);
 
 if (!$course = get_course($courseid)) {
     print_error('coursemisconf');
@@ -49,7 +50,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     if ($count != 0) {
         print_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
         html_writer::start_tag('div',array('id' => 'anchor'));
-        display_page_album($course, $title);
+        display_page_album($course, $albumid);
         html_writer::end_div('div');
         echo $OUTPUT->single_button(new moodle_url('/blocks/ucla_media/libreserves.php',
                 array('courseid' => $courseid)), get_string('returntomedia', 'block_ucla_media'), 'get');
@@ -68,36 +69,41 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 echo $OUTPUT->footer();
 
 /**
- * Function to display library music reserves for given course
+ * Function to display library music reserves for given course.
  *
- * @param course object
+ * @param object $course
+ * @param int $albumid
  */
-function display_page_album($course,$title) {
-    global $OUTPUT;
-    global $DB;
+function display_page_album($course, $albumid) {
+    global $DB, $OUTPUT;
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
     $courseid = $course->id;
     echo $OUTPUT->heading(get_string('headerlibres', 'block_ucla_media') .
             ": $course->fullname", 2, 'headingblock');
     echo html_writer::tag('p', get_string('intromusic', 'block_ucla_media'),
             array('id' => 'videoreserves-intro'));
-    echo "<br>";
-    $videos = $DB->get_records_select('ucla_library_music_reserves', 
-            'courseid=? AND albumtitle=? GROUP BY title', 
-            array($courseid, $title));
+    echo "<br />";
     
-    $samplevideo = reset($videos);
-    if ($samplevideo->composer != NULL) {
-        $title = $samplevideo->composer.' '.$title;
+    // Get media with given album title.
+    $sql = "SELECT media.*
+              FROM {ucla_library_music_reserves} media
+              JOIN {ucla_library_music_reserves} album ON (album.albumtitle=media.albumtitle)
+             WHERE album.courseid=?
+               AND album.id=?";
+    $reserves = $DB->get_records_sql($sql, array($courseid, $albumid));
+    
+    $samplereserve = reset($reserves);
+    if ($samplereserve->composer != null) {
+        $title = $samplereserve->composer.' '.$samplereserve->albumtitle;
     }
     echo html_writer::tag('h3', 'Track Listing: '.$title);
     $output = array();
-    foreach ($videos as $video) {
+    foreach ($reserves as $reserve) {
         $outputstr = '';
-        if ($video->isvideo == 0) {
-            $outputstr = html_writer::link('#anchor', $video->title, array('id' => $video->id, 'class' => 'button audio'));
+        if ($reserve->isvideo == 0) {
+            $outputstr = html_writer::link('#anchor', $reserve->title, array('id' => $reserve->id, 'class' => 'button audio'));
         } else {
-            $outputstr = html_writer::link('#anchor', $video->title, array('id' => $video->id, 'class' => 'button video'));
+            $outputstr = html_writer::link('#anchor', $reserve->title, array('id' => $reserve->id, 'class' => 'button video'));
         }
         $output[] = $outputstr;
         
