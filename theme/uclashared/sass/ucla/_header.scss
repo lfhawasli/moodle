@@ -24,6 +24,14 @@ header {
         height: $header-height;
     
         // System environment colors
+        .env-behat & {
+            background-image: none;
+            background-color: $header-color-dev;
+            // Need to have special style for Behat, because fixed header
+            // causes elements that would be under it to be unclickable even
+            // when revealed by the auto-hiding header.
+            position: absolute;
+        }
         .env-dev & {
             background-image: none;
             background-color: $header-color-dev;
