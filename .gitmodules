@@ -165,7 +165,7 @@
 	url = https://github.com/ndunand/moodle-mod_choicegroup.git
 [submodule "blocks/panopto"]
 	path = blocks/panopto
-	url = https://github.com/Panopto/Moodle-2.0-plugin-for-Panopto.git
+	url = git@github.com:ccle/Moodle-2.0-plugin-for-Panopto.git
 [submodule "lib/editor/tinymce/plugins/panoptobutton"]
 	path = lib/editor/tinymce/plugins/panoptobutton
 	url = https://github.com/Panopto/Add-Panopto-Video--button-for-moodle-tinyMCE-editor.git
