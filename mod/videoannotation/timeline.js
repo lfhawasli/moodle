@@ -1762,25 +1762,56 @@ console.log("scope=%s", eventObj.getScope());
                     var timeline = jQuery(this).data('timeline');
                     var tagId = jQuery(event.target).data('tagId');
                     var eventId = jQuery(event.target).data('eventId');
-
-                    // Adjust the videoannotation_tags level according to the retainedEvents with the largest level.
+                    // Adjust the videoannotation_tags level and reorder event levels.
+                    // Assume that all events will be kept in sequential, increasing order with no gaps between levels,
+                    // i.e. 1,3,5 cannot be a possible level scheme.
                     var newLevel = 1;
-                    if (timeline.findEvent(eventId).getLevel() == (timeline.findTag(tagId).getLevel() - 1)  &&  Number(timeline.findTag(tagId).getLevel()) !== 1) {
-                       for (keptEvent in timeline.events) {
-                            var keptEvent_TagId = timeline.events[keptEvent].getTag().getId();
-                            if (keptEvent_TagId == tagId  &&  timeline.events[keptEvent].getId() !== eventId) {
-                                var keptLevel = timeline.events[keptEvent].getLevel(); 
-                                if (keptLevel > newLevel) {
-                                    newLevel = keptLevel;
+                    var largestLevel = timeline.findTag(tagId).getLevel(); 
+                    var eventLevel = timeline.findEvent(eventId).getLevel();
+                    var numEvents = 1;
+
+                    // Find number of events at the level to be deleted.
+                    for (events in timeline.events) {
+                        if (timeline.events[events].getTag().getId() == tagId 
+                                && timeline.events[events].getId() !== eventId
+                                && timeline.events[events].getLevel() == eventLevel ) {
+                            numEvents = 2;
+                            break;
+                        }
+                    }
+
+                    // Deleting event with largest level.
+                    if (largestLevel == eventLevel) {
+                        // Case where events aren't on level 1 and multiple events don't exists on a level.
+                        // If events on level 1 or multiple events exist on a level, do nothing.
+                        if (largestLevel != 1 && numEvents <= 1) {
+                            newLevel = largestLevel - 1;
+                            var tagObj = timeline.findTag(tagId);
+                            timeline.editTag(tagId, tagObj.getName(), tagObj.getColor(), tagObj.getName(), tagObj.getColor(), true, newLevel);
+                        }
+
+                    // Deleting event either in the beginning (smallest level) or in the middle levels.
+                    } else if (numEvents < 2) {
+                        newLevel = largestLevel - 1;
+                        for (events in timeline.events) {
+                            var cur_event = timeline.events[events];
+                            if (cur_event.getTag().getId() == tagId && cur_event.getId() !== eventId) {
+                                console.log("cur event level: \n", cur_event.getLevel());
+                                if (cur_event.getLevel() > eventLevel) {
+                                    console.log("new cur_event level: \n", Number(cur_event.getLevel())-1);
+                                    timeline.events[events] = timeline.editEvent(cur_event, cur_event.getStartTime(),
+                                                        cur_event.getEndTime(), cur_event.getComment(), undefined, undefined,
+                                                        undefined, true, cur_event.getLat(), cur_event.getLng(),
+                                                        cur_event.getScope(), Number(cur_event.getLevel())-1);
                                 }
                             }
                         }
-                        newLevel++;
+                        newLevel = largestLevel - 1;
                         var tagObj = timeline.findTag(tagId);
-                        console.log("new level afteremoving is", newLevel);
-                        timeline.editTag(tagId, tagObj.getName(), tagObj.getColor(), tagObj.getName(), tagObj.getColor(), true, newLevel);
-                    } 
-
+                        timeline.editTag(tagId, tagObj.getName(), tagObj.getColor(), tagObj.getName(), tagObj.getColor(), true, newLevel); 
+                    }
+                    
+                    // Remove event.
                     timeline.removeEvent(eventId, true);
                     jQuery('#EventBar_Event' + eventId + '_Timeline' + timeline.id).remove();
                     delete timeline.editEventDialogOpen[tagId];
@@ -1871,7 +1902,7 @@ console.log("scope=%s", eventObj.getScope());
                 var eventBandHeight = jQuery('#TimeMarkerDigitPanel_Timeline' + this.id).height();
                 var editEventDialog = jQuery('#EditEventDialog_Tag' + tagId + '_Timeline' + this.id);
 
-                var level = this.findEvent(eventId).getLevel() + 1;
+                var level = this.findEvent(eventId).getLevel();
                 var tagLevel = this.findTag(tagId).getLevel();
                 var baseHeight = 22; 
                 var editDialogTop = level * baseHeight;
@@ -2128,7 +2159,7 @@ console.log("scope=%s", eventObj.getScope());
               
                 // Show view dialog box by changing parent heights to accommodate it.
                 var viewEventDialog = jQuery('#ViewEventDialog_Tag' + tagId + '_Timeline' + this.id);
-                var level = this.findEvent(eventId).getLevel() + 1;
+                var level = this.findEvent(eventId).getLevel();
                 var tagLevel = this.findTag(tagId).getLevel();
                 var baseHeight = 22; 
                 var viewDialogTop = level * baseHeight;
@@ -2276,8 +2307,8 @@ console.log("scope=%s", eventObj.getScope());
                     //sameTag = undefined;
                 });
             }
+            
             // Set the left position and width of both event bar containment and event bar
-
             var startTime = allEvents[eventIdx].getStartTime();
             var duration = allEvents[eventIdx].getEndTime() - allEvents[eventIdx].getStartTime();
             jQuery('#EventBar_Event' + eventId + '_Timeline' + this.id)
@@ -2288,8 +2319,10 @@ console.log("scope=%s", eventObj.getScope());
             // Set the vertical position of the EventBar.
             var eventBar = jQuery('#EventBar_Event' + eventId + '_Timeline' + this.id);
             var level = this.findTag(tagId).getLevel();
-            var baseHeight = 22; 
-            eventBar.css('top', baseHeight * allEvents[eventIdx].getLevel());
+
+            var baseHeight = 22;
+            // Subtract 1 from level since all levels start at level 1 by default.
+            eventBar.css('top', baseHeight * (allEvents[eventIdx].getLevel()-1));
             
             if (eventBar.parent().parent().data('oldlevel') !== level) {
                 eventBar.parent().css('height', level * baseHeight); 
@@ -3060,7 +3093,7 @@ CSAVTimeline.prototype.startRecording = function(tags) {
                 tag: tagObj,
                 startTime: effectiveStartTime,
                 endTime: effectiveStartTime,
-                level: 0
+                level: 1
             });
         } catch (err) {
             timeline.handleError(err);
@@ -3166,10 +3199,10 @@ CSAVTimeline.prototype.assignLevel = function (tagId, startTime, endTime, eventI
     }
 
     this.editEvent(eventId, startTime, endTime, undefined, startTime, endTime, undefined, true, undefined, undefined, undefined, level);
-    if (level >= tagObj.getLevel()) {
+    if (level > tagObj.getLevel()) {
         var name = tagObj.getName();
         var color = tagObj.getColor();
-        this.editTag(tagId, name, color, name, color, true, level + 1);
+        this.editTag(tagId, name, color, name, color, true, level);
     }
 }
 

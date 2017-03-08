@@ -434,8 +434,8 @@ if (!optional_param('printable', false, PARAM_BOOL)) {
             </tr>
             <tr>
                 <td>Feedback:</td>
-                <td>
-                    <?php print_textarea(false, 5, 50, 0, 0, 'feedback', strip_tags(isset($submission->gradecomment) ?
+                <td style="text-align:left">
+                    <?php print_textarea(false, 6, 50, 0, 0, 'feedback', strip_tags(isset($submission->gradecomment) ?
                     $submission->gradecomment : ''), $COURSE->id); ?>
                 </td>
             </tr>
