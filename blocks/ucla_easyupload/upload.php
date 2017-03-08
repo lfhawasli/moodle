@@ -252,7 +252,11 @@ if ($uploadform->is_cancelled()) {
     // Make course content the same visibility as parent section
     $newcm->visible = $DB->get_field('course_sections', 'visible',
             array('id' => $targetsection));
-
+    
+    if (isset($data->showdescription) && $data->showdescription) {
+        $newcm->showdescription = 1;
+    }
+    
     $coursemoduleid = add_course_module($newcm);
     if (!$coursemoduleid) {
         print_error('cannotaddnewmodule');
