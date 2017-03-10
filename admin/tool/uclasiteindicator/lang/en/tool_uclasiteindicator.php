@@ -57,6 +57,12 @@ $string['approvalmessage'] = 'Approving a request here will create the site.';
 // Pending
 $string['sitetype'] = 'Site type';
 $string['sitecat'] = 'Requested category';
+$string['sitetype_help'] = '<strong>' . $string['site_instruction'] . ":</strong> " . $string['site_instruction_desc'] . '<br><br>' .
+        '<strong>' . $string['site_instruction_noniei'] . ":</strong> " . $string['site_instruction_noniei_desc'] . '<br><br>' .
+        '<strong>' . $string['site_non_instruction'] . ":</strong> " . $string['site_non_instruction_desc'] . '<br><br>' .
+        '<strong>' . $string['site_research'] . ":</strong> " . $string['site_research_desc'] . '<br><br>' .
+        '<strong>' . $string['site_test'] . ":</strong> " . $string['site_test_desc'] . '<br><br>' .
+        '<strong>' . $string['site_private'] . ":</strong> " . $string['site_private_desc'];
 
 $string['req_contacts'] = 'Support Contact';
 $string['req_selopt_other'] = 'Other (provide reason below)';
@@ -145,3 +151,6 @@ $string['search_placeholder'] = 'Search for a collaboration site';
 // CCLE-4828
 $string['procesedby'] = '<br />by {$a->name} <br />on {$a->time}';
 $string['timerequested'] = '<br />on {$a}';
+
+$string['selecttype'] = 'Select site type';
+$string['missingsitetype'] = 'Missing site type';

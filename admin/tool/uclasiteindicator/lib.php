@@ -843,7 +843,7 @@ class siteindicator_manager {
         $recs = $DB->get_records_sql($sql);
         
         return $recs;
-    }    
+    }
     
     static function find_and_set_collab_sites() {
         global $DB;

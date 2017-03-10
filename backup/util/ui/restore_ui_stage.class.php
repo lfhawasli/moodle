@@ -820,6 +820,9 @@ class restore_ui_stage_schema extends restore_ui_stage {
                 $progress->progress($done++);
             }
             $progress->end_progress();
+            // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+            $form->add_rule('setting_course_course_sitetype', get_string('missingsitetype', 'tool_uclasiteindicator'), 'required', null, 'client');
+            // END UCLA MOD: CCLE-6437
 
             // Add the dependencies for all the settings.
             $progress->start_progress('', count($allsettings));
