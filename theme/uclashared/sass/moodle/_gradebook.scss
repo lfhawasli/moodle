@@ -71,6 +71,28 @@ $grade-report-even-hvmarked-bgcolor: #F1BE00;
     // Remove the table overflow
     .gradeparent {
         overflow: inherit;
+
+        tr:nth-child(n) td.overridden:nth-child(n) {
+            background: url([[pix:theme|corner-fold]]) no-repeat;
+            background-color: #efefef;
+        }
+    }
+
+    .gradeparent .floater .cell {
+        background-color: #777;
+        color: white;
+        a:link {
+            color: white;
+        }
+    }
+
+    .header.cell.c0 {
+        height: 40px;
+    }
+
+    // Keep header fixed to the top.
+    .header-main {
+        position: absolute;
     }
 }
 
