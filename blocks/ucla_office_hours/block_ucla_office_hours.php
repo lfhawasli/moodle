@@ -621,8 +621,8 @@ class block_ucla_office_hours extends block_base {
                     }
 
                     // Process sections hours string.
-                    $hours = str_replace('A', 'am', $hours);
-                    $hours = str_replace('P', 'pm', $hours);
+                    $hours = preg_replace('/ ?AM?/', 'am', $hours);
+                    $hours = preg_replace('/ ?PM?/', 'pm', $hours);
 
                     // Process days string.
                     $strlen = strlen($days);
