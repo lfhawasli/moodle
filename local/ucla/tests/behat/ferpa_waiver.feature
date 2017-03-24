@@ -22,7 +22,8 @@ Background:
 Scenario: Require students to sign waiver for LTI.
     Given I turn editing mode on
     And I add a "External tool" to section "0" and I fill the form with:
-        | Activity name | LTI |
+        | Activity name        | LTI                          |
+        | Launch/cartridge URL | http://lti.tools/test/tp.php |
     And I log out
     When I log in as "student1"
     And I follow "Course 1"
@@ -31,6 +32,23 @@ Scenario: Require students to sign waiver for LTI.
     And I should see "By continuing to LTI, you will be sharing"
     When I press "I agree"
     Then I should see "LTI"
+
+@javascript @_switch_window @CCLE-6534
+Scenario: Require students to sign waiver for LTI for resources that open in new window.
+    Given I turn editing mode on
+    And I add a "External tool" to section "0" and I fill the form with:
+        | Activity name        | LTI                          |
+        | Launch/cartridge URL | http://lti.tools/test/tp.php |
+        | Launch container     | New window                   |
+    And I log out
+    When I log in as "student1"
+    And I follow "Course 1"
+    And I follow "LTI"
+    And I switch to "lti" window
+    Then I should see "Privacy Waiver"
+    And I should see "By continuing to LTI, you will be sharing"
+    When I press "I agree"
+    Then I should see "IMS LTI tool provider emulator"
 
 Scenario: Allow students to not agree.
     Given I turn editing mode on

@@ -61,6 +61,15 @@ $context = context_module::instance($cm->id);
 require_login($course, true, $cm);
 require_capability('mod/lti:view', $context);
 
+// START UCLA MOD: CCLE-4863 - Sign FERPA waiver for external LTI
+// If true, then user needs to sign waiver.
+$url = new moodle_url('/mod/lti/launch.php', array('id' => $id));
+if (local_ucla_ferpa_waiver::check($context, $USER->id)) {
+    $redirecturl = mod_casa_privacy_waiver::get_link($context, $url);
+    redirect($redirecturl);
+}
+// END UCLA MOD: CCLE-4863
+
 // Completion and trigger events.
 lti_view($lti, $course, $cm, $context);
 
