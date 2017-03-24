@@ -44,7 +44,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
     $count = count($videos);
     if ($count != 0) {
-        print_page_tabs(get_string('headerbcast', 'block_ucla_media'), $course->id);
+        print_media_page_tabs(get_string('headerbcast', 'block_ucla_media'), $course->id);
         display_all($course);
 
         $event = \block_ucla_media\event\index_viewed::create(

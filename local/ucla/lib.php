@@ -1317,7 +1317,7 @@ function get_active_terms($descending = 'false') {
 function setup_js_tablesorter($tableid = null, $options = array(), $idorclass = 'id') {
     global $PAGE;
 
-    $PAGE->requires->js('/local/ucla/tablesorter/jquery-latest.js');
+    $PAGE->requires->jquery();
     $PAGE->requires->js('/local/ucla/tablesorter/jquery.tablesorter.js');
     $PAGE->requires->css('/local/ucla/tablesorter/themes/blue/style.css');
 

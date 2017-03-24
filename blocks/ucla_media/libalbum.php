@@ -48,7 +48,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
             "courseid = ? GROUP BY title", array($courseid));
     $count = count($videos);
     if ($count != 0) {
-        print_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
+        print_media_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
         html_writer::start_tag('div',array('id' => 'anchor'));
         display_page_album($course, $albumid);
         html_writer::end_div('div');
