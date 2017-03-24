@@ -808,7 +808,34 @@ function forum_cron() {
                 $a->courseidnumber = $data->get_courseidnumber();
                 $a->coursefullname = $data->get_coursefullname();
                 $a->courseshortname = $data->get_coursename();
-                $postsubject = html_to_text(get_string('postmailsubject', 'forum', $a), 0);
+                
+                // START UCLA MOD: SSC-2050 - Include associated courses in susbject header of forum emails
+                //$postsubject = html_to_text(get_string('postmailsubject', 'forum', $a), 0);
+                require_once($CFG->dirroot.'/local/ucla/lib.php');
+                require_once($CFG->dirroot.'/course/format/ucla/renderer.php');
+                
+                $courseinfos = ucla_get_course_info($course->id);
+                $displayinfo = array();
+                $limitcrosslistemail = get_config('local_ucla', 'limitcrosslistemail');
+                
+                foreach ($courseinfos as $key => $courseinfo) {
+                    if (count($displayinfo) >= $limitcrosslistemail) {
+                        $displayinfo[$key] = '...';
+                        break;
+                    }
+                    $course_text = $courseinfo->subj_area . $courseinfo->coursenum . '-' .
+                            $courseinfo->sectnum;
+                    $displayinfo[$key] = $course_text;
+                }
+
+                $regcoursetext = implode(' / ', $displayinfo);
+
+                if ($regcoursetext == "") {
+                    $postsubject = html_to_text("$shortname: ".format_string($post->subject, true));
+                } else {
+                    $postsubject = html_to_text("$shortname / $regcoursetext: ".format_string($post->subject, true));
+                }
+                // END UCLA MOD: SSC-2050
 
                 $rootid = forum_get_email_message_id($discussion->firstpost, $userto->id);
 

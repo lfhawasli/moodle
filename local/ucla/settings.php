@@ -53,6 +53,13 @@ if ($hassiteconfig) {
             get_string('registrarurlconfig', 'local_ucla'),
             get_string('registrarurlconfighelp', 'local_ucla'),
             'https://sa.ucla.edu', PARAM_URL));
+    
+    // SSC-2050 - Include associated courses in subject header of forum emails
+    $settings->add(new admin_setting_configtext(
+        'local_ucla/limitcrosslistemail',
+        get_string('limitcrosslistemailname', 'local_ucla'),
+        get_string('limitcrosslistemaildesc', 'local_ucla'),
+        2, PARAM_INT));
 
     $ADMIN->add('localplugins', $settings);
 
