@@ -56,7 +56,7 @@ function kalvidassign_assignemnt_submission_expired($kalvidassign) {
 
 /**
  * Retrieve a list of users who have submitted assignments
- *
+ * 
  * @param int $kalvidassignid The assignment id.
  * @param string $filter Filter results by assignments that have been submitted or
  * assignment that need to be graded or no filter at all.
@@ -250,8 +250,14 @@ function kalvidassign_email_teachers($cm, $name, $submission, $context) {
  */
 function kalvidassign_get_graders($cm, $user, $context) {
     // Potential graders.
-    $potgraders = get_users_by_capability($context, 'mod/kalvidassign:gradesubmission', '', '', '', '', '', '', false, false);
-    
+    // START UCLA MOD: CCLE-5309 -  "Email alert to teacher" sent to site managers.
+    //$potgraders = get_users_by_capability($context, 'mod/kalvidassign:gradesubmission', '', '', '', '', '', '', false, false);
+    $coursecxt = $context->get_course_context();
+    $course = get_course($coursecxt->instanceid);
+    $potgraders = \local_ucla_core_edit::get_course_graders($course, '',
+            'mod/kalvidassign:gradesubmission');
+    // END UCLA MOD: CCLE-5309
+
     $graders = array();
     // Separate groups are being used.
     if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
