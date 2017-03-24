@@ -59,8 +59,12 @@ class renderer extends \plugin_renderer_base {
      */
     public function render_category(category $category) {
         $classes = $category->classes;
+        // START UCLA MOD: CCLE-6512 - Profile Course details doesn't match My page Class sites
+        $title = str_replace(' ', '', strtolower($category->title));
         if (empty($classes)) {
-            $return = \html_writer::start_tag('section', array('class' => 'node_category'));
+            //$return = \html_writer::start_tag('section', array('class' => 'node_category'));
+            $return = \html_writer::start_tag('section', array('class' => 'node_category_' . $title));
+        // START UCLA MOD: CCLE-6512
         } else {
             $return = \html_writer::start_tag('section', array('class' => 'node_category ' . $classes));
         }

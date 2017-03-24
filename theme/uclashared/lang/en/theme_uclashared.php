@@ -88,11 +88,20 @@ $string['setting_default_logo_sub_text'] =
 
 $string['setting_title_system_name'] = 'System name';
 $string['setting_desc_system_name'] = 'The system name that will be displayed in the banner, below the logo.';
-$string['setting_default_system_name'] = 'Shared system';
+$string['setting_default_system_name'] = 'Shared System';
 
 $string['setting_title_system_link'] = 'System link';
 $string['setting_desc_system_link'] = 'The link associated with the system name.';
 $string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=924';
+
+// CCLE-6512 - Profile Course details doesn't match My page Class sites.
+$string['setting_title_alternative_sharedsystem_name'] = 'Alternative Shared System name';
+$string['setting_desc_alternative_sharedsystem_name'] = 'This is an alternative shared system.';
+$string['setting_default_alternative_sharedsystem_name'] = 'Social Sciences';
+
+$string['setting_title_alternative_sharedsystem_link'] = 'Alternative Shared System link';
+$string['setting_desc_alternative_sharedsystem_link'] = 'The link associated with the alternative shared system name.';
+$string['setting_default_alternative_sharedsystem_link'] = 'https://moodle2.sscnet.ucla.edu';
 
 $string['setting_title_disable_post_blocks'] = 'Disable blocks on right';
 $string['setting_desc_disable_post_blocks'] = 'Disable courses from adding blocks onto the right side of the course page. The site page will still have blocks on the right.';

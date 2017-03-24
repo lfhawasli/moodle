@@ -204,6 +204,9 @@ $string['cachedef_rolemappings'] = 'UCLA role mapping';
 $string['cachedef_urcmappings'] = 'UCLA ucla_request_classes to Moodle courses';
 $string['cachedef_usermappings'] = 'UCLA user idnumber/username to Moodle users';
 
+// CCLE-6512 - Profile Course details doesn't match My page Class sites
+$string['cantfindcourse'] = '* Can\'t find your course or collaboration site? Check {$a->altsystemname} or {$a->myucla}.';
+
 // CCLE-4415 - Prompt deletion warning
 $string['deletecoursewarning'] = 'WARNING<p>You are deleting a course for which content has been added.</p>';
 $string['deletecoursesafe'] = 'You are deleting a course for which no content has been added.';
