@@ -49,7 +49,10 @@ class single_submission_page_viewed extends \core\event\base {
     }
  
     public function get_url() {
-        return new \moodle_url('single_submission.php', array('cmid' => $this->contextinstanceid));
+        // START UCLA MOD: CCLE-6555 - "Video resource viewed" log URL missing slash
+        //return new \moodle_url('single_submission.php', array('cmid' => $this->contextinstanceid));
+        return new \moodle_url('/mod/kalvidassign/single_submission.php', array('cmid' => $this->contextinstanceid));
+        // END UCLA MOD: CCLE-6555
     }
  
     public function get_legacy_logdata() {
