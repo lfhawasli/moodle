@@ -43,7 +43,7 @@ $CFG->dbuser    = '';
 $CFG->dbpass    = '';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions['dbpersist'] = 0;
-$CFG->dboptions['dbsocket']  = 1;
+$CFG->dboptions['dbsocket']  = 0;
 
 $CFG->wwwroot  = 'https://test.ccle.ucla.edu';
 $CFG->dataroot = '/moodle_data'; 
