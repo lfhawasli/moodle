@@ -93,8 +93,9 @@ function display_page_album($course, $albumid) {
     $reserves = $DB->get_records_sql($sql, array($courseid, $albumid));
     
     $samplereserve = reset($reserves);
+    $title = $samplereserve->albumtitle;
     if ($samplereserve->composer != null) {
-        $title = $samplereserve->composer.' '.$samplereserve->albumtitle;
+        $title = $samplereserve->composer.' '.$title;
     }
     echo html_writer::tag('h3', 'Track Listing: '.$title);
     $output = array();

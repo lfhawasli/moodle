@@ -86,7 +86,7 @@ function display_page($course) {
         }
         $titles[$reserve->id] = $title;
     }
-    natsort($titles);    
+    natcasesort($titles);    
     foreach ($titles as $id => $title) {
         $outputstr = html_writer::link(
                         new moodle_url('/blocks/ucla_media/libalbum.php',
