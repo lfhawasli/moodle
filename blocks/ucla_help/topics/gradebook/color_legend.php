@@ -28,12 +28,6 @@ $buffer = <<<END
             </div>
             <div class="ui divided list">
                 <div class="item">
-                    <div class="gradebook-column-color gradebook-color"></div> Column highlight
-                </div>
-                <div class="item">
-                    <div class="gradebook-row-color gradebook-color"></div> Row highlight
-                </div>
-                <div class="item">
                     <div class="gradebook-overridden gradebook-color"></div> Overriden grade
                 </div>
             </div>
@@ -46,7 +40,7 @@ $buffer = <<<END
                 </div>
                 <div class="item">
 
-                    <img alt="Edit grade" class="smallicon" title="Edit grade" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/edit"> Edit grade
+                    <img alt="Edit grade" class="smallicon" title="Edit grade" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for student
 
                 </div>
             </div>
@@ -64,7 +58,7 @@ $buffer = <<<END
                     <img alt="Full view" class="smallicon" title="Full view" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_whole"> Full view
                 </div>
                 <div class="item">
-                    <img alt="Full view" class="smallicon" title="Quick edit" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit
+                    <img alt="Full view" class="smallicon" title="Quick edit" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for item
                 </div>
             </div>
         </div>

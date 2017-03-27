@@ -571,14 +571,14 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
     $params['courseid'] = $courseid;
     $params['activeuser'] = ENROL_USER_ACTIVE;
     $params['enabledinstance'] = ENROL_INSTANCE_ENABLED;
-    if ($ignored = $meta->get_config('nosyncroleids')) {
-        list($notignored, $xparams) = $DB->get_in_or_equal(explode(',', $ignored), SQL_PARAMS_NAMED, 'ig', false);
-        $params = array_merge($params, $xparams);
-        $notignored = "AND pra.roleid $notignored";
-    } else {
-        $notignored = "";
-    }
-    // START UCLA MOD: CCLE-2386 - TA Site Creator
+    // START UCLA MOD: CCLE-2386 - TA Site Creator / CCLE-6499 - Selecting roles for "No sync role ids" breaks TA sites
+//    if ($ignored = $meta->get_config('nosyncroleids')) {
+//        list($notignored, $xparams) = $DB->get_in_or_equal(explode(',', $ignored), SQL_PARAMS_NAMED, 'ig', false);
+//        $params = array_merge($params, $xparams);
+//        $notignored = "AND pra.roleid $notignored";
+//    } else {
+//        $notignored = "";
+//    }
 //    $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid, e.courseid
 //              FROM {role_assignments} ra
 //              JOIN {enrol} e ON (e.id = ra.itemid AND ra.component = 'enrol_meta' AND e.enrol = 'meta' $onecourse)
@@ -586,6 +586,19 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
 //         LEFT JOIN {role_assignments} pra ON (pra.contextid = pc.id AND pra.userid = ra.userid AND pra.roleid = ra.roleid AND pra.component <> 'enrol_meta' $notignored)
 //         LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = ra.userid AND ue.status = :activeuser)
 //             WHERE pra.id IS NULL OR ue.id IS NULL OR e.status <> :enabledinstance";
+    if ($ignored = $meta->get_config('nosyncroleids')) {
+        list($notignored, $xparams) = $DB->get_in_or_equal(explode(',', $ignored), SQL_PARAMS_NAMED, 'ig', false);
+        $params = array_merge($params, $xparams);
+        $notignored = "AND pra.roleid $notignored";
+        // CCLE-6499: Generate a new set of parameters with different key names that are associated with the same
+        // values to merge with the existing array of parameters.
+        list($xnotignored, $xparams) = $DB->get_in_or_equal(explode(',', $ignored), SQL_PARAMS_NAMED, 'ig', false);
+        $params = array_merge($params, $xparams);
+        $xnotignored = "AND pra.roleid $xnotignored";
+    } else {
+        $notignored = "";
+        $xnotignored = "";
+    }
     $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid, e.courseid
         , e.id AS enrolid, e.customint2 AS promoroleid, e.customint3 AS promotoroleid, e.customint4 AS promouserid, spra.roleid AS unpromoroleid, e.customtext1 AS tasiteowners, u.idnumber
               FROM {role_assignments} ra
@@ -593,10 +606,10 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
               JOIN {context} pc ON (pc.instanceid = e.customint1 AND pc.contextlevel = :coursecontext)
               JOIN {user} u ON (u.id = ra.userid AND u.deleted = 0)
          LEFT JOIN {role_assignments} pra ON (pra.contextid = pc.id AND pra.userid = ra.userid AND pra.roleid = ra.roleid AND pra.component <> 'enrol_meta' $notignored)
-         LEFT JOIN {role_assignments} spra ON (spra.contextid = pc.id AND spra.userid = ra.userid AND spra.roleid = e.customint2 AND spra.component <> 'enrol_meta' $notignored)
+         LEFT JOIN {role_assignments} spra ON (spra.contextid = pc.id AND spra.userid = ra.userid AND spra.roleid = e.customint2 AND spra.component <> 'enrol_meta' $xnotignored)
          LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = ra.userid AND ue.status = :activeuser)
              WHERE pra.id IS NULL OR ue.id IS NULL OR e.status <> :enabledinstance";
-    // END UCLA MOD: CCLE-2386
+    // END UCLA MOD: CCLE-2386 / CCLE-6499
 
     if ($unenrolaction != ENROL_EXT_REMOVED_SUSPEND) {
         $rs = $DB->get_recordset_sql($sql, $params);

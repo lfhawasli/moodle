@@ -6,7 +6,7 @@
 }
 
 .sectiontitle {
-    background: transparent url(./uclashared/pix/bgFormHdr.jpg) top left repeat;
+    background: transparent url([[pix:theme|bgFormHdr]]) top left repeat;
     font-weight: bold;
     position: relative;
     display: block;

@@ -164,7 +164,7 @@ function display_video_reserves($course) {
     // Adding GROUP BY to the where clause of the database query ensures no
     // duplicate videos are displayed for crosslisted courses.
     $videos = get_video_data($course->id);
-    print_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
+    print_media_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
         
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
 
@@ -270,7 +270,7 @@ function print_video_list($videolist, $headertitle) {
  * @param string $activetab
  * @param int $courseid
  */
-function print_page_tabs($activetab, $courseid) {
+function print_media_page_tabs($activetab, $courseid) {
     global $DB;
     $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
     $count = count($videos);

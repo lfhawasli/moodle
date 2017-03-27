@@ -43,7 +43,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     $videos = $DB->get_records('ucla_library_music_reserves', array('courseid' => $courseid));
     $count = count($videos);
     if ($count != 0) {
-        print_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
+        print_media_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
         display_page($course);
 
         $event = \block_ucla_media\event\index_viewed::create(
@@ -86,7 +86,7 @@ function display_page($course) {
         }
         $titles[$reserve->id] = $title;
     }
-    natsort($titles);    
+    natcasesort($titles);    
     foreach ($titles as $id => $title) {
         $outputstr = html_writer::link(
                         new moodle_url('/blocks/ucla_media/libalbum.php',

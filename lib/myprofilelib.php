@@ -267,10 +267,25 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
             }
             $courselisting .= html_writer::end_tag('ul');
             if (!empty($mycourses)) {
+                // START UCLA MOD: CCLE-6512 - Profile Course details doesn't match My page Class sites
+                $ccleprefix = 'CCLE';
                 // Add this node only if there are courses to display.
-                $node = new core_user\output\myprofile\node('coursedetails', 'courseprofiles',
-                    get_string('courseprofiles'), null, null, rtrim($courselisting, ', '));
+//                $node = new core_user\output\myprofile\node('coursedetails', 'courseprofiles',
+//                        get_string('courseprofiles'), null, null, rtrim($courselisting, ', '));
+                $node = new core_user\output\myprofile\node('coursedetails', 'systemname',
+                        $ccleprefix.' '.get_config('theme_uclashared', 'system_name').' *', null, null, rtrim($courselisting, ', '));
                 $tree->add_node($node);
+
+                // Redirect the user to view missing courses from MyUCLA/alternative shared system.
+                $a = new stdClass();
+                $a->altsystemname = html_writer::link(get_config('theme_uclashared', 'alternative_sharedsystem_link'),
+                        $ccleprefix.' '.get_config('theme_uclashared', 'alternative_sharedsystem_name'));
+                $a->myucla = html_writer::link(new moodle_url('https://my.ucla.edu'), 'MyUCLA');
+
+                $node = new core_user\output\myprofile\node('coursedetails', 'cantfindcourse',
+                        '<strong>'.get_string('cantfindcourse', 'local_ucla', $a).'</strong>');
+                $tree->add_node($node);
+                // END UCLA MOD: CCLE-6512
             }
         }
     }

@@ -43,7 +43,7 @@ $CFG->dbuser    = '';
 $CFG->dbpass    = '';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions['dbpersist'] = 0;
-$CFG->dboptions['dbsocket']  = 1;
+$CFG->dboptions['dbsocket']  = 0;
 
 $CFG->wwwroot  = 'https://test.ccle.ucla.edu';
 $CFG->dataroot = '/moodle_data'; 
@@ -152,7 +152,6 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 // UCLA Theme settings
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'test';
 $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
-$CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
@@ -494,6 +493,9 @@ $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a bro
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
 $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4521 - Handle "preferred name".
+
+// SSC-2050 - Sets limit to number of crosslisted course displayed in forum email header
+$CFG->forced_plugin_settings['local_ucla']['limitcrosslistemail'] = 2;
 
 // Grading config variables.
 // CCLE-4295 - Add Grouping Filter for the Grader Report

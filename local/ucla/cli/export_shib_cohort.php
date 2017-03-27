@@ -42,7 +42,7 @@ if ($options['help'] || empty($unrecognized) || count($unrecognized) != 2) {
 
 Example:
 \$php local/ucla/cli/export_shib_cohort.php <cohort idnumber> <path to export to>
-\$php local/ucla/cli/export_shib_cohort.php stageaccess /etc/httpd/conf.d/shibcohort.conf
+\$php local/ucla/cli/export_shib_cohort.php stageaccess /etc/httpd/conf.d/stageaccess.conf
 ";
     die($help);
 }
