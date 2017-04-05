@@ -89,11 +89,15 @@ $string['coursetitle'] = 'Course title';
 // CCLE-3141 - Prepare for post M2 deployment
 $string['cutoff12S'] = 'If you cannot find the course for which ' . 
         'you\'re looking, please visit our archive server ' . 
-        '(<a href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>).';
+        '(<a href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>). ' .
+        'Please note the archive server will only open in the ' .
+        '<a target="_blank" href="https://www.mozilla.org/en-US/firefox/desktop/">Firefox browser</a>.';
 $string['before12S'] = 'You are currently on the CCLE production server ' . 
         '(<a href="https://ccle.ucla.edu">https://ccle.ucla.edu</a>). For ' . 
         'courses from Winter 2012 or earlier, please visit our archive server ' . 
-        '(<a href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>).';
+        '(<a href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>). ' .
+        'Please note the archive server will only open in the ' .
+        '<a target="_blank" href="https://www.mozilla.org/en-US/firefox/desktop/">Firefox browser</a>.';
 
 $string['cutoff12F'] = 'If you cannot find the course for which ' . 
         'you\'re looking, please visit our Production Server ' . 
