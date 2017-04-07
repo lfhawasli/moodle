@@ -45,7 +45,10 @@ $observers = array(
     ),
     array(
         'eventname' => '\core\event\role_assigned',
-        'callback'  => '\local_publicprivate\observers::role_assigned'
+        'callback'  => '\local_publicprivate\observers::role_assigned',
+        // Increasing priority so that we add user to group/grouping first,
+        // so any capability checks after role assign work as expected.
+        'priority'    => 9999,
     ),
     array(
         'eventname' => '\core\event\role_unassigned',
