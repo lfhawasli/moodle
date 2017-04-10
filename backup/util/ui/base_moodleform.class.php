@@ -218,6 +218,25 @@ abstract class base_moodleform extends moodleform {
         $this->_form->addElement('header', $name, $text);
     }
 
+    // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+    /**
+     * Adds a validation rule for the given field
+     *
+     * @param    string     $element       Form element name
+     * @param    string     $message       Message to display for invalid data
+     * @param    string     $type          Rule type, use getRegisteredRules() to get types
+     * @param    string     $format        (optional)Required for extra rule data
+     * @param    string     $validation    (optional)Where to perform validation: "server", "client"
+     * @param    boolean    $reset         Client-side validation: reset the form element to its original value if there is an error?
+     * @param    boolean    $force         Force the rule to be applied, even if the target form element does not exist
+     */
+    public function add_rule($element, $message, $type, $format=null, $validation='server', $reset = false, $force = false) {
+        if ($this->_form->elementExists($element)) {
+            $this->_form->addRule($element, $message, $type, $format, $validation, $reset, $force);
+        }
+    }
+    // END UCLA MOD: CCLE-6437
+
     /**
      * Adds HTML formatting for the given backup setting, needed to group/segment
      * correctly.

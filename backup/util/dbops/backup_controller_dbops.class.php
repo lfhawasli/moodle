@@ -530,7 +530,14 @@ abstract class backup_controller_dbops extends backup_dbops {
      */
     public static function backup_get_original_course_info($courseid) {
         global $DB;
-        return $DB->get_record('course', array('id' => $courseid), 'fullname, shortname, startdate, format');
+        // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        // return $DB->get_record('course', array('id' => $courseid), 'fullname, shortname, startdate, format');
+        $coursesql = "SELECT    fullname, shortname, startdate, format, si.type as sitetype
+                      FROM      {course} c
+                      LEFT JOIN {ucla_siteindicator} si ON c.id = si.courseid
+                      WHERE     c.id = :id";
+        return $DB->get_record_sql($coursesql, array('id' => $courseid));
+        // END UCLA MOD: CCLE-6437
     }
 
     /**

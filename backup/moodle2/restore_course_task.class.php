@@ -26,6 +26,9 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+// START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+require_once($CFG->dirroot . '/local/ucla/lib.php');
+// END UCLA MOD: CCLE-6437
 
 /**
  * course task that provides all the properties and common steps to be performed
@@ -165,6 +168,19 @@ class restore_course_task extends restore_task {
      * Define the common setting that any restore course will have
      */
     protected function define_settings() {
+        // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        if (is_collab_site($this->get_courseid())) {
+            // Only show site indicator types for collaboration sites
+            $sitetypelist = siteindicator_manager::get_types_list();
+            $sitetypenames = array("" => get_string('selecttype', 'tool_uclasiteindicator')) + array_map(function($type) { return $type['fullname']; }, $sitetypelist);
+            unset($sitetypenames[siteindicator_manager::SITE_TYPE_TASITE]);
+
+            $sitetype = new restore_course_generic_setting('course_sitetype', base_setting::IS_TEXT, $this->get_info()->original_course_sitetype);
+            $sitetype->set_ui(new backup_setting_ui_select($sitetype, get_string('type', 'tool_uclasiteindicator'), $sitetypenames));
+            $sitetype->set_help('sitetype', 'tool_uclasiteindicator');
+            $this->add_setting($sitetype);
+        }
+        // END UCLA MOD: CCLE-6437
 
         //$name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED
         $fullname = new restore_course_generic_text_setting('course_fullname', base_setting::IS_TEXT, $this->get_info()->original_course_fullname);
