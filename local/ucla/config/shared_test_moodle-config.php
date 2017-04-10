@@ -44,6 +44,7 @@ $CFG->dbpass    = '';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions['dbpersist'] = 0;
 $CFG->dboptions['dbsocket']  = 0;
+$CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 $CFG->wwwroot  = 'https://test.ccle.ucla.edu';
 $CFG->dataroot = '/moodle_data'; 
