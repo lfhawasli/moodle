@@ -29,19 +29,9 @@ ul, ol {
 }
 
 img.icon {
-    width: auto;
-    height: auto;
-    @include box-sizing(content-box);
-    
-    &.pluginicon {
-        width: 24px !important;
-        height: 24px !important;
-    }
-}
-img.iconlarge {
     height: 24px;
     width: 24px;
-    vertical-align: middle;
+    @include box-sizing(content-box);
 }
 
 .defaultuserpic {
