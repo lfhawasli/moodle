@@ -157,6 +157,9 @@ abstract class backup_general_helper extends backup_helper {
         $info->original_course_shortname= $infoarr['original_course_shortname'];
         $info->original_course_startdate= $infoarr['original_course_startdate'];
         $info->original_course_contextid= $infoarr['original_course_contextid'];
+        // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        $info->original_course_sitetype= $infoarr['original_course_sitetype'];
+        // END UCLA MOD: CCLE-6437
         $info->original_system_contextid= $infoarr['original_system_contextid'];
         // Moodle backup file don't have this option before 2.3
         if (!empty($infoarr['include_file_references_to_external_content'])) {

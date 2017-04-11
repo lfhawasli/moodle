@@ -44,6 +44,7 @@ $CFG->dbpass    = '';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions['dbpersist'] = 0;
 $CFG->dboptions['dbsocket']  = 0;
+$CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 $CFG->wwwroot  = 'https://stage.ccle.ucla.edu';
 $CFG->dataroot = '/moodle_data'; 
@@ -347,7 +348,7 @@ $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
 // Site administration > Plugins > Admin tools > Manage senior scholars
-$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '003215880;303536506';
+$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '304890652;904106809;304555952';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Enrollments > UCLA registrar

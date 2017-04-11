@@ -1840,6 +1840,9 @@ class restore_course_structure_step extends restore_structure_step {
         $canchangeshortname = $isnewcourse || has_capability('moodle/course:changeshortname', $context, $userid);
         $canchangefullname = $isnewcourse || has_capability('moodle/course:changefullname', $context, $userid);
         $canchangesummary = $isnewcourse || has_capability('moodle/course:changesummary', $context, $userid);
+        // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        $canchangesitetype = $isnewcourse || has_capability('tool/uclasiteindicator:edit', $context, $userid);
+        // END UCLA MOD: CCLE-6437
 
         $data = (object)$data;
         $data->id = $this->get_courseid();
@@ -1847,6 +1850,9 @@ class restore_course_structure_step extends restore_structure_step {
         $fullname  = $this->get_setting_value('course_fullname');
         $shortname = $this->get_setting_value('course_shortname');
         $startdate = $this->get_setting_value('course_startdate');
+        // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        $sitetype = $this->get_setting_value('course_sitetype');
+        // END UCLA MOD: CCLE-6437
 
         // Calculate final course names, to avoid dupes.
         list($fullname, $shortname) = restore_dbops::calculate_course_names($this->get_courseid(), $fullname, $shortname);
@@ -1919,6 +1925,25 @@ class restore_course_structure_step extends restore_structure_step {
 
         // Course record ready, update it
         $DB->update_record('course', $data);
+
+        // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        // Update site type if necessary
+        if ($sitetype && $canchangesitetype) {
+            $sitetypedata = $DB->get_record_sql('SELECT * FROM {ucla_siteindicator} WHERE courseid = ?', array($this->get_courseid()));
+            if ($sitetypedata) {
+                if ($sitetypedata->type != $sitetype) {
+                    $sitetypedata->type = $sitetype;
+                    $DB->update_record('ucla_siteindicator', $sitetypedata);
+                }
+            } else {
+                // No site type exists. Insert record.
+                $newsitetype = new stdClass();
+                $newsitetype->courseid = $this->get_courseid();
+                $newsitetype->type = $sitetype;
+                $DB->insert_record('ucla_siteindicator', $newsitetype);
+            }
+        }
+        // END UCLA MOD: CCLE-6437
 
         course_get_format($data)->update_course_format_options($data);
 
