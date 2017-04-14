@@ -2043,14 +2043,16 @@ if ($consolecommand == "$title") {
         
         if ($contextlevelparam != CONTEXT_COURSE && $contextlevelparam != CONTEXT_COURSECAT) {
             $sql = "SELECT  ra.id,
-                            u.id AS uid, 
+                            u.id AS uid,
+                            u.lastaccess AS last,
                             CONCAT(u.lastname, ', ', u.firstname) AS name,
                             ra.modifierid,
                             ra.timemodified " . $middlesql .
                    "ORDER BY name";
         } else {
             $sql = "SELECT  ra.id,
-                            u.id AS uid, 
+                            u.id AS uid,
+                            u.lastaccess AS last,
                             CONCAT(u.lastname, ', ', u.firstname) AS name,
                             clevel.id AS cid,
                             clevel.$contextnamecolumn AS cname,
@@ -2088,6 +2090,12 @@ if ($consolecommand == "$title") {
                 $modifierresults = $DB->get_records_sql($sql, array('modifierid' => $result->modifierid));
                 $modifier = reset($modifierresults);
                 $modifiedrow->Assigned_By = $modifier->name;
+            }
+            $lastaccess = $result->last;
+            if ($lastaccess != 0) {
+                $modifiedrow->Last_Access= userdate($lastaccess);
+            } else {
+                $modifiedrow->Last_Access= 'User has not accessed CCLE';
             }
             $modifiedresults[] = $modifiedrow;
         }
