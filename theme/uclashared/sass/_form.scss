@@ -142,3 +142,8 @@ input[type="checkbox"] + label {
         display: block;
     }
 }
+
+// Editing Box resize for quick title editing.
+.inplaceeditable.inplaceeditingon input{
+    height: 20px;
+}
