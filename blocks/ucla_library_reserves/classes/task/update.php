@@ -70,26 +70,6 @@ class update extends \core\task\scheduled_task {
                             'type' => 'string',
                             'min_size' => '0',
                             'max_size' => '40');
-        $retval[] = array('name' => 'instructor_last_name',
-                            'type' => 'string',
-                            'min_size' => '0',
-                            'max_size' => '50');
-        $retval[] = array('name' => 'instructor_first_name',
-                            'type' => 'string',
-                            'min_size' => '0',
-                            'max_size' => '40');
-        $retval[] = array('name' => 'reserves_list_title',
-                            'type' => 'string',
-                            'min_size' => '0',
-                            'max_size' => '40');
-        $retval[] = array('name' => 'list_effective_date',
-                            'type' => 'date_dashed',
-                            'min_size' => '6',
-                            'max_size' => '10');
-        $retval[] = array('name' => 'list_ending_date',
-                            'type' => 'date_dashed',
-                            'min_size' => '6',
-                            'max_size' => '10');
         $retval[] = array('name' => 'url',
                             'type' => 'url',
                             'min_size' => '1',
@@ -112,18 +92,10 @@ class update extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        // Check to see that config variable is initialized.
-        $datasourceurl = get_config('block_ucla_library_reserves', 'source_url');
-        if (empty($datasourceurl)) {
-            log_ucla_data('library reserves', 'read', 'Initializing cfg variables',
-                    get_string('errlrmsglocation', 'tool_ucladatasourcesync'));
-            return;
-        }
-
         // Begin database update.
         echo get_string('lrstartnoti', 'tool_ucladatasourcesync') . "\n";
 
-        $parseddata = $this->parse_datasource($datasourceurl);
+        $parseddata = $this->parse_datasource();
         if (empty($parseddata)) {
             echo get_string('lrnoentries', 'tool_ucladatasourcesync') . "\n";
             return false;
@@ -163,7 +135,7 @@ class update extends \core\task\scheduled_task {
                 log_ucla_data('library reserves', 'write', 'Inserting library reserve data',
                         get_string('errbcinsert', 'tool_ucladatasourcesync') );
 
-                throw new moodle_exception('errbcinsert', 'tool_ucladatasourcesync');
+                throw new \moodle_exception('errbcinsert', 'tool_ucladatasourcesync');
             }
 
             // Assuming the both inserts work, we get to the following line.
@@ -179,9 +151,67 @@ class update extends \core\task\scheduled_task {
                 $numinserted) . "\n";
     }
 
+    /**
+     * Gets data via web service and returns a single array.
+     */
+    private function get_datasource() {
+        $retval = array();
+        
+        // Check to see that config variable is initialized.
+        $datasourceurl = get_config('block_ucla_library_reserves', 'source_url');
+        if (empty($datasourceurl)) {
+            log_ucla_data('library reserves', 'read', 'Initializing cfg variables',
+                    get_string('errlrmsglocation', 'tool_ucladatasourcesync'));
+            return;
+        }
+
+        $terms = get_active_terms();
+        // Iterating through all active terms and retrieving data for them.
+        foreach ($terms as $term) {
+            // Get all of the departments.
+            $departments = $this->read_xml_data($datasourceurl .
+                    '/departments/during/' . $term);
+            if (empty($departments)) {
+                // Nothing for given term.
+                continue;
+            }
+
+            $departments = $departments['department'];
+            foreach ($departments as $department) {
+                // Get all of the courses in each department.
+                $courses = $this->read_xml_data($datasourceurl.'/courses/dept/' .
+                        $department['departmentID'] . '/term/' . $term);
+                if (empty($courses)) {
+                    continue;
+                }
+                $courses = $courses['course'];
+
+                // Handle when there is only one course in this department.
+                if (key($courses) === 'courseNumber' || key($courses) === 'courseName') {
+                    // Some entries do not have course number.
+                    $temp['0'] = $courses;
+                    $courses = $temp;
+                }
+
+                foreach ($courses as $course) {
+                    $entry = array();
+                    $entry['course_number'] = isset($course['courseNumber']) ? $course['courseNumber'] : '';
+                    $entry['course_name'] = $course['courseName'];
+                    $entry['department_code'] = $department['departmentCode'];
+                    $entry['department_name'] = $department['departmentName'];
+                    $entry['url'] = $course['url'];
+                    $entry['srs'] = $course['srsNumber'];
+                    $entry['quarter'] = $department['quarter'];
+                    $retval[] = $entry;
+                }
+            }
+        }
+        return $retval;
+    }
+
    /**
     * Returns task name.
-    * 
+    *
     * @return string
     */
     public function get_name() {
@@ -190,19 +220,19 @@ class update extends \core\task\scheduled_task {
 
     /**
      * Parses the data at the given source and outputs clean, usable data.
-     * 
+     *
      * @param string $datasourceurl
      * @return array    False on error.
      */
-    private function parse_datasource($datasourceurl) {
+    private function parse_datasource() {
         $parseddata = array();
 
         // Get fields that should be in data source.
         $fields = $this->define_data_source();
 
-        // Read the file into a two-dimensional array.
-        $lines = file($datasourceurl);
-        if ($lines === false) {
+        // Flatten web service data into single array.
+        $entries = $this->get_datasource();
+        if ($entries === false) {
             echo 'returning false';
             log_ucla_data('library reserves', 'read', 'Reading data source url',
                     get_string('errlrfileopen', 'tool_ucladatasourcesync'));
@@ -211,28 +241,7 @@ class update extends \core\task\scheduled_task {
 
         $invalidfieldserrors = array();
         $numentries = 0;
-        foreach ($lines as $linenum => $line) {
-            // Stop processing data if we hit the end of the file.
-            if ($line == "=== EOF ===\n") {
-                break;
-            }
-
-            // Remove the newline at the end of each line.
-            $line = rtrim($line);
-            $incomingdata = explode("\t", $line);
-
-            // Check if all entries have the correct number of columns.
-            if (count($incomingdata) != count($fields)) {
-                // If first line, then don't give error, just skip it.
-                if ($linenum != 0) {
-                    log_ucla_data('library reserves', 'read', 'Reading data source',
-                            get_string('errinvalidrowlen', 'tool_ucladatasourcesync', $linenum) );
-                    echo(get_string('errinvalidrowlen', 'tool_ucladatasourcesync',
-                            $linenum) . "\n");
-                }
-                continue;
-            }
-
+        foreach ($entries as $entry) {
             // Bind incoming data field to local database table.
             // Don't fail if fields are invalid, just note it and continue, because
             // data is very messy, but we will try to work with it when trying to
@@ -241,7 +250,7 @@ class update extends \core\task\scheduled_task {
             foreach ($fields as $fieldnum => $fielddef) {
                 // Validate/clean data.
                 $data = validate_field($fielddef['type'],
-                        $incomingdata[$fieldnum], $fielddef['min_size'],
+                        $entry[$fielddef['name']], $fielddef['min_size'],
                         $fielddef['max_size']);
                 if ($data === false) {
                     $invalidfields[] = $fielddef['name'];
@@ -255,8 +264,7 @@ class update extends \core\task\scheduled_task {
             if (!empty($invalidfields)) {
                 $error = new \stdClass();
                 $error->fields = implode(', ', $invalidfields);
-                $error->line_num = $linenum;
-                $error->data = print_r($incomingdata, true);
+                $error->data = print_r($entry, true);
 
                 // Compile a list of parsing errors and send all errors in one email.
                 $invalidfieldserrors[] = get_string('warninvalidfields',
@@ -276,6 +284,24 @@ class update extends \core\task\scheduled_task {
         }
 
         return $parseddata;
+    }
+
+    /**
+     * Converts data url from web service from XML to PHP array.
+     *
+     * @param type $url
+     * @return boolean
+     */
+    private function read_xml_data($url) {
+        $xml = simplexml_load_file($url);
+        if ($xml === false) {
+            log_ucla_data('library reserves', 'read', 'Reading data source url',
+                   get_string('errlrfileopen', 'tool_ucladatasourcesync'));
+            return false;
+        }
+        $json = json_encode($xml);
+        $jarray = json_decode($json, true);
+        return $jarray;
     }
 
 }

@@ -47,5 +47,31 @@ function xmldb_block_ucla_library_reserves_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2012060300, 'ucla_library_reserves');        
     }
 
+    // Change source URL and drop unneeded columns.
+    if ($oldversion < 2017092800) {
+        // Change source URL.
+        set_config('source_url', 'https://webservices.library.ucla.edu/reserves',
+                'block_ucla_library_reserves');
+
+        // Drop unneeded columns.
+        $table = new xmldb_table('ucla_library_reserves');
+
+        $fields = array();
+        $fields[] = new xmldb_field('instructor_last_name');
+        $fields[] = new xmldb_field('instructor_first_name');
+        $fields[] = new xmldb_field('reserves_list_title');
+        $fields[] = new xmldb_field('list_effective_date');
+        $fields[] = new xmldb_field('list_ending_date');
+
+        // Conditionally launch drop fields.
+        foreach ($fields as $field) {
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        upgrade_block_savepoint(true, 2017092800, 'ucla_library_reserves');
+    }
+
     return true;
 }

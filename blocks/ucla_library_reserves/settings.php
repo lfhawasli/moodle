@@ -10,7 +10,7 @@ if ($ADMIN->fulltree) {
             'block_ucla_library_reserves/source_url',
             get_string('headerlibraryreservesurl','block_ucla_library_reserves'),
             get_string('desclibraryreservesurl','block_ucla_library_reserves'),
-            'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt',
+            'https://webservices.library.ucla.edu/reserves',
             PARAM_URL
         ));
 

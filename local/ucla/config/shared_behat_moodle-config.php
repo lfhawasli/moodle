@@ -289,7 +289,7 @@ $CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'cc
 $CFG->forced_plugin_settings['block_ucla_bruinmedia']['quiet_mode'] = 1;
 
 // Site administration > Plugins > Blocks > UCLA library reserves
-$CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'ftp://ftp.library.ucla.edu/incoming/eres/voyager_reserves_data.txt';
+$CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'https://webservices.library.ucla.edu/reserves';
 
 // Site administration > Plugins > Blocks > UCLA video reserves
 $CFG->forced_plugin_settings['block_ucla_video_reserves']['sourceurl'] = 'ftp://guest:access270@164.67.141.31//Users/guest/Sites/MEDIA_LINKS.txt';
