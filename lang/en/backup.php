@@ -263,7 +263,7 @@ $string['selectacategory'] = 'Select a category';
 $string['selectacourse'] = 'Select a course';
 $string['setting_overwriteconf'] = 'Overwrite course configuration';
 // BEGIN UCLA MOD: CCLE-3797 - Hide all course sections on course restore option
-$string['hidesections'] = 'Hide all course sections after import/restore';
+$string['hidesections'] = 'Hide all course modules after import/restore';
 // END UCLA MOD: CCLE-3797
 $string['setting_course_fullname'] = 'Course name';
 $string['setting_course_shortname'] = 'Course short name';
