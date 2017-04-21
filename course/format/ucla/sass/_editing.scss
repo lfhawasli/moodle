@@ -21,7 +21,6 @@ $editing-link-color: orangered;
             display: inline-block;
 
             &:after {
-                content: attr(title);
                 margin-left: 2px;
                 margin-right: 12px;
             }
