@@ -392,6 +392,16 @@ class block_ucla_tasites extends block_base {
         $newsforum = forum_get_course_forum($newcourse->id, 'news');
         forum_delete_instance($newsforum->id);
 
+        // Disable enrol invitation plugin on ta sites
+        $instances = enrol_get_instances($newcourse->id, false);
+        $plugins   = enrol_get_plugins(false);
+        foreach ($instances as $instance) {
+            $plugin = $plugins[$instance->enrol];
+            if ($instance->enrol == "invitation") {
+                $plugin->update_status($instance, ENROL_INSTANCE_DISABLED);
+            }
+        }
+
         return $newcourse;
     }
 
@@ -404,7 +414,7 @@ class block_ucla_tasites extends block_base {
      *
      * return object    Returns the newly created grouping record.
      */
-    public static function create_taspecificgrouping($parentcourseid, 
+    public static function create_taspecificgrouping($parentcourseid,
             $childcourseid, $srsarray, $uidarray) {
         global $DB;
 
@@ -628,7 +638,7 @@ class block_ucla_tasites extends block_base {
                                     break;
                                 }
                             }
-                            
+
                             if (empty($foundta)) {
                                 continue;
                             }

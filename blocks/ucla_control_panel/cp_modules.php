@@ -37,8 +37,8 @@ if (ucla_cp_module::load('email_students')) {
 // Site invitation
 if (enrol_invitationenrol_available($course->id)) {
     $modules[] = new ucla_cp_module('invitation', new moodle_url(
-                            $CFG->wwwroot . '/enrol/invitation/invitation.php', array('courseid' => $course->id)),
-                    $temptag, 'enrol/invitation:enrol');
+                $CFG->wwwroot . '/enrol/invitation/invitation.php', array('courseid' => $course->id)),
+                $temptag, 'enrol/invitation:enrol');
 }
 
 // For editing, it is a special UI case
@@ -376,7 +376,7 @@ if (has_role_in_context('student', $context) || $is_role_switched_student) {
 
 /**
  * Is the site invitation enrollment plugin installed for course?
- * 
+ *
  * @param int $courseid
  * @return bool
  */
@@ -396,10 +396,10 @@ function enrol_invitationenrol_available($courseid) {
 
 /**
  * Returns term session code for course, if any.
- * 
+ *
  * @global type $DB
  * @param object $first_course
- * @return string 
+ * @return string
  */
 function get_session_code($first_course) {
     global $DB;

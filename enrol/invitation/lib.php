@@ -187,12 +187,18 @@ class enrol_invitation_plugin extends enrol_plugin {
 
         $instance = null;
         $instances = array();
+        $instdisabled = ENROL_INSTANCE_ENABLED;
         foreach ($manager->get_enrolment_instances() as $tempinstance) {
             if ($tempinstance->enrol == 'invitation') {
                 if ($instance === null) {
                     $instance = $tempinstance;
                 }
                 $instances[] = array('id' => $tempinstance->id, 'name' => $this->get_instance_name($tempinstance));
+                
+                // Check if the enrol_invitaiton plugin is diabled
+                if ($tempinstance->status == ENROL_INSTANCE_DISABLED) {
+                    $instdisabled = $tempinstance->status;
+                }
             }
         }
         if (empty($instance)) {
@@ -200,7 +206,7 @@ class enrol_invitation_plugin extends enrol_plugin {
         }
 
         $context = context_course::instance($instance->courseid);
-        if (has_capability('enrol/invitation:enrol', $context)) {
+        if (has_capability('enrol/invitation:enrol', $context) && !$instdisabled) {
             $invitelink = new moodle_url('/enrol/invitation/invitation.php',
                 array('courseid'=>$instance->courseid, 'id'=>$instance->id));
             $button = new enrol_user_button($invitelink,
