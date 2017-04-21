@@ -232,6 +232,9 @@ switch ($videoannotation->clipselect) {
         print_error('invalidclipselect', 'videoannotation', '', $a);
 }
 
+// Get start position for clip.
+$starttime = $clip->playabletimestart;
+
 // If the URL is a TNA permalink,
 // Use the web service to translate it into a RTMP link.
 
@@ -273,7 +276,6 @@ if (has_capability('mod/videoannotation:submit', $modulecontext) &&
 if ($submission) {
    $readonly = true;
 }
-
 
 // Print the main part of the page.
 
@@ -856,7 +858,6 @@ if ($clip): ?>
 
 
         // Create JWPlayer's initialization parameters.
-
         var jwplayerParams = {
             height: <?php echo $clip->videoheight; ?>,
             width: <?php echo $clip->videowidth; ?>,
@@ -866,7 +867,6 @@ if ($clip): ?>
             allowfullscreen: "true",
             volume: 66,
             mute: false,
-
             events: {
                 onIdle: function(evt) {
                     // Change the play/pause button's icon to play.
@@ -989,6 +989,13 @@ if ($clip): ?>
         // Create a JWPlayer instance.
 
         jwplayer("flashPlayerArea1").setup(jwplayerParams);
+        var startflag = true;
+        jwplayer("flashPlayerArea1").onPlay( function(evt) {
+            if (startflag) {
+                jwplayer().seek(Number(<?php echo $starttime;?>));
+                startflag = false;
+            }          
+        });
     });
 
     </script>
