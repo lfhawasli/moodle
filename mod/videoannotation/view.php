@@ -199,7 +199,6 @@ if (!$isadmin and !$canmanage) {
     $readonly = ($readonly or $submission);
 }
 
-
 // If clip select is 0 (use student's clip), find it in in the database, ask to create one if not found.
 // If clip select is 1 (professor specified clip), find it in the database, complain if not found.
 
@@ -233,6 +232,9 @@ switch ($videoannotation->clipselect) {
         print_error('invalidclipselect', 'videoannotation', '', $a);
 }
 
+// Get start position for clip.
+$starttime = $clip->playabletimestart;
+
 // If the URL is a TNA permalink,
 // Use the web service to translate it into a RTMP link.
 
@@ -251,8 +253,29 @@ foreach ($CFG->tnapermalinkurl as $idx => $tnapermalinkurl) {
     }
 }
 
+// If a submission was made, insert the submission into the database and prevent further changes to the submission
+// by anyone.
+if (has_capability('mod/videoannotation:submit', $modulecontext) &&
+        !has_capability('mod/videoannotation:grade', $modulecontext)) {
+    // If not read-only, there is no submission record, the clip is defined, and the student has pressed the submit
+    // button, create a submission record with the current time as the submission time.
+    if (!$readonly && !$submission && $clip &&
+            optional_param('submit', "", PARAM_RAW) == "Submit annotation for grading") {
+        $submission = new stdClass();
+        $submission->videoannotationid = $videoannotation->id;
+        $submission->userid = $userid;
+        $submission->groupid = $groupid;
+        $submission->clipid = $clip->id;
+        $submission->timesubmitted = $submission->timecreated = time();
+        $DB->insert_record('videoannotation_submissions', $submission);
+        $readonly = true;
+    }
+}
 
-
+// After submitting, no one should be able to edit the annotations.
+if ($submission) {
+   $readonly = true;
+}
 
 // Print the main part of the page.
 
@@ -265,7 +288,7 @@ if (optional_param('printable', false, PARAM_BOOL)) {
     echo "<a href='?id=" . $id . "'>Exit Full Screen</a>";
 } else {
     echo "<a href='?id=" . $id . "&printable=1'>Full Screen</a>";
-    echo "<br />";
+    //echo "<br />";
     echo "<div id='groupmodetext'></div>";
     // SSC-1176
     // Adding a list of the last few changes made by other users.
@@ -413,8 +436,8 @@ if (!optional_param('printable', false, PARAM_BOOL)) {
             </tr>
             <tr>
                 <td>Feedback:</td>
-                <td>
-                    <?php print_textarea(false, 5, 50, 0, 0, 'feedback', strip_tags(isset($submission->gradecomment) ?
+                <td style="text-align:left">
+                    <?php print_textarea(false, 6, 50, 0, 0, 'feedback', strip_tags(isset($submission->gradecomment) ?
                     $submission->gradecomment : ''), $COURSE->id); ?>
                 </td>
             </tr>
@@ -835,7 +858,6 @@ if ($clip): ?>
 
 
         // Create JWPlayer's initialization parameters.
-
         var jwplayerParams = {
             height: <?php echo $clip->videoheight; ?>,
             width: <?php echo $clip->videowidth; ?>,
@@ -845,7 +867,6 @@ if ($clip): ?>
             allowfullscreen: "true",
             volume: 66,
             mute: false,
-
             events: {
                 onIdle: function(evt) {
                     // Change the play/pause button's icon to play.
@@ -968,6 +989,13 @@ if ($clip): ?>
         // Create a JWPlayer instance.
 
         jwplayer("flashPlayerArea1").setup(jwplayerParams);
+        var startflag = true;
+        jwplayer("flashPlayerArea1").onPlay( function(evt) {
+            if (startflag) {
+                jwplayer().seek(Number(<?php echo $starttime;?>));
+                startflag = false;
+            }          
+        });
     });
 
     </script>
@@ -1040,19 +1068,6 @@ endif;
 
 if (has_capability('mod/videoannotation:submit', $modulecontext)
 and !has_capability('mod/videoannotation:grade', $modulecontext)) {
-    // If not read-only, there is no submission record, the clip is defined, and the student has pressed the submit button,
-    // create a submission record with the current time as the submission time.
-    if (!$readonly && !$submission && $clip && optional_param('submit', "", PARAM_RAW) == "Submit annotation for grading") {
-        $submission = new stdClass();
-        $submission->videoannotationid = $videoannotation->id;
-        $submission->userid = $userid;
-        $submission->groupid = $groupid;
-        $submission->clipid = $clip->id;
-        $submission->timesubmitted = $submission->timecreated = time();
-        $DB->insert_record('videoannotation_submissions', $submission);
-
-    }
-
     // If not read-only, there is no submission record and the clip is defined, the student can still submit.
 
     if (!$readonly && !$submission && $clip) {
@@ -1083,14 +1098,13 @@ and !has_capability('mod/videoannotation:grade', $modulecontext)) {
     if ($submission) {
         ?>
 
-        <div>Feedback:</div>
-        <div>Score: <?php if (isset($submission->grade)) {
+        <div><h4>Feedback:</h4></div>
+        <div><b>Score:</b> <p> <?php if (isset($submission->grade)) {
             echo $submission->grade;
-        } ?></div>
-        <div>Comment: <?php if (isset($submission->gradecomment)) {
+        } ?> </p> </div>
+        <div><b>Comment:</b> <?php if (isset($submission->gradecomment)) {
             echo $submission->gradecomment;
-        } ?></div>
-
+        } ?> </div>
         <?php
     }
 }

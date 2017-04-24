@@ -125,7 +125,9 @@ echo $OUTPUT->header();
 // BEGIN UCLA MOD: CCLE-3948
 // Old line: echo $courserenderer->search_courses($searchcriteria);
 $ucla_search = $CFG->dirroot . '/blocks/ucla_search/block_ucla_search.php';
-if (file_exists($ucla_search) && empty($modulelist)) {
+// BEGIN UCLA MOD: CCLE-6540 -  Incorrect results for course list of block
+if (file_exists($ucla_search) && empty($modulelist) && empty($blocklist)) {
+// END UCLA MOD: CCLE-6540
     // Load and display the advanced search bar.
     require_once($ucla_search);
     $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
