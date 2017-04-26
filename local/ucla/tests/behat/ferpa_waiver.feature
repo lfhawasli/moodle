@@ -108,6 +108,32 @@ Scenario: Do not provide waiver for site configured LTI resources.
     And I follow "Course 1"
     And I follow "Site LTI"
     Then I should not see "Privacy Waiver"
-    And I should not see "By continuing to LTI, you will be sharing"
+    And I should not see "By continuing to Site LTI, you will be sharing"
     And I should see "Site LTI"
 
+@javascript
+Scenario: Do not provide waiver for site pre-configured LTI resources.
+    Given I log out
+    And I log in as "admin"
+    And I navigate to "Manage tools" node in "Site administration > Plugins > Activity modules > External tool"
+    And I follow "configure a tool manually"
+    And I set the field "Tool name" to "Site configured LTI"
+    And I set the field "Tool base URL/cartridge URL" to "http://lti.tools/test/tp.php"
+    And I set the field "Consumer key" to "jisc.ac.uk"
+    And I set the field "Shared secret" to "secret"
+    And I set the field "Tool configuration usage" to "Show as preconfigured tool when adding an external tool"
+    And I press "Save changes"
+    And I log out
+    And I log in as "teacher1"
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I add a "External tool" to section "0" and I fill the form with:
+        | Activity name      | Site LTI            |
+        | Preconfigured tool | Site configured LTI |
+    And I log out
+    When I log in as "student1"
+    And I follow "Course 1"
+    And I follow "Site LTI"
+    Then I should not see "Privacy Waiver"
+    And I should not see "By continuing to Site LTI, you will be sharing"
+    And I should see "Site LTI"
