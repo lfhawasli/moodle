@@ -42,7 +42,6 @@ class local_ucla_ferpa_waiver {
     static public function check(context $context, $userid) {
         global $DB;
         $checkwaiver = false;
-
         // Don't bother checking if user is not logged in.
         if (!isloggedin() || isguestuser()) {
             return false;
@@ -50,21 +49,27 @@ class local_ucla_ferpa_waiver {
 
         // There isn't a simple way to get the data from the 'mdl_lti' table
         // using core APIs, so using direct query.
-        $sql = "SELECT l.toolurl, l.typeid
+        $sql = "SELECT l.toolurl, l.typeid, lt.id AS ispreconfigured
                   FROM {context} cxt
-                  JOIN {course_modules} cm ON (cxt.instanceid=cm.id)
+                  JOIN {course_modules} cm ON (cxt.instanceid=cm.id AND cxt.contextlevel=?)
                   JOIN {lti} l ON (cm.instance=l.id)
+             LEFT JOIN {lti_types} lt ON (l.typeid=lt.id AND lt.course=?)
                  WHERE cxt.id=?";
-        $ltitool = $DB->get_record_sql($sql, array($context->id));
+        $ltitool = $DB->get_record_sql($sql, array(CONTEXT_MODULE, SITEID, $context->id));
 
         // Ignore resources that are from UCLA or from Pearson MyLabMastering.
         if (strpos($ltitool->toolurl, 'ucla.edu') === false &&
                 strpos($ltitool->toolurl, 'pearsoncmg.com') === false) {
             // Do not need to sign waiver for tools configured at site level.
-            $tool = lti_get_tool_by_url_match($ltitool->toolurl, SITEID);
-            if (empty($tool)) {
-                $checkwaiver = true;
-            }
+            
+            // See if LTI tool is setup as a preconfigured tool.
+            if (empty($ltitool->ispreconfigured)) {
+                // Try to find tool by URL.
+                $tool = lti_get_tool_by_url_match($ltitool->toolurl, SITEID);
+                if (empty($tool)) {
+                    $checkwaiver = true;
+                }                
+            }            
         }
 
         // This is a resource that needs a waiver.
