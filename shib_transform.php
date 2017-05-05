@@ -33,12 +33,20 @@ if (isset($_SERVER['SHIBDISPLAYNAME'])) {
 }
 
 if (!empty($result['alternatename'])) {
+    // Store preferred name in first name field and store first name in alternate name field.
+    $preferredname = $result['alternatename'];
+    $result['alternatename'] = $result['firstname'];
+    $result['firstname'] = $preferredname;
+
     // Handle suffix by appending it to last name.
     if (isset($_SERVER['SHIBUCLAPERSONNAMESUFFIX'])) {
-        $suffix = $this->get_first_string(
-                $_SERVER['SHIBUCLAPERSONNAMESUFFIX']
-        );
-        $result['lastname'] .= ' ' . $suffix;
+        $suffix = $this->get_first_string($_SERVER['SHIBUCLAPERSONNAMESUFFIX']);
+        $suffix = strtoupper($suffix);
+        if ($suffix == "JR" || $suffix == "SR") {
+            $result['lastname'] .= ', ' . $suffix;
+        } else {
+            $result['lastname'] .= ' ' . $suffix;
+        }
     }
     $pnaction = "set alternatename was set";
 } else if (!empty($displayname)) {

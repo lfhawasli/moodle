@@ -1645,7 +1645,11 @@ function format_displayname($displayname) {
 
     // Might have a suffix.
     if (isset($names[2])) {
-        $retval['lastname'] .= ' ' . $names[2];
+        if ($names[2] == "JR" || $names[2] == "SR") {
+            $retval['lastname'] .= ', ' . $names[2];
+        } else {
+            $retval['lastname'] .= ' ' . $names[2];
+        }
     }
 
     return $retval;
