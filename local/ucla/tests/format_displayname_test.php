@@ -96,7 +96,7 @@ class format_displayname_test extends basic_testcase {
                            'NORTON,  Ken,   JR  ',
                            'NORTON ,  KEN,   Jr  ');
         $expected = array('firstname' => 'KEN',
-                          'lastname' => 'NORTON JR');
+                          'lastname' => 'NORTON, JR');
         foreach ($testcases as $testcase) {
             $actual = format_displayname($testcase);
             $this->assertEquals($expected, $actual, 'Testcase: ' . $testcase);

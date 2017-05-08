@@ -88,6 +88,9 @@ class local_ucla_core_edit {
      * Handles logic of how to display 'alternativename' as preferred name.
      *
      * See CCLE-4521 - Handle "preferred name"
+     * 
+     * Note, in CCLE-6594 we are now storing preferred name in firstname if set
+     * and legal first name in alternatename.
      *
      * @param object $user
      * @param boolean $override  If true, will return name formatting for hybrid
@@ -117,11 +120,11 @@ class local_ucla_core_edit {
         }
 
         // User has alternative name, so see if viewer should see it.
-        $fullnamedisplay = 'lastname, alternatename';
+        $fullnamedisplay = 'lastname, firstname';
         // Do we need to display legal first name?
         if (!empty($forcehybridmode)) {
             // Display middle name, if needed.
-            $firstname = empty($user->middlename) ? 'firstname' : 'firstname middlename';
+            $firstname = empty($user->middlename) ? 'alternatename' : 'alternatename middlename';
             $fullnamedisplay .= " ($firstname)";
         }
 

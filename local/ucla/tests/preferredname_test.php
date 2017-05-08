@@ -44,6 +44,9 @@ class preferredname_test extends advanced_testcase {
      *
      * Otherwise the name should be displayed as follows:
      *  - Preferred Name (Legal Last name, Preferred first name, no middle name)
+     * 
+     * Note, in CCLE-6594 we are now storing preferred name in firstname if set
+     * and legal first name in alternatename.
      *
      * @param object $user
      * @param boolean $viewfullnamecap
@@ -51,14 +54,15 @@ class preferredname_test extends advanced_testcase {
     protected function assertPreferredNameFormat($user, $viewfullnamecap) {
         // Check if need to display full name with legal name in parenthesis or not.
         $name = fullname($user, $viewfullnamecap);
-        $legalname = empty($user->middlename) ? $user->firstname : $user->firstname . ' ' . $user->middlename;
+        $firstname = empty($user->alternatename) ? $user->firstname : $user->alternatename;
+        $legalname = empty($user->middlename) ? $firstname : $firstname . ' ' . $user->middlename;
         if (!empty($user->alternatename)) {
             if ($viewfullnamecap) {
                 // Display legal name in parenthesis.
-                $this->assertEquals(sprintf('%s, %s (%s)', $user->lastname, $user->alternatename, $legalname), $name);
+                $this->assertEquals(sprintf('%s, %s (%s)', $user->lastname, $user->firstname, $legalname), $name);
             } else {
                 // Display only preferred name.
-                $this->assertEquals(sprintf('%s, %s', $user->lastname, $user->alternatename), $name);
+                $this->assertEquals(sprintf('%s, %s', $user->lastname, $user->firstname), $name);
             }
         } else {
             // If no preferred name is set, then just display name as usual.
