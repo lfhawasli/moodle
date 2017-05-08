@@ -101,7 +101,7 @@ if ($tasitesform->is_cancelled()) {
             }
         } else if (isset($params->byta)) {
             // Get TA to create TA site for.
-            $taidnumber = $params->byta;
+            $taidnumber = str_pad($params->byta, 9, "0", STR_PAD_LEFT);
             if (empty($taidnumber)) {
                 throw new block_ucla_tasites_exception('errcantcreatetasite');
             }

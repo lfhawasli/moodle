@@ -65,6 +65,8 @@ class shib_transform_test extends basic_testcase {
         include($CFG->dirroot . '/shib_transform.php');
 
         // Check log result.
+        $this->assertEquals($result['firstname'], 'Josephine');
+        $this->assertEquals($result['alternatename'], 'Joe');
         $this->assertEquals($pnaction, "set alternatename was set");
     }
 
@@ -85,7 +87,15 @@ class shib_transform_test extends basic_testcase {
         include($CFG->dirroot . '/shib_transform.php');
 
         // Suffix was added.
-        $this->assertEquals($result['lastname'], 'Bruin JR');        
+        $this->assertEquals($result['lastname'], 'Bruin, JR');
+
+        $result['lastname'] = 'Bruin';
+        $_SERVER['SHIBUCLAPERSONNAMESUFFIX'] = 'II';
+
+        include($CFG->dirroot . '/shib_transform.php');
+
+        // Suffix was added.
+        $this->assertEquals($result['lastname'], 'Bruin II');
     }
 
     /**

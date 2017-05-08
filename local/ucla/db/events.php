@@ -43,11 +43,6 @@ $handlers = array(
         'schedule'         => 'cron',
         'internal'         => 0,
     ),
-    'ucla_weeksdisplay_changed' => array(
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction' => 'hide_past_courses',
-        'schedule'        => 'instant'
-    ),
 );
 
 $observers = array(
@@ -70,5 +65,17 @@ $observers = array(
     array(
         'eventname'   => '\tool_uclacoursecreator\event\course_creator_finished',
         'callback'    => 'local_ucla_observer::ucla_sync_built_courses',
+    ),
+    array(
+        'eventname'   => '\core\event\course_module_created',
+        'callback'    => 'local_ucla_turnitintwo::sync_assignments',
+    ),
+    array(
+        'eventname'   => '\core\event\role_assigned',
+        'callback'    => 'local_ucla_turnitintwo::sync_assignments',
+    ),
+    array(
+        'eventname'   => '\core\event\role_unassigned',
+        'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
 );
