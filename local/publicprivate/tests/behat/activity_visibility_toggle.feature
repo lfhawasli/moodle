@@ -71,8 +71,8 @@ Feature: Toggle public/private with Edit dropdown
         And I log in as "student1"
         And I browse to site "C1"
         And I follow "Week 1"
-        Then "Test assignment" activity should be public
-        And "Test label" activity should be public
+        Then I should see "Test assignment"
+        And I should see "Test label"
         And I log out
         # Check that other users or public cannot see private material
         Given I log in as "student2"
