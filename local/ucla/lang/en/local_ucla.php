@@ -300,3 +300,6 @@ $string['availabilityconditions'] = 'Access restrictions';
 // SSC-2050 - Include associated courses in subject header of forum emails
 $string['limitcrosslistemailname'] = 'Cross Listed Course Limit';
 $string['limitcrosslistemaildesc'] = 'Limit of short course names appearing on email subject.';
+
+// CCLE-6369 - Improve user experience when viewing activity they don't have access to
+$string['contactinstructors'] = 'Please contact your instructor or TA if you have any questions.';

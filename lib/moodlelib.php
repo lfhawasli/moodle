@@ -2859,7 +2859,12 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
             require_once($CFG->dirroot . '/local/ucla/lib.php');
             prompt_login($PAGE, $OUTPUT, $CFG, $course);
         } else {
-            redirect($CFG->wwwroot, get_string('activityiscurrentlyhidden'));
+            // START UCLA MOD: CCLE-6369 - Improve user experience when viewing activity they don't have access to
+            // redirect($CFG->wwwroot, get_string('activityiscurrentlyhidden'));
+            $message = $cm->availableinfo ? \core_availability\info::format_info($cm->availableinfo, $course) : get_string('activityiscurrentlyhidden');
+            $url = ($course->id != SITEID) ? new moodle_url('/course/view.php', array('id'=>$course->id)) : $CFG->wwwroot;
+            redirect($url, $message);
+            // END UCLA MOD: CCLE-6369
         }
     }
     /*
