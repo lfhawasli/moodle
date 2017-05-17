@@ -10,11 +10,11 @@ Background:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
     And the following "users" exist:
-      | username | firstname | lastname | email             |
-      | teacher  | Teacher   | T1       | teacher1@asd.com  |
-      | manager  | Manager   | M3       | manager1@asd.com  |
-      | projpart | Projpart  | P1       | projpart1@asd.com |
-      | student  | Student   | S1       | student1@asd.com  |
+      | username | firstname | lastname | email             | alternatename |
+      | teacher  | Teacher   | T1       | teacher1@asd.com  | edward        |
+      | manager  | Manager   | M3       | manager1@asd.com  | jenny         |
+      | projpart | Projpart  | P1       | projpart1@asd.com | tom           |
+      | student  | Student   | S1       | student1@asd.com  | victor        |
     And the following ucla "roles" exist:
       | role               |
       | editinginstructor  |
