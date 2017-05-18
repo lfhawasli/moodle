@@ -2044,8 +2044,18 @@ class restore_course_hide_sections_step extends restore_execution_step {
         $coursesections = $DB->get_recordset('course_sections', array('course' => $courseid));
         if ($coursesections->valid()) {
             foreach ($coursesections as $section) {
-                // Skip special section 0.
+                // Hide activities in Section 0 other than Discussion forum and Announcements.
                 if ($section->section == 0) {
+                    $activities = get_array_of_activities($courseid);
+                    foreach ($activities as $activity) {
+                        if ($activity->section == 0 && $activity->name != 'Discussion forum'
+                                && $activity->name != 'Announcements') {
+                            $cm = get_coursemodule_from_id('', $activity->cm, 0, true, MUST_EXIST);
+                            $modcontext = context_module::instance($cm->id);
+                            set_coursemodule_visible($activity->cm, 0);
+                            \core\event\course_module_updated::create_from_cm($cm, $modcontext)->trigger();
+                        }
+                    }
                     continue;
                 }
                 set_section_visible($courseid, $section->section, 0);
