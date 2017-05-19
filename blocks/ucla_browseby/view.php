@@ -24,7 +24,7 @@ $args = $handler->get_params();
 
 // Iterate through all possible arguments in this display
 foreach ($args as $arg) {
-    ${$arg} = optional_param($arg, null, PARAM_RAW);
+    ${$arg} = optional_param($arg, null, PARAM_NOTAGS);
     if (${$arg} !== null) {
         $argvls[$arg] = ${$arg};
     }
