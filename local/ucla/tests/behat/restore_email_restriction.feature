@@ -68,6 +68,8 @@ Feature: Remove email restriction from restore/import
     When I am on homepage
     And I follow "Courses"
     And I follow "Course 1"
+    And I turn editing mode on
     And I follow "Restore"
     And I restore "test_backup.mbz" backup into a new course using this options:
+    | Schema | Site type | test |
     Then I should not see "Trying to restore user 'teacher1' from backup file will cause conflict" in the "region-main" "region"
