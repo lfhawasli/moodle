@@ -122,8 +122,8 @@ class block_ucla_my_sites extends block_base {
         // NOTE: this thing currently takes the term in the get param
         // so you may have some strange behavior if this block is not
         // in the my-home page.
-        $showterm = optional_param('term', false, PARAM_RAW);
-        if (!$showterm && isset($CFG->currentterm)) {
+        $showterm = optional_param('term', false, PARAM_ALPHANUM);
+        if (!ucla_validator('term', $showterm) && isset($CFG->currentterm)) {
             $showterm = $CFG->currentterm;
         }
 
