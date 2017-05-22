@@ -22,35 +22,37 @@ class behat_publicprivate extends behat_base {
         
     /**
      * Step to test if an activity is private.
+     *
+     * Should be used when user is an instructor/admin, not student.
      * 
      * @Then /^"([^"]*)" activity should be private$/
      */
     public function activity_should_be_private($activityname) {
         $activitynode = $this->get_activity_node($activityname);
-
-        // Should have "Private Course Material" availability info.
-        $exception = new ExpectationException('"' . $activityname . '" is not private', $this->getSession());
-        $grouping = $this->find('css', 'div.availabilityinfo', $exception, $activitynode);
         
-        if (!(strpos($grouping->getText(), 'Private Course Material') !== false)) {
-            throw $exception;
+        // Should have data-ppstate = private attribute.
+        try {
+            $this->find('css', 'span.groupinglabel[data-ppstate="private"]', false, $activitynode);
+        } catch (ElementNotFoundException $e) {
+            throw new ExpectationException('"' . $activityname . '" is not private', $this->getSession());
         }
     }
 
     /**
      * Step to test if activity is public.
+     *
+     * Should be used when user is an instructor/admin, not student.
      * 
      * @Then /^"([^"]*)" activity should be public$/
      */
     public function activity_should_be_public($activityname) {
         $activitynode = $this->get_activity_node($activityname);
 
-        // Should not have availability info.
+        // Should have data-ppstate = public attribute.
         try {
-            $this->find('css', 'div.availabilityinfo', false, $activitynode);
-            throw new ExpectationException('"' . $activityname . '" is not public', $this->getSession());
+            $this->find('css', 'span.groupinglabel[data-ppstate="public"]', false, $activitynode);
         } catch (ElementNotFoundException $e) {
-            // All ok.
+            throw new ExpectationException('"' . $activityname . '" is not public', $this->getSession());
         }
     }
 
