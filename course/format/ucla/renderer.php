@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/format/topics/renderer.php');
 require_once($CFG->dirroot . '/course/format/ucla/lib.php');
 require_once($CFG->dirroot.'/local/publicprivate/lib.php');
+require_once($CFG->dirroot.'/enrol/locallib.php');
 
 /**
  * Basic renderer for ucla format. Based off the topic renderer.
@@ -254,6 +255,9 @@ class format_ucla_renderer extends format_topics_renderer {
                 echo notice_nonenrolled_users($this->course);
             }
         }
+        
+        // CCLE-6557 - Print easy to find "Enroll me" button.
+        echo $this->print_self_enrollment_button();
     }
 
     /**
@@ -506,6 +510,49 @@ class format_ucla_renderer extends format_topics_renderer {
         echo $center_content;
     }
 
+    /**
+     * Output the html for a self-enrollment button.
+     * 
+     * See CCLE-6557.
+     * 
+     * @return string
+     */
+    private function print_self_enrollment_button() {
+        global $OUTPUT, $PAGE;
+        $retval = '';
+        // Check if course has "self-enrollment" plugin enabled and user is not 
+        // enrolled.
+        $selfenrol = enrol_selfenrol_available($this->course->id);
+        if ($selfenrol == true && !is_enrolled($this->context)) {
+            $enrolmestr = get_string('enrolme', 'enrol_self');
+            $url = new moodle_url('/enrol/index.php', array('id' => $this->course->id));
+            
+            $enrols = enrol_get_plugins(true);
+            $enrolinstances = enrol_get_instances($this->course->id, true);
+
+            foreach($enrolinstances as $instance) {
+                if (!isset($enrols[$instance->enrol])) {
+                    continue;
+                }
+                if ($instance->enrol == "self") {                    
+                    $enrolmestr = get_string('enrolme', 'enrol_self');
+                    $url = new moodle_url('/enrol/index.php', 
+                            array('id' => $this->course->id, 
+                            'sesskey' => sesskey(), 
+                            'instance' => $instance->id,
+                            // This magic value is necessary to automatically
+                            // enroll the user rather than have them land on
+                            // the enroll index page.
+                            '_qf__'.$instance->id.'_enrol_self_enrol_form' => 1));
+                    $enrolmebtn = new enrol_user_button($url, $enrolmestr);
+                    $renderer = $PAGE->get_renderer('enrol');
+                    return $OUTPUT->box($renderer->render($enrolmebtn), 'text-center');
+                }
+            }
+        }        
+        return $retval;
+    }
+    
     /**
      * Output the html for a single section page .
      *

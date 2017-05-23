@@ -42,8 +42,8 @@ Feature: Adding a resource
         And I log in as "student1"
         And I browse to site "C1"
         And I follow "Week 1"
-        Then "Test glossary name" activity should be public
-        And "Test file name" activity should be public
+        Then I should see "Test glossary name"
+        And I should see "Test file name"
         And I log out
         # Check that other users or public cannot see private material
         Given I log in as "student2"

@@ -13,26 +13,23 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-header('Content Type: application/rss+xml');
+header('Content-Type: application/rss+xml');
 
 include(dirname(__FILE__) . '/config.php');
 
 $site = get_site();
-
 $wwwroot = $CFG->wwwroot . '/';
 
 // This line causes a problem if short tags are enabled, so we're going
 // to echo this within PHP.
-echo '<?xml version="1.0"?>';
-
+echo '<?xml version="1.0" encoding="utf-8"?>' . "\n";
 ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0">
   <channel>
     <title><?php echo $site->fullname ?></title>
     <link><?php echo $wwwroot ?></link>
     <description><?php echo strip_tags($site->summary) ?></description>
     <language>en-us</language>
-
     <item>
       <title>Login</title>
       <description>
@@ -41,6 +38,5 @@ echo '<?xml version="1.0"?>';
         Getting an error after a successful login? Your Logon ID might not be &lt;a href="http://kb.ucla.edu/articles/moodle-needs-certain-shibboleth-attributes"&gt;working properly&lt;/a&gt;.
       </description>
     </item>
-
   </channel>
 </rss>

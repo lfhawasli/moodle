@@ -594,7 +594,7 @@ function enrol_meta_sync($courseid = NULL, $verbose = false) {
         // values to merge with the existing array of parameters.
         list($xnotignored, $xparams) = $DB->get_in_or_equal(explode(',', $ignored), SQL_PARAMS_NAMED, 'ig', false);
         $params = array_merge($params, $xparams);
-        $xnotignored = "AND pra.roleid $xnotignored";
+        $xnotignored = "AND spra.roleid $xnotignored";
     } else {
         $notignored = "";
         $xnotignored = "";

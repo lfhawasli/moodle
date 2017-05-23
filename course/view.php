@@ -148,7 +148,10 @@
             }
             // END UCLA MOD: SSC-2155 CCLE-5329
 
-            require_capability('moodle/course:viewhiddensections', $context);
+            // START UCLA MOD: CCLE-6369 - Improve user experience when viewing activity they don't have access to
+            // require_capability('moodle/course:viewhiddensections', $context);
+            require_capability('moodle/course:viewhiddensections', $context, null, true, 'contactinstructors', 'local_ucla');
+            // END UCLA MOD: CCLE-6369
         }
     }
 
