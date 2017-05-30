@@ -219,19 +219,21 @@ class PublicPrivate_Course {
 
         if ($groupingid = groups_get_grouping_by_name($this->_course->id, get_string('publicprivategroupingname', 'local_publicprivate'))) {
             $data = groups_get_group($groupingid);
-            if (!groups_get_grouping_by_name($this->_course->id, $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate'))) {
-                $data->name = $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate');
-            } else {
-                for($i = 1; groups_get_grouping_by_name($this->_course->id, $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate') . ' [' . $i . ']'); $i++);
-                $data->name = $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate') . ' [' . $i . ']';
-            }
-
-            try {
-                if (!groups_update_grouping($data)) {
-                    throw new PublicPrivate_Course_Exception('Failed to move existing grouping with required group name.', 202);
+            if ($data) {
+                if (!groups_get_grouping_by_name($this->_course->id, $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate'))) {
+                    $data->name = $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate');
+                } else {
+                    for($i = 1; groups_get_grouping_by_name($this->_course->id, $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate') . ' [' . $i . ']'); $i++);
+                    $data->name = $data->name . ' ' . get_string('publicprivategroupingdeprecated', 'local_publicprivate') . ' [' . $i . ']';
                 }
-            } catch (DML_Exception $e) {
-                throw new PublicPrivate_Course_Exception('Failed to move existing grouping with required group name.', 202, $e);
+
+                try {
+                    if (!groups_update_grouping($data)) {
+                        throw new PublicPrivate_Course_Exception('Failed to move existing grouping with required group name.', 202);
+                    }
+                } catch (DML_Exception $e) {
+                    throw new PublicPrivate_Course_Exception('Failed to move existing grouping with required group name.', 202, $e);
+                }
             }
         }
 
