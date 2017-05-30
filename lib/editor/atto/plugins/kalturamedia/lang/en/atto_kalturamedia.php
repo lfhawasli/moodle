@@ -25,8 +25,10 @@
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))))).'/config.php');
 require_once($CFG->dirroot.'/local/kaltura/locallib.php');
 
-
-$string['pluginname'] = 'Kaltura Media';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['pluginname'] = 'Kaltura Media';
+$string['pluginname'] = 'Media';
+// END UCLA MOD: CCLE-6269
 $string['popuptitle'] = 'Select Media';
 $string['embedbuttontext'] = 'Embed';
 $string['browse_and_embed'] = 'Browse and Embed';
