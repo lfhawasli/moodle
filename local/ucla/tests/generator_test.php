@@ -468,6 +468,7 @@ class local_ucla_generator_testcase extends advanced_testcase {
                 $result = $this->getDataGenerator()
                         ->get_plugin_generator('local_ucla')
                         ->crosslist_courses($firstparent, $children);
+                $this->assertDebuggingCalled(null, null, 'Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.');
                 $this->assertTrue($result);
 
                 // Make sure that ucla_map_courseid_to_termsrses returns the
