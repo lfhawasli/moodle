@@ -280,6 +280,10 @@ $string['submissiongrade'] = 'Grade for submission';
 $string['submissiongrade_help'] = 'This setting specifies the maximum grade that may be obtained for submitted work.';
 $string['submissiongradeof'] = 'Grade for submission (of {$a})';
 $string['submissionlastmodified'] = 'Last modified';
+// START UCLA MOD: SSC-3681 - Prevent Workshop submission without content or file
+$string['submissionrequiredcontent'] = 'Please enter text here or upload a file';
+$string['submissionrequiredfile'] = 'Please upload a file or enter text in submission content box';
+// END UCLA MOD: SSC-3681
 $string['submissionsettings'] = 'Submission settings';
 $string['submissionstart'] = 'Open for submissions from';
 $string['submissionstartevent'] = '{$a} (opens for submissions)';

@@ -88,6 +88,14 @@ class workshop_submission_form extends moodleform {
             }
         }
 
+        // START UCLA MOD: SSC-3681 - Prevent Workshop submission without content or file
+        $getfiles = file_get_drafarea_files($data['attachment_filemanager']);
+        if (empty($getfiles->list) and empty($data['content_editor']['text'])) {
+            $errors['content_editor'] = get_string('submissionrequiredcontent', 'mod_workshop');
+            $errors['attachment_filemanager'] = get_string('submissionrequiredfile', 'mod_workshop');
+        }
+        // END UCLA MOD: SSC-3681
+
         if (isset($data['attachment_filemanager']) and isset($this->_customdata['workshop']->submissionfiletypes)) {
             $whitelist = workshop::normalize_file_extensions($this->_customdata['workshop']->submissionfiletypes);
             if ($whitelist) {
