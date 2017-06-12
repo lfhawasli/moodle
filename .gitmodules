@@ -31,9 +31,6 @@
 [submodule "question/format/hotpot"]
 	path = question/format/hotpot
 	url = https://github.com/gbateson/moodle-qformat_hotpot.git
-[submodule "local/mr"]
-	path = local/mr
-	url = https://github.com/moodlerooms/moodle-local_mr.git
 [submodule "local/googleanalytics"]
 	path = local/googleanalytics
 	url = https://github.com/ccle/moodle-local_googleanalytics.git
