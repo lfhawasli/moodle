@@ -163,3 +163,6 @@
 [submodule "mod/choicegroup"]
 	path = mod/choicegroup
 	url = https://github.com/ndunand/moodle-mod_choicegroup.git
+[submodule "blocks/mhaairs"]
+	path = blocks/mhaairs
+	url = https://github.com/itamart/moodle-block_mhaairs.git
