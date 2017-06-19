@@ -30,6 +30,7 @@ Feature: Restore course backups with public/private content
     @javascript
     Scenario Outline: Restoring courses
         When I restore "source_backup.mbz" backup into <Target> course using this options:
+            | Schema | Course name | Restored Source |
         And I follow "Site info"
         Then I should see "Private assign"
         And I should see "Public assign"
@@ -37,13 +38,15 @@ Feature: Restore course backups with public/private content
         And "Public assign" activity should be public
         When I log out
         And I log in as "student1"
-        And I browse to site "target"
+        And I am on site homepage
+        And I follow <Restored>
         And I follow "Week 1"
         Then I should not see "Private database"
         And I should see "Public database"
         And I log out
         And I log in as "admin"
-        And I browse to site "target"
+        And I am on site homepage
+        And I follow <Restored>
         And I turn editing mode on
         And I follow "Week 1"
         And "Private database" activity should be private
@@ -59,6 +62,6 @@ Feature: Restore course backups with public/private content
           | Public/Private | Enable |
 
         Examples:
-          | Target |
-          | "Target" |
-          | a new |
+          | Target | Restored |
+          | "Target" | "Target" |
+          | a new | "Restored Source" |

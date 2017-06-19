@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 class mod_casa_privacy_waiver_observer_testcase extends advanced_testcase {
 
     /**
-     * Makes sure that waiver information is deleted if a related course is 
+     * Makes sure that waiver information is deleted if a related course is
      * deleted.
      */
     public function test_course_delete() {
@@ -54,19 +54,19 @@ class mod_casa_privacy_waiver_observer_testcase extends advanced_testcase {
         // Create waiver entry.
         $context = context_module::instance($cm->cmid);
         mod_casa_privacy_waiver::sign($course->id, $context->id, $student->id);
-        
+
         // Make sure entry exists.
         $numwaivers = $DB->count_records('lti_privacy_waiver');
         $this->assertEquals(1, $numwaivers);
 
         // Delete course.
         delete_course($course->id);
-
+        $this->assertDebuggingCalled(null, null, 'Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.');
         // Make sure no entries exists.
         $numwaivers = $DB->count_records('lti_privacy_waiver');
         $this->assertEquals(0, $numwaivers);
-    }    
-    
+    }
+
     /**
      * Makes sure that waiver information is deleted if a related course
      * module is deleted.

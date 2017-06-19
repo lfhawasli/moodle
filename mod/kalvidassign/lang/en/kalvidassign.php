@@ -22,9 +22,14 @@
  */
 
 $string['activity_not_migrated'] = 'This activity has not yet been migrated to use the new Kaltura instance.';
-$string['modulenameplural'] = 'Kaltura Media Assignments';
-$string['modulename'] = 'Kaltura Media Assignment';
-$string['modulename_help'] = 'The Kaltura Media Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['modulenameplural'] = 'Kaltura Media Assignments';
+//$string['modulename'] = 'Kaltura Media Assignment';
+//$string['modulename_help'] = 'The Kaltura Media Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
+$string['modulenameplural'] = 'Media Assignments';
+$string['modulename'] = 'Media Assignment';
+$string['modulename_help'] = 'The Media Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
+// END UCLA MOD: CCLE-6269
 $string['name'] = 'Name';
 $string['availabledate'] = 'Available from';
 $string['duedate'] = 'Due Date';
@@ -35,7 +40,10 @@ $string['emailteachers'] = 'Email alerts to teachers';
 $string['emailteachers_help'] = 'If enabled, teachers receive email notification whenever students add or update an assignment submission. Only teachers who are able to grade the particular assignment are notified. So, for example, if the course uses separate groups, teachers restricted to particular groups won\'t receive notification about students in other groups.';
 $string['invalidid'] = 'Invalid ID';
 $string['invalid_launch_parameters'] = 'Invalid launch parameters';
-$string['pluginadministration'] = 'Kaltura Media Assignment';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['pluginadministration'] = 'Kaltura Media Assignment';
+$string['pluginadministration'] = 'Media Assignment';
+// END UCLA MOD: CCLE-6269
 $string['addvideo'] = 'Add media submission';
 $string['submitvideo'] = 'Submit media';
 $string['replacevideo'] = 'Replace media';
@@ -106,7 +114,10 @@ $string['kalvidassign:screenrecorder'] = 'Screen recorder';
 $string['checkingforjava'] = 'Checking for Java';
 $string['javanotenabled'] = 'Failed to detect Java, please make sure you have the latest version of Java installed and enabled and then try again.';
 $string['cannotdisplaythumbnail'] = 'Unable to display thumbnail';
-$string['noassignments'] = 'No Kaltura video assignments found in the course';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['noassignments'] = 'No Kaltura video assignments found in the course';
+$string['noassignments'] = 'No video assignments found in the course';
+// END UCLA MOD: CCLE-6269
 $string['submitted'] = 'Submitted';
 $string['nosubmission'] = 'No submission';
 $string['nosubmissions'] = 'No submissions';

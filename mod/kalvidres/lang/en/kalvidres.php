@@ -20,10 +20,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
-$string['modulenameplural'] = 'Kaltura Video Resource';
-$string['modulename'] = 'Kaltura Video Resource';
-$string['modulename_help'] = 'The Kaltura Video Resource enables a teacher to create a resource using a Kaltura video.';
-$string['pluginadministration'] = 'Kaltura Video Resource';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['modulenameplural'] = 'Kaltura Video Resource';
+//$string['modulename'] = 'Kaltura Video Resource';
+//$string['modulename_help'] = 'The Kaltura Video Resource enables a teacher to create a resource using a Kaltura video.';
+//$string['pluginadministration'] = 'Kaltura Video Resource';
+$string['modulenameplural'] = 'Video Resource';
+$string['modulename'] = 'Video Resource';
+$string['modulename_help'] = 'The Video Resource enables a teacher to create a resource using a video.';
+$string['pluginadministration'] = 'Video Resource';
+// END UCLA MOD: CCLE-6269
 $string['pluginname'] = 'Kaltura Video Resource';
 $string['name'] = 'Name';
 $string['novidsource'] = 'No media content found. You must add media content in order to save a video resource.';
