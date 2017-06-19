@@ -22,8 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  (C) 2014 Remote-Learner.net Inc (http://www.remote-learner.net)
  */
-
-$string['filtername'] = 'Kaltura Media';
-$string['enable'] = 'Embed Kaltura Video Links';
-$string['enable_help'] = 'Convert Kaltura video links to embed code';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['filtername'] = 'Kaltura Media';
+//$string['enable'] = 'Embed Kaltura Video Links';
+//$string['enable_help'] = 'Convert Kaltura video links to embed code';
+$string['filtername'] = 'Media';
+$string['enable'] = 'Embed Video Links';
+$string['enable_help'] = 'Convert video links to embed code';
+// END UCLA MOD: CCLE-6269
 $string['unable'] = 'Unable to convert video at this time';

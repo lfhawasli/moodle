@@ -23,7 +23,10 @@
 
 $string['pluginname'] = 'Kaltura media';
 /* All lang strings used from TinyMCE JavaScript code must be named 'pluginname:stringname', no need to create langs/en_dlg.js */
-$string['kalturamedia:desc'] = 'Embed Kaltura Media';
+// START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
+//$string['kalturamedia:desc'] = 'Embed Kaltura Media';
+$string['kalturamedia:desc'] = 'Embed Media';
+// END UCLA MOD: CCLE-6269
 $string['kalturamedia:insertbtn'] = 'Insert media';
 $string['kalturamedia:cancelbtn'] = 'Cancel';
 $string['kalturamedia:bse'] = 'Browse and Embed';
