@@ -240,7 +240,7 @@ function print_video_list($videolist, $headertitle) {
                     get_string('futurevideo_info', 'block_ucla_media',
                                userdate($video->start_date, get_string('strftimedatefullshort'))) . ')';
         } else {
-            if ($video->video_url && !empty($video->filename)) {
+            if (!empty($video->filename)) {
                 $outputstr = html_writer::link(
                         new moodle_url('/blocks/ucla_media/view.php',
                                 array('id' => $video->id, 'mode' => MEDIA_VIDEORESERVES)), $video->video_title);
