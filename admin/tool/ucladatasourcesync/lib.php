@@ -299,7 +299,11 @@ function validate_field($type, $field, $minsize=0, $maxsize=100) {
     if ($fieldsize > $maxsize || $fieldsize < $minsize) {
         return false;
     }
-
+    // Handle empty fields.
+    if (empty($field) && $minsize == 0) {
+        return $field;
+    }
+    
     switch ($type) {
         case 'term':
             if (!ucla_validator('term', $field)) {
