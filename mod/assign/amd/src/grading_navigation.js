@@ -50,6 +50,9 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
         this._region.find('[data-region="user-filters"]').on('click', this._toggleExpandFilters.bind(this));
 
         $(document).on('user-changed', this._refreshSelector.bind(this));
+        // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
+        $(document).on('done-saving-show-next', this._handleNextUser.bind(this));
+        // END UCLA MOD: SSC-3624/CCLE-6876.
 
         // Position the configure filters panel under the link that expands it.
         var toggleLink = this._region.find('[data-region="user-filters"]');
@@ -357,7 +360,10 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
      *
      * @param {Event} e
      */
-    GradingNavigation.prototype._handleNextUser = function(e) {
+    // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
+    //GradingNavigation.prototype._handleNextUser = function(e) {
+    GradingNavigation.prototype._handleNextUser = function(e, saved) {
+    // END UCLA MOD: SSC-3624/CCLE-6876.
         e.preventDefault();
         var select = this._region.find('[data-action=change-user]');
         var currentUserId = select.attr('data-selected');
@@ -373,7 +379,18 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
         var count = this._filteredUsers.length;
         var newIndex = (currentIndex + 1) % count;
 
-        if (count) {
+        // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
+        //if (count) {
+        if (saved && count) {
+            // If we've already saved the grade, skip checking if we've made any changes.
+            var userid = this._filteredUsers[newIndex].id;
+            var useridnumber = parseInt(userid, 10);
+            select.attr('data-selected', userid);
+            if (!isNaN(useridnumber) && useridnumber > 0) {
+                $(document).trigger('user-changed', userid);
+            }
+        } else if (count) {
+        // END UCLA MOD: SSC-3624/CCLE-6876.
             this._selectUserById(this._filteredUsers[newIndex].id);
         }
     };
