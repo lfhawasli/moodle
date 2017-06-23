@@ -17,7 +17,7 @@
 /**
  * Version details
  *
- * @package    format
+ * @package    format_ucla
  * @subpackage ucla
  * @copyright 2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
