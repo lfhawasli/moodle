@@ -31,23 +31,23 @@ $string['page-course-view-topics-x'] = 'Any course page in ucla format';
 $string['hidefromothers'] = 'Hide section';
 $string['showfromothers'] = 'Show section';
 
-// forum strings
+// Forum strings.
 $string['discforum'] = 'Discussion forum';
 $string['introdisc'] = 'This is a general discussion forum.';
 
-// Registrar strings
+// Registrar strings.
 $string['reg_listing'] = 'For course location and time see Registrar Listing: ';
 $string['reg_finalcd'] = 'For official course description, final exam code'.
     ' and other course information see: ';
 $string['coursecancelled'] = 'THIS CLASS HAS BEEN CANCELLED';
 
-// Course preferences strings
+// Course preferences strings.
 $string['course_pref'] = 'Course preferences';
 $string['course_pref_for'] = 'UCLA course preferences for {$a}';
 $string['landing_page'] = 'Landing page';
 $string['show_all'] = 'Show all';
 
-// Custom format strings
+// Custom format strings.
 $string['editcoursetitle'] = 'Edit course comments';
 $string['editsectiontitle'] = 'Edit section';
 $string['editofficehours'] = 'Update';
@@ -61,26 +61,26 @@ $string['collapsedhide'] = 'Hide registrar description';
 $string['coursedescription'] = 'Course description';
 $string['classdescription'] = 'Class description';
 
-// JIT strings
+// JIT strings.
 $string['file'] = 'Upload file';
 $string['link'] = 'Add link';
 $string['text'] = 'Add text';
 $string['subheading'] = 'Add subheading';
 $string['turnitin'] = 'Add Turnitin Assignment';
 
-// CCLE-5098 - Download course content configurable
+// CCLE-5098 - Download course content configurable.
 $string['coursedownload'] = 'Download course materials';
 $string['coursedownload_help'] = 'Download is enabled by default. '
         . 'If you do not want the students to be able to download the files in a single zip file, '
         . 'click "No". This feature is available to students as long as they have access to the course.';
 
-// CCLE-5741 - Suppress out of term message for SRS courses
+// CCLE-5741 - Suppress out of term message for SRS courses.
 $string['enableoutoftermmessage'] = 'Enable out of term message';
 $string['enableoutoftermmessage_help'] = 'Enable the message "You are now '
         . 'viewing a course that is no longer in session" to display when a '
         . 'course is out of session.';
 
-// CCLE-5618 - TA site creation content configurable
+// CCLE-5618 - TA site creation content configurable.
 $string['createtasite'] = 'Enable TA site creation';
 $string['createtasite_help'] = 'TA site creation is enabled by default. '
         . 'If you do not want the TAs to be able to create the TA sites, '

@@ -15,12 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains general functions for the course format UCLA. Based off
- * the topic format.
+ * This file contains general functions for the course format UCLA.
  *
+ * Based off the topic format.
+ *
+ * @package format_ucla
  * @copyright 2012 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/publicprivate/lib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
@@ -35,67 +39,72 @@ define('UCLA_FORMAT_DISPLAY_LANDING', -4);
 /**
  * Main class for the Topics course format
  *
- * @package    format_topics
- * @copyright  2012 Marina Glancy
+ * @package    format_ucla
+ * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_ucla extends format_topics {
-    
+
+    /** This is used to get the syllabus.*/
     const UCLA_FORMAT_DISPLAY_SYLLABUS = 'syllabus';
-    
+
+    /** This is used to specify display all.*/
     const UCLA_FORMAT_DISPLAY_ALL = -2;
-    
+
+    /** This is used to display landing.*/
     const UCLA_FORMAT_DISPLAY_LANDING = -4;
 
     /**
      *  Figures out the section to display. Specific only to the UCLA course format.
      *  Uses a $_GET or $_POST param to figure out what's going on.
      *
-     *  @return int       Returns section number that user is viewing
+     * @param stdClass $course course the user is viewing
+     * @param array $courseprefs course preferences
+     * @return int       Returns section number that user is viewing
      */
-    function figure_section($course = null, $course_prefs = null) {
+    public function figure_section($course = null, $courseprefs = null) {
 
         $course = $this->get_course();
-        
-        // see if user is requesting a permalink section
+
+        // See if user is requesting a permalink section.
         $sectionid = optional_param('sectionid', null, PARAM_INT);
         if (!is_null($sectionid)) {
-            // NOTE: use section
+            // NOTE: use section.
             global $section;
             // This means that a sectionid was explicitly declared, so just use
-            // $displaysection, because it has been converted to a section number
+            // $displaysection, because it has been converted to a section number.
             return $section;
         }
 
-        // see if user is requesting a specific section
+        // See if user is requesting a specific section.
         $section = optional_param('section', null, PARAM_INT);
         if (!is_null($section)) {
             // CCLE-3740 - section === -1 is an alias for section 0 (Site info)
-            // This is set by uclatheme renderer so that we can handle this redirect correctly
-            if($section === -1) {
+            // This is set by uclatheme renderer so that we can handle this redirect correctly.
+            if ($section === -1) {
                 $section = 0;
             }
-            // This means that a section was explicitly declared
+            // This means that a section was explicitly declared.
             return $section;
         }
 
-        // no specific section was requested, so see if user was looking for 
-        // "Show all" option
+        // No specific section was requested, so see if user was looking for
+        // "Show all" option.
         if (optional_param('show_all', 0, PARAM_BOOL)) {
             return self::UCLA_FORMAT_DISPLAY_ALL;
         }
 
-        // Default to course marker (usually section 0 (site info)) if there are no 
-        // landing page preference
+        // Default to course marker (usually section 0 (site info)) if there are no
+        // landing page preference.
         $prefs = $this->get_format_options();
-        
-        $landing_page = isset($prefs['landing_page']) ? $prefs['landing_page'] : false;
-        
-        if ($landing_page === false) {
-            $landing_page = $course->marker;
+
+        $landingpage = isset($prefs['landing_page']) ? $prefs['landing_page'] : false;
+
+        if ($landingpage === false) {
+            $landingpage = $course->marker;
         }
 
-        return $landing_page;
+        return $landingpage;
     }
 
     /**
@@ -119,97 +128,95 @@ class format_ucla extends format_topics {
         return $elements;
     }
 
-   /**
-    * Gets and determines if the format should display instructors.
-    * 
-    * @param object $course
-    * @return mixed            If course should display instructions, will query
-    *                          database for instructor information, else returns
-    *                          false.
-    */
-   function display_instructors() {
-       global $CFG, $DB;
+    /**
+     * Gets and determines if the format should display instructors.
+     *
+     * @return mixed            If course should display instructions, will query
+     *                          database for instructor information, else returns
+     *                          false.
+     */
+    public function display_instructors() {
+        global $CFG, $DB;
 
-       require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
-       
-       // only display office hours for registrar sites or instructional, tasite
-       // or test collaboration sites
-       $site_type = siteindicator_site::load($this->courseid);    
-       if (!empty($site_type) && !in_array($site_type->property->type,
+        require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
+
+        // Only display office hours for registrar sites or instructional, tasite
+        // or test collaboration sites.
+        $sitetype = siteindicator_site::load($this->courseid);
+        if (!empty($sitetype) && !in_array($sitetype->property->type,
                array('instruction', 'tasite', 'test'))) {
-           return false;
-       }
+            return false;
+        }
 
-       // Note that untagged collaboration websites will also show the office hours
-       // block, but that is okay; they should be tagged anyways.
+        // Note that untagged collaboration websites will also show the office hours
+        // block, but that is okay; they should be tagged anyways.
 
-       // now get instructors
-       $params = array();
-       $params[] = $this->courseid;    
-       $instructor_types = $CFG->instructor_levels_roles;
+        // Now get instructors.
+        $params = array();
+        $params[] = $this->courseid;
+        $instructortypes = $CFG->instructor_levels_roles;
 
-       // map-reduce-able
-       $roles = array();
-       foreach ($instructor_types as $instructor) {
-           foreach ($instructor as $role) {
-               $roles[$role] = $role;
-           }
-       }
+        // Map-reduce-able.
+        $roles = array();
+        foreach ($instructortypes as $instructor) {
+            foreach ($instructor as $role) {
+                $roles[$role] = $role;
+            }
+        }
 
-       // Get the people with designated roles
-       try {
-           if (!isset($roles) || empty($roles)) {
-               // Hardcoded defaults
-               $roles = array(
-                   'editingteacher',
-                   'teacher'
-               );
-           }
+        // Get the people with designated roles.
+        try {
+            if (!isset($roles) || empty($roles)) {
+                // Hardcoded defaults.
+                $roles = array(
+                    'editingteacher',
+                    'teacher'
+                );
+            }
 
-           list($in_roles, $new_params) = $DB->get_in_or_equal($roles);
-           $additional_sql = ' AND r.shortname ' . $in_roles;
-           $params = array_merge($params, $new_params);
-       } catch (coding_exception $e) {
-           // Coding exception...
-           $additional_sql = '';
-       }    
+            list($inroles, $newparams) = $DB->get_in_or_equal($roles);
+            $additionalsql = ' AND r.shortname ' . $inroles;
+            $params = array_merge($params, $newparams);
+        } catch (coding_exception $e) {
+            // Coding exception...
+            $additionalsql = '';
+        }
 
-
-       // Join on office hours info as well to get all information in one query
-       $sql = "
-           SELECT DISTINCT
-               CONCAT(u.id, '-', r.id) as recordset_id,
-               u.id,
-               u.firstname,
-               u.lastname,
-               u.email,
-               u.maildisplay,
-               u.url,
-               u.lastnamephonetic,
-               u.firstnamephonetic,
-               u.middlename,
-               u.alternatename,
-               u.idnumber,
-               r.shortname,
-               oh.officelocation,
-               oh.officehours,
-               oh.email as officeemail,
-               oh.phone
-           FROM {course} c
-           JOIN {context} ct
-               ON (ct.instanceid = c.id AND ct.contextlevel= ".CONTEXT_COURSE.")
-           JOIN {role_assignments} ra
-               ON (ra.contextid = ct.id)
-           JOIN {role} r
-               ON (ra.roleid = r.id)
-           JOIN {user} u
-               ON (u.id = ra.userid)
-           LEFT JOIN {ucla_officehours} oh
-               ON (u.id = oh.userid AND c.id = oh.courseid)
-           WHERE 
-               c.id = ?
-               $additional_sql
-           ORDER BY u.lastname, u.firstname";    
+        // Join on office hours info as well to get all information in one query.
+        $sql = "
+            SELECT DISTINCT
+                CONCAT(u.id, '-', r.id) as recordset_id,
+                u.id,
+                u.firstname,
+                u.lastname,
+                u.email,
+                u.maildisplay,
+                u.url,
+                u.lastnamephonetic,
+                u.firstnamephonetic,
+                u.middlename,
+                u.alternatename,
+                u.idnumber,
+                r.shortname,
+                oh.officelocation,
+                oh.officehours,
+                oh.email as officeemail,
+                oh.phone
+            FROM {course} c
+            JOIN {context} ct
+                ON (ct.instanceid = c.id AND ct.contextlevel= ".CONTEXT_COURSE.")
+            JOIN {role_assignments} ra
+                ON (ra.contextid = ct.id)
+            JOIN {role} r
+                ON (ra.roleid = r.id)
+            JOIN {user} u
+                ON (u.id = ra.userid)
+            LEFT JOIN {ucla_officehours} oh
+                ON (u.id = oh.userid AND c.id = oh.courseid)
+            WHERE
+                c.id = ?
+                $additionalsql
+            ORDER BY u.lastname, u.firstname";
 
         $instructors = $DB->get_records_sql($sql, $params);
 
@@ -222,9 +229,9 @@ class format_ucla extends format_topics {
             }
         }
 
-       return $instructors;
-   }
-    
+        return $instructors;
+    }
+
     /**
      * Returns the display name of the given section that the course prefers.
      *
@@ -244,7 +251,7 @@ class format_ucla extends format_topics {
             return get_string('week').' '.$section->section;
         }
     }
-    
+
     /**
      * Course-specific information to be output immediately below content on any course page
      *
@@ -255,36 +262,36 @@ class format_ucla extends format_topics {
     public function course_content_footer() {
         global $PAGE;
 
-        // Load format utilities
-        $PAGE->requires->yui_module('moodle-format_ucla-utils', 
-            'M.format_ucla.utils.init', 
+        // Load format utilities.
+        $PAGE->requires->yui_module('moodle-format_ucla-utils',
+            'M.format_ucla.utils.init',
             array(array()));
-        
+
         $PAGE->requires->strings_for_js(
                 array(
-                    'collapsedshow', 
-                    'collapsedhide', 
-                    ), 
+                    'collapsedshow',
+                    'collapsedhide',
+                    ),
                 'format_ucla'
                 );
         if ($PAGE->user_is_editing()) {
-            // If user is editing, load public/private plugin
+            // If user is editing, load public/private plugin.
             $PAGE->requires->yui_module('moodle-local_publicprivate-util', 'M.local_publicprivate.init',
                     array(array('courseid' => $this->get_courseid())));
-                    
+
             $PAGE->requires->strings_for_js(
                 array(
-                    'publicprivatemakeprivate', 
-                    'publicprivatemakepublic', 
+                    'publicprivatemakeprivate',
+                    'publicprivatemakepublic',
                     'publicprivategroupingname'
-                    ), 
+                    ),
                 'local_publicprivate'
                 );
         }
-        
+
         return parent::course_content_footer();
     }
-    
+
     /**
      * Returns the list of blocks to be automatically added for the newly created course
      *
@@ -301,19 +308,19 @@ class format_ucla extends format_topics {
     /**
      * Defines custom UCLA format options like 'landing_page'.  We can retrieve
      * these options as properties of the course object like so:
-     * 
+     *
      *      course_get_format($courseorid)->get_course()->landing_page
-     * 
-     * @param type $foreditform if we're going to retrieve options for a form
+     *
+     * @param bool $foreditform if we're going to retrieve options for a form
      * @return array of options
      */
     public function course_format_options($foreditform = false) {
         global $COURSE;
         $options = parent::course_format_options($foreditform);
-        
+
         static $uclaoptions = false;
         $iscollabsite = is_collab_site($COURSE);
-        
+
         if ($uclaoptions === false) {
             $uclaoptions = array(
                 'landing_page' => array(
@@ -342,7 +349,7 @@ class format_ucla extends format_topics {
         }
 
         // Define preferences for course edit form.  Define them as 'hidden',
-        // since modify_sections already provides this functionality
+        // since modify_sections already provides this functionality.
         if ($foreditform) {
             // Need to set "label" to the default value, because hidden fields
             // will use it as its value (see CCLE-4322).
@@ -367,7 +374,7 @@ class format_ucla extends format_topics {
                     )
                 )
             );
-            
+
             if (!$iscollabsite) {
                 $uclaoptionsedit['createtasite'] = array(
                     'label' => get_string('createtasite', 'format_ucla'),
@@ -395,13 +402,13 @@ class format_ucla extends format_topics {
 
             $uclaoptions = array_merge_recursive($uclaoptions, $uclaoptionsedit);
         }
-        
+
         $options = array_merge_recursive($options, $uclaoptions);
 
-        // Hide the course display option, since we always want it to be 
+        // Hide the course display option, since we always want it to be
         // COURSE_DISPLAY_MULTIPAGE.
         $options['coursedisplay']['element_type'] = 'hidden';
-        
+
         return $options;
     }
 
@@ -420,14 +427,14 @@ class format_ucla extends format_topics {
         // except for the "Show all" page, which is a single page for all the sections.
         $url = new moodle_url('/course/view.php', array('id' => $this->get_courseid()));
 
-        // $sectionno denotes the section we want to return to.
+        // Variable $sectionno denotes the section we want to return to.
         if (is_object($section)) {
             $sectionno = $section->section;
         } else {
             $sectionno = $section;
         }
-        // $sr denotes the page we want to return to, either the same as $sectionno
-        // or 0/empty for "Show all".
+        // Variable $sr denotes the page we want to return to, either the same as $sectionno
+        // or 0 / empty for "Show all".
         if (array_key_exists('sr', $options)) {
             $sr = $options['sr'];
         }
@@ -457,9 +464,8 @@ class format_ucla extends format_topics {
      * Allows course format to execute code on moodle_page::set_course()
      *
      * Checks that sections names are written to DB.
-     * 
+     *
      * @param moodle_page $page instance of page calling set_course
-     * @global $DB
      */
     public function page_set_course(moodle_page $page) {
         parent::page_set_course($page);
@@ -506,22 +512,25 @@ class format_ucla extends format_topics {
 }
 
 /**
-* Used to display the course structure for a course where format=topic
-*
-* This is called automatically by {@link load_course()} if the current course
-* format = ucla.
-*
-* @return bool Returns true
-*/
+ * Used to display the course structure for a course where format=topic
+ *
+ * This is called automatically by {@link load_course()} if the current course
+ * format = ucla.
+ *
+ * @param navigation_node $navigation Description
+ * @param stdClass $course Description
+ * @param navigation_node $coursenode Description
+ * @return bool Returns true
+ */
 function callback_ucla_load_content(&$navigation, $course, $coursenode) {
     global $DB, $CFG;
 
     // Sort of a dirty hack, but this so far is the best way to manipulate the
-    // navbar since these callbacks are called before the format is included
+    // navbar since these callbacks are called before the format is included.
 
     // This is to prevent further diving and incorrect associations in the
-    // navigation bar
-    $logical_limitations = array('subjarea', 'division');
+    // navigation bar.
+    $logicallimitations = array('subjarea', 'division');
 
     $subjareanode = null;
     $divisionnode = null;
@@ -529,9 +538,9 @@ function callback_ucla_load_content(&$navigation, $course, $coursenode) {
     $division = false;
     $subjarea = false;
 
-    // Browse-by hooks for categories
+    // Browse-by hooks for categories.
     if (block_instance('ucla_browseby')) {
-        // Term is needed for browseby
+        // Term is needed for browseby.
         $courseinfos = ucla_map_courseid_to_termsrses($course->id);
         $parentnode =& $coursenode->parent;
 
@@ -539,8 +548,7 @@ function callback_ucla_load_content(&$navigation, $course, $coursenode) {
             $first = reset($courseinfos);
             $term = $first->term;
 
-
-            // Find the nodes that represent the division and subject areas
+            // Find the nodes that represent the division and subject areas.
             while ($parentnode->type == navigation_node::TYPE_CATEGORY) {
                 if ($subjareanode == null) {
                     $subjarea = $DB->get_field('ucla_reg_subjectarea', 'subjarea',
@@ -562,9 +570,8 @@ function callback_ucla_load_content(&$navigation, $course, $coursenode) {
                 $parentnode =& $parentnode->parent;
             }
 
-
             // Replace the link in the navbar for subject areas and divisions
-            // with respective browseby links
+            // with respective browseby links.
             if ($divisionnode != null) {
                 $divisionnode->action = new moodle_url(
                         '/blocks/ucla_browseby/view.php',
@@ -593,27 +600,27 @@ function callback_ucla_load_content(&$navigation, $course, $coursenode) {
                 );
             }
         } else if ($siteindicator = siteindicator_site::load($course->id)) {
-            // Use browse-by collab functions to find collab categories
+            // Use browse-by collab functions to find collab categories.
             $bbhf = new browseby_handler_factory();
             $browsebycollab = $bbhf->get_type_handler('collab');
 
-            $collab_cat = $browsebycollab->get_collaboration_category();
-            siteindicator_manager::filter_category_tree($collab_cat);
+            $collabcat = $browsebycollab->get_collaboration_category();
+            siteindicator_manager::filter_category_tree($collabcat);
 
             $collabcatparams = array(
                 'type' => 'collab'
             );
 
             while ($parentnode->type == navigation_node::TYPE_CATEGORY) {
-                // Extract out the category id
+                // Extract out the category id.
                 if ($parentnode->action->param('id')) {
                     $catid = $parentnode->action->param('id');
 
                     // See if the catid is within an accepted set of
-                    // collaboration categories
+                    // collaboration categories.
                     if ($browsebycollab->find_category(
                                 $catid,
-                                $collab_cat->categories,
+                                $collabcat->categories,
                                 'id'
                             )) {
 
