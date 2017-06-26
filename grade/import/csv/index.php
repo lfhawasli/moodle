@@ -116,6 +116,17 @@ if ($formdata = $mform2->get_data()) {
 
     // At this stage if things are all ok, we commit the changes from temp table.
     if ($status) {
+        // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+        // Partial import, output which userid's were not imported.
+        if ($gradeimport->is_incompleteimport()) {
+            $useriderrors = $gradeimport->get_formatted_useriderrors();
+            echo $renderer->errors($useriderrors);
+            $errors = $gradeimport->get_gradebookerrors();
+            if (!empty($errors)) {
+                echo $renderer->errors($errors);
+            }
+        }
+        // END UCLA MOD: SSC-3723/CCLE-6923.
         grade_import_commit($course->id, $importcode);
     } else {
         $errors = $gradeimport->get_gradebookerrors();
