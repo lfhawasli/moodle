@@ -16,7 +16,7 @@
 
 /**
  * UCLA course format.  Display the whole course as "topics" made of modules.
- * 
+ *
  * Copied from Topic format
  *
  * @package format_ucla
@@ -49,19 +49,19 @@ if (!is_collab_site($course)) {
 
 $context = context_course::instance($course->id);
 
-if (($marker >=0) && has_capability('moodle/course:setcurrentsection', $context) && confirm_sesskey()) {
+if (($marker >= 0) && has_capability('moodle/course:setcurrentsection', $context) && confirm_sesskey()) {
     $course->marker = $marker;
     course_set_marker($course->id, $marker);
 }
 
-/* @var $format format_ucla */
+/* @var $format format_ucla.*/
 $format = course_get_format($course);
 
-/* @var $renderer format_ucla_renderer */
+/* @var $renderer format_ucla_renderer.*/
 $renderer = $PAGE->get_renderer('format_ucla');
 $renderer->print_header();
 
-// make sure all sections are created
+// Make sure all sections are created.
 course_create_sections_if_missing($format->get_course(), range(0, $format->get_course()->numsections));
 
 $displaysection = $format->figure_section();
@@ -72,5 +72,5 @@ if ($displaysection == $format::UCLA_FORMAT_DISPLAY_ALL) {
     $renderer->print_single_section_page($format->get_course(), null, null, null, null, $displaysection);
 }
 
-// Include course format js module
+// Include course format js module.
 $PAGE->requires->js('/course/format/ucla/format.js');

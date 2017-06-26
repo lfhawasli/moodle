@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer for outputting the ucla course format. Based off the topic course
- * format.
+ * Renderer for outputting the ucla course format.
+ *
+ * Based off the topic course format.
  *
  * @package format_ucla
  * @copyright 2012 UCLA Regent
@@ -37,26 +38,26 @@ require_once($CFG->dirroot.'/enrol/locallib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_ucla_renderer extends format_topics_renderer {
-    // course info, may contain reginfo
+    /** @var $courseinfo course info, may contain reginfo.*/
     private $courseinfo = array();
 
-    // parsed version of $courseinfo, used to display course sections
+    /** @var $displayinfo parsed version of $courseinfo, used to display course sections.*/
     private $displayinfo = array();
 
-    // instructors for course
+    /** @var $instructors array of instructors for course.*/
     private $instructors = array();
 
-    // course object
+    /** @var $course course object.*/
     private $course = null;
 
-    // context object
+    /** @var $context context object.*/
     private $context = null;
 
-    // term for course that is being rendered
+    /** @var $term term for course that is being rendered.*/
     private $term = null;
 
-    // strings to generate jit links
-    private $jit_links = array();
+    /** @var $jitlinks strings to generate jit links.*/
+    private $jitlinks = array();
 
     /**
      * Constructor method, do necessary setup for UCLA format.
@@ -67,32 +68,32 @@ class format_ucla_renderer extends format_topics_renderer {
     public function __construct(moodle_page $page, $target) {
         parent::__construct($page, $target);
 
-        // get reg info, if any
+        // Get reg info, if any.
         $this->courseinfo = ucla_get_course_info($page->course->id);
 
-        // parse that reg info
+        // Parse that reg info.
         $this->parse_courseinfo();
 
-        // get instructors, if any
+        // Get instructors, if any.
         $this->instructors = course_get_format($page->course)->display_instructors();
 
-        // save course object
+        // Save course object.
         $this->course = course_get_format($page->course)->get_course();
 
-        // save context object
+        // Save context object.
         $this->context =& $page->context;
 
-        // CCLE-2800 - cache strings for JIT links
-        $this->jit_links = array('file' => get_string('file', 'format_ucla'));
+        // CCLE-2800 - cache strings for JIT links.
+        $this->jitlinks = array('file' => get_string('file', 'format_ucla'));
         if (has_capability('mod/turnitintooltwo:addinstance', context_system::instance())) {
-            $this->jit_links += array('turnitin' => get_string('turnitin', 'format_ucla'));
+            $this->jitlinks += array('turnitin' => get_string('turnitin', 'format_ucla'));
         }
-        $this->jit_links += array('link' => get_string('link', 'format_ucla'),
+        $this->jitlinks += array('link' => get_string('link', 'format_ucla'),
                                   'text' => get_string('text', 'format_ucla'),
                                   'subheading' => get_string('subheading', 'format_ucla'));
-        
+
         // Use the public/private renderer.  This will permit us to override the
-        // way we render course modules
+        // way we render course modules.
         $this->courserenderer = $this->page->get_renderer('local_publicprivate');
     }
 
@@ -103,12 +104,13 @@ class format_ucla_renderer extends format_topics_renderer {
      *
      * Then echos those notices out.
      *
-     * @param int sectionnum            Section being displayed
+     * @param int $sectionnum            Section being displayed
+     * @param stdClass $course           Course selected
      */
     public function print_external_notices($sectionnum, $course) {
         global $OUTPUT, $PAGE, $USER;
 
-        // maybe some external notice system is redirecting back with a message
+        // Maybe some external notice system is redirecting back with a message.
         flash_display();
 
         /* show notices if:
@@ -125,16 +127,13 @@ class format_ucla_renderer extends format_topics_renderer {
             return;
         }
 
-
-
-        // check if courseinfo is set, so that we can get a possible term
+        // Check if courseinfo is set, so that we can get a possible term.
         $courseinfo = null;
         if (!empty($this->courseinfo)) {
-            // use reset instead of array_pop, because pop alters the array
+            // Use reset instead of array_pop, because pop alters the array.
             $courseinfo = reset($this->courseinfo);
 
         }
-
 
         // Retrieve plugins' notices.
         if ($pluginsfunction = get_plugins_with_function('ucla_format_notices')) {
@@ -177,19 +176,19 @@ class format_ucla_renderer extends format_topics_renderer {
     public function print_header() {
         global $CFG, $OUTPUT;
 
-        // Formatting and determining information to display for these courses
+        // Formatting and determining information to display for these courses.
         $regcoursetext = '';
         $termtext = '';
 
-        foreach($this->courseinfo as $c) {
-            if($c->hostcourse == 1) {
+        foreach ($this->courseinfo as $c) {
+            if ($c->hostcourse == 1) {
                 $hostcourse = str_replace(' ', '', ucla_make_course_title($c));
                 break;
             }
         }
 
         if (!empty($this->courseinfo)) {
-            // don't show too many
+            // Don't show too many.
             $regcourseinfo = implode(' / ', $this->displayinfo);
             $hostfocus = html_writer::tag('span', $hostcourse,
                     array('class' => 'reg-hostcourse'));
@@ -202,9 +201,9 @@ class format_ucla_renderer extends format_topics_renderer {
 
         }
 
-        // This is for the sets of instructors in a course
+        // This is for the sets of instructors in a course.
         $imploder = array();
-        $inst_text = '';
+        $insttext = '';
         if (!empty($this->instructors)) {
             foreach ($this->instructors as $instructor) {
                 if (in_array($instructor->shortname, $CFG->instructor_levels_roles['Instructor'])
@@ -215,15 +214,15 @@ class format_ucla_renderer extends format_topics_renderer {
         }
 
         if (empty($imploder)) {
-            $inst_text = 'N/A';
+            $insttext = 'N/A';
         } else {
-            $inst_text = implode(' / ', $imploder);
+            $insttext = implode(' / ', $imploder);
         }
 
-        $heading_text = '';
+        $headingtext = '';
         if (!empty($termtext)) {
-            $heading_text = $termtext . ' - ' . $regcoursetext . ' - ' . $inst_text;
-            $heading_text = html_writer::tag('div', $heading_text, array('class' => 'site-meta'));
+            $headingtext = $termtext . ' - ' . $regcoursetext . ' - ' . $insttext;
+            $headingtext = html_writer::tag('div', $headingtext, array('class' => 'site-meta'));
         }
 
         // Check if this site has a custom course logo.  If so, then the title
@@ -236,26 +235,26 @@ class format_ucla_renderer extends format_topics_renderer {
             echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
         }
 
-        echo $heading_text;
+        echo $headingtext;
         echo html_writer::tag('span', '', array('class' => 'site-title-divider'));
 
-        // display page header
+        // Display page header.
 
-        // Handle cancelled classes
+        // Handle cancelled classes.
         if (is_course_cancelled($this->courseinfo)) {
             echo $OUTPUT->notification(get_string('coursecancelled', 'format_ucla'), 'notifywarning');
         } else {
-            // display message if user is viewing an old course
+            // Display message if user is viewing an old course.
             $notice = notice_course_status($this->course);
-            // CCLE-5741 - Only show out of term message if it is enabled in course settings
+            // CCLE-5741 - Only show out of term message if it is enabled in course settings.
             if (!empty($notice) && isset($this->course->enableoutoftermmessage) && $this->course->enableoutoftermmessage) {
                 echo $notice;
             } else {
-                // display public/private notice, if applicable
+                // Display public/private notice, if applicable.
                 echo notice_nonenrolled_users($this->course);
             }
         }
-        
+
         // CCLE-6557 - Print easy to find "Enroll me" button.
         echo $this->print_self_enrollment_button();
     }
@@ -288,17 +287,17 @@ class format_ucla_renderer extends format_topics_renderer {
         // Now the list of sections..
         echo $this->start_section_list();
 
-        // Section 0, aka "Site info"
+        // Section 0, aka "Site info".
         $thissection = $sections[0];
         unset($sections[0]);
-        // do not display section summary/header info for section 0
+        // Do not display section summary/header info for section 0.
         echo $this->section_header($thissection, $course, false);
 
         echo $this->courserenderer->course_section_cm_list($course, $thissection);
 
         if ($PAGE->user_is_editing()) {
             $output = $this->courserenderer->course_section_add_cm_control($course, 0);
-            echo $output; // if $return argument in print_section_add_menus() set to false
+            echo $output; // If $return argument in print_section_add_menus() set to false.
         }
         echo $this->section_footer();
 
@@ -310,7 +309,7 @@ class format_ucla_renderer extends format_topics_renderer {
                 if (!empty($sections[$section])) {
                     $thissection = $sections[$section];
                 } else {
-                    // This will create a course section if it doesn't exist..
+                    // This will create a course section if it doesn't exist.
                     $thissection = get_fast_modinfo($course->id)->get_section_info($section);
 
                     // The returned section is only a bare database object rather than
@@ -331,7 +330,7 @@ class format_ucla_renderer extends format_topics_renderer {
                     continue;
                 }
 
-                // always show section content, even if editing is off
+                // Always show section content, even if editing is off.
                 echo $this->section_header($thissection, $course, false);
                 if ($thissection->uservisible) {
                     echo $this->courserenderer->course_section_cm_list($course, $thissection);
@@ -373,15 +372,15 @@ class format_ucla_renderer extends format_topics_renderer {
     public function print_section_zero_content() {
         global $CFG, $OUTPUT, $PAGE;
 
-        $center_content = '';
+        $centercontent = '';
 
-        // Course Information specific has a different section header
+        // Course Information specific has a different section header.
         if (!empty($this->courseinfo)) {
             // We need the stuff...
             $regclassurls = array();
             $regfinalurls = array();
-            $num_displayinfo = count($this->displayinfo);
-            for ($key = 0; $key < $num_displayinfo; $key++) {
+            $numdisplayinfo = count($this->displayinfo);
+            for ($key = 0; $key < $numdisplayinfo; $key++) {
                 $displayinfo = $this->displayinfo[$key];
                 $courseinfo = $this->courseinfo[$key];
 
@@ -393,13 +392,13 @@ class format_ucla_renderer extends format_topics_renderer {
                 );
             }
 
-            $registrar_info = get_string('reg_listing', 'format_ucla');
+            $registrarinfo = get_string('reg_listing', 'format_ucla');
 
-            $registrar_info .= implode(', ', $regclassurls);
-            $registrar_info .= html_writer::empty_tag('br');
+            $registrarinfo .= implode(', ', $regclassurls);
+            $registrarinfo .= html_writer::empty_tag('br');
 
-            $registrar_info .= get_string('reg_finalcd', 'format_ucla');
-            $registrar_info .= implode(', ', $regfinalurls);
+            $registrarinfo .= get_string('reg_finalcd', 'format_ucla');
+            $registrarinfo .= implode(', ', $regfinalurls);
 
         }
 
@@ -435,110 +434,113 @@ class format_ucla_renderer extends format_topics_renderer {
                                     get_string('collapsedshow', 'format_ucla'),
                                     array('class' => 'collapse-toggle')),
                             'collapse-toggle-container');
-                    $regsummarycontent .= html_writer::tag('div', $formattedregsummary . $toggle, array('class' => 'registrar-summary-hidden'));
-                    $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info registrar-summary-hidden'));
+                    $regsummarycontent .= html_writer::tag('div', $formattedregsummary . $toggle,
+                            array('class' => 'registrar-summary-hidden'));
+                    $centercontent .= html_writer::tag('div', $registrarinfo,
+                            array('class' => 'registrar-info registrar-summary-hidden'));
                 } else {
-                    $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info'));
+                    $centercontent .= html_writer::tag('div', $registrarinfo, array('class' => 'registrar-info'));
                     $regsummarycontent .= $formattedregsummary;
                     $supresscoursesummary = true;
                 }
-                $center_content .= html_writer::tag('div', $regsummarycontent, array('class' => 'registrar-summary'));
+                $centercontent .= html_writer::tag('div', $regsummarycontent, array('class' => 'registrar-summary'));
             } else {
-                $center_content .= html_writer::tag('div', $registrar_info, array('class' => 'registrar-info'));
+                $centercontent .= html_writer::tag('div', $registrarinfo, array('class' => 'registrar-info'));
             }
         }
 
-        // Editing button for course summary
+        // Editing button for course summary.
         if ($PAGE->user_is_editing()) {
             $streditsummary = get_string('editcoursetitle', 'format_ucla');
-            $url_options = array(
+            $urloptions = array(
                 'id' => $this->course->id,
             );
 
-            $link_options = array('title' => $streditsummary, 'class' => 'edit_course_summary');
+            $linkoptions = array('title' => $streditsummary, 'class' => 'edit_course_summary');
 
-            $moodle_url = new moodle_url('edit.php', $url_options);
+            $moodleurl = new moodle_url('edit.php', $urloptions);
 
-            $img_options = array(
+            $imgoptions = array(
                     'class' => 'icon edit iconsmall',
                     'alt' => $streditsummary
                 );
 
-            $innards = new pix_icon('t/edit', $link_options['title'],
-                'moodle', $img_options);
+            $innards = new pix_icon('t/edit', $linkoptions['title'],
+                'moodle', $imgoptions);
 
-            $center_content .= html_writer::tag('span',
-                $OUTPUT->render(new action_link($moodle_url,
-                    $innards, null, $link_options)),
+            $centercontent .= html_writer::tag('span',
+                $OUTPUT->render(new action_link($moodleurl,
+                    $innards, null, $linkoptions)),
                 array('class' => 'editbutton'));
-            
-            // Add Turnitin Assignment
+
+            // Add Turnitin Assignment.
             $turnitin = get_string('turnitin', 'format_ucla');
             $turnitinurloptions = array(
                 'add' => 'turnitintooltwo',
                 'course' => $this->course->id,
-                'section' => 0                
+                'section' => 0
             );
 
             $turnitinlinkoptions = array('title' => $turnitin, 'class' => 'edit_course_summary');
             $turnitinmoodleurl = new moodle_url('modedit.php', $turnitinurloptions);
-            $center_content .= html_writer::tag('span',
+            $centercontent .= html_writer::tag('span',
                 $OUTPUT->render(new action_link($turnitinmoodleurl,
                     null, null, $turnitinlinkoptions)),
                 array('class' => 'editbutton'));
         }
 
-        $center_content .= html_writer::start_tag('div', array('class' => 'summary'));
+        $centercontent .= html_writer::start_tag('div', array('class' => 'summary'));
         // If something is entered for the course summary then display that.
         if (!empty($this->course->summary) && !$supresscoursesummary) {
             $context = context_course::instance($this->course->id);
-            $summary = file_rewrite_pluginfile_urls($this->course->summary, 'pluginfile.php', $context->id, 'course', 'summary', NULL);
-            $center_content .= format_text($summary);
+            $summary = file_rewrite_pluginfile_urls($this->course->summary,
+                    'pluginfile.php', $context->id, 'course', 'summary', null);
+            $centercontent .= format_text($summary);
         }
 
-        $center_content .= html_writer::end_tag('div');
+        $centercontent .= html_writer::end_tag('div');
 
-        // Instructor information
+        // Instructor information.
         if (!empty($this->instructors)) {
             include_once($CFG->dirroot . '/blocks/ucla_office_hours/block_ucla_office_hours.php');
-            $instr_info = block_ucla_office_hours::render_office_hours_table(
+            $instrinfo = block_ucla_office_hours::render_office_hours_table(
                     $this->instructors, $this->course, $this->context);
 
-            $center_content .= html_writer::tag('div', $instr_info, array('class' => 'instr-info'));
+            $centercontent .= html_writer::tag('div', $instrinfo, array('class' => 'instr-info'));
         }
 
-        echo $center_content;
+        echo $centercontent;
     }
 
     /**
      * Output the html for a self-enrollment button.
-     * 
+     *
      * See CCLE-6557.
-     * 
+     *
      * @return string
      */
     private function print_self_enrollment_button() {
         global $OUTPUT, $PAGE;
         $retval = '';
-        // Check if course has "self-enrollment" plugin enabled and user is not 
+        // Check if course has "self-enrollment" plugin enabled and user is not
         // enrolled.
         $selfenrol = enrol_selfenrol_available($this->course->id);
         if ($selfenrol == true && !is_enrolled($this->context)) {
             $enrolmestr = get_string('enrolme', 'enrol_self');
             $url = new moodle_url('/enrol/index.php', array('id' => $this->course->id));
-            
+
             $enrols = enrol_get_plugins(true);
             $enrolinstances = enrol_get_instances($this->course->id, true);
 
-            foreach($enrolinstances as $instance) {
+            foreach ($enrolinstances as $instance) {
                 if (!isset($enrols[$instance->enrol])) {
                     continue;
                 }
-                if ($instance->enrol == "self") {                    
+                if ($instance->enrol == "self") {
                     $enrolmestr = get_string('enrolme', 'enrol_self');
-                    $url = new moodle_url('/enrol/index.php', 
-                            array('id' => $this->course->id, 
-                            'sesskey' => sesskey(), 
+                    $url = new moodle_url('/enrol/index.php',
+                            array('id' => $this->course->id,
+                            'sesskey' => sesskey(),
                             'instance' => $instance->id,
                             // This magic value is necessary to automatically
                             // enroll the user rather than have them land on
@@ -549,12 +551,12 @@ class format_ucla_renderer extends format_topics_renderer {
                     return $OUTPUT->box($renderer->render($enrolmebtn), 'text-center');
                 }
             }
-        }        
+        }
         return $retval;
     }
-    
+
     /**
-     * Output the html for a single section page .
+     * Output the html for a single section page.
      *
      * @param stdClass $course The course entry from DB
      * @param array $sections (argument not used)
@@ -567,11 +569,10 @@ class format_ucla_renderer extends format_topics_renderer {
         global $PAGE;
 
         $modinfo = get_fast_modinfo($course);
-//        $course = course_get_format($course)->get_course();
 
         // Can we view the section in question?
         if (!($sectioninfo = $modinfo->get_section_info($displaysection))) {
-            // This section doesn't exist
+            // This section doesn't exist.
             print_error('unknowncoursesection', 'error', null, $course->fullname);
             return;
         }
@@ -586,40 +587,17 @@ class format_ucla_renderer extends format_topics_renderer {
             return;
         }
 
-        // Copy activity clipboard..
+        // Copy activity clipboard.
         echo $this->course_activity_clipboard($course, $displaysection);
         $thissection = $modinfo->get_section_info(0);
-//        if ($thissection->summary or !empty($modinfo->sections[0]) or $PAGE->user_is_editing()) {
-//            echo $this->start_section_list();
-//            echo $this->section_header($thissection, $course, true, $displaysection);
-//            echo $this->courserenderer->course_section_cm_list($course, $thissection, $displaysection);
-//            echo $this->courserenderer->course_section_add_cm_control($course, 0, $displaysection);
-//            echo $this->section_footer();
-//            echo $this->end_section_list();
-//        }
 
-        // Start single-section div
+        // Start single-section div.
         echo html_writer::start_tag('div', array('class' => 'single-section'));
 
         // The requested section page.
         $thissection = $modinfo->get_section_info($displaysection);
 
-        // Title with section navigation links.
-//        $sectionnavlinks = $this->get_nav_links($course, $modinfo->get_section_info_all(), $displaysection);
-//        $sectiontitle = '';
-//        $sectiontitle .= html_writer::start_tag('div', array('class' => 'section-navigation header headingblock'));
-//        $sectiontitle .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
-//        $sectiontitle .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
-        // Title attributes
-//        $titleattr = 'mdl-align title';
-//        if (!$thissection->visible) {
-//            $titleattr .= ' dimmed_text';
-//        }
-//        $sectiontitle .= html_writer::tag('div', get_section_name($course, $displaysection), array('class' => $titleattr));
-//        $sectiontitle .= html_writer::end_tag('div');
-//        echo $sectiontitle;
-
-        // Now the list of sections..
+        // Now the list of sections.
         echo $this->start_section_list();
 
         echo $this->section_header($thissection, $course, true, $displaysection);
@@ -632,20 +610,18 @@ class format_ucla_renderer extends format_topics_renderer {
         echo $this->section_footer();
         echo $this->end_section_list();
 
-        // Display section bottom navigation.
-//        $sectionbottomnav = '';
-//        $sectionbottomnav .= html_writer::start_tag('div', array('class' => 'section-navigation mdl-bottom'));
-//        $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
-//        $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
-//        $sectionbottomnav .= html_writer::tag('div', $this->section_nav_selection($course, $sections, $displaysection),
-//            array('class' => 'mdl-align'));
-//        $sectionbottomnav .= html_writer::end_tag('div');
-//        echo $sectionbottomnav;
-
         // Close single-section div.
         echo html_writer::end_tag('div');
     }
 
+    /**
+     * Generate the edit controls of a section
+     *
+     * @param stdClass $course The course entry
+     * @param stdClass $section The course_section entry
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return array $controls array of links with edit controls
+     */
     protected function section_edit_controls($course, $section, $onsectionpage = false) {
         global $PAGE;
 
@@ -655,10 +631,10 @@ class format_ucla_renderer extends format_topics_renderer {
 
         $controls = parent::section_edit_controls($course, $section, $onsectionpage);
 
-        // We're expecting section 'hightlight' and 'hide', but we want
+        // We're expecting section 'highlight' and 'hide', but we want
         // to override 'highlight' for 'section edit'.
         $url = new moodle_url('/course/editsection.php',
-                array('id'=> $section->id, 'sr' => $section->section));
+                array('id' => $section->id, 'sr' => $section->section));
 
         $controls[0] = html_writer::link($url, html_writer::img($this->output->pix_url('t/edit'),
                 get_string('editsectiontitle', 'format_ucla'), array('class' => 'icon edit')),
@@ -698,40 +674,40 @@ class format_ucla_renderer extends format_topics_renderer {
             }
         }
 
-        $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
+        $o .= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
             'class' => 'section main clearfix'.$sectionstyle));
 
-        // print any external notices
+        // Print any external notices.
         $this->print_external_notices($section->section, $course);
 
         // For site info, instead of printing section title/summary, just
-        // print site info releated stuff instead
+        // print site info releated stuff instead.
         if ($section->section == 0) {
             $this->print_section_zero_content();
-            $o.= html_writer::start_tag('div', array('class' => 'content'));
+            $o .= html_writer::start_tag('div', array('class' => 'content'));
         } else {
             $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
-            $o.= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+            $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
 
-            $o.= html_writer::start_tag('div', array('class' => 'content'));
+            $o .= html_writer::start_tag('div', array('class' => 'content'));
 
             // Start section header with section links!
-            $o.= html_writer::start_tag('div', array('class' => 'sectionheader'));
-            $o.= $this->output->heading($this->section_title($section, $course), 3, 'sectionname');
+            $o .= html_writer::start_tag('div', array('class' => 'sectionheader'));
+            $o .= $this->output->heading($this->section_title($section, $course), 3, 'sectionname');
 
             $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
-            $o.= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
-            $o.= html_writer::end_tag('div');
-            // End section header
+            $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
+            $o .= html_writer::end_tag('div');
+            // End section header.
 
             if ($PAGE->user_is_editing()) {
                 $o .= $this->get_jit_links($section->section);
             }
 
-            $o.= html_writer::start_tag('div', array('class' => 'summary'));
-            $o.= $this->format_summary_text($section);
+            $o .= html_writer::start_tag('div', array('class' => 'summary'));
+            $o .= $this->format_summary_text($section);
 
-            $o.= html_writer::end_tag('div');
+            $o .= html_writer::end_tag('div');
 
             $context = context_course::instance($course->id);
             $o .= $this->section_availability_message($section,
@@ -759,11 +735,11 @@ class format_ucla_renderer extends format_topics_renderer {
      * @return string       Returns JIT link html
      */
     private function get_jit_links($section) {
-        $ret_val = html_writer::start_tag('div',
+        $retval = html_writer::start_tag('div',
                 array('class' => 'jit-links '));
 
-        foreach ($this->jit_links as $jit_type => $jit_string) {
-            if ($jit_type == 'turnitin') {
+        foreach ($this->jitlinks as $jittype => $jitstring) {
+            if ($jittype == 'turnitin') {
                 $link = new moodle_url('/course/modedit.php',
                         array('add' => 'turnitintooltwo',
                               'course' => $this->course->id,
@@ -771,18 +747,18 @@ class format_ucla_renderer extends format_topics_renderer {
             } else {
                 $link = new moodle_url('/blocks/ucla_easyupload/upload.php',
                         array('course_id' => $this->course->id,
-                              'type' => $jit_type,
+                              'type' => $jittype,
                               'section' => $section));
             }
-            $ret_val .= html_writer::link($link, $jit_string, array('class' => ''));
+            $retval .= html_writer::link($link, $jitstring, array('class' => ''));
         }
 
-        $ret_val .= html_writer::end_tag('div');
-        return $ret_val;
+        $retval .= html_writer::end_tag('div');
+        return $retval;
     }
 
     /**
-     * Generate the section title with permament section link
+     * Generate the section title with permament section link.
      *
      * @param stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
@@ -807,8 +783,8 @@ class format_ucla_renderer extends format_topics_renderer {
         $maxcrosslistshown = get_config('local_ucla', 'maxcrosslistshown');
         foreach ($this->courseinfo as $key => $courseinfo) {
             if (count($this->displayinfo) >= $maxcrosslistshown) {
-                // going over the limit of crosslists to show, replace them
-                // with ...
+                // Going over the limit of crosslists to show, replace them
+                // with...
                 $this->displayinfo[$key] = '...';
                 break;
             }
@@ -821,19 +797,19 @@ class format_ucla_renderer extends format_topics_renderer {
                         . $theterm . ' vs ' . $thisterm);
             }
 
-            $course_text = $courseinfo->subj_area . $courseinfo->coursenum . '-' .
+            $coursetext = $courseinfo->subj_area . $courseinfo->coursenum . '-' .
                     $courseinfo->sectnum;
 
-            // if section is cancelled, then cross it out
+            // If section is cancelled, then cross it out.
             if (enrolstat_is_cancelled($courseinfo->enrolstat)) {
-                $course_text = html_writer::tag('span', $course_text, array('class' => 'cancelled-course'));
+                $coursetext = html_writer::tag('span', $coursetext, array('class' => 'cancelled-course'));
             }
 
-            // save section info
-            $this->displayinfo[$key] = $course_text;
+            // Save section info.
+            $this->displayinfo[$key] = $coursetext;
         }
 
-        $this->term = $theterm; // save term for course being displayed
+        $this->term = $theterm; // Save term for course being displayed.
     }
 
 }
