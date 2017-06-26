@@ -871,6 +871,9 @@
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    /* START UCLA MOD: CCLE-6707 - Rubric is not working */
+    width: auto;
+    /* END UCLA MOD: CCLE-6707 */
 }
 
 .path-mod-assign #page-content [data-region="grade-panel"] .mform:not(.unresponsive) .fcontainer .fitem.popout .fitemtitle {
