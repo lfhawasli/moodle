@@ -14,250 +14,45 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Handle multiple choice competencies in feedback module.
+ *
+ * @package     mod_feedback
+ * @copyright   2016 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
+
 defined('MOODLE_INTERNAL') OR die('not allowed');
 require_once($CFG->dirroot.'/mod/feedback/item/multichoice/lib.php');
 require_once($CFG->dirroot.'/blocks/competencies/lib.php');
 
 /**
- * Class to handle multiple choice competencies in feedback module
+ * Class file.
  *
- * @package     block_mod_feedback
+ * @package     mod_feedback
  * @copyright   2016 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice {
-
+    /** @var string Question type.*/
     protected $type = "multichoicesetcompetencies";
 
-    public function is_supported() {
-        global $CFG;
-        return file_exists($CFG->dirroot.'/blocks/competencies/lib.php');
-    }
-
-    public function init_lib() {
-        global $CFG;
-
-        if (!$this->is_supported())
-            return false;
-
-        require_once($CFG->dirroot.'/blocks/competencies/lib.php');
-        return true;
-    }
-
     /**
-     * print the item at the edit-page of feedback
+     * Helper function for collected data, both for analysis page and export to excel
      *
-     * @global object
-     * @param object $item
-     * @return void
+     * @param stdClass $item the db-object from feedback_item
+     * @param int $groupid
+     * @param int $courseid
+     * @return array
      */
-    public function print_item_preview($item) {
-        global $OUTPUT, $DB, $COURSE;
-
-        if (!$this->is_supported())
-            return;
-
-        $info = $this->get_info($item);
-        $align = right_to_left() ? 'right' : 'left';
-
-        $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $strrequiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
-            get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
-
-        // Test if required and no value is set so we have to mark this item
-        // we have to differ check and the other subtypes.
-        $requiredmark = ($item->required == 1) ? $strrequiredmark : '';
-
-        // Print the question and label.
-        echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
-        echo format_text($item->name.$requiredmark, true, false, false);
-        if ($item->dependitem) {
-            if ($dependitem = $DB->get_record('feedback_item', array('id' => $item->dependitem))) {
-                echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
-                echo '</span>';
-            }
-        }
-        echo '</div>';
-
-        foreach (block_competencies_db::get_course_items($COURSE->id) as $competency) {
-            // Print the presentation.
-            echo '<div class="feedback_item_presentation_'.$align.'">';
-            echo '<div style="font-weight:bold;padding:6px 0 0 4px;">'.$competency->name.'</div>';
-            $index = 1;
-            $checked = '';
-            echo '<ul>';
-            if ($info->horizontal) {
-                $hv = 'h';
-            } else {
-                $hv = 'v';
-            }
-
-            if ($info->subtype == 'r' AND !$this->hidenoselect($item)) {
-                // Print the "not_selected" item on radiobuttons.
-                ?>
-                <li class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
-                    <span class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
-                        <?php
-                            echo '<input type="radio" '.
-                                    'name="'.$item->typ.'_'.$item->id.'_'.$competency->id.'[]" '.
-                                    'id="'.$item->typ.'_'.$item->id.'_'.$competency->id.'_xxx" '.
-                                    'value="" checked="checked" />';
-                        ?>
-                    </span>
-                    <span class="feedback_item_radiolabel_<?php echo $hv.'_'.$align;?>">
-                        <label for="<?php echo $item->typ . '_' . $item->id.'_xxx';?>">
-                            <?php print_string('not_selected', 'feedback');?>&nbsp;
-                        </label>
-                    </span>
-                </li>
-                <?php
-            }
-
-            $this->print_item_radio($presentation, $item, false, $info, $align, $competency);
-
-            echo '</ul>';
-            echo '</div>';
-        }
-    }
-
-    /**
-     * print the item at the complete-page of feedback
-     *
-     * @global object
-     * @param object $item
-     * @param string $value
-     * @param bool $highlightrequire
-     * @return void
-     */
-    public function print_item_complete($item, $value = null, $highlightrequire = false) {
-        global $OUTPUT, $COURSE;
-
-        if (!$this->is_supported())
-            return;
-
-        $info = $this->get_info($item);
-        $align = right_to_left() ? 'right' : 'left';
-
-        if ($value == null) {
-            $value = array();
-        }
-        $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $strrequiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
-            get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
-
-        // Test if required and no value is set so we have to mark this item
-        // we have to differ check and the other subtypes.
-        if (is_array($value)) {
-            $values = $value;
-        } else {
-            $values = explode(FEEDBACK_MULTICHOICE_LINE_SEP, $value);
-        }
-        $requiredmark = ($item->required == 1) ? $strrequiredmark : '';
-
-        // Print the question and label.
-        $inputname = $item->typ . '_' . $item->id;
-        echo '<div class="feedback_item_label_'.$align.'">';
-        echo format_text($item->name.$requiredmark, true, false, false);
-        echo '</div>';
-
-        echo '<div id="multichoice_set-'.$item->id.'">';
-        foreach (block_competencies_db::get_course_items($COURSE->id) as $competency) {
-            // Print the presentation.
-            echo '<div class="feedback_item_presentation_'.$align.'" data-competency="'.$competency->id.'">';
-            echo '<div style="padding:6px 0 0 4px;">';
-            echo '<strong>'.$competency->name.'</strong>';
-            echo '<small><br>'.$competency->description.'</small>';
-
-            if ($highlightrequire AND $item->required) {
-                if (count($values) == 0 || !array_key_exists($competency->id, $values)) {
-                    echo '<br class="error"><span id="id_error_'.$inputname.'" class="error"> '.get_string('err_required', 'form').
-                        '</span><br id="id_error_break_'.$inputname.'" class="error" >';
-                }
-            }
-            echo '</div>';
-
-            echo '<ul>';
-            if ($info->horizontal) {
-                $hv = 'h';
-            } else {
-                $hv = 'v';
-            }
-            // Print the "not_selected" item on radiobuttons.
-            if ($info->subtype == 'r' AND !$this->hidenoselect($item)) {
-            ?>
-                <li class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
-                    <span class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
-                        <?php
-                        $checked = '';
-                        if (count($values) == 0 || !array_key_exists($competency->id, $values)) {
-                            $checked = 'checked="checked"';
-                        }
-                        echo '<input type="radio" '.
-                                'name="'.$item->typ.'_'.$item->id.'_'.$competency->id.'" '.
-                                'id="'.$item->typ.'_'.$item->id.'_'.$competency->id.'_xxx" '.
-                                'data-competency="'.$competency->id.'"'.
-                                'value="" '.$checked.' />';
-                        ?>
-                    </span>
-                    <span class="feedback_item_radiolabel_<?php echo $hv.'_'.$align;?>">
-                        <label for="<?php echo $item->typ.'_'.$item->id.'_xxx';?>">
-                            <?php print_string('not_selected', 'feedback');?>&nbsp;
-                        </label>
-                    </span>
-                </li>
-            <?php
-            }
-
-            $this->print_item_radio($presentation, $item, $value, $info, $align, $competency);
-
-            echo '</ul>';
-            echo '</div>';
-
-        }
-        echo '</div>';
-        echo '<textarea name="'.$item->typ.'_'.$item->id.'" id="'.$item->typ.'_'.$item->id.'" style="display:none;">'.json_encode($value, JSON_FORCE_OBJECT).'</textarea>';
-        ?>
-        <script type="text/javascript">
-        $('#multichoice_set-<?php echo $item->id; ?> input').change(function(){
-            var competencyId = $(this).attr('data-competency'),
-                value = $(this).val(),
-                jsonObject = {},
-                textareaEle = $('#<?php echo $item->typ.'_'.$item->id; ?>')
-                
-            try{
-                jsonObject = JSON.parse(textareaEle.val())
-            }catch(e){}
-            
-            if (value == "") {
-                delete jsonObject[competencyId];
-            }
-            else {
-                jsonObject[competencyId] = value
-            }
-            textareaEle.val(JSON.stringify(jsonObject))
-        })
-        </script>
-        <?php
-    }
-
-
-    // Gets an array with three values(typ, name, XXX)
-    // XXX is an object with answertext, answercount and quotient.
     public function get_analysed($item, $groupid = false, $courseid = false) {
         global $COURSE;
-
-        if (!$this->init_lib()) {
-            return null;
-        }
 
         $info = $this->get_info($item);
 
         $analysedanswer = array();
 
         // Get the possible answers.
-        $answers = null;
         $answers = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
         if (!is_array($answers)) {
             return null;
@@ -272,6 +67,7 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
             $values[] = json_decode($response->value, true);
         }
 
+        // NOTE: need to use $COURSE because $courseid is now always set.
         foreach (block_competencies_db::get_course_items($COURSE->id) as $competency) {
             $sizeofanswers = count($answers);
             for ($i = 1; $i <= $sizeofanswers; $i++) {
@@ -298,10 +94,16 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
         return $analyseditem;
     }
 
+    /**
+     * Prepares the value for exporting to Excel.
+     *
+     * @param object $item The db-object from feedback_item
+     * @param array $value
+     * @return string
+     */
     public function get_printval($item, $value) {
         $info = $this->get_info($item);
-        $answers = null;
-        $answers = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
+        $answers = explode(FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
         if (!is_array($answers)) {
             return null;
         }
@@ -316,129 +118,162 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
     }
 
     /**
-     * print the item at the complete-page of feedback
+     * Adds an input element to the complete form
      *
-     * @global object
-     * @param object $item
-     * @param string $value
-     * @return void
+     * This element has many options - it can be displayed as group or radio elements,
+     * group of checkboxes or a dropdown list.
+     *
+     * @param stdClass $item
+     * @param mod_feedback_complete_form $form
      */
-    public function print_item_show_value($item, $value = '') {
-        global $OUTPUT;
-        $align = right_to_left() ? 'right' : 'left';
+    public function complete_form_element($item, $form) {
+        global $COURSE, $OUTPUT, $PAGE;
+
+        // We require JQuery for converting responses to JSON.
+        if (!$PAGE->requires->is_head_done()) {
+            // When editing questions header is already sent.
+            $PAGE->requires->jquery();
+        }
 
         $info = $this->get_info($item);
-        $presentation = explode (FEEDBACK_MULTICHOICE_LINE_SEP, $info->presentation);
-        $requiredmark = '';
-        if ($item->required == 1) {
-            $requiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
-                get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
+        $name = $this->get_display_name($item);
+        $inputname = $item->typ . '_' . $item->id;
+        $options = $this->get_options($item);
+        $separator = !empty($info->horizontal) ? ' ' : '<br />';
+        $values = $form->get_item_value($item);
+
+        if ($values == null) {
+            // Maybe user is submitting form and had some errors.
+            $formdata = optional_param($inputname, null, PARAM_NOTAGS);
+            if (empty($formdata)) {
+                $values = array();
+            } else {
+                // We want to extract the data from submission so we can recover
+                // user data.
+                $values = json_decode($formdata, true);
+            }
         }
+
+        $align = right_to_left() ? 'right' : 'left';
+
+        $strrequiredmark = '<img class="req" title="'.get_string('requiredelement', 'form').'" alt="'.
+            get_string('requiredelement', 'form').'" src="'.$OUTPUT->pix_url('req') .'" />';
+        $requiredmark = ($item->required == 1) ? $strrequiredmark : '';
+
+        ob_start();
 
         // Print the question and label.
         echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.$item->label.') ';
-            echo format_text($item->name . $requiredmark, true, false, false);
+        echo format_text($name.$requiredmark, true, false, false);
         echo '</div>';
+        echo '<br />';
 
-        // Print the presentation.
-        echo $OUTPUT->box_start('generalbox boxalign'.$align);
+        echo '<div id="multichoice_set-'.$item->id.'" style="font-weight:normal">';
+        foreach (block_competencies_db::get_course_items($COURSE->id) as $competency) {
+            // Print the presentation.
+            echo '<div class="feedback_item_presentation_'.$align.'" data-competency="'.$competency->id.'">';
+            echo '<div style="display: block">';
+            echo '<strong>'.$competency->name.'</strong>';
+            echo '<small><br>'.$competency->description.'</small>';
 
-        $items = array();
-        $competencies = block_competencies_db::get_items();
-        $competencyresponses = json_decode($value, true);
-        foreach ($competencyresponses as $id => $response) {
-            $items[] = '<strong>'.s($competencies[$id]->name).'</strong>: '.s($presentation[$response - 1]);
-        }
-        if (count($items))
-            echo '<ul><li>'.implode('</li><li>', $items).'</li></ul>';
-        echo $OUTPUT->box_end();
-    }
-
-    public function clean_input_value($value) {
-        return clean_param_array(json_decode($value, true), $this->value_type());
-    }
-
-    public function check_value($value, $item) {
-        global $COURSE;
-
-        $info = $this->get_info($item);
-        if ($item->required != 1) {
-            return true;
-        }
-
-        if (!$value) {
-            return false;
-        }
-
-        $competencies = block_competencies_db::get_course_items($COURSE->id);
-        $obj = $value;
-        if (count(array_diff(array_keys($competencies), array_keys($obj)))) {
-            return false;
-        }
-
-        if ($obj != $value) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function create_value($data) {
-        return $data;
-    }
-
-    // Compares the dbvalue with the dependvalue
-    // dbvalue is the value put in by the user
-    // dependvalue is the value that is compared.
-    public function compare_value($item, $dbvalue, $dependvalue) {
-        if (count(array_diff_assoc(json_decode($dbvalue, true), json_decode($dependvalue, true)))
-            + count(array_diff_assoc(json_decode($dependvalue, true), json_decode($dbvalue, true)))) {
-            return false;
-        }
-        return true;
-    }
-
-    public function value_type() {
-        return PARAM_RAW;
-    }
-
-    public function value_is_array() {
-        return false;
-    }
-
-    public function get_info($item) {
-        $presentation = empty($item->presentation) ? '' : $item->presentation;
-
-        $info = new stdClass();
-        // Check the subtype of the multichoice
-        // it can be check(c), radio(r) or dropdown(d).
-        $info->subtype = '';
-        $info->presentation = '';
-        $info->horizontal = false;
-
-        $parts = explode(FEEDBACK_MULTICHOICE_TYPE_SEP, $item->presentation);
-        @list($info->subtype, $info->presentation) = $parts;
-        if (!isset($info->subtype)) {
-            $info->subtype = 'r';
-        }
-
-        if ($info->subtype != 'd') {
-            $parts = explode(FEEDBACK_MULTICHOICE_ADJUST_SEP, $info->presentation);
-            @list($info->presentation, $info->horizontal) = $parts;
-            if (isset($info->horizontal) AND $info->horizontal == 1) {
-                $info->horizontal = true;
-            } else {
-                $info->horizontal = false;
+            if ($item->required) {
+                if (!empty($_POST) && (count($values) == 0 || !array_key_exists($competency->id, $values))) {
+                    echo '<br class="error"><span id="id_error_'.$inputname.'" class="error"> '.get_string('err_required', 'form').
+                        '</span><br id="id_error_break_'.$inputname.'" class="error" >';
+                }
             }
+            echo '</div>';
+
+            if ($info->horizontal) {
+                $hv = 'h';
+            } else {
+                $hv = 'v';
+            }
+
+            // Print the radio buttons.
+            echo '<fieldset class="felement fgroup" style="margin-left: 15px; margin-bottom:1.0em">';
+            $this->print_item_radio($options, $item, $values, $info, $align, $separator, $competency);
+            echo '</fieldset>';
+            echo '</div>';
         }
-        return $info;
+        echo '</div>';
+        ?>
+        <script type="text/javascript">
+            $('#multichoice_set-<?php echo $item->id; ?> input').change(function(){
+                var competencyId = $(this).attr('data-competency'),
+                    value = $(this).val(),
+                    jsonObject = {},
+                    textareaEle = $('input[name=<?php echo $inputname; ?>]');
+                try {
+                    jsonObject = JSON.parse(textareaEle.val());
+                } catch(e) {}
+
+                if (value == "") {
+                    delete jsonObject[competencyId];
+                } else {
+                    jsonObject[competencyId] = value;
+                }
+                textareaEle.val(JSON.stringify(jsonObject));
+            })
+
+
+        </script>
+        <?php
+
+        $contents = ob_get_contents();
+        ob_end_clean();
+
+        // The static elements add the compentancy questions.
+        $form->add_form_element($item, ['static', $inputname.'_contents',
+            $contents], false);
+
+        // The hidden field is where JQuery will store the answers as JSON.
+        $form->add_form_element($item, ['hidden', $inputname,
+            json_encode($values, JSON_FORCE_OBJECT)]);
+        $form->set_element_type($inputname, PARAM_NOTAGS);
     }
 
-    private function print_item_radio($presentation, $item, $value, $info, $align, $competency = null) {
+    /**
+     * Prepares value that user put in the form for storing in DB
+     * @param array $value
+     * @return string
+     */
+    public function create_value($value) {
+        return $value;
+    }
 
-        if (is_null($competency))
+    /**
+     * Compares the dbvalue with the dependvalue.
+     *
+     * @param stdClass $item
+     * @param string $dbvalue is the value input by user in the format as it is stored in the db
+     * @param string $dependvalue is the value that it needs to be compared against
+     */
+    public function compare_value($item, $dbvalue, $dependvalue) {
+        if (count(array_diff_assoc(json_decode($dbvalue, true),
+                json_decode($dependvalue, true))) + count(array_diff_assoc(json_decode($dependvalue, true),
+                json_decode($dbvalue, true)))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Prints radio buttons for a given competency.
+     * 
+     * @param array $presentation   Responses.
+     * @param object $item
+     * @param array $value
+     * @param object $info
+     * @param string $align
+     * @param string $separator
+     * @param object $competency
+     */
+    private function print_item_radio($presentation, $item, $value, $info, $align, $separator, $competency = null) {
+
+        if (is_null($competency)) {
             return;
+        }
 
         $index = 1;
         $checked = '';
@@ -455,37 +290,57 @@ class feedback_item_multichoicesetcompetencies extends feedback_item_multichoice
             $hv = 'v';
         }
 
+        // Handle special case of not selected.
+        if ($presentation[0] == get_string('not_selected', 'feedback')) {
+        ?>
+            <span>
+                <?php
+                $checked = '';
+                if (count($values) == 0 || !array_key_exists($competency->id, $values)) {
+                    $checked = 'checked="checked"';
+                }
+                echo '<input type="radio" '.
+                        'name="'.$item->typ.'_'.$item->id.'_'.$competency->id.'" '.
+                        'id="'.$item->typ.'_'.$item->id.'_'.$competency->id.'_xxx" '.
+                        'data-competency="'.$competency->id.'"'.
+                        'value="" '.$checked.' />';
+                ?>
+                <label for="<?php echo $item->typ.'_'.$item->id.'_'.$competency->id.'_xxx';?>" style="font-weight:normal">
+                    <?php print_string('not_selected', 'feedback');?>
+                </label>
+            </span>
+            <br />
+        <?php
+            // Remove option since we are printing it here.
+            array_shift($presentation);
+        }
+
         foreach ($presentation as $radio) {
+            $checked = '';
             foreach ($values as $competencyid => $val) {
                 if ($competencyid == $competency->id && $val == $index) {
                     $checked = 'checked="checked"';
                     break;
-                } else {
-                    $checked = '';
                 }
             }
             $inputname = $item->typ . '_' . $item->id . '_' . $competency->id;
             $inputid = $inputname.'_'.$index.'_'.$competency->id;
         ?>
-            <li class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
-                <span class="feedback_item_radio_<?php echo $hv.'_'.$align;?>">
+                <span>
                     <?php
                         echo '<input type="radio" '.
                                 'name="'.$inputname.'" '.
                                 'id="'.$inputid.'" '.
-                                'data-competency="'.$competency->id.'"'.
+                                'data-competency="'.$competency->id.'" '.
                                 'value="'.$index.'" '.$checked.' />';
                     ?>
-                </span>
-                <span class="feedback_item_radiolabel_<?php echo $hv.'_'.$align;?>">
-                    <label for="<?php echo $inputid;?>">
-                        <?php echo text_to_html($radio, true, false, false);?>&nbsp;
+                    <label for="<?php echo $inputid;?>" style="font-weight:normal">
+                        <?php echo text_to_html($radio, true, false, false);?>
                     </label>
                 </span>
-            </li>
         <?php
+            echo $separator;
             $index++;
         }
     }
-
 }
