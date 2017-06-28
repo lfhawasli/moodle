@@ -27,6 +27,7 @@
 // Custom site logos.
 
 // First get site logo.
+defined('MOODLE_INTERNAL') || die();
 $sitelogohtml = $OUTPUT->logo('ucla-logo', 'theme');
 // Get extra site logos.
 $extrasitelogos = $OUTPUT->course_logo();

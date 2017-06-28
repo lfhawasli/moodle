@@ -1,95 +1,113 @@
 <?php
-
+// This file is part of the UCLA shared course theme for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- *  Settings for UCLA Shared System theme.
- **/
-
-defined('MOODLE_INTERNAL') || die;
+ * Configuration for UCLA's Shared Server theme.
+ *
+ * For full information about creating Moodle themes, see:
+ *  http://docs.moodle.org/en/Development:Themes_2.0
+ * @package    theme_uclashared
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010 UC Regents
+ */
+defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
-    // Footer links
-    $theme_name = 'theme_uclashared';
+    // Footer links.
+    $themename = 'theme_uclashared';
 
     $options = array(
-        'prod' => get_string('env_prod', $theme_name),
-        'stage' => get_string('env_stage', $theme_name),
-        'test' => get_string('env_test', $theme_name),
-        'dev' => get_string('env_dev', $theme_name)
+        'prod' => get_string('env_prod', $themename),
+        'stage' => get_string('env_stage', $themename),
+        'test' => get_string('env_test', $themename),
+        'dev' => get_string('env_dev', $themename)
     );
 
-    $the_setting = 'running_environment';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name);
-    $setting = new admin_setting_configselect($name, $title, $description, 
+    $thesetting = 'running_environment';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
+    $setting = new admin_setting_configselect($name, $title, $description,
             $default, $options);
     $settings->add($setting);
 
-    $the_setting = 'footer_links';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name);
-    $setting = new admin_setting_configtextarea($name, $title, $description, 
+    $thesetting = 'footer_links';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
+    $setting = new admin_setting_configtextarea($name, $title, $description,
             $default, PARAM_RAW);
     $settings->add($setting);
 
-    // The sub text
-    $the_setting = 'logo_sub_text';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name);
-    $setting = new admin_setting_configtextarea($name, $title, $description, 
+    // The sub text.
+    $thesetting = 'logo_sub_text';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
+    $setting = new admin_setting_configtextarea($name, $title, $description,
             $default, PARAM_RAW);
     $settings->add($setting);
 
-    $the_setting = 'system_name';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name); 
-    $setting = new admin_setting_configtext($name, $title, $description, 
-            $default);
-    $settings->add($setting);
-    
-    $the_setting = 'system_link';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name); 
-    $setting = new admin_setting_configtext($name, $title, $description, 
-            $default);
-    $settings->add($setting);
-
-    // CCLE-6512 - Profile Course details doesn't match My page Class sites
-    $the_setting = 'alternative_sharedsystem_name';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name);
+    $thesetting = 'system_name';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
     $setting = new admin_setting_configtext($name, $title, $description,
             $default);
     $settings->add($setting);
 
-    $the_setting = 'alternative_sharedsystem_link';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = get_string('setting_default_' . $the_setting, $theme_name);
+    $thesetting = 'system_link';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
     $setting = new admin_setting_configtext($name, $title, $description,
             $default);
     $settings->add($setting);
 
-    $the_setting = 'disable_post_blocks';
-    $name = $theme_name . '/' . $the_setting;
-    $title = get_string('setting_title_' . $the_setting, $theme_name);
-    $description = get_string('setting_desc_' . $the_setting, $theme_name);
-    $default = false; 
-    $setting = new admin_setting_configcheckbox($name, $title, $description, 
+    // CCLE-6512 - Profile Course details doesn't match My page Class sites.
+    $thesetting = 'alternative_sharedsystem_name';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
+    $setting = new admin_setting_configtext($name, $title, $description,
             $default);
     $settings->add($setting);
-} 
 
-// EoF
+    $thesetting = 'alternative_sharedsystem_link';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = get_string('setting_default_' . $thesetting, $themename);
+    $setting = new admin_setting_configtext($name, $title, $description,
+            $default);
+    $settings->add($setting);
+
+    $thesetting = 'disable_post_blocks';
+    $name = $themename . '/' . $thesetting;
+    $title = get_string('setting_title_' . $thesetting, $themename);
+    $description = get_string('setting_desc_' . $thesetting, $themename);
+    $default = false;
+    $setting = new admin_setting_configcheckbox($name, $title, $description,
+            $default);
+    $settings->add($setting);
+}
+
+// EoF.

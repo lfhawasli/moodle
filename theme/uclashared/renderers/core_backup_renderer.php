@@ -21,6 +21,7 @@
  * @copyright  UC Regents 2014
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/backup/util/ui/renderer.php');
 require_once($CFG->dirroot . '/blocks/ucla_tasites/block_ucla_tasites.php');
 
@@ -45,11 +46,11 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         $html .= html_writer::start_tag('div', array('class' => 'backup-section'));
         $html .= $this->output->heading(get_string('backupdetails', 'backup'), 2, 'header');
         // START UCLA MOD: CCLE-3023 - restore in Moodle2.x site menu block is  not displayed and not default to UCLA format
-        // Friendlier notice to users
-        //$html .= $this->output->box(get_string('backupdetailsnonstandardinfo', 'backup'), 'noticebox');
+        // Friendlier notice to users.
+
         $html .= $this->output->notification(get_string('backupdetailsnonstandardinfo', 'backup',
                 get_string('backupformat' . $details['format'], 'backup')), 'notifymessage');
-        // END UCLA MOD: CCLE-3023
+        // END UCLA MOD: CCLE-3023.
         $html .= $this->backup_detail_pair(
                 get_string('backupformat', 'backup'), get_string('backupformat' . $details['format'], 'backup'));
         $html .= $this->backup_detail_pair(
@@ -96,8 +97,7 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
             $html .= $this->output->heading(get_string('restoretocurrentcourse', 'backup'), 2, array('class' => 'header'));
             $html .= $this->backup_detail_input(get_string('restoretocurrentcourseadding', 'backup'),
                     'radio', 'target', backup::TARGET_CURRENT_ADDING, array('checked' => 'checked'));
-            //$html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'), 'radio', 'target', backup::TARGET_CURRENT_DELETING);
-            // BEGIN UCLA MOD: CCLE-3446-Disable-course-delete-option-from-course-restore
+             // BEGIN UCLA MOD: CCLE-3446-Disable-course-delete-option-from-course-restore.
             if (has_capability('local/ucla:deletecoursecontentsandrestore', context_system::instance())) {
                 $html .= $this->backup_detail_input(get_string('restoretocurrentcoursedeleting', 'backup'),
                         'radio', 'target', backup::TARGET_CURRENT_DELETING);
@@ -105,10 +105,11 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
                 // BEGIN UCLA MOD: CCLE-4416-Prompt-overwriting-warning
                 // Prompt user to back-up course content that will be overriden.
                 global $COURSE;
-                $PAGE->requires->yui_module('moodle-local_ucla-restoreoverwritewarning', 'M.core_backup.course_deletion_check', array(array('courseid' => $COURSE->id)));
-                // END UCLA MOD CCLE-4416
+                $PAGE->requires->yui_module('moodle-local_ucla-restoreoverwritewarning', 'M.core_backup.course_deletion_check',
+                array(array('courseid' => $COURSE->id)));
+                // END UCLA MOD CCLE-4416.
             }
-            // END UCLA MOD: CCLE-3446
+            // END UCLA MOD: CCLE-3446.
 
             $html .= $this->backup_detail_pair('', html_writer::empty_tag('input',
                     array('type' => 'submit', 'value' => get_string('continue'))));

@@ -21,7 +21,7 @@
  * @copyright  UC Regents 2015
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/quiz/renderer.php');
 
 /**
@@ -55,7 +55,7 @@ class theme_uclashared_mod_quiz_renderer extends mod_quiz_renderer {
         $output .= $this->footer();
         return $output;
     }
-    
+
     /**
      * Returns any warnings.
      *
@@ -63,17 +63,15 @@ class theme_uclashared_mod_quiz_renderer extends mod_quiz_renderer {
      */
     public function quiz_warnings($quiztype) {
         if ($quiztype == 'autoabandon') {
-            $warningheader =
-                    html_writer::tag('span', get_string('confirmstartwarningheader', 'local_ucla'),
+            $warningheader = html_writer::tag('span', get_string('confirmstartwarningheader', 'local_ucla'),
                                      array('style' => 'color: red;'));
             $warningmsg = get_string('persistentquizwarningmessage', 'local_ucla');
             return $this->box($this->heading($warningheader . $warningmsg, 5));
-        }
-        else {
+        } else {
             return '';
         }
     }
-    
+
     /*
      * Summary Page
      */
@@ -86,7 +84,7 @@ class theme_uclashared_mod_quiz_renderer extends mod_quiz_renderer {
     public function summary_page($attemptobj, $displayoptions) {
         $output = '';
         $output .= $this->header();
-        if ($attemptobj->get_quiz()->timelimit && 
+        if ($attemptobj->get_quiz()->timelimit &&
                 $attemptobj->get_state() != quiz_attempt::ABANDONED) {
             $output .= $this->quiz_warnings($attemptobj->get_quiz()->overduehandling);
         }
@@ -97,7 +95,7 @@ class theme_uclashared_mod_quiz_renderer extends mod_quiz_renderer {
         $output .= $this->footer();
         return $output;
     }
-    
+
     /**
      * Creates any controls a the page should have.
      *
@@ -123,15 +121,14 @@ class theme_uclashared_mod_quiz_renderer extends mod_quiz_renderer {
             'slots' => '',
             'sesskey' => sesskey(),
         );
-        
+
         if ($attemptobj->get_state() == quiz_attempt::ABANDONED) {
-            $message = $this->container(get_string('quizattemptabandoned', 'local_ucla'), 
+            $message = $this->container(get_string('quizattemptabandoned', 'local_ucla'),
                     'alert alert-danger');
             $button = new single_button(
                     new moodle_url($attemptobj->view_url(), $options),
                     get_string('finishsummary', 'local_ucla'));
-        }
-        else {
+        } else {
             $button = new single_button(
                     new moodle_url($attemptobj->processattempt_url(), $options),
                     get_string('submitallandfinish', 'quiz'));

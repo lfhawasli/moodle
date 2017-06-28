@@ -17,11 +17,12 @@
 /**
  * The default layout for the base theme.
  *
- * @package   theme_base
+ * @package   theme_uclashared
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 $hasheading = ($PAGE->heading);
 $hasnavbar = (empty($PAGE->layout_options['nonavbar']) && $PAGE->has_navbar());
 $hasfooter = (empty($PAGE->layout_options['nofooter']));
@@ -49,13 +50,13 @@ $bodyclasses = array();
 if ($showsidepre && !$showsidepost) {
     if (!right_to_left()) {
         $bodyclasses[] = 'side-pre-only';
-    }else{
+    } else {
         $bodyclasses[] = 'side-post-only';
     }
 } else if ($showsidepost && !$showsidepre) {
     if (!right_to_left()) {
         $bodyclasses[] = 'side-post-only';
-    }else{
+    } else {
         $bodyclasses[] = 'side-pre-only';
     }
 } else if (!$showsidepost && !$showsidepre) {
@@ -81,14 +82,15 @@ echo $OUTPUT->doctype() ?>
         <h1 class="headermain"><?php echo $PAGE->heading ?></h1>
         <div class="headermenu"><?php
             // CCLE-6577 - Remove login link in maintenance mode.
-            if (empty($CFG->maintenance_enabled)) {
-                echo $OUTPUT->user_menu();
-            }
-            if (!empty($PAGE->layout_options['langmenu'])) {
-                echo $OUTPUT->lang_menu();
-            }
+        if (empty($CFG->maintenance_enabled)) {
+            echo $OUTPUT->user_menu();
+        }
+        if (!empty($PAGE->layout_options['langmenu'])) {
+            echo $OUTPUT->lang_menu();
+        }
             echo $PAGE->headingmenu
-        ?></div><?php } ?>
+        ?></div><?php
+} ?>
         <?php if (!empty($courseheader)) { ?>
             <div id="course-header"><?php echo $courseheader; ?></div>
         <?php } ?>
@@ -123,11 +125,11 @@ echo $OUTPUT->doctype() ?>
                 <div id="region-pre" class="block-region">
                     <div class="region-content">
                             <?php
-                        if (!right_to_left()) {
-                            echo $OUTPUT->blocks_for_region('side-pre');
-                        } elseif ($hassidepost) {
-                            echo $OUTPUT->blocks_for_region('side-post');
-                    } ?>
+                            if (!right_to_left()) {
+                                echo $OUTPUT->blocks_for_region('side-pre');
+                            } else if ($hassidepost) {
+                                echo $OUTPUT->blocks_for_region('side-post');
+                            } ?>
 
                     </div>
                 </div>
@@ -136,12 +138,12 @@ echo $OUTPUT->doctype() ?>
                 <?php if ($hassidepost OR (right_to_left() AND $hassidepre)) { ?>
                 <div id="region-post" class="block-region">
                     <div class="region-content">
-                           <?php
-                       if (!right_to_left()) {
-                           echo $OUTPUT->blocks_for_region('side-post');
-                       } elseif ($hassidepre) {
-                           echo $OUTPUT->blocks_for_region('side-pre');
-                    } ?>
+                            <?php
+                            if (!right_to_left()) {
+                                echo $OUTPUT->blocks_for_region('side-post');
+                            } else if ($hassidepre) {
+                                echo $OUTPUT->blocks_for_region('side-pre');
+                            } ?>
                     </div>
                 </div>
                 <?php } ?>

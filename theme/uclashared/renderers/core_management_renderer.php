@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/classes/management_renderer.php');
 
 /**
@@ -92,7 +93,7 @@ class theme_uclashared_core_course_management_renderer extends core_course_manag
 
     /**
      * Re-renders the pagination list as a boostrap pagination list.
-     * 
+     *
      * @param coursecat $category The category to produce pagination for.
      * @param int $page The current page.
      * @param int $perpage The number of courses to display per page.
@@ -101,21 +102,21 @@ class theme_uclashared_core_course_management_renderer extends core_course_manag
      */
     protected function listing_pagination(coursecat $category, $page, $perpage, $showtotals = false) {
         $out = parent::listing_pagination($category, $page, $perpage, $showtotals);
-        
+
         // Remove the original class in favor of bootstrap class.
         $out = str_replace('listing-pagination', 'pagination', $out);
 
         // Remove the yui3-button class.
         $out = str_replace('yui3-button', '', $out);
-        
+
         // Remove ...
         $out = str_replace('...', '', $out);
-        
-        // Wrap the <a> inslide <li>
+
+        // Wrap the <a> inslide <li>.
         $out = str_replace('<a', '<li><a', $out);
         $out = str_replace('</a>', '</a></li>', $out);
-        
-        // Return wrapped in a 'center' div
+
+        // Return wrapped in a 'center' div.
         return html_writer::div($out, 'center-text');
     }
 }

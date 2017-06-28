@@ -21,7 +21,7 @@
  * @copyright   2015 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+defined('MOODLE_INTERNAL') || die();
 /**
  * Called before theme outputs anything.
  *
@@ -31,7 +31,6 @@ function theme_uclashared_page_init(moodle_page $page) {
     global $USER;
     $context = $page->context;
     $url = $page->url;
-    
     // Need to check for redirect layout or else we will end up in an infinite
     // loop, since the redirect() function calls page init again.
     if ($page->pagelayout != 'redirect' && isset($context) && isset($url)) {
@@ -48,25 +47,25 @@ function theme_uclashared_page_init(moodle_page $page) {
     }
 }
 
-/*
+/**
  * Pulls random image for homepage background
  * and saves it to session cache.
  *
- * Returns $image.
+ * @return $image.
  */
 function theme_uclashared_frontpageimage() {
         global $CFG;
         $frontpageimagecache = cache::make('theme_uclashared', 'frontpageimage');
 
-        if(!($frontpageimagecache->get('image'))) {
+    if (!($frontpageimagecache->get('image'))) {
             $imagedir = $CFG->dirroot . "/theme/uclashared/pix/frontpageimages";
             $files = glob($imagedir . '/*.*');
             $file = array_rand($files);
             $filename = basename($files[$file]);
             $image = $imagedir . "/" . $filename;
             $frontpageimagecache->set('image', $image);
-        } else {
-            $image = $frontpageimagecache->get('image');
-        }
-        return $image;
+    } else {
+        $image = $frontpageimagecache->get('image');
     }
+        return $image;
+}

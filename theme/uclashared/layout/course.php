@@ -25,6 +25,7 @@
  */
 
 // Process and simplify all the options.
+defined('MOODLE_INTERNAL') || die();
 $hasheading = ($PAGE->heading);
 $hasnavbar = (empty($PAGE->layout_options['nonavbar']) && $PAGE->has_navbar());
 $hasfooter = (empty($PAGE->layout_options['nofooter']));
@@ -48,7 +49,7 @@ if ($showsidepre && !$showsidepost) {
     $bodyclasses[] = 'content-only';
 }
 
-$bodyclasses[] = 'theme-' . $OUTPUT->theme_name;
+$bodyclasses[] = 'theme-' . $OUTPUT->themename;
 
 // Server environment flag.
 $envflag = $OUTPUT->get_environment();

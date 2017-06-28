@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/renderer.php');
 
 /**
@@ -203,9 +204,11 @@ class theme_uclashared_core_course_renderer extends core_course_renderer {
         return $output;
     }
 
-    /*
+    /**
      * Overwrites the core course renderer function so that the modchooser ("Activity chooser on/off")
      * does not appear. See comments for add_modchoosertoggle in course/renderer.php.
+     *
+     * @return void
      */
     protected function add_modchoosertoggle() {
     }

@@ -13,7 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+/**
+ * Override Moodle's core backup renderer.
+ *
+ * @package    theme_uclashared
+ * @copyright  UC Regents 2017
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 $string['pluginname'] = 'UCLA theme';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
@@ -67,8 +73,7 @@ $string['setting_default_footer_links'] = '';
 
 $string['setting_title_logo_sub_text'] = 'Shared server divisions';
 $string['setting_desc_logo_sub_text'] = 'Divisions that are displayed in the front layout.';
-$string['setting_default_logo_sub_text'] =
-'<ul>
+$string['setting_default_logo_sub_text'] = '<ul>
     <li><span>Arts & Architecture</span></li>
     <li><span>Chemistry & Biochemistry</span></li>
     <li><span>Computer Science</span></li>
@@ -128,7 +133,7 @@ $string['page_notfound'] = 'The page you requested does not exist';
 // CCLE-4445 - Allow calendar to be synchronized with Google Calendar.
 $string['calsyncnotice'] = 'Syncing with external calendar applications is not necessarily done in real time and may depend on the calendar application you use.';
 
-// SSC-2576 - Import Search Scrolling
+// SSC-2576 - Import Search Scrolling.
 $string['instructorcourse'] = 'Instructors';
 
 // Caches.
