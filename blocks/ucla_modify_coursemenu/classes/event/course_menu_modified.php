@@ -39,7 +39,7 @@ class course_menu_modified extends \core\event\base {
      * Creates the event.
      */
     protected function init() {
-        $this->data['crud'] = 'u'; // c(reate), r(ead), u(pdate), d(elete)
+        $this->data['crud'] = 'u'; // Notation: [c]reate [r]ead [u]pdate [d]elete.
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 
