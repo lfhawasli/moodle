@@ -1,23 +1,38 @@
 <?php
+// This file is part of the UCLA Help plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Script to let users view help information or send feedback. If being called
+ * Script to let users view help information or send feedback.
+ *
+ * If being called
  * to serve as a modal window, will just output form field & help links.
- * 
  * Else, can be called displayed in a site or course context.
  *
- * @package    ucla
- * @subpackage ucla_help
- * @copyright  2011 UC Regents    
- * @author     Rex Lorenzo <rex@seas.ucla.edu>                                      
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
+ * @package    block_ucla_help
+ * @copyright  2011 UC Regents
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 
-// form to process help request
+// Form to process help request.
 require_once($CFG->dirroot . '/blocks/ucla_help/help_form.php' );
 
-// set context
+// Set context.
 $courseid = optional_param('course', 0, PARAM_INTEGER);
 if ($courseid == SITEID) {
     $courseid = 0;
@@ -31,45 +46,44 @@ if ($courseid) {
     $PAGE->set_context($context);
 }
 
-// set page title/url
-$struclahelp = get_string('pluginname', 'block_ucla_help');    
+// Set page title/url.
+$struclahelp = get_string('pluginname', 'block_ucla_help');
 $PAGE->set_title($struclahelp);
 $url = new moodle_url('/blocks/ucla_help/index.php');
 $PAGE->set_url($url);
 
-// need to change layout to be embedded if used in ajax call
-if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+// Need to change layout to be embedded if used in ajax call.
+if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-    $is_embedded = true;
+    $isembedded = true;
 } else {
-    $is_embedded = false;
+    $isembedded = false;
 }
 
-// setup page context
-if (!empty($is_embedded)) {
-    // if showing up as a modal window, then don't show normal headers/footers
-    $PAGE->set_pagelayout('embedded');    
-    // load needed javascript to make form use ajax on submit
-    // $PAGE->requires->js('/blocks/ucla_help/module.js');    
-    $PAGE->requires->js_init_call('M.block_ucla_help.init', null, true);   
+// Setup page context.
+if (!empty($isembedded)) {
+    // If showing up as a modal window, then don't show normal headers/footers.
+    $PAGE->set_pagelayout('embedded');
+    // Load needed javascript to make form use ajax on submit.
+    $PAGE->requires->js_init_call('M.block_ucla_help.init', null, true);
 } else {
-    // show header
+    // Show header.
     $PAGE->set_heading($struclahelp);
 }
 
-// using core renderer
+// Using core renderer.
 echo $OUTPUT->header();
 
 echo html_writer::start_tag('div', array('id' => 'block_ucla_help'));
 
 echo html_writer::start_tag('fieldset', array('id' => 'block_ucla_help_boxtext'));
-echo html_writer::tag('legend', get_string('helpbox_header', 'block_ucla_help'), 
+echo html_writer::tag('legend', get_string('helpbox_header', 'block_ucla_help'),
         array('id' => 'block_ucla_help_boxtext_header'));
 
-// show specific text for helpbox (should be set in admin settings)
+// Show specific text for helpbox (should be set in admin settings).
 $boxtext = get_config('block_ucla_help', 'boxtext');
 if (empty($boxtext)) {
-    // no text set, so use default text
+    // No text set, so use default text.
     echo get_string('helpbox_text_default', 'block_ucla_help');
 } else {
     echo format_text($boxtext, FORMAT_HTML);
@@ -77,57 +91,60 @@ if (empty($boxtext)) {
 echo html_writer::end_tag('fieldset');
 
 echo html_writer::start_tag('fieldset', array('id' => 'block_ucla_help_formbox'));
-echo html_writer::tag('legend', get_string('helpform_header', 'block_ucla_help'), 
+echo html_writer::tag('legend', get_string('helpform_header', 'block_ucla_help'),
         array('id' => 'block_ucla_help_formbox_header'));
 
-// CCLE-3562 - Get the list of the user's courses for selection
-$sql = 'SELECT DISTINCT crs.id, crs.fullname, crs.shortname
-          FROM {context} AS ctx
-          JOIN {course} AS crs ON crs.id = ctx.instanceid
-          JOIN {role_assignments} AS ra ON ra.contextid = ctx.id
-         WHERE ra.userid=:userid AND
-               ctx.contextlevel=:contextlevel
-      ORDER BY ra.timemodified DESC';
+// CCLE-3562 - Get the list of the user's courses for selection.
+$sql = 'SELECT DISTINCT {course}.id, {course}.fullname, {course}.shortname
+          FROM {context}
+          JOIN {course} ON {course}.id = {context}.instanceid
+          JOIN {role_assignments} ON {role_assignments}.contextid = {context}.id
+         WHERE {role_assignments}.userid=:userid AND
+               {context}.contextlevel=:contextlevel
+      ORDER BY {role_assignments}.timemodified DESC';
 $params['userid'] = $USER->id;
 $params['contextlevel'] = CONTEXT_COURSE;
 
-$user_courses = $DB->get_records_sql($sql, $params);
+$usercourses = $DB->get_records_sql($sql, $params);
 if ($courseid != 0) {
-    $user_courses[] = $course;  // Include course user was viewing, if any.
+    $usercourses[] = $course;  // Include course user was viewing, if any.
 }
 $courses = array();
 $courses[$SITE->id] = get_string('no_course', 'block_ucla_help');
 $maxlength = 40;
-foreach ($user_courses as $crs) {
-    $course_name = $crs->shortname . ' ' . $crs->fullname;
-    $courses[$crs->id] = core_text::strlen($course_name) < $maxlength ?
-            $course_name : core_text::substr($course_name, 0, $maxlength);
+foreach ($usercourses as $crs) {
+    $coursename = $crs->shortname . ' ' . $crs->fullname;
+    if (core_text::strlen($coursename) < $maxlength) {
+        $courses[$crs->id] = $coursename;
+    } else {
+        $courses[$crs->id] = core_text::substr($coursename, 0, $maxlength);
+    }
 }
-$user_courses[] = $SITE;    // Include the site default.
+$usercourses[] = $SITE;    // Include the site default.
 
-// create form object for page
-$mform = new help_form(NULL, array('courses' => $courses));
+// Create form object for page.
+$mform = new help_form(null, array('courses' => $courses));
 
-// handle form post
+// Handle form post.
 if ($fromform = $mform->get_data()) {
-    
+
     // Get email address from form submitter (if any).
     $fromaddress = null;
-    if(!empty($fromform->ucla_help_email)) {
+    if (!empty($fromform->ucla_help_email)) {
         $fromaddress = $fromform->ucla_help_email;
     } else if (!empty($USER->email)) {
         $fromaddress = $USER->email;
     } else {
         $fromaddress = $CFG->noreplyaddress;
-    }             
-        
+    }
+
     // Get message header.
     $header = get_string('message_header', 'block_ucla_help', create_description($fromform));
-    
+
     // Set context to the selected course.
     $instanceid = 0;
     $fromform->course_name = $SITE->shortname;
-    foreach ($user_courses as $c) {
+    foreach ($usercourses as $c) {
         if ($c->id == $fromform->ucla_help_course) {
             $fromform->course_name = $c->shortname;
             $instanceid = $c->id;
@@ -142,7 +159,7 @@ if ($fromform = $mform->get_data()) {
 
     // Get message body.
     $body = create_help_message($fromform);
-    
+
     // Get support contact(s).
     $supportcontacts = get_support_contact($context);
 
@@ -178,14 +195,13 @@ if ($fromform = $mform->get_data()) {
         echo $OUTPUT->notification(get_string('success_sending_message', 'block_ucla_help'), 'notifysuccess');
     } else {
         echo $OUTPUT->notification(get_string('error_sending_message', 'block_ucla_help'), 'notifyproblem');
-        // @todo: log error Send fails
-    }    
-    
-    if ($is_embedded) {
-        // if embedding help form don't have anything, since I don't know how
-        // to hide overlay that script is embedded            
-    } else {
-        // else give continue link to return to course or front page
+        // TODO: log error Send fails.
+    }
+
+    // If embedding help form don't have anything, since I don't know how
+    // to hide overlay that script is embedded.
+    if (!$isembedded) {
+        // Else give continue link to return to course or front page.
         if ($COURSE->id == 1) {
             $url = $CFG->wwwroot;
         } else {
@@ -193,11 +209,11 @@ if ($fromform = $mform->get_data()) {
         }
         echo $OUTPUT->single_button($url, get_string('continue'), 'get');
     }
-    
+
 } else {
-    // else display form and header text
+    // Else display form and header text.
     echo get_string('helpform_text', 'block_ucla_help');
-    $mform->display();    
+    $mform->display();
 }
 echo html_writer::end_tag('fieldset');
 

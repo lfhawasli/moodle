@@ -14,6 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Legend
+ *
+ * @package    block_ucla_help
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 
 $buffer = <<<END
@@ -21,7 +32,7 @@ $buffer = <<<END
         <h2 class="ui header dividing">
             Gradebook at a glance
         </h2>
-        
+
         <div class ="ui raised segment">
             <div class="ui black ribbon label">
                 Color legend
@@ -36,33 +47,39 @@ $buffer = <<<END
             </div>
             <div class="ui divided list">
                 <div class="item">
-                    <img src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/grades" title="Grades for student" class="smallicon" alt="Grades for student"> Grades for student
+                    <img src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/grades"
+                        title="Grades for student" class="smallicon" alt="Grades for student"> Grades for student
                 </div>
                 <div class="item">
 
-                    <img alt="Edit grade" class="smallicon" title="Edit grade" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for student
+                    <img alt="Edit grade" class="smallicon" title="Edit grade"
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for student
 
                 </div>
             </div>
             <div class="ui black ribbon label">
-                 Column View Icons 
+                 Column View Icons
             </div>
             <div class="ui divided list">
                 <div class="item">
-                    <img alt="Aggregates only" class="smallicon" title="Aggregates only" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_minus"> Aggregates only
+                    <img alt="Aggregates only" class="smallicon" title="Aggregates only"
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_minus"> Aggregates only
                 </div>
                 <div class="item">
-                    <img alt="Grades only" class="smallicon" title="Grades only" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_plus"> Grades only
+                    <img alt="Grades only" class="smallicon" title="Grades only"
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_plus"> Grades only
                 </div>
                 <div class="item">
-                    <img alt="Full view" class="smallicon" title="Full view" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_whole"> Full view
+                    <img alt="Full view" class="smallicon" title="Full view"
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/switch_whole"> Full view
                 </div>
                 <div class="item">
-                    <img alt="Full view" class="smallicon" title="Quick edit" src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for item
+                    <img alt="Full view" class="smallicon" title="Quick edit"
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for item
                 </div>
             </div>
         </div>
-        
+
 END;
 
 return $buffer;

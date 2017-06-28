@@ -1,7 +1,7 @@
 /**
- * 
+ *
  * YUI script to load CCLE wiki docs into sidebar
- * 
+ *
  */
 
 YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
@@ -11,15 +11,15 @@ YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
 
     var SIDEBAR_TEMPLATES = {
         DEFAULT : '<div class="ui sidebar doc help"></div>',
-        HEADER: '<h2 class="ui header">\
+            HEADER: '<h2 class="ui header">\
                         <span class="glyphicon glyphicon-ok-sign"></span>\
                         {title}\
                  </h2>',
-        CLOSE_BUTTON: '<button class="btn btn-info help-toggle btn-block">\
+            CLOSE_BUTTON: '<button class="btn btn-info help-toggle btn-block">\
                             Hide help topic\
                        </button>',
-        ACCORDION: '<div class="ui basic accordion"></div>',
-        ACCORDION_CONTENT: '<div class="title">{title}</div>\
+            ACCORDION: '<div class="ui basic accordion"></div>',
+            ACCORDION_CONTENT: '<div class="title">{title}</div>\
                             <div class="content">{content}</div>'
     }
     var MODULENAME = function() {
@@ -27,14 +27,13 @@ YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
     };
 
     Y.extend(MODULENAME, Y.Base, {
-        initializer : function(config) { // 'config' contains the parameter values
-            // Create the sidebar
+        initializer : function(config) { // Var 'config' contains the parameter values.
+            // Create the sidebar.
             SIDEBAR = Y.Node.create(SIDEBAR_TEMPLATES.DEFAULT);
 
             var help_button = Y.Node.create(SIDEBAR_TEMPLATES.CLOSE_BUTTON);
             help_button.on('click', function(e) {
                  $('.main.help.sidebar').sidebar('toggle');
-//                 $('.doc.help.sidebar').sidebar('toggle');
                  SIDEBAR.one('.ui.accordion').destroy();
             });
 
@@ -44,7 +43,7 @@ YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
 
             Y.one('body').appendChild(SIDEBAR);
 
-            // Attach events to help doc topics
+            // Attach events to help doc topics.
             Y.all('.topics .item').on('click', function (e) {
                 e.preventDefault();
 
@@ -53,24 +52,24 @@ YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
                 Y.io(M.cfg.wwwroot + '/blocks/ucla_help/sidebar/docs/rest.php?title=' + encodeURIComponent(target.getAttribute('data-title')), {
                     on: {
                         success: function(tx, r) {
-                            // Get json data
+                            // Get json data.
                             var data = Y.JSON.parse(r.responseText);
 
-                            // Prepare accordion
+                            // Prepare accordion.
                             var accordion = Y.Node.create(SIDEBAR_TEMPLATES.ACCORDION);
 
-                            // This replaces the previous accordion node
+                            // This replaces the previous accordion node.
                             SIDEBAR.one('.segment .accordion').replace(accordion);
 
-                            // Now append our data
+                            // Now append our data.
                             accordion.append(data.content);
 
-                            // Set the title
+                            // Set the title.
                             SIDEBAR.one('.ui.header').set('text', target.getAttribute('data-title'));
 
-                            // Open the sidebar
+                            // Open the sidebar.
                             $('.sidebar.doc').sidebar('toggle');
-                            // Attach the accordion handler
+                            // Attach the accordion handler.
                             $('.ui.accordion').accordion();
                         }
                     }
@@ -80,14 +79,14 @@ YUI.add('moodle-block_ucla_help-doc_loader', function(Y) {
     }, {
         NAME : ModulenameNAME,
         ATTRS : {
-                 aparam : {}
+            aparam : {}
         }
     });
 
     M.block_ucla_help = M.block_ucla_help || {};
     M.block_ucla_help.init_doc_loader = function(config) {
-        return new MODULENAME(config); // 'config' contains the parameter values
+        return new MODULENAME(config); // Var 'config' contains the parameter values.
     };
 }, '@VERSION@', {
-  requires: ['base', 'node', 'io', 'json-parse', 'jsonp']
+    requires: ['base', 'node', 'io', 'json-parse', 'jsonp']
 });
