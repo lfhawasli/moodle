@@ -206,18 +206,19 @@ class local_ucla_participants extends course_enrolment_manager {
                  LEFT JOIN {groups_members} gm ON u.id = gm.userid
                      WHERE $filtersql";
             if ($sort === 'firstname') {
-                $sql .= " ORDER BY IF(ISNULL(u.alternatename), u.firstname, u.alternatename) $direction, u.lastname $direction";
+                $sql .= " ORDER BY IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction, u.lastname $direction";
             } else if ($sort === 'lastname') {
-                $sql .= " ORDER BY u.lastname $direction, IF(ISNULL(u.alternatename), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
             } else if ($sort === 'email') {
-                $sql .= " ORDER BY u.email $direction, u.lastname $direction, IF(ISNULL(u.alternatename), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.email $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
             } else if ($sort === 'lastseen') {
-                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, IF(ISNULL(u.alternatename), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
             } else if ($sort === 'lastcourseaccess') {
-                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, IF(ISNULL(u.alternatename), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction,IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
             } else if ($sort === 'idnumber') {
-                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, IF(ISNULL(u.alternatename), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
             }
+
             $input = $DB->get_records_sql($sql, $params);
             $this->users[$key] = array_slice($input, $page * $perpage, $perpage);
             $this->usercount = count($input);
