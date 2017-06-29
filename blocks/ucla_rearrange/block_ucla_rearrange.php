@@ -1,46 +1,104 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Rearrange library
+ *
+ * Files relevant to using the rearranger
+ *
+ * @package block_ucla_rearrange
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  UC Regents
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../moodleblock.class.php');
 
 /**
- *  Rearrange library.
- *  Files relevant to using the rearranger.
- **/
+ * Rearrange block definition
+ *
+ * @package block_ucla_rearrange
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  UC Regents
+ */
 class block_ucla_rearrange extends block_base {
-    // This is where the entire section stuff should go
-    const primary_domnode = 'major-ns-container';
-    const default_targetjq = '.ns-primary';
 
-    // This is the id of top UL
-    const pagelist = 'ns-list';
+    /**
+     * This is where the entire section stuff should go.
+     * @var string
+     */
+    const PRIMARY_DOMNODE = 'major-ns-container';
+    /**
+     * @var string
+     */
+    const DEFAULT_TARGETJQ = '.ns-primary';
 
-    // This the class of UL
-    const pagelistclass = 'ns-list-class';
+    /**
+     * This is the id of top UL.
+     * @var string
+     */
+    const PAGELIST = 'ns-list';
 
-    // This the class of LI
-    const pageitem = 'ns-list-item';
+    /**
+     * This the class of UL.
+     * @var string
+     */
+    const PAGELISTCLASS = 'ns-list-class';
 
-    // This the id of UL
-    const sectionlist = 's-list';
+    /**
+     * This the class of LI.
+     * @var string
+     */
+    const PAGEITEM = 'ns-list-item';
 
-    // this the class of UL
-    const sectionlistclass = 's-list-class';
+    /**
+     * This the id of UL.
+     * @var string
+     */
+    const SECTIONLIST = 's-list';
 
-    // This is the LI class
-    const sectionitem = 's-list-item';
+    /**
+     * This the class of UL.
+     * @var string
+     */
+    const SECTIONLISTCLASS = 's-list-class';
 
-    // Non-nesting class
-    const nonnesting = 'ns-invisible';
+    /**
+     * This is the LI class.
+     * @var string
+     */
+    const SECTIONITEM = 's-list-item';
 
-    // Style "hidden" indicator for non-visisble sections/modules
-    const hiddenclass = 'ucla_rearrange_hidden';
+    /**
+     * Non-nesting class.
+     * @var string
+     */
+    const NONNESTING = 'ns-invisible';
+
+    /**
+     * Style "hidden" indicator for non-visisble sections/modules.
+     * @var string
+     */
+    const HIDDENCLASS = 'ucla_rearrange_hidden';
 
     /**
      *  Required for Moodle.
      **/
-    function init() {
+    public function init() {
         $this->title = get_string('pluginname', 'block_ucla_rearrange');
         $this->cron = 0;
     }
@@ -48,7 +106,7 @@ class block_ucla_rearrange extends block_base {
     /**
      *  Do not allow block to be added anywhere
      */
-    function applicable_formats() {
+    public function applicable_formats() {
         return array(
             'site-index' => false,
             'course-view' => false,
@@ -59,13 +117,14 @@ class block_ucla_rearrange extends block_base {
 
     /**
      * Returns an array of root modnode objects for a particular section.
-     * @param $section     The section number
-     * @param $sectinfo    Section info that includes the sequence of course 
+     * @param int $section     The section number
+     * @param string $sectinfo    Section info that includes the sequence of course
      *                     modules in the section
-     * @param $mods        The list of mods from get_all_mods().
-     * @param $modinfo     The mod information from get_all_mods().
+     * @param array $mods        The list of mods from get_all_mods().
+     * @param object $modinfo     The mod information from get_all_mods().
+     * @param string $courseid    The id of the course
      **/
-    static function mods_to_modnode_tree($section, &$sectinfo, &$mods,
+    public static function mods_to_modnode_tree($section, &$sectinfo, &$mods,
             &$modinfo, $courseid) {
 
         $nodes = array();
@@ -73,9 +132,9 @@ class block_ucla_rearrange extends block_base {
 
         $sectionmods = explode(',', $sectinfo->sequence);
 
-        foreach ($sectionmods as $mod_id) {
-            if (isset($mods[$mod_id])) {
-                $cm =& $mods[$mod_id];
+        foreach ($sectionmods as $modid) {
+            if (isset($mods[$modid])) {
+                $cm =& $mods[$modid];
 
                 if ($cm->section != $sectinfo->id) {
                     // For some reason code branch seems to occur
@@ -87,35 +146,44 @@ class block_ucla_rearrange extends block_base {
                     continue;
                 }
 
-                $display_text = format_string($modinfo->cms[$mod_id]->name,
+                $displaytext = format_string($modinfo->cms[$modid]->name,
                     true, $courseid);
-                $is_hidden = !$modinfo->cms[$mod_id]->visible;
+                $ishidden = !$modinfo->cms[$modid]->visible;
 
-                $nodes[] = new modnode($mod_id, $display_text, $cm->indent,
-                        false, $is_hidden);
+                $nodes[] = new modnode($modid, $displaytext, $cm->indent,
+                        false, $ishidden);
             }
         }
 
-        $root_nodes = modnode::build($nodes);
+        $rootnodes = modnode::build($nodes);
 
         // Add a pseudo-node that is required for section-to-section movement
-        // of modules
-        $root_nodes = array_merge(array(
+        // of modules.
+        $rootnodes = array_merge(array(
                 new modnode($section . "-" . 0, '', 0, true)
-            ), $root_nodes);
+            ), $rootnodes);
 
-
-        return $root_nodes;
+        return $rootnodes;
     }
 
-    static function get_sections_modnodes($courseid, &$sections, &$mods,
+    /**
+     * Gets section modnode objects
+     *
+     * @param string $courseid
+     * @param array $sections
+     * @param array $mods
+     * @param object $modinfo
+     * @return array
+     */
+    public static function get_sections_modnodes($courseid, &$sections, &$mods,
             &$modinfo) {
 
         $sectionnodes = array();
         foreach ($sections as $section) {
-            $sectionnodes[$section->id] =
-                self::mods_to_modnode_tree($section->section,
-                    $section, $mods, $modinfo, $courseid);
+            $sectionnodes[$section->id] = self::mods_to_modnode_tree(
+                $section->section,
+                $section, $mods, $modinfo, $courseid
+            );
         }
 
         return $sectionnodes;
@@ -124,14 +192,15 @@ class block_ucla_rearrange extends block_base {
     /**
      * Takes an array of an array of modnode objects and renders in such
      * a way that you get back an array of HTML.
-     * @return Array of HTML.
+     * @param array $setmodnodes
+     * @return array of HTML.
      **/
-    static function render_set_modnodes(&$setmodnodes) {
+    public static function render_set_modnodes(&$setmodnodes) {
         $rendered = array();
         foreach ($setmodnodes as $index => $modnodes) {
             $local = html_writer::start_tag('ul',
-                array('class' => self::pagelistclass,
-                    'id' => self::pagelist . '-' . $index));
+                array('class' => self::PAGELISTCLASS,
+                    'id' => self::PAGELIST . '-' . $index));
 
             foreach ($modnodes as $modnode) {
                 $local .= $modnode->render();
@@ -146,10 +215,14 @@ class block_ucla_rearrange extends block_base {
     }
 
     /**
-     *  Convenience function, returns an array of the HTML rendered
-     *  UL and LI DOM Objects ready to be spit out into JSON.
+     * Convenience function, returns an array of the HTML rendered
+     * UL and LI DOM Objects ready to be spit out into JSON.
+     * @param string $courseid
+     * @param array $sections
+     * @param array $mods
+     * @param object $modinfo
      **/
-    static function get_section_modules_rendered(&$courseid, &$sections,
+    public static function get_section_modules_rendered(&$courseid, &$sections,
             &$mods, &$modinfo) {
         $snodes = self::get_sections_modnodes($courseid, $sections, $mods,
             $modinfo);
@@ -158,11 +231,11 @@ class block_ucla_rearrange extends block_base {
     }
 
     /**
-     *  Adds the required javascript files.
-     *  This is the actual jQuery scripts along with the nestedsortable
-     *  javascript files.
+     * Adds the required javascript files.
+     * This is the actual jQuery scripts along with the nestedsortable
+     * javascript files.
      **/
-    static function javascript_requires() {
+    public static function javascript_requires() {
         global $CFG, $PAGE;
 
         $jspath = '/blocks/ucla_rearrange/javascript/';
@@ -177,10 +250,13 @@ class block_ucla_rearrange extends block_base {
     }
 
     /**
-     *  Convenience function to generate a variable assignment 
-     *  statement in JavaScript.
+     * Convenience function to generate a variable assignment
+     * statement in JavaScript.
+     * @param string $var
+     * @param string $val
+     * @param boolean $quote
      **/
-    static function js_variable_code($var, $val, $quote = true) {
+    public static function js_variable_code($var, $val, $quote = true) {
         if ($quote) {
             $val = '"' . addslashes($val) . '"';
         }
@@ -189,24 +265,28 @@ class block_ucla_rearrange extends block_base {
     }
 
     /**
-     *  Adds all the javascript code for the global PAGE object.
-     *  This does not add any of the functionality calls, it just
-     *  makes the NestedSortable API available to all those who dare
-     *  to attempt to use it.
+     * Adds all the javascript code for the global PAGE object.
+     * This does not add any of the functionality calls, it just
+     * makes the NestedSortable API available to all those who dare
+     * to attempt to use it.
+     *
+     * @param string $sectionslist
+     * @param string $targetobj
+     * @param array $customvars
      **/
-    static function setup_nested_sortable_js($sectionslist, $targetobj=null,
+    public static function setup_nested_sortable_js($sectionslist, $targetobj=null,
             $customvars=array()) {
         global $PAGE;
 
-        // Include all the jQuery, interface and nestedSortable files
+        // Include all the jQuery, interface and nestedSortable files.
         self::javascript_requires();
 
-        // This file contains all the library functions that we need
+        // This file contains all the library functions that we need.
         $PAGE->requires->js('/blocks/ucla_rearrange'
             . '/javascript/block_ucla_rearrange.js');
         $PAGE->requires->js('/blocks/ucla_rearrange/yui/unload.js');
 
-        // These are all the sections, neatly split by section
+        // These are all the sections, neatly split by section.
         $PAGE->requires->js_init_code(self::js_variable_code(
             'sections', json_encode($sectionslist), false));
 
@@ -218,14 +298,14 @@ class block_ucla_rearrange extends block_base {
         // This is a list of customizable variables, non-essential
         // Hooray for lack of convention, so I have to link each
         // of the PHP variables to its JavaScript variable!
-        // Note to self: Try to stick with convention
+        // Note to self: Try to stick with convention.
         $othervars = array(
-            'sortableitem' => self::sectionitem,
-            'nestedsortableitem' => self::pageitem,
-            'nonnesting' => self::nonnesting
+            'sortableitem' => self::SECTIONITEM,
+            'nestedsortableitem' => self::PAGEITEM,
+            'nonnesting' => self::NONNESTING
         );
 
-        // This API has some variables
+        // This API has some variables.
         foreach ($othervars as $variable => $default) {
             $rhs = $default;
             if (isset($customvars[$variable])) {
@@ -237,7 +317,7 @@ class block_ucla_rearrange extends block_base {
             );
         }
 
-        // And what the hell you can spec out some of your own variables
+        // And what the hell you can spec out some of your own variables.
         foreach ($customvars as $variable => $custom) {
             if (!isset($othervars[$variable])) {
                 $PAGE->requires->js_init_code(
@@ -251,23 +331,31 @@ class block_ucla_rearrange extends block_base {
         );
     }
 
-    /** 
-     *  Wraps around PHP native function parse_str();
-     **/
-    static function parse_serial($serializedstr) {
+    /**
+     * Wraps around PHP native function parse_str();
+     *
+     * @param string $serializedstr
+     * @return array
+     */
+    public static function parse_serial($serializedstr) {
         parse_str($serializedstr, $returner);
 
         return $returner;
     }
 
-    static function clean_section_order($sections) {
+    /**
+     * Cleans section order
+     * @param array $sections
+     * @return array array of cleaned sections
+     */
+    public static function clean_section_order($sections) {
         if (empty($sections)) {
             return array();
         }
 
         $clean = array();
         foreach ($sections as $sectionold => $sectiontext) {
-            // Accounting for the unavailablity of section 0
+            // Accounting for the unavailablity of section 0.
             $text = explode('-', $sectiontext);
             $clean[$sectionold] = end($text);
         }
@@ -275,16 +363,16 @@ class block_ucla_rearrange extends block_base {
         return $clean;
     }
 
-    /** 
-     *  Moves a bunch of course modules to a different section
-     *  There should already be a function for this, but there is not.
-     *  @param $sectionmodules
-     *      An Array of [ OLD_SECTION_DESTINATION ] 
-     *          => Array ( MODULE->id, indent )
-     *  @param $ordersections
-     *      An Array of [ NEW_SECTION_ORDER ] => OLD_SECTION ID 
+    /**
+     * Moves a bunch of course modules to a different section
+     * There should already be a function for this, but there is not.
+     * @param array $sectionmodules
+     *     An Array of [ OLD_SECTION_DESTINATION ]
+     *         => Array ( MODULE->id, indent )
+     * @param array $ordersections
+     *     An Array of [ NEW_SECTION_ORDER ] => OLD_SECTION ID
      **/
-    static function move_modules_section_bulk($sectionmodules,
+    public static function move_modules_section_bulk($sectionmodules,
             $ordersections=array()) {
         global $DB, $COURSE;
 
@@ -299,12 +387,12 @@ class block_ucla_rearrange extends block_base {
             $sectseq = array();
 
             foreach ($modules as $module) {
-                // Repitch the values
+                // Repitch the values.
                 foreach ($module as $k => $v) {
                     $modulearr[$k] = $v;
                 }
 
-                // This should never hit
+                // This should never hit.
                 if (!isset($modulearr['id'])) {
                     print_error(get_string('error_module_consistency',
                         'block_ucla_rearrange'));
@@ -312,16 +400,16 @@ class block_ucla_rearrange extends block_base {
                     return false;
                 }
 
-                // Add section
+                // Add section.
                 $modulearr['section'] = $section;
 
-                // Create the sequence
+                // Create the sequence.
                 $sectseq[] = $modulearr['id'];
 
                 $coursemodules[] = $modulearr;
             }
 
-            // Get the sequence
+            // Get the sequence.
             $sectionarr['sequence'] = trim(implode(',', $sectseq));
 
             // Move the section itself.
@@ -331,7 +419,7 @@ class block_ucla_rearrange extends block_base {
 
             $sectionarr['id'] = $section;
 
-            // Save the new section
+            // Save the new section.
             $sections[$section] = $sectionarr;
         }
 
@@ -341,15 +429,15 @@ class block_ucla_rearrange extends block_base {
             $DB->update_record('course_modules', $module, true);
         }
 
-        // Using the largest positive value that can be stored in an int, minus 1
-        $temp_num = 2147483646; // 2147483647-1
+        // Using the largest positive value that can be stored in an int, minus 1.
+        $tempnum = 2147483646; // This is 2147483647-1.
         foreach ($sections as $section) {
-            // Check if we are updating course menu sections
+            // Check if we are updating course menu sections.
             if (isset($section['section'])) {
-                $course_section_pair = array('course' => $COURSE->id, 'section' => $section['section']);
-                if ($DB->record_exists('course_sections', $course_section_pair)) {
-                    $DB->set_field('course_sections', 'section', $temp_num, $course_section_pair);
-                    $temp_num--;
+                $coursesectionpair = array('course' => $COURSE->id, 'section' => $section['section']);
+                if ($DB->record_exists('course_sections', $coursesectionpair)) {
+                    $DB->set_field('course_sections', 'section', $tempnum, $coursesectionpair);
+                    $tempnum--;
                 }
             }
             $DB->update_record('course_sections', $section, true);
@@ -363,26 +451,28 @@ class block_ucla_rearrange extends block_base {
      *
      * @return array   Returns link to tool.
      */
-    static function get_editing_link($params) {
+    public static function get_editing_link($params) {
         $link = html_writer::link(
                     new moodle_url('/blocks/ucla_rearrange/rearrange.php',
                         array('courseid' => $params['course']->id,
                               'section' => $params['section'])),
-                    get_string('pluginname', 'block_ucla_rearrange'));
-        // site menu block arranges editing links by key, make sure this is the
-        // 2nd link
+                    get_string('pluginname', 'block_ucla_rearrange')
+        );
+
+        // Site menu block arranges editing links by key, make sure this is the
+        // 2nd link.
         return array(2 => $link);
     }
 
     /**
      * Return information for displaying this block in the control panel.
-     * 
+     *
      * @param stdClass $course
      * @param context $context
      * @return array of "modules", where each "module" is
      * an array of (variable name => value) to initialize a ucla_cp_module
      */
-    static function ucla_cp_hook($course, $context) {
+    public static function ucla_cp_hook($course, $context) {
         $thispath = '/blocks/ucla_rearrange/rearrange.php';
 
         $section = optional_param('section', null, PARAM_INT);
@@ -404,40 +494,74 @@ class block_ucla_rearrange extends block_base {
 }
 
 /**
- *  Class representing a nested-form of indents and modules in a section.
+ * Class representing a nested-form of indents and modules in a section.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  UC Regents
  **/
 class modnode {
-    var $modid;
-    var $modtext;
-    var $modindent;
-    var $invis = false;
-    var $is_hidden = false;
+    /**
+     * Mod id
+     * @var string
+     */
+    public $modid;
+    /**
+     * Mode string
+     * @var string
+     */
+    public $modtext;
+    /**
+     * How far to indent
+     * @var int
+     */
+    public $modindent;
+    /**
+     * Makes node invisible
+     * @var bool
+     */
+    public $invis = false;
+    /**
+     * Makes node hidden
+     * @var bool
+     */
+    public $ishidden = false;
 
-    var $children = array();
+    /**
+     * Array of child nodes
+     * @var array
+     */
+    public $children = array();
 
     /**
      * Constructor
-     * 
-     * @param type $id          ID of module
-     * @param type $text        Text to display for node
-     * @param type $indent      How far to indent node
-     * @param type $invis       If true, then applies invisible class for node
-     * @param type $is_hidden   If true, then adds in text to indicate if given
+     *
+     * @param string $id          ID of module
+     * @param string $text        Text to display for node
+     * @param int $indent      How far to indent node
+     * @param boolean $invis       If true, then applies invisible class for node
+     * @param boolean $ishidden   If true, then adds in text to indicate if given
      *                          node/module if hidden
      */
-    function __construct($id, $text, $indent, $invis=false, $is_hidden=false) {
+    public function __construct($id, $text, $indent, $invis=false, $ishidden=false) {
         $this->modid = $id;
         $this->modtext = $text;
         $this->modindent = $indent;
         $this->invis = $invis;
-        $this->is_hidden = $is_hidden;
+        $this->ishidden = $ishidden;
     }
 
-    function add_child(&$node) {
+    /**
+     * Adds child node
+     * @param string $node
+     */
+    public function add_child(&$node) {
         $this->children[] =& $node;
     }
 
-    function render() {
+    /**
+     * Returns string to render
+     * @return string
+     */
+    public function render() {
         $childrender = '';
 
         if (!empty($this->children)) {
@@ -448,24 +572,24 @@ class modnode {
             }
 
             $childrender = html_writer::tag('ul', $insides, array(
-                'class' => block_ucla_rearrange::pagelistclass
+                'class' => block_ucla_rearrange::PAGELISTCLASS
             ));
         }
 
-        $class = block_ucla_rearrange::pageitem;
+        $class = block_ucla_rearrange::PAGEITEM;
         if ($this->invis) {
-            $class .= ' ' . block_ucla_rearrange::nonnesting;
+            $class .= ' ' . block_ucla_rearrange::NONNESTING;
 
         }
 
-        $is_hidden_text = '';
-        if ($this->is_hidden) {
-            $is_hidden_text = ' ' . html_writer::tag('span',
+        $ishiddentext = '';
+        if ($this->ishidden) {
+            $ishiddentext = ' ' . html_writer::tag('span',
                     '(' . get_string('hidden', 'block_ucla_rearrange') . ')',
-                    array('class' => block_ucla_rearrange::hiddenclass));
+                    array('class' => block_ucla_rearrange::HIDDENCLASS));
         }
 
-        $self = html_writer::tag('li', $this->modtext . $is_hidden_text .
+        $self = html_writer::tag('li', $this->modtext . $ishiddentext .
                 $childrender, array('id' => 'ele-' . $this->modid,
                                     'class' => $class
         ));
@@ -474,9 +598,12 @@ class modnode {
     }
 
     /**
-     *  Translates a root nodes into a flattened list with indents.
+     * Translates a root nodes into a flattened list with indents.
+     * @param string $root
+     * @param int $indent
+     * @return string
      **/
-    static function flatten($root, $indent=0) {
+    public static function flatten($root, $indent=0) {
         $set = array();
 
         if (empty($root)) {
@@ -488,12 +615,12 @@ class modnode {
                 continue;
             }
 
-            $node_indent = new stdclass();
+            $nodeindent = new stdclass();
 
-            $node_indent->id = $node['id'];
-            $node_indent->indent = $indent;
+            $nodeindent->id = $node['id'];
+            $nodeindent->indent = $indent;
 
-            $set[] = $node_indent;
+            $set[] = $nodeindent;
 
             if (isset($node['children']) && !empty($node['children'])) {
                 $return = self::flatten($node['children'], $indent + 1);
@@ -506,39 +633,41 @@ class modnode {
     }
 
     /**
-     *  Translates a flat list with indents into a set of root nodes.
+     * Translates a flat list with indents into a set of root nodes.
+     *
+     * @param array $nodes
      **/
-    static function build(&$nodes) {
-        $parent_stack = array();
-        $root_nodes = array();
+    public static function build(&$nodes) {
+        $parentstack = array();
+        $rootnodes = array();
 
-        // Take the numerated depth structure and get a nested tree
+        // Take the numerated depth structure and get a nested tree.
         foreach ($nodes as $index => &$node) {
-            if (sizeof($parent_stack) == 0) {
-                array_push($root_nodes, $node);
+            if (count($parentstack) == 0) {
+                array_push($rootnodes, $node);
             } else {
                 $indentdiff = $node->modindent - $nodes[$index - 1]->modindent;
 
                 if ($indentdiff <= 0) {
                     // Goto the previous possible parent at the same
-                    // indentation level
+                    // indentation level.
                     for ($i = abs($indentdiff) + 1; $i > 0; $i--) {
-                        array_pop($parent_stack);
+                        array_pop($parentstack);
                     }
 
-                    if (sizeof($parent_stack) == 0) {
-                        array_push($root_nodes, $node);
+                    if (count($parentstack) == 0) {
+                        array_push($rootnodes, $node);
                     } else {
-                        $nodes[end($parent_stack)]->add_child($node);
+                        $nodes[end($parentstack)]->add_child($node);
                     }
                 } else {
-                    $nodes[end($parent_stack)]->add_child($node);
+                    $nodes[end($parentstack)]->add_child($node);
                 }
             }
 
-            array_push($parent_stack, $index);
+            array_push($parentstack, $index);
         }
 
-        return $root_nodes;
+        return $rootnodes;
     }
 }

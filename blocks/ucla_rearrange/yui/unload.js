@@ -4,7 +4,7 @@ M.block_ucla_rearrange.init = function(Y) {
     Y.on('domready', function() {
 
         try {
-            // Get value of serialized data
+            // Get value of serialized data.
             var s = Y.one('#serialized').get('value');
 
             M.block_ucla_rearrange.initialdata = $("#serialized").val();
@@ -19,16 +19,16 @@ M.block_ucla_rearrange.init = function(Y) {
             }
             window.onbeforeunload = M.core_formchangechecker.report_form_dirty_state;
 
-            // If the form is submitted, don't trigger onbeforeunload action
+            // If the form is submitted, don't trigger onbeforeunload action.
             Y.one('#mform1').on('submit', function(e) {
                 window.onbeforeunload = null
-            })    
+            })
         } catch (err) {
-            // Ignore errors.  When you end up here, it means 
-            // the form has already been submitted and IDs are no longer in scope
+            // Ignore errors.  When you end up here, it means
+            // the form has already been submitted and IDs are no longer in scope.
         }
-        
-        // Enable form submit - the rearrange form is disabled by default
+
+        // Enable form submit - the rearrange form is disabled by default.
         Y.all('.mform input[type="submit"]').removeAttribute('disabled');
 
     });
