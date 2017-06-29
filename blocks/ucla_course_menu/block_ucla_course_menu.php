@@ -357,13 +357,15 @@ class block_ucla_course_menu extends block_navigation {
             $modpath = '/mod/' . $modname . '/index.php';
 
             if (file_exists($CFG->dirroot . $modpath)) {
-                $modnameshown = $modnamesplural[$modname];
-                $navigs[] = navigation_node::create($modnameshown, 
+                // The space is appended to provide some spacing between the icon and the text.
+                $modnameshown = ' ' . $modnamesplural[$modname];
+                $navigs[] = navigation_node::create($modnameshown,
                     new moodle_url($modpath, array('id' => $courseid)),
-                    navigation_node::TYPE_ACTIVITY);
+                    navigation_node::TYPE_ACTIVITY, null, null,
+                    new pix_icon('icon', '', $modname)
+                    );
             }
         }
-        
         return $navigs;
     }
 
