@@ -80,7 +80,7 @@ if (!empty($extrasitelogos)) { ?>
 }
 
 if ($hasnavbar) { ?>
-<div class="navbar container-fluid">
+<div class="navbar container-fluid hidden-print">
     <div class="row">
         <div class="navbar-breadcrumb col-sm-5 col-md-6">
             <?php echo $OUTPUT->navbar(); ?>
