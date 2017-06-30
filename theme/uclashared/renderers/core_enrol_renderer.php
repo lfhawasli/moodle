@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/enrol/renderer.php');
 
 /**
@@ -54,7 +55,7 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
      * Clone of the original that omits handles bulk operations for messaging
      * and enrollment handling.
      *
-     * @param course_enrolment_table $table
+     * @param course_enrolment_users_table $table
      * @param moodleform $mform Form that contains filter controls
      * @return string
      */
@@ -73,7 +74,7 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
             }
             $buttonhtml .= html_writer::end_tag('div');
         }
-        
+
         $content = '';
         if (!empty($buttonhtml)) {
             $content .= $buttonhtml;
@@ -110,9 +111,9 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
                 $content .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $key, 'value' => $value));
             }
 
-            $PAGE->requires->strings_for_js(array('noselectedusers'), 'local_ucla');            
-        }    
-        
+            $PAGE->requires->strings_for_js(array('noselectedusers'), 'local_ucla');
+        }
+
         $content .= html_writer::table($table);
 
         if ($table->has_bulk_operations()) {
@@ -148,7 +149,7 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
             $content .= html_writer::empty_tag('input', array('type' => 'hidden',
                                                        'name' => 'id',
                                                        'value' => $COURSE->id));
-            $content .= html_writer::start_tag('noscript', array('style' => 'display:inline')); // hides go button
+            $content .= html_writer::start_tag('noscript', array('style' => 'display:inline')); // Hides go button.
 
             $content .= html_writer::start_tag('div');
             $content .= html_writer::empty_tag('input', array('type' => 'submit',
@@ -162,8 +163,8 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
 
             $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
             $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
-        }        
-        
+        }
+
         $content .= $this->output->render($table->get_paging_bar());
         if (!empty($buttonhtml)) {
             $content .= $buttonhtml;

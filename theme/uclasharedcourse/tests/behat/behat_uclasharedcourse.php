@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Behat theme_uclasharedcourse helper code.
  *
@@ -22,11 +21,8 @@
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
-
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
-
 use Behat\Behat\Context\Step\Then as Then,
     Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
@@ -68,9 +64,10 @@ class behat_uclasharedcourse extends behat_base {
      *
      * @Then /^I should not see image "([^"]*)" in the "(?P<element_string>(?:[^"]|\\")*)" "(?P<text_selector_string>[^"]*)"$/
      * @throws ExpectationException
-     * @param string $text
+     * @param string $image
      * @param string $element Element we look in.
      * @param string $selectortype The type of element where we are looking in.
+     *
      */
     public function i_should_not_see_custom_logo($image, $element, $selectortype) {
 
@@ -85,6 +82,7 @@ class behat_uclasharedcourse extends behat_base {
         if (!empty($html) && core_text::strpos($html, $image) !== false) {
             throw new ExpectationException("Found $image image", $this->getSession());
         }
+
     }
 
 }

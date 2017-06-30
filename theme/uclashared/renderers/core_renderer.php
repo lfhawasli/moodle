@@ -21,7 +21,7 @@
  * @copyright  UC Regents 2014
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/theme/bootstrapbase/renderers/core_renderer.php');
 
 /**
@@ -49,7 +49,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
      *
      * @var string
      */
-    public $theme_name = 'uclashared';
+    public $themename = 'uclashared';
 
     /**
      * Returns separator used in header and footer links.
@@ -149,11 +149,12 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
 
         $course = $this->page->course;
 
-        // This will have login informations
-        // [0] == Login information
-        // - Format  [REALLOGIN] (as \(ROLE\))|(DISPLAYLOGIN) (from MNET)
-        // [1] == H&Fb link
-        // [2] == Logout/Login button.
+        /* This will have login informations
+         [0] == Login information
+         - Format  [REALLOGIN] (as \(ROLE\))|(DISPLAYLOGIN) (from MNET)
+         [1] == H&Fb link
+         [2] == Logout/Login button.
+        */
         $logininfo = array();
 
         $loginurl = get_login_url();
@@ -167,13 +168,15 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
             $addloginurl = false;
 
             if (isguestuser()) {
-                 $userlink = html_writer::span(get_string('loggedinasguest'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
+                 $userlink = html_writer::span(get_string('loggedinasguest'),
+                    'btn-header-text visible-md-inline-block visible-lg-inline-block');
                  $addloginurl = true;
                  $loginstr = $userlink;
             }
 
         } else {
-            $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'), 'btn-header-text visible-md-inline-block visible-lg-inline-block');
+            $loginstr = html_writer::span(get_string('loggedinnot', 'moodle'),
+            'btn-header-text visible-md-inline-block visible-lg-inline-block');
         }
 
         // The help and feedback link.
@@ -499,7 +502,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
     /**
      * Shows sitewide 'alert' banner.
      *
-     * @todo: right now it only works for 'red' alerts.
+     * TODO: right now it only works for 'red' alerts.
      *
      * @return string HTML
      */
@@ -601,7 +604,7 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
         return $output;
     }
 
-    /*
+    /**
      * Override the notification in order to include the warning style.
      *
      * @param string $message

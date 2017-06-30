@@ -24,6 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../blocks/ucla_help/locallib.php');
 
 // Process and simplify all the options.
@@ -50,7 +51,7 @@ if ($showsidepre && !$showsidepost) {
     $bodyclasses[] = 'content-only';
 }
 
-$bodyclasses[] = 'theme-' . $OUTPUT->theme_name;
+$bodyclasses[] = 'theme-' . $OUTPUT->themename;
 
 $envflag = $OUTPUT->get_environment();
 
@@ -61,7 +62,8 @@ echo $OUTPUT->doctype() ?>
     <title><?php echo $PAGE->title ?></title>
     <?php echo $OUTPUT->standard_head_html() ?>
 </head>
-<body id="<?php echo $PAGE->bodyid ?>" class="<?php echo $PAGE->bodyclasses.' '.join(' ', $bodyclasses) ?> env-<?php echo $envflag ?>">
+<body id="<?php echo $PAGE->bodyid ?>" class="<?php echo $PAGE->bodyclasses.' '.join(' ', $bodyclasses) ?> 
+env-<?php echo $envflag ?>">
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
 
 <?php

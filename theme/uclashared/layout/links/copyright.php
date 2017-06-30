@@ -52,6 +52,7 @@
 
 <?php
 $config_week = get_config('local_ucla', 'student_access_ends_week');
+defined('MOODLE_INTERNAL') || die();
 if (!empty($config_week)) {
     // display past course access policy
     echo '<h2>Past course access</h2>
