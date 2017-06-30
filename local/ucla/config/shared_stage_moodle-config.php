@@ -461,6 +461,16 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
+// Site administration > Plugins > Text editors > Atto HTML editor > Font family setting
+$CFG->forced_plugin_settings['atto_fontfamily']['fontselectlist'] = '
+    Default=Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+    Arial=Arial, Helvetica, sans-serif;
+    Times=Times New Roman, Times, serif;
+    Courier=Courier New, Courier, mono;
+    Georgia=Georgia, Times New Roman, Times, serif;
+    Verdana=Verdana, Geneva, sans-serif;
+    Trebuchet=Trebuchet MS, Helvetica, sans-serif;';
+
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > General settings
 $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
     wrap,formatselect,wrap,bold,italic,wrap,bullist,numlist,wrap,link,unlink,wrap,image, mediagallery
