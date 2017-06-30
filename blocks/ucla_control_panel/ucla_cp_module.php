@@ -13,78 +13,85 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * This file defines the control panel module class.
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Control Panel Module class.
- *
- * @package    block
- * @subpackage ucla_control_panel
  * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 class ucla_cp_module {
     /**
      *  The block that is associated with this class.
      **/
     const PARENT_BLOCK = 'block_ucla_control_panel';
-
-    /** 
-     *  This is the item identifier. It should relate to the lang file. 
+    /**
+     * @var string $itemname This is the item identifier. It should relate to the lang file.
+     */
+    public $itemname;
+    /**
+     * @var array $tags This determines which group the object is in.
+     */
+    public $tags;
+    /**
+     * @var string $requiredcap A required capability
+     */
+    public $requiredcap;
+    /**
+     * @var moodle_url $requiredcap This is the moodle_url.
+     */
+    public $action;
+    /**
      *
-     *  @var string
-     **/
-    var $item_name;
+     * @var array $options An array of display options
+     */
+    public $options;
+
+
+     /**
+      * @var string $associatedblock
+      * This should not be used when declaring or creating a module.
+      * This is purely a prototyping tool, and will automatically
+      * be populated.
+      */
+    public $associatedblock = null;
+     // Currently cannot do nested categories.
 
     /**
-     *  @var boolean
-     *  This determines which group the object is in.
-     **/
-    var $tags;
-
-    /**
-     *  @var string
-     **/
-    var $required_cap;
-
-    /**
-     *  @var moodle_url
-     **/
-    var $action;
-
-    /**
-     *  @var mixed
-     **/
-    var $options;
-
-    /** 
-     *  @var string
-     *  This should not be used when declaring or creating a module.
-     *  This is purely a prototyping tool, and will automatically
-     *  be populated.
-     **/
-    var $associated_block = null;
-
-    /**
-     *  Currently cannot do nested categories.
+     * This will construct your object.
      *
-     *  This will construct your object. 
-     *  If your action is simple (such as a link), you do not need to
-     *  do additional programming and just instantiate a ucla_cp_module.
-     *  
-     **/
-    function __construct($item_name=null, $action=null, $tags=null,
+     * If your action is simple (such as a link), you do not need to
+     * do additional programming and just instantiate a ucla_cp_module.
+     *
+     * @param string $itemname
+     * @param moodle_url $action
+     * @param array $tags
+     * @param string $capability
+     * @param array $options
+     *
+     * @return void
+     */
+    public function __construct($itemname=null, $action=null, $tags=null,
             $capability=null, $options=null) {
 
-        if ($item_name != null) {
-            $this->item_name = $item_name;
+        if ($itemname != null) {
+            $this->itemname = $itemname;
         } else {
-            // Available PHP 5.1.0+
+            // Available PHP 5.1.0+.
             if (!class_parents($this)) {
                 throw new moodle_exception('You must specify an item '
                     . 'name if you are using the base ucla_cp_module '
                     . 'class!');
             }
 
-            $this->item_name = $this->figure_name();
+            $this->itemname = $this->figure_name();
         }
 
         if ($tags == null) {
@@ -98,9 +105,9 @@ class ucla_cp_module {
         }
 
         if ($capability == null) {
-            $this->required_cap = $this->autocap();
+            $this->requiredcap = $this->autocap();
         } else {
-            $this->required_cap = $capability;
+            $this->requiredcap = $capability;
         }
 
         if ($options === null) {
@@ -114,87 +121,95 @@ class ucla_cp_module {
      *  This function is automatically called to generate some kind of name
      *  if you want this class to be automatically named to the class name.
      **/
-    function figure_name() {
-        $orig_name = get_class($this);
+    public function figure_name() {
+        $origname = get_class($this);
 
         $parents = class_parents($this);
 
         foreach ($parents as $parent) {
             if (method_exists($parent, 'figure_name')) {
-                return substr($orig_name, strlen($parent) + 1);
-            } 
+                return substr($origname, strlen($parent) + 1);
+            }
         }
 
-        return $orig_name;
+        return $origname;
     }
 
     /**
-     *  This is the default function that is used to check if the module
-     *  should be displayed or not.
-     *  Currently only supports one capability per module.
+     * This is the default function that is used to check if the module
+     * should be displayed or not.
+     * Currently only supports one capability per module.
+     * @param stdClass $course
+     * @param course_context $context
      **/
-    function validate($course, $context) {
+    public function validate($course, $context) {
         $hc = true;
 
-        if ($this->required_cap != null) {        
-            $hc = has_capability($this->required_cap, $context);
-        } 
-        
+        if ($this->requiredcap != null) {
+            $hc = has_capability($this->requiredcap, $context);
+        }
+
         return $hc;
     }
 
     /**
-     *  Simple wrapper function.
+     * Simple wrapper function.
      **/
-    function is_tag() {
+    public function is_tag() {
         return empty($this->action);
     }
 
-    
+
     /**
-     *  This function can be overwritten to allow a child class to
-     *  define their tags in code instead when instantiated.
+     * This function can be overwritten to allow a child class to
+     * define their tags in code instead when instantiated.
      **/
-    function autotag() {
+    public function autotag() {
         return null;
     }
 
     /**
-     *  This is similar to {@see autotag}, except for the capability
-     *  that is used to check for validity.
+     * @see ucla_cp_module::autotag()
+     *
+     * This is similar to autotag, except for the capability
+     * that is used to check for validity.
      **/
-    function autocap() {
+    public function autocap() {
         return null;
     }
 
     /**
-     *  This is similar to {@see autotag}, except for the options
-     *  that is set.
+     * @see ucla_cp_module::autotag()
+     *
+     * This is similar to autotag, except for the options
+     * that are set.
      **/
-    function autoopts() {
+    public function autoopts() {
         return array();
     }
 
     /**
-     *  Simple wrapper function.
+     * Simple wrapper function.
      **/
-    function get_action() {
+    public function get_action() {
         return $this->action;
     }
 
     /**
-     *  Simple function for differentiating different instances
-     *  of the same type of control panel module.
+     * Simple function for differentiating different instances
+     * of the same type of control panel module.
      **/
-    function get_key() {
-        return $this->item_name;
+    public function get_key() {
+        return $this->itemname;
     }
 
     /**
-     *  This is a wrapper to get a set option from the current class.
-     *  Options, unfortunately, are known by the viewer.
+     * This is a wrapper to get a set option from the current class.
+     * Options, unfortunately, are known by the viewer.
+     *
+     * @param string $option
      **/
-    function get_opt($option) {
+    public function get_opt($option) {
         if (!isset($this->options[$option])) {
             return null;
         }
@@ -203,9 +218,12 @@ class ucla_cp_module {
     }
 
     /**
-     *  This is to set options.
+     * This is to set options.
+     *
+     * @param string $option
+     * @param boolean $value
      **/
-    function set_opt($option, $value) {
+    public function set_opt($option, $value) {
         $this->options[$option] = $value;
     }
 
@@ -213,37 +231,46 @@ class ucla_cp_module {
      *  Returns the relevant block of th emodule.
      *  This function should not overwritten, nor should be changed.
      **/
-    function associated_block() {
-        if ($this->associated_block == null) {
+    public function associated_block() {
+        if ($this->associatedblock == null) {
             return self::PARENT_BLOCK;
         }
-        return $this->associated_block;
+        return $this->associatedblock;
     }
 
     /**
      *  Magic loader function.
+     *
+     * @param string $name
      **/
-    static function load($name) {
-        $module_path = dirname(__FILE__) . '/modules/';
-        if (!file_exists($module_path)) {
+    public static function load($name) {
+        $modulepath = dirname(__FILE__) . '/modules/';
+        if (!file_exists($modulepath)) {
             debugging(get_string('badsetup', self::PARENT_BLOCK));
             return false;
         }
 
-        $file_path = $module_path . $name . '.php';
+        $filepath = $modulepath . $name . '.php';
 
-        if (!file_exists($file_path)) {
-            debugging(get_string('badmodule', self::PARENT_BLOCK, 
+        if (!file_exists($filepath)) {
+            debugging(get_string('badmodule', self::PARENT_BLOCK,
                 $name));
             return false;
         }
 
-        require_once($file_path);
+        require_once($filepath);
         return true;
     }
 
-    // Convenience wrapper to build a particular cp_module 
-    static function build($args) {
+    /**
+     * Convenience wrapper to build a particular cp_module.
+     *
+     * @param array $args
+     *
+     * @return ucla_cp_module
+     */
+    public static function build($args) {
+
         $params = get_class_vars(get_class());
 
         if (is_object($args)) {
@@ -259,9 +286,16 @@ class ucla_cp_module {
             }
         }
 
-        extract($callparams);
+        // Manually check for class var whose name does not match args'
+        // snake-case key.
 
-        return new ucla_cp_module($item_name, $action, $tags, 
-            $required_cap, $options);
+        if (isset($args['item_name'])) {
+            $callparams['item_name'] = $args['item_name'];
+        } else {
+            $callparams['item_name'] = null;
+        }
+
+        return new ucla_cp_module($callparams['item_name'], $callparams['action'],
+            $callparams['tags'], $callparams['requiredcap'], $callparams['options']);
     }
 }

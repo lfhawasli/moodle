@@ -13,21 +13,45 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * The control panel section, a collection of several tools.
+ *
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 
+defined('MOODLE_INTERNAL') || die();
+/**
+ * Renderer for ucla control panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 class ucla_cp_renderer {
+
+    /**
+     * @var array $history
+     */
     private $history = array();
 
-    
-    static function cmp($a, $b) {
+    /**
+     * Comparator function for sorting based on key
+     *
+     * @param object $a
+     * @param object $b
+     * @return int
+     */
+    public static function cmp($a, $b) {
         return( strcmp($a->get_key(), $b->get_key()) );
     }
-    
+
     /**
-     *  get_content_array()
+     * get_content_array()
+     * @param array $contents data to sort into tables
      * @param int $size the size of the tables you want the data sorted into.
      * @param bool $sort whether or not you want to items sorted based on name.
      *
-     *  @return Array This will return the data sorted into tables.
+     * @return Array This will return the data sorted into tables.
      *      Normally, this table will be 2 levels deep (Array => Array).
      *      Each key should be the identifier within the lang file
      *      that uses a language convention.
@@ -35,10 +59,10 @@ class ucla_cp_renderer {
      *      <item>_pre represents strings that are printed before the link.
      *      <item>_post represents the string that is printed after the link.
      **/
-    static function get_content_array($contents, $size=null, $sort=true) {
-        $all_stuff = array();
+    public static function get_content_array($contents, $size=null, $sort=true) {
+        $allstuff = array();
 
-        // This is the number of groups to sort this into
+        // This is the number of groups to sort this into.
         if ($size === null) {
             $size = floor(count($contents) / 2) + 1;
 
@@ -51,117 +75,118 @@ class ucla_cp_renderer {
             $action = $content;
             $title = $content->get_key();
 
-            $all_stuff[] = $action;
+            $allstuff[] = $action;
         }
 
-        usort($all_stuff,"ucla_cp_renderer::cmp");
+        usort($allstuff, "ucla_cp_renderer::cmp");
 
-        $disp_stuff = array();
+        $dispstuff = array();
 
-        $disp_cat = array();
-        foreach ($all_stuff as $title => $action) {
-            if (count($disp_cat) == $size) {
-                $disp_stuff[] = $disp_cat;
-                $disp_cat = array();
+        $dispcat = array();
+        foreach ($allstuff as $title => $action) {
+            if (count($dispcat) == $size) {
+                $dispstuff[] = $dispcat;
+                $dispcat = array();
             }
 
-            $disp_cat[$title] = $action;
+            $dispcat[$title] = $action;
         }
 
-        if (!empty($disp_cat)) {
-            $disp_stuff[] = $disp_cat;
+        if (!empty($dispcat)) {
+            $dispstuff[] = $dispcat;
         }
 
-        return $disp_stuff;
+        return $dispstuff;
     }
 
     /**
-     *  Builds the string with the string and the descriptions, pre and post.
-     *  @param ucla_cp_module $item_obj - This is the identifier for the 
+     * Builds the string with the string and the descriptions, pre and post.
+     *
+     * @param ucla_cp_module $itemobj - This is the identifier for the
      *      current control panel item.
-     *  @param link_attributes - Attributes associated with the object if the 
-     *  object is a link.
-     *  @return string The DOMs of the control panel description and link.
+     * @param array $linkattributes - Attributes associated with the object if the
+     * object is a link.
+     * @return string The DOMs of the control panel description and link.
      **/
-    static function general_descriptive_link($item_obj, $link_attributes = null) {
+    public static function general_descriptive_link($itemobj, $linkattributes = null) {
         $fitem = '';
 
-        $bucp = $item_obj->associated_block(); 
+        $bucp = $itemobj->associated_block();
 
-        $item = $item_obj->item_name;
-        $link = $item_obj->get_action();
+        $item = $itemobj->itemname;
+        $link = $itemobj->get_action();
 
-        if ($item_obj->get_opt('pre')) {
-            $fitem .= html_writer::tag('span', get_string($item . '_pre', 
-                $bucp, $item_obj), array('class' => 'pre-link'));
+        if ($itemobj->get_opt('pre')) {
+            $fitem .= html_writer::tag('span', get_string($item . '_pre',
+                $bucp, $itemobj), array('class' => 'pre-link'));
         }
 
-        //If the object is plain text, just include the object name in the string.
-        if (get_class($item_obj) == 'ucla_cp_text_module') {
-            $fitem.= $item;
-        }
-        //If the object is a tag 
-        else if ($link === null) {
+        // If the object is plain text, just include the object name in the string.
+        if (get_class($itemobj) == 'ucla_cp_text_module') {
+            $fitem .= $item;
+        } else if ($link === null) {
+            // If the object is a tag.
             $fitem .= html_writer::tag('span', get_string($item, $bucp,
-                $item_obj), array('class' => 'disabled'));
+                $itemobj), array('class' => 'disabled'));
         } else {
-            $fitem .= html_writer::link($link, get_string($item, $bucp, 
-                $item_obj), $link_attributes);
+            $fitem .= html_writer::link($link, get_string($item, $bucp,
+                $itemobj), $linkattributes);
         }
 
-        // One needs to explicitly hide the post description
-        if ($item_obj->get_opt('post') !== false) {
-            $fitem .= html_writer::tag('span', get_string($item . '_post', 
-                $bucp, $item_obj), array('class' => 'post-link'));
+        // One needs to explicitly hide the post description.
+        if ($itemobj->get_opt('post') !== false) {
+            $fitem .= html_writer::tag('span', get_string($item . '_post',
+                $bucp, $itemobj), array('class' => 'post-link'));
         }
 
         return $fitem;
     }
 
     /**
-     *  Adds an icon to the link and description.
+     * Adds an icon to the link and description.
      *
-     *  @param ucla_cp_modules $item_obj - The item to display.
-     *  @return string The DOMs of the control panel, with an image
-     *      and whatever is returned by @see general_descriptive_link.
+     * @see ucla_cp_renderer::general_descriptive_link()
+     *
+     * @param ucla_cp_modules $itemobj - The item to display.
+     * @return string The DOMs of the control panel, with an image
+     *      and whatever is returned by general_descriptive_link
      **/
-    static function general_icon_link($item_obj) {
+    public static function general_icon_link($itemobj) {
         global $OUTPUT;
 
-        $bucp = $item_obj->associated_block();
+        $bucp = $itemobj->associated_block();
 
-        $item = $item_obj->item_name;
+        $item = $itemobj->itemname;
+        $itemstring = get_string($item, $bucp, $itemobj);
 
-        $item_string = get_string($item, $bucp, $item_obj);
-        
-        $fitem = '';       
-        //BEGIN UCLA MOD: CCLE-2869-Add Empty Alt attribute for icons on Control Panel
-        $fitem .= html_writer::start_tag('a', 
-            array('href' => $item_obj->get_action()));
+        $fitem = '';
+        // BEGIN UCLA MOD: CCLE-2869-Add Empty Alt attribute for icons on Control Panel.
+        $fitem .= html_writer::start_tag('a',
+            array('href' => $itemobj->get_action()));
 
-        $fitem .= html_writer::start_tag('img', 
-                array('src' => $OUTPUT->pix_url('cp_' . $item, $bucp), 
-                      'alt' => $item_string, 'class' => 'general_icon'));
+        $fitem .= html_writer::start_tag('img',
+                array('src' => $OUTPUT->pix_url('cp_' . $item, $bucp),
+                      'alt' => $itemstring, 'class' => 'general_icon'));
         $fitem .= html_writer::end_tag('a');
-        
+
         $fitem .= html_writer::start_tag('span', array('class' => 'general_icon_text'));
-        $fitem .= self::general_descriptive_link($item_obj);
-        
+        $fitem .= self::general_descriptive_link($itemobj);
+
         $fitem .= html_writer::end_tag('span');
-        
-        //END UCLA MOD: CCLE-2869
+
+        // END UCLA MOD: CCLE-2869.
         return $fitem;
     }
-   
+
     /**
-     *  This function will take the contents of a 2-layer deep
-     *  array and generate the string that contains the contents
-     *  in a div-split table. It can also generate the contents.
+     * This function will take the contents of a 2-layer deep
+     * array and generate the string that contains the contents
+     * in a div-split table. It can also generate the contents.
      *
-     *  @param array $contents - The contents to diplay using the renderer.
-     *  @param boolean $format - If this is true, then we will send the data
+     * @param array $contents - The contents to diplay using the renderer.
+     * @param boolean $format - If this is true, then we will send the data
      *      through {@link get_content_array}.
-     *  @param string $orient - Which orientation handler to use to render the
+     * @param string $orient - Which orientation handler to use to render the
      *      display. Currently accepts two options (defaults to rows) if the
      *      option does not exist.
      *
@@ -171,44 +196,43 @@ class ucla_cp_renderer {
      *      'row': This means taht we expect an array containing arrays each
      *          with 2 of the elements we wish to render.
      *
-     *  @param string $handler - This is the callback function used to display
+     * @param string $handler - This is the callback function used to display
      *      each element. Defaults to general_descriptive_link, and will crash
      *      the script if you provide a non-existant function.
      **/
-    static function control_panel_contents($contents, $format=false, 
+    public static function control_panel_contents($contents, $format=false,
             $orient='col', $handler='general_descriptive_link') {
 
         if ($format) {
-            $contents = ucla_cp_renderer::get_content_array($contents, 2);
+            $contents = self::get_content_array($contents, 2);
         }
-        
-        $full_table = '';
-        
+
+        $fulltable = '';
+
         $columns = ($orient == 'col');
 
-        foreach ($contents as $content_row) {
+        foreach ($contents as $contentrow) {
 
-            $row_contents = '';
-            
-            // This corresponds to bootstrap grid
-            $responsive_class = 'col-sm-6 col-xs-12 item';
+            $rowcontents = '';
 
-            foreach ($content_row as $content_item => $content_link) {
+            // This corresponds to bootstrap grid.
+            $responsiveclass = 'col-sm-6 col-xs-12 item';
 
-                $the_output = html_writer::start_tag('div',
-                    array('class' => $responsive_class . ' ' . $content_link->item_name));
-                
-                $the_output .= ucla_cp_renderer::$handler(
-                    $content_link);
-                
-                $the_output .= html_writer::end_tag('div');
-                $row_contents .= $the_output;
+            foreach ($contentrow as $contentitem => $contentlink) {
+                $theoutput = html_writer::start_tag('div',
+                    array('class' => $responsiveclass . ' ' . $contentlink->itemname));
+
+                $theoutput .= self::$handler(
+                    $contentlink);
+
+                $theoutput .= html_writer::end_tag('div');
+                $rowcontents .= $theoutput;
             }
-            
-            $full_table .= html_writer::tag('div', $row_contents,
+
+            $fulltable .= html_writer::tag('div', $rowcontents,
                 array('class' => 'row'));
         }
-        
-        return $full_table;
+
+        return $fulltable;
     }
 }

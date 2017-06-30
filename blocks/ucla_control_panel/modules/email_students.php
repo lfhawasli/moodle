@@ -13,83 +13,97 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+/**
+ * This file defines ucla_cp_module_email_students class
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 defined('MOODLE_INTERNAL') || die();
-
+/**
+ * This class is the email students module for the ucla control panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 class ucla_cp_module_email_students extends ucla_cp_module {
-    function __construct($course) {
+    /**
+     * Constructs the object
+     * @param stdClass $course
+     * @return boolean
+     */
+    public function __construct($course) {
         global $CFG, $DB;
 
-        // See if we want to do stuff
+        // See if we want to do stuff.
         $unhide = optional_param('unhide', false, PARAM_INT);
 
-        // Get all the forums
-        $course_forums = $DB->get_records('forum', 
+        // Get all the forums.
+        $courseforums = $DB->get_records('forum',
             array('course' => $course->id, 'type' => 'news'));
 
-        // Let's try to save some cycles and use moodle's modinfo mechanism
-        $fast_modinfo = get_fast_modinfo($course);
+        // Let's try to save some cycles and use moodle's modinfo mechanism.
+        $fastmodinfo = get_fast_modinfo($course);
 
         // This is used to have a slightly more stimulative visual notice.
         $this->pre_enabled = false;
         $this->post_enabled = true;
 
-        // Setting default capability
+        // Setting default capability.
         $this->capability = 'mod/forum:addnews';
 
-        // Test for forum functionality and catching
-        $init_name = 'email_students';
+        // Test for forum functionality and catching.
+        $initname = 'email_students';
 
-        // explicit unset
-        unset($init_action);
+        // Explicit unset.
+        unset($initaction);
 
-        // Check that there is only one news forum
-        if (count($course_forums) > 1) {
-            $course_forum = false;
-            $init_name = 'email_students_fix';
+        // Check that there is only one news forum.
+        if (count($courseforums) > 1) {
+            $courseforum = false;
+            $initname = 'email_students_fix';
 
-            $init_action = new moodle_url($CFG->wwwroot
+            $initaction = new moodle_url($CFG->wwwroot
                 . '/course/view.php', array('section' => '0',
                     'id' => $course->id));
         }
 
-        $course_module = null;
+        $coursemodule = null;
 
         // This means that we found 1 news forum
         // Now we need to find the course module associated with it...
-        if (count($course_forums) == 1) {
-            $instances = $fast_modinfo->get_instances();
+        if (count($courseforums) == 1) {
+            $instances = $fastmodinfo->get_instances();
 
-            // Just check out the first one
-            $target_forum = array_shift($course_forums);
+            // Just check out the first one.
+            $targetforum = array_shift($courseforums);
 
             foreach ($instances['forum'] as $instance) {
-                if ($instance->instance == $target_forum->id) {
-                    $course_module = $instance;
+                if ($instance->instance == $targetforum->id) {
+                    $coursemodule = $instance;
                     break;
                 }
             }
-        } 
+        }
 
-        if (is_null($course_module)) {
+        if (is_null($coursemodule)) {
             debugging('could not find one news forum');
             return false;
         }
 
         if ($unhide !== false && confirm_sesskey()) {
-            $modcontext = context_module::instance($course_module->id);
+            $modcontext = context_module::instance($coursemodule->id);
             require_capability('moodle/course:activityvisibility', $modcontext);
-            set_coursemodule_visible($course_module->id, true);
-            \core\event\course_module_updated::create_from_cm($course_module, $modcontext)->trigger();
+            set_coursemodule_visible($coursemodule->id, true);
+            \core\event\course_module_updated::create_from_cm($coursemodule, $modcontext)->trigger();
             // Get updated version of course module.
-            $course_module = get_fast_modinfo($course->id)->get_cm($course_module->id);
+            $coursemodule = get_fast_modinfo($course->id)->get_cm($coursemodule->id);
         }
 
-        if ($course_module->visible == '1') {
-            // This means that the forum is fine
-            $init_action = new moodle_url($CFG->wwwroot
+        if ($coursemodule->visible == '1') {
+            // This means that the forum is fine.
+            $initaction = new moodle_url($CFG->wwwroot
                 . '/mod/forum/post.php',
-                array('forum' => $target_forum->id));
+                array('forum' => $targetforum->id));
         } else {
             // This means that the forum exists and the forum
             // is hidden.
@@ -98,52 +112,73 @@ class ucla_cp_module_email_students extends ucla_cp_module {
 
             $this->capability = 'moodle/course:activityvisibility';
 
-            $init_action = new moodle_url($CFG->wwwroot
+            $initaction = new moodle_url($CFG->wwwroot
                 . '/blocks/ucla_control_panel/view.php',
-                array('unhide' => $target_forum->id,
+                array('unhide' => $targetforum->id,
                     'sesskey' => sesskey(),
                     'course_id' => $course->id));
 
-
-            $init_name = 'email_students_hidden';
+            $initname = 'email_students_hidden';
         }
 
-        $this->course_module = $course_module;
+        $this->coursemodule = $coursemodule;
 
-        if (!isset($init_action)) {
-            $init_name = 'email_students_exception';
+        if (!isset($initaction)) {
+            $initname = 'email_students_exception';
 
-            // Disable the action
-            $init_action = null;
+            // Disable the action.
+            $initaction = null;
         }
 
-        parent::__construct($init_name, $init_action);
+        parent::__construct($initname, $initaction);
     }
 
-    function get_key() {
+    /**
+     * Returns the module key
+     * @return string
+     */
+    public function get_key() {
         return 'email_students';
     }
 
-    function autotag() {
+    /**
+     * Returns an array of tags
+     * @return array
+     */
+    public function autotag() {
         return array('ucla_cp_mod_common');
     }
 
-    function autocap() {
+    /**
+     * Returns the capability
+     * @return string
+     */
+    public function autocap() {
         return $this->capability;
     }
 
-    function autoopts() {
-        return array('pre' => $this->pre_enabled, 
+    /**
+     * Returns the module options
+     * @return array
+     */
+    public function autoopts() {
+        return array('pre' => $this->pre_enabled,
             'post' => $this->post_enabled);
     }
 
-    function validate($course, $context) {
-        if (!isset($this->course_module)) {
+    /**
+     * Validates vars
+     * @param stdClass $course
+     * @param course_context $context
+     * @return boolean
+     */
+    public function validate($course, $context) {
+        if (!isset($this->coursemodule)) {
             debugging('No forum available for emailing students.');
             return false;
         }
 
-        $context = context_module::instance($this->course_module->id);
+        $context = context_module::instance($this->coursemodule->id);
 
         return has_capability($this->autocap(), $context);
     }

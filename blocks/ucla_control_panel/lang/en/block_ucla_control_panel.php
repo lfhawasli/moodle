@@ -1,4 +1,25 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Moodle strings
+ *
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 
 /** Moodle Strings **/
 $string['pluginname'] = 'UCLA control panel';
@@ -11,17 +32,17 @@ $string['nocommands'] = 'There are no available "{$a}" commands.';
 
 $string['formatincompatible'] = 'WARNING: This page is designed to be used with courses with the "ucla" format. Other formats may cause undefined behavior.';
 
-/** Dummy control panel module **/
+// Dummy control panel module.
 $string['dummy'] = '';
 $string['dummy_pre'] = '';
 $string['dummy_post'] = '';
 
-/** Default category name **/
+// Default category name.
 $string['default'] = 'Common functions';
 
 $string['unknowntag'] = 'Ungrouped functions';
 
-/** Stuff from common **/
+// Stuff from common.
 $string['ucla_cp_mod_common'] = 'Most commonly used';
 
 $string['email_students'] = 'Email students';
@@ -46,7 +67,7 @@ $string['turnitin'] = 'Add a Turnitin Assignment to Site info';
 $string['turnitin_post'] = '(' . '<a href = "https://docs.ccle.ucla.edu/w/Turnitin_Assignment_v2" target = "_blank">'
     . 'Learn how to create a Turnitin Assignment</a>' . ')';
 
-/** Stuff from myucla functions **/
+// Stuff from myucla functions.
 $string['ucla_cp_mod_myucla'] = 'MyUCLA functions';
 
 $string['download_roster'] = 'Download roster';
@@ -62,7 +83,7 @@ $string['email_roster_post'] = '';
 $string['asucla_textbooks'] = 'ASUCLA textbooks';
 $string['asucla_textbooks_post'] = '';
 
-/** Stuff from other **/
+// Stuff from other.
 $string['ucla_cp_mod_other'] = 'Other tools';
 
 $string['import_classweb'] = 'Import ClassWeb site';
@@ -92,7 +113,7 @@ $string['course_download_unavailable_post'] = 'Not available for this course';
 $string['course_download_disabled'] = 'Download course materials';
 $string['course_download_disabled_post'] = 'Disabled for students.';
 
-/** Stuff for advanced **/
+// Stuff for advanced.
 $string['more_advanced'] = 'Advanced functions';
 
 $string['ucla_cp_mod_advanced'] = 'Advanced functions';
@@ -130,7 +151,7 @@ $string['groups_post'] = 'Set up and manage course groups. These provide separat
 $string['quiz_bank'] = 'Quiz question bank';
 $string['quiz_bank_post'] = 'Edit the quiz questions for this course.';
 
-/** Stuff for Admin **/
+// Stuff for Admin.
 $string['z_admin_functions'] = 'Admin functions';
 
 $string['ucla_cp_mod_admin_advanced'] = 'Admin functions';
@@ -146,7 +167,7 @@ $string['ccle_roster_class_post'] = "";
 $string['push_grades'] = 'Push grades';
 $string['push_grades_post'] = "Forces all current grades and grade items to be sent to MyUCLA's gradebook service";
 
-/** Stuff for Student Control Panel **/
+// Stuff for Student Control Panel.
 $string['ucla_cp_mod_student'] = 'Other commands';
 $string['student_grades'] = 'Grades';
 $string['student_grades_post'] = 'View your grades on CCLE.';
@@ -159,7 +180,7 @@ $string['student_myucla_classmates_post'] = 'View a list of your classmates on M
 $string['student_myucla_textbooks'] = 'Textbooks';
 $string['student_myucla_textbooks_post'] = 'View required textbooks for this course on MyUCLA.';
 
-/** Logging event handler **/
+// Logging event handler.
 $string['eventcontrolpanelviewed'] = 'Viewed control panel';
 
-/** End of File **/
+// EOF.

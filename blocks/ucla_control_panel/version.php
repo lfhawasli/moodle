@@ -13,6 +13,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Version information defined
+ *
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->version = 2014080500;
 $plugin->dependencies = array(
@@ -20,4 +28,4 @@ $plugin->dependencies = array(
 );
 $plugin->component = 'block_ucla_control_panel';
 
-/** eof **/
+// EOF.
