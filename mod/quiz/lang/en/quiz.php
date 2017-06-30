@@ -27,7 +27,10 @@ $string['action'] = 'Action';
 $string['activityoverview'] = 'You have quizzes that are due';
 $string['adaptive'] = 'Adaptive mode';
 $string['adaptive_help'] = 'If enabled, multiple responses to a question are allowed within the same attempt at the quiz. So for example if a response is marked as incorrect, the student will be allowed to try again immediately. However, depending on the "Apply penalties" setting, a penalty will usually be subtracted for each wrong attempt.';
-$string['add'] = 'Add';
+// START UCLA MOD: CCLE-6237-Changed "Add" to "Add question" to improve usability. 
+// $string['add'] = 'Add';
+$string['add'] = 'Add question';
+// END UCLA MOD: CCLE-6237.
 $string['addaquestion'] = 'a new question';
 $string['addasection'] = 'a new section heading';
 $string['addarandomquestion'] = 'a random question';
