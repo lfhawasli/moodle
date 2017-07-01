@@ -2,7 +2,7 @@
  *  Skipping the YUI Blocks and going to jQuery.
  *  ML and Underscores CLASH!
  **/
-// Make sure that the rearrange block exists (or not)
+// Make sure that the rearrange block exists (or not).
 M.block_ucla_rearrange = M.block_ucla_rearrange || {};
 M.block_ucla_easyupload = M.block_ucla_easyupload || {};
 
@@ -15,21 +15,20 @@ M.block_ucla_easyupload.change_active_sortable = function() {
 
     $("#reorder-container").slideUp("slow",
         function() {
-            // Destroy previous functionality
+            // Destroy previous functionality.
             M.block_ucla_rearrange.destroy_nested_sortable();
 
-            // Refill with existing sections
+            // Refill with existing sections.
             var sectionInsides = '';
             if (sectionId != null) {
                 sectionInsides = M.block_ucla_rearrange.sections[sectionId];
 
-                sectionInsides = sectionInsides 
-                    + M.block_ucla_rearrange.empty_item;
+                sectionInsides = sectionInsides + M.block_ucla_rearrange.empty_item;
             } else {
                 alert('faulty section spec');
             }
 
-            // Replace all the HTML content for the section
+            // Replace all the HTML content for the section.
             var targetjqo = $(M.block_ucla_rearrange.targetjq);
             targetjqo.html(sectionInsides);
 
@@ -37,7 +36,7 @@ M.block_ucla_easyupload.change_active_sortable = function() {
 
             M.block_ucla_rearrange.create_nested_sortable();
 
-            M.block_ucla_rearrange.serialize_target(targetjqo.get(0).id); 
+            M.block_ucla_rearrange.serialize_target(targetjqo.get(0).id);
 
             $(this).slideDown("slow");
         }
@@ -51,16 +50,15 @@ M.block_ucla_easyupload.initiate_sortable_content = function() {
     var hookfn = M.block_ucla_easyupload.change_active_sortable;
 
     // This is a special case for subheadings...
-    M.block_ucla_easyupload.displayname_field = 
-        '#id_' + $('#id_default_displayname_field').val();
+    M.block_ucla_easyupload.displayname_field = '#id_' + $('#id_default_displayname_field').val();
 
-    // Assign the event hook
+    // Assign the event hook.
     $('#id_section').change(hookfn);
     $(M.block_ucla_easyupload.displayname_field).change(
         M.block_ucla_easyupload.update_new_element_name
     );
 
-    // Run the event
+    // Run the event.
     hookfn();
 };
 
@@ -71,12 +69,7 @@ M.block_ucla_easyupload.update_new_element_name = function() {
     var value = $(M.block_ucla_easyupload.displayname_field).val();
     var type = $("#id_type").val();
 
-    $("#ele-new").html(
-          "<b>" + value + "</b> "
-        + "<span class='ele-new-paren'>"
-        + "(Your new " + type + ")"
-        + "</span>" 
-    );
+    $("#ele-new").html("<b>" + value + "</b> " + "<span class='ele-new-paren'>" + "(Your new " + type + ")" + "</span>");
 };
 
 /**
@@ -88,7 +81,7 @@ M.block_ucla_easyupload.syllabus_default_public = function() {
     // selector is probably the only element that will have the "fgrouplabel" class.
     $(".fgrouplabel").hide();
 
-    // The main body of the trigger to open the function
+    // The main body of the trigger to open the function.
     $("input").keyup(function () {
         var name_value = $("#id_name").val();
         var syllabuspattern = new RegExp(".*[Ss5$]\\s*(y|Y|'/)\\s*(l|I|L|1|\\|_|\\|)\\s*(l|I|L|1|\\|_|\\|)\\s*(a|A|4|@|/-\\\\|/\\\\)\\s*(b|B|8|\\|3|\\|o)\\s*(u|U|\\|_\\|)\\s*[sS5$].*");
@@ -98,13 +91,12 @@ M.block_ucla_easyupload.syllabus_default_public = function() {
 
         // Logic that sets the "Public" radio button if:
         // - "Private" radio button is currently set &&
-        // - Their is text similar to "syllabus" and/or "course description in the "Name" field
+        // - Their is text similar to "syllabus" and/or "course description in the "Name" field.
         if( syllabuspattern.test(name_value) || coursedescpattern.test(name_value) ) {
             if( !( $("#id_publicprivateradios_publicprivate_public").is(':checked')) ) {
                 $("#id_publicprivateradios_publicprivate_public").prop("checked", true);
                 $("#id_public_warning").text( defaultchangestring );
-                var modal = '<br/><br/> <div id="open-modal" class="modal-dialog"><div class="alert alert-info" role="alert"><p>' +
-                        syllabus_body  +  '</p></div></div>';
+                var modal = '<br/><br/> <div id="open-modal" class="modal-dialog"><div class="alert alert-info" role="alert"><p>' + syllabus_body + '</p></div></div>';
 
                 // As long as the modal box was never created... create one!
                 // This is to prevent multiple boxes from being created if they
@@ -115,6 +107,6 @@ M.block_ucla_easyupload.syllabus_default_public = function() {
                 // Also, show the help button (make it visible)!
                 $(".fgrouplabel").show();
             }
-       }
+        }
     }).keyup();
 }

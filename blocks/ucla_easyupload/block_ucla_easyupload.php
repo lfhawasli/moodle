@@ -1,4 +1,26 @@
 <?php
+// This file is part of UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * UCLA easyupload's block. Note that the block cannot be added everywhere.
+ *
+ * @package    block_ucla_easyupload
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -6,20 +28,32 @@ require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot.'/course/format/ucla/lib.php');
 
+/**
+ * UCLA easyupload extends block_base.
+ *
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_easyupload extends block_base {
-    function init() {
+    /**
+     * Initializes the title of the block, using the string in lang/en/block_ucla_easyupload.php.
+     */
+    public function init() {
         $this->title = get_string('pluginname', 'block_ucla_easyupload');
     }
 
-    // Handle a physical file upload
-    static function upload($contextid) {
+    /**
+     * Handle a physical file upload.
+     * @param string $contextid
+     */
+    public static function upload($contextid) {
         global $CFG, $DB;
 
         $type = 'upload';
         $sql = "
-            SELECT i.id, i.name 
+            SELECT i.id, i.name
             FROM {repository} r
-                INNER JOIN {repository_instances} i 
+                INNER JOIN {repository_instances} i
                     ON i.typeid = r.id
             WHERE r.type = ?
         ";
@@ -57,8 +91,8 @@ class block_ucla_easyupload extends block_base {
 
     /**
      *  Checks if rearrange JS framework is available.
-     **/
-    static function block_ucla_rearrange_installed() {
+     */
+    public static function block_ucla_rearrange_installed() {
         global $CFG;
 
         $rearrangepath = $CFG->dirroot
@@ -73,11 +107,15 @@ class block_ucla_easyupload extends block_base {
     }
 
     /**
-     *  Convenience function to generate a variable assignment 
-     *  statement in JavaScript.
-     *  TODO Might want to move this function to rearrange
-     **/
-    static function js_variable_code($var, $val, $quote = true) {
+     * Convenience function to generate a variable assignment
+     * statement in JavaScript.
+     * TODO Might want to move this function to rearrange
+     * @param string $var
+     * @param string $val
+     * @param boolean $quote
+     * @return string
+     */
+    public static function js_variable_code($var, $val, $quote = true) {
         if ($quote) {
             $val = '"' . $val . '"';
         }
@@ -85,13 +123,15 @@ class block_ucla_easyupload extends block_base {
         return 'M.block_ucla_easyupload.' . $var . ' = ' . $val;
     }
 
-    /** 
-     *  Returns if the type specified has code to handle it.
-     **/
-    static function upload_type_exists($type) {
+    /**
+     * Returns if the type specified has code to handle it.
+     * @param string $type
+     * @return string/boolean
+     */
+    public static function upload_type_exists($type) {
         global $CFG;
 
-        $typelib = $CFG->dirroot 
+        $typelib = $CFG->dirroot
             . '/blocks/ucla_easyupload/upload_types/*.php';
 
         $possibles = glob($typelib);
@@ -104,68 +144,73 @@ class block_ucla_easyupload extends block_base {
 
         if (class_exists($typeclass)) {
             return $typeclass;
-        } 
+        }
 
         return false;
     }
 
-    static function ucla_cp_hook($course, $context) {
+    /**
+     * The hook callback for the block.
+     *
+     * @param stdClass $course
+     * @param context_course $context
+     * @return array
+     */
+    public static function ucla_cp_hook($course, $context) {
         global $CFG;
 
         $thispath = '/blocks/ucla_easyupload/upload.php';
 
-        $common_components = array('file', 'link');
-        $other_components = array('activity', 'resource', 'subheading', 
+        $commoncomponents = array('file', 'link');
+        $othercomponents = array('activity', 'resource', 'subheading',
             'text');
 
-        // give proper section
+        // Give proper section.
         $section = course_get_format($course)->figure_section($course);
-        $section_type = 'section';
-        $section_value = $section;
-        // handle special case for show_all
+        $sectiontype = 'section';
+        $sectionvalue = $section;
+        // Handle special case for show_all.
         if ($section == UCLA_FORMAT_DISPLAY_ALL) {
-            $section_type = 'show_all';
-            $section_value = 1;
+            $sectiontype = 'show_all';
+            $sectionvalue = 1;
         }
 
         $allmods = array();
 
-        foreach ($common_components as $common) {
+        foreach ($commoncomponents as $common) {
             $allmods[] = array(
                 'item_name' => 'add_' . $common,
                 'tags' => array('ucla_cp_mod_common'),
                 'action' => new moodle_url($thispath,
                     array('course_id' => $course->id, 'type' => $common,
-                        $section_type => $section_value)),
+                        $sectiontype => $sectionvalue)),
                 'required_cap' => 'moodle/course:manageactivities'
             );
         }
-        
-        foreach ($other_components as $common) {
+
+        foreach ($othercomponents as $common) {
             $allmods[] = array(
                 'item_name' => 'add_' . $common,
                 'tags' => array('ucla_cp_mod_other'),
                 'action' => new moodle_url($thispath,
                     array('course_id' => $course->id, 'type' => $common,
-                        $section_type => $section_value)),
+                        $sectiontype => $sectionvalue)),
                 'required_cap' => 'moodle/course:manageactivities'
             );
         }
 
         return $allmods;
     }
-    
+
     /**
      *  Do not allow block to be added anywhere
      */
-    function applicable_formats() {
+    public function applicable_formats() {
         return array(
             'site-index' => false,
             'course-view' => false,
             'my' => false,
             'not-really-applicable' => true
         );
-    }    
+    }
 }
-
-// End of file
