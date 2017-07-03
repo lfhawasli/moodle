@@ -6,7 +6,7 @@ var sidebartoggle = function(e) {
 
     $('.main.help.sidebar').sidebar({
         onChange: function() {
-        
+
             M.block_ucla_help.sidebar.invoke_function('sidebar_toggle_pre', '');
 
             $(window).delay(300).queue(function(next) {

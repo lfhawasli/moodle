@@ -1,47 +1,70 @@
 <?php
+// This file is part of the UCLA Help plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Form for users to send messages to support contacts.
  *
- * @package    ucla
- * @subpackage ucla_help
- * @copyright  2011 UC Regents    
- * @author     Rex Lorenzo <rex@seas.ucla.edu>                                         
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
+ * @package    block_ucla_help
+ * @copyright  2011 UC Regents
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/formslib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Form for users to send messages to support contacts.
+ *
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class help_form extends moodleform {
- 
-    function definition() {
+
+    /**
+     * Defines the help form itself
+     */
+    public function definition() {
         global $CFG, $COURSE, $SITE, $USER;
 
-        // if on a real course, be sure to include courseid as GET variable
+        // If on a real course, be sure to include courseid as GET variable.
         if ($COURSE->id > $SITE->id) {
             $this->_form->_attributes['action'] .= '?course='. $COURSE->id;
         }
-        
+
         $this->_form->_attributes['id'] = 'help_form';
-        
+
         $courses = $this->_customdata['courses'];
-        
+
         $mform =& $this->_form;
-        
-        // css should be used to define widths of input/textarea fields
+
+        // Css should be used to define widths of input/textarea fields.
         $mform->addElement('text', 'ucla_help_name',
                 get_string('name_field', 'block_ucla_help'));
         $mform->addElement('text', 'ucla_help_email',
                 get_string('email_field', 'block_ucla_help'));
-        
-        // set and freeze defaults for name/email
+
+        // Set and freeze defaults for name/email.
         if (isloggedin() && !isguestuser()) {
             $mform->setDefault('ucla_help_name', "$USER->firstname $USER->lastname");
             $mform->setDefault('ucla_help_email', $USER->email);
             $mform->hardFreeze('ucla_help_name');
             $mform->hardFreeze('ucla_help_email');
-            
+
             $docswikiurl = get_config('block_ucla_help', 'docs_wiki_url');
             $changeemail = new stdClass;
             $changeemail->students = html_writer::link(($docswikiurl . 'Changing_your_email_address#Students'),
@@ -54,8 +77,8 @@ class help_form extends moodleform {
 
         $mform->addElement('select', 'ucla_help_course',
                 get_string('course_field', 'block_ucla_help'), $courses);
-        
-        // set and freeze default for course
+
+        // Set and freeze default for course.
         $mform->setDefault('ucla_help_course', $COURSE->id);
         if ($COURSE->id > $SITE->id) {
             $mform->hardFreeze('ucla_help_course');
@@ -76,29 +99,28 @@ class help_form extends moodleform {
             }
         }
 
-        // no point in having a cancel option
+        // No point in having a cancel option.
         $this->add_action_buttons(false, get_string('submit_button', 'block_ucla_help'));
-        
-        // set proper types for each element
+
+        // Set proper types for each element.
         $mform->setType('ucla_help_name', PARAM_TEXT);
         $mform->setType('ucla_help_email', PARAM_EMAIL);
         $mform->setType('ucla_help_description', PARAM_TEXT);
-        
-        // trim all input
+
+        // Trim all input.
         $mform->applyFilter('ucla_help_name', 'trim');
         $mform->applyFilter('ucla_help_email', 'trim');
         $mform->applyFilter('ucla_help_description', 'trim');
-        
-        // make name field a required field 
+
+        // Make name field a required field.
         $mform->addRule('ucla_help_name', get_string('requiredelement', 'form'), 'required');
-        
-        // make email field a required field 
+
+        // Make email field a required field.
         $mform->addRule('ucla_help_email', get_string('requiredelement', 'form'), 'required');
-        // if email is present, make sure it is a valid email address
+        // If email is present, make sure it is a valid email address.
         $mform->addRule('ucla_help_email', get_string('err_email', 'form'), 'email');
-        
-        // make description field a required field 
+
+        // Make description field a required field.
         $mform->addRule('ucla_help_description', get_string('requiredelement', 'form'), 'required');
-    }                           
-}          
-?>
+    }
+}

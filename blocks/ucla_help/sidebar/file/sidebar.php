@@ -14,10 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Sidebar for file page
+ *
+ * @package    block_ucla_help
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
+
+/**
+ * Sidebar for file page
+ *
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class sidebar_file implements sidebar_widget {
 
+    /**
+     * path to file
+     * @var string $path
+     */
     private $path;
 
+    /**
+     * Constructs your object
+     * @param string $path
+     */
     public function __construct($path) {
         $this->path = null;
 
@@ -28,6 +53,11 @@ class sidebar_file implements sidebar_widget {
         }
     }
 
+    /**
+     * Requires the file based on the path given
+     *
+     * @return bool
+     */
     public function render() {
         if (!empty($this->path)) {
             return require_once($this->path);

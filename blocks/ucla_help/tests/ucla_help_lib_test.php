@@ -17,7 +17,7 @@
 /**
  * Tests the ucla_help package functionality.
  *
- * @package    ucla_help
+ * @package    block_ucla_help
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
 /**
  * Contains tests for ucla_help package.
  *
- * @package    ucla_help
+ * @package    block_ucla_help
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

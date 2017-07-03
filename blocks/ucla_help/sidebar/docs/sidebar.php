@@ -14,25 +14,56 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Sidebar for docs
+ *
+ * @package    block_ucla_help
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
+defined('MOODLE_INTERNAL') || die;
+
+/**
+ * Sidebar for docs
+ *
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class sidebar_docs extends sidebar_html implements sidebar_widget {
 
+    /**
+     * URL template for keyword query
+     *
+     * @var string $keywordquery
+     */
     private $keywordquery = '?action=query&titles={title}&prop=links&format=json';
-
+    /**
+     * Constructs your object
+     *
+     * @param string $keyword
+     */
     public function __construct($keyword) {
         global $PAGE;
 
         $PAGE->requires->js('/theme/uclashared/javascript/accordion.min.js');
-        $PAGE->requires->yui_module('moodle-block_ucla_help-doc_loader', 'M.block_ucla_help.init_doc_loader', 
+        $PAGE->requires->yui_module('moodle-block_ucla_help-doc_loader', 'M.block_ucla_help.init_doc_loader',
                 array(array('help' => '/blocks/ucla_help/help/gradebook')));
 
         $this->keyword = $keyword;
     }
 
+    /**
+     * Returns decoded JSON response from request
+     *
+     * @param string $url
+     * @return object
+     */
     private function curl($url) {
         $apiurl = get_config('block_ucla_help', 'docs_wiki_api');
         $url = $apiurl . $url;
-        
+
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
@@ -43,6 +74,11 @@ class sidebar_docs extends sidebar_html implements sidebar_widget {
         return json_decode($response);
     }
 
+    /**
+     * Sends request to get topics
+     *
+     * @return array
+     */
     private function get_topics() {
         $url = preg_replace('/{title}/', $this->keyword, $this->keywordquery);
         $response = $this->curl($url);
@@ -71,12 +107,16 @@ class sidebar_docs extends sidebar_html implements sidebar_widget {
         return $items;
     }
 
+    /**
+     * Returns html string
+     * @return string
+     */
     public function render() {
 
         $content = array_reduce($this->get_topics(), function($carry, $item) {
                     $carry .= $item;
                     return $carry;
-                }, '');
+        }, '');
 
         $topic = ucfirst($this->keyword);
         $title = $this->title($topic . ' help topics');
