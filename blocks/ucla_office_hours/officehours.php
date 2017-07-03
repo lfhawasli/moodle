@@ -7,6 +7,8 @@ require_once($CFG->dirroot .
         '/blocks/ucla_office_hours/block_ucla_office_hours.php');
 require_once($CFG->dirroot .
         '/blocks/ucla_office_hours/officehours_form.php');
+require_once($CFG->dirroot .
+        '/blocks/ucla_tasites/block_ucla_tasites.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 
@@ -19,8 +21,8 @@ if ($courseid == SITEID) {
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 require_login($course, true);
 
-$edit_user = $DB->get_record('user', array('id' => $editid), '*', MUST_EXIST);
-$edit_user_name = $edit_user->firstname . ' ' . $edit_user->lastname;
+$edituser = $DB->get_record('user', array('id' => $editid), '*', MUST_EXIST);
+$editusername = $edituser->firstname . ' ' . $edituser->lastname;
 
 $context = context_course::instance($courseid);
 $PAGE->set_context($context);
@@ -29,81 +31,139 @@ $PAGE->set_pagetype('course-view-' . $course->format);
 $PAGE->set_url('/blocks/ucla_office_hours/officehours.php',
         array('courseid' => $courseid, 'editid' => $editid));
 
-$page_title = get_string('header', 'block_ucla_office_hours', $edit_user_name);
-$PAGE->set_title($page_title);
-$PAGE->set_heading($page_title);
+$pagetitle = get_string('header', 'block_ucla_office_hours', $editusername);
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($pagetitle);
 
 set_editing_mode_button();
 
-$PAGE->navbar->add($page_title);
+$PAGE->navbar->add($pagetitle);
 
-// make sure that entry can be edited
-if (!block_ucla_office_hours::allow_editing($context, $edit_user->id)) {
-    print_error('cannotedit', 'block_ucla_office_hours');    
+// Make sure that entry can be edited.
+if (!block_ucla_office_hours::allow_editing($context, $edituser->id)) {
+    print_error('cannotedit', 'block_ucla_office_hours');
 }
 
-// get office hours entry, if any
-$officehours_entry = $DB->get_record('ucla_officehours',
+// Get office hours entry, if any.
+$officehoursentry = $DB->get_record('ucla_officehours',
         array('courseid' => $courseid, 'userid' => $editid));
-$email_settings = $edit_user->maildisplay;
+$emailsettings = $edituser->maildisplay;
 
-$updateform = new officehours_form(NULL, 
-        array('courseid' => $courseid, 
-              'editid' => $editid, 
-              'edit_email' => $edit_user->email,
-              'defaults' => $officehours_entry, 
-              'url' => $edit_user->url,
-              'email_settings' => $email_settings),
+// Get current course name. If it's a TA site, get the parent course.
+if (block_ucla_tasites::is_tasite($courseid)) {
+    $parentcourseid = block_ucla_tasites::get_tasite_enrol_meta_instance($courseid)->customint1;
+    $parentcourse = $DB->get_record('course', array('id' => $parentcourseid));
+    $currentcoursename = $parentcourse->shortname;
+} else {
+    $currentcoursename = $course->shortname;
+}
+
+// Get current course term.
+$currentcourseterm = $DB->get_field('ucla_request_classes', 'term', array('courseid' => $courseid), IGNORE_MULTIPLE);
+
+// Get user's enrolled courses and their names.
+$userenrolments = $DB->get_records('user_enrolments',
+        array('userid' => $editid));
+$enrolledcourseids = array();
+$coursenames = array();
+
+foreach ($userenrolments as $userenrolment) {
+    $enrol = $DB->get_record('enrol', array('id' => $userenrolment->enrolid));
+    $sql = 'SELECT c.id, c.shortname
+              FROM {course} c
+              JOIN {ucla_request_classes} urc ON urc.courseid = c.id
+             WHERE c.id = :id AND urc.term = :term';
+    $enrolledcourse = $DB->get_record_sql($sql, array('id' => $enrol->courseid, 'term' => $currentcourseterm));
+    // Don't include TA sites.
+    if (!empty($enrolledcourse) && !block_ucla_tasites::is_tasite_enrol_meta_instance($enrol)) {
+        $enrolledcourseids[] = $enrolledcourse->id;
+        $coursenames[] = $enrolledcourse->shortname;
+    }
+}
+
+$updateform = new officehours_form(null,
+        array('courseid' => $courseid,
+              'editid' => $editid,
+              'editemail' => $edituser->email,
+              'defaults' => $officehoursentry,
+              'url' => $edituser->url,
+              'emailsettings' => $emailsettings,
+              'coursenames' => $coursenames,
+              'currentcoursename' => $currentcoursename),
         'post',
         '',
         array('class' => 'officehours_form'));
 
-// If the cancel button is clicked, return to 'Site Info' page
-if ($updateform->is_cancelled()) { 
+// If the cancel button is clicked, return to 'Site Info' page.
+if ($updateform->is_cancelled()) {
     $url = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $courseid, 'topic' => 0));
     redirect($url);
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($page_title, 2, 'headingblock');
+echo $OUTPUT->heading($pagetitle, 2, 'headingblock');
 
-if ($data = $updateform->get_data()) { //Otherwise, process data
-    
-    // prepare new entry data
-    $new_officehours_entry = new stdClass();
-    $new_officehours_entry->userid          = $editid;
-    $new_officehours_entry->courseid        = $courseid;
-    $new_officehours_entry->modifierid      = $USER->id;
-    $new_officehours_entry->timemodified    = time();
-    $new_officehours_entry->officehours     = strip_tags(trim($data->officehours));
-    $new_officehours_entry->officelocation  = $data->office;
-    $new_officehours_entry->email           = $data->email;
-    $new_officehours_entry->phone           = $data->phone;
+if ($data = $updateform->get_data()) { // Otherwise, process data.
 
-    try {
-        if (empty($officehours_entry)) {
-            // need to insert new record
-            $DB->insert_record('ucla_officehours', $new_officehours_entry);   
-        } else {
-            // use existing record id to update
-            $new_officehours_entry->id = $officehours_entry->id;        
-            $DB->update_record('ucla_officehours', $new_officehours_entry);        
+    // Prepare new entry data.
+    $newentry = new stdClass();
+    $newentry->userid          = $editid;
+    $newentry->modifierid      = $USER->id;
+    $newentry->timemodified    = time();
+    $newentry->officehours     = strip_tags(trim($data->officehours));
+    $newentry->officelocation  = $data->office;
+    $newentry->email           = $data->email;
+    $newentry->phone           = $data->phone;
+    $officelocationallcourses  = $data->officelocationallcourses;
+    $officehoursallcourses     = $data->officehoursallcourses;
+
+    // To update current course entry, must also update parent course or child TA course.
+    $courseids = array($courseid);
+    // If TA site, add parent course.
+    if (isset($parentcourseid)) {
+        $courseids[] = $parentcourseid;
+    } else {
+        // Check if user has a TA site.
+        if (block_ucla_tasites::can_have_tasite($edituser, $courseid)) {
+            $tasiteenrols = block_ucla_tasites::get_tasite_enrolments($courseid);
+            if ($tasiteenrols[$editid]) {
+                $courseids[] = $tasiteenrols[$editid]->courseid;
+            }
         }
-    } catch (dml_exception $e) {    
-        print_error('cannotinsertrecord');        
-    }   
-    
-    // check if editing user's profile needs to change (website or email settings)
-    if ($data->website != $edit_user->url || $data->email_settings != $edit_user->maildisplay) {
-        $edit_user->url = $data->website;
-        $edit_user->maildisplay = $data->email_settings;
-        unset($edit_user->password);
-        user_update_user($edit_user);
+    }
+    foreach ($courseids as $cid) {
+        block_ucla_office_hours::update_office_hours($newentry, $cid, $editid);
     }
 
-    // display success message
-    echo $OUTPUT->notification(get_string('confirmation_message', 
-            'block_ucla_office_hours'), 'notifysuccess');
+    // Update office hours and location for each course user is enrolled in.
+    if ($officelocationallcourses || $officehoursallcourses) {
+        if (!$officelocationallcourses) {
+            unset($newentry->officelocation);
+        }
+        if (!$officehoursallcourses) {
+            unset($newentry->officehours);
+        }
+        foreach ($enrolledcourseids as $enrolledcourseid) {
+            $context = context_course::instance($enrolledcourseid);
+            // Make sure they are able to have office hours in that course.
+            if (block_ucla_office_hours::allow_editing($context, $editid)) {
+                block_ucla_office_hours::update_office_hours($newentry, $enrolledcourseid, $editid);
+            }
+        }
+    }
+
+    // Check if editing user's profile needs to change (website or email settings).
+    if ($data->website != $edituser->url || $data->emailsettings != $edituser->maildisplay) {
+        $edituser->url = $data->website;
+        $edituser->maildisplay = $data->emailsettings;
+        unset($edituser->password);
+        user_update_user($edituser);
+    }
+
+    // Display success message.
+    echo $OUTPUT->notification(get_string('confirmation_default',
+            'block_ucla_office_hours', $coursenames), 'notifysuccess');
+
     echo $OUTPUT->continue_button(new moodle_url('/course/view.php',
                     array('id' => $courseid, 'section' => 0)));
 

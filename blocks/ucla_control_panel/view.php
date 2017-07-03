@@ -1,7 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- *  The control panel section, a collection of several tools.
- **/
+ * The control panel section, a collection of several tools.
+ *
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 global $CFG, $PAGE;
 
@@ -40,10 +59,10 @@ if (isguestuser()) {
 // Initialize $PAGE.
 $PAGE->set_url('/blocks/ucla_control_panel/view.php',
         array('course_id' => $courseid));
-$page_title = $course->shortname . ': ' . get_string('pluginname',
+$pagetitle = $course->shortname . ': ' . get_string('pluginname',
                 'block_ucla_control_panel');
 $PAGE->set_context($context);
-$PAGE->set_title($page_title);
+$PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_pagetype('course-view-' . $course->format);

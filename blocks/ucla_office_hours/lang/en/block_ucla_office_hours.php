@@ -19,9 +19,10 @@ $string['header'] = 'Update office hours and contact info for {$a}';
 
 $string['header_office_info'] = 'Office information';
 $string['f_officehours'] = 'Office hours';
-$string['f_officehours_text'] = 'Include the times and days of your office hours for this course';
+$string['f_officehours_text'] = 'Include the times and days of your office hours';
 $string['f_office'] = 'Office location';
 $string['f_office_text'] = 'Enter your campus address or office hours meeting location';
+$string['office_info_all_courses'] = 'For <span class="warning-text">ALL</span> courses ({$a})';
 
 $string['header_contact_info'] = 'Contact information';
 $string['f_email_of_record'] = 'Email of record';
@@ -33,10 +34,9 @@ $string['f_phone'] = 'Phone number';
 $string['f_phone_text'] = 'Enter a number where students can reach you or leave a message. This number will be public.';
 $string['f_website'] = 'Personal website';
 
-$string['confirmation_message'] = 'Successfully updated office hours and contact information.';
+$string['confirmation_default'] = 'Successfully updated contact and office hours information.';
 $string['confirmation_redirect1'] = 'Click ';
-$string['confirmation_redirect2'] =' to go to the Site Info page of your course where the updated information can be seen.';
-
+$string['confirmation_redirect2'] = ' to go to the Site Info page of your course where the updated information can be seen.';
 
 $string['cannotedit'] = 'Sorry, but you cannot edit office hours information for given user and course';
 

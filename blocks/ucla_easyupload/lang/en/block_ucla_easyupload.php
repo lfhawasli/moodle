@@ -1,4 +1,26 @@
 <?php
+// This file is part of UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Language strings for the easyupload forms/pages.
+ *
+ * @package    block_ucla_easyupload
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $string['pluginname'] = 'UCLA Easy upload tools';
 
@@ -37,7 +59,7 @@ $string['easyupload_text_form'] = 'Add text to {$a}';
 $string['dialog_add_text'] = 'Enter text';
 $string['dialog_add_text_box'] = 'Text you want displayed in section';
 
-// These are for the link into control panel
+// These are for the link into control panel.
 $string['add_file'] = 'Upload a file';
 $string['add_file_post'] = '';
 
@@ -59,14 +81,14 @@ $string['add_text_post'] = 'Add text to appear on a course site.';
 $string['missingparam'] = 'Missing a parameter for redirection URL: {$a}';
 $string['redirectimplementationerror'] = 'The implementation for a redirect type is missing the function get_send_params().';
 
-// Rearrange
+// Rearrange.
 $string['rearrangejsrequired'] = 'The Rearrange Tool requires JavaScript to work.';
 
 $string['upload'] = 'Want to upload more than one file at the same time?';
 $string['bulkupload'] = 'Bulk upload files';
 $string['bulkupload_help'] = 'To upload multiple files you will need to use drag and drop on a course section.<br /><a href="https://docs.ccle.ucla.edu/w/Drag_and_drop" target="_blank">See the documentation site for help uploading multiple files.</a>';
 
-// SSC-1928 - Public-private Syllabus Defaulter Descriptions (Help Button included)
+// SSC-1928 - Public-private Syllabus Defaulter Descriptions (Help Button included).
 $string['upload_public_file'] = ' -- Anyone viewing the class site can access this.';
 $string['upload_private_file'] = ' -- Only users currently enrolled in the class can access this.';
 $string['default_change'] = ' Default has changed!';

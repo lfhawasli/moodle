@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the UCLA local help plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,20 +15,49 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Special wiki renderer for help sidebar.  Uses Moodle's buit-in wiki parser and extends
- * it to render items with an accordion UI.
+ * Class defining the sidebar wiki renderer
+ *
+ * @package    block_ucla_help
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
 require_once(dirname(__FILE__) . '/../../../../mod/wiki/parser/parser.php');
 require_once(dirname(__FILE__) . '/../../../../mod/wiki/parser/markups/nwiki.php');
 
+/**
+ * Special wiki renderer for help sidebar.
+ *
+ * Uses Moodle's built-in wiki parser and extends
+ * it to render items with an accordion UI.
+ *
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class sidebar_wiki_parser extends nwiki_parser {
 
+    /**
+     * Template for url query
+     * @var string $urlquery
+     */
     private $urlquery = '?action=query&titles={title}&prop=imageinfo&iiprop=url&format=json';
+    /**
+     * Template for section query
+     * @var string $sectionquery
+     */
     private $sectionquery = '?action=parse&page={title}&prop=sections&format=json';
+    /**
+     * Template for page section query
+     * @var string $pagesectionquery
+     */
     private $pagesectionquery = '?action=query&titles={title}&prop=revisions&rvprop=content&format=json&rvsection={section}';
 
+    /**
+     * Rules for  the block
+     * @var array $blockrules
+     */
     protected $blockrules = array(
         'nowiki' => array(
             'expression' => "/^<nowiki>(.*?)<\/nowiki>/ims",
@@ -38,7 +66,7 @@ class sidebar_wiki_parser extends nwiki_parser {
         ),
         'header' => array(
             'expression' => "/^\ *(={1,6})\ *(.+?)(={1,6})\ *$/ims",
-            'tags' => array(), //none
+            'tags' => array(), // None.
             'token' => '='
         ),
         'line_break' => array(
@@ -60,27 +88,27 @@ class sidebar_wiki_parser extends nwiki_parser {
             'tag' => 'p'
         ),
         'list' => array(
-            'expression' => "/^((?:\ *[\*|#]{1,5}\ *.+?)+)(\n\s*(?:\n|<(?:h\d|pre|table|tbody|thead|tr|th|td|ul|li|ol|hr)\ *\/?>))/ims",
+            'expression' => "/^((?:\ *[\*|#]{1,5}\ *.+?)+)(\n\s*(?:\n|<(?:h\d|pre"
+            . "|table|tbody|thead|tr|th|td|ul|li|ol|hr)\ *\/?>))/ims",
             'tags' => array(),
             'token' => array('*', '#')
         ),
         'paragraph' => array(
             'expression' => "/^\ *((?:<(?!\ *\/?(?:h\d|pre|table|tbody|thead|tr|th|td|ul|li|ol|hr)\ *\/?>)|[^<\s]).+?)\n\s*\n/ims",
-        // Remove the <p> tag from rendering at all.. 
-//            'tag' => ''
+        // Remove the <p> tag from rendering at all...
         )
     );
 
     /**
      * General wiki query.
-     * 
-     * @param type $url
+     *
+     * @param string $url
      * @return json_obj
      */
     private function query($url) {
         $apiurl = get_config('block_ucla_help', 'docs_wiki_api');
         $url = $apiurl . $url;
-        
+
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
@@ -97,9 +125,9 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Get total number of sections in page.
-     * 
-     * @param type $keyword
-     * @return type
+     *
+     * @param string $keyword
+     * @return int
      */
     private function get_num_sections($keyword) {
         $url = preg_replace('/{title}/', urlencode($keyword), $this->sectionquery);
@@ -109,10 +137,10 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Get content within given section.
-     * 
-     * @param type $keyword
-     * @param type $section
-     * @return type
+     *
+     * @param string $keyword
+     * @param int $section
+     * @return string
      */
     private function get_section_content($keyword, $section) {
         $url = preg_replace('/{title}/', urlencode($keyword), $this->pagesectionquery);
@@ -129,9 +157,9 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Get source URL of given image.
-     * 
-     * @param type $image
-     * @return type
+     *
+     * @param string $image
+     * @return string $url
      */
     private function get_image_src($image) {
         $url = preg_replace('/{title}/', $image, $this->urlquery);
@@ -148,34 +176,34 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Parses a sidebar wiki entry by keyword.
-     * 
-     * @param type $keyword
-     * @return type
+     *
+     * @param string $page
+     * @return array
      */
     public function parse_doc_page($page) {
 
-        // Get total number of sections for page
+        // Get total number of sections for page.
         $sections = $this->get_num_sections($page);
 
         $toparse = array();
         $parsed = array();
 
-        // First get section 0
+        // First get section 0...
         $sectionzero = $this->get_section_content($page, 0);
         $parsedsectionzero = $this->parse($sectionzero);
 
         if (!empty($parsedsectionzero['parsed_text'])) {
-            $parsed[] = array('parsed_text' =>
-                html_writer::div($parsedsectionzero['parsed_text'], 'doc intro')
+            $parsed[] = array(
+                'parsed_text' => html_writer::div($parsedsectionzero['parsed_text'], 'doc intro')
             );
         }
 
-        // Now get remaining sections
+        // Now get remaining sections...
         for ($i = 1; $i <= $sections; $i++) {
             $toparse[] = $this->get_section_content($page, $i);
         }
 
-        // And parse them
+        // And parse them.
         foreach ($toparse as $parse) {
             $parsed[] = $this->parse($parse);
         }
@@ -185,20 +213,21 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Parse a special header for sidebar.
-     * 
-     * @param type $text
-     * @param type $level
-     * @return type
+     *
+     * @param string $text
+     * @param int $level
+     * @return string
      */
     protected function generate_header($text, $level) {
         $text = trim($text);
 
         if (!$this->pretty_print && $level == 1) {
-            $text .= parser_utils::h('a', '[' . get_string('editsection', 'wiki') . ']', 
-                    array('href' => "edit.php?pageid={$this->wiki_page_id}&section=" . urlencode($text), 'class' => 'wiki_edit_section'));
+            $text .= parser_utils::h('a', '[' . get_string('editsection', 'wiki') . ']',
+                    array('href' => "edit.php?pageid={$this->wiki_page_id}&section=" .
+                        urlencode($text), 'class' => 'wiki_edit_section'));
         }
 
-        // Target <h2> tags
+        // Target <h2> tags.
         if ($level == 2) {
             return parser_utils::h('div', $text, array('class' => 'title')) . "\n\n";
         }
@@ -207,24 +236,18 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Ignore TOC processing.
-     * 
-     * @return type
+     *
+     * @return null
      */
     protected function process_toc() {
         return;
     }
 
-//    function paragraph_block_rule($match) {
-//        $text = $match[1];
-//        
-//        return $text;
-//    }
-
     /**
      * Wrap lists in a "content" container.
-     * 
-     * @param type $match
-     * @return type
+     *
+     * @param string $match
+     * @return string
      */
     protected function list_block_rule($match) {
         $list = parent::list_block_rule($match);
@@ -234,9 +257,9 @@ class sidebar_wiki_parser extends nwiki_parser {
 
     /**
      * Parse images and links.  Images are rendered and links open in a new page.
-     * 
-     * @param type $text
-     * @return type
+     *
+     * @param string $text
+     * @return string
      */
     protected function format_link($text) {
 
@@ -279,7 +302,7 @@ class sidebar_wiki_parser extends nwiki_parser {
      * Post cleanup to remove __toc__ text variations.
      */
     protected function after_parsing() {
-        // Remove the table of contents marker
+        // Remove the table of contents marker.
         $this->string = preg_replace("/__[tToOcC]{3}__/", "", $this->string);
 
         parent::after_parsing();

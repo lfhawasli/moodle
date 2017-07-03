@@ -21,7 +21,7 @@
  * @copyright  UC Regents 2014
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/theme/uclashared/renderers/core_backup_renderer.php');
 require_once($CFG->dirroot . '/theme/uclashared/renderers/core_calendar_renderer.php');
 require_once($CFG->dirroot . '/theme/uclashared/renderers/core_course_renderer.php');

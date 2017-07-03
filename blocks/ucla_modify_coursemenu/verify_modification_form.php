@@ -1,25 +1,55 @@
 <?php
+// This file is part of UCLA Modify Coursemenu plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * The moodleform used to verify the modifications to the coursemenu. Displays after changes are made.
+ *
+ * @package    block_ucla_modify_coursemenu
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The moodleform used to verify the modifications to the coursemenu.
+ *
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class verify_modification_form extends moodleform {
-
-    function definition() {
+    /**
+     * Adds the necessary elements and customdata to the moodleform.
+     */
+    public function definition() {
         $mform =& $this->_form;
-        
+
         $passthrudata = $this->_customdata['passthrudata'];
 
-        $mform->addElement('hidden', 'passthrudata', 
+        $mform->addElement('hidden', 'passthrudata',
             serialize($passthrudata));
         $mform->setType('passthrudata', PARAM_RAW);
-        
+
         $mform->addElement('hidden', 'courseid',
             $this->_customdata['courseid']);
         $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('html', $this->_customdata['displayhtml']);
-        
-        $this->add_action_buttons(true, get_string('deleteconfirm', 
+
+        $this->add_action_buttons(true, get_string('deleteconfirm',
             'block_ucla_modify_coursemenu'));
     }
 }

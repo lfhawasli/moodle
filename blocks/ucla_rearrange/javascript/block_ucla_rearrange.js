@@ -5,34 +5,34 @@
 
 M.block_ucla_rearrange = M.block_ucla_rearrange || {};
 
-/** These are not necessary, these should be handled in the PHP caller
-    of this file. But as a precaution, they are here. **/
+// These are not necessary, these should be handled in the PHP caller
+// of this file. But as a precaution, they are here.
 
-// This is the item to look for as the accepts: field in iNS
-M.block_ucla_rearrange.nestedsortableitem 
+// This is the item to look for as the accepts: field in iNS.
+M.block_ucla_rearrange.nestedsortableitem
     = M.block_ucla_rearrange.nestedsortableitem || 'ns-list-item';
 
-// This is the CSS class to use as a the object that shows up
-M.block_ucla_rearrange.nestedhelperclass 
+// This is the CSS class to use as a the object that shows up.
+M.block_ucla_rearrange.nestedhelperclass
     = M.block_ucla_rearrange.nestedhelperclass || 'ns-helper';
 
-// This is the serialized field to look for
+// This is the serialized field to look for.
 M.block_ucla_rearrange.serializedjq = M.block_ucla_rearrange.serializedjq
     || '#serialized';
 
-// This is the item to apply Sortable() to
-M.block_ucla_rearrange.sectionlist 
+// This is the item to apply Sortable() to.
+M.block_ucla_rearrange.sectionlist
     = M.block_ucla_rearrange.sectionlist || 's-list';
 
-// This is the item to look for in sortable accepts: field
-M.block_ucla_rearrange.sortableitem 
+// This is the item to look for in sortable accepts: field.
+M.block_ucla_rearrange.sortableitem
     = M.block_ucla_rearrange.sortableitem || 's-list-item';
 
-// This also is most likely not necessary
+// This also is most likely not necessary.
 M.block_ucla_rearrange.sortablehelperclass
     = M.block_ucla_rearrange.sortablehelperclass || 's-helper';
 
-/** 
+/**
  *  Other fields that need to be declared outside of this script:
  *
  *  targetjq - the jQuery query that we will run NestedSortable upon.
@@ -53,13 +53,13 @@ M.block_ucla_rearrange.create_nested_sortable = function() {
             }
 
             if (M.block_ucla_rearrange.targetjq == undefined) {
-                alert('Improperly set up NestedSortable parameters! ' 
-                    + 'Need to set up targetjq!');
+                alert(
+                    'Improperly set up NestedSortable parameters! Need to set up targetjq!'
+                );
                 return false;
             }
 
-       
-            // This has a special nesting case
+            // This has a special nesting case.
             var buildtarget = $(M.block_ucla_rearrange.targetjq);
 
             if (buildtarget.length > 1) {
@@ -71,13 +71,13 @@ M.block_ucla_rearrange.create_nested_sortable = function() {
                     var thisjq = '#' + this.id;
 
                     $(thisjq).NestedSortable(M.block_ucla_rearrange.ns_config);
-                    
+
                     M.block_ucla_rearrange.serialize_target(this.id)
                 });
             } else {
                 buildtarget.NestedSortable(M.block_ucla_rearrange.ns_config);
                 // For single ones... I need to do something...
-                // This means that there is a #id 
+                // This means that there is an #id.
                 var targetid = M.block_ucla_rearrange.targetjq.substring(1);
 
                 M.block_ucla_rearrange.serialize_target(targetid)
@@ -107,7 +107,7 @@ M.block_ucla_rearrange.destroy_nested_sortable = function() {
 };
 
 /**
- *  Takes the current setup for targetted nested sortables and makes the 
+ *  Takes the current setup for targetted nested sortables and makes the
  *  serialized hash.
  **/
 M.block_ucla_rearrange.serialize_target = function(target) {
@@ -128,7 +128,7 @@ M.block_ucla_rearrange.assign_serialized = function(data) {
     $.each(data, function() {
         var jqtarget;
 
-        // THis is a hack
+        // This is a hack.
         if (!this.id.match(/[0-9]/)) {
             jqtarget = M.block_ucla_rearrange.serializedjq;
         } else {
@@ -146,7 +146,7 @@ M.block_ucla_rearrange.assign_serialized = function(data) {
 
 /**
  *  Makes a sortable only section.
- *  This part is not necessarily designed for any other page than the 
+ *  This part is not necessarily designed for any other page than the
  *  rearrange page.
  **/
 M.block_ucla_rearrange.create_sortable = function() {
@@ -189,7 +189,7 @@ M.block_ucla_rearrange.toggle_section = function(sectionjqo) {
 
     var ectext = sectionjqo.children('.sectiontitle').children('div');
     M.block_ucla_rearrange.toggle_onoff_text(ectext,
-        M.block_ucla_rearrange.expandtext, 
+        M.block_ucla_rearrange.expandtext,
         M.block_ucla_rearrange.collapsetext);
 
 };
@@ -204,7 +204,7 @@ M.block_ucla_rearrange.toggle_onoff_text = function(
     }
 
     var jqt = eval('jqobj.' + fn + '()');
-    
+
     if (jqt == selectOn) {
         eval('jqobj.' + fn + '(selectOff)');
     } else {
@@ -218,10 +218,10 @@ M.block_ucla_rearrange.toggle_onoff_text = function(
 M.block_ucla_rearrange.create_expand_all = function() {
     $(M.block_ucla_rearrange.expandalljq).each(function() {
         $(this).click(function() {
-            // Collapse or expand all
+            // Collapse or expand all.
             M.block_ucla_rearrange.event_expand_all();
 
-            // Change the text
+            // Change the text.
             M.block_ucla_rearrange.toggle_all_text();
         });
     });
@@ -242,7 +242,7 @@ M.block_ucla_rearrange.toggle_all_text = function() {
 };
 
 /**
- *  Checks and changes the expand/collapse all button if the button 
+ *  Checks and changes the expand/collapse all button if the button
  *  no longer does naything.
  **/
 M.block_ucla_rearrange.verify_allsection_button = function() {
@@ -258,7 +258,7 @@ M.block_ucla_rearrange.verify_allsection_button = function() {
     });
 
     if (allSame != null && allSame != false
-        && !M.block_ucla_rearrange.compare_section_toggle(allSame)) { 
+        && !M.block_ucla_rearrange.compare_section_toggle(allSame)) {
         M.block_ucla_rearrange.toggle_all_text();
     }
 };
@@ -273,7 +273,7 @@ M.block_ucla_rearrange.event_expand_all = function() {
         var thisText = $(this).text();
 
         if (M.block_ucla_rearrange.compare_section_toggle(thisText)) {
-            // TODO fix this because this kind of SUCKS
+            // TODO fix this because this kind of SUCKS.
             sectionsToChange.push($(this).parent().parent());
         }
     });
@@ -305,24 +305,24 @@ M.block_ucla_rearrange.compare_section_toggle = function(text) {
  *  Custom spec-ed out function for initalziation of rearrange.
  **/
 M.block_ucla_rearrange.initialize_rearrange_tool = function(topicNumber, secNum) {
-     
+
     $(M.block_ucla_rearrange.containerjq).html(M.block_ucla_rearrange.sections);
-    
+
     M.block_ucla_rearrange.create_sortable();
     M.block_ucla_rearrange.create_nested_sortable();
     M.block_ucla_rearrange.create_expandables();
     M.block_ucla_rearrange.create_expand_all();
 
-    // CCLE-2926 - Selective expand/collapse in rearrange tool
+    // CCLE-2926 - Selective expand/collapse in rearrange tool.
     if(topicNumber >= 0) {
-        // collapse all 
-        M.block_ucla_rearrange.event_expand_all();        
-        M.block_ucla_rearrange.toggle_all_text();   // Change the text
+        // Collapse all.
+        M.block_ucla_rearrange.event_expand_all();
+        M.block_ucla_rearrange.toggle_all_text();   // Change the text.
 
-        // now only expand given section
-        $("#ns-list-"+secNum).each(function() {
+        // Now only expand given section.
+        $("#ns-list-" + secNum).each(function() {
             M.block_ucla_rearrange.toggle_section($(this).parent());
-        });        
+        });
     }
 };
 
@@ -342,4 +342,3 @@ M.block_ucla_rearrange.build_ns_config = function() {
         fit: true
     };
 };
-

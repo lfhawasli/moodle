@@ -6,66 +6,92 @@ require_once($CFG->libdir . '/completionlib.php');
 
 
 class officehours_form extends moodleform {
-    
-    function definition(){
+
+    protected function definition() {
         global $CFG, $USER, $DB;
-        
+
         $editid = $this->_customdata['editid'];
-        $edit_email = $this->_customdata['edit_email'];        
+        $editemail = $this->_customdata['editemail'];
         $courseid = $this->_customdata['courseid'];
         $defaults = $this->_customdata['defaults'];
         $website = $this->_customdata['url'];
-        $email_settings = $this->_customdata['email_settings'];
-        
+        $emailsettings = $this->_customdata['emailsettings'];
+        $coursenames = $this->_customdata['coursenames'];
+        $currentcoursename = $this->_customdata['currentcoursename'];
+
+        $multiplecourses = count($coursenames) > 1;
+        $coursenames = implode(', ', $coursenames);
+
         $mform = $this->_form;
         $mform->addElement('hidden', 'courseid', $courseid);
         $mform->setType('courseid', PARAM_INT);
         $mform->addElement('hidden', 'editid', $editid);
         $mform->setType('editid', PARAM_INT);
-        
-        // office info \\
-        $mform->addElement('header', 'header_office_info', 
+
+        // Add office info heading.
+        $mform->addElement('header', 'header_office_info',
                 get_string('header_office_info', 'block_ucla_office_hours'));
-        
-        // office hours
-        $mform->addElement('static', 'f_officehours_text', '', 
+
+        // Add office location field.
+        $mform->addElement('static', 'f_office_text', '',
+                get_string('f_office_text', 'block_ucla_office_hours'));
+        $mform->addElement('text', 'office',
+                get_string('f_office', 'block_ucla_office_hours'));
+
+        // Add radio buttons to choose which courses to apply office location.
+        if ($multiplecourses) {
+            $mform->addElement('advcheckbox', 'officelocationallcourses', '',
+                    get_string('office_info_all_courses', 'block_ucla_office_hours', $coursenames),
+                    '', array(0, 1));
+        }
+
+        // Add office hours field.
+        $mform->addElement('static', 'f_officehours_text', '', '</br>' .
                 get_string('f_officehours_text', 'block_ucla_office_hours'));
-        $mform->addElement('text', 'officehours', get_string('f_officehours', 'block_ucla_office_hours'));
+        $mform->addElement('text', 'officehours',
+                get_string('f_officehours', 'block_ucla_office_hours'));
 
-        // office location
-        $mform->addElement('static', 'f_office_text', '', 
-                get_string('f_office_text', 'block_ucla_office_hours'));        
-        $mform->addElement('text', 'office', get_string('f_office', 'block_ucla_office_hours'));
+        // Add radio buttons to choose which courses to apply office hours.
+        if ($multiplecourses) {
+            $mform->addElement('advcheckbox', 'officehoursallcourses', '',
+                    get_string('office_info_all_courses', 'block_ucla_office_hours', $coursenames),
+                    '', array(0, 1));
+        }
 
-        // contact info \\
-        $mform->addElement('header', 'header_contact_info', 
+        // Add contact info field.
+        $mform->addElement('header', 'header_contact_info',
                 get_string('header_contact_info', 'block_ucla_office_hours'));
 
-        // email of record
-        if (empty($edit_email)) {
-            $edit_email = get_string('f_email_of_record_empty', 'block_ucla_office_hours');
+        // Add email of record field.
+        if (empty($editemail)) {
+            $editemail = get_string('f_email_of_record_empty', 'block_ucla_office_hours');
         }
-        $mform->addElement('static', 'f_email_of_record', 
-                get_string('f_email_of_record', 'block_ucla_office_hours'), $edit_email);
+        $mform->addElement('static', 'f_email_of_record',
+                get_string('f_email_of_record', 'block_ucla_office_hours'), $editemail);
 
-        // email display settings
-        $display_opt = array(get_string('emaildisplayno', 'moodle'), 
-                            get_string('emaildisplayyes', 'moodle'), get_string('emaildisplaycourse', 'moodle'));
-        $mform->addElement('select', 'email_settings', get_string('f_email_display', 'block_ucla_office_hours'), $display_opt);
-        $mform->setDefault('email_settings', $email_settings);
+        // Add email display settings field.
+        $displayopt = array(get_string('emaildisplayno', 'moodle'),
+                get_string('emaildisplayyes', 'moodle'),
+                get_string('emaildisplaycourse', 'moodle'));
+        $mform->addElement('select', 'emailsettings',
+                get_string('f_email_display', 'block_ucla_office_hours'), $displayopt);
+        $mform->setDefault('emailsettings', $emailsettings);
 
-        // alternative email
-        $mform->addElement('static', 'f_email_text', '', 
-                get_string('f_email_text', 'block_ucla_office_hours', $edit_email));
-        $mform->addElement('text', 'email', get_string('f_email', 'block_ucla_office_hours'));
-        
-        // phone
-        $mform->addElement('static', 'f_phone_text', '', 
-                get_string('f_phone_text', 'block_ucla_office_hours'));        
-        $mform->addElement('text', 'phone', get_string('f_phone', 'block_ucla_office_hours'));
-        
-        // website
-        $mform->addElement('text', 'website', get_string('f_website', 'block_ucla_office_hours'));
+        // Add alternative email field.
+        $mform->addElement('static', 'f_email_text', '',
+                get_string('f_email_text', 'block_ucla_office_hours', $editemail));
+        $mform->addElement('text', 'email',
+                get_string('f_email', 'block_ucla_office_hours'));
+
+        // Add phone field.
+        $mform->addElement('static', 'f_phone_text', '',
+                get_string('f_phone_text', 'block_ucla_office_hours'));
+        $mform->addElement('text', 'phone',
+                get_string('f_phone', 'block_ucla_office_hours'));
+
+        // Add website field.
+        $mform->addElement('text', 'website',
+                get_string('f_website', 'block_ucla_office_hours'));
 
         // Set Rules, Types and Defaults
         // Set character limits for each field from field limits in DB.
@@ -76,37 +102,39 @@ class officehours_form extends moodleform {
         $phonelimit = $fields['phone']->max_length;
 
         // Set maxlength rule and type for office hours field.
-        $mform->addRule('officehours', get_string('maximumchars', '', $officehourslimit).'.  '.get_string('officehours_format', 'block_ucla_office_hours'), 
-                        'maxlength', $officehourslimit);
-        $mform->setType('officehours', PARAM_TEXT);  
+        $mform->addRule('officehours',
+                get_string('maximumchars', '', $officehourslimit).'.'.
+                get_string('officehours_format', 'block_ucla_office_hours'), 'maxlength', $officehourslimit);
+        $mform->setType('officehours', PARAM_TEXT);
 
-        // Set maxlength rule and type for office lcoation field.
-        $mform->addRule('office', get_string('maximumchars', '', $officelimit), 
+        // Set maxlength rule and type for office location field.
+        $mform->addRule('office', get_string('maximumchars', '', $officelimit),
                         'maxlength', $officelimit);
-        $mform->setType('office', PARAM_TEXT); 
+        $mform->setType('office', PARAM_TEXT);
 
         // Set maxlength and email verification rules and type for alternate email field.
-        $mform->addRule('email', get_string('maximumchars', '', $emaillimit), 
+        $mform->addRule('email', get_string('maximumchars', '', $emaillimit),
                         'maxlength', $emaillimit);
-        $mform->setType('email', PARAM_RAW_TRIMMED);    
+        $mform->addRule('email', get_string('err_email', 'form'), 'email');
+        $mform->setType('email', PARAM_EMAIL);
 
         // Set maxlenth rule and type for phone field.
-        $mform->addRule('phone', get_string('maximumchars', '', $phonelimit), 
+        $mform->addRule('phone', get_string('maximumchars', '', $phonelimit),
                         'maxlength', $phonelimit);
-        $mform->setType('phone', PARAM_TEXT); 
+        $mform->setType('phone', PARAM_TEXT);
 
         // Set default and type for website field.
         $mform->setDefault('website', $website);
-        $mform->setType('website', PARAM_URL);        
+        $mform->setType('website', PARAM_URL);
 
         // Set defaults for other fields supplied by $defaults.
-        if(!empty($defaults)) {
+        if (!empty($defaults)) {
             $mform->setDefault('office', $defaults->officelocation);
             $mform->setDefault('officehours', $defaults->officehours);
             $mform->setDefault('phone', $defaults->phone);
             $mform->setDefault('email', $defaults->email);
         }
-        
+
         $this->add_action_buttons();
     }
 
@@ -136,4 +164,4 @@ class officehours_form extends moodleform {
     }
 }
 
-//EOF
+// End of file.

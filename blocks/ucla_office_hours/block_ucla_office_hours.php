@@ -787,4 +787,31 @@ class block_ucla_office_hours extends block_base {
         return null;
     }
 
+    /**
+     * Updates office hours and office location.
+     *
+     * @param object $newofficehoursentry New office information
+     * @param int    $courseid            Course ID
+     * @param int    $editid              User ID of editing user
+     */
+    public static function update_office_hours($newofficehoursentry, $courseid, $editid) {
+        global $DB;
+
+        $newofficehoursentry->courseid = $courseid;
+        $oldofficehoursentry = $DB->get_record('ucla_officehours',
+                array('courseid' => $courseid, 'userid' => $editid));
+
+        try {
+            if (empty($oldofficehoursentry)) {
+                // Need to insert new record.
+                $DB->insert_record('ucla_officehours', $newofficehoursentry);
+            } else {
+                // Update existing record.
+                $newofficehoursentry->id = $oldofficehoursentry->id;
+                $DB->update_record('ucla_officehours', $newofficehoursentry);
+            }
+        } catch (dml_exception $e) {
+            print_error('cannotinsertrecord');
+        }
+    }
 }

@@ -27,6 +27,7 @@
 // Custom site logos.
 
 // First get site logo.
+defined('MOODLE_INTERNAL') || die();
 $sitelogohtml = $OUTPUT->logo('ucla-logo', 'theme');
 // Get extra site logos.
 $extrasitelogos = $OUTPUT->course_logo();
@@ -79,7 +80,7 @@ if (!empty($extrasitelogos)) { ?>
 }
 
 if ($hasnavbar) { ?>
-<div class="navbar container-fluid">
+<div class="navbar container-fluid hidden-print">
     <div class="row">
         <div class="navbar-breadcrumb col-sm-5 col-md-6">
             <?php echo $OUTPUT->navbar(); ?>

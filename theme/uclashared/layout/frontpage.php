@@ -25,6 +25,7 @@
  */
 
 // Include lib file.
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/theme/uclashared/lib.php');
 
 // Include frontpage.js.
@@ -77,7 +78,7 @@ echo $OUTPUT->doctype() ?>
                 <?php echo $OUTPUT->logo('ucla-logo', 'theme') ?>
                 
                 <div class="header-server">
-                    <?php 
+                    <?php
                         echo $OUTPUT->sublogo();
                     ?>
                 </div>

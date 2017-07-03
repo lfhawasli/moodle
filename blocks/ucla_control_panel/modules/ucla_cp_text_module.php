@@ -13,22 +13,45 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ *  Defines the ucla_cp_text_module class
+ *
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ **/
+defined('MOODLE_INTERNAL') || die();
 
-/* This module is meant to be used in order to display pure text (no links) 
- * within the control panel. The item_name of the module represents the pure text.
- */
+/**
+ * This class is a text module for the ucla control panel
+ *
+ * This module is meant to be used in order to display pure text (no links)
+ * within the control panel. The itemname of the module represents the pure text.
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ **/
 class ucla_cp_text_module extends ucla_cp_module{
-    
-    function __construct($item_name=null,  $tags=null,
+    /**
+     * Constructs your object
+     * @param string $itemname
+     * @param array $tags
+     * @param string $capability
+     * @param array $options
+     * @return void
+     */
+    public function __construct($itemname=null,  $tags=null,
             $capability=null, $options=null) {
 
-      parent::__construct($item_name, null, $tags, $capability, $options);
-      //This function does not used localized strings, so default false makes more sense.
-      $this->options['post'] = false;
-    }    
-    
-    //Workaround so the renderer recognizes this as text
-    function is_tag() {
+        parent::__construct($itemname, null, $tags, $capability, $options);
+        // This function does not used localized strings, so default false makes more sense.
+        $this->options['post'] = false;
+    }
+
+    /**
+     * Workaround so the renderer recognizes this as text.
+     * @return false
+     */
+    public function is_tag() {
         return false;
     }
 }

@@ -14,25 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Sidebar for feedback page
+ *
+ * @package    block_ucla_help
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
+
+/**
+ * Sidebar for feedback page
+ *
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class sidebar_feedback extends sidebar_html implements sidebar_widget {
-    
+
+    /**
+     * Ouputs the HTML string for the sidebar
+     *
+     * @return string
+     */
     public function render() {
         global $OUTPUT;
-        
-//        require_once($CFG->dirroot . '/local/ucla/jira.php');
-//        require_once($CFG->dirroot . '/blocks/ucla_help/ucla_help_lib.php');
-//        require_once($CFG->dirroot . '/blocks/ucla_help/help_form.php' );
 
         $docsurl = get_config('block_ucla_help', 'docs_wiki_url');
 
         // Link to help & feedback
-        // @todo: eventually make this RESTful
-        $link = $help_locale = $OUTPUT->call_separate_block_function(
+        // TODO: eventually make this RESTful.
+        $link = $helplocale = $OUTPUT->call_separate_block_function(
                 'ucla_help', 'get_action_link'
-            );
-        
+        );
+
         $template = $this->title('Help & feedback');
-        
+
         $template .= '
             <div class="ui segment raised" >
                 <div class="ui list">
@@ -40,7 +58,8 @@ class sidebar_feedback extends sidebar_html implements sidebar_widget {
                        Don\'t see your question?
                     </div>
                     <div class="item">
-                        Find FAQs, tutorials and a large database of help documentation at our <a href="' . $docsurl .'">Help site</a>
+                        Find FAQs, tutorials and a large database of help documentation at our <a href="' .
+                        $docsurl .'">Help site</a>
                         <div class="ui horizontal divider">
                             Or
                         </div>
@@ -48,8 +67,8 @@ class sidebar_feedback extends sidebar_html implements sidebar_widget {
                     </div>
                 </div>
             </div>';
-        
+
         return $template;
-        
-    }    
+
+    }
 }

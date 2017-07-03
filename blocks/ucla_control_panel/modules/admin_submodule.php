@@ -1,63 +1,115 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * This file defines ucla_cp_module_admin class
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 defined('MOODLE_INTERNAL') || die();
-
+/**
+ * This class is the admin module for the ucla control panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 class ucla_cp_module_admin extends ucla_cp_module {
-    private $link_arguments;
+    /**
+     * @var string $linkarguments args from the link
+     */
+    private $linkarguments;
+    /**
+     * @var bool $faulty determines if the contructor param is good
+     */
     private $faulty = false;
-    function __construct($link_param) {
+    /**
+     * Constructs your object
+     * @param string $linkparam
+     * @return void
+     */
+    public function __construct($linkparam) {
         global $CFG;
-        $link_arguments = $link_param;
-        
-        $init_action = new moodle_url($CFG->wwwroot
+        $linkarguments = $linkparam;
+
+        $initactions = new moodle_url($CFG->wwwroot
                 . '/admin/tool/uclasupportconsole/index.php',
-                $link_arguments);
-        $this->faulty = $this->test_param($link_param);
-        parent::__construct($this->get_key(), $init_action);
+                $linkarguments);
+        $this->faulty = $this->test_param($linkparam);
+        parent::__construct($this->get_key(), $initactions);
     }
 
-    function autotag() {
-        if($this->faulty) {
+    /**
+     * Returns array of tags for module
+     * @return array
+     */
+    public function autotag() {
+        if ($this->faulty) {
             return array('');
-        }
-        else {
+        } else {
             return array('ucla_cp_mod_admin_advanced');
         }
     }
-    function get_key() {
+    /**
+     * Returns the key
+     * @return string
+     */
+    public function get_key() {
         return '';
     }
-    
-    static function get_term_and_srs($course) {
+
+    /**
+     * Gets the term and srs
+     * @param stdClass $course
+     * @return string
+     */
+    public static function get_term_and_srs($course) {
         global $CFG, $DB;
         $idnumber = '';
         if (!empty($course->id)) {
-            // only query for term-srs if course exists
+            // Only query for term-srs if course exists.
             require_once($CFG->dirroot . '/local/ucla/lib.php');
-            $course_info = ucla_get_course_info($course->id);    
-            if (!empty($course_info)) {
-                // create string
-                $first_entry = true;
-                foreach ($course_info as $course_record) {
-                    $first_entry ? $first_entry = false : $idnumber .= ', ';
-                    $idnumber .= make_idnumber($course_record);
-                }                    
+            $courseinfo = ucla_get_course_info($course->id);
+            if (!empty($courseinfo)) {
+                // Create string.
+                $firstentry = true;
+                foreach ($courseinfo as $courserecord) {
+                    $firstentry ? $firstentry = false : $idnumber .= ', ';
+                    $idnumber .= make_idnumber($courserecord);
+                }
             }
         }
         $idnumber = explode('-', $idnumber);
         return $idnumber;
     }
-    static function test_param($param) {
-        if(array_key_exists('term', $param) && ($param['term'] == false)) {
+
+    /**
+     * Checks for params
+     * @param array $param
+     * @return boolean
+     */
+    public static function test_param($param) {
+        if (array_key_exists('term', $param) && ($param['term'] == false)) {
             return true;
         }
-        if(array_key_exists('srs', $param) && $param['srs'] == false) {
+        if (array_key_exists('srs', $param) && $param['srs'] == false) {
             return true;
         }
-        if(array_key_exists('courseid', $param) && $param['courseid'] == false) {
+        if (array_key_exists('courseid', $param) && $param['courseid'] == false) {
             return true;
         }
-        if(array_key_exists('console', $param) && $param['console'] == false) {
+        if (array_key_exists('console', $param) && $param['console'] == false) {
             return true;
         }
         return false;

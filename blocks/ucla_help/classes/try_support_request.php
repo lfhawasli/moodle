@@ -13,6 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Adhoc task block_ucla_help_try_support_request.
+ *
+ * @package    block_ucla_help
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -21,7 +28,7 @@ require_once(dirname(__FILE__) . '/../ucla_help_lib.php');
 /**
  * Adhoc task block_ucla_help_try_support_request.
  *
- * @package    ucla_help
+ * @package    block_ucla_help
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +36,7 @@ class block_ucla_help_try_support_request extends \core\task\adhoc_task {
 
     /**
      * Creates a JIRA issue for a support request.
-     * 
+     *
      * @throws Exception    if issue creation is unsuccessful
      */
     public function execute() {

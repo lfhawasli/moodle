@@ -14,6 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Echoes JSON from parsed doc page
+ *
+ * @package    block_ucla_help
+ * @author     Rex Lorenzo <rex@seas.ucla.edu>
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
+
 require_once(dirname(__FILE__) . '/wiki.php');
 
 // Require a title.
@@ -24,7 +35,7 @@ $data = $parser->parse_doc_page($title);
 
 $json = new stdClass();
 $json->status = 1;
-$json->content = array_reduce($data, function($out, $in) { 
+$json->content = array_reduce($data, function($out, $in) {
     $out .= $in['parsed_text'];
     return $out;
 }, '');

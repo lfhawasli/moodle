@@ -13,44 +13,52 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * This file defines the control panel module class.
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
+defined('MOODLE_INTERNAL') || die();
 
-/*
+/**
  * Used to render the myucla links section in the control panel.
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 class ucla_cp_myucla_row_renderer extends ucla_cp_renderer {
- 
+
     /**
-     *  Renders an array of myucla_row modules.
+     * Renders an array of myucla_row modules.
      *
-     *  @param array $contents - The contents to diplay using the renderer.
+     * @param array $contents - The contents to diplay using the renderer.
+     * @param boolean $format
+     * @param string $orient
+     * @param string $handler
      **/
-    static function control_panel_contents($contents, $format=false, 
+    public static function control_panel_contents($contents, $format=false,
             $orient='', $handler='') {
         $table = new html_table();
         $table->id = 'my_ucla_functions';
-        
-        //For each row module
-        $nonRowContent = "";
-        foreach ($contents as $content_rows) {
-            if(isset($content_rows->elements))
-            {
-                $content_rows_elements = $content_rows->elements;
-                $table_row = new html_table_row();
-                //For each element in the row module
-                foreach ($content_rows_elements as $content_item) {
-                   $table_row->cells[] = 
-                           ucla_cp_renderer::general_descriptive_link($content_item, 
-                                   array("target"=>"_blank"));
+
+        // For each row module...
+        $nonrowcontent = "";
+        foreach ($contents as $contentrows) {
+            if (isset($contentrows->elements)) {
+                $contentrowselements = $contentrows->elements;
+                $tablerow = new html_table_row();
+                // For each element in the row module...
+                foreach ($contentrowselements as $contentitem) {
+                    $tablerow->cells[] = ucla_cp_renderer::general_descriptive_link($contentitem,
+                            array("target" => "_blank"));
                 }
-                $table->data[] = $table_row;
-            }
-            else
-            {
-                $nonRowContent.= ucla_cp_renderer::control_panel_contents(Array($content_rows), true);
+                $table->data[] = $tablerow;
+            } else {
+                $nonrowcontent .= ucla_cp_renderer::control_panel_contents(Array($contentrows), true);
             }
         }
-        // make sure content that is not part of the row is rendered before the
-        // row content to avoid layout problem
-        return $nonRowContent.html_writer::table($table);
+        // Make sure content that is not part of the row is rendered before the
+        // row content to avoid layout problem.
+        return $nonrowcontent.html_writer::table($table);
     }
 }

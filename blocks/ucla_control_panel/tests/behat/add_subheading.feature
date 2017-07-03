@@ -16,6 +16,7 @@ Background:
        | user | course | role |
        | teacher1 | C1 | editingteacher |
 
+@javascript
 Scenario: Add subheading    
     And I log in as "teacher1"
     And I follow "Test course 1"

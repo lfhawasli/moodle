@@ -24,6 +24,11 @@
     margin-left: 0;
 }
 
+/* warning red text when changing office hours for all courses */
+.warning-text {
+    color: red;
+}
+
 /* START feature/CCLE-3002-office-table-display */
 div.instr-info {
     clear:both;

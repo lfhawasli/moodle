@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,34 +13,66 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ *  This file defines the ucla_cp_muucla_row_module class
+ *
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ **/
+// This module is meant to be used in order to display an individual class's
+// myucla links.
 
-/* This module is meant to be used in order to display an individual class's 
- * myucla links.
- */
+defined('MOODLE_INTERNAL') || die();
+/**
+ *  This class displays MyUCLA links on the control panel
+ *
+ *  This module is meant to be used in order to display an individual class's
+ *  myucla links.
+ * @package block_ucla_control_panel
+ * @copyright  UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
+ **/
 class ucla_cp_myucla_row_module extends ucla_cp_module {
 
-    /**
-     *  @var elements
+
+    /** @var elements
      * This is an array of ucla_cp_modules that contains the elements of this row.
      */
-    var $elements;
+    public $elements;
 
-    function __construct($tags = null, $capability = null, $options = null) {
+    /**
+     * Constructs the parent object
+     * @param array $tags
+     * @param string $capability
+     * @param array $options
+     */
+    public function __construct($tags = null, $capability = null, $options = null) {
         parent::__construct(null, null, $tags, $capability, $options);
     }
 
-    //Adds element to the end of the row.
-    function add_element($element) {
+    /**
+     * Adds element to the end of the row.
+     * @param ucla_cp_module $element
+     * @return void
+     */
+    public function add_element($element) {
         $this->elements[] = $element;
     }
 
-    //Returns an array containing the elements in the row
-    function get_elements() {
+    /**
+     * Returns an array containing the elements in the row.
+     * @return array
+     */
+    public function get_elements() {
         return $this->elements;
     }
 
-    //Workaround so that it's not being treated as a tag
-    function is_tag() {
+    /**
+     * Workaround so that it's not being treated as a tag.
+     * @return false
+     */
+    public function is_tag() {
         return false;
     }
 
