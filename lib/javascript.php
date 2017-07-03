@@ -52,6 +52,12 @@ if ($slashargument = min_get_slash_argument()) {
 $jsfiles = array();
 $files = explode(',', $file);
 foreach ($files as $fsfile) {
+    // START UCLA MOD: CCLE-6710 - Rearrange Materials Drag-and-Drop
+    if ($fsfile == '/blocks/ucla_rearrange/javascript/interface-1.2.min.js') {
+        // Do not cache interface file, because it causes seg faults sometimes.
+        $rev = -1;
+    }
+    // END UCLA MOD: CCLE-6710
     $jsfile = realpath($CFG->dirroot.$fsfile);
     if ($jsfile === false) {
         // does not exist
