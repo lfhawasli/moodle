@@ -354,6 +354,11 @@ if (has_role_in_context('student', $context) || $isroleswitchedstudent) {
       $temptag, $tacap);
       /* Create a TA-Site */
 
+    // Export participant roster.
+    $modules[] = new ucla_cp_module('export_participant_roster',
+            new moodle_url('export_roster.php', array('shortname' => $course->shortname)),
+            $temptag, $tempcap);
+
     // View moodle participants.
     $modules[] = new ucla_cp_module('view_roster', new moodle_url(
                             $CFG->wwwroot . '/user/index.php', array('id' => $course->id)),
