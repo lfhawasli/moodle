@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * BrowseBy class.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../moodleblock.class.php');
@@ -21,15 +29,28 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_browseby/renderer.php');
 require_once($CFG->dirroot . '/blocks/ucla_browseby/'
     . 'browseby_handler_factory.class.php');
-require_once($CFG->dirroot . '/' . $CFG->admin 
+require_once($CFG->dirroot . '/' . $CFG->admin
     . '/tool/uclacoursecreator/uclacoursecreator.class.php');
 require_once($CFG->dirroot . '/blocks/navigation/renderer.php');
 require_once($CFG->dirroot . '/blocks/navigation/block_navigation.php');
 
+/**
+ * Class for BrowseBy.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_browseby extends block_navigation {
-    var $termslist = array();
+    /**
+     * @var $termslist List of terms.
+     */
+    public $termslist = array();
 
-    function init() {
+    /**
+     * Set the initial properties for the block.
+     */
+    public function init() {
         $this->title = get_string('displayname', 'block_ucla_browseby');
         $this->content_type = BLOCK_TYPE_TEXT;
     }
@@ -37,57 +58,77 @@ class block_ucla_browseby extends block_navigation {
     /**
      *  This is called in the course where the block has been added to.
      **/
-    function get_content() {
+    public function get_content() {
         global $CFG;
-        
+
         if (is_null($this->content)) {
             $this->content = new stdClass();
-        }       
+        }
 
-        $link_types = browseby_handler_factory::get_available_types();
+        $linktypes = browseby_handler_factory::get_available_types();
 
         $blockconfig = get_config('block_ucla_browseby');
 
         $elements = array();
-        
-        foreach ($link_types as $link_type) {
-            if (empty($blockconfig->{'disable_' . $link_type})) {
+
+        foreach ($linktypes as $linktype) {
+            if (empty($blockconfig->{'disable_' . $linktype})) {
                 $elements[] = navigation_node::create(
-                    get_string('link_' . $link_type, 'block_ucla_browseby'),
+                    get_string('link_' . $linktype, 'block_ucla_browseby'),
                     new moodle_url(
                         $CFG->wwwroot . '/blocks/ucla_browseby/view.php',
-                        array('type' => $link_type)
+                        array('type' => $linktype)
                     ), navigation_node::TYPE_SECTION
                 );
             }
         }
 
         $renderer = $this->page->get_renderer('block_ucla_browseby');
-        
+
         $this->content->text = $renderer->navigation_node($elements,
             array('class' => 'block_tree list'));
-        
+
         return $this->content;
     }
 
-    function instance_allow_config() {
+    /**
+     * Prevent instance configuration.
+     *
+     * @return boolean
+     */
+    public function instance_allow_config() {
         return false;
     }
 
-    function instance_allow_multiple() {
+    /**
+     * All multiple instances of this block.
+     *
+     * @return bool Returns false
+     */
+    public function instance_allow_multiple() {
         return false;
     }
 
     /**
      * Prevent block from being collapsed.
      *
-     * @return bool
+     * @return bool Returns false
      */
     public function instance_can_be_collapsed() {
         return false;
     }
 
-    function html_attributes() {
+    /**
+     * This allows us to borrow navigation block's stylesheets.
+     *
+     * Returns the attributes to set for this block.
+     *
+     * This function returns an array of HTML attributes for this block including
+     * the defaults.
+     *
+     * @return array An array of HTML attributes
+     */
+    public function html_attributes() {
         $orig = parent::html_attributes();
         $orig['class'] .= ' block_ucla_course_menu block_navigation';
 
@@ -96,7 +137,7 @@ class block_ucla_browseby extends block_navigation {
     /**
      *  Returns the applicable places that this block can be added.
      **/
-    function applicable_formats() {
+    public function applicable_formats() {
         return array(
             'site-index' => true,
             'course-view' => false,
@@ -108,7 +149,7 @@ class block_ucla_browseby extends block_navigation {
      *  Determines the terms to run the cron job for if there were no
      *  specifics provided.
      **/
-    function guess_terms() {
+    public function guess_terms() {
         global $CFG;
 
         if (!empty($this->termslist)) {
@@ -127,7 +168,7 @@ class block_ucla_browseby extends block_navigation {
     /**
      *  Figures out terms and run sync.
      **/
-    function run_sync() {
+    public function run_sync() {
         $this->guess_terms();
 
         if (empty($this->termslist)) {
@@ -137,18 +178,30 @@ class block_ucla_browseby extends block_navigation {
         return $this->sync($this->termslist);
     }
 
-    function cron() {
+    /**
+     * Execute this method when the cron runs.
+     *
+     * @return bool
+     */
+    public function cron() {
         $result = false;
         try {
             $result = $this->run_sync();
-        } catch(Exception $e) {
-            // mostly likely couldn't connect to registrar
+        } catch (Exception $e) {
+            // Most likely couldn't connect to registrar.
             mtrace($e->getMessage());
         }
-        return $result;        
+        return $result;
     }
 
-    function sync($terms, $subjareas=null) {
+    /**
+     * Sync block.
+     *
+     * @param array $terms
+     * @param array $subjareas
+     * @return boolean
+     */
+    public function sync($terms, $subjareas=null) {
         // Don't run during unit tests. Can be triggered via
         // course_creator_finished event.
         if (defined('PHPUNIT_TEST') and PHPUNIT_TEST) {
@@ -173,7 +226,7 @@ class block_ucla_browseby extends block_navigation {
             $records = $this->get_recordset_select('ucla_reg_classinfo',
                 $where, $params, '', 'DISTINCT CONCAT(term, subj_area), term, '
                     . 'subj_area AS subjarea');
-            // Check that there are records
+            // Check that there are records.
             if (!($records && $records->valid())) {
                 return true;
             }
@@ -189,14 +242,14 @@ class block_ucla_browseby extends block_navigation {
             }
         }
 
-        // Collect data from registrar, sync to local db
+        // Collect data from registrar, sync to local db.
         foreach ($records as $record) {
             $term = $record->term;
             $subjarea = $record->subjarea;
 
             echo "Handling $term $subjarea...";
 
-            $thisreg = array('term' => $term, 
+            $thisreg = array('term' => $term,
                 'subjarea' => $subjarea);
 
             $courseinfo = $this->run_registrar_query(
@@ -227,15 +280,15 @@ class block_ucla_browseby extends block_navigation {
             $params = array($term, $subjarea);
 
             // Save which courses need instructor informations.
-            // We need to update the existing entries, and remove 
+            // We need to update the existing entries, and remove
             // non-existing ones.
             echo "sync classinfo ";
             $res = $this->partial_sync_table('ucla_browseall_classinfo', $courseinfo,
                 array('term', 'srs'), $where, $params);
 
-            // + inserted records
-            // = updated records
-            // - deleted records
+            // Denote + inserted records.
+            // Denote = updated records.
+            // Denote - deleted records.
             echo '+' . count($res[0]) . ' =' . count($res[1]) . ' -' . count($res[2]) . '...';
 
             echo "sync instrinfo ";
@@ -252,11 +305,16 @@ class block_ucla_browseby extends block_navigation {
         $cache->purge();
 
         echo "Finished sync.\n";
-            
+
         return true;
     }
-    
-    function get_all_terms() {
+
+    /**
+     * Returns all distinct terms.
+     *
+     * @return array
+     */
+    public function get_all_terms() {
         global $DB;
 
         $termobjs = $this->get_records('ucla_request_classes', null, '',
@@ -270,7 +328,10 @@ class block_ucla_browseby extends block_navigation {
         return $terms;
     }
 
-    static function add_to_frontpage() {
+    /**
+     * Adds block to frontpage.
+     */
+    public static function add_to_frontpage() {
         global $SITE;
         $fakepage = new moodle_page();
         $fakepage->set_course($SITE);
@@ -280,18 +341,27 @@ class block_ucla_browseby extends block_navigation {
         $bm->load_blocks();
         $bm->create_all_block_instances();
         if (!$bm->is_block_present('ucla_browseby')) {
-            $bm->add_block('ucla_browseby', BLOCK_POS_LEFT, 0, false); 
-            // There's no API to guarantee that this was successful :D
+            $bm->add_block('ucla_browseby', BLOCK_POS_LEFT, 0, false);
+            // There's no API to guarantee that this was successful :D.
         }
     }
 
     /**
-     *  Decoupled functions
+     *  Decoupled function.
      **/
     protected static function ucla_require_registrar() {
         ucla_require_registrar();
     }
 
+    /**
+     * Decoupled function.
+     *
+     * @param string $table
+     * @param object $tabledata
+     * @param array $syncfields
+     * @param string $partialwhere
+     * @param array $partialparams
+     */
     protected function partial_sync_table($table, $tabledata, $syncfields,
             $partialwhere=null, $partialparams=null) {
         ucla_require_db_helper();
@@ -300,21 +370,50 @@ class block_ucla_browseby extends block_navigation {
             $partialwhere, $partialparams);
     }
 
+    /**
+     * Decoupled function.
+     *
+     * @param array $vars
+     */
     protected function get_in_or_equal($vars) {
         global $DB;
 
         return $DB->get_in_or_equal($vars);
     }
 
+    /**
+     * Decoupled function.
+     *
+     * @param string $t
+     * @param string $w
+     * @param string $p
+     * @param string $s
+     * @param string $l
+     */
     protected function get_recordset_select($t, $w, $p, $s, $l) {
         global $DB;
 
         return $DB->get_recordset_select($t, $w, $p, $s, $l);
     }
-   
+
+    /**
+     * Decoupled function.
+     *
+     * @param string $q
+     * @param string $d
+     */
     protected function run_registrar_query($q, $d) {
         return registrar_query::run_registrar_query($q, $d);
     }
+
+    /**
+     * Decoupled function.
+     *
+     * @param string $t
+     * @param string $p
+     * @param string $o
+     * @param string $s
+     */
     protected function get_records($t, $p, $o, $s) {
         global $DB;
 
@@ -323,4 +422,4 @@ class block_ucla_browseby extends block_navigation {
 
 }
 
-/** eof **/
+// End of file.

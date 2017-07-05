@@ -46,7 +46,7 @@ class block_ucla_browseby_observer {
      * Handles event for course requests deleted.
      *
      * @param \tool_uclacoursecreator\event\ucla_course_deleted $event
-     * @return type
+     * @return boolean
      */
     public static function browseby_sync_deleted(\tool_uclacoursecreator\event\ucla_course_deleted $event) {
         return self::browseby_extractor_callback('deleted_requests', $event);
@@ -60,7 +60,7 @@ class block_ucla_browseby_observer {
      * @return boolean
      */
     public static function browseby_extractor_callback($field, \core\event\base $event) {
-        $data = $event->get_requests();   
+        $data = $event->get_requests();
         if (empty($data->{$field})) {
             return true;
         }
