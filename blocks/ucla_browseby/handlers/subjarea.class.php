@@ -1,36 +1,84 @@
 <?php
+// This file is part of the UCLA browse-by plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class file to handle Browse-By subject area listings.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Class definition for browsing by subject area.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class subjarea_handler extends browseby_handler {
-    function get_params() {
+
+    /**
+     * Returns what parameters are required for this handler.
+     *
+     * @return Array('division') strings that we should require_param.
+     **/
+    public function get_params() {
         return array('division');
     }
 
-    static function alter_navbar() {
+    /**
+     * Breadcrumb navigation.
+     **/
+    static public function alter_navbar() {
         global $PAGE;
 
         $urlobj = clone($PAGE->url);
         $urlobj->remove_params(array('division', 'subjarea'));
         $urlobj->params(array('type' => 'division'));
-        $PAGE->navbar->add(get_string('division_title', 
+        $PAGE->navbar->add(get_string('division_title',
             'block_ucla_browseby'), $urlobj);
-        
-        
-
     }
 
-    static function get_pretty_division($division) {
+    /**
+     * Get division.
+     *
+     * @param string $division
+     * @return string
+     */
+    static public function get_pretty_division($division) {
         $divisionobj = self::get_division($division);
         $division = to_display_case($divisionobj->fullname);
         return $division;
     }
 
-    function handle($args) {
+    /**
+     * Fetches a list of subject areas with an alphabetized index.
+     *
+     * @param array $args
+     **/
+    public function handle($args) {
         global $OUTPUT, $PAGE;
-        
-        // Load search
-        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
+
+        // Load search.
+        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init',
                 array(array('name' => 'course-search')));
-        
+
         $division = false;
         if (isset($args['division'])) {
             $division = $args['division'];
@@ -39,7 +87,7 @@ class subjarea_handler extends browseby_handler {
         $conds = array();
         $divwhere = '';
         $termwhere = '';
-        
+
         if ($division) {
             $conds['division'] = $division;
             $divwhere = 'WHERE rci.division = :division';
@@ -48,12 +96,12 @@ class subjarea_handler extends browseby_handler {
 
             self::alter_navbar();
 
-            $t = get_string('subjarea_title', 'block_ucla_browseby', 
+            $t = get_string('subjarea_title', 'block_ucla_browseby',
                 $division);
         } else {
             $t = get_string('all_subjareas', 'block_ucla_browseby');
         }
-        
+
         if (isset($args['term'])) {
             $term = $args['term'];
             $termwhere = 'AND ubc.term = :term';
@@ -66,11 +114,11 @@ class subjarea_handler extends browseby_handler {
             $conds = null;
         }
 
-        // This is the content
+        // This is the content.
         $s = '';
 
-        // Display a list of things to help us narrow down our path to 
-        // destination
+        // Display a list of things to help us narrow down our path to
+        // destination.
         $sql = "
             SELECT DISTINCT
                 CONCAT(urs.subjarea, ubc.term) AS rsid,
@@ -85,27 +133,27 @@ class subjarea_handler extends browseby_handler {
             $divwhere
             $termwhere
             ORDER BY urs.subj_area_full
-        "; 
+        ";
 
         $subjectareas = $this->get_records_sql($sql, $conds);
-        
+
         // Query for available terms (for the terms dropdown)
-        // Filter by division, if a division selected
+        // Filter by division, if a division selected.
         $sql = "SELECT DISTINCT term
                 FROM {ucla_reg_classinfo} rci
                 $divwhere";
 
         $s .= block_ucla_browseby_renderer::render_terms_selector(
             $args['term'], $sql, $conds);
-        
+
         if (empty($subjectareas)) {
             $s .= $OUTPUT->notification(get_string('subjarea_noterm',
                     'block_ucla_browseby'));
             return array($t, $s);
         }
-        
+
         $s .= block_ucla_search::search_form('course-search');
-        
+
         $table = $this->list_builder_helper($subjectareas, 'subjarea',
             'subj_area_full', 'course', 'subjarea', $term);
 

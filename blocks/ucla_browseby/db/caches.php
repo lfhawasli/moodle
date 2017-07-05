@@ -17,13 +17,16 @@
 /**
  * Browse By caches
  *
- * @package   blocks_ucla_browseby
+ * @package   block_ucla_browseby
+ * @copyright  2016 UC Regent
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
 $definitions = array(
     'browsebycache' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
-        'staticacceleration' =>true,
+        'staticacceleration' => true,
     )
 );

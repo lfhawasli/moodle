@@ -22,8 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Class definition.
+ * Class definition for browsing by course.
  *
  * @package    block_ucla_browseby
  * @copyright  2016 UC Regents

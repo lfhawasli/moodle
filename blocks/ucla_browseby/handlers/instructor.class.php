@@ -1,15 +1,51 @@
 <?php
+// This file is part of the UCLA browse-by plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class file to handle Browse-By instructor listings.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Class definition for browsing by instructor.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class instructor_handler extends browseby_handler {
-    function get_params() {
+    /**
+     * Returns what parameters are required for this handler.
+     *
+     * @return Array('alpha') strings that we should require_param.
+     **/
+    public function get_params() {
         return array('alpha');
     }
 
     /**
-     *  Builds a sub-table that combines all available users, limited
-     *  by local machine.
+     * Builds a sub-table that combines all available users, limited
+     * by local machine.
      **/
-    static function combined_select_sql_helper() {
+    static public function combined_select_sql_helper() {
         global $CFG;
 
         ucla_require_db_helper();
@@ -35,21 +71,26 @@ class instructor_handler extends browseby_handler {
         return $sql;
     }
 
-    static function alter_navbar() {
+    /**
+     * Breadcrumb navigation.
+     **/
+    static public function alter_navbar() {
         global $PAGE;
 
-        // The breadcrumb logic is kind of disorganized
+        // The breadcrumb logic is kind of disorganized.
         $urlobj = clone($PAGE->url);
         $urlobj->remove_params('alpha');
         $urlobj->params(array('type' => 'instructor'));
-        $PAGE->navbar->add(get_string('instructorsall', 
+        $PAGE->navbar->add(get_string('instructorsall',
                 'block_ucla_browseby'), $urlobj);
     }
 
     /**
-     *  Fetches a list of instructors with an alphabetized index.
+     * Fetches a list of instructors with an alphabetized index.
+     *
+     * @param array $args
      **/
-    function handle($args) {
+    public function handle($args) {
         global $OUTPUT, $PAGE;
         $cache = cache::make('block_ucla_browseby', 'browsebycache');
         $s = '';
@@ -64,18 +105,18 @@ class instructor_handler extends browseby_handler {
             $prettyterm = ucla_term_to_text($term);
         }
 
-        // Used for restricting choices
+        // Used for restricting choices.
         $letter = null;
         $letterwhere = '';
 
-        // These are the letters that are available for filtering
+        // These are the letters that are available for filtering.
         $lastnamefl = array();
         for ($l = 'A'; $l <= 'Z' && strlen($l) == 1; $l++) {
             // Do we need to strtoupper, for super duper safety?
             $lastnamefl[$l] = false;
         }
 
-        // Figure out what letters we're displaying
+        // Figure out what letters we're displaying.
         if (isset($args['alpha'])) {
             $rawletter = $args['alpha'];
 
@@ -84,7 +125,7 @@ class instructor_handler extends browseby_handler {
             $letterwhere = "WHERE us.lastname like :letter";
 
             if ($term) {
-                $t = get_string('instructorswith', 'block_ucla_browseby', 
+                $t = get_string('instructorswith', 'block_ucla_browseby',
                     $letter);
             }
 
@@ -124,7 +165,7 @@ class instructor_handler extends browseby_handler {
                     ubci.activitytype,
                     ubci.subjarea
                 FROM " . self::combined_select_sql_helper() . " ubi
-                JOIN {ucla_browseall_classinfo} ubci 
+                JOIN {ucla_browseall_classinfo} ubci
                     USING (term, srs)
                 $termwhere
                 AND ubi.profcode != '03'
@@ -133,14 +174,14 @@ class instructor_handler extends browseby_handler {
             ";
 
             $users = $this->get_records_sql($sql, $params);
-            
-            // Cache instructors
+
+            // Cache instructors.
             $cache->set('users_' . $cachekey, $users);
         }
 
-        // Decide which users to have the ability to display in the 
-        // chart
-        // TODO It might be more efficient to just add another query
+        // Decide which users to have the ability to display in the
+        // chart.
+        // TODO It might be more efficient to just add another query.
         $coursepcs = array();
         foreach ($users as $k => $user) {
             if ($this->ignore_course($user)) {
@@ -156,24 +197,24 @@ class instructor_handler extends browseby_handler {
 
         $rolecaps = $this->get_roles_with_capability('moodle/course:update');
 
-        $no_display_hack = 0;
+        $nodisplayhack = 0;
         foreach ($users as $k => $user) {
-            if ((isset($user->profcode) 
+            if ((isset($user->profcode)
                     && !isset($rolecaps[$this->role_mapping(
-                               intval($user->profcode), 
-                               $coursepcs[$user->srs], 
+                               intval($user->profcode),
+                               $coursepcs[$user->srs],
                                $user->subjarea)])
                     )) {
                 $users[$k]->no_display = true;
-                $no_display_hack++;
+                $nodisplayhack++;
                 continue;
             }
 
             $user->fullname = fullname($user);
             $lnletter = core_text::strtoupper(substr($user->lastname, 0, 1));
 
-            // If a term is selected and we need to limit instructor last 
-            // name letter choices
+            // If a term is selected and we need to limit instructor last
+            // name letter choices.
             $lastnamefl[$lnletter] = true;
 
             if ($letter !== null && $lnletter != $letter) {
@@ -196,18 +237,18 @@ class instructor_handler extends browseby_handler {
         }
 
         // Query for available terms (for the terms dropdown)
-        // Filter by division, if a division selected
+        // Filter by division, if a division selected.
         $sql = "SELECT DISTINCT term
                 FROM {user} us
                 INNER JOIN {ucla_browseall_instrinfo} ubii
                     ON ubii.uid = us.idnumber
                 $letterwhere";
 
-        $s .= block_ucla_browseby_renderer::render_terms_selector($term, 
+        $s .= block_ucla_browseby_renderer::render_terms_selector($term,
             $sql, $params);
-        
+
         // This case can be reached if the current term has no instructors.
-        if (empty($users) || count($users) == $no_display_hack) {
+        if (empty($users) || count($users) == $nodisplayhack) {
             $s .= $OUTPUT->notification(get_string('noinstructors',
                     'block_ucla_browseby'));
             return array($t, $s);
