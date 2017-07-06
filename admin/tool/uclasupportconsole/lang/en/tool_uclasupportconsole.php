@@ -151,6 +151,7 @@ $string['forinput'] = ' for input [{$a}]';
 $string['filterfor'] = 'Results filtered for: ';
 $string['exportoptions'] = 'Export: ';
 $string['totop'] = 'To top';
-
+$string['seeall'] = 'See all';
+$string['showpage'] = 'Show pages';
 // capability strings
 $string['uclasupportconsole:view'] = 'Use UCLA support console';

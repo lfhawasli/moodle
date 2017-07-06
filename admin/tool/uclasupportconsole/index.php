@@ -1978,10 +1978,22 @@ if ($consolecommand == "$title") {
     $countparam = optional_param('count', null, PARAM_INT);
     $typeparam = optional_param('type', null, PARAM_ALPHAEXT);
     $pageparam = optional_param('page', null, PARAM_INT);
+    $seeallparam = optional_param('seeall',null, PARAM_INT);
+
+    // Default is only showing the first page.
+    if (!isset ($seeallparam)){
+        $seeallparam = 0;
+    }
+    
+    // If the page didnt have enough entry, we want to show all from the start.
+    if ($countparam <= RESULTS_PER_PAGE) {
+        $seeallparam = 1;
+    }
 
     if (!isset($pageparam)) {
         $pageparam = 0;
     }
+
     $limitstart = $pageparam * RESULTS_PER_PAGE;
     
     if ($componentparam == "manual") {
@@ -1999,7 +2011,7 @@ if ($consolecommand == "$title") {
                     WHERE  id = :admin
                     ORDER BY name";
             $params = array('admin' => $admin);
-            if (!empty($exportoption)) {
+            if (!empty($exportoption) || $seeallparam ) {
                 // Do not limit Excel download results.
                 $results = $DB->get_records_sql($sql, $params);
             } else {
@@ -2063,7 +2075,7 @@ if ($consolecommand == "$title") {
         }
         $params = array('role_param' => $roleparam, 'component_param'=>$componentparam,
                         'contextlevel_param'=>$contextlevelparam, 'type_param'=>$typeparam);
-        if (!empty($exportoption)) {
+        if (!empty($exportoption) || $seeallparam) {
             // Do not limit Excel download results.
             $results = $DB->get_records_sql($sql, $params);
         } else {
@@ -2079,7 +2091,7 @@ if ($consolecommand == "$title") {
                 $modifiedrow->$contextname = "<a href=\"$CFG->wwwroot" . $contexturl . $result->$lookup . 
                     '">' . $result->cname . '</a>';
             }
-            $modifiedrow->Time_Modified = userdate($result->timemodified);
+            $modifiedrow->Time_Modified = '<p hidden="hidden">'. $result->timemodified. '</p>'.userdate($result->timemodified);
             
             if ($result->modifierid == 0) {
                 $modifiedrow->Assigned_By = 'System';
@@ -2093,7 +2105,7 @@ if ($consolecommand == "$title") {
             }
             $lastaccess = $result->last;
             if ($lastaccess != 0) {
-                $modifiedrow->Last_Access= userdate($lastaccess);
+                $modifiedrow->Last_Access= '<p hidden="hidden">'. $lastaccess. '</p>'.userdate($lastaccess);
             } else {
                 $modifiedrow->Last_Access= 'User has not accessed CCLE';
             }
@@ -2116,8 +2128,14 @@ if ($consolecommand == "$title") {
     $pageurl = new moodle_url( $PAGE->url, array('role' => $roleparam, 'component' => $componentparam, 
         'contextlevel' => $contextlevelparam, 'count' => $countparam, 'type' => $typeparam, 'console' => $title));
     
-    $sectionhtml .= $OUTPUT->paging_bar($countparam, $pageparam, RESULTS_PER_PAGE, $pageurl->out());
-    
+
+    // Only show "See All" option when it's not in seeall mode.
+    if (!$seeallparam){
+        $sectionhtml .= $OUTPUT->paging_bar($countparam, $pageparam, RESULTS_PER_PAGE, $pageurl->out()) ;
+        $sectionhtml .= '<div class="see-all"> <a href="'.$pageurl.'&seeall=1">'.get_string('seeall', 'tool_uclasupportconsole').'</a> </div>'; 
+    } else if ($countparam > RESULTS_PER_PAGE) {
+        $sectionhtml .= '<div class="show-page"> <a href="'.$pageurl.'&seeall=0">'.get_string('showpage', 'tool_uclasupportconsole').'</a> </div>'; 
+    }
     $consoles->push_console_html('users', $title, $sectionhtml);
 }
 
