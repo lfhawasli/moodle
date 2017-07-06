@@ -34,7 +34,7 @@ $btn-color-login:           #f9c739;
     @include button-variant(#ffffff, #4d4d4d, #333);
 }
 
-// keep the primary color text white.
+// Keep the primary color text white.
 .btn-primary {
     color: white !important;
 }
@@ -215,4 +215,23 @@ a.btn-help-feedback {
     }
 }
 
+// CCLE-6312 - Style added to improve visibility of collapse buttons 
+// in the assignment grading review panel.
+#page-mod-assign-grader .btn-group .btn.active {
+    background-color: lighten(#000, 80%);
+    border-color: #8c8c8c;
+}
 
+#page-mod-assign-grader .btn-group .btn.active:focus {
+    border-color: $ucla-color-blue;
+    box-shadow: 0 0 4px $ucla-color-blue;
+}
+
+#page-mod-assign-grader .btn-group .btn.active:hover {
+    background-color: lighten(#000, 80%);
+    border-color: #8c8c8c;
+}
+
+#page-mod-assign-grader .btn-group .btn:hover{
+    background-color: lighten(#000, 90%);
+}
