@@ -30,6 +30,9 @@ var CSS = {
     },
     // The CSS selectors we use.
     SELECTOR = {
+        // START UCLA MOD: CCLE-6373 - Add hidden flag to hidden content.
+        HIDDENLABEL: '.hiddenlabel',
+        // END UCLA MOD: CCLE-6373
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT : '.actionlinktext',
         ACTIVITYACTION : 'a.cm-edit-action[data-action]',
@@ -575,6 +578,9 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      */
     handle_resource_dim: function(button, activity, action) {
         var toggleclass = CSS.DIMCLASS,
+            // START UCLA MOD: CCLE-6373 - Add hidden flag to hidden content.
+            hiddenlabel = activity.one(SELECTOR.HIDDENLABEL),
+            // END UCLA MOD: CCLE-6373
             dimarea = activity.one([
                     SELECTOR.ACTIVITYLINK,
                     SELECTOR.CONTENTWITHOUTLINK
@@ -630,12 +636,22 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         if (action === 'hide') {
             // Change the UI.
             dimarea.addClass(toggleclass);
+
+            // START UCLA MOD: CCLE-6373 - Add hidden flag to hidden content.
+            hiddenlabel.removeClass(CSS.HIDE);
+            // END UCLA MOD: CCLE-6373
+
             // We need to toggle dimming on the description too.
             activity.all(SELECTOR.CONTENTAFTERLINK).addClass(CSS.DIMMEDTEXT);
             activity.all(SELECTOR.GROUPINGLABEL).addClass(CSS.DIMMEDTEXT);
         } else {
             // Change the UI.
             dimarea.removeClass(toggleclass);
+
+            // START UCLA MOD: CCLE-6373 - Add hidden flag to hidden content.
+            hiddenlabel.addClass(CSS.HIDE);
+            // END UCLA MOD: CCLE-6373
+
             // We need to toggle dimming on the description too.
             activity.all(SELECTOR.CONTENTAFTERLINK).removeClass(CSS.DIMMEDTEXT);
             activity.all(SELECTOR.GROUPINGLABEL).removeClass(CSS.DIMMEDTEXT);
