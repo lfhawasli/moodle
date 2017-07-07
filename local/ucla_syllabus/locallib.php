@@ -46,10 +46,10 @@ define('UCLA_SYLLABUS_ACTION_CONVERT', 'convert');
 
 /**
  * Syllabus manager class.
- * 
+ *
  * Main syllabus class. Used to access all syllabus functionality and
  * information.
- * 
+ *
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -62,7 +62,7 @@ class ucla_syllabus_manager {
 
     /**
      * Construct a syllabus manager.
-     * 
+     *
      * @param stdClass $course
      */
     public function __construct($course) {
@@ -77,9 +77,9 @@ class ucla_syllabus_manager {
     }
 
     /**
-     * Returns if given course can host syllabus files. Currently, only SRS 
+     * Returns if given course can host syllabus files. Currently, only SRS
      * based courses can have syllabus files.
-     * CCLE-3792: Instructional collab sites can host syllabus files 
+     * CCLE-3792: Instructional collab sites can host syllabus files
      * (along with SRS based courses).
      *
      * @return bool
@@ -95,7 +95,7 @@ class ucla_syllabus_manager {
 
     /**
      * Returns if logged in user has the ability to manage syllabi for course.
-     * 
+     *
      * @return bool
      */
     public function can_manage() {
@@ -106,7 +106,7 @@ class ucla_syllabus_manager {
 
     /**
      * Deletes given syllabus.
-     * 
+     *
      * @param ucla_syllabus $syllabus   Expecting an object that is derived from
      *                                  the ucla_syllabus class
      */
@@ -144,7 +144,7 @@ class ucla_syllabus_manager {
 
     /**
      * Convert between public or private syllabi.
-     * 
+     *
      * @param stdClass $syllabus    Expecting an object that is derived from
      *                              the ucla_syllabus class
      * @param int $convertto        UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC or
@@ -257,7 +257,7 @@ class ucla_syllabus_manager {
 
     /**
      * Returns file picker config array.
-     * 
+     *
      * @return array
      */
     public function get_filemanager_config() {
@@ -266,10 +266,10 @@ class ucla_syllabus_manager {
 
     /**
      * UCLA Site menu block hook.
-     * 
-     * Only display node if there is a syllabus uploaded. If no syllabus 
+     *
+     * Only display node if there is a syllabus uploaded. If no syllabus
      * uploaded, then display node if logged in user has the ability to add one.
-     * 
+     *
      * @return navigation_node
      */
     public function get_navigation_nodes() {
@@ -314,7 +314,7 @@ class ucla_syllabus_manager {
 
     /**
      * Returns an array of syllabi for course indexed by type.
-     * 
+     *
      * @return array
      */
     public function get_syllabi() {
@@ -330,12 +330,10 @@ class ucla_syllabus_manager {
             switch ($record->access_type) {
                 case UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC:
                 case UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN:
-                    $retval[UCLA_SYLLABUS_TYPE_PUBLIC] =
-                            new ucla_public_syllabus($record->id);
+                    $retval[UCLA_SYLLABUS_TYPE_PUBLIC] = new ucla_public_syllabus($record->id);
                     break;
                 case UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE:
-                    $retval[UCLA_SYLLABUS_TYPE_PRIVATE] =
-                            new ucla_private_syllabus($record->id);
+                    $retval[UCLA_SYLLABUS_TYPE_PRIVATE] = new ucla_private_syllabus($record->id);
                     break;
             }
         }
@@ -344,11 +342,11 @@ class ucla_syllabus_manager {
     }
 
     /**
-     * Checks if given course has a private syllabus. If so, then returns 
+     * Checks if given course has a private syllabus. If so, then returns
      * syllabus id, otherwise false.
-     * 
+     *
      * @param int $courseid
-     * 
+     *
      * @return int              Returns false if no syllabus found
      */
     public static function has_private_syllabus($courseid) {
@@ -363,11 +361,11 @@ class ucla_syllabus_manager {
     }
 
     /**
-     * Checks if given course has a public syllabus. If so, then returns 
+     * Checks if given course has a public syllabus. If so, then returns
      * syllabus id, otherwise false.
-     * 
+     *
      * @param int $courseid
-     * 
+     *
      * @return int              Returns false if no syllabus found
      */
     public static function has_public_syllabus($courseid) {
@@ -397,7 +395,7 @@ class ucla_syllabus_manager {
 
     /**
      * Returns an appropriately public or private syllabus.
-     * 
+     *
      * @param int $entryid
      * @return mixed, a public/private syllabus, or null
      */
@@ -423,9 +421,9 @@ class ucla_syllabus_manager {
     /**
      * Saves given syllabus data. Can either be an update (id must be set) or
      * insert as a new record.
-     * 
+     *
      * @param object $data  Data from syllabus form. Assumes it is validated
-     * 
+     *
      * @return int      Returns recordid of added/updated syllabus
      */
     public function save_syllabus($data) {
@@ -508,16 +506,16 @@ class ucla_syllabus_manager {
 
 /**
  * Syllabus class.
- * 
+ *
  * Class for properties shared between public and private syllabi.
- * 
+ *
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class ucla_syllabus {
-    /** 
+    /**
      * Syllabus properties.
-     * 
+     *
      * @var mixed In following format:
      *                  [columns from ucla_syllabus table]
      *                  ['stored_file'] => stored_file object
@@ -526,10 +524,10 @@ abstract class ucla_syllabus {
 
     /**
      * Constructor.
-     * 
+     *
      * If syllabus id is passed, then will fill properties for object. Else,
      * can be used as a shell to save data to create a new syllabus file.
-     * 
+     *
      * @param int $syllabusid
      */
     public function __construct($syllabusid=null) {
@@ -546,7 +544,7 @@ abstract class ucla_syllabus {
 
     /**
      * Magic getting method.
-     * 
+     *
      * @param string $name
      * @return mixed
      */
@@ -554,7 +552,7 @@ abstract class ucla_syllabus {
         // Lazy load stored_file, since it is pretty complex.
         if ($name == 'stored_file') {
             if (!isset($this->properties->stored_file)) {
-                $this->properties->stored_file =  $this->locate_syllabus_file();
+                $this->properties->stored_file = $this->locate_syllabus_file();
             }
         }
 
@@ -567,7 +565,7 @@ abstract class ucla_syllabus {
 
     /**
      * Magic isset method.
-     * 
+     *
      * @param string $name
      * @return bool
      */
@@ -581,7 +579,7 @@ abstract class ucla_syllabus {
 
     /**
      * Magic setter method.
-     * 
+     *
      * @param string $name name of property to set
      * @param mixed $value value to set the property
      * @return mixed
@@ -592,7 +590,7 @@ abstract class ucla_syllabus {
 
     /**
      * Magic unset method.
-     * 
+     *
      * @param string $name
      * @return bool
      */
@@ -602,14 +600,14 @@ abstract class ucla_syllabus {
 
     /**
      * Determine if user can view syllabus.
-     * 
+     *
      * @return bool
      */
     abstract public function can_view();
 
     /**
      * Returns link to download syllabus file.
-     * 
+     *
      * @return string   Returns html to generate link to syllabus
      */
     public function get_download_link() {
@@ -622,45 +620,45 @@ abstract class ucla_syllabus {
 
         return $string;
     }
-    
+
     /**
      * Returns html for icon image.
-     * 
+     *
      * @return string   Returns html for icon image
      */
     public function get_icon() {
         global $OUTPUT;
         $output = $OUTPUT;
-        
-        // Get file type
+
+        // Get file type.
         $file = $this->stored_file;
 
         // Only get the file type if a file exists.
         if ($file) {
             $filename = $file->get_filename();
-            $file_type = substr($filename, strpos($filename, '.') + 1);
+            $filetype = substr($filename, strpos($filename, '.') + 1);
         } else {
-            $file_type = '';
+            $filetype = '';
         }
 
         // Displays correct icon if file is of PDF or DOC/DOCX type
-        // Displays the default icon if file is of any other type
-        if ($file_type == 'pdf') {
-            $icon_url = $output->pix_url('f/pdf-24');
-        } else if ($file_type == 'doc' || $file_type == 'docx') {
-            $icon_url = $output->pix_url('f/document-24');
+        // Displays the default icon if file is of any other type.
+        if ($filetype == 'pdf') {
+            $iconurl = $output->pix_url('f/pdf-24');
+        } else if ($filetype == 'doc' || $filetype == 'docx') {
+            $iconurl = $output->pix_url('f/document-24');
         } else {
-            $icon_url = $output->pix_url('icon', 'resource');
+            $iconurl = $output->pix_url('icon', 'resource');
         }
-                
-        $string = html_writer::empty_tag('img', array('src' => $icon_url,
+
+        $string = html_writer::empty_tag('img', array('src' => $iconurl,
                 'class' => 'iconlarge activityicon', 'alt' => ' ', 'role' => 'presentation'));
         return $string;
     }
 
     /**
      * Get url to syllabus file.
-     * 
+     *
      * @return  Returns full path to syllabus file, otherwise returns empty string
      */
     public function get_file_url() {
@@ -682,7 +680,7 @@ abstract class ucla_syllabus {
 
     /**
      * Returns mimetype of uploaded syllabus file.
-     * 
+     *
      * @return string
      */
     public function get_mimetype() {
@@ -694,8 +692,8 @@ abstract class ucla_syllabus {
 
     /**
      * Returns syllabus file for syllabus object. Must have properties->id set
-     * 
-     * @return stored_file          Returns stored_file object, if file was 
+     *
+     * @return stored_file          Returns stored_file object, if file was
      *                              uploaded, otherwise returns null.
      */
     private function locate_syllabus_file() {
@@ -715,7 +713,7 @@ abstract class ucla_syllabus {
             // No files uploaded and no URL added!
             debugging('Warning, no file uploaded for given ucla_syllabus entry');
         } else {
-            if (count($files) >1) {
+            if (count($files) > 1) {
                 debugging('Warning, more than one syllabus file uploaded for given ucla_syllabus entry');
             }
 
@@ -729,18 +727,18 @@ abstract class ucla_syllabus {
 
 /**
  * Private syllabus class.
- * 
+ *
  * Inherits abilities from ucla_syllabus class, but defines
  * its own viewing function which differrs from those of
  * public syllabi.
- * 
+ *
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ucla_private_syllabus extends ucla_syllabus {
     /**
      * Determine if user can view syllabus.
-     * 
+     *
      * @return bool
      */
     public function can_view() {
@@ -758,18 +756,18 @@ class ucla_private_syllabus extends ucla_syllabus {
 
 /**
  * Public syllabus class.
- * 
+ *
  * Inherits abilities from ucla_syllabus class, but defines
- * its own viewing function which differrs from those of 
+ * its own viewing function which differrs from those of
  * private syllabi.
- * 
+ *
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ucla_public_syllabus extends ucla_syllabus {
     /**
      * Determine if user can view syllabus.
-     * 
+     *
      * @return bool
      */
     public function can_view() {

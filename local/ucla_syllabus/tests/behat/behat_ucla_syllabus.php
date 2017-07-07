@@ -61,14 +61,14 @@ class behat_ucla_syllabus extends behat_base {
      *
      * @When /^I delete a public syllabus$/
      */
-    public function i_delete_a_public_syllabus()  {
+    public function i_delete_a_public_syllabus() {
 
         // Click on the delete link.
         $linknode = $this->find_link('delete-public-syllabus');
         $linknode->click();
 
         if ($this->running_javascript()) {
-            // Click YES on the javascript alert
+            // Click YES on the javascript alert.
             $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
             // Wait..
             $this->getSession()->wait(2 * 1000, false);

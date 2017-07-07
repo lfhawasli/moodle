@@ -16,18 +16,19 @@
 
 /**
  * File for handling all syllabus events.
- * 
+ *
  * Contains functions for:
  *      - adding/updating a syllabus,
  *      - deleting a syllabus, and
  *      - responding to course alerts to syllabus.
- * 
+ *
  * @package     local_ucla_syllabus
  * @subpackage  webservice
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
 // Handling the following events.
 require_once($CFG->dirroot . '/local/ucla_syllabus/webservice/lib.php');
@@ -35,7 +36,7 @@ require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
 /**
  * Handle syllabus add/update.
- * 
+ *
  * @param   mixed $data syllabus id
  * @return  bool true if operation is successful
  */
@@ -117,7 +118,7 @@ function ucla_syllabus_updated($data) {
 
 /**
  * Handle deletion of syllabus.
- * 
+ *
  * @param   mixed $data
  * @return  bool, true if operation successful
  */
@@ -143,8 +144,8 @@ function ucla_syllabus_deleted($data) {
             case UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE:
 
                 // Case where syllabus is private:
-                //     If no public syllabus exists, POST delete.
-                //     If public syllabus exists, POST public syllabus.
+                // If no public syllabus exists, POST delete.
+                // If public syllabus exists, POST public syllabus.
                 if (empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC])) {
                     list($criteria, $payload) = syllabus_ws_manager::setup_delete($course);
                     syllabus_ws_manager::handle(syllabus_ws_manager::ACTION_TRANSFER, $criteria, $payload);
@@ -164,8 +165,8 @@ function ucla_syllabus_deleted($data) {
             case UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN:
 
                 // Case where syllabus is public:
-                //     If no private syllabus exists, POST delete.
-                //     Else do nothing.
+                // If no private syllabus exists, POST delete.
+                // Else do nothing.
                 if (empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])) {
                     list($criteria, $payload) = syllabus_ws_manager::setup_delete($course);
                     syllabus_ws_manager::handle(syllabus_ws_manager::ACTION_TRANSFER, $criteria, $payload);
@@ -179,10 +180,10 @@ function ucla_syllabus_deleted($data) {
 
 /**
  * Event handler for course alert.
- * 
- * This handles crosslisted courses by sending multiple alerts 
+ *
+ * This handles crosslisted courses by sending multiple alerts
  * in those cases.
- * 
+ *
  * @param   mixed $data course object
  * @return  bool true if operation is successful for all courses
  */

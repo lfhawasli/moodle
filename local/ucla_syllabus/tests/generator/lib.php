@@ -43,7 +43,7 @@ class local_ucla_syllabus_generator extends component_generator_base {
 
     /**
      * Creates a syllabus instance according to given record.
-     * 
+     *
      * Requires courseid to be set. Will generate a fake file if syllabus_file
      * is empty. For all other syllabus attributes, will set to a default value.
      *
@@ -54,7 +54,7 @@ class local_ucla_syllabus_generator extends component_generator_base {
      */
     public function create_instance($record) {
         global $USER;
-        
+
         // Ensure the record is an object.
         $record = (object)(array)$record;
 
@@ -85,9 +85,9 @@ class local_ucla_syllabus_generator extends component_generator_base {
             // Add actual file there.
             $filerecord = array('component' => 'user', 'filearea' => 'draft',
                     'contextid' => $usercontext->id, 'itemid' => $draftitemid,
-                    'filename' => 'syllabus' . ($this->instancecount+1) . '.txt', 'filepath' => '/');
+                    'filename' => 'syllabus' . ($this->instancecount + 1) . '.txt', 'filepath' => '/');
             $fs = get_file_storage();
-            $fs->create_file_from_string($filerecord, 'Test syllabus ' . ($this->instancecount+1) . ' file');
+            $fs->create_file_from_string($filerecord, 'Test syllabus ' . ($this->instancecount + 1) . ' file');
 
             $record->syllabus_file = $draftitemid;
         } else if (empty($record->syllabus_file)) {

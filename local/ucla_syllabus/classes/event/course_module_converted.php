@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains the event class for when a course module is converted into a
- * syllabus.
+ * Event class for when a course module is converted into a syllabus.
  *
  * @package    local_ucla_syllabus
  * @copyright  2014 UC Regents
@@ -64,7 +63,7 @@ class course_module_converted extends \core\event\base {
      */
     public function get_description() {
         $manualsyllabus = $this->other['manualsyllabus'];
-        return "The user with id '$this->userid' converted course module " . 
+        return "The user with id '$this->userid' converted course module " .
                 "'$manualsyllabus' into syllabus with id '$this->objectid'";
     }
 
