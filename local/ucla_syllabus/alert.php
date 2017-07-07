@@ -16,10 +16,10 @@
 
 /**
  * Syllabus alert file.
- * 
+ *
  * Responds to syllabus alert form. Handles setting of user preferences and
  * redirecting.
- * 
+ *
  * @package     local_ucla_syllabus
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -83,14 +83,14 @@ if (!empty($data) && confirm_sesskey()) {
 
     // Redirect no/later responses to course page (make sure to redirect to
     // landing page or user wouldn't get success message).
-    $section = 0;    
-    $format_options = course_get_format($course->id)->get_format_options();
-    if (isset($format_options['landing_page'])) {
-        $landing_page = $format_options['landing_page'];
+    $section = 0;
+    $formatoptions = course_get_format($course->id)->get_format_options();
+    if (isset($formatoptions['landing_page'])) {
+        $landingpage = $formatoptions['landing_page'];
     }
-    if (!empty($landing_page)) {
-        $section = $landing_page;
-    } 
+    if (!empty($landingpage)) {
+        $section = $landingpage;
+    }
     flash_redirect(new moodle_url('/course/view.php',
             array('id' => $id, 'section' => $section)), $successmessage);
 }

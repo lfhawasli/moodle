@@ -16,13 +16,13 @@
 
 /**
  * The web client to be used in interacting with the syllabus.
- * 
+ *
  * @package     local_ucla_syllabus
  * @subpackage  webservice
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+// @codingStandardsIgnoreLine
 require_once(dirname(__FILE__) . '/../../../config.php');
 
 // Disable for production environment.
@@ -45,7 +45,7 @@ $delete = optional_param('deleted', false, PARAM_BOOL);
 
 /**
  * Decods the size of the file.
- * 
+ *
  * @param   int $bytes
  * @param   int $decimals
  * @return  string

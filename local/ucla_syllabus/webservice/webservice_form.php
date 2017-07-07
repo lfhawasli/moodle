@@ -16,7 +16,7 @@
 
 /**
  * Form for requesting web service.
- * 
+ *
  * @package     local_ucla_syllabus
  * @subpackage  webservice
  * @copyright   2012 UC Regents
@@ -32,10 +32,10 @@ require_once($CFG->libdir.'/formslib.php');
 
 /**
  * Syllabus webservice form class.
- * 
+ *
  * Creates a form usable by the web service for describing any
  * syllabus webservice events.
- * 
+ *
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,7 +43,7 @@ class syllabus_ws_form extends moodleform {
 
     /**
      * Define form.
-     * 
+     *
      * Extracts information from $DB and $USER to appropriately
      * fill our the web service form.
      */

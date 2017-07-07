@@ -17,21 +17,22 @@
 
 /**
  * File for syllabus web servent client.
- * 
+ *
  * Contains class definition.
- * 
+ *
  * @package     local_ucla_syllabus
  * @subpackage  webservice
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Self-contained syllabus web service client.
- * 
+ *
  * Allows for communication between the client and the database.
- * 
+ *
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,7 +40,7 @@ class syllabus_ws_client {
 
     /**
      * Returns data from the database to the web client.
-     * 
+     *
      * @return mixed
      */
     public static function get_data() {
