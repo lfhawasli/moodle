@@ -55,6 +55,15 @@ class ucla_course_deleted extends \core\event\base {
     public static function get_legacy_eventname() {
         return 'ucla_course_deleted';
     }
+    
+    /**
+     * Returns data for legacy events.
+     * 
+     * @return object
+     */
+    protected function get_legacy_eventdata() {
+        return $this->get_requests();
+    }
 
     /**
      * Get event name.
