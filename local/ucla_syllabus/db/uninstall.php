@@ -16,7 +16,7 @@
 
 /**
  * Syllabus uninstallation file.
- * 
+ *
  * @see uninstall_plugin()
  *
  * @package    local_ucla_syllabus
@@ -25,9 +25,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Custom uninstallation function.
- * 
+ *
  * @return bool
  */
 function xmldb_local_ucla_syllabus_uninstall() {

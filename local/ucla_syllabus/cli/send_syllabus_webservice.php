@@ -47,7 +47,7 @@ Where type = {alert|syllabus|both}
 
 \$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php alert 14F MGMNT
 \$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php syllabus 141 "A&O SCI"
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php both 1234            
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php both 1234
 
 HELPTEXT;
     cli_error($help);
@@ -101,14 +101,14 @@ if ($type === 'alert' || $type === 'both') {
               JOIN {ucla_request_classes} urc ON urc.courseid = c.id
              WHERE $whereclause";
     $courses = $DB->get_records_sql($sql, $whereparams);
-    
+
     // Send alerts.
     if (empty($courses)) {
         $progress->output("...No courses found");
     } else {
         $progress->output(sprintf("...Processing %d courses", count($courses)));
         foreach ($courses as $course) {
-            $progress->output(sprintf("Processing %s (%s)", $course->shortname, 
+            $progress->output(sprintf("Processing %s (%s)", $course->shortname,
                     $course->srs), 1);
             $result = ucla_course_alert($course);
             if ($result) {
@@ -116,7 +116,7 @@ if ($type === 'alert' || $type === 'both') {
             } else {
                 $progress->output("...FAILURE!", 2);
             }
-        }        
+        }
     }
 }
 
@@ -139,14 +139,14 @@ if ($type === 'syllabus' || $type === 'both') {
     } else {
         $progress->output(sprintf("...Processing %d syllabi", count($syllabi)));
         foreach ($syllabi as $syllabus) {
-            $progress->output(sprintf("Processing %s (%s)", $syllabus->shortname, 
+            $progress->output(sprintf("Processing %s (%s)", $syllabus->shortname,
                     $syllabus->srs), 1);
             if (ucla_syllabus_updated($syllabus)) {
                 $progress->output("...SUCCESS", 2);
             } else {
                 $progress->output("...FAILURE!", 2);
             }
-        }        
+        }
     }
 }
 

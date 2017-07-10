@@ -17,7 +17,7 @@
 /**
  * Allows for display and management of syllabi.
  *
- * Includes core functions for course syllabus: uploading, editing, 
+ * Includes core functions for course syllabus: uploading, editing,
  * displaying, removing, downloading, and making private. Responsible
  * for actual interface of syllabus page.
  *
@@ -25,7 +25,7 @@
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+// @codingStandardsIgnoreLine
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/syllabus_form.php');
@@ -182,9 +182,9 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
                     ) {
                 require_once($CFG->dirroot.'/course/format/ucla/lib.php');
 
-                $format_options = course_get_format($course->id)->get_format_options();
-                $landing_page = isset($format_options['landing_page']) ? $format_options['landing_page'] : false;
-                if ($landing_page == UCLA_FORMAT_DISPLAY_SYLLABUS) {
+                $formatoptions = course_get_format($course->id)->get_format_options();
+                $landingpage = isset($formatoptions['landing_page']) ? $formatoptions['landing_page'] : false;
+                if ($landingpage == UCLA_FORMAT_DISPLAY_SYLLABUS) {
                     course_get_format($course->id)->update_course_format_options(
                             array('landing_page' => 0));
                 }
@@ -285,7 +285,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
             $fullurl = $syllabustodisplay->url;
             $mimetype = 'text/html';
             $clicktoopen = get_string('err_noembed', 'local_ucla_syllabus');
-            $downloadlink = $syllabustodisplay->get_icon() . 
+            $downloadlink = $syllabustodisplay->get_icon() .
                     html_writer::link($syllabustodisplay->url, $syllabustodisplay->url);
         }
 
@@ -350,7 +350,7 @@ echo $OUTPUT->footer();
 
 /**
  * Display the heading of the page.
- * 
+ *
  * @param string $pagetitle
  */
 function display_header($pagetitle) {

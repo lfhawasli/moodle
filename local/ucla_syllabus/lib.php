@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Basic user lookup.
- * 
+ *
  * Returns a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
@@ -57,7 +57,7 @@ function local_ucla_syllabus_user_outline($course, $user, $mod, $newmodule) {
 
 /**
  * Complete user lookup.
- * 
+ *
  * Prints a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
@@ -72,7 +72,7 @@ function local_ucla_syllabus_user_complete($course, $user, $mod, $newmodule) {
 
 /**
  * Find recent course activity.
- * 
+ *
  * Given a course and a time, this module should find recent activity
  * that has occurred in newmodule activities and print it out.
  * Return true if there was output, or false is there was none.
@@ -107,7 +107,7 @@ function local_ucla_syllabus_get_recent_mod_activity(&$activities, &$index, $tim
 
 /**
  * View single activity.
- * 
+ *
  * Prints single activity item prepared by the get recent mod
  * activity function.
  *
@@ -123,7 +123,7 @@ function local_ucla_syllabus_print_recent_mod_activity($activity, $courseid, $de
 
 /**
  * Syllabus cron job.
- * 
+ *
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
  * as sending out mail, toggling flags etc ...
@@ -148,7 +148,7 @@ function local_ucla_syllabus_get_extra_capabilities() {
 
 /**
  * Serves the files from the ucla_syllabus file areas.
- * 
+ *
  * Depending on the syllabus access type, do the following checks:
  *  - Public: allow download
  *  - Logged in: check to see if user is logged in
@@ -193,9 +193,11 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
 
 /**
  * Alert instructors to upload syllabus if they haven't done so already.
- * 
- * @param object $course for course information, $courseinfo for term.
- *                          
+ *
+ * @param object $course for course information,
+ * @param object $courseinfo for term.
+ *
+ * @return boolean
  */
 function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
     global $CFG, $USER;

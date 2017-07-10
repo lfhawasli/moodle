@@ -16,7 +16,7 @@
 
 /**
  * Administrator interface to web service.
- * 
+ *
  * @package     local_ucla_syllabus
  * @subpackage  webservice
  * @copyright   2012 UC Regents
