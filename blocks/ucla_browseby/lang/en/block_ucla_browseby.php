@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Strings for component 'block_ucla_browseby'.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $string['cachedef_browsebycache'] = 'Cache for Browse by results';
 $string['pluginname'] = 'UCLA browse-by';
@@ -6,38 +28,38 @@ $string['displayname'] = 'Browse by';
 $string['ucla_browseby:addinstance'] = 'Add Browseby block';
 $string['ucla_browseby:myaddinstance'] = 'Add Browseby block to My home';
 
-// Links displayed in the block
+// Links displayed in the block.
 $string['link_subjarea'] = 'Subject area';
 $string['link_division'] = 'Division';
 $string['link_instructor'] = 'Instructor';
 $string['link_collab'] = 'Collaboration sites';
 $string['link_mycourses'] = 'My sites';
 
-// This is for errors
+// This is for errors.
 $string['illegaltype'] = 'Browse by "{$a}" does not exist.';
 
-// Subject area
+// Subject area.
 $string['subjarea_title'] = 'Subject areas in {$a}';
-$string['all_subjareas'] = 'Subject areas'; 
+$string['all_subjareas'] = 'Subject areas';
 $string['subjarea_noterm'] = 'No subject areas were found for this term, please try another term.';
 
-// Divisions
+// Divisions.
 $string['division_title'] = 'Divisions';
 $string['division_none'] = 'No divisions were found on this server';
 $string['division_noterm'] = 'No divisions were found for this term, please try another term.';
 
-// Instructors
+// Instructors.
 $string['instructorsall'] = 'Instructors';
 $string['instructorswith'] = 'Instructors with a last name starting with "{$a}"';
 $string['instructosallterm'] = 'All instructors for {$a}';
 $string['noinstructors'] = 'There are no instructors for given parameters found.';
 $string['selectinstructorletter'] = "Please select a letter to view instructors.";
 
-// Instructors -> courses
+// Instructors -> courses.
 $string['coursesbyinstr'] = 'Courses taught by {$a}';
 $string['coursesinsubjarea'] = 'Courses in {$a}';
 
-// Collaborations
+// Collaborations.
 $string['collab_notfound'] = 'No collaboration sites found.';
 $string['collab_notcollab'] = 'This category is not considered a category for collaboration sites.';
 $string['collab_coursesincat'] = 'Sites in {$a}';
@@ -52,7 +74,7 @@ $string['sitename'] = 'Site name';
 $string['projectlead'] = 'Project lead';
 $string['coursecreators'] = 'Course owner';
 
-// Options
+// Options.
 $string['title_division'] = 'Disable browse-by division';
 $string['title_subjarea'] = 'Disable browse-by subject areas';
 $string['title_instructor'] = 'Disable browse-by instructors';
@@ -73,37 +95,37 @@ $string['desc_syncallterms'] = 'Check box to enable synchronization of all terms
 $string['title_use_local_courses'] = 'Use local courses';
 $string['desc_use_local_courses'] = 'Check box to allow for local courses to override the URL that has been provided by the Registrar. Otherwise, the data that the Registrar has provided will be considered infallible.';
 
-// Courses view
+// Courses view.
 $string['moreusers'] = 'MORE...';
 $string['nousersinrole'] = 'N / A';
 $string['session_break'] = 'Summer session {$a}';
 $string['registrar_link'] = '(Registrar)';
 $string['coursesnotfound'] = 'No courses found for given subject area and term';
 
-// Headers in courses view
+// Headers in courses view.
 $string['syllabus'] = 'Syllabus';
 $string['course'] = 'Course';
 $string['instructors'] = 'Instructors';
 $string['coursetitle'] = 'Course title';
 
-// CCLE-3141 - Prepare for post M2 deployment
-$string['cutoff12S'] = 'If you cannot find the course for which ' . 
-        'you\'re looking, please visit our archive server ' . 
+// CCLE-3141 - Prepare for post M2 deployment.
+$string['cutoff12S'] = 'If you cannot find the course for which ' .
+        'you\'re looking, please visit our archive server ' .
         '(<a href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>). ' .
         'Please note the archive server will only open in the ' .
         '<a target="_blank" href="https://www.mozilla.org/en-US/firefox/desktop/">Firefox browser</a>.';
-$string['before12S'] = 'You are currently on the CCLE production server ' . 
-        '(<a href="https://ccle.ucla.edu">https://ccle.ucla.edu</a>). For ' . 
-        'courses from Winter 2012 or earlier, please visit our archive server ' . 
+$string['before12S'] = 'You are currently on the CCLE production server ' .
+        '(<a href="https://ccle.ucla.edu">https://ccle.ucla.edu</a>). For ' .
+        'courses from Winter 2012 or earlier, please visit our archive server ' .
         '(<a href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>). ' .
         'Please note the archive server will only open in the ' .
         '<a target="_blank" href="https://www.mozilla.org/en-US/firefox/desktop/">Firefox browser</a>.';
 
-$string['cutoff12F'] = 'If you cannot find the course for which ' . 
-        'you\'re looking, please visit our Production Server ' . 
+$string['cutoff12F'] = 'If you cannot find the course for which ' .
+        'you\'re looking, please visit our Production Server ' .
         '(<a href="https://classes.sscnet.ucla.edu">https://classes.sscnet.ucla.edu</a>).';
-$string['before12F'] = 'You are currently on the CCLE SSC Moodle 2 Pilot Server ' . 
-        '(<a href="https://moodle2.sscnet.ucla.edu">https://moodle2.sscnet.ucla.edu</a>). For ' . 
-        'courses from Summer 2012 or earlier, please visit our Production Server ' . 
+$string['before12F'] = 'You are currently on the CCLE SSC Moodle 2 Pilot Server ' .
+        '(<a href="https://moodle2.sscnet.ucla.edu">https://moodle2.sscnet.ucla.edu</a>). For ' .
+        'courses from Summer 2012 or earlier, please visit our Production Server ' .
         '(<a href="https://classes.sscnet.ucla.edu">https://classes.sscnet.ucla.edu</a>).';
 
