@@ -1,3 +1,11 @@
+.block_ucla_my_sites.block .collab_sites_div h5 {
+    font-size: 16px;
+}
+
+.block_ucla_my_sites.block .collab_sites_div h6 {
+    font-size: 14px;
+}
+
 .block_ucla_my_sites.block .mysitesdivider {
     display: block;
     margin: 8px 0;
@@ -7,7 +15,8 @@
     padding-bottom: 2px;
 }
 
-.block_ucla_my_sites.block .termselector {
+.block_ucla_my_sites .content .sortselector,
+.block_ucla_my_sites.block .termselector{
     margin: 8px 0;
 }
 
@@ -25,7 +34,6 @@
 /*
 .block_ucla_my_sites table {
     width: 100%;
-}
 
 .block_ucla_my_sites table thead {
     line-height: 0.5em;
@@ -43,6 +51,7 @@
     width: 120px;
 }*/
 
+.block_ucla_my_sites .content .sortselector,
 .block_ucla_my_sites .content .termselector {
     color: #536895;
 /*    font-size: 0.8em;
@@ -116,3 +125,44 @@
     border-color: #ccc;
     margin-right: 25%;
 }
+
+
+.block_ucla_my_sites.block .sortselector button.transparent {
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    visiblity:hidden;
+    border:none;
+    z-index:2;
+    background-color:transparent;
+    width:100%;
+}
+
+.block_ucla_my_sites.block .sortselector fieldset div > * {
+    display: inline-block;
+}
+
+.block_ucla_my_sites.block .sortselector div.title {
+    margin-right: 2%;
+}
+
+.block_ucla_my_sites.block .sortselector {
+    margin-top: -1%;
+}
+
+.block_ucla_my_sites.block .sortselector div.radio {
+    position:relative;
+    margin-right: 1%;
+}
+
+.block_ucla_my_sites.block .sortselector div.radio > label {
+    position: relative;
+    display:block;
+}
+
+.block_ucla_my_sites.block .sortselector div.radio > label > input[type="radio"] {
+    z-index:1;
+}
+

@@ -127,9 +127,30 @@ class block_ucla_my_sites extends block_base {
             $showterm = $CFG->currentterm;
         }
 
+        // First figure out the sort order for the collab sites.
+        // See if there's any GET param trying to change the sort order.
+        $newsortorder = optional_param('sortorder', '', PARAM_ALPHA);
+        if ($newsortorder !== 'startdate' && $newsortorder !== 'sitename') {
+            $newsortorder = '';
+        }
+        
+        // Get the existing sort order from the user preferences if it exists.
+        $sortorder = get_user_preferences('mysites_collab_sortorder', 'sitename', $USER);
+        if ($sortorder !== 'startdate' && $sortorder !== 'sitename') {
+            $sortorder = 'sitename';
+        }
+        
+        // Check if the GET param is valid and different from the existing sortorder.
+        if ($newsortorder !== '' && $newsortorder !== $sortorder) {
+            // If so, replace the user preference and the $sortorder variable.
+            set_user_preference('mysites_collab_sortorder', $newsortorder, $USER);
+            $sortorder = $newsortorder;
+        }
+
         // Get courses enrolled in.
         $courses = enrol_get_my_courses('id, shortname',
             'visible DESC, sortorder ASC');
+
         $site = get_site();
         $course = $site; // Just in case we need the old global $course hack.
         if (array_key_exists($site->id, $courses)) {
@@ -350,9 +371,100 @@ class block_ucla_my_sites extends block_base {
             }
         }
 
+        // Get course categories from ID's.
+        $categoryids = array_map(function($c) {
+            return $c->category;
+        }, $collaborationsites);
+        $categories = $DB->get_records_list('course_categories', 'id', array_unique($categoryids));
+
+        // Holds the ID's of the parent categories to the base categories.
+        $parentcategoryids = array();
+        // Holds the paths to the categories.
+        $categorypaths = array();
+
+        // Extract parent ID's from path.
+        foreach ($categories as $category) {
+            // Chop off leading slash in the path.
+            if ($category->path[0] === '/') {
+                $category->path = substr($category->path, 1);
+            }
+            // Split by slashes and add to base category paths.
+            $categorypaths[$category->id] = explode('/', $category->path);
+            // Add the ID's in the path to the list of parent category ID's.
+            $parentcategoryids = array_merge($categorypaths[$category->id], $parentcategoryids);
+        }
+
+        // Get categories for parent ID's that haven't already been looked up.
+        $parentcategories = $DB->get_records_list('course_categories', 'id', array_diff(
+            array_unique($parentcategoryids), $categoryids
+        ));
+        
+        // Also add parent paths to combined paths dict.
+        foreach ($parentcategories as $category) {
+            // Chop off leading slash in the path.
+            if ($category->path[0] === '/') {
+                $category->path = substr($category->path, 1);
+            }
+            // Split by slashes and add to all category paths.
+            $categorypaths[$category->id] = explode('/', $category->path);
+        }
+        
+        // From now on we can combine the base and parent categories.
+        $categories = array_merge($parentcategories, $categories);
+        
+        // Attach collab sites as properties of base categories.
+        // Note how each category is passed by reference.
+        $tempcollaborationsites = $collaborationsites;
+        foreach ($categories as &$category) {
+            $category->collabsites = array();
+            foreach ($tempcollaborationsites as $index => $c) {
+                if ($c->category == $category->id) {
+                    $category->collabsites[] = $c;
+                    // Unset added collab sites so the inner loop goes faster.
+                    unset($tempcollaborationsites[$index]);
+                }
+            }
+        }
+        
+        // Build the simple single-level category hierarchy.
+        foreach ($categories as &$category) {
+            // If the parent is 0, then it is a top level category.
+            if ($category->parent == '0') {
+                // Create a collabsite property if it doesn't have one.
+                if (!isset($category->collabsites)) {
+                    $category->collabsites = array();
+                }
+                // Go through the categories again and find the subcategories of
+                // the current category.
+                foreach($categories as $index => &$subcategory) {
+                    // We know we've found a subcategory when the current category
+                    // shows up in the subcategory's path. Exclude categories that
+                    // match the current category's ID and that don't have any
+                    // collabsites.
+                    if ($subcategory->id !== $category->id 
+                            && in_array($category->id, $categorypaths[$subcategory->id]) 
+                            && isset($subcategory->collabsites)) {
+                        // Add the subcategory's collab sites the current one's collab sites.
+                        $category->collabsites = array_merge($category->collabsites, $subcategory->collabsites);
+                        // Unset the subcategory so that only the top-level category remains.
+                        unset($categories[$index]);
+                    }
+                }
+            }
+        }
+        
+        // Package the array of top-level categories into a class to replace the
+        // full category hierarchy used before.
+        $cathierarchy = new stdClass();
+        $cathierarchy->children = $categories;
+
         // Display Collaboration sites.
         if (!empty($collaborationsites)) {
-            $content[] = $renderer->collab_sites_overview($collaborationsites, $overviews);
+            $sortoptstring = self::make_sort_form($sortorder);
+            $sortoptstring = html_writer::tag('div', $sortoptstring,
+                    array('class' => 'sortselector'));
+            $content[] = $renderer->collab_sites_overview($collaborationsites,
+                    $overviews, $cathierarchy, $sortoptstring, $sortorder);
         } else {
             // If there are no enrolled srs courses in any term and no sites, print msg.
             if (isset($noclasssitesoverride)) {
@@ -435,8 +547,7 @@ class block_ucla_my_sites extends block_base {
         $defaultfound = false;
         foreach ($terms as $term) {
             $thisurl = clone($page);
-            $thisurl->param('term', $term);
-            $url = $thisurl->out(false);
+            $url = $thisurl->out(false, array('term' => $term,));
             $urls[$url] = ucla_term_to_text($term);
             if ($default !== false && $default == $term) {
                 $default = $url;
@@ -446,9 +557,72 @@ class block_ucla_my_sites extends block_base {
         if (!$defaultfound) {
             $default = false;
         }
-
         return $selects = new url_select($urls, $default);
     }
+
+    /**
+     * Creates an HTML form allowing the user to change the sorting of collab
+     * sites.
+     *
+     * @param string $sortorder  Used to figure out which radio button to check
+     * @return string
+     */
+    public function make_sort_form($sortorder) {
+        global $CFG, $PAGE;
+        $sortarrs = array('startdate' => array('type' => 'radio'),
+            'sitename' => array('type' => 'radio'));
+        // Get the term parameter if it exists.
+        $term = optional_param('term', false, PARAM_ALPHANUM);
+        $extraparams = '';
+        // If it does exist, add it to a hidden form element so it gets submitted.
+        if ($term) {
+            $extraparams .= html_writer::tag('input', '', array(
+                'type' => 'hidden',
+                'name' => 'term',
+                'value' => $term
+            ));
+        }
+
+        // Check the correct radio button.
+        $sortarrs[$sortorder]['checked'] = 'checked';
+
+        // Create the form itself.
+        $radiobuttons = html_writer::div(
+                html_writer::div("Sort by: ", '', array('class' => 'title')) .
+                html_writer::start_div('radio') .
+                html_writer::tag('label',
+                        html_writer::tag(
+                                'button', '', array(
+                                    'class' => 'transparent',
+                                    'name' => 'sortorder',
+                                    'value' => 'sitename',
+                                    'type' => 'submit'
+                                )
+                        ) .
+                        html_writer::tag('input', '', $sortarrs['sitename'])
+                        . get_string('sitename', 'block_ucla_my_sites')) .
+                html_writer::end_div() .
+                html_writer::start_div('radio') .
+                html_writer::tag('label',
+                        html_writer::tag(
+                                'button', '', array(
+                                    'class' => 'transparent',
+                                    'name' => 'sortorder',
+                                    'value' => 'startdate',
+                                    'type' => 'submit'
+                                )
+                        ) .
+                        html_writer::tag('input', '', $sortarrs['startdate'])
+                        . get_string('startdate', 'block_ucla_my_sites')) .
+                html_writer::end_div()
+        );
+        $form = html_writer::tag('form',
+                html_writer::tag('fieldset', $radiobuttons) . $extraparams,
+                array('class' => '', 'action' => $PAGE->url, 'method' => 'GET')
+        );
+        return $form;
+    }
+
     /**
      *  Used with usort(), sorts a bunch of entries returned via
      *  ucla_get_reg_classinfo.
