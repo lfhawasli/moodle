@@ -31,9 +31,10 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.php');
 require_once($CFG->dirroot. '/course/format/topics/lib.php');
 
-define('UCLA_FORMAT_DISPLAY_SYLLABUS', 'syllabus');
+define('UCLA_FORMAT_DISPLAY_SYLLABUS', -3);
 define('UCLA_FORMAT_DISPLAY_ALL', -2);
 define('UCLA_FORMAT_DISPLAY_LANDING', -4);
+define('UCLA_FORMAT_SITE_INFO', 0);
 
 
 /**
@@ -46,13 +47,16 @@ define('UCLA_FORMAT_DISPLAY_LANDING', -4);
 class format_ucla extends format_topics {
 
     /** This is used to get the syllabus.*/
-    const UCLA_FORMAT_DISPLAY_SYLLABUS = 'syllabus';
+    const UCLA_FORMAT_DISPLAY_SYLLABUS = -3;
 
     /** This is used to specify display all.*/
     const UCLA_FORMAT_DISPLAY_ALL = -2;
 
     /** This is used to display landing.*/
     const UCLA_FORMAT_DISPLAY_LANDING = -4;
+
+    /** This is a constant for "Site Info" section number.*/
+    const UCLA_FORMAT_SITE_INFO = 0;
 
     /**
      *  Figures out the section to display. Specific only to the UCLA course format.
@@ -65,6 +69,9 @@ class format_ucla extends format_topics {
     public function figure_section($course = null, $courseprefs = null) {
 
         $course = $this->get_course();
+
+        // Set landing page according to "Landing Page by Dates" settings.
+        $this->check_landing_page_by_dates();
 
         // See if user is requesting a permalink section.
         $sectionid = optional_param('sectionid', null, PARAM_INT);
@@ -331,6 +338,11 @@ class format_ucla extends format_topics {
                     'default' => false,
                     'type' => PARAM_BOOL
                 ),
+                // SSC-1205 - For "Landing Page by Dates" functionality.
+                'enable_landingpage_by_dates' => array(
+                    'default' => false,
+                    'type' => PARAM_BOOL
+                ),
                 'coursedownload' => array(
                     'default' => true,
                     'type' => PARAM_BOOL
@@ -508,6 +520,99 @@ class format_ucla extends format_topics {
             $formaterrors['category'] = get_string('req_category_error', 'tool_uclasiteindicator');
         }
         return $formaterrors;
+    }
+
+    /**
+     * SSC-1205 - Landing Page by Dates.
+     *
+     * Check whether or not a given course has the appropriate set landingpage,
+     * given appropriate date ranges and section numbers.
+     */
+    public function check_landing_page_by_dates() {
+        global $DB;
+        $course = $this->get_course();
+        $format = course_get_format($course);
+        $prefs = $format->get_format_options();
+        $courseid = $course->id;
+        $optionlpd = $prefs['enable_landingpage_by_dates'];
+        $lpd = isset($optionlpd) ? $optionlpd : false;
+
+        if ($lpd && $courseid != null) {
+            // Create and update cache.
+            $cachedb = cache::make('block_ucla_modify_coursemenu', 'landingpagebydatesdb');
+            $cachedisplay = cache::make('block_ucla_modify_coursemenu', 'landingpagebydatesdisplay');
+
+            // Get calls return false when the value is not available or is unitialized.
+            // $cachedb is write and read locked, but $cachedisplay is neither.
+            $displaytime = time();
+            $cachedbtime = $cachedb->get($courseid);
+            $cachedisplaytime = $cachedisplay->get($courseid);
+
+            // If get call to cache returns false then we will still query and update.
+            if (!$cachedbtime || !$cachedisplaytime || $cachedisplaytime <= $cachedbtime) {
+                $sql = "SELECT sectionid, timestart, timeend
+                          FROM {ucla_modify_coursemenu} AS mc
+                         WHERE mc.courseid = $courseid";
+                $records = $DB->get_records_sql($sql);
+                // Cache our records and update display time.
+                $cachedisplay->set_many(array(
+                    $courseid => $displaytime,
+                    $courseid . 'records' => $records
+                ));
+            }
+
+            // Check cached data and perform filtering.
+            $records = $cachedisplay->get($courseid . 'records');
+            $format = course_get_format($course);
+            $newlandingpage = $this->determine_landing_page_by_dates_section($records);
+            $prefs = $format->get_format_options();
+            if ($newlandingpage) {
+                if ($prefs['landing_page'] != $newlandingpage) {
+                    $format->update_course_format_options(array('landing_page' => $newlandingpage));
+                }
+            } else if ($prefs['landing_page'] != UCLA_FORMAT_SITE_INFO) { // Default to "Site Info" as landing page.
+                $format->update_course_format_options(array('landing_page' => UCLA_FORMAT_SITE_INFO));
+            }
+        }
+    }
+
+    /**
+     * SSC-1205 - Landing Page by Dates.
+     *
+     * Helper function for check_landing_page_by_dates().
+     * It looks at our cached records and determines which section
+     * should be the landing page for the current site.
+     *
+     * @param array $records from our db for a "Landing Page by Dates" course
+     * @return int
+     */
+    public function determine_landing_page_by_dates_section($records) {
+        $section = null;
+        $currentTime = time();
+        // Looks for date ranges that current time falls in. Make sure timeend is not null.
+        foreach ($records as $obj) {
+            if ($obj->timeend && $currentTime >= $obj->timestart && $currentTime <= $obj->timeend) {
+                $section = $obj->sectionid;
+            }
+        }
+        // Alternate loop to look for the latest valid start date that is not a date range.
+        if (!$section) {
+            $temp = array();
+            // Find all potential sections that satisfy the criteria of not being a date range
+            // and having a start time before our current time.
+            foreach ($records as $obj) {
+                if (is_null($obj->timeend) && $obj->timestart <= $currentTime) {
+                    $temp[] = $obj;
+                }
+            }
+            // Sort so that the first element of our array is the latest valid start date.
+            usort($temp, function($a, $b)
+            {
+                return $a->timestart < $b->timestart;
+            });
+            $section = count($temp) > 0 ? $temp[0]->sectionid : null;
+        }
+        return $section;
     }
 }
 

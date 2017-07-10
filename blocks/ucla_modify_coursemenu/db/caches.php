@@ -1,5 +1,5 @@
 <?php
-// This file is part of UCLA Modify Coursemenu plugin for Moodle - http://moodle.org/
+// This file is part of the UCLA modify course menu block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,15 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information.
+ * Contains caching declaration for Landing Page by Dates.
  *
- * @package    block_ucla_modify_coursemenu
- * @copyright  2014 UC Regents
+ * @package block_ucla_modify_course_menu
+ * @copyright 2017 UC Regent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+ defined('MOODLE_INTERNAL') || die();
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2017081412;  // YYYYMMDDHH (year, month, day, 24-hr time).
-$plugin->requires = 2010112400; // YYYYMMDDHH (This is the release version for Moodle 2.0).
-$plugin->component = 'block_ucla_modify_coursemenu';
+$definitions = array(
+    'landingpagebydatesdb' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'requiredataguarantee' => true,
+        'requirelockingwrite' => true,
+    ),
+    'landingpagebydatesdisplay' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+    )
+);

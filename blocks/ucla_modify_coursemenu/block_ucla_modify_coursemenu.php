@@ -67,6 +67,11 @@ class block_ucla_modify_coursemenu extends block_base {
      * @var string
      */
     const ADD_SECTION_BUTTON = 'add-section-button';
+    /**
+     * Landing page by dates date range domnode.
+     * @var string
+     */
+    const DATERANGE_DOMNODE = 'daterange-data';
 
     /**
      * Initializes the title of the coursemenu.

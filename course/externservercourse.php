@@ -15,7 +15,7 @@ function extern_server_course($course) {
     $format = course_get_format($course);
     
     if ($format->get_format() === 'ucla') {
-        if ($format->figure_section() === $format::UCLA_FORMAT_DISPLAY_SYLLABUS) {
+        if ($format->figure_section() == $format::UCLA_FORMAT_DISPLAY_SYLLABUS) {
             $syllabusurl = $CFG->wwwroot . '/local/ucla_syllabus/index.php?id=' . $course->id;
             redirect($syllabusurl);
         }
