@@ -395,6 +395,35 @@ class view {
         $sql = ' FROM {question} q ' . implode(' ', $joins);
         $sql .= ' WHERE ' . implode(' AND ', $tests);
         $this->countsql = 'SELECT count(1)' . $sql;
+
+        // START UCLA MOD: CCLE-4824 - Question Bank sorting or Questions.
+        // Build the SQL for natural sorting of questions.
+
+        // Iterate through the sort parameters.
+        foreach ($sorts as &$sortstring) {
+            // Each sort parameter is space-separated, so split it into an array.
+            $sstrfragments = explode(" ", $sortstring);
+            // If the first element (the field name) is the name field, then stop.
+            // Note that the second element is ASC or DESC for ascending or descending.
+            if ($sstrfragments[0] == "q.name") {
+                // This array holds the 10 SQL strings used to find digits in the name column.
+                $finddigitstrings = array();
+                // Generate the SQL strings for finding any of the 10 digits.
+                for ($i = '0'; $i <= '9'; $i++) {
+                    $finddigitstrings[] = "IF (LOCATE('{$i}', {$sstrfragments[0]}) > 0, LOCATE('{$i}', $sstrfragments[0]), 256)";
+                }
+                // Modify the sort parameter for the name field such that instead of
+                // merely sorting by name, it finds the first instance of a digit in
+                // the name column, chops off everything before it with substring, then
+                // casts that into an int so that numerical sorting works properly.
+                $sortstring = "CAST(SUBSTRING({$sstrfragments[0]}, LEAST(" . implode(', ', $finddigitstrings) .
+                        ")) AS UNSIGNED) {$sstrfragments[1]}, {$sortstring}";
+                break;
+            }
+        }
+        
+        // END UCLA MOD: CCLE-4824.
+
         $this->loadsql = 'SELECT ' . implode(', ', $fields) . $sql . ' ORDER BY ' . implode(', ', $sorts);
     }
 

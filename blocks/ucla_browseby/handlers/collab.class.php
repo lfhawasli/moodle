@@ -1,64 +1,113 @@
 <?php
+// This file is part of the UCLA browse-by plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class file to handle Browse-By collaboration site listings.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Class definition for browsing by collaboration sites.
+ *
+ * @package    block_ucla_browseby
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class collab_handler extends browseby_handler {
-    private $MAX_USER_DISPLAY = 5;
-    
-    static function get_default_roles_visible() {
+
+    /**
+     * @var $maxuserdisplay Maximum number of users displayed.
+     */
+    private $maxuserdisplay = 5;
+
+    /**
+     * Get the roles that are visible by default.
+     *
+     * @return array
+     */
+    static public function get_default_roles_visible() {
         return array('projectlead', 'coursecreator', 'editinginstructor');
     }
 
-    function get_params() {
+    /**
+     * Returns what parameters are required for this handler.
+     *
+     * @return array
+     */
+    public function get_params() {
         return array('category');
     }
 
-    function handle($args) {
+    /**
+     * Fetches a list of collaboration sites with an alphabetized index.
+     *
+     * @param array $args
+     */
+    public function handle($args) {
         global $CFG, $PAGE;
 
-        // Load search
-        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
+        // Load search.
+        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init',
                 array(array('name' => 'course-search')));
-        
+
         $navbar =& $PAGE->navbar;
 
-        $collablibfile = $CFG->dirroot . '/' . $CFG->admin 
+        $collablibfile = $CFG->dirroot . '/' . $CFG->admin
             .'/tool/uclasiteindicator/lib.php';
 
-        $collab_cat = false;
+        $collabcat = false;
 
         $t = '';
         $s = '';
 
         if (file_exists($collablibfile)) {
-            
+
             require_once($collablibfile);
-        
+
             $s .= block_ucla_search::search_form('collab-search');
 
-            $collab_cat = $this->get_collaboration_category();
-            siteindicator_manager::filter_category_tree($collab_cat);
+            $collabcat = $this->get_collaboration_category();
+            siteindicator_manager::filter_category_tree($collabcat);
 
             // Check if the category specified is a sub-category
-            // of the collaboration category; if so, use that
-            if ($collab_cat && isset($args['category'])) {
-                $collab_cat_id = $args['category'];
+            // of the collaboration category; if so, use that.
+            if ($collabcat && isset($args['category'])) {
+                $collabcatid = $args['category'];
 
-                $collab_subcat = $this->find_category($collab_cat_id, 
-                    $collab_cat->categories, 'id');
+                $collabsubcat = $this->find_category($collabcatid,
+                    $collabcat->categories, 'id');
 
-                if (!$collab_subcat) {
+                if (!$collabsubcat) {
                     print_error('collab_notcollab', 'block_ucla_browseby');
                 }
-            
-                $collab_cat = $collab_subcat;
+
+                $collabcat = $collabsubcat;
                 $t = get_string('collab_viewin', 'block_ucla_browseby',
-                    $collab_subcat->name);
+                    $collabsubcat->name);
             }
         } else {
-            // 
             return array(false, false);
         }
 
-        if (!$collab_cat) {
+        if (!$collabcat) {
             print_error('collab_notfound', 'block_ucla_browseby');
         }
 
@@ -66,21 +115,21 @@ class collab_handler extends browseby_handler {
         if (empty($t)) {
             $t = $defaulttitle;
         } else {
-            $navbar->add($defaulttitle, 
+            $navbar->add($defaulttitle,
                 new moodle_url('/blocks/ucla_browseby/view.php',
                     array('type' => 'collab')));
         }
-    
+
         $categorylist = array();
-        if (!empty($collab_cat->categories)) {
-            $categorylist = $collab_cat->categories;
+        if (!empty($collabcat->categories)) {
+            $categorylist = $collabcat->categories;
         }
 
-        // Render list of categories
+        // Render list of categories.
 
         $courselist = array();
-        if (!empty($collab_cat->courses)) {
-            // Default roles to use, get these shortname's role.id
+        if (!empty($collabcat->courses)) {
+            // Default roles to use, get these shortname's role.id.
             $rolenames = self::get_default_roles_visible();
             $allroles = get_all_roles();
 
@@ -104,18 +153,18 @@ class collab_handler extends browseby_handler {
             if (empty($roleids)) {
                 debugging('No roles to use in printing!');
             } else {
-                foreach ($collab_cat->courses as $course) {
-                    // Skip NULL courses
-                    if(empty($course)) {
+                foreach ($collabcat->courses as $course) {
+                    // Skip NULL courses.
+                    if (empty($course)) {
                         continue;
                     }
-                    
+
                     $context = context_course::instance($course->id);
 
                     $viewroles = $this->get_role_users($roleids, $context,
                         false, 'u.id, u.firstname, u.lastname, r.shortname');
 
-                    $courseroles = array();                    
+                    $courseroles = array();
                     foreach ($viewroles as $viewrole) {
                         $rsh = $viewrole->shortname;
                         if (isset($iroles[$rsh])) {
@@ -124,7 +173,7 @@ class collab_handler extends browseby_handler {
                             }
 
                             $courseroles[$rsh][] = $viewrole;
-                        }                       
+                        }
                     }
 
                     $course->roles = $courseroles;
@@ -133,13 +182,13 @@ class collab_handler extends browseby_handler {
                 }
             }
         }
-   
-        // Sort category list in alphabetical order
+
+        // Sort category list in alphabetical order.
         array_alphasort($categorylist, "name");
-        
+
         $rendercatlist = array();
         foreach ($categorylist as $category) {
-            if(!empty($category)) {
+            if (!empty($category)) {
                 $rendercatlist[] = html_writer::link(
                     new moodle_url('/blocks/ucla_browseby/view.php',
                         array('category' => $category->id, 'type' => 'collab')),
@@ -148,31 +197,31 @@ class collab_handler extends browseby_handler {
             }
         }
 
-        // Category heading
-        if(empty($collab_cat->name)) {
-            $title = get_string('collab_allcatsincat', 
+        // Category heading.
+        if (empty($collabcat->name)) {
+            $title = get_string('collab_allcatsincat',
                     'block_ucla_browseby');
         } else {
-            $title = get_string('collab_catsincat', 
-                    'block_ucla_browseby', $collab_cat->name);
+            $title = get_string('collab_catsincat',
+                    'block_ucla_browseby', $collabcat->name);
         }
-        
-        if(!empty($rendercatlist)) {
+
+        if (!empty($rendercatlist)) {
             $s .= $this->heading($title, 3);
         }
-        
+
         $s .= block_ucla_browseby_renderer::ucla_custom_list_render(
             $rendercatlist);
 
         $title = '';
         $list = '';
         if (!empty($courselist)) {
-            $title = get_string('collab_coursesincat', 
-                'block_ucla_browseby', $collab_cat->name);
+            $title = get_string('collab_coursesincat',
+                'block_ucla_browseby', $collabcat->name);
             $data = array();
 
-            // sort courselist of fullname (using closures, see:
-            // http://stackoverflow.com/a/10159521/6001)
+            // Sort courselist of fullname (using closures, see:
+            // http://stackoverflow.com/a/10159521/6001).
             usort($courselist, function($a, $b) {
                 return strcmp($a->fullname, $b->fullname);
             });
@@ -185,25 +234,25 @@ class collab_handler extends browseby_handler {
                 );
 
                 $nameslist = array();
-                $nameimploder = array();                
+                $nameimploder = array();
                 foreach ($roleids as $shortname => $roleid) {
                     if (!empty($course->roles[$shortname])) {
                         foreach ($course->roles[$shortname] as $role) {
                             $nameimploder[] = fullname($role);
                         }
-                    }                    
+                    }
                 }
-                
+
                 if (!empty($nameimploder)) {
-                    // limit display of users
-                    if (count($nameimploder) > $this->MAX_USER_DISPLAY) {
-                        $nameimploder = array_slice($nameimploder, 0, $this->MAX_USER_DISPLAY);
+                    // Limit display of users.
+                    if (count($nameimploder) > $this->maxuserdisplay) {
+                        $nameimploder = array_slice($nameimploder, 0, $this->maxuserdisplay);
                         $nameimploder[] = get_string('moreusers', 'block_ucla_browseby');
-                    }                                                                                                   
+                    }
                     $nameslist[] = implode(' / ', $nameimploder);
                 }
-                
-                $datum[] = empty($nameslist) ? get_string('nousersinrole', 
+
+                $datum[] = empty($nameslist) ? get_string('nousersinrole',
                             'block_ucla_browseby') : implode(' ', $nameslist);
 
                 $data[] = $datum;
@@ -229,26 +278,33 @@ class collab_handler extends browseby_handler {
         return array($t, $s);
     }
 
-    function get_collaboration_category() {
+    /**
+     * Get the category of the collaboration site.
+     *
+     * @return boolean|\stdClass
+     */
+    public function get_collaboration_category() {
         global $CFG;
 
         $colcat = new stdClass();
-                
-        // Want the whole category tree for siteindicator to filter
+
+        // Want the whole category tree for siteindicator to filter.
         $colcat->categories = $this->get_category_tree();
 
-        // Give up
+        // Give up.
         if (empty($colcat->categories)) {
             return false;
         }
 
         return $colcat;
     }
-    
+
     /**
-     *  Finds the category from the tree.
+     * Finds the category from the tree.
+     *
+     * @param string $name
      **/
-    function get_category($name) {
+    public function get_category($name) {
         if (!isset($this->cat_tree)) {
             $this->cat_tree = $this->get_category_tree();
         }
@@ -258,15 +314,22 @@ class collab_handler extends browseby_handler {
         return $this->find_category($name, $tree);
     }
 
-    function find_category($name, $categories, $field='name') {
+    /**
+     * Find the category.
+     *
+     * @param string $name
+     * @param array $categories
+     * @param string $field
+     */
+    public function find_category($name, $categories, $field='name') {
         foreach ($categories as $category) {
             if (!empty($category) && $category->{$field} == $name) {
                 return $category;
-            } 
-           
+            }
+
             $dfs = false;
             if (!empty($category->categories)) {
-                $dfs = $this->find_category($name, $category->categories, 
+                $dfs = $this->find_category($name, $category->categories,
                     $field);
             }
 
@@ -280,8 +343,13 @@ class collab_handler extends browseby_handler {
 
     /**
      *  Some more decoupled functions...
+     *
+     * @param array $roles
+     * @param string $context
+     * @param string $parent
+     * @param array $fields
      **/
-    protected function get_role_users($roles, $context, $parent=false, 
+    protected function get_role_users($roles, $context, $parent=false,
                                       $fields='') {
         return get_role_users($roles, $context, $parent, $fields);
     }
@@ -305,14 +373,15 @@ class collab_handler extends browseby_handler {
                 array(CONTEXT_COURSECAT, $id));
         foreach ($records as $category) {
             context_helper::preload_from_record($category);
-            if (!$category->visible && !has_capability('moodle/category:viewhiddencategories', context_coursecat::instance($category->id))) {
+            if (!$category->visible && !has_capability('moodle/category:viewhiddencategories',
+                    context_coursecat::instance($category->id))) {
                 continue;
             }
             $categories[] = $category;
             $categoryids[$category->id] = $category;
             if (empty($CFG->maxcategorydepth) || $depth <= $CFG->maxcategorydepth) {
-                list($category->categories, $subcategories) = $this->get_category_tree($category->id, $depth+1);
-                foreach ($subcategories as $subid=>$subcat) {
+                list($category->categories, $subcategories) = $this->get_category_tree($category->id, $depth + 1);
+                foreach ($subcategories as $subid => $subcat) {
                     $categoryids[$subid] = $subcat;
                 }
                 $category->courses = array();
@@ -320,7 +389,7 @@ class collab_handler extends browseby_handler {
         }
 
         if ($depth > 0) {
-            // This is a recursive call so return the required array
+            // This is a recursive call so return the required array.
             return array($categories, $categoryids);
         }
 
@@ -329,7 +398,7 @@ class collab_handler extends browseby_handler {
             return array();
         }
 
-        // The depth is 0 this function has just been called so we can finish it off
+        // The depth is 0 this function has just been called so we can finish it off.
 
         $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
         $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . ")";
@@ -341,13 +410,14 @@ class collab_handler extends browseby_handler {
                 $ccjoin
                 WHERE c.category $catsql ORDER BY c.sortorder ASC";
         if ($courses = $DB->get_records_sql($sql, $catparams)) {
-            // loop through them
+            // Loop through them.
             foreach ($courses as $course) {
                 if ($course->id == SITEID) {
                     continue;
                 }
                 context_helper::preload_from_record($course);
-                if (!empty($course->visible) || has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
+                if (!empty($course->visible) || has_capability('moodle/course:viewhiddencourses',
+                        context_course::instance($course->id))) {
                     $categoryids[$course->category]->courses[$course->id] = $course;
                 }
             }
@@ -355,6 +425,12 @@ class collab_handler extends browseby_handler {
         return $categories;
     }
 
+    /**
+     * Heading level.
+     *
+     * @param string $heading
+     * @param int $level
+     */
     protected function heading($heading, $level=1) {
         global $OUTPUT;
 

@@ -27,7 +27,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../config.php');
 require($CFG->libdir . '/clilib.php');
 
-list($ext_argv, $unrecog) = cli_get_params(
+list($extargv, $unrecog) = cli_get_params(
     array(
         'all' => false,
         'current-term' => false,
@@ -41,7 +41,7 @@ list($ext_argv, $unrecog) = cli_get_params(
     )
 );
 
-$reg_argv = array();
+$regargv = array();
 foreach ($argv as $arg) {
     if (strpos($arg, '-') !== false) {
         continue;
@@ -49,21 +49,21 @@ foreach ($argv as $arg) {
 
     if (strlen($arg) == 3) {
         // If we have processed up to another TERM argument,
-        // and we have no SRS requested within that TERM
-        $reg_argv[] = $arg;
+        // and we have no SRS requested within that TERM.
+        $regargv[] = $arg;
     }
 }
 
 // This may screw up...
 ini_set('display_errors', '1');
 
-// Figure out which terms to run for
-$termlist = NULL;
-if (!empty($reg_argv)) {
-    $termlist = $reg_argv;
-} 
+// Figure out which terms to run for.
+$termlist = null;
+if (!empty($regargv)) {
+    $termlist = $regargv;
+}
 
-if ($ext_argv['current-term']) {
+if ($extargv['current-term']) {
     if (!empty($CFG->currentterm)) {
         $termlist = array($CFG->currentterm);
     } else {
@@ -73,32 +73,32 @@ if ($ext_argv['current-term']) {
 
 // Figure out which subject areas to run for.
 $subjareas = null;
-if ($ext_argv['subjarea']) {
-    $subjareas = explode(',', $ext_argv['subjarea']);
+if ($extargv['subjarea']) {
+    $subjareas = explode(',', $extargv['subjarea']);
 }
 
-$q = $ext_argv['quiet'];
+$q = $extargv['quiet'];
 if ($q) {
     ob_start();
 }
 
-if ($ext_argv['all']) {
-    run_browseby_sync(null, $subjareas, true);
+if ($extargv['all']) {
+    block_ucla_browseby_observer::run_browseby_sync(null, $subjareas, true);
 } else if (empty($termlist)) {
     echo "No terms specified!\n";
-    $ext_argv['help'] = true;
+    $extargv['help'] = true;
 }
 
-if ($ext_argv['help']) {
+if ($extargv['help']) {
     die (
-"Usage: " . exec("which php") . ' ' . $argv[0] . " TERM [ TERM ... ]
+    "Usage: " . exec("which php") . ' ' . $argv[0] . " TERM [ TERM ... ]
 
 Options:
     --all           Run BrowseBy for all terms.
     --current-term  Automatically use current term.
     --subjarea      Pass in a comma delinated list of subject areas to sync.
     -h, --help      Display this message.
-    -q, --quiet     Make script say nothing. All output will be suppressed. 
+    -q, --quiet     Make script say nothing. All output will be suppressed.
 
 ");
 }

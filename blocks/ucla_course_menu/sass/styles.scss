@@ -38,11 +38,6 @@ $site-menu-hover-color:         #fcfcfc;
                 padding: 8px 8px;
                 margin: 0;
 
-                // Do not display images
-                img {
-                    display: none;
-                }
-
                 // Hidden items will have their link color darkened
                 // and will display a 'hidden' label.
                 &.block_ucla_course_menu_hidden {
@@ -72,6 +67,12 @@ $site-menu-hover-color:         #fcfcfc;
         
         // Default nodes
         .type_structure {
+
+            // Do not display icon.
+            img {
+             display:none;
+            }
+
             // Add right facing chevrons to the menu items
             &.item_with_icon {
                 .tree_item.leaf {
@@ -100,21 +101,34 @@ $site-menu-hover-color:         #fcfcfc;
                 }
             }
         }
-        
+
+        .type_activity { 
+            img {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
         // Custom nodes + moodle generated nodes
         .type_custom, 
         .type_activity {
             border-left: 0;
-            
+
             .tree_item {
                 padding-right: 0;
             
                 a, a:link, a:visited {display: inline;}
             }
         }
-        
+
         // Generate icons for site menu links
         .type_custom {
+
+            // Do not display icon.
+            img {
+                display: none;
+            }
+
             // Generic icon to prevent indentation issues
             .leaf:before {
                 // link
