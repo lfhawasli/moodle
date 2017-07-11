@@ -90,6 +90,16 @@ switch ($action) {
         $otheruserroles = optional_param('otherusers', false, PARAM_BOOL);
         $outcome->response = $manager->get_assignable_roles_for_json($otheruserroles);
         break;
+    // START UCLA MOD: 6009 - Make manual enrollment options match role restrictions for Site type
+    case 'uclagetassignable':
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
+        $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($course);
+        foreach($untrimmedroles as $role) {
+            $roles[] = array('id' => $role->id, 'name' => $role->name);
+        }
+        $outcome->response = $roles;
+        break;
+    // END UCLA MOD: 6009
     case 'searchotherusers':
         $search = optional_param('search', '', PARAM_RAW);
         $page = optional_param('page', 0, PARAM_INT);
