@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Invitation mismatch event class.
- * 
+ *
  * Class for event to be triggered when an invitation has mismatch email address.
  *
  * @package    enrol_invitation
@@ -61,7 +61,8 @@ class invitation_mismatch extends \core\event\base {
      * @return a short description for the event log.
      * */
     public function get_description() {
-        return "The user with id '{$this->userid}' has mismatch email address with the email from the invitation with enrol_invitation id '{$this->objectid}'.";
+        return "The user with id '{$this->userid}' has mismatch email address "
+        . "with the email from the invitation with enrol_invitation id '{$this->objectid}'.";
     }
 
     /**
@@ -76,7 +77,7 @@ class invitation_mismatch extends \core\event\base {
      * get_legacy_logdata()
      * Used to add log data to legacy log, this is only called if legacy logging
      * is enabled through the legacy logging plugin.
-     * 
+     *
      * @return an array that imitates the arguments that are used to be passed
      * to the old add_to_log function.
      * */

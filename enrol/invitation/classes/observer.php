@@ -47,7 +47,7 @@ class enrol_invitation_observer {
             }
         }
 
-        // Make sure you aren't trying something silly like adding enrollment 
+        // Make sure you aren't trying something silly like adding enrollment
         // plugin to siteid.
         if ($event->courseid == SITEID) {
             return false;

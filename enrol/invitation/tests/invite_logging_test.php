@@ -37,7 +37,7 @@ class enrol_invitation_events_testcase extends advanced_testcase {
 
     /**
      * Invitation manager instance.
-     * 
+     *
      * @var invitation_manager
      */
     private $invitationmanager = null;
@@ -65,6 +65,8 @@ class enrol_invitation_events_testcase extends advanced_testcase {
 
     /**
      * Setup is called before calling test case.
+     *
+     * @return void
      */
     public function setUp() {
         $this->resetAfterTest();
@@ -78,7 +80,10 @@ class enrol_invitation_events_testcase extends advanced_testcase {
         $this->testinvitee = $this->getDataGenerator()->create_user();
         $this->testinviter = $this->getDataGenerator()->create_user();
         $teacherroleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
-        $this->getDataGenerator()->role_assign($teacherroleid, $this->testinviter->id, context_course::instance($this->testcourse->id));
+        $this->getDataGenerator()->role_assign($teacherroleid,
+            $this->testinviter->id,
+            context_course::instance($this->testcourse->id)
+        );
 
         // Create manager that we want to test.
         $this->invitationmanager = new invitation_manager($this->testcourse->id);
@@ -243,7 +248,7 @@ class enrol_invitation_events_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $this->assertCount(4, $events);
         // There are multiple events that are triggered when a user is enrolled.
-        // The first to be triggered should be invitation_mismatch, since it is 
+        // The first to be triggered should be invitation_mismatch, since it is
         // triggered before enrollment, so it should be at the start of the array.
         $event = reset($events);
 
@@ -293,7 +298,7 @@ class enrol_invitation_events_testcase extends advanced_testcase {
     /**
      * Generates data object needed to submit to send_invitations()
      * with data from this test class.
-     * 
+     *
      * @return obj $data
      */
     public function generate_invite_form_data() {
@@ -311,7 +316,7 @@ class enrol_invitation_events_testcase extends advanced_testcase {
 
     /**
      * Generates an invitation instance relevant to this test class.
-     * 
+     *
      * @return obj $invitation
      */
     public function generate_invitation() {

@@ -23,7 +23,7 @@
  */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    //  It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
 require_once('locallib.php');
@@ -43,10 +43,10 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
 class invitation_form extends moodleform {
     /**
      * Display options for expiration time for temporary participants.
-     * 
+     *
      * @var array
      */
-    public static $daysexpire_options = array(3 => 3, 7 => 7, 30 => 30,
+    public static $daysexpireoptions = array(3 => 3, 7 => 7, 30 => 30,
             90 => 90, 180 => 180);
 
     /**
@@ -71,57 +71,57 @@ class invitation_form extends moodleform {
         // Set roles.
         $mform->addElement('header', 'header_role', get_string('header_role', 'enrol_invitation'));
 
-        $site_roles = $this->get_appropiate_roles($course);
+        $siteroles = $this->get_appropiate_roles($course);
         $label = get_string('assignrole', 'enrol_invitation');
-        $role_group = array();
-        foreach ($site_roles as $role_type => $roles) {
-            $role_type_string = html_writer::tag('div',
-                    get_string($role_type, 'tool_uclaroles'),
+        $rolegroup = array();
+        foreach ($siteroles as $roletype => $roles) {
+            $roletypestring = html_writer::tag('div',
+                    get_string($roletype, 'tool_uclaroles'),
                     array('class' => 'label-bstp label-primary'));
-            $role_group[] = &$mform->createElement('static', 'role_type_header',
-                    '', $role_type_string);
+            $rolegroup[] = &$mform->createElement('static', 'role_type_header',
+                    '', $roletypestring);
 
             foreach ($roles as $role) {
-                $role_string = $this->format_role_string($role);
-                $role_group[] = &$mform->createElement('radio', 'roleid', '',
-                        $role_string, $role->id);
+                $rolestring = $this->format_role_string($role);
+                $rolegroup[] = &$mform->createElement('radio', 'roleid', '',
+                        $rolestring, $role->id);
             }
         }
 
         // Give "Temporary Participant" option.
         if (get_config('enrol_invitation', 'enabletempparticipant')) {
             // Create Temporary Roles group.
-            $role_type_string = html_writer::tag('div',
+            $roletypestring = html_writer::tag('div',
                     get_string('tempgroup', 'enrol_invitation'),
                     array('class' => 'label-bstp label-warning'));
-            $role_group[] = &$mform->createElement('static', 'role_type_header',
-                    '', $role_type_string);
+            $rolegroup[] = &$mform->createElement('static', 'role_type_header',
+                    '', $roletypestring);
 
             // Add Temporary Participant role.
             $role = $DB->get_record('role',
                     array('shortname' => 'tempparticipant'));
-            $role_string = $this->format_role_string($role);
+            $rolestring = $this->format_role_string($role);
 
-            $role_group[] = &$mform->createElement('radio', 'roleid', '',
-                    $role_string, $role->id);
+            $rolegroup[] = &$mform->createElement('radio', 'roleid', '',
+                    $rolestring, $role->id);
 
             // Create dropdown for choosing day expiration.
-            $daysexpire_dropdown = &$mform->createElement('select',
-                    'daysexpire', '', self::$daysexpire_options);
-            $daysexpire_string = html_writer::tag('span',
+            $daysexpiredropdown = &$mform->createElement('select',
+                    'daysexpire', '', self::$daysexpireoptions);
+            $daysexpirestring = html_writer::tag('span',
                     get_string('daysexpire_string', 'enrol_invitation',
-                            $daysexpire_dropdown->toHtml()),
+                            $daysexpiredropdown->toHtml()),
                     array('class' => 'well well-sm daysexpire_string'));
-            $role_group[] = &$mform->createElement('static',
-                    'daysexpire_string', '', $daysexpire_string);
+            $rolegroup[] = &$mform->createElement('static',
+                    'daysexpire_string', '', $daysexpirestring);
         }
 
-        $mform->addGroup($role_group, 'role_group', $label);
+        $mform->addGroup($rolegroup, 'role_group', $label);
         $mform->addRule('role_group',
                 get_string('norole', 'enrol_invitation'), 'required');
 
         $mform->addElement('header', 'header_email', get_string('header_email', 'enrol_invitation'));
-        // Email from field
+        // Email from field.
         $mform->addElement('text', 'fromemail', get_string('fromemail', 'enrol_invitation'));
         $mform->addRule('fromemail', null, 'required', null, 'client');
         $mform->setType('fromemail', PARAM_EMAIL);
@@ -140,9 +140,9 @@ class invitation_form extends moodleform {
         $mform->setType('subject', PARAM_TEXT);
         $mform->addRule('subject', get_string('required'), 'required');
         // Default subject is "Site invitation for <course title>".
-        $default_subject = get_string('default_subject', 'enrol_invitation',
+        $defaultsubject = get_string('default_subject', 'enrol_invitation',
                 sprintf('%s: %s', $course->shortname, $course->fullname));
-        $mform->setDefault('subject', $default_subject);
+        $mform->setDefault('subject', $defaultsubject);
 
         // Message field.
         $mform->addElement('textarea', 'message', get_string('message', 'enrol_invitation'),
@@ -184,7 +184,7 @@ class invitation_form extends moodleform {
 
         // Check if form validated, and if user submitted daysexpire from POST.
         if (!empty($retval) && isset($_POST['daysexpire'])) {
-            if (in_array($_POST['daysexpire'], self::$daysexpire_options)) {
+            if (in_array($_POST['daysexpire'], self::$daysexpireoptions)) {
                 // Cannot indicate to user a real error message, so just slightly
                 // ignore user setting.
                 $retval->daysexpire = $_POST['daysexpire'];
@@ -210,7 +210,7 @@ class invitation_form extends moodleform {
         $role->description = str_ireplace(array('<hr />', '<hr/>'), '<hr>', $role->description);
         $roledescription = explode('<hr>', $role->description);
 
-        // Need to clean html, because TinyMCE adds a lot of extra tags that 
+        // Need to clean html, because TinyMCE adds a lot of extra tags that
         // mess up formatting.
         $roledescription = $roledescription[0];
         // Whitelist some formatting tags.
@@ -249,9 +249,9 @@ class invitation_form extends moodleform {
     public function validation($data, $files) {
         $errors = array();
         $delimiters = "/[;, \r\n]/";
-        $email_list = self::parse_dsv_emails($data['email'], $delimiters);
+        $emaillist = self::parse_dsv_emails($data['email'], $delimiters);
 
-        if (empty($email_list)) {
+        if (empty($emaillist)) {
             $errors['email'] = get_string('err_email', 'form');
         }
 
@@ -264,20 +264,20 @@ class invitation_form extends moodleform {
      *
      * @param string $emails           string of emails to be parsed
      * @param string $delimiters       list of delimiters as regex
-     * @return array $parsed_emails    array of emails
+     * @return array $parsedemails    array of emails
      */
     public static function parse_dsv_emails($emails, $delimiters) {
-        $parsed_emails = array();
+        $parsedemails = array();
         $emails = trim($emails);
         if (preg_match($delimiters, $emails)) {
             // Multiple email addresses specified.
-            $dsv_emails = preg_split($delimiters, $emails, null, PREG_SPLIT_NO_EMPTY);
-            foreach ($dsv_emails as $email_value) {
-                $email_value = trim($email_value);
-                if (!clean_param($email_value, PARAM_EMAIL)) {
+            $dsvemails = preg_split($delimiters, $emails, null, PREG_SPLIT_NO_EMPTY);
+            foreach ($dsvemails as $emailvalue) {
+                $emailvalue = trim($emailvalue);
+                if (!clean_param($emailvalue, PARAM_EMAIL)) {
                     return array();
                 }
-                $parsed_emails[] = $email_value;
+                $parsedemails[] = $emailvalue;
             }
         } else if (clean_param($emails, PARAM_EMAIL)) {
             // Single email.
@@ -286,6 +286,6 @@ class invitation_form extends moodleform {
             return array();
         }
 
-        return $parsed_emails;
+        return $parsedemails;
     }
 }

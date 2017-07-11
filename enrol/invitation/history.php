@@ -146,8 +146,9 @@ if (empty($invites)) {
             $role = $DB->get_record('role', array('id' => $invite->roleid));
             if (empty($role)) {
                 // Cannot find role, give error.
-                $rolecache[$invite->roleid] =
-                        get_string('historyundefinedrole', 'enrol_invitation');
+                $rolecache[$invite->roleid] = get_string(
+                    'historyundefinedrole', 'enrol_invitation'
+                );
             } else {
                 $rolecache[$invite->roleid] = $role->name;
             }

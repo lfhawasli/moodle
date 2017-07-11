@@ -30,8 +30,7 @@ $string['pluginname_desc'] = 'The site invitation module allows to send invitati
 // Email message strings.
 $string['reminder'] = 'Reminder: ';
 
-$string['emailmsgtxt'] =
-    'INSTRUCTIONS:' . "\n" .
+$string['emailmsgtxt'] = 'INSTRUCTIONS:' . "\n" .
     '------------------------------------------------------------' . "\n" .
     'You have been invited to access the site: {$a->fullname}. You will ' .
     'need to log in to CCLE with your UCLA logon in order to confirm your access ' .
@@ -57,8 +56,7 @@ $string['emailmsgtxt'] =
     'If you believe that you have received this message in error or are in need ' .
     'of assistance, please contact: {$a->supportemail} or submit a help request at {$a->helpurl}.';
 
-$string['instructormsg'] =
-    'MESSAGE FROM INSTRUCTOR:' . "\n" .
+$string['instructormsg'] = 'MESSAGE FROM INSTRUCTOR:' . "\n" .
     '------------------------------------------------------------' . "\n" .
     '{$a}' . "\n\n";
 
@@ -111,8 +109,7 @@ $string['maxinviteperday_help'] = 'Maximum invitation that can be send per day f
 $string['message'] = 'Message';
 
 $string['message_help_link'] = 'see what instructions invitees are sent';
-$string['message_help'] =
-    'INSTRUCTIONS:'.
+$string['message_help'] = 'INSTRUCTIONS:'.
     '<hr />'.
     'You have been invited to access the site: [site name]. You will ' .
     'need to log in to CCLE with your UCLA logon in order to confirm your access ' .

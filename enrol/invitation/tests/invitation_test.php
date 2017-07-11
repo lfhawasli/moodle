@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/enrol/invitation/locallib.php');
 class invitation_manager_testcase extends advanced_testcase {
     /**
      * Invitation manager instance.
-     * 
+     *
      * @var invitation_manager
      */
     private $courseinvitationmanager = null;
@@ -69,6 +69,7 @@ class invitation_manager_testcase extends advanced_testcase {
      * sure that the proper timeend is set.
      *
      * @dataProvider daystoexpire_provider
+     * @param array $daystoexpire
      */
     public function test_enroluser_withdaysexpire($daystoexpire) {
         global $DB;
@@ -90,7 +91,7 @@ class invitation_manager_testcase extends advanced_testcase {
 
         // Do not count today as one of the days.
         $today = strtotime(date('Y/m/d'));
-        $expectedexpiration = strtotime(sprintf('+%d days', $daystoexpire+1), $today)-1;
+        $expectedexpiration = strtotime(sprintf('+%d days', $daystoexpire + 1), $today) - 1;
 
         $this->assertEquals($expectedexpiration, intval($timeend));
     }
@@ -226,13 +227,13 @@ class invitation_manager_testcase extends advanced_testcase {
      * enrol/invitation/invitation_form.php: parse_dsv_emails.
      */
     public function test_emailparsing() {
-        // Check that a single email address gets successfully parsed
+        // Check that a single email address gets successfully parsed.
         $emails = 'user1@asd.com';
         $parsedemails = prepare_emails($emails);
         $this->assertCount(1, $parsedemails);
         $this->assertEquals('user1@asd.com', $parsedemails[0]);
 
-        // Check that multiple email addresses get successfully parsed
+        // Check that multiple email addresses get successfully parsed.
         $emails .= ';user2@asd.com;user3@asd.com;user4@asd.com';
         $parsedemails = prepare_emails($emails);
         $this->assertCount(4, $parsedemails);
@@ -286,12 +287,12 @@ class invitation_manager_testcase extends advanced_testcase {
     }
 
     /**
-     * To verify when extend inviation is invoke, the expiration date is 
+     * To verify when extend inviation is invoke, the expiration date is
      * this many days (set in config) from today (the day sent)
      */
     public function test_extendinvite() {
         global $DB;
-        
+
         // Settings avoid debug.
         unset_config('noemailever');
         $sink = $this->redirectEmails();
@@ -303,9 +304,9 @@ class invitation_manager_testcase extends advanced_testcase {
 
         $data = $this->generate_invite_form_data($this->testcourse->id);
         $inviteid = $this->courseinvitationmanager->send_invitations($data);
-        
+
         // Set the invitation expired.
-        $DB->set_field('enrol_invitation', 'timeexpiration', time()-1,
+        $DB->set_field('enrol_invitation', 'timeexpiration', time() - 1,
                     array('id' => $inviteid));
         $invitation = $DB->get_record('enrol_invitation', array('id' => $inviteid));
 
@@ -319,7 +320,7 @@ class invitation_manager_testcase extends advanced_testcase {
         // If the invitation did sent out within 24 hours.
         $expectedexpiration = time() + get_config('enrol_invitation', 'inviteexpiration');
         $this->assertEquals(gmdate("Y-m-d", $expectedexpiration), gmdate("Y-m-d", $timeend));
-     }
+    }
 
     /**
      * Provides array of days for invitation to expire after being accepted.
@@ -328,7 +329,7 @@ class invitation_manager_testcase extends advanced_testcase {
      */
     public function daystoexpire_provider() {
         $retval = array();
-        foreach (invitation_form::$daysexpire_options as $daysexpire) {
+        foreach (invitation_form::$daysexpireoptions as $daysexpire) {
             $retval[] = array($daysexpire);
         }
         return $retval;
@@ -336,8 +337,9 @@ class invitation_manager_testcase extends advanced_testcase {
 
     /**
      * Generates data object needed to submit to send_invitations()
-     * 
-     * @return obj $data
+     *
+     * @param string $courseid
+     * @return object $data
      */
     private function generate_invite_form_data($courseid) {
         global $DB;
