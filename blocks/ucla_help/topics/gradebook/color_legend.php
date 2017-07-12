@@ -53,7 +53,7 @@ $buffer = <<<END
                 <div class="item">
 
                     <img alt="Edit grade" class="smallicon" title="Edit grade"
-                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for student
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Single view for student
 
                 </div>
             </div>
@@ -75,7 +75,7 @@ $buffer = <<<END
                 </div>
                 <div class="item">
                     <img alt="Full view" class="smallicon" title="Quick edit"
-                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Quick edit for item
+                        src="$CFG->wwwroot/theme/image.php/uclashared/core/1393450918/t/editstring"> Single view for item
                 </div>
             </div>
         </div>
