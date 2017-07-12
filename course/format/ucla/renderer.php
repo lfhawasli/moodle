@@ -322,8 +322,7 @@ class format_ucla_renderer extends format_topics_renderer {
                 // Show the section if the user is permitted to access it, OR if it's not available
                 // but showavailability is turned on (and there is some available info text).
                 $showsection = $thissection->uservisible ||
-                        ($thissection->visible && !$thissection->available && $thissection->showavailability
-                        && !empty($thissection->availableinfo));
+                        ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo));
                 if (!$showsection) {
 
                     unset($sections[$section]);
