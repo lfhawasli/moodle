@@ -197,7 +197,7 @@ class local_ucla_participants extends course_enrolment_manager {
             $extrafields = get_extra_user_fields($this->get_context());
             $extrafields[] = 'lastaccess';
             $ufields = user_picture::fields('u', $extrafields);
-            $filtersql .= " AND IFNULL(NULLIF(u.alternatename, ''), u.firstname) LIKE '$firstinitial%' AND .u.lastname LIKE '$lastinitial%'";
+            $filtersql .= " AND u.firstname LIKE '$firstinitial%' AND u.lastname LIKE '$lastinitial%'";
             $sql = "SELECT DISTINCT $ufields, ul.timeaccess AS lastseen
                       FROM {user} u
                       JOIN {user_enrolments} ue ON (ue.userid = u.id  AND ue.enrolid $instancessql)
@@ -206,17 +206,17 @@ class local_ucla_participants extends course_enrolment_manager {
                  LEFT JOIN {groups_members} gm ON u.id = gm.userid
                      WHERE $filtersql";
             if ($sort === 'firstname') {
-                $sql .= " ORDER BY IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction, u.lastname $direction";
+                $sql .= " ORDER BY u.firstname $direction, u.lastname $direction";
             } else if ($sort === 'lastname') {
-                $sql .= " ORDER BY u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'email') {
-                $sql .= " ORDER BY u.email $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.email $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'lastseen') {
-                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'lastcourseaccess') {
-                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction,IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'idnumber') {
-                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, u.firstname $direction";
             }
 
             $input = $DB->get_records_sql($sql, $params);
