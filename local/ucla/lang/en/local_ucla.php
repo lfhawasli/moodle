@@ -296,6 +296,7 @@ $string['eventsyncenrolmentsfinished'] = 'Enrol sync finished';
 
 // CCLE-5989 - Activity availability conditions popup
 $string['availabilityconditions'] = 'Access restrictions';
+$string['hidden'] = 'Hidden';
 
 // SSC-2050 - Include associated courses in subject header of forum emails
 $string['limitcrosslistemailname'] = 'Cross Listed Course Limit';

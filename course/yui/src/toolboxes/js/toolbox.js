@@ -28,6 +28,9 @@ var CSS = {
     },
     // The CSS selectors we use.
     SELECTOR = {
+        // START UCLA MOD: CCLE-6373 - Add hidden flag to hidden content.
+        HIDDENLABEL: '.hiddenlabel',
+        // END UCLA MOD: CCLE-6373
         ACTIONAREA: '.actions',
         ACTIONLINKTEXT : '.actionlinktext',
         ACTIVITYACTION : 'a.cm-edit-action[data-action]',
