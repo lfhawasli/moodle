@@ -13,8 +13,23 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Exception file for UCLA course creator class.
+ *
+ * @package    tool_uclacoursecreator
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Course creator exception class.
+ *
+ * @package    tool_uclacoursecreator
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class course_creator_exception extends moodle_exception {
     // Nothing...
 }

@@ -38,22 +38,21 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclacoursecreator/uclaco
 class tool_uclacoursecreator_observer {
 
     /**
-    * Responds to course deletion event. Does the following things:
-    *
-    * 1) Delete course request in ucla_request_classes.
-    * 2) Check MyUCLA url web service to see if course has urls.
-    * 2a) If has urls and they aren't pointing to current server, skip them.
-    * 2b) If has urls and they are pointing to the current server, then clear them.
-    * 3) Delete entries in ucla_reg_classinfo.
-    * 4) Trigger ucla_course_deleted event.
-    *
-    *
-    * @param \core\event\course_deleted $event    Course object.
-    * @return boolean          False on error, otherwise true.
-    */
+     * Responds to course deletion event. Does the following things:
+     *
+     * 1) Delete course request in ucla_request_classes.
+     * 2) Check MyUCLA url web service to see if course has urls.
+     * 2a) If has urls and they aren't pointing to current server, skip them.
+     * 2b) If has urls and they are pointing to the current server, then clear them.
+     * 3) Delete entries in ucla_reg_classinfo.
+     * 4) Trigger ucla_course_deleted event.
+     *
+     *
+     * @param \core\event\course_deleted $event    Course object.
+     * @return boolean          False on error, otherwise true.
+     */
     public static function handle_course_deleted(\core\event\course_deleted $event) {
         global $DB;
-        //$course = get_course(get_data($event)->course->id);
         // Check if course exists in ucla_request_classes.
         $uclarequestclasses = ucla_map_courseid_to_termsrses($event->courseid);
         if (empty($uclarequestclasses)) {
@@ -61,25 +60,22 @@ class tool_uclacoursecreator_observer {
         }
         $uclaclassinfo = ucla_get_course_info($event->courseid);
 
-        // 1) Delete course request in ucla_request_classes
+        // 1) Delete course request in ucla_request_classes.
         $DB->delete_records('ucla_request_classes', array('courseid' => $event->courseid));
 
-        // 2) Check MyUCLA url web service to see if course has urls
+        // 2) Check MyUCLA url web service to see if course has urls.
         $cc = new uclacoursecreator();
-        $myucla_urlupdater = $cc->get_myucla_urlupdater();
-        if (empty($myucla_urlupdater)) {
-            return true;    // not installed
+        $myuclaurlupdater = $cc->get_myucla_urlupdater();
+        if (empty($myuclaurlupdater)) {
+            return true;    // Not installed.
         }
 
-        $has_error = false;
+        $haserror = false;
         foreach ($uclarequestclasses as $request) {
-            $result = $myucla_urlupdater->set_url_if_same_server($request->term, $request->srs, '');
-            if ($result == $myucla_urlupdater::url_set) {
-                // Url cleared.
-            } else if ($result == $myucla_urlupdater::url_notset) {
-              // Url didn't belong to current server.
-            } else {
-                $has_error = true;
+            $result = $myuclaurlupdater->set_url_if_same_server($request->term, $request->srs, '');
+            if (!($result == $myuclaurlupdater::url_set || // Url cleared.
+                    $result == $myuclaurlupdater::url_notset)) { // Url didn't belong to current server.
+                $haserror = true;
             }
 
             // 3) Delete entries in ucla_reg_classinfo.
@@ -102,7 +98,7 @@ class tool_uclacoursecreator_observer {
         ));
         $deletedevent->trigger();
 
-        return !$has_error;
+        return !$haserror;
     }
 
 }

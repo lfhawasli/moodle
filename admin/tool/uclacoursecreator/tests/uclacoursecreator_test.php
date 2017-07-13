@@ -159,7 +159,7 @@ class uclacoursecreator_test extends advanced_testcase {
         $roleid = $roles['editinginstructor'];
         // Enroll as instructor.
         foreach ($classes as $class) {
-            $generator->enrol_reg_user($user->id, $class->id, $roleid);
+            $generator->enrol_reg_user($user->id, $class->courseid, $roleid);
         }
 
         $previouscourses = $this->uclacoursecreator->get_instructor_previous_courses($user->idnumber);

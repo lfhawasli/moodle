@@ -71,9 +71,8 @@ class event_test extends advanced_testcase {
         global $DB;
 
         // Create crosslisted course and delete it.
-        $class = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array(), array());
+        $plugingen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $class = $plugingen->create_class(array(), array());
         $course = reset($class);
 
         // Make sure ucla_request_classes entries is not empty.
@@ -82,6 +81,8 @@ class event_test extends advanced_testcase {
         $this->assertTrue($exists);
 
         delete_course($course->courseid);
+
+        $this->resetDebugging();
 
         // Make sure ucla_request_classes entries are empty.
         $exists = $DB->record_exists('ucla_request_classes',
@@ -96,136 +97,135 @@ class event_test extends advanced_testcase {
         }
     }
 
-//    /**
-//     * See if ucla_request_classes and ucla_reg_classinfo entries are deleted
-//     * when a non-crosslisted course is deleted.
-//     */
-//    public function test_delete_noncrosslist_course() {
-//        global $DB;
-//
-//        // Create non-crosslisted course and delete it.
-//        $class = $this->getDataGenerator()
-//                ->get_plugin_generator('local_ucla')
-//                ->create_class(array());
-//        $course = reset($class);
-//        delete_course($course->courseid);
-//
-//        // Make sure ucla_request_classes entries are empty.
-//        $exists = $DB->record_exists('ucla_request_classes',
-//                array('courseid' => $course->courseid));
-//        $this->assertFalse($exists);
-//
-//        // Make sure ucla_reg_classinfo entries are empty.
-//        foreach ($class as $entry) {
-//            $exists = $DB->record_exists('ucla_reg_classinfo',
-//                    array('term' => $entry->term, 'srs' => $entry->srs));
-//            $this->assertFalse($exists);
-//        }
-//    }
-//
-//    /**
-//     * Test clearing of an existing MyUCLA url.
-//     */
-//    public function test_existing_myuclaurl() {
-//        global $CFG;
-//
-//        $cc = new uclacoursecreator();
-//        $myuclarlupdater = $cc->get_myucla_urlupdater();
-//
-//        // URL exist and is for current server, then should clear it.
-//        // First create url for course.
-//        $class = $this->getDataGenerator()
-//                ->get_plugin_generator('local_ucla')
-//                ->create_class(array());
-//        $course = reset($class);
-//
-//        $courseurl = array('term' => $course->term,
-//            'srs' => $course->srs,
-//            'url' => $CFG->wwwroot . '/course/view.php?id=' . $course->courseid);
-//        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
-//        $pos = strpos(array_pop($result),
-//                $myuclarlupdater::expected_success_message);
-//        $this->assertTrue($pos !== false);
-//
-//        // Now delete course.
-//        delete_course($course->courseid);
-//
-//        // Verify that myucla url is deleted.
-//        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
-//        $result = array_pop($result);
-//        $this->assertTrue(empty($result));
-//    }
-//
-//    /**
-//     * Test clearing of an existing MyUCLA url for a crosslisted course.
-//     */
-//    public function test_existing_myuclaurl_crosslisted() {
-//        global $CFG;
-//
-//        $cc = new uclacoursecreator();
-//        $myuclarlupdater = $cc->get_myucla_urlupdater();
-//
-//        // URL exist and is for current server, then should clear it.
-//        // First create urls for course.
-//        $class = $this->getDataGenerator()
-//                ->get_plugin_generator('local_ucla')
-//                ->create_class(array(), array());
-//        $course = reset($class);
-//
-//        foreach ($class as $crosslist) {
-//            $courseurl = array('term' => $crosslist->term,
-//                'srs' => $crosslist->srs,
-//                'url' => $CFG->wwwroot . '/course/view.php?id=' . $crosslist->courseid);
-//            $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
-//            $pos = strpos(array_pop($result),
-//                    $myuclarlupdater::expected_success_message);
-//            $this->assertTrue($pos !== false);
-//        }
-//
-//        // Now delete course.
-//        delete_course($course->courseid);
-//
-//        // Verify that myucla urls are deleted.
-//        foreach ($class as $crosslist) {
-//            $courseurl = array('term' => $crosslist->term,
-//                'srs' => $crosslist->srs);
-//            $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
-//            $result = array_pop($result);
-//            $this->assertTrue(empty($result));
-//        }
-//    }
-//
-//    /**
-//     * Test not clearing of an existing MyUCLA url that isn't on current server.
-//     */
-//    public function test_existing_nonlocal_myuclaurl() {
-//        global $CFG;
-//
-//        $cc = new uclacoursecreator();
-//        $myuclarlupdater = $cc->get_myucla_urlupdater();
-//
-//        // URL exist and is not for current server, then should not clear it.
-//        // First create url for course that points to non-local server.
-//        $class = $this->getDataGenerator()
-//                ->get_plugin_generator('local_ucla')
-//                ->create_class(array());
-//        $course = reset($class);
-//
-//        $courseurl = array('term' => $course->term,
-//            'srs' => $course->srs,
-//            'url' => 'http://ucla.edu');
-//        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
-//        $pos = strpos(array_pop($result),
-//                $myuclarlupdater::expected_success_message);
-//        $this->assertTrue($pos !== false);
-//
-//        // Now delete course.
-//        delete_course($course->courseid);
-//
-//        // Verify that myucla url is not deleted.
-//        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
-//        $result = array_pop($result);
-//        $this->assertEquals($result, $courseurl['url']);
-//    }
+    /**
+     * See if ucla_request_classes and ucla_reg_classinfo entries are deleted
+     * when a non-crosslisted course is deleted.
+     */
+    public function test_delete_noncrosslist_course() {
+        global $DB;
 
+        // Create non-crosslisted course and delete it.
+        $plugingen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $class = $plugingen->create_class(array());
+        $course = reset($class);
+        delete_course($course->courseid);
+        $this->resetDebugging();
+
+        // Make sure ucla_request_classes entries are empty.
+        $exists = $DB->record_exists('ucla_request_classes',
+                array('courseid' => $course->courseid));
+        $this->assertFalse($exists);
+
+        // Make sure ucla_reg_classinfo entries are empty.
+        foreach ($class as $entry) {
+            $exists = $DB->record_exists('ucla_reg_classinfo',
+                    array('term' => $entry->term, 'srs' => $entry->srs));
+            $this->assertFalse($exists);
+        }
+    }
+
+    /**
+     * Test clearing of an existing MyUCLA url.
+     */
+    public function test_existing_myuclaurl() {
+        global $CFG;
+
+        $cc = new uclacoursecreator();
+        $myuclarlupdater = $cc->get_myucla_urlupdater();
+
+        // URL exist and is for current server, then should clear it.
+        // First create url for course.
+        $plugingen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $class = $plugingen->create_class(array(), array());
+        $course = reset($class);
+
+        $courseurl = array('term' => $course->term,
+            'srs' => $course->srs,
+            'url' => $CFG->wwwroot . '/course/view.php?id=' . $course->courseid);
+        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
+        $pos = strpos(array_pop($result),
+                $myuclarlupdater::expected_success_message);
+        $this->assertTrue($pos !== false);
+
+        // Now delete course.
+        delete_course($course->courseid);
+        $this->resetDebugging();
+
+        // Verify that myucla url is deleted.
+        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
+        $result = array_pop($result);
+        $this->assertTrue(empty($result));
+    }
+
+    /**
+     * Test clearing of an existing MyUCLA url for a crosslisted course.
+     */
+    public function test_existing_myuclaurl_crosslisted() {
+        global $CFG;
+
+        $cc = new uclacoursecreator();
+        $myuclarlupdater = $cc->get_myucla_urlupdater();
+
+        // URL exist and is for current server, then should clear it.
+        // First create urls for course.
+        $plugingen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $class = $plugingen->create_class(array(), array());
+        $course = reset($class);
+
+        foreach ($class as $crosslist) {
+            $courseurl = array('term' => $crosslist->term,
+                'srs' => $crosslist->srs,
+                'url' => $CFG->wwwroot . '/course/view.php?id=' . $crosslist->courseid);
+            $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
+            $pos = strpos(array_pop($result),
+                    $myuclarlupdater::expected_success_message);
+            $this->assertTrue($pos !== false);
+        }
+
+        // Now delete course.
+        delete_course($course->courseid);
+        $this->resetDebugging();
+
+        // Verify that myucla urls are deleted.
+        foreach ($class as $crosslist) {
+            $courseurl = array('term' => $crosslist->term,
+                'srs' => $crosslist->srs);
+            $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
+            $result = array_pop($result);
+            $this->assertTrue(empty($result));
+        }
+    }
+
+    /**
+     * Test not clearing of an existing MyUCLA url that isn't on current server.
+     */
+    public function test_existing_nonlocal_myuclaurl() {
+        global $CFG;
+
+        $cc = new uclacoursecreator();
+        $myuclarlupdater = $cc->get_myucla_urlupdater();
+
+        // URL exist and is not for current server, then should not clear it.
+        // First create url for course that points to non-local server.
+        $plugingen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $class = $plugingen->create_class(array(), array());
+        $course = reset($class);
+
+        $courseurl = array('term' => $course->term,
+            'srs' => $course->srs,
+            'url' => 'http://ucla.edu');
+        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
+        $pos = strpos(array_pop($result),
+                $myuclarlupdater::expected_success_message);
+        $this->assertTrue($pos !== false);
+
+        // Now delete course.
+        delete_course($course->courseid);
+        $this->resetDebugging();
+
+        // Verify that myucla url is not deleted.
+        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
+        $result = array_pop($result);
+        $this->assertEquals($result, $courseurl['url']);
+    }
 }
