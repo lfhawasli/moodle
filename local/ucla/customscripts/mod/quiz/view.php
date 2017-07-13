@@ -17,7 +17,7 @@
 /**
  * Respondus LockDown Browser Extension for Moodle.
  *
- * @package    mod_quiz
+ * @package    local_ucla
  * @copyright  2011-2015 Respondus, Inc.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

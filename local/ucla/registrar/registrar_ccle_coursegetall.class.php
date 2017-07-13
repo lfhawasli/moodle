@@ -27,6 +27,9 @@ require_once(dirname(__FILE__) . '/registrar_query.base.php');
 
 /**
  * Enabled calling of ccle_courseGetAll SP.
+ * 
+ * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ccle_coursegetall extends registrar_stored_procedure {
 

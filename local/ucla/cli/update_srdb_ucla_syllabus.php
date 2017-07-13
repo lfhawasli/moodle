@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Command line script to bulk process and update syllabi links for a given
- * course or term.
+ * Command line script.
+ * 
+ * Bulk process and update syllabi links for a given course or term.
  *
  * @package    local_ucla
  * @copyright  2013 UCLA regents

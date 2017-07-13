@@ -27,6 +27,9 @@ require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
 
 /**
  * Calls ucla_get_user_classes_test stored procedure.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ucla_get_user_classes extends registrar_stored_procedure {
     /**

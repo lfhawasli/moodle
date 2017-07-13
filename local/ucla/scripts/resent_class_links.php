@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Command line script to resent all class links for courses that have been
- * built, but no URL was submitted.
+ * Command line script. 
+ * 
+ * Resent all class links for courses that have been built, but no URL was submitted.
  *
  * First, it tries to find the courses that were built, but have no url set in
  * mdl_ucla_browseall_classinfo.

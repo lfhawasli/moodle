@@ -27,12 +27,15 @@ require_once(dirname(__FILE__) . '/registrar_query.base.php');
 
 /**
  * Base class.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class registrar_stored_procedure extends registrar_query {
     /**
      * Returns the array describing the parameters are needed for the
      * stored procedure.
-     * @example array('term', 'srs')
+     * 
      * @return array
      */
     abstract public function get_query_params();
@@ -110,6 +113,10 @@ abstract class registrar_stored_procedure extends registrar_query {
 
     /**
      * By default, most stored procedures don't need validation.
+     * 
+     * @param array $new
+     * @param array $old
+     * @return boolean
      */
     public function validate($new, $old) {
         return true;
@@ -118,6 +125,9 @@ abstract class registrar_stored_procedure extends registrar_query {
 
 /**
  * Extends registrar_query_exception.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_stored_procedure_exception extends registrar_query_exception {
     // Nothing.

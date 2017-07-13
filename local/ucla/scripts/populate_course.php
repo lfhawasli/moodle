@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Script to automatically populate a course with users with the roles:
+ * Script to automatically populate a course for the given term with users with the roles:
+ * 
  *      * editinginstructor
  *      * ta_instructor
- * for the given term.
  *
  * Usage: php populate_course.php <courseid> <term>
  *

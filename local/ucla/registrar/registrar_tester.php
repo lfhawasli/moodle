@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the connection with the Registrar. NOTHING MORE.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_tester extends registrar_query {
     /**

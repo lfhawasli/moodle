@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Script to show end-of-course survey on alert block for school of public
- * health courses for Fall 2012. See CCLE-3679.
+ * Script to show end-of-course survey on alert block. 
+ * 
+ * For the school of public health courses for Fall 2012. See CCLE-3679.
  *
  * @copyright 2012 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

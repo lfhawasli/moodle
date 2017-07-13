@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Command line script to manually hide courses and related TA sites for a given
- * term.
+ * Command line script to manually hide courses and related TA sites for a given term.
  *
  * @copyright 2013 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

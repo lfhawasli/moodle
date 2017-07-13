@@ -415,7 +415,6 @@ class behat_ucla extends behat_files {
 
     /**
      * Get ucla data generator
-     * @static
      * @return testing_data_generator
      */
     public static function get_data_generator() {

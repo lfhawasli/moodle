@@ -17,8 +17,7 @@
 /**
  * UCLA specific capabilities
  *
- * @package    local
- * @subpackage ucla
+ * @package    local_ucla
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

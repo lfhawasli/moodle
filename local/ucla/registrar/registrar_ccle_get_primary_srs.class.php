@@ -27,9 +27,14 @@ require_once(dirname(__FILE__) . '/registrar_cacheable_stored_procedure.base.php
 
 /**
  * Calls stored procedure ccle_get_primary_srs.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ccle_get_primary_srs extends registrar_cacheable_stored_procedure {
-    // Set timeout to 1 month/30 days (these results shouldn't change).
+    /**
+     * @var $registrarcachettl Set timeout to 1 month/30 days (these results shouldn't change).
+     */
     protected static $registrarcachettl = 2592000;
 
     /**

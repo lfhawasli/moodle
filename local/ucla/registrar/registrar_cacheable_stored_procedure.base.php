@@ -26,8 +26,9 @@ defined('MOODLE_INTERNAL') || die;
 require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
 
 /**
- * This class implements a caching layer for any stored procedure that is
- * derived from it. The caching layer depends on some naming conventions for
+ * This class implements a caching layer for any stored procedure that is derived from it. 
+ * 
+ * The caching layer depends on some naming conventions for
  * its database tables:
  *
  * <stored procedure name>_cache
@@ -38,6 +39,9 @@ require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
  * expires_on   UNIX timestamp for how long the cache entries related to this
  *              query should be valid
  * <return name>    Then as many columns as needed by get_result_columns()
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class registrar_cacheable_stored_procedure extends registrar_stored_procedure {
     /**
@@ -47,6 +51,9 @@ abstract class registrar_cacheable_stored_procedure extends registrar_stored_pro
      */
     protected static $registrarcachettl = null;
 
+    /**
+     * Constructor for the plugin.
+     */
     public function __construct() {
         // See if ttl was manually set beforehand, else use plugin default.
         if (empty(self::$registrarcachettl)) {

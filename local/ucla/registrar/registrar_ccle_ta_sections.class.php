@@ -27,6 +27,9 @@ require_once(dirname(__FILE__).'/registrar_stored_procedure.base.php');
 
 /**
  * Calls stored procedure ccle_ta_sections.
+ * 
+ * @copyright   2016 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ccle_ta_sections extends registrar_stored_procedure {
 

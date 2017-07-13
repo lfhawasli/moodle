@@ -15,21 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class of static functions that help with commonly used mass-database
- * functionality.
+ * Class of static functions that help with commonly used mass-database functionality.
  *
  * @package    local_ucla
  * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class of static functions that help with commonly used mass-database
- * functionality.
+ * Class of static functions that help with commonly used mass-database functionality.
  *
  * Please don't explicitly include this file, include the local/ucla/lib.php
  * instead, and then call the function ucla_require_db_helper().
+ * 
+ * @package    local_ucla
+ * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class db_helper {
     /**
@@ -42,8 +45,9 @@ class db_helper {
      *      and new entries with.
      * @param string $partialwhere  The where statement in a
      *      get_records_select() to synchronize a smaller part of a table.
-     * @param array $partialparmas  The parameters for a get_records_select() to
+     * @param array $partialparams  The parameters for a get_records_select() to
      *      synchronize a smaller part of a table.
+     * @param boolean $allowfulldelete Full delete is allowed.
      * @return
      *      Array(
      *          0 => Array(inserted entries ids),

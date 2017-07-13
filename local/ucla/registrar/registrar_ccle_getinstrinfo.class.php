@@ -27,6 +27,9 @@ require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
 
 /**
  * Calls stored procedure ccle_GETINSTRINFO.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ccle_getinstrinfo extends registrar_stored_procedure {
     /**

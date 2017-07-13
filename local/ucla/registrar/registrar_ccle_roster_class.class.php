@@ -27,6 +27,9 @@ require_once(dirname(__FILE__) . '/registrar_cacheable_stored_procedure.base.php
 
 /**
  * Calls stored procedure ccle_roster_class.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ccle_roster_class extends registrar_cacheable_stored_procedure {
     /**

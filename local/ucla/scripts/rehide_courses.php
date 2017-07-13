@@ -15,8 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * One off command line script to manually hide courses and related TA sites for
- * a given term. Makes sure that guest enrollment plugins are disabled and
+ * One off command line script.
+ * 
+ * Manually hide courses and related TA sites for a given term. 
+ * Makes sure that guest enrollment plugins are disabled and
  * will not touch past courses that were made unhidden.
  *
  * Documentation: https://ccle.ucla.edu/mod/page/view.php?id=395287

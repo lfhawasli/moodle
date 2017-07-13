@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Command line script to force auto-generated forums to be private after a
- * given term.
+ * Command line script to force auto-generated forums to be private after a given term.
  *
  * Documentation: https://ccle.ucla.edu/mod/page/view.php?id=395287
  *

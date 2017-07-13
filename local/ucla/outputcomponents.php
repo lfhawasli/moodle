@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Extends html_writer to override external_link().
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ucla_html_writer extends html_writer {
     /**

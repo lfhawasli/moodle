@@ -27,6 +27,9 @@ defined('MOODLE_INTERNAL') || die;
  * Registrar Connectivity class.
  *
  * Essentially a wrapper for a wrapper for ODBC.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class registrar_query {
     /**
@@ -61,6 +64,9 @@ abstract class registrar_query {
      */
     protected $notrim = false;
 
+    /**
+     * The default encoding.
+     */
     const DEFAULT_ENCODING = 'ISO-8859-1';
 
     /**
@@ -71,7 +77,7 @@ abstract class registrar_query {
      *
      * @param string $queryname The name of the stored procedure.
      * @param array $data       The data to pass into stored procedure.
-     * @param  $filtered        Default true. If false, then will make sure
+     * @param boolean $filtered        Default true. If false, then will make sure
      *                          result includes bad data
      * @return array
      */
@@ -96,8 +102,8 @@ abstract class registrar_query {
     /**
      * This function will utilize the ODBC connection and retrieve data.
      *
-     * @param $drivingdata The data to run a set of queries on.
-     * @param  $filtered Not used in base class. Passed by run_registrar_query
+     * @param array $drivingdata The data to run a set of queries on.
+     * @param boolean $filtered Not used in base class. Passed by run_registrar_query
      *
      * @return Array( Array( ) )
      *     false - indicates bad input
@@ -232,7 +238,9 @@ abstract class registrar_query {
     /**
      * Returns the ADOConnection object for registrar connection.
      *
-     * Wrapper for @see open_registrar_connection().
+     * Wrapper for 
+     * @see registrar_query::open_registrar_connection() Opens a registrar
+     *                                                               connection object
      *
      * May change state of object.
      *
@@ -446,6 +454,9 @@ abstract class registrar_query {
 
 /**
  * Extends moodle_exception.
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_query_exception extends moodle_exception {
     // Nothing...

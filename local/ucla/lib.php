@@ -443,8 +443,8 @@ function ucla_registrar_user_to_moodle_user($reginfo, $cachedconfigs=null) {
 /**
  * Returns a pretty looking term in the format of 12S => Spring 2012.
  *
- * @param string term
- * @param char session  If session is passed, then, assuming the term is
+ * @param string $term
+ * @param char $session  If session is passed, then, assuming the term is
  *                      summer, will return 121, A => Summer 2012 - Session A.
  *
  * @return string
@@ -907,9 +907,9 @@ function ucla_send_mail($to, $subj, $body = '', $header = '') {
 /**
  * Sorts a set of terms.
  *
- * @param  $terms          Array( term, ... )
- * @param  $descending     Optional parameter to sort with most recent term
- *                         first.
+ * @param  array    $terms         Array( term, ... )
+ * @param  boolean  $descending    Optional parameter to sort with 
+ *                                 most recent term first.
  * @return Array( term_in_order, ... )
  */
 function terms_arr_sort($terms, $descending = false) {
@@ -1161,8 +1161,8 @@ function term_enum($term) {
 /**
  * Compare-to function.
  *
- * @param string $term   The first
- * @param string $term   The second
+ * @param string $term    The first
+ * @param string $other   The second
  *
  * @return int
  *     first > second return 1
@@ -1298,17 +1298,17 @@ function make_friendly_url($course) {
     return '/course/view/' . rawurlencode($course->shortname);
 }
 
-/*
+/**
  * Checks the role_assignments table and sees if the viewer shares a context
  * with the target.
  *
  * @param int $targetid     Id of user to check if viewer shares a context with
- * @param int $userid       Defaults to null. If null, then will use currently
+ * @param int $viewerid     Defaults to null. If null, then will use currently
  *                         logged in user.
  *
  * @return boolean          True if viewer does share a context with target,
  *                         otherwise false.
- */
+ **/
 function has_shared_context($targetid, $viewerid=null) {
     global $DB, $USER;
 
@@ -1335,8 +1335,8 @@ function has_shared_context($targetid, $viewerid=null) {
  * Returns active terms. Used by course requestor, course creator, and pre-pop
  * enrollment to see what terms should be processed.
  *
- * @param  $descending     Optional parameter to sort active terms with most
- *     recent first.
+ * @param  boolean $descending     Optional parameter to sort active terms with 
+ *                                 most recent first.
  *
  * @return array           Returns an array of terms
  */
@@ -1366,8 +1366,6 @@ function get_active_terms($descending = 'false') {
 
 /**
  * Sets up the JQuery plugin to sort a given table.
- *
- * @global object $PAGE
  *
  * @param string $tableid   Optional. If entered, will be used to associate
  *                         which table to enable sorting. If not passed will
