@@ -16,7 +16,7 @@
 
 /**
  * Contains stored procedure class ucla_get_course_srs.
- * 
+ *
  * Documentation: https://ccle.ucla.edu/mod/page/view.php?id=395287
  *
  * @package    local_ucla
@@ -24,23 +24,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
 
 /**
  * Stored procedure ucla_get_course_srs.
- * 
+ *
  * @package    local_ucla
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registrar_ucla_get_course_srs extends registrar_stored_procedure {
-
     /**
      * Returns query params.
-     * 
+     *
      * @return array    array of strings
      */
-    function get_query_params() {
+    public function get_query_params() {
         return array('term', 'subjarea', 'crsidx', 'secidx');
     }
 

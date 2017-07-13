@@ -16,4 +16,4 @@ Scenario: Additional names is not hidden in other themes
     And I follow "Profile" in the user menu
     When I follow "Edit profile"
     Then I should see "Additional names"
-  
+

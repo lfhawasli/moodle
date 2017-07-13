@@ -13,7 +13,7 @@ Feature: Deleting a course with additional course content
       | Category 1 | 0        | CAT1     |
       | Category 2 | CAT1     | CAT2     |
     Given the following "courses" exist:
-      | fullname | shortname | category | format | 
+      | fullname | shortname | category | format |
       | Course 1 | COURSE1   | CAT2     | ucla   |
       | Course 2 | COURSE2   | CAT2     | topics |
       | Course 3 | COURSE3   | CAT2     | weeks  |

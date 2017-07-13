@@ -55,7 +55,7 @@ Feature: Overwriting a course with via a restore
       When I click on "Restore" "link" in the "source.mbz" "table_row"
       And I press "Continue"
       # Radio buttons in backup/restore are not properly labeled, so have to
-      # Refer to "Delete the contents of the existing course and then restore" 
+      # Refer to "Delete the contents of the existing course and then restore"
       # with this complicated method.
       When I click on "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-existing-course')]/descendant::input[@type='radio'][@name='target'][@value='3']" "xpath_element"
       And I click on "targetid" "radio" in the "Target" "table_row"
@@ -79,7 +79,7 @@ Feature: Overwriting a course with via a restore
       And I click on "Restore" "link" in the "source.mbz" "table_row"
       And I press "Continue"
       # Radio buttons in backup/restore are not properly labeled, so have to
-      # Refer to "Delete the contents of the existing course and then restore" 
+      # Refer to "Delete the contents of the existing course and then restore"
       # with this complicated method.
       When I click on "//div[contains(concat(' ', normalize-space(@class), ' '), 'bcs-existing-course')]/descendant::input[@type='radio'][@name='target'][@value='3']" "xpath_element"
       And I click on "targetid" "radio" in the "Target" "table_row"

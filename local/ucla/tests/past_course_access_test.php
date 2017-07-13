@@ -54,9 +54,8 @@ class past_course_access_test extends advanced_testcase {
          */
 
         // Need to create one more test site.
-        $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array('term' => '131'));
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $uclagen->create_class(array('term' => '131'));
 
         $summercourses = ucla_get_courses_by_terms(array('131'));
         $this->assertEquals(count($summercourses), 4);
@@ -79,8 +78,7 @@ class past_course_access_test extends advanced_testcase {
                     break;
                 // Site with TA site.
                 case 2:
-                    $tasitegenerator = $this->getDataGenerator()
-                            ->get_plugin_generator('block_ucla_tasites');
+                    $tasitegenerator = $this->getDataGenerator()->get_plugin_generator('block_ucla_tasites');
                     $tasitegenerator->setup();
                     $tasite = $tasitegenerator->create_instance($course);
                     $summercourseids[] = $tasite->id;
@@ -91,7 +89,7 @@ class past_course_access_test extends advanced_testcase {
                             array('enrol' => 'guest',
                         'courseid' => $course->id));
                     foreach ($guestplugins as $guestplugin) {
-                        $enrolguestplugin->delete_instance($guestplugin);                        
+                        $enrolguestplugin->delete_instance($guestplugin);
                     }
                     break;
                 // Regular, default site.
@@ -115,7 +113,7 @@ class past_course_access_test extends advanced_testcase {
                         break;
                     }
                 }
-                $this->assertEquals(ENROL_INSTANCE_ENABLED, $enabled);                
+                $this->assertEquals(ENROL_INSTANCE_ENABLED, $enabled);
             }
         }
 
@@ -151,7 +149,7 @@ class past_course_access_test extends advanced_testcase {
                         break;
                     }
                 }
-                $this->assertEquals(ENROL_INSTANCE_ENABLED, $enabled);                     
+                $this->assertEquals(ENROL_INSTANCE_ENABLED, $enabled);
             }
         }
     }
@@ -195,11 +193,10 @@ class past_course_access_test extends advanced_testcase {
         $summercourses = ucla_get_courses_by_terms(array('131'));
         $this->assertFalse(empty($summercourses));
 
-        $tasitegenerator = $this->getDataGenerator()
-                ->get_plugin_generator('block_ucla_tasites');
+        $tasitegenerator = $this->getDataGenerator()->get_plugin_generator('block_ucla_tasites');
         $tasitegenerator->setup();
         foreach ($summercourses as $courseid => $courseinfo) {
-            $course = $DB->get_record('course', array('id' => $courseid));
+            $course = get_course($courseid);
             $tasitegenerator->create_instance($course);
         }
 
@@ -289,8 +286,7 @@ class past_course_access_test extends advanced_testcase {
         // Now unhide one summer course and try week 4, make sure that unhidden
         // course is not rehidden.
         $unhidecourse = array_pop($summercourses);
-        list($unhidecourse, $courseid) =
-                array(end($summercourses), key($summercourses));
+        list($unhidecourse, $courseid) = array(end($summercourses), key($summercourses));
         $DB->set_field('course', 'visible', 1, array('id' => $courseid));
 
         $event = block_ucla_weeksdisplay\event\week_changed::create(
@@ -308,24 +304,20 @@ class past_course_access_test extends advanced_testcase {
     protected function setUp() {
         $this->resetAfterTest(true);
 
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+
         // Set current term.
         set_config('currentterm', '13F');
 
         // Create some courses for several terms 13S/131/13F/14W.
         $terms = array('13S', '131', '13F', '14W');
         foreach ($terms as $term) {
-            $this->getDataGenerator()
-                    ->get_plugin_generator('local_ucla')
-                    ->create_class(array('term' => $term));
-            $this->getDataGenerator()
-                    ->get_plugin_generator('local_ucla')
-                    ->create_class(array('term' => $term));
-            $this->getDataGenerator()
-                    ->get_plugin_generator('local_ucla')
-                    ->create_class(array('term' => $term));
+            $uclagen->create_class(array('term' => $term));
+            $uclagen->create_class(array('term' => $term));
+            $uclagen->create_class(array('term' => $term));
         }
 
-        // Function local_ucla_observer::hide_past_courses will attempt to send 
+        // Function local_ucla_observer::hide_past_courses will attempt to send
         // email, but will output debugging messages instead. We will use
         // assertDebuggingCalled() and getDebuggingMessages() to verify
         // email message.

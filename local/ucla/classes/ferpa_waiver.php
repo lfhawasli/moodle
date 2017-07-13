@@ -49,7 +49,7 @@ class local_ucla_ferpa_waiver {
 
         // There isn't a simple way to get the data from the 'mdl_lti' table
         // using core APIs, so using direct query.
-        $sql = "SELECT l.toolurl, l.typeid, lt.id AS ispreconfigured
+        $sql = "SELECT l.toolurl, l.typeid, lt.id ispreconfigured
                   FROM {context} cxt
                   JOIN {course_modules} cm ON (cxt.instanceid=cm.id AND cxt.contextlevel=?)
                   JOIN {lti} l ON (cm.instance=l.id)
@@ -61,15 +61,15 @@ class local_ucla_ferpa_waiver {
         if (strpos($ltitool->toolurl, 'ucla.edu') === false &&
                 strpos($ltitool->toolurl, 'pearsoncmg.com') === false) {
             // Do not need to sign waiver for tools configured at site level.
-            
+
             // See if LTI tool is setup as a preconfigured tool.
             if (empty($ltitool->ispreconfigured)) {
                 // Try to find tool by URL.
                 $tool = lti_get_tool_by_url_match($ltitool->toolurl, SITEID);
                 if (empty($tool)) {
                     $checkwaiver = true;
-                }                
-            }            
+                }
+            }
         }
 
         // This is a resource that needs a waiver.

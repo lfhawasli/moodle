@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Triggered when courses have their enrollments synced by local ucla enrollment
- * helper.
+ * Triggered when courses have their enrollments synced by enrollment helper.
  *
  * @package    local_ucla
  * @copyright  2014 UC Regents
@@ -35,6 +34,12 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sync_enrolments_finished extends \core\event\base {
+
+    /**
+     * Decodes courses from the event data.
+     *
+     * @return array
+     */
     public function get_courses() {
         return json_decode($this->data['other']);
     }

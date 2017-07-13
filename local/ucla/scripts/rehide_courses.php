@@ -1,36 +1,54 @@
 <?php
-/*
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
  * One off command line script to manually hide courses and related TA sites for
  * a given term. Makes sure that guest enrollment plugins are disabled and
  * will not touch past courses that were made unhidden.
+ *
+ * Documentation: https://ccle.ucla.edu/mod/page/view.php?id=395287
+ *
+ * @package    local_ucla
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
 
-$moodleroot = dirname(dirname(dirname(dirname(__FILE__))));
-require($moodleroot . '/config.php');
+require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/lib/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(
-    array(
-        'help' => false
-    ),
-    array(
-        'h' => 'help'
-    )
+        array(
+    'help' => false
+        ), array(
+    'h' => 'help'
+        )
 );
 
 if ($options['help']) {
-    $help =
-"Command line script to manually hide courses and related TA sites for a given
+    $help = "Command line script to manually hide courses and related TA sites for a given
  term.
 
 Options:
 -h, --help            Print out this help
 
 Example:
-\$sudo -u www-data /usr/bin/php enrol/database/cli/ucla_sync.php [TERM]
+\$sudo -u www-data /usr/bin/php local/ucla/scripts/rehide_courses.php [TERM]
 ";
     echo $help;
     die;
@@ -44,25 +62,25 @@ $term = $unrecognized[0];
 
 echo "Hiding courses for term: " . $term . "\n";
 
-list($num_hidden_courses, $num_hidden_tasites, $num_problem_courses,
-        $num_skipped_courses, $error_messages) = rehide_courses($term);
+list($numhiddencourses, $numhiddentasites, $numproblemcourses,
+        $numskippedcourses, $errormessages) = rehide_courses($term);
 
-echo sprintf("Hid %d courses.\n", $num_hidden_courses);
-echo sprintf("Hid %d TA sites.\n", $num_hidden_tasites);
-echo sprintf("Had %d problem courses.\n", $num_problem_courses);
-echo sprintf("Had %d skipped courses.\n", $num_skipped_courses);
-echo $error_messages;
+echo sprintf("Hid %d courses.\n", $numhiddencourses);
+echo sprintf("Hid %d TA sites.\n", $numhiddentasites);
+echo sprintf("Had %d problem courses.\n", $numproblemcourses);
+echo sprintf("Had %d skipped courses.\n", $numskippedcourses);
+echo $errormessages;
 die("\nDONE!\n");
 
 /**
  * Exactly like hide_courses, but will not touch unhidden courses.
  *
- * @global object $DB
  * @param string $term
+ *
  * @return mixed            Returns false on invalid term. Otherwise returns an
- *                          array of $num_hidden_courses, $num_hidden_tasites,
- *                          $num_problem_courses, $num_skipped_courses,
- *                          $error_messages.
+ *                          array of $numhiddencourses, $numhiddentasites,
+ *                          $numproblemcourses, $numskippedcourses,
+ *                          $errormessages.
  */
 function rehide_courses($term) {
     global $CFG, $DB;
@@ -74,23 +92,23 @@ function rehide_courses($term) {
     }
 
     // Track some stats.
-    $num_hidden_courses = 0;
-    $num_hidden_tasites = 0;
-    $num_problem_courses = 0;
-    $num_skipped_courses = 0;
-    $error_messages = '';
+    $numhiddencourses = 0;
+    $numhiddentasites = 0;
+    $numproblemcourses = 0;
+    $numskippedcourses = 0;
+    $errormessages = '';
 
     // Get list of courses to hide.
     $courses = ucla_get_courses_by_terms(array($term));
 
     if (empty($courses)) {
         // No courses to hide.
-        return array($num_hidden_courses, $num_hidden_tasites,
-                     $num_problem_courses, $num_skipped_courses,
-                     $error_messages);
+        return array($numhiddencourses, $numhiddentasites,
+            $numproblemcourses, $numskippedcourses,
+            $errormessages);
     }
 
-    $enrol_guest_plugin = enrol_get_plugin('guest');
+    $enrolguestplugin = enrol_get_plugin('guest');
 
     // Now run command to hide all courses for given term. Don't worry about
     // updating visibleold (don't care) and we aren't using update_course,
@@ -98,26 +116,25 @@ function rehide_courses($term) {
     $courseobj = new stdClass();
     $courseobj->visible = 0;
     foreach ($courses as $courseid => $courseinfo) {
-        $courses_processed = array($courseid);
+        $coursesprocessed = array($courseid);
         $courseobj->id = $courseid;
         try {
-            ++$num_hidden_courses;
+            ++$numhiddencourses;
 
             // Try to see if course had any TA sites.
-            $existing_tasites = block_ucla_tasites::get_tasites($courseid);
-            if (!empty($existing_tasites)) {
-                foreach ($existing_tasites as $tasite) {
-                    ++$num_hidden_tasites;
-                    $courses_processed[] = $tasite->id;
+            $existingtasites = block_ucla_tasites::get_tasites($courseid);
+            if (!empty($existingtasites)) {
+                foreach ($existingtasites as $tasite) {
+                    ++$numhiddentasites;
+                    $coursesprocessed[] = $tasite->id;
                 }
             }
 
             // Hide courses and guest plugins.
-            foreach ($courses_processed as $courseid) {
-                $course = $DB->get_record('course', array('id' => $courseid), 
-                        '*', MUST_EXIST);
+            foreach ($coursesprocessed as $courseid) {
+                $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
                 if ($course->visible == 1) {
-                    ++$num_skipped_courses;
+                    ++$numskippedcourses;
                     continue;
                 }
 
@@ -126,14 +143,13 @@ function rehide_courses($term) {
 
                 PublicPrivate_Course::set_guest_plugin($course, ENROL_INSTANCE_DISABLED);
             }
-
         } catch (dml_exception $e) {
-            $error_messages .= sprintf("Could not hide courseid %d\n%s\n",
+            $errormessages .= sprintf("Could not hide courseid %d\n%s\n",
                     $courseobj->id, $e->getMessage());
-            ++$num_problem_courses;
+            ++$numproblemcourses;
         }
     }
 
-    return array($num_hidden_courses, $num_hidden_tasites,
-                 $num_problem_courses, $num_skipped_courses, $error_messages);
+    return array($numhiddencourses, $numhiddentasites,
+        $numproblemcourses, $numskippedcourses, $errormessages);
 }

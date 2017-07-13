@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $definitions = array(
     // Store role mappings to avoid repetitive DB queries within one request.
     'rolemappings' => array(

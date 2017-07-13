@@ -44,14 +44,14 @@ class preferredname_test extends advanced_testcase {
      *
      * Otherwise the name should be displayed as follows:
      *  - Preferred Name (Legal Last name, Preferred first name, no middle name)
-     * 
+     *
      * Note, in CCLE-6594 we are now storing preferred name in firstname if set
      * and legal first name in alternatename.
      *
      * @param object $user
      * @param boolean $viewfullnamecap
      */
-    protected function assertPreferredNameFormat($user, $viewfullnamecap) {
+    protected function assert_preferred_name_format($user, $viewfullnamecap) {
         // Check if need to display full name with legal name in parenthesis or not.
         $name = fullname($user, $viewfullnamecap);
         $firstname = empty($user->alternatename) ? $user->firstname : $user->alternatename;
@@ -59,7 +59,8 @@ class preferredname_test extends advanced_testcase {
         if (!empty($user->alternatename)) {
             if ($viewfullnamecap) {
                 // Display legal name in parenthesis.
-                $this->assertEquals(sprintf('%s, %s (%s)', $user->lastname, $user->firstname, $legalname), $name);
+                $this->assertEquals(sprintf('%s, %s (%s)', $user->lastname,
+                        $user->firstname, $legalname), $name);
             } else {
                 // Display only preferred name.
                 $this->assertEquals(sprintf('%s, %s', $user->lastname, $user->firstname), $name);
@@ -84,8 +85,8 @@ class preferredname_test extends advanced_testcase {
      * Makes sure that fullname works as expected for a user without an alternative name.
      */
     public function test_fullname_preferredname_empty() {
-        $user = $this->getDataGenerator()->create_user(array('firstname' => 'afirstname', 'lastname' => 'alastname',
-                'alternatename' => '', 'middlename' => 'Test'));
+        $user = $this->getDataGenerator()->create_user(array('firstname' => 'afirstname',
+                'lastname' => 'alastname', 'alternatename' => '', 'middlename' => 'Test'));
 
         // Make sure that alternatename is not set.
         $this->assertEmpty($user->alternatename);
@@ -94,10 +95,12 @@ class preferredname_test extends advanced_testcase {
         $name = fullname($user);
         $this->assertEquals(sprintf('%s, %s', $user->lastname, $user->firstname), $name);
         $name = fullname($user, true);
-        $this->assertEquals(sprintf('%s, %s %s', $user->lastname, $user->firstname, $user->middlename), $name);
+        $this->assertEquals(sprintf('%s, %s %s', $user->lastname,
+                $user->firstname, $user->middlename), $name);
 
         // See if we handle middle name properly as well.
-        $user = $this->getDataGenerator()->create_user(array('alternatename' => '', 'middlename' => ''));
+        $user = $this->getDataGenerator()->create_user(array('alternatename' => '',
+            'middlename' => ''));
         $this->assertEmpty($user->alternatename);
         $this->assertEmpty($user->middlename);
 
@@ -113,13 +116,11 @@ class preferredname_test extends advanced_testcase {
     public function test_fullname_preferredname_set() {
         global $COURSE;
         // Import all UCLA roles.
-        $roles = $this->getDataGenerator()
-            ->get_plugin_generator('local_ucla')
-            ->create_ucla_roles();
+        $roles = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_ucla_roles();
 
         // Make sure that we have a user with alternatename set.
-        $user = $this->getDataGenerator()->create_user(array('firstname' => 'afirstname', 'lastname' => 'alastname',
-            'alternatename' => 'Test'));
+        $user = $this->getDataGenerator()->create_user(array('firstname' => 'afirstname',
+            'lastname' => 'alastname', 'alternatename' => 'Test'));
         $this->assertNotEmpty($user->alternatename);
 
         // Check that name displays properly for different users.
@@ -127,21 +128,21 @@ class preferredname_test extends advanced_testcase {
         // Admins should see full name.
         $this->setAdminUser();
         $systemcontext = context_system::instance();
-        $this->assertPreferredNameFormat($user,
+        $this->assert_preferred_name_format($user,
                 has_capability('moodle/site:viewfullnames', $systemcontext));
 
         // Managers should see full name.
         $manager = $this->getDataGenerator()->create_user();
         role_assign($roles['manager'], $manager->id, $systemcontext);
         $this->setUser($manager);
-        $this->assertPreferredNameFormat($user,
+        $this->assert_preferred_name_format($user,
                 has_capability('moodle/site:viewfullnames', $systemcontext));
 
         // But manager limited should not.
         $managerlimited = $this->getDataGenerator()->create_user();
         role_assign($roles['manager_limited'], $managerlimited->id, $systemcontext);
         $this->setUser($managerlimited);
-        $this->assertPreferredNameFormat($user,
+        $this->assert_preferred_name_format($user,
                 has_capability('moodle/site:viewfullnames', $systemcontext));
 
         // Setup course.
@@ -157,7 +158,7 @@ class preferredname_test extends advanced_testcase {
             $this->setUser($userrole);
             $viewfullnamecap = has_capability('moodle/site:viewfullnames', $context);
             $this->assertTrue($viewfullnamecap);
-            $this->assertPreferredNameFormat($user, $viewfullnamecap);
+            $this->assert_preferred_name_format($user, $viewfullnamecap);
         }
 
         // Non-instructing roles should not see full name.
@@ -168,7 +169,7 @@ class preferredname_test extends advanced_testcase {
             $this->setUser($userrole);
             $viewfullnamecap = has_capability('moodle/site:viewfullnames', $context);
             $this->assertFalse($viewfullnamecap);
-            $this->assertPreferredNameFormat($user, $viewfullnamecap);
+            $this->assert_preferred_name_format($user, $viewfullnamecap);
         }
     }
 

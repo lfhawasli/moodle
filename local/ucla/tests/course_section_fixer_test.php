@@ -75,7 +75,7 @@ class course_section_fixer_test extends advanced_testcase {
 
         // If no section specified, just use the next biggest value.
         if (!isset($section['section'])) {
-            $nextnum = $DB->get_field('course_sections', 'MAX(section)+1',
+            $nextnum = $DB->get_field('course_sections', 'MAX(section) + 1',
                     array('course' => $course->id));
             $section['section'] = $nextnum;
         }

@@ -19,7 +19,7 @@
  *
  * @package     local_ucla
  * @copyright   2014 UC Regents
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -390,8 +390,9 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         foreach ($newdivisions as $division) {
             try {
                 $DB->insert_record('ucla_reg_division', $division);
+                // @codingStandardsIgnoreLine
             } catch (dml_exception $e) {
-                // Ignore if entry already exists.
+                // We want a blank catch to ignore if entry already exists.
             }
         }
 
@@ -589,7 +590,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
             $roles = array_merge($roles, $CFG->instructor_levels_roles[$key]);
         }
         list($shortnamesql, $params) = $DB->get_in_or_equal($roles);
-        $sql = "SELECT u.id, u.email, p.value AS altemail
+        $sql = "SELECT u.id, u.email, p.value altemail
                   FROM {user_preferences} p
                   JOIN {user} u ON (p.userid=u.id)
                  WHERE p.name = 'message_processor_email_email'
@@ -603,14 +604,16 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         if ($users->valid()) {
             foreach ($users as $user) {
                 // Clear the alternative email.
-                $DB->set_field('user_preferences', 'value', "", array('name' => 'message_processor_email_email', 'userid' => $user->id));
+                $DB->set_field('user_preferences', 'value', "",
+                        array('name' => 'message_processor_email_email', 'userid' => $user->id));
             }
         }
         $users->close();
         // Disable popup notifications.
         $DB->set_field('message_processors', 'enabled', '0', array('name' => 'popup'));
         // Fetch records where users don't have email notifications.
-        $select = "(value = 'none' AND name = 'message_provider_mod_forum_posts_loggedoff') OR (value = 'none' AND name = 'message_provider_mod_forum_posts_loggedin')";
+        $select = "(value = 'none' AND name = 'message_provider_mod_forum_posts_loggedoff') "
+                . "OR (value = 'none' AND name = 'message_provider_mod_forum_posts_loggedin')";
         $providers = $DB->get_recordset_select('user_preferences', $select, array());
         // Set the record to include email notifications.
         if ($providers->valid()) {
@@ -623,7 +626,7 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2015071500, 'local', 'ucla');
     }
 
-    // CCLE-5700 - Add new MU (Music) division
+    // CCLE-5700 - Add new MU (Music) division.
     if ($oldversion < 2016022300) {
         if (!$DB->record_exists('ucla_reg_division', array('code' => 'MU'))) {
             $DB->insert_record('ucla_reg_division',

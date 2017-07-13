@@ -53,9 +53,9 @@ class local_ucla_observer {
 
         foreach ($defaultforums as $type => $defaultname) {
             // Get forum and course module information.
-            $sql = "SELECT   cm.id AS cmid,
-                            f.id AS id,
-                            f.name AS name
+            $sql = "SELECT   cm.id cmid,
+                            f.id id,
+                            f.name name
                    FROM     {forum} f
                    JOIN     {course_modules} cm ON (f.id=cm.instance)
                    JOIN     {modules} m ON (cm.module=m.id)
@@ -211,7 +211,7 @@ class local_ucla_observer {
             debugging('Database enrolment plugin is not installed');
             return false;
         }
-        
+
         $trace = null;
         if (debugging()) {
             $trace = new text_progress_trace();

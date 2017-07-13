@@ -1,16 +1,16 @@
 YUI.add('moodle-local_ucla-availabilityconditions', function (Y, NAME) {
 
-// Based on popuphelp and tooltip
+// Based on popuphelp and tooltip.
 
 function AVAILABILITYCONDITIONS() {
     AVAILABILITYCONDITIONS.superclass.constructor.apply(this, arguments);
 }
 
 var SELECTORS = {
-        CLOSEBUTTON: '.closebutton',
-        CLICKABLELINKS: 'span.availabilitypopup > a',
-        FOOTER: 'div.moodle-dialogue-ft'
-    };
+    CLOSEBUTTON: '.closebutton',
+    CLICKABLELINKS: 'span.availabilitypopup > a',
+    FOOTER: 'div.moodle-dialogue-ft'
+};
 
 AVAILABILITYCONDITIONS.NAME = 'moodle-local_ucla-availabilityconditions';
 
@@ -39,7 +39,7 @@ Y.extend(AVAILABILITYCONDITIONS, Y.Base, {
 
         // Grab the clickedlink - this contains the URL we fetch and we align the panel to it.
         clickedlink = e.target.ancestor('a', true);
-        
+
         // Set availability conditions based on data attribute.
         this.tooltip.setAttrs({
             headerContent: 'Access restrictions',

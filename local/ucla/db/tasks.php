@@ -23,6 +23,9 @@
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
+
 $tasks = array(
     array(
         'classname' => 'local_ucla\task\local_ucla_cron_task',

@@ -38,8 +38,7 @@ list($options, $unrecognized) = cli_get_params(array('help' => false),
         array('h' => 'help'));
 
 if ($options['help']) {
-    $help =
-"CLI script to fix \"broken\" assignments 2.2 modules.
+    $help = "CLI script to fix \"broken\" assignments 2.2 modules.
 
 For the assignment upgrade tool to work (CCLE-3282) we need to fix several
 problems with the old assignment entries. Such problems include:
@@ -142,7 +141,7 @@ if (!empty($nonexistentsections)) {
             $section->course = $nonexistentsection->course;
             $section->name = 'Upgraded assignments (2.2)';
             $section->summary = '';
-            $section->summaryformat = 1; // FORMAT_HTML, but must be a string
+            $section->summaryformat = 1; // FORMAT_HTML, but must be a string.
             $section->visible = 1;
             $section->showavailability = 0;
             $section->availablefrom = 0;
@@ -150,14 +149,14 @@ if (!empty($nonexistentsections)) {
             $section->groupingid = 0;
 
             $movesection = false;
-            if (!$DB->record_exists('course_sections', array('section' => $numsections+1))) {
+            if (!$DB->record_exists('course_sections', array('section' => $numsections + 1))) {
                 // Safe to use the next number in the sequence.
-                $section->section = $numsections+1;
+                $section->section = $numsections + 1;
             } else {
                 // A section already exists there, just add the next section.
                 $maxsection = $DB->get_field('course_sections', 'MAX(section)',
                         array('course' => $course->id));
-                $section->section = $maxsection+1;
+                $section->section = $maxsection + 1;
                 $movesection = true;
             }
 
@@ -171,11 +170,11 @@ if (!empty($nonexistentsections)) {
                 // $numsections, so let's temporarily set it to be high.
                 course_get_format($course)->update_course_format_options(
                         array('numsections' => $section->section));
-                
-                $result = move_section_to($course, $section->section, $numsections+1);
+
+                $result = move_section_to($course, $section->section, $numsections + 1);
                 if (empty($result)) {
                     $trace->output(sprintf('Call to move_section_to failed with %s|%s|%s',
-                            $course->id, $section->section, $numsections+1), 1);
+                            $course->id, $section->section, $numsections + 1), 1);
                     // Reset back numsections.
                     course_get_format($course)->update_course_format_options(
                             array('numsections' => $numsections));
@@ -183,18 +182,18 @@ if (!empty($nonexistentsections)) {
                 } else {
                     // No need to reset numsections, it will be changed next.
                     $trace->output(sprintf('Moved section %d to %d for course %d',
-                            $section->section, $numsections+1, $course->id), 1);
+                            $section->section, $numsections + 1, $course->id), 1);
                 }
             }
 
-            $sectionnum = $numsections+1;
+            $sectionnum = $numsections + 1;
             $coursecache[$course->id] = $sectionnum; // Cache section.
-            
+
             // Increase numsection so newly created section will display now.
             course_get_format($course)->update_course_format_options(
                     array('numsections' => $sectionnum));
         }
-        
+
         $newsectionid = course_add_cm_to_section($nonexistentsection->course,
                 $nonexistentsection->id, $sectionnum);
 

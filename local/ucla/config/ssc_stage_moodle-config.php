@@ -28,7 +28,7 @@
  *  If you want configurations to be not within revisioning, then place
  *  your secrets @ moodle/config_private.php.
  *
- **/
+ */
 
 unset($CFG);
 global $CFG;
@@ -123,7 +123,7 @@ define('MYUCLA_URL_UPDATER_TEST_CONFIG_ACCESSDENIED_URL',
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
 
-// CCLE-2763 - Use new $CFG->divertallemailsto setting in 1.9 and 2.x 
+// CCLE-2763 - Use new $CFG->divertallemailsto setting in 1.9 and 2.x
 // development/testing environments
 $CFG->divertallemailsto = 'franks@ssc.ucla.edu';
 
@@ -558,7 +558,7 @@ if (file_exists($_config_private_)) {
  *  Enabling for SSC.
  *  Keeping in code for sake of quick re-enabling and reference.
  *  To disable, remove the '/' from the end of the following line.
- **/
+ */
 $CFG->auth = 'shibboleth';
 $CFG->alternateloginurl = $CFG->wwwroot . '/login/ucla_login.php?shibboleth';
 
@@ -589,7 +589,7 @@ $CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_institution']
 $CFG->forced_plugin_settings['auth/shibboleth']['field_lock_institution'] = 'locked';
 /**
  *  End shibboleth configurations.
- **/
+ */
 
 // set external database connection settings after config_private.php has
 // been read for the Registrar connection details

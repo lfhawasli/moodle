@@ -44,7 +44,7 @@ class rolemapping_test extends advanced_testcase {
     private $createdroles = array();
 
     /**
-     * Make sure that get_moodlerole is returning the appropiate data from 
+     * Make sure that get_moodlerole is returning the appropiate data from
      * local/ucla/rolemappings.php.
      */
     public function test_get_moodlerole() {
@@ -108,7 +108,7 @@ class rolemapping_test extends advanced_testcase {
     /**
      * Make sure that get_pseudorole always returns editingteacher if passing in
      * anyone with a role code of 01.
-     * 
+     *
      * @dataProvider role_combo_provider
      *
      * @param array $rolecombo
@@ -126,9 +126,9 @@ class rolemapping_test extends advanced_testcase {
     }
 
     /**
-     * Make sure that get_pseudorole always returns supervising_instructor if 
+     * Make sure that get_pseudorole always returns supervising_instructor if
      * passing in anyone with a role code of 03.
-     * 
+     *
      * @dataProvider role_combo_provider
      *
      * @param array $rolecombo
@@ -149,10 +149,10 @@ class rolemapping_test extends advanced_testcase {
      * Test get_pseudorole to see if the following conditions for the 02 role
      * work:
      *  - Anyone with 02 on a course with an 01 is a ta
-     *  - If someone is an 02 in the primary section, and there is an 03, they 
+     *  - If someone is an 02 in the primary section, and there is an 03, they
      *    are a ta_instructor (assumes no 01, because of first condition)
      *  - All other 02 cases, default to ta
-     * 
+     *
      * @dataProvider role_combo_provider
      *
      * @param array $rolecombo
@@ -196,7 +196,7 @@ class rolemapping_test extends advanced_testcase {
     /**
      * Make sure that get_pseudorole always returns grader if
      * passing in anyone with a role code of 04.
-     * 
+     *
      * @dataProvider role_combo_provider
      *
      * @param array $rolecombo
@@ -216,7 +216,7 @@ class rolemapping_test extends advanced_testcase {
     /**
      * Make sure that get_pseudorole always returns student_instructor if
      * passing in anyone with a role code of 22.
-     * 
+     *
      * @dataProvider role_combo_provider
      *
      * @param array $rolecombo
@@ -280,10 +280,10 @@ class rolemapping_test extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    /*     * *******  HELPER FUNCTIONS FOR UNIT TESTING  ******* */
+    /********* HELPER FUNCTIONS FOR UNIT TESTING  ********/
 
     /**
-     * Provides a multitude of role combinations for primary and secondary 
+     * Provides a multitude of role combinations for primary and secondary
      * sections with all possible mixes of 01, 02, and 03.
      */
     public function role_combo_provider() {
@@ -291,9 +291,7 @@ class rolemapping_test extends advanced_testcase {
         $rolecodes = array('01', '02', '03');
 
         // Get all the role combos (also include empty sets).
-        $primaryrolecombos = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->power_set($rolecodes, 0);
+        $primaryrolecombos = $this->getDataGenerator()->get_plugin_generator('local_ucla')->power_set($rolecodes, 0);
         $secondaryrolecombos = $primaryrolecombos;
 
         $index = 0;

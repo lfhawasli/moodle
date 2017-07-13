@@ -23,6 +23,7 @@
  *
  * @package local_ucla
  * @author  Rex Lorenzo - based on code by Yangmun Choi
+ * @copyright  2013 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -36,6 +37,9 @@ ucla_require_registrar();
 
 /**
  * Helper class for database enrolment plugin implementation.
+ *
+ * @copyright  2013 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_enrollment_helper {
 
@@ -129,7 +133,7 @@ class local_ucla_enrollment_helper {
     /**
      * Will try to create or find user that matches the given enrollment record.
      *
-     * @param arrray $enrollment    Enrollment records returned by
+     * @param array $enrollment     Enrollment records returned by
      *                              $this->get_instructors and
      *                              $this->get_students
      *
@@ -182,6 +186,7 @@ class local_ucla_enrollment_helper {
                               'auth' => 'shibboleth'), '*', MUST_EXIST);
             } catch (dml_missing_record_exception $notfound) {
                 // This is okay and expected, so just continue along.
+                $retval = null;
             } catch (dml_multiple_records_exception $multiple) {
                 // This is kinda bad. Means that multiple users have the same
                 // UID set. Need to report this, and try to see if username
@@ -206,6 +211,7 @@ class local_ucla_enrollment_helper {
                               'auth' => 'shibboleth'), '*', MUST_EXIST);
             } catch (dml_missing_record_exception $notfound) {
                 // This is okay and expected, so just continue along.
+                $retval = null;
             }
 
             if (!empty($foundmultipleuids) && !empty($retval)) {
@@ -287,8 +293,7 @@ class local_ucla_enrollment_helper {
                                         $enrollment[$field]), 2);
                         $user->{$this->localuserfield} = $enrollment[$field];
                         $blankfields[$this->localuserfield] = $enrollment[$field];
-                    } else if ($enrollment[$field]
-                            != $user->{$this->localuserfield}) {
+                    } else if ($enrollment[$field] != $user->{$this->localuserfield}) {
                         // Sanity check! If uid exists, it should match.
                         $this->trace->output(sprintf(
                                 'ERROR: Found mismatching user UIDs ' .
@@ -385,8 +390,8 @@ class local_ucla_enrollment_helper {
      * For a given course, will return an array of enrollment records containing
      * a user's information and role in course.
      *
-     * @param array $requestclasss  Array of ucla_request_classes entries for a
-     *                              single course.
+     * @param array $requestclassses    Array of ucla_request_classes entries
+     *                                  for a single course.
      *
      * @return array                Array of enrollment records of user info and
      *                              user's roleid.
@@ -402,7 +407,7 @@ class local_ucla_enrollment_helper {
      * and then does the role mapping to return an array of instructors and
      * their roles for a given course.
      *
-     * @param array $requestclasss  Array of ucla_request_classes entries for a
+     * @param array $requestclasses Array of ucla_request_classes entries for a
      *                              single course.
      *
      * @return array                Array of enrollment records of user info and
@@ -490,7 +495,7 @@ class local_ucla_enrollment_helper {
      * does the role mapping to return an array of students and their roles for
      * a given course.
      *
-     * @param array $requestclasss  Array of ucla_request_classes entries for a
+     * @param array $requestclasses Array of ucla_request_classes entries for a
      *                              single course.
      *
      * @return array                Array of enrollment records of user info and
@@ -547,8 +552,8 @@ class local_ucla_enrollment_helper {
 
         $sql = "SELECT  c.id,
                         c.visible,
-                        c." . $this->localcoursefield . " AS mapping,
-                        e.id AS enrolid,
+                        c." . $this->localcoursefield . " mapping,
+                        e.id enrolid,
                         c.shortname
                 FROM    {course} c
                 JOIN    {enrol} e ON (e.courseid = c.id AND e.enrol = 'database')
@@ -592,14 +597,14 @@ class local_ucla_enrollment_helper {
      *
      * Returns true if course is not cancelled, $requestedroles is empty, and we
      * are not processing just 1 course.
-     * 
-     * See "CCLE-4354 - All enrollment is dropped if can connect to SRDB, but  
+     *
+     * See "CCLE-4354 - All enrollment is dropped if can connect to SRDB, but
      * get no data returned".
-     * 
+     *
      * @param object $course        Database record.
      * @param array $requestedroles Variable from sync_enrolments().
      * @param null|int $onecourse   Parameter from sync_enrolments().
-     * 
+     *
      * @return boolean
      */
     public function get_preventfullunenrol($course, $requestedroles, $onecourse) {
@@ -689,17 +694,17 @@ class local_ucla_enrollment_helper {
         );
 
         // Log any failed results.
-        if (!empty($results[registrar_query::failed_outputs])) {
+        if (!empty($results[registrar_query::FAILED_OUTPUTS])) {
             $this->trace->output(sprintf('%d failed results from %s (%s,%s):',
-                    count($results[registrar_query::failed_outputs]), $sp,
+                    count($results[registrar_query::FAILED_OUTPUTS]), $sp,
                     $term, $srs), 1);
-            foreach ($results[registrar_query::failed_outputs] as $failed) {
+            foreach ($results[registrar_query::FAILED_OUTPUTS] as $failed) {
                 $failed = array_map('trim', $failed);
                 $this->trace->output(implode(',', $failed), 2);
             }
         }
 
-        return $results[registrar_query::query_results];
+        return $results[registrar_query::QUERY_RESULTS];
     }
 
     /**
@@ -754,9 +759,7 @@ class local_ucla_enrollment_helper {
      * Translate results from the stored procedure "ccle_roster_class" to
      * fields expected by Moodle.
      *
-     * @param progress_trace $trace
-     * @param array $regdata            Data row from "ccle_roster_class" SP.
-     * @param string $remoteuserfield   Config enrol_database|remoteuserfield.
+     * @param array $regdata    Data row from "ccle_roster_class" SP.
      *
      * @return array
      */
@@ -775,10 +778,8 @@ class local_ucla_enrollment_helper {
      * Let other plugins know that enrollment was updated for the following
      * courses.
      *
-     * @param array     Expecting $courses to be an array similar to what is
-     *                  returned by get_existing_courses().
-     *
-     * @return void
+     * @param array $courses    Expecting to be an array similar to what is
+     *                          returned by get_existing_courses().
      */
     public function trigger_sync_enrolments_event($courses) {
         if (class_exists('phpunit_util') && phpunit_util::is_test_site()) {

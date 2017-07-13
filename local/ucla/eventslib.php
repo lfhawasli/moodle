@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// @todo When automatic class loading is available via Moodle 2.6, we no longer
+// TODO: When automatic class loading is available via Moodle 2.6, we no longer
 // need to include the local_ucla_regsender class, so delete it.
 require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
 
@@ -70,7 +70,7 @@ function clear_srdb_ucla_syllabus($data) {
  *
  * NOTE: This only responds to the ucla_syllabus_added and ucla_syllabus_deleted
  * events, because the link stays the same if a syllabus is updated.
- * 
+ *
  * @param mixed $data   Either syllabus record id or syllabus record object.
  * @return bool         Returns false on problems, otherwise true.
  */

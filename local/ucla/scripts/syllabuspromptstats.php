@@ -1,6 +1,25 @@
 <?php
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Script to get usage stats of the syllabus reminder prompt.
+ *
+ * @package    local_ucla
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
@@ -31,9 +50,7 @@ if ($rs->valid()) {
         $parts = explode('_', $record->name);
         $courseid = array_pop($parts);
         $term = $DB->get_field('ucla_request_classes', 'term', array('courseid' => $courseid), IGNORE_MULTIPLE);
-        if (empty($term)) {
-            // Does not belong to Registrar course, so ignore it.
-        } else {
+        if (!empty($term)) {
             if (!isset($results[$term])) {
                 $results[$term] = array('never' => 0, 'later' => 0);
             }
@@ -46,4 +63,6 @@ if ($rs->valid()) {
     }
 }
 
+// Using print_r, because it is easy to read display.
+// @codingStandardsIgnoreLine
 print_r($results);

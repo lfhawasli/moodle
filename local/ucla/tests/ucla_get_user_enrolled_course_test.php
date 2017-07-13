@@ -50,15 +50,13 @@ class ucla_get_user_enrolled_course_test extends advanced_testcase {
     public function test_enrolled_student() {
         global $DB;
 
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+
         // Create class.
-        $classes = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array());
+        $classes = $uclagen->create_class(array());
         $class = reset($classes);
 
-        $student = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_user();
+        $student = $uclagen->create_user();
 
         // Get the student roleid.
         $studentroleid = $DB->get_field('role', 'id', array('shortname' => 'student'));
@@ -67,13 +65,13 @@ class ucla_get_user_enrolled_course_test extends advanced_testcase {
         $this->getDataGenerator()->enrol_user($student->id, $class->courseid,
                 $studentroleid, 'database');
 
-        // Need to populate ccle_roster_class_cache. Cannot mock 
+        // Need to populate ccle_roster_class_cache. Cannot mock
         // registrar_ccle_roster_class because it uses static function calls.
         // If we refactor the registrar classes to be better mockable, this test
         // should be changed.
         $record = array('param_term' => $class->term,
                         'param_srs' => $class->srs,
-                        'expires_on' => time()+600,
+                        'expires_on' => time() + 600,
                         'term_cd' => $class->term,
                         'stu_id' => $student->idnumber,
                         'full_name_person' => fullname($student),
@@ -94,15 +92,13 @@ class ucla_get_user_enrolled_course_test extends advanced_testcase {
     public function test_enrolled_student_crosslisted() {
         global $DB;
 
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+
         // Create class.
-        $classes = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array(), array());
+        $classes = $uclagen->create_class(array(), array());
         $class = reset($classes);
 
-        $student = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_user();
+        $student = $uclagen->create_user();
 
         // Get the student roleid.
         $studentroleid = $DB->get_field('role', 'id', array('shortname' => 'student'));
@@ -117,7 +113,7 @@ class ucla_get_user_enrolled_course_test extends advanced_testcase {
         // should be changed.
         $record = array('param_term' => $class->term,
                         'param_srs' => $class->srs,
-                        'expires_on' => time()+600,
+                        'expires_on' => time() + 600,
                         'term_cd' => $class->term,
                         'stu_id' => $student->idnumber,
                         'full_name_person' => fullname($student),
@@ -138,21 +134,17 @@ class ucla_get_user_enrolled_course_test extends advanced_testcase {
     public function test_nonenrolled_student() {
         global $DB;
 
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+
         // Create class we are looking for.
-        $classes = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array('term' => '14S'));
+        $classes = $uclagen->create_class(array('term' => '14S'));
         $class = reset($classes);
 
         // Create another class we are not looking for.
-        $classes = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array('term' => '14S'));
+        $classes = $uclagen->create_class(array('term' => '14S'));
         $otherclass = reset($classes);
 
-        $student = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_user();
+        $student = $uclagen->create_user();
 
         // Get the student roleid.
         $studentroleid = $DB->get_field('role', 'id', array('shortname' => 'student'));
@@ -167,7 +159,7 @@ class ucla_get_user_enrolled_course_test extends advanced_testcase {
         // should be changed.
         $record = array('param_term' => $otherclass->term,
                         'param_srs' => $otherclass->srs,
-                        'expires_on' => time()+600,
+                        'expires_on' => time() + 600,
                         'term_cd' => $otherclass->term,
                         'stu_id' => $student->idnumber,
                         'full_name_person' => fullname($student),

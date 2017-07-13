@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * Command line script to bulk process and update syllabi links for a given
  * course or term.
  *
@@ -33,8 +33,7 @@ require_once("$CFG->dirroot/local/ucla/classes/local_ucla_regsender.php");
 list($options, $unrecognized) = cli_get_params(array('help' => false), array('h' => 'help'));
 
 if ($options['help']) {
-    $help =
-"Updates links to syllabi for given courseid or term.
+    $help = "Updates links to syllabi for given courseid or term.
 
 Options:
 -h, --help            Print out this help
@@ -72,8 +71,8 @@ $courseids = null;
 if (!empty($term)) {
     $courseids = $DB->get_fieldset_select('ucla_request_classes', 'courseid',
             'term = ?', array($term));
-} else if (!empty($courseid)){
-    $courseids[] = $courseid;    
+} else if (!empty($courseid)) {
+    $courseids[] = $courseid;
 }
 
 if (empty($courseids)) {

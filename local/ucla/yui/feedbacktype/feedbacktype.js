@@ -1,8 +1,8 @@
 /**
-  * When a Feedback type checkbox is checked, list it's relevant sub
-  * options only. Otherwise, hide them.
-  *
-**/
+ * When a Feedback type checkbox is checked, list it's relevant sub
+ * options only. Otherwise, hide them.
+ *
+ */
 YUI().add('moodle-local_ucla-feedbacktype', function (Y) {
     // Load our namespace.
     M.local_ucla = M.local_ucla || {};

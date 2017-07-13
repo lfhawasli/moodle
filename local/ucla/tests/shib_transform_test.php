@@ -124,7 +124,7 @@ class shib_transform_test extends basic_testcase {
      */
     public function test_display_name_same() {
         global $CFG;
-        
+
         // No middle name.
         $result['firstname'] = 'Joe';
         $result['middlename'] = '';
@@ -133,7 +133,7 @@ class shib_transform_test extends basic_testcase {
         $result['institution'] = '';
 
         include($CFG->dirroot . '/shib_transform.php');
-        
+
         $this->assertEquals($pnaction, 'displayName equals ln, fn mn. Name unchanged.');
 
         // Middle name.

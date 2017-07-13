@@ -45,14 +45,14 @@ class local_ucla_participants extends course_enrolment_manager {
      * @param context_course $context
      * @return array    Roles sorted alphabetically.
      */
-    function get_roles_used_in_course(context_course $context) {
+    public function get_roles_used_in_course(context_course $context) {
         global $DB;
 
         // For some reason cannot have rn.contextid = ra.contextid in ON clause.
         $params[] = $context->id;
         $params[] = $context->id;
 
-        $sql = "SELECT DISTINCT r.id, r.name, r.shortname, rn.name AS coursealias
+        $sql = "SELECT DISTINCT r.id, r.name, r.shortname, rn.name coursealias
                   FROM {role_assignments} ra, {role} r
              LEFT JOIN {role_names} rn ON (rn.contextid = ? AND rn.roleid = r.id)
                  WHERE r.id = ra.roleid
@@ -117,8 +117,8 @@ class local_ucla_participants extends course_enrolment_manager {
             $details['groupings'] = array();
             foreach ($usergroups as $gid => $unused) {
                 $details['groups'][$gid] = $allgroups[$gid]->name;
-                $groupingids = $DB->get_records('groupings_groups', array('groupid'=>$gid), '', 'groupingid');
-                foreach ($groupingids as $groupingid=>$unused) {
+                $groupingids = $DB->get_records('groupings_groups', array('groupid' => $gid), '', 'groupingid');
+                foreach ($groupingids as $groupingid => $unused) {
                     $grouping = groups_get_grouping($groupingid);
                     $details['groupings'][$groupingid] = $grouping->name;
                 }

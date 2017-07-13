@@ -27,16 +27,17 @@ require_once("$CFG->dirroot/enrol/locallib.php");
 require_once("$CFG->dirroot/enrol/users_forms.php");
 require_once("$CFG->dirroot/group/lib.php");
 
-$id      = required_param('id', PARAM_INT); // course id
+$id      = required_param('id', PARAM_INT); // Course id.
 $action  = optional_param('action', '', PARAM_ALPHANUMEXT);
 $filter  = optional_param('ifilter', 0, PARAM_INT);
 $search  = optional_param('search', '', PARAM_RAW);
 $role    = optional_param('role', 0, PARAM_INT);
 $fgroup  = optional_param('filtergroup', 0, PARAM_INT);
 // START UCLA MOD: CCLE-4418 - Do not display inactive users by default.
+// @codingStandardsIgnoreLine
 //$status  = optional_param('status', -1, PARAM_INT);
 $status  = optional_param('status', ENROL_USER_ACTIVE, PARAM_INT);
-// END UCLA MOD: CCLE-4418
+// END UCLA MOD: CCLE-4418.
 
 // When users reset the form, redirect back to first page without other params.
 if (optional_param('resetbutton', '', PARAM_RAW) !== '') {
@@ -46,7 +47,7 @@ if (optional_param('resetbutton', '', PARAM_RAW) !== '') {
 $firstinitial = optional_param('sifirst', null, PARAM_NOTAGS);
 $lastinitial = optional_param('silast', null, PARAM_NOTAGS);
 
-$course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 $context = context_course::instance($course->id, MUST_EXIST);
 
 if ($course->id == SITEID) {
@@ -67,13 +68,13 @@ $grouping = optional_param('grouping', $course->defaultgroupingid, PARAM_INT);
 $manager = new local_ucla_participants($PAGE, $course, $filter, $role, $search, $fgroup, $status, $grouping);
 $table = new local_ucla_course_enrolment_users_table($manager, $PAGE);
 $initialparams = array('sifirst' => $firstinitial, 'silast' => $lastinitial);
-$PAGE->set_url('/enrol/users.php', $manager->get_url_params()+$table->get_url_params()+$initialparams);
+$PAGE->set_url('/enrol/users.php', $manager->get_url_params() + $table->get_url_params() + $initialparams);
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $id)));
 
-// Check if there is an action to take
+// Check if there is an action to take.
 if ($action) {
 
-    // Check if the page is confirmed (and sesskey is correct)
+    // Check if the page is confirmed (and sesskey is correct).
     $confirm = optional_param('confirm', false, PARAM_BOOL) && confirm_sesskey();
 
     $actiontaken = false;
@@ -83,8 +84,8 @@ if ($action) {
     $pagecontent = null;
 
     switch ($action) {
-        /**
-         * Removes a role from the user with this course
+        /*
+         * Removes a role from the user with this course.
          */
         case 'unassign':
             if (has_capability('moodle/role:assign', $manager->get_context())) {
@@ -93,28 +94,32 @@ if ($action) {
                 if ($confirm && $manager->unassign_role_from_user($user, $role)) {
                     redirect($PAGE->url);
                 } else {
-                    $user = $DB->get_record('user', array('id'=>$user), '*', MUST_EXIST);
+                    $user = $DB->get_record('user', array('id' => $user), '*', MUST_EXIST);
                     $allroles = $manager->get_all_roles();
                     $role = $allroles[$role];
-                    $yesurl = new moodle_url($PAGE->url, array('action'=>'unassign', 'roleid'=>$role->id, 'user'=>$user->id, 'confirm'=>1, 'sesskey'=>sesskey()));
-                    $message = get_string('unassignconfirm', 'role', array('user'=>fullname($user, true), 'role'=>$role->localname));
+                    $yesurl = new moodle_url($PAGE->url, array('action' => 'unassign',
+                        'roleid' => $role->id, 'user' => $user->id, 'confirm' => 1, 'sesskey' => sesskey()));
+                    $message = get_string('unassignconfirm', 'role',
+                            array('user' => fullname($user, true), 'role' => $role->localname));
                     $pagetitle = get_string('unassignarole', 'role', $role->localname);
                     $pagecontent = $OUTPUT->confirm($message, $yesurl, $PAGE->url);
                 }
                 $actiontaken = true;
             }
             break;
-        /**
+        /*
          * Assigns a new role to a user enrolled within this course.
-         * A user must be enrolled in the course in order for this script to action
+         * A user must be enrolled in the course in order for this script to action.
          */
         case 'assign':
-            $user = $DB->get_record('user', array('id'=>required_param('user', PARAM_INT)), '*', MUST_EXIST);
+            $user = $DB->get_record('user', array('id' => required_param('user', PARAM_INT)), '*', MUST_EXIST);
             if (is_enrolled($context, $user) && has_capability('moodle/role:assign', $manager->get_context())) {
-                $mform = new enrol_users_assign_form(NULL, array('user'=>$user, 'course'=>$course, 'assignable'=>$manager->get_assignable_roles()));
+                $mform = new enrol_users_assign_form(null, array('user' => $user,
+                        'course' => $course, 'assignable' => $manager->get_assignable_roles()));
                 $mform->set_data($PAGE->url->params());
                 $data = $mform->get_data();
-                if ($mform->is_cancelled() || ($data && array_key_exists($data->roleid, $manager->get_assignable_roles()) && $manager->assign_role_to_user($data->roleid, $user->id))) {
+                if ($mform->is_cancelled() || ($data && array_key_exists($data->roleid, $manager->get_assignable_roles()) &&
+                        $manager->assign_role_to_user($data->roleid, $user->id))) {
                     redirect($PAGE->url);
                 } else {
                     $pagetitle = get_string('assignroles', 'role');
@@ -122,13 +127,16 @@ if ($action) {
                 $actiontaken = true;
             }
             break;
-        /**
-         * Removes the user from the given group
+        /*
+         * Removes the user from the given group.
          */
         case 'removemember':
-            /** CCLE-2302 - Remove ability to change group information from this
-             *  screen. Solves issue dealing with public private groups editable
-             *  from this screen as well as for section groups.
+            // We want to keep the commented out code.
+            // @codingStandardsIgnoreStart
+            /*
+             * CCLE-2302 - Remove ability to change group information from this
+             * screen. Solves issue dealing with public private groups editable
+             * from this screen as well as for section groups.
             if (has_capability('moodle/course:managegroups', $manager->get_context())) {
                 $groupid = required_param('group', PARAM_INT);
                 $userid  = required_param('user', PARAM_INT);
@@ -140,26 +148,36 @@ if ($action) {
                     if (!$group) {
                         break;
                     }
-                    $yesurl = new moodle_url($PAGE->url, array('action'=>'removemember', 'group'=>$groupid, 'user'=>$userid, 'confirm'=>1, 'sesskey'=>sesskey()));
-                    $message = get_string('removefromgroupconfirm', 'group', array('user'=>fullname($user, true), 'group'=>$group->name));
+                    $yesurl = new moodle_url($PAGE->url, array('action' => 'removemember',
+                        'group' => $groupid, 'user' => $userid, 'confirm' => 1, 'sesskey' => sesskey()));
+
+                    $message = get_string('removefromgroupconfirm', 'group',
+                            array('user'=>fullname($user, true), 'group'=>$group->name));
+
                     $pagetitle = get_string('removefromgroup', 'group', $group->name);
                     $pagecontent = $OUTPUT->confirm($message, $yesurl, $PAGE->url);
                 }
                 $actiontaken = true;
             }
             //*/
+            // @codingStandardsIgnoreEnd
             break;
-        /**
+        /*
          * Makes the user a member of a given group
          */
         case 'addmember':
-            /** CCLE-2302 - Remove ability to change group information from this
-             *  screen.
+            // We want to keep the commented out code.
+            // @codingStandardsIgnoreStart
+            /*
+             * CCLE-2302 - Remove ability to change group information from this
+             * screen.
             if (has_capability('moodle/course:managegroups', $manager->get_context())) {
                 $userid = required_param('user', PARAM_INT);
                 $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
 
-                $mform = new enrol_users_addmember_form(NULL, array('user'=>$user, 'course'=>$course, 'allgroups'=>$manager->get_all_groups()));
+                $mform = new enrol_users_addmember_form(null, array('user'=>$user,
+                        'course'=>$course, 'allgroups'=>$manager->get_all_groups()));
+             
                 $mform->set_data($PAGE->url->params());
                 $data = $mform->get_data();
                 if ($mform->is_cancelled() || ($data && $manager->add_user_to_group($user, $data->groupid))) {
@@ -170,6 +188,7 @@ if ($action) {
                 $actiontaken = true;
             }
             //*/
+            // @codingStandardsIgnoreEnd
             break;
     }
 
@@ -192,7 +211,7 @@ if ($action) {
     }
 }
 
-$users = $manager->get_users_for_display($manager, $table->sort, 
+$users = $manager->get_users_for_display($manager, $table->sort,
         $table->sortdirection, $table->page, $table->perpage,
         $firstinitial, $lastinitial);
 $usercount = $manager->get_usercount();
@@ -204,7 +223,7 @@ $canassign = has_capability('moodle/role:assign', $manager->get_context());
 $canviewlog = has_capability('report/log:view', $context);
 $canloginas = has_capability('moodle/user:loginas', $context) && !\core\session\manager::is_loggedinas();
 $misclinks = false;
-foreach ($users as $userid=>&$user) {
+foreach ($users as $userid => &$user) {
     if ($bulkoperations) {
         $user['select'] = html_writer::empty_tag('input', array('type' => 'checkbox',
                                                           'class' => 'usercheckbox',
@@ -238,16 +257,19 @@ foreach ($users as $userid=>&$user) {
     }
 
     $user['picture'] = $OUTPUT->render($user['picture']);
-    $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $manager->get_assignable_roles(), $canassign, $PAGE->url);
-    $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'], $manager->get_all_groups(), has_capability('moodle/course:managegroups', $manager->get_context()), $PAGE->url);
+    $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'],
+            $manager->get_assignable_roles(), $canassign, $PAGE->url);
+    $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'],
+            $manager->get_all_groups(), has_capability('moodle/course:managegroups',
+                    $manager->get_context()), $PAGE->url);
     $user['enrol'] = $renderer->user_enrolments_and_actions($user['enrolments']);
-    // Add grouping information under groups information
+    // Add grouping information under groups information.
     $user['group'] .= '<br><br><strong>Groupings</strong><br>';
     $groupingoutput = '';
-    foreach($user['groupings'] as $groupingid => $name) {
-        $groupingoutput .= html_writer::tag('div', $name, array('class'=>'grouping', 'rel'=>$groupingid));
+    foreach ($user['groupings'] as $groupingid => $name) {
+        $groupingoutput .= html_writer::tag('div', $name, array('class' => 'grouping', 'rel' => $groupingid));
     }
-    $user['group'] = $user['group'].html_writer::tag('div', $groupingoutput, array('class'=>'groupings'));
+    $user['group'] = $user['group'].html_writer::tag('div', $groupingoutput, array('class' => 'groupings'));
 }
 
 // Determine fields to show in the table.
@@ -292,7 +314,7 @@ if (has_capability('moodle/course:enrolconfig', $context) or has_capability('moo
     );
 }
 
-// Remove hidden fields if the user has no access
+// Remove hidden fields if the user has no access.
 if (!has_capability('moodle/course:viewhiddenuserfields', $context)) {
     $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
     if (isset($hiddenfields['lastaccess'])) {

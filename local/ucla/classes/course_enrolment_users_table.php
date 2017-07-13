@@ -37,8 +37,8 @@ class local_ucla_course_enrolment_users_table extends course_enrolment_users_tab
      *
      * You can also use a multi dimensional array for this to have multiple fields
      * in a single column
-     *  
-     * This leaves out the checkbox field when bulk enrolment operations are present; 
+     *
+     * This leaves out the checkbox field when bulk enrolment operations are present;
      * local/ucla/customscripts/enrol/users.php takes care of that
      *
      * @param array $fields An array of fields to set

@@ -4,18 +4,17 @@ YUI.add('moodle-local_ucla-gradebooktable', function (Y, NAME) {
  * YUI script to create floating headers student name column.
  */
 
-
-// Get local_ucla plugin
+// Get local_ucla plugin.
 M.local_ucla = M.local_ucla || {};
 
-// Create a gradebook module
+// Create a gradebook module.
 M.local_ucla.gradebook = {
-    // Resuable nodes
+    // Resuable nodes.
     node_student_header_cell: {},
     node_student_cell: {},
     node_footer_row: {},
 
-    // Init module
+    // Init module.
     init: function() {
         // Set up some reusable nodes.
         this.node_student_header_cell = Y.one('#studentheader');
@@ -56,17 +55,17 @@ M.local_ucla.gradebook = {
                 M.local_ucla.gradebook.update_assignment_footer_position();
                 M.local_ucla.gradebook.update_assignment_header_position();
                 M.local_ucla.gradebook.update_user_column_position();
-                
+
                 // Resize headers & footers.
                 // This is an expensive operation, not expected to happen often.
                 var headers = Y.all('#gradebook-header-container .gradebook-header-cell');
                 var resizedcells = Y.all('#user-grades .heading .cell');
-                
+
                 var headeroffsetleft = Y.one('#studentheader').getX();
                 var newcontainerwidth = 0;
                 resizedcells.each(function(cell, idx) {
                     var headercell = headers.item(idx);
-                    
+
                     newcontainerwidth += cell.get('offsetWidth');
                     var styles = {
                         width: cell.get('offsetWidth'),
@@ -74,9 +73,9 @@ M.local_ucla.gradebook = {
                     };
                     headercell.setStyles(styles);
                 });
-                
+
                 var footers = Y.all('#gradebook-footer-container .gradebook-footer-cell');
-                
+
                 if (footers.size() !== 0) {
                     var resizedavgcells = Y.all('#user-grades .avg .cell');
 
@@ -92,25 +91,25 @@ M.local_ucla.gradebook = {
                 }
 
                 Y.one('#gradebook-header-container').setStyle('width', newcontainerwidth);
-                
+
             };
         }
 
-        // Remove loading screen.  Need to do YUI synthetic event to trigger
+        // Remove loading screen. Need to do YUI synthetic event to trigger.
         // on all browsers.
         Y.on('domready', function() {
             Y.one('.gradebook-loading-screen').remove(true);
         });
     },
     float_user_column: function() {
-        // Grab the user names column
+        // Grab the user names column.
         var user_column = Y.all('#user-grades .user.cell');
 
-        // Generate a floating table
+        // Generate a floating table.
         var floating_user_column = Y.Node.create('<div aria-hidden="true" id="gradebook-user-container"></div>');
         var floating_user_column_height = 0;
         var user_column_offset = this.node_student_cell.getY();
-        
+
         user_column.each(function(node) {
 
             // Create cloned node and container.
@@ -118,7 +117,7 @@ M.local_ucla.gradebook = {
             // this will guarantee that student cells are always aligned.
             var container_node = Y.Node.create('<div class="gradebook-user-cell"></div>');
 
-            // Grab the username
+            // Grab the username.
             var usernamenode = node.cloneNode(true);
             container_node.append(usernamenode.getHTML());
             usernamenode = null;
@@ -131,18 +130,18 @@ M.local_ucla.gradebook = {
             });
 
             floating_user_column_height += node.get('offsetHeight');
-            // Retrieve the corresponding row
+            // Retrieve the corresponding row.
             var classes = node.ancestor().getAttribute('class').split(' ').join('.');
-            // Attach highlight event
+            // Attach highlight event.
             container_node.on('click', function() {
                 Y.one('.' + classes).all('.grade').toggleClass('hmarked');
             });
-            // Add the cloned nodes to our floating table
+            // Add the cloned nodes to our floating table.
             floating_user_column.appendChild(container_node);
 
         }, this);
 
-        // Style the table
+        // Style the table.
         floating_user_column.setStyles({
             'position': 'absolute',
             'left': this.node_student_cell.getX() + 'px',
@@ -159,9 +158,9 @@ M.local_ucla.gradebook = {
         // Float the 'user name' header cell.
         var floating_user_header_cell = Y.Node.create('<div aria-hidden="true" id="gradebook-user-header-container"></div>');
 
-        // Clone the node
+        // Clone the node.
         var cellnode = this.node_student_header_cell.cloneNode(true);
-        // Append node contents
+        // Append node contents.
         floating_user_header_cell.append(cellnode.getHTML());
         floating_user_header_cell.setStyles({
             'position': 'absolute',
@@ -171,7 +170,7 @@ M.local_ucla.gradebook = {
             'height': this.node_student_header_cell.get('offsetHeight') + 'px'
         });
 
-        // Safe for collection
+        // Safe for collection.
         cellnode = null;
 
         Y.one('body').append(floating_user_header_cell);
@@ -179,31 +178,31 @@ M.local_ucla.gradebook = {
     float_assignment_header: function() {
         var grade_headers = Y.all('#user-grades tr.heading .cell');
 
-        // Generate a floating headers
+        // Generate a floating headers.
         var floating_grade_headers = Y.Node.create('<div aria-hidden="true" id="gradebook-header-container"></div>');
 
         var floating_grade_headers_width = 0;
         var floating_grade_headers_height = 0;
         var grade_headers_offset = this.node_student_header_cell.getX();
-        
+
         grade_headers.each(function(node) {
 
-            // Get the target column to highlight.  This is embedded in
+            // Get the target column to highlight. This is embedded in
             // the column cell #, but it's off by one, so need to adjust for that.
             var col = node.getAttribute('class');
 
-            // Extract the column #
+            // Extract the column #.
             var search = /c[0-9]+/g;
             var match = search.exec(col);
             match = match[0].replace('c', '');
 
-            // Offset
+            // Offset.
             var target_col = parseInt(match, 10);
             ++target_col;
 
             var nodepos = node.getX();
 
-            // We need to clone the node, otherwise we mutate original obj
+            // We need to clone the node, otherwise we mutate original obj.
             var nodeclone = node.cloneNode(true);
 
             var newnode = Y.Node.create('<div class="gradebook-header-cell"></div>');
@@ -218,11 +217,11 @@ M.local_ucla.gradebook = {
                 'left': (nodepos - grade_headers_offset) + 'px'
             });
 
-            // Sum up total width
+            // Sum up total width.
             floating_grade_headers_width += parseInt(node.get('offsetWidth'), 10);
             floating_grade_headers_height = node.get('offsetHeight');
 
-            // Attach 'highlight column' event to new node
+            // Attach 'highlight column' event to new node.
             newnode.on('click', function() {
                 Y.all('.cell.c' + target_col).toggleClass('vmarked');
             });
@@ -251,7 +250,7 @@ M.local_ucla.gradebook = {
         var floating_grade_footers = Y.Node.create('<div aria-hidden="true" id="gradebook-footer-container"></div>');
         var floating_grade_footer_width = 0;
         var footer_row_offset = this.node_footer_row.getX();
-        // Copy nodes
+        // Copy nodes.
         footer_row.each(function(node) {
 
             var nodepos = node.getX();
@@ -273,14 +272,15 @@ M.local_ucla.gradebook = {
         // Attach 'Update' button.
         var update_button = Y.one('#gradersubmit');
         if (update_button) {
-            var button = Y.Node.create('<button class="btn btn-sm btn-default">' + update_button.getAttribute('value') + '</button>');
+            var button = Y.Node.create('<button class="btn btn-sm btn-default">' +
+                    update_button.getAttribute('value') + '</button>');
             button.on('click', function() {
                 update_button.simulate('click');
             });
             floating_grade_footers.one('.gradebook-footer-cell').append(button);
         }
 
-        // Position the row
+        // Position the row.
         floating_grade_footers.setStyles({
             'position': 'absolute',
             'left': this.node_footer_row.getX() + 'px',
@@ -318,7 +318,7 @@ M.local_ucla.gradebook = {
     update_assignment_header_position: function() {
         // CCLE-4795 - New header is static and is exactly 40px tall.
         var static_header_offset = 40;
-        
+
         var header = document.getElementById('gradebook-header-container');
         var header_cell = document.getElementById('studentheader');
 
@@ -328,7 +328,7 @@ M.local_ucla.gradebook = {
 
         var headercelltop = header_cell.offsetTop + header_cell.offsetParent.offsetTop;
 
-        // Check that we're at offset
+        // Check that we're at offset.
         if (window.pageYOffset + static_header_offset > headercelltop ) {
             // Use new header height in offset calculation.
             header.style.top = window.pageYOffset + static_header_offset + 'px';
@@ -362,7 +362,7 @@ M.local_ucla.gradebook = {
         }
     },
     sidebar_toggle: function() {
-        // Update positions when sidebar toggles
+        // Update positions when sidebar toggles.
         this.update_assignment_footer_position();
         this.update_assignment_header_position();
         this.update_user_column_position();

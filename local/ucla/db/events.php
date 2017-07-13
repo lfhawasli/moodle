@@ -16,13 +16,15 @@
 
 /**
  * Event handlers.
- * 
+ *
  * This file contains the event handlers for the Moodle event API.
- * 
+ *
  * @package local_ucla
  * @copyright 2013 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $handlers = array(
     'ucla_course_deleted' => array(

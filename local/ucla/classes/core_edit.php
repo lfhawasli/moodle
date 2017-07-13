@@ -88,7 +88,7 @@ class local_ucla_core_edit {
      * Handles logic of how to display 'alternativename' as preferred name.
      *
      * See CCLE-4521 - Handle "preferred name"
-     * 
+     *
      * Note, in CCLE-6594 we are now storing preferred name in firstname if set
      * and legal first name in alternatename.
      *
@@ -234,11 +234,18 @@ class local_ucla_core_edit {
      * @param object $user
      */
     public static function profile_display_help_request($user) {
-        $emailstop = array(0 => get_string('emailenable'), 1 => get_string('emaildisable'));
-        $maildigest = array(0 => get_string('emaildigestoff'), 1 => get_string('emaildigestcomplete'), 2 =>get_string('emaildigestsubjects'));
-        $maildisplay = array(0 => get_string('emaildisplayno'), 1 => get_string('emaildisplayyes'), 2 => get_string('emaildisplaycourse'));
-        $autosubscribe = array(0 => get_string('autosubscribeno'), 1 => get_string('autosubscribeyes'));
-        $trackforums = array(0 => get_string('trackforumsno'), 1 => get_string('trackforumsyes'));
+        $emailstop = array(0 => get_string('emailenable'),
+            1 => get_string('emaildisable'));
+        $maildigest = array(0 => get_string('emaildigestoff'),
+            1 => get_string('emaildigestcomplete'),
+            2 => get_string('emaildigestsubjects'));
+        $maildisplay = array(0 => get_string('emaildisplayno'),
+            1 => get_string('emaildisplayyes'),
+            2 => get_string('emaildisplaycourse'));
+        $autosubscribe = array(0 => get_string('autosubscribeno'),
+            1 => get_string('autosubscribeyes'));
+        $trackforums = array(0 => get_string('trackforumsno'),
+            1 => get_string('trackforumsyes'));
         $htmleditor = array('default' => get_string('defaulteditor'));
         $editors = editors_get_enabled();
         foreach ($editors as $name => $editor) {
@@ -257,20 +264,20 @@ class local_ucla_core_edit {
             array(get_string('fullnameuser'), fullname($user, true)),
             array(get_string('alternatename'), $user->alternatename),
             array('Email status', $emailstop[$user->emailstop]),
-            array(get_string('lastlogin'), userdate($user->lastlogin)."&nbsp; (".format_time(time() - $user->lastlogin).")"), 
+            array(get_string('lastlogin'), userdate($user->lastlogin)."&nbsp; (".format_time(time() - $user->lastlogin).")"),
             array(get_string('emaildisplay'), $maildisplay[$user->maildisplay]),
-            array(get_string('emaildigest'),$maildigest[$user->maildigest]),
+            array(get_string('emaildigest'), $maildigest[$user->maildigest]),
             array(get_string('textediting'), $htmleditor[$texteditingpref]),
             array(get_string('autosubscribe'), $autosubscribe[$user->autosubscribe]),
             array(get_string('trackforums'), $trackforums[$user->trackforums]),
-            array('Time modified', userdate($user->timemodified)."&nbsp; (".format_time(time() - $user->timemodified).")"), 
+            array('Time modified', userdate($user->timemodified)."&nbsp; (".format_time(time() - $user->timemodified).")"),
         );
         echo html_writer::table($table);
     }
 
     /**
      * Given a course ID, retrieve the course's number, term, and department.
-     * 
+     *
      * @param int $courseid
      */
     public static function profile_get_course_info($courseid) {
@@ -321,7 +328,7 @@ class local_ucla_core_edit {
         foreach ($sortedcourses as $term => &$subjectarea) {
             ksort($subjectarea);
             foreach ($subjectarea as $index => $courses) {
-                ksort($courses);                
+                ksort($courses);
                 // Sort by section and then flatten array.
                 $termsubjectcourses = array();
                 foreach ($courses as &$sections) {
