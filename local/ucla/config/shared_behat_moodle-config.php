@@ -266,12 +266,12 @@ $CFG->forced_plugin_settings['page']['printheading'] = 1;
 $CFG->forced_plugin_settings['resource']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['resource']['printheading'] = 1;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment
+// Site administration > Plugins > Activity modules > Turnitin Assignment (Legacy)
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
 $CFG->turnitin_studentemail = 0;
 $CFG->turnitin_tutoremail = 0;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment 2
+// Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->forced_plugin_settings['turnitintooltwo']['useerater'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['useanon'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['inboxlayout'] = 1;
