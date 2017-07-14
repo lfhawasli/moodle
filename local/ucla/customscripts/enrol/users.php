@@ -341,7 +341,7 @@ foreach ($alpha as $letter) {
     if ($letter == $firstinitial) {
         $content .= html_writer::tag('strong', $letter);
     } else {
-        $content .= html_writer::link(new moodle_url($PAGE->url, array('sifirst' => $letter)), $letter);
+        $content .= html_writer::link(new moodle_url($PAGE->url, array('page' => 0, 'sifirst' => $letter)), $letter);
     }
 }
 $content .= html_writer::end_tag('div');
@@ -361,7 +361,7 @@ foreach ($alpha as $letter) {
     if ($letter == $lastinitial) {
         $content .= html_writer::tag('strong', $letter);
     } else {
-        $content .= html_writer::link(new moodle_url($PAGE->url, array('silast' => $letter)), $letter);
+        $content .= html_writer::link(new moodle_url($PAGE->url, array('page' => 0, 'silast' => $letter)), $letter);
     }
 }
 $content .= html_writer::end_tag('div');
