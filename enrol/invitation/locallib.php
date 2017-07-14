@@ -196,15 +196,17 @@ class invitation_manager {
                 $invitation->inviterid = $USER->id;
                 $invitation->notify_inviter = empty($data->notify_inviter) ? 0 : 1;
 
+                $messageparams = new stdClass();
+                $messageparams->instructormessage = '';
                 // Construct message: custom (if any) + template.
                 $message = '';
                 if (!empty($data->message)) {
+                    $messageparams->instructormessage = get_string('htmlinstructormsg', 'enrol_invitation', $data->message);
                     $message .= get_string('instructormsg', 'enrol_invitation',
                             $data->message);
                     $invitation->message = $data->message;
                 }
 
-                $messageparams = new stdClass();
                 $messageparams->fullname = sprintf(
                     '%s: %s', $course->shortname, $course->fullname
                 );
@@ -216,8 +218,8 @@ class invitation_manager {
 
                 // Append privacy notice, if needed.
                 $privacynotice = $this->get_project_privacy_notice($course->id);
-                if (!empty($privacynotice)) {
-                    $inviteurl .= $privacynotice;
+                if (empty($privacynotice)) {
+                    $privacynotice = '';
                 }
 
                 // Append days expired, if needed.
@@ -241,12 +243,14 @@ class invitation_manager {
                 }
 
                 $messageparams->inviteurl = $inviteurl;
+                $messageparams->privacynotice = $privacynotice;
                 $messageparams->supportemail = $data->fromemail;
                 $helpurl = new moodle_url('/blocks/ucla_help/index.php', array('course' => $this->courseid));
                 $helpurl = $helpurl->out(false);
                 $messageparams->helpurl = $helpurl;
                 $message .= get_string('emailmsgtxt', 'enrol_invitation', $messageparams);
-
+                $htmlmessage = get_string('htmlemailmsgtxt', 'enrol_invitation', $messageparams);
+                
                 if (!$resend) {
                     $objid = $DB->insert_record('enrol_invitation', $invitation);
                     $retval = $objid;
@@ -270,7 +274,7 @@ class invitation_manager {
                 // Send invitation to the user.
                 $contactuser = $this->get_contact_user($invitation->email);
 
-                email_to_user($contactuser, $fromuser, $invitation->subject, $message);
+                email_to_user($contactuser, $fromuser, $invitation->subject, $message, $htmlmessage);
 
                 // Log activity after sending the email.
                 if ($resend) {
