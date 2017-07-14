@@ -174,7 +174,13 @@ class invitation_manager {
                 // Set time.
                 $timesent = time();
                 $invitation->timesent = $timesent;
-                $invitation->timeexpiration = $timesent + get_config('enrol_invitation', 'inviteexpiration');
+
+                 if (!empty($data -> invite_expiration_time)) {
+                    $invitation->timeexpiration = $data -> invite_expiration_time;
+                 } else {
+                    $invitation->timeexpiration = $timesent +
+                    get_config('enrol_invitation', 'inviteexpiration');
+                 }
 
                 // Update invite to have the proper timesent/timeexpiration.
                 if ($resend) {

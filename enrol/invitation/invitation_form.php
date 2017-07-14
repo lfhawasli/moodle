@@ -120,6 +120,13 @@ class invitation_form extends moodleform {
         $mform->addRule('role_group',
                 get_string('norole', 'enrol_invitation'), 'required');
 
+        // The title "Add restrictions?".
+        $mform->addElement('header', 'addrestriction', get_string('addrestriction', 'enrol_invitation'));
+       
+        // Add option for invite expiration.
+        $mform -> addElement('date_time_selector', 'invite_expiration_time', get_string('invite_expiration', 'enrol_invitation'));
+        $mform -> setDefault('invite_expiration_time', time() + get_config('enrol_invitation', 'inviteexpiration'));
+
         $mform->addElement('header', 'header_email', get_string('header_email', 'enrol_invitation'));
         // Email from field.
         $mform->addElement('text', 'fromemail', get_string('fromemail', 'enrol_invitation'));

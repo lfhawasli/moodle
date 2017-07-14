@@ -74,7 +74,9 @@ $string['editenrollment'] = 'Edit enrollment';
 $string['header_email'] = 'Who do you want to invite?';
 $string['fromemail'] = 'From';
 $string['emailaddressnumber'] = 'Email address';
-
+$string['addrestriction'] = 'Add restrictions?';
+$string['invite_expiration'] = 'Invitation expiration';
+$string['role_expiration'] = 'Role expiration';
 $string['notifymsg'] = 'Hello, I would like to inform you that user $a->username, with email $a->email has successful gained access to your course, $a->course';
 
 
