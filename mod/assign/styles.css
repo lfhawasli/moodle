@@ -436,6 +436,12 @@
     text-decoration: none;
 }
 
+/* START UCLA MOD: CCLE-6715 - Added hover effect.*/
+.path-mod-assign [data-region="user-info"] h4 :hover {
+    text-decoration: underline;
+}
+/*END UCLA MOD: CCLE-6715.*/
+
 .path-mod-assign [data-region="user-info"] .img-rounded {
     display: block;
     float: left;
@@ -451,6 +457,12 @@
     display: block;
     font-style: normal;
 }
+
+/* START UCLA MOD: CCLE-6715 - Added hover effect.*/
+.path-mod-assign [data-region="user-info"] em :hover{
+    text-decoration: underline;
+}
+/*END UCLA MOD: CCLE-6715.*/
 
 .path-mod-assign [data-region="grading-actions-form"] label {
     display: inline-block;
