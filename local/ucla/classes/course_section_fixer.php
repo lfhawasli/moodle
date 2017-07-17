@@ -15,17 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class to course problems with course sections that might be caused by Moodle
- * plugins.
+ * Fixes problems with course sections that might be caused by Moodle plugins.
  *
- * @package    local_ucla
- * @copyright  2013 UC Regents
+ * @package     local_ucla
+ * @copyright   2013 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/lib.php');
 
 /**
  * Class definition.
+ *
+ * @copyright   2013 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_ucla_course_section_fixer {
 
@@ -158,7 +161,7 @@ class local_ucla_course_section_fixer {
         $actualcount = $DB->count_records('course_sections', array('course' => $course->id));
 
         // Adding 1 to $numsections, because it does not include Site info (0).
-        if ($actualcount > ($numsections+1)) {
+        if ($actualcount > ($numsections + 1)) {
             // Course has more sections than specified in $numsections.
             if ($adjustnum) {
                 // Fix problem. Again, remember that $numsections does not
@@ -340,7 +343,7 @@ class local_ucla_course_section_fixer {
                 // Add section to last section number.
                 $maxsection = $DB->get_field('course_sections', 'MAX(section)',
                         array('course' => $course->id));
-                $section->section = $maxsection+1;
+                $section->section = $maxsection + 1;
 
                 // Find all course modules for this section and add them.
                 $cmids = $DB->get_fieldset_select('course_modules', 'id',
@@ -373,8 +376,8 @@ class local_ucla_course_section_fixer {
                 } catch (Exception $ex) {
                     // One reason why a section cannot be deleted is because it
                     // has invalid course modules with an instance id of 0.
-                    // We cannot delete the module.                    
-                    
+                    // We cannot delete the module.
+
                     // Hide section and the modules inside.
                     course_update_section($course->id, $section, array('visible' => 0));
                     ++$retval['added'];

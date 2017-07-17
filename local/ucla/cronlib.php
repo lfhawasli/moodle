@@ -1,17 +1,47 @@
 <?php
-/**
- *  Shared UCLA-written for cron-synching functions.
- **/
+// This file is part of the UCLA local_ucla plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Shared UCLA-written for cron-synching functions.
+ *
+ * @package    local_ucla
+ * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot  . '/' . $CFG->admin .
         '/tool/uclacoursecreator/uclacoursecreator.class.php');
 
 /**
  * Updates the ucla_reg_classinfo table.
+ *
+ * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ucla_reg_classinfo_cron {
 
-    static function enrolstat_translate($char) {
+    /**
+     * Translates enrollment code to string.
+     *
+     * @param char $char
+     *
+     * @return string
+     */
+    public static function enrolstat_translate($char) {
         $codes = array(
             'X' => 'Cancelled',
             'O' => 'Opened',
@@ -79,7 +109,7 @@ class ucla_reg_classinfo_cron {
      * @return boolean      Returns true if records needs to be updated,
      *                      otherwise returns false.
      */
-    function needs_updating(stdClass $old, array $new) {
+    public function needs_updating(stdClass $old, array $new) {
         $checkfields = array('acttype', 'coursetitle', 'sectiontitle',
             'enrolstat', 'url', 'crs_desc', 'crs_summary');
 
@@ -100,25 +130,25 @@ class ucla_reg_classinfo_cron {
      *
      * @return array
      */
-    function query_registrar($sp, $data) {
+    public function query_registrar($sp, $data) {
         return registrar_query::run_registrar_query($sp, $data);
     }
 
     /**
-     * Get courses from the ucla_request_classes table for a given term. Query 
-     * the registrar for those courses. 
-     * 
-     * From the records that are returned from the registrar then insert or 
-     * update records in the ucla_reg_classinfo table. 
-     * 
+     * Get courses from the ucla_request_classes table for a given term. Query
+     * the registrar for those courses.
+     *
+     * From the records that are returned from the registrar then insert or
+     * update records in the ucla_reg_classinfo table.
+     *
      * Then for the courses that didn't have any data returned to them from
-     * the registrar, then mark those courses as cancelled in the 
+     * the registrar, then mark those courses as cancelled in the
      * ucla_reg_classinfo table.
      *
      * @param array $terms
-     * @return boolean 
+     * @return boolean
      */
-    function run($terms) {
+    public function run($terms) {
         global $DB;
 
         if (empty($terms)) {
@@ -166,8 +196,7 @@ class ucla_reg_classinfo_cron {
                 );
                 if (!$coursesrs) {
                     // The course was not found in the registrar, it no longer exists.
-                    $notfoundatregistrar[] =
-                        array('term' => $request->term, 'srs' => $request->srs);
+                    $notfoundatregistrar[] = array('term' => $request->term, 'srs' => $request->srs);
                 } else {
                     // The course does exist, but with a new srs.
                     $outerarray = reset($coursesrs);
@@ -222,11 +251,10 @@ class ucla_reg_classinfo_cron {
                     $ic++;
                 }
 
-                
             }
         }
         $urcrecords->close();
-        
+
         // Mark courses that the registrar didn't have data for as "cancelled".
         $numnotfound = 0;
         if (!empty($notfoundatregistrar)) {
@@ -237,7 +265,7 @@ class ucla_reg_classinfo_cron {
                 ++$numnotfound;
             }
         }
-        
+
         mtrace("Updated: $uc . Inserted: $ic . Not found at registrar: "
             . "$numnotfound . No update needed: $nc");
 
@@ -246,36 +274,42 @@ class ucla_reg_classinfo_cron {
 }
 
 /**
- *  Fills the subject area cron table.
- **/
+ * Fills the subject area cron table.
+ *
+ * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class ucla_reg_subjectarea_cron {
-    function run($terms) {
+
+    /**
+     * Gets the subject areas for the given terms and ucla_reg_subjectarea table.
+     * @param array $terms
+     * @return boolean
+     */
+    public function run($terms) {
         global $DB;
 
         $ttte = 'ucla_reg_subjectarea';
 
         if (empty($terms)) {
             debugging('NOTICE: empty $terms for ucla_reg_subjectarea_cron');
-            return true;    // maybe not an error
+            return true;    // Maybe not an error.
         }
 
         $reg = registrar_query::get_registrar_query('cis_subjectareagetall');
         if (!$reg) {
             mtrace("No registrar module found.");
         }
-  
+
         $subjareas = array();
         foreach ($terms as $term) {
-            try {            
-                $regdata = 
-                    $reg->retrieve_registrar_info(
-                            array('term' => $term)
-                        );
-            } catch(Exception $e) {
-                // mostly likely couldn't connect to registrar
+            try {
+                $regdata = $reg->retrieve_registrar_info(array('term' => $term));
+            } catch (Exception $e) {
+                // Mostly likely couldn't connect to registrar.
                 mtrace($e->getMessage());
                 return false;
-            }                      
+            }
 
             if ($regdata) {
                 $subjareas = array_merge($subjareas, $regdata);
@@ -284,9 +318,9 @@ class ucla_reg_subjectarea_cron {
 
         if (empty($subjareas)) {
             debugging('ERROR: empty $subjareas for ucla_reg_subjectarea_cron');
-            return false;   // most likely an error
-        }        
-        
+            return false;   // Most likely an error.
+        }
+
         $checkers = array();
         foreach ($subjareas as $k => $subjarea) {
             $newrec = new stdClass();
@@ -295,29 +329,27 @@ class ucla_reg_subjectarea_cron {
             $t = array_change_key_case($subjarea, CASE_LOWER);
             $t['modified'] = time();
 
-            $sa_text = $t['subjarea'];
-            $checkers[] = $sa_text;
+            $satext = $t['subjarea'];
+            $checkers[] = $satext;
         }
 
-        list($sql_in, $params) = $DB->get_in_or_equal($checkers);
-        $sql_where = 'subjarea ' . $sql_in;
+        list($sqlin, $params) = $DB->get_in_or_equal($checkers);
+        $sqlwhere = 'subjarea ' . $sqlin;
 
-        $selected = $DB->get_records_select($ttte, $sql_where, $params,
+        $selected = $DB->get_records_select($ttte, $sqlwhere, $params,
             '', 'TRIM(subjarea), id');
 
         $newsa = 0;
         $updsa = 0;
 
-        $amdebugging = debugging();
-
         foreach ($subjareas as $sa) {
-            $sa_text = $sa['subjarea'];
-            if (empty($selected[$sa_text])) {
+            $satext = $sa['subjarea'];
+            if (empty($selected[$satext])) {
                 $DB->insert_record($ttte, $sa);
 
                 $newsa ++;
             } else {
-                $sa['id'] = $selected[$sa_text]->id;
+                $sa['id'] = $selected[$satext]->id;
                 $DB->update_record($ttte, $sa);
                 $updsa ++;
             }
@@ -330,29 +362,45 @@ class ucla_reg_subjectarea_cron {
     }
 }
 
-// CCLE-3739 - Do not allow "UCLA registrar" enrollment plugin to be hidden 
+/**
+ * CCLE-3739 - Do not allow "UCLA registrar" enrollment plugin to be hidden.
+ *
+ * @copyright  2012 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class ucla_reg_enrolment_plugin_cron {
-    public function run($terms = null) {
+    /**
+     * Finds courses with database enrollment plugin hidden and enables it.
+     *
+     * @return boolean
+     */
+    public function run() {
         global $DB;
-        
+
         // Find courses whose registrar (database) enrolment has been disabled
-        // @note 'enrol.status' is not indexed, but it's a boolean value
-        $records = $DB->get_records('enrol', array('enrol' => 'database', 
+        // @note 'enrol.status' is not indexed, but it's a boolean value.
+        $records = $DB->get_records('enrol', array('enrol' => 'database',
             'status' => ENROL_INSTANCE_DISABLED));
-        
-        // Now enable them the Moodle way
-        foreach($records as $r) {
+
+        // Now enable them the Moodle way.
+        foreach ($records as $r) {
             self::update_plugin($r->courseid, $r->id);
         }
-        
+
         return true;
     }
-    
+
+    /**
+     * Enables database enrollment plugin.
+     *
+     * @param int $courseid
+     * @param int $instanceid
+     */
     static public function update_plugin($courseid, $instanceid) {
         $instances = enrol_get_instances($courseid, false);
         $plugins   = enrol_get_plugins(false);
 
-        // Straight out of enrol/instances.php
+        // Straight out of enrol/instances.php.
         $instance = $instances[$instanceid];
         $plugin = $plugins[$instance->enrol];
         if ($instance->status != ENROL_INSTANCE_ENABLED) {
@@ -360,5 +408,3 @@ class ucla_reg_enrolment_plugin_cron {
         }
     }
 }
-
-// EoF

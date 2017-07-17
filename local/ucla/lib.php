@@ -1,64 +1,40 @@
 <?php
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- *  UCLA Global functions.
- **/
+ * UCLA global functions.
+ *
+ * @package     local_ucla
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot.'/lib/accesslib.php');
-
-// Contains our external-link generator thing
 require_once($CFG->dirroot.'/local/ucla/outputcomponents.php');
-
-// Contains public/private lib
 require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
 
 /**
- *  @deprecated
- *  This will attempt to access this file from the web.
- *  If that is properly set up, then all directories below this directory
- *  will be web-forbidden.
- **/
-function ucla_verify_configuration_setup() {
-    global $CFG;
-
-    if (!function_exists('curl_init')) {
-        throw new moodle_exception('curl_failure', 'local_ucla');
-    }
-
-    ini_set('display_errors', '1');
-    ini_set('error_reporting', E_ALL);
-
-    $ch = curl_init();
-
-    $self = $CFG->wwwroot . '/local/ucla/version.php';
-    $address = $self;
-
-    // Attempt to get at a file that should not be web-visible
-    curl_setopt($ch, CURLOPT_URL, $address);
-    curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $res = curl_exec($ch);
-
-    $returner = false;
-    if (!$res) {
-        throw new moodle_exception(curl_error($ch));
-    } else {
-        if (preg_match('/HTTP\/[0-9]*\.[0-9]*\s*403/', $res)) {
-            $returner = true;
-        }
-    }
-
-    curl_close($ch);
-
-    return $returner;
-}
-
-/**
- *  Function to sort an array of strings in alphabetical order
- **/
+ * Function to sort an array of strings in alphabetical order.
+ *
+ * @param array $array
+ * @param string $sortkey
+ */
 function array_alphasort(&$array, $sortkey) {
     usort($array, function($a, $b) use ($sortkey) {
         if (!empty($a) && !empty($b)) {
@@ -68,20 +44,18 @@ function array_alphasort(&$array, $sortkey) {
 }
 
 /**
- *  Convenience function to include db-helpers.
- **/
+ * Convenience function to include db-helpers.
+ */
 function ucla_require_db_helper() {
     global $CFG;
 
-    require_once($CFG->dirroot
-        . '/local/ucla/dbhelpers.php');
+    require_once($CFG->dirroot . '/local/ucla/dbhelpers.php');
 }
 
-/** 
- *  Function to include all the Registrar connection functionality.
- *  This function MUST NOT do anything other than load libraries.
- *  
- **/
+/**
+ * Function to include all the Registrar connection functionality.
+ * This function MUST NOT do anything other than load libraries.
+ */
 function ucla_require_registrar() {
     global $CFG;
 
@@ -92,19 +66,21 @@ function ucla_require_registrar() {
 }
 
 /**
- *  Responder for results from ccle_courseinstructorsget to see if
- *  the user is a dummy user.
- *  @param $ucla_id String of the UID number
- *  @return boolean 
- **/
-function is_dummy_ucla_user($ucla_id) {
-    // dummy THE STAFF
-    if ($ucla_id == '100399990') {
+ * Responder for results from ccle_courseinstructorsget to see if the user is a
+ * dummy user.
+ *
+ * @param string $uclaid String of the UID number
+ *
+ * @return boolean
+ */
+function is_dummy_ucla_user($uclaid) {
+    // THE STAFF.
+    if ($uclaid == '100399990') {
         return true;
     }
 
-    // dummy TA
-    if ($ucla_id == '200399999') {
+    // TA.
+    if ($uclaid == '200399999') {
         return true;
     }
 
@@ -112,22 +88,30 @@ function is_dummy_ucla_user($ucla_id) {
 }
 
 /**
- *  Checks if an enrol-stat code means a course is cancelled.
- **/
+ * Checks if an enrol-stat code means a course is cancelled.
+ *
+ * @param char $enrolstat
+ *
+ * @return boolean.
+ */
 function enrolstat_is_cancelled($enrolstat) {
     return strtolower($enrolstat) == 'x';
 }
 
-/** 
- *  Checks if a course should be considered cancelled.
- *  Note that this does require an enrolstat, which means that
- *      the data needs to come from ucla_reg_classinfo.
- *  Note that misformed data will throw an exception.
- *  @param  $courseset  Array( Object->enrolstat, ... )
- *  @return boolean     true = cancelled
- **/
+/**
+ * Checks if a course should be considered cancelled.
+ *
+ * Note that this does require an enrolstat, which means that the data needs to
+ * come from ucla_reg_classinfo.
+ *
+ * Note that misformed data will throw an exception.
+ *
+ * @param  array $courseset  Array( Object->enrolstat, ... )
+ *
+ * @return boolean     true = cancelled
+ */
 function is_course_cancelled($courseset) {
-    // No information, assume not-cancellable
+    // No information, assume not-cancelled.
     if (empty($courseset)) {
         return false;
     }
@@ -145,8 +129,12 @@ function is_course_cancelled($courseset) {
 }
 
 /**
- *  Builds the URL for the Registrar's finals information page.
- **/
+ * Builds the URL for the Registrar's finals information page.
+ *
+ * @param object $courseinfo
+ *
+ * @return boolean
+ */
 function build_registrar_finals_url($courseinfo) {
     if (!empty($courseinfo->term)
             && ucla_validator('term', $courseinfo->term)) {
@@ -192,10 +180,15 @@ function build_registrar_finals_url($courseinfo) {
 }
 
 /**
- *  Translate the single-character enrollment code to a word.
- *  There is an assumption here that case does not matter for these
- *  enrollment codes.
- **/
+ * Translate the single-character enrollment code to a word.
+ *
+ * There is an assumption here that case does not matter for these
+ * enrollment codes.
+ *
+ * @param char $enrolstat
+ *
+ * @return string
+ */
 function enrolstat_string($enrolstat) {
     $sm = get_string_manager();
     $ess = 'enrolstat_' . strtolower($enrolstat);
@@ -210,20 +203,22 @@ function enrolstat_string($enrolstat) {
 }
 
 /**
- *  Creates a display-ready string for a course.
- *  Slightly similar to shortname...
- *  @param $courseinfo Array with fields
- *      subj_area - the subject area
- *      coursenum - the course number
- *      sectnum   - the number of the section
- *      Or object from ucla_get_reg_classinfo
- *  @param $displayone boolean True to display the sectnum of 1
- **/
+ * Creates a display-ready string for a course.
+ * Slightly similar to shortname...
+ * @param array $courseinfo Array with fields
+ *     subj_area - the subject area
+ *     coursenum - the course number
+ *     sectnum   - the number of the section
+ *     Or object from ucla_get_reg_classinfo
+ * @param boolean $displayone boolean True to display the sectnum of 1
+ *
+ * @return string
+ */
 function ucla_make_course_title($courseinfo, $displayone=true) {
     if (is_object($courseinfo)) {
         $courseinfo = get_object_vars($courseinfo);
     }
- 
+
     $sectnum = '-' . $courseinfo['sectnum'];
     if (!$displayone && $courseinfo['sectnum'] == 1) {
         $sectnum = '';
@@ -233,16 +228,19 @@ function ucla_make_course_title($courseinfo, $displayone=true) {
         . $sectnum;
 }
 
-/** 
- *  Serialize/hashes courses.
- **/
+/**
+ * Serialize/hashes courses.
+ *
+ * @param array|object $courseinfo
+ *
+ * @return string       String in term-srs format.
+ */
 function make_idnumber($courseinfo) {
     if (is_object($courseinfo)) {
         $courseinfo = get_object_vars($courseinfo);
     }
 
     if (empty($courseinfo['term']) || empty($courseinfo['srs'])) {
-        debugging('No key from object: ' . print_r($courseinfo, true));
         return false;
     }
 
@@ -250,9 +248,11 @@ function make_idnumber($courseinfo) {
 }
 
 /**
- *  Fetch each corresponding term and srs for a particular courseid.
- * 
- *  @param int $courseid
+ * Fetch each corresponding term and srs for a particular courseid.
+ *
+ * @param int $courseid
+ *
+ * @return array
  */
 function ucla_map_courseid_to_termsrses($courseid) {
     global $DB;
@@ -263,7 +263,7 @@ function ucla_map_courseid_to_termsrses($courseid) {
     if ($termsrses = $cache->get($cachekey)) {
         return $termsrses;
     }
- 
+
     $termsrses = $DB->get_records('ucla_request_classes',
             array('courseid' => $courseid, 'action' => 'built'));
 
@@ -272,8 +272,13 @@ function ucla_map_courseid_to_termsrses($courseid) {
 }
 
 /**
- *  Fetch the corresponding courseid for a particular term and srs.
- **/
+ * Fetch the corresponding courseid for a particular term and srs.
+ *
+ * @param string $term
+ * @param string $srs
+ *
+ * @return int              Returns false if not found.
+ */
 function ucla_map_termsrs_to_courseid($term, $srs) {
     global $DB;
 
@@ -292,9 +297,14 @@ function ucla_map_termsrs_to_courseid($term, $srs) {
 }
 
 /**
- *  Fetch the corresponding information from the registrar for a 
- *  particular term and srs.
- **/
+ * Fetch the corresponding information from the registrar for a
+ * particular term and srs.
+ *
+ * @param string $term
+ * @param string $srs
+ *
+ * @return object
+ */
 function ucla_get_reg_classinfo($term, $srs) {
     global $DB;
 
@@ -315,8 +325,9 @@ function ucla_get_reg_classinfo($term, $srs) {
  * Convenience function to get registrar information for classes.
  *
  * @param int $courseid
+ *
  * @return array            Array of entries from ucla_reg_classinfo table with
- *                          hostcourse value added.
+ *                         hostcourse value added.
  */
 function ucla_get_course_info($courseid) {
     $reginfos = array();
@@ -334,12 +345,15 @@ function ucla_get_course_info($courseid) {
 }
 
 /**
- *  Convenience function. 
- *  @param  $requests   
- *      Array of Objects with properties term, srs, and $indexby
- *      if the requests do not have $indexby, then it will not be indexed
- *  @param  $indexby    What you want as the primary index
- **/
+ * Convenience function.
+ *
+ * @param array $requests   Array of Objects with properties term, srs, and
+ *                          $indexby. If the requests do not have $indexby, then
+ *                          it will not be indexed.
+ * @param string $indexby   What you want as the primary index.
+ *
+ * @return array
+ */
 function index_ucla_course_requests($requests, $indexby='setid') {
     $reindexed = array();
 
@@ -355,18 +369,15 @@ function index_ucla_course_requests($requests, $indexby='setid') {
 }
 
 /**
- *  Gets the course sets for a particular term.
- *  @param  $terms  Array of terms that we want to filter by.
- *  @param  $filterwithoutcourses   boolean do not display requests without
- *      courses associated with them.
- *  @return
- *      Array (
- *          {course}.`id` => ucla_get_course_info()
- *      )
- **/
+ * Gets the course sets for a particular term.
+ *
+ * @param array $terms  Terms that we want to filter by.
+ *
+ * @return array        Results from ucla_get_course_info indexed by courseid.
+ */
 function ucla_get_courses_by_terms($terms) {
     global $DB;
- 
+
     list($sqlin, $params) = $DB->get_in_or_equal($terms);
     $where = 'term ' . $sqlin;
 
@@ -375,13 +386,17 @@ function ucla_get_courses_by_terms($terms) {
 
     return index_ucla_course_requests($records, 'courseid');
 }
- 
+
 /**
- *  Based on what is set by the enrolment plugin, match user info
- *  provided by the Registrar to the local database.
- **/
-function ucla_registrar_user_to_moodle_user($reginfo,
-                                            $cachedconfigs=null) {
+ * Based on what is set by the enrolment plugin, match user info
+ * provided by the Registrar to the local database.
+ *
+ * @param array $reginfo
+ * @param object $cachedconfigs
+ *
+ * @return object
+ */
+function ucla_registrar_user_to_moodle_user($reginfo, $cachedconfigs=null) {
     global $CFG, $DB;
 
     if ($cachedconfigs) {
@@ -390,9 +405,9 @@ function ucla_registrar_user_to_moodle_user($reginfo,
         $configs = get_config('enrol_database');
     }
 
-    $userfield         = strtolower($configs->remoteuserfield);
+    $userfield = strtolower($configs->remoteuserfield);
 
-    $localuserfield   = $configs->localuserfield;
+    $localuserfield = $configs->localuserfield;
 
     $sqlparams = array();
     $sqlbuilder = array();
@@ -414,7 +429,7 @@ function ucla_registrar_user_to_moodle_user($reginfo,
     if (!empty($reginfo[$userfield])) {
         $mapping = $reginfo[$userfield];
     }
- 
+
     $searchstr = "$localuserfield = ?";
     $sqlparams[] = $mapping;
 
@@ -426,61 +441,71 @@ function ucla_registrar_user_to_moodle_user($reginfo,
 }
 
 /**
- *  Returns a pretty looking term in the format of 12S => Spring 2012.
- * 
- * @param string term
- * @param char session      If session is passed, then, assuming the term is 
- *                          summer, will return 121, A => Summer 2012 - Session A
- **/
+ * Returns a pretty looking term in the format of 12S => Spring 2012.
+ *
+ * @param string $term
+ * @param char $session  If session is passed, then, assuming the term is
+ *                      summer, will return 121, A => Summer 2012 - Session A.
+ *
+ * @return string
+ */
 function ucla_term_to_text($term, $session=null) {
-    $term_letter = strtolower(substr($term, -1, 1));
+    $termletter = strtolower(substr($term, -1, 1));
     $termtext = '';
-    if ($term_letter == "f") {
+    if ($termletter == "f") {
         $termtext = "Fall";
-    } else if ($term_letter == "w") {
-        // W -> Winter
+    } else if ($termletter == "w") {
+        // W -> Winter.
         $termtext = "Winter";
-    } else if ($term_letter == "s") {
-        // S -> Spring
+    } else if ($termletter == "s") {
+        // S -> Spring.
         $termtext = "Spring";
-    } else if ($term_letter == "1") {
-        // 1 -> Summer
+    } else if ($termletter == "1") {
+        // 1 -> Summer.
         $termtext = "Summer";
     } else {
-        debugging("Invalid term letter: ".$term_letter);
+        debugging("Invalid term letter: ".$termletter);
         return null;
     }
 
     $years = substr($term, 0, 2);
     $termtext .= " 20$years";
- 
-    if ($term_letter == "1" && !empty($session)) {
+
+    if ($termletter == "1" && !empty($session)) {
         $termtext .= " - Session " . strtoupper($session);
     }
- 
+
     return $termtext;
 }
 
+/**
+ * Checks if given term is a summer term.
+ *
+ * @param string $term
+ *
+ * @return boolean
+ */
 function is_summer_term($term) {
     return ucla_validator('term', $term) && substr($term, -1, 1) == '1';
 }
 
 /**
- * Properly format a given string so it is suitable to be used as a name. Name 
- * might include the following characters ' or - or a space. Need to properly 
+ * Properly format a given string so it is suitable to be used as a name. Name
+ * might include the following characters ' or - or a space. Need to properly
  * uppercase the first letter and lowercase the rest.
  *
- * NOTE: 
- *  - Special case added if the last name starts with "MC". Assuming that
+ * NOTE:
+ * - Special case added if the last name starts with "MC". Assuming that
  * next character should be uppercase.
- *  - Special case: If a name as 's, like Women's studies, then the S shouldn't
- * be capitalized. 
+ * - Special case: If a name as 's, like Women's studies, then the S shouldn't
+ * be capitalized.
  *
  * @param string $name
  * @param boolean $handleconjunctions   If true, will lower case any
  *                                      conjunctions, like "and" and "a". Used
  *                                      when formatting departments or subject
  *                                      areas.
+ *
  * @return string                       Name in proper format.
  */
 function ucla_format_name($name=null, $handleconjunctions=false) {
@@ -492,13 +517,13 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
 
     /* The way to handle special cases in a person's name is to recurse on
      * the following cases:
-     *  - If name has a space.
-     *  - If name is multipart.
-     *  - If name has a hypen.
-     *  - If name has an aprostrophe.
-     *  - If name starts with "MC".
-     *  - If name has conjunctions, e.g. "and", "of", "the", "as", "a".
-     *  - If name has initials.
+     * - If name has a space.
+     * - If name is multipart.
+     * - If name has a hypen.
+     * - If name has an aprostrophe.
+     * - If name starts with "MC".
+     * - If name has conjunctions, e.g. "and", "of", "the", "as", "a".
+     * - If name has initials.
      */
 
     // Has space?
@@ -562,7 +587,7 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
     }
 
     // Starts with MC (and is more than 2 characters)?
-    if (core_text::strlen($name)>2 && (0 == strncasecmp($name, 'mc', 2))) {
+    if (core_text::strlen($name) > 2 && (0 == strncasecmp($name, 'mc', 2))) {
         $name[2] = core_text::strtoupper($name[2]);    // Make 3rd character uppercase.
     }
 
@@ -591,19 +616,20 @@ function ucla_format_name($name=null, $handleconjunctions=false) {
 /**
  * Given a registrar profcode and list of other roles a user has, returns what
  * Moodle role a user should have.
- * 
+ *
  * @param string|array $profcode    If array, then expects prof code(s) for
- *                                  given user in an array indexed by 'primary'
- *                                  and 'secondary'. If string then will assume
- *                                  profcode is for primary for backwards
- *                                  compatibility.
+ *                                 given user in an array indexed by 'primary'
+ *                                 and 'secondary'. If string then will assume
+ *                                 profcode is for primary for backwards
+ *                                 compatibility.
  * @param array $otherroles         Expects all prof code(s) for all roles for
- *                                  all course sections indexed by 'primary' and
- *                                  'secondary'. However, if those keys are not
- *                                  found, then will assume given array is for
- *                                  primary section for backwards compability.
+ *                                 all course sections indexed by 'primary' and
+ *                                 'secondary'. However, if those keys are not
+ *                                 found, then will assume given array is for
+ *                                 primary section for backwards compability.
  * @param string $subjectarea       Default "*SYSTEM*". What subject area we
- *                                  are assigning roles for.
+ *                                 are assigning roles for.
+ *
  * @return int                      Role id for local Moodle system.
  */
 function role_mapping($profcode, array $otherroles, $subjectarea="*SYSTEM*") {
@@ -620,7 +646,7 @@ function role_mapping($profcode, array $otherroles, $subjectarea="*SYSTEM*") {
 
     // Logic to parse profcodes, and return pseudorole.
     $pseudorole = get_pseudorole($profcode, $otherroles);
- 
+
     // Convert pseudorole to the appropiate role for given subject area.
     $moodleroleid = get_moodlerole($pseudorole, $subjectarea);
 
@@ -628,30 +654,31 @@ function role_mapping($profcode, array $otherroles, $subjectarea="*SYSTEM*") {
 }
 
 /**
- * Given 
+ * Given instructor codes, return proper Moodle pseudo role.
+ *
  * Refer to Jira: CCLE-2320 and https://ccle.ucla.edu/mod/page/view.php?id=82418
- * 
+ *
  * role InstSet     Pseudo Role
  * 01   any         editingteacher
- * 03	any	    supervising_instructor
+ * 03   any         supervising_instructor
  * 04   any         grader
- * 22	any	    student_instructor
- * 02 (in any section)	01 (in any section)       ta
- * 02 (primary)	03 (in any section)       ta_instructor
+ * 22   any         student_instructor
+ * 02 (in any section)  01 (in any section)       ta
+ * 02 (primary) 03 (in any section)       ta_instructor
  * 02 (secondary) 02 (primary) or 03 (in any section) ta
- * 
+ *
  * @param array $profcode       Prof code(s) for given user in an array indexed
  *                              by 'primary' and 'secondary'.
- * @param array $other_roles    All prof code(s) for all roles for all course
+ * @param array $otherprofcodes All prof code(s) for all roles for all course
  *                              sections indexed by 'primary' and 'secondary'.
- * 
+ *
  * @return string               Returns either: editingteacher, ta,
  *                              ta_instructor, supervising_instructor, or
  *                              student_instructor
- *                              Returns null if no pseudo role can be found
+ *                              Returns null if no pseudo role can be found.
  */
 function get_pseudorole(array $profcode, array $otherprofcodes) {
- 
+
     // Shortcuts for 01 and 03.
     if (isset($profcode['primary']) && in_array('01', $profcode['primary']) ||
             isset($profcode['secondary']) && in_array('01', $profcode['secondary'])) {
@@ -661,13 +688,13 @@ function get_pseudorole(array $profcode, array $otherprofcodes) {
             isset($profcode['secondary']) && in_array('03', $profcode['secondary'])) {
         return 'supervising_instructor';
     }
- 
+
     // Handling the complex 02 roles.
     if (isset($profcode['primary']) && in_array('02', $profcode['primary']) ||
             isset($profcode['secondary']) && in_array('02', $profcode['secondary'])) {
 
         // Anyone with 02 on a course with an 01 is a ta.
-        // 02 (in any section)	01 (in any section)       ta
+        // 02 (in any section)	01 (in any section)       ta.
         if (isset($otherprofcodes['primary']) && in_array('01', $otherprofcodes['primary']) ||
                 isset($otherprofcodes['secondary']) && in_array('01', $otherprofcodes['secondary'])) {
             return 'ta';
@@ -675,14 +702,14 @@ function get_pseudorole(array $profcode, array $otherprofcodes) {
 
         // If someone is an 02 in the primary section, and there is an 03, they
         // are a ta_instructor (assumes no 01, because of first condition).
-        // 02 (primary)	03 (in any section)       ta_instructor
+        // 02 (primary)	03 (in any section)       ta_instructor.
         if (isset($profcode['primary']) && in_array('02', $profcode['primary'])) {
             if (isset($otherprofcodes['primary']) && in_array('03', $otherprofcodes['primary']) ||
                     isset($otherprofcodes['secondary']) && in_array('03', $otherprofcodes['secondary'])) {
                 return 'ta_instructor';
             }
         }
- 
+
         // For all other 02 cases, default to ta.
         return 'ta';
     }
@@ -704,22 +731,25 @@ function get_pseudorole(array $profcode, array $otherprofcodes) {
 }
 
 /**
- *  This is a function to return the pseudoroles for student enrolment
- *  code values.
- *  @return string - pseudorole, false - not enrolled
- **/
+ * This is a function to return the pseudoroles for student enrolment.
+ * code values.
+ *
+ * @param char $studentcode
+ *
+ * @return string   Pseudorole, false - not enrolled
+ */
 function get_student_pseudorole($studentcode) {
     $code = strtolower(trim($studentcode));
     $psrole = false;
 
     switch($code) {
-        case 'w':   // waitlist
-        case 'h':   // held (unex)
-        case 'p':   // pending
+        case 'w':   // Waitlist.
+        case 'h':   // Held (UNEX).
+        case 'p':   // Pending.
             $psrole = 'waitlisted';
             break;
-        case 'e':   // enrolled
-        case 'a':   // approved (unex)
+        case 'e':   // Enrolled.
+        case 'a':   // Approved (unex).
             $psrole = 'student';
             break;
         default:
@@ -727,7 +757,7 @@ function get_student_pseudorole($studentcode) {
             // d = dropped
             // c = cancelled
             // If they do not have an explicitly declared role code,
-            // then they are considered unenrolled
+            // then they are considered unenrolled.
             $psrole = false;
     }
 
@@ -735,17 +765,18 @@ function get_student_pseudorole($studentcode) {
 }
 
 /**
- * @param string $type   
- *      Type can be 'term', 'srs', 'uid'
- * @param mixed $value   
- *      term: DDC (two digit number with C being either F, W, S, 1)
- *      SRS/UID: (9 digit number, can have leading zeroes)
- * @return boolean      true if the value matches the type, false otherwise.
+ * Validates different UCLA values.
+ *
  * @throws moodle_exception When the input type is invalid.
+ *
+ * @param string $type  Type can be 'term', 'srs', 'uid', or 'academicyear'.
+ * @param mixed $value
+ *
+ * @return boolean      True if the value matches the type, false otherwise.
  */
 function ucla_validator($type, $value) {
     $result = 0;
- 
+
     switch($type) {
         case 'term':
             $result = preg_match('/^[0-9]{2}[FWS1]$/', $value);
@@ -764,24 +795,24 @@ function ucla_validator($type, $value) {
             throw new moodle_exception('invalid type', 'ucla_validator');
             break;
     }
- 
+
     return $result == 1;
 }
 
 /**
  * Given a pseudorole (from get_pseudorole), returns what moodle role a user
- * should be assigned for a given department. First a look-up is done in the 
+ * should be assigned for a given department. First a look-up is done in the
  * database for a given pseudorole and subject area. Then the function looks
  * at the role mapping config file. If the role mapping is present in that file
  * it will override any values from the database.
- * 
- * @throws moodle_exception         Throws moodle exception if no role mapping 
+ *
+ * @throws moodle_exception         Throws moodle exception if no role mapping
  *                                  is found
- * 
+ *
  * @param string $pseudorole
  * @param string $subjectarea       Default "*SYSTEM*".
- * 
- * @return int                      Moodle role id. 
+ *
+ * @return int                      Moodle role id.
  */
 function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
     global $CFG, $DB;
@@ -797,7 +828,7 @@ function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
 
     require($CFG->dirroot . '/local/ucla/rolemappings.php');
 
-    // if mapping exists in file, then don't care what values are in the db
+    // If mapping exists in file, then don't care what values are in the db.
     if (!empty($role[$pseudorole][$subjectarea])) {
         if ($moodlerole = $DB->get_record('role',
                 array('shortname' => $role[$pseudorole][$subjectarea]))) {
@@ -805,8 +836,8 @@ function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
             return $moodlerole->id;
         }
     }
- 
-    // didn't find role mapping in config file, check database
+
+    // Didn't find role mapping in config file, check database.
     if ($moodlerole = $DB->get_record('ucla_rolemapping',
             array(
                 'pseudo_role' => $pseudorole,
@@ -815,9 +846,9 @@ function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
         $cache->set($cachekey, $moodlerole->moodle_roleid);
         return $moodlerole->moodle_roleid;
     }
- 
-    // if no role was found, then use *SYSTEM* default
-    // (should be set in config)
+
+    // If no role was found, then use *SYSTEM* default
+    // (should be set in config).
     if (!empty($role[$pseudorole]['*SYSTEM*'])) {
         if ($moodlerole = $DB->get_record('role',
                 array('shortname' => $role[$pseudorole]['*SYSTEM*']))) {
@@ -827,17 +858,24 @@ function get_moodlerole($pseudorole, $subjectarea='*SYSTEM*') {
             debugging('pseudorole mapping found, but local role not found');
         }
     }
- 
-    // oh no... didn't find proper role mapping, stop the presses
+
+    // Oh no... didn't find proper role mapping, stop the presses.
     throw new moodle_exception('invalidrolemapping', 'local_ucla', null,
             sprintf('Params: $pseudorole - %s, $subjectarea - %s',
                     $pseudorole, $subjectarea));
 }
 
 /**
- *  Wrapper with debugging and diverting controls for PHP's mail.
- **/
-function ucla_send_mail($to, $subj, $body='', $header='') {
+ * Wrapper with debugging and diverting controls for PHP's mail.
+ *
+ * @param string $to
+ * @param string $subj
+ * @param string $body
+ * @param string $header
+ *
+ * @return boolean
+ */
+function ucla_send_mail($to, $subj, $body = '', $header = '') {
     global $CFG;
 
     if (!empty($CFG->noemailever)) {
@@ -846,17 +884,17 @@ function ucla_send_mail($to, $subj, $body='', $header='') {
     }
 
     if (!empty($CFG->divertallemailsto)) {
-        // change subject to have divert message
+        // Change subject to have divert message.
         $subj = "[DIVERTED $to] $subj";
-        // clear out old to
+        // Clear out old to.
         $to = $CFG->divertallemailsto;
-        // clear header variable, because it might contain an email address
+        // Clear header variable, because it might contain an email address.
         $header = '';
     }
 
     if (debugging() && empty($CFG->divertallemailsto)) {
-        // if divertallemailsto is set, then send out email even if debugging is
-        // enabled
+        // If divertallemailsto is set, then send out email even if debugging is
+        // enabled.
         debugging("TO: $to\nSUBJ: $subj\nBODY: $body\nHEADER: $header");
     } else {
         debugging("Sending real email to " . $to);
@@ -867,31 +905,32 @@ function ucla_send_mail($to, $subj, $body='', $header='') {
 }
 
 /**
- *  Sorts a set of terms.
- *  @param  $terms          Array( term, ... )
- *  @param  $descending     Optional parameter to sort with most recent term 
- *                          first.
- *  @return Array( term_in_order, ... )
- **/
+ * Sorts a set of terms.
+ *
+ * @param  array    $terms         Array( term, ... )
+ * @param  boolean  $descending    Optional parameter to sort with 
+ *                                 most recent term first.
+ * @return Array( term_in_order, ... )
+ */
 function terms_arr_sort($terms, $descending = false) {
     $ksorter = array();
 
-    // enumerate terms
+    // Enumerate terms.
     foreach ($terms as $k => $term) {
         $ksorter[$k] = term_enum($term);
     }
 
-    // sort
+    // Sort.
     asort($ksorter);
- 
-    // denumerate terms
+
+    // Denumerate terms.
     $sorted = array();
     foreach ($ksorter as $k => $v) {
         $term = $terms[$k];
         $sorted[$term] = $term;
     }
- 
-    // sort in descending order
+
+    // Sort in descending order.
     if ($descending == true) {
         $sorted = array_reverse($sorted, true);
     }
@@ -899,17 +938,21 @@ function terms_arr_sort($terms, $descending = false) {
 }
 
 /**
- *  Checks if a particular shortname given is allowed to view the 
- *  the particular term.
- *  @param  $term           Term to check
- *  @param  $roleshortname  Shortname of role
- *  @param  $currterm       Term to use as current term
- *  @param  $currweek       Week to use as current week
- *  @param  $limitweek      Week to use as cut-off week
- **/
+ * Checks if a particular shortname given is allowed to view the
+ * the particular term.
+ *
+ * @param string $term          Term to check.
+ * @param string $roleshortname Shortname of role.
+ * @param string $currterm      Term to use as current term.
+ * @param int $currweek         Week to use as current week.
+ * @param int $limitweek        Week to use as cut-off week.
+ * @param string $leastterm     Oldest term to allow access.
+ *
+ * @return boolean
+ */
 function term_role_can_view($term, $roleshortname, $currterm=null,
                             $currweek=null, $limitweek=null, $leastterm=null) {
-    // Nobody can see courses from non-terms
+    // Nobody can see courses from non-terms.
     if (!ucla_validator('term', $term)) {
         return false;
     }
@@ -927,7 +970,7 @@ function term_role_can_view($term, $roleshortname, $currterm=null,
     if ($limitweek === null) {
         $limitweek = get_config('local_ucla', 'student_access_ends_week');
     }
- 
+
     if ($currweek === null) {
         $currweek = get_config('local_ucla', 'current_week');
     }
@@ -935,31 +978,38 @@ function term_role_can_view($term, $roleshortname, $currterm=null,
     if ($currterm === null) {
         $currterm = get_config(null, 'currentterm');
     }
- 
-    // find the maximum-access-role
-    // Check out CCLE-2834 for documentation and reasoning
+
+    // Find the maximum-access-role.
+    // Check out CCLE-2834 for documentation and reasoning.
     $canviewprev = false;
     if (in_array($roleshortname, array(
-                // Role-mapped course editors
+                // Role-mapped course editors.
                 'ta_admin', 'ta_instructor', 'editinginstructor',
                     'supervising_instructor', 'studentfacilitator',
-                // Site adjuncts
+                // Site adjuncts.
                 'manager', 'instructional_assistant', 'editor'
             ))) {
         $canviewprev = true;
     }
 
-    // Either can see all terms or can see until week 2, the previous term
+    // Either can see all terms or can see until week 2, the previous term.
     if ($canviewprev || term_cmp_fn($term, $currterm) >= 0
         || ($currweek < $limitweek
             && term_cmp_fn($term, term_get_prev($currterm)) == 0)) {
-        // This should evaluate to true
+        // This should evaluate to true.
         return $term;
     }
 
     return false;
 }
 
+/**
+ * Returns an array with missing terms added.
+ *
+ * @param array $terms
+ *
+ * @return array
+ */
 function terms_arr_fill($terms) {
     $startterm = reset($terms);
     $endterm = end($terms);
@@ -973,6 +1023,16 @@ function terms_arr_fill($terms) {
     return $terms;
 }
 
+/**
+ * Returns terms in between the start and end terms.
+ *
+ * @throws moodle_exception
+ *
+ * @param string $startterm
+ * @param string $endterm
+ *
+ * @return array
+ */
 function terms_range($startterm, $endterm) {
     if (!ucla_validator('term', $startterm)
             || !ucla_validator('term', $endterm)) {
@@ -985,7 +1045,7 @@ function terms_range($startterm, $endterm) {
         return $terms;
     }
 
-    // We can get a reverse range, so handle that
+    // We can get a reverse range, so handle that.
     $reverse = false;
     if (term_cmp_fn($startterm, $endterm) > 0) {
         $reverse = $startterm;
@@ -1009,10 +1069,11 @@ function terms_range($startterm, $endterm) {
 }
 
 /**
- *  Takes in a UCLA term (Ex: 11F) and returns the term after it.
- * 
- *  @param current_term a valid term string (Ex: '11F')
- *  @return the term after the current term.
+ * Takes in a UCLA term (Ex: 11F) and returns the term after it.
+ *
+ * @param string $term
+ *
+ * @return string
  */
 function term_get_next($term) {
     if (empty($term)) {
@@ -1023,8 +1084,8 @@ function term_get_next($term) {
 
     switch($quarter) {
         case 'F':
-            $next_year = ($year == 99) ? '00' : sprintf('%02d', intval($year)+1);
-            return $next_year.'W';
+            $nextyear = ($year == 99) ? '00' : sprintf('%02d', intval($year) + 1);
+            return $nextyear.'W';
         case 'W':
             return $year.'S';
         case 'S':
@@ -1037,10 +1098,11 @@ function term_get_next($term) {
 }
 
 /**
- *  Takes in a UCLA term (Ex: 11F) and returns the term before it.
- * 
- *  @param current_term a valid term string (Ex: '11F')
- *  @return the term after the current term.
+ * Takes in a UCLA term (Ex: 11F) and returns the term before it.
+ *
+ * @param string $term
+ *
+ * @return string
  */
 function term_get_prev($term) {
     if (empty($term)) {
@@ -1053,8 +1115,8 @@ function term_get_prev($term) {
         case 'F':
             return $year.'1';
         case 'W':
-            $prev_year = ($year == 0) ? '99' : sprintf('%02d', intval($year)-1);
-            return $prev_year.'F';
+            $prevyear = ($year == 0) ? '99' : sprintf('%02d', intval($year) - 1);
+            return $prevyear.'F';
         case 'S':
             return $year.'W';
         case '1':
@@ -1065,25 +1127,27 @@ function term_get_prev($term) {
 }
 
 /**
- *  PHP side function to order terms.
- *  @param  $term   term
- *  @return string sortable term        Returns false on error
- **/
+ * PHP side function to order terms.
+ *
+ * @param string $term
+ *
+ * @return int          Sortable term. Returns false on error.
+ */
 function term_enum($term) {
     if (!ucla_validator('term', $term)) {
         return false;
     }
- 
-    // assumption: 65F is the oldest term that registrar has
-    // so treat years 65 and older as 19XX and years before as 20XX
+
+    // Assumption: 65F is the oldest term that registrar has
+    // so treat years 65 and older as 19XX and years before as 20XX.
     $year = (int) substr($term, 0, -1);
     if ($year < 65) {
-        $year = str_pad($year, 2, '0', STR_PAD_LEFT); // fixes year 00-09 problems
+        $year = str_pad($year, 2, '0', STR_PAD_LEFT); // Fixes year 00-09 problems.
         $year = '20' . $year;
     } else {
         $year = '19' . $year;
     }
- 
+
     $r = array(
         'W' => 0,
         'S' => 1,
@@ -1095,14 +1159,16 @@ function term_enum($term) {
 }
 
 /**
- *  Compare-to function.
- *  @param  $term   The first
- *  @param  $term   The second
- *  @return 
- *      first > second return 1
- *      first == second return 0
- *      first < second return -1
- **/
+ * Compare-to function.
+ *
+ * @param string $term    The first
+ * @param string $other   The second
+ *
+ * @return int
+ *     first > second return 1
+ *     first == second return 0
+ *     first < second return -1
+ */
 function term_cmp_fn($term, $other) {
     $et = term_enum($term);
     $eo = term_enum($other);
@@ -1116,11 +1182,12 @@ function term_cmp_fn($term, $other) {
 }
 
 /**
- * Returns true if given course is a collabration site (aka non-srs course), 
+ * Returns true if given course is a collabration site (aka non-srs course),
  * otherwise false.
- * 
+ *
  * @param int|object $course
- * @return boolean 
+ *
+ * @return boolean
  */
 function is_collab_site($course) {
     global $DB;
@@ -1136,7 +1203,8 @@ function is_collab_site($course) {
  * Only queries for the division of the hostcourse.
  *
  * @param int $courseid
- * @return boolean 
+ *
+ * @return boolean
  */
 function is_engineering($courseid) {
     global $DB;
@@ -1176,27 +1244,23 @@ function has_role_in_context($shortname, context $context) {
 
 /**
  * Sets the editing button in the $PAGE element to be the url passed in.
- * 
- * Code copied from fragments of code in course/view.php to set the "Turn 
+ *
+ * Code copied from fragments of code in course/view.php to set the "Turn
  * editing on/off" button.
- * 
- * @global object $OUTPUT
- * @global object $PAGE
- * @global object $USER
- * 
+ *
  * @param moodle_url $url   Expecting moodle_url object. If null, then defaults
- *                          redirecting user to $PAGE->url
+ *                          redirecting user to $PAGE->url.
  */
 function set_editing_mode_button($url=null) {
     global $OUTPUT, $PAGE, $USER;
- 
+
     if (empty($url)) {
         $url = $PAGE->url;
     }
- 
-    // see if user is trying to turn editing on/off
+
+    // See if user is trying to turn editing on/off
     // copied from course/view.php:line 12, 104-128, 153-155, 205-206
-    // (at the time of Moodle 2.2.2)
+    // (at the time of Moodle 2.2.2).
     $edit = optional_param('edit', -1, PARAM_BOOL);
     if (!isset($USER->editing)) {
         $USER->editing = 0;
@@ -1204,7 +1268,7 @@ function set_editing_mode_button($url=null) {
     if ($PAGE->user_allowed_editing()) {
         if (($edit == 1) and confirm_sesskey()) {
             $USER->editing = 1;
-            // edited to use url specified in function
+            // Edited to use url specified in function.
             redirect($url);
         } else if (($edit == 0) and confirm_sesskey()) {
             $USER->editing = 0;
@@ -1212,10 +1276,10 @@ function set_editing_mode_button($url=null) {
                 $USER->activitycopy       = false;
                 $USER->activitycopycourse = null;
             }
-            // edited to use url specified in function
+            // Edited to use url specified in function.
             redirect($url);
         }
-        // edited to use url specified in function
+        // Edited to use url specified in function.
         $buttons = $OUTPUT->edit_button($url);
         $PAGE->set_button($buttons);
     } else {
@@ -1224,95 +1288,97 @@ function set_editing_mode_button($url=null) {
 }
 
 /**
- *  Gets the FriendlyURL version of a course link.
- *  @param $course  course object
- *  @return string  URL to use, relative to $CFG->wwwroot
- **/
+ * Gets the FriendlyURL version of a course link.
+ *
+ * @param object $course
+ *
+ * @return string           URL to use, relative to $CFG->wwwroot.
+ */
 function make_friendly_url($course) {
     return '/course/view/' . rawurlencode($course->shortname);
 }
 
-/*
+/**
  * Checks the role_assignments table and sees if the viewer shares a context
  * with the target.
  *
  * @param int $targetid     Id of user to check if viewer shares a context with
- * @param int $userid       Defaults to null. If null, then will use currently
- *                          logged in user.
+ * @param int $viewerid     Defaults to null. If null, then will use currently
+ *                         logged in user.
  *
  * @return boolean          True if viewer does share a context with target,
- *                          otherwise false.
- */
+ *                         otherwise false.
+ **/
 function has_shared_context($targetid, $viewerid=null) {
     global $DB, $USER;
- 
+
     if (empty($viewerid)) {
         $viewerid = $USER->id;
     }
- 
-    // use raw SQL, because there is no built in moodle database api to join a
-    // table on itself
+
+    // Use raw SQL, because there is no built in moodle database api to join a
+    // table on itself.
     $sql = "SELECT  COUNT(*)
-            FROM    {role_assignments} AS ra_target,
-                    {role_assignments} AS ra_viewer
+            FROM    {role_assignments} ra_target,
+                    {role_assignments} ra_viewer
             WHERE   ra_target.userid=:targetid AND
                     ra_viewer.userid=:viewerid AND
                     ra_target.contextid=ra_viewer.contextid";
     $result = $DB->get_field_sql($sql, array('targetid' => $targetid,
                                              'viewerid' => $viewerid));
 
-    // if there is a result, return true, otherwise false
+    // If there is a result, return true, otherwise false.
     return !empty($result);
 }
 
 /**
- * Returns active terms. Used by course requestor, course creator, and pre-pop 
+ * Returns active terms. Used by course requestor, course creator, and pre-pop
  * enrollment to see what terms should be processed.
- * 
- * @param  $descending     Optional parameter to sort active terms with most 
- *      recent first.
+ *
+ * @param  boolean $descending     Optional parameter to sort active terms with 
+ *                                 most recent first.
+ *
  * @return array           Returns an array of terms
  */
 function get_active_terms($descending = 'false') {
-    $ret_val = array();
- 
+    $retval = array();
+
     $terms = get_config('local_ucla', 'active_terms');
     if (is_string($terms)) {
-        // terms should a comma deliminated list (but might be array already if
-        // if defined in config file)
+        // Terms should a comma deliminated list (but might be array already if
+        // if defined in config file).
         $terms = explode(',', $terms);
     }
- 
+
     if (!empty($terms)) {
         foreach ($terms as $term) {
             $term = trim($term);
             if (ucla_validator('term', $term)) {
-                $ret_val[$term] = $term;
+                $retval[$term] = $term;
             }
         }
     }
- 
+
     // The weeksdisplay block generates all the terms in correct order
-    // But in case this is from a Config file instead
-    return terms_arr_sort($ret_val, $descending);
+    // but in case this is from a config file instead.
+    return terms_arr_sort($retval, $descending);
 }
 
 /**
  * Sets up the JQuery plugin to sort a given table.
  *
- * @global object $PAGE
- *
  * @param string $tableid   Optional. If entered, will be used to associate
- *                          which table to enable sorting. If not passed will
- *                          generate a unique id number.
+ *                         which table to enable sorting. If not passed will
+ *                         generate a unique id number.
  * @param array  $options   Optional. Specify additional options to be passed
- *                          to initialize the tablesorter. Each element in the
- *                          array represents an option/value pair, e.g.
- *                          'debug: true'
+ *                         to initialize the tablesorter. Each element in the
+ *                         array represents an option/value pair, e.g.
+ *                         'debug: true'
  * @param string $idorclass Default to id. If set to 'class', will apply table
- *                          sorting to all tables with a given class.
+ *                         sorting to all tables with a given class.
+ *
  * @return string           Returns table id, either the one passed in or the
- *                          one auto-generated.
+ *                         one auto-generated.
  */
 function setup_js_tablesorter($tableid = null, $options = array(), $idorclass = 'id') {
     global $PAGE;
@@ -1340,20 +1406,28 @@ function setup_js_tablesorter($tableid = null, $options = array(), $idorclass = 
     return $tableid;
 }
 
+/**
+ * Redirects users to login.
+ *
+ * @param object $PAGE
+ * @param object $OUTPUT
+ * @param object $CFG
+ * @param object $course
+ */
 function prompt_login($PAGE, $OUTPUT, $CFG, $course) {
     $PAGE->set_url('/');
     $PAGE->set_course($course);
     $PAGE->set_title($course->shortname);
     $PAGE->set_heading($course->fullname);
     $PAGE->navbar->add(get_string('loginredirect', 'local_ucla'));
- 
+
     notice(get_string('notloggedin', 'local_ucla'), get_login_url());
 }
 
 /**
  * Displays flash successful messages from session.
- * 
- * @global object $OUTPUT
+ *
+ * @deprecated since version 3.1. See MDL-30811.
  */
 function flash_display() {
     global $OUTPUT;
@@ -1367,20 +1441,22 @@ function flash_display() {
  * Copies the $success_msg in a session variable to be used on redirected page
  * via flash_display()
  *
- * @param moodle_url|string $url A moodle_url to redirect to. Strings are not to be trusted!
- * @param string $success_msg The message to display to the user
+ * @deprecated since version 3.1. See MDL-30811.
+ *
+ * @param moodle_url|string $url    A moodle_url to redirect to.
+ * @param string $successmsg        The message to display to the user.
  */
-function flash_redirect($url, $success_msg) {
-    // message to indicate to user that content was edited
-    $_SESSION['flash_success_msg']  = $success_msg;
+function flash_redirect($url, $successmsg) {
+    // Message to indicate to user that content was edited.
+    $_SESSION['flash_success_msg']  = $successmsg;
     redirect($url);
 }
 
 /**
  * Notify students and instructors the status of a course.
  *
- * @global object $OUTPUT
  * @param object $course
+ *
  * @return string           Returns notice if any is needed.
  */
 function notice_course_status($course) {
@@ -1394,7 +1470,7 @@ function notice_course_status($course) {
 
     $noticestring = '';
     $noticeparam = null;
- 
+
     if (is_past_course($course)) {
         $currentweek = get_config('local_ucla', 'current_week');
         if ($currentweek === \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
@@ -1425,12 +1501,9 @@ function notice_course_status($course) {
         }
     }
 
-//    debugging(sprintf('$ispastcourse = %d, $ishidden = %d, $istemprole = %d',
-//            $ispastcourse, $ishidden, $istemprole));
-
-    // For matrix of status/message, please see
+    // For matrix of status/message, please see:
     // CCLE-3787 - Temporary participant role.
-    // CCLE-5741 - Only show out of term message if it is enabled in course settings
+    // CCLE-5741 - Only show out of term message if it is enabled in course settings.
     if ((!$ispastcourse && !$ishidden && !$istemprole) ||
             ($ispastcourse && !$course->enableoutoftermmessage)) {
         return;
@@ -1445,7 +1518,7 @@ function notice_course_status($course) {
             }
         } else if (!isloggedin() || isguestuser()) {
             $noticestring = get_string('notice_course_status_pasthidden_login', 'local_ucla');
-            $loginbutton = new single_button(new moodle_url('/login/index.php'), 
+            $loginbutton = new single_button(new moodle_url('/login/index.php'),
                     get_string('login', 'local_ucla'));
             $loginbutton->class = 'continuebutton';
             $noticestring .= $OUTPUT->render($loginbutton);
@@ -1479,7 +1552,7 @@ function notice_course_status($course) {
             }
         } else if (!isloggedin() || isguestuser()) {
             $noticestring = get_string('notice_course_status_pasthidden_login', 'local_ucla');
-            $loginbutton = new single_button(new moodle_url('/login/index.php'), 
+            $loginbutton = new single_button(new moodle_url('/login/index.php'),
                     get_string('login', 'local_ucla'));
             $loginbutton->class = 'continuebutton';
             $noticestring .= $OUTPUT->render($loginbutton);
@@ -1505,9 +1578,9 @@ function notice_course_status($course) {
 
 /**
  * Checks if given course belongs to a past term.
- * 
- * @global type $CFG
+ *
  * @param object $course
+ *
  * @return boolean          Returns false if course is not a reg course or is
  *                          not in past term. Otherwise true.
  */
@@ -1517,7 +1590,7 @@ function is_past_course($course) {
     if (empty($courseinfos)) {
         return false;
     }
-    // only notify for old courses
+    // Only notify for old courses.
     $courseinfo = current($courseinfos);
     if (term_cmp_fn($courseinfo->term, $CFG->currentterm) == -1) {
         return true;
@@ -1526,8 +1599,8 @@ function is_past_course($course) {
 }
 
 /**
- * Handles the hiding of courses and related TA sites, and reports  any 
- * successes or failures. 
+ * Handles the hiding of courses and related TA sites, and reports  any
+ * successes or failures.
  *
  * When hiding a course we will also disable the guest enrollment plugin,
  * because, due to a Moodle bug, users with a disabled enrollment can still
@@ -1536,8 +1609,7 @@ function is_past_course($course) {
  * Please do not call this method directly. It should only be called from
  * local/ucla/eventslib.php:hide_past_courses or the command line script
  * local/ucla/scripts/hide_courses.php.
- * 
- * @global object $DB
+ *
  * @param string $term
  * @return mixed            Returns false on invalid term. Otherwise returns an
  *                          array of $num_hidden_courses, $num_hidden_tasites,
@@ -1553,21 +1625,21 @@ function hide_courses($term) {
     }
 
     // Track some stats.
-    $num_hidden_courses = 0;
-    $num_hidden_tasites = 0;
-    $num_problem_courses = 0;
-    $error_messages = '';
+    $numhiddencourses = 0;
+    $numhiddentasites = 0;
+    $numproblemcourses = 0;
+    $errormessages = '';
 
     // Get list of courses to hide.
     $courses = ucla_get_courses_by_terms(array($term));
 
     if (empty($courses)) {
         // No courses to hide.
-        return array($num_hidden_courses, $num_hidden_tasites,
-                     $num_problem_courses, $error_messages);
+        return array($numhiddencourses, $numhiddentasites,
+                     $numproblemcourses, $errormessages);
     }
 
-    $enrol_guest_plugin = enrol_get_plugin('guest');
+    $enrolguestplugin = enrol_get_plugin('guest');
 
     // Now run command to hide all courses for given term. Don't worry about
     // updating visibleold (don't care) and we aren't using update_course,
@@ -1575,22 +1647,22 @@ function hide_courses($term) {
     $courseobj = new stdClass();
     $courseobj->visible = 0;
     foreach ($courses as $courseid => $courseinfo) {
-        $courses_processed = array($courseid);
+        $coursesprocessed = array($courseid);
         $courseobj->id = $courseid;
         try {
-            ++$num_hidden_courses;
+            ++$numhiddencourses;
 
             // Try to see if course had any TA sites.
-            $existing_tasites = block_ucla_tasites::get_tasites($courseid);
-            if (!empty($existing_tasites)) {
-                foreach ($existing_tasites as $tasite) {
-                    ++$num_hidden_tasites;
-                    $courses_processed[] = $tasite->id;
+            $existingtasites = block_ucla_tasites::get_tasites($courseid);
+            if (!empty($existingtasites)) {
+                foreach ($existingtasites as $tasite) {
+                    ++$numhiddentasites;
+                    $coursesprocessed[] = $tasite->id;
                 }
             }
 
             // Hide courses and guest plugins.
-            foreach ($courses_processed as $courseid) {
+            foreach ($coursesprocessed as $courseid) {
                 $courseobj->id = $courseid;
                 $DB->update_record('course', $courseobj, true);
 
@@ -1600,19 +1672,20 @@ function hide_courses($term) {
             }
 
         } catch (dml_exception $e) {
-            $error_messages .= sprintf("Could not hide courseid %d\n%s\n",
+            $errormessages .= sprintf("Could not hide courseid %d\n%s\n",
                     $courseobj->id, $e->getMessage());
-            ++$num_problem_courses;
+            ++$numproblemcourses;
         }
     }
 
-    return array($num_hidden_courses, $num_hidden_tasites,
-                 $num_problem_courses, $error_messages);
+    return array($numhiddencourses, $numhiddentasites,
+                 $numproblemcourses, $errormessages);
 }
 
 /**
  * Given a displayname in the following format:
- *  LAST, FIRST MIDDLE, SUFFIX
+ * LAST, FIRST MIDDLE, SUFFIX
+ *
  * Will return an array for a user's lastname and firstname.
  *
  * Consolidates name formating used in shib_transform.php and prepop.
@@ -1634,6 +1707,7 @@ function format_displayname($displayname) {
 
     if (empty($names)) {
         // No name found.
+        return $retval;
     } else if (empty($names[1])) {
         // No first name.
         $retval['lastname'] = $names[0];
@@ -1657,11 +1731,11 @@ function format_displayname($displayname) {
 
 /**
  * Print a grouping menu for filtering by grouping in grader report.
- * 
- * @category group
- * @param stdClass $course
+ *
+ * @param object $course
  * @param mixed $urlroot
- * @param int $activegrouping groupingid that is active (NULL for none)
+ * @param int $activegrouping   Groupingid that is active (NULL for none).
+ *
  * @return string
  */
 function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
@@ -1681,7 +1755,6 @@ function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
     $groupingsmenu = $DB->get_records_select_menu('groupings', $select, $params, $sort, $fields);
 
     if ($groupingsmenu) {
-
         // Change the "Private Course Material" grouping to show as "All" if it exists.
         $publicprivatecourse = new PublicPrivate_Course($course);
         $pubprivgroupingid = $publicprivatecourse->get_grouping();
@@ -1693,10 +1766,10 @@ function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
         // active grouping was supplied.
         if (!isset($activegrouping) && isset($course->defaultgroupingid)
             && isset($groupingsmenu[$course->defaultgroupingid])) {
- 
+
             $activegrouping = $course->defaultgroupingid;
         }
- 
+
         // Build a string with the grouping being viewed,
         // or a select with all available groupings.
         $groupinglabel = get_string('view_grouping', 'local_ucla');
@@ -1721,11 +1794,12 @@ function groupings_print_filter_menu($course, $urlroot, $activegrouping) {
 
 /**
  * For a crosslisted $courseid, find what SRS $userid is enrolled in.
- * This info is in the ccle_roster_class_cache table.  There should
+ * This info is in the ccle_roster_class_cache table. There should
  * only be one record, but it's possible to receive more.
  *
  * @param int $courseid
  * @param int $userid
+ *
  * @return array of courses
  */
 function ucla_get_user_enrolled_course($courseid, $userid) {
@@ -1739,10 +1813,9 @@ function ucla_get_user_enrolled_course($courseid, $userid) {
         return array();
     }
 
-    $srslist = implode(',',
-        array_map(function($o) {
-            return $o->srs;
-        }, $courses));
+    // Ignore coding standards warning on closures.
+    // @codingStandardsIgnoreLine
+    $srslist = implode(',', array_map(function($o) {return $o->srs;}, $courses));
     $term = $courses[0]->term;
 
     if (empty($srslist) || empty($term)) {
@@ -1754,8 +1827,8 @@ function ucla_get_user_enrolled_course($courseid, $userid) {
                    urc.subj_area, urc.crsidx, urc.secidx,
                    u.idnumber as uidstudent
               FROM {ccle_roster_class_cache} crcc,
-                   {ucla_reg_classinfo} AS urc,
-                   {user} AS u
+                   {ucla_reg_classinfo} urc,
+                   {user} u
              WHERE u.id = :userid AND
                    u.idnumber = crcc.stu_id AND
                    urc.term = crcc.param_term AND

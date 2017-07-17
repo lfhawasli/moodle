@@ -22,16 +22,20 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
-
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form class.
+ *
+ * @copyright   2014 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_ucla_modchooser_preferences_form extends moodleform {
+    /**
+     * Defines the form elements.
+     */
     public function definition() {
-        global $USER, $CFG;
-
         $mform =& $this->_form;
 
         $returnto = $this->_customdata['returnto'];

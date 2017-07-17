@@ -36,8 +36,7 @@ list($options, $unrecognized) = cli_get_params(
         array('h' => 'help', 't' => 'terms', 'f' => 'file'));
 
 if ($options['help'] || empty($options['terms']) || empty($options['file']) || empty($options)) {
-    $help =
-"Generates CSV of instructors of courses with no content, including syllabi.
+    $help = "Generates CSV of instructors of courses with no content, including syllabi.
 
 Options:
 -h, --help            Print out this help
@@ -72,7 +71,7 @@ if ($file === false) {
 // Get all the instructors teaching for a given list of terms.
 list($termsql, $params) = $DB->get_in_or_equal($terms, SQL_PARAMS_NAMED);
 $sql = "SELECT DISTINCT u.id,
-               CONCAT(u.lastname, ', ', u.firstname) AS name,
+               CONCAT(u.lastname, ', ', u.firstname) name,
                u.email
           FROM {user} u
           JOIN {role_assignments} ra ON (ra.userid=u.id)

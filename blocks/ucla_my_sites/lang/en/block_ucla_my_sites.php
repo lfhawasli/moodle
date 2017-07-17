@@ -26,3 +26,6 @@ $string['dismiss'] = 'Dismiss';
 $string['dismissed'] = 'You have successfully dismissed the notification.';
 
 $string['notenrolled'] = 'You are currently not assigned to any courses or collaboration sites on this system.';
+
+$string['startdate'] = 'Start date';
+$string['sitename'] = 'Site name';

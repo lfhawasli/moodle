@@ -228,49 +228,54 @@ class block_ucla_course_menu extends block_navigation {
             }
 
             if (empty($section->name)) {
-                $sectionname = get_section_name($this->page->course, 
+                $sectionname = get_section_name($this->page->course,
                     $section);
             } else {
                 $sectionname = $section->name;
             }
 
             $sectionname = strip_tags($sectionname);
-            
-            if (!$viewhiddensections && !$section->visible) {
-                continue;
-            }
 
-            // Add (empty) tag to sections with no content.
+            // No content in section.
             $nocontent = empty($section->sequence) && empty($section->summary);
-            if ($nocontent && $viewhiddensections) {
-                $sectionname = $sectionname . " (empty)";
-            }      
 
-            $sectnum = $section->section;
-            $key = 'section-' . $sectnum;
-            $elements[$key] = navigation_node::create($sectionname,
-                new moodle_url('/course/view.php', array(
-                    'id' => $courseid,
-                    'section' => $sectnum
-                )), navigation_node::TYPE_SECTION
-            );
-
-            // Indicate that section is hidden.
-            if(!$section->visible) {
-                $elements[$key]->classes = array('block_ucla_course_menu_hidden');
-            }
-            // Check that section contains activities.
-            if (empty($nocontent)) {
-                if (is_array($elements[$key]->classes)) {
-                    $elements[$key]->classes[] = 'hascontent';
-                } else {
-                    $elements[$key]->classes = array('hascontent');
-
+            // Check if something may be displayed.
+            if (empty($nocontent) || $viewhiddensections) {
+                $showsection = $section->uservisible || ($section->visible &&
+                    !$section->available && !empty($section->availableinfo));
+                if (!$showsection) {
+                    unset($section);
+                    continue;
                 }
-            // People who cannot view hidden sections are not allowed to see sections with no content.
-            } else if (!$viewhiddensections) {
-                unset($elements[$key]);
+
+                if ($nocontent && $viewhiddensections) {
+                    $sectionname = $sectionname . " (empty)";
+                }
+
+                $sectnum = $section->section;
+                $key = 'section-' . $sectnum;
+                $elements[$key] = navigation_node::create($sectionname,
+                    new moodle_url('/course/view.php', array(
+                        'id' => $courseid,
+                        'section' => $sectnum
+                    )), navigation_node::TYPE_SECTION
+                );
+
+                if (!$section->visible) {
+                    $elements[$key]->classes = array('block_ucla_course_menu_hidden');
+                }
+
+                if (empty($nocontent)) {
+                    if (is_array($elements[$key]->classes)) {
+                        $elements[$key]->classes[] = 'hascontent';
+                    } else {
+                        $elements[$key]->classes = array('hascontent');
+                    }
+                } else if (!$viewhiddensections) {
+                    unset($elements[$key]);
+                }
             }
+            unset($section);
         }
 
         // Create view-all section link.

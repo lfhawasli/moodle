@@ -90,9 +90,9 @@ foreach ($hostcourses as $hostcourse) {
         // Sometimes the web service can spit out an error.
         $trace->output('Exception, skipping: ' . $e->getMessage(), 2);
         continue;
-    }    
+    }
 
-    $trace->output(sprintf('Checking %s %s (%s)', $hostcourse->department, 
+    $trace->output(sprintf('Checking %s %s (%s)', $hostcourse->department,
             $hostcourse->course, $hostcourse->srs));
 
     // Get crosslists that are listed in local DB.
@@ -118,13 +118,13 @@ foreach ($hostcourses as $hostcourse) {
         // separate request.
         if (empty($foundmatch)) {
             $exists = $DB->get_record('ucla_request_classes',
-                    array('term' => $term, 'srs' => $remotecrosslist['srs']));            
+                    array('term' => $term, 'srs' => $remotecrosslist['srs']));
             if (empty($exists)) {
                 $missingcrosslists[] = $remotecrosslist['srs'];
                 ++$nummissing;
             } else {
                 // Report that cross-list already built.
-                $trace->output(sprintf('Crosslist already built: %s %s (%s)', 
+                $trace->output(sprintf('Crosslist already built: %s %s (%s)',
                         $exists->department, $exists->course, $exists->srs), 1);
             }
         }

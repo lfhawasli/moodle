@@ -61,7 +61,7 @@ class mod_casa_privacy_waiver_observer_testcase extends advanced_testcase {
 
         // Delete course.
         delete_course($course->id);
-        $this->assertDebuggingCalled(null, null, 'Events API using $handlers array has been deprecated in favour of Events 2 API, please use it instead.');
+        $this->resetDebugging();    // Ignore debugging about Event API 1.
         // Make sure no entries exists.
         $numwaivers = $DB->count_records('lti_privacy_waiver');
         $this->assertEquals(0, $numwaivers);

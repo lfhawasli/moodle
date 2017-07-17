@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * Class to set/get data from Registrar tables, a stored procedure.
  *
  * @package    local_ucla
@@ -39,11 +39,23 @@ require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
  */
 class local_ucla_regsender {
     /**
-     * Constants to return when set_syllabus_links is called.
+     * Returned when update failed.
      */
     const FAILED = -1;
+
+    /**
+     * Returned when no update ocurred.
+     */
     const NOUPDATE = 0;
+
+    /**
+     * Returned when some informatin is updated.
+     */
     const PARTIALUPDATE = 1;
+
+    /**
+     * Returned when update is success.
+     */
     const SUCCESS = 2;
 
 
@@ -99,7 +111,7 @@ class local_ucla_regsender {
      * Returns an array of entries, with a limit of $limit, from the Registrar
      * syllabus table.
      *
-     * @param type $limit   Maximum syllabus entries to return. Default is 10.
+     * @param int $limit   Maximum syllabus entries to return. Default is 10.
      * @return array        Returns null if cannot connect to the Registrar.
      */
     public function get_recent_syllabus_links($limit = 10) {
@@ -152,7 +164,7 @@ class local_ucla_regsender {
      * term/srs.
      *
      * @throws registrar_query_exception    If cannot connect to registrar.
-     * 
+     *
      * @param int $courseid
      * @return array            Array of records from the Registrar indexed by
      *                          term and srs. Returns false if course is not a
@@ -189,15 +201,15 @@ class local_ucla_regsender {
      * @return ADOConnection    Returns null if connection cannot be opened.
      */
     protected function open_regconnection($debug = false) {
-        if (empty($this->adodb)) {            
+        if (empty($this->adodb)) {
             $this->adodb = registrar_query::open_registrar_connection();
-        }        
+        }
         $this->adodb->debug = $debug;
         return $this->adodb;
     }
 
     /**
-     * Looks up the type of syllabi uploaded for a course and sends the 
+     * Looks up the type of syllabi uploaded for a course and sends the
      * corresponding links to the Registrar.
      *
      * @param int $courseid
@@ -253,15 +265,15 @@ class local_ucla_regsender {
         }
 
         $result = $this->set_syllabus_links($courseid, $links);
-        if ($result == local_ucla_regsender::FAILED) {
+        if ($result == self::FAILED) {
             $trace->output("ERROR! Could not set links for course id $courseid; Aborting", 1);
-        } else if ($result == local_ucla_regsender::NOUPDATE) {
+        } else if ($result == self::NOUPDATE) {
             $trace->output("Syllabi links already set, no changes", 1);
             $retval = true;
-        } else if ($result == local_ucla_regsender::PARTIALUPDATE) {
+        } else if ($result == self::PARTIALUPDATE) {
             $trace->output("Some syllabi links already set, some changes", 1);
             $retval = true;
-        } else if ($result == local_ucla_regsender::SUCCESS) {
+        } else if ($result == self::SUCCESS) {
             $trace->output("All syllabi links set successfully", 1);
             $retval = true;
         } else {

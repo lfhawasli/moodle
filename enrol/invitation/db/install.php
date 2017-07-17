@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir . '/enrollib.php');
 
@@ -48,8 +50,8 @@ function xmldb_enrol_invitation_install() {
     // See http://docs.moodle.org/dev/Datalib_Notes
     // and http://docs.moodle.org/dev/Data_manipulation_API#Using_Recordsets.
     $invitation = enrol_get_plugin('invitation');
-    $courses_records = $DB->get_recordset('course');
-    foreach ($courses_records as $course) {
+    $coursesrecords = $DB->get_recordset('course');
+    foreach ($coursesrecords as $course) {
         // Make sure that we aren't adding the SITEID.
         if ($course->id == SITEID) {
             continue;
@@ -60,5 +62,5 @@ function xmldb_enrol_invitation_install() {
             debugging('Cannot add enrol plugin for courseid ' . $course->id);
         }
     }
-    $courses_records->close();
+    $coursesrecords->close();
 }

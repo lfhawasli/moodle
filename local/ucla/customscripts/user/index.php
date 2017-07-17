@@ -22,6 +22,8 @@
  * @package local_ucla
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 if (local_ucla_core_edit::using_ucla_theme()) {
     $contextid    = optional_param('contextid', 0, PARAM_INT); // One of this or.
     $courseid     = optional_param('id', 0, PARAM_INT); // This are required.

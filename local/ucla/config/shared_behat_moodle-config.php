@@ -22,13 +22,13 @@
  *  moodle/config.php -> moodle/local/ucla/config/<this file>
  *
  *  The original configuration file should not be used, as it does not have
- *  any capability of saying that another configuration file can be 
+ *  any capability of saying that another configuration file can be
  *  included before starting the Moodle session.
  *
  *  If you want configurations to be not within revisioning, then place
  *  your secrets @ moodle/config_private.php.
  *
- **/
+ */
 
 unset($CFG);
 global $CFG;
@@ -47,22 +47,19 @@ $CFG->dboptions['dbsocket']  = 1;
 $CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 $CFG->wwwroot  = '';
-$CFG->dataroot = ''; 
+$CFG->dataroot = '';
 
 // This determines what the admin folder is called.
 $CFG->admin    = 'admin';
 
-// This is directory permissions for newly created directories
+// This is directory permissions for newly created directories.
 $CFG->directorypermissions = 0777;
 
 // This should never change after the first install, or else any special
 // logins using the Moodle login will not work.
 $CFG->passwordsaltmain = '';
 
-// Determines current term
-//$CFG->currentterm = '12S';
-
-// Registrar
+// Registrar.
 $CFG->registrar_dbtype = 'odbc_mssql';
 $CFG->registrar_dbhost = '';
 $CFG->registrar_dbuser = '';
@@ -70,46 +67,32 @@ $CFG->registrar_dbpass = '';
 $CFG->registrar_dbname = 'srdb';
 $CFG->registrar_dbencoding = 'ISO-8859-1';
 
-// Format and browseby and anything else that requires instructors to be 
+// Format and browseby and anything else that requires instructors to be
 // displayed, we need to determine which roles should be displayed.
 $CFG->instructor_levels_roles['Instructor'] = array('editinginstructor', 'ta_instructor');
 $CFG->instructor_levels_roles['Teaching Assistant'] = array('ta', 'ta_admin');
 $CFG->instructor_levels_roles['Student Facilitator'] = array('studentfacilitator');
 
-// To enable friendly urls in your dev instance, please add the config values to
-// your config_private.php
-//// CCLE-2283: Friendly URLs
-//// CCLE-2283: Redirect to archive (these have a high chance of changing)
-//$CFG->forced_plugin_settings['local_ucla']['friendly_urls_enabled] = false;
-//$CFG->forced_plugin_settings['local_ucla']['remotetermcutoff] = '';
-//$CFG->forced_plugin_settings['local_ucla']['archiveserver] = '';
-
-// My Sites CCLE-2810
-// Term limiting
+// My Sites CCLE-2810 - Term limiting.
 $CFG->forced_plugin_settings['local_ucla']['student_access_ends_week'] = 3;
 $CFG->forced_plugin_settings['local_ucla']['oldest_available_term'] = '08S';
 
-// Browseby CCLE-2894
+// Browseby CCLE-2894.
 $CFG->forced_plugin_settings['block_ucla_browseby']['use_local_courses'] = true;
 $CFG->forced_plugin_settings['block_ucla_browseby']['ignore_coursenum'] = '194,295,296,375';
 $CFG->forced_plugin_settings['block_ucla_browseby']['allow_acttypes'] = 'CLI,LEC,SEM,LAB,FLD,ACT,STU,REC,RGP';
 
-// Course builder \\
-//$terms_to_built = array('12S', '121', '12F');
-
-// Course Requestor
-//$CFG->forced_plugin_settings['tool_uclacourserequestor']['terms'] = $terms_to_built;
-$CFG->forced_plugin_settings['tool_uclacourserequestor']['mailinst_default'] = false; 
+// Course Requestor.
+$CFG->forced_plugin_settings['tool_uclacourserequestor']['mailinst_default'] = false;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_default'] = true;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_hide'] = true;
 
-// Course Creator
-//$CFG->forced_plugin_settings['tool_uclacoursecreator']['terms'] = $terms_to_built;
+// Course Creator.
 $CFG->forced_plugin_settings['tool_uclacoursecreator']['course_creator_email'] = 'ccle-operations@lists.ucla.edu';
 $CFG->forced_plugin_settings['tool_uclacoursecreator']['email_template_dir'] = '';
 $CFG->forced_plugin_settings['tool_uclacoursecreator']['make_division_categories'] = true;
 
-// MyUCLA url updater
+// MyUCLA url updater.
 $CFG->forced_plugin_settings['tool_myucla_url']['url_service'] = 'https://m2test.ccle.ucla.edu/rex/myucla_url_updater/update.php';  // test server
 $CFG->forced_plugin_settings['tool_myucla_url']['user_name'] = 'CCLE Admin';   // name for registering URL with My.UCLA
 $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ccle@ucla.edu';  // email for registering URL with My.UCLA
@@ -127,17 +110,14 @@ define('MYUCLA_URL_UPDATER_TEST_CONFIG_OVERRIDE_DEBUGGING',
 define('MYUCLA_URL_UPDATER_TEST_CONFIG_ACCESSDENIED_URL',
         'https://test.ccle.ucla.edu/myucla_url_updater/accessdenied.php');
 
-// Pre-pop
-//$CFG->forced_plugin_settings['enrol_database']['terms'] = $terms_to_built;
-
-// turn off messaging (CCLE-2318 - MESSAGING)
+// Turn off messaging (CCLE-2318 - MESSAGING).
 $CFG->messaging = false;
 
-// CCLE-2763 - Use new $CFG->divertallemailsto setting in 1.9 and 2.x 
-// development/testing environments
+// CCLE-2763 - Use new $CFG->divertallemailsto setting in 1.9 and 2.x
+// development/testing environments.
 $CFG->divertallemailsto = 'ccle-email-test@lists.ucla.edu';
 
-// CCLE-2306 - HELP SYSTEM BLOCK
+// CCLE-2306 - HELP SYSTEM BLOCK.
 // If using JIRA, jira_user, jira_password, jira_pid should be defined in config_private.php.
 $CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/rest/api/latest/issue';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu/w/';
@@ -145,78 +125,58 @@ $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
 $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 
-// CCLE-2301 - COURSE MENU BLOCK
+// CCLE-2301 - COURSE MENU BLOCK.
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
-// UCLA Theme settings
+// UCLA Theme settings.
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat';
 $CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 $CFG->cachejs = false;
 
-// Newly created courses for ucla formats should only have the course menu block
+// Newly created courses for ucla formats should only have the course menu block.
 $CFG->defaultblocks_ucla = 'ucla_course_menu';
 
-// Enable conditional activities
+// Enable conditional activities.
 $CFG->enableavailability = true;
-$CFG->enablecompletion = true;  // needs to be enabled so that completion
-                                // of tasks can be one of the conditions
+$CFG->enablecompletion = true;  // Needs to be enabled so that completion
+                                // of tasks can be one of the conditions.
 
-// CCLE-2229 - Force public/private to be on
-// Default to off, but need to be able to turn it on for UCLA features.
-//$CFG->enablegroupmembersonly = true; // needs to be on for public-private to work
-//$CFG->enablepublicprivate = true; 
-
-// CCLE-2792 - Enable multimedia filters
-// NOTE: you still need to manually set the "Active?" value of the "Multimedia 
-// plugins" filter at "Site administration > Plugins > Filters > Manage filters"
+// CCLE-2792 - Enable multimedia filters.
+// NOTE: You still need to manually set the "Active?" value of the "Multimedia
+// plugins" filter at "Site administration > Plugins > Filters > Manage filters".
 $CFG->filter_mediaplugin_enable_youtube = true;
 $CFG->filter_mediaplugin_enable_vimeo = true;
 $CFG->filter_mediaplugin_enable_mp3 = true;
 $CFG->filter_mediaplugin_enable_flv = true;
-$CFG->filter_mediaplugin_enable_swf = false;    // security risk if enabled
+$CFG->filter_mediaplugin_enable_swf = false;    // Security risk if enabled.
 $CFG->filter_mediaplugin_enable_html5audio = true;
 $CFG->filter_mediaplugin_enable_html5video = true;
 $CFG->filter_mediaplugin_enable_qt = true;
 $CFG->filter_mediaplugin_enable_wmp = true;
 $CFG->filter_mediaplugin_enable_rm = true;
 
-// CCLE-2362 - MyUCLA Gradebook Integration
+// CCLE-2362 - MyUCLA Gradebook Integration.
 $CFG->gradebook_webservice = 'https://stage.cis.ucla.edu/ws/moodleitemgrade/service.svc?wsdl';
-// this ID is discountinued, if you need a real gradebook_id, please contact
-// the CCLE lead developer and assign it via your config_private.php file
+// This ID is discountinued, if you need a real gradebook_id, please contact
+// the CCLE lead developer and assign it via your config_private.php file.
 $CFG->gradebook_id = 1;
 $CFG->gradebook_password = '123';
 $CFG->gradebook_send_updates = 0;
 
-/// CCLE-2810 - My Sites - disallow customized "My Moodle" page
+// CCLE-2810 - My Sites - disallow customized "My Moodle" page.
 // Core Behat tests do not expect this.
 $CFG->forcedefaultmymoodle = true;
 
-// Enable PHPunit/Behat testing
+// Enable PHPunit/Behat testing.
 $CFG->phpunit_prefix = 'phpu_';
 $CFG->behat_prefix = 'bht_';
 
-// email address to notify in case of system problems
+// Email address to notify in case of system problems.
 $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lists.ccle.ucla.edu';
 
-// CCLE-5959 - Disable Web Installations of Plugins
+// CCLE-5959 - Disable Web Installations of Plugins.
 $CFG->disableupdateautodeploy = 1;
-
-//$string['log_apache_error'] = 'Apache error';
-//$string['log_apache_access'] = 'Apache access';
-//$string['log_apache_ssl_access'] = 'Apache SSL access';
-//$string['log_apache_ssl_error'] = 'Apache SSL error';
-//$string['log_apache_ssl_request'] = 'Apache SSL access';
-//$string['log_shibboleth_shibd'] = 'Shibboleth daemon';
-//$string['log_shibboleth_trans'] = 'Shibboleth transaction';
-//$string['log_moodle_cron'] = 'Moodle cron';
-
-// Site administration > Advanced features
-// Leave at defaults for core Behat tests.
-//$CFG->usetags = 0;
-//$CFG->enablenotes = 0;
-//$CFG->bloglevel = 0; // Disable blog system completely
 
 // Site administration > Users > Accounts > User default preferences
 $CFG->defaultpreference_autosubscribe = 0;
@@ -266,12 +226,12 @@ $CFG->forced_plugin_settings['page']['printheading'] = 1;
 $CFG->forced_plugin_settings['resource']['requiremodintro'] = 0;
 $CFG->forced_plugin_settings['resource']['printheading'] = 1;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment
+// Site administration > Plugins > Activity modules > Turnitin Assignment (Legacy)
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
 $CFG->turnitin_studentemail = 0;
 $CFG->turnitin_tutoremail = 0;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment 2
+// Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->forced_plugin_settings['turnitintooltwo']['useerater'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['useanon'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['inboxlayout'] = 1;
@@ -283,19 +243,19 @@ $CFG->forced_plugin_settings['url']['printheading'] = 1;
 $CFG->forced_plugin_settings['url']['display'] = 3; // RESOURCELIB_DISPLAY_NEW
 
 // Site administration > Plugins > Activity modules > Video Annotation
-$CFG->tnawebserviceurl = array("http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php", 
-                               "http://tvnews.library.ucla.edu/util/webservice.php", 
-                               "http://newsscape.library.ucla.edu/util/webservice.php", 
+$CFG->tnawebserviceurl = array("http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php",
+                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php",
+                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php",
+                               "http://www.sscnet.ucla.edu/tna/webservice/edge/webservice.php",
+                               "http://tvnews.library.ucla.edu/util/webservice.php",
+                               "http://newsscape.library.ucla.edu/util/webservice.php",
                                "https://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php");
-$CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,", 
-                              "http://www.sscnet.ucla.edu/tna/edge/video,", 
-                              "http://www.sscnet.ucla.edu/csa/search/video,", 
-                              "http://dcl.sscnet.ucla.edu/search/video,", 
-                              "http://tvnews.library.ucla.edu/video,", 
-                              "http://newsscape.library.ucla.edu/video,", 
+$CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
+                              "http://www.sscnet.ucla.edu/tna/edge/video,",
+                              "http://www.sscnet.ucla.edu/csa/search/video,",
+                              "http://dcl.sscnet.ucla.edu/search/video,",
+                              "http://tvnews.library.ucla.edu/video,",
+                              "http://newsscape.library.ucla.edu/video,",
                               "https://tvnews.sscnet.ucla.edu/edge/video,");
 $CFG->tnastreamerurl = "rtmp://169.232.194.193/csa";
 
@@ -414,7 +374,7 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 
 // Site administration > Security > Site policies
-$CFG->forceloginforprofiles = true; 
+$CFG->forceloginforprofiles = true;
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes

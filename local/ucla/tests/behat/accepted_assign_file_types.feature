@@ -25,7 +25,7 @@ Scenario: Accept only txt files.
     Given I log in as "teacher"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add a "Assignment" to section "1" 
+    And I add a "Assignment" to section "1"
     And I set the following fields to these values:
       | Assignment name | Test assignment name |
       | Description | Accept txt only |

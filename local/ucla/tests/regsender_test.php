@@ -75,7 +75,7 @@ class regsender_test extends advanced_testcase {
      * Creates the 'ucla_syllabus_test' table.
      *
      * Code copied from enrol/database/tests/sync_test.php: init_enrol_database.
-     * 
+     *
      * @throws exception
      */
     protected function init_reg_database() {
@@ -121,8 +121,8 @@ class regsender_test extends advanced_testcase {
 
             case 'pgsql_native_moodle_database':
                 set_config('registrar_dbtype', 'postgres7');
-                if (!empty($CFG->dboptions['dbsocket']) and ($CFG->dbhost ===
-                        'localhost' or $CFG->dbhost === '127.0.0.1')) {
+                if (!empty($CFG->dboptions['dbsocket']) and ($CFG->dbhost === 'localhost'
+                        or $CFG->dbhost === '127.0.0.1')) {
                     if (strpos($CFG->dboptions['dbsocket'], '/') !== false) {
                         set_config('registrar_dbhost',
                                 $CFG->dboptions['dbsocket']);
@@ -221,9 +221,8 @@ class regsender_test extends advanced_testcase {
 
         // Return an array of all the possible combinations of public, private,
         // and protect set or unset.
-        $combos = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->power_set(local_ucla_regsender::$syllabustypes, 0);
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $combos = $uclagen->power_set(local_ucla_regsender::$syllabustypes, 0);
 
         foreach ($combos as $index => $combo) {
             // For each combo set, build the return array consistenting of the
@@ -260,8 +259,7 @@ class regsender_test extends advanced_testcase {
         $this->resetAfterTest(false);
         $this->preventResetByRollback();
 
-        $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
-                ->create_class(array());
+        $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_class(array());
         $this->_class = array_pop($course);
 
         $classinfos = ucla_get_course_info($this->_class->courseid);
@@ -281,13 +279,12 @@ class regsender_test extends advanced_testcase {
     }
 
     /**
-     * Make sure that event handler doesn't try to send syllabus links for 
+     * Make sure that event handler doesn't try to send syllabus links for
      * collaboration sites.
      */
     public function test_collab_sites() {
-        $collab = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_collab(array('type' => 'instruction'));
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $collab = $uclagen->create_collab(array('type' => 'instruction'));
 
         $course = get_course($collab->id);
         $syllabusmanager = new ucla_syllabus_manager($course);
@@ -296,17 +293,17 @@ class regsender_test extends advanced_testcase {
         $syllabus = new stdClass();
         $syllabus->courseid = $collab->id;
         $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
-        $syllabus = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla_syllabus')
-                ->create_instance($syllabus);
+        $syllabus = $this->getDataGenerator()->get_plugin_generator('local_ucla_syllabus')->create_instance($syllabus);
 
         // Trigger event and make sure nothing remains in queue.
         events_cron('ucla_syllabus_added');
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
         $this->is_event_queue_clear(true);
 
         // Delete course and make sure that event queue is clear.
         delete_course($collab->id);
         events_cron('ucla_syllabus_deleted');
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
         $this->is_event_queue_clear(true);
     }
 
@@ -324,21 +321,19 @@ class regsender_test extends advanced_testcase {
         // Create 5 courses with syllabi.
         $numcourses = 5;
         for ($i = 0; $i < $numcourses; $i++) {
-            $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')
-                    ->create_class(array());
+            $course = $this->getDataGenerator()->get_plugin_generator('local_ucla')->create_class(array());
             $class = array_pop($course);
             $courseid = $class->courseid;
 
             $syllabus = new stdClass();
             $syllabus->courseid = $courseid;
             $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
-            $syllabus = $this->getDataGenerator()
-                    ->get_plugin_generator('local_ucla_syllabus')
-                    ->create_instance($syllabus);
+            $syllabus = $this->getDataGenerator()->get_plugin_generator('local_ucla_syllabus')->create_instance($syllabus);
         }
 
         // Sending syllabi links is done via cron, so need to trigger that.
         events_cron('ucla_syllabus_added');
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
 
         // Now Registrar table should have all syllabi links, lets get the most
         // recent ones.
@@ -363,8 +358,7 @@ class regsender_test extends advanced_testcase {
      */
     public function test_get_syllabus_links_empty() {
         // No data in syllabus table. Should return nothing for given term/srs.
-        $result = $this->_local_ucla_regsender
-                ->get_syllabus_links($this->_class->courseid);
+        $result = $this->_local_ucla_regsender->get_syllabus_links($this->_class->courseid);
         $this->assertEmpty($result[$this->_class->term][$this->_class->srs]);
     }
 
@@ -412,12 +406,10 @@ class regsender_test extends advanced_testcase {
         $this->assertEquals($result, local_ucla_regsender::SUCCESS);
 
         // Create new course and crosslist it with the existing course.
-        $anothercourse = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array(array('term' => $this->_class->term)));
-        $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->crosslist_courses($this->_class, $anothercourse);
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $anothercourse = $uclagen->create_class(array(array('term' => $this->_class->term)));
+        $uclagen->crosslist_courses($this->_class, $anothercourse);
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
 
         // Now set same link and should return a partial update return code,
         // because the newly crosslisted course did not have the link, but the
@@ -482,6 +474,8 @@ class regsender_test extends advanced_testcase {
     public function test_ucla_syllabus_events() {
         global $DB;
 
+        $syllabusgen = $this->getDataGenerator()->get_plugin_generator('local_ucla_syllabus');
+
         $courseid = $this->_class->courseid;
         $course = get_course($courseid);
         $syllabusmanager = new ucla_syllabus_manager($course);
@@ -490,12 +484,11 @@ class regsender_test extends advanced_testcase {
         $syllabus = new stdClass();
         $syllabus->courseid = $courseid;
         $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
-        $syllabus = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla_syllabus')
-                ->create_instance($syllabus);
+        $syllabus = $syllabusgen->create_instance($syllabus);
 
         // Sending syllabi links is done via cron, so need to trigger that.
         events_cron('ucla_syllabus_added');
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
 
         // This should have triggered an event and the Registrar table should
         // now have a record.
@@ -520,9 +513,7 @@ class regsender_test extends advanced_testcase {
         $syllabus = new stdClass();
         $syllabus->courseid = $courseid;
         $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC;
-        $syllabus = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla_syllabus')
-                ->create_instance($syllabus);
+        $syllabus = $syllabusgen->create_instance($syllabus);
         $syllabi = $syllabusmanager->get_syllabi();
         $publicyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
         $syllabusmanager->delete_syllabus($publicyllabus);
@@ -530,6 +521,7 @@ class regsender_test extends advanced_testcase {
         $this->is_event_queue_clear(false);
         events_cron('ucla_syllabus_added');
         events_cron('ucla_syllabus_deleted');
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
         // Make sure there are no more events in the queue.
         $this->is_event_queue_clear(true);
 
@@ -537,9 +529,7 @@ class regsender_test extends advanced_testcase {
         $syllabus = new stdClass();
         $syllabus->courseid = $courseid;
         $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN;
-        $syllabus = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla_syllabus')
-                ->create_instance($syllabus);
+        $syllabus = $syllabusgen->create_instance($syllabus);
         events_cron('ucla_syllabus_added');
         $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
@@ -550,11 +540,11 @@ class regsender_test extends advanced_testcase {
         delete_course($courseid);
         events_cron('ucla_course_deleted');
         events_cron('ucla_syllabus_deleted');
+        $this->resetDebugging();    // Ignore Event 1 API warnings.
         // Make sure there are no more events in the queue.
         $this->is_event_queue_clear(true);
         // Need to get syllabi links via classinfo, because course is deleted.
-        $links = $this->_local_ucla_regsender
-                ->get_syllabus_link(
+        $links = $this->_local_ucla_regsender->get_syllabus_link(
                 $this->_classinfo->term, $this->_classinfo->subj_area,
                 $this->_classinfo->crsidx, $this->_classinfo->classidx);
         $this->assertNotEmpty($links);
@@ -562,5 +552,4 @@ class regsender_test extends advanced_testcase {
         $this->assertEmpty($links['protect_syllabus_url']);
         $this->assertEmpty($links['private_syllabus_url']);
     }
-
 }

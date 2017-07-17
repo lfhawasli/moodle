@@ -64,7 +64,7 @@ class behat_ucla extends behat_files {
     /**
      * Loads base configs needed for a UCLA environment.  Primarily,
      * this loads the UCLA theme with public/private and a term.
-     * 
+     *
      * @Given /^I am in a ucla environment$/
      */
     public function load_default_ucla_environment() {
@@ -196,16 +196,16 @@ class behat_ucla extends behat_files {
                                 array('idnumber' => $elementdata['idnumber']));
                         $ppmod = PublicPrivate_Module::build($cmid);
                         $ppmod->disable();
-                    } 
+                    }
                 }
         }
     }
 
     /**
      * Step to browse directly to any address in the Moodle root.
-     * 
+     *
      * @Given /^I am on "([^"]*)"$/
-     * 
+     *
      * @param string $url   Relative to Moodle root.
      */
     public function i_am_on($url) {
@@ -233,7 +233,7 @@ class behat_ucla extends behat_files {
      * Generates UCLA SRS and collab sites and saves course objs in $courses array.
      * NOTE: For 'class' site types, this method will generate a separate shortname to be saved
      *       into the 'courses' db table.
-     * 
+     *
      * @param \Behat\Gherkin\Node\TableNode $data
      * @throws PendingException
      */
@@ -297,16 +297,16 @@ class behat_ucla extends behat_files {
     /**
      * Generates a single UCLA site.  The site will have two enrolled
      * users, a student and an editing instructor.
-     * 
+     *
      * @Given /^a ucla "([^"]*)" site exist$/
-     * 
+     *
      * @param string $site type for a collab site, or 'class' for an SRS site
      */
     public function ucla_site_exist($site) {
         global $DB;
 
         $data = array();
-        $data[0] = array('fullname', 'shortname','type');
+        $data[0] = array('fullname', 'shortname', 'type');
         $data[1] = array("$site site", "$site site", $site);
         $this->generate_ucla_sites(new TableNode($data));
 
@@ -332,7 +332,7 @@ class behat_ucla extends behat_files {
     /**
      * Shortcut to navigate to the default UCLA site created by
      * "a ucla <site type> site exists".
-     * 
+     *
      * @Given /^I go to the default ucla site$/
      */
     public function i_goto_ucla_srs_site() {
@@ -345,6 +345,8 @@ class behat_ucla extends behat_files {
      *
      * Future steps are expected to look for certain messages.
      *
+     * Ignore coding standards error about long line. Necessary for Behat step.
+     * @codingStandardsIgnoreLine
      * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filepicker_field_string>(?:[^"]|\\")*)" filemanager and it fails$/
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
@@ -413,7 +415,6 @@ class behat_ucla extends behat_files {
 
     /**
      * Get ucla data generator
-     * @static
      * @return testing_data_generator
      */
     public static function get_data_generator() {
@@ -426,9 +427,9 @@ class behat_ucla extends behat_files {
 
     /**
      * Set a private config setting with a value
-     * 
+     *
      * @Given /^I set the private config setting "([^"]*)" to "(\d+)";$/
-     * 
+     *
      * @param string $config
      * @param string $value
      */

@@ -45,14 +45,14 @@ class local_ucla_participants extends course_enrolment_manager {
      * @param context_course $context
      * @return array    Roles sorted alphabetically.
      */
-    function get_roles_used_in_course(context_course $context) {
+    public function get_roles_used_in_course(context_course $context) {
         global $DB;
 
         // For some reason cannot have rn.contextid = ra.contextid in ON clause.
         $params[] = $context->id;
         $params[] = $context->id;
 
-        $sql = "SELECT DISTINCT r.id, r.name, r.shortname, rn.name AS coursealias
+        $sql = "SELECT DISTINCT r.id, r.name, r.shortname, rn.name coursealias
                   FROM {role_assignments} ra, {role} r
              LEFT JOIN {role_names} rn ON (rn.contextid = ? AND rn.roleid = r.id)
                  WHERE r.id = ra.roleid
@@ -117,8 +117,8 @@ class local_ucla_participants extends course_enrolment_manager {
             $details['groupings'] = array();
             foreach ($usergroups as $gid => $unused) {
                 $details['groups'][$gid] = $allgroups[$gid]->name;
-                $groupingids = $DB->get_records('groupings_groups', array('groupid'=>$gid), '', 'groupingid');
-                foreach ($groupingids as $groupingid=>$unused) {
+                $groupingids = $DB->get_records('groupings_groups', array('groupid' => $gid), '', 'groupingid');
+                foreach ($groupingids as $groupingid => $unused) {
                     $grouping = groups_get_grouping($groupingid);
                     $details['groupings'][$groupingid] = $grouping->name;
                 }
@@ -197,7 +197,7 @@ class local_ucla_participants extends course_enrolment_manager {
             $extrafields = get_extra_user_fields($this->get_context());
             $extrafields[] = 'lastaccess';
             $ufields = user_picture::fields('u', $extrafields);
-            $filtersql .= " AND IFNULL(NULLIF(u.alternatename, ''), u.firstname) LIKE '$firstinitial%' AND .u.lastname LIKE '$lastinitial%'";
+            $filtersql .= " AND u.firstname LIKE '$firstinitial%' AND u.lastname LIKE '$lastinitial%'";
             $sql = "SELECT DISTINCT $ufields, ul.timeaccess AS lastseen
                       FROM {user} u
                       JOIN {user_enrolments} ue ON (ue.userid = u.id  AND ue.enrolid $instancessql)
@@ -206,17 +206,17 @@ class local_ucla_participants extends course_enrolment_manager {
                  LEFT JOIN {groups_members} gm ON u.id = gm.userid
                      WHERE $filtersql";
             if ($sort === 'firstname') {
-                $sql .= " ORDER BY IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction, u.lastname $direction";
+                $sql .= " ORDER BY u.firstname $direction, u.lastname $direction";
             } else if ($sort === 'lastname') {
-                $sql .= " ORDER BY u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'email') {
-                $sql .= " ORDER BY u.email $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.email $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'lastseen') {
-                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'lastcourseaccess') {
-                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction,IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
             } else if ($sort === 'idnumber') {
-                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, IF(ISNULL(NULLIF(u.alternatename, '')), u.firstname, u.alternatename) $direction";
+                $sql .= " ORDER BY u.idnumber $direction, u.lastname $direction, u.firstname $direction";
             }
 
             $input = $DB->get_records_sql($sql, $params);

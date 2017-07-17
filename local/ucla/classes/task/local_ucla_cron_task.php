@@ -14,24 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_ucla\task;
-
-require_once($CFG->dirroot.'/local/ucla/lib.php');
-
 /**
  * UCLA local plugin cron task runner.
- *
- * Contains the settings for UCLA specific customizations.
  *
  * @package    local_ucla
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_ucla\task;
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot.'/local/ucla/lib.php');
+
+/**
+ * Task class.
+ *
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_ucla_cron_task extends \core\task\scheduled_task {
-    
+
     /**
      * Executes the task.
-     * 
+     *
      * @throws Exception on error
      */
     public function execute() {

@@ -33,8 +33,7 @@ list($options, $unrecognized) = cli_get_params(array('help' => false),
         array('h' => 'help'));
 
 if ($options['help'] || empty($unrecognized)) {
-    $help =
-"CLI script to uninstall one or more plugins.
+    $help = "CLI script to uninstall one or more plugins.
 
 Pass in a plugin name, or several separated by commas, and the script will ask
 for a confirmation and then will uninstall those plugins.

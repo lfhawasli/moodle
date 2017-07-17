@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 // SYSTEM defaults.
 $role['ta']['*SYSTEM*'] = 'ta_admin'; // 02 whenever there is also an 01.
 $role['ta_instructor']['*SYSTEM*'] = 'ta_instructor';

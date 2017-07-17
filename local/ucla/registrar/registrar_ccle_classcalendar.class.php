@@ -16,17 +16,18 @@
 
 /**
  * Enabled calling of ccle_classCalender SP.
- * 
+ *
  * @package    local_ucla
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
 require_once(dirname(__FILE__) . '/registrar_cacheable_stored_procedure.base.php');
 
 /**
  * UCLA Registrar Calendar stored procedure class.
- * 
+ *
  * @package    local_ucla
  * @copyright  2015 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -35,7 +36,7 @@ class registrar_ccle_classcalendar extends registrar_stored_procedure {
 
     /**
      * Returns query params.
-     * 
+     *
      * @return array
      */
     public function get_query_params() {

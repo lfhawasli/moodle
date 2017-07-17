@@ -29,16 +29,16 @@ require_once('edit_form.php');
 $courseid   = required_param('courseid', PARAM_INT);
 $instanceid = optional_param('id', 0, PARAM_INT); // Instanceid.
 
-$course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $context = context_course::instance($course->id);
 
 require_login($course);
 require_capability('enrol/invitation:config', $context);
 
-$PAGE->set_url('/enrol/invitation/edit.php', array('courseid'=>$course->id, 'id'=>$instanceid));
+$PAGE->set_url('/enrol/invitation/edit.php', array('courseid' => $course->id, 'id' => $instanceid));
 $PAGE->set_pagelayout('admin');
 
-$return = new moodle_url('/enrol/instances.php', array('id'=>$course->id));
+$return = new moodle_url('/enrol/instances.php', array('id' => $course->id));
 if (!enrol_is_enabled('invitation')) {
     redirect($return);
 }
@@ -46,11 +46,13 @@ if (!enrol_is_enabled('invitation')) {
 $plugin = enrol_get_plugin('invitation');
 
 if ($instanceid) {
-    $instance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol'=>'invitation', 'id'=>$instanceid), '*', MUST_EXIST);
+    $instance = $DB->get_record('enrol', array(
+        'courseid' => $course->id, 'enrol' => 'invitation', 'id' => $instanceid), '*', MUST_EXIST
+    );
 } else {
     require_capability('moodle/course:enrolconfig', $context);
     // No instance yet, we have to add new instance.
-    navigation_node::override_active_url(new moodle_url('/enrol/instances.php', array('id'=>$course->id)));
+    navigation_node::override_active_url(new moodle_url('/enrol/instances.php', array('id' => $course->id)));
     $instance = new stdClass();
     $instance->id       = null;
     $instance->courseid = $course->id;
@@ -68,8 +70,8 @@ if ($mform->is_cancelled()) {
         $instance->timemodified   = time();
         $DB->update_record('enrol', $instance);
     } else {
-        $fields = array('status'=>$data->status,
-                        'name'=>$data->name);
+        $fields = array('status' => $data->status,
+                        'name' => $data->name);
         $plugin->add_instance($course, $fields);
     }
 

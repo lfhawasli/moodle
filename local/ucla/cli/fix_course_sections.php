@@ -37,8 +37,7 @@ list($options, $unrecognized) = cli_get_params(
         array('h' => 'help', 'f' => 'fix', 'a' => 'all', 'm' => 'method'));
 
 if ($options['help']) {
-    $help =
-"Fix course's sections.
+    $help = "Fix course's sections.
 
 Will attempt to fix a course's sections by:
 * Extra sections above the numsections for a course are deleted.
@@ -91,8 +90,8 @@ if (!empty($options['all'])) {
                   JOIN {ucla_request_classes} urc ON (urc.courseid=c.id)
                  WHERE urc.term=:term";
         $courses = $DB->get_records_sql($sql, array('term' => $argument));
-    // Check if someone is passing in a valid courseid.
     } else if (intval($argument) > 0) {
+        // Check if someone is passing in a valid courseid.
         try {
             $course = get_course($argument);
         } catch (Exception $e) {

@@ -1,14 +1,14 @@
 /**
- * When a submission type checkbox is checked, list it's relevent sub 
+ * When a submission type checkbox is checked, list it's relevent sub
  * options only. Otherwise, hide them.
  *
-**/
-YUI.add('moodle-local_ucla-submissiontype', function (Y) {   
-    // Load our namespace
+ */
+YUI.add('moodle-local_ucla-submissiontype', function (Y) {
+    // Load our namespace.
     M.local_ucla = M.local_ucla || {};
 
-    // Attach script
-    M.local_ucla.submissiontype = {  
+    // Attach script.
+    M.local_ucla.submissiontype = {
         init: function() {
             var mediagallery = Y.one('#fitem_id_assignsubmission_mediagallery_mg');
             var mediagallerycheck = Y.one('#id_assignsubmission_mediagallery_enabled');

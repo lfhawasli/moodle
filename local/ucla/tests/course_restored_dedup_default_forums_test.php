@@ -44,13 +44,13 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
 
     /**
      * Stores types and names of the default forums.
-     * @var array 
+     * @var array
      */
     private $_defaultforums = array();
 
     /**
      * Helper function to call local_ucla_observer::course_restored_dedup_default_forums().
-     * 
+     *
      * @param string $type  backup::TYPE_1COURSE or backup::TYPE_1ACTIVITY.
      */
     private function call_course_restored_dedup_default_forums($type) {
@@ -106,9 +106,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
     protected function setUp() {
         $this->resetAfterTest(true);
 
-        $class = $this->getDataGenerator()
-                ->get_plugin_generator('local_ucla')
-                ->create_class(array('term' => '13S'));
+        $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
+        $class = $uclagen->create_class(array('term' => '13S'));
         $course = array_pop($class);
         $this->_courseid = $course->courseid;
 
@@ -135,9 +134,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
 
             // Add in another forum that is exactly the same.
             $original = array_pop($forums['typeforums']);
-            $this->getDataGenerator()
-                    ->get_plugin_generator('mod_forum')
-                    ->create_instance($original);
+            $forumgen = $this->getDataGenerator()->get_plugin_generator('mod_forum');
+            $forumgen->create_instance($original);
             $forums = $this->get_by_forums_type($type);
             ++$totalforums;
             ++$typecount;
@@ -173,9 +171,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             // Add in another forum but with the name changed.
             $original = array_pop($forums['typeforums']);
             $original->name = substr(md5(rand()), 0, 100);
-            $defaultchanged = $this->getDataGenerator()
-                    ->get_plugin_generator('mod_forum')
-                    ->create_instance($original);
+            $forumgen = $this->getDataGenerator()->get_plugin_generator('mod_forum');
+            $defaultchanged = $forumgen->create_instance($original);
             $forums = $this->get_by_forums_type($type);
             ++$totalforums;
             ++$typecount;
@@ -212,8 +209,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
 
             // Add in another forum but add some posts.
             $original = array_pop($forums['typeforums']);
-            $forumgenerator = $this->getDataGenerator()->get_plugin_generator('mod_forum');
-            $withcontent = $forumgenerator->create_instance($original);
+            $forumgen = $this->getDataGenerator()->get_plugin_generator('mod_forum');
+            $withcontent = $forumgen->create_instance($original);
             $forums = $this->get_by_forums_type($type);
             ++$totalforums;
             ++$typecount;
@@ -224,7 +221,7 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
             $discussion->course = $this->_courseid;
             $discussion->forum = $withcontent->id;
             $discussion->userid = $USER->id;
-            $forumgenerator->create_discussion($discussion);
+            $forumgen->create_discussion($discussion);
 
             // Run function and make sure it deletes the original, empty forum.
             $this->call_course_restored_dedup_default_forums(backup::TYPE_1COURSE);
@@ -255,9 +252,8 @@ class course_restored_dedup_default_forums_test extends advanced_testcase {
 
             // Add in another forum that is exactly the same.
             $original = array_pop($forums['typeforums']);
-            $this->getDataGenerator()
-                    ->get_plugin_generator('mod_forum')
-                    ->create_instance($original);
+            $forumgen = $this->getDataGenerator()->get_plugin_generator('mod_forum');
+            $forumgen->create_instance($original);
             $forums = $this->get_by_forums_type($type);
             ++$totalforums;
             ++$typecount;

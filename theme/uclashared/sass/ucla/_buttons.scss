@@ -15,8 +15,14 @@ $btn-color-login:           #f9c739;
 // --------------------------------------------------
 
 // Default Boostrap button
+.submissionlinks .btn {
+    color:black;
+    &:hover{
+        color:#536895;
+    }
+}
 .btn {
-
+    border-color: #b3b3b3;
     @include respond-at(xs) {
         width: 100%;
         margin-top: 4px;

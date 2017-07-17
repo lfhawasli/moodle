@@ -22,13 +22,13 @@
  *  moodle/config.php -> moodle/local/ucla/config/<this file>
  *
  *  The original configuration file should not be used, as it does not have
- *  any capability of saying that another configuration file can be 
+ *  any capability of saying that another configuration file can be
  *  included before starting the Moodle session.
  *
  *  If you want configurations to be not within revisioning, then place
  *  your secrets @ moodle/config_private.php.
  *
- **/
+ */
 
 unset($CFG);
 global $CFG;
@@ -47,7 +47,7 @@ $CFG->dboptions['dbsocket']  = 0;
 $CFG->dboptions['dbcollation'] = 'utf8mb4_unicode_ci';
 
 $CFG->wwwroot  = 'https://stage.ccle.ucla.edu';
-$CFG->dataroot = '/moodle_data'; 
+$CFG->dataroot = '/moodle_data';
 
 // This determines what the admin folder is called.
 $CFG->admin    = 'admin';
@@ -66,17 +66,17 @@ $CFG->registrar_dbpass = '';
 $CFG->registrar_dbname = 'srdb';
 $CFG->registrar_dbencoding = 'ISO-8859-1';
 
-// Format and browseby and anything else that requires instructors to be 
+// Format and browseby and anything else that requires instructors to be
 // displayed, we need to determine which roles should be displayed.
 $CFG->instructor_levels_roles['Instructor'] = array('editinginstructor', 'ta_instructor');
 $CFG->instructor_levels_roles['Teaching Assistant'] = array('ta', 'ta_admin');
 $CFG->instructor_levels_roles['Student Facilitator'] = array('studentfacilitator');
 
 // CCLE-2283: Friendly URLs
-// CCLE-2283: Redirect to archive 
-$CFG->forced_plugin_settings['local_ucla']['friendly_urls_enabled'] = true; 
-$CFG->forced_plugin_settings['local_ucla']['remotetermcutoff'] = '12S'; 
-$CFG->forced_plugin_settings['local_ucla']['archiveserver'] = 'https://ccle.ucla.edu'; 
+// CCLE-2283: Redirect to archive
+$CFG->forced_plugin_settings['local_ucla']['friendly_urls_enabled'] = true;
+$CFG->forced_plugin_settings['local_ucla']['remotetermcutoff'] = '12S';
+$CFG->forced_plugin_settings['local_ucla']['archiveserver'] = 'https://ccle.ucla.edu';
 
 // My Sites CCLE-2810
 // Term limiting
@@ -91,7 +91,7 @@ $CFG->forced_plugin_settings['block_ucla_browseby']['allow_acttypes'] = 'CLI,LEC
 // Course builder \\
 
 // Course Requestor
-$CFG->forced_plugin_settings['tool_uclacourserequestor']['mailinst_default'] = false; 
+$CFG->forced_plugin_settings['tool_uclacourserequestor']['mailinst_default'] = false;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_default'] = true;
 $CFG->forced_plugin_settings['tool_uclacourserequestor']['nourlupdate_hide'] = true;
 
@@ -121,7 +121,7 @@ define('MYUCLA_URL_UPDATER_TEST_CONFIG_ACCESSDENIED_URL',
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
 
-// CCLE-2763 - Use new $CFG->divertallemailsto setting in 1.9 and 2.x 
+// CCLE-2763 - Use new $CFG->divertallemailsto setting in 1.9 and 2.x
 // development/testing environments
 $CFG->divertallemailsto = 'ccle-email-test@lists.ucla.edu';
 
@@ -158,7 +158,7 @@ $CFG->enablegroupmembersonly = true; // needs to be on for public-private to wor
 $CFG->enablepublicprivate = true;
 
 // CCLE-2792 - Enable multimedia filters
-// NOTE: you still need to manually set the "Active?" value of the "Multimedia 
+// NOTE: you still need to manually set the "Active?" value of the "Multimedia
 // plugins" filter at "Site administration > Plugins > Filters > Manage filters"
 $CFG->filter_mediaplugin_enable_youtube = true;
 $CFG->filter_mediaplugin_enable_vimeo = true;
@@ -293,12 +293,12 @@ $CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 120;
 // Site administration > Plugins > Activity modules > Scheduler
 $CFG->scheduler_maxstudentsperslot = 75;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment
+// Site administration > Plugins > Activity modules > Turnitin Assignment (Legacy)
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
 $CFG->turnitin_studentemail = 0;
 $CFG->turnitin_tutoremail = 0;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment 2
+// Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->forced_plugin_settings['turnitintooltwo']['useerater'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['useanon'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['inboxlayout'] = 1;
@@ -516,7 +516,7 @@ $CFG->emailonlyfromnoreplyaddress = 1;
 $CFG->enablemobilewebservice = 1;
 
 // Site administration > Security > Site policies
-$CFG->forceloginforprofiles = true; 
+$CFG->forceloginforprofiles = true;
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
 $CFG->allowobjectembed = 1;
 $CFG->maxeditingtime = 900; // 15 minutes

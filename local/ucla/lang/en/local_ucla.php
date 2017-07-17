@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The local_ucla language file.
+ *
+ * @package    local_ucla
+ * @copyright 2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'UCLA customizations';
@@ -31,7 +38,7 @@ $string['external-link'] = 'External website (opens new window)';
 
 /* strings for datetimehelpers */
 
-// for distance_of_time_in_words
+// For distance_of_time_in_words.
 $string['less_than_x_seconds'] = 'less than {$a} seconds';
 $string['half_minute'] = 'half a minute';
 $string['less_minute'] = 'less than a minute';
@@ -42,8 +49,8 @@ $string['about_x_hours'] = 'about {$a} hours';
 $string['a_day'] = '1 day';
 $string['x_days'] = '{$a} days';
 
-// CCLE-3158 - Use UCLA specific lang string for copyright help icon in filepicker
-$string['license_help']='This question requires you to declare the copyright
+// CCLE-3158 - Use UCLA specific lang string for copyright help icon in filepicker.
+$string['license_help'] = 'This question requires you to declare the copyright
 status of the item you are uploading. Each option is explained in greater detail
 below.
 
@@ -113,12 +120,12 @@ comply with copyright law in the handling of course materials;</strong> see the
     for more details.
 ';
 
-// SSC-1306 - Let instructors know when if the announcements forum is hidden
+// SSC-1306 - Let instructors know when if the announcements forum is hidden.
 $string['announcementshidden'] = 'The Announcements forum is currently hidden: Emails will NOT be sent out to students.';
 $string['unhidelink'] = 'Click here to unhide';
 $string['askinstructortounhide'] = 'Please ask the instructor to unhide this forum.';
 
-// capability strings
+// Capability strings.
 $string['ucla:assign_all'] = 'CCLE-2530: Can see the entire user database when assigning roles';
 $string['ucla:editadvancedcoursesettings'] = 'CCLE-3278: Can edit the course settings for category, format, maximum upload size, or language defaults';
 $string['ucla:deletecoursecontentsandrestore'] = 'CCLE-3446: Can delete course contents when restoring a course';
@@ -128,8 +135,8 @@ $string['ucla:browsecourses'] = 'CCLE-3773: Gives users link to "Add/edit course
 $string['ucla:vieweventlist'] = 'CCLE-4671: Can view event list page';
 $string['ucla:viewscheduledtasks'] = 'CCLE-4999: Can view scheduled tasks page';
 
-// CCLE-3028 - Fix nonlogged users redirect on hidden content
-// If a user who is not logged in tries to access private course information
+// CCLE-3028 - Fix nonlogged users redirect on hidden content.
+// If a user who is not logged in tries to access private course information.
 $string['login'] = 'Log in';
 $string['loginredirect'] = 'Login required';
 $string['notloggedin'] = 'Please login to view this content.';
@@ -147,13 +154,13 @@ $string['notice_course_status_pasttemp'] = 'You have temporary access to a site 
 $string['notice_course_status_hiddentemp'] = 'You have temporary access to a site that is currently unavailable. Your access will expire after {$a}.';
 $string['notice_course_status_pasthiddentemp'] = 'You have temporary access to a site for a course that is no longer in session. Your access will expire after {$a}.';
 
-$string['lti_warning'] = 'There are risks using external tools. Please read ' . 
+$string['lti_warning'] = 'There are risks using external tools. Please read ' .
         'this help document for more information: ' .
         '<a target="_blank" href="https://docs.ccle.ucla.edu/w/LTI">https://docs.ccle.ucla.edu/w/LTI</a>';
 
 // Settings.
 $string['student_access_ends_week'] = 'Prevent student access on week';
-$string['student_access_ends_week_description'] = 'When the specified week starts, the system will automatically ' . 
+$string['student_access_ends_week_description'] = 'When the specified week starts, the system will automatically ' .
         'hide all courses for previous term. For example, if "3" is given, then when "Week 3" starts for Spring ' .
         'Quarter, then all courses for Winter will be hidden automatically. Also, if set, will prevent "My sites" ' .
         'from listing the previous term\'s courses for students. If set to "0" no courses will be hidden ' .
@@ -171,8 +178,8 @@ $string['handlepreferrednamedesc'] = 'If enabled, will use alternatename field a
 $string['registrarurlconfig'] = 'Registrar URL';
 $string['registrarurlconfighelp'] = 'Set the URL for UCLA Registrar.';
 
-// Form submit login check
-$string['longincheck_login'] = 'Your session has timed out. In order to save 
+// Form submit login check.
+$string['longincheck_login'] = 'Your session has timed out. In order to save
          your work login again and save your changes.';
 $string['logincheck_idfail'] = 'Your user ID does not match!  This form has been ' .
         'disabled in order to prevent an erroneous submission. ' .
@@ -181,21 +188,21 @@ $string['logincheck_networkfail'] = 'There was no response from the server. ' .
         'You might be disconnected from your network. Please reconnect and try again.';
 $string['logincheck_success'] = 'You\'re logged in.  You can now submit this form.';
 
-// CCLE-3652 - Students unable to see "Submission Grading" link on Assignment module
+// CCLE-3652 - Students unable to see "Submission Grading" link on Assignment module.
 $string['submissionsgrading'] = 'Grading criteria';
 
-// CCLE-3970 - Install and evaluate LSU's Gradebook Improvements
+// CCLE-3970 - Install and evaluate LSU's Gradebook Improvements.
 $string['overridecat'] = 'Allow Grade Override';
 $string['overridecat_help'] = 'This option allows users to override the final grade in for category totals. Unchecking this option will make category totals uneditable.';
 
-// CCLE-4293 - Display a message when attempting to override grades
+// CCLE-4293 - Display a message when attempting to override grades.
 $string['overridewarning'] = 'If you override a grade
     you will lose the ability to make any additional changes to the grade from
     within the activity itself. To change the grade from within the activity,
     simply click on the item name in the Grader report or click on the activity
     from the course homepage.';
 
-// CCLE-4295 Add groups filter to grader report
+// CCLE-4295 Add groups filter to grader report.
 $string['view_grouping'] = 'View grouping';
 $string['all_groupings'] = 'All';
 
@@ -204,14 +211,14 @@ $string['cachedef_rolemappings'] = 'UCLA role mapping';
 $string['cachedef_urcmappings'] = 'UCLA ucla_request_classes to Moodle courses';
 $string['cachedef_usermappings'] = 'UCLA user idnumber/username to Moodle users';
 
-// CCLE-6512 - Profile Course details doesn't match My page Class sites
+// CCLE-6512 - Profile Course details doesn't match My page Class sites.
 $string['cantfindcourse'] = '* Can\'t find your course or collaboration site? Check {$a->altsystemname} or {$a->myucla}.';
 
-// CCLE-4415 - Prompt deletion warning
+// CCLE-4415 - Prompt deletion warning.
 $string['deletecoursewarning'] = 'WARNING<p>You are deleting a course for which content has been added.</p>';
 $string['deletecoursesafe'] = 'You are deleting a course for which no content has been added.';
 
-// CCLE-4416 - Prompt overwriting warning
+// CCLE-4416 - Prompt overwriting warning.
 $string['deletecoursecontenttitle'] = 'Course deletion warning';
 $string['deletecoursecontentyes'] = 'Create backup';
 $string['deletecoursecontentno'] = 'Continue';
@@ -220,10 +227,10 @@ $string['deletecoursecontentwarning'] = '<p>You are about to delete the content 
         . '<p>{$a->shortname} ({$a->fullname})</p>'
         . '<p>To ensure that your content is saved, first create a backup.  If you are sure you want to delete the content, press "Continue".';
 
-// CCLE-4413 assignment file submission file type validation
+// CCLE-4413 assignment file submission file type validation.
 $string['invalidfiletype'] = '{$a->notaccepted} filetype cannot be accepted.<br />Acceptable file type(s): {$a->accepted}';
 
-// CCLE-3843 - Single file recovery
+// CCLE-3843 - Single file recovery.
 $string['logfiledeleted'] = 'Deleted file';
 
 // CCLE-3673 - Limit crosslist display using config value.
@@ -232,7 +239,7 @@ $string['maxcrosslistshowndesc'] = 'Limit the amount of crosslisted courses show
 
 $string['crontask'] = 'Cron task for local_ucla';
 
-// CCLE-4424 - Reject attempt on quiz timeout
+// CCLE-4424 - Reject attempt on quiz timeout.
 $string['confirmstartwarningheader'] = 'Warning: ';
 $string['confirmstartwarningmessage'] = 'You must click submit for this attempt to be counted.';
 $string['confirmstartwarningattemptlimit'] = 'You have {$a} attempts.';
@@ -242,11 +249,11 @@ $string['finishsummary'] = 'Return to Quiz View';
 $string['persistentquizwarningmessage'] = 'This quiz is not automatically submitted. Please be sure to submit your quiz attempt before the time runs out or your attempt will not be counted.';
 $string['quizattemptabandoned'] = 'You did not submit your attempt before the time ran out. Your attempt was counted as zero.';
 
-// CCLE-5099 - Alert instructors who use TurnItIn Direct and MyUCLA
+// CCLE-5099 - Alert instructors who use TurnItIn Direct and MyUCLA.
 $string['turnitinwarning'] = 'Be aware there are two portals for TurnItIn submissions: MyUCLA and '
         . 'CCLE. Only one should be used per course.<br/><br/>For further information please read ';
 
-// CCLE-4568 - Need a better screen for users who log into Moodle without an email address
+// CCLE-4568 - Need a better screen for users who log into Moodle without an email address.
 $string['errmissingemail'] = 'Because your email address is missing from your CCLE profile, you will not be able to login to CCLE until you update your official UCLA email address.<br/><br/>Instructions vary for faculty/staff and students. For more information go to: <a href="http://directory.ucla.edu/update.php">http://directory.ucla.edu/update.php</a>';
 
 // CCLE-4329 - Handling public forums.
@@ -281,7 +288,7 @@ $string['customwelcomemessagesubject'] = 'Subject';
 $string['customwelcomemessagefrom'] = 'From';
 $string['customwelcomemessagefrom_help'] = 'Please enter the email address you would like student to reply to.';
 
-// CCLE-4863 - Prompt FERPA waiver for LTI/External Plugins
+// CCLE-4863 - Prompt FERPA waiver for LTI/External Plugins.
 $string['ferpawaiverdesc'] = 'Before you may continue you must agree to the following statements.
 <ul>
 <li>I understand that by providing personal and academic information on this web site I am providing this information to third parties not affiliated with UCLA.</li>
@@ -294,12 +301,13 @@ $string['ferpawaiverrequired'] = 'FERPA waiver needs to be signed for this cours
 
 $string['eventsyncenrolmentsfinished'] = 'Enrol sync finished';
 
-// CCLE-5989 - Activity availability conditions popup
+// CCLE-5989 - Activity availability conditions popup.
 $string['availabilityconditions'] = 'Access restrictions';
+$string['hidden'] = 'Hidden';
 
-// SSC-2050 - Include associated courses in subject header of forum emails
+// SSC-2050 - Include associated courses in subject header of forum emails.
 $string['limitcrosslistemailname'] = 'Cross Listed Course Limit';
 $string['limitcrosslistemaildesc'] = 'Limit of short course names appearing on email subject.';
 
-// CCLE-6369 - Improve user experience when viewing activity they don't have access to
+// CCLE-6369 - Improve user experience when viewing activity they don't have access to.
 $string['contactinstructors'] = 'Please contact your instructor or TA if you have any questions.';

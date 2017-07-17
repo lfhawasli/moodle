@@ -1,15 +1,47 @@
 <?php
-/*
- * Class to override default moodle import course search to find teachers of courses in searchsql
+// This file is part of UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Overrides the import course search.
+ *
+ * @package    local_ucla
+ * @copyright  2013 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Override import course search to find instructors of courses in searchsql.
+ *
  * @package local_ucla
  * @copyright  2013 UC Regents
- **/
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_ucla_import_course_search extends import_course_search {
+    /**
+     * Adds in ability to also search by instructors.
+     *
+     * @return array
+     */
     protected function get_searchsql() {
         global $DB;
         $tablealias = 'ctx';
         $contextlevel = CONTEXT_COURSE;
-        $joinon = 'c.id'; 
+        $joinon = 'c.id';
         // Fetch all instructor equivalent roles.
         $instructortypes = $DB->get_records_select('role', $DB->sql_like('description', '?'), array('%instequiv%'));
 
@@ -21,10 +53,11 @@ class local_ucla_import_course_search extends import_course_search {
             }
         }
 
-        list($in_roles, $inst_params) = $DB->get_in_or_equal($roles, SQL_PARAMS_NAMED);
-        $sql_where_condition = ' WHERE r.shortname ' . $in_roles;
+        list($inroles, $instparams) = $DB->get_in_or_equal($roles, SQL_PARAMS_NAMED);
+        $sqlwherecondition = ' WHERE r.shortname ' . $inroles;
         list($ctxselect, $ctxjoin) = array((", " . context_helper::get_preload_record_columns_sql($tablealias)),
-                "LEFT JOIN {context} $tablealias ON ($tablealias.instanceid = $joinon AND $tablealias.contextlevel = $contextlevel)");
+                "LEFT JOIN {context} $tablealias ON ($tablealias.instanceid = $joinon "
+                . "AND $tablealias.contextlevel = $contextlevel)");
 
         $params = array(
             'fullnamesearch' => '%'.$this->get_search().'%',
@@ -39,7 +72,7 @@ class local_ucla_import_course_search extends import_course_search {
         $join     = " LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id
                       LEFT JOIN {role} r ON r.id = ra.roleid
                       LEFT JOIN {user} usr ON usr.id = ra.userid ";
-        $where   = " $sql_where_condition
+        $where   = " $sqlwherecondition
                             AND (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). "
                             OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). "
                             OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). "
@@ -51,7 +84,7 @@ class local_ucla_import_course_search extends import_course_search {
             $where .= " AND c.id <> :currentcourseid";
             $params['currentcourseid'] = $this->currentcourseid;
         }
-        $params = array_merge($params, $inst_params);
+        $params = array_merge($params, $instparams);
         return array($select.$ctxselect.$from.$ctxjoin.$join.$where.$orderby, $params);
     }
 }

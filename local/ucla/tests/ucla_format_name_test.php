@@ -103,8 +103,8 @@ class ucla_format_name_test extends basic_testcase {
     }
 
     /**
-     * When formatting a name, if is something in the format of 
-     * "WOMEN'S STUDIES", then the "S" after the apostrophe should not be 
+     * When formatting a name, if is something in the format of
+     * "WOMEN'S STUDIES", then the "S" after the apostrophe should not be
      * capitalized.
      */
     public function test_posessive_s() {
@@ -113,7 +113,7 @@ class ucla_format_name_test extends basic_testcase {
     }
 
     /**
-     * Make sure that conjunctions are not capitlized, e.g. "and", "of", "the", 
+     * Make sure that conjunctions are not capitlized, e.g. "and", "of", "the",
      * "as", "a". Needed when formatting subject areas.
      */
     public function test_conjunctions() {

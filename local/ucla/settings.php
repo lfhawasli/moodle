@@ -35,14 +35,14 @@ if ($hassiteconfig) {
             get_string('student_access_ends_week', 'local_ucla'),
             get_string('student_access_ends_week_description', 'local_ucla'), 0,
             PARAM_INT));
-    
+
     $settings->add(new admin_setting_configtext(
             'local_ucla/maxcrosslistshown',
             get_string('maxcrosslistshown', 'local_ucla'),
             get_string('maxcrosslistshowndesc', 'local_ucla'), 6,
             PARAM_INT));
 
-    // CCLE-4521 - Handle "preferred name"
+    // CCLE-4521 - Handle "preferred name".
     $settings->add(new admin_setting_configcheckbox('local_ucla/handlepreferredname',
         get_string('handlepreferredname', 'local_ucla'),
         get_string('handlepreferrednamedesc', 'local_ucla'),
@@ -53,8 +53,8 @@ if ($hassiteconfig) {
             get_string('registrarurlconfig', 'local_ucla'),
             get_string('registrarurlconfighelp', 'local_ucla'),
             'https://sa.ucla.edu', PARAM_URL));
-    
-    // SSC-2050 - Include associated courses in subject header of forum emails
+
+    // SSC-2050 - Include associated courses in subject header of forum emails.
     $settings->add(new admin_setting_configtext(
         'local_ucla/limitcrosslistemail',
         get_string('limitcrosslistemailname', 'local_ucla'),
@@ -64,14 +64,14 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
 
     // Inject setting to turn on UCLA edits for enrol_database into
-    // Site administration > Plugins > Enrolments > UCLA registrar
+    // Site administration > Plugins > Enrolments > UCLA registrar.
     $temp = $ADMIN->locate('enrolsettingsdatabase');
     $temp->add(new admin_setting_configcheckbox('local_ucla/overrideenroldatabase',
             get_string('overrideenroldatabase', 'local_ucla'),
             get_string('overrideenroldatabasedesc', 'local_ucla'),
             0));
     // CCLE-2924 - Prevent blind updating of users, give a time-out before
-    // registrar information trumps shibboleth information
+    // registrar information trumps shibboleth information.
     $temp->add(new admin_setting_configtext('local_ucla/minuserupdatewaitdays',
             get_string('minuserupdatewaitdays', 'local_ucla'),
             get_string('minuserupdatewaitdays_desc', 'local_ucla'), 30));

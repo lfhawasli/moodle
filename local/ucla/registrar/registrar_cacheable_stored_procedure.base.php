@@ -1,149 +1,170 @@
 <?php
+// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * local/ucla/registrar/registrar_cacheable_stored_procedure.base.php
+ * Registrar cacheable class.
+ *
+ * @package     local_ucla
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
+require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
+
+/**
+ * This class implements a caching layer for any stored procedure that is derived from it. 
  * 
- * This class implements a caching layer for any stored procedure that is 
- * derived from it. The caching layer depends on some naming conventions for 
+ * The caching layer depends on some naming conventions for
  * its database tables:
- * 
+ *
  * <stored procedure name>_cache
- * 
+ *
  * The  <stored procedure name>_cache table is outlined as:
  * id
  * param_<param name> Then as many columns as needed by get_query_params()
- * expires_on   UNIX timestamp for how long the cache entries related to this  
+ * expires_on   UNIX timestamp for how long the cache entries related to this
  *              query should be valid
  * <return name>    Then as many columns as needed by get_result_columns()
+ * 
+ * @copyright   2012 UC Regents
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once(dirname(__FILE__) . '/registrar_stored_procedure.base.php');
-
 abstract class registrar_cacheable_stored_procedure extends registrar_stored_procedure {
     /**
      * If null, then will use the local_plugin setting. Here so that child
      * classes can override plugin settings.
-     * @var int
+     * @var int     Time in seconds.
      */
-    static $registrar_cache_ttl = null;
-    
+    protected static $registrarcachettl = null;
+
+    /**
+     * Constructor for the plugin.
+     */
     public function __construct() {
-        // see if ttl was manually set beforehand, else use plugin default
-        if (empty(static::$registrar_cache_ttl)) {
-            static::$registrar_cache_ttl = get_config('local_ucla', 'registrar_cache_ttl');
+        // See if ttl was manually set beforehand, else use plugin default.
+        if (empty(self::$registrarcachettl)) {
+            self::$registrarcachettl = get_config('local_ucla', 'registrar_cache_ttl');
         }
     }
 
     /**
-     *  Returns the array describing the columns that are returned by the
-     *  stored procedure.
-     *  @return array
-     **/
-    abstract function get_result_columns();
-    
+     * Returns the array describing the columns that are returned by the
+     * stored procedure.
+     * @return array
+     */
+    abstract public function get_result_columns();
+
     /**
      * This function will first try to see if there is a valid cache copy of
      * the results for the given set of parameters.
-     * 
+     *
      * If a valid cache is found, then those results are returned instead. If
      * not, then the regular retrieve_registrar_info is called and a cache copy
      * is saved.
-     * 
-     * Note, that parameters that return 0 results will always be calling the 
+     *
+     * Note, that parameters that return 0 results will always be calling the
      * registrar.
      *
-     *  @param $driving_data The data to run a set of queries on.
-     *  @param  $cached Default true. If false, then will return uncached data
-     *  @return Array( Array( ) )
-     *      false - indicates bad input
-     *      empty array() - indicates good input, but no results
-     **/    
-    function retrieve_registrar_info($driving_data, $cached=true) {
+     * @param aray $drivingdata The data to run a set of queries on.
+     * @param boolean $cached Default true. If false, then will return uncached data
+     *
+     * @return array    False indicates bad input. Empty array indicates good input, but no results.
+     */
+    public function retrieve_registrar_info($drivingdata, $cached = true) {
         global $DB;
-        $query_params = array();    // store values to pass into $DB object
-        $results = array();         // results to return
-        
-        // see if caching is turned off
+        $queryparams = array(); // Store values to pass into $DB object.
+        $results = array();     // Results to return.
+
+        // See if caching is turned off.
         if (!$cached) {
-            // just call parent
-            return parent::retrieve_registrar_info($driving_data);
+            // Just call parent.
+            return parent::retrieve_registrar_info($drivingdata);
         }
-        
-        // get information and parameters for this call
-        $storedproc_cache = $this->get_stored_procedure() . '_cache';      
-        $params = $this->unindexed_key_translate($driving_data);
+
+        // Get information and parameters for this call.
+        $storedproccache = $this->get_stored_procedure() . '_cache';
+        $params = $this->unindexed_key_translate($drivingdata);
         if (empty($params)) {
             return false;
-        }       
-        
-        // columns to be returned
-        $columns_to_return = implode(',', $this->get_result_columns());
-        
-        // try to see if there is a valid cache copy
-        // NOTE: id needs to be returned so that we don't get "Did you remember 
-        // to make the first column something unique in your call to 
-        // get_records?" errors
-        $sql = "SELECT  id, $columns_to_return
-                FROM    {{$storedproc_cache}}
-                WHERE   expires_on >= UNIX_TIMESTAMP() AND ";
-        
-        $first_entry = true;
-        foreach ($params as $name => $value) {
-            // remember that parameters columns with have "param_" prefix
-            $first_entry ? $first_entry = false : $sql .= ' AND ';
-            $sql .= 'param_' . $name . '= :param_' . $name;
-            $query_params['param_' . $name] = $value;
-        }        
-        
-        try {
-            $cache_results = $DB->get_records_sql($sql, $query_params);           
-        } catch (Exception $e) {
-            // query failed, maybe table is missing or columns mismatched
-            throw new registrar_stored_procedure_exception(
-                    sprintf('Cache query failed for: %s (%s)', $storedproc_cache, 
-                            print_r($query_params, true)));
         }
-        
-        if (empty($cache_results)) {
-            //debugging('cache miss');
-            
-            // no valid cache found, so first delete any cache copy;
-            // don't want to have old data laying around
-            $DB->delete_records($storedproc_cache, $query_params);
-             
-            // call stored procedure regularly
-            $results = parent::retrieve_registrar_info($driving_data);
-            
+
+        // Columns to be returned.
+        $columnstoreturn = implode(',', $this->get_result_columns());
+
+        // Try to see if there is a valid cache copy.
+        // NOTE: id needs to be returned so that we don't get "Did you remember
+        // to make the first column something unique in your call to
+        // get_records?" errors.
+        $sql = "SELECT  id, $columnstoreturn
+                FROM    {{$storedproccache}}
+                WHERE   expires_on >= UNIX_TIMESTAMP() AND ";
+
+        $firstentry = true;
+        foreach ($params as $name => $value) {
+            // Remember that parameters columns with have "param_" prefix.
+            $firstentry ? $firstentry = false : $sql .= ' AND ';
+            $sql .= 'param_' . $name . '= :param_' . $name;
+            $queryparams['param_' . $name] = $value;
+        }
+
+        try {
+            $cacheresults = $DB->get_records_sql($sql, $queryparams);
+        } catch (Exception $e) {
+            // Query failed, maybe table is missing or columns mismatched.
+            throw new registrar_stored_procedure_exception(
+                    sprintf('Cache query failed for: %s (%s)', $storedproccache,
+                            implode('|', $queryparams)));
+        }
+
+        if (empty($cacheresults)) {
+            // No valid cache found, so first delete any cache copy;
+            // don't want to have old data laying around.
+            $DB->delete_records($storedproccache, $queryparams);
+
+            // Call stored procedure regularly.
+            $results = parent::retrieve_registrar_info($drivingdata);
+
             if (!empty($results)) {
-                //debugging('inserting cache');
-                
-                // save cache copy
-                
-                // set cache timeout
-                $expires_on = time() + static::$registrar_cache_ttl; 
-                
-                $query_params['expires_on'] = $expires_on;
-                
+                // Save cache copy.
+
+                // Set cache timeout.
+                $expireson = time() + static::$registrarcachettl;
+
+                $queryparams['expires_on'] = $expireson;
+
                 foreach ($results as $result) {
-                    // take advantage of the fact that result is indexed by column name
-                    $insert_params = array_merge($query_params, $result);
-                    try {                        
-                        $DB->insert_record($storedproc_cache, (object) $insert_params, false, true);
+                    // Take advantage of the fact that result is indexed by column name.
+                    $insertparams = array_merge($queryparams, $result);
+                    try {
+                        $DB->insert_record($storedproccache, (object) $insertparams, false, true);
                     } catch (Exception $e) {
-                        // insert failed, maybe table is missing or columns mismatched
+                        // Insert failed, maybe table is missing or columns mismatched.
                         throw new registrar_stored_procedure_exception(
-                                sprintf('Cache insert failed for: %s (%s)', $storedproc_cache, 
-                                        print_r($insert_params, true)));
+                                sprintf('Cache insert failed for: %s (%s)', $storedproccache,
+                                        implode('|', $insertparams)));
                     }
                 }
             }
         } else {
-            //debugging('cache hit');
-
-            // format results so it is returned as an array
-            foreach ($cache_results as $cache_result) {
-                $results[] = (array) $cache_result;
+            // Format results so it is returned as an array.
+            foreach ($cacheresults as $cacheresult) {
+                $results[] = (array) $cacheresult;
             }
-        }        
+        }
         return $results;
-   }
+    }
 }

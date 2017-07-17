@@ -22,13 +22,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// We do not require users to be logged in to get here.
+// @codingStandardsIgnoreLine
 require_once("../../config.php");
 
 // If user is coming to this page, they most likely were attempted to be auto
 // logged in.
 // If the errorType is "opensaml::FatalProfileException", then isPassive login
 // failed, so we just redirect user back to where they were.
-// 
+//
 // See https://wiki.shibboleth.net/confluence/display/SHIB2/isPassive for info.
 
 $errortype = optional_param('errorType', null, PARAM_TEXT);
@@ -38,6 +40,8 @@ $requesturl = optional_param('requestURL', null, PARAM_LOCALURL);
 local_ucla_autologin::clear();
 
 if (!empty($CFG->debugautologin)) {
+    // This is debugging code, so ignore coding standards issue.
+    // @codingStandardsIgnoreLine
     print_object($_GET);
 }
 
@@ -61,6 +65,7 @@ if (isset($errortype) && strpos($errortype, 'FatalProfileException') !== false) 
 
 } else {
     // User got here because of some other error!
+    // @codingStandardsIgnoreLine
     error_log('errshiberror: ' . $FULLME);
     // This string should have a friendly message (see CCLE-653 - Better Shibboleth error message).
     print_error('shib_no_attributes_error', 'auth_shibboleth');

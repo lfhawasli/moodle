@@ -2117,10 +2117,6 @@ if ($consolecommand == "$title") {
         $componentparam = "manual";
     }
 
-    if ($typeparam == "") {
-        $typeparam = "N/A";
-    }
-
     $inputs = array('role' => $roleparam, 'contextlevel' => $contextlevelparam,
                     'component' => $componentparam, 'type' => $typeparam);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $modifiedresults, $inputs,

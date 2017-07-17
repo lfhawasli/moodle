@@ -248,7 +248,12 @@ YUI.add('moodle-enrol_manual-quickenrolment', function(Y) {
         getAssignableRoles : function(){
             Y.io(M.cfg.wwwroot+'/enrol/ajax.php', {
                 method:'POST',
+                // START UCLA MOD: 6009 - Make manual enrollment options match role restrictions for Site type
+                /*
                 data:'id='+this.get(UEP.COURSEID)+'&action=getassignable&sesskey='+M.cfg.sesskey,
+                */
+                data:'id='+this.get(UEP.COURSEID)+'&action=uclagetassignable&sesskey='+M.cfg.sesskey,
+                // END UCLA MOD: 6009
                 on: {
                     complete: function(tid, outcome, args) {
                         try {

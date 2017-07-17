@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Command line script to run after every run of Moodle cron, to see if it
- * produced any errors.
+ * Run after every run of Moodle cron, to see if it produced any errors.
  *
  * No output unless errors found, and then that is emailed by the cron job to
  * the cron job owner. So check who your ~moodle/.forward points to.
@@ -27,28 +26,32 @@
  * DEPLOYMENT: Add to moodle cron crontab entry, as in the example below where
  * it fits between cron.php and logrotate.
  *
- * 5 * * * * /usr/bin/php /data/prod/moodle/admin/cli/cron.php >> /data/prod/moodledata/cron.log && /usr/bin/php /data/prod/moodle/local/ucla/cli/moodle_cron_errors.php && /usr/sbin/logrotate /home/moodle/logrotate.prod.cron.conf -s /home/moodle/prod.cron.logrotate-status
+ * 5 * * * * /usr/bin/php /data/prod/moodle/admin/cli/cron.php >> /data/prod/moodledata/cron.log &&
+ *  /usr/bin/php /data/prod/moodle/local/ucla/cli/moodle_cron_errors.php &&
+ *  /usr/sbin/logrotate /home/moodle/logrotate.prod.cron.conf -s /home/moodle/prod.cron.logrotate-status
+ *
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define('CLI_SCRIPT', true);
 
-$moodleroot = dirname(dirname(dirname(dirname(__FILE__))));
-require($moodleroot . '/config.php');
+require(__DIR__.'/../../../config.php');
 
 // CONFIG SECTION.
-$search_items = array("error");  // Allowing for possible future search of other things.
+$searchitems = array("error");  // Allowing for possible future search of other things.
 $logfile = get_config('tool_uclasupportconsole', 'log_moodle_cron');
-$logfile_size = $CFG->dataroot . "/moodle_cron_size.dat";
+$logfilesize = $CFG->dataroot . "/moodle_cron_size.dat";
 $debug = 0;
 
 // Checks log filesize against previous days.
 $filesize = filesize($logfile);
-if (file_exists($logfile_size)) {
-    $oldlogsize = file($logfile_size);
+if (file_exists($logfilesize)) {
+    $oldlogsize = file($logfilesize);
     $oldsize = rtrim($oldlogsize[0]);  // Remove any carriage returns.
 } else {
     $oldsize = 0;
     if ($debug) {
-        echo "$logfile_size didn't exist.\n";
+        echo "$logfilesize didn't exist.\n";
     }
 }
 if ($debug) {
@@ -56,7 +59,7 @@ if ($debug) {
 }
 
 // Save log filesize to file.
-$fh = fopen($logfile_size, 'w') or die("can't open file");
+$fh = fopen($logfilesize, 'w') or die("can't open file");
 fwrite($fh, "$filesize\n");
 fclose($fh);
 
@@ -78,12 +81,12 @@ if ($fp = fopen($logfile, 'r')) { // Make sure it opens the log file.
         exit;
     }
 
-    $matched_lines = array();
-    $prev_line = ""; // Used for storing line in previous loop iteration to prepend to a matched line.
+    $matchedlines = array();
+    $prevline = ""; // Used for storing line in previous loop iteration to prepend to a matched line.
 
     while ($line = fgets($fp)) {  // While it can get a line, loop through them looking for matches.
-        foreach ($search_items as $value) {
-            if (preg_match("/$value/i", $line) and 
+        foreach ($searchitems as $value) {
+            if (preg_match("/$value/i", $line) and
                     !preg_match("/errors=0/", $line) and
                     !preg_match("/Sending post /", $line) and
                     !preg_match("/users were sent post /", $line)) {
@@ -92,18 +95,18 @@ if ($fp = fopen($logfile, 'r')) { // Make sure it opens the log file.
                     // a RSS error. We want to ignore RSS errors since they
                     // happen often and we cannot do anything about it. So,
                     // unset previous matched line.
-                    array_pop($matched_lines);
+                    array_pop($matchedlines);
                 } else {
                     // Save this matched line as well as the line above it.
-                    $matched_lines[] = $prev_line . $line;   
+                    $matchedlines[] = $prevline . $line;
                 }
             }
-            $prev_line = $line; // Store previous line.
+            $prevline = $line; // Store previous line.
         }
     }
     fclose($fp); // Close the log file.
-    if (count($matched_lines) > 0) {
+    if (count($matchedlines) > 0) {
         echo $CFG->wwwroot . " moodle cron monitoring script moodle_cron_errors.php found the following in $logfile:\n";
-        echo implode('', $matched_lines);
+        echo implode('', $matchedlines);
     }
 }

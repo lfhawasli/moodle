@@ -35,13 +35,13 @@ class local_ucla_turnitintwo {
     /**
      * Given a module or course context, returns records from turnitintooltwo
      * table.
-     * 
+     *
      * @param context $context
      * @return array
      */
     public static function get_turnitintwo_by_context(context $context) {
         global $DB;
-        
+
         // What context is the user being given the capbility? Only care
         // about course and module contexts.
         if ($context->contextlevel == CONTEXT_MODULE) {
@@ -72,13 +72,13 @@ class local_ucla_turnitintwo {
     /**
      * When a TurnItInTwo assignment is created or a role is added to the
      * course or module, synchronize the tutors listing.
-     * 
-     * @param \core\event\base $event   Only expecting course_module_created, 
+     *
+     * @param \core\event\base $event   Only expecting course_module_created,
      *                                  role_assigned, role_unassigned events.
      */
     public static function sync_assignments(\core\event\base $event) {
         // Make sure we should process this event.
-        $context = $event->get_context();        
+        $context = $event->get_context();
         switch ($event->eventname) {
             case '\core\event\course_module_created':
                 // Make sure module is TurnItInTwo assignment.
@@ -88,7 +88,7 @@ class local_ucla_turnitintwo {
                 break;
             case '\core\event\role_assigned':
                 // Make sure user being assigned can grade TurnitinTwo.
-                if (!has_capability('mod/turnitintooltwo:grade', 
+                if (!has_capability('mod/turnitintooltwo:grade',
                         $context, $event->relateduserid)) {
                     return;
                 }
@@ -101,10 +101,10 @@ class local_ucla_turnitintwo {
                 // Ignore any other events.
                 return;
         }
-        
+
         // Get assignments by either course or module context.
         $tiiassignments = self::get_turnitintwo_by_context($context);
-        
+
         // If any TurnItInTwo assignments found, synchronize Tutors.
         if (!empty($tiiassignments)) {
             foreach ($tiiassignments as $tiiassignment) {
@@ -112,10 +112,10 @@ class local_ucla_turnitintwo {
             }
         }
     }
-    
+
     /**
      * Adds/remove Tutor roles from given TurnItInTwo assignment.
-     * 
+     *
      * @param object $tiiassignment
      * @return boolean
      */
@@ -126,12 +126,12 @@ class local_ucla_turnitintwo {
         $members = $tiiassign->get_tii_users_by_role('Instructor', 'mdl');
         $course = $tiiassign->get_course_data($tiiassign->turnitintooltwo->course);
         // Get current Tutors.
-        $moodleusers = get_users_by_capability(context_module::instance($cm->id), 
-                'mod/turnitintooltwo:grade', 'u.id', '', '', '', 
+        $moodleusers = get_users_by_capability(context_module::instance($cm->id),
+                'mod/turnitintooltwo:grade', 'u.id', '', '', '',
                 groups_get_activity_group($cm));
-        
+
         // Register new user with TII with new membership.
-        foreach($moodleusers as $userid => $moodleuser) {
+        foreach ($moodleusers as $userid => $moodleuser) {
             if (!array_key_exists($userid, $members)) {
                 $user = new turnitintooltwo_user($userid, 'Instructor');
                 $user->join_user_to_class($course->turnitin_cid);
@@ -143,7 +143,7 @@ class local_ucla_turnitintwo {
             $user = new turnitintooltwo_user($userid, 'Instructor');
             turnitintooltwo_user::remove_user_from_class($member['membership_id']);
         }
-        
+
         return true;
     }
 }

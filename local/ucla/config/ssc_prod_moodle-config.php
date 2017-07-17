@@ -28,7 +28,7 @@
  *  If you want configurations to be not within revisioning, then place
  *  your secrets @ moodle/config_private.php.
  *
- **/
+ */
 
 unset($CFG);
 global $CFG;
@@ -270,12 +270,12 @@ $CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 120;
 // Site administration > Plugins > Activity modules > Scheduler
 $CFG->scheduler_maxstudentsperslot = 75;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment
+// Site administration > Plugins > Activity modules > Turnitin Assignment (Legacy)
 $CFG->turnitin_apiurl = 'https://api.turnitin.com/api.asp';
 $CFG->turnitin_studentemail = 0;
 $CFG->turnitin_tutoremail = 0;
 
-// Site administration > Plugins > Activity modules > Turnitin Assignment 2
+// Site administration > Plugins > Activity modules > Turnitin Assignment
 $CFG->forced_plugin_settings['turnitintooltwo']['useerater'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['useanon'] = 1;
 $CFG->forced_plugin_settings['turnitintooltwo']['inboxlayout'] = 1;
@@ -528,7 +528,7 @@ if (file_exists($_config_private_)) {
  *  Enabling for SSC.
  *  Keeping in code for sake of quick re-enabling and reference.
  *  To disable, remove the '/' from the end of the following line.
- **/
+ */
 $CFG->auth = 'shibboleth';
 $CFG->alternateloginurl = $CFG->wwwroot . '/login/ucla_login.php?shibboleth';
 
@@ -559,7 +559,7 @@ $CFG->forced_plugin_settings['auth/shibboleth']['field_updatelocal_institution']
 $CFG->forced_plugin_settings['auth/shibboleth']['field_lock_institution'] = 'locked';
 /**
  *  End shibboleth configurations.
- **/
+ */
 
 // set external database connection settings after config_private.php has
 // been read for the Registrar connection details

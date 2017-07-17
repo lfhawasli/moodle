@@ -78,8 +78,7 @@ if ($unrecognized) {
 }
 
 if ($options['help']) {
-    $help =
-"Execute enrol sync with external database.
+    $help = "Execute enrol sync with external database.
 The enrol_database plugin must be enabled and properly configured.
 
 If no term is specified it will run for the terms defined in

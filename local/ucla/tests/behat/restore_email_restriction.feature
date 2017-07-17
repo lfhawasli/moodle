@@ -41,7 +41,7 @@ Feature: Remove email restriction from restore/import
     And I reply "Discussion 1" post from "Test forum name" forum with:
       | Subject | Reply 2 to discussion 1 |
       | Message | Discussion contents 2, third message |
-    And I log out  
+    And I log out
     # Backup the course.
     Given I log in as "admin"
     And I follow "Courses"
