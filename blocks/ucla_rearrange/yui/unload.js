@@ -28,8 +28,17 @@ M.block_ucla_rearrange.init = function(Y) {
             // the form has already been submitted and IDs are no longer in scope.
         }
 
-        // Enable form submit - the rearrange form is disabled by default.
-        Y.all('.mform input[type="submit"]').removeAttribute('disabled');
-
+        // CCLE-3930 - Rearrange erases modules in sections when javascript is turned off or not fully loaded.
+        // Submission buttons are only enabled when required interface-1.2.min.js file is fully loaded.
+        // Variable $.iNestedSortable exists when interface-1.2.min.js is loaded.
+        if ($.iNestedSortable) {
+            // Enable form submit - the rearrange form is disabled by default.
+            Y.all('.mform input[type="submit"]').removeAttribute('disabled');
+        } else {
+            // Disable buttons because interface-1.2.min.js file is not loaded.
+            $(window).load(function() {
+                $('.mform input[type="submit"]').attr("disabled", true);
+            });
+        }
     });
 }

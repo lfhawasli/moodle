@@ -429,18 +429,36 @@ class block_ucla_rearrange extends block_base {
             $DB->update_record('course_modules', $module, true);
         }
 
+        // CCLE-3930 - Rearrange erases modules in sections when javascript is turned off or not fully loaded.
+        // Var $empty initially set to true.
+        $empty = true;
+        // Disregards the first section. This code only matters when jQuery is
+        // disabled, so no rearrange changes can be made in any of the sections
+        // anyways. If jQuery is disabled, there should be no section numbers
+        // in the remaining sections so $empty should never be set to false.
+        foreach (array_slice($sections, 1) as $section) {
+            if (isset($section['section'])) {
+                $empty = false;
+            }
+        }
+
         // Using the largest positive value that can be stored in an int, minus 1.
         $tempnum = 2147483646; // This is 2147483647-1.
-        foreach ($sections as $section) {
-            // Check if we are updating course menu sections.
-            if (isset($section['section'])) {
-                $coursesectionpair = array('course' => $COURSE->id, 'section' => $section['section']);
-                if ($DB->record_exists('course_sections', $coursesectionpair)) {
-                    $DB->set_field('course_sections', 'section', $tempnum, $coursesectionpair);
-                    $tempnum--;
+
+        // Var $empty is false only when javascript is enabled and
+        // sections have been rearranged.
+        if (!$empty) {
+            foreach ($sections as $section) {
+                // Check if we are updating course menu sections.
+                if (isset($section['section'])) {
+                    $coursesectionpair = array('course' => $COURSE->id, 'section' => $section['section']);
+                    if ($DB->record_exists('course_sections', $coursesectionpair)) {
+                        $DB->set_field('course_sections', 'section', $tempnum, $coursesectionpair);
+                        $tempnum--;
+                    }
+                    $DB->update_record('course_sections', $section, true);
                 }
             }
-            $DB->update_record('course_sections', $section, true);
         }
     }
 
