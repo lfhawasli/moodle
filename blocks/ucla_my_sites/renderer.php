@@ -47,7 +47,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         foreach ($classsites as $x => $class) {
             // Build class title.
 
-            // There might be multiple reg_info records for cross-listed 
+            // There might be multiple reg_info records for cross-listed
             // courses, so find section user is enrolled in or use hostcourse.
             $hostreginfo = null; $enrolledreginfo = null;
             $numenrolledfound = 0;
@@ -61,7 +61,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
                     $hostreginfo = $reginfo;
                 }
             }
-            // If found multiple enrolled or did not find enrolled course, just 
+            // If found multiple enrolled or did not find enrolled course, just
             // use hostcourse.
             if ($numenrolledfound > 1 || empty($enrolledreginfo)) {
                 $titlereginfo = $hostreginfo;
@@ -136,13 +136,14 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
      *
      * @param array     $courses list of courses in sorted order
      * @param array     $overviews list of course overviews
+     * @param stdClass  $cathierarchy hierarchy of all categories for sites
+     * @param string    $sortopstring HTML string for the sort options form
+     * @param string    $sortorder string param for the sort order of collab sites
      * @return array content to be displayed in ucla_my_sites block
      */
-    public function collab_sites_overview($collaborationsites, $overviews) {
+    public function collab_sites_overview($collaborationsites, $overviews, $cathierarchy, $sortoptstring, $sortorder) {
         global $USER, $CFG, $OUTPUT, $PAGE;
         $content = array();
-        // Sort a bunch of collabortation sites via fullname.
-        array_alphasort($collaborationsites, "fullname");
 
         $collapser = '';
         // Add a collapse/expand icon if any class sites have notifications.
@@ -166,7 +167,51 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
         $content[] = html_writer::tag('h3', get_string('collaborationsites',
                 'block_ucla_my_sites').$collapser, array('class' => 'mysitesdivider'));
 
+        // Add the form string to the $content array.
+        $content[] = $sortoptstring;
         $content[] = html_writer::start_tag('div', array('class' => 'collab_sites_div'));
+
+        // Traverse the simplified category hierarchy and add the categories and collab sites to
+        // $content.
+        self::visit_top_categories($overviews, $cathierarchy, $content, $sortorder);
+
+        $content[] = html_writer::end_tag('div');
+        return implode($content);
+    }
+
+    /**
+     * Visits each of the top-level categories from the simplified hierarchy and
+     * display their collaboration sites.
+     * 
+     * @param array $overviews  The overviews for the collab sites
+     * @param stdClass $cathierarchy   The simplified hierarchy of the collab sites
+     * @param array $content   The content array to which HTML strings are added
+     * @param string $sortorder   The sortorder of the collab sites
+     */
+    public function visit_top_categories($overviews, $cathierarchy, &$content, $sortorder) {
+        foreach($cathierarchy->children as $category) {
+            $content[] = html_writer::tag('h4', $category->name);
+            self::display_collab_sites($category->collabsites, $overviews, $content, $sortorder);
+        }
+    }
+
+    /**
+     * Takes a bunch of collab sites and adds their links to a passed in
+     * content array
+     *
+     * @param array $collaborationsites Contains stdClass with collab sites.
+     * @param array $overviews Contains overviews of the collab sites.
+     * @param array $content The content array to which HTML elements should be added.
+     * @param string    $sortorder string param for the sort order of collab sites
+     */
+    public function display_collab_sites($collaborationsites, $overviews, &$content, $sortorder) {
+        // Sort the collaboration sites now.
+        usort($collaborationsites, function($a, $b) use ($sortorder) {
+            if ($sortorder === 'sitename') {
+                return strcmp($a->fullname, $b->fullname);
+            }
+            return -1 * strcmp($a->startdate, $b->startdate);
+        });
         foreach ($collaborationsites as $x => $collab) {
             // Make link.
             $collablink = html_writer::link(new moodle_url('/course/view.php',
@@ -193,8 +238,6 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
                 $content[] = '<hr class="course_divider">';
             }
         }
-        $content[] = html_writer::end_tag('div');
-        return implode($content);
     }
 
     /**
