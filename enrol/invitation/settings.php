@@ -36,11 +36,18 @@ if ($ADMIN->fulltree) {
     $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
                      ENROL_INSTANCE_DISABLED => get_string('no'));
     $settings->add(new admin_setting_configselect('enrol_invitation/status',
-        get_string('status', 'enrol_invitation'), get_string('status_desc', 'enrol_invitation'), ENROL_INSTANCE_DISABLED, $options));
+        get_string('status', 'enrol_invitation'),
+        get_string('status_desc', 'enrol_invitation'),
+        ENROL_INSTANCE_DISABLED, $options)
+    );
 
     // Default to 2 weeks expiration.
     $settings->add(new admin_setting_configtext('enrol_invitation/inviteexpiration',
-        get_string('inviteexpiration', 'enrol_invitation'), get_string('inviteexpiration_desc', 'enrol_invitation'), 1209600, PARAM_INT));
+        get_string('inviteexpiration', 'enrol_invitation'),
+        get_string('inviteexpiration_desc', 'enrol_invitation'),
+        1209600,
+        PARAM_INT
+    ));
 
     // Enable special case handling for tempparticipant
     // (requires tempparticipant role to exist on system).

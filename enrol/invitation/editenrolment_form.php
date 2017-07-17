@@ -29,7 +29,7 @@ require_once("$CFG->libdir/formslib.php");
 
 /**
  * Form to edit invitation enrolment for a user.
- * 
+ *
  * @copyright  2013 UC Regents
  * @copyright  2011 Jerome Mouneyrac {@link http://www.moodleitandme.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -72,7 +72,7 @@ class enrol_invitation_user_enrolment_form extends moodleform {
 
     /**
      * Form validation.
-     * 
+     *
      * @param array $data
      * @param array $files
      *

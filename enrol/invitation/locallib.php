@@ -75,9 +75,9 @@ class invitation_manager {
      *
      * It's mostly useful to add a link in a block menu - by default icon is
      * displayed.
-     * 
-     * @param boolean $withicon - set to false to not display the icon
-     * @return
+     *
+     * @param boolean $withicon set to false to not display the icon
+     * @return string
      */
     public function get_menu_link($withicon = true) {
         global $OUTPUT;
@@ -112,24 +112,25 @@ class invitation_manager {
     public static function get_project_privacy_notice($courseid) {
         global $CFG;
         require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.php');
-        $ret_val = null;
+        $retval = null;
 
         // Get current course's site type group.
         try {
-            $siteindicator_site = new siteindicator_site($courseid);
-            $site_type = $siteindicator_site->property->type;
-            $siteindicator_manager = new siteindicator_manager();
-            $site_type_group = $siteindicator_manager->get_rolegroup_for_type($site_type);
+            $siteindicatorsite = new siteindicator_site($courseid);
+            $sitetype = $siteindicatorsite->property->type;
+            $siteindicatormanager = new siteindicator_manager();
+            $sitetypegroup = $siteindicatormanager->get_rolegroup_for_type($sitetype);
 
             // If site type group is project, then return some notice.
-            if ($site_type_group == siteindicator_manager::SITE_GROUP_TYPE_PROJECT) {
-                $ret_val = "\n\n" . get_string('project_privacy_notice', 'enrol_invitation');
+            if ($sitetypegroup == siteindicator_manager::SITE_GROUP_TYPE_PROJECT) {
+                $retval = "\n\n" . get_string('project_privacy_notice', 'enrol_invitation');
             }
         } catch (Exception $e) {
             // Throws exception if no site type found.
+            unset($e);
         }
 
-        return $ret_val;
+        return $retval;
     }
 
     /**
@@ -173,8 +174,7 @@ class invitation_manager {
                 // Set time.
                 $timesent = time();
                 $invitation->timesent = $timesent;
-                $invitation->timeexpiration = $timesent +
-                        get_config('enrol_invitation', 'inviteexpiration');
+                $invitation->timeexpiration = $timesent + get_config('enrol_invitation', 'inviteexpiration');
 
                 // Update invite to have the proper timesent/timeexpiration.
                 if ($resend) {
@@ -198,18 +198,20 @@ class invitation_manager {
                     $invitation->message = $data->message;
                 }
 
-                $message_params = new stdClass();
-                $message_params->fullname =
-                        sprintf('%s: %s', $course->shortname, $course->fullname);
-                $message_params->expiration = date('M j, Y g:ia', $invitation->timeexpiration);
-                $inviteurl =  new moodle_url('/enrol/invitation/enrol.php',
-                                array('token' => $token));
+                $messageparams = new stdClass();
+                $messageparams->fullname = sprintf(
+                    '%s: %s', $course->shortname, $course->fullname
+                );
+                $messageparams->expiration = date('M j, Y g:ia', $invitation->timeexpiration);
+                $inviteurl = new moodle_url('/enrol/invitation/enrol.php',
+                    array('token' => $token)
+                );
                 $inviteurl = $inviteurl->out(false);
 
                 // Append privacy notice, if needed.
-                $privacy_notice = $this->get_project_privacy_notice($course->id);
-                if (!empty($privacy_notice)) {
-                    $inviteurl .= $privacy_notice;
+                $privacynotice = $this->get_project_privacy_notice($course->id);
+                if (!empty($privacynotice)) {
+                    $inviteurl .= $privacynotice;
                 }
 
                 // Append days expired, if needed.
@@ -232,12 +234,12 @@ class invitation_manager {
                     }
                 }
 
-                $message_params->inviteurl = $inviteurl;
-                $message_params->supportemail = $data->fromemail;
+                $messageparams->inviteurl = $inviteurl;
+                $messageparams->supportemail = $data->fromemail;
                 $helpurl = new moodle_url('/blocks/ucla_help/index.php', array('course' => $this->courseid));
                 $helpurl = $helpurl->out(false);
-                $message_params->helpurl = $helpurl;
-                $message .= get_string('emailmsgtxt', 'enrol_invitation', $message_params);
+                $messageparams->helpurl = $helpurl;
+                $message .= get_string('emailmsgtxt', 'enrol_invitation', $messageparams);
 
                 if (!$resend) {
                     $objid = $DB->insert_record('enrol_invitation', $invitation);
@@ -291,7 +293,7 @@ class invitation_manager {
     /**
      * Enrol the user in the course, update the database to mark the token as used,
      * and (optionally) notify inviter.
-     * 
+     *
      * @param obj $invitation   a enrol_invitation record
      * @param obj $course       a course object
      */
@@ -341,13 +343,15 @@ class invitation_manager {
             $siteurl = new moodle_url('/');
             $emailinfo->siteurl = $siteurl->out(false);
 
-            email_to_user($contactuser, get_admin(), get_string('emailtitleuserenrolled', 'enrol_invitation', $emailinfo), get_string('emailmessageuserenrolled', 'enrol_invitation', $emailinfo));
+            email_to_user($contactuser, get_admin(), get_string(
+                'emailtitleuserenrolled', 'enrol_invitation', $emailinfo
+            ), get_string('emailmessageuserenrolled', 'enrol_invitation', $emailinfo));
         }
     }
 
     /**
      * Updates invitation if inviter chooses to revoke, extend, or resend
-     * 
+     *
      * @param obj $invite       an instance of an enrol_invitation record
      * @param int $actionid     either INVITE_REVOKE, INVITE_EXTEND, or INVITE_RESEND
      */
@@ -355,7 +359,7 @@ class invitation_manager {
         global $DB;
         $course = $DB->get_record('course', array('id' => $this->courseid));
 
-        if($actionid == self::INVITE_REVOKE) {
+        if ($actionid == self::INVITE_REVOKE) {
             $DB->set_field('enrol_invitation', 'timeexpiration', $invite->timesent,
                     array('courseid' => $invite->courseid, 'id' => $invite->id));
 
@@ -404,7 +408,7 @@ class invitation_manager {
     }
 
     /**
-     * Given an email address, will return a user object that can be used in 
+     * Given an email address, will return a user object that can be used in
      * email_to_user().
      *
      * @param string $email
@@ -447,7 +451,7 @@ class invitation_manager {
         // Invites sent before newest were resent.
         if ($invite->timeexpiration != $mostrecenttime) {
             return get_string('status_invite_resent', 'enrol_invitation');
-        }    
+        }
 
         if ($invite->tokenused) {
             // Invite was used already.
@@ -560,7 +564,7 @@ class invitation_manager {
      */
     public function who_used_invite($invite) {
         global $DB;
-        $ret_val = new stdClass();
+        $retval = new stdClass();
 
         if (empty($invite->userid) || empty($invite->tokenused) ||
                 empty($invite->courseid) || empty($invite->timeused)) {
@@ -572,21 +576,21 @@ class invitation_manager {
         if (empty($user)) {
             return false;
         }
-        $ret_val->username = sprintf('%s %s', $user->firstname, $user->lastname);
-        $ret_val->useremail = $user->email;
+        $retval->username = sprintf('%s %s', $user->firstname, $user->lastname);
+        $retval->useremail = $user->email;
 
         // Find their roles for course.
-        $ret_val->roles = get_user_roles_in_course($invite->userid, $invite->courseid);
-        if (empty($ret_val->roles)) {
+        $retval->roles = get_user_roles_in_course($invite->userid, $invite->courseid);
+        if (empty($retval->roles)) {
             // If no roles, then they must have been booted out later.
             return false;
         }
-        $ret_val->roles = strip_tags($ret_val->roles);
+        $retval->roles = strip_tags($retval->roles);
 
         // Format string when invite was used.
-        $ret_val->timeused = date('M j, Y g:ia', $invite->timeused);
+        $retval->timeused = date('M j, Y g:ia', $invite->timeused);
 
-        return $ret_val;
+        return $retval;
     }
 }
 
@@ -616,10 +620,11 @@ function prepare_notice_object($invitation) {
 
 /**
  * Prints out tabs and highlights the appropiate current tab.
- * 
- * @param string $active_tab  Either 'invite' or 'history'
+ *
+ * @param string $activetab Either 'invite' or 'history'
+ * @return void
  */
-function print_page_tabs($active_tab) {
+function print_page_tabs($activetab) {
     global $CFG, $COURSE;
 
     $tabs[] = new tabobject('invite',
@@ -632,20 +637,20 @@ function print_page_tabs($active_tab) {
                     get_string('invitehistory', 'enrol_invitation'));
 
     // Display tabs here.
-    print_tabs(array($tabs), $active_tab);
+    print_tabs(array($tabs), $activetab);
 }
 
 /**
  * Convert a string of emails into an array with a separate entry for each unique
  * email.
- * 
+ *
  * @param string $emailstring   string containing one or more email addresses
  * @return array $email_list    array containing unique emails separated by delimiters
  */
 function prepare_emails($emailstring) {
     // Check for the invitation of multiple users.
     $delimiters = "/[;, \r\n]/";
-    $email_list = invitation_form::parse_dsv_emails($emailstring, $delimiters);
-    $email_list = array_unique($email_list);
-    return $email_list;
+    $emaillist = invitation_form::parse_dsv_emails($emailstring, $delimiters);
+    $emaillist = array_unique($emaillist);
+    return $emaillist;
 }

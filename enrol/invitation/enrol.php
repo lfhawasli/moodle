@@ -59,7 +59,7 @@ if ($invalidinvite or $oldinvite) {
     $PAGE->set_url('/admin/enrol.php');
     $PAGE->set_context(context_system::instance());
     echo $OUTPUT->header();
-    echo $OUTPUT->notification(get_string('expiredtoken','enrol_invitation'), 'enrol_invitation');
+    echo $OUTPUT->notification(get_string('expiredtoken', 'enrol_invitation'), 'enrol_invitation');
     echo $OUTPUT->continue_button($return);
     echo $OUTPUT->footer();
     exit;
@@ -92,8 +92,8 @@ if (isguestuser()) {
 
     echo $OUTPUT->box_start('generalbox', 'notice');
 
-    $notice_object = prepare_notice_object($invitation);
-    echo get_string('loggedinnot', 'enrol_invitation', $notice_object);
+    $noticeobject = prepare_notice_object($invitation);
+    echo get_string('loggedinnot', 'enrol_invitation', $noticeobject);
     $loginbutton = new single_button(new moodle_url($CFG->wwwroot
             . '/login/index.php'), get_string('login'));
 
@@ -124,14 +124,14 @@ if (empty($confirm)) {
             get_string('invitationacceptancebutton', 'enrol_invitation'), 'get');
     $cancel = new moodle_url('/');
 
-    $notice_object = prepare_notice_object($invitation);
+    $noticeobject = prepare_notice_object($invitation);
 
     $invitationacceptance = get_string('invitationacceptance',
-            'enrol_invitation', $notice_object);
+            'enrol_invitation', $noticeobject);
 
-    $privacy_notice = invitation_manager::get_project_privacy_notice($course->id, true);
-    if (!empty($privacy_notice)) {
-        $invitationacceptance .= $privacy_notice;
+    $privacynotice = invitation_manager::get_project_privacy_notice($course->id, true);
+    if (!empty($privacynotice)) {
+        $invitationacceptance .= $privacynotice;
     }
 
     // If invitation has "daysexpire" set, then give notice.

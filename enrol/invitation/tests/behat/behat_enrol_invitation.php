@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the UCLA shared course theme for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -41,6 +40,8 @@ class behat_enrol_invitation extends behat_base {
      * Attempts to navigate to access page that enrols user in a course.
      * Equivalent to clicking ACCESS LINK in the last invite email to the user.
      *
+     * Ignore long line cording standard.
+     * @codingStandardsIgnoreLine
      * @Then /^I follow the link in the last invitation sent to "(?P<username_string>(?:[^"]|\\")*)" for site "(?P<course_fullname_string>(?:[^"]|\\")*)"$/
      *
      * @param string $uname
@@ -73,7 +74,9 @@ class behat_enrol_invitation extends behat_base {
     /**
      * Checks that a given message was in the last invitation sent to the user.
      * Note that this step requires the recipient to have an email.
-     * 
+     *
+     * Ignore long line cording standard.
+     * @codingStandardsIgnoreLine
      * @Then /^the last invite sent to "(?P<username_string>(?:[^"]|\\")*)" should contain "(?P<expected_message_string>(?:[^"]|\\")*)"$/
      *
      * @param string $uname
@@ -84,7 +87,7 @@ class behat_enrol_invitation extends behat_base {
 
         // Need to order by id DESC to get most recent invitation.
         // (Can't use timesent because Selenium is too fast.)
-        $sql =      "SELECT e.message "
+        $sql = "SELECT e.message "
                 .     "FROM {enrol_invitation} e "
                 .     "JOIN {user} u ON e.email = u.email "
                 .    "WHERE u.username = :username "
