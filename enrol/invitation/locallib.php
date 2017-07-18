@@ -175,12 +175,11 @@ class invitation_manager {
                 $timesent = time();
                 $invitation->timesent = $timesent;
 
-                 if (!empty($data -> invite_expiration_time)) {
-                    $invitation->timeexpiration = $data -> invite_expiration_time;
-                 } else {
-                    $invitation->timeexpiration = $timesent +
-                    get_config('enrol_invitation', 'inviteexpiration');
-                 }
+                if (!empty($data->invite_expiration_time)) {
+                    $invitation->timeexpiration = $data->invite_expiration_time;
+                } else {
+                    $invitation->timeexpiration = $timesent + get_config('enrol_invitation', 'inviteexpiration');
+                }
 
                 // Update invite to have the proper timesent/timeexpiration.
                 if ($resend) {
@@ -226,20 +225,14 @@ class invitation_manager {
                 if (get_config('enrol_invitation', 'enabletempparticipant')) {
                     $tempparticipant = $DB->get_record('role',
                             array('shortname' => 'tempparticipant'));
+                }
 
-                    // If inviting a temporary role, check how many days the
-                    // role should be limited to.
-                    if ($tempparticipant->id == $invitation->roleid) {
-                        // If for some reason the daysexpire is empty, default to 3.
-                        $daysexpire = 3;
-                        if (!empty($data->daysexpire)) {
-                            $daysexpire = $data->daysexpire;
-                        }
-
-                        $inviteurl .= "\n\n" . get_string('daysexpire_notice',
-                                'enrol_invitation', $daysexpire);
-                        $invitation->daysexpire = $daysexpire;
-                    }
+                // If daysexpire is set.
+                if (!empty($data->daysexpire)) {
+                    $daysexpire = $data->daysexpire;
+                    $inviteurl .= "\n\n" . get_string('daysexpire_notice',
+                        'enrol_invitation', $daysexpire);
+                    $invitation->daysexpire = $daysexpire;
                 }
 
                 $messageparams->inviteurl = $inviteurl;
@@ -543,6 +536,7 @@ class invitation_manager {
         // Handle daysexpire by adding making the enrollment expiration be the
         // end of the day after daysexpire days.
         $timeend = 0;
+        // If role expires, otherwise daysexpire is set to NULL.
         if (!empty($invitation->daysexpire)) {
             // Get today's date as a timestamp. Ignore the current time.
             $today = strtotime(date('Y/m/d'));
@@ -553,7 +547,6 @@ class invitation_manager {
             // before midnight.
             $timeend += 86399;
         }
-
         $enrol = enrol_get_plugin('invitation');
         $enrol->enrol_user($this->enrolinstance, $USER->id,
                 $invitation->roleid, 0, $timeend);

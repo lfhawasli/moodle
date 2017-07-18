@@ -188,7 +188,7 @@ class invitation_manager_testcase extends advanced_testcase {
         $messages = $sink->get_messages();
         $warningtext = "Please be aware that if you accept this invitation your profile information"
                 . " will be available to the other members of this project.";
-        $timeexpire = $data -> invite_expiration_time;
+        $timeexpire = $data->invite_expiration_time;
         $timeexpire = date('M j, Y g:ia', $timeexpire);
         $expiretext = 'and will expire on (' . $timeexpire . ')';
         foreach ($messages as $message) {

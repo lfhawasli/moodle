@@ -115,6 +115,8 @@ $string['emailaddressnumber'] = 'Email address';
 $string['addrestriction'] = 'Add restrictions?';
 $string['invite_expiration'] = 'Invitation expiration';
 $string['role_expiration'] = 'Role expiration';
+$string['never_expire'] = 'Never expires';
+$string['expires_after_certain_days'] = 'Expires after certain days';
 $string['notifymsg'] = 'Hello, I would like to inform you that user $a->username, with email $a->email has successful gained access to your course, $a->course';
 
 
