@@ -21,18 +21,22 @@
  * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
+define('LOCAL_KALTURAMEDIAGALLERY_LINK_LOCATION_NAVIGATION_BLOCK', 0);
+define('LOCAL_KALTURAMEDIAGALLERY_LINK_LOCATION_COURSE_SETTINGS', 1);
 /**
  * This function adds Kaltura media gallery link to the navigation block.  The code ensures that the Kaltura media gallery link is only displayed in the 'Current courses'
  * menu true.  In addition it check if the current context is one that is below the course context.
  * @param global_navigation $navigation a global_navigation object
  * @return void
  */
-// START UCLA MOD: CCLE-4908 - local_kaltura: Upgrade to Kaltura KAF
-// Display link to course media gallery in Administration > Course administration.
-//function local_kalturamediagallery_extend_navigation($navigation) {
-function local_kalturamediagallery_extend_settings_navigation($navigation) {
-// END UCLA MOD: CCLE-4908
+function local_kalturamediagallery_extend_navigation($navigation) {
     global $USER, $PAGE, $DB;
+
+    // Either a set value of 0 or an unset value means hook into navigation block.
+    if (!empty(get_config('local_kalturamediagallery', 'link_location')))
+    {
+        return;
+    }
 
     if (empty($USER->id)) {
         return;
@@ -64,11 +68,7 @@ function local_kalturamediagallery_extend_settings_navigation($navigation) {
         $coursecontext = $context;
     }
 
-    // START UCLA MOD: CCLE-4908 - local_kaltura: Upgrade to Kaltura KAF
-    // Display link to course media gallery in Administration > Course administration.
-    //$mycoursesnode = $navigation->find('currentcourse', $navigation::TYPE_ROOTNODE);
-    $mycoursesnode = $navigation->find('courseadmin', $navigation::TYPE_COURSE);
-    // END UCLA MOD: CCLE-4908
+    $mycoursesnode = $navigation->find('currentcourse', $navigation::TYPE_ROOTNODE);
 
     if (empty($mycoursesnode) || !has_capability('local/kalturamediagallery:view', $coursecontext, $USER)) {
         return;
@@ -77,4 +77,19 @@ function local_kalturamediagallery_extend_settings_navigation($navigation) {
     $name = get_string('nav_mediagallery', 'local_kalturamediagallery');
     $url = new moodle_url('/local/kalturamediagallery/index.php', array('courseid' => $coursecontext->instanceid));
     $kalmedgalnode = $mycoursesnode->add($name, $url, navigation_node::NODETYPE_LEAF, $name, 'kalcrsgal');
+}
+
+function local_kalturamediagallery_extend_navigation_course(navigation_node $parent, stdClass $course, context_course $context) {
+    global $USER;
+
+    if (get_config('local_kalturamediagallery', 'link_location') != LOCAL_KALTURAMEDIAGALLERY_LINK_LOCATION_COURSE_SETTINGS
+        || empty($USER->id)
+        || !has_capability('local/kalturamediagallery:view', $context, $USER)) {
+        return;
+    }
+
+    $name = get_string('nav_mediagallery', 'local_kalturamediagallery');
+    $url = new moodle_url('/local/kalturamediagallery/index.php', array('courseid' => $course->id));
+    $icon = new pix_icon('kaltura_icon', $name);
+    $parent->add($name, $url, navigation_node::NODETYPE_LEAF, $name, 'kalturamediagallery-settings', $icon);
 }

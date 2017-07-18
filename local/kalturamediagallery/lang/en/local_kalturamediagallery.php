@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
+
 // START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
 //$string['heading_mediagallery'] = 'Kaltura Media Gallery';
 //$string['invalid_launch_parameters'] = 'Invalid launch parameters';
@@ -35,3 +36,8 @@ $string['nav_mediagallery'] = 'Media Gallery';
 $string['nav_mediagallery_page'] = 'Media Gallery';
 // END UCLA MOD: CCLE-6269
 $string['pluginname'] = 'Kaltura Media Gallery';
+$string['setting_heading_desc'] = 'Settings';
+$string['link_location'] = 'Link location';
+$string['link_location_desc'] = 'Choose where mediagallery link is displayed';
+$string['link_location_navigation'] = 'Navigation block';
+$string['link_location_course_settings'] = 'Course settings';
