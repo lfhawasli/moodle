@@ -371,7 +371,29 @@ class syllabus_form extends moodleform {
      * @param object $existingsyllabus
      */
     private function display_private_syllabus_form($existingsyllabus) {
-        global $CFG;
+        global $CFG, $PAGE;
+
+        $jspath = '/local/ucla_syllabus/javascript/';
+        $PAGE->requires->jquery();
+
+        // Indicates which radio button should be selected initially.
+        // By default this is FILE when there is no syllabus added.
+        $defaultsyllabus = 'file';
+
+        // If a syllabus already exists and its a URL, then the default radio
+        // button option should be URL instead of file.
+        if (!empty($existingsyllabus)) {
+            if (!empty($existingsyllabus->url)) {
+                $defaultsyllabus = 'url';
+            }
+        }
+
+        if ($defaultsyllabus === 'file') {
+            $PAGE->requires->js($jspath . 'local_ucla_syllabus_file.js');
+        } else {
+            $PAGE->requires->js($jspath . 'local_ucla_syllabus_url.js');
+        }
+
         $mform = $this->_form;
         $privatesyllabusstring = get_string('icon_private_syllabus', 'local_ucla_syllabus');
 
@@ -393,25 +415,35 @@ class syllabus_form extends moodleform {
                     get_string('err_file_not_uploaded', 'local_ucla_syllabus'),
                     'required');
         } else {
-            // Add a syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc', '',
+            // Instructions to add a syllabus by file upload or URL.
+            $mform->addElement('header', 'syllabus_upload_desc',
                     get_string('syllabus_url_file', 'local_ucla_syllabus'));
+
+            // Provides information about the type of syllabus that was previously uploaded.
+            $mform->addElement('hidden', 'default_source', $defaultsyllabus);
+            $mform->setType('default_source', PARAM_TEXT);
+
+            // Add radio buttons to choose uploading by file or providing a URL.
+            $radioarray = array();
+            // File upload is the default unless a syllabus has been selected by URL.
+            if ($defaultsyllabus === 'file') {
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('file', 'local_ucla_syllabus'), 0);
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('url', 'local_ucla_syllabus'), 1);
+            } else {
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('file', 'local_ucla_syllabus'), 1);
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('url', 'local_ucla_syllabus'), 0);
+            }
+            $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('file', 'local_ucla_syllabus'), null, $config);
-            $mform->addElement('static', 'desc', '', 'OR');
             $mform->addHelpButton('syllabus_file', 'filetypepreference', 'local_ucla_syllabus');
 
             // Add URL field.
             $mform->addElement('text', 'syllabus_url', get_string('url', 'local_ucla_syllabus'),
                     array('size' => '50'));
             $mform->setType('syllabus_url', PARAM_URL);
-
-            // Warning about multiple resource upload.
-            $multipleresource = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
-                    . ' ' . get_string('syllabus_choice', 'local_ucla_syllabus');
-            $mform->addElement('static', 'form_multiple_resource_note', '', $multipleresource);
 
             // Warning about insecure URL's.
             $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
@@ -422,6 +454,14 @@ class syllabus_form extends moodleform {
         // Show access type.
         $mform->addElement('hidden', 'access_types[access_type]', UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE);
         $mform->setType('access_types[access_type]', PARAM_TEXT);
+
+        // Options.
+        $mform->addElement('header', 'syllabus_options',
+                    get_string('options', 'local_ucla_syllabus'));
+
+        // Display name options description.
+        $mform->addElement('static', 'syllabus_name_options', '',
+                    get_string('choose_syllabus_name_private', 'local_ucla_syllabus'));
 
         // Show display name.
         $mform->addElement('text', 'display_name', get_string('display_name', 'local_ucla_syllabus'));
@@ -468,6 +508,9 @@ class syllabus_form extends moodleform {
             $mform->setType('entryid', PARAM_INT);
         }
 
+        // Submission buttons.
+        $mform->addElement('header', 'syllabus_submission',
+                    get_string('submit_syllabus', 'local_ucla_syllabus'));
         $this->add_action_buttons();
     }
 
@@ -477,7 +520,29 @@ class syllabus_form extends moodleform {
      * @param object $existingsyllabus
      */
     private function display_public_syllabus_form($existingsyllabus) {
-        global $CFG;
+        global $CFG, $PAGE;
+
+        $jspath = '/local/ucla_syllabus/javascript/';
+        $PAGE->requires->jquery();
+
+        // Indicates which radio button should be selected initially.
+        // By default this is FILE when there is no syllabus added.
+        $defaultsyllabus = 'file';
+
+        // If a syllabus already exists and its a URL, then the default radio
+        // button option should be URL instead of file.
+        if (!empty($existingsyllabus)) {
+            if (!empty($existingsyllabus->url)) {
+                $defaultsyllabus = 'url';
+            }
+        }
+
+        if ($defaultsyllabus === 'file') {
+            $PAGE->requires->js($jspath . 'local_ucla_syllabus_file.js');
+        } else {
+            $PAGE->requires->js($jspath . 'local_ucla_syllabus_url.js');
+        }
+
         $mform = $this->_form;
         $publicworldsyllabusstring = get_string('icon_public_world_syllabus', 'local_ucla_syllabus');
         $publicuclasyllabusstring = get_string('icon_public_ucla_syllabus', 'local_ucla_syllabus');
@@ -498,14 +563,29 @@ class syllabus_form extends moodleform {
                     get_string('err_file_not_uploaded', 'local_ucla_syllabus'),
                     'required');
         } else {
-            // Add a syllabus description.
-            $mform->addElement('static', 'syllabus_upload_desc', '',
+            // Instructions to add a syllabus by file upload or URL.
+            $mform->addElement('header', 'syllabus_upload_desc',
                     get_string('syllabus_url_file', 'local_ucla_syllabus'));
+
+            // Provides information about the type of syllabus that was previously uploaded.
+            $mform->addElement('hidden', 'default_source', $defaultsyllabus);
+            $mform->setType('default_source', PARAM_TEXT);
+
+            // Add radio buttons to choose uploading by file or providing a URL.
+            $radioarray = array();
+            // File upload is the default unless a syllabus has been selected by URL.
+            if ($defaultsyllabus === 'file') {
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('file', 'local_ucla_syllabus'), 0);
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('url', 'local_ucla_syllabus'), 1);
+            } else {
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('file', 'local_ucla_syllabus'), 1);
+                $radioarray[] = $mform->createElement('radio', 'fileurl', '', get_string('url', 'local_ucla_syllabus'), 0);
+            }
+            $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 
             // Perform single file upload.
             $mform->addElement('filemanager', 'syllabus_file',
                     get_string('file', 'local_ucla_syllabus'), null, $config);
-            $mform->addElement('static', 'desc', '', 'OR');
             $mform->addHelpButton('syllabus_file', 'filetypepreference', 'local_ucla_syllabus');
 
             // Add URL field.
@@ -513,16 +593,19 @@ class syllabus_form extends moodleform {
                     array('size' => '50'));
             $mform->setType('syllabus_url', PARAM_URL);
 
-            // Warning about multiple resource upload.
-            $multipleresource = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
-                    . ' ' . get_string('syllabus_choice', 'local_ucla_syllabus');
-            $mform->addElement('static', 'form_multiple_resource_note', '', $multipleresource);
-
             // Warning about insecure URL's.
             $notice = html_writer::tag('i', '', array('class' => 'fa fa-exclamation-triangle'))
                     . ' ' . get_string('form_notice_insecure_url', 'local_ucla_syllabus');
             $mform->addElement('static', 'insecure_url_notice', '', $notice);
         }
+
+        // Options.
+        $mform->addElement('header', 'syllabus_options',
+                    get_string('options', 'local_ucla_syllabus'));
+
+        // Access options description.
+        $mform->addElement('static', 'syllabus_access_desc', '',
+                    get_string('choose_access_options', 'local_ucla_syllabus'));
 
         // Show access type.
         $label = get_string('access', 'local_ucla_syllabus');
@@ -549,6 +632,10 @@ class syllabus_form extends moodleform {
                 html_writer::empty_tag('br'));
         $mform->addGroupRule('access_types',
                 get_string('access_none_selected', 'local_ucla_syllabus'), 'required');
+
+        // Display name options description.
+        $mform->addElement('static', 'syllabus_name_options', '',
+                    get_string('choose_syllabus_name_public', 'local_ucla_syllabus'));
 
         // Show display name.
         $mform->addElement('text', 'display_name', get_string('display_name', 'local_ucla_syllabus'));
@@ -591,6 +678,9 @@ class syllabus_form extends moodleform {
             $mform->setType('entryid', PARAM_INT);
         }
 
+        // Submission buttons.
+        $mform->addElement('header', 'syllabus_submission',
+                    get_string('submit_syllabus', 'local_ucla_syllabus'));
         $this->add_action_buttons();
     }
 

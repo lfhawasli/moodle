@@ -19,3 +19,7 @@
 .ucla_syllabus-container #download_link img {
     vertical-align: inherit;
 }
+
+.syllabus_form #fgroup_id_access_types {
+    padding-bottom: 1.0em;
+}
