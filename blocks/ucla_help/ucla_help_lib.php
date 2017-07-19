@@ -182,12 +182,12 @@ class admin_setting_ucla_help_support_contact extends admin_setting {
         $i = 0;
         foreach ((array) $supportcontacts as $context => $supportcontact) {
             $form['context'.$i]             = $context;
-            $form['supportcontact'.$i]     = $supportcontact;
+            $form['support_contact'.$i]     = $supportcontact;
             $i++;
         }
         // Add one more blank field set for new support contact.
         $form['context'.$i]            = '';
-        $form['supportcontact'.$i]       = '';
+        $form['support_contact'.$i]       = '';
 
         return $form;
     }
