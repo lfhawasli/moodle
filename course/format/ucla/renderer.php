@@ -169,6 +169,25 @@ class format_ucla_renderer extends format_topics_renderer {
     }
 
     /**
+     * We override this function to replace 'Edit' with 'Edit section'.
+     *
+     * @param array $controls The edit control items from section_edit_control_items
+     * @param stdClass $course The course entry from DB
+     * @param stdClass $section The course_section entry from DB
+     * @return string HTML to output.
+     */
+    protected function section_edit_control_menu($controls, $course, $section) {
+        $html = parent::section_edit_control_menu($controls, $course, $section);
+        // Only replace first instance of 'Edit'.
+        $pos = strpos($html, get_string('edit'));
+        if ($pos) {
+            return substr_replace($html, get_string('editsection'), $pos, strlen(get_string('edit')));
+        } else {
+            return "";
+        }
+    }
+
+    /**
      * Output the html for the page header. For SRS courses will display
      * reginfo content. Also displays public/private message if user is not
      * logged in.
@@ -695,7 +714,8 @@ class format_ucla_renderer extends format_topics_renderer {
             $o .= $this->output->heading($this->section_title($section, $course), 3, 'sectionname');
 
             $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
-            $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
+            $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side',
+                    'style' => 'position: relative; top: -40px;'));
             $o .= html_writer::end_tag('div');
             // End section header.
 
