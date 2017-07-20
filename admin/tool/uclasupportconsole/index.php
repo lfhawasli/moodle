@@ -20,6 +20,10 @@ $exportoption = optional_param('export', null, PARAM_ALPHA);
 $displayforms = empty($consolecommand);
 $alldata = data_submitted();
 
+// Set $inputs['totalcount'] to $totalcount when calling
+// supportconsole_render_section_shortcut() for paginated support console tools.
+$totalcount = optional_param('count', null, PARAM_INT);
+
 admin_externalpage_setup('reportsupportconsole');
 
 require_login();
@@ -2118,6 +2122,7 @@ if ($consolecommand == "$title") {
     }
 
     $inputs = array('role' => $roleparam, 'contextlevel' => $contextlevelparam,
+                    'totalcount' => $totalcount,
                     'component' => $componentparam, 'type' => $typeparam);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $modifiedresults, $inputs,
             get_string('usersdescription', 'tool_uclasupportconsole', (object) $inputs));
