@@ -258,7 +258,6 @@ class format_ucla_renderer extends format_topics_renderer {
         echo html_writer::tag('span', '', array('class' => 'site-title-divider'));
 
         // Display page header.
-
         // Handle cancelled classes.
         if (is_course_cancelled($this->courseinfo)) {
             echo $OUTPUT->notification(get_string('coursecancelled', 'format_ucla'), 'notifywarning');
