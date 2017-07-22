@@ -17,7 +17,7 @@
 /**
  * Event handlers.
  *
- * @package    tool_uclasiteindicator
+ * @package    tool_uclacoursecreator
  * @copyright  2016 UC Regent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

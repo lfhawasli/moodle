@@ -13,12 +13,21 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Strings for the UCLA course creator class.
+ *
+ * @package    tool_uclacoursecreator
+ * @category   test
+ * @copyright  2014 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
+
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'UCLA course creator';
 $string['uclacoursecreator'] = $string['pluginname'];
-$string['cli_helpmsg'] = 
-"USAGE: cli_autocreate.php ([TERM] ([TERM] ... ))
+$string['cli_helpmsg'] = "USAGE: cli_autocreate.php ([TERM] ([TERM] ... ))
 This script will build courses in the terms specified in course requestor.
 
 You can specify as many terms as you would like.
