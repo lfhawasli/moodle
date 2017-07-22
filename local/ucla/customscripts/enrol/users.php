@@ -275,8 +275,8 @@ foreach ($users as $userid => &$user) {
 // Determine fields to show in the table.
 $userdetails = array (
     'picture' => false,
-    'firstname' => get_string('firstname'),
     'lastname' => get_string('lastname'),
+    'firstname' => get_string('firstname')
 );
 $extrafields = get_extra_user_fields($context);
 foreach ($extrafields as $field) {
