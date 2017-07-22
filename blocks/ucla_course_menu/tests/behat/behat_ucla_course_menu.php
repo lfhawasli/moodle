@@ -59,8 +59,7 @@ class behat_ucla_course_menu extends behat_base {
      * @param string $section
      * @return array
      */
-    public function i_should_see_higlighted($section)
-    {
+    public function i_should_see_higlighted($section) {
         return array(
             new Then('I should see "' . $section . '" in the "//li[contains(@class, \'current_branch\')]/p/a" "xpath_element"')
         );
@@ -75,8 +74,7 @@ class behat_ucla_course_menu extends behat_base {
      * @param string $section
      * @return array
      */
-    public function i_should_see_in_site_menu($section)
-    {
+    public function i_should_see_in_site_menu($section) {
         return array(
             new Then('I should see "' . $section . '" in the ".block_ucla_course_menu" "css_element"')
         );
@@ -90,8 +88,7 @@ class behat_ucla_course_menu extends behat_base {
      * @param string $section
      * @return array
      */
-    public function i_should_not_see_in_site_menu($section)
-    {
+    public function i_should_not_see_in_site_menu($section) {
         return array(
             new Then('I should not see "' . $section . '" in the ".block_ucla_course_menu" "css_element"')
         );
@@ -101,6 +98,7 @@ class behat_ucla_course_menu extends behat_base {
      * Checks if a site menu section contains the 'hidden' label.
      *
      * @Given /^the "([^"]*)" section in the ucla site menu is hidden$/
+     * @param string $section
      */
     public function the_site_menu_section_hidden($section) {
 
@@ -118,6 +116,7 @@ class behat_ucla_course_menu extends behat_base {
      * Checks that a site menu section does NOT have a 'hidden' label.
      *
      * @Given /^the "([^"]*)" section in the ucla site menu is visible$/
+     * @param string $section
      */
     public function the_site_menu_section_visible($section) {
 
@@ -129,6 +128,6 @@ class behat_ucla_course_menu extends behat_base {
         }
 
         throw new ExpectationException('The section "' . $section . '" has a "hidden" label.', $this->getSession());
-}
+    }
 
 }
