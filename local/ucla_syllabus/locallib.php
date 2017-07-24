@@ -139,7 +139,17 @@ class ucla_syllabus_manager {
         $data->access_type = $syllabus->access_type;
 
         // Trigger necessary events.
-        events_trigger_legacy('ucla_syllabus_deleted', $data);
+        $deletedevent = \local_ucla_syllabus\event\syllabus_deleted::create(
+                array(
+                    'other' => array(
+                            'courseid'    => $data->courseid,
+                            'access_type' => $data->access_type
+                        ),
+                    'objectid' => $syllabus->id,
+                    'context' => context_course::instance($data->courseid)
+                )
+        );
+        $deletedevent->trigger();
     }
 
     /**
@@ -188,8 +198,31 @@ class ucla_syllabus_manager {
         $olddata->access_type = $syllabus->access_type;
 
         // Trigger events.
-        events_trigger_legacy('ucla_syllabus_deleted', $olddata);
-        events_trigger_legacy('ucla_syllabus_added', $data);
+        $contextid = context_course::instance($data->courseid)->id;
+        $deletedevent = \local_ucla_syllabus\event\syllabus_deleted::create(
+            array(
+                'objectid' => $olddata->id,
+                'other' => array(
+                        'courseid' => $olddata->courseid,
+                        'access_type' => $olddata->access_type
+                    ),
+                'contextid' => $contextid
+            )
+        );
+        $deletedevent->trigger();
+
+        $addedevent = \local_ucla_syllabus\event\syllabus_added::create(
+            array(
+                'objectid' => $data->id,
+                'courseid' => $data->courseid,
+                'other' => array(
+                        'access_type' => $data->access_type
+                    ),
+                'contextid' => $contextid
+            )
+        );
+        $addedevent->trigger();
+
     }
 
     /**
@@ -464,7 +497,7 @@ class ucla_syllabus_manager {
 
             $DB->update_record('ucla_syllabus', $syllabusentry);
 
-            $eventname = 'ucla_syllabus_updated';
+            $eventname = 'syllabus_updated';
         } else {
             // Save when this syllabi was created.
             $syllabusentry->timecreated  = time();
@@ -475,7 +508,7 @@ class ucla_syllabus_manager {
                 print_error(get_string('cannnot_make_db_entry', 'local_ucla_syllabus'));
             }
 
-            $eventname = 'ucla_syllabus_added';
+            $eventname = 'syllabus_added';
         }
 
         // Then save file, with link to syllabus.
@@ -485,7 +518,14 @@ class ucla_syllabus_manager {
                 $recordid, $this->filemanagerconfig);
 
         // No errors, so trigger events.
-        events_trigger_legacy($eventname, $recordid);
+        $eventclass = '\\local_ucla_syllabus\\event\\' . $eventname;
+        $event = $eventclass::create(
+            array(
+                'objectid' => $recordid,
+                'contextid' => $coursecontext->id
+            )
+        );
+        $event->trigger();
 
         // Everything completed, so see if manual syllabus was converted.
         if (!empty($data->manualsyllabus)) {

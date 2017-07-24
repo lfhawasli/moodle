@@ -311,3 +311,7 @@ $string['limitcrosslistemaildesc'] = 'Limit of short course names appearing on e
 
 // CCLE-6369 - Improve user experience when viewing activity they don't have access to.
 $string['contactinstructors'] = 'Please contact your instructor or TA if you have any questions.';
+
+// CCLE-5910 - Migrate events for local_ucla.
+$string['clear_srdb_ucla_syllabus_task'] = 'Clear syllabus links from SRDB.';
+$string['update_srdb_ucla_syllabus_task'] = 'Updates syllabus links at SRDB.';
