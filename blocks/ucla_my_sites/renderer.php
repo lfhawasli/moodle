@@ -189,9 +189,11 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
      * @param string $sortorder   The sortorder of the collab sites
      */
     public function visit_top_categories($overviews, $cathierarchy, &$content, $sortorder) {
-        foreach($cathierarchy->children as $category) {
+        foreach (array_values($cathierarchy->children) as $index => $category) {
             $content[] = html_writer::tag('h4', $category->name);
+            $content[] = html_writer::start_div("collab_sites_container");
             self::display_collab_sites($category->collabsites, $overviews, $content, $sortorder);
+            $content[] = html_writer::end_div();
         }
     }
 
@@ -234,7 +236,7 @@ class block_ucla_my_sites_renderer extends block_course_overview_renderer {
             }
             $collablink .= '<br>';
             $content[] = $collablink;
-            if ($x < count($collaborationsites) - 1) {
+            if ($x < count($collaborationsites)) {
                 $content[] = '<hr class="course_divider">';
             }
         }
