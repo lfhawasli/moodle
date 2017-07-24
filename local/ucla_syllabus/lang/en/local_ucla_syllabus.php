@@ -107,6 +107,9 @@ $string['err_noembed'] = 'Unable to show embedded file. Please download file to 
 $string['err_syllabus_convert'] = 'Cannot convert syllabus when both a restricted and unrestricted syllabi are uploaded';
 $string['err_invalid_url'] = 'Please enter a valid URL.';
 $string['err_cannot_manage'] = 'Sorry, but you do not have the capability to manage syllabi for course';
+$string['err_course_alert'] = 'Cannot process course alert successfully';
+$string['err_syllabus_transfer'] = 'Cannot transfer syllabus successfully';
+$string['err_syllabus_delete'] = 'Cannot delete syllabus successfully';
 
 // Capability strings.
 $string['ucla_syllabus:managesyllabus'] = 'Ability to add, edit, and delete syllabus for a course';
@@ -181,3 +184,8 @@ $string['eventsyllabus_added'] = 'Added syllabus';
 $string['eventsyllabus_deleted'] = 'Added syllabus';
 $string['eventsyllabus_updated'] = 'Updated syllabus';
 $string['eventsyllabus_viewed'] = 'Viewed syllabus';
+
+// Strings for tasks.
+$string['taskcourse_alert'] = 'Course alert task';
+$string['tasksyllabus_deleted'] = 'Syllabus deleted task';
+$string['tasksyllabus_updated'] = 'Syllabus updated task';

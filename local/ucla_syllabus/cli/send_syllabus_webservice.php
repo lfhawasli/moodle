@@ -27,7 +27,6 @@ define('CLI_SCRIPT', true);
 require(__DIR__.'/../../../config.php');
 require_once("$CFG->libdir/clilib.php");
 require_once("$CFG->dirroot/local/ucla/lib.php");
-require_once("$CFG->dirroot/local/ucla_syllabus/webservice/eventlib.php");
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(array('help' => false), array('h' => 'help'));
@@ -45,7 +44,7 @@ Example:
 
 Where type = {alert|syllabus|both}
 
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php alert 14F MGMNT
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php alert 14F MGMT
 \$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php syllabus 141 "A&O SCI"
 \$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php both 1234
 
@@ -110,10 +109,18 @@ if ($type === 'alert' || $type === 'both') {
         foreach ($courses as $course) {
             $progress->output(sprintf("Processing %s (%s)", $course->shortname,
                     $course->srs), 1);
-            $result = ucla_course_alert($course);
-            if ($result) {
+
+            $task = new \local_ucla_syllabus\task\ucla_course_alert_task();
+            $task->set_custom_data(
+                array(
+                    'courseid' => $course->id
+                )
+            );
+
+            try {
+                $task->execute();
                 $progress->output("...SUCCESS", 2);
-            } else {
+            } catch (Exception $e) {
                 $progress->output("...FAILURE!", 2);
             }
         }
@@ -141,9 +148,18 @@ if ($type === 'syllabus' || $type === 'both') {
         foreach ($syllabi as $syllabus) {
             $progress->output(sprintf("Processing %s (%s)", $syllabus->shortname,
                     $syllabus->srs), 1);
-            if (ucla_syllabus_updated($syllabus)) {
+
+            $task = new \local_ucla_syllabus\task\ucla_syllabus_updated_task();
+            $task->set_custom_data(
+                array(
+                    'objectid' => $syllabus->id
+                )
+            );
+
+            try {
+                $task->execute();
                 $progress->output("...SUCCESS", 2);
-            } else {
+            } catch (Exception $e) {
                 $progress->output("...FAILURE!", 2);
             }
         }
