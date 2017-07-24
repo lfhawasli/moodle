@@ -227,23 +227,25 @@ class invitation_manager {
                             array('shortname' => 'tempparticipant'));
                 }
 
+                $roleexpiration = get_string('roleneverexpire_notice',
+                        'enrol_invitation');
                 // If daysexpire is set.
                 if (!empty($data->daysexpire)) {
                     $daysexpire = $data->daysexpire;
-                    $inviteurl .= "\n\n" . get_string('daysexpire_notice',
-                        'enrol_invitation', $daysexpire);
+                    $roleexpiration = get_string('daysexpire_notice',
+                            'enrol_invitation', $daysexpire);
                     $invitation->daysexpire = $daysexpire;
                 }
 
                 $messageparams->inviteurl = $inviteurl;
                 $messageparams->privacynotice = $privacynotice;
                 $messageparams->supportemail = $data->fromemail;
+                $messageparams->roleexpiration = $roleexpiration;
                 $helpurl = new moodle_url('/blocks/ucla_help/index.php', array('course' => $this->courseid));
                 $helpurl = $helpurl->out(false);
                 $messageparams->helpurl = $helpurl;
                 $message .= get_string('emailmsgtxt', 'enrol_invitation', $messageparams);
                 $htmlmessage = get_string('htmlemailmsgtxt', 'enrol_invitation', $messageparams);
-                
                 if (!$resend) {
                     $objid = $DB->insert_record('enrol_invitation', $invitation);
                     $retval = $objid;
@@ -263,7 +265,6 @@ class invitation_manager {
                 $fromuser->firstnamephonetic = '';
                 $fromuser->lastnamephonetic = '';
                 $fromuser->middlename = '';
-
                 // Send invitation to the user.
                 $contactuser = $this->get_contact_user($invitation->email);
 

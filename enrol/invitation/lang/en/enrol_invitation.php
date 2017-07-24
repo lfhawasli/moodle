@@ -31,26 +31,26 @@ $string['pluginname_desc'] = 'The site invitation module allows to send invitati
 $string['reminder'] = 'Reminder: ';
 
 $string['emailmsgtxt'] = <<<'EOD'
-INSTRUCTIONS:
+Site invitation:
 ------------------------------------------------------------
 You have been invited to access {$a->fullname}
 
-Follow the link to accept: {$a->inviteurl}{$a->privacynotice}
+Follow the link to view invitation: {$a->inviteurl}
+
+{$a->privacynotice}
 
 Please note:
   •   You must have a UCLA Logon ID to accept this invitation.
-EOD
-. <<<'EOD'
-Follow the link for more information: https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID
+      Follow the link for more information: https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID
   •   The invitation can be only used once.
-  •   It will expire on {$a->expiration}
+  •   The invitation will expire on {$a->expiration}
+  •   {$a->roleexpiration}
 
-NEED HELP?:
 ------------------------------------------------------------
 If you believe that you have received this message in error or are in need
-EOD
-. ' of assistance, please contact: {$a->supportemail} or submit a help request' .
-' at {$a->helpurl}.';
+of assistance, please contact: {$a->supportemail} or submit a help request
+ at {$a->helpurl}.
+EOD;
 
 $string['instructormsg'] = 'MESSAGE FROM INSTRUCTOR:' . "\n" .
     '------------------------------------------------------------' . "\n" .
@@ -72,22 +72,21 @@ $string['htmlemailmsgtxt'] = <<<'EOD'
             -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
             -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);">
-            I accept</a>
+            View invitation</a>
         </div>
+        {$a->privacynotice}
         <p>Please note:</p>
         <ul>
             <li> You must have a <a href="https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID"> UCLA Logon ID </a>
             to accept this invitation. </li>
             <li> The invitation can be only used once. </li>
-            <li> It will expire on {$a->expiration} </li>
+            <li> The invitation will expire on {$a->expiration} </li>
+            <li> {$a->roleexpiration}</li>
         </ul>
         <hr style="margin-top: 2%; margin-bottom: 2%">
         <p> If you believe that you have received this message in error or are in
         need of assistance, please contact <a href="mailto:{$a->supportemail}" target="_top">
-        {$a->supportemail}
-        </a>
-        or submit a help
-        request <a href="{$a->helpurl}"> here </a>. </p>
+        {$a->supportemail}</a> or submit a help request <a href="{$a->helpurl}"> here </a>. </p>
     </body>
 </html>
 EOD;
@@ -151,31 +150,25 @@ $string['maxinviteperday_help'] = 'Maximum invitation that can be send per day f
 $string['message'] = 'Message';
 
 $string['message_help_link'] = 'see what instructions invitees are sent';
-$string['message_help'] = 'INSTRUCTIONS:'.
-    '<hr />'.
-    'You have been invited to access the site: [site name]. You will ' .
-    'need to log in to CCLE with your UCLA logon in order to confirm your access ' .
-    'to the site. If you do not have a UCLA logon, please see the instructions ' .
-    'below. Be advised that by clicking on the site access link provided in this ' .
-    'email you are acknowledging that:<br />' .
-    ' --you are the person to whom this email was addressed and for whom this ' .
-    '   invitation is intended;<br />' .
-    ' --the link below can be used only one time, and will expire on ([expiration date]).<br /><br />' .
-    'ACCESS LINK:'.
-    '<hr />'.
-    '[invite url]<br /><br />'.
-    'UCLA LOGON:'.
-    '<hr />'.
-    'If you currently do not have a UCLA Logon ID, you can obtain one here:<br />' .
-    'https://logon.ucla.edu/activate.php<br />' .
-    'When asked to identify your role in the UCLA system, use the guidelines below:<br />' .
-    '* If you are not currently an enrolled student at UCLA with a 9 digit UID, select ' .
-    '"I do not have a UCLA Identification Number and I am NONE OF THE ABOVE".<br />' .
-    '* If you are a UC cross-campus visiting student, select "New UCLA Student".<br /><br />' .
-    'NEED HELP?:'.
-    '<hr />'.
-    'If you believe that you have received this message in error or are in need ' .
-    'of assistance, please contact: [sender\'s email] or submit a help request at [help block link with course id]';
+$string['message_help'] = <<<'EOD'
+Site invitation:
+<hr>
+You have been invited to access the site: [site name].
+
+Follow the link to view invitation: [invite url]
+
+Please note:
+<ul>
+    <li> You must have a <a href="https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID"> UCLA Logon ID </a>
+    to accept this invitation. </li>
+    <li> The invitation can be only used once. </li>
+    <li> The invitation will expire on [invite expiration] </li>
+</ul>
+<hr />
+If you believe that you have received this message in error or are in need of
+assistance, please contact: [sender's email] or submit a help request at
+[help block link with course id].
+EOD;
 
 $string['noinvitationinstanceset'] = 'No invitation enrollment instance has been found. Please add an invitation enroll instance to your course first.';
 $string['nopermissiontosendinvitation'] = 'No permission to send invitation';
@@ -268,6 +261,7 @@ $string['tempgroup'] = 'Temporary';
 $string['daysexpire_string'] = 'Expires {$a} days after being accepted.';
 $string['daysexpire_notice'] = 'After accepting this invitation, your access to the site will expire in {$a} days.';
 $string['err_daysexpire'] = 'Invalid choice option for days expiration.';
+$string['roleneverexpire_notice'] = 'After accpting this invitation, your access to the site will never expire.';
 
 // Strings to handle event.
 $string['eventinvitationsent'] = 'Invitation has been sent';
