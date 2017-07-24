@@ -1,5 +1,5 @@
 <?php
-// This file is part of UCLA syllabus plugin for Moodle - http://moodle.org/
+// This file is part of UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains the event class for when a syllabus is viewed.
+ * Contains the event class for when files are deleted.
  *
  * @package    local_ucla_syllabus
- * @copyright  2014 UC Regents
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,52 +27,30 @@ namespace local_ucla_syllabus\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Records when a syllabus is viewed.
+ * Records the file hash before a file is deleted from the file system.
  *
  * @package    local_ucla_syllabus
- * @copyright  2014 UC Regents
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class syllabus_viewed extends syllabus_base {
+abstract class syllabus_base extends \core\event\base {
 
     /**
-     * Creates the event.
-     */
-    protected function init() {
-        $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'ucla_syllabus';
-    }
-
-    /**
-     * Returns a short description for the event that includes the syllabus id
-     * being viewed.
-     *
-     * NOTE: Must be non-localized string.
+     * Returns the name of the event.
      *
      * @return string
      */
-    public function get_description() {
-        return "The user with id '$this->userid' viewed the syllabus with id '$this->objectid'";
+    public static function get_name() {
+        return get_string('event' . get_called_class(), 'local_ucla_syllabus');
     }
 
     /**
-     * Returns URL to the syllabus page.
+     * Returns URL to the course page.
      *
      * @return moodle_url
      */
     public function get_url() {
         return new \moodle_url('/local/ucla_syllabus/index.php',
                 array('id' => $this->courseid));
-    }
-
-    /**
-     * Add data to legacy log.
-     *
-     * @return array
-     */
-    public function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'syllabus view',
-            '../local/ucla_syllabus/index.php?id=' . $this->courseid, '');
     }
 }

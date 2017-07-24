@@ -177,4 +177,7 @@ $string['manualsuccessfulconversion'] = 'Successfully converted manual syllabus.
 
 // Strings for events.
 $string['eventcoursemoduleconverted'] = 'Converted manual syllabus';
-$string['eventsyllabusviewed'] = 'Viewed syllabus';
+$string['eventsyllabus_added'] = 'Added syllabus';
+$string['eventsyllabus_deleted'] = 'Added syllabus';
+$string['eventsyllabus_updated'] = 'Updated syllabus';
+$string['eventsyllabus_viewed'] = 'Viewed syllabus';

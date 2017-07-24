@@ -26,28 +26,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array(
-    'ucla_course_deleted' => array(
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction' => 'clear_srdb_ucla_syllabus',
-        'schedule'        => 'cron',
-        'internal'         => 0,
-    ),
-    'ucla_syllabus_added' => array (
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction'  => 'update_srdb_ucla_syllabus',
-        'schedule'         => 'cron',
-        'internal'         => 0,
-    ),
-    'ucla_syllabus_deleted' => array (
-        'handlerfile'     => '/local/ucla/eventslib.php',
-        'handlerfunction'  => 'update_srdb_ucla_syllabus',
-        'schedule'         => 'cron',
-        'internal'         => 0,
-    ),
-);
-
 $observers = array(
+    array(
+        'eventname'  => '\local_ucla_syllabus\event\syllabus_added',
+        'callback'    => 'local_ucla_observer::update_srdb_ucla_syllabus',
+    ),
+    array(
+        'eventname'  => '\local_ucla_syllabus\event\syllabus_deleted',
+        'callback'    => 'local_ucla_observer::update_srdb_ucla_syllabus',
+    ),
+    array(
+        'eventname'  => '\tool_uclacoursecreator\event\ucla_course_deleted',
+        'callback'    => 'local_ucla_observer::clear_srdb_ucla_syllabus',
+    ),
     array(
         'eventname'  => '\block_ucla_weeksdisplay\event\week_changed',
         'callback'    => 'local_ucla_observer::hide_past_courses',
