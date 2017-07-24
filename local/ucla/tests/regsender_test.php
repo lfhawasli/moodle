@@ -24,11 +24,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-// TODO: When automatic class loading is available via Moodle 2.6, we no longer
-// need to include the local_ucla_regsender class, so delete it.
-global $CFG;
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
-
 /**
  * PHPunit testcase class.
  *

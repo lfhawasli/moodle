@@ -25,8 +25,6 @@
 namespace local_ucla\task;
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
-
 /**
  * Task class.
  *
