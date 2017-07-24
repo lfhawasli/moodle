@@ -268,3 +268,34 @@ function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
     return true;
 }
 
+/**
+ * Adds a bulk download syllabi link to the course admin menu.
+ *
+ * @param navigation_node $navigation The navigation node to extend
+ * @param context $context The context of the course
+ * @return void|null return null if we don't want to display the node.
+ */
+function local_ucla_syllabus_extend_navigation_category_settings($navigation, $context) {
+    global $PAGE;
+
+    if (!has_capability('moodle/course:view', $context)) {
+        return null;
+    }
+
+    $url = new moodle_url('/local/ucla_syllabus/downloadsyllabi.php', array('id' => $context->instanceid));
+
+    // Add the "Bulk download syllabi" link.
+    $node = navigation_node::create(
+        get_string('bulkdownloadsyllabi', 'local_ucla_syllabus'),
+        $url,
+        navigation_node::NODETYPE_LEAF,
+        null, null, new pix_icon('i/restore', '')
+    );
+
+    if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
+        $node->make_active();
+    }
+
+    $navigation->add_node($node);
+}
+

@@ -189,3 +189,18 @@ $string['eventsyllabus_viewed'] = 'Viewed syllabus';
 $string['taskcourse_alert'] = 'Course alert task';
 $string['tasksyllabus_deleted'] = 'Syllabus deleted task';
 $string['tasksyllabus_updated'] = 'Syllabus updated task';
+
+// CCLE-6651 - Bulk download syllabi.
+$string['bulkdownloadsyllabi'] = 'Bulk download syllabi';
+$string['bulkdownloadsyllabiheading'] = 'Bulk download syllabi by term';
+$string['showsyllabi'] = 'Show syllabi in selected term';
+$string['downloadsyllabi'] = 'Download syllabi in selected term';
+$string['tablecolcourse'] = 'Course';
+$string['tablecolsyllabus'] = 'Syllabus';
+$string['category'] = 'Category';
+$string['selectedterm'] = 'Selected term';
+$string['numberofsyllabi'] = 'Number of syllabi';
+$string['errornosyllabi'] = 'No syllabi to download.';
+$string['errordownload'] = 'Error downloading syllabi.';
+$string['errornocourses'] = 'No courses exist in the selected term.';
+$string['progressbar'] = 'Preparing syllabus archive...';
