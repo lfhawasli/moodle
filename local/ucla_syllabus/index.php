@@ -105,6 +105,21 @@ if ($canmanagesyllabus) {
 if (!empty($USER->editing) && $canmanagesyllabus) {
     // Look for submitted data.
     $data = $syllabusform->get_data();
+
+    // If both a file was uploaded and a URL was provided, then check which
+    // radio button was last clicked to determined which syllabus to keep.
+    if (!empty($data)) {
+        if (($data->default_source === 'file' && !$data->fileurl) ||
+                ($data->default_source === 'url' && $data->fileurl)) {
+            // File radio button was selected. Clear the URL.
+            $data->syllabus_url = '';
+        } else if (($data->default_source === 'file' && $data->fileurl) ||
+                ($data->default_source === 'url' && !$data->fileurl)) {
+            // URL radio button was selected. Clear the file.
+            $data->syllabus_file = 0;
+        }
+    }
+
     // Check if we stored the data in the session (e.g. after the confirm dialog).
     if (empty($data) && isset($_SESSION['ucla_syllabus_data'])) {
         $data = $_SESSION['ucla_syllabus_data'];
