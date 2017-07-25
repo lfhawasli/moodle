@@ -509,14 +509,18 @@ function groups_get_activity_groupmode($cm, $course=null) {
  */
 function groups_print_course_menu($course, $urlroot, $return=false) {
     global $USER, $OUTPUT;
+    // START UCLA MOD: CCLE-6780 - Always display group filter in Gradebook.
+    // if (!$groupmode = $course->groupmode) {
+    //     if ($return) {
+    //         return '';
+    //     } else {
+    //        return;
+    //     }
+    // }
 
-    if (!$groupmode = $course->groupmode) {
-        if ($return) {
-            return '';
-        } else {
-            return;
-        }
-    }
+    // Get course groupmode.
+    $groupmode = $course->groupmode;
+    // END UCLA MOD: CCLE-6780
 
     $context = context_course::instance($course->id);
     $aag = has_capability('moodle/site:accessallgroups', $context);
@@ -541,9 +545,17 @@ function groups_print_course_menu($course, $urlroot, $return=false) {
 
     if ($groupmode == VISIBLEGROUPS) {
         $grouplabel = get_string('groupsvisible');
-    } else {
+    // START UCLA MOD: CCLE-6780 - Always display group filter in Gradebook.
+    // } else {
+    //     $grouplabel = get_string('groupsseparate');
+    // }
+    // Choose label for group.
+    } else if ($groupmode == SEPARATEGROUPS) {
         $grouplabel = get_string('groupsseparate');
+    } else {
+        $grouplabel = get_string('groups');
     }
+    // END UCLA MOD: CCLE-6780.
 
     if ($aag and $course->defaultgroupingid) {
         if ($grouping = groups_get_grouping($course->defaultgroupingid)) {
@@ -779,11 +791,12 @@ function groups_print_activity_menu($cm, $urlroot, $return=false, $hideallpartic
 function groups_get_course_group($course, $update=false, $allowedgroups=null) {
     global $USER, $SESSION;
 
-    if (!$groupmode = $course->groupmode) {
-        // NOGROUPS used
-        return false;
-    }
-
+    // START UCLA MOD: CCLE-6780 - Always display group filter in Gradebook.
+    // if (!$groupmode = $course->groupmode) {
+    //     // NOGROUPS used
+    //     return false;
+    // }
+    // END UCLA MOD: CCLE-6780.
     $context = context_course::instance($course->id);
     if (has_capability('moodle/site:accessallgroups', $context)) {
         $groupmode = 'aag';
