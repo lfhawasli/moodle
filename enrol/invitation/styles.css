@@ -36,3 +36,15 @@
     color: #444;
     width: 100%;
 }
+
+#fitem_id_daysexpire_string {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+#fitem_id_ifroleexpire_string {
+    margin-top: 10px;
+}
+
+#fitem_id_ifroleexpire_string .fitemtitle, #fitem_id_daysexpire_string .fitemtitle {
+    padding-top: 8px;
+}

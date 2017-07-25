@@ -174,7 +174,12 @@ class invitation_manager {
                 // Set time.
                 $timesent = time();
                 $invitation->timesent = $timesent;
-                $invitation->timeexpiration = $timesent + get_config('enrol_invitation', 'inviteexpiration');
+
+                if (!empty($data->invite_expiration_time)) {
+                    $invitation->timeexpiration = $data->invite_expiration_time;
+                } else {
+                    $invitation->timeexpiration = $timesent + get_config('enrol_invitation', 'inviteexpiration');
+                }
 
                 // Update invite to have the proper timesent/timeexpiration.
                 if ($resend) {
@@ -190,15 +195,17 @@ class invitation_manager {
                 $invitation->inviterid = $USER->id;
                 $invitation->notify_inviter = empty($data->notify_inviter) ? 0 : 1;
 
+                $messageparams = new stdClass();
+                $messageparams->instructormessage = '';
                 // Construct message: custom (if any) + template.
                 $message = '';
                 if (!empty($data->message)) {
+                    $messageparams->instructormessage = get_string('htmlinstructormsg', 'enrol_invitation', $data->message);
                     $message .= get_string('instructormsg', 'enrol_invitation',
                             $data->message);
                     $invitation->message = $data->message;
                 }
 
-                $messageparams = new stdClass();
                 $messageparams->fullname = sprintf(
                     '%s: %s', $course->shortname, $course->fullname
                 );
@@ -210,37 +217,35 @@ class invitation_manager {
 
                 // Append privacy notice, if needed.
                 $privacynotice = $this->get_project_privacy_notice($course->id);
-                if (!empty($privacynotice)) {
-                    $inviteurl .= $privacynotice;
+                if (empty($privacynotice)) {
+                    $privacynotice = '';
                 }
 
                 // Append days expired, if needed.
                 if (get_config('enrol_invitation', 'enabletempparticipant')) {
                     $tempparticipant = $DB->get_record('role',
                             array('shortname' => 'tempparticipant'));
+                }
 
-                    // If inviting a temporary role, check how many days the
-                    // role should be limited to.
-                    if ($tempparticipant->id == $invitation->roleid) {
-                        // If for some reason the daysexpire is empty, default to 3.
-                        $daysexpire = 3;
-                        if (!empty($data->daysexpire)) {
-                            $daysexpire = $data->daysexpire;
-                        }
-
-                        $inviteurl .= "\n\n" . get_string('daysexpire_notice',
-                                'enrol_invitation', $daysexpire);
-                        $invitation->daysexpire = $daysexpire;
-                    }
+                $roleexpiration = get_string('roleneverexpire_notice',
+                        'enrol_invitation');
+                // If daysexpire is set.
+                if (!empty($data->daysexpire)) {
+                    $daysexpire = $data->daysexpire;
+                    $roleexpiration = get_string('daysexpire_notice',
+                            'enrol_invitation', $daysexpire);
+                    $invitation->daysexpire = $daysexpire;
                 }
 
                 $messageparams->inviteurl = $inviteurl;
+                $messageparams->privacynotice = $privacynotice;
                 $messageparams->supportemail = $data->fromemail;
+                $messageparams->roleexpiration = $roleexpiration;
                 $helpurl = new moodle_url('/blocks/ucla_help/index.php', array('course' => $this->courseid));
                 $helpurl = $helpurl->out(false);
                 $messageparams->helpurl = $helpurl;
                 $message .= get_string('emailmsgtxt', 'enrol_invitation', $messageparams);
-
+                $htmlmessage = get_string('htmlemailmsgtxt', 'enrol_invitation', $messageparams);
                 if (!$resend) {
                     $objid = $DB->insert_record('enrol_invitation', $invitation);
                     $retval = $objid;
@@ -260,11 +265,10 @@ class invitation_manager {
                 $fromuser->firstnamephonetic = '';
                 $fromuser->lastnamephonetic = '';
                 $fromuser->middlename = '';
-
                 // Send invitation to the user.
                 $contactuser = $this->get_contact_user($invitation->email);
 
-                email_to_user($contactuser, $fromuser, $invitation->subject, $message);
+                email_to_user($contactuser, $fromuser, $invitation->subject, $message, $htmlmessage);
 
                 // Log activity after sending the email.
                 if ($resend) {
@@ -533,6 +537,7 @@ class invitation_manager {
         // Handle daysexpire by adding making the enrollment expiration be the
         // end of the day after daysexpire days.
         $timeend = 0;
+        // If role expires, otherwise daysexpire is set to NULL.
         if (!empty($invitation->daysexpire)) {
             // Get today's date as a timestamp. Ignore the current time.
             $today = strtotime(date('Y/m/d'));
@@ -543,7 +548,6 @@ class invitation_manager {
             // before midnight.
             $timeend += 86399;
         }
-
         $enrol = enrol_get_plugin('invitation');
         $enrol->enrol_user($this->enrolinstance, $USER->id,
                 $invitation->roleid, 0, $timeend);
