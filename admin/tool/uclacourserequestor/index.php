@@ -1,8 +1,27 @@
 <?php
+// This file is part of the UCLA course creator plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- *  Course Requestor
- *  This code can use some good refactoring.
- **/
+ * The course requestor. This code can use some good refactoring.
+ *
+ * @package    tool_uclacourserequestor
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 $uccdirr = '/tool/uclacoursecreator/uclacoursecreator.class.php';
@@ -19,7 +38,7 @@ require_login();
 $syscontext = context_system::instance();
 $rucr = 'tool_uclacourserequestor';
 
-// Adding 'Support Admin' capability to course requestor
+// Adding 'Support Admin' capability to course requestor.
 if (!has_capability('tool/uclacourserequestor:edit', $syscontext)) {
     print_error('accessdenied', 'admin');
 }
@@ -29,16 +48,16 @@ $selectedterm = get_term();
 
 $thisfile = $thisdir . 'index.php';
 
-// used to determine if course is already been requested
+// Used to determine if course is already been requested.
 $existingcourse = null;
 
-// used to determine if cross-listed course is already been requested
+// Used to determine if cross-listed course is already been requested.
 $existingaliascourse = null;
 
-// Damn, sorry for all the naming inconsistencies
+// Damn, sorry for all the naming inconsistencies.
 define('UCLA_CR_SUBMIT', 'submitrequests');
 
-// Initialize $PAGE
+// Initialize $PAGE.
 $PAGE->set_url($thisdir . $thisfile);
 $PAGE->set_context($syscontext);
 $PAGE->set_heading(get_string('pluginname', $rucr));
@@ -46,7 +65,7 @@ $PAGE->set_pagetype('admin-uclacourserequestor');
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->js_init_call('M.tool_uclacourserequestor.init');
 
-// Prepare and load Moodle Admin interface
+// Prepare and load Moodle Admin interface.
 admin_externalpage_setup('uclacourserequestor');
 
 $subjareas = registrar_query::run_registrar_query('cis_subjectareagetall',
@@ -54,63 +73,63 @@ $subjareas = registrar_query::run_registrar_query('cis_subjectareagetall',
 
 $prefieldsdata = get_requestor_view_fields();
 
-$top_forms = array(
+$topforms = array(
     UCLA_REQUESTOR_FETCH => array('srs', 'subjarea'),
     UCLA_REQUESTOR_VIEW => array('view', 'hidden_srs_view')
 );
 
-// merge future and existing terms
+// Merge future and existing terms.
 $terms = $prefieldsdata['term'] + get_active_terms();
 $terms = terms_arr_sort($terms, true);
 if (empty($terms)) {
     $terms[$selectedterm] = $selectedterm;
 }
 
-// This will be passed to each form
-$nv_cd = array(
+// This will be passed to each form.
+$nvcd = array(
     'subjareas' => $subjareas,
     'selterm' => $selectedterm,
     'terms' => $terms,
     'prefields' => $prefieldsdata
 );
 
-// We're going to display the forms, but later
-$cached_forms = array();
+// We're going to display the forms, but later.
+$cachedforms = array();
 
 // This is the courses we want to display.
 $requests = null;
 
-// This is to know which form type we came from :(
+// This is to know which form type we came from :(.
 $groupid = null;
 
-// This is the data that is to be displayed in the center form
+// This is the data that is to be displayed in the center form.
 $uclacrqs = null;
 
 // This is a holder that will maintain the original data
-// (for use when clicking 'checkchanges')
-$pass_uclacrqs = null;
+// (for use when clicking 'checkchanges').
+$passuclacrqs = null;
 
-// This is the global requestor previous value
+// This is the global requestor previous value.
 $requestorglobal = '';
 
-// These are the messages that are requestor errors
+// These are the messages that are requestor errors.
 $errormessages = array();
 
 // This is the field in the postdata that should represent the state of
 // data in the current database for the requestors.
 $uf = 'unchangeables';
 
-foreach ($top_forms as $gk => $group) {
+foreach ($topforms as $gk => $group) {
     foreach ($group as $form) {
         $classname = 'requestor_' . $form . '_form';
         $filename = $CFG->dirroot . $thisdir . $classname . '.php';
 
-        // OK, it appears we need all of them
+        // OK, it appears we need all of them.
         require_once($filename);
 
-        $fl = new $classname(null, $nv_cd);
+        $fl = new $classname(null, $nvcd);
 
-        $cached_forms[$gk][$form] = $fl;
+        $cachedforms[$gk][$form] = $fl;
 
         if ($requests === null && $recieved = $fl->get_data()) {
             $requests = $fl->respond($recieved);
@@ -123,10 +142,10 @@ foreach ($top_forms as $gk => $group) {
             if ($requests === false) {
                 $errormessages[] = 'registrarunavailable';
             } else {
-                // Place into our holder
+                // Place into our holder.
                 $uclacrqs = new ucla_courserequests();
                 foreach ($requests as $setid => $set) {
-                    // This may get us strangeness
+                    // This may get us strangeness.
                     $uclacrqs->add_set($set);
                 }
             }
@@ -134,10 +153,10 @@ foreach ($top_forms as $gk => $group) {
     }
 }
 
-// Special catch for our single term-srs viewer
+// Special catch for our single term-srs viewer.
 $getsrs = optional_param('srs', false, PARAM_ALPHANUM);
 if ($getsrs && $requests === null) {
-    $termsrsform = $cached_forms[UCLA_REQUESTOR_VIEW]['hidden_srs_view'];
+    $termsrsform = $cachedforms[UCLA_REQUESTOR_VIEW]['hidden_srs_view'];
     $termsrsobj = new stdClass();
     $termsrsobj->{$termsrsform->groupname} = array(
             'srs' => $getsrs,
@@ -160,7 +179,7 @@ $actionparam = optional_param('action', false, PARAM_TEXT);
 
 if ($viewformparam && $termparam && $departmentparam && $actionparam) {
     // If user clicked on a page, we need to setup data.
-    $requestorviewform = $cached_forms[UCLA_REQUESTOR_VIEW]['view'];
+    $requestorviewform = $cachedforms[UCLA_REQUESTOR_VIEW]['view'];
     $requestviewobj = new stdClass();
     $requestviewobj->{$requestorviewform->groupname} = array(
         'term' => $termparam,
@@ -175,9 +194,9 @@ if ($viewformparam && $termparam && $departmentparam && $actionparam) {
     foreach ($requests as $request) {
         $uclacrqs->add_set($request);
     }
-} else if ($cached_forms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {
+} else if ($cachedforms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {
     // User clicked on "View/Edit existing requests".
-    $viewformdata = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->get_data();
+    $viewformdata = $cachedforms[UCLA_REQUESTOR_VIEW]['view']->get_data();
     $termparam = urlencode($viewformdata->requestgroup['term']);
     $departmentparam = urlencode($viewformdata->requestgroup['department']);
     $actionparam = urlencode($viewformdata->requestgroup['action']);
@@ -185,7 +204,7 @@ if ($viewformparam && $termparam && $departmentparam && $actionparam) {
 
 // None of the forms took input, so maybe the center form?
 // In this situation, we are assuming all information is
-// logically correct but properly sanitized
+// logically correct but properly sanitized.
 $saverequeststates = false;
 
 $coursebuilder = new uclacoursecreator();
@@ -199,7 +218,7 @@ if ($requests === null) {
             $groupid = $prevs->formcontext;
         }
 
-        // Save all these requests
+        // Save all these requests.
         if (!empty($prevs->{UCLA_CR_SUBMIT})) {
             $saverequeststates = true;
         }
@@ -210,7 +229,7 @@ if ($requests === null) {
         }
         $requests = array();
         $rkeyset = array();
-        // Unchangables
+        // Unchangables.
         if (!empty($prevs->{$uf})) {
             $uclacrqs = unserialize(base64_decode($prevs->{$uf}));
             unset($prevs->{$uf});
@@ -218,7 +237,7 @@ if ($requests === null) {
             debugging('no prev data');
         }
 
-        // overwrite with Changables
+        // Overwrite with Changables.
         foreach ($prevs as $key => $prev) {
             $att = request_parse_input($key, $prev);
 
@@ -236,7 +255,7 @@ if ($requests === null) {
         }
 
         // Replace entries without a requestor contact with the value for
-        // the global requestor
+        // the global requestor.
         if (!empty($prevs->requestorglobal)) {
             $requestorglobal = $prevs->requestorglobal;
         }
@@ -248,58 +267,58 @@ if ($requests === null) {
 
             $changes[$setid] = $changeset;
 
-            // If we are crosslisting a course, make sure the srs is correct
+            // If we are crosslisting a course, make sure the srs is correct.
             if ( isset($changes[$setid]['add-crosslist']) ) {
-                $list_srs = $changes[$setid]['crosslists'];
-                $newest_srs = count($list_srs) - 1;
+                $listsrs = $changes[$setid]['crosslists'];
+                $newestsrs = count($listsrs) - 1;
                 $hc = ($uclacrqs->setindex[$setid]);
                 $hcourse = array_pop($hc);
 
                 // This assumes that crosslisting courses requires the
-                // crosslisted courses to be in the same term (quarter)
-                $crs_srs = ucla_courserequests::get_main_srs($hcourse['term'], $list_srs[$newest_srs]);
-                $changes[$setid]['crosslists'][$newest_srs] = $crs_srs;
+                // crosslisted courses to be in the same term (quarter).
+                $crssrs = ucla_courserequests::get_main_srs($hcourse['term'], $listsrs[$newestsrs]);
+                $changes[$setid]['crosslists'][$newestsrs] = $crssrs;
             }
 
         }
     }
 }
 
-// Save the requests before applying changes
+// Save the requests before applying changes.
 if ($uclacrqs !== null) {
-    $pass_uclacrqs = clone($uclacrqs);
+    $passuclacrqs = clone($uclacrqs);
 }
 
 if (!empty($changes)) {
     $changed = $uclacrqs->apply_changes($changes, $groupid);
 }
 
-// These are the options that can be applied globally
+// These are the options that can be applied globally.
 $globaloptions = array();
 
-// These are the messages that reflect positive changes
+// These are the messages that reflect positive changes.
 $changemessages = array();
 
 $processrequests = isset($uclacrqs) && !$uclacrqs->is_empty();
 
 if ($processrequests) {
-    // This is the form data before the save
+    // This is the form data before the save.
     $requestswitherrors = $uclacrqs->validate_requests($groupid);
     if ($saverequeststates) {
         $successfuls = $uclacrqs->commit();
 
-        // figure out changes that have occurred
+        // Figure out changes that have occurred.
         foreach ($requestswitherrors as $setid => $set) {
             if (isset($successfuls[$setid])) {
                 $retcode = $successfuls[$setid];
                 $strid = ucla_courserequests::commit_flag_string($retcode);
 
-                $host_course = array();
+                $hostcourse = array();
                 $coursedescs = array();
                 foreach ($set as $course) {
                     $coursedescs[] = requestor_dept_course($course);
                     if ($course['hostcourse']) {
-                        $host_course = $course;
+                        $hostcourse = $course;
                     }
                 }
 
@@ -327,20 +346,21 @@ if ($processrequests) {
                                     . requestor_dept_course($cl);
 
                                     // Update (remove) MyUCLA urls.
-                                    if ($action == 'removed' && !empty($host_course)) {
+                                    if ($action == 'removed' && !empty($hostcourse)) {
 
-                                        $idtermsrs = array(make_idnumber($host_course) =>
-                                            array('term' => $host_course['term'],
-                                                'srs' => $host_course['srs'])
+                                        $idtermsrs = array(
+                                            make_idnumber($hostcourse) => array(
+                                                'term' => $hostcourse['term'],
+                                                'srs' => $hostcourse['srs'])
                                             );
 
-                                        $url_updater = new myucla_urlupdater();
-                                        $results = $url_updater->send_MyUCLA_urls($idtermsrs, false);
-                                        $class_url = array_pop($results);
+                                        $urlupdater = new myucla_urlupdater();
+                                        $results = $urlupdater->send_MyUCLA_urls($idtermsrs, false);
+                                        $classurl = array_pop($results);
 
                                         // Check host url to make sure it is on
                                         // the same server.
-                                        if (strpos($class_url, $CFG->wwwroot) !== false) {
+                                        if (strpos($classurl, $CFG->wwwroot) !== false) {
                                             update_myucla_urls($cl['term'], $cl['srs'], '');
                                         }
                                     }
@@ -361,37 +381,37 @@ if ($processrequests) {
                 } else if ($retcode == ucla_courserequests::insertsuccess) {
                     if ( isset($changed[$setid]['crosslists']['added']) ) {
                         // Adding new crosslist courses
-                        // If we need to get the course from the registrar
-                        foreach ($changed[$setid]['crosslists']['added'] as $cross_course) {
-                            $c_term = $cross_course['term'];
-                            $c_srs = ucla_courserequests::get_main_srs($c_term, $cross_course['srs']);
+                        // If we need to get the course from the registrar.
+                        foreach ($changed[$setid]['crosslists']['added'] as $crosscourse) {
+                            $cterm = $crosscourse['term'];
+                            $csrs = ucla_courserequests::get_main_srs($cterm, $crosscourse['srs']);
 
-                            if ($cross_course['hostcourse'] == 0 && $cross_course['action'] == 'build') {
-                                crosslist_course_from_registrar($c_term, $c_srs);
+                            if ($crosscourse['hostcourse'] == 0 && $crosscourse['action'] == 'build') {
+                                crosslist_course_from_registrar($cterm, $csrs);
                             }
 
-                            // update MyUCLA urls for the newly updated crosslist
-                            if (!empty($host_course)) {
-                                $host_courseid = $host_course['courseid'];
-                                if ($host_course['nourlupdate'] == 0 && !empty($host_courseid)) {
+                            // Update MyUCLA urls for the newly updated crosslist.
+                            if (!empty($hostcourse)) {
+                                $hostcourseid = $hostcourse['courseid'];
+                                if ($hostcourse['nourlupdate'] == 0 && !empty($hostcourseid)) {
                                     if (get_config('local_ucla', 'friendly_urls_enabled')) {
-                                        $shortname = $DB->get_field('course', 'shortname', array('id' => $host_courseid));
-                                        $friendly_host_course_url = '/course/view/' . rawurlencode($shortname);
-                                        $c_url = $CFG->wwwroot . "$friendly_host_course_url";
+                                        $shortname = $DB->get_field('course', 'shortname', array('id' => $hostcourseid));
+                                        $friendlyhostcourseurl = '/course/view/' . rawurlencode($shortname);
+                                        $curl = $CFG->wwwroot . "$friendlyhostcourseurl";
                                     } else {
-                                        $c_url = $CFG->wwwroot . "/course/view.php?id=$host_courseid";
+                                        $curl = $CFG->wwwroot . "/course/view.php?id=$hostcourseid";
                                     }
-                                    update_myucla_urls($c_term, $c_srs, $c_url);
+                                    update_myucla_urls($cterm, $csrs, $curl);
                                 }
                             }
                         }
                     } else {
                         // Adding in new courses
-                        // update MyUCLA urls
-                        foreach ($set as $new_course) {
-                            if ($new_course['nourlupdate'] == 0 && !empty($new_course['courseid'])) {
-                                $new_url = $CFG->wwwroot . '/course/view.php?id=' . $new_course['courseid'];
-                                update_myucla_urls($new_course['term'], $new_course['srs'], $new_url);
+                        // update MyUCLA urls.
+                        foreach ($set as $newcourse) {
+                            if ($newcourse['nourlupdate'] == 0 && !empty($newcourse['courseid'])) {
+                                $newurl = $CFG->wwwroot . '/course/view.php?id=' . $newcourse['courseid'];
+                                update_myucla_urls($newcourse['term'], $newcourse['srs'], $newurl);
                             }
                         }
                     }
@@ -414,17 +434,17 @@ if ($processrequests) {
             $changemessages[] = get_string('nochanges', $rucr);
         }
 
-        // Apply to version that best represents the database
-        $pass_uclacrqs = clone($uclacrqs);
+        // Apply to version that best represents the database.
+        $passuclacrqs = clone($uclacrqs);
 
-        // Reloading the 3rd form
-        $nv_cd['prefields'] = get_requestor_view_fields();
-        $cached_forms[UCLA_REQUESTOR_VIEW]['view']
-            = new requestor_view_form(null, $nv_cd);
+        // Reloading the 3rd form.
+        $nvcd['prefields'] = get_requestor_view_fields();
+        $cachedforms[UCLA_REQUESTOR_VIEW]['view']
+            = new requestor_view_form(null, $nvcd);
     }
 
     // If nobody has determined which requests to display, then disply
-    // all of them
+    // all of them.
     if (!isset($requeststodisplay)) {
         $requeststodisplay = $requestswitherrors;
     }
@@ -479,7 +499,7 @@ if ($processrequests) {
                 $filters .= html_writer::tag('span',
                         html_writer::checkbox('', 'grad', true, 'grad', array('class' => 'check-all')),
                         array('class' => 'label grad'));
-                $filters .=  html_writer::tag('span',
+                $filters .= html_writer::tag('span',
                         html_writer::checkbox('', 'tut', true, 'tut', array('class' => 'check-all')),
                         array('class' => 'label tut'));
                 $globaloptions[][] = $filters;
@@ -487,11 +507,11 @@ if ($processrequests) {
         }
     }
 
-    // user wants to build courses now
+    // User wants to build courses now.
     if ($forcebuild == true) {
         $termlist = array();
         foreach ($requestswitherrors as $course) {
-            foreach($course as $value) {
+            foreach ($course as $value) {
                 if ($value['action'] == UCLA_COURSE_TOBUILD) {
                     $termlist[] = $value['term'];
                 }
@@ -499,8 +519,7 @@ if ($processrequests) {
         }
 
         $termlist = array_unique($termlist);
-        //events_trigger_legacy('build_courses_now', $termlist);
-        //creating the instance of the trigger
+        // Creating the instance of the trigger.
         $builder = new \tool_uclacoursecreator\task\build_courses_now();
         $builder->set_custom_data($termlist);
         \core\task\manager::queue_adhoc_task($builder);
@@ -528,7 +547,7 @@ if ($processrequests) {
             continue;
         }
 
-        if(!isset($rowclasses[$key]) ||
+        if (!isset($rowclasses[$key]) ||
                 !in_array($rowclasses[$key], array('warning', 'error'))) {
             // If row has an error, it will already have style set.
             $rowclasses[$key] = $data['type'];
@@ -554,34 +573,34 @@ if ($processrequests) {
     $requeststable->rowclasses = $rowclasses;
 }
 
-$registrar_link = new moodle_url(
+$registrarlink = new moodle_url(
         get_config('local_ucla', 'registrarurl')) . '/ro/public/soc';
 
-// Start rendering
+// Start rendering.
 echo $OUTPUT->header();
 echo html_writer::start_tag('div', array('id' => $rucr));
 echo $OUTPUT->heading(get_string('pluginname', $rucr), 2, 'headingblock');
 
-// generate build schedule/notice (if any)
-$build_notes = get_config($rucr, 'build_notes');
-if ($coursebuilder->lock_exists()) { // if course build is in progress, let user know
-    if (!empty($build_notes)) {
-        $build_notes .= html_writer::empty_tag('br');
+// Generate build schedule/notice (if any).
+$buildnotes = get_config($rucr, 'build_notes');
+if ($coursebuilder->lock_exists()) { // If course build is in progress, let user know.
+    if (!empty($buildnotes)) {
+        $buildnotes .= html_writer::empty_tag('br');
     }
-    $build_notes .= get_string('alreadybuild', $rucr);
+    $buildnotes .= get_string('alreadybuild', $rucr);
 } else if (course_build_queued()) {
-    if (!empty($build_notes)) {
-        $build_notes .= html_writer::empty_tag('br');
+    if (!empty($buildnotes)) {
+        $buildnotes .= html_writer::empty_tag('br');
     }
-    $build_notes .= get_string('queuebuild', $rucr);
+    $buildnotes .= get_string('queuebuild', $rucr);
 }
-if (!empty($build_notes)) {
-    $build_notice = html_writer::tag('div', $build_notes,
+if (!empty($buildnotes)) {
+    $buildnotice = html_writer::tag('div', $buildnotes,
             array('id' => 'uclacourserequestor_notice'));
-    echo $OUTPUT->notification($build_notice, 'notifymessage');
+    echo $OUTPUT->notification($buildnotice, 'notifymessage');
 }
 
-foreach ($cached_forms as $gn => $group) {
+foreach ($cachedforms as $gn => $group) {
     echo $OUTPUT->box_start('generalbox');
     echo $OUTPUT->heading(get_string($gn, $rucr), 3);
 
@@ -591,7 +610,7 @@ foreach ($cached_forms as $gn => $group) {
 
     if ('fetch' == $gn) {
         echo html_writer::link(
-            $registrar_link,
+            $registrarlink,
             get_string('srslookup', $rucr),
             array('target' => '_blank')
         );
@@ -599,7 +618,7 @@ foreach ($cached_forms as $gn => $group) {
     echo $OUTPUT->box_end();
 }
 
-// display notice to user regarding their requests
+// Display notice to user regarding their requests.
 if (!empty($changemessages)) {
     $messagestr = implode(html_writer::empty_tag('br'), $changemessages);
 
@@ -608,7 +627,7 @@ if (!empty($changemessages)) {
     }
 }
 
-// display error to user regarding their requests
+// Display error to user regarding their requests.
 if (!empty($errormessages)) {
     $sm = get_string_manager();
     $errorlist = array();
@@ -651,17 +670,17 @@ if (!empty($requeststable->data)) {
 
     echo html_writer::tag('input', '', array(
             'type' => 'hidden',
-            'value' => base64_encode(serialize($pass_uclacrqs)),
+            'value' => base64_encode(serialize($passuclacrqs)),
             'name' => $uf
         ));
 
-    // only display build now button any "View existing requests" are set  to
-    // "to be built"
+    // Only display build now button any "View existing requests" are set  to
+    // "to be built".
     $showbutton = false;
     if ('views' == $groupid) {
         foreach ($requestswitherrors as $course) {
-            foreach($course as $value) {
-                if(isset($value['action']) && $value['action'] == "build") {
+            foreach ($course as $value) {
+                if (isset($value['action']) && $value['action'] == "build") {
                     $showbutton = true;
                     break;
                 }
@@ -669,7 +688,7 @@ if (!empty($requeststable->data)) {
         }
     }
 
-    // only display built now button for non-prod environments
+    // Only display built now button for non-prod environments.
     $configprod = get_config('theme_uclashared', 'running_environment');
     if ($configprod != 'prod' && $showbutton) {
         if (!$coursebuilder->lock_exists() && !course_build_queued()) {
@@ -681,18 +700,18 @@ if (!empty($requeststable->data)) {
                 'id' => 'buildcourses'
             ));
         } else {
-            $button_status = '';
+            $buttonstatus = '';
             if ($coursebuilder->lock_exists()) {
-                $button_status = get_string('alreadybuild', $rucr);
+                $buttonstatus = get_string('alreadybuild', $rucr);
             } else if (course_build_queued()) {
-                $button_status = get_string('queuebuild', $rucr);
+                $buttonstatus = get_string('queuebuild', $rucr);
             }
 
-            // if course build is happening/queued, disable button
+            // If course build is happening/queued, disable button.
             echo html_writer::tag('input', '', array(
                 'type' => 'submit',
                 'name' => 'buildcourses',
-                'value' => $button_status,
+                'value' => $buttonstatus,
                 'class' => 'right',
                 'disabled' => true
             ));
@@ -701,14 +720,14 @@ if (!empty($requeststable->data)) {
     }
 
     // Only display paging bar for requested courses.
-    if ($viewformparam || $cached_forms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {        
+    if ($viewformparam || $cachedforms[UCLA_REQUESTOR_VIEW]['view']->is_submitted()) {
         $baseurl = new moodle_url('/admin/tool/uclacourserequestor/index.php',
                 array('requestor_view_form' => '1', 'term' => $termparam,
                       'department' => $departmentparam, 'action' => $actionparam));
-        $coursesperpage = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->coursesperpage;
-        $page = $cached_forms[UCLA_REQUESTOR_VIEW]['view']->page;
-        echo $OUTPUT->paging_bar($cached_forms[UCLA_REQUESTOR_VIEW]['view']->totalcourses,
-                $page, $coursesperpage, $baseurl);     
+        $coursesperpage = $cachedforms[UCLA_REQUESTOR_VIEW]['view']->coursesperpage;
+        $page = $cachedforms[UCLA_REQUESTOR_VIEW]['view']->page;
+        echo $OUTPUT->paging_bar($cachedforms[UCLA_REQUESTOR_VIEW]['view']->totalcourses,
+                $page, $coursesperpage, $baseurl);
     }
     echo html_writer::table($requeststable);
 
@@ -726,7 +745,7 @@ if (!empty($requeststable->data)) {
 echo html_writer::end_tag('div');
 echo $OUTPUT->footer();
 
-// script functions
+// Script functions.
 
 /**
  * Looks in the event tables and checks if a request to build courses now has

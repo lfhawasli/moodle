@@ -1,27 +1,25 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * -----------------------------------------------------------------------------
  *
- * This file is part of the Course Menu block for Moodle
- *
- * The Course Menu block for Moodle software package is Copyright 2008
- * onwards NetSapiensis AB and is provided under the terms of the GNU GENERAL 
- * PUBLIC LICENSE Version 3 (GPL). This program is free software: you can 
- * redistribute it and/or modify it under the terms of the GNU General Public 
- * License as published by the Free Software Foundation, either version 3 of 
- * the License, or (at your option) any later version.
- *
- * This program is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by the Free 
- * Software Foundation, either version 3 of the License, or (at your option) 
- * any later version. This program is distributed in the hope that it will be 
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * See the GNU General Public License for more details. You should have 
- * received a copy of the GNU General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- * -----------------------------------------------------------------------------
- **/
+ * @type @exp;M@pro;block_ucla_course_menu * @package    blocks
+ * @subpackage massaction
+ * @copyright  2011 University of Minnesota
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 M.block_ucla_course_menu = M.block_ucla_course_menu || {
     /** The number of expandable branches in existence */
@@ -43,22 +41,21 @@ M.block_ucla_course_menu = M.block_ucla_course_menu || {
      * @function
      */
     init:function(Y) {
-    	M.core_dock.init(Y);
-	    if (M.core_dock.genericblock) {
-	    	// Give the tree class the dock block properties
-	        Y.augment(M.block_ucla_course_menu.classes.tree, M.core_dock.genericblock);
-			//adjust the title to fit the content ?
-			
-	    }
+        M.core_dock.init(Y);
+        if (M.core_dock.genericblock) {
+            // Give the tree class the dock block properties.
+            Y.augment(M.block_ucla_course_menu.classes.tree, M.core_dock.genericblock);
+                // Adjust the title to fit the content?
+        }
     },
     /**
      * Add new instance of navigation tree to tree collection
      */
     init_add_tree:function(Y, id, properties) {
-    	if (properties.courselimit) {
+        if (properties.courselimit) {
             this.courselimit = properties.courselimit;
         }
-    	M.block_ucla_course_menu.treecollection[id] = new M.block_ucla_course_menu.classes.tree(Y, id, properties);
+        M.block_ucla_course_menu.treecollection[id] = new M.block_ucla_course_menu.classes.tree(Y, id, properties);
     }
 };
 
@@ -71,7 +68,7 @@ M.block_ucla_course_menu = M.block_ucla_course_menu || {
  * @param {object} properties Object containing tree properties
  */
 M.block_ucla_course_menu.classes.tree = function(Y, id, properties) {
-	this.Y = Y;
+    this.Y = Y;
     this.id = id;
     this.key = id;
     this.errorlog = [];
@@ -93,21 +90,20 @@ M.block_ucla_course_menu.classes.tree = function(Y, id, properties) {
     if (properties.candock) {
         this.candock = true;
     }
-    
-    var node = this.Y.one('#inst'+this.id);
-	
-    // Can't find the block instance within the page
+
+    var node = this.Y.one('#inst' + this.id);
+
+    // Can't find the block instance within the page.
     if (node === null) {
         return;
     }
 
-    
-    // Attach event to toggle expansion
+    // Attach event to toggle expansion.
     node.all('.tree_item.branch').on('click', this.toggleexpansion , this);
     var uri = location.href;
     var section = '';
     var sectionLinks = Y.all("a.section_link");
-    
+
     section = uri.split("#")[1];
     sectionLinks.each (function (v) {
         if(v.getAttribute("href") == "#" + section) {
@@ -130,8 +126,8 @@ M.block_ucla_course_menu.classes.tree = function(Y, id, properties) {
         if (v.getAttribute("href").indexOf("#") != -1) {
             section = v.getAttribute("href");
             Y.all(".active_tree_node").each (function (v) {
-               v.removeClass("active_tree_node");
-               v.get('parentNode').removeClass("current_branch");
+                v.removeClass("active_tree_node");
+                v.get('parentNode').removeClass("current_branch");
             });
             v.get('parentNode').addClass("active_tree_node");
             v.get('parentNode').get('parentNode').addClass("current_branch");
@@ -148,19 +144,19 @@ M.block_ucla_course_menu.classes.tree = function(Y, id, properties) {
     });
 
     // Attach events to expand by AJAX
-    //var expandablenode;
+    // var expandablenode.
     for (var i in this.expansions) {
-    	var expandablenode = Y.one('#'+this.expansions[i].id);
+        var expandablenode = Y.one('#' + this.expansions[i].id);
         if (expandablenode) {
             expandablenode.on('ajaxload|click', this.init_load_ajax, this, this.expansions[i]);
             M.block_ucla_course_menu.expandablebranchcount++;
         } else if (M.cfg.debug) {
-            Y.one(document.body).append(Y.Node.create('<div class="notification" style="font-size:6pt;">Expandable node within navigation was missing [#'+this.expansions[i].id+']</div>'));
+            Y.one(document.body).append(Y.Node.create('<div class="notification" style="font-size:6pt;">Expandable node within navigation was missing [#' + this.expansions[i].id + ']</div>'));
         } else {
-            // Failing over silently
+            // Failing over silently.
         }
     }
-    
+
     if (node.hasClass('block_js_expansion')) {
         node.on('mouseover', function(e){this.toggleClass('mouseover');}, node);
         node.on('mouseout', function(e){this.toggleClass('mouseover');}, node);
@@ -169,7 +165,7 @@ M.block_ucla_course_menu.classes.tree = function(Y, id, properties) {
 
 /**
  * Loads a branch via AJAX
- * 
+ *
  * @param {event} e The event object
  * @param {object} branch A branch to load via ajax
  */
@@ -184,11 +180,11 @@ M.block_ucla_course_menu.classes.tree.prototype.init_load_ajax = function(e, bra
     }
     var cfginstance = '', Y = this.Y;
     if (this.instance != null) {
-        cfginstance = '&instance='+this.instance
+        cfginstance = '&instance=' + this.instance
     }
-    Y.io(M.cfg.wwwroot+'/lib/ajax/getnavbranch.php', {
+    Y.io(M.cfg.wwwroot + '/lib/ajax/getnavbranch.php', {
         method:'POST',
-        data:'elementid='+branch.id+'&id='+branch.branchid+'&type='+branch.type+'&sesskey='+M.cfg.sesskey+cfginstance,
+        data:'elementid=' + branch.id + '&id=' + branch.branchid + '&type=' + branch.type + '&sesskey=' + M.cfg.sesskey + cfginstance,
         on: {
             complete:this.load_ajax,
             success:function() {Y.detach('click', this.init_load_ajax, target);}
@@ -218,9 +214,9 @@ M.block_ucla_course_menu.classes.tree.prototype.load_ajax = function(tid, outcom
             return true;
         }
     } catch (e) {
-        // If we got here then there was an error parsing the result
+        // If we got here then there was an error parsing the result.
     }
-    // The branch is empty so class it accordingly
+    // The branch is empty so class it accordingly.
     args.target.replaceClass('branch', 'emptybranch');
     return true;
 };
@@ -234,7 +230,7 @@ M.block_ucla_course_menu.classes.tree.prototype.load_ajax = function(tid, outcom
  */
 M.block_ucla_course_menu.classes.tree.prototype.add_branch = function(branchobj, target, depth) {
 
-    // Make the new branch into an object
+    // Make the new branch into an object.
     var branch = new M.block_ucla_course_menu.classes.branch(this, branchobj);
     var childrenul = false, Y = this.Y;
     if (depth === 1) {
@@ -250,22 +246,22 @@ M.block_ucla_course_menu.classes.tree.prototype.add_branch = function(branchobj,
     if (childrenul) {
         var count = 0;
         for (var i in branch.children) {
-            // Add each branch to the tree
+            // Add each branch to the tree.
             if (branch.children[i].type == 20) {
                 count++;
             }
-            if (typeof(branch.children[i])=='object') {
-                this.add_branch(branch.children[i], childrenul, depth+1);
+            if (typeof(branch.children[i]) == 'object') {
+                this.add_branch(branch.children[i], childrenul, depth + 1);
             }
         }
         if (branch.type == 10 && count >= M.block_ucla_course_menu.courselimit) {
             var properties = Array();
             properties['name'] = M.str.moodle.viewallcourses;
             properties['title'] = M.str.moodle.viewallcourses;
-            properties['link'] = M.cfg.wwwroot+'/course/category.php?id='+branch.key;
+            properties['link'] = M.cfg.wwwroot + '/course/category.php?id=' + branch.key;
             properties['haschildren'] = false;
             properties['icon'] = {'pix':"i/navigationitem",'component':'moodle'};
-            this.add_branch(properties, childrenul, depth+1);
+            this.add_branch(properties, childrenul, depth + 1);
         }
     }
     return true;
@@ -277,8 +273,8 @@ M.block_ucla_course_menu.classes.tree.prototype.add_branch = function(branchobj,
  */
 M.block_ucla_course_menu.classes.tree.prototype.toggleexpansion = function(e) {
     // First check if they managed to click on the li iteslf, then find the closest
-    // LI ancestor and use that
-	
+    // LI ancestor and use that.
+
     if (e.target.get('nodeName').toUpperCase() == 'A') {
         // A link has been clicked don't fire any more events just do the default.
         e.stopPropagation();
@@ -297,23 +293,23 @@ M.block_ucla_course_menu.classes.tree.prototype.toggleexpansion = function(e) {
     if (this.candock) {
         M.core_dock.resize();
     }
-    
+
     var act = "add";
     if (target.hasClass('collapsed')) {
-    	act = "remove";
+        act = "remove";
     }
     var elName = target.one('.item_name').get('innerHTML');
     var Y = this.Y;
     var instId = this.id;
     Y.io(M.cfg.wwwroot + '/blocks/ucla_course_menu/ajax.php', {
         method:'POST',
-        data:'element_name='+elName+'&action='+act+'&instance='+instId,
+        data:'element_name=' + elName + '&action=' + act + '&instance=' + instId,
         on: {
             success:function() {  }
         },
         context:this
     });
-    
+
 };
 
 /**
@@ -339,7 +335,7 @@ M.block_ucla_course_menu.classes.branch = function(tree, obj) {
     this.haschildren = false;
     this.children = false;
     if (obj !== null) {
-        // Construct from the provided xml
+        // Construct from the provided xml.
         this.construct_from_json(obj);
     }
 };
@@ -358,9 +354,9 @@ M.block_ucla_course_menu.classes.branch.prototype.construct_from_json = function
         this.children = [];
     }
     if (this.id && this.id.match(/^expandable_branch_\d+$/)) {
-        // Assign a new unique id for this new expandable branch
+        // Assign a new unique id for this new expandable branch.
         M.block_ucla_course_menu.expandablebranchcount++;
-        this.id = 'expandable_branch_'+M.block_ucla_course_menu.expandablebranchcount;
+        this.id = 'expandable_branch_' + M.block_ucla_course_menu.expandablebranchcount;
     }
 };
 
@@ -372,7 +368,7 @@ M.block_ucla_course_menu.classes.branch.prototype.inject_into_dom = function(ele
 
     var Y = this.tree.Y;
 
-    var isbranch = ((this.expandable !== null || this.haschildren) && this.expansionceiling===null);
+    var isbranch = ((this.expandable !== null || this.haschildren) && this.expansionceiling === null);
     var branchli = Y.Node.create('<li></li>');
     var branchp = Y.Node.create('<p class="tree_item"></p>');
 
@@ -397,7 +393,7 @@ M.block_ucla_course_menu.classes.branch.prototype.inject_into_dom = function(ele
         branchp.setAttribute('id', this.id);
     }
 
-    // Prepare the icon, should be an object representing a pix_icon
+    // Prepare the icon, should be an object representing a pix_icon.
     var branchicon = false;
     if (this.icon != null && (!isbranch || this.type == 40)) {
         branchicon = Y.Node.create('<img alt="" />');
@@ -422,7 +418,7 @@ M.block_ucla_course_menu.classes.branch.prototype.inject_into_dom = function(ele
         }
         branchp.append(this.name.replace(/\n/g, '<br />'));
     } else {
-        var branchlink = Y.Node.create('<a title="'+this.title+'" href="'+this.link+'"></a>');
+        var branchlink = Y.Node.create('<a title="' + this.title + '" href="' + this.link + '"></a>');
         if (branchicon) {
             branchlink.appendChild(branchicon);
         }
@@ -446,12 +442,10 @@ M.block_ucla_course_menu.classes.branch.prototype.inject_into_dom = function(ele
     }
 };
 
-/**
- * Causes the course menu block module to initalise the first time the module
- * is used!
- *
- * NOTE: Never convert the second argument to a function reference...
- * doing so causes scoping issues
- */
-YUI.add('block_ucla_course_menu', function(Y) { M.block_ucla_course_menu.init(Y); }, '0.0.0.1', 
+// Causes the course menu block module to initalise the first time the module
+// is used!
+// NOTE: Never convert the second argument to a function reference...
+// doing so causes scoping issues.
+
+YUI.add('block_ucla_course_menu', function(Y) { M.block_ucla_course_menu.init(Y); }, '0.0.0.1',
     M.yui.loader.modules.block_ucla_course_menu.requires);

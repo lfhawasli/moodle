@@ -24,14 +24,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Block course menu observer class.
+ *
+ * @package    block_ucla_course_menu
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_course_menu_observer {
 
     /**
      * Checks if course has a ucla_course_menu_block. If so, then it makes the
      * block have a defaultweight of -10 (move to the very first element).
-     * 
+     *
      * @param \core\event\course_created $event
-     * 
+     *
      * @return boolean
      */
     public static function move_course_menu_block_created(\core\event\course_created $event) {
@@ -58,9 +65,9 @@ class block_ucla_course_menu_observer {
     /**
      * Checks if course has a ucla_course_menu_block. If so, then it makes the
      * block have a defaultweight of -10 (move to the very first element).
-     * 
+     *
      * @param \core\event\course_restored $event
-     * 
+     *
      * @return boolean
      */
     public static function move_course_menu_block_restored(\core\event\course_restored $event) {
@@ -70,7 +77,7 @@ class block_ucla_course_menu_observer {
         if ($event->type != backup::TYPE_1COURSE) {
             return true;
         }
-        
+
         // Get course context.
         $context = context_course::instance($event->courseid);
         if (empty($context)) {

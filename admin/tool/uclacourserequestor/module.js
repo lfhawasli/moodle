@@ -27,14 +27,14 @@ M.tool_uclacourserequestor = {
                     checkbox.ancestor('tr').removeClass('checkbox-checked');
                 }
             });
-            
+
             // Style the already selected checkboxes.
             Y.all('#uclacourserequestor_requests .lastcol input[type="checkbox"]:checked').each(function(node) {
                 node.ancestor('tr').addClass('checkbox-checked');
             })
         });
-        
-        // Attach 'check-all' event to instructors
+
+        // Attach 'check-all' event to instructors.
         var checkallinstructors = Y.one('#ucrgeneraloptions .check-all-instructors');
         if (checkallinstructors) {
             checkallinstructors.on('change', function(e) {
@@ -48,15 +48,15 @@ M.tool_uclacourserequestor = {
 
         // Attach 'check all' event to ugrad, grad and tut.
         Y.all('#ucrgeneraloptions .label input[type="checkbox"]').on('change', function (e) {
-            
-            // Get the type: ugrad, grad, tut
+
+            // Get the type: ugrad, grad, tut.
             var type = e.target.ancestor('span').getAttribute('class');
             type = type.replace(/label /g, "");
 
-            // Select all checboxes of type
+            // Select all checboxes of type.
             var myTypeCheckboxes = Y.all('#uclacourserequestor_requests td.lastcol.' + type + ' input[type="checkbox"]');
 
-            // If user checked, then 'check' all checkboxes of type
+            // If user checked, then 'check' all checkboxes of type.
             if (e.target.get('checked')) {
 
                 myTypeCheckboxes.each(function (node) {
@@ -81,7 +81,7 @@ M.tool_uclacourserequestor = {
             var index = e.target.get('selectedIndex');
             var term = e.target.get('options').item(index).getAttribute('value');
             var url = window.location.href;
-            
+
             // Check to see if the URL has the '?' necessary
             // to include params. If so, we append a '?' and parse
             // the URL appropriately.

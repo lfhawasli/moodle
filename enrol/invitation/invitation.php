@@ -51,6 +51,9 @@ $pagetitle = get_string('inviteusers', 'enrol_invitation');
 $PAGE->set_heading($pagetitle);
 $PAGE->set_title($pagetitle);
 $PAGE->navbar->add($pagetitle);
+$jspath = '/enrol/invitation/';
+$PAGE->requires->jquery();
+$PAGE->requires->js($jspath . 'invitation_form.js');
 
 echo $OUTPUT->header();
 

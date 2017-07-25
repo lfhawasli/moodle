@@ -17,7 +17,7 @@
 /**
  * Tests the UCLA course requestor lib file.
  *
- * @package    tool_uclacoursrequestor
+ * @package    tool_uclacourserequestor
  * @category   test
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,8 +31,6 @@ require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uclacourserequestor/lib.php');
  *
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @group ucla
- * @group tool_uclacoursrequestor
  */
 class lib_test extends advanced_testcase {
 

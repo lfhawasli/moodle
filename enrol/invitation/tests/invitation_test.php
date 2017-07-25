@@ -188,7 +188,7 @@ class invitation_manager_testcase extends advanced_testcase {
         $messages = $sink->get_messages();
         $warningtext = "Please be aware that if you accept this invitation your profile information"
                 . " will be available to the other members of this project.";
-        $timeexpire = time() + get_config('enrol_invitation', 'inviteexpiration');
+        $timeexpire = $data->invite_expiration_time;
         $timeexpire = date('M j, Y g:ia', $timeexpire);
         $expiretext = 'and will expire on (' . $timeexpire . ')';
         foreach ($messages as $message) {
@@ -350,7 +350,7 @@ class invitation_manager_testcase extends advanced_testcase {
         $data->fromemail = $this->testinviter->email;
         $data->role_group['roleid'] = $DB->get_field('role', 'id', array('shortname' => 'student'));
         $data->subject = 'Test invite';
-
+        $data->invite_expiration_time = time() + get_config('enrol_invitation', 'inviteexpiration');
         return $data;
     }
 

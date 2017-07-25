@@ -104,21 +104,35 @@ class invitation_form extends moodleform {
 
             $rolegroup[] = &$mform->createElement('radio', 'roleid', '',
                     $rolestring, $role->id);
-
-            // Create dropdown for choosing day expiration.
-            $daysexpiredropdown = &$mform->createElement('select',
-                    'daysexpire', '', self::$daysexpireoptions);
-            $daysexpirestring = html_writer::tag('span',
-                    get_string('daysexpire_string', 'enrol_invitation',
-                            $daysexpiredropdown->toHtml()),
-                    array('class' => 'well well-sm daysexpire_string'));
-            $rolegroup[] = &$mform->createElement('static',
-                    'daysexpire_string', '', $daysexpirestring);
         }
 
         $mform->addGroup($rolegroup, 'role_group', $label);
         $mform->addRule('role_group',
                 get_string('norole', 'enrol_invitation'), 'required');
+
+        // The title "Add restrictions?".
+        $mform->addElement('header', 'addrestriction', get_string('addrestriction', 'enrol_invitation'));
+
+        // Add option for invite expiration.
+        $mform->addElement('date_time_selector', 'invite_expiration_time', get_string('invite_expiration', 'enrol_invitation'));
+        $mform->setDefault('invite_expiration_time', time() + get_config('enrol_invitation', 'inviteexpiration'));
+
+        // Add option for role expiration.
+        $ifroleexpires = array(0 => get_string('never_expire', 'enrol_invitation'),
+            1 => get_string('expires_after_certain_days', 'enrol_invitation'));
+        // Create dropdown for choosing wether to set an expiration date.
+        $ifroleexpiredropdown = &$mform->createElement('select',
+                'ifroleexpires', '', $ifroleexpires);
+        $ifroleexpirestring = html_writer::tag('span', $ifroleexpiredropdown->toHtml(), array('class' => 'ifroleexpire_string'));
+        $mform->addElement('static', 'ifroleexpire_string', get_string('role_expiration', 'enrol_invitation'), $ifroleexpirestring);
+        // Create dropdown for choosing day expiration.
+        $daysexpiredropdown = &$mform->createElement('select',
+                'daysexpire', '', self::$daysexpireoptions);
+        $daysexpirestring = html_writer::tag('span',
+                get_string('daysexpire_string', 'enrol_invitation',
+                        $daysexpiredropdown->toHtml()),
+                array('class' => 'daysexpire_string'));
+        $mform->addElement('static', 'daysexpire_string', get_string('role_expiration', 'enrol_invitation'), $daysexpirestring);
 
         $mform->addElement('header', 'header_email', get_string('header_email', 'enrol_invitation'));
         // Email from field.
@@ -190,7 +204,6 @@ class invitation_form extends moodleform {
                 $retval->daysexpire = $_POST['daysexpire'];
             }
         }
-
         return $retval;
     }
 

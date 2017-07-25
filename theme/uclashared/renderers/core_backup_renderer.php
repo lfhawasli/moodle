@@ -141,8 +141,10 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
             if ($wholecourse) {
                 $html .= $this->backup_detail_input(get_string('restoretoexistingcourseadding', 'backup'),
                         'radio', 'target', backup::TARGET_EXISTING_ADDING, array('checked' => 'checked'));
-                $html .= $this->backup_detail_input(get_string('restoretoexistingcoursedeleting', 'backup'),
-                        'radio', 'target', backup::TARGET_EXISTING_DELETING);
+                if (has_capability('local/ucla:deletecoursecontentsandrestore', context_system::instance())) {
+                    $html .= $this->backup_detail_input(get_string('restoretoexistingcoursedeleting', 'backup'),
+                            'radio', 'target', backup::TARGET_EXISTING_DELETING);
+                }
                 $html .= $this->backup_detail_pair(get_string('selectacourse', 'backup'), $this->render($courses));
             } else {
                 // We only allow restore adding to existing for now. Enforce it here.

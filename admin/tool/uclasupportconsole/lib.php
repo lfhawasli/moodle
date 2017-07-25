@@ -262,6 +262,9 @@ function supportconsole_render_section_shortcut($title, $data,
         $pretext = get_string('noresults', 'tool_uclasupportconsole');
     } else if ($size == 1) {
         $pretext = get_string('oneresult', 'tool_uclasupportconsole');
+    } else if (isset($inputs['totalcount']) && $inputs['totalcount'] > $size) {
+        $pretext = get_string('paginatedxresults', 'tool_uclasupportconsole',
+            array('pagecount' => $size, 'totalcount' => $inputs['totalcount']));
     } else {
         $pretext = get_string('xresults', 'tool_uclasupportconsole', $size);
     }

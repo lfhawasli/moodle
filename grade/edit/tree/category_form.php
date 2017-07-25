@@ -228,7 +228,10 @@ class edit_category_form extends moodleform {
         $mform->addElement('checkbox', 'grade_item_hidden', get_string('hidden', 'grades'));
         $mform->addHelpButton('grade_item_hidden', 'hidden', 'grades');
         $mform->addElement('date_time_selector', 'grade_item_hiddenuntil', get_string('hiddenuntil', 'grades'), array('optional'=>true));
-        $mform->disabledIf('grade_item_hidden', 'grade_item_hiddenuntil[off]', 'notchecked');
+        // START UCLA MOD: CCLE-6741 - Disable Hidden if HiddenUntil is enabled
+        // $mform->disabledIf('grade_item_hidden', 'grade_item_hiddenuntil[off]', 'notchecked');
+        $mform->disabledIf('grade_item_hidden', 'grade_item_hiddenuntil[enabled]', 'checked');
+        // END UCLA MOD: CCLE-6741
 
         /// locking
         $mform->addElement('checkbox', 'grade_item_locked', get_string('locked', 'grades'));

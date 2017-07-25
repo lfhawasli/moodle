@@ -182,7 +182,10 @@ class edit_item_form extends moodleform {
             // advcheckbox is not compatible with disabledIf!
             $mform->addElement('checkbox', 'hidden', get_string('hidden', 'grades'));
             $mform->addElement('date_time_selector', 'hiddenuntil', get_string('hiddenuntil', 'grades'), array('optional'=>true));
-            $mform->disabledIf('hidden', 'hiddenuntil[off]', 'notchecked');
+            // START UCLA MOD: CCLE-6741 - Disable Hidden if HiddenUntil is enabled
+            // $mform->disabledIf('hidden', 'hiddenuntil[off]', 'notchecked');
+            $mform->disabledIf('hidden', 'hiddenuntil[enabled]', 'checked');
+            // END UCLA MOD: CCLE-6741
         } else {
             $mform->addElement('static', 'hidden', get_string('hidden', 'grades'),
                     get_string('componentcontrolsvisibility', 'grades'));

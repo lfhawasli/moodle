@@ -24,11 +24,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-// TODO: When automatic class loading is available via Moodle 2.6, we no longer
-// need to include the local_ucla_regsender class, so delete it.
-global $CFG;
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
-
 /**
  * PHPunit testcase class.
  *
@@ -58,7 +53,7 @@ class regsender_test extends advanced_testcase {
      *
      * @var local_ucla_regsender
      */
-    private $_local_ucla_regsender = null;
+    private $_localuclaregsender = null;
 
     /**
      * Deletes the manually created 'ucla_syllabus_test' table.
@@ -186,16 +181,9 @@ class regsender_test extends advanced_testcase {
      * @param boolean $isclear  If true, will assert that queue is clear.
      *                          If false, will assert otherwise.
      */
-    private function is_event_queue_clear($isclear) {
+    private function is_adhoc_queue_clear($isclear) {
         global $DB;
-        // Make sure there are events in the queue.
-        $eventsql = "SELECT  qh.*
-                FROM    {events_queue_handlers} qh
-                JOIN    {events_handlers} h ON (qh.handlerid = h.id)
-                WHERE   (h.eventname=? OR h.eventname=?)";
-        $eventparams = array('ucla_syllabus_added', 'ucla_syllabus_deleted');
-        $existingevents = $DB->record_exists_sql($eventsql, $eventparams);
-
+        $existingevents = $DB->record_exists('task_adhoc', array());
         if ($isclear) {
             $this->assertFalse($existingevents);
         } else {
@@ -241,7 +229,7 @@ class regsender_test extends advanced_testcase {
     }
 
     /**
-     * Cleares the 'ucla_syllabus_test' table.
+     * Clears the 'ucla_syllabus_test' table.
      */
     protected function reset_reg_database() {
         global $DB;
@@ -265,7 +253,7 @@ class regsender_test extends advanced_testcase {
         $classinfos = ucla_get_course_info($this->_class->courseid);
         $this->_classinfo = array_pop($classinfos);
 
-        $this->_local_ucla_regsender = new local_ucla_regsender();
+        $this->_localuclaregsender = new local_ucla_regsender();
     }
 
     /**
@@ -273,9 +261,9 @@ class regsender_test extends advanced_testcase {
      */
     public function tearDown() {
         $this->cleanup_reg_database();
-        $this->_local_ucla_regsender->close_regconnection();
+        $this->_localuclaregsender->close_regconnection();
         unset($this->_class);
-        unset($this->_local_ucla_regsender);
+        unset($this->_localuclaregsender);
     }
 
     /**
@@ -296,15 +284,40 @@ class regsender_test extends advanced_testcase {
         $syllabus = $this->getDataGenerator()->get_plugin_generator('local_ucla_syllabus')->create_instance($syllabus);
 
         // Trigger event and make sure nothing remains in queue.
-        events_cron('ucla_syllabus_added');
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
-        $this->is_event_queue_clear(true);
-
+        $this->process_adhoc_tasks();
+        $this->is_adhoc_queue_clear(true);
         // Delete course and make sure that event queue is clear.
         delete_course($collab->id);
-        events_cron('ucla_syllabus_deleted');
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
-        $this->is_event_queue_clear(true);
+
+        $this->process_adhoc_tasks();
+        $this->is_adhoc_queue_clear(true);
+    }
+
+    /**
+     * Processes all adhoc tasks in queue.
+     *
+     * @throws coding_exception
+     */
+    public function process_adhoc_tasks() {
+        global $DB;
+        // Run all adhoc tasks.
+        $timenow = time();
+        while (!\core\task\manager::static_caches_cleared_since($timenow) &&
+                $task = \core\task\manager::get_next_adhoc_task($timenow)) {
+            try {
+                $result = $task->execute();
+                if ($DB->is_transaction_started()) {
+                    throw new coding_exception("Task left transaction open");
+                }
+                \core\task\manager::adhoc_task_complete($task);
+            } catch (Exception $e) {
+                if ($DB && $DB->is_transaction_started()) {
+                    $DB->force_transaction_rollback();
+                }
+                \core\task\manager::adhoc_task_failed($task);
+            }
+            unset($task);
+        }
     }
 
     /**
@@ -315,7 +328,7 @@ class regsender_test extends advanced_testcase {
         $this->setAdminUser();
 
         // Empty data should return nothing.
-        $results = $this->_local_ucla_regsender->get_recent_syllabus_links();
+        $results = $this->_localuclaregsender->get_recent_syllabus_links();
         $this->assertEquals(0, count($results));
 
         // Create 5 courses with syllabi.
@@ -332,23 +345,22 @@ class regsender_test extends advanced_testcase {
         }
 
         // Sending syllabi links is done via cron, so need to trigger that.
-        events_cron('ucla_syllabus_added');
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
+        $this->process_adhoc_tasks();
 
         // Now Registrar table should have all syllabi links, lets get the most
         // recent ones.
-        $results = $this->_local_ucla_regsender->get_recent_syllabus_links();
+        $results = $this->_localuclaregsender->get_recent_syllabus_links();
         $this->assertEquals($numcourses, count($results));
 
-        $results = $this->_local_ucla_regsender->get_recent_syllabus_links($numcourses);
+        $results = $this->_localuclaregsender->get_recent_syllabus_links($numcourses);
         $this->assertEquals($numcourses, count($results));
 
         $lesser = $numcourses - rand(1, $numcourses - 1);
-        $results = $this->_local_ucla_regsender->get_recent_syllabus_links($lesser);
+        $results = $this->_localuclaregsender->get_recent_syllabus_links($lesser);
         $this->assertEquals($lesser, count($results));
 
         // Test if set invalid number to method.
-        $results = $this->_local_ucla_regsender->get_recent_syllabus_links(-1);
+        $results = $this->_localuclaregsender->get_recent_syllabus_links(-1);
         $this->assertEquals($numcourses, count($results));
     }
 
@@ -358,7 +370,7 @@ class regsender_test extends advanced_testcase {
      */
     public function test_get_syllabus_links_empty() {
         // No data in syllabus table. Should return nothing for given term/srs.
-        $result = $this->_local_ucla_regsender->get_syllabus_links($this->_class->courseid);
+        $result = $this->_localuclaregsender->get_syllabus_links($this->_class->courseid);
         $this->assertEmpty($result[$this->_class->term][$this->_class->srs]);
     }
 
@@ -375,12 +387,12 @@ class regsender_test extends advanced_testcase {
         $courseid = $this->_class->courseid;
 
         // Call setter.
-        $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+        $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                 $links);
         $this->assertEquals(local_ucla_regsender::SUCCESS, $result);
 
         // Make sure the getter matches the input.
-        $results = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $results = $this->_localuclaregsender->get_syllabus_links($courseid);
 
         foreach ($links as $type => $link) {
             $this->assertEquals($results[$this->_class->term]
@@ -401,7 +413,7 @@ class regsender_test extends advanced_testcase {
 
         // First set public link.
         $links['public'] = $courselink;
-        $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+        $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                 $links);
         $this->assertEquals($result, local_ucla_regsender::SUCCESS);
 
@@ -409,12 +421,11 @@ class regsender_test extends advanced_testcase {
         $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
         $anothercourse = $uclagen->create_class(array(array('term' => $this->_class->term)));
         $uclagen->crosslist_courses($this->_class, $anothercourse);
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
 
         // Now set same link and should return a partial update return code,
         // because the newly crosslisted course did not have the link, but the
         // original course did.
-        $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+        $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                 $links);
         $this->assertEquals($result, local_ucla_regsender::PARTIALUPDATE);
     }
@@ -441,27 +452,27 @@ class regsender_test extends advanced_testcase {
          */
         foreach (local_ucla_regsender::$syllabustypes as $type) {
             // First set link to be same server.
-            $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+            $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                     array($type => $sitelink));
             $this->assertEquals($result, local_ucla_regsender::SUCCESS);
 
             // Then change link, but still on same server.
-            $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+            $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                     array($type => $courselink));
             $this->assertEquals($result, local_ucla_regsender::SUCCESS);
 
             // Update link again using the same value as before, should be no
             // update.
-            $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+            $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                     array($type => $courselink));
             $this->assertEquals($result, local_ucla_regsender::NOUPDATE);
 
             // Now  change link at Registrar to be a different server.
             // Subsequent updates will be skipped.
-            $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+            $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                     array($type => 'http://ucla.edu'));
             $this->assertEquals($result, local_ucla_regsender::SUCCESS);
-            $result = $this->_local_ucla_regsender->set_syllabus_links($courseid,
+            $result = $this->_localuclaregsender->set_syllabus_links($courseid,
                     array($type => $courselink));
             $this->assertEquals($result, local_ucla_regsender::NOUPDATE);
         }
@@ -487,12 +498,11 @@ class regsender_test extends advanced_testcase {
         $syllabus = $syllabusgen->create_instance($syllabus);
 
         // Sending syllabi links is done via cron, so need to trigger that.
-        events_cron('ucla_syllabus_added');
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
+        $this->process_adhoc_tasks();
 
         // This should have triggered an event and the Registrar table should
         // now have a record.
-        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $links = $this->_localuclaregsender->get_syllabus_links($courseid);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
@@ -501,9 +511,9 @@ class regsender_test extends advanced_testcase {
         // an delete and add event.
         $syllabusmanager->convert_syllabus($syllabus,
                 UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE);
-        events_cron('ucla_syllabus_deleted');
-        events_cron('ucla_syllabus_added');
-        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $this->process_adhoc_tasks();
+
+        $links = $this->_localuclaregsender->get_syllabus_links($courseid);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
@@ -518,33 +528,33 @@ class regsender_test extends advanced_testcase {
         $publicyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
         $syllabusmanager->delete_syllabus($publicyllabus);
         // Make sure there are events in the queue.
-        $this->is_event_queue_clear(false);
-        events_cron('ucla_syllabus_added');
-        events_cron('ucla_syllabus_deleted');
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
+        $this->is_adhoc_queue_clear(false);
+        $this->process_adhoc_tasks();
+
         // Make sure there are no more events in the queue.
-        $this->is_event_queue_clear(true);
+        $this->is_adhoc_queue_clear(true);
 
         // Now add a syllabus that requires someone to login to view.
         $syllabus = new stdClass();
         $syllabus->courseid = $courseid;
         $syllabus->access_type = UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN;
         $syllabus = $syllabusgen->create_instance($syllabus);
-        events_cron('ucla_syllabus_added');
-        $links = $this->_local_ucla_regsender->get_syllabus_links($courseid);
+        $this->process_adhoc_tasks();
+
+        $links = $this->_localuclaregsender->get_syllabus_links($courseid);
         $this->assertEmpty($links[$this->_class->term][$this->_class->srs]['public_syllabus_url']);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['private_syllabus_url']);
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
 
         // Delete course and make sure that syllabi are wiped out.
         delete_course($courseid);
-        events_cron('ucla_course_deleted');
-        events_cron('ucla_syllabus_deleted');
-        $this->resetDebugging();    // Ignore Event 1 API warnings.
+        $this->process_adhoc_tasks();
+
         // Make sure there are no more events in the queue.
-        $this->is_event_queue_clear(true);
+        $this->is_adhoc_queue_clear(true);
+
         // Need to get syllabi links via classinfo, because course is deleted.
-        $links = $this->_local_ucla_regsender->get_syllabus_link(
+        $links = $this->_localuclaregsender->get_syllabus_link(
                 $this->_classinfo->term, $this->_classinfo->subj_area,
                 $this->_classinfo->crsidx, $this->_classinfo->classidx);
         $this->assertNotEmpty($links);

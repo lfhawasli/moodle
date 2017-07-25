@@ -16,7 +16,7 @@
 
 /**
  * Command line script.
- * 
+ *
  * Bulk process and update syllabi links for a given course or term.
  *
  * @package    local_ucla
@@ -28,7 +28,6 @@ define('CLI_SCRIPT', true);
 
 require(__DIR__.'/../../../config.php');
 require_once("$CFG->libdir/clilib.php");
-require_once("$CFG->dirroot/local/ucla/classes/local_ucla_regsender.php");
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(array('help' => false), array('h' => 'help'));

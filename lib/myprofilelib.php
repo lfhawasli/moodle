@@ -46,7 +46,10 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     $contactcategory = new core_user\output\myprofile\category('contact', get_string('userdetails'));
     // No after property specified intentionally. It is a hack to make administration block appear towards the end. Refer MDL-49928.
     $coursedetailscategory = new core_user\output\myprofile\category('coursedetails', get_string('coursedetails'));
-    $miscategory = new core_user\output\myprofile\category('miscellaneous', get_string('miscellaneous'), 'coursedetails');
+    // START UCLA MOD: CCLE-6760 - Rename Miscellaneous to Site Activity
+    // $miscategory = new core_user\output\myprofile\category('miscellaneous', get_string('miscellaneous'), 'coursedetails');
+    $miscategory = new core_user\output\myprofile\category('miscellaneous', get_string('siteactivity', 'local_ucla'), 'coursedetails');
+    // START UCLA MOD: CCLE-6760
     $reportcategory = new core_user\output\myprofile\category('reports', get_string('reports'), 'miscellaneous');
     $admincategory = new core_user\output\myprofile\category('administration', get_string('administration'), 'reports');
     $loginactivitycategory = new core_user\output\myprofile\category('loginactivity', get_string('loginactivity'), 'administration');

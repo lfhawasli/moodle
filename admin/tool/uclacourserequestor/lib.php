@@ -1,27 +1,44 @@
 <?php
+// This file is part of the UCLA course creator plugin for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  A library of functions useful for course requestor and probably
- *  course creator.
- *  @author Yangmun Choi
- **/
+ * A library of functions useful for course requestor and probably course creator.
+ *
+ * @author     Yangmun Choi
+ * @package    tool_uclacourserequestor
+ * @copyright  2011 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
 // These are the requestor flags used.
-// This means to build
+// This means to build.
 define('UCLA_COURSE_TOBUILD', 'build');
-// This means that stuff is done
+// This means that stuff is done.
 define('UCLA_COURSE_BUILT', 'built');
-// This means that hopefully things are working
+// This means that hopefully things are working.
 define('UCLA_COURSE_LOCKED', 'running');
-// This means request failed tobe built
+// This means request failed tobe built.
 define('UCLA_COURSE_FAILED', 'failed');
 
-// This means to skip validation for this course
+// This means to skip validation for this course.
 define('UCLA_REQUEST_IGNORE', 'ignore');
 
-// Meta Error
+// Meta Error.
 define('UCLA_REQUESTOR_ERROR', 'error');
 define('UCLA_REQUESTOR_WARNING', 'warning');
 define('UCLA_REQUESTOR_KEEP', 'keepintable');
@@ -29,7 +46,7 @@ define('UCLA_REQUESTOR_PASTTERM_ALERT', 'pasttermalert');
 
 define('UCLA_REQUEST_WARNING_CHECKED', 'warning-checked');
 
-// Errors
+// Errors.
 define('UCLA_REQUESTOR_EXIST', 'alreadysubmitted');
 define('UCLA_REQUESTOR_BADCL', 'illegalcrosslist');
 define('UCLA_REQUESTOR_GHOST', 'ghostcoursecreated');
@@ -44,14 +61,18 @@ define('UCLA_REQUESTOR_VIEW', 'views');
 $uclalib = $CFG->dirroot . '/local/ucla/lib.php';
 require_once($uclalib);
 
-require_once($CFG->dirroot . '/' . $CFG->admin 
+require_once($CFG->dirroot . '/' . $CFG->admin
     . '/tool/uclacourserequestor/ucla_courserequests.class.php');
 
 require_once($CFG->dirroot . '/admin/tool/myucla_url/myucla_urlupdater.class.php');
 
 /**
- *  Fetches a single course from the request table.
- **/
+ * Fetches a single course from the request table.
+ *
+ * @param string $term
+ * @param string $srs
+ * $return array|boolean false
+ */
 function get_course_request($term, $srs) {
     if (empty($term) || empty($srs)) {
         return false;
@@ -69,21 +90,21 @@ function get_course_request($term, $srs) {
 }
 
 /**
- *  Fetches requests either by term or by term-srs.
- *  You can currently only fetch by host requests.
- *  @param $inputs
+ * Fetches requests either by term or by term-srs,
+ * you can currently only fetch by host requests.
+ * @param array $inputs
  *      This can either be:
- *          Array of terms 
+ *          Array of terms
  *              OR
  *          Array of Array('term' => term, 'srs' => srs)
- *  @return 
+ * @return array
  *      Array(
  *          term-srs => Array(
  *              request-fields
  *          ),
  *          ...
  *      )
- **/
+ */
 function get_course_requests($inputs=array()) {
     global $DB;
 
@@ -94,37 +115,37 @@ function get_course_requests($inputs=array()) {
     $where = '';
     $params = array();
 
-    // Build parameters and SQL
+    // Build parameters and SQL.
     if (!empty($inputs)) {
-        $first_one = reset($inputs);
-        if (!is_array($first_one)) {
-            // This means a set of terms
+        $firstone = reset($inputs);
+        if (!is_array($firstone)) {
+            // This means a set of terms.
             $sql = '';
             list($sql, $params)  = $DB->get_in_or_equal($inputs);
-            $where = '`term` ' . $sql;
+            $where = 'term ' . $sql;
 
             $clwhere = $where;
             $clparams = $params;
         } else {
-            // This means a set of term-srs
+            // This means a set of term-srs.
             $wheres = array();
             $clwheres = array();
 
             foreach ($inputs as $termsrs) {
                 $term = $termsrs['term'];
                 $srs = $termsrs['srs'];
-                
+
                 $params[] = $term;
                 $params[] = $srs;
 
-                $wheres[] = '`term` = ? AND `srs` = ?';
+                $wheres[] = 'term = ? AND srs = ?';
             }
 
             $where = implode(' OR ', $wheres);
         }
     }
 
-    // Fetch none of them (on the safe side)
+    // Fetch none of them (on the safe side).
     if (empty($params)) {
         debugging('get_course_request() could not figure out params!');
         return array();
@@ -144,12 +165,15 @@ function get_course_requests($inputs=array()) {
 }
 
 /**
- *  Fetches a set of requests from the db.
- **/
+ * Fetches a set of requests from the db.
+ *
+ * @param string $setid
+ * @return array
+ */
 function get_set($setid) {
     global $DB;
 
-    $set = $DB->get_records('ucla_request_classes', 
+    $set = $DB->get_records('ucla_request_classes',
         array('setid' => $setid));
 
     if (!$set) {
@@ -166,19 +190,28 @@ function get_set($setid) {
 }
 
 /**
- *  Wrapper function for set_field
- **/
+ * Wrapper function for set_field.
+ *
+ * @param string $setid
+ * @param string $courseid
+ * @return array
+ */
 function associate_set_to_course($setid, $courseid) {
     global $DB;
 
-    return $DB->set_field('ucla_request_classes', 'courseid', 
+    return $DB->set_field('ucla_request_classes', 'courseid',
         $courseid, array('setid' => $setid));
 }
 
 
-/** 
- *  Convenience function to apply a change to a set in memory.
- **/
+/**
+ * Convenience function to apply a change to a set in memory.
+ *
+ * @param object $set
+ * @param string $field
+ * @param string $val
+ * @return object
+ */
 function apply_to_set($set, $field, $val) {
     if (empty($set)) {
         return false;
@@ -196,14 +229,14 @@ function apply_to_set($set, $field, $val) {
 }
 
 /**
- *  Inflates up the instructors.
- *  @param  $r  Array|Object
- *  @return Array(
- *      ... ,
- *      'instructor' => Array('instructors'),
- *      ... 
- *  )
- *
+ * Inflates up the instructors.
+ * @param  array|object $r
+ * @return array
+ *     Array(
+ *     ... ,
+ *     'instructor' => Array('instructors'),
+ *     ...
+ *     )
  **/
 function prep_request_from_db($r) {
     if (is_object($r)) {
@@ -221,7 +254,7 @@ function prep_request_from_db($r) {
                 $instarr[$tinst] = $tinst;
             }
         }
-        
+
         $r[$f] = $instarr;
     }
 
@@ -229,13 +262,13 @@ function prep_request_from_db($r) {
 }
 
 /**
- *  Fills in instructor information from the Registrar, then preps each entry
- *      to be inserted into the DB.
- *  
- *  @param  $courses    None of these courses should be in the request tables,
- *              but they should be direct from Registrar.
- *  @return Array()     Representing ucla_request_classes row.
- **/
+ * Fills in instructor information from the Registrar, then preps each entry
+ *     to be inserted into the DB.
+ *
+ * @param  array $courses    None of these courses should be in the request tables,
+ *             but they should be direct from Registrar.
+ * @return array     Representing ucla_request_classes row.
+ */
 function registrar_to_requests($courses) {
     $infos = array();
 
@@ -255,7 +288,7 @@ function registrar_to_requests($courses) {
         $srs = $course['srs'];
 
         $k = make_idnumber($course);
-        
+
         $instrs = get_instructor_info_from_registrar($term, $srs);
         $returninfos[] = prep_registrar_entry($course, $instrs, $defaults);
     }
@@ -264,9 +297,13 @@ function registrar_to_requests($courses) {
 }
 
 /**
- *  Convenience function returns either the request info from the local DB
- *  or automatically queries the Registrar.
- **/
+ * Convenience function returns either the request info from the local DB
+ * or automatically queries the Registrar.
+ *
+ * @param string $term
+ * @param string $srs
+ * @return array|boolean false
+ */
 function get_request_info($term, $srs) {
     $exists = get_course_request($term, $srs);
 
@@ -274,7 +311,7 @@ function get_request_info($term, $srs) {
         return $exists;
     }
 
-    // This is very expensive
+    // This is very expensive.
     $reted = get_course_info_from_registrar($term, $srs);
 
     $ret = false;
@@ -289,9 +326,11 @@ function get_request_info($term, $srs) {
 }
 
 /**
- *  Wastes clock cycles and returns the crosslist checking mechanism.
- *  Takes about 0.25 seconds.
- **/
+ * Wastes clock cycles and returns the crosslist checking mechanism. Takes about 0.25 seconds.
+ *
+ * @param string $term
+ * @param string $srs
+ */
 function get_crosslisted_courses($term, $srs) {
     global $CFG;
 
@@ -308,7 +347,7 @@ function get_crosslisted_courses($term, $srs) {
 
     $exts = false;
 
-    // Extract out Array('term' => , 'srs' => )
+    // Extract out the array with term and srs keys.
     if (!empty($r->getConSchedData)) {
         $exts = array();
 
@@ -327,9 +366,12 @@ function get_crosslisted_courses($term, $srs) {
 }
 
 /**
- *  Convenience function to extract the term and SRS from the returned
- *  XML-parsed-node-object.
- **/
+ * Convenience function to extract the term and SRS from the returned
+ * XML-parsed-node-object.
+ *
+ * @param string $xml
+ * @return object
+ */
 function extract_term_srs_xml($xml) {
     $t = array('term', 'srs');
     $r = array();
@@ -349,16 +391,19 @@ function extract_term_srs_xml($xml) {
 }
 
 /**
- *  Customizable ignoring stuff.
- **/
+ * Customizable ignoring stuff.
+ *
+ * @param object $data
+ * @return boolean
+ */
 function requestor_ignore_entry($data) {
     if (is_array($data)) {
         $data = (object) $data;
     }
 
     if (!isset($data->subj_area)) {
-        debugging('cannot check to ignore entry: ' 
-            . print_r($data, true));
+        debugging('cannot check to ignore entry: '
+            . var_dump($data, true));
         return false;
     }
 
@@ -390,12 +435,12 @@ function requestor_ignore_entry($data) {
     }
 
     // CCLE-4513 - Limit course builds for LS to 192 and below.
-    if (in_array($subj, array('BMD RES', 'EE BIOL', 'MCD BIO', 'PHYSCI', 
+    if (in_array($subj, array('BMD RES', 'EE BIOL', 'MCD BIO', 'PHYSCI',
             'NEUROSC', 'MIMG', 'LIFESCI', 'SOC GEN')) && $num > 192) {
         return true;
     }
 
-    // CCLE-2894: Custom filtering for courses
+    // CCLE-2894: Custom filtering for courses.
     $customfilter = get_config('tool_uclacourserequestor', 'customfilters');
     if ($customfilter) {
         foreach ($customfilter as $filter) {
@@ -404,14 +449,19 @@ function requestor_ignore_entry($data) {
             }
         }
     }
-    
+
     return false;
 }
 
 /**
- *  Strips and simplifies data from the registrar to be ready for placement 
- *  in the request classes tables.
- **/
+ * Strips and simplifies data from the registrar to be ready for placement
+ * in the request classes tables.
+ *
+ * @param object $regdata
+ * @param array $instinfo
+ * @param array $defaults
+ * @return object
+ */
 function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
     global $OUTPUT;
     $term = $regdata['term'];
@@ -455,7 +505,7 @@ function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
                 $u->firstnamephonetic = '';
                 $u->lastnamephonetic = '';
                 $u->middlename = '';
-                
+
                 $fullname = fullname($u);
 
                 $instarr[$fullname] = $fullname;
@@ -478,19 +528,20 @@ function prep_registrar_entry($regdata, $instinfo, $defaults=array()) {
 }
 
 /**
- *  Gets default settings for requests from the database.
- **/
+ * Gets default settings for requests from the database.
+ *
+ * @return object
+ */
 function get_requestor_defaults() {
-    // Determine some defaults
+    // Determine some defaults.
     $defaults = array();
-    //$defaults['hidden'] = get_config('moodlecourse')->visible;
 
     $configs = get_config('tool_uclacourserequestor');
 
     $editables = request_get_editables();
-    $translate_tf = array('true' => 1, 'false' => 0);
+    $translatetf = array('true' => 1, 'false' => 0);
 
-    // These are options that are soft, defaults changed through UI
+    // These are options that are soft, defaults changed through UI.
     foreach ($editables as $ed) {
         $varname = $ed . '_default';
         $d = false;
@@ -512,17 +563,17 @@ function get_requestor_defaults() {
 }
 
 /**
- *  Returns the set of related courses to the host course.
- *  @param $host Array(
- *          'term' => term
- *          'srs' => srs
- *          (optional) 'setid' => setid
- *      )
- *  @return Array(
- *          request_key => Array(request) 
- *          ...
- *      ) at least one of these will have the property of 'hostcourse' = 1
- **/
+ * Returns the set of related courses to the host course.
+ * @param array $host Array(
+ *         'term' => term
+ *         'srs' => srs
+ *         (optional) 'setid' => setid
+ *     )
+ * @return array Array(
+ *         request_key => Array(request)
+ *         ...
+ *     ) at least one of these will have the property of 'hostcourse' = 1
+ */
 function get_crosslist_set_for_host($host) {
     if (is_object($host)) {
         $host = get_object_vars($host);
@@ -532,36 +583,36 @@ function get_crosslist_set_for_host($host) {
         return false;
     }
 
-    // If it's already existing in our database, just use that
+    // If it's already existing in our database, just use that.
     if (isset($host['setid'])) {
         return get_set($host['setid']);
     }
 
-    // Non-existing set of courses
+    // Non-existing set of courses.
     $h = 'hostcourse';
     $hostkey = make_idnumber($host);
     $set = array($hostkey => $host);
 
     // These are entries from the registrar, so they need to have their
-    // crosslists checked
+    // crosslists checked.
     global $DB;
     $clists = get_crosslisted_courses($host['term'], $host['srs']);
-    
+
     foreach ($clists as $clist) {
         $clkey = make_idnumber($clist);
-        
+
         if (!empty($set[$clkey])) {
             $setter = $set[$clkey];
         } else {
-            // This will get us just the single course we are looking for
+            // This will get us just the single course we are looking for.
             $setter = get_request_info($clist['term'], $clist['srs']);
         }
 
-        // CCLE-3870 - If the crosslist does not exist in our local DB, then do 
+        // CCLE-3870 - If the crosslist does not exist in our local DB, then do
         // not include it as a crosslist, even if it is in the registrar.
-        // If the course is not even in our local DB, then include the 
+        // If the course is not even in our local DB, then include the
         // registrar's crosslistings.
-        if ( !isset($setter['setid']) || 
+        if ( !isset($setter['setid']) ||
                 $DB->record_exists('ucla_request_classes', array('srs' => $host['srs'], 'setid' => $setter['setid'])) ) {
             $set[$clkey] = $setter;
         }
@@ -572,8 +623,12 @@ function get_crosslist_set_for_host($host) {
 }
 
 /**
- *  Calculates and sets the proper host numbers.
- **/
+ * Calculates and sets the proper host numbers.
+ *
+ * @param string $orighost
+ * @param object $set
+ * @return object
+ */
 function set_host_calculate($orighost, $set) {
     $h = 'hostcourse';
     $hostexists = false;
@@ -586,7 +641,7 @@ function set_host_calculate($orighost, $set) {
 
         if (!$hostexists && $request[$h]) {
             $hostexists = $key;
-        } 
+        }
     }
 
     if (!$hostexists) {
@@ -599,16 +654,19 @@ function set_host_calculate($orighost, $set) {
 }
 
 /**
- *  Returns the greatest host of the course.
- **/
+ * Returns the greatest host of the course.
+ *
+ * @param object $set
+ * @return string
+ */
 function set_find_host_key($set) {
     $hk = false;
     $h = 'hostcourse';
 
     foreach ($set as $k => $c) {
         if (!isset($c[$h])) {
-            
-            debugging('no hostcourse: ' . print_r($set, true));
+
+            debugging('no hostcourse: ' . var_dump($set));
             return false;
         }
 
@@ -621,10 +679,11 @@ function set_find_host_key($set) {
 }
 
 /**
- *  Convenience function to write the visual character summary for a 
- *  particular course request.
- *  @param Object with fields coursenum sectnum
- **/
+ * Convenience function to write the visual character summary for a
+ * particular course request.
+ * @param object $regdata with fields coursenum sectnum
+ * @return string
+ */
 function get_course_from_reginfo($regdata) {
     if (is_object($regdata)) {
         $regdata = get_object_vars($regdata);
@@ -643,7 +702,7 @@ function get_course_from_reginfo($regdata) {
 function get_class_type($regdata) {
     $type = '';
 
-    // If fields aren't set, entry is a cross-listed course
+    // If fields aren't set, entry is a cross-listed course.
     if (!isset($regdata['activitytype']) || !isset($regdata['catlg_no'])) {
         return $type;
     }
@@ -662,37 +721,40 @@ function get_class_type($regdata) {
  * and/or leading letter.
  *
  * @param string $coursenum     From ucla_reg_classinfo table.
- * @return
+ * @return int
  */
 function get_course_num($coursenum) {
     return (int)preg_replace('/[^0-9]/', '', $coursenum);
 }
 
 /**
- *  Takes a set of sets, and returns a flat requests list, with each
- *  request maintaing its own crosslists.
- **/
+ * Takes a set of sets, and returns a flat requests list, with each
+ * request maintaing its own crosslists.
+ * @param object $requestinfos
+ * @param object $context
+ * @return array
+ */
 function prepare_requests_for_display($requestinfos, $context) {
     // Here, we finally turn our setid-indexed flat array into
-    // the crosslist heirarchy
+    // the crosslist heirarchy.
     $c = 'crosslists';
 
     $displayrows = array();
     $errorrows = array();
 
-    $nourlupdate_hide = get_config('tool_uclacourserequestor', 'nourlupdate_hide');
+    $nourlupdatehide = get_config('tool_uclacourserequestor', 'nourlupdate_hide');
 
     foreach ($requestinfos as $setid => $set) {
         $displaykey = set_find_host_key($set);
 
         $displayrow = $set[$displaykey];
 
-        // hide MyUCLA url
-        if (!empty($nourlupdate_hide)) {
+        // Hide MyUCLA url.
+        if (!empty($nourlupdatehide)) {
             unset($displayrow['nourlupdate']);
         }
 
-        // Add crosslists
+        // Add crosslists.
         $displayrow[$c] = array();
 
         foreach ($set as $key => $request) {
@@ -704,7 +766,7 @@ function prepare_requests_for_display($requestinfos, $context) {
         }
 
         // Deal with fields that are displayed but not in the request
-        // tables themselves
+        // tables themselves.
         if ($context == UCLA_REQUESTOR_FETCH) {
             $k = 'build';
             // Hack, perhaps find a better place for this...
@@ -723,7 +785,7 @@ function prepare_requests_for_display($requestinfos, $context) {
             $displayrow[$k] = $default;
         }
 
-        // Make fields pretty
+        // Make fields pretty.
         $prepped = prep_request_entry($displayrow);
 
         if (!empty($prepped)) {
@@ -735,8 +797,11 @@ function prepare_requests_for_display($requestinfos, $context) {
 }
 
 /**
- *  Removes fields with no data for all rows.
- **/
+ * Removes fields with no data for all rows.
+ *
+ * @param array $table
+ * @return array
+ */
 function remove_empty_fields($table) {
     $removes = array();
     foreach ($table as $k => $r) {
@@ -768,10 +833,14 @@ function remove_empty_fields($table) {
 }
 
 /**
- *  Quick function that doesn't really need to be a function,
- *  but it parses the fields from a previously displayed 
- *  requestor contents tables.
- **/
+ * Quick function that doesn't really need to be a function,
+ * but it parses the fields from a previously displayed
+ * requestor contents tables.
+ *
+ * @param string $key
+ * @param string $value
+ * @return boolean
+ */
 function request_parse_input($key, $value) {
     $vals = array();
     preg_match('/^([new_0-9]*)-(.*)$/', $key, $vals);
@@ -795,9 +864,11 @@ function request_parse_input($key, $value) {
     return false;
 }
 
-/** 
- *  Checks if a request's changes should be ignored.
- *  @return boolean
+/**
+ * Checks if a request's changes should be ignored.
+ *
+ * @param object $request
+ * @return boolean
  **/
 function request_ignored($request) {
     $b = 'build';
@@ -813,8 +884,12 @@ function request_ignored($request) {
     return $ignored;
 }
 
+/**
+ * Convenience function to return an array of editables.
+ * @return array of strings
+ */
 function request_get_editables() {
-    if (get_config('tool_uclacourserequestor', 'nourlupdate_hide')) {
+    if (get_config('tool_uclacourserequestor', 'nourlupdatehide')) {
         return array('mailinst', 'action', 'requestoremail');
     } else {
         return array('mailinst', 'nourlupdate', 'action', 'requestoremail');
@@ -822,10 +897,13 @@ function request_get_editables() {
 }
 
 /**
- *  This takes all the data for a request, and prepares it to be displayed
- *  as text to a user, including all errors that need to be included.
- *   This entire function and its functionality could use some good organizing
- **/
+ * This takes all the data for a request, and prepares it to be displayed
+ * as text to a user, including all errors that need to be included. This entire
+ * function and its functionality could use some good organizing.
+ *
+ * @param object $requestinfo
+ * @return object
+ */
 function prep_request_entry($requestinfo) {
     global $PAGE;
 
@@ -833,34 +911,34 @@ function prep_request_entry($requestinfo) {
     $wars = UCLA_REQUESTOR_WARNING;
     $alert = UCLA_REQUESTOR_PASTTERM_ALERT;
     $worstnote = null;
-    
-    // Shortcut/optimization
+
+    // Shortcut/optimization.
     $br = html_writer::empty_tag('br');
 
     $rucr = 'tool_uclacourserequestor';
 
-    // This is the returned display-ready row
+    // This is the returned display-ready row.
     $formatted = array();
 
-    // Will be used to identify changes for sets
+    // Will be used to identify changes for sets.
     $key = $requestinfo['setid'];
 
-    // Check if course is from a past term
-    $is_past_term = true;
-    $active_terms = get_active_terms();
-    foreach ($active_terms as $active_term) {
-        if($requestinfo['term'] == $active_term) {
-            $is_past_term = false;
+    // Check if course is from a past term.
+    $ispastterm = true;
+    $activeterms = get_active_terms();
+    foreach ($activeterms as $activeterm) {
+        if ($requestinfo['term'] == $activeterm) {
+            $ispastterm = false;
         }
     }
-    
-    // If course is from a past term, set past term alert
-    // This alert will be overwritten by requestor warnings and errors, if any
-    if($is_past_term) {
+
+    // If course is from a past term, set past term alert.
+    // This alert will be overwritten by requestor warnings and errors, if any.
+    if ($ispastterm) {
         $worstnote = $alert;
     }
 
-    // Add build/delete button
+    // Add build/delete button.
     $actiondefault = null;
     $addedtext = '';
     $e = UCLA_REQUESTOR_URLEXISTS;
@@ -868,7 +946,7 @@ function prep_request_entry($requestinfo) {
         $worstnote = $wars;
         $addedtext = $br . get_string($e, $rucr, $requestinfo[$wars][$e]);
         // This hidden field will who us that this request has already
-        // been viewed at least once
+        // been viewed at least once.
         $addedtext .= html_writer::tag('input',
             '', array(
                 'value' => 1,
@@ -877,7 +955,7 @@ function prep_request_entry($requestinfo) {
             ));
     }
 
-    // Handle the action drop down
+    // Handle the action drop down.
     $tr = 'action';
     $actionval = $requestinfo[$tr];
     $inputname = "$key-$tr";
@@ -886,30 +964,29 @@ function prep_request_entry($requestinfo) {
     $buil = UCLA_COURSE_TOBUILD;
     if ($actionval == $fail) {
         $options = array(
-            $buil => requestor_statuses_translate($buil), 
+            $buil => requestor_statuses_translate($buil),
             $fail => requestor_statuses_translate($fail)
         );
 
         $trstr = html_writer::select($options, $inputname, $fail);
     } else {
-        // No choices if it does not involving changing from 
-        // 'failed' to 'build'
-        $trstr = 
-            html_writer::tag('span', requestor_statuses_translate($actionval),
-                array('class' => $actionval)) 
+        // No choices if it does not involving changing from
+        // 'failed' to 'build'.
+        $trstr = html_writer::tag('span', requestor_statuses_translate($actionval),
+                array('class' => $actionval))
             . html_writer::empty_tag('input', array(
-                'name' => $inputname, 
-                'type' => 'hidden', 
+                'name' => $inputname,
+                'type' => 'hidden',
                 'value' => $actionval
             ));
     }
 
-    // Finished with 'action'
+    // Finished with 'action'.
     $formatted[$tr] = $trstr;
     unset($requestinfo[$tr]);
 
     // If there is any relevance to changing the values, we're going
-    // to let the user edit the row
+    // to let the user edit the row.
     $editable = false;
     if ($actionval != UCLA_COURSE_BUILT) {
         $editable = true;
@@ -925,7 +1002,7 @@ function prep_request_entry($requestinfo) {
         $timestr = date($dds);
     }
 
-    // Finished with timerequested
+    // Finished with timerequested.
     $formatted[$f] = $timestr;
     unset($requestinfo[$f]);
 
@@ -943,40 +1020,40 @@ function prep_request_entry($requestinfo) {
     $idstr = '';
 
     // Will disable building of this course
-    // when course is already built
+    // when course is already built.
     $buildoptions = array();
 
     $idstr = '';
     if (!empty($requestinfo[$errs][$e])) {
         $worstnote = $errs;
 
-            // Can't use an MForm due to disability to use nested form,
-            // so cannot be clever, unless decide to overwrite some PEAR
-            // Libraries... which is not desired
-            if ($e == UCLA_REQUESTOR_EXIST) {
-                $gotosinglesrshtml = html_writer::link(new moodle_url(
-                  $PAGE->url, array('srs' => $requestinfo['srs'],
-                       'term' => $requestinfo['term'])
-                   ), get_string('viewrequest', $rucr));
-                $idstr = get_string($e, $rucr) . html_writer::empty_tag('br')
-                . $gotosinglesrshtml;
-            } else {
-                $idstr = get_string($e, $rucr) . html_writer::empty_tag('br');
-            }
+        // Can't use an MForm due to disability to use nested form,
+        // so cannot be clever, unless decide to overwrite some PEAR
+        // Libraries... which is not desired.
+        if ($e == UCLA_REQUESTOR_EXIST) {
+            $gotosinglesrshtml = html_writer::link(new moodle_url(
+                $PAGE->url, array('srs' => $requestinfo['srs'],
+                    'term' => $requestinfo['term'])
+                ), get_string('viewrequest', $rucr));
+            $idstr = get_string($e, $rucr) . html_writer::empty_tag('br')
+            . $gotosinglesrshtml;
+        } else {
+            $idstr = get_string($e, $rucr) . html_writer::empty_tag('br');
+        }
         $editable = false;
 
     } else {
         $idstr .= $requestinfo[$f];
     }
-           
+
     $formatted[$f] = $idstr;
     unset($requestinfo[$f]);
-    
-    // requestoremail or 'contact'
+
+    // Can be 'requestoremail or 'contact'.
     $f = 'requestoremail';
     $reval = '';
     if ($actionval == UCLA_COURSE_BUILT) {
-        // Append '' to prevent a checkbox from appearing
+        // Append '' to prevent a checkbox from appearing.
         $reval = $requestinfo[$f] . '';
         unset($requestinfo[$f]);
     } else {
@@ -1000,26 +1077,25 @@ function prep_request_entry($requestinfo) {
     $formatted[$f] = $reval;
     unset($requestinfo[$f]);
 
-    // courseid
+    // Only 'courseid'.
     $f = 'courseid';
     $fstr = '';
     if (!empty($requestinfo[$f])) {
         $courseid = $requestinfo[$f];
         $fstr = html_writer::link(new moodle_url(
-                '/course/view.php', 
+                '/course/view.php',
                 array('id' => $courseid
-            )), 
-            $courseid, 
+            )),
+            $courseid,
             array('target' => '_blank')
         );
     }
 
     $formatted[$f] = $fstr;
     unset($requestinfo[$f]);
-    // Finished with courseid
-    
+    // Finished with courseid.
 
-    // Handle other checkboxes
+    // Handle other checkboxes.
     $editables = request_get_editables();
 
     $sharedattr = array();
@@ -1042,7 +1118,7 @@ function prep_request_entry($requestinfo) {
             continue;
         }
 
-        // The defaults should've been handled these a long time ago
+        // The defaults should've been handled these a long time ago.
         if (!isset($requestinfo[$editme])) {
             $oldval = false;
         } else {
@@ -1055,7 +1131,7 @@ function prep_request_entry($requestinfo) {
         unset($requestinfo[$editme]);
     }
 
-    // Handle Crosslists
+    // Handle Crosslists.
     $f = 'crosslists';
     $ff = "$key-crosslists[]";
     $clinputattr = array(
@@ -1071,7 +1147,7 @@ function prep_request_entry($requestinfo) {
 
     $ocls = array();
 
-    // Add self to crosslists
+    // Add self to crosslists.
     $riclstr = html_writer::empty_tag('input', array(
         'type' => 'hidden',
         'name' => $ff,
@@ -1090,7 +1166,7 @@ function prep_request_entry($requestinfo) {
 
             // Perhaps refactor this code later?
             if (!empty($ocl[$errs])) {
-                // Save this for later
+                // Save this for later.
                 $worstnote = $errs;
 
                 $errstr = '';
@@ -1103,15 +1179,15 @@ function prep_request_entry($requestinfo) {
                     unset($ocl[$errs][$error]);
                 }
 
-                // There was an error, display editable field and error msg
+                // There was an error, display editable field and error msg.
                 $clinputattr['value'] = $clsrs;
 
                 $clinput = $errstr . $br . html_writer::empty_tag(
-                        'input', 
+                        'input',
                         $clinputattr
                     ) . "$br $moreinfo";
 
-                // Secret to keep crosslists alive
+                // Secret to keep crosslists alive.
                 if (!$editable) {
                     $clinput .= html_writer::empty_tag(
                         'input',
@@ -1124,7 +1200,7 @@ function prep_request_entry($requestinfo) {
                 }
             } else {
                 $warstr = '';
-                // If there is a warning, uncheck box by default
+                // If there is a warning, uncheck box by default.
                 $defaultclbuild = true;
 
                 $clinput = '';
@@ -1142,41 +1218,41 @@ function prep_request_entry($requestinfo) {
 
                     $clinput = html_writer::tag('input',
                         '', array(
-                            'name' => "$key-"   
+                            'name' => "$key-"
                                 . request_warning_checked_key($ocl),
                             'value' => 1,
                             'type' => 'hidden'
                         ));
                 }
 
-                // Display check box
+                // Display check box.
                 $clinput .= html_writer::checkbox(
                     $ff,
-                    $clsrs, 
-                    $defaultclbuild, 
+                    $clsrs,
+                    $defaultclbuild,
                     "$clkey $moreinfo",
                     $clinputattr
                 ) . html_writer::tag(
-                        'span', 
+                        'span',
                         $warstr
                     );
             }
 
             $riclstr .= $clinput . $br;
 
-            // Instructors merge up into host course
+            // Instructors merge up into host course.
             foreach ($ocl['instructor'] as $k => $v) {
                 $requestinfo['instructor'][$k] = $v;
             }
         }
     }
-  
-    // Add a new crosslist dialog
+
+    // Add a new crosslist dialog.
     if ($cleditable) {
-        unset($clinputattr['value']);     
+        unset($clinputattr['value']);
         $riclstr .= html_writer::empty_tag('input', $clinputattr);
         $riclstr .= html_writer::empty_tag(
-            'input', 
+            'input',
             array(
                 'type' => 'submit',
                 'name' => "$key-add-crosslist",
@@ -1184,7 +1260,7 @@ function prep_request_entry($requestinfo) {
             )
         );
     }
-   
+
     $e = UCLA_REQUESTOR_BADCL;
     if (!empty($requestinfo[$errs][$e])) {
         $riclstr .= $br . get_string('hostandchild', $rucr);
@@ -1194,7 +1270,7 @@ function prep_request_entry($requestinfo) {
 
     $formatted['crosslists'] = $riclstr;
 
-    // Instructors
+    // Instructors.
     $instrstr = '';
     if (empty($requestinfo['instructor'])) {
         $instrstr = get_string('noinst', $rucr);
@@ -1209,21 +1285,21 @@ function prep_request_entry($requestinfo) {
 
     unset($requestinfo['instructor']);
 
-    // Add delete/build (action) checkboxes
+    // Add delete/build (action) checkboxes.
     $maybeexists = array('delete', 'build');
-    foreach ($maybeexists as $k) {        
-        // CCLE-3103 - When deleting a course add in a trigger to also 
-        // delete the course request and My.UCLA url
-        // Preventing requests from being deleted in this UI. It should be
-        // deleted by deleting the actual course   
+    foreach ($maybeexists as $k) {
+        // CCLE-3103 - When deleting a course add in a trigger to also
+        // delete the course request and My0UCLA url,
+        // preventing requests from being deleted in this UI. It should be
+        // deleted by deleting the actual course.
         if ($k == 'delete' && !empty($formatted['courseid'])) {
             continue;
         }
-        
+
         if (isset($requestinfo[$k])) {
             $actval = $requestinfo[$k];
-            
-            if (!$editable 
+
+            if (!$editable
                     && $actionval != UCLA_COURSE_BUILT
                     && $actionval != UCLA_COURSE_FAILED) {
                 $actval = true;
@@ -1235,8 +1311,8 @@ function prep_request_entry($requestinfo) {
                 $actval = false;
             }
 
-            // Also disable if we have $addedtext
-            // This is the case when a course is marked as cancelled
+            // Also disable if we have $addedtext.
+            // This is the case when a course is marked as cancelled.
             if ($worstnote == $errs || !empty($addedtext)) {
                 $buildoptions['disabled'] = true;
                 $actval = false;
@@ -1253,7 +1329,7 @@ function prep_request_entry($requestinfo) {
                 $buildoptions['class'] = $requestinfo['type'];
             }
 
-            $formatted[$k] = html_writer::checkbox("$key-$k", '1', 
+            $formatted[$k] = html_writer::checkbox("$key-$k", '1',
                 $actval, $addedtext, $buildoptions);
         }
     }
@@ -1265,12 +1341,12 @@ function prep_request_entry($requestinfo) {
         }
     }
 
-    // Just reorder things 
+    // Just reorder things.
     $ordfor = array();
     $notused = array();
     $ordered = array(
-        'id', 'courseid', 
-        'term', 'srs', 
+        'id', 'courseid',
+        'term', 'srs',
         'department', 'course', 'instructor',
         'crosslists',
         'timerequested',
@@ -1288,7 +1364,7 @@ function prep_request_entry($requestinfo) {
         }
     }
 
-    // add error/warn in here...
+    // Add error/warn in here...
     if ($worstnote != null) {
         $ordfor['errclass'] = $worstnote;
     }
@@ -1297,21 +1373,23 @@ function prep_request_entry($requestinfo) {
 }
 
 /**
- *  Designates a warning-viewed handler for warnings.
- *  @param $request The request should be an array with keys
- *      'term', 'srs'
- *  @return string The string to use in the name field of the input
- *      that represents that a particular warning has been viewed.
- *      Currently used by ucla_courserequests->commit()
- **/
+ * Designates a warning-viewed handler for warnings.
+ * @param array $request The request should be an array with keys
+ *     'term', 'srs'
+ * @return string The string to use in the name field of the input
+ *     that represents that a particular warning has been viewed.
+ *     Currently used by ucla_courserequests->commit()
+ */
 function request_warning_checked_key($request) {
     return make_idnumber($request) . '-' . UCLA_REQUEST_WARNING_CHECKED;
 }
 
 /**
- *  Convenience function returns the concatenation of the subject area
- *  and the course (course num and sect num).
- **/
+ * Convenience function returns the concatenation of the subject area
+ * and the course (course num and sect num).
+ * @param object $request
+ * @return string
+ */
 function requestor_dept_course($request) {
     $co = 'course';
     $de = 'department';
@@ -1325,8 +1403,11 @@ function requestor_dept_course($request) {
 }
 
 /**
- *  Takes a status/action and translates it to a human readable form.
- **/
+ * Takes a status/action and translates it to a human readable form.
+ *
+ * @param string $status
+ * @return object
+ */
 function requestor_statuses_translate($status) {
     $rucr = 'tool_uclacourserequestor';
 
@@ -1340,9 +1421,10 @@ function requestor_statuses_translate($status) {
 }
 
 /**
- *  Calculates the available filters for the drop down menu for
- *  Viewing existing request entries.
- **/
+ * Calculates the available filters for the drop down menu for
+ * viewing existing request entries.
+ * @return object
+ */
 function get_requestor_view_fields() {
     global $DB;
 
@@ -1354,7 +1436,7 @@ function get_requestor_view_fields() {
     } else {
         $prefieldstr = $rsid . ', ' . $prefieldstr;
     }
-    $builtcategories = $DB->get_records('ucla_request_classes', null, 
+    $builtcategories = $DB->get_records('ucla_request_classes', null,
         'department', 'DISTINCT ' . $prefieldstr);
     $prefieldsdata = array();
     foreach ($builtcategories as $builts) {
@@ -1364,18 +1446,20 @@ function get_requestor_view_fields() {
             if (!isset($prefieldsdata[$varname])) {
                 $prefieldsdata[$varname] = array();
             }
-            
+
             $prefieldsdata[$varname][$builts->$prefield] = $builts->$prefield;
         }
     }
-    
+
     $prefieldsdata['term'] = terms_arr_sort($prefieldsdata['term'], true);
     return $prefieldsdata;
 }
 
 /**
- *  Takes about 0.015 second per entry.
- **/
+ * Fetches courses for the subject area. Takes about 0.015 seconds per entry.
+ * @param string $term
+ * @param string $subjarea
+ */
 function get_courses_for_subj_area($term, $subjarea) {
     $result = registrar_query::run_registrar_query('cis_coursegetall',
         array('term' => $term, 'subjarea' => $subjarea));
@@ -1384,8 +1468,11 @@ function get_courses_for_subj_area($term, $subjarea) {
 }
 
 /**
- *  Takes about 0.025 second.
- **/
+ * Fetches course info using course term and srs. Takes about 0.025 seconds.
+ * @param string $term
+ * @param string $srs
+ * @return array
+ */
 function get_course_info_from_registrar($term, $srs) {
     $result = registrar_query::run_registrar_query('ccle_getclasses',
         array('term' => $term, 'srs' => $srs));
@@ -1394,8 +1481,11 @@ function get_course_info_from_registrar($term, $srs) {
 }
 
 /**
- *  Takes about 0.015 second.
- **/
+ * Fetches instructor info using course term and srs. Takes about 0.015 seconds.
+ * @param string $term
+ * @param string $srs
+ * @return array
+ */
 function get_instructor_info_from_registrar($term, $srs) {
     $result = registrar_query::run_registrar_query('ccle_courseinstructorsget',
         array('term' => $term, 'srs' => $srs));
@@ -1404,16 +1494,18 @@ function get_instructor_info_from_registrar($term, $srs) {
 
 /**
  * Queries the registrar for the course and inserts it into ucla_reg_classinfo
- * 
- * @return true if term/srs pair exists, false otherwise
+ *
+ * @param string $term
+ * @param string $srs
+ * @return boolean true if term/srs pair exists, false otherwise
  */
 function crosslist_course_from_registrar($term, $srs) {
     global $DB;
-    
+
     if ($DB->record_exists('ucla_reg_classinfo', array('term' => $term, 'srs' => $srs))) {
         return true;
     }
-    
+
     $course = get_course_info_from_registrar($term, $srs);
     if ( !empty($course) && isset($course['term']) && isset($course['srs']) ) {
         $DB->insert_record('ucla_reg_classinfo', $course);
@@ -1422,7 +1514,7 @@ function crosslist_course_from_registrar($term, $srs) {
         $DB->insert_record('ucla_reg_classinfo', $course[0]);
         return true;
     }
-    
+
     return false;
 }
 
@@ -1439,11 +1531,11 @@ function update_myucla_urls($term, $srs, $url) {
     $course = array('term' => $term, 'srs' => $srs);
     $updatecourse = array(
         make_idnumber($course) => array(
-            'term' => $term, 
-            'srs' => $srs, 
+            'term' => $term,
+            'srs' => $srs,
             'url' => $url
         )
     );
 
-    $urlupdater->send_MyUCLA_urls($updatecourse, true);    
+    $urlupdater->send_MyUCLA_urls($updatecourse, true);
 }

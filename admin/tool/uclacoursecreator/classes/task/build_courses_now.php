@@ -38,8 +38,6 @@ class build_courses_now extends \core\task\adhoc_task {
 
     /**
      * Respond to events that require course creator to build now.
-     *
-     * @param array $terms  An array of terms to run course builder for
      */
     public function execute() {
         $bcc = new \uclacoursecreator();

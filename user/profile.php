@@ -96,7 +96,10 @@ if (!$currentpage = my_get_page($userid, MY_PAGE_PUBLIC)) {
 }
 
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('mypublic');
+// START UCLA MOD: CCLE-6761 - Add 'Profile' header on Profile Page
+// $PAGE->set_pagelayout('mypublic');
+$PAGE->set_pagelayout('admin');
+// END UCLA MOD: CCLE-6761
 $PAGE->set_pagetype('user-profile');
 
 // Set up block editing capabilities.
@@ -204,6 +207,9 @@ $event->trigger();
 
 // TODO WORK OUT WHERE THE NAV BAR IS!
 echo $OUTPUT->header();
+// START UCLA MOD: CCLE-6761 - Add 'Profile' header on Profile Page
+echo $OUTPUT->heading(get_string('profile'));
+// END UCLA MOD: CCLE-6761
 echo '<div class="userprofile">';
 
 if ($user->description && !isset($hiddenfields['description'])) {

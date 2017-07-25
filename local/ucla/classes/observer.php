@@ -33,6 +33,41 @@ defined('MOODLE_INTERNAL') || die();
 class local_ucla_observer {
 
     /**
+     * Handles when a UCLA course is deleted by clearing the related course entries
+     * in the "ucla_syllabus" table at SRDB.
+     *
+     * Note, cannot rely on handling deleted syllabus from deleted courses via the
+     * ucla_syllabus_deleted event handler, because the entries in the
+     * ucla_reg_classinfo table will be deleted by the time the event is fired.
+     *
+     * @param \tool_uclacoursecreator\event\ucla_course_deleted $event
+     * @return bool         Returns false on problems, otherwise true.
+     */
+    public static function clear_srdb_ucla_syllabus(\tool_uclacoursecreator\event\ucla_course_deleted $event) {
+        $data = json_decode($event->other);
+        $task = new \local_ucla\task\clear_srdb_ucla_syllabus_task();
+        $task->set_custom_data(array('ucla_reg_classinfo' => $data->ucla_reg_classinfo));
+        \core\task\manager::queue_adhoc_task($task);
+    }
+
+    /**
+     * Handles the updating "ucla_syllabus" table at SRDB by getting the course
+     * that triggered the event and pushing out links for all the different syllabus
+     * types.
+     *
+     * NOTE: This only responds to the syllabus_added and syllabus_deleted
+     * events, because the link stays the same if a syllabus is updated.
+     *
+     * @param \local_ucla_syllabus\event\syllabus_base $event
+     * @return bool         Returns false on problems, otherwise true.
+     */
+    public static function update_srdb_ucla_syllabus(\local_ucla_syllabus\event\syllabus_base $event) {
+        $task = new \local_ucla\task\update_srdb_ucla_syllabus_task();
+        $task->set_custom_data(array('courseid' => $event->courseid));
+        \core\task\manager::queue_adhoc_task($task);
+    }
+
+    /**
      * When a course is restored, check if it has duplicate Announcement
      *
      * @param \core\event\course_restored $event
