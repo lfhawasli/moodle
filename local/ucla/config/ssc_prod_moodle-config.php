@@ -121,7 +121,6 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
 // UCLA Theme settings
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'prod';
-//$CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 // CCLE-6512 - Profile Course details doesn't match My page Class sites
 $CFG->forced_plugin_settings['theme_uclashared']['alternative_sharedsystem_name'] = 'Shared Server';
 $CFG->forced_plugin_settings['theme_uclashared']['alternative_sharedsystem_link'] = 'https://ccle.ucla.edu';
