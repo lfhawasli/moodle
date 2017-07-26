@@ -218,6 +218,7 @@ $CFG->defaultpreference_trackforums = 1;
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
+$CFG->hiddenuserfields = 'city,country,timezone,icqnumber,skypeid,yahooid,aimid,msnid';
 
 // Site administration > Courses > Course default settings
 $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
