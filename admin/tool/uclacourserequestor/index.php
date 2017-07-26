@@ -326,7 +326,7 @@ if ($processrequests) {
                 $retmess = get_string($strid, $rucr, $coursedescstr);
 
                 // We care only for updates.
-                if ($retcode == ucla_courserequests::savesuccess) {
+                if ($retcode == ucla_courserequests::SAVESUCCESS) {
                     if (!empty($changed[$setid])) {
                         $fieldstr = '';
                         $fieldstrs = array();
@@ -378,7 +378,7 @@ if ($processrequests) {
 
                         $changemessages[$setid] = "$retmess -- $fieldstr";
                     }
-                } else if ($retcode == ucla_courserequests::insertsuccess) {
+                } else if ($retcode == ucla_courserequests::INSERTSUCCESS) {
                     if ( isset($changed[$setid]['crosslists']['added']) ) {
                         // Adding new crosslist courses
                         // If we need to get the course from the registrar.
