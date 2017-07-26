@@ -1111,7 +1111,6 @@ $consoles->push_console_html('modules', $title , $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
 // Recently updated syllabus links at the Registrar's ucla_syllabus table.
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_regsender.php');
 
 $title = "syllabusrecentlinks";
 $sectionhtml = '';
