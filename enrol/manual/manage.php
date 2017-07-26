@@ -59,7 +59,7 @@ if (is_siteadmin()) {
     $roles = get_assignable_roles($context);
 } else {
     require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
-    $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($course);
+    $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($course, true);
     foreach($untrimmedroles as $role) {
         $roles[$role->id] = $role->name;
     }
