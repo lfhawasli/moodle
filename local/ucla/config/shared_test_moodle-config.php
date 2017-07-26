@@ -152,7 +152,6 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
 // UCLA Theme settings
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'test';
-$CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
