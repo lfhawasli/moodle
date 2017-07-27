@@ -38,7 +38,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__.'/../../../config.php');
 
 // CONFIG SECTION.
-$searchitems = array("error");  // Allowing for possible future search of other things.
+$searchitems = array("error", "warning");  // Allowing for possible future search of other things.
 $logfile = get_config('tool_uclasupportconsole', 'log_moodle_cron');
 $logfilesize = $CFG->dataroot . "/moodle_cron_size.dat";
 $debug = 0;
