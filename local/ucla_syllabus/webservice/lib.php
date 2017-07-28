@@ -73,7 +73,7 @@ class syllabus_ws_item {
 
         if ($this->_match_criteria()) {
             // See if there's an alert waiting for this SRS.
-            $alerttime = get_config('next_attempt_alert_'.$payload->srs, 'local_ucla_syllabus');
+            $alerttime = get_config('next_attempt_alert_'.$payload['srs'], 'local_ucla_syllabus');
             $now = time();
 
             // There's an alert waiting, try to process it.
@@ -82,7 +82,7 @@ class syllabus_ws_item {
                 if ($this->_post($payload)) {
 
                     // Successful POST, so remove timestamp.
-                    unset_config('local_ucla_syllabus', 'next_attempt_alert_'.$payload->srs);
+                    unset_config('local_ucla_syllabus', 'next_attempt_alert_'.$payload['srs']);
                 } else {
 
                     // Failed to POST, send an email if it has been more than two hours.
@@ -90,7 +90,7 @@ class syllabus_ws_item {
                         $this->_contact($payload);
 
                         // Set a new reminder for two hours from now.
-                        set_config('local_ucla_syllabus', $now + self::NEXT_ATTEMPT, 'next_attempt_alert_'.$payload->srs);
+                        set_config('local_ucla_syllabus', $now + self::NEXT_ATTEMPT, 'next_attempt_alert_'.$payload['srs']);
 
                         return false;
                     }
@@ -98,13 +98,13 @@ class syllabus_ws_item {
             } else {
                 // No alert is waiting.
                 // Set an alert to notify two hours from now in case we fail.
-                set_config('local_ucla_syllabus', $now + self::NEXT_ATTEMPT, 'next_attempt_alert_'.$payload->srs);
+                set_config('local_ucla_syllabus', $now + self::NEXT_ATTEMPT, 'next_attempt_alert_'.$payload['srs']);
 
                 // Attempt to POST.
                 if ($this->_post($payload)) {
 
                     // Successful POST, so remove alert.
-                    unset_config('local_ucla_syllabus', 'next_attempt_alert_'.$payload->srs);
+                    unset_config('local_ucla_syllabus', 'next_attempt_alert_'.$payload['srs']);
                 } else {
 
                     // Failed to POST, so send an email.  Alert remains in place.

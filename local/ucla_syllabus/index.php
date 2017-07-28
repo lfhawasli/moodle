@@ -108,7 +108,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
 
     // If both a file was uploaded and a URL was provided, then check which
     // radio button was last clicked to determined which syllabus to keep.
-    if (!empty($data)) {
+    if (isset($data->default_source)) {
         if (($data->default_source === 'file' && !$data->fileurl) ||
                 ($data->default_source === 'url' && $data->fileurl)) {
             // File radio button was selected. Clear the URL.

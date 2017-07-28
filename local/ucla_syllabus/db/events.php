@@ -27,39 +27,30 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array (
-    'ucla_syllabus_added' => array (
-        'handlerfile'      => '/local/ucla_syllabus/webservice/eventlib.php',
-        'handlerfunction'  => 'ucla_syllabus_updated',
-        'schedule'         => 'cron',
-        'internal'         => 0,
+$observers = array (
+    array(
+        'eventname'  => '\local_ucla_syllabus\event\syllabus_added',
+        'callback'    => 'local_ucla_syllabus_webservice_observer::ucla_syllabus_updated',
+        'internal'   =>  false
     ),
-
-    'ucla_syllabus_updated' => array (
-        'handlerfile'      => '/local/ucla_syllabus/webservice/eventlib.php',
-        'handlerfunction'  => 'ucla_syllabus_updated',
-        'schedule'         => 'cron',
-        'internal'         => 0,
+    array(
+        'eventname'  => '\local_ucla_syllabus\event\syllabus_updated',
+        'callback'    => 'local_ucla_syllabus_webservice_observer::ucla_syllabus_updated',
+        'internal'   =>  false
     ),
-
-    'ucla_syllabus_deleted' => array (
-        'handlerfile'      => '/local/ucla_syllabus/webservice/eventlib.php',
-        'handlerfunction'  => 'ucla_syllabus_deleted',
-        'schedule'         => 'cron',
-        'internal'         => 0,
+    array(
+        'eventname'  => '\local_ucla_syllabus\event\syllabus_deleted',
+        'callback'    => 'local_ucla_syllabus_webservice_observer::ucla_syllabus_deleted',
+        'internal'   =>  false
     ),
-
-    'course_created' => array(
-        'handlerfile'      => '/local/ucla_syllabus/webservice/eventlib.php',
-        'handlerfunction'  => 'ucla_course_alert',
-        'schedule'         => 'cron',
-        'internal'         => 0,
+    array(
+        'eventname'  => '\core\event\course_created',
+        'callback'    => 'local_ucla_syllabus_webservice_observer::ucla_course_alert',
+        'internal'   =>  false
     ),
-
-    'course_deleted' => array(
-        'handlerfile'      => '/local/ucla_syllabus/eventlib.php',
-        'handlerfunction'  => 'delete_syllabi',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+    array(
+        'eventname'  => '\core\event\course_deleted',
+        'callback'    => 'local_ucla_syllabus_observer::delete_syllabi',
+        'internal'   =>  true
     ),
 );
