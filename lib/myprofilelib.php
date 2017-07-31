@@ -62,49 +62,53 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     $tree->add_category($admincategory);
     $tree->add_category($loginactivitycategory);
 
+    // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
+    $showuserdetailstosupport = has_capability('moodle/user:viewhiddendetails', $courseorusercontext);
+
     // Add core nodes.
     // Full profile node.
-    if (!empty($course)) {
-        if (empty($CFG->forceloginforprofiles) || $iscurrentuser ||
-            has_capability('moodle/user:viewdetails', $usercontext)
-            || has_coursecontact_role($user->id)) {
-            $url = new moodle_url('/user/profile.php', array('id' => $user->id));
-            $node = new core_user\output\myprofile\node('miscellaneous', 'fullprofile', get_string('fullprofile'), null, $url);
-            $tree->add_node($node);
-        }
-    }
+//    if (!empty($course)) {
+//        if (empty($CFG->forceloginforprofiles) || $iscurrentuser ||
+//            has_capability('moodle/user:viewdetails', $usercontext)
+//            || has_coursecontact_role($user->id)) {
+//            $url = new moodle_url('/user/profile.php', array('id' => $user->id));
+//            $node = new core_user\output\myprofile\node('miscellaneous', 'fullprofile', get_string('fullprofile'), null, $url);
+//            $tree->add_node($node);
+//        }
+//    }
 
     // Edit profile.
-    if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
-        if (($iscurrentuser || is_siteadmin($USER) || !is_siteadmin($user)) && has_capability('moodle/user:update',
-                    $systemcontext)) {
-            $url = new moodle_url('/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
-                'returnto' => 'profile'));
-            $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
-                null, null, 'editprofile');
-            $tree->add_node($node);
-        } else if ((has_capability('moodle/user:editprofile', $usercontext) && !is_siteadmin($user))
-                   || ($iscurrentuser && has_capability('moodle/user:editownprofile', $systemcontext))) {
-            $userauthplugin = false;
-            if (!empty($user->auth)) {
-                $userauthplugin = get_auth_plugin($user->auth);
-            }
-            if ($userauthplugin && $userauthplugin->can_edit_profile()) {
-                $url = $userauthplugin->edit_profile_url();
-                if (empty($url)) {
-                    if (empty($course)) {
-                        $url = new moodle_url('/user/edit.php', array('id' => $user->id, 'returnto' => 'profile'));
-                    } else {
-                        $url = new moodle_url('/user/edit.php', array('id' => $user->id, 'course' => $course->id,
-                            'returnto' => 'profile'));
-                    }
-                }
-                $node = new core_user\output\myprofile\node('contact', 'editprofile',
-                        get_string('editmyprofile'), null, $url, null, null, 'editprofile');
-                $tree->add_node($node);
-            }
-        }
-    }
+//    if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
+//        if (($iscurrentuser || is_siteadmin($USER) || !is_siteadmin($user)) && has_capability('moodle/user:update',
+//                    $systemcontext)) {
+//            $url = new moodle_url('/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
+//                'returnto' => 'profile'));
+//            $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
+//                null, null, 'editprofile');
+//            $tree->add_node($node);
+//        } else if ((has_capability('moodle/user:editprofile', $usercontext) && !is_siteadmin($user))
+//                   || ($iscurrentuser && has_capability('moodle/user:editownprofile', $systemcontext))) {
+//            $userauthplugin = false;
+//            if (!empty($user->auth)) {
+//                $userauthplugin = get_auth_plugin($user->auth);
+//            }
+//            if ($userauthplugin && $userauthplugin->can_edit_profile()) {
+//                $url = $userauthplugin->edit_profile_url();
+//                if (empty($url)) {
+//                    if (empty($course)) {
+//                        $url = new moodle_url('/user/edit.php', array('id' => $user->id, 'returnto' => 'profile'));
+//                    } else {
+//                        $url = new moodle_url('/user/edit.php', array('id' => $user->id, 'course' => $course->id,
+//                            'returnto' => 'profile'));
+//                    }
+//                }
+//                $node = new core_user\output\myprofile\node('contact', 'editprofile',
+//                        get_string('editmyprofile'), null, $url, null, null, 'editprofile');
+//                $tree->add_node($node);
+//            }
+//        }
+//    }
+    // END UCLA MOD: CCLE-6759
 
     // Preference page.
     if (!$iscurrentuser && $PAGE->settingsnav->can_view_user_preferences($user->id)) {
@@ -124,17 +128,21 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $tree->add_node($node);
     }
 
+    // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
     // Contact details.
-    if (has_capability('moodle/user:viewhiddendetails', $courseorusercontext)) {
-        $hiddenfields = array();
-    } else {
-        $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
-    }
-    if (has_capability('moodle/site:viewuseridentity', $courseorusercontext)) {
-        $identityfields = array_flip(explode(',', $CFG->showuseridentity));
-    } else {
-        $identityfields = array();
-    }
+//    if (has_capability('moodle/user:viewhiddendetails', $courseorusercontext)) {
+//        $hiddenfields = array();
+//    } else {
+//        $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
+//    }
+//    if (has_capability('moodle/site:viewuseridentity', $courseorusercontext)) {
+//        $identityfields = array_flip(explode(',', $CFG->showuseridentity));
+//    } else {
+//        $identityfields = array();
+//    }
+    $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
+    $identityfields = array_flip(explode(',', $CFG->showuseridentity));
+    // END UCLA MOD: CCLE-6759
 
     if (is_mnet_remote_user($user)) {
         $sql = "SELECT h.id, h.name, h.wwwroot,
@@ -154,16 +162,23 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $tree->add_node($node);
     }
 
-    if (isset($identityfields['email']) and ($iscurrentuser
-                                             or $user->maildisplay == 1
-                                             or has_capability('moodle/course:useremail', $courseorusercontext)
-                                             or has_capability('moodle/site:viewuseridentity', $courseorusercontext)
-                                             or ($user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
-        $node = new core_user\output\myprofile\node('contact', 'email', get_string('email'), null, null,
-            obfuscate_mailto($user->email, ''));
-        $tree->add_node($node);
-    }
-
+    // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
+    //  if (isset($identityfields['email']) and ($iscurrentuser
+    //                                                 or $user->maildisplay == 1
+    //                                                 or has_capability('moodle/course:useremail', $courseorusercontext)
+    //                                                 or has_capability('moodle/site:viewuseridentity', $courseorusercontext)
+    //                                                 or ($user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
+        if ($showuserdetailstosupport && isset($identityfields['email']) and ($iscurrentuser
+                                                 or $user->maildisplay == 1
+                                                 or has_capability('moodle/course:useremail', $courseorusercontext)
+                                                 or has_capability('moodle/site:viewuseridentity', $courseorusercontext)
+                                                 or ($user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
+    // END UCLA MOD: CCLE-6759
+            $node = new core_user\output\myprofile\node('contact', 'email', get_string('email'), null, null,
+                obfuscate_mailto($user->email, ''));
+            $tree->add_node($node);
+        }
+    
     if (!isset($hiddenfields['country']) && $user->country) {
         $node = new core_user\output\myprofile\node('contact', 'country', get_string('country'), null, null,
                 get_string($user->country, 'countries'));
@@ -202,22 +217,35 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $tree->add_node($node);
     }
 
-    if (isset($identityfields['idnumber']) && $user->idnumber) {
-        $node = new core_user\output\myprofile\node('contact', 'idnumber', get_string('idnumber'), null, null,
-            $user->idnumber);
-        $tree->add_node($node);
-    }
-
-    if ($user->url && !isset($hiddenfields['webpage'])) {
-        $url = $user->url;
-        if (strpos($user->url, '://') === false) {
-            $url = 'http://'. $url;
+    // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
+    //  if (isset($identityfields['idnumber']) && $user->idnumber) {
+        if ($showuserdetailstosupport && isset($identityfields['idnumber']) && $user->idnumber) {
+    // END UCLA MOD: CCLE-6759
+            $node = new core_user\output\myprofile\node('contact', 'idnumber', get_string('idnumber'), null, null,
+                $user->idnumber);
+            $tree->add_node($node);
         }
-        $webpageurl = new moodle_url($url);
-        $node = new core_user\output\myprofile\node('contact', 'webpage', get_string('webpage'), null, null,
-            html_writer::link($url, $webpageurl));
-        $tree->add_node($node);
-    }
+    // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
+    //  if ($user->url && !isset($hiddenfields['webpage'])) {
+        if ($showuserdetailstosupport && $user->url && !isset($hiddenfields['webpage'])) {
+    // END UCLA MOD: CCLE-6759
+            $url = $user->url;
+            if (strpos($user->url, '://') === false) {
+                $url = 'http://'. $url;
+            }
+            $webpageurl = new moodle_url($url);
+            $node = new core_user\output\myprofile\node('contact', 'webpage', get_string('webpage'), null, null,
+                html_writer::link($url, $webpageurl));
+            $tree->add_node($node);
+        }
+
+        // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
+        if ($showuserdetailstosupport && $user->username) {
+            $node = new core_user\output\myprofile\node('contact', 'username', get_string('username'), null, null,
+            $user->username);
+            $tree->add_node($node);
+        }
+        // END UCLA MOD: CCLE-6759
 
     // Printing tagged interests. We want this only for full profile.
     if (empty($course) && ($interests = core_tag_tag::get_item_tags('core', 'user', $user->id))) {

@@ -123,7 +123,6 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
 // UCLA Theme settings
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'prod';
-$CFG->forced_plugin_settings['theme_uclashared']['footer_links'] = '';
 
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
@@ -196,6 +195,7 @@ $CFG->defaultpreference_trackforums = 1;
 // Site administration > Users > Permissions > User policies
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
+$CFG->hiddenuserfields = 'city,country,timezone,icqnumber,skypeid,yahooid,aimid,msnid';
 
 // Site administration > Courses > Course default settings
 $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
@@ -470,10 +470,13 @@ $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-2.kaf.kaltura.com';
 
-// Site administration > Plugins > Local plugins > Moodle Mobile additional features
+// Site administration > Plugins > Local plugins > Kaltura Media Gallery.
+$CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
+
+// Site administration > Plugins > Local plugins > Moodle Mobile additional features.
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
 
-// Site administration > Plugins > Local plugins > UCLA configurations
+// Site administration > Plugins > Local plugins > UCLA customizations.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus';
 $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4521 - Handle "preferred name".

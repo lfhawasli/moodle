@@ -51,10 +51,7 @@ class grades_updated extends \core\event\base {
     }
  
     public function get_url() {
-        // START UCLA MOD: CCLE-6555 - "Video resource viewed" log URL missing slash
-        //return new \moodle_url('grade_submissions.php', array('cmid' => $this->contextinstanceid));
         return new \moodle_url('/mod/kalvidassign/grade_submissions.php', array('cmid' => $this->contextinstanceid));
-        // END UCLA MOD: CCLE-6555
     }
  
     public function get_legacy_logdata() {
