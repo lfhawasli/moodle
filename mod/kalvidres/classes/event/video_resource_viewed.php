@@ -48,10 +48,7 @@ class video_resource_viewed extends \core\event\base {
     }
  
     public function get_url() {
-        // START UCLA MOD: CCLE-6555 - "Video resource viewed" log URL missing slash
-        //return new \moodle_url('view.php', array('id' => $this->contextinstanceid));
         return new \moodle_url('/mod/kalvidres/view.php', array('id' => $this->contextinstanceid));
-        // END UCLA MOD: CCLE-6555
     }
  
     public function get_legacy_logdata() {

@@ -456,10 +456,13 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 // Site administration > Plugins > Local plugins > Kaltura package libraries
 $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-3.kaf.kaltura.com';
 
-// Site administration > Plugins > Local plugins > Moodle Mobile additional features
+// Site administration > Plugins > Local plugins > Kaltura Media Gallery.
+$CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
+
+// Site administration > Plugins > Local plugins > Moodle Mobile additional features.
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
 
-// Site administration > Plugins > Local plugins > UCLA configurations
+// Site administration > Plugins > Local plugins > UCLA customizations.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
 $CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4521 - Handle "preferred name".
