@@ -78,7 +78,12 @@ switch ($action) {
     case 'assign':
         $user = $DB->get_record('user', array('id'=>required_param('user', PARAM_INT)), '*', MUST_EXIST);
         $roleid = required_param('roleid', PARAM_INT);
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        /*
         if (!array_key_exists($roleid, $manager->get_assignable_roles())) {
+        */
+        if (!array_key_exists($roleid, $manager->get_assignable_roles(false, true))) {
+        // END UCLA MOD: CCLE-6809.
             throw new enrol_ajax_exception('invalidrole');
         }
         if (!has_capability('moodle/role:assign', $manager->get_context()) || !$manager->assign_role_to_user($roleid, $user->id)) {
@@ -97,7 +102,7 @@ switch ($action) {
             $outcome->response = $manager->get_assignable_roles_for_json($otheruserroles);
         } else {
             require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
-            $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($course);
+            $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($course, true);
             foreach($untrimmedroles as $role) {
                 $roles[] = array('id' => $role->id, 'name' => $role->name);
             }

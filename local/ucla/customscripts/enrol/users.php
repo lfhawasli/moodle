@@ -258,7 +258,8 @@ foreach ($users as $userid => &$user) {
 
     $user['picture'] = $OUTPUT->render($user['picture']);
     $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'],
-            $manager->get_assignable_roles(), $canassign, $PAGE->url);
+            // CCLE-6809 - Expand roles that can be manually enrolled.
+            $manager->get_assignable_roles(false, true), $canassign, $PAGE->url);
     $user['group'] = $renderer->user_groups_and_actions($userid, $user['groups'],
             $manager->get_all_groups(), has_capability('moodle/course:managegroups',
                     $manager->get_context()), $PAGE->url);

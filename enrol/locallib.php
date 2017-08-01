@@ -623,7 +623,19 @@ class course_enrolment_manager {
      *
      * @return array
      */
-    public function get_assignable_roles($otherusers = false) {
+    public function get_assignable_roles($otherusers = false, $manual = false) {
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        if ($manual) {
+            global $CFG;
+            require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
+            $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($this->course, true);
+            $roles = array();
+            foreach($untrimmedroles as $role) {
+                $roles[$role->id] = $role->name;
+            }
+            return $roles;
+        }
+        // END UCLA MOD: CCLE-6809.
         if ($this->_assignableroles === null) {
             $this->_assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false); // verifies unassign access control too
         }
@@ -725,7 +737,12 @@ class course_enrolment_manager {
     public function unassign_role_from_user($userid, $roleid) {
         global $DB;
         // Admins may unassign any role, others only those they could assign.
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        /*
         if (!is_siteadmin() and !array_key_exists($roleid, $this->get_assignable_roles())) {
+        */
+        if (!is_siteadmin() and !array_key_exists($roleid, $this->get_assignable_roles(false, true))) {
+        // END UCLA MOD: CCLE-6809.
             if (defined('AJAX_SCRIPT')) {
                 throw new moodle_exception('invalidrole');
             }
@@ -759,7 +776,12 @@ class course_enrolment_manager {
      */
     public function assign_role_to_user($roleid, $userid) {
         require_capability('moodle/role:assign', $this->context);
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        /*
         if (!array_key_exists($roleid, $this->get_assignable_roles())) {
+        */
+        if (!array_key_exists($roleid, $this->get_assignable_roles(false, true))) {
+        // END UCLA MOD: CCLE-6809.
             if (defined('AJAX_SCRIPT')) {
                 throw new moodle_exception('invalidrole');
             }

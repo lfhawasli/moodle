@@ -301,11 +301,12 @@ class uclaroles_manager {
      * Returns the list of assignable roles for given course.
      * 
      * @param object $course    Course record
+     * @param boolean $manual   Is this a manual enrolment page?
      * 
      * @return array        Returns an array in the following format:
      *                      [shortname] => [name]
      */
-    static function get_assignable_roles_by_courseid($course) {
+    static function get_assignable_roles_by_courseid($course, $manual = false) {
         global $DB;
         // first, find out what site type course is
         $site_type = null;
@@ -343,7 +344,27 @@ class uclaroles_manager {
                 }
             }
         }
-        
+        // If we're manually enrolling users, we want to expand the available roles.
+        if ($manual) {
+            $shortnames = array('coursesitemanager');
+            switch($site_type){
+                case siteindicator_manager::SITE_TYPE_SRS_INSTRUCTION:
+                case siteindicator_manager::SITE_TYPE_PRIVATE:
+                    $shortnames[] = 'student';
+                case siteindicator_manager::SITE_TYPE_TEST:
+                case siteindicator_manager::SITE_TYPE_INSTRUCTION: // Degree-related.
+                case siteindicator_manager::SITE_TYPE_INSTRUCTION_NONIEI: // Non-degree related.
+                    $shortnames[] = 'editinginstructor';
+                    break;
+            }
+            $assignableroles = array_merge(
+                $assignableroles,
+                $DB->get_records_list('role', 'shortname', $shortnames, 'sortorder'));
+        }
+        // Sort the roles in alphabetical order.
+        usort($assignableroles, function($a, $b) {
+            return strcmp($a->name, $b->name);
+        });
         return $assignableroles;
     }
     
