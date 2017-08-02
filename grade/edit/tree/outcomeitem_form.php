@@ -87,6 +87,9 @@ class edit_outcomeitem_form extends moodleform {
         $mform->addElement('advcheckbox', 'locked', get_string('locked', 'grades'));
         $mform->addHelpButton('locked', 'locked', 'grades');
         $mform->addElement('date_time_selector', 'locktime', get_string('locktime', 'grades'), array('optional'=>true));
+        // START UCLA MOD: CCLE-6803 - Disable Locked if Lockafter is enabled
+        $mform->disabledIf('locked', 'locktime[enabled]', 'checked');
+        // END UCLA MOD: CCLE-6803
 
 /// parent category related settings
         $mform->addElement('header', 'headerparent', get_string('parentcategory', 'grades'));
