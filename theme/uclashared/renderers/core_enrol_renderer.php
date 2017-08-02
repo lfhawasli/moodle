@@ -34,19 +34,45 @@ require_once($CFG->dirroot . '/enrol/renderer.php');
 class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
 
     /**
-     * Prevent users from editing groups.
+     * Adds grouping display (CCLE-6807). Originally from
+     * core_enrol_renderer::user_groups_and_actions().
      *
      * @param int $userid
      * @param array $groups
+     * @param array $groupings
      * @param array $allgroups
      * @param bool $canmanagegroups
      * @param moodle_url $pageurl
      * @return string
      */
-    public function user_groups_and_actions($userid, $groups, $allgroups, $canmanagegroups, $pageurl) {
-        // Easiest solution: prevent editing of groups from this UI.
-        return parent::user_groups_and_actions($userid, $groups, $allgroups,
-                        false, $pageurl);
+    public function user_groups_and_groupings_actions($userid, $groups, $allgroups, $canmanagegroups = false, $pageurl) {
+        global $DB;
+        // Remove following line once CCLE-6145 and dependant tickets are done.
+        //$canmanagegroups = false;
+
+        $iconenrolremove = $this->output->pix_url('t/delete');
+        $groupicon = $this->output->pix_icon('i/group', get_string('addgroup', 'group'));
+
+        $groupoutput = '';
+        foreach($groups as $groupid => $name) {
+            $groupingids = $DB->get_records('groupings_groups', array('groupid' => $groupid), '', 'groupingid');
+            foreach ($groupingids as $groupingid => $unused) {
+                $grouping = groups_get_grouping($groupingid);
+                if ($canmanagegroups and groups_remove_member_allowed($groupid, $userid)) {
+                    $url = new moodle_url($pageurl, array('action' => 'removemember', 'group'=>$groupid, 'user'=>$userid));
+                    $groupoutput .= html_writer::tag('div', $name ." / ". $grouping->name, array('class' => 'group', 'rel' => $groupid));
+                } else {
+                    $groupoutput .= html_writer::tag('div', $name ." / ". $grouping->name, array('class'=>'group', 'rel' => $groupid));
+                }
+            }
+        }
+        $output = '';
+        if ($canmanagegroups && (count($groups) < count($allgroups))) {
+            $url = new moodle_url($pageurl, array('action'=>'addmember', 'user' => $userid));
+            $output .= html_writer::tag('div', html_writer::link($url, $groupicon), array('class'=>'addgroup'));
+        }
+        $output = $output.html_writer::tag('div', $groupoutput, array('class'=>'groups'));
+        return $output;
     }
 
     /**
