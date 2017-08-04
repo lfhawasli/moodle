@@ -1273,10 +1273,10 @@ foreach ($qs as $query) {
         // get all data, even bad, and uncached
         $results = registrar_query::run_registrar_query($query, $params, false);
         
-        if (!$good_data = $results[registrar_query::query_results]) {
+        if (!$good_data = $results[registrar_query::QUERY_RESULTS]) {
             $good_data = array();
         }        
-        $results = array_merge($good_data, $results[registrar_query::failed_outputs]);
+        $results = array_merge($good_data, $results[registrar_query::FAILED_OUTPUTS]);
         
         $sectionhtml .= supportconsole_render_section_shortcut($query,
             $results, $params);
