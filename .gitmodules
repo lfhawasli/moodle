@@ -166,3 +166,6 @@
 [submodule "blocks/mhaairs"]
 	path = blocks/mhaairs
 	url = https://github.com/itamart/moodle-block_mhaairs.git
+[submodule "mod/hotquestion"]
+	path = mod/hotquestion
+	url = https://github.com/drachels/moodle-mod_hotquestion.git
