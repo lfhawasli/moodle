@@ -95,10 +95,17 @@
 #page-mod-forum-index .subscription,
 #page-mod-forum-view .subscription {float: right;text-align:right;white-space: nowrap;margin: 5px 0;}
 /** START UCLA MOD: CCLE-4882 forum customization **/
+/** Styles for allposts.php **/
 #page-mod-forum-allposts .allposts, 
 #page-mod-forum-view .allposts {text-align:right;white-space: nowrap;margin: 5px 0;}
 .forumpost.clearfix.print {border-width: 0px 0px 0px 0px;box-shadow: none;}
 /** END UCLA MOD: CCLE-4882 forum customization **/
+/** START UCLA MOD: CCLE-5283 - Standardize printer-friendly **/
+#page-mod-forum-allposts .printicon {
+    background: url([[pix:t/print]]) no-repeat scroll 2px center transparent;
+    padding-left: 20px;
+}
+/** END UCLA MOD: CCLE-5283 **/
 
 /** Styles for search.php */
 #page-mod-forum-search .introcontent {padding: 15px;font-weight:bold;}

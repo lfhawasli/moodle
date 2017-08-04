@@ -285,9 +285,7 @@ if ($showcommonelements) {
                 'offset' => $offset,
             ));
             echo html_writer::start_span('wrap printicon');
-            echo html_writer::start_tag('a', array('id' => 'printer', 'class' => 'btn', 'title' => get_string("printerfriendly", "qanda"), 'href' => $url));
-            echo html_writer::img($OUTPUT->pix_url('e/print', 'core'), get_string("printerfriendly", "qanda"), array('id' => 'printer-icon', 'class' => 'icon',));
-            echo html_writer::end_tag('a');
+            echo html_writer::link($url, get_string('printerfriendly', 'qanda'), array('id' => 'printer-icon', 'class' => 'icon'));
             echo html_writer::end_span();
         }
     }
