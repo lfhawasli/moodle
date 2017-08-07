@@ -318,3 +318,7 @@ $string['siteactivity'] = 'Site activity';
 // CCLE-5910 - Migrate events for local_ucla.
 $string['clear_srdb_ucla_syllabus_task'] = 'Clear syllabus links from SRDB.';
 $string['update_srdb_ucla_syllabus_task'] = 'Updates syllabus links at SRDB.';
+
+// SSC-3739/CCLE-6785 - Grade import fixes.
+$string['duplicateuser'] = 'Please check these id\'s and remove duplicates:{$a}';
+$string['incompleteuser'] = 'Please check and fix these incomplete id\'s:{$a}';

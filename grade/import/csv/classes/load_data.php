@@ -59,6 +59,10 @@ class gradeimport_csv_load_data {
     protected $gradebookerrors;
     /** @var array $newgradeitems An array of new grade items to be inserted into the gradebook. */
     protected $newgradeitems;
+    // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
+    /** @var array $rowkeys An array of row keys that is used to check for duplicates in the import. */
+    protected $rowkeys;
+    // END UCLA MOD: SSC-3739/CCLE-6785.
 
     /**
      * Load CSV content for previewing.
@@ -398,6 +402,9 @@ class gradeimport_csv_load_data {
                 // Skip invalid row with blank user field.
                 if (!empty($value)) {
                     $this->studentid = $this->check_user_exists($value, $userfields[$mappingidentifier]);
+                    // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
+                    $this->rowkeys[] = $value;
+                    // END UCLA MOD: SSC-3739/CCLE-6785.
                 }
             break;
             case 'new':
@@ -448,6 +455,11 @@ class gradeimport_csv_load_data {
         $forceimport = $formdata->forceimport;
         // Temporary array to keep track of what new headers are processed.
         $this->newgradeitems = array();
+        // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
+        $this->rowkeys = array();
+        $incompleterowkeys = array();
+        $paddedrowkeys = array();
+        // END UCLA MOD: SSC-3739/CCLE-6785.
         $this->trim_headers();
         $timeexportkey = null;
         $map = array();
@@ -517,6 +529,14 @@ class gradeimport_csv_load_data {
                 } else {
                     $feedbackgradeid = '';
                 }
+                // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
+                // Prepend zeroes to UIDs shorter than 9 digits.
+                if ($mappingidentifier == 'useridnumber' && strlen($value) < 9 && $value != '') {
+                    $incompleterowkeys[] = $value;
+                    $value = str_pad($value, 9, '0', STR_PAD_LEFT);
+                    $paddedrowkeys[] = $value;
+                }
+                // END UCLA MOD: SSC-3739/CCLE-6785.
 
                 $this->map_user_data_with_value($mappingidentifier, $value, $header, $map, $key, $courseid, $feedbackgradeid,
                         $verbosescales);
@@ -601,6 +621,33 @@ class gradeimport_csv_load_data {
                 }
             }
         }
+        // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
+        // Check to see if programmatically completed UID's result in duplicates.
+        if (!empty($paddedrowkeys)) {
+            $tmpstring = '';
+            for ($i = 0; $i < count($paddedrowkeys); $i++) {
+                $indexes = array_keys($this->rowkeys, $paddedrowkeys[$i]);
+                if (count($indexes) > 1) {
+                    $tmpstring .= '<br>' . $incompleterowkeys[$i];
+                }
+            }
+            if ($tmpstring != '') {
+                $this->cleanup_import(get_string('incompleteuser', 'local_ucla', $tmpstring));
+                return $this->status;
+            }
+        }
+        // Case sensitive check for duplicate import row keys.
+        if (!empty($this->rowkeys)) {
+            $arraydupes = array_unique(array_diff_assoc($this->rowkeys, array_unique($this->rowkeys)));
+            if (!empty($arraydupes)) {
+                $tmpstring = '';
+                foreach ($arraydupes as $dupe) {
+                    $tmpstring .= '<br>' . $dupe;
+                }
+                $this->cleanup_import(get_string('duplicateuser', 'local_ucla', $tmpstring));
+            }
+        }
+        // END UCLA MOD: SSC-3739/CCLE-6785.
         return $this->status;
     }
 
