@@ -319,6 +319,17 @@ $string['siteactivity'] = 'Site activity';
 $string['clear_srdb_ucla_syllabus_task'] = 'Clear syllabus links from SRDB.';
 $string['update_srdb_ucla_syllabus_task'] = 'Updates syllabus links at SRDB.';
 
+// SSC-3697 - Option to temporarily hide a course.
+$string['hidefrom'] = 'Hide from';
+$string['hideuntil'] = 'Hide until';
+$string['customhide'] = 'Hide temporarily?';
+$string['customhide_help'] = 'Gives the option to temporarily hide a course during a specified period of time.';
+$string['course_visibility_task'] = 'Temporarily hidden courses';
+$string['temphideerror'] = '"Hide from" time must be before "Hide until" time.';
+$string['temphidenotif'] = 'This course will be temporarily hidden from {$a->hidestartdate} to {$a->hideenddate}.';
+$string['hidenotif'] = 'This course will be hidden on {$a->hidestartdate}.';
+$string['unhiddennotif'] = 'This course is temporarily hidden. It will become visible on {$a->hideenddate}.';
+
 // SSC-3739/CCLE-6785 - Grade import fixes.
 $string['duplicateuser'] = 'Please check these id\'s and remove duplicates:{$a}';
 $string['incompleteuser'] = 'Please check and fix these incomplete id\'s:{$a}';
