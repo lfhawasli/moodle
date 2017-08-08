@@ -98,6 +98,10 @@ $event = \report_log\event\user_report_viewed::create(array('context' => $course
         'other' => array('mode' => $mode)));
 $event->trigger();
 
+// START UCLA MOD: CCLE-6045 - Feature Improvements to All Logs page.
+list($output, $reportlog) = local_ucla_core_edit::init_report_log_user($user, $course, $logreader, $mode, $page, $perpage);
+// END UCLA MOD: CCLE-6045.
+
 echo $OUTPUT->header();
 if ($courseid != SITEID) {
     $userheading = array(
@@ -107,23 +111,25 @@ if ($courseid != SITEID) {
     echo $OUTPUT->context_header($userheading, 2);
 }
 
-// Time to filter records from.
-if ($mode === 'today') {
-    $timefrom = usergetmidnight(time());
-} else {
-    $timefrom = 0;
-}
+// START UCLA MOD: CCLE-6045 - Feature Improvements to All Logs page.
+// // Time to filter records from.
+// if ($mode === 'today') {
+//     $timefrom = usergetmidnight(time());
+// } else {
+//     $timefrom = 0;
+// }
 
-$output = $PAGE->get_renderer('report_log');
-$reportlog = new report_log_renderable($logreader, $course, $user->id, 0, '', -1, -1, false, false, true, false, $PAGE->url,
-        $timefrom, '', $page, $perpage, 'timecreated DESC');
+// $output = $PAGE->get_renderer('report_log');
+// $reportlog = new report_log_renderable($logreader, $course, $user->id, 0, '', -1, -1, false, false, true, false, $PAGE->url,
+//         $timefrom, '', $page, $perpage, 'timecreated DESC');
 
-// Setup table if log reader is enabled.
-if (!empty($reportlog->selectedlogreader)) {
-    $reportlog->setup_table();
-    $reportlog->tablelog->is_downloadable(false);
-}
-
+// // Setup table if log reader is enabled.
+// if (!empty($reportlog->selectedlogreader)) {
+//     $reportlog->setup_table();
+//     $reportlog->tablelog->is_downloadable(false);
+// }
+//
+// END UCLA MOD: CCLE-6045.
 echo $output->reader_selector($reportlog);
 
 if ($mode === 'today') {

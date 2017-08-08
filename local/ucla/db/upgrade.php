@@ -635,6 +635,23 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2016022300, 'local', 'ucla');
     }
 
+    // We need to store when to start and stop hiding a course.
+    if ($oldversion < 2017072700) {
+        $table = new xmldb_table('course');
+        $fields = array();
+        $fields[] = new xmldb_field('hidestartdate', XMLDB_TYPE_INTEGER, '15', XMLDB_UNSIGNED, null, null, null, null, null, null);
+        $fields[] = new xmldb_field('hideenddate', XMLDB_TYPE_INTEGER, '15', XMLDB_UNSIGNED, null, null, null, null, null, null);
+
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2017072700, 'local', 'ucla');
+    }
+
     return $result;
 }
 

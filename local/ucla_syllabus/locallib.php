@@ -736,7 +736,7 @@ abstract class ucla_syllabus {
      * @return stored_file          Returns stored_file object, if file was
      *                              uploaded, otherwise returns null.
      */
-    private function locate_syllabus_file() {
+    public function locate_syllabus_file() {
         $retval = null;
 
         if (empty($this->properties->id) || empty($this->properties->courseid)) {
