@@ -559,7 +559,7 @@ $CFG->minpasswordnonalphanum = 0;
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
-$CFG->themelist = "uclashared,uclasharedcourse";
+$CFG->themelist = "snap,uclashared,uclasharedcourse";
 $CFG->themedesignermode = 0;
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php

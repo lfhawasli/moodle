@@ -569,7 +569,7 @@ $CFG->clamfailureonupload = 'donothing';
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
-$CFG->themelist = "uclashared,uclasharedcourse";
+$CFG->themelist = "snap,uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     View self help articles|https://docs.ccle.ucla.edu/

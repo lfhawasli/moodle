@@ -433,14 +433,20 @@ class local_ucla_core_edit {
      * @return boolean
      */
     public static function using_ucla_theme() {
-        global $CFG;
-        // Checks if $CFG->theme is set.
-        if (isset($CFG->theme)) {
-            // Checks if theme is uclashared/uclasharedcourse.
-            if ($CFG->theme == 'uclashared' ||
-                $CFG->theme == 'uclasharedcourse') {
-                return true;
-            }
+        global $CFG, $COURSE;
+
+        // If in a course, see if using any specified theme.
+        $themename = '';
+        if (isset($COURSE->theme) && !empty($COURSE->theme)) {
+            $themename = $COURSE->theme;
+        } else if (isset($CFG->theme)) {
+            $themename = $CFG->theme;
+        }
+
+        // Checks if theme is uclashared/uclasharedcourse.
+        if ($themename == 'uclashared' ||
+            $themename == 'uclasharedcourse') {
+            return true;
         }
         return false;
     }
