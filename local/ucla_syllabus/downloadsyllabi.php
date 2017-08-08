@@ -27,6 +27,12 @@ require_once($CFG->dirroot.'/lib/coursecatlib.php');
 require_once('./downloadsyllabi_form.php');
 require_once('./locallib.php');
 
+// Library needed to fetch url-based syllabi and convert them to pdfs.
+require_once($CFG->dirroot.'/vendor/autoload.php');
+use Knp\Snappy\Pdf;
+$htmltopdfconverter = new Pdf($CFG->dirroot.'/vendor/h4cc/wkhtmltopdf-amd64/bin/wkhtmltopdf-amd64');
+$htmltopdfconverter->setOption('disable-javascript', true);
+
 $categoryid = required_param('id', PARAM_INT);
 $category = coursecat::get($categoryid);
 
@@ -56,6 +62,9 @@ if ($data = $mform->get_data()) {
     $table->head = array(get_string('tablecolcourse', 'local_ucla_syllabus'),
             get_string('tablecolsyllabus', 'local_ucla_syllabus'));
     $table->data = array();
+
+    // Only prepare a download if the download button was pressed.
+    $downloading = !empty($data->downloadbutton);
     $syllabusfiles = array();
 
     foreach ($courses as $course) {
@@ -74,13 +83,30 @@ if ($data = $mform->get_data()) {
         } else {
             $foundsyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
         }
-       
+
         if (!empty($foundsyllabus->url)) {
             // Syllabus is a URL.
             $link = html_writer::link($foundsyllabus->url, $foundsyllabus->url);
             $table->data[] = array($courselink, $link);
+
+            // Try to convert webpage to a pdf and prepare for download in the zipfile.
+            if ($downloading) {
+                try {
+                    $webpagecontent = $htmltopdfconverter->getOutput($foundsyllabus->url);
+                    $syllabusfiles[$course->shortname . '_syllabus.pdf'] = array($webpagecontent);
+                } catch (moodle_exception $e) {
+                    // The page was unable to be converted. Just include a .txt of the URL instead.
+                    $syllabusfiles[$course->shortname . '_syllabus_url.txt'] = array($foundsyllabus->url);
+                }
+            }
         } else {
             // Syllabus is a file.
+            $syllabusfile = null;
+            try {
+                $syllabusfile = $foundsyllabus->locate_syllabus_file();
+            } catch (moodle_exception $e) {
+                continue;
+            }
             if ($syllabusfile = $foundsyllabus->locate_syllabus_file()) {
                 $syllabusfilename = $syllabusfile->get_filename();
 
@@ -90,13 +116,15 @@ if ($data = $mform->get_data()) {
                 $table->data[] = array($courselink, $downloadlink);
 
                 // Prepare the syllabi for download in the zipfile.
-                $syllabusfiles[$course->shortname . '_syllabus_' . $syllabusfilename] = $syllabusfile;
+                if ($downloading) {
+                    $syllabusfiles[$course->shortname . '_syllabus_' . $syllabusfilename] = $syllabusfile;
+                }
             }
         }
     }
 
     // If download button was pressed, download syllabi in selected term.
-    if (!empty($data->downloadbutton)) {
+    if ($downloading) {
         // Prepare the zipfile.
         $zipname = clean_filename(str_replace(' ', '_', $category->name) . "_syllabi.zip");
         // Save to a specified temporary directory.
