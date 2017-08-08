@@ -908,7 +908,7 @@ function ucla_send_mail($to, $subj, $body = '', $header = '') {
  * Sorts a set of terms.
  *
  * @param  array    $terms         Array( term, ... )
- * @param  boolean  $descending    Optional parameter to sort with 
+ * @param  boolean  $descending    Optional parameter to sort with
  *                                 most recent term first.
  * @return Array( term_in_order, ... )
  */
@@ -1335,7 +1335,7 @@ function has_shared_context($targetid, $viewerid=null) {
  * Returns active terms. Used by course requestor, course creator, and pre-pop
  * enrollment to see what terms should be processed.
  *
- * @param  boolean $descending     Optional parameter to sort active terms with 
+ * @param  boolean $descending     Optional parameter to sort active terms with
  *                                 most recent first.
  *
  * @return array           Returns an array of terms
@@ -1460,7 +1460,39 @@ function flash_redirect($url, $successmsg) {
  * @return string           Returns notice if any is needed.
  */
 function notice_course_status($course) {
-    global $CFG, $OUTPUT, $USER;
+    global $CFG, $DB, $OUTPUT, $USER;
+
+    // Do special display for users with update access for temporary hiding.
+    if (has_capability('moodle/course:update', context_course::instance($course->id))) {
+        // Temporary course visibility status.
+        // If the cron hasn't hidden/unhidden the course yet, just change it ourselves.
+        $course = \local_ucla\task\course_visibility_task::set_visiblity($course);
+
+        // Display the temporary visibility status.
+        $temporaryvisiblitystatus = null;
+        $strftimedaydatetime = get_string('strftimedaydatetime', 'langconfig');
+        if ($course->visible && !empty($course->hidestartdate)) {
+            $hidestartdate = userdate($course->hidestartdate, $strftimedaydatetime);
+            if (!empty($course->hideenddate)) {
+                // Course will be hidden temporarily in the future.
+                $hideenddate = userdate($course->hideenddate, $strftimedaydatetime);
+                $temporaryvisiblitystatus = get_string('temphidenotif', 'local_ucla',
+                        array('hidestartdate' => $hidestartdate, 'hideenddate' => $hideenddate));
+            } else {
+                // Course will be hidden indefinitely in the future.
+                $temporaryvisiblitystatus = get_string('hidenotif', 'local_ucla',
+                        array('hidestartdate' => $hidestartdate));
+            }
+        } else if (!$course->visible && !empty($course->hideenddate)) {
+            // Course will be unhidden in the future.
+            $hideenddate = userdate($course->hideenddate, $strftimedaydatetime);
+            $temporaryvisiblitystatus = get_string('unhiddennotif', 'local_ucla',
+                    array('hideenddate' => $hideenddate));
+        }
+        if (!empty($temporaryvisiblitystatus)) {
+            return $OUTPUT->notification($temporaryvisiblitystatus, 'notifywarning');
+        }
+    }
 
     // Will display a different message depending on the combination of the
     // following statuses.

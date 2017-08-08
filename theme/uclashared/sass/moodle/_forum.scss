@@ -161,3 +161,9 @@
         @include box-sizing(content-box);
     }
 }
+
+/* Properly size forum pin icon. */
+.path-mod-forum .forumheaderlist .discussion .pinned img {
+    padding: 0px;
+    margin-right: 5px;
+}

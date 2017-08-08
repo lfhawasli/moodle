@@ -142,6 +142,18 @@ function xmldb_local_ucla_install() {
         $DB->insert_record('ucla_reg_division', $division);
     }
 
+    // SSC-3697/CCLE-6713 - Schedule a course to be hidden or visible.    
+    $table = new xmldb_table('course');
+    $fields = array();
+    $fields[] = new xmldb_field('hidestartdate', XMLDB_TYPE_INTEGER, '15', XMLDB_UNSIGNED, null, null, null, null, null, null);
+    $fields[] = new xmldb_field('hideenddate', XMLDB_TYPE_INTEGER, '15', XMLDB_UNSIGNED, null, null, null, null, null, null);
+    $dbman = $DB->get_manager();
+    foreach ($fields as $field) {
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
+
     return true;
 }
 

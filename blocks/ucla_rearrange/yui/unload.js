@@ -5,16 +5,52 @@ M.block_ucla_rearrange.init = function(Y) {
 
         try {
             // Get value of serialized data.
-            var s = Y.one('#serialized').get('value');
-
-            M.block_ucla_rearrange.initialdata = $("#serialized").val();
+            var tableVal = [];
+            var it = 0;
+            $('*[id*="serialized-"]').each(function(e) {
+                tableVal[it] = ($(this).val());
+                it++;
+            });
+            tableVal.push ($("#serialized").val());
+            M.block_ucla_rearrange.initialdata = tableVal;
             var warningmessage = M.util.get_string('changesmadereallygoaway', 'moodle');
             M.core_formchangechecker.report_form_dirty_state = function() {
-                if(M.block_ucla_rearrange.initialdata != $("#serialized").val()) {
-                    return warningmessage;
-                }
-                else {
-                    return;
+                var tableTemp = [];
+                it = 0;
+                $('*[id*="serialized-"]').each(function(e) {
+                    tableTemp[it] = ($(this).val());
+                    it++;
+                });
+                tableTemp.push ($("#serialized").val());
+                // Compare the init value with current value.
+                for (var i = 0; i < tableTemp.length; i++) {
+                    // If different, check if its just the order that's being changed.
+                    if(tableTemp[i] != M.block_ucla_rearrange.initialdata[i]) {
+                        var temp = tableTemp[i].split("&");
+                        var init = M.block_ucla_rearrange.initialdata[i].split("&");
+                        if (temp.length != init.length) {
+                             return warningmessage;
+                        } else {
+                            // Get the id number of each element, sort then compare.
+                            for (var j = 0; j < temp.length; j++) {
+                                temp[j] = temp[j].split("=")[1];
+                                init[j] = init[j].split("=")[1];
+                            }
+                            var index = temp.indexOf("0");
+                            if (index > -1) {
+                                temp.splice(index, 1);
+                            }
+                            index = init.indexOf("0");
+                            if (index > -1) {
+                                init.splice(index, 1);
+                            }
+                            for (var k = 0; k < temp.length; k++) {
+                                if (temp[k] != init[k]) {
+                                    return warningmessage;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             window.onbeforeunload = M.core_formchangechecker.report_form_dirty_state;

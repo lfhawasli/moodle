@@ -201,6 +201,87 @@ class local_ucla_core_edit {
         }
     }
 
+    /** Initialize report log user
+     *
+     * @param $user the user object
+     * @param $course the course object
+     * @param $logreader the logreader object
+     * @param $mode the mode of report
+     * @param $page the page of report
+     * @param $perpage number report per page
+    */
+    public static function init_report_log_user($user, $course, $logreader, $mode, $page, $perpage) {
+
+        global $PAGE;
+
+        $date        = optional_param('date', 0, PARAM_INT); // Date to display.
+        $modid       = optional_param('modid', 0, PARAM_ALPHANUMEXT); // Module id or 'site_errors'.
+        $modaction   = optional_param('modaction', '', PARAM_ALPHAEXT); // An action as recorded in the logs.
+        $edulevel    = optional_param('edulevel', -1, PARAM_INT); // Educational level.
+        $logformat   = optional_param('download', '', PARAM_ALPHA);
+
+        $params = array();
+        if ($user->id !== 0) {
+            $params['id'] = $user->id;
+        }
+        if (!empty($course->id)) {
+            $params['course'] = $course->id;
+        } else {
+            $site = get_site();
+            $course->id = $site->id;
+        }
+        if ($mode !== '') {
+            $params['mode'] = $mode;
+        }
+        if ($date !== 0) {
+            $params['date'] = $date;
+        }
+        if ($modid !== 0) {
+            $params['modid'] = $modid;
+        }
+        if ($modaction !== '') {
+            $params['modaction'] = $modaction;
+        }
+        if ($page !== '0') {
+            $params['page'] = $page;
+        }
+        if ($perpage !== '100') {
+            $params['perpage'] = $perpage;
+        }
+        if ($logformat !== '') {
+            $params['download'] = $logformat;
+        }
+        if ($logreader !== '') {
+            $params['logreader'] = $logreader;
+        }
+        if (($edulevel != -1)) {
+            $params['edulevel'] = $edulevel;
+        }
+
+        if ($mode === 'today') {
+            $date = usergetmidnight(time());
+        }
+
+        $url = new moodle_url("/report/log/user.php", $params);
+
+        $output = $PAGE->get_renderer('local_ucla');
+
+        $reportlog = new local_ucla_renderable($logreader, $course, $user->id, $modid, $modaction,
+            -1, $edulevel, true, true, true, true, $url, $date, $logformat, $page, $perpage, 'timecreated DESC', $mode);
+
+        if (!empty($reportlog->selectedlogreader)) {
+            $reportlog->setup_table();
+        }
+
+        if (!empty($logformat)) {
+            \core\session\manager::write_close();
+            $reportlog->download();
+            exit();
+        }
+
+        return array($output, $reportlog);
+    }
+
     /**
      * Given a user, return true if they have an instructing role in the system.
      *
