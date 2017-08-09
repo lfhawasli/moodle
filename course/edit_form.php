@@ -589,8 +589,9 @@ class course_edit_form extends moodleform {
                 $data->visible = 1;
             }
         } else if ($data->hideenddate) {
-            if (time() < $data->hidestartdate) {
-                // Show for now, start hiding in the future.
+            if (($data->hidestartdate && time() < $data->hidestartdate)
+                    || $data->hideenddate < time()) {
+                // Show for now.
                 $data->visible = 1;
             } else {
                 // Hide immediately.
