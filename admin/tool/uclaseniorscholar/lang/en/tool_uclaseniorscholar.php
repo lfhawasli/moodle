@@ -57,7 +57,7 @@ $string['ccle'] = 'CCLE';
 $string['allterm'] = 'all terms';
 $string['list_course_by_term'] = 'List course by';
 $string['submit_button'] = 'Submit';
-$string['print_button'] = 'Printer friendly';
+$string['printerfriendly'] = 'Printer-friendly version';
 $string['export_button'] = 'Export to Excel';
 
 $string['no_result'] = 'Your search does not return any result';
