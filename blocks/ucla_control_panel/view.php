@@ -56,6 +56,20 @@ if (isguestuser()) {
     redirect($CFG->wwwroot . '/course/view.php?id=' . $courseid);
 }
 
+// Perform actions.
+if (has_capability('moodle/course:manageactivities', $context)) {
+    $action = optional_param('action', null, PARAM_ALPHANUMEXT);
+    switch ($action) {
+        // Disallow students to download course materials.
+        case 'toggle_course_download':
+        case 'toggle_course_download_disabled':
+            course_get_format($courseid)->update_course_format_options(
+                    array('coursedownload' => ($action == 'toggle_course_download') ? 0 : 1));
+            redirect(new moodle_url('view.php', array('course_id' => $courseid)));
+            break;
+    }
+}
+
 // Initialize $PAGE.
 $PAGE->set_url('/blocks/ucla_control_panel/view.php',
         array('course_id' => $courseid));

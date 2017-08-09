@@ -372,7 +372,13 @@ if (has_role_in_context('student', $context) || $isroleswitchedstudent) {
     }
 
     // Course Content Download.
-    $modules[] = new ucla_cp_module_course_download($coursedownloadstr, $coursedownloadurl, $temptag);
+    if (has_capability('moodle/course:manageactivities', $context)) {
+        // Provide the ability to enable/disable the "download course materials" tool.
+        $modules[] = new ucla_cp_module_course_download($coursedownloadstr, $coursedownloadurl, $temptag, null,
+                array('toggle' => true));
+    } else {
+        $modules[] = new ucla_cp_module_course_download($coursedownloadstr, $coursedownloadurl, $temptag);
+    }
 }
 // Functions for features that haven't been implemented in moodle 2.0 yet.
 /*   if (!is_collab($course->id)){
