@@ -60,7 +60,9 @@ if (isset($action)) {
 init_copyright_page($course, $courseid, $context);
 set_editing_mode_button();
 setup_js_tablesorter('copyright_status_table', array('textExtraction:uclaCopyrightTextExtraction'));
-
+$PAGE->requires->yui_module('moodle-core-formchangechecker', 'M.core_formchangechecker.init', array(array(
+        'formid' => 'block_ucla_copyright_status_form_copyright_status_list')));
+$PAGE->requires->string_for_js('changesmadereallygoaway', 'moodle');
 // Start output screen.
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'block_ucla_copyright_status'),
