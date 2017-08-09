@@ -1475,9 +1475,11 @@ function notice_course_status($course) {
             $hidestartdate = userdate($course->hidestartdate, $strftimedaydatetime);
             if (!empty($course->hideenddate)) {
                 // Course will be hidden temporarily in the future.
-                $hideenddate = userdate($course->hideenddate, $strftimedaydatetime);
-                $temporaryvisiblitystatus = get_string('temphidenotif', 'local_ucla',
-                        array('hidestartdate' => $hidestartdate, 'hideenddate' => $hideenddate));
+                if ($course->hideenddate >= time()) {
+                    $hideenddate = userdate($course->hideenddate, $strftimedaydatetime);
+                    $temporaryvisiblitystatus = get_string('temphidenotif', 'local_ucla',
+                            array('hidestartdate' => $hidestartdate, 'hideenddate' => $hideenddate));
+                }
             } else {
                 // Course will be hidden indefinitely in the future.
                 $temporaryvisiblitystatus = get_string('hidenotif', 'local_ucla',
@@ -1533,11 +1535,16 @@ function notice_course_status($course) {
         }
     }
 
+    $enableoutoftermmessage = true;
+    if (isset($course->enableoutoftermmessage)) {
+        $enableoutoftermmessage = $course->enableoutoftermmessage;
+    }
+
     // For matrix of status/message, please see:
     // CCLE-3787 - Temporary participant role.
     // CCLE-5741 - Only show out of term message if it is enabled in course settings.
     if ((!$ispastcourse && !$ishidden && !$istemprole) ||
-            ($ispastcourse && !$course->enableoutoftermmessage)) {
+            ($ispastcourse && !$enableoutoftermmessage)) {
         return;
     } else if ($ispastcourse && !$ishidden && !$istemprole) {
         $coursecontext = context_course::instance($course->id);
