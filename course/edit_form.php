@@ -202,27 +202,35 @@ class course_edit_form extends moodleform {
         }
 
         $choices = array();
+        // START UCLA MOD: CCLE-6857 - Schedule course visibility for multiple dates.
+        /*
         $choices['0'] = get_string('hide');
         $choices['1'] = get_string('show');
+        */
+        $choices['0'] = get_string('hideoption', 'local_visibility');
+        $choices['1'] = get_string('showoption', 'local_visibility');
+        // END UCLA MOD: CCLE-6857.
         $mform->addElement('select', 'visible', get_string('visible'), $choices);
         $mform->addHelpButton('visible', 'visible');
         $mform->setDefault('visible', $courseconfig->visible);
-        // START UCLA MOD: SSC-3697 - Option to temporarily hide a course.
-        // From/Until date_time_selectors.
-        $mform->addElement('date_time_selector', 'hidestartdate', get_string('hidefrom', 'local_ucla'), array('optional' => true));
-        $mform->setDefault('hidestartdate', null);
-        $mform->addElement('date_time_selector', 'hideenddate', get_string('hideuntil', 'local_ucla'), array('optional' => true));
-        $mform->setDefault('hideenddate', null);
-
-        // If either hidefrom or hideuntil are enabled, then disable "Visible" option.
-        $mform->disabledIf('visible', 'hideenddate[enabled]', 'checked');
-        $mform->disabledIf('visible', 'hidestartdate[enabled]', 'checked');
-        // END UCLA MOD: SSC-3697.
         if (!empty($course->id)) {
             if (!has_capability('moodle/course:visibility', $coursecontext)) {
                 $mform->hardFreeze('visible');
                 $mform->setConstant('visible', $course->visible);
             }
+            // START UCLA MOD: CCLE-6857 - Schedule course visibility for multiple dates.
+            global $DB;
+            // Disable the option to change visibility if the visibility is being scheduled.
+            if ($DB->record_exists_select('ucla_visibility_schedule', 'past = 0', array('courseid' => $course->id))) {
+                $mform->hardFreeze('visible');
+                $mform->setConstant('visible', $course->visible);
+                // Include a link to where the user can modify the schedule.
+                $link = html_writer::link(new moodle_url('/local/visibility/schedule.php', array('id' => $course->id)),
+                        get_string('visibilitylink', 'local_visibility'));
+                $mform->addElement('static', '', '', '<i>' . get_string('visibilitydisabled', 'local_visibility') . ' ' . $link . '</i>');
+                $mform->addElement('html', '<br>');
+            }
+            // END UCLA MOD: CCLE-6857.
         } else {
             if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
                 $mform->hardFreeze('visible');
@@ -568,41 +576,6 @@ class course_edit_form extends moodleform {
         // END UCLA MOD: CCLE-4230
     }
 
-    // START UCLA MOD: SSC-3697 - Option to temporarily hide a course.
-    /**
-     * Overriden to support temporary hide/show options.
-     *
-     * @return object submitted data; NULL if not valid or not submitted or cancelled
-     */
-    function get_data() {
-        $data = parent::get_data();
-        if (is_null($data)) {
-            return null; // Data invalid.
-        }
-
-        // Set hideenddate, hidestartdate, and visible to appropriate values.
-        if ($data->hidestartdate && !$data->hideenddate) {
-            // Hide the course indefinitely after hidestartdate.
-            if (time() > $data->hidestartdate) {
-                $data->visible = 0;
-            } else {
-                $data->visible = 1;
-            }
-        } else if ($data->hideenddate) {
-            if (($data->hidestartdate && time() < $data->hidestartdate)
-                    || $data->hideenddate < time()) {
-                // Show for now.
-                $data->visible = 1;
-            } else {
-                // Hide immediately.
-                $data->visible = 0;
-            }
-        }
-
-        return $data;
-    }
-    // END UCLA MOD: SSC-3697.
-
     /**
      * Validation.
      *
@@ -630,13 +603,6 @@ class course_edit_form extends moodleform {
                 }
             }
         }
-        // START UCLA MOD: SSC-3697 - Option to temporarily hide a course.
-        if ($data['hideenddate'] || $data['hidestartdate']) {
-            if ($data['hidestartdate'] && $data['hideenddate'] && $data['hideenddate'] <= $data['hidestartdate']) {
-                $errors['hidestartdate'] = get_string('temphideerror', 'local_ucla');
-            }
-        }
-        // END UCLA MOD: SSC-3697.
 
         $errors = array_merge($errors, enrol_course_edit_validation($data, $this->context));
 
