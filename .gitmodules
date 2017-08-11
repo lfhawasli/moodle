@@ -87,7 +87,7 @@
 	url = git@github.com:ucla/moodle-mod_zoom.git
 [submodule "blocks/massaction"]
 	path = blocks/massaction
-	url = git@github.com:ccle/moodle-block_massaction.git 
+	url = git@github.com:ccle/moodle-block_massaction.git
 [submodule "mod/turnitintool"]
 	path = mod/turnitintool
 	url = git@github.com:ccle/moodle-mod_turnitintool.git
@@ -129,16 +129,16 @@
 	url = git@github.com:ccle/moodle-plagiarism_turnitin.git
 [submodule "mod/certificate"]
 	path = mod/certificate
-	url = git@github.com:ccle/moodle-mod_certificate.git 
+	url = git@github.com:ccle/moodle-mod_certificate.git
 [submodule "local/mobile"]
 	path = local/mobile
 	url = git@github.com:jleyva/moodle-local_mobile.git
 [submodule "lib/editor/atto/plugins/chemrender"]
 	path = lib/editor/atto/plugins/chemrender
-	url = git@github.com:ucla/moodle-atto_chemrender.git 
+	url = git@github.com:ucla/moodle-atto_chemrender.git
 [submodule "filter/chemrender"]
 	path = filter/chemrender
-	url = git@github.com:ucla/moodle-filter-chemrender.git 
+	url = git@github.com:ucla/moodle-filter-chemrender.git
 [submodule "mod/casa"]
 	path = mod/casa
 	url = git@github.com:ucla/moodle-mod_casa.git
@@ -159,7 +159,7 @@
 	url = git@github.com:damyon/moodle-atto_count.git
 [submodule "mod/hvp"]
         path = mod/hvp
-        url = git@github.com:ccle/h5p-moodle-plugin.git 
+        url = git@github.com:ccle/h5p-moodle-plugin.git
 [submodule "mod/choicegroup"]
 	path = mod/choicegroup
 	url = https://github.com/ndunand/moodle-mod_choicegroup.git
@@ -169,3 +169,6 @@
 [submodule "mod/hotquestion"]
 	path = mod/hotquestion
 	url = https://github.com/drachels/moodle-mod_hotquestion.git
+[submodule "local/mediaconversion/libraries/KalturaGeneratedAPIClientsPHP"]
+	path = local/mediaconversion/libraries/KalturaGeneratedAPIClientsPHP
+	url = https://github.com/kaltura/KalturaGeneratedAPIClientsPHP.git
