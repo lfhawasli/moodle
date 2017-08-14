@@ -29,7 +29,7 @@ $breakpoint-large:          1200px !default;
     
     & > a {
         font-size: $type-font-size;
-        @extend .btn;
+        @extend .btn !optional;
         
         margin-top: 20px;
     }

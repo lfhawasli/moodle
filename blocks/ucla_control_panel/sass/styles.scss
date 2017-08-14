@@ -65,6 +65,20 @@
                 clear: left;
                 width: 100%;
             }
+
+            .toggle-link {
+                margin-top: 5px;
+                color: #536895;
+                display: inline-block;
+                clear: left;
+                font-size: 80%;
+                width: auto;
+            }
+
+            .toggle-link-icon {
+                padding-left: 15px;
+                padding-right: 1px;
+            }
         }
         
     }
