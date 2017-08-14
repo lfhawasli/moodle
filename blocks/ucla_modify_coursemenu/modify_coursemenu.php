@@ -180,7 +180,7 @@ $modifycoursemenuform = new ucla_modify_coursemenu_form(
         ),
     'post',
     '',
-    array('class' => 'ucla_modify_coursemenu_form')
+    array('class' => 'ucla_modify_coursemenu_form', 'id' => 'add_submit_form')
 );
 
 // This is needed if we're deleting sections.
@@ -574,6 +574,15 @@ if ($syllabusdata->can_host_syllabi) {
 
 $PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery-1.3.2.min.js');
 $PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery.tablednd_0_5.js');
+$PAGE->requires->yui_module('moodle-core-formchangechecker',
+        'M.core_formchangechecker.init', array(array(
+            'formid' => 'tableform'
+        )));
+$PAGE->requires->yui_module('moodle-core-formchangechecker',
+        'M.core_formchangechecker.init', array(array(
+            'formid' => 'add_submit_form'
+        )));
+$PAGE->requires->string_for_js('changesmadereallygoaway', 'moodle');
 $PAGE->requires->js('/blocks/ucla_modify_coursemenu/modify_coursemenu.js');
 
 $PAGE->requires->string_for_js('section0name', $formatcompstr);
@@ -653,7 +662,12 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
 
     $tablestructure->head = $tsheadstrs;
 
+    // Create the table form.
+    echo html_writer::start_tag('form', array('id' => 'tableform', 'class' => 'ucla_modify_coursemenu_form mform',
+        'autocomplete' => 'off', 'action' => $PAGE->url->out(), 'method' => 'post', 'accept-charset' => 'utf-8'));
     echo html_writer::table($tablestructure);
+    echo html_writer::end_tag('form');
+
     $modifycoursemenuform->display();
 }
 
