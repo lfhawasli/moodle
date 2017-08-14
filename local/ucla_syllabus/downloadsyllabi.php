@@ -94,13 +94,19 @@ if ($data = $mform->get_data()) {
                 try {
                     $webpagecontent = $htmltopdfconverter->getOutput($foundsyllabus->url);
                     $syllabusfiles[$course->shortname . '_syllabus.pdf'] = array($webpagecontent);
-                } catch (Exception $e) {
+                } catch (moodle_exception $e) {
                     // The page was unable to be converted. Just include a .txt of the URL instead.
                     $syllabusfiles[$course->shortname . '_syllabus_url.txt'] = array($foundsyllabus->url);
                 }
             }
         } else {
             // Syllabus is a file.
+            $syllabusfile = null;
+            try {
+                $syllabusfile = $foundsyllabus->locate_syllabus_file();
+            } catch (moodle_exception $e) {
+                continue;
+            }
             if ($syllabusfile = $foundsyllabus->locate_syllabus_file()) {
                 $syllabusfilename = $syllabusfile->get_filename();
 

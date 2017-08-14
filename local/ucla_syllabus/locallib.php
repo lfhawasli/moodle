@@ -575,7 +575,7 @@ abstract class ucla_syllabus {
         if (!empty($syllabusid)) {
             $this->properties = $DB->get_record('ucla_syllabus', array('id' => $syllabusid));
             if (empty($this->properties)) {
-                throw moodle_exception('Invalid syllabus id');
+                throw new moodle_exception('Invalid syllabus id');
             }
         } else {
             $this->properties = new stdClass();
@@ -751,10 +751,12 @@ abstract class ucla_syllabus {
         // Should really have just one file uploaded, but handle weird cases.
         if (count($files) < 1 && empty($this->properties->url)) {
             // No files uploaded and no URL added!
-            debugging('Warning, no file uploaded for given ucla_syllabus entry');
+            throw new moodle_exception('Warning, no file uploaded for given ucla_syllabus entry for course '
+                    . $this->properties->courseid);
         } else {
             if (count($files) > 1) {
-                debugging('Warning, more than one syllabus file uploaded for given ucla_syllabus entry');
+                 throw new moodle_exception('Warning, more than one syllabus file uploaded for given ucla_syllabus entry for course '
+                    . $this->properties->courseid);
             }
 
             $retval = reset($files);
