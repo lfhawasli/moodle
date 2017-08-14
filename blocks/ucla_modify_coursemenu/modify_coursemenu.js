@@ -422,6 +422,62 @@ M.block_ucla_modify_coursemenu.start = function() {
 
         return true;
     });
+
+    Y.use('moodle-core-formchangechecker', function() {
+        M.core_formchangechecker.get_form_dirty_state = function() {
+            var state = M.core_formchangechecker.stateinformation,
+                editor;
+
+            // If the form was submitted, then return a non-dirty state.
+            if (state.formsubmitted) {
+                return 0;
+            }
+
+            // If any fields have been marked dirty, return a dirty state.
+            if (state.formchanged) {
+                return 1;
+            }
+
+            M.block_ucla_modify_coursemenu.savedata;
+            var newdata = $('#' + M.block_ucla_modify_coursemenu.table_id + ' tbody').tableDnDSerialize();
+            var savesplit = M.block_ucla_modify_coursemenu.savedata.split("&");
+            var newsplit = newdata.split("&");
+            if (savesplit.length !== newsplit.length) {
+                return 1;
+            }
+            var savestr;
+            var newstr;
+            for (var i = 0; i < savesplit.length; i++) {
+                savestr = savesplit[i].substring(savesplit[i].lastIndexOf("=") + 1);
+                newstr = newsplit[i].substring(newsplit[i].lastIndexOf("=") + 1);
+                if (savestr !== newstr) {
+                    return 1;
+                }
+            }
+
+            // If a field has been focused and changed, but still has focus then the browser won't fire the
+            // onChange event. We check for this eventuality here.
+            if (state.focused_element) {
+                if (state.focused_element.element.get('value') !== state.focused_element.initial_value) {
+                    return 1;
+                }
+            }
+
+            // Handle TinyMCE editor instances.
+            // We can't add a listener in the initializer as the editors may not have been created by that point
+            // so we do so here instead.
+            if (typeof window.tinyMCE !== 'undefined') {
+                for (editor in window.tinyMCE.editors) {
+                    if (window.tinyMCE.editors[editor].isDirty()) {
+                        return 1;
+                    }
+                }
+            }
+
+            // If we reached here, then the form hasn't met any of the dirty conditions.
+            return 0;
+        }
+    });
 }
 
 M.block_ucla_modify_coursemenu.parse_sectionid = function(section_dom, sliceindex) {
@@ -450,5 +506,8 @@ M.block_ucla_modify_coursemenu.get_sections_jq = function(jq) {
  *  $(document).ready() callback.
  **/
 M.block_ucla_modify_coursemenu.initialize = function() {
-    $(document).ready(function() {M.block_ucla_modify_coursemenu.start()});
+    $(document).ready(function() {
+        M.block_ucla_modify_coursemenu.start();
+        M.block_ucla_modify_coursemenu.savedata = $('#' + M.block_ucla_modify_coursemenu.table_id + ' tbody').tableDnDSerialize();
+    });
 }

@@ -264,15 +264,10 @@ function display_copyright_status_contents($courseid, $filter) {
         echo html_writer::end_tag('ul');
         echo html_writer::end_tag('fieldset');
     }
-    // End display statistics.
-
-    echo html_writer::start_tag('div',
-            array('id' => 'block_ucla_copyright_status_cp'));
-    echo html_writer::start_tag('form',
-            array('id' => 'block_ucla_copyright_status_form_copyright_status_list',
-                  'action' => $PAGE->url->out(), 'method' => 'post'));
 
     // Display copyright filter.
+    echo html_writer::start_tag('form', array('id' => 'block_ucla_copyright_status_form_copyright_status_filter',
+        'action' => $PAGE->url->out(), 'method' => 'post'));
     echo html_writer::start_tag('div',
             array('id' => 'block_ucla_copyright_status_filter'));
     echo html_writer::tag('span',
@@ -285,7 +280,15 @@ function display_copyright_status_contents($courseid, $filter) {
            array(array('selectid' => 'block_ucla_copyright_status_id_filter_copyright', 'nothing' => false))
            );
     echo html_writer::end_tag('div');
+    echo html_writer::end_tag('form');
     // End display copyright filter.
+
+    // End display statistics.
+    echo html_writer::start_tag('div',
+            array('id' => 'block_ucla_copyright_status_cp'));
+    echo html_writer::start_tag('form',
+            array('id' => 'block_ucla_copyright_status_form_copyright_status_list',
+                  'action' => $PAGE->url->out(), 'method' => 'post'));
     // Display copyright status list.
     unset($licenseoptions['all']);
     $t = new html_table();

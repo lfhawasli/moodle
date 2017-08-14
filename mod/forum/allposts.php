@@ -114,7 +114,10 @@ if (!$print) {
     echo html_writer::tag('div',
             html_writer::link(new moodle_url('/mod/forum/allposts.php',
                     array('forumid' => $forum->id, 'sort' => $sortparam, 'print' => true)),
-            get_string('modeprint', 'forum')),
+            // START UCLA MOD: CCLE-5283 - Standardize printer-friendly.
+            //get_string('modeprint', 'forum')),
+            get_string('modeprint', 'forum'), array('class' => 'printicon')),
+            // END MOD: CCLE-5283.
             array('class' => 'allposts'));
 }
 // Add export button

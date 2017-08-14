@@ -109,6 +109,7 @@ class ucla_cp_renderer {
      * @return string The DOMs of the control panel description and link.
      **/
     public static function general_descriptive_link($itemobj, $linkattributes = null) {
+        global $OUTPUT;
         $fitem = '';
 
         $bucp = $itemobj->associated_block();
@@ -136,7 +137,26 @@ class ucla_cp_renderer {
         // One needs to explicitly hide the post description.
         if ($itemobj->get_opt('post') !== false) {
             $fitem .= html_writer::tag('span', get_string($item . '_post',
-                $bucp, $itemobj), array('class' => 'post-link'));
+                    $bucp, $itemobj), array('class' => 'post-link'));
+
+            // If enabled, display an option to toggle availability of this option.
+            if ($itemobj->get_opt('toggle')) {
+                $msg = get_string($item . '_toggle', $bucp, $itemobj);
+
+                // Checks if $item ends in "disabled", in which case we want the toggle to enable it (and vice versa).
+                $enable = (stripos(strrev($item), strrev('_disabled')) === 0);
+                // Set the action to toggle the current availability.
+                $action = 'toggle_' . $item;
+
+                $icon = ($enable) ? 'hide' : 'show';
+                $iconurl = $OUTPUT->pix_url('t/' . $icon);
+                $fitem .= html_writer::link(
+                        new moodle_url('', array('action' => 'toggle_' . $item,
+                        'course_id' => required_param('course_id', PARAM_INT))),
+                        html_writer::img($iconurl, '',
+                        array('height' => 10, 'class' => 'toggle-link-icon'))
+                        . $msg, array('class' => 'toggle-link'));
+            }
         }
 
         return $fitem;

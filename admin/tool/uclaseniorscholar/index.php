@@ -126,12 +126,12 @@ if (empty($mode)) {
                                                'name' => 'submit_button',
                                                'value' => get_string('submit_button', 'tool_uclaseniorscholar'),
                                                'type' => 'submit'));
+
     // Printer friendly version.
-    echo html_writer::empty_tag('input', array('id' => 'history_print_btn',
-                                               'name' => 'mode',
-                                               'class' => 'button_grp',
-                                               'value' => get_string('print_button', 'tool_uclaseniorscholar'),
-                                               'type' => 'submit'));
+    $printurl = new moodle_url('', array('mode' => 'Printer friendly'));
+    $printtitle = get_string('printerfriendly', 'tool_uclaseniorscholar');
+    $printattributes = array('class' => 'printicon');
+    echo html_writer::link($printurl, $printtitle, $printattributes);
 
     echo html_writer::empty_tag('input', array('type' => 'hidden',
                                                'id' => 'id_filter',

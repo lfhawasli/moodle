@@ -1,7 +1,9 @@
-.button_grp {
-    margin-left: 5px;
-}
-
 .coursecancelled {
 	color: red;
+}
+
+form#tool_uclaseniorscholar_history_by_user a.printicon {
+    background: url([[pix:t/print]]) no-repeat scroll 7px center transparent;
+    padding-left: 25px;
+    vertical-align: middle;
 }
