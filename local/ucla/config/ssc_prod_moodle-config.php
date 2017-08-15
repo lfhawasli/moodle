@@ -506,6 +506,9 @@ preferences,moodle|/user/preferences.php|preferences";
 // Site administration > Appearance > Themes > Snap > Snap
 $CFG->forced_plugin_settings['theme_snap']['messagestoggle'] = 0;
 
+// Site administration > Appearance > Themes > Snap > Resource display
+$CFG->forced_plugin_settings['theme_snap']['resourcedisplay'] = 'list';
+
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
 $CFG->navshowcategories = 0;
