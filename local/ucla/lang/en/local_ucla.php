@@ -335,4 +335,4 @@ $string['duplicateuser'] = 'Please check these id\'s and remove duplicates:{$a}'
 $string['incompleteuser'] = 'Please check and fix these incomplete id\'s:{$a}';
 
 // CCLE-6807 - Improve Group/Grouping column on Participants page.
-$string['groupsandgroupings'] = 'Group / Grouping';
+$string['groupsandgroupings'] = 'Group /<br />Grouping';
