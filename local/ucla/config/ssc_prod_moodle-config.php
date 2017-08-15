@@ -503,6 +503,9 @@ $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
 $CFG->customusermenuitems = "grades,grades|/grade/report/mygrades.php|grades
 preferences,moodle|/user/preferences.php|preferences";
 
+// Site administration > Appearance > Themes > Snap > Snap
+$CFG->forced_plugin_settings['theme_snap']['messagestoggle'] = 0;
+
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
 $CFG->navshowcategories = 0;
