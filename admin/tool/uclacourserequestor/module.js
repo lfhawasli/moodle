@@ -38,7 +38,7 @@ M.tool_uclacourserequestor = {
         var checkallinstructors = Y.one('#ucrgeneraloptions .check-all-instructors');
         if (checkallinstructors) {
             checkallinstructors.on('change', function(e) {
-                var intructorCheckboxes = Y.all('#uclacourserequestor_requests td:nth-last-child(2):not(.warning):not(.error) input[type="checkbox"]');
+                var intructorCheckboxes = Y.all('#uclacourserequestor_requests td:nth-last-child(3):not(.warning):not(.error) input[type="checkbox"]');
 
                 intructorCheckboxes.each(function(node) {
                     node.set('checked', e.target.get('checked'));
