@@ -86,9 +86,6 @@ $string['asucla_textbooks_post'] = '';
 // Stuff from other.
 $string['ucla_cp_mod_other'] = 'Other tools';
 
-$string['import_classweb'] = 'Import ClassWeb site';
-$string['import_classweb_post'] = 'Import content from a previous course on ClassWeb to this site.';
-
 $string['import_moodle'] = 'Import Moodle course data';
 $string['import_moodle_post'] = 'Copy activities and content from one of your Moodle courses to another.';
 
