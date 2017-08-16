@@ -50,6 +50,9 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
         this._region.find('[data-region="user-filters"]').on('click', this._toggleExpandFilters.bind(this));
 
         $(document).on('user-changed', this._refreshSelector.bind(this));
+        // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
+        $(document).on('done-saving-show-next', this._handleNextUser.bind(this));
+        // END UCLA MOD: SSC-3624/CCLE-6876.
 
         // Position the configure filters panel under the link that expands it.
         var toggleLink = this._region.find('[data-region="user-filters"]');
