@@ -5,9 +5,21 @@
 .officehours_form .fstatic {
     font-style: italic;
 }
-
-/* remove spacing under alternative email field */
+/* Delineate static help messages. */
+.officehours_form .static-help {
+    margin-bottom: 0.5em;
+}
+/* Remove spacing under fields with help messages. */
 .officehours_form #fitem_id_email {
+    margin-bottom: -0.5em;
+}
+.officehours_form #fitem_id_phone {
+    margin-bottom: -0.5em;
+}
+.officehours_form #fitem_id_office {
+    margin-bottom: -0.5em;
+}
+.officehours_form #fitem_id_officehours {
     margin-bottom: -0.5em;
 }
 
