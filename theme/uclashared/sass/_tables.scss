@@ -174,9 +174,13 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
     float: inherit;
 }
 
+.userenrolment .group {
+    padding: 5px 0;
+}
+
 .userenrolment .group.groupgroupingdiv {
     border-top: 1px solid gray;
-    width: 60%;
+    width: 100%;
 }
 
 @media only screen and (max-width: $breakpoint-xsmall),
