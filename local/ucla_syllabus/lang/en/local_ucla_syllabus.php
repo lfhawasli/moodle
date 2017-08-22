@@ -88,6 +88,7 @@ $string['private_disclaimer'] = 'This syllabus is available only to enrolled stu
 $string['preview'] = 'preview';
 $string['private'] = 'restricted';
 $string['modified'] = 'Last modified: ';
+$string['strftimedatetimeshortfilename'] = '%y-%m-%d--%H-%M';
 
 // Success strings.
 $string['successful_add'] = 'Successfully added syllabus';
