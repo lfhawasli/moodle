@@ -169,3 +169,6 @@
 [submodule "mod/hotquestion"]
 	path = mod/hotquestion
 	url = https://github.com/drachels/moodle-mod_hotquestion.git
+[submodule "filter/tabs"]
+	path = filter/tabs
+	url = https://github.com/JosePFs/moodle-filter_tabs.git
