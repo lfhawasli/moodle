@@ -264,13 +264,6 @@ foreach ($users as $userid => &$user) {
             $manager->get_all_groups(), has_capability('moodle/course:managegroups',
                     $manager->get_context()), $PAGE->url);
     $user['enrol'] = $renderer->user_enrolments_and_actions($user['enrolments']);
-    // Add grouping information under groups information.
-    $user['group'] .= '<br><br><strong>Groupings</strong><br>';
-    $groupingoutput = '';
-    foreach ($user['groupings'] as $groupingid => $name) {
-        $groupingoutput .= html_writer::tag('div', $name, array('class' => 'grouping', 'rel' => $groupingid));
-    }
-    $user['group'] = $user['group'].html_writer::tag('div', $groupingoutput, array('class' => 'groupings'));
 }
 
 // Determine fields to show in the table.
@@ -306,7 +299,7 @@ if (has_capability('moodle/role:assign', $context)) {
 }
 if (has_capability('moodle/course:managegroups', $context)) {
     $fields += array(
-        'group' => get_string('groups', 'group')
+        'group' => get_string('groupsandgroupings', 'local_ucla')
     );
 }
 if (has_capability('moodle/course:enrolconfig', $context) or has_capability('moodle/course:enrolreview', $context)) {

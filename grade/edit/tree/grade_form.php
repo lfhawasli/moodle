@@ -103,9 +103,6 @@ class edit_grade_form extends moodleform {
         $mform->addHelpButton('locked', 'locked', 'grades');
         $mform->addElement('date_time_selector', 'locktime', get_string('locktime', 'grades'), array('optional'=>true));
         $mform->disabledIf('locktime', 'gradetype', 'eq', GRADE_TYPE_NONE);
-        // START UCLA MOD: CCLE-6803 - Disable Locked if Lockafter is enabled
-        $mform->disabledIf('locked', 'locktime[enabled]', 'checked');
-        // END UCLA MOD: CCLE-6803
 
         // Feedback format is automatically converted to html if user has enabled editor
         $feedbackoptions = array('maxfiles'=>0, 'maxbytes'=>0); //TODO: no files here for now, if ever gets implemented use component 'grade' and filearea 'feedback'

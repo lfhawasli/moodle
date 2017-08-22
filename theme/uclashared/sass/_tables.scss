@@ -162,12 +162,25 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
 // Make the role column flexible width (overriding bootstrapbase).
 .userenrolment {
     .col_role {
-        max-width: 262px;
         width: auto;
     }
     .col_select {
         text-align: center;
     }
+}
+
+// Override base float: left property.
+.userenrolment .col_group .group {
+    float: inherit;
+}
+
+.userenrolment .group {
+    padding: 5px 0;
+}
+
+.userenrolment .group.groupgroupingdiv {
+    border-top: 1px solid gray;
+    width: 100%;
 }
 
 @media only screen and (max-width: $breakpoint-xsmall),
@@ -212,6 +225,7 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
         display: block; 
         border-left: 0; 
         border-right: 0;
+        height: $ccle-userenrollment-row-height;
         max-height: $ccle-userenrollment-row-height;
         width: auto;
     }
@@ -219,8 +233,10 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
         border-top: 0;
     }
     .userenrolment td.col_userdetails,
-    .userenrolment th.col_userdetails {
-        min-height: 70px;
+    .userenrolment th.col_userdetails,
+    .userenrolment td.col_group,
+    .userenrolment th.col_group {
+        min-height: 125px;
     }
     .userenrolment .col_lastseen,
     .userenrolment .col_role { 
@@ -236,10 +252,6 @@ only screen and (min-width: $breakpoint-xsmall) and (max-width: $breakpoint-medi
     }
     .userenrolment td {
         padding: 4px;
-    }
-    .userenrolment td.col_userdetails,
-    .userenrolment th.col_userdetails {
-        min-height: 125px;
     }
 }
 

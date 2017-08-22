@@ -239,9 +239,6 @@ class edit_category_form extends moodleform {
 
         $mform->addElement('date_time_selector', 'grade_item_locktime', get_string('locktime', 'grades'), array('optional'=>true));
         $mform->disabledIf('grade_item_locktime', 'grade_item_gradetype', 'eq', GRADE_TYPE_NONE);
-        // START UCLA MOD: CCLE-6803 - Disable Locked if Lockafter is enabled
-        $mform->disabledIf('grade_item_locked', 'grade_item_locktime[enabled]', 'checked');
-        // END UCLA MOD: CCLE-6803
 
 /// parent category related settings
         $mform->addElement('header', 'headerparent', get_string('parentcategory', 'grades'));

@@ -343,6 +343,7 @@ $CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
 $CFG->tnastreamerurl = "rtmp://169.232.194.193/csa";
 
 // Site administration > Plugins > Assignment plugins > Submission plugins > File submissions
+$CFG->forced_plugin_settings['assignsubmission_file']['maxfiles'] = 50;
 $CFG->forced_plugin_settings['assignsubmission_file']['maxbytes'] = 104857600;   // 100MB
 
 // Site administration > Plugins > Assignment plugins > Feedback plugins > Feedback PoodLL
@@ -462,12 +463,13 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     list = unorderedlist, orderedlist
     indent = indent
     undo = undo
+    pastespecial = pastespecial
     links = link
     files = image, media, managefiles, kalturamedia, mediagallery
     other = htmlplus, fullscreen
     style2 = strike, subscript, superscript
     align = align, table, bsgrid
-    insert = chemrender, chemistry, computing, equation, poodll, charmap, clear, pastespecial
+    insert = chemrender, chemistry, computing, equation, poodll, charmap, clear
     accessibility = accessibilitychecker, accessibilityhelper';
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor

@@ -344,10 +344,6 @@ if (has_role_in_context('student', $context) || $isroleswitchedstudent) {
     $modules[] = new ucla_cp_module('edit_profile', new moodle_url(
                             $CFG->wwwroot . '/user/edit.php'), $temptag, 'moodle/user:editownprofile');
 
-      $modules[] = new ucla_cp_module('import_classweb', new moodle_url('view.php'),
-      $temptag, $tempcap);
-      // Import from classweb.
-
     // Import from existing moodle course.
     $modules[] = new ucla_cp_module('import_moodle', new moodle_url($CFG->wwwroot .
             '/backup/import.php', array('id' => $course->id)), $temptag,
