@@ -150,11 +150,6 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
             });
             if (nextUserId == this._lastUserId) {
                 $(document).trigger('reset', nextUserId);
-            // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
-            // Use 'next-user' as the parameter for nextUserId to tell it to use the next user in the grading list.
-            } else if (nextUserId == 'next-user') {
-                $(document).trigger('done-saving-show-next');
-            // END UCLA MOD: SSC-3624/CCLE-6876.
             } else {
                 $(document).trigger('user-changed', nextUserId);
             }
@@ -349,9 +344,6 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
 
         docElement.on('user-changed', this._refreshGradingPanel.bind(this));
         docElement.on('save-changes', this._submitForm.bind(this));
-        // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
-        docElement.on('save-and-show-next', this._submitForm.bind(this, null, "next-user"));
-        // END UCLA MOD: SSC-3624/CCLE-6876.
         docElement.on('reset', this._resetForm.bind(this));
 
         docElement.on('save-form-state', this._saveFormState.bind(this));
