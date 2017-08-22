@@ -343,6 +343,7 @@ $CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
 $CFG->tnastreamerurl = "rtmp://169.232.194.193/csa";
 
 // Site administration > Plugins > Assignment plugins > Submission plugins > File submissions
+$CFG->forced_plugin_settings['assignsubmission_file']['maxfiles'] = 50;
 $CFG->forced_plugin_settings['assignsubmission_file']['maxbytes'] = 104857600;   // 100MB
 
 // Site administration > Plugins > Assignment plugins > Feedback plugins > Feedback PoodLL
