@@ -229,6 +229,7 @@ class local_publicprivate_renderer extends core_course_renderer {
         if (!empty($cmname)) {
             // Start the div for the activity title, excluding the edit icons.
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
+            $output .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
             $output .= $cmname;
 
             // Module can put text after the link (e.g. forum unread)
@@ -263,8 +264,6 @@ class local_publicprivate_renderer extends core_course_renderer {
             $modicons .= ' '. $this->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
             $modicons .= $mod->afterediticons;
         }
-
-        $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
 
         if (!empty($modicons)) {
             $output .= html_writer::span($modicons, 'actions');
