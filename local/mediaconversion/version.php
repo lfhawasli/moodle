@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version = 2017071902;
+$plugin->version = 2017071904;
 $plugin->component = 'local_mediaconversion';
 $plugin->release = 'Media conversion';
 $plugin->requires = 2014050800;

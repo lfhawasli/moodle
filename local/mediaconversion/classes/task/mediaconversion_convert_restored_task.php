@@ -28,13 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__.'/../../locallib.php');
 
 /**
- * This is the media conversion task class that extends adhoc task.
+ * This is the media conversion task class that extends adhoc task for restored courses.
  *
  * @package    local_mediaconversion
  * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mediaconversion_convert_task extends \core\task\adhoc_task {
+class mediaconversion_convert_restored_task extends \core\task\adhoc_task {
     /**
      * Executes the task.
      *
@@ -43,13 +43,20 @@ class mediaconversion_convert_task extends \core\task\adhoc_task {
     public function execute() {
         global $CFG;
         $customdata = $this->get_custom_data();
-        $data = $customdata->eventdata;
-        // Get modinfo (along with course info).
-        $courseandmodinfo = get_course_and_cm_from_cmid($data->objectid, $data->other->modulename, $data->courseid);
-        // Only delete the old course module if the new one is added successfully.
-        if (local_cm_convert_and_add_module($data->contextid, $courseandmodinfo,
-                $customdata->userid, $data->objectid, $data->other->name)) {
-            course_delete_module($data->objectid);
+        // Get course modinfo.
+        $modinfo = get_fast_modinfo($customdata->courseid);
+        foreach ($modinfo->get_cms() as $cm) {
+            // We only want to deal with file uploads.
+            if ($cm->get_course_module_record(true)->modname !== 'resource') {
+                continue;
+            }
+            // Get the module context.
+            $context = \context_module::instance($cm->id);
+            // Only delete the old course module if the new one is added successfully.
+            if (local_cm_convert_and_add_module($context->id, array($cm->get_course(), $cm),
+                    $customdata->userid, $cm->id, $cm->name)) {
+                course_delete_module($cm->id);
+            }
         }
     }
 
@@ -59,6 +66,6 @@ class mediaconversion_convert_task extends \core\task\adhoc_task {
      * @return string
      */
     public function get_name() {
-        return get_string('taskmediaconversion_convert', 'local_mediaconversion');
+        return get_string('taskmediaconversion_convert_restored', 'local_mediaconversion');
     }
 }

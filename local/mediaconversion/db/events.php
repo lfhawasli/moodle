@@ -29,5 +29,11 @@ $observers = array (
         'eventname' => '\core\event\course_module_created',
         'callback' => 'local_mediaconversion_observer::mediaconversion_convert',
         'internal' => false
+    ),
+
+    array(
+        'eventname' => '\core\event\course_restored',
+        'callback' => 'local_mediaconversion_observer::mediaconversion_convert_restored',
+        'internal' => false
     )
 );

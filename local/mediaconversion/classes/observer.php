@@ -54,4 +54,22 @@ class local_mediaconversion_observer {
         );
         \core\task\manager::queue_adhoc_task($task);
     }
+
+    /**
+     * This is called whenever a course is restored.
+     *
+     * @param \core\event\course_restored $event
+     */
+    public static function mediaconversion_convert_restored(\core\event\course_restored $event) {
+        global $USER;
+        $data = $event->get_data();
+        $task = new \local_mediaconversion\task\mediaconversion_convert_restored_task();
+        $task->set_custom_data(
+            array(
+                'courseid' => $data['courseid'],
+                'userid' => $USER->id
+            )
+        );
+        \core\task\manager::queue_adhoc_task($task);
+    }
 }
