@@ -271,9 +271,8 @@ function html_table_auto_headers($data, $tabletype = '') {
  * @param string $mediatype for specially rendering the bruincast table
  * @return string
  */
-function supportconsole_render_section_shortcut($title, $data, 
-                                                $inputs=array(), $moreinfo=null, $mediatype='') {
-    global $OUTPUT;
+function supportconsole_render_section_shortcut($title, $data, $inputs=array(), $moreinfo=null, $mediatype='') {
+    global $OUTPUT, $PAGE;
 
     // Check if user wanted an Excel download instead.
     $export = optional_param('export', null, PARAM_ALPHA);
@@ -314,9 +313,70 @@ function supportconsole_render_section_shortcut($title, $data,
         // Not every support console tool as input.
         if (!is_array($inputs)) {
             $inputs = (array) $inputs;
-        }        
+        }
         $pretext .= get_string('forinput', 'tool_uclasupportconsole',
                 implode(', ', $inputs));
+    }
+
+    $sort = '';
+    if ($title = 'userswithrole') {
+        if (!empty($inputs)) {
+            if (array_key_exists('role', $inputs)) {
+                $role = $inputs['role'];
+            }
+            if (array_key_exists('component', $inputs)) {
+                $component = $inputs['component'];
+            }
+            if (array_key_exists('totalcount', $inputs)) {
+                $count = $inputs['totalcount'];
+            }
+            if (array_key_exists('contextlevel', $inputs)) {
+                $contextlevel = $inputs['contextlevel'];
+            }
+
+            if (!empty($role) && !empty($component) && !empty($count) && !empty($contextlevel)) {
+                $pageurl = new moodle_url( $PAGE->url, array('role' => $role, 'component' => $component,
+                'contextlevel' => $contextlevel, 'count' => $count, 'console' => $title));
+
+                $sortby = optional_param('sortby', null, PARAM_ALPHAEXT);
+
+                $sort = get_string('sortby');
+                $sort .= html_writer::start_tag('form', array(
+                    'method' => 'post',
+                    'action' => $pageurl,
+                    'id' => 'sortby',
+                    'name' => 'sortby',
+                    'console' => 'userswithrole'
+                ));
+                $sort .= html_writer::start_tag('input', array(
+                    'type' => 'hidden',
+                ));
+
+                $sortoptions = array(
+                    'name' => get_string('sortbyx', 'moodle', get_string('name', 'tool_uclasupportconsole')),
+                    'namedesc' => get_string('sortbyxreverse', 'moodle', get_string('name', 'tool_uclasupportconsole')),
+                    'cid' => get_string('sortbyx', 'moodle', get_string('cid', 'tool_uclasupportconsole')),
+                    'ciddesc' => get_string('sortbyxreverse', 'moodle', get_string('cid', 'tool_uclasupportconsole')),
+                    'timemodified' => get_string('sortbyx', 'moodle', get_string('timemodified', 'tool_uclasupportconsole')),
+                    'timemodifieddesc' => get_string('sortbyxreverse', 'moodle', get_string('timemodified', 'tool_uclasupportconsole')),
+                    'modifierid' => get_string('sortbyx', 'moodle', get_string('modifierid', 'tool_uclasupportconsole')),
+                    'modifieriddesc' => get_string('sortbyxreverse', 'moodle', get_string('modifierid', 'tool_uclasupportconsole')),
+                    'lastaccess' => get_string('sortbyx', 'moodle', get_string('lastaccess', 'tool_uclasupportconsole')),
+                    'lastaccessdesc' => get_string('sortbyxreverse', 'moodle', get_string('lastaccess', 'tool_uclasupportconsole'))
+                );
+
+                if (isset($sortby)) {
+                    $sort .= html_writer::select($sortoptions, 'sortby', $sortby, array('' => 'choosedots'),
+                            array('onchange' => 'this.form.submit()'));
+                } else {
+                    $sort .= html_writer::select($sortoptions, 'sortby', '', array('' => 'choosedots'),
+                            array('onchange' => 'this.form.submit()'));
+                }
+
+                $sort .= html_writer::end_tag('input');
+                $sort .= html_writer::end_tag('form');
+            }
+        }
     }
 
     // Export options.
@@ -328,9 +388,20 @@ function supportconsole_render_section_shortcut($title, $data,
     if (empty($data)) {
         return $OUTPUT->box($pretext) . $export;
     } else if ($moreinfo != null) {
-        return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) .
+        if ($title == 'userswithrole' && !empty($role) && !empty($component) &&
+                !empty($count) && !empty($contextlevel)) {
+            return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) . $OUTPUT->box($sort) .
+                supportconsole_render_table_shortcut_userswrole($data, $mediatype) . $export;
+        } else {
+            return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) .
                 supportconsole_render_table_shortcut($data, $mediatype) . $export;
+        }
     } else {
+        if ($title == 'userswithrole' && !empty($role) && !empty($component) &&
+                !empty($count) && !empty($contextlevel)) {
+            return $OUTPUT->box($pretext) . $OUTPUT->box($sort) .
+                supportconsole_render_table_shortcut_userswrole($data, $mediatype) . $export;
+        }
         return $OUTPUT->box($pretext) .
                 supportconsole_render_table_shortcut($data, $mediatype) . $export;
     }
@@ -519,6 +590,12 @@ function supportconsole_render_table_shortcut($data, $tabletype) {
     }   
     return html_writer::table($table);
 }   
+
+function supportconsole_render_table_shortcut_userswrole($data) {
+    $table = html_table_auto_headers($data);
+
+    return html_writer::table($table);
+}
 
 function supportconsole_simple_form($title, $contents='', $buttonvalue='Go') {
     global $PAGE;

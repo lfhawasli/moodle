@@ -1977,12 +1977,13 @@ if ($consolecommand == "$title") {
     $typeparam = optional_param('type', null, PARAM_ALPHAEXT);
     $pageparam = optional_param('page', null, PARAM_INT);
     $seeallparam = optional_param('seeall',null, PARAM_INT);
+    $sortby = optional_param('sortby', null, PARAM_ALPHAEXT);
 
     // Default is only showing the first page.
     if (!isset ($seeallparam)){
         $seeallparam = 0;
     }
-    
+
     // If the page didnt have enough entry, we want to show all from the start.
     if ($countparam <= RESULTS_PER_PAGE) {
         $seeallparam = 1;
@@ -1993,13 +1994,13 @@ if ($consolecommand == "$title") {
     }
 
     $limitstart = $pageparam * RESULTS_PER_PAGE;
-    
+
     if ($componentparam == "manual") {
         $componentparam = "";
     }
-    
+
     $modifiedresults = array();
-    
+
     if ($componentparam == "admin") {
         $adminresult = explode(',', get_config(null, 'siteadmins'));
         foreach ($adminresult as $admin) {
@@ -2023,13 +2024,13 @@ if ($consolecommand == "$title") {
         }
     } else {
         // Common SQL used by both Course and Category Contexts
-        $middlesql = "FROM    {role_assignments} ra 
-                      JOIN    {role} r ON 
-                              (r.name = :role_param AND 
-                               ra.component = :component_param AND 
-                               ra.roleid = r.id) 
+        $middlesql = "FROM    {role_assignments} ra
+                      JOIN    {role} r ON
+                              (r.name = :role_param AND
+                               ra.component = :component_param AND
+                               ra.roleid = r.id)
                       JOIN    {user} u ON (u.id = ra.userid)
-                      JOIN    {context} c ON 
+                      JOIN    {context} c ON
                                (c.id = ra.contextid AND
                                 c.contextlevel = :contextlevel_param) ";
         if ($typeparam && ($contextlevelparam == CONTEXT_COURSE)) {
@@ -2050,15 +2051,28 @@ if ($consolecommand == "$title") {
             $contexturl = "/course/view.php?id=";
             $lookup = "cid";
         }
-        
+
+        $desc = false;
+        if (isset($sortby)) {
+            if (substr($sortby, -4) == 'desc') {
+                $desc = true;
+                $sortby = substr($sortby, 0, -4);
+            }
+        }
+
         if ($contextlevelparam != CONTEXT_COURSE && $contextlevelparam != CONTEXT_COURSECAT) {
             $sql = "SELECT  ra.id,
                             u.id AS uid,
                             u.lastaccess AS last,
                             CONCAT(u.lastname, ', ', u.firstname) AS name,
                             ra.modifierid,
-                            ra.timemodified " . $middlesql .
-                   "ORDER BY name";
+                            ra.timemodified " . $middlesql;
+            if (isset($sortby)) {
+                $sql .= "ORDER BY " . $sortby;
+                if ($desc) {
+                    $sql .= ' DESC';
+                }
+            }
         } else {
             $sql = "SELECT  ra.id,
                             u.id AS uid,
@@ -2067,10 +2081,16 @@ if ($consolecommand == "$title") {
                             clevel.id AS cid,
                             clevel.$contextnamecolumn AS cname,
                             ra.modifierid,
-                            ra.timemodified " . $middlesql . 
-                   "JOIN    $contexttablename clevel ON (clevel.id=c.instanceid)
-                    ORDER BY name";
+                            ra.timemodified " . $middlesql .
+                   "JOIN    $contexttablename clevel ON (clevel.id=c.instanceid)";
+            if (isset($sortby)) {
+                $sql .= "ORDER BY " . $sortby;
+                if ($desc) {
+                    $sql .= ' DESC';
+                }
+            }
         }
+
         $params = array('role_param' => $roleparam, 'component_param'=>$componentparam,
                         'contextlevel_param'=>$contextlevelparam, 'type_param'=>$typeparam);
         if (!empty($exportoption) || $seeallparam) {
@@ -2086,16 +2106,16 @@ if ($consolecommand == "$title") {
             $userurl = new moodle_url("/user/profile.php", array('id' => $result->uid));
             $modifiedrow->Name = "<a href=\"".$userurl->out()."\">$result->name</a>";
             if ($contextlevelparam == CONTEXT_COURSE || $contextlevelparam == CONTEXT_COURSECAT) {
-                $modifiedrow->$contextname = "<a href=\"$CFG->wwwroot" . $contexturl . $result->$lookup . 
+                $modifiedrow->$contextname = "<a href=\"$CFG->wwwroot" . $contexturl . $result->$lookup .
                     '">' . $result->cname . '</a>';
             }
             $modifiedrow->Time_Modified = '<p hidden="hidden">'. $result->timemodified. '</p>'.userdate($result->timemodified);
-            
+
             if ($result->modifierid == 0) {
                 $modifiedrow->Assigned_By = 'System';
             } else {
                 $sql = "SELECT  CONCAT(u.lastname, ', ', u.firstname) AS name
-                        FROM    {user} u 
+                        FROM    {user} u
                         WHERE   u.id = :modifierid";
                 $modifierresults = $DB->get_records_sql($sql, array('modifierid' => $result->modifierid));
                 $modifier = reset($modifierresults);
@@ -2120,16 +2140,21 @@ if ($consolecommand == "$title") {
                     'component' => $componentparam, 'type' => $typeparam);
     $sectionhtml .= supportconsole_render_section_shortcut($title, $modifiedresults, $inputs,
             get_string('usersdescription', 'tool_uclasupportconsole', (object) $inputs));
-    $pageurl = new moodle_url( $PAGE->url, array('role' => $roleparam, 'component' => $componentparam, 
-        'contextlevel' => $contextlevelparam, 'count' => $countparam, 'type' => $typeparam, 'console' => $title));
-    
+    if (!empty($sortby)) {
+        $pageurl = new moodle_url($PAGE->url, array('role' => $roleparam, 'component' => $componentparam,
+                'contextlevel' => $contextlevelparam, 'count' => $countparam, 'type' => $typeparam, 'console' => $title,
+                'sortby' => $sortby));
+    } else {
+        $pageurl = new moodle_url($PAGE->url, array('role' => $roleparam, 'component' => $componentparam,
+                'contextlevel' => $contextlevelparam, 'count' => $countparam, 'type' => $typeparam, 'console' => $title));
+    }
 
     // Only show "See All" option when it's not in seeall mode.
     if (!$seeallparam){
         $sectionhtml .= $OUTPUT->paging_bar($countparam, $pageparam, RESULTS_PER_PAGE, $pageurl->out()) ;
-        $sectionhtml .= '<div class="see-all"> <a href="'.$pageurl.'&seeall=1">'.get_string('seeall', 'tool_uclasupportconsole').'</a> </div>'; 
+        $sectionhtml .= '<div class="see-all"> <a href="'.$pageurl.'&seeall=1">'.get_string('seeall', 'tool_uclasupportconsole').'</a> </div>';
     } else if ($countparam > RESULTS_PER_PAGE) {
-        $sectionhtml .= '<div class="show-page"> <a href="'.$pageurl.'&seeall=0">'.get_string('showpage', 'tool_uclasupportconsole').'</a> </div>'; 
+        $sectionhtml .= '<div class="show-page"> <a href="'.$pageurl.'&seeall=0">'.get_string('showpage', 'tool_uclasupportconsole').'</a> </div>';
     }
     $consoles->push_console_html('users', $title, $sectionhtml);
 }
@@ -2260,6 +2285,9 @@ if ($displayforms) {
 
     $row = new stdClass();
     $row->idnumber = null;
+    $row->userid = null;
+    $row->username = null;
+    $row->email = null;
     foreach ($dupids as $k => $dupid) {
         if($row->idnumber != $dupid->idnumber) {
             if($row->idnumber != null) {
