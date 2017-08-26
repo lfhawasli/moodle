@@ -56,6 +56,45 @@ function cmp_stop_date($a, $b) {
 }
 
 /**
+ * Given ucla_bruincast record, will return string to be used in OID Wowza
+ * filter.
+ *
+ * @param array $bruincast
+ * @return string
+ */
+function get_bruincast_filter_text($bruincast) {
+    $wowzaserver = get_config('block_ucla_media', 'bruincast_wowza');
+
+    // Check if we have a video file.
+    $isvideo = false;
+    if (!empty($bruincast->bruincast_url)) {
+        $isvideo = true;
+    }
+
+    // Get application name in format <4 digit year><quarter>-<v(video) or a(audio)>.
+    $appname = '20' . substr($bruincast->term, 0, 2) .
+            strtolower(substr($bruincast->term, 2, 1)) .'-';
+    $isvideo ? $appname .= 'v' : $appname . 'a';
+
+    $pathinfo = null;
+    if ($isvideo) {
+        $pathinfo = pathinfo($bruincast->bruincast_url);
+    } else {
+        $pathinfo = pathinfo($bruincast->audio_url);
+    }
+
+    $httpurl = $wowzaserver . '/' . $appname . '/' . $pathinfo['extension'] . ':'
+            . $pathinfo['basename'] . '/playlist.m3u8';
+
+    $parseurl = parse_url($wowzaserver);
+    $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
+            $appname . '/' . $pathinfo['extension'] . ':' . $pathinfo['basename'];
+
+    return sprintf('{bruincast:jw,"%s",%s,%s,%s}',$bruincast->name, $httpurl,
+            $rtmpurl, $isvideo);
+}
+
+/**
  * Queries for video reserves for a given course.
  *
  * @param int $courseid

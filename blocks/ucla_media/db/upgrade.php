@@ -95,7 +95,7 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         $addfields[] = new xmldb_field('httpurl', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $addfields[] = new xmldb_field('rtmpurl', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $addfields[] = new xmldb_field('isvideo', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
-        
+
         foreach ($addfields as $field) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
@@ -103,15 +103,15 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         }
         upgrade_block_savepoint(true, 2016091200, 'ucla_media');
     }
-    
+
     if ($oldversion < 2016110800) {
         $table = new xmldb_table('ucla_library_music_reserves');
-        
+
         $addfields[] = new xmldb_field('metadata', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $addfields[] = new xmldb_field('performers', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $addfields[] = new xmldb_field('albumtitle', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $addfields[] = new xmldb_field('composer', XMLDB_TYPE_TEXT, null, null, null, null, null);
-        
+
         foreach ($addfields as $field) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
@@ -119,20 +119,22 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         }
         upgrade_block_savepoint(true, 2016110800, 'ucla_media');
     }
-    
+
+    // Add support for Wowza server.
     if ($oldversion < 2017051500) {
         $table = new xmldb_table('ucla_bruincast');
-        $field = new xmldb_field('week');
-        if ($dbman->field_exists($table, $field)) {
-                $dbman->drop_field($table, $field);
-            }
-            
-        $index = new xmldb_field('date', XMLDB_TYPE_INTEGER, 10, null, null, null, null, 'podcast_url');
 
-       
-            if (!$dbman->field_exists($table, $index)) {
-                $dbman->add_field($table, $index);
+        $fields = array();
+        $fields[] = new xmldb_field('audio_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'bruincast_url');
+        $fields[] = new xmldb_field('podcast_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'audio_url');
+        $fields[] = new xmldb_field('date', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'podcast_url');
+        $fields[] = new xmldb_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'date');
+
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
             }
+        }
         
         upgrade_block_savepoint(true, 2017051500, 'ucla_media');
     }

@@ -54,8 +54,13 @@ class filter_oidwowza extends moodle_text_filter {
         $newtext = $text;
 
         if ($CFG->filter_oidwowza_enable_mp4) {
+            // For Video reserves Wowza links.
             $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
             $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_callback', $newtext);
+            // For Bruincast Wowza links.
+            $search = '/\{bruincast:jw,"(.*?)",(.*?),(.*?),(.*?)\}/';
+            $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_bruincast_callback', $newtext);
+            // For Library music reserves Wowza links.
             $search = '/\{lib:jw,"(.*?)",(.*?),(.*?),(.*?)\}/';
             $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_lib_callback', $newtext);   
         }
@@ -123,7 +128,67 @@ class filter_oidwowza extends moodle_text_filter {
 }
 
 /**
- * Replaces WOWZA link with media player.
+ * Replaces Bruincast Wowza link with media player.
+ *
+ * @param array $link
+ * @return string       HTML fragment to display video player.
+ */
+function oidwowza_filter_mp4_bruincast_callback($link) {
+    $title   = clean_param($link[1], PARAM_NOTAGS);
+    $httpurl = clean_param($link[2], PARAM_TEXT);
+    $rtmpurl = clean_param($link[3], PARAM_TEXT);
+    $isvideo = clean_param($link[4], PARAM_INT);
+
+    if (!empty($httpurl)) {
+        $httpurl = urldecode($httpurl);
+    }
+    if (!empty($rtmpurl)) {
+        $rtmpurl = urldecode($rtmpurl);
+    }
+    $height = 480;
+    $width = 720;
+
+    $playerid = uniqid();
+    if ($isvideo == 1) {
+        return "
+        <div id='player-$playerid'></div>
+	<script type='text/javascript'>
+	jwplayer('player-$playerid').setup({
+		width: $width,
+		height: $height,
+		playlist: [{
+                    sources :
+                        [
+                            {file: '$httpurl'},
+                            {file: '$rtmpurl'}
+                        ]
+                    }],
+                primary: 'html5'
+		});
+	</script>";
+    } else {
+        return "
+            <div id='player-$playerid'></div>
+            <script type='text/javascript'>
+            jwplayer('player-$playerid').setup({
+	    sources: [
+		    {file: '$rtmpurl'},
+		    {file: '$httpurl'}
+            ],
+		rtmp: {
+			bufferlength: 3
+		},
+            modes: [
+                { type: 'html5' },
+                { type: 'flash' }
+            ],
+	    height: 30,
+        }) </script>";
+    }
+}
+
+/**
+ * Replaces Video reserves WOWZA link with media player.
  *
  * @param array $link   Consisting of type, url, file, width, and height.
  * @param boolean $autostart    Unused.
@@ -319,7 +384,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
 }
 
 /**
- * Replaces WOWZA link with media player.
+ * Replaces Music library reserve WOWZA link with media player.
  *
  * @param array $link   Consisting of name, httpurl, rtmpurl and if isvideo.
  * @param boolean $autostart    Unused.

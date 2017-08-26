@@ -30,7 +30,6 @@ Questions? Contact <a href="mailto:music-circ@library.ucla.edu">Music Circulatio
 $string['headerlibraryurl'] = 'Source URL';
 $string['desclibraryurl'] = 'JSON source URL for library music reserves data';
 $string['title'] = 'Media resources';
-$string['intro'] = 'Please note that this media is intended for on-campus use only. Off-campus use is possible in certain circumstances, but it is not supported, dependable, or recommended. In order to view the video streams, you may need to download and install the Silverlight plugin.';
 $string['availability'] = 'Available: ';
 $string['back'] = 'Back to listing';
 $string['currentvideo'] = 'Current videos';
@@ -43,8 +42,7 @@ $string['futurevideo'] = 'Future videos';
 $string['futurevideo_info'] = 'Will be available on {$a}';
 $string['intro'] = 'Please note that this media is intended for on-campus use only.
     Off-campus use is possible in certain circumstances, but it is not supported, dependable, or
-    recommended. In order to view the video streams, you may need to download and install the
-    <a href="http://www.microsoft.com/silverlight/get-started/install/default.aspx" target="_blank">Silverlight plugin</a>.';
+    recommended.';
 
 $string['novideo'] = 'No videos available';
 $string['pastvideo'] = 'Past videos';
@@ -62,7 +60,6 @@ $string['vidreserves_tab'] = 'Video reserves ({$a})';
 $string['libraryreserves_tab'] = 'Digital audio reserves ({$a})';
 $string['mediaresnotavailable'] = "There are no media resources for this course.";
 
-// Types of bruincasts. To be removed once new web service is done: CCLE-6263.
 $string['titlebcast'] = 'Bruincast';
 $string['headerbruincastloginurl'] = 'Bruincast Login Source URL';
 $string['descbruincastloginurl'] = 'Bruincast login URL to obtain a session from Bruincast datasource';
@@ -77,6 +74,10 @@ $string['headerbruincasthttppass'] = 'Bruincast HTTP access Password';
 $string['descbruincasthttppass'] = 'Bruincast HTTP access Password to obtain a HTTP session';
 $string['headerbruincasturl'] = 'Bruincast Datasource URL';
 $string['descbruincasturl'] = 'Bruincast URL to obtain data from Bruincast datasource API';
+$string['headerbruincastwowza'] = 'Bruincast Wowza URL';
+$string['descbruincastwowza'] = 'Server location for Bruincast Wowza.';
+
+// Types of bruincasts. To be removed once new web service is done: CCLE-6263.
 $string['node_restricted'] = 'Private';
 $string['node_open'] = 'Open';
 $string['node_see_instructor'] = 'See Instructor';

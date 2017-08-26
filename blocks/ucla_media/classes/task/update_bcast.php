@@ -40,7 +40,7 @@ class update_bcast extends \core\task\scheduled_task {
     * @return boolean
     */
     public function execute() {
-        global $CFG, $DB;
+        global $DB;
 
         $htaccessusername = get_config('block_ucla_media', 'bruincast_http_user');
         $htaccesspassword = get_config('block_ucla_media', 'bruincast_http_pass');
@@ -50,8 +50,8 @@ class update_bcast extends \core\task\scheduled_task {
 
         // User data.
         $userdata = array(
-        'username' => get_config('block_ucla_media', 'bruincast_user'),
-        'password' => get_config('block_ucla_media', 'bruincast_pass')
+            'username' => get_config('block_ucla_media', 'bruincast_user'),
+            'password' => get_config('block_ucla_media', 'bruincast_pass')
         );
         
         // Doing the CURL for Login.
@@ -83,8 +83,8 @@ class update_bcast extends \core\task\scheduled_task {
             
             // Setting parameters for our request.
             $params = array(
-            'display_id' => 'ccle_api_courses',
-            'args[0]' => $correctedterm
+                'display_id' => 'ccle_api_courses',
+                'args[0]' => $correctedterm
             );
 
             // Doing a Curl to retrive bruincasted courses for a particular term.
@@ -113,9 +113,11 @@ class update_bcast extends \core\task\scheduled_task {
             // Only processing next part if the result was non-empty.
             if (array_key_exists('item', $cleanedresult)) {
 
-                // The below if statement is a workaround for an XML parsing problem. When only one item is retrieved in a query
-                // the array $cleanedresult[item] contains information about that one item, however, when there are multiple results
-                // the array is an array of arrays that contain information about these results.
+                // The below if statement is a workaround for an XML parsing 
+                // problem. When only one item is retrieved in a query the array
+                // $cleanedresult[item] contains information about that one
+                // item, however, when there are multiple results the array is
+                // an array of arrays that contain information about these results.
                 if (array_key_exists('srs__', $cleanedresult['item'])) {
                     $array = $cleanedresult;
                 } else {
@@ -155,8 +157,16 @@ class update_bcast extends \core\task\scheduled_task {
                     $cleanedresult = json_decode($json, true);
                     curl_close($curl);
 
+                    // If there is more than one resource, then 'item' is an
+                    // array of arrays. But if there is only one, then it is
+                    // by itself. Make it an array of arrays.
+                    $contents = $cleanedresult['item'];
+                    if (count($cleanedresult['item']) == 1) {
+                        $contents = array($cleanedresult['item']);
+                    }
+
                     // Entering each media item for a particular course in a particular term into the DB.
-                    foreach ($cleanedresult['item'] as $content) {
+                    foreach ($contents as $content) {
                         $entry = new \stdClass();
                         $entry->courseid = ucla_map_termsrs_to_courseid($term, $srs);
                         $entry->term = $term;

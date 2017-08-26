@@ -61,9 +61,8 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     if ($mode == MEDIA_BCAST) {
         echo $OUTPUT->heading($video->name, 2, 'headingblock');
         // Try to embed video on page by calling filter.
-        $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
-                'rtmpe://' . '164.67.141.72:1935',
-                $video->name, 640, 720, urlencode($video->bruincast_url));
+        $filtertext = get_bruincast_filter_text($video);
+
         $filter = new filter_oidwowza($context, array());
         $html = $filter->filter($filtertext);
         echo $html;
@@ -72,6 +71,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                 new moodle_url('/blocks/ucla_media/bcast.php',
                     array('courseid' => $course->id)),
                 get_string('back', 'block_ucla_media')));
+
         $event = \block_ucla_media\event\video_viewed::create(array(
             'context' => $context,
             'objectid' => $video->id,

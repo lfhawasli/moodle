@@ -22,4 +22,5 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $plugin->version    = 2017051500;
+$plugin->requires   = 2010112400;
 $plugin->component = 'block_ucla_media';
