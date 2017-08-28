@@ -59,8 +59,12 @@ class downloadsyllabi_form extends moodleform {
         $mform->addElement('select', 'term', get_string('selectedterm', 'local_ucla_syllabus'), $this->terms);
         $mform->setType('term', PARAM_ALPHANUM);
         $mform->setDefault('term', $CFG->currentterm);
+
         $mform->addElement('submit', 'retrievebutton', get_string('showsyllabi', 'local_ucla_syllabus'));
         $mform->addElement('submit', 'downloadbutton', get_string('downloadsyllabi', 'local_ucla_syllabus'));
+
+        $mform->addElement('checkbox', 'converturlstopdfs', '', get_string('converttopdf', 'local_ucla_syllabus'));
+        $mform->setDefault('converturlstopdfs', 1);
 
         $mform->addElement('hidden', 'id', $this->category->id);
         $mform->setType('id', PARAM_INT);
@@ -101,7 +105,7 @@ class downloadsyllabi_form extends moodleform {
             foreach ($subcategories as $subcategory) {
                 $terms = array_merge($terms, self::get_category_terms($subcategory));
             }
-        }        
+        }
         return terms_arr_sort($terms, true);
     }
     /**
