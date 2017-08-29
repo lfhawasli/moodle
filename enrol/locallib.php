@@ -625,7 +625,7 @@ class course_enrolment_manager {
      */
     public function get_assignable_roles($otherusers = false, $manual = false) {
         // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
-        if ($manual) {
+        if ($manual && !is_siteadmin()) {
             global $CFG;
             require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
             $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($this->course, true);
