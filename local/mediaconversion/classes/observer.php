@@ -34,24 +34,26 @@ defined('MOODLE_INTERNAL') || die();
 class local_mediaconversion_observer {
     /**
      * This is called whenever a course module is added. It dispatches the convert
-     * media task to convert video files to kaltura video resources.
+     * media task to convert video files to kaltura video resources and also dispatches
+     * the convert intro media task.
      *
      * @param \core\event\course_module_created $event
      */
     public static function mediaconversion_convert(\core\event\course_module_created $event) {
         global $CFG, $USER;
         $data = $event->get_data();
-        // We only want to deal with resources.
+        $customdata = array('eventdata' => $data, 'userid' => $USER->id);
+        // We only want to convert the main file for resources.
         if ($data['other']['modulename'] !== 'resource') {
+            // Only dispatch a dedicated task to convert the intro if it's not
+            // a resource (otherwise mediaconversion_convert_task handles it).
+            $task = new \local_mediaconversion\task\mediaconversion_convert_text_task();
+            $task->set_custom_data($customdata);
+            \core\task\manager::queue_adhoc_task($task);
             return;
         }
         $task = new \local_mediaconversion\task\mediaconversion_convert_task();
-        $task->set_custom_data(
-            array(
-                'eventdata' => $data,
-                'userid' => $USER->id
-            )
-        );
+        $task->set_custom_data($customdata);
         \core\task\manager::queue_adhoc_task($task);
     }
 

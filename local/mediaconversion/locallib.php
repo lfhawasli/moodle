@@ -219,10 +219,9 @@ function local_cm_get_player($configsettings) {
  * @param string $entryid The Kaltura entry id.
  * @param int $height The entry height.
  * @param int $width The entry width.
- * @param int $uiconfid The Kaltura player id.
  * @return string A source URL.
  */
-function local_kaltura_cm_build_source_url($entryid, $height, $width, $uiconfid) {
+function local_kaltura_cm_build_source_url($entryid, $height, $width) {
     $localconfigsettings = get_config('local_mediaconversion');
     if (!isset($localconfigsettings->player_skin)) {
         echo get_string('missingplayerskinerror', 'local_mediaconversion');
@@ -250,7 +249,7 @@ function local_cm_build_source_url($configsettings, \KalturaMediaEntry &$entry) 
     $player = local_cm_get_player($configsettings);
     $height = $configsettings->filter_player_height;
     $width = $configsettings->filter_player_width;
-    $source = local_kaltura_cm_build_source_url($entry->id, $height, $width, $player);
+    $source = local_kaltura_cm_build_source_url($entry->id, $height, $width);
     $source = local_kaltura_add_kaf_uri_token($source);
     $entry->height = $height;
     $entry->width = $width;
@@ -341,13 +340,14 @@ function local_cm_create_modinfo($configsettings, \KalturaMediaEntry $entry, $ar
  * @param array $courseandmodinfo  The first element is the course, and the
  *                                 second element is the cm_info object
  * @param string $name  The name of the resource
+ * @param string $modname  The name of the module.
  * @return \stdClass
  */
-function local_cm_package_argsinfo($courseandmodinfo, $name) {
+function local_cm_package_argsinfo($courseandmodinfo, $name, $modname = 'resource') {
     global $DB;
     $groupcourse = $courseandmodinfo[0];
     $modinfo = $courseandmodinfo[1];
-    $moddata = $DB->get_record('resource', array('id' => $modinfo->instance));
+    $moddata = $DB->get_record($modname, array('id' => $modinfo->instance));
     $argsinfo = new stdClass();
     $argsinfo->name = $name;
     $argsinfo->visible = $modinfo->visible;
@@ -358,6 +358,10 @@ function local_cm_package_argsinfo($courseandmodinfo, $name) {
     $argsinfo->coursemodule = 0;
     $argsinfo->section = $modinfo->sectionnum;
     $argsinfo->intro = $moddata->intro;
+    // Some modules have content that needs to be converted.
+    if (isset($moddata->content)) {
+        $argsinfo->content = $moddata->content;
+    }
     $argsinfo->introformat = $moddata->introformat;
     $argsinfo->cmidnumber = $modinfo->idnumber;
     $argsinfo->description = '';
@@ -368,36 +372,54 @@ function local_cm_package_argsinfo($courseandmodinfo, $name) {
  * Uploads the video and generates the corresponding modinfo for its
  * kaltura video resource.
  *
- * @param string $pathtofile
+ * @param stored_file $file
  * @param stdClass $argsinfo
  * @param string $userid
+ * @param string $cmid  The module ID the video is being converted for -
+ *                      used only for error reporting.
  * @return stdClass|null
  */
-function local_cm_convert_video($pathtofile, $argsinfo, $userid) {
-    global $DB;
-    // Set the user to the uploader.
-    $user = $DB->get_record('user', array('id' => $userid));
-    cron_setup_user($user);
+function local_cm_convert_video(stored_file $file, $argsinfo, $userid, $cmid) {
+    // Try to copy file to a temp location.
+    if (!($pathtofile = $file->copy_content_to_temp())) {
+        mtrace('Failed to copy file with id ' . $file->get_id() . ' for cm instance ' . $cmid);
+        return null;
+    }
+    // Get Kaltura category settings from config settings.
     $localconfigsettings = get_config('local_mediaconversion');
     if (!isset($localconfigsettings->base_category_path)) {
         echo get_string('missingbasecatpatherror', 'local_mediaconversion');
         return null;
     }
+    // Get the configsettings for the Kaltura plugin.
     $configsettings = local_kaltura_get_config();
     $client = local_cm_get_kaltura_client($configsettings);
+    // Upload the file to Kaltura.
     if (!$entry = local_cm_upload_video_from_filepath($client,
             $pathtofile, $argsinfo->name, $argsinfo->description)) {
         return null;
     }
+    // Get/make the appropriate category in the KMC for the video.
     if (!$category = local_cm_get_kaltura_category($client,
             $argsinfo->course, $localconfigsettings->base_category_path)) {
         return null;
     }
+    // Put the video in the category.
     if (!$categoryentry = local_cm_add_category_entry($client,
             $category->id, $entry->id)) {
         return null;
     }
+    // Create the modinfo for a Kaltura video resource.
     $modinfo = local_cm_create_modinfo($configsettings, $entry, $argsinfo);
+    // Delete the temp file.
+    if (file_exists($pathtofile)) {
+        unlink($pathtofile);
+    } else {
+        mtrace('Warning: temp file for cm instance ' . $cmid . ' could not be '
+                . 'deleted since it was not found');
+    }
+    mtrace('Successfully uploaded video with entry ID ' . $modinfo->entry_id
+            . ' for cm instance ' . $cmid);
     return $modinfo;
 }
 
@@ -405,12 +427,14 @@ function local_cm_convert_video($pathtofile, $argsinfo, $userid) {
  * Loops through files and finds the main video file.
  *
  * @param int $contextid
- * @return stored_file|null
+ * @param string $modulename
+ * @param string $filearea
+ * @return stored_file|null   Returns null on failure.
  */
-function local_cm_get_video_file($contextid) {
+function local_cm_get_video_file($contextid, $modulename = 'resource', $filearea = 'content') {
     // Get the file.
     $fs = get_file_storage();
-    $files = $fs->get_area_files($contextid, 'mod_resource', 'content');
+    $files = $fs->get_area_files($contextid, "mod_$modulename", $filearea);
     // Find a video file.
     $mainfile = null;
     foreach ($files as $file) {
@@ -424,6 +448,7 @@ function local_cm_get_video_file($contextid) {
 
 /**
  * This function gets the main video file, uploads it to Kaltura, and adds the new module.
+ * It also converts files embedded in the intro text if necessary.
  *
  * @param int $contextid
  * @param array $courseandmodinfo (see the description at local_cm_package_argsinfo)
@@ -432,27 +457,28 @@ function local_cm_get_video_file($contextid) {
  * @param string $cmname
  * @return boolean  Returns false if any step failed.
  */
-function local_cm_convert_and_add_module($contextid, $courseandmodinfo, $userid, $cmid, $cmname) {
+function local_cm_convert_and_add_module($contextid, $courseandmodinfo, $userid,
+        $cmid, $cmname) {
+    global $DB;
     // Get the video file.
     if (!($mainfile = local_cm_get_video_file($contextid))) {
         return false;
     }
-    // Try to copy file.
-    if (!($dir = $mainfile->copy_content_to_temp())) {
-        mtrace('Failed to copy file with id ' . $mainfile->get_id() . ' for cm instance ' . $cmid);
-        return false;
-    }
     // Package info and try to convert the video.
     $argsinfo = local_cm_package_argsinfo($courseandmodinfo, $cmname);
-    if (!$newmodinfo = local_cm_convert_video($dir, $argsinfo, $userid)) {
-        mtrace('Failed to convert video at ' . $dir . ' for cm instance ' . $cmid);
-        return false;
+    // See if we need to convert anything in the intro text.
+    if ($newintro = local_cm_convert_and_get_new_text('resource', $cmid,
+            $contextid, $userid, 'intro', $argsinfo)) {
+        // Set the argsinfo intro to the new converted intro.
+        $argsinfo->intro = $newintro;
     }
-    mtrace('Successfully uploaded video with entry ID ' . $newmodinfo->entry_id
-            . ' for cm instance ' . $cmid);
-    // Delete the temp file.
-    if (file_exists($dir)) {
-        unlink($dir);
+    // Set the user to the uploader.
+    $user = $DB->get_record('user', array('id' => $userid));
+    cron_setup_user($user);
+    if (!$newmodinfo = local_cm_convert_video($mainfile, $argsinfo, $userid, $cmid)) {
+        mtrace('Failed to convert video named ' . $mainfile->get_filename()
+                . ' for cm instance ' . $cmid);
+        return false;
     }
     $res = null;
     // Add the new module.
@@ -466,4 +492,117 @@ function local_cm_convert_and_add_module($contextid, $courseandmodinfo, $userid,
     mtrace('Successfully added new Kaltura Video Resource with id ' . $res->instance
             . ' replacing cm instance ' . $cmid);
     return true;
+}
+
+/**
+ * Returns an array of filenames embedded in a module's intro text.
+ *
+ * @param string $intro
+ * @param string $startmatch Text preceding the filename
+ * @param string $endmatch Text after the filename
+ * @return array
+ */
+function local_cm_get_filenames_from_intro($intro, $startmatch, $endmatch) {
+    $filenames = [];
+    preg_match_all('#(?<=' . preg_quote($startmatch)
+            . ')[^(' . preg_quote($endmatch) . ')]*#', $intro, $filenames);
+    return $filenames[0];
+}
+
+/**
+ * Simple convenience function to find the right file given the filename.
+ *
+ * @param array(stored_file) $files
+ * @param string $filename
+ * @return stored_file|null
+ */
+function local_cm_get_video_file_by_name($files, $filename) {
+    foreach ($files as $introfile) {
+        if (substr($introfile->get_mimetype(), 0, 5) === 'video'
+                && $introfile->get_filename() === urldecode($filename)) {
+            return $introfile;
+        }
+    }
+    return null;
+}
+
+/**
+ * Converts embedded video files in a module's text for a module and returns the
+ * new intro text.
+ *
+ * @param string $modulename
+ * @param string $cmid
+ * @param string $contextid
+ * @param string $userid
+ * @param string $filearea
+ * @param stdClass $argsinfo  Saves some DB lookups to pass it in rather than
+ *                            look up manually.
+ * @return string|null
+ */
+function local_cm_convert_and_get_new_text($modulename, $cmid, $contextid, $userid, $filearea = 'intro', $argsinfo = null) {
+    // Get any embedded intro files for this module.
+    $fs = get_file_storage();
+    $introfiles = $fs->get_area_files($contextid, "mod_$modulename", $filearea);
+    if (count($introfiles) <= 0) {
+        return null;
+    }
+    // Get the argsinfo if there are intro files and if it wasn't already given.
+    if (!$argsinfo) {
+        $courseandmodinfo = get_course_and_cm_from_cmid($cmid);
+        $argsinfo = local_cm_package_argsinfo($courseandmodinfo, '', $modulename);
+    }
+    // Figure out what our text is.
+    $text = $argsinfo->$filearea;
+    // Get the names of the embedded files.
+    $startmatch = '<a href="@@PLUGINFILE@@/';
+    $endmatch = '">';
+    $filenames = local_cm_get_filenames_from_intro($text, $startmatch, $endmatch);
+    $newtext = $text;
+    $numconverted = 0;
+    // Loop through each of the filenames found.
+    foreach ($filenames as $filename) {
+        // Find the appropriate video file.
+        if (!$file = local_cm_get_video_file_by_name($introfiles, $filename)) {
+            continue;
+        }
+        // Try to convert the video itself. A lot of the modinfo it returns is
+        // useless for this task, but we do need the entry id.
+        if (!$newtempmodinfo = local_cm_convert_video($file, $argsinfo, $userid, $cmid)) {
+                mtrace('Failed to convert video named ' . $file->get_filename()
+                        . ' for cm instance ' . $cmid);
+            continue;
+        }
+        // Similar to what's in lib/editor/atto/plugins/kalturamedia/yui/src/button.js.
+        $content = '<a href="' . local_kaltura_cm_build_source_url($newtempmodinfo->entry_id,
+            $newtempmodinfo->height, $newtempmodinfo->width) . '">tinymce-kalturamedia-embed'
+            . "||$filename||$newtempmodinfo->width||$newtempmodinfo->height</a>";
+        // Replace the old embedded text with the new Kaltura text (str_replace is much
+        // faster than preg_replace, which is why we need $startmatch and $endmatch).
+        $numreplaced = 0;
+        $newtext = str_replace($startmatch . $filename . $endmatch
+                . urldecode($filename) . '</a>', $content, $newtext, $numreplaced);
+        // If any strings were replaced, increment the counter for converted files.
+        if ($numreplaced > 0) {
+            $numconverted++;
+            // If more than one string was replaced, issue a warning, since it's likely
+            // that the target string was incorrect.
+            if ($numreplaced > 1) {
+                mtrace('Warning: More than one string replacement occurred when'
+                        . ' replacing the embedded file ' . urldecode($filename)
+                        . " in the $filearea text of cm instance " . $cmid);
+            }
+        } else {
+            // Otherwise warn that a file was uploaded and not used.
+            mtrace('Warning: Kaltura video with entry id ' . $newtempmodinfo->entry_id
+                    . ' was uploaded but was not added to the text. This'
+                    . ' video should probably be removed.');
+        }
+    }
+    if ($numconverted > 0) {
+        mtrace('Successfully replaced ' . $numconverted . '/' . count($filenames)
+                . " embedded $filearea files with Kaltura videos for cm instance "
+                . $cmid);
+        return $newtext;
+    }
+    return null;
 }

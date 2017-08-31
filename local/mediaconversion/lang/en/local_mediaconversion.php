@@ -39,3 +39,4 @@ $string['failedcoursecaterror'] = 'Could not create the course category';
 $string['failedentrycaterror'] = 'Could not create the entry category';
 $string['taskmediaconversion_convert'] = 'Media conversion task for new file upload';
 $string['taskmediaconversion_convert_restored'] = 'Media conversion task for restored course';
+$string['taskmediaconversion_convert_text'] = 'Media conversion task for module text';
