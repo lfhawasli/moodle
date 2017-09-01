@@ -517,6 +517,35 @@ class ucla_syllabus_manager {
                 $coursecontext->id, 'local_ucla_syllabus', 'syllabus',
                 $recordid, $this->filemanagerconfig);
 
+        $sqlget = "SELECT *
+                     FROM {files}
+                     WHERE contextid = :contextid
+                        AND itemid = :itemid
+                        AND component = 'local_ucla_syllabus'
+                        AND filearea = 'syllabus'
+                        AND NOT " . $DB->sql_isempty('files', 'source', true, true);
+        $sourcerecord = $DB->get_record_sql($sqlget,
+                array('contextid' => $coursecontext->id, 'itemid' => $recordid));
+        $filename = $sourcerecord->source;
+
+        $modifiedtext = ' (' . get_string('modified', 'local_ucla_syllabus')
+            . userdate($syllabusentry->timemodified, get_string('strftimedatetimeshortfilename', 'local_ucla_syllabus')) . ')';
+
+        $pathinfo = pathinfo($filename);
+
+        $newfilename = $pathinfo['filename'] . $modifiedtext;
+        if (isset($pathinfo['extension'])) {
+            $newfilename .= '.' . $pathinfo['extension'];
+        }
+
+        $update = new stdClass();
+        $update->id = $sourcerecord->id;
+        $update->filename = clean_param($newfilename, PARAM_FILE);
+
+        $update->pathnamehash = file_storage::get_pathname_hash($sourcerecord->contextid, $sourcerecord->component,
+                $sourcerecord->filearea, $sourcerecord->itemid, $sourcerecord->filepath, $update->filename);
+        $DB->update_record('files', $update);
+
         // No errors, so trigger events.
         $eventclass = '\\local_ucla_syllabus\\event\\' . $eventname;
         $event = $eventclass::create(
