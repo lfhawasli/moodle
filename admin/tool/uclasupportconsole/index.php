@@ -1512,58 +1512,46 @@ if ($displayforms) {
     $days = required_param('datedays', PARAM_NUMBER);
     $daysec = $days * 86400;
     $timeto = $timefrom + $daysec;
-    
-    $results = $DB->get_records_sql("
-        SELECT 
-            (@s := @s+1) AS identifier,
-            m.Due_date, 
-            c.shortname, 
-            c.fullname,
-            m.modtype, 
-            m.Name
-        FROM ((
-            SELECT 
-                'quiz' AS modtype, 
-                course, 
-                name, 
-                FROM_UNIXTIME(timeclose) AS Due_Date
-                FROM {quiz}
-                WHERE timeclose
-                BETWEEN  {$timefrom} AND {$timeto}
-        ) UNION (
-            SELECT 
-                'assignment' AS modtype, 
-                course, 
-                name, 
-                FROM_UNIXTIME(duedate) AS Due_Date
-            FROM {assign}
-            WHERE duedate
-            BETWEEN {$timefrom} AND {$timeto}
-        ) UNION (
-            SELECT
-                'turnitintool' AS modtype,
-                tiit.course,
-                CONCAT_WS(' ', tiit.name, partname) AS name,
-            FROM_UNIXTIME(dtdue) AS Due_Date
-            FROM {turnitintool} tiit
-            JOIN {turnitintool_parts} ON tiit.id = turnitintoolid
-            WHERE dtdue
-            BETWEEN {$timefrom} AND {$timeto}
-        ) UNION (
-            SELECT
-                'turnitintooltwo' AS modtype,
-                tiit2.course,
-                CONCAT_WS(' ', tiit2.name, partname) AS name,
-            FROM_UNIXTIME(dtdue) AS Due_Date
-            FROM {turnitintooltwo} tiit2
-            JOIN {turnitintooltwo_parts} ON tiit2.id = turnitintooltwoid
-            WHERE dtdue
-            BETWEEN {$timefrom} AND {$timeto}
-        )) AS m
-        JOIN (SELECT @s := 0) AS increment
-        INNER JOIN {course} c ON c.id = m.course
-        ORDER BY `m`.`Due_Date` ASC
-    ");    
+
+    $sql = "SELECT (@s := @s+1) AS identifier, m.Due_date, c.shortname,
+                   (SELECT COUNT(DISTINCT u.id)
+                      FROM {course} AS subc
+                      JOIN {context} AS ctx ON subc.id = ctx.instanceid
+                      JOIN {role_assignments} AS ra ON ra.contextid = ctx.id
+                      JOIN {role} AS r ON r.id = ra.roleid
+                      JOIN {user} AS u ON u.id = ra.userid
+                     WHERE subc.id=c.id) AS participants,
+                   c.fullname, m.modtype, m.Name
+              FROM (
+                     (SELECT 'quiz' AS modtype, course, name,
+                             FROM_UNIXTIME(timeclose) AS Due_Date
+                        FROM {quiz}
+                       WHERE timeclose BETWEEN $timefrom AND $timeto
+                     ) UNION (
+                      SELECT 'assignment' AS modtype, course, name,
+                             FROM_UNIXTIME(duedate) AS Due_Date
+                        FROM {assign}
+                       WHERE duedate BETWEEN $timefrom AND $timeto
+                     ) UNION (
+                      SELECT 'turnitintool' AS modtype, tiit.course,
+                             CONCAT_WS(' ', tiit.name, partname) AS name,
+                             FROM_UNIXTIME(dtdue) AS Due_Date
+                        FROM {turnitintool} tiit
+                        JOIN {turnitintool_parts} ON tiit.id = turnitintoolid
+                       WHERE dtdue BETWEEN $timefrom AND $timeto
+                     ) UNION (
+                      SELECT 'turnitintooltwo' AS modtype, tiit2.course,
+                             CONCAT_WS(' ', tiit2.name, partname) AS name,
+                             FROM_UNIXTIME(dtdue) AS Due_Date
+                        FROM {turnitintooltwo} tiit2
+                        JOIN {turnitintooltwo_parts} ON tiit2.id = turnitintooltwoid
+                       WHERE dtdue BETWEEN $timefrom AND $timeto)
+                   ) AS m
+              JOIN (SELECT @s := 0) AS increment
+              JOIN {course} c ON c.id = m.course
+          ORDER BY `m`.`Due_Date` ASC";
+
+    $results = $DB->get_records_sql($sql);
 
     foreach ($results as $k => $result) {
         if (isset($result->courseid)) {
