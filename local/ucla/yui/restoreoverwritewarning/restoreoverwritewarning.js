@@ -24,9 +24,6 @@ YUI.add('moodle-local_ucla-restoreoverwritewarning', function(Y) {
 
                         // If the user clicks "Backup", direct users to backup the course.
                         confirm.on('complete-yes', function(e) {
-                            window.open(json.config.url, '_self');
-                        }, this);
-                        confirm.on('complete-no', function(e) {
                             Y.one('.' + section + ' input[value="Continue"]').simulate('click');
                         }, this);
                         // Show the confirm box.

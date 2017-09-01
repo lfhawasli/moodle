@@ -220,12 +220,12 @@ $string['deletecoursesafe'] = 'You are deleting a course for which no content ha
 
 // CCLE-4416 - Prompt overwriting warning.
 $string['deletecoursecontenttitle'] = 'Course deletion warning';
-$string['deletecoursecontentyes'] = 'Create backup';
-$string['deletecoursecontentno'] = 'Continue';
+$string['deletecoursecontentyes'] = 'Continue';
+$string['deletecoursecontentno'] = 'Cancel';
 
 $string['deletecoursecontentwarning'] = '<p>You are about to delete the content of the site:</p>'
         . '<p>{$a->shortname} ({$a->fullname})</p>'
-        . '<p>To ensure that your content is saved, first create a backup.  If you are sure you want to delete the content, press "Continue".';
+        . '<p>To ensure that your content is saved, first <a href="{$a->backuplink}">create a backup.</a>  If you are sure you want to delete the content, press "Continue".';
 
 // CCLE-4413 assignment file submission file type validation.
 $string['invalidfiletype'] = '{$a->notaccepted} filetype cannot be accepted.<br />Acceptable file type(s): {$a->accepted}';
