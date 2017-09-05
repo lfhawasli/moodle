@@ -60,6 +60,7 @@ if ($data = $mform->get_data()) {
     // Prepare the table.
     $table = new html_table();
     $table->head = array(get_string('tablecolcourse', 'local_ucla_syllabus'),
+            get_string('tablecolinstructor', 'local_ucla_syllabus'),
             get_string('tablecolsyllabus', 'local_ucla_syllabus'));
     $table->data = array();
 
@@ -74,50 +75,81 @@ if ($data = $mform->get_data()) {
                 $course->shortname, array('target' => '_blank'));
 
         $manager = new ucla_syllabus_manager($course);
-
-        // Prefer to give private syllabus.
         $syllabi = $manager->get_syllabi();
-        $foundsyllabus = null;
-        if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])) {
-            $foundsyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE];
-        } else {
-            $foundsyllabus = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
-        }
 
-        if (!empty($foundsyllabus->url)) {
-            // Syllabus is a URL.
-            $link = html_writer::link($foundsyllabus->url, $foundsyllabus->url);
-            $table->data[] = array($courselink, $link);
-
-            // Try to convert webpage to a pdf and prepare for download in the zipfile.
-            if ($downloading) {
-                try {
-                    $webpagecontent = $htmltopdfconverter->getOutput($foundsyllabus->url);
-                    $syllabusfiles[$course->shortname . '_syllabus.pdf'] = array($webpagecontent);
-                } catch (moodle_exception $e) {
-                    // The page was unable to be converted. Just include a .txt of the URL instead.
-                    $syllabusfiles[$course->shortname . '_syllabus_url.txt'] = array($foundsyllabus->url);
-                }
+        // Get a string list of instructor last names, if any.
+        $instructors = '';
+        $instructorsfull = array(); // For the table.
+        $courseformat = course_get_format($course);
+        if ($courseformat instanceof format_ucla) {
+            foreach ($courseformat->display_instructors() as $instructor) {
+                $instructors .= '_' . $instructor->lastname;
+                $instructorsfull[] = $instructor->firstname . ' ' . $instructor->lastname;
             }
-        } else {
-            // Syllabus is a file.
-            $syllabusfile = null;
-            try {
-                $syllabusfile = $foundsyllabus->locate_syllabus_file();
-            } catch (moodle_exception $e) {
+        }
+        $instructorsfull = join(', ', $instructorsfull);
+
+        // Check if there are multiple syllabi.
+        $numsyllabi = 0;
+        foreach ($syllabi as $foundsyllabus) {
+            if (isset($foundsyllabus)) {
+                $numsyllabi++;
+            }
+        }
+        $multiplesyllabi = $numsyllabi > 1;
+
+        // Iterate through each syllabi and add them to the zipfile/table of syllabi.
+        foreach ($syllabi as $syllabustype => $syllabus) {
+            if (!isset($syllabus)) {
                 continue;
             }
-            if ($syllabusfile = $foundsyllabus->locate_syllabus_file()) {
-                $syllabusfilename = $syllabusfile->get_filename();
 
-                // Display the syllabi in a table.
-                $fileurl = $foundsyllabus->get_file_url();
-                $downloadlink = html_writer::link($fileurl, $foundsyllabus->get_icon() . $syllabusfilename);
-                $table->data[] = array($courselink, $downloadlink);
+            // We don't want to display the syllabus type if there's only one syllabi for this course.
+            $syllabustype = ($multiplesyllabi) ? ('_' . $syllabustype) : '';
 
-                // Prepare the syllabi for download in the zipfile.
+            if (!empty($syllabus->url)) {
+                // Syllabus is a URL.
+                $link = html_writer::link($syllabus->url, $syllabus->url);
+                $table->data[] = array($courselink, $instructorsfull, $link);
+
+                // Try to convert webpage to a pdf and prepare for download in the zipfile.
                 if ($downloading) {
-                    $syllabusfiles[$course->shortname . '_syllabus_' . $syllabusfilename] = $syllabusfile;
+                    if (isset($data->converturlstopdfs)) {
+                        try {
+                            $webpagecontent = $htmltopdfconverter->getOutput($syllabus->url);
+                            $zipname = $course->shortname . $instructors . $syllabustype . '_syllabus.pdf';
+                            $syllabusfiles[$zipname] = array($webpagecontent);
+                        } catch (Exception $e) {
+                            // The page was unable to be converted. Just include a .txt of the URL instead.
+                            $zipname = $course->shortname . $instructors . $syllabustype . '_syllabus_url.txt';
+                            $syllabusfiles[$zipname] = array($syllabus->url);
+                        }
+                    } else {
+                        $zipname = $course->shortname . $instructors . $syllabustype . '_syllabus_url.txt';
+                        $syllabusfiles[$zipname] = array($syllabus->url);
+                    }
+                }
+            } else {
+                // Syllabus is a file.
+                $syllabusfile = null;
+                try {
+                    $syllabusfile = $syllabus->locate_syllabus_file();
+                } catch (moodle_exception $e) {
+                    continue;
+                }
+                if ($syllabusfile = $syllabus->locate_syllabus_file()) {
+                    $syllabusfilename = $syllabusfile->get_filename();
+
+                    // Display the syllabi in a table.
+                    $fileurl = $syllabus->get_file_url();
+                    $downloadlink = html_writer::link($fileurl, $syllabus->get_icon() . $syllabusfilename);
+                    $table->data[] = array($courselink, $instructorsfull, $downloadlink);
+
+                    // Prepare the syllabi for download in the zipfile.
+                    if ($downloading) {
+                        $zipname = $course->shortname . $instructors . $syllabustype . '_syllabus_' . $syllabusfilename;
+                        $syllabusfiles[$zipname] = $syllabusfile;
+                    }
                 }
             }
         }

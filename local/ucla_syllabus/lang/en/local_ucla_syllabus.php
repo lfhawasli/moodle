@@ -88,6 +88,7 @@ $string['private_disclaimer'] = 'This syllabus is available only to enrolled stu
 $string['preview'] = 'preview';
 $string['private'] = 'restricted';
 $string['modified'] = 'Last modified: ';
+$string['strftimedatetimeshortfilename'] = '%y-%m-%d--%H-%M';
 
 // Success strings.
 $string['successful_add'] = 'Successfully added syllabus';
@@ -195,8 +196,10 @@ $string['bulkdownloadsyllabi'] = 'Bulk download syllabi';
 $string['bulkdownloadsyllabiheading'] = 'Bulk download syllabi by term';
 $string['showsyllabi'] = 'Show syllabi in selected term';
 $string['downloadsyllabi'] = 'Download syllabi in selected term';
+$string['converttopdf'] = 'Convert URL syllabi to PDFs of the webpages when downloading. Uncheck to download as .txt files.';
 $string['tablecolcourse'] = 'Course';
 $string['tablecolsyllabus'] = 'Syllabus';
+$string['tablecolinstructor'] = 'Instructor(s)';
 $string['category'] = 'Category';
 $string['selectedterm'] = 'Selected term';
 $string['numberofsyllabi'] = 'Number of syllabi';
