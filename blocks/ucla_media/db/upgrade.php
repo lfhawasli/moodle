@@ -135,8 +135,27 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
                 $dbman->add_field($table, $field);
             }
         }
-        
+
         upgrade_block_savepoint(true, 2017051500, 'ucla_media');
     }
+
+    // Add comments.
+    if ($oldversion < 2017091300) {
+        $table = new xmldb_table('ucla_bruincast');
+        $field = new xmldb_field('comments', XMLDB_TYPE_TEXT, null, null, null, null, null, 'name');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_block_savepoint(true, 2017091300, 'ucla_media');
+    }
+
+    // Make bruincast_url nullable.
+    if ($oldversion < 2017091800) {
+        $table = new xmldb_table('ucla_bruincast');
+        $field = new xmldb_field('bruincast_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'restricted');
+        $dbman->change_field_notnull($table, $field);
+        upgrade_block_savepoint(true, 2017091800, 'ucla_media');
+    }
+
     return true;
 }

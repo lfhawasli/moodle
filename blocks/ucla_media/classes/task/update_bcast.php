@@ -23,6 +23,7 @@
  */
 
 namespace block_ucla_media\task;
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
 
 /**
@@ -34,11 +35,11 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.p
  */
 class update_bcast extends \core\task\scheduled_task {
 
-   /**
-    * Update Bruincast database.
-    *
-    * @return boolean
-    */
+    /**
+     * Update Bruincast database.
+     *
+     * @return boolean
+     */
     public function execute() {
         global $DB;
 
@@ -53,7 +54,8 @@ class update_bcast extends \core\task\scheduled_task {
             'username' => get_config('block_ucla_media', 'bruincast_user'),
             'password' => get_config('block_ucla_media', 'bruincast_pass')
         );
-        
+
+        echo "a\n";
         // Doing the CURL for Login.
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $requesturl);
@@ -63,6 +65,7 @@ class update_bcast extends \core\task\scheduled_task {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
 
         $response = curl_exec($curl);
         $xml = new \SimpleXMLElement($response);
@@ -80,7 +83,7 @@ class update_bcast extends \core\task\scheduled_task {
         foreach ($terms as $term) {
             // Converting term to API format.
             $correctedterm = self::convert_term($term);
-            
+
             // Setting parameters for our request.
             $params = array(
                 'display_id' => 'ccle_api_courses',
@@ -98,6 +101,7 @@ class update_bcast extends \core\task\scheduled_task {
             curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
             curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
 
             $query = http_build_query($params, '', '&');
             /* Please note http_build_query is different in moodle and outside it, and it's usage is different */
@@ -113,7 +117,7 @@ class update_bcast extends \core\task\scheduled_task {
             // Only processing next part if the result was non-empty.
             if (array_key_exists('item', $cleanedresult)) {
 
-                // The below if statement is a workaround for an XML parsing 
+                // The below if statement is a workaround for an XML parsing
                 // problem. When only one item is retrieved in a query the array
                 // $cleanedresult[item] contains information about that one
                 // item, however, when there are multiple results the array is
@@ -148,6 +152,7 @@ class update_bcast extends \core\task\scheduled_task {
                     curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
                     curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
                     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
 
                     $query = http_build_query($params, '', '&');
                     curl_setopt($curl, CURLOPT_URL, "$url?$query");
@@ -161,7 +166,7 @@ class update_bcast extends \core\task\scheduled_task {
                     // array of arrays. But if there is only one, then it is
                     // by itself. Make it an array of arrays.
                     $contents = $cleanedresult['item'];
-                    if (count($cleanedresult['item']) == 1) {
+                    if (!array_key_exists(0, $cleanedresult['item'])) {
                         $contents = array($cleanedresult['item']);
                     }
 
@@ -176,16 +181,18 @@ class update_bcast extends \core\task\scheduled_task {
                         if (!is_array($content['video'])) {
                             $entry->bruincast_url = $content['video'];
                         } else {
-                            $entry->bruincast_url = 'null';
+                            $entry->bruincast_url = null;
                         }
                         // Similar to above.
                         if (!is_array($content['audio'])) {
                             $entry->audio_url = $content['audio'];
                         } else {
-                            $entry->audio_url = 'null';
+                            $entry->audio_url = null;
                         }
                         $entry->name = $content['title'];
-                        $entry->podcast_url = 'null';
+                        if (!empty($content['comments'])) {
+                            $entry->comments = $content['comments'];
+                        }
                         $temp = $content['date_for_recording_s_'];
                         $tempdate = explode('/', $temp);
                         $date = mktime(0, 0, 0, $tempdate[0], $tempdate[1], $tempdate[2]);
@@ -196,13 +203,13 @@ class update_bcast extends \core\task\scheduled_task {
             }
         }
     }
-    
-   /**
-    * Converts term from the format of 17F to fall-2017, etc.
-    *
-    * @param $term is a given term in the YYQ format where YY is year and Q is quarter
-    * @return string
-    */
+
+    /**
+     * Converts term from the format of 17F to fall-2017, etc.
+     *
+     * @param $term is a given term in the YYQ format where YY is year and Q is quarter
+     * @return string
+     */
     private function convert_term($term) {
         $correctedterm = '20'.$term[0].$term[1];
         if ($term[2] == 'F') {
@@ -214,14 +221,14 @@ class update_bcast extends \core\task\scheduled_task {
         } else {
             $correctedterm = 'summer-'.$correctedterm;
         }
-        return $correctedterm;  
+        return $correctedterm;
     }
-   
-   /**
-    * Returns task name.
-    *
-    * @return string
-    */
+
+    /**
+     * Returns task name.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('taskupdatebcast', 'block_ucla_media');
     }

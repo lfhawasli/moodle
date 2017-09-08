@@ -76,6 +76,19 @@ $string['headerbruincasturl'] = 'Bruincast Datasource URL';
 $string['descbruincasturl'] = 'Bruincast URL to obtain data from Bruincast datasource API';
 $string['headerbruincastwowza'] = 'Bruincast Wowza URL';
 $string['descbruincastwowza'] = 'Server location for Bruincast Wowza.';
+$string['bruincastnotice'] = 'Bruincast notice';
+$string['bruincastnoticedesc'] = 'If set, will display notice on all Bruincast pages.';
+
+// Strings for Bruincast display.
+$string['bccoursedate'] = 'Course date';
+$string['bcmedia'] = 'Media';
+$string['bctitle'] = 'Title';
+$string['bccomments'] = 'Comments';
+$string['bcvideo'] = 'Video';
+$string['bcaudio'] = 'Audio';
+$string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are '
+        . 'available. For help regarding BruinCast content please read our '
+        . '<a href="https://docs.ccle.ucla.edu/w/BruinCast">help document</a>.';
 
 // Types of bruincasts. To be removed once new web service is done: CCLE-6263.
 $string['node_restricted'] = 'Private';

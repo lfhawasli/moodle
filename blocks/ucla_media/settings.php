@@ -36,14 +36,14 @@ if ($ADMIN->fulltree) {
             'block_ucla_media/bruincast_login_url',
             get_string('headerbruincastloginurl', 'block_ucla_media'),
             get_string('descbruincastloginurl', 'block_ucla_media'),
-            'http://d7.oid.ucla.edu/api/v1/user/login',
+            'https://d7.oid.ucla.edu/api/v1/user/login',
             PARAM_URL
         ));
     $settings->add(new admin_setting_configtext(
             'block_ucla_media/bruincast_url',
             get_string('headerbruincasturl', 'block_ucla_media'),
             get_string('descbruincasturl', 'block_ucla_media'),
-            'http://d7.oid.ucla.edu/api/v1/views/ccle_api',
+            'https://d7.oid.ucla.edu/api/v1/views/ccle_api',
             PARAM_URL
         ));
     $settings->add(new admin_setting_configtext(
@@ -81,4 +81,8 @@ if ($ADMIN->fulltree) {
             'http://164.67.141.72:1935',
             PARAM_URL
         ));
+    $settings->add(new admin_setting_confightmleditor(
+            'block_ucla_media/bruincast_notice',
+            get_string('bruincastnotice', 'block_ucla_media'),
+            get_string('bruincastnoticedesc', 'block_ucla_media'), ''));
 }

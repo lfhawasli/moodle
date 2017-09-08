@@ -1,4 +1,4 @@
- <?php
+<?php
 // This file is part of the UCLA Media block for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 $videoid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
 // Try to find corresponding course for given video.
-if ($mode == MEDIA_BCAST) {
+if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
     $video = $DB->get_record('ucla_bruincast', array('id' => $videoid));
     if (empty($video)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
@@ -58,10 +58,10 @@ echo $OUTPUT->header();
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
-    if ($mode == MEDIA_BCAST) {
+    if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
         echo $OUTPUT->heading($video->name, 2, 'headingblock');
-        // Try to embed video on page by calling filter.
-        $filtertext = get_bruincast_filter_text($video);
+        // Try to embed video or audio on page by calling filter.
+        $filtertext = get_bruincast_filter_text($video, $mode);
 
         $filter = new filter_oidwowza($context, array());
         $html = $filter->filter($filtertext);
@@ -94,7 +94,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         }
 
         echo $OUTPUT->heading($video->video_title, 2, 'headingblock');
-        
+
         // Try to embed video on page by calling filter.
         $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
                 'rtmpe://' . get_config('block_ucla_video_reserves', 'wowzaurl'),
@@ -118,7 +118,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                 'type' => get_string('headervidres', 'block_ucla_media')
             )));
         $event->trigger();
-    } 
+    }
 } else {
     echo get_string('guestsarenotallowed', 'error');
 }

@@ -22,13 +22,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $tasks = array(
-    // Run at 10:30 am and 8:30 pm.
+    // Run hourly between 8am-8pm.
     array(
         'classname' => 'block_ucla_media\task\update_bcast',
         'blocking' => 0,
-        'minute' => '30',
-        'hour' => '10,20',
+        'minute' => '*',
+        'hour' => '8-20',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
