@@ -28,38 +28,34 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__.'/../../locallib.php');
 
 /**
- * This is the media conversion task class that extends adhoc task for mod intros
+ * This task adds course administrators as co-editors and co-publishers for Kaltura content.
  *
  * @package    local_mediaconversion
  * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mediaconversion_convert_text_task extends \core\task\adhoc_task {
+class mediaconversion_add_collaborators_task extends \core\task\adhoc_task {
     /**
      * Executes the task.
      *
      * @throws Exception on error
      */
     public function execute() {
-        global $DB;
+        global $CFG, $DB;
         $customdata = $this->get_custom_data();
         $data = $customdata->eventdata;
-        // Convert the video files embedded in content text. Note that we don't need
-        // to delete the old files as Moodle automatically cleans them up for us.
-        if ($newintro = local_cm_convert_and_get_new_text($data->other->modulename,
-                $data->objectid, $data->contextid, $customdata->userid)) {
-            // Change the intro text in the database to the new text.
-            $DB->set_field($data->other->modulename, 'intro', $newintro, ['id' => $data->other->instanceid]);
+        // Get entry id from DB.
+        $moddata = $DB->get_record('kalvidres', ['id' => $data->other->instanceid]);
+        // Get course.
+        $course = get_course($data->courseid);
+        // Update collaborators.
+        $client = local_cm_get_kaltura_client(local_kaltura_get_config());
+        $idstring = "for entry with id $moddata->entry_id in kalvidres with id $data->objectid";
+        if (!local_cm_update_entry_collaborators($client, $moddata->entry_id, $course)) {
+            mtrace('Failed to update collaborators ' . $idstring);
         }
-        // Page resources also have page content that must be replaced.
-        if ($data->other->modulename === 'page' && $newcontent = local_cm_convert_and_get_new_text(
-                $data->other->modulename, $data->objectid, $data->contextid, $customdata->userid,
-                'content')) {
-            // Change the content text for something with text content (like a page resource).
-            $DB->set_field($data->other->modulename, 'content', $newcontent, ['id' => $data->other->instanceid]);
-        }
+        mtrace('Successfully added course admins as collaborators ' . $idstring);
     }
-
 
     /**
      * Get a descriptive name for this task (shown to admins).
@@ -67,6 +63,6 @@ class mediaconversion_convert_text_task extends \core\task\adhoc_task {
      * @return string
      */
     public function get_name() {
-        return get_string('taskmediaconversion_convert_text', 'local_mediaconversion');
+        return get_string('taskmediaconversion_add_collaborators', 'local_mediaconversion');
     }
 }

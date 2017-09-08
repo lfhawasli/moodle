@@ -55,7 +55,7 @@ function local_cm_get_kaltura_client($configsettings) {
     $client = new KalturaClient($config);
     try {
         $session = $client->session->start($configsettings->adminsecret,
-                $USER->username, KalturaSessionType::ADMIN, $configsettings->partner_id);
+                $USER->email, KalturaSessionType::ADMIN, $configsettings->partner_id);
     } catch (Exception $ex) {
         if (!isset($session)) {
             die("Could not establish Kaltura session. Please verify that you are using valid Kaltura partner credentials.");
@@ -66,6 +66,25 @@ function local_cm_get_kaltura_client($configsettings) {
 }
 
 /**
+ * Gets a string of the course admins who need to be collaborators and publishers
+ * on Kaltura.
+ *
+ * @param stdClass $course
+ * @return string  A comma separated string for Kaltura to know who should be
+ *                 collaborators and publishers on all videos uploaded for a course.
+ */
+function local_cm_get_course_admin_usernames($course) {
+    // Gets the users who can manage activities at the course context.
+    $courseadmins = local_ucla_core_edit::get_course_graders($course, '',
+            'moodle/course:manageactivities');
+    // Put the emails in a comma-separated string.
+    $emails = array_map(function($admin) {
+        return $admin->email;
+    }, $courseadmins);
+    return implode(',', $emails);
+}
+
+/**
  * Uploads a video using its path and returns the resulting
  * media entry.
  *
@@ -73,11 +92,15 @@ function local_cm_get_kaltura_client($configsettings) {
  * @param string $filepath
  * @param string $title
  * @param string $description
+ * @param stdClass $course  Needed to set the entry collaborators.
  * @return KalturaMediaEntry|null
  */
-function local_cm_upload_video_from_filepath(\KalturaClient $client, $filepath, $title, $description) {
+function local_cm_upload_video_from_filepath(\KalturaClient $client, $filepath,
+        $title, $description, $course) {
     $uploadtoken = $client->media->upload($filepath);
     $entry = new KalturaMediaEntry();
+    $entry->entitledUsersEdit = local_cm_get_course_admin_usernames($course);
+    $entry->entitledUsersPublish = $entry->entitledUsersEdit;
     $entry->name = $title;
     $entry->description = $description;
     $entry->mediaType = KalturaMediaType::VIDEO;
@@ -111,6 +134,27 @@ function local_cm_upload_video_from_url(\KalturaClient $client, $url, $title, $d
         return null;
     }
     return $entry;
+}
+
+/**
+ * Adds course admins as collaborators to an existing media entry
+ *
+ * @param \KalturaClient $client
+ * @param string $entryid The entry_id for the media entry
+ * @param stdClass $course
+ * @return KalturaMediaEntry|null
+ */
+function local_cm_update_entry_collaborators(\KalturaClient $client, $entryid, $course) {
+    $newentry = new KalturaMediaEntry();
+    $newentry->entitledUsersEdit = local_cm_get_course_admin_usernames($course);
+    $newentry->entitledUsersPublish = $newentry->entitledUsersEdit;
+    try {
+        $updatedentry = $client->media->update($entryid, $newentry);
+    } catch (Exception $ex) {
+        echo get_string('failedentryupdateerror', 'local_mediaconversion', $entryid);
+        return null;
+    }
+    return $newentry;
 }
 
 /**
@@ -355,6 +399,9 @@ function local_cm_package_argsinfo($courseandmodinfo, $name, $modname = 'resourc
     $argsinfo->groupingid = $groupcourse->defaultgroupingid;
     $argsinfo->availabilityconditionsjson = $modinfo->availability;
     $argsinfo->course = $groupcourse->id;
+    // Save the course object as a property of the argsinfo to save DB calls
+    // later even though we technically don't need it here.
+    $argsinfo->courseobject = $groupcourse;
     $argsinfo->coursemodule = 0;
     $argsinfo->section = $modinfo->sectionnum;
     $argsinfo->intro = $moddata->intro;
@@ -396,7 +443,7 @@ function local_cm_convert_video(stored_file $file, $argsinfo, $userid, $cmid) {
     $client = local_cm_get_kaltura_client($configsettings);
     // Upload the file to Kaltura.
     if (!$entry = local_cm_upload_video_from_filepath($client,
-            $pathtofile, $argsinfo->name, $argsinfo->description)) {
+            $pathtofile, $argsinfo->name, $argsinfo->description, $argsinfo->courseobject)) {
         return null;
     }
     // Get/make the appropriate category in the KMC for the video.

@@ -44,15 +44,22 @@ class local_mediaconversion_observer {
         $data = $event->get_data();
         $customdata = array('eventdata' => $data, 'userid' => $USER->id);
         // We only want to convert the main file for resources.
-        if ($data['other']['modulename'] !== 'resource') {
-            // Only dispatch a dedicated task to convert the intro if it's not
-            // a resource (otherwise mediaconversion_convert_task handles it).
-            $task = new \local_mediaconversion\task\mediaconversion_convert_text_task();
+        if ($data['other']['modulename'] === 'resource') {
+            $task = new \local_mediaconversion\task\mediaconversion_convert_task();
             $task->set_custom_data($customdata);
             \core\task\manager::queue_adhoc_task($task);
             return;
         }
-        $task = new \local_mediaconversion\task\mediaconversion_convert_task();
+        // If it's a Kaltura video resource, we need to add the course admins as
+        // collaborators.
+        if ($data['other']['modulename'] === 'kalvidres') {
+            $task = new \local_mediaconversion\task\mediaconversion_add_collaborators_task();
+            $task->set_custom_data($customdata);
+            \core\task\manager::queue_adhoc_task($task);
+        }
+        // Only dispatch a dedicated task to convert the intro if it's not
+        // a resource (otherwise mediaconversion_convert_task handles it).
+        $task = new \local_mediaconversion\task\mediaconversion_convert_text_task();
         $task->set_custom_data($customdata);
         \core\task\manager::queue_adhoc_task($task);
     }
