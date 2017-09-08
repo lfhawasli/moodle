@@ -41,7 +41,9 @@ abstract class syllabus_base extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event' . get_called_class(), 'local_ucla_syllabus');
+        $reflect = new \ReflectionClass(get_called_class());
+        // Remove the namespace from the class using getShortName.
+        return get_string('event' . $reflect->getShortName(), 'local_ucla_syllabus');
     }
 
     /**

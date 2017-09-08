@@ -1,4 +1,4 @@
-@ucla @local_ucla_syllabus
+@ucla @local_ucla_syllabus @javascript
 Feature: Use an URL as a syllabus
     As an instructor
     I want to be able to use an URL as my syllabus
@@ -24,7 +24,8 @@ Scenario: Check warning for unsecure urls
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
-    And I set the field "URL" to "http://ucla.edu"
+    And I click on "URL" "radio"
+    And I set the field "syllabus_url" to "http://ucla.edu"
     And I press "Save changes"
     Then I should see "The syllabus URL (http://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
     And I press "Continue"
@@ -32,7 +33,7 @@ Scenario: Check warning for unsecure urls
     And I should see "http://ucla.edu"
     And I turn editing mode on
     When I follow "Edit"
-    And I set the field "URL" to "https://ucla.edu"
+    And I set the field "syllabus_url" to "https://ucla.edu"
     And I press "Save changes"
     Then I should not see "The syllabus URL (https://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
 
@@ -42,7 +43,8 @@ Scenario: Viewing URL as a student
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
-    And I set the field "URL" to "http://ucla.edu"
+    And I click on "URL" "radio"
+    And I set the field "syllabus_url" to "http://ucla.edu"
     And I press "Save changes"
     Then I should see "The syllabus URL (http://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
     Given I press "Continue"
@@ -60,7 +62,7 @@ Scenario: Viewing URL as a student
     And I turn editing mode on
     And I follow the "Syllabus" section in the ucla site menu
     When I follow "Edit"
-    Then I set the field "URL" to "https://ucla.edu"
+    Then I set the field "syllabus_url" to "https://ucla.edu"
     And I press "Save changes"
     And I log out
     And I log in as "student1"
@@ -77,7 +79,8 @@ Scenario: Viewing URL as an instructor
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
-    And I set the field "URL" to "http://ucla.edu"
+    And I click on "URL" "radio"
+    And I set the field "syllabus_url" to "http://ucla.edu"
     And I press "Save changes"
     Then I should see "The syllabus URL (http://ucla.edu) does not use https, and will not be embedded in the page for security reasons. It will display as a link instead. Do you want to continue?"
     And I press "Continue"
@@ -88,7 +91,7 @@ Scenario: Viewing URL as an instructor
     And "//*[contains(@id, 'resourceobject')]" "xpath_element" should not exist
     And I turn editing mode on
     And I follow "Edit"
-    And I set the field "URL" to "https://ucla.edu"
+    And I set the field "syllabus_url" to "https://ucla.edu"
     And I press "Save changes"
     And I turn editing mode off
     Then I should see "Syllabus" in the "region-main" "region"
