@@ -49,10 +49,9 @@ try {
             $config->yesLabel = get_string('deletecoursecontentyes', 'local_ucla');
             $config->noLabel = get_string('deletecoursecontentno', 'local_ucla');;
             $config->closeButtonTitle = get_string('close', 'editor');
-            $config->question = get_string('deletecoursecontentwarning', 'local_ucla',
-                    array('shortname' => $course->shortname, 'fullname' => $course->fullname));
-
             $url = new moodle_url('/backup/backup.php', array('id' => $course->id));
+            $config->question = get_string('deletecoursecontentwarning', 'local_ucla',
+                    array('shortname' => $course->shortname, 'fullname' => $course->fullname, 'backuplink' => (string)$url));
             $config->url = (string) $url;
 
             // Set status.
