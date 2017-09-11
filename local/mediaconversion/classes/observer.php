@@ -33,15 +33,52 @@ defined('MOODLE_INTERNAL') || die();
  */
 class local_mediaconversion_observer {
     /**
-     * This is called whenever a course module is added. It dispatches the convert
-     * media task to convert video files to kaltura video resources and also dispatches
-     * the convert intro media task.
+     * This is called whenever a course module is added.
      *
      * @param \core\event\course_module_created $event
      */
-    public static function mediaconversion_convert(\core\event\course_module_created $event) {
-        global $CFG, $USER;
+    public static function mediaconversion_convert_added(\core\event\course_module_created $event) {
+        self::mediaconversion_convert($event->get_data());
+    }
+
+    /**
+     * This is called whenever a course is restored.
+     *
+     * @param \core\event\course_restored $event
+     */
+    public static function mediaconversion_convert_restored(\core\event\course_restored $event) {
+        global $USER;
         $data = $event->get_data();
+        $task = new \local_mediaconversion\task\mediaconversion_convert_restored_task();
+        $task->set_custom_data(
+            array(
+                'courseid' => $data['courseid'],
+                'userid' => $USER->id
+            )
+        );
+        \core\task\manager::queue_adhoc_task($task);
+    }
+
+    /**
+     * This is called whenever a course module is edited.
+     *
+     * @param \core\event\course_module_updated $event
+     */
+    public static function mediaconversion_convert_edited(\core\event\course_module_updated $event) {
+        self::mediaconversion_convert($event->get_data());
+    }
+
+    /**
+     * This is called whenever a course module is added or updated. It dispatches the convert
+     * media task to convert video files to kaltura video resources and also dispatches
+     * the convert intro media task.
+     *
+     * @param stdClass $eventdata
+     * @return void
+     */
+    public static function mediaconversion_convert($eventdata) {
+        global $USER;
+        $data = $eventdata;
         $customdata = array('eventdata' => $data, 'userid' => $USER->id);
         // We only want to convert the main file for resources.
         if ($data['other']['modulename'] === 'resource') {
@@ -61,24 +98,6 @@ class local_mediaconversion_observer {
         // a resource (otherwise mediaconversion_convert_task handles it).
         $task = new \local_mediaconversion\task\mediaconversion_convert_text_task();
         $task->set_custom_data($customdata);
-        \core\task\manager::queue_adhoc_task($task);
-    }
-
-    /**
-     * This is called whenever a course is restored.
-     *
-     * @param \core\event\course_restored $event
-     */
-    public static function mediaconversion_convert_restored(\core\event\course_restored $event) {
-        global $USER;
-        $data = $event->get_data();
-        $task = new \local_mediaconversion\task\mediaconversion_convert_restored_task();
-        $task->set_custom_data(
-            array(
-                'courseid' => $data['courseid'],
-                'userid' => $USER->id
-            )
-        );
         \core\task\manager::queue_adhoc_task($task);
     }
 }

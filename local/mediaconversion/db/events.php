@@ -27,13 +27,19 @@ defined('MOODLE_INTERNAL') || die();
 $observers = array (
     array(
         'eventname' => '\core\event\course_module_created',
-        'callback' => 'local_mediaconversion_observer::mediaconversion_convert',
+        'callback' => 'local_mediaconversion_observer::mediaconversion_convert_added',
         'internal' => false
     ),
 
     array(
         'eventname' => '\core\event\course_restored',
         'callback' => 'local_mediaconversion_observer::mediaconversion_convert_restored',
+        'internal' => false
+    ),
+
+    array(
+        'eventname' => '\core\event\course_module_updated',
+        'callback' => 'local_mediaconversion_observer::mediaconversion_convert_edited',
         'internal' => false
     )
 );

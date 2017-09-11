@@ -513,11 +513,21 @@ function local_cm_convert_and_add_module($contextid, $courseandmodinfo, $userid,
     }
     // Package info and try to convert the video.
     $argsinfo = local_cm_package_argsinfo($courseandmodinfo, $cmname);
-    // See if we need to convert anything in the intro text.
-    if ($newintro = local_cm_convert_and_get_new_text('resource', $cmid,
-            $contextid, $userid, 'intro', $argsinfo)) {
-        // Set the argsinfo intro to the new converted intro.
-        $argsinfo->intro = $newintro;
+    // If there are pluginfiles, we can't convert this video, since the
+    // pluginfile URLs will break (and yes, we must manually check for
+    // the boolean 'false' because strpos can return falsey offsets).
+    if (strpos($argsinfo->intro, '@@PLUGINFILE@@/') !== false) {
+        // See if we need to convert anything in the intro text.
+        if ($newintro = local_cm_convert_and_get_new_text('resource', $cmid,
+                $contextid, $userid, 'intro', $argsinfo)) {
+            $modinfo = $courseandmodinfo[1];
+            // Set the intro to the new converted intro.
+            $DB->set_field('resource', 'intro', $newintro, ['id' => $modinfo->instance]);
+        }
+        mtrace('Couldn\'t convert the file resource with cmid ' . $cmid
+                . ' to a Kaltura video resource because'
+                . ' it had embedded pluginfiles');
+        return false;
     }
     // Set the user to the uploader.
     $user = $DB->get_record('user', array('id' => $userid));
