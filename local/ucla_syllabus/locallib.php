@@ -344,6 +344,43 @@ class ucla_syllabus_manager {
 
         return $retval;
     }
+    
+    /**
+     * Get syllabus link name for course toc for SNAP theme.
+     *
+     * Only display link if there is a syllabus uploaded. If no syllabus
+     * uploaded, then display link if logged in user has the ability to add one.
+     *
+     * @return string
+     */
+    public function get_syllabus_name() {
+        global $USER;
+        $syllabusname = null;
+
+        // Restrict syllabus tool to only SRS sites.
+        if (!$this->can_host_syllabi()) {
+            return $syllabusname;
+        }
+
+        // Is there a syllabus uploaded?
+        $syllabi = $this->get_syllabi();
+
+        if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]) &&
+                $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view()) {
+            // See if logged in user can view private syllabus.
+            $syllabusname = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->display_name;
+        } else if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) &&
+                $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]->can_view()) {
+            // Fallback on trying to see if user can view public syllabus.
+            $syllabusname = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]->display_name;
+        } else if ($this->can_manage() && !empty($USER->editing)) {
+            // If no syllabus, then only show link for instructors to add a
+            // syllabus when in editing mode.
+            $syllabusname = get_string('syllabus_needs_setup', 'local_ucla_syllabus');
+        }
+
+        return $syllabusname;
+    }
 
     /**
      * Returns an array of syllabi for course indexed by type.

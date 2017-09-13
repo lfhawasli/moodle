@@ -360,6 +360,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
     echo $OUTPUT->container($body, 'ucla_syllabus-container');
 }
 
+echo html_writer::start_tag('br');
 echo $OUTPUT->footer();
 
 
