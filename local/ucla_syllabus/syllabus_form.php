@@ -778,12 +778,16 @@ class syllabus_form extends moodleform {
      * For both resources it will set the display name to be the module name.
      */
     private function handle_manual_syllabus() {
+        global $PAGE;
+        $jspath = '/local/ucla_syllabus/javascript/';
         $manualsyllabus = $this->get_manual_syllabus_info();
         if (!empty($manualsyllabus)) {
             $data['display_name'] = $manualsyllabus->module->name;
             if ($manualsyllabus->modname == 'url') {
                 // Set value for URL.
                 $data['syllabus_url'] = $manualsyllabus->module->externalurl;
+                // Dynamically checks the radio button for URL upload.
+                $PAGE->requires->js($jspath . 'local_ucla_syllabus_url_manual.js');
             } else if ($manualsyllabus->modname == 'resource') {
                 // Copy existing resouce file (assume we are getting first file).
                 $draftitemid = file_get_submitted_draft_itemid('syllabus_file');
@@ -792,6 +796,8 @@ class syllabus_form extends moodleform {
                         'mod_resource', 'content', 0,
                         $this->syllabusmanager->get_filemanager_config());
                 $data['syllabus_file'] = $draftitemid;
+                // Dynamically checks the radio button for File upload.
+                $PAGE->requires->js($jspath . 'local_ucla_syllabus_file_manual.js');
             }
             $this->set_data($data);
 
