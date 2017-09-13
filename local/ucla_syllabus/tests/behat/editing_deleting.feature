@@ -1,4 +1,4 @@
-@ucla @local_ucla_syllabus
+@ucla @local_ucla_syllabus @javascript
 Feature: Editing and deleting a syllabus
     As an instructor
     I want to be able to edit and delete a syllabus
@@ -22,7 +22,8 @@ Background:
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
-    And I set the field "URL" to "http://ucla.edu"
+    And I click on "URL" "radio"
+    And I set the field "syllabus_url" to "http://ucla.edu"
     And I press "Save changes"
     And I press "Continue"
 
@@ -30,7 +31,7 @@ Scenario: Editing syllabus information
     Given I should see "http://ucla.edu"
     And I should see "Syllabus"
     When I follow "Edit"
-    And I set the field "URL" to "http://www.uclabruins.com/"
+    And I set the field "syllabus_url" to "http://www.uclabruins.com/"
     And I set the field "Display name" to "Course outline"
     And I press "Save changes"
     And I press "Continue"
