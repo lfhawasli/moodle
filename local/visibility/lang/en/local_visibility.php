@@ -52,3 +52,4 @@ $string['visibilitylink'] = 'Click here to modify the course visibility schedule
 $string['hideoption'] = 'Hidden from students';
 $string['showoption'] = 'Visible to students';
 $string['save'] = 'Save';
+$string['coursehidden'] = 'This course is temporarily unavailable to students. It will become available again on <b>{$a->hideuntil}</b>. {$a->title}';
