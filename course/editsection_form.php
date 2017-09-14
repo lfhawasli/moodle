@@ -78,6 +78,10 @@ class editsection_form extends moodleform {
             // availabilityconditionsjson for consistency with moodleform_mod.
             $mform->addElement('textarea', 'availabilityconditionsjson',
                     get_string('accessrestrictions', 'availability'));
+            // START UCLA MOD: CCLE-6774 - Add legend explaining visibility conditions in "Access restrictions" section.
+            $mform->addHelpButton('availabilityconditionsjson', 'restrictaccess', 'availability');
+            // END UCLA MOD: CCLE-6774.
+            
             \core_availability\frontend::include_all_javascript($course, null,
                     $this->_customdata['cs']);
         }
