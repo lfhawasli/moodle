@@ -62,6 +62,9 @@ $string['manageplugins'] = 'Manage restrictions';
 $string['missingplugin'] = 'Missing restriction plugin';
 $string['or'] = 'or';
 $string['restrictaccess'] = 'Restrict access';
+$string['restrictaccess_help'] = 'If the eye is **SHUT** then students who do not meet that part of the condition will not see the activity at all.
+    
+If the eye is **OPEN** the students who do not meet that part of the condition will see the activity but it will be greyed out and have information about why they can\'t access it yet.';
 $string['restrictbygroup'] = 'Add group/grouping access restriction';
 $string['setheading'] = '{$a->number} Set of {$a->count} restriction(s)';
 $string['unknowncondition'] = 'Unknown condition (deleted condition plugin)';
