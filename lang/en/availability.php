@@ -62,9 +62,11 @@ $string['manageplugins'] = 'Manage restrictions';
 $string['missingplugin'] = 'Missing restriction plugin';
 $string['or'] = 'or';
 $string['restrictaccess'] = 'Restrict access';
+// START UCLA MOD: CCLE-6774 - Add legend explaining visibility conditions in "Access restrictions" section.
 $string['restrictaccess_help'] = 'If the eye is **SHUT** then students who do not meet that part of the condition will not see the activity at all.
     
 If the eye is **OPEN** the students who do not meet that part of the condition will see the activity but it will be greyed out and have information about why they can\'t access it yet.';
+// END UCLA MOD: CCLE-6774.
 $string['restrictbygroup'] = 'Add group/grouping access restriction';
 $string['setheading'] = '{$a->number} Set of {$a->count} restriction(s)';
 $string['unknowncondition'] = 'Unknown condition (deleted condition plugin)';
