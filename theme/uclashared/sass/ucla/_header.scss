@@ -3,7 +3,6 @@
 //
 
 $ccle-color-logo:       #FFBC00;
-$ccle-color-sublogo:    #c8dbf7;
 
 //
 // Header styles for CCLE banner.
@@ -74,12 +73,7 @@ header {
     }
     
     .header-system-name {
-        float: left;
-        color: $header-color-system-text;
-        display: inline-block;
-        padding: 2px 0;
-        font-weight: bold;
-        text-transform: uppercase;
+        display: none;
     }
     
     .weeks-display {
@@ -167,10 +161,9 @@ header {
 
 // Defines how header logo area looks
 .header-logo {
-    margin: 0 15px;
+    margin-left: 15px;
     text-align: left;
-    width: 70px;
-    margin-top: 2px;
+    margin-top: 14px;
     display: inline-block;
     
     // Remove the hover decoration on the logo
@@ -190,6 +183,8 @@ header {
         font-weight: bold;
 
         font-size: 1.6rem;
+        margin-right: 4px;
+        margin-left: 4px;
         /*margin-right: 8px;*/
         /*margin-left: 4px;*/
         &:hover {text-decoration: none;}
@@ -201,32 +196,66 @@ header {
 
     // Full CCLE text 
     .logo-ccle-sub {
-        display: inline-block;
-        font-size: 1.1rem;
-        color: $ccle-color-sublogo;
+        display: none;
+    }
 
-        // Split the text in two
-        .logo-cc,
-        .logo-le {
+    .logo-system-name,
+    .logo-system-name-vertical-bar {
+        color: white;
+        font-weight: regular;
+    }
 
-            margin-right: 8px;
-            display: block;
+    .logo-system-name {
+        font-size: 1.45rem;
+    }
 
-            width: 100%;
-            text-transform: capitalize;
-        }
-        
-        .env-dev &, .env-test &, .env-stage & {
-            color: white;
-        }
+    .logo-system-name-vertical-bar {
+        position: relative;
+        bottom: 2px;
+        font-size: 1.0rem;
     }
     
+    .logo-system-name:hover, 
+    .logo-system-name:active {
+        text-decoration: underline;
+    }
+
     @include respond-xs {
         width: 100%;
         text-align: center;
+        margin-top: 2px;
+        margin-left: 0px;
         
         .logo-ucla {
-            width: 70px;
+            width: 60px;
+            display: inline;
+        }
+        
+        .logo-ccle {
+            width: auto;
+            margin-left: 4px;
+            font-size: 2.4rem;
+        }
+
+        .logo-system-name {
+            font-size: 2.3rem;
+        }
+
+        .logo-system-name-vertical-bar {
+            position: relative;
+            bottom: 3px;
+            font-size: 1.77rem;
+        }
+    }
+
+    @include respond-xxs {
+        width: 100%;
+        text-align: center;
+        margin-top: 2px;
+        margin-left: 0px;
+        
+        .logo-ucla {
+            width: 60px;
             display: inline;
         }
         
@@ -234,12 +263,23 @@ header {
             width: auto;
             margin-left: 4px;
             /*display: inline-block;*/
-            font-size: 2.9rem;
+            font-size: 2.4rem;
+        }
+
+        .logo-system-name {
+            font-size: 1.75rem;
+        }
+
+        .logo-system-name-vertical-bar {
+            position: relative;
+            bottom: 3px;
+            font-size: 1.40rem;
         }
     }
-    
+
     @include respond-sm {
         width: auto;
+        margin-top: 2px;
         
         .logo-ucla {
             width: 70px;
@@ -257,6 +297,18 @@ header {
             .env-dev &, .env-test &, .env-stage & {
                 color: white;
             }
+        }
+        
+        .logo-system-name {
+            position: relative;
+            bottom: 1px;
+            font-size: 2.5rem;
+        }
+
+        .logo-system-name-vertical-bar {
+            position: relative;
+            bottom: 4px;
+            font-size: 1.9rem;
         }
     }
 }
