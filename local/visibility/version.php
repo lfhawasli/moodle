@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local_ucla plugin for Moodle - http://moodle.org/
+// This file is part of UCLA local plugin for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,26 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
- * UCLA local plugin cron task.
+ * Defines the version of UCLA visibility plugin.
  *
- * Contains the settings for UCLA specific customizations.
- *
- * @package    local_ucla
- * @copyright  2014 UC Regents
+ * @package    local_visibility
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
-    array(
-        'classname' => 'local_ucla\task\local_ucla_cron_task',
-        'blocking' => 0,
-        'minute' => '*',
-        'hour' => '0', // Midnight.
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    )
-);
+$plugin->version   = 2017090706;        // The current block version (Date: YYYYMMDDXX).
+$plugin->cron      = 0;                 // Period for cron to check this module (secs).
+$plugin->component = 'local_visibility'; // To check on upgrade, that module sits in correct place.
+
+$plugin->dependencies = array('local_ucla' => ANY_VERSION);

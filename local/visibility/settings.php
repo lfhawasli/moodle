@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local_ucla plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,27 +13,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * UCLA local plugin cron task.
+ * Plugin settings for local_visibility.
  *
- * Contains the settings for UCLA specific customizations.
- *
- * @package    local_ucla
- * @copyright  2014 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_visibility
+ * @copyright  2017 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html gnu gpl v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-
-$tasks = array(
-    array(
-        'classname' => 'local_ucla\task\local_ucla_cron_task',
-        'blocking' => 0,
-        'minute' => '*',
-        'hour' => '0', // Midnight.
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    )
-);

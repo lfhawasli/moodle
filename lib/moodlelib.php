@@ -2734,6 +2734,25 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
                         $alt_msg_shown = true;
                     }
                 }
+                // Display a message to students if the course is temporarily hidden.
+                if (empty($alt_msg_shown)) {
+                    $schedule = $DB->get_records('ucla_visibility_schedule', array('courseid' => $course->id, 'past' => 0));
+                    foreach ($schedule as $range) {
+                        $title = '';
+                        if ($range->hideuntil >= time() && $range->hidefrom <= time()) {
+                            $title = '';
+                            if (isset($range->title) && $range->title != '') {
+                                $title = '<i>(' . $range->title . ')</i>';
+                            }
+                            $hideuntil = userdate($range->hideuntil, get_string('strftimedatetime', 'langconfig'));
+                            notice(get_string('coursehidden', 'local_visibility',
+                                    array('hideuntil' => $hideuntil, 'title' => $title)),
+                                    $CFG->wwwroot .'/');
+                            $alt_msg_shown = true;
+                            break;
+                        }
+                    }
+                }
                 if (empty($alt_msg_shown)) {
                     notice(get_string('coursehidden'), $CFG->wwwroot .'/');
                 }
