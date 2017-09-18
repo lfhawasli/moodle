@@ -500,6 +500,9 @@ $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-1.kaf.kaltur
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
 
+// Site administration > Plugins > Local plugins > Kaltura media conversion.
+$CFG->forced_plugin_settings['local_mediaconversion']['base_category_path'] = 'ccle-shared-stage-kaf>site>channels';
+
 // Site administration > Plugins > Local plugins > Moodle Mobile additional features.
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).
 
