@@ -255,6 +255,10 @@ $CFG->forum_enabletimedposts = 1;
 $CFG->forum_rsstype = 2;
 $CFG->forum_rssarticles = 5;
 
+// Site administration > Plugins > Activity modules > H5P > H5P Settings
+$CFG->forced_plugin_settings['mod_hvp']['enable_save_content_state'] = 1;
+$CFG->forced_plugin_settings['mod_hvp']['enable_lrs_content_types'] = 1;
+
 // Site administration > Plugins > Activity modules > IMS content package
 $CFG->forced_plugin_settings['imscp']['requiremodintro'] = 0;
 
