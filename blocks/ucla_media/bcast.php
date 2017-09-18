@@ -26,6 +26,7 @@
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
+$pageparams = array();
 $courseid = required_param('courseid', PARAM_INT);
 
 if (!$course = get_course($courseid)) {
@@ -33,10 +34,16 @@ if (!$course = get_course($courseid)) {
 }
 require_login($course);
 $context = context_course::instance($courseid, MUST_EXIST);
+$pageparams['courseid'] = $courseid;
+
+// See if user wants to view a particular video.
+$videoid = optional_param('videoid', null, PARAM_INT);
+if (!empty($video)) {
+    $pageparams['video'] = $videoid;
+}
 
 init_page($course, $context,
-        new moodle_url('/blocks/ucla_media/bcast.php',
-                array('courseid' => $courseid)));
+        new moodle_url('/blocks/ucla_media/bcast.php', $pageparams));
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
@@ -45,6 +52,8 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     $count = count($videos);
     if ($count != 0) {
         print_media_page_tabs(get_string('headerbcast', 'block_ucla_media'), $course->id);
+
+        // Show all videos.
         display_all($course);
 
         $event = \block_ucla_media\event\index_viewed::create(
@@ -73,145 +82,85 @@ function display_all($course) {
     echo $OUTPUT->heading(get_string('headerbcast', 'block_ucla_media') .
             ": $course->fullname", 2, 'headingblock');
 
-    echo html_writer::tag('p', get_string('intro', 'block_ucla_media'),
-            array('id' => 'videoreserves-intro'));
-    echo "<br>";
-
-    // Later this will be replaced with a table listing of videos by week.
-    $content = get_videos($course->id);
-    foreach ($content as $link) {
-        echo $link . '<br>';
+    $notice = get_config('block_ucla_media', 'bruincast_notice');
+    if (!empty($notice)) {
+        echo $OUTPUT->notification($notice);
     }
 
+    echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
+
+    $videos = get_videos($course->id);
+
+    $table = new html_table();
+    $table->head = array(get_string('bccoursedate', 'block_ucla_media'),
+        get_string('bcmedia', 'block_ucla_media'));
+    $table->size = array('20%', '80%');
+    $table->id = 'bruincast-content-table';
+
+    foreach ($videos as $video) {
+        // Each video entry will have two rows. One row for Course date and
+        // Media, then another row for Title and Comments.
+
+        // Create Course date and Media row.
+        $datecell = date('D, m/d/Y', $video->date);
+
+        $mediacell = '';
+        if (!empty($video->bruincast_url)) {
+            $videolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                    array('mode' => MEDIA_BCAST_VIDEO, 'id' => $video->id)),
+                    get_string('bcvideo', 'block_ucla_media'));
+            $mediacell .= '<button type="button" class="btn btn-default">' .
+                    '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
+                    $videolink . '</button>';
+        }
+
+        if (!empty($video->audio_url)) {
+            $audiolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                    array('mode' => MEDIA_BCAST_AUDIO, 'id' => $video->id)),
+                    get_string('bcaudio', 'block_ucla_media'));
+            $mediacell .= ' <button type="button" class="btn btn-default">' .
+                    '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
+                    $audiolink . '</button>';
+        }
+
+        // Create Title and Comments row.
+        $titlecommentstring = '';
+        if (!empty($video->name)) {
+            $titlecommentstring .= html_writer::tag('strong',
+                    get_string('bctitle', 'block_ucla_media') . ':') . ' ' .
+                    $video->name . '<br />';
+        }
+        if (!empty($video->comments)) {
+            $titlecommentstring .= html_writer::tag('strong',
+                    get_string('bccomments', 'block_ucla_media') . ':') . ' ' .
+                    $video->comments;
+        }
+        if (!empty($mediacell)) {
+            // Add spacing if there are media buttons.
+            $mediacell .= '<br><br>';
+        }
+        $mediacell .= $titlecommentstring;
+
+        // Make date cell v align middle and font size larger.
+        $datecellclass = new html_table_cell($datecell);
+        $datecellclass->style = "vertical-align: middle; font-size: larger";
+
+        $cells = array($datecellclass, $mediacell);
+        $row = new html_table_row($cells);
+        $table->data[] = $row;
+    }
+
+    echo html_writer::table($table);
     echo html_writer::end_div('div');
 }
 
 /**
- * A course might have more than 1 Bruincast link. Some possible reasons are if
- * a course is cross-listed or if there are multiple restriction types, or both.
+ * Returns Bruincast videos for course.
  *
- * Logic to decide how to display links in these different scenarios:
- *
- * 1) If links all have same restriction, then get last part of url, which will
- *    be the course name and display it as: Bruincast (<course title>)
- * 2) If links have different restrictions, then display as:
- *    Bruincast (<restriction type>) 
- * 3) If links have different restrictions and different course titles, then
- *    display as: Bruincast (<course title>/<restriction type>)
- * 4) If there is only 1 url, then display as: Bruincast (<restriction type>)
- *
- * This will be replaced later when the new web service that we use to get
- * Bruincast videos is done via CCLE-6263.
+ * @param int $courseid
+ * @return array
  */
 function get_videos($courseid) {
     global $DB;
-
-    $videos = array();
-
-    // Links will be indexed as: [coursetitle][restriction] => url.
-    $links = array();
-
-    if ($matchingcourses = $DB->get_records('ucla_bruincast',
-            array('courseid' => $courseid))) {
-        $titlesused = array();
-        $restrictionsused = array();
-        foreach ($matchingcourses as $matchingcourse) {
-            if (empty($matchingcourse->bruincast_url)) {
-                continue;
-            }
-
-            $title = basename($matchingcourse->bruincast_url);
-            $title = core_text::strtoupper($title);
-
-            $restriction = 'node_' . core_text::strtolower($matchingcourse->restricted);
-            $restriction = str_replace(' ', '_', $restriction);
-
-            $links[$title][$restriction] = $matchingcourse->bruincast_url;
-
-            $titlesused[] = $title;
-            $restrictionsused[] = $restriction;
-        }
-
-        // See what type of display scenario we are going to use.
-        $multipletitles = false;
-        $multiplerestrictions = false;
-        if (count(array_unique($titlesused)) > 1) {
-            $multipletitles = true;
-        }
-        if (count(array_unique($restrictionsused)) > 1) {
-            $multiplerestrictions = true;
-        }
-
-        foreach ($links as $title => $restrictions) {
-            foreach ($restrictions as $restriction => $url) {
-                if ($multipletitles && !$multiplerestrictions) {
-                    // 1) If links all have same restriction, then get last
-                    //    part of url, which will be the course name and
-                    //    display it as:
-                    //      Bruincast (<course title>)
-                    $videos[] = html_writer::link($url, sprintf('%s (%s)',
-                            get_string('titlebcast', 'block_ucla_media'), $title));
-                } else if (!$multipletitles && $multiplerestrictions) {
-                    // 2) If links have different restrictions, then display
-                    //    as:
-                    //      Bruincast (<restriction type>)
-                    $videos[] = html_writer::link($url, sprintf('%s (%s)',
-                            get_string('titlebcast', 'block_ucla_media'),
-                            get_string($restriction, 'block_ucla_media')));
-                } else if ($multipletitles && $multiplerestrictions) {
-                    // 3) If links have different restrictions and different
-                    //    course titles, then display as:
-                    //     Bruincast (<course title>/<restriction type>)
-                    $videos[] = html_writer::link($url, sprintf('%s (%s/%s)',
-                            get_string('titlebcast', 'block_ucla_media'),
-                            $title,
-                            get_string($restriction, 'block_ucla_media')));
-                } else if (!$multipletitles && !$multiplerestrictions) {
-                    // 4) If there is only 1 url, then display as:
-                    //     Bruincast (<restriction type>)
-                    $type = '';
-                    if ($restriction != 'node_open') {
-                        // Don't add restriction type text for open.
-                        $type = sprintf(' (%s)', get_string($restriction, 'block_ucla_media'));
-                    }
-                    $videos[] = html_writer::link($url,
-                            get_string('titlebcast', 'block_ucla_media') . $type);
-                }
-            }
-        }
-    }
-    return $videos;
-}
-
-function print_bcast($videolist, $i) {
-    $j = 0;
-    $table = new html_table();
-    $table->head = array('Name ', '' , '', '');
-    $table->attributes = array('class' => 'bruincasttable generaltable');
-    foreach ($videolist as $video) {
-        if ($video->week == $i) {
-            $name = $video->name;
-            $vidurl = "";
-            $audurl = "";
-            $podurl = "";
-            if ($video->bruincast_url != null) {
-                $vidurl = html_writer::link(
-                new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $video->id, 'mode' => MEDIA_BCAST)), "Video");
-            }
-            if ($video->audio_url != null) {
-                $audurl = $video->audio_url;
-            }
-            if ($video->podcast_url != null) {
-                $podurl = $video->podcast_url;
-            }
-            $table->data[] = array($video->name, $vidurl, $audurl, $podurl);
-            $j++;
-        }
-    }
-    if ($j != 0) {
-        echo html_writer::tag('h3', "Week ".$i);
-        echo html_writer::table($table);
-    }
-
+    return $DB->get_records('ucla_bruincast', array('courseid' => $courseid), 'date ASC');
 }

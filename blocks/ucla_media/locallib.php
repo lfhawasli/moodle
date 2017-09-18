@@ -23,9 +23,10 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-define('MEDIA_BCAST', 1);
-define('MEDIA_VIDEORESERVES', 2);
-define('MEDIA_LIBRARYMUSIC', 3);
+define('MEDIA_BCAST_VIDEO', 1);
+define('MEDIA_BCAST_AUDIO', 2);
+define('MEDIA_VIDEORESERVES', 3);
+define('MEDIA_LIBRARYMUSIC', 4);
 
 /**
  * Sorts start date from least recent to most recent.
@@ -53,6 +54,47 @@ function cmp_stop_date($a, $b) {
         return 0;
     }
     return ($a->stop_date < $b->stop_date) ? 1 : -1;
+}
+
+/**
+ * Given ucla_bruincast record, will return string to be used in OID Wowza
+ * filter.
+ *
+ * @param array $bruincast
+ * @param int $mode         Either MEDIA_BCAST_VIDEO or MEDIA_BCAST_AUDIO.
+ * @return string
+ */
+function get_bruincast_filter_text($bruincast, $mode) {
+    $wowzaserver = get_config('block_ucla_media', 'bruincast_wowza');
+
+    // Check if we have a video file.
+    $isvideo = false;
+    if ($mode == MEDIA_BCAST_VIDEO && !empty($bruincast->bruincast_url)) {
+        // Make sure video exists.
+        $isvideo = true;
+    }
+
+    // Get application name in format <4 digit year><quarter>-<v(video) or a(audio)>.
+    $appname = '20' . substr($bruincast->term, 0, 2) .
+            strtolower(substr($bruincast->term, 2, 1)) .'-';
+    $isvideo ? $appname .= 'v' : $appname .= 'a';
+
+    $pathinfo = null;
+    if ($isvideo) {
+        $pathinfo = pathinfo($bruincast->bruincast_url);
+    } else {
+        $pathinfo = pathinfo($bruincast->audio_url);
+    }
+
+    $httpurl = $wowzaserver . '/' . $appname . '/' . $pathinfo['extension'] . ':'
+            . $pathinfo['basename'] . '/playlist.m3u8';
+
+    $parseurl = parse_url($wowzaserver);
+    $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
+            $appname . '/' . $pathinfo['extension'] . ':' . $pathinfo['basename'];
+
+    return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->name, $httpurl,
+            $rtmpurl, $isvideo);
 }
 
 /**
@@ -125,21 +167,21 @@ function cmp_title($a, $b) {
 
 /**
  * Check if a given ip is in the UCLA network.
- * 
+ *
  * From https://gist.github.com/tott/7684443
  * @param a ip in the form of "x.x.x.x" where x can be numbers between 0 to 255
  * @return boolean true if the ip is a ucla campus ip
  */
 function is_on_campus_ip($ip) {
-    // List of acceptable ip addresses obtained from https://kb.ucla.edu/articles/list-of-uc-related-ip-addresses. 
+    // List of acceptable ip addresses obtained from https://kb.ucla.edu/articles/list-of-uc-related-ip-addresses.
     // This specifies ip ranges belonging to UCLA.
-    $acceptableips = array('128.97.0.0/16', '131.179.0.0/16', '149.142.0.0/16', '164.67.0.0/16', '169.232.0.0/16', 
+    $acceptableips = array('128.97.0.0/16', '131.179.0.0/16', '149.142.0.0/16', '164.67.0.0/16', '169.232.0.0/16',
                             '172.16.0.0/12', '192.35.210.0/24', '192.35.225.0/24', '192.154.2.0/24');
     foreach ($acceptableips as $range) {
         if (strpos($range, '/') == false) {
             $range .= '/32';
         }
-	// $range is in IP/CIDR format eg 127.0.0.1/24.
+        // Variable $range is in IP/CIDR format eg 127.0.0.1/24.
         list($range, $netmask) = explode('/', $range, 2);
         $rangedecimal = ip2long($range);
         $ipdecimal = ip2long($ip);
@@ -165,7 +207,7 @@ function display_video_reserves($course) {
     // duplicate videos are displayed for crosslisted courses.
     $videos = get_video_data($course->id);
     print_media_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
-        
+
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
 
     echo $OUTPUT->heading(get_string('headervidres', 'block_ucla_media') .
@@ -297,10 +339,11 @@ function print_media_page_tabs($activetab, $courseid) {
                                 array('courseid' => $courseid)),
                                     get_string('vidreserves_tab', 'block_ucla_media', $count));
     }
-    $videos = $DB->get_records_sql('SELECT DISTINCT albumtitle FROM {ucla_library_music_reserves} WHERE courseid=?', array($courseid));
+    $videos = $DB->get_records_sql('SELECT DISTINCT albumtitle FROM '
+            . '{ucla_library_music_reserves} WHERE courseid=?', array($courseid));
     $count = count($videos);
     if ($count != 0) {
-       $tabs[] = new tabobject(get_string('headerlibres', 'block_ucla_media'),
+        $tabs[] = new tabobject(get_string('headerlibres', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/libreserves.php',
                                 array('courseid' => $courseid)),
                                     get_string('libraryreserves_tab', 'block_ucla_media', $count));
