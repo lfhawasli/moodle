@@ -374,6 +374,10 @@ class format_ucla extends format_topics {
                     'label' => false,
                     'element_type' => 'hidden'
                 ),
+                'enable_landingpage_by_dates' => array(
+                    'label' => false,
+                    'element_type' => 'hidden'
+                ),
                 'coursedownload' => array(
                     'label' => get_string('coursedownload', 'format_ucla'),
                     'help' => 'coursedownload',
