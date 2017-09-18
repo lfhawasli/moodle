@@ -26,7 +26,8 @@
 #sections-table .col-section-num,
 #sections-table .col-section-hide,
 #sections-table .col-section-delete,
-#sections-table .col-section-landing {
+#sections-table .col-section-landing,
+#sections-table .col-section-landing-auto {
     text-align: center;
 }
 
@@ -76,4 +77,30 @@ div.modify-course-sections-summary h2,
 div.modify-course-sections-summary h3,
 div.modify-course-sections-summary h4 {
     text-align: left;
+}
+
+/**
+ * Included styles for datepicker and related tooltips for Landing Page by Dates.
+ */
+input.landing-page-auto-box[type="checkbox"] {
+    margin: 0 10px;
+}
+
+.datepicker-range {
+    display: none;
+}
+
+.datepicker-container {
+    display: inline-block;
+}
+
+/* Flatpickr sets its fields to read-only. Moodle's default styles make this grey, override it with !important. */
+input.datepicker {
+    cursor: pointer !important;
+    background-color: inherit !important;
+}
+
+.datepicker-tooltip-text {
+    display: none;
+    color: red;
 }

@@ -161,6 +161,23 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
     }
     row_html += '</td>';
 
+    // Add checkboxes and input fields for "Landing Page by Dates" range selectors.
+    row_html += '<td class="col-section-landing-auto">';
+    if (sectiondata.no['landingpage'] == undefined) {
+        row_html += '<input id="datepicker_' + sectionident + '" type="checkbox" name="lpdatebox"' +
+            'class="landing-page-auto-box"/>';
+        var dateInputStart = '<div class="datepicker-container datepicker-container-start">' +
+            '<input type="text" id="date-start-' + sectionident + '" name="datestart" class="datepicker">' + '</div>';
+        var dateInputEnd = '<div class="datepicker-container">' +
+            '<input type="text" id="date-end-' + sectionident + '" name="dateend" class="datepicker">' + '</div>';
+        row_html += '<div class="datepicker-range">' +
+            '<span style="color: red;"> From*</span>' +
+            dateInputStart + ' ' + M.util.get_string('landingpagebydatesto', 'block_ucla_modify_coursemenu') +
+            ' ' + dateInputEnd + '</div>';
+        row_html += '<div class="datepicker-tooltip-text">"text"</div>';
+    }
+    row_html += '</td>';
+
     row_html += '</tr>';
 
     row_html = '<tr class="' + trclasssupp + 'section-row" id="section-' + sectionident + '">' + row_html;
@@ -188,7 +205,11 @@ M.block_ucla_modify_coursemenu.attach_row_listeners = function(jq) {
         M.block_ucla_modify_coursemenu.set_landingpageradio_visible(
                 parentjq
             );
-
+        
+        // Set proper visibility for "Landing Page by Dates" column when delete is checked.
+        M.block_ucla_modify_coursemenu.set_landingpagebydates_visible(
+                parentjq
+            );
         return true;
     });
 
@@ -207,6 +228,10 @@ M.block_ucla_modify_coursemenu.attach_row_listeners = function(jq) {
                 parentjq
             );
 
+        // Set proper visibility for "Landing Page by Dates" column when hidden is checked.
+        M.block_ucla_modify_coursemenu.set_landingpagebydates_visible(
+                parentjq
+            );
         return true;
     });
 
@@ -226,6 +251,10 @@ M.block_ucla_modify_coursemenu.attach_row_listeners = function(jq) {
                 parentjq
             );
 
+        // Set proper visibility for "Landing Page by Dates" columns when hidden is checked.
+        M.block_ucla_modify_coursemenu.set_landingpagebydates_visible(
+                parentjq
+            );
         return true;
     };
 
@@ -242,6 +271,8 @@ M.block_ucla_modify_coursemenu.attach_row_listeners = function(jq) {
         $(this).find('.drag-handle img').addClass('hidden-handle');
     });
 
+    // Add date picker to "Landing Page by Dates" date range selectors.
+    M.block_ucla_modify_coursemenu.add_date_range_listener(jq);
 }
 
 M.block_ucla_modify_coursemenu.check_reset_landingpage = function() {
@@ -295,6 +326,19 @@ M.block_ucla_modify_coursemenu.set_landingpageradio_visible = function(
     M.block_ucla_modify_coursemenu.check_reset_landingpage();
 }
 
+// SSC-1205 - Set the appropriate visibility for "Landing Page by Dates" setting.
+M.block_ucla_modify_coursemenu.set_landingpagebydates_visible = function(
+        parentjq) {
+    var lpd = parentjq.find('[name=lpdatebox]');
+
+    // If any of the chckboxes are checked, the section cannot have a "Landing Page by Dates" setting.
+    if ($(parentjq).find('.hidden-checkbox').is(":checked") || $(parentjq).find('.delete-checkbox').is(":checked")) {
+        lpd.attr('checked', false).hide().change();
+    } else {
+        lpd.show();
+    }
+}
+
 /**
  *  Initialize a bunch of stuff...
  **/
@@ -326,6 +370,9 @@ M.block_ucla_modify_coursemenu.start = function() {
     // Prevent some js errors.
     $('#' + thetableid + ' thead tr').addClass('nodrag').addClass('nodrop');
 
+    // Create a pointer to the passed-through "Landing Page by Dates" date range JSON object.
+    bumc.date_range = JSON.parse($('#' + bumc.daterange_id).val());
+
     // CCLE-3685 - If the course has a syllabus, add it to the table as the first row.
     syllabusdata = bumc.syllabusdata;
     if (syllabusdata.can_host_syllabi) {
@@ -340,6 +387,10 @@ M.block_ucla_modify_coursemenu.start = function() {
                 syllabussection
             )
         );
+
+        // Add "Landing Page by Dates" datepicker listeners if there is a syllabus.
+        var syllabusRowJq = $('#' + thetableid + ' > tbody > #section-' + syllabusdata.section);
+        bumc.add_date_range_listener(syllabusRowJq);
     }
 
     // Generate the existing sections.
@@ -361,6 +412,9 @@ M.block_ucla_modify_coursemenu.start = function() {
 
         // Insert pseudo-section for 'show all'.
         if (sectionindex == 0 && M.str[courseformat].show_all != undefined) {
+            // Add "Landing Page by Dates" datepicker listeners for site info.
+            bumc.add_date_range_listener($('#' + thetableid + ' > tbody > tr:last'));
+
             var showallsection = {
                 'name': M.str[courseformat]['show_all'],
                 'section': bumc.showallsection,
@@ -372,6 +426,9 @@ M.block_ucla_modify_coursemenu.start = function() {
                     showallsection
                 )
             );
+
+            // Add "Landing Page by Dates" datepicker listeners for show all.
+            bumc.add_date_range_listener($('#' + thetableid + ' > tbody > tr:last'));
         } else {
             // Attach hide-delete listeners.
             M.block_ucla_modify_coursemenu.attach_row_listeners(
@@ -382,6 +439,9 @@ M.block_ucla_modify_coursemenu.start = function() {
 
     // Initialize logic.
     bumc.make_dnd_table(thetableid);
+
+    // Initialize "Landing Page by Dates".
+    bumc.initialize_landing_page_by_dates();
 
     // Attach global listeners.
     $("#add-section-button").click(function () {
@@ -398,8 +458,20 @@ M.block_ucla_modify_coursemenu.start = function() {
     bumc.set_landingpageradio_default();
 
     // Form submission, transfer fake form data onto MForm fields.
-    $("#id_submitbutton").click(function () {
+    $("#id_submitbutton").click(function (e) {
         var mbumc = M.block_ucla_modify_coursemenu;
+
+        // Check validity of "Landing Page by Dates" date ranges.
+        if (mbumc.landing_page_by_dates_valid_dates()) {
+            // Valid, so append option back to formset.
+            var additionalOptions = $('#id_additional_options');
+            additionalOptions.hide();
+            additionalOptions.append($('#fitem_id_enablelandingpagebydates'));
+        } else {
+            // Invalid dates, so prevent form submission.
+            e.preventDefault();
+            return false;
+        }
 
         $('#' + mbumc.newsections_id).val(mbumc.get_sections_jq(
                 '.new-section'
@@ -417,8 +489,27 @@ M.block_ucla_modify_coursemenu.start = function() {
             );
 
         $('#' + mbumc.serialized_id).val(
-                $('#' + mbumc.table_id + ' input[name!=landingpageradios]').serialize()
-            );
+            $('#' + mbumc.table_id + ' input').not(
+                '[name="landingpageradios"], ' +
+                '[name="lpdatebox"], ' +
+                '[name="datestart"], ' +
+                '[name="dateend"]'
+            ).serialize()
+        );
+
+        // Transfer the "Landing Page by Dates" data to specific variable on the backend.
+        $('#' + mbumc.daterange_id).val((function() {
+            var dateRangeJson = {};
+            $('#' + mbumc.table_id + ' input[name=lpdatebox]:checked').each(function(index, value) {
+                var id = value.id.split('_')[1]; // Split according to the separator we used earlier.
+                dateRangeJson[id] = {};
+                $(value).siblings().find('input[name="datestart"], input[name="dateend"]')
+                    .each(function(index, value) {
+                        dateRangeJson[id][value.name] = value.value;
+                    });
+            });
+            return JSON.stringify(dateRangeJson);
+        })());
 
         return true;
     });
@@ -501,13 +592,207 @@ M.block_ucla_modify_coursemenu.get_sections_jq = function(jq) {
     return sectionswithclass;
 }
 
+// SSC-1205 - Function to add a listener for the Landing Page by Date datepicker.
+M.block_ucla_modify_coursemenu.add_date_range_listener = function(jq) {
+    var bumc = M.block_ucla_modify_coursemenu;
+    var datepickerInput = jq.find('input.landing-page-auto-box')[0];
+    var sectionId = datepickerInput.id.split('_')[1];
+
+    if (bumc.date_range[sectionId]) { // Initialize datepickers with our database data.
+        datepickerInput.checked = true;
+        $(datepickerInput).siblings('.datepicker-range').css('display', 'inline-block');
+        jq.find('input.datepicker[name=datestart]').flatpickr({
+            enableTime: true,
+            enableSeconds: true,
+            minuteIncrement: 1,
+            altInput: true,
+            altFormat: "M j, Y h:i:S K",
+            dateFormat: "U",
+            defaultDate: bumc.date_range[sectionId].datestart
+        });
+        jq.find('input.datepicker[name=dateend]').flatpickr({
+            enableTime: true,
+            enableSeconds: true,
+            minuteIncrement: 1,
+            altInput: true,
+            altFormat: "M j, Y h:i:S K",
+            dateFormat: "U",
+            defaultDate: bumc.date_range[sectionId].dateend
+        });
+    } else { // Initialize blank datepickers for sections without database data.
+        jq.find('input.datepicker[name=datestart]').flatpickr({
+            altInput: true,
+            altFormat: "M j, Y h:i:S K",
+            dateFormat: "U",
+            enableTime: true,
+            enableSeconds: true,
+            minuteIncrement: 1,
+            onReady: function() {
+                if (this.amPM) {
+                    this.amPM.textContent = 'AM';
+                }
+            }
+        });
+        jq.find('input.datepicker[name=dateend]').flatpickr({
+            altInput: true,
+            altFormat: "M j, Y h:i:S K",
+            dateFormat: "U",
+            enableTime: true,
+            enableSeconds: true,
+            minuteIncrement: 1,
+            defaultHour: 11,
+            defaultMinute: 59,
+            defaultSeconds: 59,
+            onReady: function() {
+                if (this.amPM) {
+                    this.amPM.textContent = 'PM';
+                }
+            }
+        });
+    }
+
+    // Change display of date range depending on checkbox state.
+    $(datepickerInput).change(function() {
+        if (this.checked) {
+            $(this).siblings('.datepicker-range').css('display', 'inline-block');
+        } else {
+            $(this).siblings('.datepicker-range').css('display', 'none');
+        }
+    });
+}
+
+// SSC-1205 - Initialize "Landing Page By Dates" option, set initial visibility and create listener for visibility changes.
+M.block_ucla_modify_coursemenu.initialize_landing_page_by_dates = function() {
+    // Initialize and "cache" jQuery selectors that we can.
+    var landingpageByDatesHeader = $('th:contains("Landing page by Dates")');
+    var landingpageHeader = $('th:contains("Landing page")').filter(function() { return $(this).text() === 'Landing page'});
+    var landingpageByDatesColumn = $('.col-section-landing-auto');
+    var landingpageColumn = $('.col-section-landing');
+    var enableLandingpageByDatesCheckbox = $('#fitem_id_enablelandingpagebydates');
+
+    // Hide "Landing Page by Dates" column on startup if option was not checked.
+    // Append its enable checkbox (#fitem_id_...) to the proper column.
+    if (!$('#id_enablelandingpagebydates').is(':checked')) {
+        landingpageHeader.append(enableLandingpageByDatesCheckbox);
+        landingpageByDatesHeader.hide();
+        landingpageByDatesColumn.hide();
+    } else {
+        landingpageByDatesHeader.append(enableLandingpageByDatesCheckbox);
+        landingpageHeader.hide();
+        landingpageColumn.hide();
+    }
+
+    // Create listener for changing "Landing Page by Dates" visiblity when option is checked on and off.
+    $('#id_enablelandingpagebydates').change(function() {
+        if (this.checked) {
+            landingpageByDatesHeader.append(enableLandingpageByDatesCheckbox);
+            landingpageHeader.hide();
+            landingpageColumn.hide();
+
+            // Automatically enable landing page by dates for the current set landing page.
+            var parentRow = $("[name='landingpageradios']:checked").closest("tr");
+            var flatpickrInstance = parentRow.find('[name="datestart"]').get(0)._flatpickr;
+            parentRow.find("[name='lpdatebox']").attr('checked', true).change();
+            // If the current landing page's date doesn't have a date range then set the start date
+            // to the current date.
+            if (!parentRow.find('[name="datestart"]').val()) {
+                var d = new Date();
+                flatpickrInstance.setDate(d);
+            }
+
+            landingpageByDatesHeader.show();
+            landingpageByDatesColumn.show();
+        } else {
+            landingpageHeader.append(enableLandingpageByDatesCheckbox);
+            landingpageByDatesHeader.hide();
+            landingpageByDatesColumn.hide();
+            landingpageHeader.show();
+            landingpageColumn.show();
+        }
+    });
+}
+
+// SSC-1205 - Date Validation and error setting for "Landing Page by Dates". Returns true if there are errors.
+M.block_ucla_modify_coursemenu.landing_page_by_dates_valid_dates = function() {
+    // Clear all Landing Page by Date error messages for now.
+    $('.datepicker-tooltip-text').css({"display": "none"});
+
+    var noErrors = true;
+    var autoLandingPageInputs = $('input[name=lpdatebox]:checked');
+
+    // Landing Page by Date jQuery code that finds empty start date range date boxes that are enabled.
+    var emptyAutoLandingPageInputs = $(autoLandingPageInputs)
+        .siblings()
+        .find('input[name=datestart]')
+        .filter(function() { return !this.value; });
+    if (emptyAutoLandingPageInputs.length) {
+        for (var i = 0; i < emptyAutoLandingPageInputs.length; i++) {
+            var tooltip = $(emptyAutoLandingPageInputs[i]).closest('tr').find('.datepicker-tooltip-text');
+            tooltip.text(M.util.get_string('landingpagebydatesempty', 'block_ucla_modify_coursemenu'));
+            tooltip.css({"display": "block"});
+        }
+        noErrors = false;
+    } else {
+        // Date validation block for our date ranges. Note that we never have to check for null start dates
+        // because this code block is only executed if these are non-empty.
+
+        // Create date objects for comparison purposes.
+        var startDateArray = new Array(autoLandingPageInputs.length);
+        var endDateArray = new Array(autoLandingPageInputs.length);
+        for (var i = 0; i < autoLandingPageInputs.length; i++) {
+            var currentStart = $.trim($(autoLandingPageInputs[i]).closest('tr').find('input[name=datestart]').val());
+            var currentEnd = $.trim($(autoLandingPageInputs[i]).closest('tr').find('input[name=dateend]').val());
+
+            startDateArray[i] = currentStart;
+            if (currentEnd != '') {
+                endDateArray[i] = currentEnd;
+            }
+        }
+
+        // Perform naive validation for date objects.
+        for (var i = 0; i < autoLandingPageInputs.length; i++) {
+            // Check date sequentiality.
+            if (endDateArray[i] != null && startDateArray[i] >= endDateArray[i]) {
+                var tooltip = $(autoLandingPageInputs[i]).closest('tr').find('.datepicker-tooltip-text');
+                tooltip.text(M.util.get_string('landingpagebydatessequential', 'block_ucla_modify_coursemenu'));
+                tooltip.css({"display": "block"});
+                noErrors = false;
+            }
+            for (var j = 0; j < autoLandingPageInputs.length; j++) {
+                if (i != j) {
+                    // Check that start date isn't the same as any other start dates.
+                    if (startDateArray[i] == startDateArray[j]) {
+                        var tooltip = $(autoLandingPageInputs[i]).closest('tr').find('.datepicker-tooltip-text');
+                        tooltip.text(M.util.get_string('landingpagebydatesequivalent', 'block_ucla_modify_coursemenu'));
+                        tooltip.css({"display": "block"});
+                        noErrors = false;
+                    }
+                    // Check that the start date is not in another date range.
+                    if (endDateArray[j] != null && startDateArray[i] >= startDateArray[j] && startDateArray[i] <= endDateArray[j]) {
+                        var tooltip = $(autoLandingPageInputs[i]).closest('tr').find('.datepicker-tooltip-text');
+                        tooltip.text(M.util.get_string('landingpagebydatesstartoverlap', 'block_ucla_modify_coursemenu'));
+                        tooltip.css({"display": "block"});
+                        noErrors = false;
+                    }
+                    // Check that date ranges do not overlap.
+                    if (endDateArray[i] != null && endDateArray[j] != null &&
+                        startDateArray[i] <= endDateArray[j] && startDateArray[j] <= endDateArray[i]) {
+                        var tooltip = $(autoLandingPageInputs[i]).closest('tr').find('.datepicker-tooltip-text');
+                        tooltip.text(M.util.get_string('landingpagebydatesrangeoverlap', 'block_ucla_modify_coursemenu'));
+                        tooltip.css({"display": "block"});
+                        noErrors = false;
+                    }
+                }
+            }
+        }
+    }
+    return noErrors;
+}
+
 /**
  *  Function to call to initialize everything using JQuery's
  *  $(document).ready() callback.
  **/
 M.block_ucla_modify_coursemenu.initialize = function() {
-    $(document).ready(function() {
-        M.block_ucla_modify_coursemenu.start();
-        M.block_ucla_modify_coursemenu.savedata = $('#' + M.block_ucla_modify_coursemenu.table_id + ' tbody').tableDnDSerialize();
-    });
+    $(document).ready(function() {M.block_ucla_modify_coursemenu.start()});
 }
