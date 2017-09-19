@@ -41,6 +41,7 @@ $THEME->sheets = array(
     'ucla',
     'moodle',
     'components',
+    'flatpickr.min'
 );
 
 // Style sheets from parent themes that we want to exclude.
