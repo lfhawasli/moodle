@@ -334,6 +334,14 @@ class theme_uclashared_core_renderer extends theme_bootstrapbase_core_renderer {
                                         'logo-le'), 'logo-ccle-sub hidden-xs hidden-sm')
         );
 
+        // Display branding for Shared System in logo.
+        $url = $this->get_config('theme_uclashared', 'system_link');
+        $text = $this->get_config('theme_uclashared', 'system_name');
+        if (!empty($url) && !empty($text)) {
+            $link .= html_writer::span('| ', 'logo-system-name-vertical-bar');
+            $link .= html_writer::link($url, $text, array('class' => 'logo-system-name'));
+            $link .= "</span>";
+        }
         return $link;
     }
 

@@ -8,6 +8,10 @@
  Large devices (large desktops, 1200px and up) 
 @media (min-width: $screen-lg-min) { ... }*/
 
+/* Non bootstrap native mixin value, for super small screens (320px min). */
+@mixin respond-xxs {
+    @media (max-width: 371px) { @content; }
+}
 @mixin respond-xs {
     @media (max-width: $screen-xs) { @content; }
 }

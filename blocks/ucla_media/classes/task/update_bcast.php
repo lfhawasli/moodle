@@ -23,6 +23,7 @@
  */
 
 namespace block_ucla_media\task;
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
 
 /**
@@ -35,213 +36,199 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.p
 class update_bcast extends \core\task\scheduled_task {
 
     /**
-     * Checks for crosslist issues and emails $bruincast_errornotify_email to fix.
+     * Update Bruincast database.
      *
-     * @param array $data   Should be processed data that was validated and matched
+     * @return boolean
      */
-    private function check_crosslists(&$data) {
-        $errornotifyemail = get_config('block_ucla_bruincast', 'errornotify_email');
-        $quietmode = get_config('block_ucla_bruincast', 'quiet_mode');
+    public function execute() {
+        global $DB;
 
-        $problemcourses = array();
+        $htaccessusername = get_config('block_ucla_media', 'bruincast_http_user');
+        $htaccesspassword = get_config('block_ucla_media', 'bruincast_http_pass');
 
-        // Find crosslisted courses.
-        foreach ($data as $entries) {
-            foreach ($entries as $d) {
-                // Get the courseid for a particular TERM-SRS.
-                if (isset($d->courseid)) {
-                    $courseid = $d->courseid;
+        // REST Server URL.
+        $requesturl = get_config('block_ucla_media', 'bruincast_login_url');
+
+        // User data.
+        $userdata = array(
+            'username' => get_config('block_ucla_media', 'bruincast_user'),
+            'password' => get_config('block_ucla_media', 'bruincast_pass')
+        );
+
+        echo "a\n";
+        // Doing the CURL for Login.
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $requesturl);
+        curl_setopt($curl, CURLOPT_POST, 1); // Do a regular HTTP POST.
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($userdata)); // Set POST data.
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
+
+        $response = curl_exec($curl);
+        $xml = new \SimpleXMLElement($response);
+        $cookie = $xml->session_name .'='. $xml->sessid;
+
+        curl_close($curl);
+
+        // URL to get relevant courses accoring to term.
+        $url = get_config('block_ucla_media', 'bruincast_url');
+
+        // Clearing old records.
+        $DB->delete_records('ucla_bruincast');
+        $terms = get_active_terms();
+        // Iterating through all active terms and retrieving data for them.
+        foreach ($terms as $term) {
+            // Converting term to API format.
+            $correctedterm = self::convert_term($term);
+
+            // Setting parameters for our request.
+            $params = array(
+                'display_id' => 'ccle_api_courses',
+                'args[0]' => $correctedterm
+            );
+
+            // Doing a Curl to retrive bruincasted courses for a particular term.
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($curl, CURLOPT_POST, 0); // Do a regular HTTP POST.
+            curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+            curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
+            curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
+
+            $query = http_build_query($params, '', '&');
+            /* Please note http_build_query is different in moodle and outside it, and it's usage is different */
+
+            curl_setopt($curl, CURLOPT_URL, $url.'?'.$query);
+            $output = curl_exec($curl);
+
+            $xml = simplexml_load_string($output, "SimpleXMLElement", LIBXML_NOCDATA);
+            $json = json_encode($xml);
+            $cleanedresult = json_decode($json, true);
+            curl_close($curl);
+
+            // Only processing next part if the result was non-empty.
+            if (array_key_exists('item', $cleanedresult)) {
+
+                // The below if statement is a workaround for an XML parsing
+                // problem. When only one item is retrieved in a query the array
+                // $cleanedresult[item] contains information about that one
+                // item, however, when there are multiple results the array is
+                // an array of arrays that contain information about these results.
+                if (array_key_exists('srs__', $cleanedresult['item'])) {
+                    $array = $cleanedresult;
                 } else {
-                    continue;   // Course is not on the system.
+                    $array = $cleanedresult['item'];
                 }
 
-                // Find out if it's crosslisted.
-                $courses = ucla_map_courseid_to_termsrses($courseid);
+                foreach ($array as $item) {
+                    // The below if statement is due to the structure of the parsed XML, as sometimes $item contains
+                    // non relevant data.
+                    if (array_key_exists('srs__', $item)) {
+                        $srs = $item['srs__'];
+                    } else {
+                        continue;
+                    }
+                    $params = array(
+                    'display_id' => 'ccle_api_media',
+                    'args[0]' => $correctedterm,
+                    'args[1]' => $srs
+                    );
 
-                // Enforce:
-                // If for a crosslisted course, any of the bruincast urls are restricted,
-                // then all of the courses need to have access to the bruincast.
-                if (count($courses) > 1) {
-                    if (strtolower($d->restricted) == 'restricted') {
-                        foreach ($courses as $c) {
-                            if (empty($data[$c->term.'-'.$c->srs])) {
-                                $msg = "Restricted BruinCast URL is not "
-                                        . "associated with crosslisted coures:\n"
-                                        . "url: " . $d->bruincast_url . "\n"
-                                        . "term: " . $d->term . "\n"
-                                        . "srs: " . $d->srs . "\n"
-                                        . "affected course srs: " . $c->srs . "\n";
+                    // Retrieving information about a specific course in a specific term.
+                    $curl = curl_init();
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+                    curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
+                    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+                    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                    curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
+                    curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
+                    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
 
-                                $problemcourses[] = $msg;
-                            }
+                    $query = http_build_query($params, '', '&');
+                    curl_setopt($curl, CURLOPT_URL, "$url?$query");
+                    $output = curl_exec($curl);
+                    $xml = simplexml_load_string($output, "SimpleXMLElement", LIBXML_NOCDATA);
+                    $json = json_encode($xml);
+                    $cleanedresult = json_decode($json, true);
+                    curl_close($curl);
+
+                    // If there is more than one resource, then 'item' is an
+                    // array of arrays. But if there is only one, then it is
+                    // by itself. Make it an array of arrays.
+                    $contents = $cleanedresult['item'];
+                    if (!array_key_exists(0, $cleanedresult['item'])) {
+                        $contents = array($cleanedresult['item']);
+                    }
+
+                    // Entering each media item for a particular course in a particular term into the DB.
+                    foreach ($contents as $content) {
+                        $entry = new \stdClass();
+                        $entry->courseid = ucla_map_termsrs_to_courseid($term, $srs);
+                        $entry->term = $term;
+                        $entry->srs = $srs;
+                        $entry->restricted = 'Restricted';
+                        // This if statement is used as $content['video'] is a blank array if there is no video link.
+                        if (!is_array($content['video'])) {
+                            $entry->bruincast_url = $content['video'];
+                        } else {
+                            $entry->bruincast_url = null;
                         }
+                        // Similar to above.
+                        if (!is_array($content['audio'])) {
+                            $entry->audio_url = $content['audio'];
+                        } else {
+                            $entry->audio_url = null;
+                        }
+                        $entry->name = $content['title'];
+                        if (!empty($content['comments'])) {
+                            $entry->comments = $content['comments'];
+                        }
+                        $temp = $content['date_for_recording_s_'];
+                        $tempdate = explode('/', $temp);
+                        $date = mktime(0, 0, 0, $tempdate[0], $tempdate[1], $tempdate[2]);
+                        $entry->date = $date;
+                        $DB->insert_record('ucla_bruincast', $entry);
                     }
                 }
             }
-        }
-
-        $mailbody = implode("\n", $problemcourses);
-
-        // Send problem course details if we have any.
-        if (empty($errornotifyemail) || $quietmode) {
-            echo $mailbody;
-        } else if (trim($mailbody) != '') {
-            ucla_send_mail($errornotifyemail,
-                    'BruinCast data issues (' . date('r') . ')', $mailbody);
         }
     }
 
     /**
-     * Defines how to validate the fields.
+     * Converts term from the format of 17F to fall-2017, etc.
      *
-     * @return array
+     * @param $term is a given term in the YYQ format where YY is year and Q is quarter
+     * @return string
      */
-    private function define_data_source() {
-        $retval = array();
-
-        $retval[] = array('name' => 'term',
-            'type' => 'term',
-            'min_size' => '3',
-            'max_size' => '3');
-        $retval[] = array('name' => 'srs',
-            'type' => 'srs',
-            'min_size' => '7',
-            'max_size' => '9');
-        $retval[] = array('name' => 'class',
-            'type' => 'string',
-            'min_size' => '0',
-            'max_size' => '255');
-        $retval[] = array('name' => 'restricted',
-            'type' => 'string',
-            'min_size' => '0',
-            'max_size' => '12');
-        $retval[] = array('name' => 'bruincast_url',
-            'type' => 'url',
-            'min_size' => '1',
-            'max_size' => '255');
-        return $retval;
+    private function convert_term($term) {
+        $correctedterm = '20'.$term[0].$term[1];
+        if ($term[2] == 'F') {
+            $correctedterm = 'fall-'.$correctedterm;
+        } else if ($term[2] == 'S') {
+            $correctedterm = 'spring-'.$correctedterm;
+        } else if ($term[2] == 'W') {
+            $correctedterm = 'winter-'.$correctedterm;
+        } else {
+            $correctedterm = 'summer-'.$correctedterm;
+        }
+        return $correctedterm;
     }
 
-   /**
-    * Update Bruincast database.
-    *
-    * @return boolean
-    */
-    public function execute() {
-        global $CFG, $DB;
-
-        // Check to see if config variables are initialized.
-        $sourceurl = get_config('block_ucla_bruincast', 'source_url');
-        if (empty($sourceurl)) {
-            log_ucla_data('bruincast', 'read', 'Initializing cfg variables',
-                get_string('errbcmsglocation', 'tool_ucladatasourcesync') );
-                return;
-        }
-
-        // Begin database update.
-        echo get_string('bcstartnoti', 'tool_ucladatasourcesync') . "\n";
-
-        $csvdata = get_csv_data($sourceurl);
-        if (empty($csvdata)) {
-            return false;
-        }
-        $fields = $this->define_data_source();
-
-        // We know for the bruincast DATA that the first two rows are a
-        // timestamp and the column titles, so get rid of them.
-        unset($csvdata[0]);
-        unset($csvdata[1]);
-
-        $cleandata = array();
-
-        // This is expected bruincast mapping.
-        $keymap = array('term', 'srs', 'class', 'restricted', 'bruincast_url');
-
-        // Create an array of table record objects to insert.
-        foreach ($csvdata as $datanum => $d) {
-            $obj = new \stdClass();
-
-            if (count($d) != count($fields)) {
-                echo count($d) . ' vs ' . count($fields); exit;
-                echo get_string('errbcinvalidrowlen', 'tool_ucladatasourcesync') . "\n";
-                continue;
-            }
-            $invalidfields = array();
-            foreach ($fields as $fieldnum => $fielddef) {
-                // Validate/clean data.
-                $data = validate_field($fielddef['type'], $d[$fieldnum],
-                        $fielddef['min_size'], $fielddef['max_size']);
-                if ($data === false) {
-                    $invalidfields[] = $fielddef['name'];
-                }
-            }
-
-            // Give warning about errors.
-            if (!empty($invalidfields)) {
-                $error = new \stdClass();
-                $error->fields = implode(', ', $invalidfields);
-                $error->line_num = $datanum;
-                $error->data = $d;
-                print($d);
-                echo(get_string('warninvalidfields', 'tool_ucladatasourcesync',
-                        $error) . "\n");
-                continue;
-            }
-
-            foreach ($keymap as $k => $v) {
-                if ($k == 2) {   // Skip 'class' field.
-                    continue;
-                }
-                $obj->$v = $d[$k];
-            }
-
-            // Index by term-srs, so that check_crosslists can see if crosslists exist.
-            // There can be multiple entries for a given term/srs.
-            $cleandata[$obj->term.'-'.$obj->srs][] = $obj;
-        }
-
-        // Do not process bruincast data if there are no valid entries.
-        if (empty($cleandata)) {
-            die(get_string('bcnoentries', 'tool_ucladatasourcesync'). "\n");
-        }
-
-        // Drop table if we are processing new entries.
-        $DB->delete_records('ucla_bruincast');
-
-        // Insert records.
-        try {
-            $insertcount = 0;
-            foreach ($cleandata as &$termsrsentries) {
-                foreach ($termsrsentries as &$cd) {
-                    $courseid = match_course($cd->term, $cd->srs);
-
-                    if (!empty($courseid)) {
-                        $cd->courseid = $courseid;
-                    }
-
-                    $DB->insert_record('ucla_bruincast', $cd);
-                    ++$insertcount;
-                }
-            }
-
-            // Give total inserts.
-            echo get_string('bcsuccessnoti', 'tool_ucladatasourcesync', $insertcount) . "\n";
-
-            // Find errors in the crosslisted courses and notify.
-            $this->check_crosslists($cleandata);
-        } catch (dml_exception $e) {
-            // Report a DB insert error.
-            echo "\n" . get_string('errbcinsert', 'tool_ucladatasourcesync') . "\n";
-        }
-
-        return true;
-    }
-
-   /**
-    * Returns task name.
-    *
-    * @return string
-    */
+    /**
+     * Returns task name.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('taskupdatebcast', 'block_ucla_media');
     }

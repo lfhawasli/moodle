@@ -1,3 +1,11 @@
 .bruincasttable td {
     width:10%;
 }
+
+#bruincast-content-table .btn a {
+    color: white;
+}
+
+#bruincast-content-table .btn {
+    padding-right: 1.0em;
+}

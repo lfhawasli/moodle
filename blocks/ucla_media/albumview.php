@@ -25,7 +25,7 @@ require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 
 $id = required_param('id', PARAM_TEXT);
-$video = $DB->get_record_sql('SELECT * FROM {ucla_library_music_reserves} WHERE id=?', array($id));
+$video = $DB->get_record('ucla_library_music_reserves', array('id' => $id));
 $courseid = $video->courseid;
 
 if (!$course = get_course($courseid)) {

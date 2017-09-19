@@ -1462,37 +1462,47 @@ function flash_redirect($url, $successmsg) {
 function notice_course_status($course) {
     global $CFG, $DB, $OUTPUT, $USER;
 
-    // Do special display for users with update access for temporary hiding.
+    // Display the temporary course visibility status for users with update access.
     if (has_capability('moodle/course:update', context_course::instance($course->id))) {
-        // Temporary course visibility status.
-        // If the cron hasn't hidden/unhidden the course yet, just change it ourselves.
-        $course = \local_ucla\task\course_visibility_task::set_visiblity($course);
+        // If the cron hasn't hidden/unhidden the course yet, just change it ourselves. Also retrieve visibility schedule.
+        $visibilityandranges = \local_visibility\task\course_visibility_task::determine_visibility($course->id, $course->visible);
+        
+        if (isset($visibilityandranges)) {
+            $course->visible = $visibilityandranges['visible'];
+            $visibilityschedule = $visibilityandranges['ranges'];
 
-        // Display the temporary visibility status.
-        $temporaryvisiblitystatus = null;
-        $strftimedaydatetime = get_string('strftimedaydatetime', 'langconfig');
-        if ($course->visible && !empty($course->hidestartdate)) {
-            $hidestartdate = userdate($course->hidestartdate, $strftimedaydatetime);
-            if (!empty($course->hideenddate)) {
-                // Course will be hidden temporarily in the future.
-                if ($course->hideenddate >= time()) {
-                    $hideenddate = userdate($course->hideenddate, $strftimedaydatetime);
-                    $temporaryvisiblitystatus = get_string('temphidenotif', 'local_ucla',
-                            array('hidestartdate' => $hidestartdate, 'hideenddate' => $hideenddate));
+            // Determine the closest upcoming range.
+            foreach ($visibilityschedule as $range) {
+                if ($range->hideuntil > time()) {
+                    $upcomingrange = $range;
+                    break;
                 }
-            } else {
-                // Course will be hidden indefinitely in the future.
-                $temporaryvisiblitystatus = get_string('hidenotif', 'local_ucla',
-                        array('hidestartdate' => $hidestartdate));
             }
-        } else if (!$course->visible && !empty($course->hideenddate)) {
-            // Course will be unhidden in the future.
-            $hideenddate = userdate($course->hideenddate, $strftimedaydatetime);
-            $temporaryvisiblitystatus = get_string('unhiddennotif', 'local_ucla',
-                    array('hideenddate' => $hideenddate));
         }
-        if (!empty($temporaryvisiblitystatus)) {
-            return $OUTPUT->notification($temporaryvisiblitystatus, 'notifywarning');
+
+        // Determine whether the course is scheduled to be hidden, or scheduled to be unhidden.
+        if (isset($upcomingrange)) {
+            $strftimedatetime = get_string('strftimedatetime', 'langconfig');
+            $tempvisibilitystatus = null;
+            $time = time();
+            if ($course->visible && $upcomingrange->hidefrom >= $time && $upcomingrange->hideuntil > $time) {
+                // Course is scheduled to be hidden.
+                $tempvisibilitystatus = get_string('temphidenotif', 'local_visibility',
+                            array('hidefrom' => userdate($upcomingrange->hidefrom, $strftimedatetime),
+                                  'hideuntil' => userdate($upcomingrange->hideuntil, $strftimedatetime)));
+            } else if (!$course->visible && $upcomingrange->hidefrom <= $time && $upcomingrange->hideuntil > $time) {
+                // Course is scheduled to be unhidden.
+                $tempvisibilitystatus = get_string('unhiddennotif', 'local_visibility',
+                    array('hideuntil' => userdate($upcomingrange->hideuntil, $strftimedatetime)));
+            }
+            if (isset($tempvisibilitystatus)) {
+                // If it is set, include the range title in the notification message.
+                $title = '';
+                if (isset($upcomingrange->title) && $upcomingrange->title != '') {
+                    $title = ' <i>(' . $upcomingrange->title . ')</i>';
+                }
+                return $OUTPUT->notification($tempvisibilitystatus . $title, 'notifywarning');
+            }
         }
     }
 

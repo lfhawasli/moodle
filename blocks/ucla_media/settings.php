@@ -32,5 +32,57 @@ if ($ADMIN->fulltree) {
             'https://webservices-test.library.ucla.edu/music/v2/classes',
             PARAM_URL
         ));
-
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_login_url',
+            get_string('headerbruincastloginurl', 'block_ucla_media'),
+            get_string('descbruincastloginurl', 'block_ucla_media'),
+            'https://d7.oid.ucla.edu/api/v1/user/login',
+            PARAM_URL
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_url',
+            get_string('headerbruincasturl', 'block_ucla_media'),
+            get_string('descbruincasturl', 'block_ucla_media'),
+            'https://d7.oid.ucla.edu/api/v1/views/ccle_api',
+            PARAM_URL
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_http_user',
+            get_string('headerbruincasthttpuser', 'block_ucla_media'),
+            get_string('descbruincasthttpuser', 'block_ucla_media'),
+            '',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configpasswordunmask(
+            'block_ucla_media/bruincast_http_pass',
+            get_string('headerbruincasthttppass', 'block_ucla_media'),
+            get_string('descbruincasthttppass', 'block_ucla_media'),
+            '',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_user',
+            get_string('headerbruincastuser', 'block_ucla_media'),
+            get_string('descbruincastuser', 'block_ucla_media'),
+            '',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configpasswordunmask(
+            'block_ucla_media/bruincast_pass',
+            get_string('headerbruincastpass', 'block_ucla_media'),
+            get_string('descbruincastpass', 'block_ucla_media'),
+            '',
+            PARAM_TEXT
+        ));
+    $settings->add(new admin_setting_configtext(
+            'block_ucla_media/bruincast_wowza',
+            get_string('headerbruincastwowza', 'block_ucla_media'),
+            get_string('descbruincastwowza', 'block_ucla_media'),
+            'http://164.67.141.72:1935',
+            PARAM_URL
+        ));
+    $settings->add(new admin_setting_confightmleditor(
+            'block_ucla_media/bruincast_notice',
+            get_string('bruincastnotice', 'block_ucla_media'),
+            get_string('bruincastnoticedesc', 'block_ucla_media'), ''));
 }

@@ -140,6 +140,7 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
 // UCLA Theme settings
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'stage';
+$CFG->forced_plugin_settings['theme_uclashared']['system_name'] = 'Shared System (STAGE)';
 
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
@@ -274,6 +275,10 @@ $CFG->forum_enablerssfeeds = 1;
 $CFG->forum_enabletimedposts = 1;
 $CFG->forum_rsstype = 2;
 $CFG->forum_rssarticles = 5;
+
+// Site administration > Plugins > Activity modules > H5P > H5P Settings
+$CFG->forced_plugin_settings['mod_hvp']['enable_save_content_state'] = 1;
+$CFG->forced_plugin_settings['mod_hvp']['enable_lrs_content_types'] = 1;
 
 // Site administration > Plugins > Activity modules > IMS content package
 $CFG->forced_plugin_settings['imscp']['requiremodintro'] = 0;
@@ -494,6 +499,9 @@ $CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-1.kaf.kaltur
 
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
+
+// Site administration > Plugins > Local plugins > Kaltura media conversion.
+$CFG->forced_plugin_settings['local_mediaconversion']['base_category_path'] = 'ccle-shared-stage-kaf>site>channels';
 
 // Site administration > Plugins > Local plugins > Moodle Mobile additional features.
 $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a browser window (for SSO plugins).

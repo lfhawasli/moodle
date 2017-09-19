@@ -179,8 +179,8 @@ if (has_capability('moodle/grade:viewall', $context)) { //Teachers will see all 
     print_grade_page_head($courseid, 'report', 'user', get_string('pluginname', 'gradereport_user'). ' - '.fullname($report->user));
 
     // START UCLA MOD CCLE-4433 - Insert grades link to my.ucla.edu -- this is same link from control panel.
+    require_once $CFG->dirroot.'/local/ucla/lib.php';
     $enrolledcourses = ucla_get_user_enrolled_course($courseid, $userid);
-
     if (!empty($enrolledcourses)) {
         $enrolledcourse = array_shift($enrolledcourses);
         $myuclaurl = new moodle_url('https://be.my.ucla.edu/directLink.aspx?featureID=71&term=' .

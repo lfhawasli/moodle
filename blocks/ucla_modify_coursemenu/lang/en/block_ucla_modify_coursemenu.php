@@ -64,3 +64,17 @@ $string['buttonnumsections'] = 'Increase number of sections';
 
 // Modify course menu event log handler.
 $string['coursemenu_modified'] = 'Modified site menu';
+
+// SSC-1205 - Landing Page by Dates.
+$string['landing_page_by_dates'] = 'Landing page by Dates';
+$string['landingpagebydatesto'] = 'to';
+$string['landingpagebydatesempty'] = 'You must select a start date.';
+$string['landingpagebydatesequivalent'] = 'Duplicate start dates.';
+$string['landingpagebydatesstartoverlap'] = 'Start date overlaps another range.';
+$string['landingpagebydatessequential'] = 'Date range is not sequential.';
+$string['landingpagebydatesrangeoverlap'] = 'Date range overlaps with another range.';
+$string['enablelandingpagebydates'] = 'Enable landing page by dates.';
+
+// Cache string for "Landing Page by Dates".
+$string['cachedef_landingpagebydatesdb'] = 'Cache to store revision times of Landing Page by Dates database data.';
+$string['cachedef_landingpagebydatesdisplay'] = 'Cache to store revision times of Landing Page by Dates display data.';
