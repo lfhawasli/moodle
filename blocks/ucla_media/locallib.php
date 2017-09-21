@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 define('MEDIA_BCAST_VIDEO', 1);
-define('MEDIA_BCAST_AUDIO', 2);
-define('MEDIA_VIDEORESERVES', 3);
-define('MEDIA_LIBRARYMUSIC', 4);
+define('MEDIA_BCAST_AUDIO', 4);
+define('MEDIA_VIDEORESERVES', 2);
+define('MEDIA_LIBRARYMUSIC', 3);
 
 /**
  * Sorts start date from least recent to most recent.
