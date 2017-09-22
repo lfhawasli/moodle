@@ -355,6 +355,8 @@ class uclaroles_manager {
                 case siteindicator_manager::SITE_TYPE_INSTRUCTION: // Degree-related.
                 case siteindicator_manager::SITE_TYPE_INSTRUCTION_NONIEI: // Non-degree related.
                     $shortnames[] = 'editinginstructor';
+                    $shortnames[] = 'ta';
+                    $shortnames[] = 'ta_admin';
                     break;
             }
             $assignableroles = array_merge(
