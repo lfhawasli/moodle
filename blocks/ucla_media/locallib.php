@@ -86,12 +86,12 @@ function get_bruincast_filter_text($bruincast, $mode) {
         $pathinfo = pathinfo($bruincast->audio_url);
     }
 
-    $httpurl = $wowzaserver . '/' . $appname . '/' . $pathinfo['extension'] . ':'
+    $httpurl = $wowzaserver . '/' . $appname . '/mp4:'
             . $pathinfo['basename'] . '/playlist.m3u8';
 
     $parseurl = parse_url($wowzaserver);
     $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
-            $appname . '/' . $pathinfo['extension'] . ':' . $pathinfo['basename'];
+            $appname . '/mp4:' . $pathinfo['basename'];
 
     return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->name, $httpurl,
             $rtmpurl, $isvideo);
