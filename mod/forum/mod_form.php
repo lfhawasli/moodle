@@ -54,6 +54,17 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->addHelpButton('type', 'forumtype', 'forum');
         $mform->setDefault('type', 'general');
 
+        // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+        if(isset($CFG->forum_enableanonymousposts) && $CFG->forum_enableanonymousposts) {
+            $options = array();
+            $options[FORUM_ANONYMOUS_NEVER] = get_string('forum:anonno', 'local_lae');
+            $options[FORUM_ANONYMOUS_ALWAYS] = get_string('forum:anonyes', 'local_lae');
+            $options[FORUM_ANONYMOUS_ALLOWED] = get_string('forum:anonoptional', 'local_lae');
+            $mform->addElement('select','anonymous',get_string('forum:allowanonymous', 'local_lae'), $options);
+            $mform->addHelpButton('anonymous', 'forum:allowanonymous', 'local_lae');
+        }
+        // END UCLA MOD: CCLE-6854.
+
         // Attachments and word count.
         $mform->addElement('header', 'attachmentswordcounthdr', get_string('attachmentswordcount', 'forum'));
 

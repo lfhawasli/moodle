@@ -162,5 +162,10 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox('forum_enabletimedposts', get_string('timedposts', 'forum'),
                        get_string('configenabletimedposts', 'forum'), 1));
+
+    // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+    $settings->add(new admin_setting_configcheckbox('forum_enableanonymousposts', get_string('forum:anonymouspost', 'local_lae'),
+                       get_string('forum:configenableanonymouspost', 'local_lae'), 0));
+    // END UCLA MOD: CCLE-6854.
 }
 
