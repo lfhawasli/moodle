@@ -268,7 +268,10 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
             print_error('maxtimehaspassed', 'forum', '', format_time($CFG->maxeditingtime));
         }
     }
-    if (($post->userid <> $USER->id) and
+    // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+    //if (($post->userid <> $USER->id) and
+    if ((($post->userid <> $USER->id) && ($post->hiddenuserid <> $USER->id)) and
+    // END UCLA MOD: CCLE-6854.
                 !has_capability('mod/forum:editanypost', $modcontext)) {
         print_error('cannoteditposts', 'forum');
     }
@@ -306,7 +309,10 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
     require_login($course, false, $cm);
     $modcontext = context_module::instance($cm->id);
 
-    if ( !(($post->userid == $USER->id && has_capability('mod/forum:deleteownpost', $modcontext))
+    // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+    //if ( !(($post->userid == $USER->id && has_capability('mod/forum:deleteownpost', $modcontext))
+    if ( !((($post->userid == $USER->id || $post->hiddenuserid == $USER->id) && has_capability('mod/forum:deleteownpost', $modcontext))
+    // END UCLA MOD: CCLE-6854.
                 || has_capability('mod/forum:deleteanypost', $modcontext)) ) {
         print_error('cannotdeletepost', 'forum');
     }
@@ -571,8 +577,10 @@ $draftitemid = file_get_submitted_draft_itemid('attachments');
 file_prepare_draft_area($draftitemid, $modcontext->id, 'mod_forum', 'attachment', empty($post->id)?null:$post->id, mod_forum_post_form::attachment_options($forum));
 
 //load data into form NOW!
-
-if ($USER->id != $post->userid) {   // Not the original author, so add a message to the end
+// START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+//if ($USER->id != $post->userid) {   // Not the original author, so add a message to the end
+if (($USER->id != $post->userid) && ($USER->id != $post->hiddenuserid)) {   // Not the original author, so add a message to the end
+// END UCLA MOD: CCLE-6854.
     $data = new stdClass();
     $data->date = userdate($post->modified);
     if ($post->messageformat == FORMAT_HTML) {
@@ -704,7 +712,10 @@ if ($mform_post->is_cancelled()) {
         // or has either startnewdiscussion or reply capability and is editting own post
         // then he can proceed
         // MDL-7066
-        if ( !(($realpost->userid == $USER->id && (has_capability('mod/forum:replypost', $modcontext)
+        // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+        //if ( !(($realpost->userid == $USER->id && (has_capability('mod/forum:replypost', $modcontext)
+        if ( !(((($realpost->userid == $USER->id) || ($realpost->hiddenuserid == $USER->id)) && (has_capability('mod/forum:replypost', $modcontext)
+        // END UCLA MOD: CCLE-6854.
                             || has_capability('mod/forum:startdiscussion', $modcontext))) ||
                             has_capability('mod/forum:editanypost', $modcontext)) ) {
             print_error('cannotupdatepost', 'forum');
@@ -824,6 +835,10 @@ if ($mform_post->is_cancelled()) {
                     'forumtype' => $forum->type,
                 )
             );
+            // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+            $params['anonymous'] = local_lae_forum::get_anonymous_logging_flag($forum, $fromform);
+            // END UCLA MOD: CCLE-6854.
+            
             $event = \mod_forum\event\post_created::create($params);
             $event->add_record_snapshot('forum_posts', $fromform);
             $event->add_record_snapshot('forum_discussions', $discussion);
@@ -922,6 +937,10 @@ if ($mform_post->is_cancelled()) {
                         'forumid' => $forum->id,
                     )
                 );
+                // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+                $params['anonymous'] = local_lae_forum::get_anonymous_logging_flag($forum, $fromform);
+                // END UCLA MOD: CCLE-6854.
+
                 $event = \mod_forum\event\discussion_created::create($params);
                 $event->add_record_snapshot('forum_discussions', $discussion);
                 $event->trigger();
