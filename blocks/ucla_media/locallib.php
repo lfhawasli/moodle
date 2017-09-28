@@ -62,9 +62,10 @@ function cmp_stop_date($a, $b) {
  *
  * @param array $bruincast
  * @param int $mode         Either MEDIA_BCAST_VIDEO or MEDIA_BCAST_AUDIO.
+ * @param string $filename  If present, then there is multiple
  * @return string
  */
-function get_bruincast_filter_text($bruincast, $mode) {
+function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
     $wowzaserver = get_config('block_ucla_media', 'bruincast_wowza');
 
     // Check if we have a video file.
@@ -79,19 +80,29 @@ function get_bruincast_filter_text($bruincast, $mode) {
             strtolower(substr($bruincast->term, 2, 1)) .'-';
     $isvideo ? $appname .= 'v' : $appname .= 'a';
 
-    $pathinfo = null;
-    if ($isvideo) {
-        $pathinfo = pathinfo($bruincast->bruincast_url);
-    } else {
-        $pathinfo = pathinfo($bruincast->audio_url);
+    $content = $isvideo ? $bruincast->bruincast_url : $bruincast->audio_url;
+    $contentfiles = explode(',', $content);
+    $contentfiles = array_map('trim', $contentfiles);
+
+    // Get filename. If passed in parameters then verify it is valid filename.
+    if (!empty($filename)) {
+        if (!in_array($filename, $contentfiles)) {
+            // Not found so unset it.
+            unset($filename);
+        }
+    }
+
+    // If no filename found, then use first entry from contentfiles.
+    if (empty($filename)) {
+        $filename = reset($contentfiles);
     }
 
     $httpurl = $wowzaserver . '/' . $appname . '/mp4:'
-            . $pathinfo['basename'] . '/playlist.m3u8';
+            . $filename . '/playlist.m3u8';
 
     $parseurl = parse_url($wowzaserver);
     $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
-            $appname . '/mp4:' . $pathinfo['basename'];
+            $appname . '/mp4:' . $filename;
 
     return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->name, $httpurl,
             $rtmpurl, $isvideo);

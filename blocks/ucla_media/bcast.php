@@ -37,9 +37,9 @@ $context = context_course::instance($courseid, MUST_EXIST);
 $pageparams['courseid'] = $courseid;
 
 // See if user wants to view a particular video.
-$videoid = optional_param('videoid', null, PARAM_INT);
-if (!empty($video)) {
-    $pageparams['video'] = $videoid;
+$mediaid = optional_param('videoid', null, PARAM_INT);
+if (!empty($media)) {
+    $pageparams['video'] = $mediaid;
 }
 
 init_page($course, $context,
@@ -89,7 +89,7 @@ function display_all($course) {
 
     echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
 
-    $videos = get_videos($course->id);
+    $bccontent = get_bccontent($course->id);
 
     $table = new html_table();
     $table->head = array(get_string('bccoursedate', 'block_ucla_media'),
@@ -97,43 +97,78 @@ function display_all($course) {
     $table->size = array('20%', '80%');
     $table->id = 'bruincast-content-table';
 
-    foreach ($videos as $video) {
+    foreach ($bccontent as $media) {
         // Each video entry will have two rows. One row for Course date and
         // Media, then another row for Title and Comments.
 
         // Create Course date and Media row.
-        $datecell = date('D, m/d/Y', $video->date);
+        $datecell = date('D, m/d/Y', $media->date);
 
         $mediacell = '';
-        if (!empty($video->bruincast_url)) {
-            $videolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
-                    array('mode' => MEDIA_BCAST_VIDEO, 'id' => $video->id)),
-                    get_string('bcvideo', 'block_ucla_media'));
-            $mediacell .= '<button type="button" class="btn btn-default">' .
-                    '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
-                    $videolink . '</button>';
+
+        $hasmultivideos = false;
+        if (!empty($media->bruincast_url)) {
+            // There might be multiple video files, separated by comma.
+            $videos = explode(',', $media->bruincast_url);
+            $videos = array_map('trim', $videos);
+
+            $hasmultivideos = count($videos) > 1;
+            foreach ($videos as $index => $filename) {
+                $buttontext = get_string('bcvideo', 'block_ucla_media');
+                if ($hasmultivideos) {
+                    // If there are multiple videos, then append number.
+                    $buttontext .= ' ' . ($index + 1);
+                }
+
+                $videolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                        array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'filename' => $filename)),
+                        $buttontext);
+                $mediacell .= '<button type="button" class="btn btn-default">' .
+                        '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
+                        $videolink . '</button>';
+                $mediacell .= ' ';
+            }
         }
 
-        if (!empty($video->audio_url)) {
-            $audiolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
-                    array('mode' => MEDIA_BCAST_AUDIO, 'id' => $video->id)),
-                    get_string('bcaudio', 'block_ucla_media'));
-            $mediacell .= ' <button type="button" class="btn btn-default">' .
-                    '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
-                    $audiolink . '</button>';
+        if (!empty($media->audio_url)) {
+            // If there are multiple videos and audio, put a new line.
+            if ($hasmultivideos) {
+                $mediacell .= '<br /><br />';
+            }
+
+            // There might be multiple audio files, separated by comma.
+            $audio = explode(',', $media->audio_url);
+            $audio = array_map('trim', $audio);
+
+            $hasmultiaudio = count($audio) > 1;
+            foreach ($audio as $index => $filename) {
+                $buttontext = get_string('bcaudio', 'block_ucla_media');
+                if ($hasmultiaudio) {
+                    // If there are multiple audio, then append number.
+                    $buttontext .= ' ' . ($index + 1);
+                }
+
+                $audiolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                        array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'filename' => $filename)),
+                        $buttontext);
+                $mediacell .= ' <button type="button" class="btn btn-default">' .
+                        '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
+                        $audiolink . '</button>';
+                $mediacell .= '';
+            }
         }
 
         // Create Title and Comments row.
         $titlecommentstring = '';
-        if (!empty($video->name)) {
+        if (!empty($media->name)) {
             $titlecommentstring .= html_writer::tag('strong',
                     get_string('bctitle', 'block_ucla_media') . ':') . ' ' .
-                    $video->name . '<br />';
+                    $media->name . '<br />';
         }
-        if (!empty($video->comments)) {
+        if (!empty($media->comments)) {
             $titlecommentstring .= html_writer::tag('strong',
                     get_string('bccomments', 'block_ucla_media') . ':') . ' ' .
-                    $video->comments;
+                    $media->comments;
         }
         if (!empty($mediacell)) {
             // Add spacing if there are media buttons.
@@ -155,12 +190,12 @@ function display_all($course) {
 }
 
 /**
- * Returns Bruincast videos for course.
+ * Returns Bruincast content for course.
  *
  * @param int $courseid
  * @return array
  */
-function get_videos($courseid) {
+function get_bccontent($courseid) {
     global $DB;
     return $DB->get_records('ucla_bruincast', array('courseid' => $courseid), 'date ASC');
 }
