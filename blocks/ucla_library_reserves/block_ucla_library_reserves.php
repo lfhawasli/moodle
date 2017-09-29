@@ -65,6 +65,15 @@ class block_ucla_library_reserves extends block_base {
     }
 
     /**
+     * Displays settings link in admin menu.
+     *
+     * @return boolean
+     */
+    public function has_config() {
+        return true;
+    }
+
+    /**
      * Called by moodle
      */
     public function applicable_formats() {

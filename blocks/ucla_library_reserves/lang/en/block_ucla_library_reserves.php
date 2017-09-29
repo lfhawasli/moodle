@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['desclibraryreservesurl'] = 'CSV source URL for library reserves data';
+$string['desclibraryreservesurl'] = 'Base URL for library reserves web service';
 $string['headerlibraryreservesurl'] = 'Source URL';
 $string['pluginname'] = 'UCLA library reserves';
 $string['taskupdate'] = 'Updates library reserves';
