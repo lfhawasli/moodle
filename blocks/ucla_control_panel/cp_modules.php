@@ -115,8 +115,8 @@ if (!empty($courseinfo)) {
                         new moodle_url("https://be.my.ucla.edu/login/directLink.aspx?featureID=73&term="
                                 . $courseterm . "&srs=" . $coursesrs), $temptag, $tacap));
         $myuclarow->add_element(new ucla_cp_module('asucla_textbooks',
-                        new moodle_url('http://www.collegestore.org/textbookstore/main.asp?remote=1&ref=ucla&term='
-                                . $courseterm . $session . '&course=' . $coursesrs . '&getbooks=Display+books'), $temptag, $tacap));
+                        new moodle_url('http://ucla.verbacompare.com/compare?catids=' . $courseterm . $coursesrs),
+                                $temptag, $tacap));
         $modules[] = $myuclarow;
     }
 }
