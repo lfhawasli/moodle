@@ -325,3 +325,8 @@ $string['incompleteuser'] = 'Please check and fix these incomplete id\'s:{$a}';
 
 // CCLE-6807 - Improve Group/Grouping column on Participants page.
 $string['groupsandgroupings'] = 'Group /<br />Grouping';
+
+// SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+$string['incompleteimportstart'] = 'User mapping error: Could not find users with id numbers:';
+$string['incompleteimportstatus'] = 'Incomplete import. All input UID\'s except those above were imported correctly.
+        Please fix the entries for only UID\'s displayed above.';

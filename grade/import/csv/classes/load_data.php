@@ -57,6 +57,10 @@ class gradeimport_csv_load_data {
     protected $importcode;
     /** @var array $gradebookerrors An array of errors from trying to import into the gradebook. */
     protected $gradebookerrors;
+    // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+    /** @var array $useriderrors An array of userid errors from trying to import into the gradebook. */
+    protected $useriderrors;
+    // END UCLA MOD: SSC-3723/CCLE-6923.
     /** @var array $newgradeitems An array of new grade items to be inserted into the gradebook. */
     protected $newgradeitems;
     // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
@@ -244,7 +248,11 @@ class gradeimport_csv_load_data {
             $usermappingerrorobj = new stdClass();
             $usermappingerrorobj->field = $userfields['label'];
             $usermappingerrorobj->value = $value;
-            $this->cleanup_import(get_string('usermappingerror', 'grades', $usermappingerrorobj));
+            // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+            //$this->cleanup_import(get_string('usermappingerror', 'grades', $usermappingerrorobj));
+            // Improper userid. Save the corresponding error info, but continue import.
+            $this->useriderrors[] = $usermappingerrorobj->value;
+            // END UCLA MOD: SSC-3723/CCLE-6923.
             unset($usermappingerrorobj);
             return null;
         }
@@ -401,10 +409,18 @@ class gradeimport_csv_load_data {
             case 'username':
                 // Skip invalid row with blank user field.
                 if (!empty($value)) {
+                    // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+                    /*
                     $this->studentid = $this->check_user_exists($value, $userfields[$mappingidentifier]);
                     // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
                     $this->rowkeys[] = $value;
                     // END UCLA MOD: SSC-3739/CCLE-6785.
+                    */
+                    $this->studentid = $this->check_user_exists($value, $userfields[$mappingidentifier]);
+                    if ($this->studentid != null) {
+                        $this->rowkeys[] = $value;
+                    }
+                    // END UCLA MOD: SSC-3723/CCLE-6923.
                 }
             break;
             case 'new':
@@ -461,6 +477,10 @@ class gradeimport_csv_load_data {
         $paddedrowkeys = array();
         // END UCLA MOD: SSC-3739/CCLE-6785.
         $this->trim_headers();
+        // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+        $this->useridvalid = true;    // Is the current user valid?
+        $this->completeimport = true; // Is this a complete import?
+        // END UCLA MOD: SSC-3723/CCLE-6923.
         $timeexportkey = null;
         $map = array();
         // Loops mapping_0, mapping_1 .. mapping_n and construct $map array.
@@ -547,19 +567,41 @@ class gradeimport_csv_load_data {
 
             // No user mapping supplied at all, or user mapping failed.
             if (empty($this->studentid) || !is_numeric($this->studentid)) {
+                // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+                /*
                 // User not found, abort whole import.
                 $this->cleanup_import(get_string('usermappingerrorusernotfound', 'grades'));
                 break;
+                */
+                // User not found, set control variables and continue.
+                $this->useridvalid = false;
+                $this->completeimport = false;
+                // END UCLA MOD: SSC-3723/CCLE-6923.
             }
 
+            // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+            /*
             if ($separatemode and !groups_is_member($currentgroup, $this->studentid)) {
                 // Not allowed to import into this group, abort.
                 $this->cleanup_import(get_string('usermappingerrorcurrentgroup', 'grades'));
                 break;
             }
+            */
+            // Nest if statement to make sure we do not check an invalid userid.
+            if ($separatemode and !empty($this->studentid)) {
+                if (!groups_is_member($currentgroup, $this->studentid)) {
+                    // Not allowed to import into this group, abort.
+                    $this->cleanup_import(get_string('usermappingerrorcurrentgroup', 'grades'));
+                    break;
+                }
+            }
+            // END UCLA MOD: SSC-3723/CCLE-6923.
 
             // Insert results of this students into buffer.
-            if ($this->status and !empty($this->newgrades)) {
+            // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+            //if ($this->status and !empty($this->newgrades)) {
+            if ($this->status and !empty($this->newgrades) and $this->useridvalid) {
+            // END UCLA MOD: SSC-3723/CCLE-6923.
 
                 foreach ($this->newgrades as $newgrade) {
 
@@ -599,7 +641,10 @@ class gradeimport_csv_load_data {
             }
 
             // Updating/inserting all comments here.
-            if ($this->status and !empty($this->newfeedbacks)) {
+            // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+            //if ($this->status and !empty($this->newfeedbacks)) {
+            if ($this->status and !empty($this->newfeedbacks) and $this->useridvalid) {
+            // END UCLA MOD: SSC-3723/CCLE-6923.
                 foreach ($this->newfeedbacks as $newfeedback) {
                     $sql = "SELECT *
                               FROM {grade_import_values}
@@ -620,7 +665,19 @@ class gradeimport_csv_load_data {
                     }
                 }
             }
+            // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+            $this->useridvalid = true; // Reset userid validity for next userid.
+            // END UCLA MOD: SSC-3723/CCLE-6923.
         }
+
+        // START UCLA MOD : SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+        // If no user's data will be imported then abort and cleanup.
+        if (empty($this->rowkeys)) {
+            $this->status = false;
+            import_cleanup($this->importcode);
+            return $this->status;
+        }
+        // END UCLA MOD: SSC-3723/CCLE-6923.
         // START UCLA MOD: SSC-3739/CCLE-6785 - Grade import fixes.
         // Check to see if programmatically completed UID's result in duplicates.
         if (!empty($paddedrowkeys)) {
@@ -695,4 +752,29 @@ class gradeimport_csv_load_data {
     public function get_gradebookerrors() {
         return $this->gradebookerrors;
     }
+
+    // START UCLA MOD: SSC-3723/CCLE-6923 - Grades: Import fails on bad UID.
+    /**
+     * Returns the formatted userid errors for this class.
+     *
+     * @return array.
+     */
+    public function get_formatted_useriderrors() {
+        $formattederror[0] = get_string('incompleteimportstart', 'local_ucla') . '<br>';
+        foreach ($this->useriderrors as $id) {
+            $formattederror[0] .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$id<br>";
+        }
+        $formattederror[0] .= '<br>' . get_string('incompleteimportstatus', 'local_ucla');
+        return $formattederror;
+    }
+
+    /**
+     * Returns whether or not a full import was submitted.
+     *
+     * @return array returns status of import.
+     */
+    public function is_incompleteimport() {
+        return !$this->completeimport;
+    }
+    // END UCLA MOD: SSC-3723/CCLE-6923.
 }

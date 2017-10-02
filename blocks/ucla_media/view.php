@@ -26,42 +26,44 @@ require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 
-$videoid = required_param('id', PARAM_INT);
+$mediaid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
+$filename = optional_param('filename', null, PARAM_FILE);
+
 // Try to find corresponding course for given video.
 if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
-    $video = $DB->get_record('ucla_bruincast', array('id' => $videoid));
-    if (empty($video)) {
+    $media = $DB->get_record('ucla_bruincast', array('id' => $mediaid));
+    if (empty($media)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
-    } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
+    } else if (empty($media->courseid) || !$course = get_course($media->courseid)) {
         print_error('coursemisconf');
     }
 } else if ($mode == MEDIA_VIDEORESERVES) {
-    $video = $DB->get_record('ucla_video_reserves', array('id' => $videoid));
-    if (($video->filename == null) && !empty($video->video_url)) {
-        redirect($video->video_url);
+    $media = $DB->get_record('ucla_video_reserves', array('id' => $mediaid));
+    if (($media->filename == null) && !empty($media->video_url)) {
+        redirect($media->video_url);
     }
-    if (empty($video)) {
+    if (empty($media)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
-    } else if (empty($video->courseid) || !$course = get_course($video->courseid)) {
+    } else if (empty($media->courseid) || !$course = get_course($media->courseid)) {
         print_error('coursemisconf');
     }
 }
 require_login($course);
-$context = context_course::instance($video->courseid, MUST_EXIST);
+$context = context_course::instance($media->courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $videoid)));
+                array('id' => $mediaid)));
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
     if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
-        echo $OUTPUT->heading($video->name, 2, 'headingblock');
+        echo $OUTPUT->heading($media->name, 2, 'headingblock');
         // Try to embed video or audio on page by calling filter.
-        $filtertext = get_bruincast_filter_text($video, $mode);
+        $filtertext = get_bruincast_filter_text($media, $mode, $filename);
 
         $filter = new filter_oidwowza($context, array());
         $html = $filter->filter($filtertext);
@@ -74,31 +76,31 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
         $event = \block_ucla_media\event\video_viewed::create(array(
             'context' => $context,
-            'objectid' => $video->id,
+            'objectid' => $media->id,
             'other' => array(
-                'name' => $video->name,
+                'name' => $media->name,
                 'type' => get_string('headerbcast', 'block_ucla_media')
             )));
         $event->trigger();
     } else if ($mode == MEDIA_VIDEORESERVES) {
         $currentdate = time();
         $timeformat = get_string('strftimedate', 'langconfig');
-        if ($currentdate > $video->stop_date) {
+        if ($currentdate > $media->stop_date) {
             // Is video is past.
             print_error('pastvideo_info', 'block_ucla_media', '',
-                    userdate($video->stop_date, $timeformat));
-        } else if ($currentdate < $video->start_date) {
+                    userdate($media->stop_date, $timeformat));
+        } else if ($currentdate < $media->start_date) {
             // Is video is in future.
             print_error('futurevideo_info', 'block_ucla_media', '',
-                    userdate($video->start_date, $timeformat));
+                    userdate($media->start_date, $timeformat));
         }
 
-        echo $OUTPUT->heading($video->video_title, 2, 'headingblock');
+        echo $OUTPUT->heading($media->video_title, 2, 'headingblock');
 
         // Try to embed video on page by calling filter.
         $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',
                 'rtmpe://' . get_config('block_ucla_video_reserves', 'wowzaurl'),
-                $video->filename, $video->width, $video->height, urlencode($video->video_url));
+                $media->filename, $media->width, $media->height, urlencode($media->video_url));
         $filter = new filter_oidwowza($context, array());
         $html = $filter->filter($filtertext);
         echo $html;
@@ -112,9 +114,9 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         // Log the video the user is viewing.
         $event = \block_ucla_media\event\video_viewed::create(array(
             'context' => $context,
-            'objectid' => $video->id,
+            'objectid' => $media->id,
             'other' => array(
-                'name' => $video->video_title,
+                'name' => $media->video_title,
                 'type' => get_string('headervidres', 'block_ucla_media')
             )));
         $event->trigger();

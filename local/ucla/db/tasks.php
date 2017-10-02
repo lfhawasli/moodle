@@ -30,7 +30,7 @@ $tasks = array(
     array(
         'classname' => 'local_ucla\task\local_ucla_cron_task',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '0',
         'hour' => '0', // Midnight.
         'day' => '*',
         'dayofweek' => '*',

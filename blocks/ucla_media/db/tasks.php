@@ -29,7 +29,7 @@ $tasks = array(
     array(
         'classname' => 'block_ucla_media\task\update_bcast',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '0',
         'hour' => '8-20',
         'day' => '*',
         'dayofweek' => '*',
