@@ -120,13 +120,13 @@ function display_all($course) {
                     $buttontext .= ' ' . ($index + 1);
                 }
 
+                $buttontext = '<button type="button" class="btn btn-default">' .
+                        '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
+                        $buttontext . '</button>';
                 $videolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
                         array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'filename' => $filename)),
                         $buttontext);
-                $mediacell .= '<button type="button" class="btn btn-default">' .
-                        '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
-                        $videolink . '</button>';
-                $mediacell .= ' ';
+                $mediacell .= $videolink . ' ';
             }
         }
 
@@ -148,13 +148,13 @@ function display_all($course) {
                     $buttontext .= ' ' . ($index + 1);
                 }
 
+                $buttontext = ' <button type="button" class="btn btn-default">' .
+                        '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
+                        $buttontext . '</button>';
                 $audiolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
                         array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'filename' => $filename)),
                         $buttontext);
-                $mediacell .= ' <button type="button" class="btn btn-default">' .
-                        '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
-                        $audiolink . '</button>';
-                $mediacell .= '';
+                $mediacell .= $audiolink . '';
             }
         }
 
