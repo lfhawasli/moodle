@@ -170,6 +170,9 @@ class update_bcast extends \core\task\scheduled_task {
                         $contents = array($cleanedresult['item']);
                     }
 
+                    // CCLE-7002 - Leading zeros dropped for BruinCast.
+                    $srs = validate_field('srs', $srs, 7, 9);
+
                     // Entering each media item for a particular course in a particular term into the DB.
                     foreach ($contents as $content) {
                         $entry = new \stdClass();
