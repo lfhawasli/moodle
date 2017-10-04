@@ -220,11 +220,11 @@ class update_vidreserves extends \core\task\scheduled_task {
 
         // If the term is less than 3 characters, it's probably from
         // missing leading zeroes. We solve this by prepending zeroes.
-        $row[0] = str_pad($row[0], 3, STR_PAD_LEFT);
+        $row[0] = str_pad($row[0], 3, 0, STR_PAD_LEFT);
 
-        // Fix all formatting issues with incoming data add leading zeroes to the
-        // srs is its under 9 chars.
-        $row[1] = str_pad($row[1], 9, STR_PAD_LEFT);
+        // Fix all formatting issues with incoming data add leading zeroes to 
+        // the srs is its under 9 chars.
+        $row[1] = str_pad($row[1], 9, 0, STR_PAD_LEFT);
 
         // Format the start and end dates yyyy-mm-dd.
         $row[2] = $this->fix_date_format($row[2]);
