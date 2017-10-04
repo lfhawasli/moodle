@@ -78,7 +78,14 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
     // Get application name in format <4 digit year><quarter>-<v(video) or a(audio)>.
     $appname = '20' . substr($bruincast->term, 0, 2) .
             strtolower(substr($bruincast->term, 2, 1)) .'-';
-    $isvideo ? $appname .= 'v' : $appname .= 'a';
+    $extension = '';
+    if ($isvideo) {
+        $appname .= 'v';
+        $extension = 'mp4';
+    } else {
+        $appname .= 'a';
+        $extension = 'mp3';
+    }
 
     $content = $isvideo ? $bruincast->bruincast_url : $bruincast->audio_url;
     $contentfiles = explode(',', $content);
@@ -97,12 +104,12 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
         $filename = reset($contentfiles);
     }
 
-    $httpurl = $wowzaserver . '/' . $appname . '/mp4:'
+    $httpurl = $wowzaserver . '/' . $appname . '/' . $extension . ':'
             . $filename . '/playlist.m3u8';
 
     $parseurl = parse_url($wowzaserver);
     $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
-            $appname . '/mp4:' . $filename;
+            $appname . '/' . $extension . ':' . $filename;
 
     return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->name, $httpurl,
             $rtmpurl, $isvideo);
