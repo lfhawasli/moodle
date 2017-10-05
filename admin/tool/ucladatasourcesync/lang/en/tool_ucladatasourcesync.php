@@ -48,7 +48,7 @@ $string['errbcinvalidrowlen'] = "ERROR: Invalid row length in provided Bruincast
 // Notification messages.
 $string['bcstartnoti'] = "Starting BruinCast DB update:";
 $string['bcsuccessnoti'] = '... {$a} records successfully inserted.';
-$string['bcnoentries'] = 'No BruinCast entries found.';
+$string['bcnoentries'] = 'No BruinCast entries found.  Nothing changed.';
 
 // Strings for bruinmedia_dbsync.
 // Error messages.
