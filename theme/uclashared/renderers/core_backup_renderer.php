@@ -247,7 +247,9 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
             }
 
             // Get instructors for each course, if any.
-            $courseinstrs = course_get_format($course->id)->display_instructors();
+            $format = course_get_format($course->id);
+            $courseinstrs = method_exists($format, 'display_instructors') ?
+                    $format->display_instructors() : [];
 
             // Fetch TA-Admin/Owner for the TA site.
             if (block_ucla_tasites::is_tasite($course->id)) {
