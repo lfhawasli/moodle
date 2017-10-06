@@ -41,6 +41,6 @@ $settings->add(new admin_setting_configtext(
             'filter_oidwowza/video_reserves_url',
             get_string('headerwowzaurl', 'filter_oidwowza'),
             get_string('descwowzaurl', 'filter_oidwowza'),
-            'oid-as-wowza.oid.ucla.edu:1935',
+            'oid-as-wowza.oid.ucla.edu',
             PARAM_URL
         ));

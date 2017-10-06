@@ -54,7 +54,7 @@ $context = context_course::instance($media->courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $mediaid)));
+                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename)));
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
