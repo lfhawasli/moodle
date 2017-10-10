@@ -75,18 +75,20 @@ class schedule_form extends moodleform {
             get_string('untilcol', 'local_visibility'), '');
         $table->data = array();
         foreach ($this->visibilityschedule as $index => $range) {
-            // Format the rows based on whether their ranges are upcoming or in the past.
-            if (!$upcomingfound && $range->hideuntil > time()) {
-                $upcomingfound = true; // We only want to bold one of them. The closest upcoming range.
-                $table->rowclasses[$index] = 'bold';
-            } else if ($range->past || $range->hideuntil <= time()) {
-                $table->rowclasses[$index] = 'text-muted';
-            }
-            $table->rowclasses[$index] .= ' range' . $range->id . ' '; // This is used to delete the range.
-
+            // This is used to delete the range.
+            $table->rowclasses[$index] = 'range' . $range->id;
             $deletebutton = '<img src="' . $OUTPUT->pix_url('t/delete', '') .
                     '" style="cursor:pointer;" class="rangedeletebutton"'.
                     'data-course="'. $this->course->id .'" data-id="'. $range->id .'";/>';
+
+            // Format the rows based on whether their ranges are upcoming or in the past.
+            if (!$upcomingfound && $range->hideuntil > time()) {
+                $upcomingfound = true; // We only want to bold one of them. The closest upcoming range.
+                $table->rowclasses[$index] .= ' bold';
+            } else if ($range->past || $range->hideuntil <= time()) {
+                $table->rowclasses[$index] .= ' text-muted';
+            }
+            $table->rowclasses[$index] .= ' range' . $range->id . ' '; // This is used to delete the range.
 
             $table->data[] = array(
                 $range->title ? $range->title : '<i>n/a</i>',
