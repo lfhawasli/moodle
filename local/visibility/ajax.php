@@ -43,7 +43,6 @@ if ($course->id == SITEID) {
 require_login($course);
 
 $coursecontext = context_course::instance($courseid);
-require_capability('moodle/course:view', $coursecontext);
 require_capability('moodle/course:update', $coursecontext);
 require_capability('moodle/course:visibility', $coursecontext);
 
