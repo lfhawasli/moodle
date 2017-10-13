@@ -54,3 +54,8 @@ $string['showoption'] = 'Visible to students';
 $string['save'] = 'Save';
 $string['coursehidden'] = 'This course is temporarily unavailable to students. It will become available again on <b>{$a->hideuntil}</b>. {$a->title}';
 $string['deleteerror'] = 'Error deleting selected range.';
+// Logging event handler.
+$string['eventcoursevisibilityhide'] = 'Course visibility - hidden';
+$string['eventcoursevisibilityshow'] = 'Course visibility - visible';
+$string['eventcoursevisibilityhide_desc'] = 'This course visibility has been changed. Course is now hidden.';
+$string['eventcoursevisibilityshow_desc'] = 'This course visibility has been changed. Course is now visible.';

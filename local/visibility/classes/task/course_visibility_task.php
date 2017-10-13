@@ -41,7 +41,7 @@ class course_visibility_task extends \core\task\scheduled_task {
         self::determine_visibility();
     }
     /**
-     * Determines which courses need their visibilitites changed, and updates them apprpriately.
+     * Determines which courses need their visibilities changed, and updates them appropriately.
      *
      * @param $id int, optional, course id - if set, only check visibility of this single course.
      *                 Must be provided along with $visible.
@@ -104,16 +104,34 @@ class course_visibility_task extends \core\task\scheduled_task {
         // Iterate through each course and determine whether its visibility should be changed.
         foreach ($visibilitychecks as $courseid => $visibilitycheck) {
             if ($visibilitycheck && $coursevisibility[$courseid]) {
+
                 // Course is visible, but shouldn't be. Hide it.
                 course_change_visibility($courseid, false);
+
+                // Log visibility action - hide.
+                $context = \context_course::instance($courseid);
+                $event = \local_visibility\event\course_visibility_hide::create(array(
+                    'context' => $context
+                ));
+                $event->trigger();
+
                 if (!is_null($visible) && !is_null($id)) {
                     $visible = false;
                     break;
                 }
             }
             if (!$visibilitycheck && !$coursevisibility[$courseid]) {
+
                 // Course isn't visible, but should be. Show it.
                 course_change_visibility($courseid, true);
+
+                // Log visibility action - show.
+                $context = \context_course::instance($courseid);
+                $event = \local_visibility\event\course_visibility_show::create(array(
+                    'context' => $context
+                ));
+                $event->trigger();
+
                 if (!is_null($visible) && !is_null($id)) {
                     $visible = true;
                     break;
