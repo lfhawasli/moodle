@@ -82,11 +82,11 @@ class schedule_form extends moodleform {
             } else if ($range->past || $range->hideuntil <= time()) {
                 $table->rowclasses[$index] = 'text-muted';
             }
+            $table->rowclasses[$index] .= ' range' . $range->id . ' '; // This is used to delete the range.
 
-            $deletebutton = '<input type="image" src="' . $OUTPUT->pix_url('t/delete', '') .
-                    '" onclick="skipClientValidation = true;"' .
-                    '" name="' . $deletebuttonname .
-                    '" value= "' . $range->id . '" />';
+            $deletebutton = '<img src="' . $OUTPUT->pix_url('t/delete', '') .
+                    '" style="cursor:pointer;" class="rangedeletebutton"'.
+                    'data-course="'. $this->course->id .'" data-id="'. $range->id .'";/>';
 
             $table->data[] = array(
                 $range->title ? $range->title : '<i>n/a</i>',
@@ -151,7 +151,16 @@ class schedule_form extends moodleform {
      * @param array $files
      */
     public function validation($data, $files) {
+        global $DB;
+
         $errors = array();
+
+        // Refresh and resort the schedule for this course, since some ranges may have been deleted.
+        $this->visibilityschedule = $DB->get_records('ucla_visibility_schedule',
+                array('courseid' => $this->_customdata['courseid']));
+        usort($this->visibilityschedule, function($a, $b) {
+            return ($a->hidefrom > $b->hidefrom);
+        });
 
         // Make sure everything was provided.
         if (empty($data['hidefrom'])) {
