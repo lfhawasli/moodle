@@ -217,6 +217,9 @@ class update_bcast extends \core\task\scheduled_task {
                 throw new \moodle_exception('bcnoentries', 'tool_ucladatasourcesync');
             }
 
+            // Crosslist courses.
+            $numinserted += $this->perform_crosslisting();
+
             // Success, so commit changes.
             $transaction->allow_commit();
             mtrace(get_string('bcsuccessnoti', 'tool_ucladatasourcesync', $numinserted));
@@ -247,6 +250,50 @@ class update_bcast extends \core\task\scheduled_task {
     }
 
     /**
+     * Copies the Bruincast from course1 to course 2.
+     *
+     * @param array $course1    Array with shortname, courseid and srs.
+     * @param array $course2    Array with shortname, courseid and srs.
+     *
+     * @return int  Number of records added.
+     */
+    private function copy_entries($course1, $course2) {
+        global $DB;
+        $numinserted = 0;
+        $records = $DB->get_records('ucla_bruincast',
+                array('courseid' => $course1['courseid']));
+        if (!empty($records)) {
+            $a = new \stdClass();
+            $a->course1 = $course1['shortname'];
+            $a->course2 = $course2['shortname'];
+            mtrace(get_string('bccrosslistentries', 'tool_ucladatasourcesync', $a));
+            foreach ($records as $record) {
+                unset($record->id);   // Want to create new entry.
+                // Change courseid and srs to course2.
+                $record->courseid = $course2['courseid'];
+                $record->srs = $course2['srs'];
+
+                // Append shortname of original course to title.
+                $record->name = $course1['shortname'] . ' ' . $record->name;
+
+                // Make sure that entry does not already exist for same file.
+                // Somethings BruinCast already crossposted data.
+                if (!$DB->record_exists('ucla_bruincast',
+                        array('courseid' => $record->courseid,
+                            'bruincast_url' => $record->bruincast_url,
+                            'audio_url' => $record->audio_url,
+                            'date' => $record->date))) {
+                    $DB->insert_record('ucla_bruincast', $record);
+                    mtrace('+', '');
+                    ++$numinserted;
+                }
+            }
+            mtrace(''); // New line.
+        }
+        return $numinserted;
+    }
+
+    /**
      * Returns task name.
      *
      * @return string
@@ -255,4 +302,64 @@ class update_bcast extends \core\task\scheduled_task {
         return get_string('taskupdatebcast', 'block_ucla_media');
     }
 
+    /**
+     * Finds courses that should have their media cross-listed and copies data
+     * both ways (if there is any).
+     * 
+     * @return int  Number of records added.
+     */
+    public function perform_crosslisting() {
+        global $DB;
+        mtrace(get_string('bccrosslistmedia', 'tool_ucladatasourcesync'));
+
+        // Expecting crosslists to be in following format:
+        // 17F-CHEM153A-2=17F-CHEM153A-3
+        // Each on a new line.
+        $crosslistsconfig = get_config('block_ucla_media', 'bruincast_crosslists');
+        $crosslists = explode("\n", $crosslistsconfig);
+        $crosslists = array_map('trim', $crosslists);
+
+        $numinserted = 0;
+        foreach ($crosslists as $crosslist) {
+            // Split by "=".
+            $shortnames = explode('=', $crosslist);
+            // Must be only two elements.
+            if (count($shortnames) != 2) {
+                mtrace(get_string('bcinvalidcrosslists', 'tool_ucladatasourcesync',
+                        $crosslist));
+                continue;
+            }
+            // Verify that course shortnames exists and store course data.
+            $courses = array();
+            $validatedcourses = true;
+            foreach ($shortnames as $index => $shortname) {
+                if ($courseid = $DB->get_field('course', 'id',
+                        array('shortname' => $shortname))) {
+                    $courses[$index] = array();
+                    $courses[$index]['shortname'] = $shortname;
+                    $courses[$index]['courseid'] = $courseid;
+                    // Found courseid, need to also find srs.
+                    $srs = $DB->get_field('ucla_request_classes', 'srs',
+                            array('courseid' => $courseid, 'hostcourse' => 1),
+                            MUST_EXIST);
+                    $courses[$index]['srs'] = $srs;
+                } else {
+                    mtrace(get_string('bcinvalidcrosslists', 'tool_ucladatasourcesync',
+                        $shortname));
+                    $validatedcourses = false;
+                    break;
+                }
+            }
+
+            if (!$validatedcourses) {
+                // Skip invalid record.
+                continue;
+            }
+
+            // Everything is good to go, so let's copy data in ucla_bruincast.
+            $numinserted += $this->copy_entries($courses[0], $courses[1]);
+            $numinserted += $this->copy_entries($courses[1], $courses[0]);
+        }
+        return $numinserted;
+    }
 }

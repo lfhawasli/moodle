@@ -163,6 +163,15 @@
 [submodule "mod/choicegroup"]
 	path = mod/choicegroup
 	url = https://github.com/ndunand/moodle-mod_choicegroup.git
+[submodule "blocks/panopto"]
+	path = blocks/panopto
+	url = git@github.com:ccle/Moodle-2.0-plugin-for-Panopto.git
+[submodule "lib/editor/tinymce/plugins/panoptobutton"]
+	path = lib/editor/tinymce/plugins/panoptobutton
+	url = https://github.com/Panopto/Add-Panopto-Video--button-for-moodle-tinyMCE-editor.git
+[submodule "lib/editor/atto/plugins/panoptobutton"]
+	path = lib/editor/atto/plugins/panoptobutton
+	url = https://github.com/Panopto/Panopto-Button-for-Atto.git
 [submodule "blocks/mhaairs"]
 	path = blocks/mhaairs
 	url = https://github.com/itamart/moodle-block_mhaairs.git

@@ -78,6 +78,8 @@ $string['headerbruincastwowza'] = 'Bruincast Wowza URL';
 $string['descbruincastwowza'] = 'Server location for Bruincast Wowza.';
 $string['bruincastnotice'] = 'Bruincast notice';
 $string['bruincastnoticedesc'] = 'If set, will display notice on all Bruincast pages.';
+$string['bruincastcrosslists'] = 'Bruincast crosslists';
+$string['bruincastcrosslistsdesc'] = 'Each line is a pairing of shortnames that should share BruinCast content in the following format: 17F-CHEM153A-2=17F-CHEM153A-3';
 
 // Strings for Bruincast display.
 $string['bccoursedate'] = 'Course date';
@@ -89,12 +91,6 @@ $string['bcaudio'] = 'Audio';
 $string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are '
         . 'available. For help regarding BruinCast content please read our '
         . '<a href="https://docs.ccle.ucla.edu/w/BruinCast">help document</a>.';
-
-// Types of bruincasts. To be removed once new web service is done: CCLE-6263.
-$string['node_restricted'] = 'Private';
-$string['node_open'] = 'Open';
-$string['node_see_instructor'] = 'See Instructor';
-$string['node_online'] = 'E-Lecture';
 
 $string['videoreservesipwarning'] = 'You are accessing this content from off-campus. If the content does not load, you will need to use the UCLA VPN to obtain an on-campus internet address.</br>
 BOL VPN instructions: <a target="_blank" href="https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients">https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients</a>.';

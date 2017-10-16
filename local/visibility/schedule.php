@@ -30,7 +30,6 @@ $courseid = required_param('id', PARAM_INT);
 // Access control checks.
 require_login();
 $coursecontext = context_course::instance($courseid);
-require_capability('moodle/course:view', $coursecontext);
 require_capability('moodle/course:update', $coursecontext);
 require_capability('moodle/course:visibility', $coursecontext);
 
@@ -44,18 +43,16 @@ $PAGE->set_title(get_string('coursevisibilityheader', 'local_visibility'));
 $PAGE->set_heading($course->fullname);
 $baseurl = new moodle_url('schedule.php', array('id' => $courseid));
 
+// Include javascript.
+$PAGE->requires->js_call_amd('local_visibility/visibility', 'init');
+
 // Instantiate moodleform.
 $mform = new schedule_form(null, array('courseid' => $courseid));
 
 if (optional_param('cancel', false, PARAM_BOOL)) {
     redirect($baseurl);
 }
-// Check if the user just tried to delete a schedule entry, and delete that entry if so.
-if ($deletedscheduleid = optional_param('scheduledeletebutton', 0, PARAM_RAW)) {
-    $DB->delete_records('ucla_visibility_schedule',
-            array('id' => $deletedscheduleid, 'courseid' => $courseid));
-    redirect($baseurl);
-}
+
 // If form was submitted, update table with new date range.
 if ($data = $mform->get_data()) {
     if (optional_param('savevisiblebutton', 0, PARAM_RAW) && isset($data->visible)) {

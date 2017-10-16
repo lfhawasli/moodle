@@ -85,4 +85,8 @@ if ($ADMIN->fulltree) {
             'block_ucla_media/bruincast_notice',
             get_string('bruincastnotice', 'block_ucla_media'),
             get_string('bruincastnoticedesc', 'block_ucla_media'), ''));
+    $settings->add(new admin_setting_configtextarea(
+            'block_ucla_media/bruincast_crosslists',
+            get_string('bruincastcrosslists', 'block_ucla_media'),
+            get_string('bruincastcrosslistsdesc', 'block_ucla_media'), ''));
 }

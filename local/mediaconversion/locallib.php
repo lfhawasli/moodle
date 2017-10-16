@@ -427,6 +427,10 @@ function local_cm_package_argsinfo($courseandmodinfo, $name, $modname = 'resourc
  * @return stdClass|null
  */
 function local_cm_convert_video(stored_file $file, $argsinfo, $userid, $cmid) {
+    global $DB;
+    // Set the user to the uploader.
+    $user = $DB->get_record('user', array('id' => $userid));
+    cron_setup_user($user);
     // Try to copy file to a temp location.
     if (!($pathtofile = $file->copy_content_to_temp())) {
         mtrace('Failed to copy file with id ' . $file->get_id() . ' for cm instance ' . $cmid);
@@ -506,7 +510,6 @@ function local_cm_get_video_file($contextid, $modulename = 'resource', $filearea
  */
 function local_cm_convert_and_add_module($contextid, $courseandmodinfo, $userid,
         $cmid, $cmname) {
-    global $DB;
     // Get the video file.
     if (!($mainfile = local_cm_get_video_file($contextid))) {
         return false;
@@ -529,9 +532,6 @@ function local_cm_convert_and_add_module($contextid, $courseandmodinfo, $userid,
                 . ' it had embedded pluginfiles');
         return false;
     }
-    // Set the user to the uploader.
-    $user = $DB->get_record('user', array('id' => $userid));
-    cron_setup_user($user);
     if (!$newmodinfo = local_cm_convert_video($mainfile, $argsinfo, $userid, $cmid)) {
         mtrace('Failed to convert video named ' . $mainfile->get_filename()
                 . ' for cm instance ' . $cmid);
@@ -606,6 +606,7 @@ function local_cm_convert_and_get_new_text($modulename, $cmid, $contextid, $user
     // Get the argsinfo if there are intro files and if it wasn't already given.
     if (!$argsinfo) {
         $courseandmodinfo = get_course_and_cm_from_cmid($cmid);
+        // Note the empty name field in this call - we'll have to get the name later.
         $argsinfo = local_cm_package_argsinfo($courseandmodinfo, '', $modulename);
     }
     // Figure out what our text is.
@@ -622,6 +623,10 @@ function local_cm_convert_and_get_new_text($modulename, $cmid, $contextid, $user
         if (!$file = local_cm_get_video_file_by_name($introfiles, $filename)) {
             continue;
         }
+        // Manually modify the argsinfo name here once we've got access to the
+        // file - this is important since we call local_cm_package_argsinfo with
+        // an empty string for the name field.
+        $argsinfo->name = $file->get_filename();
         // Try to convert the video itself. A lot of the modinfo it returns is
         // useless for this task, but we do need the entry id.
         if (!$newtempmodinfo = local_cm_convert_video($file, $argsinfo, $userid, $cmid)) {
