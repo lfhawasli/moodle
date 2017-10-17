@@ -120,6 +120,10 @@ class local_ucla_turnitintwo {
      * @return boolean
      */
     public static function sync_tutors($tiiassignment) {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/turnitintooltwo/turnitintooltwo_assignment.class.php');
+        require_once($CFG->dirroot . '/mod/turnitintooltwo/turnitintooltwo_user.class.php');
+        
         $tiiassign = new turnitintooltwo_assignment($tiiassignment->id, $tiiassignment);
         $cm = get_coursemodule_from_instance('turnitintooltwo', $tiiassignment->id);
 
