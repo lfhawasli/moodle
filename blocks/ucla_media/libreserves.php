@@ -46,7 +46,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         print_media_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
         display_page($course);
 
-        $event = \block_ucla_media\event\index_viewed::create(
+        $event = \block_ucla_media\event\library_reserves_index_viewed::create(
             array('context' => $context, 'other' => array(
                 'page' => get_string('headerlibres', 'block_ucla_media')
                     )));

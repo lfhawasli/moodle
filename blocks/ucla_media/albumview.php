@@ -47,12 +47,12 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     echo html_writer::empty_tag('br');
        
     // Log the video the user is viewing.
-    $event = \block_ucla_media\event\video_viewed::create(array(
+    $event = \block_ucla_media\event\library_reserves_viewed::create(array(
         'context' => $context,
-        'objectid' => $video->id,
+        'objectid' => $courseid,
         'other' => array(
             'name' => $video->title,
-            'type' => get_string('headerlibres', 'block_ucla_media')
+            'albumid' => $video->id
         )));
     $event->trigger();
 } else {
