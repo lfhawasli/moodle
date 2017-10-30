@@ -54,7 +54,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         html_writer::end_div('div');
         echo $OUTPUT->single_button(new moodle_url('/blocks/ucla_media/libreserves.php',
                 array('courseid' => $courseid)), get_string('returntomedia', 'block_ucla_media'), 'get');
-        $event = \block_ucla_media\event\index_viewed::create(
+        $event = \block_ucla_media\event\library_reserves_index_viewed::create(
             array('context' => $context, 'other' => array(
                 'page' => get_string('headerlibres', 'block_ucla_media')
                     )));

@@ -56,7 +56,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         // Show all videos.
         display_all($course);
 
-        $event = \block_ucla_media\event\index_viewed::create(
+        $event = \block_ucla_media\event\bruincast_index_viewed::create(
             array('context' => $context, 'other' => array(
                 'page' => get_string('headerbcast', 'block_ucla_media')
                     )));

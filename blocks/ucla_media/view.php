@@ -54,7 +54,7 @@ $context = context_course::instance($media->courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $mediaid)));
+                array('id' => $mediaid, 'mode' => $mode)));
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
@@ -74,12 +74,12 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                     array('courseid' => $course->id)),
                 get_string('back', 'block_ucla_media')));
 
-        $event = \block_ucla_media\event\video_viewed::create(array(
+        $event = \block_ucla_media\event\bruincast_viewed::create(array(
             'context' => $context,
             'objectid' => $media->id,
             'other' => array(
-                'name' => $media->name,
-                'type' => get_string('headerbcast', 'block_ucla_media')
+                'filename' => $filename,
+                'mode' => $mode
             )));
         $event->trigger();
     } else if ($mode == MEDIA_VIDEORESERVES) {
@@ -108,16 +108,16 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         echo html_writer::empty_tag('br');
         echo $OUTPUT->container(html_writer::link(
                 new moodle_url('/blocks/ucla_media/videoreserves.php',
-                    array('courseid' => $course->id)),
+                    array('courseid' => $course->id, 'mode' => $mode)),
                 get_string('back', 'block_ucla_media')));
 
         // Log the video the user is viewing.
-        $event = \block_ucla_media\event\video_viewed::create(array(
+        $event = \block_ucla_media\event\video_reserves_viewed::create(array(
             'context' => $context,
             'objectid' => $media->id,
             'other' => array(
                 'name' => $media->video_title,
-                'type' => get_string('headervidres', 'block_ucla_media')
+                'mode' => $mode
             )));
         $event->trigger();
     }
