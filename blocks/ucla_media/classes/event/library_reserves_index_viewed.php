@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Video reserve 'video viewed' logging event handler.
+ * Library Music reserve 'index viewed' logging event handler.
  *
  * @package    block_ucla_media
- * @copyright  2016 UC Regents
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,10 +30,10 @@ defined('MOODLE_INTERNAL') || die();
  * Class file.
  *
  * @package    block_ucla_media
- * @copyright  2016 UC Regents
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class video_viewed extends \core\event\base {
+class library_reserves_index_viewed extends \core\event\base {
 
     /**
      * Initialization method.
@@ -41,7 +41,6 @@ class video_viewed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'ucla_video_reserves';
     }
 
     /**
@@ -50,27 +49,26 @@ class video_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventvideoviewed', 'block_ucla_media');
+        return get_string('eventlibreserveindexviewed', 'block_ucla_media');
     }
 
     /**
-     * Returns info on when a user with ID has viwed a control panel module (tab).
+     * Returns info on when a user with ID has viewed a library reserve index.
      *
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' viewed the video "
-            . "'{$this->other['name']}'.";
+        return "The user with id '{$this->userid}' viewed the digital audio reserve index.";
     }
 
     /**
-     * Returns URL to video viewed.
+     * Returns URL to Library reserves index viewed.
      *
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $this->objectid));
+        return new \moodle_url('/blocks/ucla_media/libreserves.php',
+                array('courseid' => $this->courseid));
     }
 
     /**
@@ -79,8 +77,7 @@ class video_viewed extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'video reserve view',
-            '../blocks/ucla_media/view.php?id='.$this->objectid,
-            $this->other['name']);
+        return array($this->courseid, 'course', 'library music reserves index',
+            '../blocks/ucla_media/index.php?courseid='.$this->courseid);
     }
 }

@@ -201,18 +201,16 @@ class course_edit_form extends moodleform {
             }
         }
 
-        $choices = array();
-        // START UCLA MOD: CCLE-6857 - Schedule course visibility for multiple dates.
+        // START UCLA MOD: CCLE-6987 - Course visibility, Duplicate locations.
         /*
+        $choices = array();
         $choices['0'] = get_string('hide');
         $choices['1'] = get_string('show');
-        */
-        $choices['0'] = get_string('hideoption', 'local_visibility');
-        $choices['1'] = get_string('showoption', 'local_visibility');
-        // END UCLA MOD: CCLE-6857.
         $mform->addElement('select', 'visible', get_string('visible'), $choices);
         $mform->addHelpButton('visible', 'visible');
         $mform->setDefault('visible', $courseconfig->visible);
+        */
+        // END UCLA MOD: CCLE-6987.
         if (!empty($course->id)) {
             if (!has_capability('moodle/course:visibility', $coursecontext)) {
                 $mform->hardFreeze('visible');

@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Video reserve 'index viewed' logging event handler.
+ * BruinCast 'index viewed' logging event handler.
  *
  * @package    block_ucla_media
- * @copyright  2016 UC Regents
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,10 +30,10 @@ defined('MOODLE_INTERNAL') || die();
  * Class file.
  *
  * @package    block_ucla_media
- * @copyright  2016 UC Regents
+ * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class index_viewed extends \core\event\base {
+class bruincast_index_viewed extends \core\event\base {
 
     /**
      * Initialization method.
@@ -49,25 +49,25 @@ class index_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventindexviewed', 'block_ucla_media');
+        return get_string('eventbruincastindexviewed', 'block_ucla_media');
     }
 
     /**
-     * Returns info on when a user with ID has viwed a control panel module (tab).
+     * Returns info on when a user with ID has viewed bruincast index.
      *
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' viewed the index.";
+        return "The user with id '{$this->userid}' viewed the bruincast index.";
     }
 
     /**
-     * Returns URL to video viewed.
+     * Returns URL to bruincast index viewed.
      *
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/blocks/ucla_media/index.php',
+        return new \moodle_url('/blocks/ucla_media/bcast.php',
                 array('courseid' => $this->courseid));
     }
 
@@ -77,7 +77,7 @@ class index_viewed extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'video reserve index',
+        return array($this->courseid, 'course', 'bruincast index',
             '../blocks/ucla_media/index.php?courseid='.$this->courseid);
     }
 }

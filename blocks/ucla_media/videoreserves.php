@@ -45,7 +45,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         display_video_reserves($course);
 
         // Log that user viewed index.
-        $event = \block_ucla_media\event\index_viewed::create(
+        $event = \block_ucla_media\event\video_reserves_index_viewed::create(
                 array('context' => $context,
                     'other' => array(
                     'page' => get_string('headervidres', 'block_ucla_media')

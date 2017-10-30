@@ -239,6 +239,10 @@ function users_search_sql($search, $u = 'u', $searchanywhere = true, array $extr
             $DB->sql_fullname($u . 'firstname', $u . 'lastname'),
             $conditions[] = $u . 'lastname'
         );
+        // START UCLA MOD: CCLE-6029 - Fix participants search for alternate names and middlenames
+        $conditions[] = $u . 'middlename';
+        $conditions[] = $u . 'alternatename';
+        // END UCLA MOD: CCLE-6029
         foreach ($extrafields as $field) {
             $conditions[] = $u . $field;
         }
