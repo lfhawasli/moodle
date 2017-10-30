@@ -78,7 +78,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
             'context' => $context,
             'objectid' => $media->id,
             'other' => array(
-                'name' => $media->name,
+                'filename' => $filename,
                 'mode' => $mode
             )));
         $event->trigger();

@@ -60,7 +60,7 @@ class bruincast_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '{$this->userid}' viewed the bruincast "
-            . "'{$this->other['name']}'.";
+            . "'{$this->other['filename']}'.";
     }
 
     /**
@@ -72,7 +72,7 @@ class bruincast_viewed extends \core\event\base {
         return new \moodle_url('/blocks/ucla_media/view.php',
                 array('id' => $this->objectid,
                     'mode' => $this->other['mode'],
-                    'filename' => $this->other['name']
+                    'filename' => $this->other['filename']
                 ));
     }
 
@@ -84,6 +84,6 @@ class bruincast_viewed extends \core\event\base {
     public function get_legacy_logdata() {
         return array($this->courseid, 'course', 'bruincast view',
             '../blocks/ucla_media/view.php?id='.$this->objectid,
-            $this->other['name'], $this->other['mode']);
+            $this->other['filename'], $this->other['mode']);
     }
 }

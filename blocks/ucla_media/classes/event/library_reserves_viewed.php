@@ -59,7 +59,7 @@ class library_reserves_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' viewed the library reserve "
+        return "The user with id '{$this->userid}' viewed the digital audio reserve "
             . "'{$this->other['name']}'.";
     }
 

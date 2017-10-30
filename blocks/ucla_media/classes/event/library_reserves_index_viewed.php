@@ -58,7 +58,7 @@ class library_reserves_index_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '{$this->userid}' viewed the library music reserve index.";
+        return "The user with id '{$this->userid}' viewed the digital audio reserve index.";
     }
 
     /**
