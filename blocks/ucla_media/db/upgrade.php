@@ -157,5 +157,45 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2017091800, 'ucla_media');
     }
 
+    // Remove old fields and add in unique key for BruinCast.
+    if ($oldversion < 2017101901) {
+        $table = new xmldb_table('ucla_bruincast');
+        $oldfields = array();
+        $oldfields[] = new xmldb_field('restricted');
+        $oldfields[] = new xmldb_field('podcast_url');
+        foreach ($oldfields as $field) {
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        // Rename misnamed fields.
+        $renamefields = array();
+        $renamefields['video_files'] = new xmldb_field('bruincast_url', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $renamefields['audio_files'] = new xmldb_field('audio_url', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $renamefields['title'] = new xmldb_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        foreach ($renamefields as $newname => $field) {
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->rename_field($table, $field, $newname);
+            }
+        }
+
+        // Define index unique_recording (unique) to be added to ucla_bruincast.
+        $index = new xmldb_index('unique_recording', XMLDB_INDEX_UNIQUE, array('term', 'srs', 'date', 'title'));
+        if (!$dbman->index_exists($table, $index)) {
+            try {
+                $dbman->add_index($table, $index);
+            } catch (Exception $ex) {
+                // If there is an error, there is a duplicate video. Need to
+                // truncate table and try again.
+                echo get_string('erraddingindex', 'block_ucla_media');
+                $DB->execute('TRUNCATE TABLE {ucla_bruincast}');
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        upgrade_block_savepoint(true, 2017101901, 'ucla_media');
+    }
+
     return true;
 }
