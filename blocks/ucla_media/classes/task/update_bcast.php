@@ -229,7 +229,6 @@ class update_bcast extends \core\task\scheduled_task {
                                     $DB->update_record('ucla_bruincast', $entry);
                                     $existingmedia[$term][$srs][$date][$entry->title] = false;
                                     ++$numupdated;
-                                    mtrace('u', '');    // Update.
                                 } else {
                                     mtrace(get_string('bcfoundupdatedentry',
                                             'tool_ucladatasourcesync',
@@ -241,7 +240,6 @@ class update_bcast extends \core\task\scheduled_task {
                                 try {
                                     $DB->insert_record('ucla_bruincast', $entry);
                                     ++$numinserted;
-                                    mtrace('+', '');    // Added.
                                 } catch (\dml_write_exception $ex) {
                                     // It is a duplicate entry, so ignore it.
                                     mtrace(get_string('founddupentry',
@@ -267,7 +265,6 @@ class update_bcast extends \core\task\scheduled_task {
                                 $DB->delete_records('ucla_bruincast',
                                         array('id' => $deleteid));
                                 ++$numdeleted;
-                                mtrace('-', '');    // Deleted.
                             }
                         }
                     }
@@ -284,7 +281,7 @@ class update_bcast extends \core\task\scheduled_task {
             $counts->deleted    = $numdeleted;
             $counts->inserted   = $numinserted;
             $counts->updated    = $numupdated;
-            mtrace(get_string('bcsuccessnoti', 'tool_ucladatasourcesync', $counts));
+            mtrace(get_string('successnotice', 'tool_ucladatasourcesync', $counts));
 
         } catch (Exception $e) {
             $transaction->rollback($e);
@@ -347,7 +344,6 @@ class update_bcast extends \core\task\scheduled_task {
                             'audio_files' => $record->audio_files,
                             'date' => $record->date))) {
                     $DB->insert_record('ucla_bruincast', $record);
-                    mtrace('+', '');
                     ++$numinserted;
                 }
 

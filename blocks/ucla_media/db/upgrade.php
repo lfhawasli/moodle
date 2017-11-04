@@ -196,6 +196,76 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
 
         upgrade_block_savepoint(true, 2017101901, 'ucla_media');
     }
+    
+    // Change httpurl and rtmp to char, add new fields, add in unique key for
+    // Digital audio reserves.
+    if ($oldversion < 2017110500) {
+        $table = new xmldb_table('ucla_library_music_reserves');
+
+        // Changing type from text to char.
+        $fields = array();
+        $fields[] = new xmldb_field('httpurl', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'title');
+        $fields[] = new xmldb_field('rtmpurl', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'httpurl');
+        foreach ($fields as $field) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        // Adding new fields to get unique entry.
+        $fields = array();
+        $fields[] = new xmldb_field('workid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'composer');
+        $fields[] = new xmldb_field('volume', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'workid');
+        $fields[] = new xmldb_field('disc', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'volume');
+        $fields[] = new xmldb_field('side', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'disc');
+        $fields[] = new xmldb_field('tracknumber', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'side');
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Define index uniquemedia.
+        $index = new xmldb_index('uniquemedia', XMLDB_INDEX_UNIQUE,
+                array('term', 'srs', 'workid', 'volume', 'disc', 'side', 'tracknumber'));
+        if (!$dbman->index_exists($table, $index)) {
+            try {
+                $dbman->add_index($table, $index);
+            } catch (Exception $ex) {
+                // If there is an error, there is a duplicate media. Need to
+                // truncate table and try again.
+                echo get_string('erraddingindex', 'block_ucla_media');
+                $DB->execute('TRUNCATE TABLE {ucla_library_music_reserves}');
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        upgrade_block_savepoint(true, 2017110500, 'ucla_media');
+    }
+
+    // Change fields to match library database schema.
+    if ($oldversion < 2017110700) {
+        $table = new xmldb_table('ucla_library_music_reserves');
+        
+        // First need to drop unique index before changing type.
+        $index = new xmldb_index('uniquemedia', XMLDB_INDEX_UNIQUE, array('term', 'srs', 'workid', 'volume', 'disc', 'side', 'tracknumber'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Changing type from int to char.
+        $fields = array();
+        $fields[] = new xmldb_field('volume', XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, '0', 'workid');
+        $fields[] = new xmldb_field('disc', XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, '0', 'volume');
+        $fields[] = new xmldb_field('side', XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, '0', 'disc');
+        $fields[] = new xmldb_field('tracknumber', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, '0', 'side');
+        foreach ($fields as $field) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        // Add back index.
+        $dbman->add_index($table, $index);
+
+        upgrade_block_savepoint(true, 2017110700, 'ucla_media');
+    }
 
     return true;
 }
