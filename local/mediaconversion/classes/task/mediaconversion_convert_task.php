@@ -37,19 +37,26 @@ require_once(__DIR__.'/../../locallib.php');
 class mediaconversion_convert_task extends \core\task\adhoc_task {
     /**
      * Executes the task.
-     *
-     * @throws Exception on error
      */
     public function execute() {
         global $CFG;
         $customdata = $this->get_custom_data();
         $data = $customdata->eventdata;
-        // Get modinfo (along with course info).
-        $courseandmodinfo = get_course_and_cm_from_cmid($data->objectid, $data->other->modulename, $data->courseid);
-        // Only delete the old course module if the new one is added successfully.
-        if (local_cm_convert_and_add_module($data->contextid, $courseandmodinfo,
-                $customdata->userid, $data->objectid, $data->other->name)) {
-            course_delete_module($data->objectid);
+        try {
+            // Get modinfo (along with course info).
+            $courseandmodinfo = get_course_and_cm_from_cmid($data->objectid, $data->other->modulename, $data->courseid);
+            // Only delete the old course module if the new one is added successfully.
+            if (local_cm_convert_and_add_module($data->contextid, $courseandmodinfo,
+                    $customdata->userid, $data->objectid, $data->other->name)) {
+                course_delete_module($data->objectid);
+            }
+        } catch (Exception $ex) {
+            // If an exception is thrown it is because the course module does
+            // not exist or cannot be deleted. Most likely it is because the
+            // course module has been deleted since the task has been created.
+            mtrace(sprintf('Could not find course module %s (%d)',
+                    $data->other->modulename, $data->objectid));
+            return true;
         }
     }
 
