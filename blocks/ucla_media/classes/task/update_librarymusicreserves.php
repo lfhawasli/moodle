@@ -53,42 +53,128 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
             return false;
         }
 
-        // Drop table if we are processing new entries.
-        $DB->delete_records('ucla_library_music_reserves');
-        foreach ($courses as $course) {
-            $courseid = match_course($course->term, $course->srs);
-            foreach ($course->works as $work) {
-                $entry = new \stdClass();
-                $entry->term = $course->term;
-                $entry->srs = $course->srs;
-                if ($courseid) { // Checking if course exists in our system.
-                    $entry->courseid = $courseid;
-                } else {
-                    $entry->courseid = null;
-                }
-                $entry->albumtitle = $work->title;
-                if ($work->isVideo) {
-                    $entry->isvideo = 1;
-                } else {
-                    $entry->isvideo = 0;
-                }
-                $entry->composer = $work->composer;
-                $entry->performers = $work->performers;
-                $entry->metadata = "Note1:" + $work->noteOne + " Note2:" + $work->noteTwo;                
-                foreach ($work->items as $item) {                    
-                    if (empty($item->trackTitle) || $item->trackTitle == 'N/A') {
-                        // If track doesn't have title, just use work title.
-                        $entry->title = $work->title;
+        // Index existing videos by unique key.
+        $existingmedia = $this->get_existingmedia();
+
+        // Wrap everything in a transaction, because we don't want to lose data
+        // if there is a data issue.
+        $numdeleted = $numinserted = $numupdated = 0;
+        $transaction = $DB->start_delegated_transaction();
+        try {
+            foreach ($courses as $course) {
+                $courseid = match_course($course->term, $course->srs);
+                foreach ($course->works as $work) {
+                    $entry = new \stdClass();
+                    $entry->term = $course->term;
+                    $entry->srs = $course->srs;
+                    if ($courseid) { // Checking if course exists in our system.
+                        $entry->courseid = $courseid;
                     } else {
-                        $entry->title = $item->trackTitle;
-                    }                                   
-                    $entry->httpurl = $item->httpURL;
-                    $entry->rtmpurl =  $item->rtmpURL;
-                    $DB->insert_record('ucla_library_music_reserves', $entry);
+                        $entry->courseid = null;
+                    }
+                    $entry->albumtitle = $work->title;
+                    if ($work->isVideo) {
+                        $entry->isvideo = 1;
+                    } else {
+                        $entry->isvideo = 0;
+                    }
+                    $entry->composer = $work->composer;
+                    $entry->performers = $work->performers;
+                    $entry->metadata = "Note1: " . $work->noteOne .
+                            "<br />Note2: " . $work->noteTwo;
+                    $entry->workid = $work->workID;
+                    foreach ($work->items as $item) {
+                        if (empty($item->trackTitle) || $item->trackTitle == 'N/A') {
+                            // If track doesn't have title, just use work title.
+                            $entry->title = $work->title;
+                        } else {
+                            $entry->title = $item->trackTitle;
+                        }
+                        $entry->httpurl = $item->httpURL;
+                        $entry->rtmpurl = $item->rtmpURL;
+                        $entry->volume = !empty($item->volume) ? intval($item->volume) : 0;
+                        $entry->disc = !empty($item->disc) ? intval($item->disc) : 0;
+                        $entry->side = !empty($item->side) ? intval($item->side) : 0;
+                        $entry->tracknumber = !empty($item->trackNumber) ? intval($item->trackNumber) : 0;
+
+                        // Unique key to find duplicate entries.
+                        $key = $entry->term . '-' . $entry->srs . '-' . $entry->workid
+                                 . '-' . $entry->volume . '-' . $entry->disc . '-' .
+                                $entry->side . '-' . $entry->tracknumber;
+
+                        if (isset($existingmedia[$key])) {
+                            // Entry exists, so update.
+                            $entry->id = $existingmedia[$key];
+                            $DB->update_record('ucla_library_music_reserves', $entry);
+                            unset($existingmedia[$key]);
+                            ++$numupdated;
+                        } else {
+                            // Does not exist, so add.
+                            try {
+                                $DB->insert_record('ucla_library_music_reserves', $entry);
+                                ++$numinserted;
+                            } catch (Exception $ex) {
+                                // It is a duplicate entry, so ignore it.
+                                mtrace("\n" . get_string('founddupentry',
+                                        'tool_ucladatasourcesync', $key));
+                            }
+                        }
+                    }
                 }
             }
+
+            // Finished processing, so delete entries that no longer exists.
+            foreach ($existingmedia as $deleteid) {
+                // Found record that was not updated, so delete.
+                $DB->delete_records('ucla_library_music_reserves',
+                        array('id' => $deleteid));
+                ++$numdeleted;
+            }
+
+
+            if ($numinserted == 0 && $numupdated == 0) {
+                throw new \moodle_exception('lrnoentries', 'tool_ucladatasourcesync');
+            }
+
+            // Success, so commit changes.
+            $transaction->allow_commit();
+            $counts = new \stdClass();
+            $counts->deleted    = $numdeleted;
+            $counts->inserted   = $numinserted;
+            $counts->updated    = $numupdated;
+            mtrace(get_string('successnotice', 'tool_ucladatasourcesync', $counts));
+
+        } catch (Exception $e) {
+            $transaction->rollback($e);
         }
+
+        
         return true;
+    }
+
+    /**
+     * Returns existing media in following format:
+     *  [term-srs-workid-volume-disc-side-tracknumber] = record id
+     *
+     * @return array
+     */
+    public function get_existingmedia() {
+        global $DB;
+        $retval = array();
+
+        $records = $DB->get_records('ucla_library_music_reserves', array(),
+                null, 'id,term,srs,workid,volume,disc,side,tracknumber');
+        if (empty($records)) {
+            return $retval;
+        }
+
+        foreach ($records as $record) {
+            $key = $record->term . '-' . $record->srs . '-' . $record->workid
+                     . '-' . $record->volume . '-' . $record->disc . '-' . 
+                    $record->side . '-' . $record->tracknumber;
+            $retval[$key] = $record->id;
+        }
+        return $retval;
     }
 
     /**

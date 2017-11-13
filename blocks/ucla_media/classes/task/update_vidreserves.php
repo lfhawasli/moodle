@@ -204,7 +204,7 @@ class update_vidreserves extends \core\task\scheduled_task {
         $counts->deleted    = $deletedcount;
         $counts->inserted   = $insertcount;
         $counts->updated    = $updatecount;
-        $logstring = get_string('vrsuccessnoti', 'tool_ucladatasourcesync', $counts);
+        $logstring = get_string('successnotice', 'tool_ucladatasourcesync', $counts);
         log_ucla_data('video reserves', 'update', $logstring);
         echo "\n" . $logstring . "\n";
     }

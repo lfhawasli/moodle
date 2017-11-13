@@ -86,6 +86,7 @@ $string['bruincastnotice'] = 'Bruincast notice';
 $string['bruincastnoticedesc'] = 'If set, will display notice on all Bruincast pages.';
 $string['bruincastcrosslists'] = 'Bruincast crosslists';
 $string['bruincastcrosslistsdesc'] = 'Each line is a pairing of shortnames that should share BruinCast content in the following format: 17F-CHEM153A-2=17F-CHEM153A-3';
+$string['erraddingindex'] = 'Error adding unique_recording index, truncating table. Run update script after upgrading.';
 
 // Strings for Bruincast display.
 $string['bccoursedate'] = 'Course date';
