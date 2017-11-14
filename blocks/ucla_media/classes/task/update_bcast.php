@@ -77,16 +77,21 @@ class update_bcast extends \core\task\scheduled_task {
         // URL to get relevant courses accoring to term.
         $url = get_config('block_ucla_media', 'bruincast_url');
 
-        // Wrap everything in a transaction, because we don't want to have an 
-        // empty table while data is being updated.
-        $numinserted = 0;
+        // Index existing videos by term, srs, date, and title (same as unique key).
+        $existingmedia = array();
+
+        // Wrap everything in a transaction, because we don't want to lose data
+        // if there is a data issue.
+        $numdeleted = $numinserted = $numupdated  = 0;
         $transaction = $DB->start_delegated_transaction();
         try {
-            // Clearing old records.
-            $DB->delete_records('ucla_bruincast');
             $terms = get_active_terms();
             // Iterating through all active terms and retrieving data for them.
             foreach ($terms as $term) {
+                mtrace("Processing $term");
+                // Get existing entries for term.
+                $existingmedia += $this->get_existingmedia($term);
+
                 // Converting term to API format.
                 $correctedterm = self::convert_term($term);
 
@@ -179,26 +184,28 @@ class update_bcast extends \core\task\scheduled_task {
                         // CCLE-7002 - Leading zeros dropped for BruinCast.
                         $srs = validate_field('srs', $srs, 7, 9);
 
+                        // Match content to a course, if any.
+                        $courseid = match_course($term, $srs);
+
                         // Entering each media item for a particular course in a particular term into the DB.
                         foreach ($contents as $content) {
                             $entry = new \stdClass();
-                            $entry->courseid = ucla_map_termsrs_to_courseid($term, $srs);
+                            $entry->courseid = $courseid;
                             $entry->term = $term;
                             $entry->srs = $srs;
-                            $entry->restricted = 'Restricted';
                             // This if statement is used as $content['video'] is a blank array if there is no video link.
                             if (!is_array($content['video'])) {
-                                $entry->bruincast_url = $content['video'];
+                                $entry->video_files = $content['video'];
                             } else {
-                                $entry->bruincast_url = null;
+                                $entry->video_files = null;
                             }
                             // Similar to above.
                             if (!is_array($content['audio'])) {
-                                $entry->audio_url = $content['audio'];
+                                $entry->audio_files = $content['audio'];
                             } else {
-                                $entry->audio_url = null;
+                                $entry->audio_files = null;
                             }
-                            $entry->name = $content['title'];
+                            $entry->title = $content['title'];
                             if (!empty($content['comments'])) {
                                 $entry->comments = $content['comments'];
                             }
@@ -206,27 +213,79 @@ class update_bcast extends \core\task\scheduled_task {
                             $tempdate = explode('/', $temp);
                             $date = mktime(0, 0, 0, $tempdate[0], $tempdate[1], $tempdate[2]);
                             $entry->date = $date;
-                            $DB->insert_record('ucla_bruincast', $entry);
-                            ++$numinserted;
+
+                            // See if we need to update or add.
+                            if (isset($existingmedia[$term][$srs][$date][$entry->title])) {
+                                // Exists, so update.
+
+                                // Bruincast data sometimes has duplicate entries
+                                // due to the same file being uploaded multiple
+                                // times due to user error. We handle this by
+                                // not unsetting entry in $existingmedia, instead
+                                // we set it to false meaning we already updated it.
+                                if (!empty($existingmedia[$term][$srs][$date][$entry->title])) {
+
+                                    $entry->id = $existingmedia[$term][$srs][$date][$entry->title];
+                                    $DB->update_record('ucla_bruincast', $entry);
+                                    $existingmedia[$term][$srs][$date][$entry->title] = false;
+                                    ++$numupdated;
+                                } else {
+                                    mtrace(get_string('bcfoundupdatedentry',
+                                            'tool_ucladatasourcesync',
+                                            "$term $srs $date $entry->title"));
+                                }
+
+                            } else {
+                                // Add new entry.
+                                try {
+                                    $DB->insert_record('ucla_bruincast', $entry);
+                                    ++$numinserted;
+                                } catch (\dml_write_exception $ex) {
+                                    // It is a duplicate entry, so ignore it.
+                                    mtrace(get_string('founddupentry',
+                                            'tool_ucladatasourcesync',
+                                            "$term $srs $date $entry->title"));
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            if ($numinserted == 0) {
+            // Crosslist courses.
+            $numinserted += $this->perform_crosslisting($existingmedia);
+
+            // Finished processing, so delete entries that no longer exists.
+            foreach ($existingmedia as $srses) {
+                foreach ($srses as $dates) {
+                    foreach ($dates as $titles) {
+                        foreach ($titles as $deleteid) {
+                            if (!empty($deleteid)) {
+                                // Found record that was not updated, so delete.
+                                $DB->delete_records('ucla_bruincast',
+                                        array('id' => $deleteid));
+                                ++$numdeleted;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($numinserted == 0 && $numupdated == 0) {
                 throw new \moodle_exception('bcnoentries', 'tool_ucladatasourcesync');
             }
 
-            // Crosslist courses.
-            $numinserted += $this->perform_crosslisting();
-
             // Success, so commit changes.
             $transaction->allow_commit();
-            mtrace(get_string('bcsuccessnoti', 'tool_ucladatasourcesync', $numinserted));
+            $counts = new \stdClass();
+            $counts->deleted    = $numdeleted;
+            $counts->inserted   = $numinserted;
+            $counts->updated    = $numupdated;
+            mtrace(get_string('successnotice', 'tool_ucladatasourcesync', $counts));
 
         } catch (Exception $e) {
             $transaction->rollback($e);
-        }        
+        }
     }
 
     /**
@@ -254,10 +313,11 @@ class update_bcast extends \core\task\scheduled_task {
      *
      * @param array $course1    Array with shortname, courseid and srs.
      * @param array $course2    Array with shortname, courseid and srs.
+     * @param array $existingmedia  Passed by reference.
      *
      * @return int  Number of records added.
      */
-    private function copy_entries($course1, $course2) {
+    private function copy_entries($course1, $course2, &$existingmedia) {
         global $DB;
         $numinserted = 0;
         $records = $DB->get_records('ucla_bruincast',
@@ -274,23 +334,51 @@ class update_bcast extends \core\task\scheduled_task {
                 $record->srs = $course2['srs'];
 
                 // Append shortname of original course to title.
-                $record->name = $course1['shortname'] . ' ' . $record->name;
+                $record->title = $course1['shortname'] . ' ' . $record->title;
 
                 // Make sure that entry does not already exist for same file.
-                // Somethings BruinCast already crossposted data.
+                // Sometimes BruinCast already crossposted data.
                 if (!$DB->record_exists('ucla_bruincast',
                         array('courseid' => $record->courseid,
-                            'bruincast_url' => $record->bruincast_url,
-                            'audio_url' => $record->audio_url,
+                            'video_files' => $record->video_files,
+                            'audio_files' => $record->audio_files,
                             'date' => $record->date))) {
                     $DB->insert_record('ucla_bruincast', $record);
-                    mtrace('+', '');
                     ++$numinserted;
+                }
+
+                // Make existing entry false so it is not deleted.
+                if (isset($existingmedia[$record->term][$record->srs][$record->date][$record->title])) {
+                    $existingmedia[$record->term][$record->srs][$record->date][$record->title] = false;
                 }
             }
             mtrace(''); // New line.
         }
         return $numinserted;
+    }
+
+    /**
+     * Returns existing media for given term in following format:
+     *  [term][srs][date][title] = record id
+     *
+     * @param string $term
+     * @return array
+     */
+    public function get_existingmedia($term) {
+        global $DB;
+        $retval = array();
+
+        $records = $DB->get_records('ucla_bruincast', array('term' => $term),
+                null, 'id,term,srs,date,title');
+        if (empty($records)) {
+            return $retval;
+        }
+
+        foreach ($records as $record) {
+            $retval[$record->term][$record->srs][$record->date][$record->title]
+                    = $record->id;
+        }
+        return $retval;
     }
 
     /**
@@ -305,10 +393,11 @@ class update_bcast extends \core\task\scheduled_task {
     /**
      * Finds courses that should have their media cross-listed and copies data
      * both ways (if there is any).
-     * 
-     * @return int  Number of records added.
+     *
+     * @param array $existingmedia  Passed by reference.
+     * @return array  Number of records added.
      */
-    public function perform_crosslisting() {
+    public function perform_crosslisting(&$existingmedia) {
         global $DB;
         mtrace(get_string('bccrosslistmedia', 'tool_ucladatasourcesync'));
 
@@ -316,6 +405,10 @@ class update_bcast extends \core\task\scheduled_task {
         // 17F-CHEM153A-2=17F-CHEM153A-3
         // Each on a new line.
         $crosslistsconfig = get_config('block_ucla_media', 'bruincast_crosslists');
+        if (empty($crosslistsconfig)) {
+            return;
+        }
+
         $crosslists = explode("\n", $crosslistsconfig);
         $crosslists = array_map('trim', $crosslists);
 
@@ -357,8 +450,8 @@ class update_bcast extends \core\task\scheduled_task {
             }
 
             // Everything is good to go, so let's copy data in ucla_bruincast.
-            $numinserted += $this->copy_entries($courses[0], $courses[1]);
-            $numinserted += $this->copy_entries($courses[1], $courses[0]);
+            $numinserted += $this->copy_entries($courses[0], $courses[1], $existingmedia);
+            $numinserted += $this->copy_entries($courses[1], $courses[0], $existingmedia);
         }
         return $numinserted;
     }

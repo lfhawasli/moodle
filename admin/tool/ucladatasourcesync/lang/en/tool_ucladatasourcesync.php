@@ -25,8 +25,10 @@
 $string['pluginname'] = 'UCLA data source synchronization';
 
 // General strings.
-// Error messages.
 $string['errcannotinsert'] = 'Cannot insert record: {$a}';
+$string['successnotice'] = 'Inserted: {$a->inserted}, Updated: {$a->updated}, Deleted: {$a->deleted} records.';
+$string['founddupentry'] = 'Found duplicate entry {$a}';
+
 // Event messages.
 $string['eventbcread'] = "Bruincast read error.";
 $string['eventbcparsing'] = "Bruincast parsing data error.";
@@ -47,11 +49,11 @@ $string['errbcinsert'] = "ERROR: Problem writing to the database.";
 $string['errbcinvalidrowlen'] = "ERROR: Invalid row length in provided Bruincast data.";
 // Notification messages.
 $string['bcstartnoti'] = "Starting BruinCast DB update:";
-$string['bcsuccessnoti'] = '... {$a} records successfully inserted.';
 $string['bcnoentries'] = 'No BruinCast entries found. Nothing changed.';
 $string['bcinvalidcrosslists'] = 'Invalid crosslists: {$a}';
 $string['bccrosslistmedia'] = 'Crosslisting media';
 $string['bccrosslistentries'] = 'Crosslisting {$a->course1} with {$a->course2}';
+$string['bcfoundupdatedentry'] = 'Already updated {$a}';
 
 // Strings for bruinmedia_dbsync.
 // Error messages.
@@ -74,9 +76,8 @@ $string['warnnonexistentsrs'] = 'WARNING: Found non-existent srs {$a->term} {$a-
 $string['noticediscussionsrs'] = 'NOTICE: Found discussion srs {$a->srs}, using primary {$a->primary_srs}';
 $string['noticefoundaltcourseid'] = 'NOTICE: Found courseid {$a->courseid} by using term/subject/cat_num: {$a->term}-{$a->subject_area}-{$a->cat_num}-{$a->sec_num}';
 // Notification messages.
-$string['lrstartnoti'] = "Starting library reserves DB update:";
-$string['lrsuccessnoti'] = '{$a} records successfully inserted.';
-$string['lrnoentries'] = 'No library reserve entries found.';
+$string['lrstartnoti'] = "Starting ldigitial audio DB update:";
+$string['lrnoentries'] = 'No digitial audio reserve entries found.';
 
 // Strings for videoreserves_dbsync.
 // Error messages.
@@ -85,5 +86,4 @@ $string['errvrinvalidrowlen'] = 'ERROR: Invalid row length in provided video res
 $string['errvrfileopen'] = "ERROR: Problem accessing data URL";
 // Notification messages.
 $string['vrstartnoti'] = "Starting video reserves DB update:";
-$string['vrsuccessnoti'] = 'Inserted: {$a->inserted}, Updated: {$a->updated}, Deleted: {$a->deleted} records.';
 $string['vrnoentries'] = 'No video reserve entries found.';

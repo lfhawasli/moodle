@@ -208,7 +208,8 @@ $site-menu-hover-color:         #fcfcfc;
             color: $ucla-blue;
             vertical-align: middle;
             display: inline-block;
-            width: 90%;
+            width: 100%;
+            padding: 10px;
         }
 
         a:hover {
@@ -225,6 +226,11 @@ $site-menu-hover-color:         #fcfcfc;
     // Give sections a darker color.
     li.type_structure {
         background-color: $site-menu-background-color;
+
+        p.tree_item {
+            padding: 0;
+            display: inline;
+        }
     }
 }
 

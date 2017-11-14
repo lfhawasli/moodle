@@ -89,7 +89,8 @@ function display_page_album($course, $albumid) {
               FROM {ucla_library_music_reserves} media
               JOIN {ucla_library_music_reserves} album ON (album.albumtitle=media.albumtitle)
              WHERE album.courseid=?
-               AND album.id=?";
+               AND album.id=?
+          ORDER BY media.volume, media.disc, media.side, media.tracknumber";
     $reserves = $DB->get_records_sql($sql, array($courseid, $albumid));
     
     $samplereserve = reset($reserves);

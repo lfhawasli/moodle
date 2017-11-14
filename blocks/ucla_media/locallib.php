@@ -70,7 +70,7 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
 
     // Check if we have a video file.
     $isvideo = false;
-    if ($mode == MEDIA_BCAST_VIDEO && !empty($bruincast->bruincast_url)) {
+    if ($mode == MEDIA_BCAST_VIDEO && !empty($bruincast->video_files)) {
         // Make sure video exists.
         $isvideo = true;
     }
@@ -87,7 +87,7 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
         $extension = 'mp3';
     }
 
-    $content = $isvideo ? $bruincast->bruincast_url : $bruincast->audio_url;
+    $content = $isvideo ? $bruincast->video_files : $bruincast->audio_files;
     $contentfiles = explode(',', $content);
     $contentfiles = array_map('trim', $contentfiles);
 
@@ -111,7 +111,7 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
     $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
             $appname . '/' . $extension . ':' . $filename;
 
-    return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->name, $httpurl,
+    return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->title, $httpurl,
             $rtmpurl, $isvideo);
 }
 

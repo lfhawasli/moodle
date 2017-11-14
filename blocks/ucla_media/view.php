@@ -61,7 +61,7 @@ echo $OUTPUT->header();
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
     if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
-        echo $OUTPUT->heading($media->name, 2, 'headingblock');
+        echo $OUTPUT->heading($media->title, 2, 'headingblock');
         // Try to embed video or audio on page by calling filter.
         $filtertext = get_bruincast_filter_text($media, $mode, $filename);
 

@@ -107,9 +107,9 @@ function display_all($course) {
         $mediacell = '';
 
         $hasmultivideos = false;
-        if (!empty($media->bruincast_url)) {
+        if (!empty($media->video_files)) {
             // There might be multiple video files, separated by comma.
-            $videos = explode(',', $media->bruincast_url);
+            $videos = explode(',', $media->video_files);
             $videos = array_map('trim', $videos);
 
             $hasmultivideos = count($videos) > 1;
@@ -130,14 +130,14 @@ function display_all($course) {
             }
         }
 
-        if (!empty($media->audio_url)) {
+        if (!empty($media->audio_files)) {
             // If there are multiple videos and audio, put a new line.
             if ($hasmultivideos) {
                 $mediacell .= '<br /><br />';
             }
 
             // There might be multiple audio files, separated by comma.
-            $audio = explode(',', $media->audio_url);
+            $audio = explode(',', $media->audio_files);
             $audio = array_map('trim', $audio);
 
             $hasmultiaudio = count($audio) > 1;
@@ -160,10 +160,10 @@ function display_all($course) {
 
         // Create Title and Comments row.
         $titlecommentstring = '';
-        if (!empty($media->name)) {
+        if (!empty($media->title)) {
             $titlecommentstring .= html_writer::tag('strong',
                     get_string('bctitle', 'block_ucla_media') . ':') . ' ' .
-                    $media->name . '<br />';
+                    $media->title . '<br />';
         }
         if (!empty($media->comments)) {
             $titlecommentstring .= html_writer::tag('strong',
