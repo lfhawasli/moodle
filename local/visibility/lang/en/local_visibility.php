@@ -59,3 +59,5 @@ $string['eventcoursevisibilityhide'] = 'Course visibility - hidden';
 $string['eventcoursevisibilityshow'] = 'Course visibility - visible';
 $string['eventcoursevisibilityhide_desc'] = 'This course visibility has been changed. Course is now hidden.';
 $string['eventcoursevisibilityshow_desc'] = 'This course visibility has been changed. Course is now visible.';
+// Confirmation Modal
+$string['confirmremovevisibilitysession'] = 'Are you absolutely sure you want to delete this hidden visibility session?';
