@@ -8037,6 +8037,10 @@ function forum_view($forum, $course, $cm, $context) {
         'objectid' => $forum->id
     );
 
+    // START UCLA MOD: CCLE-6995 - Further test Anonymous Forum implementation.
+    $params['anonymous'] = local_lae_forum::get_anonymous_logging_flag($forum, $cm);
+    // END UCLA MOD: CCLE-6995.
+
     $event = \mod_forum\event\course_module_viewed::create($params);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
@@ -8057,6 +8061,10 @@ function forum_discussion_view($modcontext, $forum, $discussion) {
         'context' => $modcontext,
         'objectid' => $discussion->id,
     );
+
+    // START UCLA MOD: CCLE-6995 - Further test Anonymous Forum implementation.
+    $params['anonymous'] = local_lae_forum::get_anonymous_logging_flag($forum, $discussion);
+    // END UCLA MOD: CCLE-6995.
 
     $event = \mod_forum\event\discussion_viewed::create($params);
     $event->add_record_snapshot('forum_discussions', $discussion);
