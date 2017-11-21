@@ -209,8 +209,6 @@ class course_edit_form extends moodleform {
         $mform->addElement('select', 'visible', get_string('visible'), $choices);
         $mform->addHelpButton('visible', 'visible');
         $mform->setDefault('visible', $courseconfig->visible);
-        */
-        // END UCLA MOD: CCLE-6987.
         if (!empty($course->id)) {
             if (!has_capability('moodle/course:visibility', $coursecontext)) {
                 $mform->hardFreeze('visible');
@@ -235,6 +233,8 @@ class course_edit_form extends moodleform {
                 $mform->setConstant('visible', $courseconfig->visible);
             }
         }
+        */
+        // END UCLA MOD: CCLE-6987.
 
         $mform->addElement('date_selector', 'startdate', get_string('startdate'));
         $mform->addHelpButton('startdate', 'startdate');
