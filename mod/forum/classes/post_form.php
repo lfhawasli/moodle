@@ -147,6 +147,12 @@ class mod_forum_post_form extends moodleform {
             $mform->addElement('checkbox', 'mailnow', get_string('mailnow', 'forum'));
         }
 
+        // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+        if ($forum->anonymous == FORUM_ANONYMOUS_ALLOWED && ($post->userid != $CFG->anonymous_userid) && empty($post->id)) {
+            $mform->addElement('checkbox', 'anonymous', get_string('forum:anonymouspost', 'local_lae'));
+        }
+        // END UCLA MOD: CCLE-6854.
+
         if ($groupmode = groups_get_activity_groupmode($cm, $course)) {
             $groupdata = groups_get_activity_allowed_groups($cm);
 
@@ -268,6 +274,11 @@ class mod_forum_post_form extends moodleform {
 
         $mform->addElement('hidden', 'reply');
         $mform->setType('reply', PARAM_INT);
+
+        // START UCLA MOD: CCLE-6854 - Instructors requesting anonymous forum posting.
+        $mform->addElement('hidden', 'hiddenuserid');
+        $mform->setType('hiddenuserid', PARAM_INT);
+        // END UCLA MOD: CCLE-6854.
     }
 
     /**
