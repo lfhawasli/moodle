@@ -83,209 +83,201 @@ class update_bcast extends \core\task\scheduled_task {
         // Wrap everything in a transaction, because we don't want to lose data
         // if there is a data issue.
         $numdeleted = $numinserted = $numupdated  = 0;
-        $transaction = $DB->start_delegated_transaction();
-        try {
-            $terms = get_active_terms();
-            // Iterating through all active terms and retrieving data for them.
-            foreach ($terms as $term) {
-                mtrace("Processing $term");
-                // Get existing entries for term.
-                $existingmedia += $this->get_existingmedia($term);
+        $terms = get_active_terms();
+        // Iterating through all active terms and retrieving data for them.
+        foreach ($terms as $term) {
+            mtrace("Processing $term");
+            // Get existing entries for term.
+            $existingmedia += $this->get_existingmedia($term);
 
-                // Converting term to API format.
-                $correctedterm = self::convert_term($term);
+            // Converting term to API format.
+            $correctedterm = self::convert_term($term);
 
-                // Setting parameters for our request.
-                $params = array(
-                    'display_id' => 'ccle_api_courses',
-                    'args[0]' => $correctedterm
-                );
+            // Setting parameters for our request.
+            $params = array(
+                'display_id' => 'ccle_api_courses',
+                'args[0]' => $correctedterm
+            );
 
-                // Doing a Curl to retrive bruincasted courses for a particular term.
-                $curl = curl_init();
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($curl, CURLOPT_POST, 0); // Do a regular HTTP POST.
-                curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
-                curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-                curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-                curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
-                curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
-                curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
+            // Doing a Curl to retrive bruincasted courses for a particular term.
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($curl, CURLOPT_POST, 0); // Do a regular HTTP POST.
+            curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+            curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
+            curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
 
-                $query = http_build_query($params, '', '&');
-                /* Please note http_build_query is different in moodle and outside it, and it's usage is different */
+            $query = http_build_query($params, '', '&');
+            /* Please note http_build_query is different in moodle and outside it, and it's usage is different */
 
-                curl_setopt($curl, CURLOPT_URL, $url.'?'.$query);
-                $output = curl_exec($curl);
+            curl_setopt($curl, CURLOPT_URL, $url.'?'.$query);
+            $output = curl_exec($curl);
 
-                $xml = simplexml_load_string($output, "SimpleXMLElement", LIBXML_NOCDATA);
-                $json = json_encode($xml);
-                $cleanedresult = json_decode($json, true);
-                curl_close($curl);
+            $xml = simplexml_load_string($output, "SimpleXMLElement", LIBXML_NOCDATA);
+            $json = json_encode($xml);
+            $cleanedresult = json_decode($json, true);
+            curl_close($curl);
 
-                // Only processing next part if the result was non-empty.
-                if (array_key_exists('item', $cleanedresult)) {
+            // Only processing next part if the result was non-empty.
+            if (array_key_exists('item', $cleanedresult)) {
 
-                    // The below if statement is a workaround for an XML parsing
-                    // problem. When only one item is retrieved in a query the array
-                    // $cleanedresult[item] contains information about that one
-                    // item, however, when there are multiple results the array is
-                    // an array of arrays that contain information about these results.
-                    if (array_key_exists('srs__', $cleanedresult['item'])) {
-                        $array = $cleanedresult;
+                // The below if statement is a workaround for an XML parsing
+                // problem. When only one item is retrieved in a query the array
+                // $cleanedresult[item] contains information about that one
+                // item, however, when there are multiple results the array is
+                // an array of arrays that contain information about these results.
+                if (array_key_exists('srs__', $cleanedresult['item'])) {
+                    $array = $cleanedresult;
+                } else {
+                    $array = $cleanedresult['item'];
+                }
+
+                foreach ($array as $item) {
+                    // The below if statement is due to the structure of the parsed XML, as sometimes $item contains
+                    // non relevant data.
+                    if (array_key_exists('srs__', $item)) {
+                        $srs = $item['srs__'];
                     } else {
-                        $array = $cleanedresult['item'];
+                        continue;
+                    }
+                    $params = array(
+                        'display_id' => 'ccle_api_media',
+                        'args[0]' => $correctedterm,
+                        'args[1]' => $srs
+                    );
+
+                    // Retrieving information about a specific course in a specific term.
+                    $curl = curl_init();
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+                    curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
+                    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+                    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                    curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
+                    curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
+                    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
+
+                    $query = http_build_query($params, '', '&');
+                    curl_setopt($curl, CURLOPT_URL, "$url?$query");
+                    $output = curl_exec($curl);
+                    $xml = simplexml_load_string($output, "SimpleXMLElement", LIBXML_NOCDATA);
+                    $json = json_encode($xml);
+                    $cleanedresult = json_decode($json, true);
+                    curl_close($curl);
+
+                    // If there is more than one resource, then 'item' is an
+                    // array of arrays. But if there is only one, then it is
+                    // by itself. Make it an array of arrays.
+                    $contents = $cleanedresult['item'];
+                    if (!array_key_exists(0, $cleanedresult['item'])) {
+                        $contents = array($cleanedresult['item']);
                     }
 
-                    foreach ($array as $item) {
-                        // The below if statement is due to the structure of the parsed XML, as sometimes $item contains
-                        // non relevant data.
-                        if (array_key_exists('srs__', $item)) {
-                            $srs = $item['srs__'];
+                    // CCLE-7002 - Leading zeros dropped for BruinCast.
+                    $srs = validate_field('srs', $srs, 7, 9);
+
+                    // Match content to a course, if any.
+                    $courseid = match_course($term, $srs);
+
+                    // Entering each media item for a particular course in a particular term into the DB.
+                    foreach ($contents as $content) {
+                        $entry = new \stdClass();
+                        $entry->courseid = $courseid;
+                        $entry->term = $term;
+                        $entry->srs = $srs;
+                        // This if statement is used as $content['video'] is a blank array if there is no video link.
+                        if (!is_array($content['video'])) {
+                            $entry->video_files = $content['video'];
                         } else {
-                            continue;
+                            $entry->video_files = null;
                         }
-                        $params = array(
-                            'display_id' => 'ccle_api_media',
-                            'args[0]' => $correctedterm,
-                            'args[1]' => $srs
-                        );
-
-                        // Retrieving information about a specific course in a specific term.
-                        $curl = curl_init();
-                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                        curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
-                        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-                        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-                        curl_setopt($curl, CURLOPT_COOKIE, "$cookie"); // Use the previously saved session.
-                        curl_setopt($curl, CURLOPT_USERPWD, "$htaccessusername:$htaccesspassword");
-                        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-                        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);  // Essential for SSL.
-
-                        $query = http_build_query($params, '', '&');
-                        curl_setopt($curl, CURLOPT_URL, "$url?$query");
-                        $output = curl_exec($curl);
-                        $xml = simplexml_load_string($output, "SimpleXMLElement", LIBXML_NOCDATA);
-                        $json = json_encode($xml);
-                        $cleanedresult = json_decode($json, true);
-                        curl_close($curl);
-
-                        // If there is more than one resource, then 'item' is an
-                        // array of arrays. But if there is only one, then it is
-                        // by itself. Make it an array of arrays.
-                        $contents = $cleanedresult['item'];
-                        if (!array_key_exists(0, $cleanedresult['item'])) {
-                            $contents = array($cleanedresult['item']);
+                        // Similar to above.
+                        if (!is_array($content['audio'])) {
+                            $entry->audio_files = $content['audio'];
+                        } else {
+                            $entry->audio_files = null;
                         }
+                        $entry->title = $content['title'];
+                        if (!empty($content['comments'])) {
+                            $entry->comments = $content['comments'];
+                        }
+                        $temp = $content['date_for_recording_s_'];
+                        $tempdate = explode('/', $temp);
+                        $date = mktime(0, 0, 0, $tempdate[0], $tempdate[1], $tempdate[2]);
+                        $entry->date = $date;
 
-                        // CCLE-7002 - Leading zeros dropped for BruinCast.
-                        $srs = validate_field('srs', $srs, 7, 9);
+                        // See if we need to update or add.
+                        if (isset($existingmedia[$term][$srs][$date][$entry->title])) {
+                            // Exists, so update.
 
-                        // Match content to a course, if any.
-                        $courseid = match_course($term, $srs);
+                            // Bruincast data sometimes has duplicate entries
+                            // due to the same file being uploaded multiple
+                            // times due to user error. We handle this by
+                            // not unsetting entry in $existingmedia, instead
+                            // we set it to false meaning we already updated it.
+                            if (!empty($existingmedia[$term][$srs][$date][$entry->title])) {
 
-                        // Entering each media item for a particular course in a particular term into the DB.
-                        foreach ($contents as $content) {
-                            $entry = new \stdClass();
-                            $entry->courseid = $courseid;
-                            $entry->term = $term;
-                            $entry->srs = $srs;
-                            // This if statement is used as $content['video'] is a blank array if there is no video link.
-                            if (!is_array($content['video'])) {
-                                $entry->video_files = $content['video'];
+                                $entry->id = $existingmedia[$term][$srs][$date][$entry->title];
+                                $DB->update_record('ucla_bruincast', $entry);
+                                $existingmedia[$term][$srs][$date][$entry->title] = false;
+                                ++$numupdated;
                             } else {
-                                $entry->video_files = null;
+                                mtrace(get_string('bcfoundupdatedentry',
+                                        'tool_ucladatasourcesync',
+                                        "$term $srs $date $entry->title"));
                             }
-                            // Similar to above.
-                            if (!is_array($content['audio'])) {
-                                $entry->audio_files = $content['audio'];
-                            } else {
-                                $entry->audio_files = null;
-                            }
-                            $entry->title = $content['title'];
-                            if (!empty($content['comments'])) {
-                                $entry->comments = $content['comments'];
-                            }
-                            $temp = $content['date_for_recording_s_'];
-                            $tempdate = explode('/', $temp);
-                            $date = mktime(0, 0, 0, $tempdate[0], $tempdate[1], $tempdate[2]);
-                            $entry->date = $date;
 
-                            // See if we need to update or add.
-                            if (isset($existingmedia[$term][$srs][$date][$entry->title])) {
-                                // Exists, so update.
-
-                                // Bruincast data sometimes has duplicate entries
-                                // due to the same file being uploaded multiple
-                                // times due to user error. We handle this by
-                                // not unsetting entry in $existingmedia, instead
-                                // we set it to false meaning we already updated it.
-                                if (!empty($existingmedia[$term][$srs][$date][$entry->title])) {
-
-                                    $entry->id = $existingmedia[$term][$srs][$date][$entry->title];
-                                    $DB->update_record('ucla_bruincast', $entry);
-                                    $existingmedia[$term][$srs][$date][$entry->title] = false;
-                                    ++$numupdated;
-                                } else {
-                                    mtrace(get_string('bcfoundupdatedentry',
-                                            'tool_ucladatasourcesync',
-                                            "$term $srs $date $entry->title"));
-                                }
-
-                            } else {
-                                // Add new entry.
-                                try {
-                                    $DB->insert_record('ucla_bruincast', $entry);
-                                    ++$numinserted;
-                                } catch (\dml_write_exception $ex) {
-                                    // It is a duplicate entry, so ignore it.
-                                    mtrace(get_string('founddupentry',
-                                            'tool_ucladatasourcesync',
-                                            "$term $srs $date $entry->title"));
-                                }
+                        } else {
+                            // Add new entry.
+                            try {
+                                $DB->insert_record('ucla_bruincast', $entry);
+                                ++$numinserted;
+                            } catch (\dml_write_exception $ex) {
+                                // It is a duplicate entry, so ignore it.
+                                mtrace(get_string('founddupentry',
+                                        'tool_ucladatasourcesync',
+                                        "$term $srs $date $entry->title"));
                             }
                         }
                     }
                 }
             }
-
-            // Crosslist courses.
-            $numinserted += $this->perform_crosslisting($existingmedia);
-
-            // Finished processing, so delete entries that no longer exists.
-            foreach ($existingmedia as $srses) {
-                foreach ($srses as $dates) {
-                    foreach ($dates as $titles) {
-                        foreach ($titles as $deleteid) {
-                            if (!empty($deleteid)) {
-                                // Found record that was not updated, so delete.
-                                $DB->delete_records('ucla_bruincast',
-                                        array('id' => $deleteid));
-                                ++$numdeleted;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($numinserted == 0 && $numupdated == 0) {
-                throw new \moodle_exception('bcnoentries', 'tool_ucladatasourcesync');
-            }
-
-            // Success, so commit changes.
-            $transaction->allow_commit();
-            $counts = new \stdClass();
-            $counts->deleted    = $numdeleted;
-            $counts->inserted   = $numinserted;
-            $counts->updated    = $numupdated;
-            mtrace(get_string('successnotice', 'tool_ucladatasourcesync', $counts));
-
-        } catch (Exception $e) {
-            $transaction->rollback($e);
         }
+
+        // Crosslist courses.
+        $numinserted += $this->perform_crosslisting($existingmedia);
+
+        // Finished processing, so delete entries that no longer exists.
+        foreach ($existingmedia as $srses) {
+            foreach ($srses as $dates) {
+                foreach ($dates as $titles) {
+                    foreach ($titles as $deleteid) {
+                        if (!empty($deleteid)) {
+                            // Found record that was not updated, so delete.
+                            $DB->delete_records('ucla_bruincast',
+                                    array('id' => $deleteid));
+                            ++$numdeleted;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($numinserted == 0 && $numupdated == 0) {
+            throw new \moodle_exception('bcnoentries', 'tool_ucladatasourcesync');
+        }
+
+        $counts = new \stdClass();
+        $counts->deleted    = $numdeleted;
+        $counts->inserted   = $numinserted;
+        $counts->updated    = $numupdated;
+        mtrace(get_string('successnotice', 'tool_ucladatasourcesync', $counts));
     }
 
     /**
@@ -343,8 +335,15 @@ class update_bcast extends \core\task\scheduled_task {
                             'video_files' => $record->video_files,
                             'audio_files' => $record->audio_files,
                             'date' => $record->date))) {
-                    $DB->insert_record('ucla_bruincast', $record);
-                    ++$numinserted;
+                    try {
+                        $DB->insert_record('ucla_bruincast', $record);
+                        ++$numinserted;
+                    } catch (\dml_write_exception $ex) {
+                        // It is a duplicate entry, so ignore it.
+                        mtrace(get_string('founddupentry',
+                                'tool_ucladatasourcesync',
+                                "$record->term $record->srs $record->date $record->title"));
+                    }
                 }
 
                 // Make existing entry false so it is not deleted.
