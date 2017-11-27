@@ -27,7 +27,7 @@ define('AJAX_SCRIPT', true);
 require_once('../../config.php');
 
 $courseid = required_param('courseid', PARAM_INT);
-$rangeid = required_param('rangeid', PARAM_INT);
+$rangeid = optional_param('rangeid', -1, PARAM_INT);
 $action  = required_param('action', PARAM_ALPHANUMEXT);
 
 $PAGE->set_url(new moodle_url('local/visibility/ajax.php',
@@ -57,6 +57,14 @@ switch ($action) {
     case 'delete':
         $deleted = $DB->delete_records('ucla_visibility_schedule',
                 array('id' => $rangeid, 'courseid' => $courseid));
+        if (empty($deleted)) {
+            $outcome->success = false;
+            $outcome->error = 'failed';
+        }
+        break;
+    case 'deleteall':
+        $deleted = $DB->delete_records('ucla_visibility_schedule',
+                array('courseid' => $courseid));
         if (empty($deleted)) {
             $outcome->success = false;
             $outcome->error = 'failed';
