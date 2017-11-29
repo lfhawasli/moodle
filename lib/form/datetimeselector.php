@@ -179,7 +179,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
         // START UCLA MOD: CCLE-6868 - Revamp date picker.
         global $OUTPUT, $PAGE;
         $PAGE->requires->js('/lib/flatpickr/flatpickr.min.js');
-        $PAGE->requires->js('/lib/flatpickr/plugins/displayTimezone/displayTimezone.js');
+        $PAGE->requires->js('/lib/flatpickr/plugins/confirmDate/confirmDate.js');
         // Custom CSS for flatpickr is added in theme/uclashared/styles/.
 
         // Support different locales.
@@ -215,7 +215,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                 onReady: function(dateObj, dateStr, fp) {
                     fp.altInput.name = "'.$inputname .'_flatpickr_display";
                 },
-                plugins: [new displayTimezonePlugin()]
+                plugins: [new confirmDatePlugin({})]
             });';
         $this->_elements[] = @MoodleQuickForm::createElement('html',
                 '<div style="display: inline; margin-right: 10px;" class="flatpickr" name ="'. $inputname .'_flatpickr">');
