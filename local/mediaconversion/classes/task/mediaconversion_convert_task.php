@@ -39,7 +39,6 @@ class mediaconversion_convert_task extends \core\task\adhoc_task {
      * Executes the task.
      */
     public function execute() {
-        global $CFG;
         $customdata = $this->get_custom_data();
         $data = $customdata->eventdata;
         try {
@@ -50,13 +49,13 @@ class mediaconversion_convert_task extends \core\task\adhoc_task {
                     $customdata->userid, $data->objectid, $data->other->name)) {
                 course_delete_module($data->objectid);
             }
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // If an exception is thrown it is because the course module does
             // not exist or cannot be deleted. Most likely it is because the
             // course module has been deleted since the task has been created.
-            mtrace(sprintf('Could not find course module %s (%d)',
+            // Or class has been deleted.
+            mtrace(sprintf('Could not convert course module %s (%d)',
                     $data->other->modulename, $data->objectid));
-            return true;
         }
     }
 

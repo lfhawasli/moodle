@@ -44,22 +44,29 @@ class mediaconversion_convert_text_task extends \core\task\adhoc_task {
         global $DB;
         $customdata = $this->get_custom_data();
         $data = $customdata->eventdata;
-        // Convert the video files embedded in content text. Note that we don't need
-        // to delete the old files as Moodle automatically cleans them up for us.
-        if ($newintro = local_cm_convert_and_get_new_text($data->other->modulename,
-                $data->objectid, $data->contextid, $customdata->userid)) {
-            // Change the intro text in the database to the new text.
-            $DB->set_field($data->other->modulename, 'intro', $newintro, ['id' => $data->other->instanceid]);
+        try {
+            // Convert the video files embedded in content text. Note that we don't need
+            // to delete the old files as Moodle automatically cleans them up for us.
+            if ($newintro = local_cm_convert_and_get_new_text($data->other->modulename,
+                    $data->objectid, $data->contextid, $customdata->userid)) {
+                // Change the intro text in the database to the new text.
+                $DB->set_field($data->other->modulename, 'intro', $newintro, ['id' => $data->other->instanceid]);
+            }
+            // Page resources also have page content that must be replaced.
+            if ($data->other->modulename === 'page' && $newcontent = local_cm_convert_and_get_new_text(
+                    $data->other->modulename, $data->objectid, $data->contextid, $customdata->userid,
+                    'content')) {
+                // Change the content text for something with text content (like a page resource).
+                $DB->set_field($data->other->modulename, 'content', $newcontent, ['id' => $data->other->instanceid]);
+            }
+        } catch (\Exception $ex) {
+            // If an exception is thrown it is because the course module does
+            // not exist or class has been deleted.
+            mtrace(sprintf('Could not convert course module %s (%d)',
+                    $data->other->modulename, $data->objectid));
         }
-        // Page resources also have page content that must be replaced.
-        if ($data->other->modulename === 'page' && $newcontent = local_cm_convert_and_get_new_text(
-                $data->other->modulename, $data->objectid, $data->contextid, $customdata->userid,
-                'content')) {
-            // Change the content text for something with text content (like a page resource).
-            $DB->set_field($data->other->modulename, 'content', $newcontent, ['id' => $data->other->instanceid]);
-        }
-    }
 
+    }
 
     /**
      * Get a descriptive name for this task (shown to admins).
