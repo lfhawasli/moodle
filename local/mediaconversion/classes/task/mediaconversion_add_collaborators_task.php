@@ -41,20 +41,29 @@ class mediaconversion_add_collaborators_task extends \core\task\adhoc_task {
      * @throws Exception on error
      */
     public function execute() {
-        global $CFG, $DB;
+        global $DB;
         $customdata = $this->get_custom_data();
         $data = $customdata->eventdata;
-        // Get entry id from DB.
-        $moddata = $DB->get_record('kalvidres', ['id' => $data->other->instanceid]);
-        // Get course.
-        $course = get_course($data->courseid);
-        // Update collaborators.
-        $client = local_cm_get_kaltura_client(local_kaltura_get_config());
-        $idstring = "for entry with id $moddata->entry_id in kalvidres with id $data->objectid";
-        if (!local_cm_update_entry_collaborators($client, $moddata->entry_id, $course)) {
-            mtrace('Failed to update collaborators ' . $idstring);
+        try {
+            // Get entry id from DB.
+            $moddata = $DB->get_record('kalvidres', ['id' => $data->other->instanceid]);
+            // Get course.
+            $course = get_course($data->courseid);
+            // Update collaborators.
+            $client = local_cm_get_kaltura_client(local_kaltura_get_config());
+            $idstring = "for entry with id $moddata->entry_id in kalvidres with id $data->objectid";
+            if (!local_cm_update_entry_collaborators($client, $moddata->entry_id, $course)) {
+                mtrace('Failed to update collaborators ' . $idstring);
+                return;
+            }
+            mtrace('Successfully added course admins as collaborators ' . $idstring);
+        } catch (\Exception $ex) {
+            // If an exception is thrown it is because the kalvidres or course
+            // does not exist.
+            mtrace(sprintf('Could not add collaborators for kalvidres %d',
+                    $data->other->instanceid));
+            return;
         }
-        mtrace('Successfully added course admins as collaborators ' . $idstring);
     }
 
     /**

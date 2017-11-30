@@ -41,21 +41,34 @@ class mediaconversion_convert_restored_task extends \core\task\adhoc_task {
      * @throws Exception on error
      */
     public function execute() {
-        global $CFG;
         $customdata = $this->get_custom_data();
-        // Get course modinfo.
-        $modinfo = get_fast_modinfo($customdata->courseid);
+
+        try {
+            // Get course modinfo.
+            $modinfo = get_fast_modinfo($customdata->courseid);
+        } catch (\dml_exception $ex) {
+            // Exception is thrown if course is not found.
+            mtrace(sprintf('Could not find course %d', $customdata->courseid));
+            return;
+        }
+
         foreach ($modinfo->get_cms() as $cm) {
-            // We only want to deal with file uploads.
-            if ($cm->get_course_module_record(true)->modname !== 'resource') {
+            try {
+                // We only want to deal with file uploads.
+                if ($cm->get_course_module_record(true)->modname !== 'resource') {
+                    continue;
+                }
+                // Get the module context.
+                $context = \context_module::instance($cm->id);
+                // Only delete the old course module if the new one is added successfully.
+                if (local_cm_convert_and_add_module($context->id, array($cm->get_course(), $cm),
+                        $customdata->userid, $cm->id, $cm->name)) {
+                    course_delete_module($cm->id);
+                }
+            } catch (\Exception $ex) {
+                // Could not convert content.
+                mtrace(sprintf('Could not convert course module (%d); skipping', $cm->id));
                 continue;
-            }
-            // Get the module context.
-            $context = \context_module::instance($cm->id);
-            // Only delete the old course module if the new one is added successfully.
-            if (local_cm_convert_and_add_module($context->id, array($cm->get_course(), $cm),
-                    $customdata->userid, $cm->id, $cm->name)) {
-                course_delete_module($cm->id);
             }
         }
     }
