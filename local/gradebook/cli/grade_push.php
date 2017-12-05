@@ -147,8 +147,12 @@ foreach ($courses as $courseid) {
 
             // Now send grade.
             try {
-                $gradetask->execute();
-                $trace->output('Successfully sent grade', 2);
+                $result = $gradetask->execute();
+                if ($result) {
+                    $trace->output('Successfully sent grade', 2);
+                } else {
+                    $trace->output('Did not sent grade', 2);
+                }
                 ++$numgradessent;
             } catch (Exception $e) {
                 $trace->output(sprintf('Failed to send grade %d', $gradegrade->id), 2);
