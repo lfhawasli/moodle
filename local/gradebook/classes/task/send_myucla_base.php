@@ -186,7 +186,7 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
         $transactionrec = array_shift($transactionrecs);
 
         $userrec = null;
-        if (empty($transactionrecs)) {
+        if (empty($transactionrec)) {
             mtrace(sprintf('...WARNING: No history found for %s (%d)',
                     $gradeobject->table, $gradeobject->id));
         } else {
