@@ -104,12 +104,10 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
         $filename = reset($contentfiles);
     }
 
-    $httpurl = $wowzaserver . '/' . $appname . '/' . $extension . ':'
+    $httpurl = 'https://' . $wowzaserver . '/' . $appname . '/' . $extension . ':'
             . $filename . '/playlist.m3u8';
-
-    $parseurl = parse_url($wowzaserver);
-    $rtmpurl = 'rtmp://' . $parseurl['host'] . ':' . $parseurl['port'] . '/' .
-            $appname . '/' . $extension . ':' . $filename;
+    $rtmpurl = 'rtmps://' . $wowzaserver . '/' . $appname . '/' . $extension . ':'
+            . $filename;
 
     return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->title, $httpurl,
             $rtmpurl, $isvideo);
