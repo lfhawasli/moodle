@@ -84,15 +84,16 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
         $gradeinfo = $this->get_custom_data();
         if (!$this->should_send_to_myucla($gradeinfo->courseid, $gradeinfo->itemtype)) {
             // We didn't need to process this request.
-            // TODO: Add logging, because task shouldn't have gotten this far.
-            return;
+            mtrace(sprintf('...Should not send to MyUCLA; ignoring updates for %s %s',
+                    $gradeinfo->courseid, $gradeinfo->itemtype));
+            return false;
         }
 
         $courses = $this->get_courses_info();
         if (empty($courses)) {
             // We couldn't find course to associate this grade with.
-            // TODO: Add logging.
-            return;
+            mtrace('...Could not find courses to associate grade with; ignoring update');
+            return false;
         }
 
         // May be processing multiple course info for cross-listed courses.
@@ -124,6 +125,8 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
                 throw $e;
             }
         }
+
+        return true;
     }
 
     /**
@@ -154,6 +157,12 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
         if (empty($this->gradeinfo)) {
             $this->gradeinfo = parent::get_custom_data();
         }
+
+        if (empty($this->gradeinfo)) {
+            throw new \Exception('ERROR: Empty $gradeinfo from ' .
+                    'get_custom_data(), might be json_encode issue');
+        }
+
         return $this->gradeinfo;
     }
 
@@ -172,21 +181,25 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
             throw new \Exception(get_class($gradeobject).' must a grade_object.');
         }
 
-        // Assumption: There should always be a record returned.
         $transactionrecs = $DB->get_records($gradeobject->table . '_history',
                 array('oldid' => $gradeobject->id), 'id DESC', 'id, loggeduser', 0, 1);
         $transactionrec = array_shift($transactionrecs);
 
-        // Get user record for whoever made grade change.
         $userrec = null;
-        if ($transactionrec->loggeduser == $USER->id) {
-            // Try to save a database query by seeing if the user who made the
-            // transaction is the logged in user. It should usually be the case.
-            $userrec = $USER;
-        } else if (!empty($transactionrec->loggeduser)) {
-            // Going to fetch the user record from the DB.
-            $userrec = $DB->get_record('user',
-                    array('id' => $transactionrec->loggeduser));
+        if (empty($transactionrec)) {
+            mtrace(sprintf('...WARNING: No history found for %s (%d)',
+                    $gradeobject->table, $gradeobject->id));
+        } else {
+            // Get user record for whoever made grade change.
+            if ($transactionrec->loggeduser == $USER->id) {
+                // Try to save a database query by seeing if the user who made the
+                // transaction is the logged in user. It should usually be the case.
+                $userrec = $USER;
+            } else if (!empty($transactionrec->loggeduser)) {
+                // Going to fetch the user record from the DB.
+                $userrec = $DB->get_record('user',
+                        array('id' => $transactionrec->loggeduser));
+            }
         }
 
         if (empty($userrec)) {
@@ -203,7 +216,8 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
                 '0.0.0.0' : $userrec->lastip;
 
         // Store history table id.
-        $transactionuser->transactionid = $transactionrec->id;
+        $transactionuser->transactionid = empty($transactionrec->id) ?
+                0 : $transactionrec->id;
 
         return $transactionuser;
     }
@@ -335,6 +349,10 @@ abstract class send_myucla_base extends \core\task\adhoc_task {
                 $ret .= ' ';
             }
         }
+
+        // Prevent json_encode problems, see https://stackoverflow.com/a/24414901/6001.
+        $ret = mb_convert_encoding($ret, "UTF-8", "auto");
+
         return $ret;
     }
 }

@@ -106,6 +106,7 @@ class send_myucla_grade extends send_myucla_base {
         $courses = ucla_get_course_info($gradeinfo->courseid);
         if (empty($courses)) {
             // Course was not a srs course, so skip it.
+            mtrace(sprintf('...Course %d was not srs course; skipping', $gradeinfo->courseid));
             return null;
         }
         $srslist = array_map(function($o) { return $o->srs; }, $courses);
@@ -139,7 +140,31 @@ class send_myucla_grade extends send_myucla_base {
         // We should only get one record, but we should handle multiple.
         $enrolledcourses = $DB->get_records_sql($sql, $params);
 
-        // TODO: Log if we get multiple records. Might be an enrollment problem.
+        // If we get multiple records might be an enrollment problem.
+        if (count($enrolledcourses) > 1) {
+            mtrace(sprintf('...WARNING: Multipe records returned for user in course %s|%s',
+                    $gradeinfo->userid, $params['term'], $srslist));
+        }
+
+        // Give error if we got empty result and user is a student.
+        if (empty($enrolledcourses)) {
+            $context = \context_course::instance($gradeinfo->courseid);
+
+            // Make sure user is not suspended.
+            $suspended = get_suspended_userids($context, true);
+            if (!in_array($gradeinfo->userid, $suspended)) {
+                $roles = get_user_roles($context, $gradeinfo->userid);
+                foreach ($roles as $role) {
+                    if ($role->shortname == 'student') {
+                        mtrace('...WARNING: Student role found but enrolled via ' .
+                                'Registrar not found for userid ' . $gradeinfo->userid);
+                        break;
+                    }
+                }
+            } else {
+                mtrace('...NOTICE: Student is suspended');
+            }
+        }
 
         return $enrolledcourses;
     }
