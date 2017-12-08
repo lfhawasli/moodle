@@ -1,7 +1,26 @@
 <?php
-defined('MOODLE_INTERNAL') || die;
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$ADMIN->add('root', new admin_category('tweaks', 'Custom tweaks'));
-$ADMIN->add('tweaks', new admin_externalpage('mediasite_courses', 'Tweak something',
-            $CFG->wwwroot.'/local/mediasite_courses/setuppage.php'));
-?>
+/**
+ * Mediasite plugin for Moodle.
+ *
+ * @package local_mediasite_courses
+ * @copyright Sonic Foundry 2017  {@link http://sonicfoundry.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die;
+// There are no settings specific to this plug-in. All management is done in the Activity plug-in.

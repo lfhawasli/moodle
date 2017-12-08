@@ -1,6 +1,30 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Mediasite plugin for Moodle.
+ *
+ * @package mod_mediasite
+ * @copyright Sonic Foundry 2017  {@link http://sonicfoundry.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace Sonicfoundry;
+
+defined('MOODLE_INTERNAL') || die();
 
 class SonicfoundryException extends \Exception {
     const QUERY_API_KEY_BY_NAME = 1;
@@ -29,7 +53,7 @@ class SonicfoundryException extends \Exception {
     const QUERY_PRESENTATIONS_FOR_FOLDER = 24;
     const INVALID_ARGUMENT = 25;
     private $data;
-    function __construct($message, $code, $data = null) {
+    public function __construct($message, $code, $data = null) {
         parent::__construct($message, $code);
         $this->data = $data;
     }
@@ -40,7 +64,7 @@ class SonicfoundryException extends \Exception {
         return parent::getCode() == self::QUERY_CATALOG_SHARES_TIMEOUT ||
                parent::getCode() == self::QUERY_PRESENTATIONS_TIMEOUT;
     }
-    public function codeToString() {
+    public function code_to_string() {
         switch($this->getCode()) {
             case self::QUERY_API_KEY_BY_NAME:
                 return 'query API key by name';

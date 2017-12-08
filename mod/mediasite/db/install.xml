@@ -5,14 +5,14 @@
         <FIELD LENGTH="10" NAME="id" NOTNULL="true" SEQUENCE="true" TYPE="int"/>
         <FIELD COMMENT="Course mediasite activity belongs to" DEFAULT="0" LENGTH="10" NAME="course" NOTNULL="true" SEQUENCE="false" TYPE="int"/>
         <FIELD COMMENT="name field for moodle instances" LENGTH="255" NAME="name" NOTNULL="true" SEQUENCE="false" TYPE="char"/>
-        <FIELD NAME="description" NOTNULL="true" SEQUENCE="false" TYPE="text"/>
+        <FIELD NAME="description" NOTNULL="false" SEQUENCE="false" TYPE="text"/>
         <FIELD LENGTH="36" NAME="resourceid" NOTNULL="true" SEQUENCE="false" TYPE="char"/>
         <FIELD LENGTH="255" NAME="resourcetype" NOTNULL="true" SEQUENCE="false" TYPE="char"/>
         <FIELD DEFAULT="0" LENGTH="1" NAME="openaspopup" NOTNULL="true" SEQUENCE="false" TYPE="int"/>
         <FIELD COMMENT="Presentation's record date" LENGTH="10" NAME="recorddateutc" NOTNULL="false" SEQUENCE="false" TYPE="int"/>
         <FIELD COMMENT="Presentation's presenters" NAME="presenters" NOTNULL="false" SEQUENCE="false" TYPE="text"/>
-        <FIELD COMMENT="Presentation's tags" NAME="tags" NOTNULL="false" SEQUENCE="false" TYPE="text"/>
-        <FIELD LENGTH="50" NAME="mode" NOTNULL="false" SEQUENCE="false" TYPE="char"/>
+        <FIELD COMMENT="Presentation's tags" NAME="sofotags" NOTNULL="false" SEQUENCE="false" TYPE="text"/>
+        <FIELD LENGTH="50" NAME="displaymode" NOTNULL="false" SEQUENCE="false" TYPE="char"/>
         <FIELD LENGTH="1000" NAME="launchurl" NOTNULL="false" SEQUENCE="false" TYPE="char"/>
         <FIELD COMMENT="The id of the site. It has to match the other mediasite table that contains the list of sites" LENGTH="10" NAME="siteid" NOTNULL="false" SEQUENCE="false" TYPE="int"/>
       </FIELDS>
