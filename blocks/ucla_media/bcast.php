@@ -43,7 +43,7 @@ if (!empty($media)) {
 }
 
 init_page($course, $context,
-        new moodle_url('/blocks/ucla_media/bcast.php', $pageparams));
+        new moodle_url('/blocks/ucla_media/bcast.php', $pageparams), MEDIA_BCAST_VIDEO);
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?

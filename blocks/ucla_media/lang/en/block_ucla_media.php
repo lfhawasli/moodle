@@ -101,5 +101,3 @@ $string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are 
 
 $string['videoreservesipwarning'] = 'You are accessing this content from off-campus. If the content does not load, you will need to use the UCLA VPN to obtain an on-campus internet address.</br>
 BOL VPN instructions: <a target="_blank" href="https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients">https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients</a>.';
-
-$string['returntomedia'] = 'Return to Media List';

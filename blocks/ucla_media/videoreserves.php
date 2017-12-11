@@ -35,7 +35,7 @@ $context = context_course::instance($courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/videoreserves.php',
-                array('courseid' => $courseid)));
+                array('courseid' => $courseid)), MEDIA_VIDEORESERVES);
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
