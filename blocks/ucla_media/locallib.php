@@ -104,10 +104,21 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
         $filename = reset($contentfiles);
     }
 
-    $httpurl = 'https://' . $wowzaserver . '/' . $appname . '/' . $extension . ':'
-            . $filename . '/playlist.m3u8';
-    $rtmpurl = 'rtmps://' . $wowzaserver . '/' . $appname . '/' . $extension . ':'
-            . $filename;
+    $contentpath = $appname . '/' . $extension . ':' . $filename;
+
+    // Generate SecureToken hash.
+    $additionalparams = '';
+    $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
+    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime,
+            get_config('', 'filter_oidwowza_bcsharedsecret'));
+    if (!empty($securetoken)) {
+        $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
+    }
+
+    $httpurl = 'https://' . $wowzaserver . '/' . $contentpath .
+            '/playlist.m3u8' . $additionalparams;
+    $rtmpurl = 'rtmps://' . $wowzaserver . '/' . $contentpath .
+            $additionalparams;
 
     return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->title, $httpurl,
             $rtmpurl, $isvideo);
