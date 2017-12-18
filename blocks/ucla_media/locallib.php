@@ -104,10 +104,21 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
         $filename = reset($contentfiles);
     }
 
-    $httpurl = 'https://' . $wowzaserver . '/' . $appname . '/' . $extension . ':'
-            . $filename . '/playlist.m3u8';
-    $rtmpurl = 'rtmps://' . $wowzaserver . '/' . $appname . '/' . $extension . ':'
-            . $filename;
+    $contentpath = $appname . '/' . $extension . ':' . $filename;
+
+    // Generate SecureToken hash.
+    $additionalparams = '';
+    $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
+    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime,
+            get_config('', 'filter_oidwowza_bcsharedsecret'));
+    if (!empty($securetoken)) {
+        $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
+    }
+
+    $httpurl = 'https://' . $wowzaserver . '/' . $contentpath .
+            '/playlist.m3u8' . $additionalparams;
+    $rtmpurl = 'rtmps://' . $wowzaserver . '/' . $contentpath .
+            $additionalparams;
 
     return sprintf('{bruincast:jw,"%s",%s,%s,%s}', $bruincast->title, $httpurl,
             $rtmpurl, $isvideo);
@@ -258,8 +269,10 @@ function display_video_reserves($course) {
  * @param object $course
  * @param context_course $context
  * @param moodle_url $url
+ * @param int $mode         Optional. Add link to index page for given mode.
+ * @param string $title     Optional. Add link to breakcrumbs.
  */
-function init_page($course, $context, $url) {
+function init_page($course, $context, $url, $mode = null, $title = null) {
     global $PAGE;
     $PAGE->set_url($url);
 
@@ -272,6 +285,33 @@ function init_page($course, $context, $url) {
 
     $PAGE->set_pagelayout('incourse');
     $PAGE->set_pagetype('course-view-' . $course->format);
+
+    // Reset breadcrumbs and make it start with course and Media resources.
+    $PAGE->navbar->ignore_active();
+    $PAGE->navbar->add($course->shortname, new moodle_url('/course/view.php' ,
+            array('id' => $course->id)));
+    $PAGE->navbar->add(get_string('title', 'block_ucla_media'));
+
+    if (!empty($mode)) {
+        $index = '';
+        $indextitle = '';
+        if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
+            $index = '/blocks/ucla_media/bcast.php';
+            $indextitle = get_string('headerbcast', 'block_ucla_media');
+        } else if ($mode == MEDIA_VIDEORESERVES) {
+            $index = '/blocks/ucla_media/videoreserves.php';
+            $indextitle = get_string('headervidres', 'block_ucla_media');
+        } else if ($mode == MEDIA_LIBRARYMUSIC) {
+            $index = '/blocks/ucla_media/libreserves.php';
+            $indextitle = get_string('headerlibres', 'block_ucla_media');
+        }
+        $indexurl = new moodle_url($index, array('courseid' => $course->id));
+        $PAGE->navbar->add($indextitle, $indexurl);
+    }
+
+    if (!empty($title)) {
+        $PAGE->navbar->add($title, new moodle_url($url));
+    }
 }
 
 /**

@@ -35,7 +35,7 @@ $context = context_course::instance($courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/libreserves.php',
-                array('courseid' => $courseid)));
+                array('courseid' => $courseid)), MEDIA_LIBRARYMUSIC);
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
@@ -72,8 +72,8 @@ function display_page($course) {
     $courseid = $course->id;
     echo $OUTPUT->heading(get_string('headerlibres', 'block_ucla_media') .
             ": $course->fullname", 2, 'headingblock');
-    echo html_writer::tag('p', get_string('intromusic', 'block_ucla_media'),
-            array('id' => 'videoreserves-intro'));
+    echo $OUTPUT->notification(get_string('intromusic', 'block_ucla_media'), 'info');
+
     echo "<br>";
     $reserves = $DB->get_records_sql('SELECT * FROM {ucla_library_music_reserves} WHERE courseid=? GROUP BY albumtitle', array($courseid));
     $titles = array();

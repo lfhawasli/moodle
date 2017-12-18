@@ -87,15 +87,21 @@ class filter_oidwowza extends moodle_text_filter {
      * @param string $clientip
      * @param string $contentpath
      * @param int $endtime
+     * @param string $sharedsecret  What secret to use. Video reserves and
+     *                              Bruincast use different tokens.
      * @param string $remoteip      Used primarily for unit testing.
      *
      * @return string               SecureToken hash to send to Wowza.
      */
-    public static function generate_securetoken($contentpath, $endtime, $remoteip = null) {
-        $hashclientip = get_config('', 'filter_oidwowza_hashclientip');
-        $sharedsecret = get_config('', 'filter_oidwowza_sharedsecret');
+    public static function generate_securetoken($contentpath, $endtime, $sharedsecret, $remoteip = null) {
+
+        // If there is no token, then there is not token to generate.
+        if (empty($sharedsecret)) {
+            return '';
+        }
 
         // Parameters need to be in alphabetical order, even the numbers.
+        $hashclientip = get_config('', 'filter_oidwowza_hashclientip');
         if (!empty($hashclientip)) {
             $params[] = $remoteip ? $remoteip : $_SERVER['REMOTE_ADDR'];
         }
@@ -252,9 +258,13 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $contentpath = $app . '/_definst_/' . $format . $file;
    
     // Generate SecureToken hash.
+    $additionalparams = '';
     $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
-    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
-    $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
+    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime,
+            get_config('', 'filter_oidwowza_sharedsecret'));
+    if (!empty($securetoken)) {
+        $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
+    }
 
     // Streaming paths.
     $srtpath = 'https://' . $url . '/' . $app . '/' . $srt;
