@@ -77,8 +77,6 @@ class downloadsyllabi_form extends moodleform {
      * @param array $files
      */
     public function validation($data, $files) {
-        global $DB;
-
         $errors = array();
         if (!array_key_exists($data['term'], $this->terms)) {
             $errors['term'] = get_string('errornocourses', 'local_ucla_syllabus');
@@ -106,7 +104,12 @@ class downloadsyllabi_form extends moodleform {
                 $terms = array_merge($terms, self::get_category_terms($subcategory));
             }
         }
-        return terms_arr_sort($terms, true);
+
+        // Add "All terms" as botton item.
+        $all = get_string('all');
+        $termlist = terms_arr_sort($terms, true) + array($all => $all);
+        
+        return $termlist;
     }
     /**
      * Recursively retrieves courses with syllabi that belong the provided
@@ -118,21 +121,37 @@ class downloadsyllabi_form extends moodleform {
      */
     public function get_category_courses($category, $term) {
         global $DB;
-
-        $sql = "SELECT DISTINCT c.*
-                  FROM mdl_ucla_request_classes urc
-                  JOIN mdl_ucla_syllabus us
-                       ON urc.courseid = us.courseid
-                  JOIN mdl_ucla_reg_classinfo rc
-                       ON urc.srs = rc.srs AND urc.term = rc.term
-                  JOIN mdl_course c
-                       ON urc.courseid = c.id
-                 WHERE urc.department = :catshortname
-                       AND urc.term = :term
-                       AND urc.hostcourse = 1
-                       AND rc.enrolstat != 'X'
-              ORDER BY rc.crsidx ASC, rc.secidx ASC";
-        $params = array('catshortname' => $category->idnumber, 'term' => $term);
+        
+        if ($term == get_string('all')) {
+            // If using 'All' term then get all courses in given category.
+            // Uses different query type than term to allow collaborations sites
+            // to be downloaded.
+            $sql = "SELECT DISTINCT c.*
+                      FROM {course} c
+                      JOIN {ucla_syllabus} us
+                           ON c.id=us.courseid
+                      JOIN {course_categories} cc
+                           ON cc.id=c.category
+                     WHERE cc.id=:categoryid
+                     ORDER BY c.sortorder";
+            $params = array('categoryid' => $category->id); 
+        } else {
+            // Use specified term.
+            $sql = "SELECT DISTINCT c.*
+                      FROM {ucla_request_classes} urc
+                      JOIN {ucla_syllabus} us
+                           ON urc.courseid = us.courseid
+                      JOIN {ucla_reg_classinfo} rc
+                           ON urc.srs = rc.srs AND urc.term = rc.term
+                      JOIN {course} c
+                           ON urc.courseid = c.id
+                     WHERE urc.department = :catshortname
+                           AND urc.term = :term
+                           AND urc.hostcourse = 1
+                           AND rc.enrolstat != 'X'
+                  ORDER BY rc.crsidx ASC, rc.secidx ASC";
+            $params = array('catshortname' => $category->idnumber, 'term' => $term);
+        }
         $syllabi = $DB->get_records_sql($sql, $params);
 
         // Check syllabi of each subcategory as well.

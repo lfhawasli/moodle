@@ -180,6 +180,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
         global $OUTPUT, $PAGE;
         $PAGE->requires->js('/lib/flatpickr/flatpickr.min.js');
         $PAGE->requires->js('/lib/flatpickr/plugins/confirmDate/confirmDate.js');
+        $PAGE->requires->js('/lib/flatpickr/plugins/displayTimezone/displayTimezone.js');        
         // Custom CSS for flatpickr is added in theme/uclashared/styles/.
 
         // Support different locales.
@@ -198,25 +199,33 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
         $timeformat = $this->_options['timeformat'];
         $datetimeformat = $dateformat . ', ' . $timeformat;
         $placeholder = (isset($this->_options['placeholder'])) ? $this->_options['placeholder'] : 'Select date...';
+        // Force the timezone to server time unless the moodleform creating the datetimepicker has specified otherwise.
+        $timezone = ($this->_options['timezone'] == 99) ?
+                (core_date::get_server_timezone_object()->getOffset(new DateTime()) / 3600) :
+                ($this->_options['timezone']);
+        // Convert to correct UTC format.
+        $timezoneminutes = abs($timezone - floor($timezone)) * 60;
+        $timezone .= ($timezoneminutes < 10) ? (":0" . $timezoneminutes) : (":" . $timezoneminutes);
+
         // For compatibility with names that characters like [] created by moodleform functions such
         // as repeat_elements, we use getElementsByName instead of getElementsbyId, since HTML ids cannot contain [].
         $flatpickrdefinition = '
-            flatpickr(document.getElementsByName("'. $inputname .'_flatpickr")[0], {
-                enableTime: true,
-                dateFormat: "U",
-                altInput: true,
-                altFormat: "'. self::translate_date_tokens($datetimeformat) .'",
-                wrap: true,
-                time_24hr: '. $time24hr . ',
-                locale: "'. $this->_options['locale'] .'",
-                minuteIncrement: ' . $this->_options['step'] . ',
-                minDate: new Date('. $this->_options['startyear'] .' , 0, 1),
-                maxDate: new Date('. $this->_options['stopyear'] .' , 11, 31),
-                onReady: function(dateObj, dateStr, fp) {
-                    fp.altInput.name = "'.$inputname .'_flatpickr_display";
-                },
-                plugins: [new confirmDatePlugin({})]
-            });';
+            flatpickr(document.getElementsByName("'. $inputname .'_flatpickr")[0], {'.
+                'enableTime: true,'.
+                'dateFormat: "Y-m-dTH:i'. $timezone .'",'.
+                'altInput: true,'.
+                'altFormat: "'. self::translate_date_tokens($datetimeformat) .'",'.
+                'wrap: true,'.
+                'time_24hr: '. $time24hr . ','.
+                'locale: "'. $this->_options['locale'] .'",'.
+                'minuteIncrement: ' . $this->_options['step'] . ','.
+                'minDate: new Date('. $this->_options['startyear'] .' , 0, 1),'.
+                'maxDate: new Date('. $this->_options['stopyear'] .' , 11, 31),'.
+                'onReady: function(dateObj, dateStr, fp) {'.
+                    'fp.altInput.name = "'.$inputname .'_flatpickr_display";'.
+                '},'.
+                'plugins: [new confirmDatePlugin({}), new displayTimezonePlugin({})]'.
+            '});';
         $this->_elements[] = @MoodleQuickForm::createElement('html',
                 '<div style="display: inline; margin-right: 10px;" class="flatpickr" name ="'. $inputname .'_flatpickr">');
         $this->_elements[] = @MoodleQuickForm::createElement('text', 'date_time_selector', '',
@@ -323,6 +332,8 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                 }
                 if (!is_array($value)) {
                     // START UCLA MOD: CCLE-6868 - Revamp date picker.
+                    // This code is called whenever the datetimepicker is initialized. It's responsible for
+                    // setting the default, initial value of the datetimepicker.
                     /*
                     $calendartype = \core_calendar\type_factory::get_calendar_instance();
                     $currentdate = $calendartype->timestamp_to_date_array($value, $this->_options['timezone']);
@@ -335,7 +346,14 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                         'month' => $currentdate['mon'],
                         'year' => $currentdate['year']);
                     */
-                    $value -= $value % ($this->_options['step'] * 60); // Round value to previous multiple of step.
+                    $value -= $value % ($this->_options['step'] * 60); // Round datetime to previous multiple of step.
+
+                    // Convert datetime from Unix time to UTC in server timezone.
+                    $value = (new DateTime('@' . $value)); // Convert from Unix time to php DateTime.
+                    $servertimezoneoffset = core_date::get_server_timezone_object()->getOffset(new DateTime());
+                    $value->setTimeZone(new DateTimeZone(timezone_name_from_abbr('', $servertimezoneoffset, 0)));
+                    $value = $value->format('Y-m-d\TH:i'); // Convert to UTC.
+
                     $value = array('date_time_selector' => $value);
                     // END UCLA MOD: CCLE-6868.
                     // If optional, default to off, unless a date was provided.
@@ -459,6 +477,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
             */
 
             $value = $valuearray['date_time_selector'];
+            $value = strtotime($value); // Convert from UTC to unix time.
             // Validate $value. The user could have modified it in-browser.
             $value -= $value % ($this->_options['step'] * 60);
             $mincheck = strtotime('1' . ' January ' . $this->_options['startyear']) > $value;

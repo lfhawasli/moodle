@@ -39,7 +39,8 @@ $context = context_course::instance($courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/libalbum.php',
-                array('title' => $title)));
+                array('courseid' => $courseid, 'albumid' => $albumid,
+                    'title' => $title)), MEDIA_LIBRARYMUSIC, $title);
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
@@ -52,8 +53,13 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         html_writer::start_tag('div',array('id' => 'anchor'));
         display_page_album($course, $albumid);
         html_writer::end_div('div');
-        echo $OUTPUT->single_button(new moodle_url('/blocks/ucla_media/libreserves.php',
-                array('courseid' => $courseid)), get_string('returntomedia', 'block_ucla_media'), 'get');
+
+        echo html_writer::empty_tag('br');
+        echo $OUTPUT->container(html_writer::link(
+                new moodle_url('/blocks/ucla_media/libreserves.php',
+                    array('courseid' => $courseid)),
+                get_string('back', 'block_ucla_media')));
+
         $event = \block_ucla_media\event\library_reserves_index_viewed::create(
             array('context' => $context, 'other' => array(
                 'page' => get_string('headerlibres', 'block_ucla_media')
@@ -78,11 +84,6 @@ function display_page_album($course, $albumid) {
     global $DB, $OUTPUT;
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
     $courseid = $course->id;
-    echo $OUTPUT->heading(get_string('headerlibres', 'block_ucla_media') .
-            ": $course->fullname", 2, 'headingblock');
-    echo html_writer::tag('p', get_string('intromusic', 'block_ucla_media'),
-            array('id' => 'videoreserves-intro'));
-    echo "<br />";
     
     // Get media with given album title.
     $sql = "SELECT media.*
@@ -98,7 +99,10 @@ function display_page_album($course, $albumid) {
     if ($samplereserve->composer != null) {
         $title = $samplereserve->composer.' '.$title;
     }
-    echo html_writer::tag('h3', 'Track Listing: '.$title);
+
+    echo $OUTPUT->heading($title, 2, 'headingblock');
+    echo $OUTPUT->notification(get_string('intromusic', 'block_ucla_media'), 'info');
+
     $output = array();
     foreach ($reserves as $reserve) {
         $outputstr = '';

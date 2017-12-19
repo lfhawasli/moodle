@@ -78,7 +78,7 @@ if ($ADMIN->fulltree) {
             'block_ucla_media/bruincast_wowza',
             get_string('headerbruincastwowza', 'block_ucla_media'),
             get_string('descbruincastwowza', 'block_ucla_media'),
-            'http://164.67.141.72:1935',
+            '164.67.141.72',
             PARAM_URL
         ));
     $settings->add(new admin_setting_confightmleditor(

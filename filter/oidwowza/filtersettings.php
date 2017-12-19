@@ -31,7 +31,11 @@ $settings->add(new admin_setting_configcheckbox('filter_oidwowza_hashclientip',
 
 $settings->add(new admin_setting_configtext('filter_oidwowza_minutesexpire',
         get_string('filter_oidwowza_minutesexpire', 'filter_oidwowza'),
-        get_string('filter_oidwowza_minutesexpire_desc', 'filter_oidwowza'), 5, PARAM_INT));
+        get_string('filter_oidwowza_minutesexpire_desc', 'filter_oidwowza'), 240, PARAM_INT));
+
+$settings->add(new admin_setting_configtext('filter_oidwowza_bcsharedsecret',
+        get_string('filter_oidwowza_bcsharedsecret', 'filter_oidwowza'),
+        get_string('filter_oidwowza_bcsharedsecret_desc', 'filter_oidwowza'), '', PARAM_ALPHANUMEXT));
 
 $settings->add(new admin_setting_configtext('filter_oidwowza_sharedsecret',
         get_string('filter_oidwowza_sharedsecret', 'filter_oidwowza'),
@@ -41,6 +45,6 @@ $settings->add(new admin_setting_configtext(
             'filter_oidwowza/video_reserves_url',
             get_string('headerwowzaurl', 'filter_oidwowza'),
             get_string('descwowzaurl', 'filter_oidwowza'),
-            'oid-as-wowza.oid.ucla.edu:1935',
+            'oid-as-wowza.oid.ucla.edu',
             PARAM_URL
         ));

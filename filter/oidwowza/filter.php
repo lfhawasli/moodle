@@ -72,7 +72,7 @@ class filter_oidwowza extends moodle_text_filter {
         }
 
         // Prefix the jwplayer.
-        $jwplayerpath = $CFG->wwwroot . '/filter/oidwowza/jwplayer/jwplayer.js';
+        $jwplayerpath = 'https://content.jwplatform.com/libraries/q3GUgsN9.js';
         $newtext = '<script type="text/javascript" src="' . $jwplayerpath . '"></script>'
                 . $newtext;
 
@@ -87,15 +87,21 @@ class filter_oidwowza extends moodle_text_filter {
      * @param string $clientip
      * @param string $contentpath
      * @param int $endtime
+     * @param string $sharedsecret  What secret to use. Video reserves and
+     *                              Bruincast use different tokens.
      * @param string $remoteip      Used primarily for unit testing.
      *
      * @return string               SecureToken hash to send to Wowza.
      */
-    public static function generate_securetoken($contentpath, $endtime, $remoteip = null) {
-        $hashclientip = get_config('', 'filter_oidwowza_hashclientip');
-        $sharedsecret = get_config('', 'filter_oidwowza_sharedsecret');
+    public static function generate_securetoken($contentpath, $endtime, $sharedsecret, $remoteip = null) {
+
+        // If there is no token, then there is not token to generate.
+        if (empty($sharedsecret)) {
+            return '';
+        }
 
         // Parameters need to be in alphabetical order, even the numbers.
+        $hashclientip = get_config('', 'filter_oidwowza_hashclientip');
         if (!empty($hashclientip)) {
             $params[] = $remoteip ? $remoteip : $_SERVER['REMOTE_ADDR'];
         }
@@ -145,18 +151,17 @@ function oidwowza_filter_mp4_bruincast_callback($link) {
     if (!empty($rtmpurl)) {
         $rtmpurl = urldecode($rtmpurl);
     }
-    $height = 480;
-    $width = 720;
 
     $playerid = uniqid();
     if ($isvideo == 1) {
         return "
-        <div id='player-$playerid'></div>
-	<script type='text/javascript'>
-	jwplayer('player-$playerid').setup({
-		width: $width,
-		height: $height,
-		playlist: [{
+            <div id='player-$playerid'></div>
+            <script type='text/javascript'>
+            jwplayer('player-$playerid').setup({
+                autostart: true,
+                width: '100%',
+                aspectratio: '3:2',
+                playlist: [{
                     sources :
                         [
                             {file: '$httpurl'},
@@ -164,26 +169,28 @@ function oidwowza_filter_mp4_bruincast_callback($link) {
                         ]
                     }],
                 primary: 'html5'
-		});
-	</script>";
+            });
+            </script>";
     } else {
         return "
             <div id='player-$playerid'></div>
             <script type='text/javascript'>
             jwplayer('player-$playerid').setup({
-	    sources: [
-		    {file: '$rtmpurl'},
-		    {file: '$httpurl'}
-            ],
-		rtmp: {
-			bufferlength: 3
-		},
-            modes: [
-                { type: 'html5' },
-                { type: 'flash' }
-            ],
-	    height: 30,
-        }) </script>";
+                autostart: true,
+                sources: [
+                        {file: '$rtmpurl'},
+                        {file: '$httpurl'}
+                ],
+                    rtmp: {
+                            bufferlength: 3
+                    },
+                modes: [
+                    { type: 'html5' },
+                    { type: 'flash' }
+                ],
+                height: 30
+            });
+            </script>";
     }
 }
 
@@ -201,8 +208,6 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $type   = clean_param($link[1], PARAM_NOTAGS);
     $url    = clean_param($link[2], PARAM_NOTAGS);
     $file   = clean_param($link[3], PARAM_NOTAGS);
-    $width  = clean_param($link[4], PARAM_INT);
-    $height = clean_param($link[5], PARAM_INT);
     $fallbackurl = clean_param($link[6], PARAM_TEXT);
     if (!empty($fallbackurl)) {
         $fallbackurl = urldecode($fallbackurl);
@@ -253,16 +258,20 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $contentpath = $app . '/_definst_/' . $format . $file;
    
     // Generate SecureToken hash.
+    $additionalparams = '';
     $endtime = time() + MINSECS * get_config('', 'filter_oidwowza_minutesexpire');
-    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime);
-    $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
+    $securetoken = filter_oidwowza::generate_securetoken($contentpath, $endtime,
+            get_config('', 'filter_oidwowza_sharedsecret'));
+    if (!empty($securetoken)) {
+        $additionalparams = "?wowzatokenendtime=$endtime&wowzatokenhash=$securetoken";
+    }
 
     // Streaming paths.
-    $srtpath = 'http://' . $url . '/' . $app . '/' . $srt;
-    $html5path = 'http://' . $url . '/' .
+    $srtpath = 'https://' . $url . '/' . $app . '/' . $srt;
+    $html5path = 'https://' . $url . '/' .
             $contentpath . '/playlist.m3u8' . $additionalparams;
 
-    $rtmppath = 'rtmp://'.$url . '/' . $contentpath . $additionalparams;
+    $rtmppath = 'rtmps://'.$url . '/' . $contentpath . $additionalparams;
 
     // Set playerid, so that we can support multiple video embeds.
     $playerid = uniqid();
@@ -365,21 +374,22 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
         <div id='player-$playerid'></div>
 	<script type='text/javascript'>
 	jwplayer('player-$playerid').setup({
-		width: $width,
-		height: $height,
-		plugins: {
-                    $mbrjs
-                    },
-		playlist: [{
-                    sources :
-                        [
-                            {file: '$html5path'},
-                            {file: '$rtmppath'}
-                        ]
-                    $srtjs
-                    }],
-                primary: 'html5'
-		});
+            autostart: true,
+            width: '100%',
+            aspectratio: '3:2',
+            plugins: {
+                $mbrjs
+                },
+            playlist: [{
+                sources :
+                    [
+                        {file: '$html5path'},
+                        {file: '$rtmppath'}
+                    ]
+                $srtjs
+                }],
+            primary: 'html5'
+        });
 	</script>" . $timeline . $fallbackurl;
 }
 
@@ -404,18 +414,17 @@ function oidwowza_filter_mp4_lib_callback($link, $autostart = false) {
     if (!empty($rtmpurl)) {
         $rtmpurl = urldecode($rtmpurl);
     }
-    $height = 480;
-    $width = 720;
     
     $playerid = uniqid();
     if ($isvideo == 1) {
         return "
-        <div id='player-$playerid'></div>
-	<script type='text/javascript'>
-	jwplayer('player-$playerid').setup({
-		width: $width,
-		height: $height,
-		playlist: [{
+            <div id='player-$playerid'></div>
+            <script type='text/javascript'>
+            jwplayer('player-$playerid').setup({
+                autostart: true,
+                width: '100%',
+                aspectratio: '3:2',
+                playlist: [{
                     sources :
                         [
                             {file: '$httpurl'},
@@ -423,26 +432,18 @@ function oidwowza_filter_mp4_lib_callback($link, $autostart = false) {
                         ]
                     }],
                 primary: 'html5'
-		});
-	</script>";
+                });
+            </script>";
     } else {
         return "
             <div id='player-$playerid'></div>
             <script type='text/javascript'>
             jwplayer('player-$playerid').setup({
-	    sources: [
-		    {file: '$rtmpurl'},
-		    {file: '$httpurl'}
-            ],
-		rtmp: {
-			bufferlength: 3
-		},
-            modes: [
-                { type: 'html5' },
-                { type: 'flash' }
-            ],
-	    height: 30,
-        }) </script>";
+                file: '$httpurl',
+                height: 30,
+                width: 500
+            });
+            </script>";
     }
 
 }

@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 $mediaid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
 $filename = optional_param('filename', null, PARAM_FILE);
+$title = '';    // To be set later.
 
 // Try to find corresponding course for given video.
 if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
@@ -38,6 +39,8 @@ if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
     } else if (empty($media->courseid) || !$course = get_course($media->courseid)) {
         print_error('coursemisconf');
     }
+
+    $title = date('D, m/d/Y', $media->date) . ': ' . $media->title;
 } else if ($mode == MEDIA_VIDEORESERVES) {
     $media = $DB->get_record('ucla_video_reserves', array('id' => $mediaid));
     if (($media->filename == null) && !empty($media->video_url)) {
@@ -48,20 +51,27 @@ if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
     } else if (empty($media->courseid) || !$course = get_course($media->courseid)) {
         print_error('coursemisconf');
     }
+
+    $title = $media->video_title;
 }
 require_login($course);
 $context = context_course::instance($media->courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $mediaid, 'mode' => $mode)));
+                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename)),
+                $mode, $title);
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
     if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
-        echo $OUTPUT->heading($media->title, 2, 'headingblock');
+        echo $OUTPUT->heading($title, 2, 'headingblock');
+        if (!empty($media->comments)) {
+            echo html_writer::tag('p', $media->comments);
+        }
+
         // Try to embed video or audio on page by calling filter.
         $filtertext = get_bruincast_filter_text($media, $mode, $filename);
 
@@ -95,7 +105,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                     userdate($media->start_date, $timeformat));
         }
 
-        echo $OUTPUT->heading($media->video_title, 2, 'headingblock');
+        echo $OUTPUT->heading($title, 2, 'headingblock');
 
         // Try to embed video on page by calling filter.
         $filtertext = sprintf('{wowza:jw,%s,%s,%d,%d,%s}',

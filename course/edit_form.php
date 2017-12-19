@@ -557,11 +557,7 @@ class course_edit_form extends moodleform {
             // changed to uclasharedcourse theme, if user has capability.
             $editcoursetheme = false;
             if (!empty($context) && has_capability('local/ucla:editcoursetheme', $context)) {
-                // Only allow collab sites to change themes.
-                $indicator = siteindicator_site::load($mform->getElementValue('id'));
-                if ((!empty($indicator))) {
-                    $editcoursetheme = true;
-                }
+                $editcoursetheme = true;
             }
             if (!$editcoursetheme) {
                 $element = $mform->getElement('theme');

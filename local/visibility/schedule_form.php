@@ -76,7 +76,7 @@ class schedule_form extends moodleform {
         $table->data = array();
         foreach ($this->visibilityschedule as $index => $range) {
             // This is used to delete the range.
-            $table->rowclasses[$index] = 'range' . $range->id;
+            $table->rowclasses[$index] = 'visibility-session range' . $range->id;
             $deletebutton = '<img src="' . $OUTPUT->pix_url('t/delete', '') .
                     '" style="cursor:pointer;" class="rangedeletebutton"'.
                     'data-course="'. $this->course->id .'" data-id="'. $range->id .'";/>';
@@ -140,6 +140,9 @@ class schedule_form extends moodleform {
         $mform->addElement('html', html_writer::table($table) . '<br>');
         $mform->registerNoSubmitButton($deletebuttonname);
 
+        // Define a delete all button, which deletes the sessions using ajax.
+        $mform->addElement('button', 'rangedeleteallbutton', get_string("deleteall"),
+                array('data-course' => $this->course->id));
     }
 
     /**

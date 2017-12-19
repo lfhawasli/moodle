@@ -41,19 +41,23 @@ class securetoken_testcase extends advanced_testcase {
      public function test_generation() {
          $this->resetAfterTest(true);
 
+         // Set secret.
+         $secret = 'qwerty';
+         set_config('filter_oidwowza_sharedsecret', $secret);
+
          // Hash with ip.
          set_config('filter_oidwowza_hashclientip', 1);
-         set_config('filter_oidwowza_sharedsecret', 'qwerty');
-         $token = filter_oidwowza::generate_securetoken('15S-ENGL170C-1/mp4:ID4837_BladeRunner.mp4', 1448491221, '128.97.175.185');
+         
+         $token = filter_oidwowza::generate_securetoken('15S-ENGL170C-1/mp4:ID4837_BladeRunner.mp4', 1448491221, $secret, '128.97.175.185');
          $this->assertEquals('gzwE-11KEpMiiII3CkohEgrtDjW7F2qzuUliqQKJTc8=', $token);
 
          // Hash without ip.
          set_config('filter_oidwowza_hashclientip', 0);
-         $token = filter_oidwowza::generate_securetoken('15S-ENGL170C-1/mp4:ID4837_BladeRunner.mp4', 1448491221, '128.97.175.185');
+         $token = filter_oidwowza::generate_securetoken('15S-ENGL170C-1/mp4:ID4837_BladeRunner.mp4', 1448491221, $secret, '128.97.175.185');
          $this->assertEquals('hUmQYc0k8U9fgNUz31V4BjH5IVOuxvQFcesYg2Kmqmg=', $token);
 
          // Do not pass IP.
-         $sametoken = filter_oidwowza::generate_securetoken('15S-ENGL170C-1/mp4:ID4837_BladeRunner.mp4', 1448491221);
+         $sametoken = filter_oidwowza::generate_securetoken('15S-ENGL170C-1/mp4:ID4837_BladeRunner.mp4', 1448491221, $secret);
          $this->assertEquals($token, $sametoken);
      }
  }

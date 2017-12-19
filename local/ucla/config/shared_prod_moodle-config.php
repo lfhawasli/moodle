@@ -541,7 +541,7 @@ $CFG->clamfailureonupload = 'donothing';
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
-$CFG->themelist = "uclashared,uclasharedcourse";
+$CFG->themelist = "snap,uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     View self help articles|https://docs.ccle.ucla.edu/
@@ -549,6 +549,12 @@ $CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
     Request a site|/course/request.php";
 $CFG->customusermenuitems = "grades,grades|/grade/report/mygrades.php|grades
 preferences,moodle|/user/preferences.php|preferences";
+
+// Site administration > Appearance > Themes > Snap > Snap
+$CFG->forced_plugin_settings['theme_snap']['messagestoggle'] = 0;
+
+// Site administration > Appearance > Themes > Snap > Resource display
+$CFG->forced_plugin_settings['theme_snap']['resourcedisplay'] = 'list';
 
 // Site administration > Appearance > Navigation
 $CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)

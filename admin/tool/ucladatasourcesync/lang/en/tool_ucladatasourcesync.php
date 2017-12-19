@@ -76,7 +76,7 @@ $string['warnnonexistentsrs'] = 'WARNING: Found non-existent srs {$a->term} {$a-
 $string['noticediscussionsrs'] = 'NOTICE: Found discussion srs {$a->srs}, using primary {$a->primary_srs}';
 $string['noticefoundaltcourseid'] = 'NOTICE: Found courseid {$a->courseid} by using term/subject/cat_num: {$a->term}-{$a->subject_area}-{$a->cat_num}-{$a->sec_num}';
 // Notification messages.
-$string['lrstartnoti'] = "Starting ldigitial audio DB update:";
+$string['lrstartnoti'] = "Starting digitial audio DB update:";
 $string['lrnoentries'] = 'No digitial audio reserve entries found.';
 
 // Strings for videoreserves_dbsync.
