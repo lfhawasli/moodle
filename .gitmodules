@@ -184,3 +184,6 @@
 [submodule "local/mediaconversion/libraries/KalturaGeneratedAPIClientsPHP"]
 	path = local/mediaconversion/libraries/KalturaGeneratedAPIClientsPHP
 	url = https://github.com/kaltura/KalturaGeneratedAPIClientsPHP.git
+[submodule "theme/snap"]
+	path = theme/snap
+	url = https://github.com/ccle/moodle-theme_snap

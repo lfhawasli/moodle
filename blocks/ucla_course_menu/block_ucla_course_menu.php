@@ -108,6 +108,9 @@ class block_ucla_course_menu extends block_navigation {
      *  Called by Moodle.
      **/
     public function get_content() {
+        if ($this->page->theme->name == 'snap') {
+            return;
+        }
         global $CFG;
 
         if ($this->contentgenerated === true) {
