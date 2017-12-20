@@ -169,7 +169,6 @@ class instructor_handler extends browseby_handler {
                     USING (term, srs)
                 $termwhere
                 AND ubi.profcode != '03'
-
                 ORDER BY ubi.lastname, ubi.firstname
             ";
 
@@ -179,32 +178,9 @@ class instructor_handler extends browseby_handler {
             $cache->set('users_' . $cachekey, $users);
         }
 
-        // Decide which users to have the ability to display in the
-        // chart.
-        // TODO It might be more efficient to just add another query.
-        $coursepcs = array();
-        foreach ($users as $k => $user) {
-            if ($this->ignore_course($user)) {
-                unset($users[$k]);
-                continue;
-            }
-
-            if (isset($user->profcode)) {
-                $pc = $user->profcode;
-                $coursepcs[$user->srs][$pc] = $pc;
-            }
-        }
-
-        $rolecaps = $this->get_roles_with_capability('moodle/course:update');
-
         $nodisplayhack = 0;
         foreach ($users as $k => $user) {
-            if ((isset($user->profcode)
-                    && !isset($rolecaps[$this->role_mapping(
-                               intval($user->profcode),
-                               $coursepcs[$user->srs],
-                               $user->subjarea)])
-                    )) {
+            if (isset($user->profcode) && $user->profcode == '03') {
                 $users[$k]->no_display = true;
                 $nodisplayhack++;
                 continue;
