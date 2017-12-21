@@ -150,9 +150,6 @@ class course_handler extends browseby_handler {
                 $subjareapretty);
 
             // Get all courses in this subject area from our browseall tables.
-            // CCLE-3989 - Supervising Instructor Shown On Course List:
-            // Filter out instructors of type '03' (supervising instructor)
-            // in WHERE clause.
             $sql = self::BROWSEALL_SQL_HELPER . "
                 FROM {ucla_browseall_classinfo} ubci
                 INNER JOIN {ucla_browseall_instrinfo} ubii
@@ -166,7 +163,6 @@ class course_handler extends browseby_handler {
             " .
             self::BROWSEALL_SYLLABUS_HELPER .
             "   WHERE ubci.subjarea = :subjarea
-                AND ubii.profcode != '03'
                 $termwhere
             " . self::BROWSEALL_ORDER_HELPER;
 
@@ -209,9 +205,6 @@ class course_handler extends browseby_handler {
 
             // Query that selects courses for selected term only.
             // This will not include people enrolled only locally.
-            // CCLE-3989 - Supervising Instructor Shown On Course List:
-            // Filter out instructors of type '03' (supervising instructor)
-            // in WHERE clause.
             $sql = self::BROWSEALL_SQL_HELPER . "
                 FROM {ucla_browseall_classinfo} ubci
                 LEFT JOIN {ucla_browseall_instrinfo} ubii
@@ -294,18 +287,6 @@ class course_handler extends browseby_handler {
 
         $uselocalcourses = $this->get_config('use_local_courses');
 
-        $coursepcs = array();
-        foreach ($courseslist as $k => $course) {
-            if (isset($course->profcode)) {
-                $pc = $course->profcode;
-                if (!isset($coursepcs[$k])) {
-                    $coursepcs[$k] = array();
-                }
-
-                $coursepcs[$k][$pc] = $pc;
-            }
-        }
-
         // Takes a denormalized Array of course-instructors and returns a set of
         // courses into $fullcourseslist.
         $fullcourseslist = array();
@@ -317,10 +298,12 @@ class course_handler extends browseby_handler {
             $k = make_idnumber($course);
             // Append instructors, since they could have duplicate rows.
             if (isset($fullcourseslist[$k])) {
-                $courseobj = $fullcourseslist[$k];
-
-                if ($instructorname = $this->fullname($course)) {
-                    $courseobj->instructors[$course->userid] = $instructorname;
+                // CCLE-3989 - Supervising Instructor Shown On Course List.
+                if (!empty($course->profcode) && $course->profcode != '03') {
+                    $courseobj = $fullcourseslist[$k];
+                    if ($instructorname = $this->fullname($course)) {
+                        $courseobj->instructors[$course->userid] = $instructorname;
+                    }
                 }
             } else {
                 $courseobj = new stdclass();
@@ -357,8 +340,11 @@ class course_handler extends browseby_handler {
                         $course->course_title, $course->section_title
                     );
 
-                if ($instructorname = $this->fullname($course)) {
-                    $courseobj->instructors[$course->userid] = $instructorname;
+                // CCLE-3989 - Supervising Instructor Shown On Course List.
+                if (!empty($course->profcode) && $course->profcode != '03') {
+                    if ($instructorname = $this->fullname($course)) {
+                        $courseobj->instructors[$course->userid] = $instructorname;
+                    }
                 }
 
                 $courseobj->session_group = $course->session_group;

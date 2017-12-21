@@ -209,27 +209,6 @@ abstract class browseby_handler {
     /**
      * Decoupled function.
      *
-     * @param string $cap
-     * @return array
-     */
-    protected function get_roles_with_capability($cap) {
-        return get_roles_with_capability($cap);
-    }
-
-    /**
-     * Decoupled function.
-     *
-     * @param int $pc
-     * @param int $o
-     * @param string $sa
-     */
-    protected function role_mapping($pc, $o, $sa="*SYSTEM*") {
-        return role_mapping($pc, $o, $sa);
-    }
-
-    /**
-     * Decoupled function.
-     *
      * @param string $divisioncode
      */
     protected function get_division($divisioncode) {
