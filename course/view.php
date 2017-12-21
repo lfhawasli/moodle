@@ -331,6 +331,15 @@
     // anything after that point.
     course_view(context_course::instance($course->id), $section);
 
+    // START UCLA MOD: CCLE-7101 - Drag/drop upload not working for UCLA format
+    if ($PAGE->theme->name == 'snap') {
+        // If in Snap theme do not call include_course_ajax(). It includes its
+        // own version.
+        echo $OUTPUT->footer();
+        die();
+    }
+    // END UCLA MOD: CCLE-7101
+
     // Include course AJAX
     include_course_ajax($course, $modnamesused);
     
