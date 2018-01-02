@@ -218,6 +218,11 @@ class sendgrade_test extends advanced_testcase {
         set_config('gradebook_id', 99);
         set_config('gradebook_password', 'test');
         set_config('gradebook_send_updates', 1);
+
+        // Make sure the adhoc queue is cleared.
+        while ($task = \core\task\manager::get_next_adhoc_task(time())) {
+            \core\task\manager::adhoc_task_complete($task);
+        }
     }
 
     /**

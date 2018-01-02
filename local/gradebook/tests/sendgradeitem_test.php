@@ -55,6 +55,24 @@ class sendgradeitem_test extends advanced_testcase {
     private $tmplogfile;
 
     /**
+     * Helper function to get the course module id from the grade item.
+     * @param grade_item $gradeitem
+     * @return int
+     */
+    private function get_cmid_from_gradeitem(grade_item $gradeitem) {
+        global $DB;
+        $sql = "SELECT cm.id
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id=cm.module
+                 WHERE cm.course=:courseid
+                   AND m.name=:module
+                   AND cm.instance=:instance";
+        return $DB->get_field_sql($sql, array('courseid' => $gradeitem->courseid,
+            'module' => $gradeitem->itemmodule,
+            'instance' => $gradeitem->iteminstance));
+    }
+
+    /**
      * Returns a version of send_myucla_grade_item that has its
      * get_webservice_client() remapped to the mocked_get_webservice_client()
      * method of the current class.
@@ -74,6 +92,30 @@ class sendgradeitem_test extends advanced_testcase {
                 ->will($this->returnCallback(array($this, 'mocked_get_webservice_client')));
 
         return $mockgradeitemtask;
+    }
+
+    /**
+     * Helper function to get send_myucla_grade_item task.
+     *
+     * @return send_myucla_grade_item
+     */
+    private function get_send_myucla_grade_item_task() {
+        // A grade item should have been automatically generated and an adhoc
+        // task of type send_myucla_grade_item should have been created.
+        $task = \core\task\manager::get_next_adhoc_task(time());
+        $this->assertNotNull($task);
+        $this->assertEquals('local_gradebook\task\send_myucla_grade_item',
+                get_class($task));
+
+        // Important to call this to release the cron lock.
+        \core\task\manager::adhoc_task_complete($task);
+
+        // Make sure the adhoc queue is cleared.
+        while ($extratask = \core\task\manager::get_next_adhoc_task(time())) {
+            \core\task\manager::adhoc_task_complete($extratask);
+        }
+
+        return $task;
     }
 
     /**
@@ -137,6 +179,11 @@ class sendgradeitem_test extends advanced_testcase {
         set_config('gradebook_id', 99);
         set_config('gradebook_password', 'test');
         set_config('gradebook_send_updates', 1);
+
+        // Make sure the adhoc queue is cleared.
+        while ($task = \core\task\manager::get_next_adhoc_task(time())) {
+            \core\task\manager::adhoc_task_complete($task);
+        }
     }
 
     /**
@@ -296,14 +343,7 @@ class sendgradeitem_test extends advanced_testcase {
                 ->create_module('assign', array('course' => $this->course->id,
                     'duedate' => strtotime("+1 week")));
 
-        // A grade item should have been automatically generated and an adhoc
-        // task of type send_myucla_grade_item should have been created.
-        $task = \core\task\manager::get_next_adhoc_task(time());
-        $this->assertNotNull($task);
-        $this->assertEquals('local_gradebook\task\send_myucla_grade_item',
-                get_class($task));
-        // Important to call this to release the cron lock.
-        \core\task\manager::adhoc_task_complete($task);
+        $task = $this->get_send_myucla_grade_item_task();
 
         // Get course that format_myucla_parameters needs.
         $courses = $task->get_courses_info();
@@ -333,6 +373,11 @@ class sendgradeitem_test extends advanced_testcase {
         $this->assertEmpty($myuclaparams['mItem']['itemComment']);
         $this->assertEquals($gradeitem->grademax, $myuclaparams['mItem']['itemMaxScore']);
 
+        // Make sure itemEditURL is correct.
+        $cmid = $this->get_cmid_from_gradeitem($gradeitem);
+        $this->assertEquals($CFG->wwwroot . '/mod/assign/view.php?id=' . $cmid,
+                $myuclaparams['mItem']['itemEditURL']);
+
         // Need to make sure that itemDue is send in yyyy-mm-dd hh:mm:ss.fff,
         // where fff stands for milliseconds, format.
         $expecteddatetime = date('Y-m-d H:i:s.000', $assign->duedate);
@@ -348,6 +393,61 @@ class sendgradeitem_test extends advanced_testcase {
         // Verify that the mTransaction info is the same.
         $this->assertEquals($this->instructor->idnumber, $myuclaparams['mTransaction']['userUID']);
         $this->assertEquals(fullname($this->instructor), $myuclaparams['mTransaction']['userName']);
+    }
+
+    /**
+     * The test_format_myucla_parameters tests the assign module which does not
+     * have a grade.php. We want to test with the lesson module that does. As
+     * well as test manual grade items to make sure we get the right URL sent.
+     */
+    public function test_get_editurl() {
+        global $CFG;
+
+        // Create lesson.
+        $lesson = $this->getDataGenerator()->create_module('lesson',
+                array('course' => $this->course));
+
+        $task = $this->get_send_myucla_grade_item_task();
+
+        // Get course that format_myucla_parameters needs.
+        $courses = $task->get_courses_info();
+        // Shouldn't be a cross-listed course.
+        $this->assertEquals(1, count($courses));
+        $course = reset($courses);  // Get first entry.
+
+        // Make sure the task has the proper elements set.
+        $myuclaparams = $task->format_myucla_parameters($course);
+        $lessonitem = grade_item::fetch(array('itemtype'     => 'mod',
+                                             'itemmodule'   => 'lesson',
+                                             'iteminstance' => $lesson->id,
+                                             'courseid'     => $this->course->id));
+
+        // Make sure itemEditURL is correct.
+        $cmid = $this->get_cmid_from_gradeitem($lessonitem);
+        $this->assertEquals($CFG->wwwroot . '/mod/lesson/grade.php?id=' . $cmid .
+                '&itemnumber=' . $lessonitem->itemnumber,
+                $myuclaparams['mItem']['itemEditURL']);
+
+        // Create manual grade item.
+        $coursecategory = grade_category::fetch_course_category($this->course->id);
+        $itemparams = array(
+            'courseid' => $this->course->id,
+            'itemtype' => 'manual',
+            'itemname' => 'Midterm',
+            'categoryid' => $coursecategory->id,
+        );
+
+        $manualitem = new \grade_item($itemparams, false);
+        $itemid = $manualitem->insert('manual');
+
+        $task = $this->get_send_myucla_grade_item_task();
+        $myuclaparams = $task->format_myucla_parameters($course);
+
+        // Make sure name is the same since item is not a module.
+        $this->assertEquals($manualitem->itemname, $myuclaparams['mItem']['itemName']);
+        $this->assertEquals($CFG->wwwroot . '/grade/report/singleview/index.php?id=' .
+                $this->course->id . '&itemid=' . $itemid . '&item=grade',
+                $myuclaparams['mItem']['itemEditURL']);
     }
 
     /**
