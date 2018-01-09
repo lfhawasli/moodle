@@ -19,6 +19,22 @@ Installation
 3) Update mod/assign/feedback/editpdf/fpdi/fpdi_bridge.php (or the replacement file) to extend 'pdf' instead of 'TCPDF'.
 4) Make a note below of any changes made.
 
+2017/10/03
+----------
+1/ Updated to 1.6.2
+2/ Cherry-picked changes in MDL-55848.
+3/ Renamed 'TCPDF' to 'pdf' as stated above.
+4/ Applied php7.2 compatibility fix, remove this if it is fixed in next major release (2.0) (MDL-60301).
+
+Updated by Ankit Agarwal<ankit.agrr@gmail.com> (MDL-60301)
+
+2016/11/15
+----------
+
+1) Class not exists check and the empty fpdi_bridge class has been removed from fpdi_bridge.php to fix a behat error.
+
+Updated by Simey Lameze (MDL-55848)
+
 2015/12/04
 ----------
 Updated to FPDI: 1.6.1

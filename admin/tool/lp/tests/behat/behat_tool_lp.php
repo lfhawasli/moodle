@@ -44,7 +44,7 @@ class behat_tool_lp extends behat_base {
      * @param string $rowname
      */
     public function click_on_edit_menu_of_the_row($nodetext, $rowname) {
-        $xpathtarget = "//ul//li//ul//li[@class='tool-lp-menu-item']//a[contains(.,'" . $nodetext . "')]";
+        $xpathtarget = "//ul//li//ul//li[contains(concat(' ', @class, ' '), ' tool-lp-menu-item ')]//a[contains(.,'" . $nodetext . "')]";
 
         $this->execute('behat_general::i_click_on_in_the', [get_string('edit'), 'link', $this->escape($rowname), 'table_row']);
         $this->execute('behat_general::i_click_on_in_the', [$xpathtarget, 'xpath_element', $this->escape($rowname), 'table_row']);
@@ -63,16 +63,4 @@ class behat_tool_lp extends behat_base {
         $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
     }
 
-    /**
-     * Select item from autocomplete list.
-     *
-     * @Given /^I click on "([^"]*)" item in the autocomplete list$/
-     *
-     * @param string $item
-     */
-    public function i_click_on_item_in_the_autocomplete_list($item) {
-        $xpathtarget = "//ul[@class='form-autocomplete-suggestions']//li//span//span[contains(.,'" . $item . "')]";
-
-        $this->execute('behat_general::i_click_on', [$xpathtarget, 'xpath_element']);
-    }
 }

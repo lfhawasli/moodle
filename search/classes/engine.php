@@ -138,7 +138,7 @@ abstract class engine {
      * Returns a search instance of the specified area checking internal caching.
      *
      * @param string $areaid Area id
-     * @return \core_search\area\base
+     * @return \core_search\base
      */
     protected function get_search_area($areaid) {
 
@@ -174,11 +174,11 @@ abstract class engine {
     /**
      * Returns a document instance prepared to be rendered.
      *
-     * @param \core_search\area\base $searcharea
+     * @param \core_search\base $searcharea
      * @param array $docdata
      * @return \core_search\document
      */
-    protected function to_document(\core_search\area\base $searcharea, $docdata) {
+    protected function to_document(\core_search\base $searcharea, $docdata) {
 
         list($componentname, $areaname) = \core_search\manager::extract_areaid_parts($docdata['areaid']);
         $doc = \core_search\document_factory::instance($docdata['itemid'], $componentname, $areaname, $this);
@@ -196,6 +196,63 @@ abstract class engine {
         }
 
         return $doc;
+    }
+
+    /**
+     * Loop through given iterator of search documents
+     * and and have the search engine back end add them
+     * to the index.
+     *
+     * @param iterator $iterator the iterator of documents to index
+     * @param searcharea $searcharea the area for the documents to index
+     * @param array $options document indexing options
+     * @return array Processed document counts
+     */
+    public function add_documents($iterator, $searcharea, $options) {
+        $numrecords = 0;
+        $numdocs = 0;
+        $numdocsignored = 0;
+        $lastindexeddoc = 0;
+        $firstindexeddoc = 0;
+        $partial = false;
+
+        foreach ($iterator as $document) {
+            // Stop if we have exceeded the time limit (and there are still more items). Always
+            // do at least one second's worth of documents otherwise it will never make progress.
+            if ($lastindexeddoc !== $firstindexeddoc &&
+                    !empty($options['stopat']) && manager::get_current_time() >= $options['stopat']) {
+                $partial = true;
+                break;
+            }
+
+            if (!$document instanceof \core_search\document) {
+                continue;
+            }
+
+            if (isset($options['lastindexedtime']) && $options['lastindexedtime'] == 0) {
+                // If we have never indexed this area before, it must be new.
+                $document->set_is_new(true);
+            }
+
+            if ($options['indexfiles']) {
+                // Attach files if we are indexing.
+                $searcharea->attach_files($document);
+            }
+
+            if ($this->add_document($document, $options['indexfiles'])) {
+                $numdocs++;
+            } else {
+                $numdocsignored++;
+            }
+
+            $lastindexeddoc = $document->get('modified');
+            if (!$firstindexeddoc) {
+                $firstindexeddoc = $lastindexeddoc;
+            }
+            $numrecords++;
+        }
+
+        return array($numrecords, $numdocs, $numdocsignored, $lastindexeddoc, $partial);
     }
 
     /**
@@ -255,7 +312,7 @@ abstract class engine {
     /**
      * Do anything that may need to be done before an area is indexed.
      *
-     * @param \core_search\area\base $searcharea The search area that was complete
+     * @param \core_search\base $searcharea The search area that was complete
      * @param bool $fullindex True if a full index is being performed
      * @return void
      */
@@ -268,7 +325,7 @@ abstract class engine {
      *
      * Return false to prevent the search area completed time and stats from being updated.
      *
-     * @param \core_search\area\base $searcharea The search area that was complete
+     * @param \core_search\base $searcharea The search area that was complete
      * @param int $numdocs The number of documents that were added to the index
      * @param bool $fullindex True if a full index is being performed
      * @return bool True means that data is considered indexed

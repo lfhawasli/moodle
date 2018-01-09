@@ -87,6 +87,15 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Opens course index page.
+     *
+     * @Given /^I am on course index$/
+     */
+    public function i_am_on_course_index() {
+        $this->getSession()->visit($this->locate_path('/course/index.php'));
+    }
+
+    /**
      * Reloads the current page.
      *
      * @Given /^I reload the page$/
@@ -134,7 +143,7 @@ class behat_general extends behat_base {
 
         // Wait until the URL change is executed.
         if ($this->running_javascript()) {
-            $this->getSession()->wait($waittime * 1000, false);
+            $this->getSession()->wait($waittime * 1000);
 
         } else if (!empty($url)) {
             // We redirect directly as we can not wait for an automatic redirection.
@@ -244,7 +253,7 @@ class behat_general extends behat_base {
      */
     public function i_wait_seconds($seconds) {
         if ($this->running_javascript()) {
-            $this->getSession()->wait($seconds * 1000, false);
+            $this->getSession()->wait($seconds * 1000);
         } else {
             sleep($seconds);
         }
@@ -625,6 +634,9 @@ class behat_general extends behat_base {
                     } catch (WebDriver\Exception\NoSuchElement $e) {
                         // Do nothing just return, as element is no more on page.
                         return true;
+                    } catch (ElementNotFoundException $e) {
+                        // Do nothing just return, as element is no more on page.
+                        return true;
                     }
                 }
 
@@ -997,6 +1009,43 @@ class behat_general extends behat_base {
             \core\task\manager::scheduled_task_failed($task);
             throw new DriverException('The "' . $taskname . '" scheduled task failed', 0, $e);
         }
+    }
+
+    /**
+     * Runs all ad-hoc tasks in the queue.
+     *
+     * This is faster and more reliable than running cron (running cron won't
+     * work more than once in the same test, for instance). However it is
+     * a little less 'realistic'.
+     *
+     * While the task is running, we suppress mtrace output because it makes
+     * the Behat result look ugly.
+     *
+     * @Given /^I run all adhoc tasks$/
+     * @throws DriverException
+     */
+    public function i_run_all_adhoc_tasks() {
+        // Do setup for cron task.
+        cron_setup_user();
+
+        // Run tasks. Locking is handled by get_next_adhoc_task.
+        $now = time();
+        ob_start(); // Discard task output as not appropriate for Behat output!
+        while (($task = \core\task\manager::get_next_adhoc_task($now)) !== null) {
+
+            try {
+                $task->execute();
+
+                // Mark task complete.
+                \core\task\manager::adhoc_task_complete($task);
+            } catch (Exception $e) {
+                // Mark task failed and throw exception.
+                \core\task\manager::adhoc_task_failed($task);
+                ob_end_clean();
+                throw new DriverException('An adhoc task failed', 0, $e);
+            }
+        }
+        ob_end_clean();
     }
 
     /**
@@ -1564,7 +1613,12 @@ class behat_general extends behat_base {
         }
         // Gets the node based on the requested selector type and locator.
         $node = $this->get_selected_node($selectortype, $element);
-        $this->getSession()->getDriver()->post_key("\xEE\x80\x84", $node->getXpath());
+        $driver = $this->getSession()->getDriver();
+        if ($driver instanceof \Moodle\BehatExtension\Driver\MoodleSelenium2Driver) {
+            $driver->post_key("\xEE\x80\x84", $node->getXpath());
+        } else {
+            $driver->keyDown($node->getXpath(), "\t");
+        }
     }
 
     /**

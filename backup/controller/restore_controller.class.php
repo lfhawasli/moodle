@@ -63,6 +63,7 @@ class restore_controller extends base_controller {
     protected $precheck;    // Results of the execution of restore prechecks
 
     protected $info;   // Information retrieved from backup contents
+    /** @var restore_plan */
     protected $plan;   // Restore execution plan
 
     protected $execution;     // inmediate/delayed
@@ -153,6 +154,9 @@ class restore_controller extends base_controller {
         } else {
             // Load plan
             $this->load_plan();
+
+            // Apply all default settings (based on type/format/mode).
+            $this->apply_defaults();
 
             // Perform all initial security checks and apply (2nd param) them to settings automatically
             restore_check::check_security($this, true);
@@ -521,6 +525,15 @@ class restore_controller extends base_controller {
         $this->plan = new restore_plan($this);
         $this->plan->build(); // Build plan for this controller
         $this->set_status(backup::STATUS_PLANNED);
+    }
+
+    /**
+     * Apply defaults from the global admin settings
+     */
+    protected function apply_defaults() {
+        $this->log('applying restore defaults', backup::LOG_DEBUG);
+        restore_controller_dbops::apply_config_defaults($this);
+        $this->set_status(backup::STATUS_CONFIGURED);
     }
 }
 

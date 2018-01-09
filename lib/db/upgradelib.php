@@ -131,26 +131,6 @@ function upgrade_group_members_only($groupingid, $availability) {
 }
 
 /**
- * Updates the mime-types for files that exist in the database, based on their
- * file extension.
- *
- * @param array $filetypes Array with file extension as the key, and mimetype as the value
- */
-function upgrade_mimetypes($filetypes) {
-    global $DB;
-    $select = $DB->sql_like('filename', '?', false);
-    foreach ($filetypes as $extension=>$mimetype) {
-        $DB->set_field_select(
-            'files',
-            'mimetype',
-            $mimetype,
-            $select,
-            array($extension)
-        );
-    }
-}
-
-/**
  * Marks all courses with changes in extra credit weight calculation
  *
  * Used during upgrade and in course restore process
@@ -286,26 +266,6 @@ function upgrade_calculated_grade_items($courseid = null) {
             }
         }
     }
-}
-
-/**
- * This upgrade script merges all tag instances pointing to the same course tag
- *
- * User id is no longer used for those tag instances
- */
-function upgrade_course_tags() {
-    global $DB;
-    $sql = "SELECT min(ti.id)
-        FROM {tag_instance} ti
-        LEFT JOIN {tag_instance} tii on tii.itemtype = ? and tii.itemid = ti.itemid and tii.tiuserid = 0 and tii.tagid = ti.tagid
-        where ti.itemtype = ? and ti.tiuserid <> 0 AND tii.id is null
-        group by ti.tagid, ti.itemid";
-    $ids = $DB->get_fieldset_sql($sql, array('course', 'course'));
-    if ($ids) {
-        list($idsql, $idparams) = $DB->get_in_or_equal($ids);
-        $DB->execute('UPDATE {tag_instance} SET tiuserid = 0 WHERE id ' . $idsql, $idparams);
-    }
-    $DB->execute("DELETE FROM {tag_instance} WHERE itemtype = ? AND tiuserid <> 0", array('course'));
 }
 
 /**
@@ -526,4 +486,19 @@ function upgrade_standardise_score($rawgrade, $sourcemin, $sourcemax, $targetmin
     $diff = $targetmax - $targetmin;
     $standardisedvalue = $factor * $diff + $targetmin;
     return $standardisedvalue;
+}
+
+/**
+ * Delete orphaned records in block_positions
+ */
+function upgrade_block_positions() {
+    global $DB;
+    $id = 'id';
+    if ($DB->get_dbfamily() !== 'mysql') {
+        // Field block_positions.subpage has type 'char', it can not be compared to int in db engines except for mysql.
+        $id = $DB->sql_concat('?', 'id');
+    }
+    $sql = "DELETE FROM {block_positions}
+    WHERE pagetype IN ('my-index', 'user-profile') AND subpage NOT IN (SELECT $id FROM {my_pages})";
+    $DB->execute($sql, ['']);
 }

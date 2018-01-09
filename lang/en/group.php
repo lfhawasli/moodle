@@ -56,6 +56,7 @@ $string['deletegroupsconfirm'] = 'Are you sure you want to delete the following 
 $string['deleteselectedgroup'] = 'Delete selected group';
 $string['editgroupingsettings'] = 'Edit grouping settings';
 $string['editgroupsettings'] = 'Edit group settings';
+$string['editusersgroupsa'] = 'Edit groups for "{$a}"';
 $string['enrolmentkey'] = 'Enrolment key';
 $string['enrolmentkey_help'] = 'An enrolment key enables access to the course to be restricted to only those who know the key. If a group enrolment key is specified, then not only will entering that key let the user into the course, but it will also automatically make them a member of this group.
 
@@ -107,7 +108,7 @@ $string['groupmembersselected'] = 'Members of selected group';
 $string['groupmode'] = 'Group mode';
 $string['groupmode_help'] = 'This setting has 3 options:
 
-* No groups - There are no sub groups, everyone is part of one big community
+* No groups
 * Separate groups - Each group member can only see their own group, others are invisible
 * Visible groups - Each group member works in their own group, but can also see other groups
 

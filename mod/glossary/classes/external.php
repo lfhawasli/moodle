@@ -90,14 +90,9 @@ class mod_glossary_external extends external_api {
             'definition' => new external_value(PARAM_RAW, 'The definition'),
             'definitionformat' => new external_format_value('definition'),
             'definitiontrust' => new external_value(PARAM_BOOL, 'The definition trust flag'),
+            'definitioninlinefiles' => new external_files('entry definition inline files', VALUE_OPTIONAL),
             'attachment' => new external_value(PARAM_BOOL, 'Whether or not the entry has attachments'),
-            'attachments' => new external_multiple_structure(
-                new external_single_structure(array(
-                    'filename' => new external_value(PARAM_FILE, 'File name'),
-                    'mimetype' => new external_value(PARAM_RAW, 'Mime type'),
-                    'fileurl'  => new external_value(PARAM_URL, 'File download URL')
-                )), 'attachments', VALUE_OPTIONAL
-            ),
+            'attachments' => new external_files('attachments', VALUE_OPTIONAL),
             'timecreated' => new external_value(PARAM_INT, 'Time created'),
             'timemodified' => new external_value(PARAM_INT, 'Time modified'),
             'teacherentry' => new external_value(PARAM_BOOL, 'The entry was created by a teacher, or equivalent.'),
@@ -148,19 +143,11 @@ class mod_glossary_external extends external_api {
         $entry->attachment = !empty($entry->attachment) ? 1 : 0;
         $entry->attachments = array();
         if ($entry->attachment) {
-            $fs = get_file_storage();
-            if ($files = $fs->get_area_files($context->id, 'mod_glossary', 'attachment', $entry->id, 'filename', false)) {
-                foreach ($files as $file) {
-                    $filename = $file->get_filename();
-                    $fileurl = moodle_url::make_webservice_pluginfile_url($context->id, 'mod_glossary', 'attachment',
-                        $entry->id, '/', $filename);
-                    $entry->attachments[] = array(
-                        'filename' => $filename,
-                        'mimetype' => $file->get_mimetype(),
-                        'fileurl'  => $fileurl->out(false)
-                    );
-                }
-            }
+            $entry->attachments = external_util::get_area_files($context->id, 'mod_glossary', 'attachment', $entry->id);
+        }
+        $definitioninlinefiles = external_util::get_area_files($context->id, 'mod_glossary', 'entry', $entry->id);
+        if (!empty($definitioninlinefiles)) {
+            $entry->definitioninlinefiles = $definitioninlinefiles;
         }
     }
 
@@ -182,7 +169,7 @@ class mod_glossary_external extends external_api {
     /**
      * Describes the parameters for get_glossaries_by_courses.
      *
-     * @return external_external_function_parameters
+     * @return external_function_parameters
      * @since Moodle 3.1
      */
     public static function get_glossaries_by_courses_parameters() {
@@ -232,6 +219,7 @@ class mod_glossary_external extends external_api {
                 $glossary->name = external_format_string($glossary->name, $context->id);
                 list($glossary->intro, $glossary->introformat) = external_format_text($glossary->intro, $glossary->introformat,
                     $context->id, 'mod_glossary', 'intro', null);
+                $glossary->introfiles = external_util::get_area_files($context->id, 'mod_glossary', 'intro', false, false);
 
                 // Make sure we have a number of entries per page.
                 if (!$glossary->entbypage) {
@@ -243,6 +231,7 @@ class mod_glossary_external extends external_api {
                     $modes[$glossary->displayformat] = self::get_browse_modes_from_display_format($glossary->displayformat);
                 }
                 $glossary->browsemodes = $modes[$glossary->displayformat];
+                $glossary->canaddentry = has_capability('mod/glossary:write', $context) ? 1 : 0;
             }
         }
 
@@ -268,6 +257,7 @@ class mod_glossary_external extends external_api {
                     'name' => new external_value(PARAM_RAW, 'Glossary name'),
                     'intro' => new external_value(PARAM_RAW, 'The Glossary intro'),
                     'introformat' => new external_format_value('intro'),
+                    'introfiles' => new external_files('Files in the introduction text', VALUE_OPTIONAL),
                     'allowduplicatedentries' => new external_value(PARAM_INT, 'If enabled, multiple entries can have the' .
                         ' same concept name'),
                     'displayformat' => new external_value(PARAM_TEXT, 'Display format type'),
@@ -308,7 +298,8 @@ class mod_glossary_external extends external_api {
                     'groupingid' => new external_value(PARAM_INT, 'Grouping ID'),
                     'browsemodes' => new external_multiple_structure(
                         new external_value(PARAM_ALPHA, 'Modes of browsing allowed')
-                    )
+                    ),
+                    'canaddentry' => new external_value(PARAM_INT, 'Whether the user can add a new entry', VALUE_OPTIONAL),
                 ), 'Glossaries')
             ),
             'warnings' => new external_warnings())
@@ -495,6 +486,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -511,6 +503,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -592,6 +585,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -608,6 +602,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -769,6 +764,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -785,6 +781,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure(true)
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -963,6 +960,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -979,6 +977,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -1066,6 +1065,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -1082,6 +1082,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -1167,6 +1168,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -1183,6 +1185,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -1247,6 +1250,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -1263,6 +1267,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -1333,6 +1338,7 @@ class mod_glossary_external extends external_api {
         return array(
             'count' => $count,
             'entries' => $entries,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry', $entries),
             'warnings' => $warnings
         );
     }
@@ -1349,6 +1355,7 @@ class mod_glossary_external extends external_api {
             'entries' => new external_multiple_structure(
                 self::get_entry_return_structure()
             ),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
             'warnings' => new external_warnings()
         ));
     }
@@ -1394,6 +1401,8 @@ class mod_glossary_external extends external_api {
 
         return array(
             'entry' => $entry,
+            'ratinginfo' => \core_rating\external\util::get_rating_info($glossary, $context, 'mod_glossary', 'entry',
+                array($entry)),
             'warnings' => $warnings
         );
     }
@@ -1407,6 +1416,139 @@ class mod_glossary_external extends external_api {
     public static function get_entry_by_id_returns() {
         return new external_single_structure(array(
             'entry' => self::get_entry_return_structure(),
+            'ratinginfo' => \core_rating\external\util::external_ratings_structure(),
+            'warnings' => new external_warnings()
+        ));
+    }
+
+    /**
+     * Returns the description of the external function parameters.
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.2
+     */
+    public static function add_entry_parameters() {
+        return new external_function_parameters(array(
+            'glossaryid' => new external_value(PARAM_INT, 'Glossary id'),
+            'concept' => new external_value(PARAM_TEXT, 'Glossary concept'),
+            'definition' => new external_value(PARAM_RAW, 'Glossary concept definition'),
+            'definitionformat' => new external_format_value('definition'),
+            'options' => new external_multiple_structure (
+                new external_single_structure(
+                    array(
+                        'name' => new external_value(PARAM_ALPHANUM,
+                            'The allowed keys (value format) are:
+                            inlineattachmentsid (int); the draft file area id for inline attachments
+                            attachmentsid (int); the draft file area id for attachments
+                            categories (comma separated int); comma separated category ids
+                            aliases (comma separated str); comma separated aliases
+                            usedynalink (bool); whether the entry should be automatically linked.
+                            casesensitive (bool); whether the entry is case sensitive.
+                            fullmatch (bool); whether to match whole words only.'),
+                        'value' => new external_value(PARAM_RAW, 'the value of the option (validated inside the function)')
+                    )
+                ), 'Optional settings', VALUE_DEFAULT, array()
+            )
+        ));
+    }
+
+
+    /**
+     * Add a new entry to a given glossary.
+     *
+     * @param int $glossaryid the glosary id
+     * @param string $concept    the glossary concept
+     * @param string $definition the concept definition
+     * @param int $definitionformat the concept definition format
+     * @param array  $options    additional settings
+     * @return array Containing entry and warnings.
+     * @since Moodle 3.2
+     * @throws moodle_exception
+     * @throws invalid_parameter_exception
+     */
+    public static function add_entry($glossaryid, $concept, $definition, $definitionformat, $options = array()) {
+        global $CFG;
+
+        $params = self::validate_parameters(self::add_entry_parameters(), array(
+            'glossaryid' => $glossaryid,
+            'concept' => $concept,
+            'definition' => $definition,
+            'definitionformat' => $definitionformat,
+            'options' => $options,
+        ));
+        $warnings = array();
+
+        // Get and validate the glossary.
+        list($glossary, $context, $course, $cm) = self::validate_glossary($params['glossaryid']);
+        require_capability('mod/glossary:write', $context);
+
+        if (!$glossary->allowduplicatedentries) {
+            if (glossary_concept_exists($glossary, $params['concept'])) {
+                throw new moodle_exception('errconceptalreadyexists', 'glossary');
+            }
+        }
+
+        // Prepare the entry object.
+        $entry = new stdClass;
+        $entry->id = null;
+        $entry->aliases = '';
+        $entry->usedynalink = $CFG->glossary_linkentries;
+        $entry->casesensitive = $CFG->glossary_casesensitive;
+        $entry->fullmatch = $CFG->glossary_fullmatch;
+        $entry->concept = $params['concept'];
+        $entry->definition_editor = array(
+            'text' => $params['definition'],
+            'format' => $params['definitionformat'],
+        );
+        // Options.
+        foreach ($params['options'] as $option) {
+            $name = trim($option['name']);
+            switch ($name) {
+                case 'inlineattachmentsid':
+                    $entry->definition_editor['itemid'] = clean_param($option['value'], PARAM_INT);
+                    break;
+                case 'attachmentsid':
+                    $entry->attachment_filemanager = clean_param($option['value'], PARAM_INT);
+                    break;
+                case 'categories':
+                    $entry->categories = clean_param($option['value'], PARAM_SEQUENCE);
+                    $entry->categories = explode(',', $entry->categories);
+                    break;
+                case 'aliases':
+                    $entry->aliases = clean_param($option['value'], PARAM_NOTAGS);
+                    // Convert to the expected format.
+                    $entry->aliases = str_replace(",", "\n", $entry->aliases);
+                    break;
+                case 'usedynalink':
+                case 'casesensitive':
+                case 'fullmatch':
+                    // Only allow if linking is enabled.
+                    if ($glossary->usedynalink) {
+                        $entry->{$name} = clean_param($option['value'], PARAM_BOOL);
+                    }
+                    break;
+                default:
+                    throw new moodle_exception('errorinvalidparam', 'webservice', '', $name);
+            }
+        }
+
+        $entry = glossary_edit_entry($entry, $course, $cm, $glossary, $context);
+
+        return array(
+            'entryid' => $entry->id,
+            'warnings' => $warnings
+        );
+    }
+
+    /**
+     * Returns the description of the external function return value.
+     *
+     * @return external_description
+     * @since Moodle 3.2
+     */
+    public static function add_entry_returns() {
+        return new external_single_structure(array(
+            'entryid' => new external_value(PARAM_INT, 'New glossary entry ID'),
             'warnings' => new external_warnings()
         ));
     }

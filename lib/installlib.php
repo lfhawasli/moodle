@@ -260,7 +260,7 @@ function install_generate_configphp($database, $cfg) {
         $configphp .= '$CFG->upgradekey = ' . var_export($cfg->upgradekey, true) . ';' . PHP_EOL . PHP_EOL;
     }
 
-    $configphp .= 'require_once(dirname(__FILE__) . \'/lib/setup.php\');' . PHP_EOL . PHP_EOL;
+    $configphp .= 'require_once(__DIR__ . \'/lib/setup.php\');' . PHP_EOL . PHP_EOL;
     $configphp .= '// There is no php closing tag in this file,' . PHP_EOL;
     $configphp .= '// it is intentional because it prevents trailing whitespace problems!' . PHP_EOL;
 
@@ -525,4 +525,7 @@ function install_cli_database(array $options, $interactive) {
     if (isset($options['summary'])) {
         $DB->set_field('course', 'summary', $options['summary'], array('format' => 'site'));
     }
+
+    // Redirect to site registration on first login.
+    set_config('registrationpending', 1);
 }

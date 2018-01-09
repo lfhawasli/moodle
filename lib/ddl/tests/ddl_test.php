@@ -199,6 +199,7 @@ class core_ddl_testcase extends database_driver_testcase {
      * Test behaviour of create_table()
      */
     public function test_create_table() {
+
         $DB = $this->tdb; // Do not use global $DB!
         $dbman = $this->tdb->get_manager();
 
@@ -289,8 +290,9 @@ class core_ddl_testcase extends database_driver_testcase {
             $this->assertInstanceOf('ddl_exception', $e);
         }
 
-        // Long table name names - the largest allowed.
-        $table = new xmldb_table('test_table0123456789_____xyz');
+        // Long table name names - the largest allowed by the configuration which exclude the prefix to ensure it's created.
+        $tablechars = str_repeat('a', xmldb_table::NAME_MAX_LENGTH);
+        $table = new xmldb_table($tablechars);
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -302,8 +304,9 @@ class core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->table_exists($table));
         $dbman->drop_table($table);
 
-        // Table name is too long.
-        $table = new xmldb_table('test_table0123456789_____xyz9');
+        // Table name is too long, ignoring any prefix size set.
+        $tablechars = str_repeat('a', xmldb_table::NAME_MAX_LENGTH + 1);
+        $table = new xmldb_table($tablechars);
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -337,7 +340,7 @@ class core_ddl_testcase extends database_driver_testcase {
         // Weird column names - the largest allowed.
         $table = new xmldb_table('test_table3');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('abcdef____0123456789_______xyz', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
+        $table->add_field(str_repeat('b', xmldb_field::NAME_MAX_LENGTH), XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->setComment("This is a test'n drop table. You can drop it safely");
 
@@ -347,10 +350,10 @@ class core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->table_exists($table));
         $dbman->drop_table($table);
 
-        // Too long field name - max 30.
+        // Too long field name.
         $table = new xmldb_table('test_table4');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('abcdeabcdeabcdeabcdeabcdeabcdez', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
+        $table->add_field(str_repeat('a', xmldb_field::NAME_MAX_LENGTH + 1), XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->setComment("This is a test'n drop table. You can drop it safely");
 
@@ -2109,6 +2112,55 @@ class core_ddl_testcase extends database_driver_testcase {
 
             $this->assertNotEquals($result2, $result3);
             $this->assertRegExp('/_fl4_/', $result3);
+        }
+    }
+
+    /**
+     * Data provider for test_get_enc_quoted().
+     *
+     * @return array The type-value pair fixture.
+     */
+    public function test_get_enc_quoted_provider() {
+        return array(
+            // Reserved: some examples from SQL-92.
+            [true, 'from'],
+            [true, 'table'],
+            [true, 'where'],
+            // Not reserved.
+            [false, 'my_awesome_column_name']
+        );
+    }
+
+    /**
+     * This is a test for sql_generator::getEncQuoted().
+     *
+     * @dataProvider test_get_enc_quoted_provider
+     * @param string $reserved Whether the column name is reserved or not.
+     * @param string $columnname The column name to be quoted, according to the value of $reserved.
+     **/
+    public function test_get_enc_quoted($reserved, $columnname) {
+        $DB = $this->tdb;
+        $gen = $DB->get_manager()->generator;
+
+        if (!$reserved) {
+            // No need to quote the column name.
+            $this->assertSame($columnname, $gen->getEncQuoted($columnname));
+        } else {
+            // Column name should be quoted.
+            $dbfamily = $DB->get_dbfamily();
+
+            switch ($dbfamily) {
+                case 'mysql':
+                    $this->assertSame("`$columnname`", $gen->getEncQuoted($columnname));
+                    break;
+                case 'mssql': // The Moodle connection runs under 'QUOTED_IDENTIFIER ON'.
+                case 'oracle':
+                case 'postgres':
+                case 'sqlite':
+                default:
+                    $this->assertSame('"' . $columnname . '"', $gen->getEncQuoted($columnname));
+                    break;
+            }
         }
     }
 

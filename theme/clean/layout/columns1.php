@@ -44,6 +44,7 @@ echo $OUTPUT->doctype() ?>
             <?php echo $OUTPUT->navbar_home(); ?>
             <?php echo $OUTPUT->navbar_button(); ?>
             <?php echo $OUTPUT->user_menu(); ?>
+            <?php echo $OUTPUT->navbar_plugin_output(); ?>
             <?php echo $OUTPUT->search_box(); ?>
             <div class="nav-collapse collapse">
                 <?php echo $OUTPUT->custom_menu(); ?>
@@ -64,6 +65,7 @@ echo $OUTPUT->doctype() ?>
             <?php
             echo $OUTPUT->course_content_header();
             echo $OUTPUT->main_content();
+            echo $OUTPUT->activity_navigation();
             echo $OUTPUT->course_content_footer();
             ?>
         </section>

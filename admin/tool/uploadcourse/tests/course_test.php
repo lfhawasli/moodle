@@ -36,22 +36,20 @@ global $CFG;
 class tool_uploadcourse_course_testcase extends advanced_testcase {
 
     /**
-     * Tidy up open files that may be left open.
+     * @expectedException coding_exception
      */
-    protected function tearDown() {
-        gc_collect_cycles();
-    }
-
     public function test_proceed_without_prepare() {
         $this->resetAfterTest(true);
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
         $updatemode = tool_uploadcourse_processor::UPDATE_NOTHING;
         $data = array();
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
-        $this->setExpectedException('coding_exception');
         $co->proceed();
     }
 
+    /**
+     * @expectedException moodle_exception
+     */
     public function test_proceed_when_prepare_failed() {
         $this->resetAfterTest(true);
         $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
@@ -59,7 +57,6 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $data = array();
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
         $this->assertFalse($co->prepare());
-        $this->setExpectedException('moodle_exception');
         $co->proceed();
     }
 
@@ -71,7 +68,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
         $this->assertTrue($co->prepare());
         $co->proceed();
-        $this->setExpectedException('coding_exception');
+        $this->expectException('coding_exception');
         $co->proceed();
     }
 
@@ -121,6 +118,36 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertTrue($co->prepare());
         $co->proceed();
         $this->assertTrue($DB->record_exists('course', array('shortname' => 'c2')));
+    }
+
+    public function test_create_with_sections() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $updatemode = tool_uploadcourse_processor::UPDATE_NOTHING;
+        $defaultnumsections = get_config('moodlecourse', 'numsections');
+
+        // Add new course, make sure default number of sections is created.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
+        $data = array('shortname' => 'newcourse1', 'fullname' => 'New course1', 'format' => 'topics', 'category' => 1);
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse1'));
+        $this->assertNotEmpty($courseid);
+        $this->assertEquals($defaultnumsections + 1,
+            $DB->count_records('course_sections', ['course' => $courseid]));
+
+        // Add new course specifying number of sections.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
+        $data = array('shortname' => 'newcourse2', 'fullname' => 'New course2', 'format' => 'topics', 'category' => 1,
+            'numsections' => 15);
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertNotEmpty($courseid);
+        $this->assertEquals(15 + 1,
+            $DB->count_records('course_sections', ['course' => $courseid]));
     }
 
     public function test_delete() {
@@ -247,10 +274,9 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
             'fullname' => 'Fullname',
             'category' => '1',
             'visible' => '0',
-            'startdate' => '8 June 1990',
             'idnumber' => '123abc',
             'summary' => 'Summary',
-            'format' => 'weeks',
+            'format' => 'topics',
             'theme' => 'afterburner',
             'lang' => 'en',
             'newsitems' => '7',
@@ -273,6 +299,20 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
             'enrolment_3_disable' => '1',
         );
 
+        // There should be a start date if there is a end date.
+        $data['enddate'] = '7 June 1990';
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertFalse($co->prepare());
+        $this->assertArrayHasKey('nostartdatenoenddate', $co->get_errors());
+
+        $data['startdate'] = '8 June 1990';
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertFalse($co->prepare());
+        $this->assertArrayHasKey('enddatebeforestartdate', $co->get_errors());
+
+        // They are correct now.
+        $data['enddate'] = '18 June 1990';
+
         $this->assertFalse($DB->record_exists('course', array('shortname' => 'c1')));
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
         $this->assertTrue($co->prepare());
@@ -285,6 +325,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertEquals($data['category'], $course->category);
         $this->assertEquals($data['visible'], $course->visible);
         $this->assertEquals(mktime(0, 0, 0, 6, 8, 1990), $course->startdate);
+        $this->assertEquals(mktime(0, 0, 0, 6, 18, 1990), $course->enddate);
         $this->assertEquals($data['idnumber'], $course->idnumber);
         $this->assertEquals($data['summary'], $course->summary);
         $this->assertEquals($data['format'], $course->format);
@@ -336,7 +377,6 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
             'fullname' => 'Fullname 2',
             'category' => $cat->id,
             'visible' => '1',
-            'startdate' => '11 June 1984',
             'idnumber' => 'changeidn',
             'summary' => 'Summary 2',
             'format' => 'topics',
@@ -363,6 +403,21 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         );
 
         $this->assertTrue($DB->record_exists('course', array('shortname' => 'c1')));
+
+        $data['enddate'] = '31 June 1984';
+        // Previous start and end dates are 8 and 18 June 1990.
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertFalse($co->prepare());
+        $this->assertArrayHasKey('enddatebeforestartdate', $co->get_errors());
+
+        $data['startdate'] = '19 June 1990';
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertFalse($co->prepare());
+        $this->assertArrayHasKey('enddatebeforestartdate', $co->get_errors());
+
+        // They are correct now.
+        $data['startdate'] = '11 June 1984';
+
         $co = new tool_uploadcourse_course($mode, $updatemode, $data);
         $this->assertTrue($co->prepare());
         $co->proceed();
@@ -373,6 +428,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertEquals($data['category'], $course->category);
         $this->assertEquals($data['visible'], $course->visible);
         $this->assertEquals(mktime(0, 0, 0, 6, 11, 1984), $course->startdate);
+        $this->assertEquals(mktime(0, 0, 0, 6, 31, 1984), $course->enddate);
         $this->assertEquals($data['idnumber'], $course->idnumber);
         $this->assertEquals($data['summary'], $course->summary);
         $this->assertEquals($data['format'], $course->format);
@@ -428,9 +484,10 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
             'category' => '1',
             'visible' => '0',
             'startdate' => 644803200,
+            'enddate' => 645667200,
             'idnumber' => '123abc',
             'summary' => 'Summary',
-            'format' => 'weeks',
+            'format' => 'topics',
             'theme' => 'afterburner',
             'lang' => 'en',
             'newsitems' => '7',
@@ -455,6 +512,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertEquals($defaultdata['category'], $course->category);
         $this->assertEquals($defaultdata['visible'], $course->visible);
         $this->assertEquals($defaultdata['startdate'], $course->startdate);
+        $this->assertEquals($defaultdata['enddate'], $course->enddate);
         $this->assertEquals($defaultdata['idnumber'], $course->idnumber);
         $this->assertEquals($defaultdata['summary'], $course->summary);
         $this->assertEquals($defaultdata['format'], $course->format);
@@ -481,6 +539,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
             'category' => $cat->id,
             'visible' => '1',
             'startdate' => 455760000,
+            'enddate' => 457488000,
             'idnumber' => 'changedid',
             'summary' => 'Summary 2',
             'format' => 'topics',
@@ -508,6 +567,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertEquals($defaultdata['category'], $course->category);
         $this->assertEquals($defaultdata['visible'], $course->visible);
         $this->assertEquals($defaultdata['startdate'], $course->startdate);
+        $this->assertEquals($defaultdata['enddate'], $course->enddate);
         $this->assertEquals($defaultdata['idnumber'], $course->idnumber);
         $this->assertEquals($defaultdata['summary'], $course->summary);
         $this->assertEquals($defaultdata['format'], $course->format);
@@ -709,6 +769,33 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
             }
         }
         $this->assertTrue($found);
+    }
+
+    /**
+     * Test that specifying course template respects default restore settings
+     */
+    public function test_restore_file_settings() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Set admin config setting so that activities are not restored by default.
+        set_config('restore_general_activities', 0, 'restore');
+
+        $c1 = $this->getDataGenerator()->create_course();
+
+        $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+        $data = array('shortname' => 'A1', 'backupfile' => __DIR__ . '/fixtures/backup.mbz',
+            'summary' => 'A', 'category' => 1, 'fullname' => 'A1', 'templatecourse' => $c1->shortname);
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $course = $DB->get_record('course', array('shortname' => 'A1'));
+
+        // Make sure the glossary is not restored.
+        $modinfo = get_fast_modinfo($course);
+        $this->assertEmpty($modinfo->get_instances_of('glossary'));
     }
 
     public function test_restore_invalid_file() {

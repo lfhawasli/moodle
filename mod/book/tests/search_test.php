@@ -66,10 +66,10 @@ class mod_book_search_testcase extends advanced_testcase {
         // Enabled by default once global search is enabled.
         $this->assertTrue($searcharea->is_enabled());
 
-        set_config($varname . '_enabled', false, $componentname);
+        set_config($varname . '_enabled', 0, $componentname);
         $this->assertFalse($searcharea->is_enabled());
 
-        set_config($varname . '_enabled', true, $componentname);
+        set_config($varname . '_enabled', 1, $componentname);
         $this->assertTrue($searcharea->is_enabled());
     }
 
@@ -117,6 +117,26 @@ class mod_book_search_testcase extends advanced_testcase {
 
         // No new records.
         $this->assertFalse($recordset->valid());
+        $recordset->close();
+
+        // Create another book and chapter.
+        $book2 = $this->getDataGenerator()->create_module('book', array('course' => $course1->id));
+        $bookgenerator->create_chapter(array('bookid' => $book2->id,
+                'content' => 'Chapter3', 'title' => 'Title3'));
+
+        // Query by context, first book.
+        $recordset = $searcharea->get_document_recordset(0, \context_module::instance($book->cmid));
+        $this->assertEquals(2, iterator_count($recordset));
+        $recordset->close();
+
+        // Second book.
+        $recordset = $searcharea->get_document_recordset(0, \context_module::instance($book2->cmid));
+        $this->assertEquals(1, iterator_count($recordset));
+        $recordset->close();
+
+        // Course.
+        $recordset = $searcharea->get_document_recordset(0, \context_course::instance($course1->id));
+        $this->assertEquals(3, iterator_count($recordset));
         $recordset->close();
     }
 

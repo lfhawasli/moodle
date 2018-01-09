@@ -93,11 +93,11 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
             }
             $radiobuttons[] = $hidden . html_writer::empty_tag('input', $inputattributes) .
                     html_writer::tag('label',
-                        $this->number_in_style($value, $question->answernumbering) .
+                        html_writer::span($this->number_in_style($value, $question->answernumbering), 'answernumber') .
                         $question->make_html_inline($question->format_text(
                                 $ans->answer, $ans->answerformat,
                                 $qa, 'question', 'answer', $ansid)),
-                    array('for' => $inputattributes['id']));
+                        array('for' => $inputattributes['id'], 'class' => 'm-l-1'));
 
             // Param $options->suppresschoicefeedback is a hack specific to the
             // oumultiresponse question type. It would be good to refactor to
@@ -185,6 +185,24 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
     public function specific_feedback(question_attempt $qa) {
         return $this->combined_feedback($qa);
     }
+
+    /**
+     * Function returns string based on number of correct answers
+     * @param array $right An Array of correct responses to the current question
+     * @return string based on number of correct responses
+     */
+    protected function correct_choices(array $right) {
+        // Return appropriate string for single/multiple correct answer(s).
+        if (count($right) == 1) {
+                return get_string('correctansweris', 'qtype_multichoice',
+                        implode(', ', $right));
+        } else if (count($right) > 1) {
+                return get_string('correctanswersare', 'qtype_multichoice',
+                        implode(', ', $right));
+        } else {
+                return "";
+        }
+    }
 }
 
 
@@ -223,8 +241,7 @@ class qtype_multichoice_single_renderer extends qtype_multichoice_renderer_base 
     public function correct_response(question_attempt $qa) {
         $question = $qa->get_question();
 
-        // START UCLA MOD: CCLE-5503 - Quiz, One answer only allows multiple answers
-        // Put all correct answers (100% grade) into $right
+        // Put all correct answers (100% grade) into $right.
         $right = array();
         foreach ($question->answers as $ansid => $ans) {
             if (question_state::graded_state_for_fraction($ans->fraction) ==
@@ -233,30 +250,7 @@ class qtype_multichoice_single_renderer extends qtype_multichoice_renderer_base 
                         $qa, 'question', 'answer', $ansid));
             }
         }
-
-        // Return appropriate string for single/multiple correct answer(s)
-        if (!empty($right)) {
-            if (count($right) == 1) {
-                return get_string('correctansweris', 'qtype_multichoice',
-                        implode(', ', $right));
-            } else {
-                return get_string('correctanswersare', 'qtype_multichoice',
-                        implode(', ', $right));
-            }
-        }
-
-        //foreach ($question->answers as $ansid => $ans) {
-        //    if (question_state::graded_state_for_fraction($ans->fraction) ==
-        //            question_state::$gradedright) {
-        //        return get_string('correctansweris', 'qtype_multichoice',
-        //                $question->make_html_inline($question->format_text($ans->answer, $ans->answerformat,
-        //                        $qa, 'question', 'answer', $ansid)));
-        //    }
-        //}
-
-        // END UCLA MOD: CCLE-5503
-
-        return '';
+        return $this->correct_choices($right);
     }
 }
 
@@ -306,27 +300,7 @@ class qtype_multichoice_multi_renderer extends qtype_multichoice_renderer_base {
                         $qa, 'question', 'answer', $ansid));
             }
         }
-
-        // START UCLA MOD: CCLE-5503 - Quiz, One answer only allows multiple answers
-        // Return appropriate string for single/multiple correct answer(s)
-        if (!empty($right)) {
-            if (count($right) == 1) {
-                return get_string('correctansweris', 'qtype_multichoice',
-                        implode(', ', $right));
-            } else {
-                return get_string('correctanswersare', 'qtype_multichoice',
-                        implode(', ', $right));
-            }
-        }
-
-        //if (!empty($right)) {
-        //    return get_string('correctansweris', 'qtype_multichoice',
-        //            implode(', ', $right));
-        //}
-
-        // END UCLA MOD: CCLE-5503
-
-        return '';
+        return $this->correct_choices($right);
     }
 
     protected function num_parts_correct(question_attempt $qa) {

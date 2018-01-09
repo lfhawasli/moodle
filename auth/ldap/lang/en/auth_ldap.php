@@ -36,8 +36,6 @@ $string['auth_ldap_contexts_key'] = 'Contexts';
 $string['auth_ldap_create_context'] = 'If you enable user creation with email confirmation, specify the context where users are created. This context should be different from other users to prevent security issues. You don\'t need to add this context to ldap_context-variable, Moodle will search for users from this context automatically.<br /><b>Note!</b> You have to modify the method user_create() in file auth/ldap/auth.php to make user creation work';
 $string['auth_ldap_create_context_key'] = 'Context for new users';
 $string['auth_ldap_create_error'] = 'Error creating user in LDAP.';
-$string['auth_ldap_creators'] = 'List of groups or contexts whose members are allowed to create new courses. Separate multiple groups with \';\'. Usually something like \'cn=teachers,ou=staff,o=myorg\'';
-$string['auth_ldap_creators_key'] = 'Creators';
 $string['auth_ldapdescription'] = 'This method provides authentication against an external LDAP server.
                                   If the given username and password are valid, Moodle creates a new user
                                   entry in its database. This module can read user attributes from LDAP and prefill
@@ -77,9 +75,11 @@ $string['auth_ldap_opt_deref'] = 'Determines how aliases are handled during sear
 $string['auth_ldap_opt_deref_key'] = 'Dereference aliases';
 $string['auth_ldap_passtype'] = 'Specify the format of new or changed passwords in LDAP server.';
 $string['auth_ldap_passtype_key'] = 'Password format';
-$string['auth_ldap_passwdexpire_settings'] = 'LDAP password expiration settings.';
+$string['auth_ldap_passwdexpire_settings'] = 'LDAP password expiration settings';
 $string['auth_ldap_preventpassindb'] = 'Select yes to prevent passwords from being stored in Moodle\'s DB.';
-$string['auth_ldap_preventpassindb_key'] = 'Don\'t cache passwords';
+$string['auth_ldap_preventpassindb_key'] = 'Prevent password caching';
+$string['auth_ldap_rolecontext'] = '{$a->localname} context';
+$string['auth_ldap_rolecontext_help'] = 'LDAP context used to select for <i>{$a->localname}</i> mapping. Separate multiple groups with \';\'. Usually something like "cn={$a->shortname},ou=staff,o=myorg".';
 $string['auth_ldap_search_sub'] = 'Search users from subcontexts.';
 $string['auth_ldap_search_sub_key'] = 'Search subcontexts';
 $string['auth_ldap_server_settings'] = 'LDAP server settings';
@@ -114,12 +114,14 @@ $string['auth_ntlmsso_subnet_key'] = 'Subnet';
 $string['auth_ntlmsso_type_key'] = 'Authentication type';
 $string['auth_ntlmsso_type'] = 'The authentication method configured in the web server to authenticate the users (if in doubt, choose NTLM)';
 $string['connectingldap'] = "Connecting to LDAP server...\n";
+$string['connectingldapsuccess'] = "Connecting to your LDAP server was successful";
 $string['creatingtemptable'] = "Creating temporary table {\$a}\n";
 $string['didntfindexpiretime'] = 'password_expire() didn\'t find expiration time.';
 $string['didntgetusersfromldap'] = "Did not get any users from LDAP -- error? -- exiting\n";
 $string['gotcountrecordsfromldap'] = "Got {\$a} records from LDAP\n";
+$string['ldapnotconfigured'] = 'The LDAP host url is currently not configured';
 $string['morethanoneuser'] = 'Strange! More than one user record found in ldap. Only using the first one.';
-$string['needbcmath'] = 'You need the BCMath extension to use grace logins with Active Directory';
+$string['needbcmath'] = 'You need the BCMath extension to use expired password checking with Active Directory.';
 $string['needmbstring'] = 'You need the mbstring extension to change passwords in Active Directory';
 $string['nodnforusername'] = 'Error in user_update_password(). No DN for: {$a->username}';
 $string['noemail'] = 'Tried to send you an email but failed!';
@@ -134,12 +136,14 @@ $string['ntlmsso_isdisabled'] = 'NTLM SSO is disabled.';
 $string['ntlmsso_unknowntype'] = 'Unknown ntlmsso type!';
 $string['pagedresultsnotsupp'] = 'LDAP paged results not supported (either your PHP version lacks support, you have configured Moodle to use LDAP protocol version 2 or Moodle cannot contact your LDAP server to see if paged support is available.)';
 $string['pagesize'] = 'Make sure this value is smaller than your LDAP server result set size limit (the maximum number of entries that can be returned in a single query)';
-$string['pagesize_key'] = 'Page Size';
+$string['pagesize_key'] = 'Page size';
 $string['pluginname'] = 'LDAP server';
 $string['pluginnotenabled'] = 'Plugin not enabled!';
 $string['renamingnotallowed'] = 'User renaming not allowed in LDAP';
 $string['rootdseerror'] = 'Error querying rootDSE for Active Directory';
+$string['syncroles'] = 'Synchronise system roles from LDAP';
 $string['synctask'] = 'LDAP users sync job';
+$string['systemrolemapping'] = 'System role mapping';
 $string['start_tls'] = 'Use regular LDAP service (port 389) with TLS encryption';
 $string['start_tls_key'] = 'Use TLS';
 $string['updateremfail'] = 'Error updating LDAP record. Error code: {$a->errno}; Error string: {$a->errstring}<br/>Key ({$a->key}) - old moodle value: \'{$a->ouvalue}\' new value: \'{$a->nuvalue}\'';
@@ -156,3 +160,7 @@ $string['userentriestorevive'] = "User entries to be revived: {\$a}\n";
 $string['userentriestoupdate'] = "User entries to be updated: {\$a}\n";
 $string['usernotfound'] = 'User not found in LDAP';
 $string['useracctctrlerror'] = 'Error getting userAccountControl for {$a}';
+
+// Deprecated since Moodle 3.4.
+$string['auth_ldap_creators'] = 'List of groups or contexts whose members are allowed to create new courses. Separate multiple groups with \';\'. Usually something like \'cn=teachers,ou=staff,o=myorg\'';
+$string['auth_ldap_creators_key'] = 'Creators';

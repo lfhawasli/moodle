@@ -252,6 +252,43 @@ class mod_forum_mail_testcase extends advanced_testcase {
         return $messages;
     }
 
+    public function test_cron_message_includes_courseid() {
+        $this->resetAfterTest(true);
+
+        // Create a course, with a forum.
+        $course = $this->getDataGenerator()->create_course();
+
+        $options = array('course' => $course->id, 'forcesubscribe' => FORUM_FORCESUBSCRIBE);
+        $forum = $this->getDataGenerator()->create_module('forum', $options);
+
+        // Create two users enrolled in the course as students.
+        list($author, $recipient) = $this->helper_create_users($course, 2);
+
+        // Post a discussion to the forum.
+        list($discussion, $post) = $this->helper_post_to_forum($forum, $author);
+
+        // Run cron and check that \core\event\message_sent contains the course id.
+        // Close the message sink so that message_send is run.
+        $this->helper->messagesink->close();
+
+        // Catch just the cron events. For each message sent two events are fired:
+        // core\event\message_sent
+        // core\event\message_viewed.
+        $this->helper->eventsink = $this->redirectEvents();
+        $this->expectOutputRegex('/Processing user/');
+
+        forum_cron();
+
+        // Get the events and close the sink so that remaining events can be triggered.
+        $events = $this->helper->eventsink->get_events();
+        $this->helper->eventsink->close();
+
+        // Reset the message sink for other tests.
+        $this->helper->messagesink = $this->redirectMessages();
+        $event = reset($events);
+        $this->assertEquals($course->id, $event->other['courseid']);
+    }
+
     public function test_forced_subscription() {
         $this->resetAfterTest(true);
 
@@ -895,8 +932,8 @@ class mod_forum_mail_testcase extends advanced_testcase {
                     'contents' => array(
                         '~{$a',
                         '~&(amp|lt|gt|quot|\#039);(?!course)',
-                        'Attachment example.txt:\n' .
-                            'http://www.example.com/moodle/pluginfile.php/\d*/mod_forum/attachment/\d*/example.txt\n',
+                        'Attachment example.txt:' . PHP_EOL .
+                            'https://www.example.com/moodle/pluginfile.php/\d*/mod_forum/attachment/\d*/example.txt' . PHP_EOL,
                         'Hello Moodle', 'Moodle Forum', 'Welcome.*Moodle', 'Love Moodle', '1\d1'
                     ),
                 ),
@@ -954,12 +991,12 @@ class mod_forum_mail_testcase extends advanced_testcase {
         $newcase['expectations'][0]['contents'] = array(
             '~{$a',
             '~&(amp|lt|gt|quot|\#039);(?!course)',
-            'Attachment example.txt:\n' .
-            'http://www.example.com/moodle/pluginfile.php/\d*/mod_forum/attachment/\d*/example.txt\n',
+            'Attachment example.txt:' . PHP_EOL .
+            'https://www.example.com/moodle/pluginfile.php/\d*/mod_forum/attachment/\d*/example.txt' .  PHP_EOL ,
             'Text and image', 'Moodle Forum',
-            'Welcome to Moodle, *\n.*'
-                .'http://www.example.com/moodle/pluginfile.php/\d+/mod_forum/post/\d+/'
-                .'Screen%20Shot%202016-03-22%20at%205\.54\.36%20AM%20%281%29\.png *\n.*!',
+            'Welcome to Moodle, *' . PHP_EOL . '.*'
+                .'https://www.example.com/moodle/pluginfile.php/\d+/mod_forum/post/\d+/'
+                .'Screen%20Shot%202016-03-22%20at%205\.54\.36%20AM%20%281%29\.png *' . PHP_EOL . '.*!',
             'Love Moodle', '1\d1');
         $textcases['Text mail with text+image message i.e. @@PLUGINFILE@@ token handling'] = array('data' => $newcase);
 
@@ -1004,7 +1041,7 @@ class mod_forum_mail_testcase extends advanced_testcase {
             '<div class="attachments">( *\n *)?<a href',
             '<div class="subject">\n.*HTML text and image', '>Moodle Forum',
             '<p>Welcome to Moodle, '
-                .'<img src="http://www.example.com/moodle/pluginfile.php/\d+/mod_forum/post/\d+/'
+                .'<img src="https://www.example.com/moodle/pluginfile.php/\d+/mod_forum/post/\d+/'
                 .'Screen%20Shot%202016-03-22%20at%205\.54\.36%20AM%20%281%29\.png"'
                 .' alt="" width="200" height="393" class="img-responsive" />!</p>',
             '>Love Moodle', '>1\d1');

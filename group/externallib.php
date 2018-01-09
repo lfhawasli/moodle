@@ -24,6 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once("$CFG->libdir/externallib.php");
 
 /**
@@ -1386,6 +1388,7 @@ class core_group_external extends external_api {
 
         $results = array(
             'groups' => $usergroups,
+            'canaccessallgroups' => has_capability('moodle/site:accessallgroups', $context, $user),
             'warnings' => $warnings
         );
         return $results;
@@ -1401,6 +1404,8 @@ class core_group_external extends external_api {
         return new external_single_structure(
             array(
                 'groups' => new external_multiple_structure(self::group_description()),
+                'canaccessallgroups' => new external_value(PARAM_BOOL,
+                    'Whether the user will be able to access all the activity groups.', VALUE_OPTIONAL),
                 'warnings' => new external_warnings(),
             )
         );

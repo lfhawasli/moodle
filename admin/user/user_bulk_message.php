@@ -13,7 +13,7 @@ require_login();
 require_capability('local/ucla:bulk_users', context_system::instance());
 // END UCLA MOD: CCLE-2970
 admin_externalpage_setup('userbulk');
-require_capability('moodle/site:readallmessages', context_system::instance());
+require_capability('moodle/site:manageallmessaging', context_system::instance());
 
 $return = $CFG->wwwroot.'/'.$CFG->admin.'/user/user_bulk.php';
 

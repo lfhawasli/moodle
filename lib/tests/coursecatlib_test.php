@@ -451,6 +451,7 @@ class core_coursecatlib_testcase extends advanced_testcase {
 
         try {
             // Enable the multilang filter and set it to apply to headings and content.
+            filter_manager::reset_caches();
             filter_set_global_state('multilang', TEXTFILTER_ON);
             filter_set_applies_to_strings('multilang', true);
             $expected = array($c3, $c4, $c1, $c2);
@@ -747,6 +748,22 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $this->assertEquals(0, count($courses[$c3->id]->get_course_overviewfiles()));
         $this->assertEquals(2, count($courses[$c4->id]->get_course_overviewfiles()));
         $this->assertEquals(1, count($courses[$c5->id]->get_course_overviewfiles()));
+    }
+
+    public function test_get_nested_name() {
+        $cat1name = 'Cat1';
+        $cat2name = 'Cat2';
+        $cat3name = 'Cat3';
+        $cat4name = 'Cat4';
+        $category1 = coursecat::create(array('name' => $cat1name));
+        $category2 = coursecat::create(array('name' => $cat2name, 'parent' => $category1->id));
+        $category3 = coursecat::create(array('name' => $cat3name, 'parent' => $category2->id));
+        $category4 = coursecat::create(array('name' => $cat4name, 'parent' => $category2->id));
+
+        $this->assertEquals($cat1name, $category1->get_nested_name(false));
+        $this->assertEquals("{$cat1name} / {$cat2name}", $category2->get_nested_name(false));
+        $this->assertEquals("{$cat1name} / {$cat2name} / {$cat3name}", $category3->get_nested_name(false));
+        $this->assertEquals("{$cat1name} / {$cat2name} / {$cat4name}", $category4->get_nested_name(false));
     }
 
     /**

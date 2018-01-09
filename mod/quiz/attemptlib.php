@@ -1094,6 +1094,18 @@ class quiz_attempt {
     }
 
     /**
+     * Helper method for unit tests. Get the underlying question usage object.
+     * @return question_usage_by_activity the usage.
+     */
+    public function get_question_usage() {
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('get_question_usage is only for use in unit tests. ' .
+                    'For other operations, use the quiz_attempt api, or extend it properly.');
+        }
+        return $this->quba;
+    }
+
+    /**
      * Get the question_attempt object for a particular question in this attempt.
      * @param int $slot the number used to identify this question within this attempt.
      * @return question_attempt
@@ -2318,6 +2330,25 @@ class quiz_attempt {
         $event = \mod_quiz\event\attempt_reviewed::create($params);
         $event->add_record_snapshot('quiz_attempts', $this->get_attempt());
         $event->trigger();
+    }
+
+    /**
+     * Update the timemodifiedoffline attempt field.
+     * This function should be used only when web services are being used.
+     *
+     * @param int $time time stamp
+     * @return boolean false if the field is not updated because web services aren't being used.
+     * @since Moodle 3.2
+     */
+    public function set_offline_modified_time($time) {
+        global $DB;
+
+        // Update the timemodifiedoffline field only if web services are being used.
+        if (WS_SERVER) {
+            $this->attempt->timemodifiedoffline = $time;
+            return true;
+        }
+        return false;
     }
 
 }

@@ -54,7 +54,6 @@ define(['jquery', 'mod_assign/grading_events'], function($, GradingEvents) {
      * @private
      * @param {Event} event
      * @param {Integer} userid
-     * @return {Deferred} promise resolved when the animations are complete.
      */
     GradingActions.prototype._showActionsForm = function(event, userid) {
         var form = this._region.find('[data-region=grading-actions-form]');
@@ -235,9 +234,7 @@ define(['jquery', 'mod_assign/grading_events'], function($, GradingEvents) {
         $(document).on('user-changed', this._showActionsForm.bind(this));
 
         this._region.find('[name="savechanges"]').on('click', this._trigger.bind(this, 'save-changes'));
-        // START UCLA MOD: SSC-3624/CCLE-6876 - Assignment: "Save and show next" button.
         this._region.find('[name="saveandshownext"]').on('click', this._trigger.bind(this, 'save-and-show-next'));
-        // END UCLA MOD: SSC-3624/CCLE-6876.
         this._region.find('[name="resetbutton"]').on('click', this._trigger.bind(this, 'reset'));
         this._region.find('form').on('submit', function(e) {
             e.preventDefault();

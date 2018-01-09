@@ -35,20 +35,17 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
          * @return {Promise}
          */
         list: function(contextId, options) {
-            var promise,
-                args = {
+            var args = {
                     context: {
                         contextid: contextId
                     }
                 };
 
             $.extend(args, typeof options === 'undefined' ? {} : options);
-            promise = Ajax.call([{
+            return Ajax.call([{
                 methodname: 'core_competency_list_competency_frameworks',
                 args: args
             }])[0];
-
-            return promise.fail(Notification.exception);
         },
 
         /**
@@ -75,8 +72,8 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
          * @param {String} selector The selector of the auto complete element.
          * @param {String} query The query string.
          * @param {Function} callback A callback function receiving an array of results.
-         * @return {Void}
          */
+        /* eslint-disable promise/no-callback-in-promise */
         transport: function(selector, query, callback) {
             var el = $(selector),
                 contextId = el.data('contextid'),
@@ -85,11 +82,10 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             if (!contextId) {
                 throw new Error('The attribute data-contextid is required on ' + selector);
             }
-
             this.list(contextId, {
                 query: query,
                 onlyvisible: onlyVisible,
-            }).then(callback);
+            }).then(callback).catch(Notification.exception);
         }
     };
 

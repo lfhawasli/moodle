@@ -292,6 +292,48 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     }
 
     /**
+     * Load all coursecat objects.
+     *
+     * @param   array   $options Options:
+     * @param   bool    $options.returnhidden Return categories even if they are hidden
+     * @return  coursecat[]
+     */
+    public static function get_all($options = []) {
+        global $DB;
+
+        $coursecatrecordcache = cache::make('core', 'coursecatrecords');
+
+        $catcontextsql = \context_helper::get_preload_record_columns_sql('ctx');
+        $catsql = "SELECT cc.*, {$catcontextsql}
+                     FROM {course_categories} cc
+                     JOIN {context} ctx ON cc.id = ctx.instanceid";
+        $catsqlwhere = "WHERE ctx.contextlevel = :contextlevel";
+        $catsqlorder = "ORDER BY cc.depth ASC, cc.sortorder ASC";
+
+        $catrs = $DB->get_recordset_sql("{$catsql} {$catsqlwhere} {$catsqlorder}", [
+            'contextlevel' => CONTEXT_COURSECAT,
+        ]);
+
+        $types['categories'] = [];
+        $categories = [];
+        $toset = [];
+        foreach ($catrs as $record) {
+            $category = new coursecat($record);
+            $toset[$category->id] = $category;
+
+            if (!empty($options['returnhidden']) || $category->is_uservisible()) {
+                $categories[$record->id] = $category;
+            }
+        }
+        $catrs->close();
+
+        $coursecatrecordcache->set_many($toset);
+
+        return $categories;
+
+    }
+
+    /**
      * Returns the first found category
      *
      * Note that if there are no categories visible to the current user on the first level,
@@ -930,7 +972,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
         $fields = array('c.id', 'c.category', 'c.sortorder',
                         'c.shortname', 'c.fullname', 'c.idnumber',
-                        'c.startdate', 'c.visible', 'c.cacherev');
+                        'c.startdate', 'c.enddate', 'c.visible', 'c.cacherev');
         if (!empty($options['summary'])) {
             $fields[] = 'c.summary';
             $fields[] = 'c.summaryformat';
@@ -1256,6 +1298,17 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         global $DB;
         return $DB->record_exists_sql("select 1 from {course} where category = ?",
                 array($this->id));
+    }
+
+    /**
+     * Get the link used to view this course category.
+     *
+     * @return  \moodle_url
+     */
+    public function get_view_link() {
+        return new \moodle_url('/course/index.php', [
+            'categoryid' => $this->id,
+        ]);
     }
 
     /**
@@ -1703,6 +1756,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             throw new moodle_exception('cannotdeletecategoryquestions', '', '', $this->get_formatted_name());
         }
 
+        // Delete all events in the category.
+        $DB->delete_records('event', array('categoryid' => $this->id));
+
         // Finally delete the category and it's context.
         $DB->delete_records('course_categories', array('id' => $this->id));
 
@@ -1839,6 +1895,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         if ($coursesids) {
+            require_once($CFG->dirroot.'/course/lib.php');
             if (!move_courses($coursesids, $newparentid)) {
                 if ($showfeedback) {
                     echo $OUTPUT->notification("Error moving courses");
@@ -2155,6 +2212,32 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         } else {
             return get_string('top');
         }
+    }
+
+    /**
+     * Get the nested name of this category, with all of it's parents.
+     *
+     * @param   bool    $includelinks Whether to wrap each name in the view link for that category.
+     * @param   string  $separator The string between each name.
+     * @param   array   $options Formatting options.
+     * @return  string
+     */
+    public function get_nested_name($includelinks = true, $separator = ' / ', $options = []) {
+        // Get the name of hierarchical name of this category.
+        $parents = $this->get_parents();
+        $categories = static::get_many($parents);
+        $categories[] = $this;
+
+        $names = array_map(function($category) use ($options, $includelinks) {
+            if ($includelinks) {
+                return html_writer::link($category->get_view_link(), $category->get_formatted_name($options));
+            } else {
+                return $category->get_formatted_name($options);
+            }
+
+        }, $categories);
+
+        return implode($separator, $names);
     }
 
     /**
@@ -2741,6 +2824,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
  * @property-read int $showgrades Retrieved from DB on first request
  * @property-read int $newsitems Retrieved from DB on first request
  * @property-read int $startdate
+ * @property-read int $enddate
  * @property-read int $marker Retrieved from DB on first request
  * @property-read int $maxbytes Retrieved from DB on first request
  * @property-read int $legacyfiles Retrieved from DB on first request

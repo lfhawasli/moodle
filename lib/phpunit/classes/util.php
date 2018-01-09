@@ -220,6 +220,10 @@ class phpunit_util extends testing_util {
         core_filetypes::reset_caches();
         \core_search\manager::clear_static();
         core_user::reset_caches();
+        \core\output\icon_system::reset_caches();
+        if (class_exists('core_media_manager', false)) {
+            core_media_manager::reset_caches();
+        }
 
         // Reset static unit test options.
         if (class_exists('\availability_date\condition', false)) {
@@ -228,6 +232,11 @@ class phpunit_util extends testing_util {
 
         // Reset internal users.
         core_user::reset_internal_users();
+
+        // Clear static caches in calendar container.
+        if (class_exists('\core_calendar\local\event\container', false)) {
+            core_calendar\local\event\container::reset_caches();
+        }
 
         //TODO MDL-25290: add more resets here and probably refactor them to new core function
 
@@ -271,6 +280,9 @@ class phpunit_util extends testing_util {
 
         // Reset the log manager cache.
         get_log_manager(true);
+
+        // Reset user agent.
+        core_useragent::instance(true, null);
 
         // verify db writes just in case something goes wrong in reset
         if (self::$lastdbwrites != $DB->perf_get_writes()) {
@@ -412,10 +424,12 @@ class phpunit_util extends testing_util {
 
         self::reset_dataroot();
         testing_initdataroot($CFG->dataroot, 'phpunit');
-        self::drop_dataroot();
 
-        // drop all tables
+        // Drop all tables.
         self::drop_database($displayprogress);
+
+        // Drop dataroot.
+        self::drop_dataroot();
     }
 
     /**
@@ -544,7 +558,15 @@ class phpunit_util extends testing_util {
             <testsuite name="@component@_testsuite">
                 <directory suffix="_test.php">.</directory>
             </testsuite>
-        </testsuites>';
+        </testsuites>
+        <filter>
+            <whitelist processUncoveredFilesFromWhitelist="false">
+                <directory suffix=".php">.</directory>
+                <exclude>
+                    <directory suffix="_test.php">.</directory>
+                </exclude>
+            </whitelist>
+        </filter>';
 
         // Start a sequence between 100000 and 199000 to ensure each call to init produces
         // different ids in the database.  This reduces the risk that hard coded values will
@@ -602,7 +624,7 @@ class phpunit_util extends testing_util {
 
         foreach ($backtrace as $bt) {
             if (isset($bt['object']) and is_object($bt['object'])
-                    && $bt['object'] instanceof PHPUnit_Framework_TestCase) {
+                    && $bt['object'] instanceof PHPUnit\Framework\TestCase) {
                 $debug = new stdClass();
                 $debug->message = $message;
                 $debug->level   = $level;
@@ -821,5 +843,45 @@ class phpunit_util extends testing_util {
         } else {
             return 'en_AU.UTF-8';
         }
+    }
+
+    /**
+     * Executes all adhoc tasks in the queue. Useful for testing asynchronous behaviour.
+     *
+     * @return void
+     */
+    public static function run_all_adhoc_tasks() {
+        $now = time();
+        while (($task = \core\task\manager::get_next_adhoc_task($now)) !== null) {
+            try {
+                $task->execute();
+                \core\task\manager::adhoc_task_complete($task);
+            } catch (Exception $e) {
+                \core\task\manager::adhoc_task_failed($task);
+            }
+        }
+    }
+
+    /**
+     * Helper function to call a protected/private method of an object using reflection.
+     *
+     * Example 1. Calling a protected object method:
+     *   $result = call_internal_method($myobject, 'method_name', [$param1, $param2], '\my\namespace\myobjectclassname');
+     *
+     * Example 2. Calling a protected static method:
+     *   $result = call_internal_method(null, 'method_name', [$param1, $param2], '\my\namespace\myclassname');
+     *
+     * @param object|null $object the object on which to call the method, or null if calling a static method.
+     * @param string $methodname the name of the protected/private method.
+     * @param array $params the array of function params to pass to the method.
+     * @param string $classname the fully namespaced name of the class the object was created from (base in the case of mocks),
+     *        or the name of the static class when calling a static method.
+     * @return mixed the respective return value of the method.
+     */
+    public static function call_internal_method($object, $methodname, array $params = array(), $classname) {
+        $reflection = new \ReflectionClass($classname);
+        $method = $reflection->getMethod($methodname);
+        $method->setAccessible(true);
+        return $method->invokeArgs($object, $params);
     }
 }

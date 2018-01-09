@@ -47,9 +47,13 @@ class core_test_generator_testcase extends advanced_testcase {
         $this->assertInstanceOf('mod_quiz_generator', $generator);
     }
 
+    /**
+     * Test plugin generator, with no component directory.
+     *
+     * @expectedException        coding_exception
+     * @expectedExceptionMessage Component core_completion does not support generators yet. Missing tests/generator/lib.php.
+     */
     public function test_get_plugin_generator_no_component_dir() {
-        $this->setExpectedException('coding_exception', 'Component core_completion does not support ' .
-                    'generators yet. Missing tests/generator/lib.php.');
         $generator = $this->getDataGenerator()->get_plugin_generator('core_completion');
     }
 
@@ -166,7 +170,7 @@ class core_test_generator_testcase extends advanced_testcase {
         $this->assertSame('', $course->idnumber);
         $this->assertSame('topics', $course->format);
         $this->assertEquals(0, $course->newsitems);
-        $this->assertEquals(5, $course->numsections);
+        $this->assertEquals(5, course_get_format($course)->get_last_section_number());
         $this->assertRegExp('/^Test course \d/', $course->summary);
         $this->assertSame(FORMAT_MOODLE, $course->summaryformat);
 
@@ -182,6 +186,9 @@ class core_test_generator_testcase extends advanced_testcase {
 
     public function test_create_module() {
         global $CFG, $SITE, $DB;
+
+        $this->setAdminUser();
+
         if (!file_exists("$CFG->dirroot/mod/page/")) {
             $this->markTestSkipped('Can not find standard Page module');
         }

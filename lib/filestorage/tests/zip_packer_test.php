@@ -297,6 +297,41 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
     /**
      * @depends test_archive_to_storage
      */
+    public function test_extract_to_pathname_returnvalue_successful() {
+        global $CFG;
+
+        $this->resetAfterTest(false);
+
+        $packer = get_file_packer('application/zip');
+
+        $target = make_request_directory();
+
+        $archive = "$CFG->tempdir/archive.zip";
+        $this->assertFileExists($archive);
+        $result = $packer->extract_to_pathname($archive, $target, null, null, true);
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @depends test_archive_to_storage
+     */
+    public function test_extract_to_pathname_returnvalue_failure() {
+        global $CFG;
+
+        $this->resetAfterTest(false);
+
+        $packer = get_file_packer('application/zip');
+
+        $target = make_request_directory();
+
+        $archive = "$CFG->tempdir/noarchive.zip";
+        $result = $packer->extract_to_pathname($archive, $target, null, null, true);
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @depends test_archive_to_storage
+     */
     public function test_extract_to_storage() {
         global $CFG;
 
@@ -428,7 +463,7 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
             $result = $zip_archive->close();
         } catch (Exception $e) {
             // New PHP versions print PHP Warning.
-            $this->assertInstanceOf('PHPUnit_Framework_Error_Warning', $e);
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
             $this->assertContains('ZipArchive::close', $e->getMessage());
         }
         // This is crazy, but it shows how some PHP versions do return true.
@@ -437,7 +472,7 @@ class core_files_zip_packer_testcase extends advanced_testcase implements file_p
             $this->assertFalse($result);
         } catch (Exception $e) {
             // But others do insist into returning true (5.6.13...). Only can accept them.
-            $this->assertInstanceOf('PHPUnit_Framework_ExpectationFailedException', $e);
+            $this->assertInstanceOf('PHPUnit\Framework\ExpectationFailedException', $e);
             $this->assertTrue($result);
         }
         $this->assertFileNotExists($archive);

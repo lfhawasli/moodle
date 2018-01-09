@@ -178,6 +178,15 @@ class behat_data_generators extends behat_base {
             'datagenerator' => 'tag',
             'required' => array('name')
         ),
+        'events' => array(
+            'datagenerator' => 'event',
+            'required' => array('name', 'eventtype'),
+            'switchids' => array(
+                'user' => 'userid',
+                'course' => 'courseid',
+                'category' => 'categoryid',
+            )
+        ),
     );
 
     /**
