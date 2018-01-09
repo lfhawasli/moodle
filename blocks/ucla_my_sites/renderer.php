@@ -22,14 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
-require_once($CFG->dirroot.'/blocks/course_overview/renderer.php');
+
 /**
  * My_sites block rendrer
  *
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_ucla_my_sites_renderer extends block_course_overview_renderer {
+class block_ucla_my_sites_renderer {
 
     /**
      * Construct contents of course_overview block
