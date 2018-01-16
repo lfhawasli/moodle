@@ -478,6 +478,16 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
 
             $value = $valuearray['date_time_selector'];
             $value = strtotime($value); // Convert from UTC to unix time.
+
+            // Make any necessary adjustments for DST.
+            $currentdst = date('I', time()); // Are we currently in DST?
+            $valuedst = date('I', $value); // Is the selected time in DST?
+            if ($valuedst && !$currentdst) {
+                $value -= 3600;
+            } else if (!$valuedst && $currentdst) {
+                $value += 3600;
+            }
+
             // Validate $value. The user could have modified it in-browser.
             $value -= $value % ($this->_options['step'] * 60);
             $mincheck = strtotime('1' . ' January ' . $this->_options['startyear']) > $value;
