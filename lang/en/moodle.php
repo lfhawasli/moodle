@@ -1268,6 +1268,9 @@ $string['moodlelogo'] = 'Moodle logo';
 $string['month'] = 'Month';
 $string['months'] = 'Months';
 $string['modified'] = 'Modified';
+// BEGIN UCLA MOD: CCLE-6398 - Have top tools be configurable
+$string['modchooser'] = 'Activities/Resources chooser';
+//END UCLA MOD: CCLE-6398
 $string['moduleintro'] = 'Description';
 $string['modulesetup'] = 'Setting up module tables';
 $string['modulesuccess'] = '{$a} tables have been set up correctly';
