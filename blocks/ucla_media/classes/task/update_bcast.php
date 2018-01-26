@@ -38,9 +38,10 @@ class update_bcast extends \core\task\scheduled_task {
     /**
      * Update Bruincast database.
      *
+     * @param array $terms  Optional. Used if task is called via command line.
      * @return boolean
      */
-    public function execute() {
+    public function execute($terms = null) {
         global $DB;
 
         mtrace(get_string('bcstartnoti', 'tool_ucladatasourcesync'));
@@ -83,7 +84,9 @@ class update_bcast extends \core\task\scheduled_task {
         // Wrap everything in a transaction, because we don't want to lose data
         // if there is a data issue.
         $numdeleted = $numinserted = $numupdated  = 0;
-        $terms = get_active_terms();
+        if (empty($terms)) {
+            $terms = get_active_terms();
+        }
         // Iterating through all active terms and retrieving data for them.
         foreach ($terms as $term) {
             mtrace("Processing $term");
