@@ -2070,7 +2070,7 @@ function forum_search_posts($searchterms, $courseid=0, $limitfrom=0, $limitnum=5
         return false;
     }
 
-    $now = round(time(), -2); // db friendly
+    $now = floor(time() / 60) * 60; // DB Cache Friendly.
 
     $fullaccess = array();
     $where = array();
@@ -2512,7 +2512,7 @@ function forum_count_discussions($forum, $cm, $course) {
 
     static $cache = array();
 
-    $now = round(time(), -2); // db cache friendliness
+    $now = floor(time() / 60) * 60; // DB Cache Friendly.
 
     $params = array($course->id);
 
@@ -2612,7 +2612,7 @@ function forum_get_discussions($cm, $forumsort="", $fullpost=true, $unused=-1, $
 
     $timelimit = '';
 
-    $now = round(time(), -2);
+    $now = floor(time() / 60) * 60;
     $params = array($cm->instance);
 
     $modcontext = context_module::instance($cm->id);
@@ -2766,7 +2766,7 @@ function forum_get_discussion_neighbours($cm, $discussion, $forum) {
     }
 
     $neighbours = array('prev' => false, 'next' => false);
-    $now = round(time(), -2);
+    $now = floor(time() / 60) * 60;
     $params = array();
 
     $modcontext = context_module::instance($cm->id);
@@ -2934,7 +2934,7 @@ function forum_get_default_sort_order($desc = true, $compare = 'd.timemodified',
 function forum_get_discussions_unread($cm) {
     global $CFG, $DB, $USER;
 
-    $now = round(time(), -2);
+    $now = floor(time() / 60) * 60;
     $cutoffdate = $now - ($CFG->forum_oldpostdays*24*60*60);
 
     $params = array();
@@ -3006,7 +3006,7 @@ function forum_get_discussions_unread($cm) {
 function forum_get_discussions_count($cm) {
     global $CFG, $DB, $USER;
 
-    $now = round(time(), -2);
+    $now = floor(time() / 60) * 60;
     $params = array($cm->instance);
     $groupmode    = groups_get_activity_groupmode($cm);
     $currentgroup = groups_get_activity_group($cm);
@@ -6551,7 +6551,7 @@ function forum_tp_is_post_old($post, $time=null) {
 function forum_tp_get_course_unread_posts($userid, $courseid) {
     global $CFG, $DB;
 
-    $now = round(time(), -2); // DB cache friendliness.
+    $now = floor(time() / 60) * 60; // DB cache friendliness.
     $cutoffdate = $now - ($CFG->forum_oldpostdays * 24 * 60 * 60);
     $params = array($userid, $userid, $courseid, $cutoffdate, $userid);
 
@@ -6650,7 +6650,7 @@ function forum_tp_count_forum_unread_posts($cm, $course, $resetreadcache = false
 
     list ($groups_sql, $groups_params) = $DB->get_in_or_equal($mygroups);
 
-    $now = round(time(), -2); // db cache friendliness
+    $now = floor(time() / 60) * 60; // DB Cache friendliness.
     $cutoffdate = $now - ($CFG->forum_oldpostdays*24*60*60);
     $params = array($USER->id, $forumid, $cutoffdate);
 
@@ -7852,7 +7852,7 @@ function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false,
     // Will record forums where the user can freely access everything
     $forumsearchfullaccess = array();
     // DB caching friendly
-    $now = round(time(), -2);
+    $now = floor(time() / 60) * 60;
     // For each course to search we want to find the forums the user has posted in
     // and providing the current user can access the forum create a search condition
     // for the forum to get the requested users posts.
