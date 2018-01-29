@@ -26,9 +26,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-// START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
-require_once($CFG->dirroot . '/local/ucla/lib.php');
-// END UCLA MOD: CCLE-6437
 
 /**
  * course task that provides all the properties and common steps to be performed
@@ -169,6 +166,11 @@ class restore_course_task extends restore_task {
      */
     protected function define_settings() {
         // START UCLA MOD: CCLE-6437 - Prompt for site type after backup/restore
+        global $CFG;
+        
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclasiteindicator/lib.php');
+        require_once($CFG->dirroot . '/local/ucla/lib.php');
+
         if (is_collab_site($this->get_courseid())) {
             // Only show site indicator types for collaboration sites
             $sitetypelist = siteindicator_manager::get_types_list();
