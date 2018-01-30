@@ -95,6 +95,7 @@ class send_myucla_grade_item extends send_myucla_base {
         // Create link to view grade item. Course modules have a special way to
         // get their view url.
         $gradeinfo->url = '';
+        $cminfo = null;
         if (!empty($gradeitem)) {
             $modinfo = get_fast_modinfo($gradeitem->courseid);
             if (isset($modinfo->instances[$gradeitem->itemmodule][$gradeitem->iteminstance])) {
@@ -104,13 +105,7 @@ class send_myucla_grade_item extends send_myucla_base {
         }
 
         // Create link to edit grade item. We will link directly to QuickEdit.
-        $gradeinfo->editurl = '';
-        if (!empty($gradeitem)) {
-            $gradeinfo->editurl = new \moodle_url('/grade/report/quick_edit/index.php',
-                    array('id'      => $gradeitem->courseid,
-                          'itemid'  => $gradeitem->id,
-                          'item'    => 'grade'));
-        }
+        $gradeinfo->editurl = $this->get_editurl($gradeitem, $cminfo);
 
         // Set variables to notify deletion.
         if (!empty($deleted)) {
@@ -166,6 +161,44 @@ class send_myucla_grade_item extends send_myucla_base {
     }
 
     /**
+     * Returns the proper URL to use for editing/viewing a given grade item.
+     *
+     * Borrows from the private method get_activity_link() in class
+     * grade_structure in file grade/lib.php.
+     *
+     * @param object $gradeitem
+     * @param cm_info $cminfo
+     * @return string               Returns URL to edit grade.
+     */
+    private function get_editurl($gradeitem, $cminfo = null) {
+        global $CFG;
+
+        $retval = '';
+        if (empty($gradeitem)) {
+            return $retval;
+        }
+
+        // For manual grade items/non-modules, link to single view report.
+        if ($gradeitem->itemtype != 'mod') {
+            $retval = new \moodle_url('/grade/report/singleview/index.php',
+                    array('id'      => $gradeitem->courseid,
+                          'itemid'  => $gradeitem->id,
+                          'item'    => 'grade'));
+        } else {
+            // If module has grade.php, link to that, otherwise view.php
+            if (file_exists($CFG->dirroot . '/mod/' . $gradeitem->itemmodule . '/grade.php')) {
+                $retval = new \moodle_url('/mod/' . $gradeitem->itemmodule . '/grade.php',
+                        array('id' => $cminfo->id, 'itemnumber' => $gradeitem->itemnumber));
+            } else {
+                $retval = new \moodle_url('/mod/' . $gradeitem->itemmodule . '/view.php',
+                        array('id' => $cminfo->id));
+            }
+        }
+        // Return urls not-escaped. Will be escaped in web service layer.
+        return $retval->out(false);
+    }
+
+    /**
      * Get due date. There isn't a standard due date field, so we have to hard 
      * code special case handling for certain modules.
      *
@@ -183,6 +216,7 @@ class send_myucla_grade_item extends send_myucla_base {
                 $itemduefield = 'duedate';
                 break;
             case 'assignment':
+            case 'kalvidassign':
             case 'nanogong':
                 $itemduefield = 'timedue';
                 break;
@@ -205,6 +239,10 @@ class send_myucla_grade_item extends send_myucla_base {
                 break;
             case 'questionnaire':
                 $itemduefield = 'closedate';
+                break;
+            case 'turnitintool':
+            case 'turnitintooltwo':
+                $itemduefield = 'defaultdtdue';
                 break;
             case 'workshop':
                 $itemduefield = 'assessmentend';
@@ -231,8 +269,6 @@ class send_myucla_grade_item extends send_myucla_base {
      *                  non-srs course.
      */
     public function set_gradeinfo($gradeitem) {
-        global $CFG;
-
         if (get_class($gradeitem) != 'grade_item') {
             throw new \Exception(get_class($gradeitem).' must be a grade_item.');
         }

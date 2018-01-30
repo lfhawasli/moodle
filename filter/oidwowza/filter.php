@@ -72,7 +72,12 @@ class filter_oidwowza extends moodle_text_filter {
         }
 
         // Prefix the jwplayer.
-        $jwplayerpath = 'https://content.jwplatform.com/libraries/q3GUgsN9.js';
+        // If handling BruinCast audio, need to use JWplayer 6.
+        if (preg_match('/bruincast:jw\S*\.mp3/', $text)) {
+            $jwplayerpath = $CFG->wwwroot . '/filter/oidwowza/jwplayer6/jwplayer.js';
+        } else {
+            $jwplayerpath = 'https://content.jwplatform.com/libraries/q3GUgsN9.js';
+        }
         $newtext = '<script type="text/javascript" src="' . $jwplayerpath . '"></script>'
                 . $newtext;
 

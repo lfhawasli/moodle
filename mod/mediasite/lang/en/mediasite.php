@@ -1,4 +1,30 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Mediasite plugin for Moodle.
+ *
+ * @package mod_mediasite
+ * @copyright Sonic Foundry 2017  {@link http://sonicfoundry.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+defined('MOODLE_INTERNAL') || die();
+
 $string['actiondelete'] = 'Delete existing site';
 $string['actionedit'] = 'Edit existing site';
 $string['actiontblhder'] = 'Action';
@@ -47,6 +73,8 @@ $string['lti_debug_launch'] = "Show LTI Debug Information";
 $string['lti_debug_launch_postfix'] = "<i>(Not recommended for use in production)</i>";
 $string['lti_embed_type_catalog_required'] = 'Please select at least one Catalog embedding format.';
 $string['lti_embed_type_presentation_required'] = 'Please select at least one Presentation embedding format.';
+$string['mbstring_required_message'] = 'Moodle is not configured correctly for Mediasite Content. The multibyte string PHP extension (mbstring) is required.';
+$string['mbstring_required_embed_message'] = 'Moodle is not configured correctly for Mediasite Content. Not all content may be displayed. Please contact your administrator.';
 $string['mediasite'] = "Mediasite";
 $string['mediasite:addinstance'] = "Add Mediasite content to a course";
 $string['mediasite:courses7'] = "Use Mediasite Courses";
@@ -65,6 +93,7 @@ $string['mode'] = 'Embedding Layout';
 $string['modulename'] = 'Mediasite Content';
 $string['modulename_help'] = '<p>Add Mediasite content to a Moodle course via the Mediasite Content activity plug-in. The activity plug-in enables searching for Mediasite presentations and Catalogs based on rights granted to the logged in user in Mediasite. The search can be embedded in a Moodle course via a variety of embed options.</p><p>Embedded Mediasite content can be delivered to users authorized to access instructional materials for the course, via the activity plug-in\'s Single Sign-On capabilities. Mediasite content embedded as presentations, can be played back in a secure fashion from Moodle\'s course pages. Likewise, Mediasite content embedded as catalogs, can be browsed  in a secure fashion from Moodle\'s course pages.</p><p>The activity plug-in also enables tracking of playback activity of the logged in user watching the embedded presentation.  Mediasite content embedded in Moodle course pages can be delivered on-demand or as live broadcasts, with all available Mediasite capabilities including Advanced Search and Interactivity.</p>';
 $string['modulenameplural'] = 'Mediasite Content';
+$string['sofotags'] = 'Tags';
 $string['my_mediasite'] = "My Mediasite";
 $string['my_mediasite_course_menu'] = 'Course Menu';
 $string['my_mediasite_header'] = 'My Mediasite';
@@ -75,8 +104,8 @@ $string['my_mediasite_site_pages'] = 'Site Home';
 $string['my_mediasite_title'] = "My Mediasite Link Text";
 $string['my_mediasite_title_required'] = 'My Mediasite Link Text is required when My Mediasite is enabled.';
 $string['nosites'] = 'There are no configured sites.';
-$string['notauthorized'] = 'You are not authorized for this resource.'; // obsolete?
-$string['notfound'] = 'The selected Mediasite content was not found.'; // obsolete?
+$string['notauthorized'] = 'You are not authorized for this resource.'; // Obsolete?
+$string['notfound'] = 'The selected Mediasite content was not found.'; // Obsolete?
 $string['notypes'] = 'There are currently no LTI tools setup in Moodle. Click the Install link above to add some.';
 $string['openaspopup'] = 'Open content in new window';
 $string['openaspopup_help'] = 'When viewing the resource should it be displayed as a pop-up or inline.';
@@ -97,6 +126,7 @@ $string['presentation_abstract_plus_player'] = 'Abstract + Player';
 $string['PresentationLink'] = 'Link Only';
 $string['presenters'] = 'Presenters';
 $string['press_to_submit'] = 'Press to launch this activity';
+$string['purge_all_caches_message'] = 'Mediasite Content in courses may be partially visible in courses for a brief time. Use Site administration > Development > Purge all caches to fix course content immediately.';
 $string['requiredsitelti_consumer_key'] = "An LTI Consumer Key is required.";
 $string['requiredsitelti_consumer_secret'] = "An LTI Consumer Secret is required.";
 $string['requiredsitename'] = 'Site Name is required';
@@ -120,8 +150,6 @@ $string['sitenames'] = 'Select a default server';
 $string['sitenametblhder'] = 'Site Name';
 $string['siteroottblhder'] = 'Site Root';
 $string['siteselectionheader'] = "Select a Mediasite Server";
-$string['tags'] = 'Tags';
 $string['toggle_debug_data'] = 'Toggle Debug Data';
 $string['unauthorized'] = 'Unauthorized';
 $string['viewsubmissions'] = 'View submissions and grading screen';
-?>
