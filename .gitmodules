@@ -102,7 +102,7 @@
 	url = https://github.com/netspotau/moodle-block_mediagallery.git
 [submodule "mod/assign/submission/mediagallery"]
 	path = mod/assign/submission/mediagallery
-	url = https://github.com/netspotau/moodle-assignsubmission_mediagallery.git
+	url = git@github.com:ccle/moodle-assignsubmission_mediagallery.git
 [submodule "lib/editor/tinymce/plugins/mediagallery"]
 	path = lib/editor/tinymce/plugins/mediagallery
 	url = https://github.com/netspotau/moodle-tinymce_mediagallery.git
@@ -153,7 +153,7 @@
 	url = git@github.com:justinhunt/moodle-repository_poodll.git
 [submodule "mod/assign/feedback/poodll"]
 	path = mod/assign/feedback/poodll
-	url = git@github.com:justinhunt/moodle-assignfeedback_poodll.git
+	url = git@github.com:ccle/moodle-assignfeedback_poodll.git
 [submodule "lib/editor/atto/plugins/count"]
 	path = lib/editor/atto/plugins/count
 	url = git@github.com:damyon/moodle-atto_count.git
