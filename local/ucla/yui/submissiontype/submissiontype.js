@@ -17,13 +17,6 @@ YUI.add('moodle-local_ucla-submissiontype', function (Y) {
             var maxfilesize = Y.one('#fitem_id_assignsubmission_file_maxsizebytes');
             var filesubmitcheck = Y.one('#id_assignsubmission_file_enabled');
 
-            var usqfiletypescheck = Y.one('#id_assignsubmission_usqfiletypes_enabled');
-            if (usqfiletypescheck != null) {
-                var usqfilelabel = usqfiletypescheck.get('nextSibling');
-            }
-            var usqsupportedfiles = Y.one('#fgroup_id_assignsubmission_usqfiletypes_filetypes');
-            var usqsupportedother = Y.one('#fitem_id_assignsubmission_usqfiletypes_filetypesother');
-
             var recordertype = Y.one('#fitem_id_assignsubmission_onlinepoodll_recordertype');
             var timelimit = Y.one('#fitem_id_assignsubmission_onlinepoodll_timelimit');
             var onlinepoodllcheck = Y.one('#id_assignsubmission_onlinepoodll_enabled');
@@ -41,51 +34,6 @@ YUI.add('moodle-local_ucla-submissiontype', function (Y) {
                 mediagallerycheck.on('change', function (e) {
                     mediagallery.toggleView();
                 });
-            }
-
-            // Handle visibility of sub options when File submissions type checked.
-            if (filesubmitcheck != null && usqfiletypescheck != null) {
-                if (filesubmitcheck.get('checked')) {
-                    maxfilesub.show();
-                    maxfilesize.show();
-                    usqfiletypescheck.show();
-                    usqfilelabel.show();
-                } else {
-                    maxfilesub.hide();
-                    maxfilesize.hide();
-                    usqfiletypescheck.hide();
-                    usqfilelabel.hide();
-                }
-                filesubmitcheck.on('change', function (e) {
-                    maxfilesub.toggleView();
-                    maxfilesize.toggleView();
-                    usqfiletypescheck.toggleView();
-                    usqfilelabel.toggleView();
-                    // Force hide Accepted file type sub options when File submissions type was checked.
-                    if (usqfiletypescheck.getAttribute('hidden') === 'hidden') {
-                        usqfiletypescheck.set('checked', false);
-                        usqsupportedfiles.hide();
-                        usqsupportedother.hide();
-                    }
-                });
-            } else if (filesubmitcheck != null && usqfiletypescheck == null) {
-                if (filesubmitcheck.get('checked')) {
-                    maxfilesub.show();
-                    maxfilesize.show();
-                } else {
-                    maxfilesub.hide();
-                    maxfilesize.hide();
-                }
-                filesubmitcheck.on('change', function (e) {
-                    maxfilesub.toggleView();
-                    maxfilesize.toggleView();
-                });
-            } else if (filesubmitcheck == null && usqfiletypescheck != null) {
-                usqfiletypescheck.hide();
-                usqfilelabel.hide();
-                usqfiletypescheck.set('checked', false);
-                usqsupportedfiles.hide();
-                usqsupportedother.hide();
             }
 
             // Handle visibility of sub options when Online Poodll type checked.
@@ -114,22 +62,6 @@ YUI.add('moodle-local_ucla-submissiontype', function (Y) {
                     wordlimit.toggleView();
                 });
             }
-
-            // Handle visibility of sub options when Accepted file type checked.
-            if (usqfiletypescheck != null) {
-                if (usqfiletypescheck.get('checked')) {
-                    usqsupportedfiles.show();
-                    usqsupportedother.show();
-                } else {
-                    usqsupportedfiles.hide();
-                    usqsupportedother.hide();
-                }
-                usqfiletypescheck.on('change', function (e) {
-                    usqsupportedfiles.toggleView();
-                    usqsupportedother.toggleView();
-                });
-            }
-
         },
     };
 }, '@VERSION@', {'requires':['node','event']});
