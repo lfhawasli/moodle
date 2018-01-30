@@ -227,9 +227,6 @@ $string['deletecoursecontentwarning'] = '<p>You are about to delete the content 
         . '<p>{$a->shortname} ({$a->fullname})</p>'
         . '<p>To ensure that your content is saved, first <a href="{$a->backuplink}">create a backup.</a>  If you are sure you want to delete the content, press "Continue".';
 
-// CCLE-4413 assignment file submission file type validation.
-$string['invalidfiletype'] = '{$a->notaccepted} filetype cannot be accepted.<br />Acceptable file type(s): {$a->accepted}';
-
 // CCLE-3843 - Single file recovery.
 $string['logfiledeleted'] = 'Deleted file';
 

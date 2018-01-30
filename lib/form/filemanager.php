@@ -221,46 +221,6 @@ class MoodleQuickForm_filemanager extends HTML_QuickForm_element implements temp
         $this->_options['maxfiles'] = $num;
     }
 
-    // START UCLA MOD: CCLE-4413 assignment file submission file type validation
-
-    /**
-    * Returns the acceptable types of files which can be uploaded.
-    *
-    * @return string
-    */
-    function getAcceptedtypes() {
-        return $this->_options['accepted_types'];
-    }
-
-    /**
-    * Sets the acceptable types of files which can be uploaded.
-    *
-    * @param string $types accepted types list
-    */
-    function setAcceptedtypes($types) {
-        $this->_options['accepted_types'] = $types;
-    }
-
-    /**
-    * Returns the returnable types of files.
-    *
-    * @return int
-    */
-    function getReturntypes() {
-        return $this->_options['return_types'];
-    }
-
-    /**
-    * Sets the returnable types of files
-    *
-    * @param int $types return types bitmask
-    */
-    function setReturntypes($types) {
-        $this->_options['return_types'] = $types;
-    }
-
-    // END UCLA MOD: CCLE-4413
-
     /**
      * Returns html for help button.
      *
