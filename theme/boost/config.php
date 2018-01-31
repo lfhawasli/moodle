@@ -27,10 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/lib.php');
 
 $THEME->name = 'boost';
-// START UCLA MOD CCLE-7178: Arrow image showing at the bottom of footer.
-//$THEME->sheets = [];
-$THEME->sheets = ['flatpickr.min'];
-// END UCLA MOD CCLE-7178.
+$THEME->sheets = [];
 $THEME->editor_sheets = [];
 $THEME->usefallback = true;
 $THEME->scss = function($theme) {
