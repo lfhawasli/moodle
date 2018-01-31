@@ -53,16 +53,6 @@ if ($ADMIN->fulltree) {
             $default, PARAM_RAW);
     $settings->add($setting);
 
-    // The sub text.
-    $thesetting = 'logo_sub_text';
-    $name = $themename . '/' . $thesetting;
-    $title = get_string('setting_title_' . $thesetting, $themename);
-    $description = get_string('setting_desc_' . $thesetting, $themename);
-    $default = get_string('setting_default_' . $thesetting, $themename);
-    $setting = new admin_setting_configtextarea($name, $title, $description,
-            $default, PARAM_RAW);
-    $settings->add($setting);
-
     $thesetting = 'system_name';
     $name = $themename . '/' . $thesetting;
     $title = get_string('setting_title_' . $thesetting, $themename);
@@ -99,15 +89,4 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext($name, $title, $description,
             $default);
     $settings->add($setting);
-
-    $thesetting = 'disable_post_blocks';
-    $name = $themename . '/' . $thesetting;
-    $title = get_string('setting_title_' . $thesetting, $themename);
-    $description = get_string('setting_desc_' . $thesetting, $themename);
-    $default = false;
-    $setting = new admin_setting_configcheckbox($name, $title, $description,
-            $default);
-    $settings->add($setting);
 }
-
-// EoF.
