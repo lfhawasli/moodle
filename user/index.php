@@ -135,6 +135,11 @@ if ($course->groupmode != NOGROUPS) {
         }
     }
 }
+
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+$groupingid   = optional_param('grouping', 0, PARAM_INT);
+// END UCLA MOD: CCLE-5686.
+
 $hasgroupfilter = false;
 $lastaccess = 0;
 $searchkeywords = [];
@@ -160,6 +165,11 @@ foreach ($filtersapplied as $filter) {
             $groupid = $value;
             $hasgroupfilter = true;
             break;
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        case USER_FILTER_GROUPING:
+            $groupingid = $value;
+            break;
+        // END UCLA MOD: CCLE-5686.
         case USER_FILTER_LAST_ACCESS:
             $lastaccess = $value;
             break;
@@ -225,7 +235,10 @@ $baseurl = new moodle_url('/user/index.php', array(
         'id' => $course->id,
         'perpage' => $perpage));
 
-$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+//$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
+$participanttable = new \core_user\participants_table($course->id, $groupid, $groupingid, $lastaccess, $roleid, $enrolid, $status,
+// END UCLA MOD: CCLE-5686.
     $searchkeywords, $bulkoperations, $selectall);
 $participanttable->define_baseurl($baseurl);
 
