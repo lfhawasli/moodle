@@ -4252,7 +4252,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
                     !has_shared_context($context->instanceid, $USER->id)) {
                 // if no shared context, then maybe viewer is admin/manager
                 if (!has_capability('moodle/user:viewalldetails', $context)) {
-                    redirect($theme->pix_url('u/'.$filename, 'moodle'));
+                    redirect($theme->pix_icon('u/'.$filename, 'moodle'));
                 }
             }
             // END UCLA MOD: CCLE-2454            

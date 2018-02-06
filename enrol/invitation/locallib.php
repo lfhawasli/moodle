@@ -89,7 +89,7 @@ class invitation_manager {
 
             // Display an icon with requested (css can be changed in stylesheet).
             if ($withicon) {
-                $inviteicon = html_writer::img($OUTPUT->pix_url('invite', 'enrol_invitation'), "invitation",
+                $inviteicon = html_writer::img($OUTPUT->pix_icon('invite', 'enrol_invitation'), "invitation",
                         array('class' => "enrol_invitation_item_icon",
                               'title' => "invitation"));
             }
