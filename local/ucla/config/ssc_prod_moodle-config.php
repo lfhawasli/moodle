@@ -470,6 +470,10 @@ $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 // Site administration > Plugins > Message outputs > Email
 $CFG->emailonlyfromnoreplyaddress = 1;
 
+// Site administration > Plugins > Message outputs > Default message outputs
+$CFG->forced_plugin_settings['message']['email_provider_mod_forum_posts_permitted'] = 'forced';
+$CFG->forced_plugin_settings['message']['email_provider_mod_forum_digests_permitted'] = 'forced';
+
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
 
