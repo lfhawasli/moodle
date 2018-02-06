@@ -76,6 +76,9 @@ class user_groups_editable extends \core\output\inplace_editable {
 
         foreach ($coursegroups as $group) {
             $options[$group->id] = format_string($group->name, true, ['context' => $this->context]);
+            // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+            $options[$group->id] = $this->add_grouping($options[$group->id], $group);
+            // END UCLA MOD: CCLE-5686.
         }
         $this->edithint = get_string('editusersgroupsa', 'group', fullname($user));
         $this->editlabel = get_string('editusersgroupsa', 'group', fullname($user));
@@ -83,6 +86,22 @@ class user_groups_editable extends \core\output\inplace_editable {
         $attributes = ['multiple' => true];
         $this->set_type_autocomplete($options, $attributes);
     }
+
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    /**
+     * Adds grouping information following group string.
+     *
+     * @param string $displaystring
+     * @param object $group
+     * @return string
+     */
+    private function add_grouping($displaystring, $group) {
+        if (!empty($group->groupings)) {
+            $displaystring .= ' /<br />' . implode(', ', $group->groupings);
+        }
+        return $displaystring;
+    }
+    // END UCLA MOD: CCLE-5686.
 
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -93,8 +112,23 @@ class user_groups_editable extends \core\output\inplace_editable {
     public function export_for_template(\renderer_base $output) {
         $listofgroups = [];
         $groupids = json_decode($this->value);
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        $prependnewline = false;
+        // END UCLA MOD: CCLE-5686.
         foreach ($groupids as $id) {
-            $listofgroups[] = format_string($this->coursegroups[$id]->name, true, ['context' => $this->context]);
+            // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+            //$listofgroups[] = format_string($this->coursegroups[$id]->name, true, ['context' => $this->context]);
+            $displaystring = format_string($this->coursegroups[$id]->name, true, ['context' => $this->context]);            
+            $displaystring = $this->add_grouping($displaystring, $this->coursegroups[$id]);
+            if (!empty($prependnewline)) {
+                // Need to prepend newline because Moodle adds comma when 
+                // joining multiple groups together.
+                $displaystring = '<hr />' . $displaystring;                
+            }
+            $listofgroups[] = $displaystring;
+            // Next interation add newlines.
+            $prependnewline = true;
+            // END UCLA MOD: CCLE-5686.
         }
 
         if (!empty($listofgroups)) {

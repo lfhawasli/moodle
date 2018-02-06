@@ -150,6 +150,23 @@ class core_user_renderer extends plugin_renderer_base {
         }
         $filteroptions += $groupoptions;
 
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        // Filter options for groupings, if avaiable.
+        if (has_capability('moodle/site:accessallgroups', $context)) {
+            // List all groupings if user can access all groups.
+            $groupings = groups_get_all_groupings($course->id);
+        } else {
+            // Otherwise, just list the groupings the user belongs to.
+            $groupings = groups_get_all_groupings($course->id, $USER->id);
+        }
+        $criteria = get_string('grouping', 'group');
+        $groupingoptions = [];
+        foreach ($groupings as $id => $grouping) {
+            $groupingoptions += $this->format_filter_option(USER_FILTER_GROUPING, $criteria, $id, $grouping->name);
+        }
+        $filteroptions += $groupingoptions;
+        // END UCLA MOD: CCLE-5686.
+
         $canreviewenrol = has_capability('moodle/course:enrolreview', $context);
 
         // Filter options for status.
