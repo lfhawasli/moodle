@@ -116,6 +116,8 @@ class ucla_cp_renderer {
 
         $item = $itemobj->itemname;
         $link = $itemobj->get_action();
+        $strhide = get_string('hide');
+        $strshow = get_string('show');
 
         if ($itemobj->get_opt('pre')) {
             $fitem .= html_writer::tag('span', get_string($item . '_pre',
@@ -149,7 +151,11 @@ class ucla_cp_renderer {
                 $action = 'toggle_' . $item;
 
                 $icon = ($enable) ? 'hide' : 'show';
-                $iconurl = $OUTPUT->pix_url('t/' . $icon);
+                if ($icon == 'hide') {
+                    $iconurl = $OUTPUT->image_url('t/' . $icon, $strhide);
+                } else {
+                    $iconurl = $OUTPUT->image_url('t/' . $icon, $strshow);
+                }
                 $fitem .= html_writer::link(
                         new moodle_url('', array('action' => 'toggle_' . $item,
                         'course_id' => required_param('course_id', PARAM_INT))),
@@ -185,7 +191,7 @@ class ucla_cp_renderer {
             array('href' => $itemobj->get_action()));
 
         $fitem .= html_writer::start_tag('img',
-                array('src' => $OUTPUT->pix_url('cp_' . $item, $bucp),
+                array('src' => $OUTPUT->pix_icon('cp_' . $item, $bucp),
                       'alt' => $itemstring, 'class' => 'general_icon'));
         $fitem .= html_writer::end_tag('a');
 

@@ -92,7 +92,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
             $pix = $category->name . '/logo';
             $address = new moodle_url($CFG->wwwroot . '/course/view.php?id=' . $COURSE->id);
 
-            $pixurl = $this->pix_url($pix, $this->theme);
+            $pixurl = $this->image_url($pix, $this->theme);
             $logoalt = $COURSE->fullname;
             $logoimg = html_writer::img($pixurl, $logoalt);
             $alternativelogo = html_writer::link($address, $logoimg);
@@ -260,7 +260,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
                 null, $this->course_logo_config());
 
         // Show logo guide.
-        $pixurl = $this->pix_url('guide', 'theme');
+        $pixurl = $this->image_url('guide', 'theme');
         $img = html_writer::img($pixurl, null);
         $mform->addElement('static', 'description', '', $img);
 

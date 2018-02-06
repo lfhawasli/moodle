@@ -18,7 +18,7 @@ function display_uclasupportconsole_export_options($params) {
 
     // Right now, only supporting xls.
     $xlsstring = get_string('application/vnd.ms-excel', 'mimetypes');
-    $icon = html_writer::img($OUTPUT->pix_url('f/spreadsheet'), $xlsstring, array('title' => $xlsstring));
+    $icon = html_writer::img($OUTPUT->image_url('f/spreadsheet'), $xlsstring, array('title' => $xlsstring));
     $params['export'] = 'xls';
     $exportoptions .= html_writer::link(
             new moodle_url('/'.$CFG->admin.'/tool/uclasupportconsole/index.php',

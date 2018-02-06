@@ -1530,7 +1530,7 @@ function qanda_print_sorting_links($cm, $mode, $sortkey = '', $sortorder = '') {
             $neworder = '&amp;sortorder=asc';
             $newordertitle = get_string('changeto', 'qanda', $asc);
         }
-        $icon = " <img src=\"" . $OUTPUT->pix_url($sortorder, 'qanda') . "\" class=\"icon\" alt=\"$newordertitle\" />";
+        $icon = " <img src=\"" . $OUTPUT->pix_icon($sortorder, 'qanda') . "\" class=\"icon\" alt=\"$newordertitle\" />";
     } else {
         if ($sortkey != 'CREATION' and $sortkey != 'UPDATE' and
                 $sortkey != 'FIRSTNAME' and $sortkey != 'LASTNAME') {
@@ -1539,7 +1539,7 @@ function qanda_print_sorting_links($cm, $mode, $sortkey = '', $sortorder = '') {
         } else {
             $newordertitle = $desc;
             $neworder = '&amp;sortorder=desc';
-            $icon = ' <img src="' . $OUTPUT->pix_url('asc', 'qanda') . '" class="icon" alt="' . $newordertitle . '" />';
+            $icon = ' <img src="' . $OUTPUT->pix_icon('asc', 'qanda') . '" class="icon" alt="' . $newordertitle . '" />';
         }
     }
     $ficon = '';
