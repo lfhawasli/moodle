@@ -428,10 +428,13 @@ function requestor_ignore_entry($data) {
 
     // CCLE-4511 - Filter certain course numbers for engineering.
     if (in_array($subj, array('BIOENGR', 'BIOINFR', 'CH ENGR', 'C&EE', 'COM SCI',
-            'EL ENGR', 'ENGR', 'MAT SCI', 'MECH&AE')) &&
+            'EC ENGR', 'EL ENGR', 'ENGR', 'MAT SCI', 'MECH&AE')) &&
             in_array($rawnum, array('199', '260', '296', '298', '299', '375',
                 '596', '597A', '597B', '597C', '598', '599'))) {
-        return true;
+        // But include these class numbers if they are section 80-89.
+        if ($data->sectnum < 80 || $data->sectnum >89) {
+            return true;
+        }
     }
 
     // CCLE-4513 - Limit course builds for LS to 192 and below.
