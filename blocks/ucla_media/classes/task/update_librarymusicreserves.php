@@ -113,7 +113,7 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                             try {
                                 $DB->insert_record('ucla_library_music_reserves', $entry);
                                 ++$numinserted;
-                            } catch (Exception $ex) {
+                            } catch (\Exception $ex) {
                                 // It is a duplicate entry, so ignore it.
                                 mtrace("\n" . get_string('founddupentry',
                                         'tool_ucladatasourcesync', $key));
