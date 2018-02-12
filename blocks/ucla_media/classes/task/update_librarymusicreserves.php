@@ -92,10 +92,10 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                         }
                         $entry->httpurl = $item->httpURL;
                         $entry->rtmpurl = $item->rtmpURL;
-                        $entry->volume = !empty($item->volume) ? intval($item->volume) : 0;
-                        $entry->disc = !empty($item->disc) ? intval($item->disc) : 0;
-                        $entry->side = !empty($item->side) ? intval($item->side) : 0;
-                        $entry->tracknumber = !empty($item->trackNumber) ? intval($item->trackNumber) : 0;
+                        $entry->volume = !empty($item->volume) ? $item->volume : 0;
+                        $entry->disc = !empty($item->disc) ? $item->disc : 0;
+                        $entry->side = !empty($item->side) ? $item->side : 0;
+                        $entry->tracknumber = !empty($item->trackNumber) ? $item->trackNumber : 0;
 
                         // Unique key to find duplicate entries.
                         $key = $entry->term . '-' . $entry->srs . '-' . $entry->workid
