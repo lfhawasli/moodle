@@ -93,7 +93,7 @@ function display_page_album($course, $albumid) {
                AND album.id=?
           ORDER BY media.volume, media.disc, media.side, media.tracknumber";
     $reserves = $DB->get_records_sql($sql, array($courseid, $albumid));
-    
+
     $samplereserve = reset($reserves);
     $title = $samplereserve->albumtitle;
     if ($samplereserve->composer != null) {
@@ -114,7 +114,7 @@ function display_page_album($course, $albumid) {
         $output[] = $outputstr;
         
     }
-    echo html_writer::alist($output, array(), 'ol');
+    echo html_writer::alist($output, array(), 'ul');
     echo html_writer::end_div('div');
 }
 
