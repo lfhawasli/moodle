@@ -77,7 +77,7 @@ if (is_dir($exportto)) {
  *      ShibRequestSetting requireSession 1
  *      ShibRequireSession On
  *      ShibUseHeaders On
- *      require SHIBUCLALOGONID nshemer sdicks
+ *      require shib-attr SHIBUCLALOGONID nshemer sdicks
  * </Location>
  */
 
