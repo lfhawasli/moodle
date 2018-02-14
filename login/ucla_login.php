@@ -93,9 +93,6 @@ $site = get_site();
 
 $loginsite = get_string('loginsite');
 
-//HTTPS is required in this page when $CFG->loginhttps enabled
-$PAGE->https_required();
-
 $context = context_system::instance();
 $PAGE->set_url("$CFG->wwwroot/login/ucla_login.php");
 $PAGE->set_context($context);
@@ -261,9 +258,6 @@ if ($session_has_timed_out && !data_submitted()) {
     $errorcode = 4;
 }
 
-// make sure we really are on the https page when https login required
-$PAGE->verify_https_required();
-
 /// Generate the login page with forms
 
 if (!isset($frm) or !is_object($frm)) {
@@ -299,18 +293,20 @@ if (isloggedin() and !isguestuser()) {
     echo $OUTPUT->confirm(get_string('alreadyloggedin', 'error', fullname($USER)), $logout, $continue);
     echo $OUTPUT->box_end();
 } else {
+    // Needed for output render to work properly.
+    $authsequence = get_enabled_auth_plugins(true);
+    $authplugin = get_auth_plugin('manual');
+    $authplugin->loginpage_hook();
+
     ob_start();
-    include("index_form.html");
+    $loginform = new \core_auth\output\login($authsequence, $frm->username);
+    $loginform->set_error($errormsg);
+    echo $OUTPUT->render($loginform);
     $form = ob_get_clean();
 
     $target_form = str_replace($CFG->httpswwwroot . '/login/index.php', 
         $PAGE->url, $form);
-
     echo $target_form;
-    if (!empty($CFG->loginpageautofocus)) {
-        //focus username or password
-        $PAGE->requires->js_init_call('M.util.focus_login_form', null, true);
-    }    
 }
 
 echo $OUTPUT->footer();
