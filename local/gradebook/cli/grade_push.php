@@ -154,7 +154,7 @@ foreach ($courses as $courseid) {
                     $trace->output('Did not sent grade', 2);
                 }
                 ++$numgradessent;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $trace->output(sprintf('Failed to send grade %d', $gradegrade->id), 2);
                 cli_problem(sprintf('Exception %s', $e->getMessage()));
             }
