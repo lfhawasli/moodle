@@ -225,7 +225,7 @@ class ucla_reg_classinfo_cron {
 
                         $transaction->allow_commit();
                         $uc++;
-                    } catch (Exception $ex) {
+                    } catch (\Exception $ex) {
                         $transaction->rollback($ex);
                         mtrace("Update to {$request->term} {$request->srs} failed - records rolled back to original state");
                     }
@@ -305,7 +305,7 @@ class ucla_reg_subjectarea_cron {
         foreach ($terms as $term) {
             try {
                 $regdata = $reg->retrieve_registrar_info(array('term' => $term));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Mostly likely couldn't connect to registrar.
                 mtrace($e->getMessage());
                 return false;
