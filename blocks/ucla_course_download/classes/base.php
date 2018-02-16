@@ -142,6 +142,7 @@ abstract class block_ucla_course_download_base {
         $request->content = json_encode($this->get_content());
         $request->contexthash = sha1($request->content);
         $request->timerequested = time();
+        $request->timeupdated = null;
         $request->numdownloaded = 0;
         $request->active = 1;
 
