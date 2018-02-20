@@ -196,11 +196,11 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                     fp.altInput.name = "'.$inputname .'_flatpickr_display";
                 }
             });';
-        $this->_elements[] = @MoodleQuickForm::createElement('static', 'flatpickrdiv', '', '
+        $this->_elements[] = $this->createFormElement('static', 'flatpickrdiv', '', '
             <div style="display: inline; margin-right: 10px;" class="flatpickr" name ="'. $inputname .'_flatpickr">');
-        $this->_elements[] = @MoodleQuickForm::createElement('text', 'date_selector', '',
+        $this->_elements[] = $this->createFormElement('text', 'date_selector', '',
                 array('data-input' => 'data-input', 'placeholder' => $placeholder));
-        $this->_elements[] = @MoodleQuickForm::createElement('static', 'flatpickrscript', '',
+        $this->_elements[] = $this->createFormElement('static', 'flatpickrscript', '',
             '<a style="text-decoration: none;" class="input-button" title="Calendar" data-toggle>
                 <i class="fa fa-calendar" aria-hidden="true"></i>
             </a>' .
