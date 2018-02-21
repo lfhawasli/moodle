@@ -309,9 +309,6 @@ $string['hidden'] = 'Hidden';
 $string['limitcrosslistemailname'] = 'Cross Listed Course Limit';
 $string['limitcrosslistemaildesc'] = 'Limit of short course names appearing on email subject.';
 
-// CCLE-6369 - Improve user experience when viewing activity they don't have access to.
-$string['contactinstructors'] = 'Please contact your instructor or TA if you have any questions.';
-
 // CCLE-6760 - Rename Miscellaneous to Site Activity.
 $string['siteactivity'] = 'Site activity';
 
