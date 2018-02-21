@@ -133,5 +133,15 @@ function xmldb_format_ucla_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014110500, 'format', 'ucla');
     }
 
+    // Remove numsections (CCLE-7121), based on MDL-57769.
+    if ($oldversion < 2018021300) {
+        require_once($CFG->dirroot . '/course/format/ucla/db/upgradelib.php');
+
+        // Remove 'numsections' option. Handle orphaned and to-be-created sections.
+        format_ucla_upgrade_remove_numsections();
+
+        upgrade_plugin_savepoint(true, 2018021300, 'format', 'ucla');
+    }
+
     return true;
 }

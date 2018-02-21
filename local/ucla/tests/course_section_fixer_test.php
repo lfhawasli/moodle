@@ -34,6 +34,8 @@ global $CFG;
  * @group ucla
  * @group local_ucla
  */
+// TODO Some tests may no longer be pointful with UCLA course format,
+// since numsections is removed.
 class course_section_fixer_test extends advanced_testcase {
 
     /**

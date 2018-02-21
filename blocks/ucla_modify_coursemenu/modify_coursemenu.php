@@ -55,7 +55,6 @@ $justshowsuccessmessage = optional_param('success', 0, PARAM_INT);
 // via the course section modifier.
 $sectionnum = optional_param('section', 0, PARAM_INT);
 $showall = optional_param('show_all', 0, PARAM_INT);
-$adjustnum = optional_param('adjustnum', 0, PARAM_BOOL);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $format = course_get_format($course);
@@ -71,13 +70,7 @@ require_capability('moodle/course:manageactivities', $context);
 // Set editing url to be section or default page.
 $allsections = $format->get_sections();
 $sections = array();
-$numsections = $format->get_course()->numsections;
 foreach ($allsections as $k => $section) {
-
-    if ($section->section > $numsections) {
-        continue;
-    }
-
     $s = new stdClass();
     $s->name = $format->get_section_name($section);
     $s->id = $section->id;
@@ -146,14 +139,6 @@ if ($justshowsuccessmessage) {
     $event->trigger();
 
     die();
-} else if ($adjustnum) {
-    // Fix problem and redirect back to same page.
-    $result = local_ucla_course_section_fixer::detect_numsections($course, $adjustnum);
-    if ($result) {
-        flash_redirect($PAGE->url, get_string('successnumsections', 'block_ucla_modify_coursemenu'));
-    } else {
-        $OUTPUT->notification(get_string('failurenumsections', 'block_ucla_modify_coursemenu'));
-    }
 }
 
 // Before loading modinfo, make sure section information is correct.
@@ -268,7 +253,7 @@ if ($modifycoursemenuform->is_cancelled()) {
             $sectdata['course'] = $courseid;
             $section = (object) $sectdata;
         } else {
-            // It a section that existed, and was < course.numsections.
+            // It's a section that existed.
             $section = $sections[$oldsectnum];
         }
 
@@ -311,7 +296,6 @@ if ($modifycoursemenuform->is_cancelled()) {
     $passthrudata->sections = $sections;
     $passthrudata->deletesectionids = $deletesectionids;
     $passthrudata->landingpage = $landingpage;
-    $passthrudata->coursenumsections = $newsectnum;
 
     // We need to add a validation thing for deleting sections.
     if (!empty($sectionsnotify)) {
@@ -569,10 +553,6 @@ if ($passthrudata || $verifydata) {
     course_get_format($courseid)->update_course_format_options(
             array('landing_page' => $passthrudata->landingpage));
 
-    // Update the course numsections.
-    course_get_format($courseid)->update_course_format_options(
-            array('numsections' => $passthrudata->coursenumsections));
-
     // Get the new values for sectioncache and modinfo.
     // Maybe there is a better way?
     unset($course->sectioncache);
@@ -663,22 +643,6 @@ set_editing_mode_button($courseviewurl);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($restr, 2, 'headingblock');
-
-// Give alert if there are more sections than there are numsections.
-$extrasections = local_ucla_course_section_fixer::detect_numsections($course);
-if ($extrasections !== false) {
-    $sectionlist = html_writer::alist($extrasections);
-    $message = get_string('alertnumsections', 'block_ucla_modify_coursemenu', $sectionlist);
-    $redirecturl = $PAGE->url;
-    $redirecturl->param('adjustnum', true);
-    $continue = new single_button($redirecturl, get_string('buttonnumsections', 'block_ucla_modify_coursemenu'));
-
-    $output = $OUTPUT->box_start('generalbox', 'notice');
-    $output .= html_writer::tag('p', $message);
-    $output .= html_writer::tag('div', $OUTPUT->render($continue), array('class' => 'buttons'));
-    $output .= $OUTPUT->box_end();
-    echo $output;
-}
 
 // Any messages that need displaying?
 flash_display();
