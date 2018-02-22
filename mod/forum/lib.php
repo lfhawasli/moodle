@@ -824,10 +824,11 @@ function forum_cron() {
                 $displayinfo = array();
                 $limitcrosslistemail = get_config('local_ucla', 'limitcrosslistemail');
 
-                // Store substring of course shortname with term removed.
+                // Store substring of course shortname with term and non-digits/alphas removed.
                 $coursename = $shortname;
                 if (($pos = strpos($shortname, '-')) !== false) {
                     $coursename = substr($shortname, $pos + 1);
+                    $coursename = preg_replace('/[^A-Za-z0-9]/', '', $coursename);
                 }
 
                 foreach ($courseinfos as $key => $courseinfo) {
@@ -840,7 +841,7 @@ function forum_cron() {
                             $courseinfo->sectnum;
 
                     // Prevent duplicate listing of the course shortnames.
-                    if ($course_text !== $coursename) {
+                    if (preg_replace('/[^A-Za-z0-9]/', '', $course_text) !== $coursename) {
                         $displayinfo[$key] = $course_text;
                     }
                 }
