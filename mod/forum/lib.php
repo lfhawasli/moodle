@@ -3507,8 +3507,33 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
 
     // User picture.
     if (!$authorhidden) {
-        $picture = $OUTPUT->user_picture($postuser, ['courseid' => $course->id]);
-        $output .= html_writer::div($picture, 'left picture');
+        // START UCLA MOD: CCLE-7223 - Reimplement core edit CCLE-5696 Enlarge forum profile pictures.
+        // $picture = $OUTPUT->user_picture($postuser, ['courseid' => $course->id]);
+        // $output .= html_writer::div($picture, 'left picture');
+
+        $devicetype = core_useragent::get_device_type();
+        
+        $output .= html_writer::start_tag('div', array('class'=>'left picture'));
+        if ($devicetype == 'mobile' || $devicetype == 'tablet') {
+            $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id, 'size'=>70));
+        } else {
+            $output .= $OUTPUT->user_picture($postuser, array('courseid'=>$course->id, 'size'=>105));
+        }
+        
+        $output .= html_writer::start_tag('div', array('class'=>'left'));
+
+        $groupoutput = '';
+        if ($groups) {
+            $groupoutput = print_group_picture($groups, $course->id, false, true, true);
+        }
+        if (empty($groupoutput)) {
+            $groupoutput = '&nbsp;';
+        }
+        $output .= html_writer::div($groupoutput, 'grouppictures');
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
+        // END UCLA MOD: CCLE-7223.
+        
         $topicclass = 'topic' . $topicclass;
     }
 
@@ -3542,7 +3567,8 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     // Row with the forum post content.
     $output .= html_writer::start_div('row maincontent clearfix');
     // Show if author is not hidden or we have groups.
-    if (!$authorhidden || $groups) {
+    // START UCLA MOD: CCLE-7223 - Reimplement core edit CCLE-5696 Enlarge forum profile pictures.
+    /* if (!$authorhidden || $groups) {
         $output .= html_writer::start_div('left');
         $groupoutput = '';
         if ($groups) {
@@ -3553,7 +3579,8 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         }
         $output .= html_writer::div($groupoutput, 'grouppictures');
         $output .= html_writer::end_div(); // Left side.
-    }
+    }*/
+    // END UCLA MOD: CCLE-7223.
 
     $output .= html_writer::start_tag('div', array('class'=>'no-overflow'));
     $output .= html_writer::start_tag('div', array('class'=>'content'));
