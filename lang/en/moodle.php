@@ -1772,6 +1772,9 @@ $string['selectanaction'] = 'Select an action';
 $string['selectagroup'] = 'Select a group';
 $string['selectaregion'] = 'Select a region';
 $string['selctauser'] = 'Select a user';
+// START UCLA MOD: CCLE-6917 - Revamp date picker.
+$string['selectadate'] = 'Select a date...';
+// END UCLA MOD: CCLE-6917.
 $string['selectall'] = 'Select all';
 $string['selectallusersonpage'] = 'Select all users on this page';
 $string['selectalluserswithcount'] = 'Select all {$a} users';

@@ -94,7 +94,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         // Note: flatpickr does not support non-gregorian calendar.
         $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
                 'defaulttime' => 0, 'timezone' => 99, 'step' => 5, 'optional' => false, 'clear' => false,
-                'placeholder' => 'Select date...', 'locale' => current_language());
+                'placeholder' => get_string('selectadate'), 'locale' => current_language());
         // END UCLA MOD: CCLE-6917.
         // TODO MDL-52313 Replace with the call to parent::__construct().
         HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes);
@@ -164,8 +164,9 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
      * @access private
      */
     function _createElements() {
-        // START UCLA MOD: CCLE-6917 - Revamp date picker.
-        global $OUTPUT, $PAGE;
+        global $OUTPUT;
+        // START UCLA MOD: CCLE-6917 - Revamp date picker.        
+        global $PAGE;
         $PAGE->requires->js('/lib/flatpickr/flatpickr.min.js');
         // Custom CSS for flatpickr is added in theme/uclashared/styles/.
 
@@ -180,7 +181,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         }
 
         $inputname = $this->getName();
-        $placeholder = (isset($this->_options['placeholder'])) ? $this->_options['placeholder'] : 'Select date...';
+        $placeholder = (isset($this->_options['placeholder'])) ? $this->_options['placeholder'] : get_string('selectadate');
         // For compatibility with names that characters like [] created by moodleform functions such
         // as repeat_elements, we use getElementsByName instead of getElementsbyId, since HTML ids cannot contain [].
         $flatpickrdefinition = '
@@ -196,8 +197,9 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                     fp.altInput.name = "'.$inputname .'_flatpickr_display";
                 }
             });';
-        $this->_elements[] = $this->createFormElement('static', 'flatpickrdiv', '', '
-            <div style="display: inline; margin-right: 10px;" class="flatpickr" name ="'. $inputname .'_flatpickr">');
+        $this->_elements[] = $this->createFormElement('static', 'flatpickrdiv', '',
+                '<div style="display: inline; margin-right: 10px;"
+                class="flatpickr" name ="'. $inputname .'_flatpickr">');
         $this->_elements[] = $this->createFormElement('text', 'date_selector', '',
                 array('data-input' => 'data-input', 'placeholder' => $placeholder));
         $this->_elements[] = $this->createFormElement('static', 'flatpickrscript', '',
@@ -324,7 +326,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                 */
                 // When using the function addElement, rather than createElement, we still
                 // enter this case, making this check necessary.
-                if (!empty($arg[2]['optional']) && !empty($arg[0])) {
+                if (isset($arg[2]['optional']) && $arg[2]['optional'] && !$this->_usedcreateelement) {
                     $caller->disabledIf($arg[0] . '[date_selector]', $arg[0] . '[enabled]');
                     $caller->disabledIf($arg[0] . '_flatpickr_display', $arg[0] . '[enabled]');
                 }
@@ -388,7 +390,10 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                 $valuearray += $thisexport;
             }
         }
-        if (count($valuearray) && isset($valuearray['year'])) {
+        // START UCLA MOD: CCLE-6917 - Revamp date picker.
+        //if (count($valuearray) && isset($valuearray['year'])) {
+        if (count($valuearray)) {
+        // END UCLA MOD: CCLE-6917.
             if($this->_options['optional']) {
                 // If checkbox is on, the value is zero, so go no further
                 if(empty($valuearray['enabled'])) {
