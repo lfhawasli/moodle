@@ -61,8 +61,8 @@ $format = course_get_format($course);
 $renderer = $PAGE->get_renderer('format_ucla');
 $renderer->print_header();
 
-// Make sure all sections are created.
-course_create_sections_if_missing($format->get_course(), range(0, $format->get_course()->numsections));
+// Make sure section 0 is created.
+course_create_sections_if_missing($format->get_course(), 0);
 
 $displaysection = $format->figure_section();
 

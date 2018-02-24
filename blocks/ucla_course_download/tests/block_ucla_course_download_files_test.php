@@ -102,10 +102,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
         // Get resource generator. It will be able to create actual files.
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_resource');
 
-        // First, make sure that course has all its sections created.
+        // The course should already have all its sections created.
         $format = course_get_format($this->course);
-        course_create_sections_if_missing($this->course,
-                range(0, $format->get_course()->numsections));
 
         $retval = array();  // Used to assert files are queried properly.
         $fs = get_file_storage();
@@ -297,7 +295,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     public function test_filled_course() {
         // Create as many number of file resources as the section number + 1.
         $contenttocreate = array();
-        for ($section=0; $section<=$this->course->numsections; $section++) {
+        $numsections = course_get_format($this->course)->get_last_section_number();
+        for ($section=0; $section<=$numsections; $section++) {
             // Plus 1, because we want something in "Site info".
             $numfiles = $section + 1;
             for ($i=0; $i<$numfiles; $i++) {
@@ -528,7 +527,8 @@ class block_ucla_course_download_files_test extends advanced_testcase {
     public function test_same_content() {
         // Create content for course. Just add 1 file per section.
         $contenttocreate = array();
-        for ($section=0; $section<=$this->course->numsections; $section++) {
+        $numsections = course_get_format($this->course)->get_last_section_number();
+        for ($section=0; $section<=$numsections; $section++) {
             $contenttocreate[] = array('section' => $section);
         }
         $expectedfiles = $this->populate_course($contenttocreate);

@@ -100,7 +100,6 @@ foreach ($modnames as $modname => $modnamestr) {
 
 // Prep things for section selector.
 $sections = $modinfo->get_section_info_all();
-$numsections = $format->get_format_options()['numsections'];
 
 $sectionnames = array();
 $indexedsections = array();
@@ -108,10 +107,6 @@ $indexedsections = array();
 $defaultsection = 0;
 
 foreach ($sections as $section) {
-    if ($section->section > $numsections) {
-        continue;
-    }
-
     $sid = $section->id;
     if ($section->section == $currsect) {
         $defaultsection = $sid;
