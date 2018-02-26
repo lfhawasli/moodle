@@ -96,10 +96,9 @@ class block_ucla_office_hours extends block_base {
         * );
         */
 
-        // format $CFG->instructor_levels_roles so it is easier to search
-        $allowed_roles = array_merge($CFG->instructor_levels_roles['Instructor'],
-                $CFG->instructor_levels_roles['Teaching Assistant']);
-
+        // Format $CFG->instructor_levels_roles so it is easier to search.
+        $allowed_roles = call_user_func_array('array_merge', $CFG->instructor_levels_roles);
+ 
         // get user's roles
         $roles = get_user_roles($course_context, $edit_user_id);
 
