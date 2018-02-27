@@ -330,7 +330,7 @@ $CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
                               "http://tvnews.library.ucla.edu/video,",
                               "http://newsscape.library.ucla.edu/video,",
                               "https://tvnews.sscnet.ucla.edu/edge/video,");
-$CFG->tnastreamerurl = "rtmp://169.232.194.193/csa";
+$CFG->tnastreamerurl = "rtmpt://wowza.library.ucla.edu/csa_edge";
 
 // Site administration > Plugins > Assignment plugins > Submission plugins > File submissions
 $CFG->forced_plugin_settings['assignsubmission_file']['maxbytes'] = 104857600;   // 100MB

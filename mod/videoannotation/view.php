@@ -245,7 +245,7 @@ foreach ($CFG->tnapermalinkurl as $idx => $tnapermalinkurl) {
             $content = file_get_contents($CFG->tnawebserviceurl[$idx] . '?action=uuidToFileName&uuid=' . urlencode($uuid));
             $contentobj = json_decode($content);
             if (preg_match('/^(\d{4})\-(\d{2})\-(\d{2})_(\d{2})(\d{2})/', $contentobj->filename, $matches)) {
-                $rtmpurl = $CFG->tnastreamerurl . "/{$matches[1]}/{$matches[1]}-{$matches[2]}/{$matches[1]}-{$matches[2]}-{$matches[3]}/" . basename($contentobj->filename, '.txt') . '.mp4';
+                $rtmpurl = $CFG->tnastreamerurl . "mp4:{$matches[1]}/{$matches[1]}-{$matches[2]}/{$matches[1]}-{$matches[2]}-{$matches[3]}/" . basename($contentobj->filename, '.txt') . '.mp4';
                 $clip->url = $rtmpurl;
                 break;
             }
