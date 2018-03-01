@@ -380,10 +380,6 @@ $CFG->forced_plugin_settings['enrol_self']['sendcoursewelcomemessage'] = 0;
 $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bcastlinks/';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 
-// Site administration > Plugins > Blocks > UCLA bruinmedia
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
-
 // Site administration > Plugins > Blocks > UCLA course download
 $CFG->forced_plugin_settings['block_ucla_course_download']['student_access_begins_week'] = 9;
 // CCLE-5582 - Decrease maxfile size to 250
