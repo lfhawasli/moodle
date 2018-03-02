@@ -31,7 +31,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/../../course/modlib.php');
-require_once(__DIR__.'/libraries/KalturaGeneratedAPIClientsPHP/KalturaClient.php');
+require_once(__DIR__.'/../kaltura/API/KalturaClient.php');
 require_once(__DIR__.'/../kaltura/migrationlib.php');
 require_once(__DIR__.'/../../mod/kalvidres/lib.php');
 require_once(__DIR__.'/../kaltura/locallib.php');
