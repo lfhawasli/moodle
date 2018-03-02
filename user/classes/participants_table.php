@@ -54,6 +54,18 @@ class participants_table extends \table_sql {
      */
     protected $currentgroup;
 
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    /**
+     * @var int|false False if grouping not used, int if groupings used.
+     */
+    protected $currentgrouping;
+
+    /**
+     * @var \stdClass[] The list of groupings for the course.
+     */
+    protected $groupings;
+    // END UCLA MOD: CCLE-5686.
+
     /**
      * @var int $accesssince The time the user last accessed the site
      */
@@ -142,7 +154,10 @@ class participants_table extends \table_sql {
      * @param bool $bulkoperations Is the user allowed to perform bulk operations?
      * @param bool $selectall Has the user selected all users on the page?
      */
-    public function __construct($courseid, $currentgroup, $accesssince, $roleid, $enrolid, $status, $search,
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    //public function __construct($courseid, $currentgroup, $accesssince, $roleid, $enrolid, $status, $search,
+    public function __construct($courseid, $currentgroup, $currentgrouping, $accesssince, $roleid, $enrolid, $status, $search,
+    // END UCLA MOD: CCLE-5686.
             $bulkoperations, $selectall) {
         global $CFG;
 
@@ -183,7 +198,10 @@ class participants_table extends \table_sql {
         // Add column for groups if the user can view them.
         $canseegroups = !isset($hiddenfields['groups']);
         if ($canseegroups) {
-            $headers[] = get_string('groups');
+            // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+            //$headers[] = get_string('groups');
+            $headers[] = get_string('groupsandgroupings', 'local_ucla');
+            // END UCLA MOD: CCLE-5686.
             $columns[] = 'groups';
         }
 
@@ -220,6 +238,9 @@ class participants_table extends \table_sql {
 
         // Set the variables we need to use later.
         $this->currentgroup = $currentgroup;
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        $this->currentgrouping = $currentgrouping;
+        // END UCLA MOD: CCLE-5686.
         $this->accesssince = $accesssince;
         $this->roleid = $roleid;
         $this->search = $search;
@@ -429,7 +450,10 @@ class participants_table extends \table_sql {
     public function query_db($pagesize, $useinitialsbar = true) {
         list($twhere, $tparams) = $this->get_sql_where();
 
-        $total = user_get_total_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        //$total = user_get_total_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        $total = user_get_total_participants($this->course->id, $this->currentgroup, $this->currentgrouping, $this->accesssince,
+        // END UCLA MOD: CCLE-5686.
             $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams);
 
         $this->pagesize($pagesize, $total);
@@ -439,7 +463,10 @@ class participants_table extends \table_sql {
             $sort = 'ORDER BY ' . $sort;
         }
 
-        $this->rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        //$this->rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        $this->rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->currentgrouping, $this->accesssince,
+        // END UCLA MOD: CCLE-5686.
             $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams, $sort, $this->get_page_start(),
             $this->get_page_size());
 

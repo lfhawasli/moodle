@@ -289,6 +289,20 @@ function groups_get_all_groups($courseid, $userid=0, $groupingid=0, $fields='g.*
             }
         }
         $results = $groups;
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        // Add in grouping information as well. Only participants page uses this
+        // parameter. On contribution better to add extra param.
+        foreach ($results as $index => $group) {
+            // Get groupings for given group.
+            $sql = "SELECT g.id,
+                           g.name
+                      FROM {groupings} g
+                      JOIN {groupings_groups} gg ON (g.id=gg.groupingid)
+                     WHERE gg.groupid=?";
+            $groupings = $DB->get_records_sql_menu($sql, array($group->id));
+            $results[$index]->groupings = $groupings;
+        }
+        // END UCLA MOD: CCLE-5686.
     }
 
     return $results;
@@ -531,9 +545,33 @@ function groups_get_user_groups($courseid, $userid=0) {
  * @param int $courseid return all groupings from course with this courseid
  * @return array Returns an array of the grouping objects (empty if none)
  */
-function groups_get_all_groupings($courseid) {
-    $data = groups_get_course_data($courseid);
-    return $data->groupings;
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+//function groups_get_all_groupings($courseid) {
+//    $data = groups_get_course_data($courseid);
+//    return $data->groupings;
+function groups_get_all_groupings($courseid, $userid = null) {
+    global $DB;
+    if (empty($userid)) {
+        // Use cache to return all groupings.
+        $data = groups_get_course_data($courseid);
+        return $data->groupings;
+    }
+
+    // Search for all groupings user belongs to.
+    list($usql, $params) = $DB->get_in_or_equal($userid);
+
+    array_unshift($params, $courseid);
+
+    $results = $DB->get_records_sql("SELECT DISTINCT gp.*
+                                       FROM {groupings} gp
+                                       JOIN {groupings_groups} gg
+                                       JOIN {groups} g ON gg.groupid = g.id
+                                       JOIN {groups_members} gm ON gm.groupid = g.id
+                                      WHERE gp.courseid = ?
+                                            AND gm.userid $usql
+                                   ORDER BY gp.name ASC", $params);
+    return $results;
+// END UCLA MOD: CCLE-5686.
 }
 
 /**

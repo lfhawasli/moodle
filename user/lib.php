@@ -28,6 +28,9 @@ define('USER_FILTER_LAST_ACCESS', 3);
 define('USER_FILTER_ROLE', 4);
 define('USER_FILTER_STATUS', 5);
 define('USER_FILTER_STRING', 6);
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+define('USER_FILTER_GROUPING', 7);
+// END UCLA MOD: CCLE-5686.
 
 /**
  * Creates a user
@@ -1262,7 +1265,10 @@ function user_get_tagged_users($tag, $exclusivemode = false, $fromctx = 0, $ctx 
  * @param array $additionalparams The additional params
  * @return array
  */
-function user_get_participants_sql($courseid, $groupid = 0, $accesssince = 0, $roleid = 0, $enrolid = 0, $statusid = -1,
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+//function user_get_participants_sql($courseid, $groupid = 0, $accesssince = 0, $roleid = 0, $enrolid = 0, $statusid = -1,
+function user_get_participants_sql($courseid, $groupid = 0, $groupingid = 0, $accesssince = 0, $roleid = 0, $enrolid = 0, $statusid = -1,
+// END UCLA MOD: CCLE-5686.
                                    $search = '', $additionalwhere = '', $additionalparams = array()) {
     global $DB, $USER;
 
@@ -1331,6 +1337,14 @@ function user_get_participants_sql($courseid, $groupid = 0, $accesssince = 0, $r
         $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid = :roleid AND contextid $relatedctxsql)";
         $params = array_merge($params, array('roleid' => $roleid), $relatedctxparams);
     }
+
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    if ($groupingid) {
+        $joins[] = 'JOIN {groups_members} groupinggm ON (u.id=groupinggm.userid)';
+        $joins[] = 'JOIN {groupings_groups} groupinggg ON (groupinggm.groupid=groupinggg.groupid AND groupinggg.groupingid=:groupingid)';
+        $params = array_merge($params, array('groupingid' => $groupingid));
+    }
+    // END UCLA MOD: CCLE-5686.
 
     if (!empty($search)) {
         if (!is_array($search)) {
@@ -1409,11 +1423,17 @@ function user_get_participants_sql($courseid, $groupid = 0, $accesssince = 0, $r
  * @param array $additionalparams The additional params
  * @return int
  */
-function user_get_total_participants($courseid, $groupid = 0, $accesssince = 0, $roleid = 0, $enrolid = 0, $statusid = -1,
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+//function user_get_total_participants($courseid, $groupid = 0, $accesssince = 0, $roleid = 0, $enrolid = 0, $statusid = -1,
+function user_get_total_participants($courseid, $groupid = 0, $groupingid = 0, $accesssince = 0, $roleid = 0, $enrolid = 0, $statusid = -1,
+// END UCLA MOD: CCLE-5686.
                                      $search = '', $additionalwhere = '', $additionalparams = array()) {
     global $DB;
 
-    list($select, $from, $where, $params) = user_get_participants_sql($courseid, $groupid, $accesssince, $roleid, $enrolid,
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    //list($select, $from, $where, $params) = user_get_participants_sql($courseid, $groupid, $accesssince, $roleid, $enrolid,
+    list($select, $from, $where, $params) = user_get_participants_sql($courseid, $groupid, $groupingid, $accesssince, $roleid, $enrolid,
+    // END UCLA MOD: CCLE-5686.
         $statusid, $search, $additionalwhere, $additionalparams);
 
     return $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
@@ -1436,11 +1456,17 @@ function user_get_total_participants($courseid, $groupid = 0, $accesssince = 0, 
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @return moodle_recordset
  */
-function user_get_participants($courseid, $groupid = 0, $accesssince, $roleid, $enrolid = 0, $statusid, $search,
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+//function user_get_participants($courseid, $groupid = 0, $accesssince, $roleid, $enrolid = 0, $statusid, $search,
+function user_get_participants($courseid, $groupid = 0, $groupingid = 0, $accesssince, $roleid, $enrolid = 0, $statusid, $search,
+// END UCLA MOD: CCLE-5686.
                                $additionalwhere = '', $additionalparams = array(), $sort = '', $limitfrom = 0, $limitnum = 0) {
     global $DB;
 
-    list($select, $from, $where, $params) = user_get_participants_sql($courseid, $groupid, $accesssince, $roleid, $enrolid,
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    //list($select, $from, $where, $params) = user_get_participants_sql($courseid, $groupid, $accesssince, $roleid, $enrolid,
+    list($select, $from, $where, $params) = user_get_participants_sql($courseid, $groupid, $groupingid, $accesssince, $roleid, $enrolid,
+    // END UCLA MOD: CCLE-5686.
         $statusid, $search, $additionalwhere, $additionalparams);
 
     return $DB->get_recordset_sql("$select $from $where $sort", $params, $limitfrom, $limitnum);
