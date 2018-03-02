@@ -360,15 +360,6 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
                   }]";
     }
 
-    // Provide URL (BruinMedia) fallback, if available.
-    if (!empty($fallbackurl)) {
-        $fallbackurl = html_writer::link($fallbackurl,
-                get_string('fallbackurl', 'block_ucla_media'),
-                array('class' => 'small'));
-        $fallbackurl = html_writer::div($fallbackurl, 'text-center',
-                array('style' => 'max-width: ' . $width . 'px'));
-    }
-
     // Print out the player output.
     return "
         <div id='player-$playerid'></div>

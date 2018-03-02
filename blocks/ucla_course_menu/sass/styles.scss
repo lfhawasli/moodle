@@ -153,10 +153,6 @@ $site-menu-hover-color:         #fcfcfc;
             .bruincast-link.leaf:before {
                 @include node-glyphicon("\e059");
             }
-            // Add bruinmedia link icon
-            .bruinmedia-link.leaf:before {
-                @include node-glyphicon("\e059");
-            }
             // Add video furnace link icon
             .video-furnace-link.leaf:before {
                 @include node-glyphicon("\e009");
