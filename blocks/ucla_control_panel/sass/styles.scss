@@ -5,59 +5,58 @@
 @import "uclatheme";
 
 #cpanel-wrapper {
-    
     width: 100%;
-    
+
     & > .cpheading {
         @include ccle-admin-header;
     }
-
     float: left;
     margin-bottom: 20px;
-    
+
     & > .cpanel-group {
         width: 100%;
     }
     // Subsections
     h2.copan-title {
         padding: 0 5px;
-        border-bottom: 1px solid #CCC;
+        border-bottom: 1px solid #ccc;
         font-size: 20px;
         margin-top: 10px;
     }
-    
+
     // Affects all rows
     .row {
         margin-left: 0;
 
         .item {
             min-height: 50px;
-            display : inline-block;
-            clear : none;
+            display: inline-block;
+            clear: none;
             padding: 5px 20px;
             @include box-sizing(border-box);
-            
-            & > a, .disabled {
+
+            & > a,
+            .disabled {
                 width: 100%;
                 display: block;
                 font-size: 16px;
             }
-            
+
             .general_icon {
                 float: left;
-                
+
                 > a {
                     width: 100%;
                     display: inline-block;
                 }
             }
-            
+
             .general_icon_text {
                 padding: 10px 50px;
                 display: block;
                 color: gray;
             }
-            
+
             .post-link {
                 margin-top: 5px;
                 color: gray;
@@ -80,10 +79,9 @@
                 padding-right: 1px;
             }
         }
-        
     }
 }
-        
+
 // Styles for 'MyUCLA functions'
 #my_ucla_functions {
     width: 100%;
@@ -96,11 +94,13 @@
     .generaltable .cell {
         padding-left: 10px;
         border: 0;
+
         & > a {
             width: 100%;
             display: inline-block;
         }
     }
+
     .post-link {
         color: gray;
         display: block;

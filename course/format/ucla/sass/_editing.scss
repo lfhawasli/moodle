@@ -1,18 +1,13 @@
 //
 // CCLE / COURSE / editing mode
 // --------------------------------------------------
-
 $editing-link-color: orangered;
 
 // UCLA format specific
 .ucla-format {
 
     // Converts some icons to text.
-    $collection: (
-        editing_section,
-        editing_showhide,
-        edit_course_summary
-    );
+    $collection: (editing_section, editing_showhide, edit_course_summary);
 
     @each $icon in $collection {
         a.#{$icon} {
@@ -53,7 +48,7 @@ $editing-link-color: orangered;
             margin-right: 12px;
         }
     }
-    
+
     // Creates extra space for the .course-content boundary and 
     // prevents the 'Edit' menu from opening above the 'Edit' link
     .section-modchooser {
@@ -67,7 +62,7 @@ $editing-link-color: orangered;
         display: none;
         visibility: hidden;
     }
-    
+
     // This styles the 'Add activity or resource' area + button
     .section-modchooser,
     .section_add_menus {
@@ -79,7 +74,10 @@ $editing-link-color: orangered;
             display: inline-block;
 
             // Remove moodle default icon, and display glyphicon instead
-            .smallicon {display: none;}
+            .smallicon {
+                display: none;
+            }
+
             a:before {
                 @include glyphicon("\2b");
                 margin-right: 4px;

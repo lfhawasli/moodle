@@ -1,117 +1,151 @@
 /** General Styles **/
 .path-mod-qanda .qanda-post {
     border-collapse: separate;
-    margin: 0px auto;
-    text-align: left; }
+    margin: 0 auto;
+    text-align: left;
+}
 
-.path-mod-qanda .qanda-post.continuous .question { display: inline; }
+.path-mod-qanda .qanda-post.continuous .question {
+    display: inline;
+}
 
 .path-mod-qanda .qanda-post .commands {
     width: 200px;
-    white-space: nowrap; }
+    white-space: nowrap;
+}
 
-.path-mod-qanda .qanda-post td.picture { width: 35px; }
+.path-mod-qanda .qanda-post td.picture {
+    width: 35px;
+}
 
-.path-mod-qanda .qanda-post .entry-lower-section .aliases { text-align: center; }
+.path-mod-qanda .qanda-post .entry-lower-section .aliases {
+    text-align: center;
+}
 
 .path-mod-qanda .qanda-post .entry-lower-section .icons {
     text-align: right;
-    padding-right: 5px; }
+    padding-right: 5px;
+}
 
 .path-mod-qanda .qanda-post .entry-lower-section .ratings {
     text-align: right;
     padding-right: 5px;
-    padding-bottom: 2px; }
+    padding-bottom: 2px;
+}
 
-.path-mod-qanda .qanda-post .qanda-hidden-note { margin: 0 .45em; }
+.path-mod-qanda .qanda-post .qanda-hidden-note {
+    margin: 0 .45em;
+}
 
 .path-mod-qanda .qanda-display {
     margin-left: auto;
-    margin-right: auto; }
+    margin-right: auto;
+}
 
 .path-mod-qanda .qanda-display .tabs {
     width: 100%;
-    margin-bottom: 0px; }
+    margin-bottom: 0;
+}
 
 .path-mod-qanda .qanda-display .tabs .side {
     border-style: none;
-    border-width: 0px;
-    width: auto; }
+    border-width: 0;
+    width: auto;
+}
 
-.path-mod-qanda .qanda-display .separator { width: 4px; }
+.path-mod-qanda .qanda-display .separator {
+    width: 4px;
+}
 
-.path-mod-qanda table.qandapopup { width: 95%; }
+.path-mod-qanda table.qandapopup {
+    width: 95%;
+}
 
 /** Used in tabs.php **/
-.path-mod-qanda .entrybox, 
+.path-mod-qanda .entrybox,
 .path-mod-qanda table.qanda-approval,
 .path-mod-qanda .qanda-post .entry-lower-section table {
     width: 100%;
-    margin-bottom: 0em; }
+    margin-bottom: 0;
+}
 
-.qanda-activity-picture { float: left; }
+.qanda-activity-picture {
+    float: left;
+}
 
-.qanda-activity-content { margin-left: 40px; }
+.qanda-activity-content {
+    margin-left: 40px;
+}
 
 /** Page specific styles **/
 #page-mod-qanda-view .qanda-control {
     float: left;
     text-align: right;
     white-space: nowrap;
-    margin: 0px;
-    margin-left: .5em; }
+    margin: 0;
+    margin-left: .5em;
+}
 
 #page-mod-qanda-view table.qanda-category-header,
 #page-mod-qanda-import table.qanda-import-export {
     margin-left: auto;
-    margin-right: auto; }
+    margin-right: auto;
+}
 
-#page-mod-qanda-view table.qanda-category-header { margin-bottom: 0em; }
+#page-mod-qanda-view table.qanda-category-header {
+    margin-bottom: 0;
+}
 
-#page-mod-qanda-view table.qanda-category-header th { padding: 0px; }
+#page-mod-qanda-view table.qanda-category-header th {
+    padding: 0;
+}
 
-#page-mod-qanda-showentry #page-content { min-width: 600px; }
+#page-mod-qanda-showentry #page-content {
+    min-width: 600px;
+}
 
-.path-mod-qanda.dir-rtl .qanda-post { text-align: right; }
+.path-mod-qanda.dir-rtl .qanda-post {
+    text-align: right;
+}
 
 /* Hide answer editor from students */
 #page-mod-qanda-edit div.editor-not-admin {
-    display:none;
+    display: none;
 }
 
 #page-mod-qanda-edit table#id_answer_editor_tbl,
 #page-mod-qanda-edit table#id_question_editor_tbl {
-    width:100% !important;
+    width: 100% !important;
 }
 
 #page-mod-qanda-edit .mform fieldset div {
-    margin:0;
+    margin: 0;
 }
 
 #page-mod-qanda-edit div.question-editor div#fitem_id_question_editor div.feditor,
-#page-mod-qanda-edit div.editor-admin div#fitem_id_answer_editor div.feditor{
-    float:none;
-    text-align:left;
-    margin-left:0;
+#page-mod-qanda-edit div.editor-admin div#fitem_id_answer_editor div.feditor {
+    float: none;
+    text-align: left;
+    margin-left: 0;
     padding: 1em 1.5em 1em 1.5em;
-    width:auto ;
+    width: auto;
 }
 
 .path-mod-qanda div.add-and-search-box div.qanda-add-entry {
-    float:left;
-    margin-left:3em;
+    float: left;
+    margin-left: 3em;
 }
 
 .path-mod-qanda div.add-and-search-box div.search-box {
-    float:right;
-    background-color:#ffffff;
-    -moz-border-radius:6px;
-    -webkit-border-radius:6px;
-    border-radius:6px;
-    display:inline-block;
-    color:#ffffff;
-    font-family:arial;
-    font-size:12px;
+    float: right;
+    background-color: #fff;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    display: inline-block;
+    color: #fff;
+    font-family: arial;
+    font-size: 12px;
     padding-right: 10px;
     margin-right: 20px;
 }
@@ -126,69 +160,66 @@
 }
 
 .path-mod-qanda div.qanda-entry div.qanda-entry-count {
-    float:left;
+    float: left;
 }
 
 #page-mod-qanda-edit div.question fieldset.hidden {
-    margin:0;
+    margin: 0;
 }
 
 /* Style the entry number box  */
-.path-mod-qanda div.qanda-entry-count{
-    text-align: right;    
-    font-size:1.25em;
-    width:3ex;
-    color: black; 
-    padding-top:1em;
-    margin-right:.5em;
-    z-index:3;
+.path-mod-qanda div.qanda-entry-count {
+    text-align: right;
+    font-size: 1.25em;
+    width: 3ex;
+    color: black;
+    padding-top: 1em;
+    margin-right: .5em;
+    z-index: 3;
 }
 
 /** Style the Q&A pair block **/
 .path-mod-qanda table.qanda-post,
-#page-mod-qanda-edit div.question-editor{
-    text-align:left;
-    margin-left:0;
+#page-mod-qanda-edit div.question-editor {
+    text-align: left;
+    margin-left: 0;
 }
 
 .path-mod-qanda table.qanda-post tbody {
-    border:0;
+    border: 0;
 }
 
 .path-mod-qanda .qanda-post tr.answer-row,
-.path-mod-qanda .qanda-post tr.question-row  {
-    padding:0;
-
+.path-mod-qanda .qanda-post tr.question-row {
+    padding: 0;
 }
 
 .path-mod-qanda .qanda-post th.entry-header {
-    text-align:left;
+    text-align: left;
     padding-top: 0;
 }
 
 .path-mod-qanda .qanda-post tr.answer-row td.entry {
-    border-top: 1px solid #DDDDDD;
+    border-top: 1px solid #ddd;
 }
-
-
 
 .path-mod-qanda .qanda-post th.entry {
     padding-top: 0;
 }
 
 .path-mod-qanda table.qanda-post tr.answer-row div.answer,
-.path-mod-qanda .qanda-post th.entry-header div.question  {
-    text-align:left;
-    margin:0em;
+.path-mod-qanda .qanda-post th.entry-header div.question {
+    text-align: left;
+    margin: 0;
 }
 
 #page-mod-qanda-edit div.question,
 #page-mod-qanda-edit div.answer {
-    margin-bottom:1em;
+    margin-bottom: 1em;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    border: 1px solid #DDDDDD;
+    border: 1px solid #ddd;
 }
 
 
@@ -196,47 +227,47 @@
 
 #page-mod-qanda-edit div.question div.question-label,
 #page-mod-qanda-edit div.answer div.answer-label {
-    display:none;
+    display: none;
 }
 
 .path-mod-qanda .qanda-post th.entry-header div.question div.question-label,
 .path-mod-qanda .qanda-post tr.answer-row div.answer div.answer-label,
 #page-mod-qanda-edit div#fitem_id_question_editor div.fitemtitle,
 #page-mod-qanda-edit div#fitem_id_answer_editor div.fitemtitle {
-    text-align:left;
-    font-size:1.5em;
-    border:1px solid black;
-    border-bottom:0;
+    text-align: left;
+    font-size: 1.5em;
+    border: 1px solid black;
+    border-bottom: 0;
     -moz-border-radius: 5px 5px 0px 0px;
-    -webkit-border-radius:  5px 5px 0px 0px;
-    border-radius:  5px 5px 0px 0px;
-    float:left;
-    padding-left:.5em;
-    padding-right:1em;
-    padding-top:.25em;
+    -webkit-border-radius: 5px 5px 0px 0px;
+    border-radius: 5px 5px 0px 0px;
+    float: left;
+    padding-left: .5em;
+    padding-right: 1em;
+    padding-top: .25em;
     margin-bottom: -5px;
-    border: none; 
-    background: #ffffff;
-    color: #394A6E;
+    border: none;
+    background: #fff;
+    color: #394a6e;
     transition: color 0.3s ease-out;
-    z-index:2;
-    width:auto;
+    z-index: 2;
+    width: auto;
 }
 
 #page-mod-qanda-edit img.req {
-    margin-left:.25em;
+    margin-left: .25em;
 }
 
 /** Style the Question/Answer text **/
 .path-mod-qanda .qanda-post th.entry-header div.question div.question-text,
-.path-mod-qanda .qanda-post tr.answer-row div.answer div.answer-text{
-    padding-left:1em;
-    padding-right:1em;
-    padding-top:1em;
-    padding-bottom:1em;
-    border:1px solid black;
-    background-color:#fff;
-    background-image:none;
+.path-mod-qanda .qanda-post tr.answer-row div.answer div.answer-text {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    border: 1px solid black;
+    background-color: #fff;
+    background-image: none;
     -moz-border-radius: 4px 10px 10px 10px;
     -webkit-border-radius: 4px 10px 10px 10px;
     border-radius: 4px 10px 10px 10px;
@@ -248,78 +279,77 @@
 
 .path-mod-qanda .qanda-post th.entry-header div.question div.question-text p,
 .path-mod-qanda .qanda-post tr.answer-row div.answer div.answer-text p {
-    margin:0;
+    margin: 0;
 }
 
-.path-mod-qanda .qanda-post div.time, 
+.path-mod-qanda .qanda-post div.time,
 .path-mod-qanda .qanda-post div.user-information {
-    clear:both;
+    clear: both;
     text-align: left;
-    font-size:0.85em;
-    padding-left:25px;
+    font-size: 0.85em;
+    padding-left: 25px;
 }
 
 .path-mod-qanda .qanda-post div.user-information {
-    padding-top:5px;
+    padding-top: 5px;
 }
 
 /** Style the Question/Answer text in the editor **/
 #page-mod-qanda-edit div#fitem_id_answer_editor div.felement,
-#page-mod-qanda-edit div#fitem_id_question_editor div.felement{
-    padding-left:1em;
-    padding-right:1em;
-    padding-top:1em;
-    padding-bottom:.5em;
-    border:1px solid black;
-    background-color:#fff;
-    background-image:none;
+#page-mod-qanda-edit div#fitem_id_question_editor div.felement {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    padding-bottom: .5em;
+    border: 1px solid black;
+    background-color: #fff;
+    background-image: none;
     -moz-border-radius: 4px 10px 10px 10px;
     -webkit-border-radius: 4px 10px 10px 10px;
     border-radius: 4px 10px 10px 10px;
     clear: both;
-    border: none; 
+    border: none;
     color: #777;
     transition: color 0.3s ease-out;
 }
 
 /** Style the Last Edited Date / Edit button line **/
 
-.path-mod-qanda .qanda-post  div.modified-date-edit .icons{
-    padding-bottom:10px;
+.path-mod-qanda .qanda-post  div.modified-date-edit .icons {
+    padding-bottom: 10px;
 }
 
 .path-mod-qanda .qanda-post div.modified-date-edit div.time {
-    float:left;
+    float: left;
 }
 
 .path-mod-qanda .qanda-post div.modified-date-edit div.edit-button {
-    float:left;
-    padding-left:1em;
+    float: left;
+    padding-left: 1em;
 }
 
-
-.path-mod-qanda .qanda-post div.modified-date-edit div.edit-button td.icons  {
-    padding:0;
+.path-mod-qanda .qanda-post div.modified-date-edit div.edit-button td.icons {
+    padding: 0;
 }
 
 .path-mod-qanda th,
 #page-mod-qanda-edit th {
-    font-weight:normal;
+    font-weight: normal;
 }
 
 /** Hide the Keyword portion of the Q&A post **/
 .path-mod-qanda .qanda-post td.entry-lower-section td.aliases,
 .path-mod-qanda td.entry-attachment {
-    display:none;
+    display: none;
 }
 
 .path-mod-qanda .qanda-post td.entry-lower-section {
-    padding-top:0;
+    padding-top: 0;
 }
 
 /** Hide the Q&A tabs  **/
-.path-mod-qanda div.qanda-display div.tabtree  { 
-    display:none;
+.path-mod-qanda div.qanda-display div.tabtree {
+    display: none;
 }
 
 /* Create a button in place of the Waiting Approval link 
@@ -329,33 +359,33 @@
 /* Styling for the alternate Q&A format with images in place of "Question" and "Answer" */
 .path-mod-qanda .qanda-post th.entry-header div.question_alt div.question_image,
 .path-mod-qanda .qanda-post tr.answer-row div.answer_alt div.answer_image {
-    font-size:1.5em;
-    font-style:italic;
-    border-right:0;
+    font-size: 1.5em;
+    font-style: italic;
+    border-right: 0;
     -moz-border-radius: 5px 0px 0px 5px;
-    -webkit-border-radius:  5px 0px 0px 5px;
-    border-radius:  5px 0px 0px 5px;
-    float:left;
-    padding-left:0em;
-    padding-right:.5em;
-    padding-top:.25em;
+    -webkit-border-radius: 5px 0px 0px 5px;
+    border-radius: 5px 0px 0px 5px;
+    float: left;
+    padding-left: 0;
+    padding-right: .5em;
+    padding-top: .25em;
     border: none;
     color: #777;
     transition: color 0.3s ease-out;
-    z-index:20;
+    z-index: 20;
 }
 
 /** Style the Question/Answer text **/
 .path-mod-qanda .qanda-post th.entry-header div.question_alt div.question-text,
 .path-mod-qanda .qanda-post tr.answer-row div.answer_alt div.answer-text {
-    padding-left:1em;
-    padding-right:1em;
-    padding-top:1em;
-    padding-bottom:1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     color: black;
-    background-color:#fff;
-    background-image:none;
-    font-size:1em;
+    background-color: #fff;
+    background-image: none;
+    font-size: 1em;
     -moz-border-radius: 4px 10px 10px 10px;
     -webkit-border-radius: 4px 10px 10px 10px;
     border-radius: 4px 10px 10px 10px;
@@ -364,58 +394,57 @@
 }
 
 .path-mod-qanda div.qanda-entry-table table.qanda-post {
-    text-align:left;
-    border: 1px solid #DDDDDD;
+    text-align: left;
+    border: 1px solid #ddd;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    border-radius: 4px ;
-    margin-bottom:.5em;
-
+    border-radius: 4px;
+    margin-bottom: .5em;
     color: #7e7975;
     border-radius: 5px;
     background: white;
-    padding:.5em;
-    margin-left:0;
+    padding: .5em;
+    margin-left: 0;
 }
 
 .path-mod-qanda div#intro.generalbox {
-    width:80%;
-    margin:0;
-    margin-left:125px;
-    padding:10px;
+    width: 80%;
+    margin: 0;
+    margin-left: 125px;
+    padding: 10px;
 }
 
 .path-mod-qanda div#qanda-title {
-    float:left;
+    float: left;
     text-align: center;
-    font-size:3em;
-    color:#777777;
-    border:0;
-    margin-bottom:0px;
-    padding-top:0px;
-    color:#2e4a90;
+    font-size: 3em;
+    color: #777;
+    border: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    color: #2e4a90;
 }
 
 .path-mod-qanda div.add-and-search-box {
-    float:left;
-    margin-top:1em;
+    float: left;
+    margin-top: 1em;
     margin-bottom: 1em;
-    width:100%;
+    width: 100%;
 }
 
 .path-mod-qanda div.add-and-search-box div.single-button,
-.path-mod-qanda div.add-and-search-box div.qanda-control{
-    float:left;
+.path-mod-qanda div.add-and-search-box div.qanda-control {
+    float: left;
 }
 
 .path-mod-qanda div.add-and-search-box div.single-button {
-    margin-top:0px;
-    margin-bottom:0px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .path-mod-qanda div.qanda-control {
-    float:left;
-    text-align:center;
+    float: left;
+    text-align: center;
 }
 
 .path-mod-qanda div.qanda-control a#printer-icon {
@@ -425,7 +454,7 @@
 }
 
 .path-mod-qanda div.qanda-permalink a {
-    float:right;
+    float: right;
 }
 
 /* Style the searched term highlighting */
@@ -436,26 +465,31 @@
 .path-mod-qanda a.qanda-delete,
 .path-mod-qanda a.qanda-approve {
     margin-left: 0.5ex;
-    color:#FFF;
+    color: #fff;
 }
 
 .path-mod-qanda .search-box input#fullsearch,
-.path-mod-qanda .search-box label{
-    display:none;
+.path-mod-qanda .search-box label {
+    display: none;
 }
 
-.path-mod-qanda div#notice p { margin-bottom:0px; }
+.path-mod-qanda div#notice p {
+    margin-bottom: 0;
+}
 
 .path-mod-qanda div#notice div.question-text,
 .path-mod-qanda div#notice div.answer-text {
-    background-color:white;
-    padding-left:2em;
-    margin-bottom:0px;
+    background-color: white;
+    padding-left: 2em;
+    margin-bottom: 0;
 }
 
 .path-mod-qanda div.qanda-entry div.approval tr.answer-row,
 .path-mod-qanda div.qanda-entry div.approval div.time,
-.path-mod-qanda div.qanda-entry div.approval div.qanda-permalink{ display:none; }
+.path-mod-qanda div.qanda-entry div.approval div.qanda-permalink {
+    display: none;
+}
 
-
-.path-mod-qanda div.qanda-entry div.qanda-entry-table table.qanda-post { width:95%; }
+.path-mod-qanda div.qanda-entry div.qanda-entry-table table.qanda-post {
+    width: 95%;
+}

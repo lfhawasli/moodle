@@ -1,47 +1,51 @@
-.forumpost{
-    &.firstpost .subject{
+.forumpost {
+    &.firstpost .subject {
         font-size: 2rem;
     }
+
     .content {
         .posting.fullpost {
             padding: 0 16px;
         }
     }
+
     .row {
         .topic,
         .content-mask,
         .options {
             margin-left: 113px;
         }
-        .topic{
+
+        .topic {
             padding: 8px;
         }
-        
-        .left{
+
+        .left {
             width: 113px;
         }
-        
-        .starter .subject{
+
+        .starter .subject {
             font-size: 2rem;
         }
     }
     @media (max-width: 1000px) {
         .picture img {
-            width:78px;
-            height:78px;
-            
+            width: 78px;
+            height: 78px;
+
             &.userpicture {
-                margin-left: 0px;
+                margin-left: 0;
             }
         }
-        .row{
+
+        .row {
             .topic,
             .content-mask,
             .options {
                 margin-left: 78px;
             }
-            
-            .left{
+
+            .left {
                 width: 78px;
             }
         }

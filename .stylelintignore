@@ -85,3 +85,11 @@ theme/bootstrapbase/less/bootstrap/
 theme/bootstrapbase/javascript/html5shiv.js
 theme/bootstrapbase/amd/src/bootstrap.js
 theme/bootstrapbase/less/fontawesome/
+
+
+# START UCLA MOD: CCLE-7138 - Code cleanup: Lint all plain CSS, match coding style and be lint-free
+
+# Ignore minified files
+*.min.*
+
+# END UCLA MOD: CCLE-7138.

@@ -13,12 +13,15 @@
 .officehours_form #fitem_id_email {
     margin-bottom: -0.5em;
 }
+
 .officehours_form #fitem_id_phone {
     margin-bottom: -0.5em;
 }
+
 .officehours_form #fitem_id_office {
     margin-bottom: -0.5em;
 }
+
 .officehours_form #fitem_id_officehours {
     margin-bottom: -0.5em;
 }
@@ -27,6 +30,7 @@
 .officehours_form.mform .fitem .fitemtitle {
     width: 20%;
 }
+
 .officehours_form.mform .fitem .felement {
     margin-left: 21%;
 }
@@ -43,6 +47,6 @@
 
 /* START feature/CCLE-3002-office-table-display */
 div.instr-info {
-    clear:both;
+    clear: both;
 }
 /* END feature/CCLE-3002-office-table-display */

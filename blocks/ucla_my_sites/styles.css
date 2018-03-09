@@ -11,12 +11,12 @@
     margin: 8px 0;
     border-bottom: 2px solid #536895;
     font-weight: bold;
-    color: #394A6E;
+    color: #394a6e;
     padding-bottom: 2px;
 }
 
 .block_ucla_my_sites .content .sortselector,
-.block_ucla_my_sites.block .termselector{
+.block_ucla_my_sites.block .termselector {
     margin: 8px 0;
 }
 
@@ -54,7 +54,7 @@
 .block_ucla_my_sites .content .sortselector,
 .block_ucla_my_sites .content .termselector {
     color: #536895;
-/*    font-size: 0.8em;
+    /*    font-size: 0.8em;
     margin-top: -6px;*/
 }
 /*
@@ -82,7 +82,7 @@
 
 .block_ucla_my_sites.block .alertCount {
     background-repeat: no-repeat;
-    background-position: 2px 0px;;
+    background-position: 2px 0px;
     background-size: 20px auto;
     padding-left: 8px;
     padding-right: 8px;
@@ -92,7 +92,7 @@
     margin-left: 3px;
 }
 
-.block_ucla_my_sites.block .collapsibleregioncaption img{
+.block_ucla_my_sites.block .collapsibleregioncaption img {
     margin-right: 10px;
 }
 
@@ -126,18 +126,17 @@
     margin-right: 25%;
 }
 
-
 .block_ucla_my_sites.block .sortselector button.transparent {
-    position:absolute;
-    left:0;
-    right:0;
-    top:0;
-    bottom:0;
-    visiblity:hidden;
-    border:none;
-    z-index:2;
-    background-color:transparent;
-    width:100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    visiblity: hidden;
+    border: none;
+    z-index: 2;
+    background-color: transparent;
+    width: 100%;
 }
 
 .block_ucla_my_sites.block .sortselector fieldset div > * {
@@ -153,17 +152,17 @@
 }
 
 .block_ucla_my_sites.block .sortselector div.radio {
-    position:relative;
+    position: relative;
     margin-right: 1%;
 }
 
 .block_ucla_my_sites.block .sortselector div.radio > label {
     position: relative;
-    display:block;
+    display: block;
 }
 
 .block_ucla_my_sites.block .sortselector div.radio > label > input[type="radio"] {
-    z-index:1;
+    z-index: 1;
 }
 
 .block_ucla_my_sites.block div.collab_sites_container {
