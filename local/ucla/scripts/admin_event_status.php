@@ -43,7 +43,6 @@ list($extargv, $unrecog) = cli_get_params(
 
 // Default values.
 $defaulttolerance = 5;  // How big can the faildelay be in minutes?
-$defaultdisplay = 20;
 $defaultmaxcount = 30;
 
 $tolerance = (!empty($extargv['tolerance']) && !empty($unrecog[0])) ? $unrecog[0] : $defaulttolerance;
@@ -69,6 +68,24 @@ foreach ($queues as $queue => $task) {
                 . "$queue queue. The task that processes that queue has a "
                 . "faildelay greater than the tolerance of $tolerance minutes.\n\n";
         }
+    }
+}
+
+// Also check task_adhoc queue, but since there can be many items in the adhoc
+// queue at a time we are mainly interested in if a task has a long faildelay.
+
+// Get the tasks in the queue.
+$tasks = $DB->get_records('task_adhoc', array(), null, 'DISTINCT classname');
+foreach ($tasks as $task) {
+    // See if there is a long fail delay.
+    $alert = $DB->record_exists_select('task_adhoc', 'classname=? AND faildelay>?',
+            array($task->classname, $tolerance * MINSECS));
+    if (!empty($alert)) {
+        $totalrecords = $DB->count_records('task_adhoc', array('classname' => $task->classname));
+        $subject .= $task->classname . " ";
+        $message .= "There are $totalrecords pending events in from $task->classname in the "
+            . "task_adhoc queue. The task that processes that queue has a "
+            . "faildelay greater than the tolerance of $tolerance minutes.\n\n";
     }
 }
 
