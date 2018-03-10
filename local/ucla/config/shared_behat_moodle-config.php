@@ -119,7 +119,7 @@ $CFG->divertallemailsto = 'ccle-email-test@lists.ucla.edu';
 
 // CCLE-2306 - HELP SYSTEM BLOCK.
 // If using JIRA, jira_user, jira_password, jira_pid should be defined in config_private.php.
-$CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://jira.ats.ucla.edu/rest/api/latest/issue';
+$CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://ucla-ccle.atlassian.net/rest/api/latest/issue';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu/w/';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs.ccle.ucla.edu/api.php';
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
