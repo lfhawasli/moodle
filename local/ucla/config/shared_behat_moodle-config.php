@@ -323,6 +323,9 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
         messageStyle: "none"
     });';
 
+// Site administration > Plugins > Filters > Tabs
+$CFG->forced_plugin_settings['filter_tabs']['enablebootstrap'] = 2; // Bootstrap 4 tabs.
+
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
 
