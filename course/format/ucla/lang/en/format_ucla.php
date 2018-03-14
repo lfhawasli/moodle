@@ -86,3 +86,5 @@ $string['createtasite_help'] = 'TA site creation is enabled by default. '
         . 'If you do not want the TAs to be able to create the TA sites, '
         . 'click "No". This feature is available for TAs';
 
+// Admin panel strings.
+$string['adminpanel'] = 'Admin panel';

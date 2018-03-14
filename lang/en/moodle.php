@@ -300,10 +300,7 @@ $string['costdefault'] = 'Default cost';
 $string['counteditems'] = '{$a->count} {$a->items}';
 $string['country'] = 'Country';
 $string['course'] = 'Course';
-// START UCLA MOD: CCLE-7356 - Rename Course administration to Admin panel.
-//$string['courseadministration'] = 'Course administration';
-$string['courseadministration'] = 'Admin panel';
-// END UCLA MOD: CCLE-7356.
+$string['courseadministration'] = 'Course administration';
 $string['coursealreadyfinished'] = 'Course already finished';
 $string['courseapprovedemail'] = 'Your requested course, {$a->name}, has been approved and you have been made a {$a->teacher}.  To access your new course, go to {$a->url}';
 $string['courseapprovedemail2'] = 'Your requested course, {$a->name}, has been approved.  To access your new course, go to {$a->url}';
