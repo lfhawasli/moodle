@@ -75,18 +75,6 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
         $isvideo = true;
     }
 
-    // Get application name in format <4 digit year><quarter>-<v(video) or a(audio)>.
-    $appname = '20' . substr($bruincast->term, 0, 2) .
-            strtolower(substr($bruincast->term, 2, 1)) .'-';
-    $extension = '';
-    if ($isvideo) {
-        $appname .= 'v';
-        $extension = 'mp4';
-    } else {
-        $appname .= 'a';
-        $extension = 'mp3';
-    }
-
     $content = $isvideo ? $bruincast->video_files : $bruincast->audio_files;
     $contentfiles = explode(',', $content);
     $contentfiles = array_map('trim', $contentfiles);
@@ -102,6 +90,19 @@ function get_bruincast_filter_text($bruincast, $mode, $filename = null) {
     // If no filename found, then use first entry from contentfiles.
     if (empty($filename)) {
         $filename = reset($contentfiles);
+    }
+
+    // Get application name in format <4 digit year><quarter>-<v(video) or a(audio)>.
+    $appname = '20' . substr($bruincast->term, 0, 2) .
+            strtolower(substr($bruincast->term, 2, 1)) .'-';
+    $extension = '';
+    if ($isvideo) {
+        $appname .= 'v';
+        $extension = 'mp4';
+    } else {
+        // Audio files can be mp3 or mp4, use file extension.
+        $appname .= 'a';
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
     }
 
     $contentpath = $appname . '/' . $extension . ':' . $filename;
