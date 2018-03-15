@@ -1,0 +1,9 @@
+/**
+ * File for navigation styles.
+ */
+
+// Hide course shortname link via CSS because it is added after
+// local_ucla_extend_navigation is called.
+[data-key="coursehome"] {
+    display: none;
+}

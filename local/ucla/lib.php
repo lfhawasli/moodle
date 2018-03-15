@@ -1889,3 +1889,20 @@ function ucla_get_user_enrolled_course($courseid, $userid) {
 
     return $enrolledcourses;
 }
+
+/**
+ * Modify Moodle's global navigation by leveraging Moodle's
+ * *_extend_navigation() hook.
+ *
+ * Neat trick learned from: https://moodle.org/plugins/local_boostnavigation
+ *
+ * The hook only works for local plugins as well as modules and reports.
+ *
+ * @param global_navigation $navigation
+ */
+function local_ucla_extend_navigation(global_navigation $navigation) {
+    if (local_ucla_core_edit::using_ucla_theme()) {
+        $modify = new theme_uclashared\modify_navigation();
+        $modify->run($navigation);
+    }
+}
