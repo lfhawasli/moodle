@@ -8,7 +8,6 @@
 @mixin node-glyphicon($icon) {
     
     @include glyphicon($icon);
-    
     float: left;
     color: $ccle-blue;
     vertical-align: middle;
@@ -16,17 +15,15 @@
     line-height: 1.2;
     margin-right: 4px;
 }
-
-$site-menu-background-color:    #f9f9f9;
-$site-menu-hover-color:         #fcfcfc;
+$site-menu-background-color: #f9f9f9;
+$site-menu-hover-color: #fcfcfc;
 
 .block_ucla_course_menu {
-    
     .block_tree {
-        
+
         // Site menu structures
-        .type_structure, 
-        .type_custom, 
+        .type_structure,
+        .type_custom,
         .type_activity {
             border: 0;
             border-bottom: 1px solid #eee;
@@ -41,9 +38,12 @@ $site-menu-hover-color:         #fcfcfc;
                 // Hidden items will have their link color darkened
                 // and will display a 'hidden' label.
                 &.block_ucla_course_menu_hidden {
-                    a {color: #aaa;}
+                    a {
+                        color: #aaa;
+                    }
+
                     a:after {
-                        @include hidden-label(1.2rem)
+                        @include hidden-label(1.2rem);
                     }
                 }
             }
@@ -53,7 +53,9 @@ $site-menu-hover-color:         #fcfcfc;
                 border-left-color: $ccle-blue;
                 background-color: white;
 
-                a {color: $ccle-blue}
+                a {
+                    color: $ccle-blue;
+                }
 
                 .tree_item {
                     border-bottom: 1px solid #ddd;
@@ -64,13 +66,13 @@ $site-menu-hover-color:         #fcfcfc;
                 border-left-color: $ccle-blue;
             }
         }
-        
+
         // Default nodes
         .type_structure {
 
             // Do not display icon.
             img {
-             display:none;
+                display: none;
             }
 
             // Add right facing chevrons to the menu items
@@ -78,7 +80,7 @@ $site-menu-hover-color:         #fcfcfc;
                 .tree_item.leaf {
                     display: inline-block;
                     width: 100%;
-                    padding:  8px;
+                    padding: 8px;
                 }
 
                 // Add '>' glyphicon ONLY when section contains content.
@@ -87,22 +89,22 @@ $site-menu-hover-color:         #fcfcfc;
                     float: right;
                     color: #ccc;
                     vertical-align: middle;
-                    line-height: 1.2
+                    line-height: 1.2;
                 }
                 // Color the '>' icon blue when active and has content.
-                &.current_branch  {
+                &.current_branch {
                     .hascontent.leaf:after {
                         @include glyphicon("\e080");
                         float: right;
                         color: $ccle-blue;
                         vertical-align: middle;
-                        line-height: 1.2
+                        line-height: 1.2;
                     }
                 }
             }
         }
 
-        .type_activity { 
+        .type_activity {
             img {
                 width: 18px;
                 height: 18px;
@@ -110,14 +112,18 @@ $site-menu-hover-color:         #fcfcfc;
         }
 
         // Custom nodes + moodle generated nodes
-        .type_custom, 
+        .type_custom,
         .type_activity {
             border-left: 0;
 
             .tree_item {
                 padding-right: 0;
-            
-                a, a:link, a:visited {display: inline;}
+
+                a,
+                a:link,
+                a:visited {
+                    display: inline;
+                }
             }
         }
 
@@ -166,14 +172,13 @@ $site-menu-hover-color:         #fcfcfc;
                 @include node-glyphicon("\e021");
             }
         }
-        
+
         .type_activity {
             // Add glyphicon-th-list icon to moodle modules
             .leaf:before {
                 @include node-glyphicon("\e012");
             }
         }
-        
     }
 }
 
@@ -192,15 +197,20 @@ $site-menu-hover-color:         #fcfcfc;
 // UCLA course menu specific styles
 .block.block_ucla_course_menu {
     .content {
-        padding: 0;   
+        padding: 0;
     }
-    
+
     .block_tree {
         text-align: left;
-        .active_tree_node {font-weight: bold}
-        
+
+        .active_tree_node {
+            font-weight: bold;
+        }
+
         // Style links
-        a, a:link, a:visited {
+        a,
+        a:link,
+        a:visited {
             color: $ucla-blue;
             vertical-align: middle;
             display: inline-block;
@@ -212,11 +222,11 @@ $site-menu-hover-color:         #fcfcfc;
             text-decoration: none;
         }
     }
-    
-    
-    
+
     li.type_structure {
-        &:hover {background-color: $site-menu-hover-color;}
+        &:hover {
+            background-color: $site-menu-hover-color;
+        }
     }
 
     // Give sections a darker color.

@@ -5,23 +5,21 @@
 
 // These are contents of a course
 .course-content {
-    
     font-size: $type-font-size;
     line-height: $type-line-height;
-    
+
     .registrar-info.registrar-summary-hidden {
         border-bottom: 0;
         margin-bottom: 4px;
     }
+
     .registrar-summary-hidden {
-        
         .collapse-toggle-container {
             border-top: 1px solid #ddd;
             width: 100%;
             text-align: center;
-            
             display: inline-block;
-            
+
             .collapse-toggle {
                 font-size: 1.2rem;
                 color: black;
@@ -32,7 +30,7 @@
                 font-weight: bold;
                 
                 @include border-radius(2px);
-                
+
                 &:hover {
                     background-color: #efefef;
                     border: 1px solid #ddd;
@@ -40,14 +38,14 @@
                 }
             }
         }
-        
+
         .text_to_html {
             display: none;
             border-top: 1px solid #ddd;
             padding-top: 8px;
         }
     }
-    
+
     // Course header
     // Contains title 
     > .headingblock {
@@ -55,21 +53,20 @@
         // @todo: turn this conversion into a sass function
         font-size: 26px;
         font-size: 2.6rem;
-        
         background-color: $ccle-light-blue;
         border: 1px solid $ccle-border-blue;
         color: $ccle-dark-blue;
         padding: 4px 2px;
-        
+
         // Course registrar/crosslist metadata
-        > .course-meta  {
+        > .course-meta {
             color: scale-lightness($ccle-dark-blue, 35%);
             font-weight: normal;
             // @todo: turn this into a sass function
             font-size: 14px;
             font-size: $type-font-size;
             margin-bottom: 4px;
-            
+
             // Crosslist metadata will be truncated and limited
             // to a single line.  
             @include respond-to(handhelds) {
@@ -78,25 +75,26 @@
                 text-overflow: ellipsis;
                 height: $type-line-height;
             }
-            
+
             /// Term and hostcourse will be bolded and darkened
             > .reg-term {
                 text-transform: uppercase;
                 font-weight: bold;
                 color: $ccle-dark-blue;
             }
+
             > .reg-courses > .reg-hostcourse {
                 font-weight: bold;
                 color: $ccle-dark-blue;
             }
         }
     }
-    
+
     // Office hours table
     .instr-info {
         margin-top: 10px;
     }
-    
+
     // Put a border around hidden sections
     .hidden .content {
         border: 4px dotted #ccc;
@@ -107,7 +105,7 @@
 // @todo: move to our theme.
 .summary {
     .highlight {
-        border: 1px solid #EBD742;
+        border: 1px solid #ebd742;
         background-color: yellow;
         padding: 0 1px;
         
@@ -119,7 +117,8 @@
 
 // For left-aligned checkboxes for completion tracking
 li.activity {
-    .autocompletion, form.togglecompletion {
+    .autocompletion,
+    form.togglecompletion {
         margin-right: 6px;
         margin-left: 4px;
     }

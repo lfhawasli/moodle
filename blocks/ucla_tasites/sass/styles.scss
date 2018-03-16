@@ -1,14 +1,13 @@
-
 @import "uclatheme";
 
 /* Remove lefthand padding for checkboxes in "Create TA sites" section  */
 #build_header .fcheckbox {
     margin-left: 0;
 }
+
 #build_header .fcheckbox input {
     margin-right: 3pt;
 }
-
 $ta-site-color: #fff5cb;
 $ta-site-desaurated: #d4ccad;
 $ta-site-hover-color: #fffae5;
@@ -18,14 +17,13 @@ $ta-site-hover-color: #fffae5;
         li.type_structure {
             background-color: $ta-site-color;
             border-left-color: $ta-site-color;
-            
             border-top-color: lighten($ta-site-color, 10%);
             border-bottom-color: darken($ta-site-color, 10%);
-            
+
             &.item_with_icon .leaf:after {
-                color: $ta-site-desaurated ;
+                color: $ta-site-desaurated;
             }
-            
+
             &:hover {
                 background-color: $ta-site-hover-color;
             }

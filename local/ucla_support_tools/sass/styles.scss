@@ -38,8 +38,8 @@
         float: left;
     }
 }
+
 .ucla-support-category {
-    
     border: 4px solid #ecf0f1;
     background-color: #ecf0f1;
     width: 100%;
@@ -47,10 +47,11 @@
     min-height: 100px;
 
     @include border-radius(2px);
-    
+
     &:hover {
         border-color: #bdc3c7;
     }
+
     .cat-title {
         padding: 6px;
         font-size: 1.3rem !important;
@@ -60,6 +61,7 @@
         margin: 4px 0 12px;
         color: #55585d;
     }
+
     .cat-color {
         display: inline-block;
         float: left;
@@ -73,6 +75,7 @@
         
         @include border-radius(50%);
     }
+
     .ucla-support-category-body {
         clear: both;
     }
@@ -89,54 +92,59 @@
     .ucla-support-category-footer {
         padding: 4px;
         background-color: #f84b00;
-        
+
         .btn-link {
             color: white;
         }
     }
-    
+
     .btn-primary[data-action="addtool"] {
         margin: 4px;
 
         @include border-radius(0);
     }
-    
+
     ul {
         margin: 0;
     }
-    
+
     li {
         list-style: none;
-        
+
         .ucla-support-tool {
             border: 1px solid #8fafcf;
         }
+
         &:first-child .ucla-support-tool {
             @include box-shadow(#D1D7DA 2px -1px 3px);
         }
-        
+
         &:nth-child(2n) .ucla-support-tool {
             border: 1px solid #d7e2ee;
+
             .title {
                 background-color: #e9f0f8;
             }
+
             .body {
-                background-color: #F9FBFD;
+                background-color: #f9fbfd;
             }
         }
     }
-    
+
     &.favorites {
         .cat-color {
             background-color: #e67e22;
         }
+
         .ucla-support-tool {
-            .edit, .body {
+            .edit,
+            .body {
                 display: none;
             }
         }
     }
-    
+
     .ucla-support-tool {
         margin: auto 0;
         border: 0;
@@ -144,10 +152,11 @@
         
         @include box-shadow(0 0 0 0);
         @include border-radius(0);
-        
+
         a[data-action="delete"] {
             display: none;
         }
+
         .ucla-support-tool-title i {
             color: #f8ba00;
             float: right;
@@ -158,30 +167,31 @@
 
 .ucla-support-tool-category-labels {
     margin-bottom: 20px;
-    
+
     ul {
         margin: 0;
     }
+
     li {
         list-style: none;
         margin-bottom: 2px;
     }
-    
+
     .category-label {
         background-color: #ecf0f1;
         padding: 8px;
         font-size: 1.4rem;
         text-transform: uppercase;
         font-weight: 300;
-        color: #55585D;
-        
+        color: #55585d;
+
         label {
             margin: 0;
             display: block;
             padding: 4px 0;
             font-weight: 300;
             cursor: pointer;
-            
+
             i {
                 display: inline;
                 padding: 3px 0;
@@ -189,20 +199,24 @@
                 float: right;
             }
         }
+
         &:hover {
             background-color: #95a5a6;
             color: white;
         }
+
         &.selected {
-            
             background-color: lighten(#ecf0f1, 4%);
+
             &:hover {
                 background-color: lighten(#95a5a6, 2%);
             }
         }
+
         input[type="checkbox"] {
             display: none;
         }
+
         .cat-color {
             width: 25px;
             height: 25px;
@@ -214,14 +228,13 @@
             
             @include border-radius(50%);
         }
+
         .edit {
             @extend %edit;
             background-color: white;
-            
             margin-top: 4px;
         }
     }
-
 }
 
 .ucla-support-label {
@@ -239,24 +252,27 @@
     height: 140px;
 
     @include box-shadow(#D1D7DA 1px 1px 3px);
-    
+
     &.expanded,
     .ucla-support-category & {
         height: auto;
-        
+
         .body {
             display: block;
         }
-        
     }
+
     .ucla-support-category & {
         border: 0;
+
         .title {
             padding-bottom: 12px;
         }
+
         .body {
             padding-top: 12px;
         }
+
         a[data-action="description"] {
             display: none;
         }
@@ -269,29 +285,33 @@
         width: 100%;
         /*padding-bottom: 22px;*/
         background-color: lighten(#d7e2ee, 10%);
-        
+
         a {
             color: #444;
             display: inline;
         }
+
         a[data-action="favorite"] {
             color: #e67e22;
             float: right;
             margin-left: 4px;
+
             .fa-star-o {
                 color: #444;
+
                 &:hover {
                     color: #e67e22;
                 }
             }
         }
+
         a[data-action="options"] {
             color: #fff;
             float: right;
             margin-left: 8px;
         }
-        
     }
+
     .body {
         color: #444;
         padding: 12px;
@@ -306,11 +326,13 @@
             font-size: 1.2rem;
         }
     }
+
     a.tool-docs-link {
         float: right;
         margin-left: 4px;
         color: #7f8c8d;
     }
+
     a[data-action="description"] {
         color: #444;
         float: left;
@@ -318,20 +340,22 @@
         padding: 8px;
         text-align: center;
         text-transform: uppercase;
-        
+
         &:hover {
             color: #3498db;
         }
     }
+
     .tool-tags {
         margin: 4px 0;
-        
+
         li {
             list-style: none;
             margin-right: 4px;
             float: left;
         }
     }
+
     .tool-cats {
         padding: 8px;
         text-align: right;
@@ -341,7 +365,7 @@
         .ucla-support-category & {
             display: none;
         }
-        
+
         .cat-color {
             width: 25px;
             height: 25px;
@@ -352,20 +376,21 @@
             @include border-radius(50%);
         }
     }
-    
+
     .edit {
         @extend %edit;
         clear: both;
-        
+
         .ucla-support-category & {
             top: 0;
         }
-        
+
         a[data-action="remove"] {
             .ucla-support-tool-alltools & {
                 display: none;
             }
         }
+
         a[data-action="edit"],
         a[data-action="delete"] {
             .ucla-support-category & {
@@ -379,6 +404,7 @@
     ul {
         margin-left: 0;
     }
+
     li.hidden {
         display: none;
         visibility: hidden;
@@ -386,12 +412,11 @@
 }
 
 .ucla-support-tool-category-list {
-    
     li.collapsed {
-
         .ucla-support-tool-grid {
             display: none;
         }
+
         .ucla-support-category {
             min-height: 40px;
         }
@@ -400,6 +425,7 @@
 
 .ucla-support-tool-filter {
     text-align: center;
+
     .form-control {
         width: 50%;
     }
@@ -412,7 +438,7 @@
     /*padding: 16px 0 0;*/
     text-align: center;
     margin-bottom: 16px;
-    
+
     .form-group {
         margin: 15px 0;
     }
@@ -422,17 +448,19 @@
     ul {
         margin-left: 0;
     }
+
     li {
         list-style: none;
         display: inline-block;
         vertical-align: top;
     }
+
     .ucla-support-tool {
         border: 0;
         max-width: 200px;
         width: 200px;
         height: auto;
-        
+
         .body,
         .title {
             display: block;
@@ -442,10 +470,12 @@
             white-space: nowrap;
             padding: 0;
             background-color: #fff;
-            
-            a {color: #444;}
-        
+
+            a {
+                color: #444;
+            }
         }
+
         .body {
             height: 20px;
             background-color: #fff;
@@ -454,8 +484,9 @@
 
         @include box-shadow(0 0 0 0);
     }
+
     .fa {
         margin-right: 4px;
-        color: #eb6b2d
+        color: #eb6b2d;
     }
 }

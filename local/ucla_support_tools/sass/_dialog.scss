@@ -13,6 +13,7 @@
     &.yui3-panel-content .yui3-widget-bd {
         padding: 0;
     }
+
     .title {
         text-align: center;
         border-bottom: 2px solid #ddd;
@@ -21,6 +22,7 @@
         padding: 12px;
         font-size: 1.8rem;
     }
+
     .message {
         padding: 10px;
 
@@ -30,9 +32,11 @@
             font-weight: bold;
         }
     }
+
     .form-control {
         width: 100%;
     }
+
     .form-group {
         color: #666;
     }
