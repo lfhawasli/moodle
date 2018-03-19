@@ -53,4 +53,59 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
         return $c;
     }
+
+    /**
+     * Returns copyright information used in footer.
+     *
+     * @return string
+     */
+    public function copyright_info() {
+        return get_string('copyright_information', 'theme_uclashared', date('Y'));
+    }
+
+    /**
+     * Returns string of links to be used in footer.
+     *
+     * @return string
+     */
+    public function footer_links() {
+
+        $links = array(
+            'contact_ccle',
+            'about_ccle',
+            'privacy',
+            'copyright',
+            'uclalinks',
+            'separator',
+            'school',
+            'registrar',
+            'myucla',
+            'disability',
+            'caps'
+        );
+
+        $footerstring = '';
+
+        $opennewwindow = false;
+        foreach ($links as $link) {
+
+            if ($link == 'separator') {
+                $footerstring .= \html_writer::tag('li', ' | ');
+                $opennewwindow = true;
+            } else {
+                $linkdisplay = get_string('foodis_' . $link, 'theme_uclashared');
+                $linkhref = get_string('foolin_' . $link, 'theme_uclashared');
+                if (empty($opennewwindow)) {
+                    $params = array('href' => $linkhref);
+                } else {
+                    $params = array('href' => $linkhref, 'target' => '_blank');
+                }
+
+                $linka = \html_writer::tag('a', $linkdisplay, $params);
+
+                $footerstring .= \html_writer::tag('li', $linka);
+            }
+        }
+        return $footerstring;
+    }
 }

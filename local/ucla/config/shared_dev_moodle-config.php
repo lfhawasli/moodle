@@ -637,6 +637,9 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = 
 // NOTE: config is in local/ucla/configs, even though it is linked in root.
 $CFG->customscripts = $_dirroot_ . "/local/ucla/customscripts";
 
+// CCLE-7309 - Modify Footer
+$CFG->forced_plugin_settings['tool_mobile']['setuplink'] = '';
+
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
 
