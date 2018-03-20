@@ -107,7 +107,7 @@ class modify_navigation {
             return;
         }
 
-        // Create activities/resources course node. Flat node so it
+        // Create activities/resources course node. Flat node so it.
         $activitiesnode = \navigation_node::create(get_string('activitiesresources', 'theme_uclashared'),
                 new \moodle_url('/course/view.php', array('id' => $COURSE->id)), // We have to add a URL to the course node,
                                                                                 // otherwise the node wouldn't be added to
@@ -178,7 +178,7 @@ class modify_navigation {
         if ($PAGE->course->id == SITEID) {
             return;
         }
-        
+
         if (is_enrolled($PAGE->context) || has_capability('moodle/course:view', $PAGE->context)) {
             $adminurl = new \moodle_url('/blocks/ucla_control_panel/view.php',
                     array('course_id' => $PAGE->course->id));
@@ -225,6 +225,39 @@ class modify_navigation {
                     null, null, new \pix_icon('i/edit', '')), 0);
             $turneditingon->set_showdivider(true);
             $this->coursenode->add_node($turneditingon);
+        }
+    }
+
+    /**
+     * Changes or removes icons for certain nodes.
+     */
+    private function change_icons() {
+        global $PAGE;
+
+        $nodestochange['participants']['type'] = \global_navigation::TYPE_CONTAINER;
+        $nodestochange['participants']['icon'] = new \pix_icon('i/users', get_string('participants'));
+        foreach ($nodestochange as $name => $nodeinfo) {
+            if ($node = $this->navigation->find($name, $nodeinfo['type'])) {
+                $node->icon = $nodeinfo['icon'];
+            }
+        }
+
+        // The settingsnav is not set if we are purging caches.
+        @$settingsnav = $PAGE->settingsnav; // Supress NOTICE when purging caches.
+        if (empty($settingsnav)) {
+            return;
+        }
+
+        // Add gear icon to Site administration. Treat separately since it is
+        // harder to find.
+        // Code from lib/navigationlib.php:flat_navigation->initialise().
+        $admin = $settingsnav->find('siteadministration', \global_navigation::TYPE_SITE_ADMIN);
+        if (!$admin) {
+            // Try again - crazy nav tree!
+            $admin = $settingsnav->find('root', \global_navigation::TYPE_SITE_ADMIN);
+        }
+        if ($admin) {
+            $admin->icon = new \pix_icon('t/preferences', get_string('administrationsite'));
         }
     }
 
@@ -302,6 +335,9 @@ class modify_navigation {
 
         // Rearrange items.
         $this->rearrange_nodes();
+
+        // Change icons for nodes.
+        $this->change_icons();
 
         // If at least one section needs to be collapsed.
         if (!empty($this->collapsenodesforjs)) {
