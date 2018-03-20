@@ -158,9 +158,6 @@ $CFG->cachejs = true;
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
-// Newly created courses for ucla formats should only have the course menu block
-$CFG->defaultblocks_ucla = 'ucla_course_menu';
-
 // Enable conditional activities
 $CFG->enableavailability = true;
 $CFG->enablecompletion = true;  // needs to be enabled so that completion

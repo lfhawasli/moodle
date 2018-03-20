@@ -100,7 +100,8 @@ class block_ucla_course_menu extends block_navigation {
      **/
     public function applicable_formats() {
         return array(
-            'course' => true
+            'course' => false,
+            'not-really-applicable' => true
         );
     }
 

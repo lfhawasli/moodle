@@ -24,5 +24,5 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2016070800;
+$plugin->version = 2018032200;
 $plugin->component = 'block_ucla_course_menu';

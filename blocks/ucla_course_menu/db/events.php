@@ -18,23 +18,18 @@
  * Event handlers.
  *
  * @package    block_ucla_course_menu
- * @copyright  2016 UC Regent
+ * @copyright  2018 UC Regent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/* Course Creation/Restore:
- *  - ensure that ucla_course_menu block is properly located in the top of the
- *    left-hand side of the screen
+/* Course Restore:
+ *  - Remove the course menu block from the restored course.
  */
 defined('MOODLE_INTERNAL') || die();
 $observers = array(
     array(
-        'eventname' => '\core\event\course_created',
-        'callback'  => 'block_ucla_course_menu_observer::move_course_menu_block_created'
-    ),
-
-    array(
         'eventname' => '\core\event\course_restored',
-        'callback'  => 'block_ucla_course_menu_observer::move_course_menu_block_restored'
-    )
+        'callback'  => 'block_ucla_course_menu_observer::remove_course_menu_block_restored',
+        'internal'   => true
+        ),
 );

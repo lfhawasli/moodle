@@ -33,6 +33,21 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_block_ucla_course_menu_upgrade($oldversion, $block) {
     global $DB, $CFG;
 
+    // CCLE-7279 - Remove Course Menu Block.
+    if ($oldversion < 2018032200) {
+        $blockinstances = $DB->get_recordset('block_instances',
+                array('blockname' => 'ucla_course_menu',));
+        // If atleast one block instance exists, delete them.
+        if ($blockinstances->valid()) {
+            foreach($blockinstances as $blockinstance) {
+                blocks_delete_instance($blockinstance);
+            }
+        }
+        $blockinstances->close();
+        
+        // Savepoint reached.
+        upgrade_block_savepoint(true, 2018032200, 'ucla_course_menu');
+    }
     return true;
 }
 
