@@ -348,6 +348,11 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                     */
                     $value -= $value % ($this->_options['step'] * 60); // Round datetime to previous multiple of step.
 
+                    // If DST is in effect, apply offset.
+                    if (date('I', $value)) {
+                        $value -= dst_offset_on($value, core_date::get_server_timezone_object());
+                    }
+
                     // Convert datetime from Unix time to UTC in server timezone.
                     $value = (new DateTime('@' . $value)); // Convert from Unix time to php DateTime.
                     $servertimezoneoffset = core_date::get_server_timezone_object()->getOffset(new DateTime());
