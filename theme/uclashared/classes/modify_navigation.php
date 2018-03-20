@@ -184,7 +184,7 @@ class modify_navigation {
                     array('course_id' => $PAGE->course->id));
             $courseadmin = \navigation_node::create(get_string('courseadministration'),
                         $adminurl, \navigation_node::TYPE_SETTING,
-                        null, null, new \pix_icon('i/settings', ''));
+                        null, 'courseadministration', new \pix_icon('i/settings', ''));
 
             $this->coursenode->add_node($courseadmin);
         }
@@ -222,10 +222,36 @@ class modify_navigation {
             // Create flat nav node so we can set divider.
             $turneditingon = new \flat_navigation_node(\navigation_node::create($editstring, $editurl,
                     \navigation_node::TYPE_SETTING,
-                    null, null, new \pix_icon('i/edit', '')), 0);
+                    null, 'editingmode', new \pix_icon('i/edit', '')), 0);
             $turneditingon->set_showdivider(true);
             $this->coursenode->add_node($turneditingon);
         }
+    }
+
+    /**
+     * Add Show all node if using UCLA format.
+     */
+    private function add_show_all() {
+        global $COURSE, $PAGE;
+
+        // Only proceed if we are inside a course and we are _not_ on the frontpage.
+        if ($PAGE->context->get_course_context(false) == false || $COURSE->id == SITEID) {
+            return;
+        }
+
+        // See if we should show Activities/Resources section.
+        $format = course_get_format($COURSE);
+        if (($format->get_format() != 'ucla')) {
+            return;
+        }
+
+        $showallurl = new \moodle_url('/course/view.php',
+                array('id' => $PAGE->course->id, 'show_all' => 1));
+        $showall = \navigation_node::create(get_string('show_all', 'format_ucla'),
+                    $showallurl, \navigation_node::TYPE_SECTION,
+                    null, 'showall', null);
+
+        $this->coursenode->add_node($showall);
     }
 
     /**
@@ -329,6 +355,7 @@ class modify_navigation {
         $this->remove_nodes();
 
         // Add nodes.
+        $this->add_show_all();
         $this->add_activityresources();
         $this->add_editingmode();
         $this->add_courseadmin();
