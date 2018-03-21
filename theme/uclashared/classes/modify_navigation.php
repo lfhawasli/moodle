@@ -79,11 +79,6 @@ class modify_navigation {
     private function add_activityresources() {
         global $CFG, $COURSE, $PAGE;
 
-        // Only proceed if we are inside a course and we are _not_ on the frontpage.
-        if ($PAGE->context->get_course_context(false) == false || $COURSE->id == SITEID) {
-            return;
-        }
-
         // See if we should show Activities/Resources section.
         $format = course_get_format($COURSE);
         if (($format->get_format() != 'ucla')) {
@@ -175,10 +170,6 @@ class modify_navigation {
     private function add_courseadmin() {
         global $PAGE;
 
-        if ($PAGE->course->id == SITEID) {
-            return;
-        }
-
         if (is_enrolled($PAGE->context) || has_capability('moodle/course:view', $PAGE->context)) {
             $adminurl = new \moodle_url('/blocks/ucla_control_panel/view.php',
                     array('course_id' => $PAGE->course->id));
@@ -196,7 +187,7 @@ class modify_navigation {
     private function add_editingmode() {
         global $PAGE;
 
-        if ($PAGE->user_allowed_editing() && $PAGE->course->id != SITEID) {
+        if ($PAGE->user_allowed_editing()) {
             // Add the turn on/off settings.
             if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {
                 // We are on the course page, retain the current page params e.g. section.
@@ -234,11 +225,6 @@ class modify_navigation {
     private function add_show_all() {
         global $COURSE, $PAGE;
 
-        // Only proceed if we are inside a course and we are _not_ on the frontpage.
-        if ($PAGE->context->get_course_context(false) == false || $COURSE->id == SITEID) {
-            return;
-        }
-
         // See if we should show Activities/Resources section.
         $format = course_get_format($COURSE);
         if (($format->get_format() != 'ucla')) {
@@ -252,6 +238,33 @@ class modify_navigation {
                     null, 'showall', null);
 
         $this->coursenode->add_node($showall);
+    }
+
+    /**
+     * Adds link to UCLA syllabus if on a course type that supports it.
+     */
+    private function add_syllabus() {
+        global $CFG;
+        // Add node for syllabus (if needed).
+        include_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
+        if (class_exists('ucla_syllabus_manager')) {
+            global $COURSE;
+            $uclasyllabusmanager = new \ucla_syllabus_manager($COURSE);
+            $syllabusnode = $uclasyllabusmanager->get_navigation_nodes();
+            if (!empty($syllabusnode)) {
+                // Found node, so add to course before first section.               
+                $siteinfonode = null;
+                $children = $this->coursenode->get_children_key_list();
+                // Find 1st child that is an integer.
+                foreach ($children as $child) {
+                    if (intval($child) !== 0) {
+                        $siteinfonode = $child;
+                        break;
+                    }
+                }
+                $this->coursenode->add_node($syllabusnode, $siteinfonode);
+            }
+        }
     }
 
     /**
@@ -354,11 +367,14 @@ class modify_navigation {
         // Remove nodes.
         $this->remove_nodes();
 
-        // Add nodes.
-        $this->add_show_all();
-        $this->add_activityresources();
-        $this->add_editingmode();
-        $this->add_courseadmin();
+        // Add nodes if on course.
+        if ($PAGE->course->id != SITEID) {
+            $this->add_syllabus();
+            $this->add_show_all();
+            $this->add_activityresources();
+            $this->add_editingmode();
+            $this->add_courseadmin();
+        }
 
         // Rearrange items.
         $this->rearrange_nodes();
