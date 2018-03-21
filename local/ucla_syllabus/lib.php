@@ -202,6 +202,7 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
 function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
     global $CFG, $USER;
     require_once($CFG->dirroot . '/local/ucla_syllabus/alert_form.php');
+    require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
     // Ignore any old terms or if term is not set (meaning it is a collab site).
     if (!isset($courseinfo->term) ||
