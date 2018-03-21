@@ -39,3 +39,4 @@ $string['pluginname'] = 'Paragraph styles';
 $string['pre'] = '<pre style="margin: 10px 0">Pre-formatted</pre>';
 // END UCLA MOD: CCLE-4848-Paragraph styles’ drop-down does not show the current style for a selected text.
 $string['title'] = 'Paragraph styles';
+$string['privacy:metadata'] = 'The atto_title plugin does not store any personal data.';
