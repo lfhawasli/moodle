@@ -18,7 +18,7 @@
  * Observer class.
  *
  * @package    block_ucla_course_menu
- * @copyright  2016 UC Regent
+ * @copyright  2018 UC Regent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,53 +28,22 @@ defined('MOODLE_INTERNAL') || die();
  * Block course menu observer class.
  *
  * @package    block_ucla_course_menu
- * @copyright  2016 UC Regents
+ * @copyright  2018 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_ucla_course_menu_observer {
 
     /**
-     * Checks if course has a ucla_course_menu_block. If so, then it makes the
-     * block have a defaultweight of -10 (move to the very first element).
-     *
-     * @param \core\event\course_created $event
-     *
-     * @return boolean
-     */
-    public static function move_course_menu_block_created(\core\event\course_created $event) {
-        global $DB;
-
-        // Get course context.
-        $context = context_course::instance($event->courseid);
-        if (empty($context)) {
-            return false;
-        }
-
-        // Get block instance, if any.
-        $blockinstance = $DB->get_record('block_instances',
-                array('blockname' => 'ucla_course_menu',
-                      'parentcontextid' => $context->__get('id')));
-        if (!empty($blockinstance)) {
-            // Calling block_instance will call set_default_location().
-            $uclacoursemenu = block_instance('ucla_course_menu', $blockinstance);
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if course has a ucla_course_menu_block. If so, then it makes the
-     * block have a defaultweight of -10 (move to the very first element).
+     * Checks if course has a ucla_course_menu_block. If so, then remove it.
      *
      * @param \core\event\course_restored $event
      *
      * @return boolean
      */
-    public static function move_course_menu_block_restored(\core\event\course_restored $event) {
+    public static function remove_course_menu_block_restored(\core\event\course_restored $event) {
         global $DB;
-
         // Only respond to course restores.
-        if ($event->type != backup::TYPE_1COURSE) {
+        if ($event->other['type'] != backup::TYPE_1COURSE) {
             return true;
         }
 
@@ -87,12 +56,8 @@ class block_ucla_course_menu_observer {
         // Get block instance, if any.
         $blockinstance = $DB->get_record('block_instances',
                 array('blockname' => 'ucla_course_menu',
-                      'parentcontextid' => $context->__get('id')));
-        if (!empty($blockinstance)) {
-            // Calling block_instance will call set_default_location().
-            $uclacoursemenu = block_instance('ucla_course_menu', $blockinstance);
-        }
-
+                      'parentcontextid' => $context->id));
+        blocks_delete_instance($blockinstance);
         return true;
     }
 }

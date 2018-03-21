@@ -133,9 +133,6 @@ $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 $CFG->cachejs = false;
 
-// Newly created courses for ucla formats should only have the course menu block.
-$CFG->defaultblocks_ucla = 'ucla_course_menu';
-
 // Enable conditional activities.
 $CFG->enableavailability = true;
 $CFG->enablecompletion = true;  // Needs to be enabled so that completion
