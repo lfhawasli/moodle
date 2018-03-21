@@ -188,12 +188,10 @@ class format_ucla_renderer extends format_topics_renderer {
     }
 
     /**
-     * Output the html for the page header. For SRS courses will display
-     * reginfo content. Also displays public/private message if user is not
-     * logged in.
+     * Output the meta information about the course in the main course header part. 
      */
-    public function print_header() {
-        global $CFG, $OUTPUT;
+    public function print_site_meta_text() {
+        global $CFG;
 
         // Formatting and determining information to display for these courses.
         $regcoursetext = '';
@@ -244,18 +242,22 @@ class format_ucla_renderer extends format_topics_renderer {
             $headingtext = html_writer::tag('div', $headingtext, array('class' => 'site-meta'));
         }
 
+        return $headingtext;
+    }
+
+    /**
+     * Output the html for the course section header. Also displays
+     * public/private message if user is not logged in.
+     */
+    public function print_header() {
+        global $CFG, $OUTPUT;
+
         // Check if this site has a custom course logo.  If so, then the title
         // will be rendered by the theme.
         $courselogos = null;
         if (method_exists($OUTPUT, 'course_logo')) {
             $courselogos = $OUTPUT->course_logo();
         }
-        if (empty($courselogos)) {
-            echo $OUTPUT->heading($this->course->fullname, 1, 'site-title');
-        }
-
-        echo $headingtext;
-        echo html_writer::tag('span', '', array('class' => 'site-title-divider'));
 
         // Display page header.
         // Handle cancelled classes.
