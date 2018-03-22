@@ -196,6 +196,15 @@ class theme_uclashared_core_enrol_renderer extends core_enrol_renderer {
             $content .= html_writer::end_tag('div');
             $content .= html_writer::end_tag('form');
 
+            // Option to download a csv of all the course members.
+            $content .= html_writer::start_tag('br');
+            $downloadrosterlink = new moodle_url($CFG->wwwroot . '/blocks/ucla_control_panel/export_roster.php',
+                    array('shortname' => $COURSE->shortname));
+            $downloadrosterbutton = html_writer::empty_tag('input', array('type' => 'button',
+                    'id' => 'downloadroster',
+                    'value' => get_string('download_roster', 'block_ucla_control_panel')));
+            $content .= html_writer::link($downloadrosterlink, $downloadrosterbutton);
+
             $module = array('name' => 'core_user', 'fullpath' => '/user/module.js');
             $PAGE->requires->js_init_call('M.core_user.init_participation', null, false, $module);
         }
