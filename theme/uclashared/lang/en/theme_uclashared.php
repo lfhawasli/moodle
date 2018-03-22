@@ -70,3 +70,25 @@ $string['page_notfound'] = 'The page you requested does not exist';
 
 // Caches.
 $string['cachedef_frontpageimage'] = 'Frontpage image';
+
+// The footer links.
+$string['foodis_contact_ccle'] = 'Contact';
+$string['foolin_contact_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=926';
+$string['foodis_about_ccle'] = 'About';
+$string['foolin_about_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?section=0';
+$string['foodis_privacy'] = 'Privacy';
+$string['foolin_privacy'] = $CFG->wwwroot . '/theme/uclashared/view.php?page=privacy';
+$string['foodis_copyright'] = 'Copyright';
+$string['foolin_copyright'] = $CFG->wwwroot . '/theme/uclashared/view.php?page=copyright';
+$string['foodis_uclalinks'] = 'UCLA links';
+$string['foolin_uclalinks'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=6996';
+$string['foodis_school'] = 'UCLA';
+$string['foolin_school'] = 'http://www.ucla.edu/';
+$string['foodis_registrar'] = 'Registrar';
+$string['foolin_registrar'] = 'http://www.registrar.ucla.edu/';
+$string['foodis_myucla'] = 'MyUCLA';
+$string['foolin_myucla'] = 'http://my.ucla.edu/';
+$string['foodis_disability'] = 'Disability';
+$string['foolin_disability'] = 'http://www.cae.ucla.edu/';
+$string['foodis_caps'] = 'Couns/PsychSvc (CAPS)';
+$string['foolin_caps'] = 'http://www.counseling.ucla.edu/';
