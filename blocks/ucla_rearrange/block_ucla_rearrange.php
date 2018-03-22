@@ -470,16 +470,11 @@ class block_ucla_rearrange extends block_base {
      * @return array   Returns link to tool.
      */
     public static function get_editing_link($params) {
-        $link = html_writer::link(
-                    new moodle_url('/blocks/ucla_rearrange/rearrange.php',
-                        array('courseid' => $params['course']->id,
-                              'section' => $params['section'])),
-                    get_string('pluginname', 'block_ucla_rearrange')
-        );
-
-        // Site menu block arranges editing links by key, make sure this is the
-        // 2nd link.
-        return array(2 => $link);
+        $icon = 'fa-arrows';    // Fontawesome icon.
+        $link = new moodle_url('/blocks/ucla_rearrange/rearrange.php',
+                array('courseid' => $params['course']->id, 'section' => $params['section']));
+        $text = get_string('pluginname', 'block_ucla_rearrange');
+        return array('icon' => $icon, 'link' => $link->out(false), 'text' => $text);
     }
 
     /**

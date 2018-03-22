@@ -202,12 +202,11 @@ class block_ucla_modify_coursemenu extends block_base {
      * @return array   Returns link to tool.
      */
     public static function get_editing_link($params) {
-        $link = html_writer::link(
-                new moodle_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
-                array('courseid' => $params['course']->id, 'section' => $params['section'])),
-                get_string('pluginname', 'block_ucla_modify_coursemenu'));
-        // Site menu block arranges editing links by key, make sure this is the first link.
-        return array(1 => $link);
+        $icon = 'fa-pencil';    // Fontawesome icon.
+        $link = new moodle_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
+                array('courseid' => $params['course']->id, 'section' => $params['section']));
+        $text = get_string('pluginname', 'block_ucla_modify_coursemenu');
+        return array('icon' => $icon, 'link' => $link->out(false), 'text' => $text);
     }
 
     /**

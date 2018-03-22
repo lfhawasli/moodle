@@ -46,3 +46,22 @@
     cursor: pointer;
 }
 
+/* Style quick links section. */
+#nav-drawer-quicklinks {
+    .col-md-4 {
+        text-align: center;
+        padding-bottom: 0.5em;
+        .fa {
+            color: $btn-color-editing;
+            display: block;
+            font-size: larger;
+        }
+    }
+    a, a:active, a:visited {
+        color: inherit;
+        text-decoration: none;
+    }
+    a:hover {
+        color: darken($btn-color-editing, 5%);
+    }
+}
