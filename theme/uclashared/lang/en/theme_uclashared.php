@@ -13,13 +13,15 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Override Moodle's core backup renderer.
+ * Language file.
  *
  * @package    theme_uclashared
  * @copyright  UC Regents 2017
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['activitiesresources'] = 'Activities/Resources';
 $string['pluginname'] = 'UCLA theme';
 $string['region-side-pre'] = 'Right';   // Boost no longer has left region.
 $string['choosereadme'] = 'The theme from University of California, Los Angeles.';
