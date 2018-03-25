@@ -2018,14 +2018,8 @@ $string['viewfileinpopup'] = 'View file in a popup window';
 $string['viewprofile'] = 'View profile';
 $string['views'] = 'Views';
 $string['viewsolution'] = 'view solution';
-// START UCLA MOD: CCLE-6867 - Schedule course visibility for multiple dates.
-/*
 $string['visible'] = 'Visible';
 $string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from teachers and administrators, users are not allowed to enter the course.';
-*/
-$string['visible'] = 'Course visibility';
-$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from teachers and administrators, users are not allowed to enter the course. This option is disabled when the course is scheduled to be hidden.';
-// END UCLA MOD: CCLE-6867.
 $string['visibletostudents'] = 'Visible to {$a}';
 $string['warning'] = 'Warning';
 $string['warningdeleteresource'] = 'Warning: {$a} is referred in a resource. Would you like to update the resource?';
