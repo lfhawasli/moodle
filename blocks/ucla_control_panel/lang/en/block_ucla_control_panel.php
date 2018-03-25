@@ -86,9 +86,6 @@ $string['asucla_textbooks_post'] = '';
 // Stuff from other.
 $string['ucla_cp_mod_other'] = 'Other tools';
 
-$string['export_participant_roster'] = 'Export participant roster';
-$string['export_participant_roster_post'] = 'Download the class roster as a CSV file.';
-
 $string['import_moodle'] = 'Import Moodle course data';
 $string['import_moodle_post'] = 'Copy activities and content from one of your Moodle courses to another.';
 
