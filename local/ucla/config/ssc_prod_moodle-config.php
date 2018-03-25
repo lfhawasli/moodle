@@ -225,6 +225,7 @@ $CFG->grade_overridecat = 0;
 
 // Site administration > Grades > Report settings > Grader report
 $CFG->grade_report_showcalculations = 1;
+$CFG->grade_report_user_showweight = 0;
 
 // CCLE-5445 - Default city and country
 // Site administration > Location > Location settings
