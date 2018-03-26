@@ -629,7 +629,7 @@ block_ucla_modify_coursemenu::many_js_init_code_helpers(array(
 
 $PAGE->requires->js_init_code(
     js_writer::set_variable('M.block_ucla_modify_coursemenu.pix.handle',
-        $OUTPUT->pix_icon('handle', 'block_ucla_modify_coursemenu')->out()
+        $OUTPUT->image_url('handle', 'block_ucla_modify_coursemenu')->out()
     ));
 
 $PAGE->requires->string_for_js('show_all', $formatcompstr);

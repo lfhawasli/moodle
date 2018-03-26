@@ -54,31 +54,15 @@ class block_ucla_copyright_status extends block_base {
     static function get_editing_link($params) {
         global $CFG;
 
-        // Get number of items copyright itemsthat need attention.
-        $a = count(get_files_copyright_status_by_course($params['course']->id,
-                $CFG->sitedefaultlicense));
+        $icon = 'fa-copyright';    // Fontawesome icon.
 
-        // Put inside a badge if items need attention.
-        if (empty($a)) {
-            $span = '';
-        } else {
-            $span = html_writer::tag('span', $a,
-                                     array('class' => 'badge badge-warning',
-                                     'tabindex' => '0',
-                                     'aria-label' => $a . get_string('aria_copyright_badge', 'block_ucla_copyright_status'),
-                                     'aria-describedby' => 'id-copyright-status'));
-        }
-
-        $link = html_writer::link(
-                new moodle_url('/blocks/ucla_copyright_status/view.php',
+        $link = new moodle_url('/blocks/ucla_copyright_status/view.php',
                     array('courseid' => $params['course']->id,
-                          'section' => $params['section'])),
-                          get_string('pluginname', 'block_ucla_copyright_status') . $span,
-                          array('id' => 'id-copyright-status'));
+                          'section' => $params['section']));
+        $text = get_string('pluginname', 'block_ucla_copyright_status');
 
-        // Site menu block arranges editing links by key, make sure this is the...
-        // ...3rd link.
-        return array(3 => $link);
+        return array('icon' => $icon, 'link' => $link->out(false), 
+            'text' => $text);
     }
 
     /**
