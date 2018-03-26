@@ -261,7 +261,7 @@ $string['tempgroup'] = 'Temporary';
 $string['daysexpire_string'] = 'Expires {$a} days after being accepted.';
 $string['daysexpire_notice'] = 'After accepting this invitation, your access to the site will expire in {$a} days.';
 $string['err_daysexpire'] = 'Invalid choice option for days expiration.';
-$string['roleneverexpire_notice'] = 'After accpting this invitation, your access to the site will never expire.';
+$string['roleneverexpire_notice'] = 'After accepting this invitation, your access to the site will never expire.';
 
 // Strings to handle event.
 $string['eventinvitationsent'] = 'Invitation has been sent';

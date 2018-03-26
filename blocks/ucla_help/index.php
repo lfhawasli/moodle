@@ -164,7 +164,7 @@ if ($fromform = $mform->get_data()) {
     $supportcontacts = get_support_contact($context);
 
     // Get uploaded attachment if there is one.
-    if (isloggedin() && !isguestuser()) {
+    if (isloggedin() && !isguestuser() && get_config('block_ucla_help', 'enablefileuploads')) {
         $attachmentname = $mform->get_new_filename('ucla_help_attachment');
 
         // Save attachment to a temporary directory.
