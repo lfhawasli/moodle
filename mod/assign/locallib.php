@@ -1503,13 +1503,13 @@ class assign {
 
         // START UCLA MOD: CCLE-5968 - Simplify assignment settings.
         global $PAGE;
-        $PAGE->requires->yui_module('moodle-local_ucla-submissiontype',
-                'M.local_ucla.submissiontype.init');
+//        $PAGE->requires->yui_module('moodle-local_ucla-submissiontype',
+//                'M.local_ucla.submissiontype.init');
         // END UCLA MOD: CCLE-5968
 
         // START UCLA MOD: CCLE-6085 - Simplify assignment feedback type.
-        $PAGE->requires->yui_module('moodle-local_ucla-feedbacktype',
-                'M.local_ucla.feedbacktype.init');
+//        $PAGE->requires->yui_module('moodle-local_ucla-feedbacktype',
+//                'M.local_ucla.feedbacktype.init');
         // END UCLA MOD: CCLE-6085.
 
         if ($plugin->is_visible() && !$plugin->is_configurable() && $plugin->is_enabled()) {
