@@ -2,45 +2,37 @@
  * Copy from course/format/ucla-format/styles.css with ucla-format renamed to ucla-format.
  */
 .course-content ul.ucla-format {
-  margin: 0;
-  list-style: none; }
+    margin: 0;
+    list-style: none;
+}
 
+// Removing style.
 /*.course-content ul.ucla-format li.section .content {
     margin: 0 40px;
 }*/
+
 .course-content ul.ucla-format li.section .left,
 .course-content ul.ucla-format li.section .right {
-  width: 40px;
-  padding: 0 6px; }
+    width: 40px;
+    padding: 0 6px;
+}
 
 .course-content ul.ucla-format li.section .left {
-  padding-top: 22px;
-  text-align: right; }
+    padding-top: 22px;
+    text-align: right;
+}
 
 .jsenabled .course-content ul.ucla-format li.section .left,
 .jsenabled .course-content ul.ucla-format li.section .right {
-  width: auto; }
+    width: auto;
+}
 
 .course-content ul.ucla-format li.section .left .section-handle img.icon {
-  padding: 0;
-  vertical-align: baseline; }
+    padding: 0;
+    vertical-align: baseline;
+}
 
 .course-content ul.ucla-format li.section .section_action_menu .textmenu,
 .course-content ul.ucla-format li.section .section_action_menu .menu-action-text {
-  white-space: nowrap; }
-
-.format-ucla .single-section h3.sectionname {
-  text-align: left; }
-.format-ucla .hidden .content {
-  border: 4px dotted #ccc; }
-.format-ucla li.activity {
-  padding: 5px 10px;
-  border-top: 1px solid #f5f5f5; }
-  .format-ucla li.activity:not(.label):nth-child(2n) {
-    background-color: #f9f9f9; }
-  .format-ucla li.activity:not(.label):hover {
-    background-color: #f5f5f5; }
-  .format-ucla li.activity.label:hover {
-    background-color: white !important; }
-
-/*# sourceMappingURL=styles.css.map */
+    white-space: nowrap;
+}

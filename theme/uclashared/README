@@ -1,5 +1,17 @@
 UCLA Shared Theme
 
+
+Below is no longer correct.
+
+To build plugins:
+
+Lint: stylelint course/format/ucla/sass/*.scss --syntax scss
+
+
+Watch: sass -t compressed --watch course/format/ucla/sass/styles.scss:course/format/ucla/styles.css
+
+Build: sass course/format/ucla/sass/styles.scss course/format/ucla/styles.css
+
 You need the following tools to build this theme
 
     * Compass (http://compass-style.org/)

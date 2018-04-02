@@ -1,4 +1,4 @@
-# UCLA theme SASS compilation.  This 
+# UCLA SASS compilation.
 # 
 # Usage:
 # 
@@ -16,29 +16,22 @@
 
 require './compass.rb'
 require 'sass-css-importer'
-add_import_path Sass::CssImporter::Importer.new("vendor")
 
 ## UCLA theme directory
 theme_dir = "theme/uclashared"
 
-## Location of CSS dir
-css_dir = "#{theme_dir}/style"
-
-## Location of SASS dir
-sass_dir = "#{theme_dir}/sass"
+## Location of theme SASS dir
+sass_dir = "theme/uclashared/scss"
 
 ## Location of images
 images_dir = "#{theme_dir}/pix"
 
-## Location of javascript
-javascripts_dir = "#{theme_dir}/javascript"
-
-## Import boostrap package
-additional_import_paths = ["#{theme_dir}/vendor/twbs/bootstrap-sass/assets/stylesheets", "#{theme_dir}/vendor/fortawesome", sass_dir]
+## Import boost package
+boost_dir = "theme/boost/scss"
+additional_import_paths = ["#{boost_dir}/bootstrap", "#{boost_dir}/fortawesome", sass_dir]
 
 ## For production environment, use compressed CSS
 output_style = (environment == :production) ? :compressed : :expanded
-
 
 # Set up compass 'watch' for Moodle modules
 # 

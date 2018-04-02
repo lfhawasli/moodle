@@ -72,5 +72,5 @@ if ($displaysection == $format::UCLA_FORMAT_DISPLAY_ALL) {
     $renderer->print_single_section_page($format->get_course(), null, null, null, null, $displaysection);
 }
 
-// Include course format js module.
-$PAGE->requires->js('/course/format/ucla/format.js');
+// Include topics course format js module.
+$PAGE->requires->js('/course/format/topics/format.js');
