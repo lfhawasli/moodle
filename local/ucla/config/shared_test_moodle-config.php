@@ -217,6 +217,7 @@ $CFG->bloglevel = 0; // Disable blog system completely
 $CFG->messagingallowemailoverride = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
+$CFG->enableplagiarism = 1;
 // CCLE-7144 - Enable stealth activities
 $CFG->allowstealth = 1;
 
@@ -255,7 +256,7 @@ $CFG->grade_aggregations_visible = '0,10,11,12,2,4,6,8,13'; // Enables all aggre
 $CFG->grade_overridecat = 0;
 
 // Site administration > Grades > Report settings > Grader report
-$CFG->grade_report_showeyecons = 0;
+$CFG->grade_report_showeyecons = 1;
 $CFG->grade_report_showanalysisicon = 0;
 $CFG->grade_report_showuserimage = 0;
 $CFG->grade_report_showcalculations = 1;

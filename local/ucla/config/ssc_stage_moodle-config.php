@@ -207,6 +207,7 @@ $CFG->enablebadges = 0; // Disable badges
 $CFG->messagingallowemailoverride = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
+$CFG->enableplagiarism = 1;
 // CCLE-7144 - Enable stealth activities
 $CFG->allowstealth = 1;
 
@@ -246,6 +247,7 @@ $CFG->grade_overridecat = 0;
 
 // Site administration > Grades > Report settings > Grader report
 $CFG->grade_report_showcalculations = 1;
+$CFG->grade_report_showeyecons = 1;
 $CFG->grade_report_user_showweight = 0;
 
 // CCLE-5445 - Default city and country
