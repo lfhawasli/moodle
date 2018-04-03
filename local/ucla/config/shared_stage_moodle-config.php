@@ -244,7 +244,7 @@ $CFG->grade_aggregations_visible = '0,10,11,12,2,4,6,8,13'; // Enables all aggre
 $CFG->grade_overridecat = 0;
 
 // Site administration > Grades > Report settings > Grader report
-$CFG->grade_report_showeyecons = 0;
+$CFG->grade_report_showeyecons = 1;
 $CFG->grade_report_showanalysisicon = 0;
 $CFG->grade_report_showuserimage = 0;
 $CFG->grade_report_showcalculations = 1;
