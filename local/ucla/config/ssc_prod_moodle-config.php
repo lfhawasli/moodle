@@ -189,6 +189,7 @@ $CFG->enablebadges = 0; // Disable badges
 $CFG->messagingallowemailoverride = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
+$CFG->enableplagiarism = 1;
 
 // Site administration > Users > Accounts > User default preferences
 $CFG->defaultpreference_autosubscribe = 0;
