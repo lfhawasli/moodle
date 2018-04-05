@@ -4497,7 +4497,13 @@ class action_menu implements renderable, templatable {
                 $data->actionmenulink = $item->export_for_template($output);
             } else if ($item instanceof action_menu_filler) {
                 $data->actionmenufiller = $item->export_for_template($output);
-            } else if ($item instanceof action_link) {
+            } 
+            // START UCLA MOD: CCLE-7310 - Convert JIT links to Section Tools.
+            else if ($item instanceof theme_uclashared\action_menu_header) {
+                $data->actionmenuheader = $item->export_for_template($output);
+            }
+            // END UCLA MOD: CCLE-7310.
+            else if ($item instanceof action_link) {
                 $data->actionlink = $item->export_for_template($output);
             } else if ($item instanceof pix_icon) {
                 $data->pixicon = $item->export_for_template($output);
@@ -4519,7 +4525,13 @@ class action_menu implements renderable, templatable {
                 $data->actionmenulink = $item->export_for_template($output);
             } else if ($item instanceof action_menu_filler) {
                 $data->actionmenufiller = $item->export_for_template($output);
-            } else if ($item instanceof action_link) {
+            } 
+            // START UCLA MOD: CCLE-7310 - Convert JIT links to Section Tools.
+            else if ($item instanceof theme_uclashared\action_menu_header) {
+                $data->actionmenuheader = $item->export_for_template($output);
+            } 
+            // END UCLA MOD: CCLE-7310.
+            else if ($item instanceof action_link) {
                 $data->actionlink = $item->export_for_template($output);
             } else if ($item instanceof pix_icon) {
                 $data->pixicon = $item->export_for_template($output);

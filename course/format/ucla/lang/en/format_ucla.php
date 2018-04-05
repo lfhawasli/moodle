@@ -61,13 +61,6 @@ $string['collapsedhide'] = 'Hide registrar description';
 $string['coursedescription'] = 'Course description';
 $string['classdescription'] = 'Class description';
 
-// JIT strings.
-$string['file'] = 'Upload file';
-$string['link'] = 'Add link';
-$string['text'] = 'Add text';
-$string['subheading'] = 'Add subheading';
-$string['turnitin'] = 'Add Turnitin Assignment';
-
 // CCLE-5098 - Download course content configurable.
 $string['coursedownload'] = 'Enable download course materials';
 $string['coursedownload_help'] = 'Download is enabled by default. '
@@ -86,3 +79,11 @@ $string['createtasite_help'] = 'TA site creation is enabled by default. '
         . 'If you do not want the TAs to be able to create the TA sites, '
         . 'click "No". This feature is available for TAs';
 
+// CCLE-7310 - Convert JIT links to Section Tools.
+$string['sectiontools'] = 'Section tools';
+$string['file'] = 'File';
+$string['link'] = 'Link';
+$string['label'] = 'Label';
+$string['activity'] = 'Activity/Resource';
+$string['add'] = 'ADD';
+$string['manage'] = 'MANAGE';
