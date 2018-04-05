@@ -29,6 +29,113 @@
 .course-content ul.ucla-format li.section .section_action_menu .menu-action-text {
   white-space: nowrap; }
 
+/**
+ * Variables to use in theme.
+ *
+ * Use this file to override any variables from Boost. Or to add variables
+ * for use in the UCLA theme.
+ *
+ * NOTE: In SCSS any variables must be defined first before they can be used.
+ */
+/*// Used by course format.
+$ccle-light-blue:               #d1dbef;
+$ccle-lighter-blue:             #dfe7f4;
+$ccle-border-blue:              #afc5f0;
+$ccle-dark-blue:                #394a6e;*/
+/**
+ * Header color for PROD header
+ *
+ * @type Color
+ * @group header
+ */
+/**
+ * Header color for TEST header
+ *
+ * @type Color
+ * @group header
+ */
+/**
+ * Header color for STAGE header
+ *
+ * @type Color
+ * @group header
+ */
+/**
+ * Header color for development environment header
+ *
+ * @type Color
+ * @group header
+ */
+/**
+ * System indicator (right below header) background color
+ *
+ * @type Color
+ * @group header
+ */
+/**
+ * System indicator text color
+ *
+ * @type Color
+ * @group header
+*/
+.tag, .format-ucla .groupinglabel {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem; }
+  .tag:empty, .format-ucla .groupinglabel:empty {
+    display: none; }
+
+.btn .tag, .btn .format-ucla .groupinglabel, .format-ucla .btn .groupinglabel {
+  position: relative;
+  top: -1px; }
+
+a.tag:focus, .format-ucla a.groupinglabel:focus, a.tag:hover, .format-ucla a.groupinglabel:hover {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer; }
+
+.tag-pill {
+  padding-right: 0.6em;
+  padding-left: 0.6em;
+  border-radius: 10rem; }
+
+.tag-default {
+  background-color: #818a91; }
+  .tag-default[href]:focus, .tag-default[href]:hover {
+    background-color: #687077; }
+
+.tag-primary {
+  background-color: #0072b1; }
+  .tag-primary[href]:focus, .tag-primary[href]:hover {
+    background-color: #00517e; }
+
+.tag-success {
+  background-color: #77b300; }
+  .tag-success[href]:focus, .tag-success[href]:hover {
+    background-color: #558000; }
+
+.tag-info {
+  background-color: #ad53b2; }
+  .tag-info[href]:focus, .tag-info[href]:hover {
+    background-color: #8d4191; }
+
+.tag-warning {
+  background-color: #ff8800; }
+  .tag-warning[href]:focus, .tag-warning[href]:hover {
+    background-color: #cc6d00; }
+
+.tag-danger {
+  background-color: #ff4136; }
+  .tag-danger[href]:focus, .tag-danger[href]:hover {
+    background-color: #ff1103; }
+
 .format-ucla .single-section h3.sectionname {
   text-align: left; }
 .format-ucla .hidden .content {
@@ -42,5 +149,14 @@
     background-color: #f5f5f5; }
   .format-ucla li.activity.label:hover {
     background-color: white !important; }
+.format-ucla .section-cm-edit-actions .dropdown-toggle {
+  color: #ff4500; }
+.format-ucla .groupinglabel {
+  background-color: none;
+  border: 1px solid #ddd;
+  color: #999;
+  display: inline-block; }
+.format-ucla .section .activity .activityinstance .groupinglabel {
+  padding: .2em .6em; }
 
 /*# sourceMappingURL=styles.css.map */

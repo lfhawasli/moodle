@@ -1,6 +1,12 @@
 // Include the topics css as a base.
 @import "topics";
 
+// Import theme files.
+@import "../../../../theme/uclashared/scss/variables";
+@import "../../../../theme/boost/scss/bootstrap/variables";
+@import "../../../../theme/boost/scss/bootstrap/mixins";
+@import "../../../../theme/boost/scss/bootstrap/tags";
+
 .format-ucla {
     // The section name.
     .single-section h3.sectionname {
@@ -29,6 +35,27 @@
         &.label:hover {
             background-color: white !important;
         }
+    }
+
+    // Use the editing color for the 'Edit' link.
+    .section-cm-edit-actions {
+        .dropdown-toggle {
+            color: $link-color-editing;
+        }
+    }
+
+    // Label for Access restrictions.
+    .groupinglabel {
+        @extend .tag;
+        background-color: none;
+        border: 1px solid #ddd;
+        color: #999;
+        display: inline-block;
+    }
+
+    // Override Moodle style.
+    .section .activity .activityinstance .groupinglabel {
+        padding: .2em .6em;
     }
 }
 
