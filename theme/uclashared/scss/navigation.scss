@@ -65,3 +65,35 @@
         color: darken($btn-color-editing, 5%);
     }
 }
+
+/* Style the turn editing on/off button */
+.header-editing-button {
+    .btn {
+        color: white;
+        background-color: $btn-color-editing;
+        border-color: $btn-color-editing;
+        position: relative;
+        padding: 0.5rem 0.5rem 0.5rem 2rem;
+    }
+    .btn:hover {
+        color: white;
+        background-color: darken($btn-color-editing, 10%);
+        border-color: darken($btn-color-editing, 10%);
+    }
+    /* Style for adding the pencil button */
+    .btn:before {
+        font-family: FontAwesome;
+        left: -0.5rem;
+        margin-left: 1rem;
+        position: absolute;
+    }
+}
+
+/* Style to choose which icon to show for the editing button */
+.header-editing-button.non-edit-mode .btn:before {
+    content: "\f040";
+}
+
+.header-editing-button.edit-mode .btn:before {
+    content: "\f00c";
+}
