@@ -299,9 +299,49 @@ class participants_table extends \table_sql {
      * @return string
      */
     public function col_fullname($data) {
-        global $OUTPUT;
+        // START UCLA MOD: CCLE-7130 - Add View Activity and Log In As for participants.
+        //global $OUTPUT;
+        //return $OUTPUT->user_picture($data, array('size' => 35, 'courseid' => $this->course->id, 'includefullname' => true));
 
-        return $OUTPUT->user_picture($data, array('size' => 35, 'courseid' => $this->course->id, 'includefullname' => true));
+        global $OUTPUT, $USER;
+
+        $text = $OUTPUT->user_picture($data, array('size' => 35, 'courseid' => $this->course->id, 'includefullname' => true));
+
+        // Miscellanous links
+        $links = array();
+
+        // Activity link
+        $canviewlog = has_capability('report/log:view', $this->context);
+        if ($canviewlog) {
+            $url = new \moodle_url('/report/log/index.php', array(
+                'id' => $this->course->id,
+                'user' => $data->id,
+                'chooselog' => true
+                ));
+            $links[] = \html_writer::link($url, get_string('activity'));
+        }
+
+        // Log in as link
+        $canloginas = has_capability('moodle/user:loginas', $this->context) && !\core\session\manager::is_loggedinas();
+        if ($canloginas && $USER->id != $data->id && !is_siteadmin($data->id)) {
+            $url = new \moodle_url('/course/loginas.php', array(
+            'id' => $this->course->id,
+            'user' => $data->id,
+            'sesskey' => sesskey()
+            ));
+            $links[] = \html_writer::link($url, get_string('loginas'));
+        }
+
+        // If miscellanous links are to be displayed
+        if (!empty($links)) {
+            $text .= \html_writer::start_div();
+            $text .= implode(' &middot; ', $links);
+            $text .= \html_writer::end_div();
+        }
+
+        return $text;
+
+        // END UCLA MOD: CCLE-7130.
     }
 
     /**
