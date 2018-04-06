@@ -1,84 +1,36 @@
 UCLA Shared Theme
 
-You need the following tools to build this theme
+You need the following tools:
 
-    * Compass (http://compass-style.org/)
-    * Rake (https://github.com/ruby/rake)
-    * Composer (already available from Moodle)
+* Stylelint: https://stylelint.io/
+* SASS: https://sass-lang.com/install
 
-Important files:
+To build plugins SASS:
 
-    * Rakefile          - defines theme buildig tasks.
-    * config.rb         - defines how to build SASS -> CSS
-    * composer.json     - defines packages needed by this theme.
+    For example, if you want to compile the SASS files for the UCLA course format
+    do the following:
 
-Important paths (relative to theme)
+    To check SASS files if they following coding conventions:
+    stylelint course/format/ucla/sass/*.scss --syntax scss
 
-    * /vendor       - untracked (by git) dir to download composer packages
-    * /fonts        - dir used by moodle's font loader.
-    * /javascript   - dir used by moodle's theme js loader
-    * /sass         - dir used to hold all theme sass
-    * /style        - target dir for compiled sass CSS.  should be read-only.
+    To compile SASS files:
+    sass -t compressed course/format/ucla/sass/styles.scss course/format/ucla/styles.css
 
-To build this theme:
+    To compile SASS files while you work with them:
+    sass -t compressed --watch course/format/ucla/sass/styles.scss:course/format/ucla/styles.css
 
-    If the composer dependencies are not available, those need to be downloaded
-    first.  From the Moodle project root, run:
-
-        php composer.phar install -d theme/uclashared
-
-    That will download all the packages defined in this theme's composer.json.
-    
-    To build the theme elements, run the following inside this theme's root dir:
-    
-        rake build_theme
-
-    That will run all the tasks and copy all the dependencies defined in this 
-    theme's Rakefile.
-
-To add new composer packages:
-
-    Edit the composer.json file and add the packages as defined by the composer
-    package repo (https://packagist.org/).  This usually means adding a single
-    line to the "require" obj.
-
-    If your package does not define a composer manifest, you can add it as a
-    repository object.  See the examples in this theme's composer.json file.
-
-    Your new package will most likely contain some element that needs to
-    integrate directly into the theme.  This dependency resolution is handled 
-    by rake.  The Rakefile defines three tasks:
-
-        build_fonts: for when you need to copy fonts from a package into our
-            theme's font folder.
-
-        build_js: for when you need to copy javascript files from a package into
-            our the theme's javascript directory.
-
-        build_css: to generate production ready compiled & minified CSS from our
-            theme's SASS.
-
-    If your package adds javascript, it will need to be copied via the build_js
-    task.  If your package adds fonts, it will need to be copied via the 
-    build_fonts task.  If your package bring in CSS/SASS, there is no need 
-    to modify the build_css task.  In this case, the theme's config.rb will need
-    to be updated with a new import path.
-
-Adding new SASS import paths:
-
-    Edit the config.rb file.  Assuming your brought in a new composer
-    dependency, you may only need to specify the target path of the new SASS 
-    source.  This path is added to the array:
-        
-        additional_import_paths = [ ... ]
-
+    After you finish your changes you can commit the compiled SASS file. Change the
+    paths to the appropriate plugin you are editing.
 
 Developing theme SASS:
     
-    This theme can build its own CSS when editing SASS files.  From this theme's
-    root dir run:
+    Add new or change existing SASS files in theme/uclashared/scss directory.
 
-        compass watch
+    Moodle includes it's own built-in SASS compiler for themes and it is
+    configured to compile the following main SASS file:
 
-    Now edit the SASS source files and the corresponding CSS files will be 
-    automatically generated.
+    theme/uclashared/scss/moodle.scss
+
+    If you need to add more styles make sure to @import them in this file.
+
+    To reflect your changes be sure to purge the Moodle cache.

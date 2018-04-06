@@ -104,7 +104,7 @@ function block_ucla_course_download_ucla_format_notices($course) {
     // Render the alert.
     $alertform = new course_download_alert_form(new moodle_url('/blocks/ucla_course_download/alert.php',
                 array('id' => $course->id)), null, 'post', '',
-                array('class' => 'ucla-format-notice-box'));
+                array('class' => 'alert alert-info'));
 
     $alertform->display();
 

@@ -38,3 +38,5 @@ composer.phar
 /lib/yuilib/*/*/*-coverage.js
 atlassian-ide-plugin.xml
 /node_modules/
+# UCLA Modifications.
+styles.css.map

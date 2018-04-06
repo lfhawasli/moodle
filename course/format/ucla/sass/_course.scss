@@ -1,12 +1,19 @@
-//
-// CCLE / COURSE / course site
-// --------------------------------------------------
+/**
+ * Styles related to course information.
+ */
 
-
-// These are contents of a course
 .course-content {
-    font-size: $type-font-size;
-    line-height: $type-line-height;
+    // Registrar info in the 'site info' summary.
+    .registrar-info {
+        color: #878787;
+        line-height: 1.2;
+        font-weight: 300;
+        padding-bottom: 10px;
+
+        .cancelled-course {
+            text-decoration: line-through;
+        }
+    }
 
     .registrar-info.registrar-summary-hidden {
         border-bottom: 0;
@@ -21,19 +28,18 @@
             display: inline-block;
 
             .collapse-toggle {
-                font-size: 1.2rem;
+                font-size: 0.8rem;
                 color: black;
                 position: relative;
                 top: -12px;
                 background-color: white;
                 padding: 2px 12px;
                 font-weight: bold;
-                
-                @include border-radius(2px);
+                border: 1px solid #ddd;
+                text-decoration: none;
 
                 &:hover {
-                    background-color: #efefef;
-                    border: 1px solid #ddd;
+                    background-color: #efefef;                    
                     text-decoration: none;
                 }
             }
@@ -44,82 +50,5 @@
             border-top: 1px solid #ddd;
             padding-top: 8px;
         }
-    }
-
-    // Course header
-    // Contains title 
-    > .headingblock {
-        // temporary fix for XP/IE8 headers
-        // @todo: turn this conversion into a sass function
-        font-size: 26px;
-        font-size: 2.6rem;
-        background-color: $ccle-light-blue;
-        border: 1px solid $ccle-border-blue;
-        color: $ccle-dark-blue;
-        padding: 4px 2px;
-
-        // Course registrar/crosslist metadata
-        > .course-meta {
-            color: scale-lightness($ccle-dark-blue, 35%);
-            font-weight: normal;
-            // @todo: turn this into a sass function
-            font-size: 14px;
-            font-size: $type-font-size;
-            margin-bottom: 4px;
-
-            // Crosslist metadata will be truncated and limited
-            // to a single line.  
-            @include respond-to(handhelds) {
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                height: $type-line-height;
-            }
-
-            /// Term and hostcourse will be bolded and darkened
-            > .reg-term {
-                text-transform: uppercase;
-                font-weight: bold;
-                color: $ccle-dark-blue;
-            }
-
-            > .reg-courses > .reg-hostcourse {
-                font-weight: bold;
-                color: $ccle-dark-blue;
-            }
-        }
-    }
-
-    // Office hours table
-    .instr-info {
-        margin-top: 10px;
-    }
-
-    // Put a border around hidden sections
-    .hidden .content {
-        border: 4px dotted #ccc;
-    }
-}
-
-// Course search highlight -- yellowish osx-like color used
-// @todo: move to our theme.
-.summary {
-    .highlight {
-        border: 1px solid #ebd742;
-        background-color: yellow;
-        padding: 0 1px;
-        
-        @include background-image(linear-gradient(top, yellow, #EBD742));
-        @include border-radius(4px);
-        @include box-shadow(#aaa 1px 2px 2px);
-    }
-}
-
-// For left-aligned checkboxes for completion tracking
-li.activity {
-    .autocompletion,
-    form.togglecompletion {
-        margin-right: 6px;
-        margin-left: 4px;
     }
 }

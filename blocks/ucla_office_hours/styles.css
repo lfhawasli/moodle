@@ -45,8 +45,19 @@
     color: red;
 }
 
-/* START feature/CCLE-3002-office-table-display */
 div.instr-info {
     clear: both;
 }
-/* END feature/CCLE-3002-office-table-display */
+
+/* Style office hours block on Site info. */
+.office-hours-table {
+    border: 1px solid #ddd;
+}
+.office-hours-table thead {
+    background-color: #efefef;
+}
+.instr-info .office-hours-table thead th {
+    /* Override generaltable styles. */
+    border-top: 1px solid #ddd;
+    border-bottom: none;
+}

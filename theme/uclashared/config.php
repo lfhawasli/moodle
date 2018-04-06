@@ -55,5 +55,5 @@ $THEME->requiredblocks = '';
 // region into the page when editing is enabled and it takes up too much room.
 $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
 
-//// Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
+// Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';

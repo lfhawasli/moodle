@@ -1,0 +1,38 @@
+/**
+ * Copy from course/format/ucla-format/styles.css with ucla-format renamed to ucla-format.
+ */
+.course-content ul.ucla-format {
+    margin: 0;
+    list-style: none;
+}
+
+// Removing style.
+/*.course-content ul.ucla-format li.section .content {
+    margin: 0 40px;
+}*/
+
+.course-content ul.ucla-format li.section .left,
+.course-content ul.ucla-format li.section .right {
+    width: 40px;
+    padding: 0 6px;
+}
+
+.course-content ul.ucla-format li.section .left {
+    padding-top: 22px;
+    text-align: right;
+}
+
+.jsenabled .course-content ul.ucla-format li.section .left,
+.jsenabled .course-content ul.ucla-format li.section .right {
+    width: auto;
+}
+
+.course-content ul.ucla-format li.section .left .section-handle img.icon {
+    padding: 0;
+    vertical-align: baseline;
+}
+
+.course-content ul.ucla-format li.section .section_action_menu .textmenu,
+.course-content ul.ucla-format li.section .section_action_menu .menu-action-text {
+    white-space: nowrap;
+}

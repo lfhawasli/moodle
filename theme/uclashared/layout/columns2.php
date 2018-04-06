@@ -60,20 +60,21 @@ if ($PAGE->user_allowed_editing() && $PAGE->user_is_editing()) {
     $templatecontext['editingon'] = true;
 
     // Prepare editing quick links.
+    if (class_exists('block_ucla_modify_coursemenu')) {
+        // Get section user is viewing.
+        $displaysection = 0;
+        $format = course_get_format($COURSE);
+        if (($format->get_format() === 'ucla')) {
+            $displaysection = $format->figure_section();
+        }
 
-    // Get section user is viewing.
-    $displaysection = 0;
-    $format = course_get_format($COURSE);
-    if (($format->get_format() === 'ucla')) {
-        $displaysection = $format->figure_section();
+        $params['course'] = $COURSE;
+        $params['section'] = $displaysection;
+
+        $templatecontext['modifysections'] = block_ucla_modify_coursemenu::get_editing_link($params);
+        $templatecontext['rearrangematerials'] = block_ucla_rearrange::get_editing_link($params);
+        $templatecontext['managecopyright'] = block_ucla_copyright_status::get_editing_link($params);
     }
-
-    $params['course'] = $COURSE;
-    $params['section'] = $displaysection;
-
-    $templatecontext['modifysections'] = block_ucla_modify_coursemenu::get_editing_link($params);
-    $templatecontext['rearrangematerials'] = block_ucla_rearrange::get_editing_link($params);
-    $templatecontext['managecopyright'] = block_ucla_copyright_status::get_editing_link($params);
 }
 
 echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);
