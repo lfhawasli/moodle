@@ -35,10 +35,11 @@
                 background-color: white;
                 padding: 2px 12px;
                 font-weight: bold;
+                border: 1px solid #ddd;
+                text-decoration: none;
 
                 &:hover {
-                    background-color: #efefef;
-                    border: 1px solid #ddd;
+                    background-color: #efefef;                    
                     text-decoration: none;
                 }
             }
