@@ -451,7 +451,7 @@ function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
     // Now we can display the alert.
     $alert_form = new copyright_alert_form(new moodle_url('/blocks/ucla_copyright_status/alert.php',
             array('id' => $course->id)), $a, 'post', '',
-            array('class' => 'ucla-format-notice-box'));
+            array('class' => 'alert alert-info'));
 
     $alert_form->display();    
     return true;
