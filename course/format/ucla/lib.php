@@ -300,19 +300,6 @@ class format_ucla extends format_topics {
     }
 
     /**
-     * Returns the list of blocks to be automatically added for the newly created course
-     *
-     * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
-     *     each of values is an array of block names (for left and right side columns)
-     */
-    public function get_default_blocks() {
-        return array(
-            BLOCK_POS_LEFT => array('ucla_course_menu'),
-            BLOCK_POS_RIGHT => array()
-        );
-    }
-
-    /**
      * Defines custom UCLA format options like 'landing_page'.  We can retrieve
      * these options as properties of the course object like so:
      *
