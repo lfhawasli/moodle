@@ -1,5 +1,5 @@
-// Include the topics css as a base.
-@import "topics";
+@import "topics";   // Include the topics css as a base.
+@import "course";
 
 // Import theme files.
 @import "../../../../theme/uclashared/scss/variables";
@@ -37,10 +37,26 @@
         }
     }
 
+    .course-content {
+        // Remove extra padding to left of modules.
+        ul.section {
+            margin: 1rem 0;
+            padding-left: 0;
+        }
+
+        // Made activity completion checkmark.
+        form.togglecompletion {
+            display: inline;
+            margin-right: 6px;
+            margin-left: 4px;
+        }
+    }
+
     // Use the editing color for the 'Edit' link.
     .section-cm-edit-actions {
         .dropdown-toggle {
             color: $link-color-editing;
+            padding-right: 0.5em;
         }
     }
 
@@ -51,11 +67,19 @@
         border: 1px solid #ddd;
         color: #999;
         display: inline-block;
+        margin-left: 12px;
     }
 
-    // Override Moodle style.
-    .section .activity .activityinstance .groupinglabel {
-        padding: .2em .6em;
+    // Override Moodle styles.
+    .section .activity .activityinstance {
+        > a {
+            display: inline;
+            padding-left: 0;
+        }
+
+        .groupinglabel {
+            padding: .2em .6em;
+        }
     }
 }
 
