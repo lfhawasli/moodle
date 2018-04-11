@@ -31,37 +31,11 @@
     padding: 8px;
 }
 
-/*
-.block_ucla_my_sites table {
-    width: 100%;
-
-.block_ucla_my_sites table thead {
-    line-height: 0.5em;
-}
-
-.block_ucla_my_sites .r0 {
-    background-color: #EFF2FA;
-}
-
-.block_ucla_my_sites .r1 {
-    background-color: white;
-}
-
-.block_ucla_my_sites .lastcol {
-    width: 120px;
-}*/
-
 .block_ucla_my_sites .content .sortselector,
 .block_ucla_my_sites .content .termselector {
     color: #536895;
-    /*    font-size: 0.8em;
-    margin-top: -6px;*/
 }
-/*
-.block_ucla_my_sites .content .termselector select {
-    font-size: 9px;
-}
-*/
+
 .block_ucla_my_sites .content .termselector .urlselect {
     display: inline-block;
 }
@@ -70,34 +44,6 @@
     font-size: 10px;
     font-weight: bold;
     text-transform: uppercase;
-}
-
-.block_ucla_my_sites.block .collapsibleregion {
-    padding-left: 25px;
-}
-
-.block_ucla_my_sites.block .collapsibleregioncaption img {
-    margin-right: 25px;
-}
-
-.block_ucla_my_sites.block .alertCount {
-    background-repeat: no-repeat;
-    background-position: 2px 0px;
-    background-size: 20px auto;
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-bottom: 5px;
-    font-size: 13px;
-    color: white;
-    margin-left: 3px;
-}
-
-.block_ucla_my_sites.block .collapsibleregioncaption img {
-    margin-right: 10px;
-}
-
-.block_ucla_my_sites.block .collapsibleregioninner {
-    margin-left: 50px;
 }
 
 .block_ucla_my_sites.block .course_title {

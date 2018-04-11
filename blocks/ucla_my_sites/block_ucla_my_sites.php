@@ -15,13 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * My sites block
+ * My sites block.
  *
- * Based off of blocks/course_overview.
- *
- * @package   blocks
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_ucla_my_sites
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/weblib.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -42,14 +43,54 @@ require_once($CFG->dirroot.'/blocks/ucla_browseby/handlers/course.class.php');
 
 require_once($CFG->dirroot . '/blocks/ucla_my_sites/alert_form.php');
 
+/**
+ * My sites block implementation.
+ *
+ * @package    block_ucla_my_sites
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_my_sites extends block_base {
-    private $cache = array();
 
     /**
-     * block initializations
+     * Locations where block can be displayed.
+     *
+     * @return array
      */
-    public function init() {
-        $this->title   = get_string('pluginname', 'block_ucla_my_sites');
+    public function applicable_formats() {
+        return array('my-index' => true);
+    }
+
+    /**
+     * Given a role array or string, will format the roles into a display
+     * friendly format.
+     *
+     * @param mixed $roles      A comma deliminated string or array
+     *
+     * @return string           If error, then returns false, otherwise returns
+     *                          a string of comma deliminated roles
+     */
+    private function format_roles($roles) {
+        if (empty($roles)) {
+            return '';
+        }
+
+        // If roles is a string, then parse it.
+        if (is_string($roles)) {
+            // Most likely string from get_user_roles_in_course().
+            $roles = explode(',', strip_tags($roles));
+        } else if (!is_array($roles)) {
+            return false;
+        }
+
+        $rolenames = array();
+        foreach ($roles as $role) {
+            $rolenames[] = trim($role);
+        }
+        $rolenames = array_unique($rolenames);
+        $rolenames = implode(', ', $rolenames);
+
+        return $rolenames;
     }
 
     /**
@@ -62,10 +103,6 @@ class block_ucla_my_sites extends block_base {
      */
     public function get_content() {
         global $USER, $CFG, $OUTPUT, $PAGE, $DB;
-
-        // Include module.js.
-        $PAGE->requires->jquery();
-        $PAGE->requires->js('/blocks/ucla_my_sites/module.js', true);
 
         if ($this->content !== null) {
             return $this->content;
@@ -108,16 +145,20 @@ class block_ucla_my_sites extends block_base {
             }
         }
 
-        // Render favorite UCLA support tools.
-        if (has_capability('local/ucla_support_tools:view', context_system::instance())) {
-            $render = $PAGE->get_renderer('local_ucla_support_tools');
-            $content[] = $render->mysites_favorites();
-            $content[] = $OUTPUT->single_button
-                    (new moodle_url('/local/ucla_support_tools'),
-                    get_string('mysiteslink', 'local_ucla_support_tools'));
-            // Logging.
-            $PAGE->requires->yui_module('moodle-block_ucla_my_sites-usagelog', 'M.block_ucla_my_sites.usagelog.init', array());
-        }
+        // Uncomment when following ticket is fixed:
+        // CCLE-7380 - Fix UCLA support tools.
+//        // Render favorite UCLA support tools.
+//        if (has_capability('local/ucla_support_tools:view', context_system::instance())) {
+//            $render = $PAGE->get_renderer('local_ucla_support_tools');
+//            $content[] = $render->mysites_favorites();
+//            $content[] = $OUTPUT->single_button
+//                    (new moodle_url('/local/ucla_support_tools'),
+//                    get_string('mysiteslink', 'local_ucla_support_tools'));
+//            // Logging.
+//            $PAGE->requires->yui_module('moodle-block_ucla_my_sites-usagelog', 'M.block_ucla_my_sites.usagelog.init', array());
+//        }
+
+
 
         // NOTE: this thing currently takes the term in the get param
         // so you may have some strange behavior if this block is not
@@ -133,13 +174,13 @@ class block_ucla_my_sites extends block_base {
         if ($newsortorder !== 'startdate' && $newsortorder !== 'sitename') {
             $newsortorder = '';
         }
-        
+
         // Get the existing sort order from the user preferences if it exists.
         $sortorder = get_user_preferences('mysites_collab_sortorder', 'sitename', $USER);
         if ($sortorder !== 'startdate' && $sortorder !== 'sitename') {
             $sortorder = 'sitename';
         }
-        
+
         // Check if the GET param is valid and different from the existing sortorder.
         if ($newsortorder !== '' && $newsortorder !== $sortorder) {
             // If so, replace the user preference and the $sortorder variable.
@@ -165,10 +206,6 @@ class block_ucla_my_sites extends block_base {
                 $courses[$c->id]->lastaccess = 0;
             }
         }
-
-        // Check for Course Overview alerts/notifications.
-        //$overviews = $this->get_overviews($courses);
-        $overviews = array();   // Temporarily turn off overviews.
 
         // These are all the terms in the dropdown.
         $availableterms = array();
@@ -339,32 +376,16 @@ class block_ucla_my_sites extends block_base {
         $termoptstr = html_writer::tag('div', $termoptstr,
                 array('class' => 'termselector'));
 
-        // Add a collapse/expand icon if any class sites have notifications.
-        $collapser = '';
-        foreach ($overviews as $id => $value) {
-            foreach ($classsites as $classsite) {
-                if (property_exists($classsite, 'id') && $classsite->id == $id) {
-                    $collapser = html_writer::tag('a', html_writer::tag('img', '', array(
-                        'src' => new moodle_url('/blocks/ucla_my_sites/img/expanded.svg'),
-                        'class' => 'class_course_expand')), array('href' => '#/'));
-                    break;
-                }
-            }
-            if ($collapser != '') {
-                break;
-            }
-        }
-
         $renderer = $PAGE->get_renderer('block_ucla_my_sites');
 
         // Display Class sites.
         if (!isset($noclasssitesoverride)) {
             $content[] = html_writer::tag('h3',
-                    get_string('classsites', 'block_ucla_my_sites').$collapser,
+                    get_string('classsites', 'block_ucla_my_sites'),
                     array('class' => 'mysitesdivider'));
             $content[] = $termoptstr;
             if (!empty($classsites)) {
-                $content[] = $renderer->class_sites_overview($classsites, $overviews);
+                $content[] = $renderer->class_sites_overview($classsites);
             } else {
                 $content[] = html_writer::tag('p', get_string('noclasssites',
                         'block_ucla_my_sites', ucla_term_to_text($showterm)));
@@ -398,7 +419,7 @@ class block_ucla_my_sites extends block_base {
         $parentcategories = $DB->get_records_list('course_categories', 'id', array_diff(
             array_unique($parentcategoryids), $categoryids
         ));
-        
+
         // Also add parent paths to combined paths dict.
         foreach ($parentcategories as $category) {
             // Chop off leading slash in the path.
@@ -408,10 +429,10 @@ class block_ucla_my_sites extends block_base {
             // Split by slashes and add to all category paths.
             $categorypaths[$category->id] = explode('/', $category->path);
         }
-        
+
         // From now on we can combine the base and parent categories.
         $categories = array_merge($parentcategories, $categories);
-        
+
         // Attach collab sites as properties of base categories.
         // Note how each category is passed by reference.
         $tempcollaborationsites = $collaborationsites;
@@ -425,7 +446,7 @@ class block_ucla_my_sites extends block_base {
                 }
             }
         }
-        
+
         // Build the simple single-level category hierarchy.
         foreach ($categories as &$category) {
             // If the parent is 0, then it is a top level category.
@@ -436,13 +457,13 @@ class block_ucla_my_sites extends block_base {
                 }
                 // Go through the categories again and find the subcategories of
                 // the current category.
-                foreach($categories as $index => &$subcategory) {
+                foreach ($categories as $index => &$subcategory) {
                     // We know we've found a subcategory when the current category
                     // shows up in the subcategory's path. Exclude categories that
                     // match the current category's ID and that don't have any
                     // collabsites.
-                    if ($subcategory->id !== $category->id 
-                            && in_array($category->id, $categorypaths[$subcategory->id]) 
+                    if ($subcategory->id !== $category->id
+                            && in_array($category->id, $categorypaths[$subcategory->id])
                             && isset($subcategory->collabsites)) {
                         // Add the subcategory's collab sites the current one's collab sites.
                         $category->collabsites = array_merge($category->collabsites, $subcategory->collabsites);
@@ -452,7 +473,7 @@ class block_ucla_my_sites extends block_base {
                 }
             }
         }
-        
+
         // Package the array of top-level categories into a class to replace the
         // full category hierarchy used before.
         $cathierarchy = new stdClass();
@@ -464,7 +485,7 @@ class block_ucla_my_sites extends block_base {
             $sortoptstring = html_writer::tag('div', $sortoptstring,
                     array('class' => 'sortselector'));
             $content[] = $renderer->collab_sites_overview($collaborationsites,
-                    $overviews, $cathierarchy, $sortoptstring, $sortorder);
+                    $cathierarchy, $sortoptstring, $sortorder);
         } else {
             // If there are no enrolled srs courses in any term and no sites, print msg.
             if (isset($noclasssitesoverride)) {
@@ -478,86 +499,28 @@ class block_ucla_my_sites extends block_base {
     }
 
     /**
-     * Display overview for courses
-     *
-     * @param array $courses courses for which overview needs to be shown
-     * @return array html overview
-     */
-    private function get_overviews($courses) {
-        $htmlarray = array();
-
-        if ($modules = get_plugin_list_with_function('mod', 'print_overview')) {
-
-            // Split courses list into batches with no more than MAX_MODINFO_CACHE_SIZE courses in one batch.
-            // Otherwise we exceed the cache limit in get_fast_modinfo() and rebuild it too often.
-            if (defined('MAX_MODINFO_CACHE_SIZE') && MAX_MODINFO_CACHE_SIZE > 0 && count($courses) > MAX_MODINFO_CACHE_SIZE) {
-                $batches = array_chunk($courses, MAX_MODINFO_CACHE_SIZE, true);
-            } else {
-                $batches = array($courses);
-            }
-
-            foreach ($batches as $courses) {
-                foreach ($modules as $fname) {
-                    try {
-                        // Might throw error. Related to CCLE-6291. Course
-                        // module belongs to non-existent section.
-                        $fname($courses, $htmlarray);
-                    } catch (Throwable $t) {
-                        // Executed only in PHP 7, will not match in PHP 5.x.
-                    } catch (Exception $e) {
-                        // Executed only in PHP 5.x, will not be reached in PHP 7.
-                    }
-                }
-            }
-        }
-
-        return $htmlarray;
-    }
-
-    /**
-     * allow the block to have a configuration page
+     * Disallow the block to have a configuration page.
      *
      * @return boolean
      */
     public function has_config() {
         return false;
     }
+
     /**
-     * locations where block can be displayed
-     *
-     * @return array
+     * Block initialization.
      */
-    public function applicable_formats() {
-        return array('my-index' => true);
+    public function init() {
+        $this->title   = get_string('pluginname', 'block_ucla_my_sites');
     }
 
     /**
-     * Creates the javascript-activated drop-down menu for terms selection.
+     * Prevent block from being collapsed.
      *
-     * @param  $terms  Array of terms
-     * @param  $default    Term to select initially.
-     * @return url_select  A list of terms that are drop-down-onchange-go
-     **/
-    public function make_terms_selector($terms, $default=false) {
-        global $CFG, $PAGE;
-        $urls = array();
-        $page = $PAGE->url;
-        // Hack to stop debugging message that says that the current
-        // term is not a local relative url.
-        $defaultfound = false;
-        foreach ($terms as $term) {
-            $thisurl = clone($page);
-            $url = $thisurl->out(false, array('term' => $term,));
-            $urls[$url] = ucla_term_to_text($term);
-            if ($default !== false && $default == $term) {
-                $default = $url;
-                $defaultfound = true;
-            }
-        }
-        if (!$defaultfound) {
-            $default = false;
-        }
-        return $selects = new url_select($urls, $default);
+     * @return bool
+     */
+    public function instance_can_be_collapsed() {
+        return false;
     }
 
     /**
@@ -624,11 +587,46 @@ class block_ucla_my_sites extends block_base {
     }
 
     /**
-     *  Used with usort(), sorts a bunch of entries returned via
-     *  ucla_get_reg_classinfo.
-     *    https://jira.ats.ucla.edu:8443/browse/CCLE-2832
-     *  Sorts via term, subject area, cat_num, sec_num
-     **/
+     * Creates the javascript-activated drop-down menu for terms selection.
+     *
+     * @param  array $terms  Array of terms
+     * @param  string $default    Term to select initially.
+     *
+     * @return url_select  A list of terms that are drop-down-onchange-go
+     */
+    public function make_terms_selector($terms, $default = false) {
+        global $PAGE;
+        $urls = array();
+        $page = $PAGE->url;
+        // Hack to stop debugging message that says that the current
+        // term is not a local relative url.
+        $defaultfound = false;
+        foreach ($terms as $term) {
+            $thisurl = clone($page);
+            $url = $thisurl->out(false, array('term' => $term));
+            $urls[$url] = ucla_term_to_text($term);
+            if ($default !== false && $default == $term) {
+                $default = $url;
+                $defaultfound = true;
+            }
+        }
+        if (!$defaultfound) {
+            $default = false;
+        }
+        return $selects = new url_select($urls, $default);
+    }
+
+    /**
+     * Used with usort(), sorts a bunch of entries returned via
+     * ucla_get_reg_classinfo (CCLE-2832).
+     *
+     * Sorts via term, subject area, cat_num, sec_num
+     *
+     * @param object $a
+     * @param object $b
+     *
+     * @return int
+     */
     public function registrar_course_sort($a, $b) {
         if (empty($a->reg_info) || empty($b->reg_info)) {
             throw new moodle_exception('cannotcomparecourses');
@@ -686,47 +684,5 @@ class block_ucla_my_sites extends block_base {
             }
         }
         return 0;
-    }
-
-    /**
-     * Given a role array or string, will format the roles into a display
-     * friendly format.
-     *
-     * @param mixed $roles      A comma deliminated string or array
-     *
-     * @return string           If error, then returns false, otherwise returns
-     *                          a string of comma deliminated roles
-     */
-    private function format_roles($roles) {
-        if (empty($roles)) {
-            // debugging('no roles');
-            return '';
-        }
-
-        // If roles is a string, then parse it.
-        if (is_string($roles)) {
-            // Most likely string from get_user_roles_in_course().
-            $roles = explode(',', strip_tags($roles));
-        } else if (!is_array($roles)) {
-            return false;
-        }
-
-        $rolenames = array();
-        foreach ($roles as $role) {
-            $rolenames[] = trim($role);
-        }
-        $rolenames = array_unique($rolenames);
-        $rolenames = implode(', ', $rolenames);
-
-        return $rolenames;
-    }
-
-    /**
-     * Prevent block from being collapsed.
-     *
-     * @return bool
-     */
-    public function instance_can_be_collapsed() {
-        return false;
     }
 }

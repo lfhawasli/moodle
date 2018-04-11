@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * my_sites alert file.
+ * Alert file.
  *
  * Responds to my_sites alert form. Handles setting of user preferences and
  * redirecting.
  *
- * @package     blocks
+ * @package     block_ucla_my_sites
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,6 +28,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_my_sites/alert_form.php');
+
+require_login();
 
 $PAGE->set_context(context_system::instance());
 
