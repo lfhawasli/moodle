@@ -165,6 +165,22 @@ class modify_navigation {
     }
 
     /**
+     * Check if the page is editable and the user has editing permissions.
+     * If button is to be displayed for the conditions, return true, otherwise false.
+     * Currently checks if the page is grader page, course section page or syllabus section page.
+     *
+     * @return boolean
+     */
+    public function is_editing_button_displayed() {
+        global $PAGE;
+
+        return (!($PAGE->url->compare(new \moodle_url('/grade/report/grader/index.php'), URL_MATCH_BASE)) &&
+                !($PAGE->user_allowed_editing() &&
+                ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE) ||
+                $PAGE->url->compare(new \moodle_url('/local/ucla_syllabus/index.php'), URL_MATCH_BASE))));
+    }
+
+    /**
      * Add link to new Control Panel/Site administration page, see CCLE-7193.
      */
     private function add_courseadmin() {
@@ -177,6 +193,11 @@ class modify_navigation {
                         $adminurl, \navigation_node::TYPE_SETTING,
                         null, 'courseadministration', new \pix_icon('i/settings', ''));
 
+            // If editing button is not displayed, courseadmin becomes a new tree parent
+            if ($this->is_editing_button_displayed()) {
+                $courseadmin = new \flat_navigation_node($courseadmin, 0);
+                $courseadmin->set_showdivider(true);
+            }
             $this->coursenode->add_node($courseadmin);
         }
     }
@@ -185,38 +206,77 @@ class modify_navigation {
      * Add Turn editing on/off.
      */
     private function add_editingmode() {
-        global $PAGE;
+        global $PAGE, $USER;
 
-        if ($PAGE->user_allowed_editing()) {
-            // Add the turn on/off settings.
-            if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {
-                // We are on the course page, retain the current page params e.g. section.
-                $baseurl = clone($PAGE->url);
-                $baseurl->param('sesskey', sesskey());
-            } else {
-                // Edit on the main course page.
-                $baseurl = new \moodle_url('/course/view.php',
-                        array('id' => $PAGE->course->id,
-                              'return' => $PAGE->url->out_as_local_url(false),
-                              'sesskey' => sesskey()));
-            }
-
-            $editurl = clone($baseurl);
-            if ($PAGE->user_is_editing()) {
-                $editurl->param('edit', 'off');
-                $editstring = get_string('turneditingoff');
-            } else {
-                $editurl->param('edit', 'on');
-                $editstring = get_string('turneditingon');
-            }
-
-            // Create flat nav node so we can set divider.
-            $turneditingon = new \flat_navigation_node(\navigation_node::create($editstring, $editurl,
-                    \navigation_node::TYPE_SETTING,
-                    null, 'editingmode', new \pix_icon('i/edit', '')), 0);
-            $turneditingon->set_showdivider(true);
-            $this->coursenode->add_node($turneditingon);
+        // Exit function if not on an editable page or if does not have permission to edit
+        if ($this->is_editing_button_displayed()) {
+            return;
         }
+
+        // If on grader page, editing button should mirror for grader
+        if ($PAGE->url->compare(new \moodle_url('/grade/report/grader/index.php'), URL_MATCH_BASE)) {
+            // Code below is copied from /grade/report/grader/index.php
+            // Lines 32, 67-68, 93-109
+
+            $page = optional_param('page', 0, PARAM_INT);   // active page
+            // return tracking object
+            $gpr = new \grade_plugin_return(array('type'=>'report', 'plugin'=>'grader', 'courseid'=>$PAGE->course->id, 'page'=>$page));
+
+            // page params for the turn editing on
+            $options = $gpr->get_options();
+            $options['sesskey'] = sesskey();
+
+            if ($USER->gradeediting[$PAGE->course->id]) {
+                $options['edit'] = 0;
+                $editingmode = true;
+            } else {
+                $options['edit'] = 1;
+                $editingmode = false;
+            }
+            $editurl = new \moodle_url('index.php', $options);
+
+        } else {
+            // If user can edit the page
+            if ($PAGE->user_allowed_editing()) {
+                // Add the turn on/off settings.
+                if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+                    // We are on the course page, retain the current page params e.g. section.
+                    $baseurl = clone($PAGE->url);
+                    $baseurl->param('sesskey', sesskey());
+                } else {
+                    // Edit on the main course page.
+                    $baseurl = new \moodle_url('/course/view.php',
+                            array('id' => $PAGE->course->id,
+                                  'return' => $PAGE->url->out_as_local_url(false),
+                                  'sesskey' => sesskey()));
+                }
+
+                $editurl = clone($baseurl);
+                if ($PAGE->user_is_editing()) {
+                    $editurl->param('edit', 'off');
+                    $editingmode = true;
+                } else {
+                    $editurl->param('edit', 'on');
+                    $editingmode = false;
+                }
+            }
+        }
+
+        // Set button label and icon depending on editing mode
+        if ($editingmode === true) {
+            $editstring = get_string('turneditingoff');
+            $editicon = 'e/tick';
+        } else {
+            $editstring = get_string('turneditingon');
+            $editicon = 'i/edit';
+        }
+
+        // Create flat nav node so we can set divider.
+        $turneditingon = new \flat_navigation_node(\navigation_node::create($editstring, $editurl,
+                \navigation_node::TYPE_SETTING,
+                null, 'editingmode', new \pix_icon($editicon, '')), 0);
+        $turneditingon->set_showdivider(true);
+        $this->coursenode->add_node($turneditingon);
     }
 
     /**

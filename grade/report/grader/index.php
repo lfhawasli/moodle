@@ -97,12 +97,21 @@ if (has_capability('moodle/grade:edit', $context)) {
     if ($USER->gradeediting[$course->id]) {
         $options['edit'] = 0;
         $string = get_string('turneditingoff');
+        // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button
+        $editmodeclass = 'edit-mode';
+        // END UCLA MOD: CCLE-7336
     } else {
         $options['edit'] = 1;
         $string = get_string('turneditingon');
+        // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button
+        $editmodeclass = 'non-edit-mode';
+        // END UCLA MOD: CCLE-7336
     }
 
     $buttons = new single_button(new moodle_url('index.php', $options), $string, 'get');
+    // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button
+    $buttons->class = 'header-editing-button ' . $editmodeclass;
+    // END UCLA MOD: CCLE-7336
 } else {
     $USER->gradeediting[$course->id] = 0;
     $buttons = '';

@@ -131,6 +131,11 @@ class core_renderer extends \theme_boost\output\core_renderer {
         if (empty($PAGE->layout_options['nonavbar'])) {
             $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
+            // If the page is a course page or a section of a course, then display the editing button
+            if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE) ||
+                    $PAGE->url->compare(new \moodle_url('/local/ucla_syllabus/index.php'), URL_MATCH_BASE)) {
+                $html .= html_writer::div($this->header_editing_mode_button(), 'breadcrumb-button pull-xs-right header-editing-button');
+            }
             $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button pull-xs-right');
             $html .= html_writer::end_div();
         } else if ($pageheadingbutton) {
@@ -150,5 +155,44 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::end_div();
         $html .= html_writer::end_tag('header');
         return $html;
+    }
+
+    /**
+     * This returns a rendered button for the turn editing on/off in the course header.
+     *
+     * @return string
+     */
+    private function header_editing_mode_button() {
+        global $PAGE;
+
+        if ($PAGE->user_allowed_editing()) {
+            // Add the turn on/off settings.
+            if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+                // We are on the course page, retain the current page params e.g. section.
+                $baseurl = clone($PAGE->url);
+                $baseurl->param('sesskey', sesskey());
+            } else {
+                // Edit on the main course page.
+                $baseurl = new \moodle_url('/course/view.php',
+                        array('id' => $PAGE->course->id,
+                              'return' => $PAGE->url->out_as_local_url(false),
+                              'sesskey' => sesskey()));
+            }
+
+            $editurl = clone($baseurl);
+            if ($PAGE->user_is_editing()) {
+                $editurl->param('edit', 'off');
+                $editstring = get_string('turneditingoff');
+                $editmodeclass = 'edit-mode';
+            } else {
+                $editurl->param('edit', 'on');
+                $editstring = get_string('turneditingon');
+                $editmodeclass = 'non-edit-mode';
+            }
+
+            $edit_button = new \single_button($editurl, $editstring);
+            $edit_button->class = 'header-editing-button ' . $editmodeclass;
+            return $this->render($edit_button);
+        }
     }
 }
