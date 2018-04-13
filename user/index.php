@@ -103,6 +103,12 @@ echo $OUTPUT->heading(get_string('participants'));
 $filtersapplied = optional_param_array('unified-filters', [], PARAM_NOTAGS);
 $filterwassubmitted = optional_param('unified-filter-submitted', 0, PARAM_BOOL);
 
+// START UCLA MOD: CCLE-7180 - Do not display inactive users by default.
+if (!$filterwassubmitted && has_capability('moodle/course:enrolreview', $context)) {
+    $filtersapplied[] = USER_FILTER_STATUS . ':' . ENROL_USER_ACTIVE;
+}
+// END UCLA MOD: CCLE-7180.
+
 // If they passed a role make sure they can view that role.
 if ($roleid) {
     $viewableroles = get_profile_roles($context);
