@@ -187,8 +187,8 @@ class modify_navigation {
         global $PAGE;
 
         if (is_enrolled($PAGE->context) || has_capability('moodle/course:view', $PAGE->context)) {
-            $adminurl = new \moodle_url('/blocks/ucla_control_panel/view.php',
-                    array('course_id' => $PAGE->course->id));
+            $adminurl = new \moodle_url('/course/admin.php',
+                    array('courseid' => $PAGE->course->id));
             $courseadmin = \navigation_node::create(get_string('courseadministration'),
                         $adminurl, \navigation_node::TYPE_SETTING,
                         null, 'courseadministration', new \pix_icon('i/settings', ''));
