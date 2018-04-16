@@ -23,21 +23,19 @@
  */
 
 $string['changeemail'] = 'You have set an alternative email ({$a}). To change it, please go to "My profile settings > Messaging".';
-$string['classsites'] = 'Class sites';
-$string['collaborationsites'] = 'Collaboration sites';
 $string['dismiss'] = 'Dismiss';
 $string['dismissed'] = 'You have successfully dismissed the notification.';
 $string['loginrequired'] = 'Please login to view My sites';
-$string['noclasssites'] = 'No classes found for {$a}.';
 $string['noclasssitesatall'] = 'You are currently not assigned to any sites on this system.';
-$string['nocollabsites'] = 'No collaboration sites found.';
 $string['notenrolled'] = 'You are currently not assigned to any courses or collaboration sites on this system.';
-$string['noterms'] = 'You have no terms on this site.';
 $string['pluginname'] = 'My sites';
 $string['shared_server_archive_notice'] = 'Starting June 16, 2012 any courses from Spring 2012 or earlier that were previously hosted at <a target="_blank" href="https://ccle.ucla.edu">https://ccle.ucla.edu</a> have been moved to our archive server (<a target="_blank" href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>)';
 $string['sitename'] = 'Site name';
 $string['sortby'] = 'Sort by';
 $string['startdate'] = 'Start date';
 $string['student_access_notice'] = 'Students/guests no longer have access to past content after the class has ended.';
+$string['tab'] = '{$a}';    // Mustache template does not allow variables in first parameter.
+$string['tabclasstext'] = 'Class';
+$string['tabcollabtext'] = 'Collaboration';
 $string['ucla_my_sites:addinstance'] = 'Add My sites block';
 $string['ucla_my_sites:myaddinstance'] = 'Add My sites to My home';

@@ -1,116 +1,45 @@
-.block_ucla_my_sites.block .collab_sites_div h5 {
-    font-size: 16px;
+/* Remove border around block. */
+.block_ucla_my_sites.card {
+    border: 0;
 }
 
-.block_ucla_my_sites.block .collab_sites_div h6 {
-    font-size: 14px;
-}
-
-.block_ucla_my_sites.block .mysitesdivider {
-    display: block;
-    margin: 8px 0;
-    border-bottom: 2px solid #536895;
-    font-weight: bold;
-    color: #394a6e;
-    padding-bottom: 2px;
-}
-
-.block_ucla_my_sites .content .sortselector,
-.block_ucla_my_sites.block .termselector {
-    margin: 8px 0;
-}
-
-.block_ucla_my_sites.block,
-.block_ucla_my_sites.block .content,
-.block_ucla_my_sites.block .content .header {
-    background-color: white;
-}
-
-.block_ucla_my_sites.block .content .header {
-    line-height: 20px;
-    padding: 8px;
-}
-
-.block_ucla_my_sites .content .sortselector,
-.block_ucla_my_sites .content .termselector {
+/* Selector styles. */
+.block_ucla_my_sites .selector {
     color: #536895;
+    margin-bottom: 0.5em;
+    font-size: 90%;
 }
-
-.block_ucla_my_sites .content .termselector .urlselect {
+.block_ucla_my_sites .termselector .urlselect,
+.block_ucla_my_sites.block .sortselector fieldset div > * {
     display: inline-block;
 }
-
-.block_ucla_my_sites .registrar-link {
-    font-size: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
+/* Hide button for sort selector. This lets form autosubmit. */
+.block_ucla_my_sites .sortselector button.transparent {
+    display: none;
+}
+.block_ucla_my_sites .sortselector div.sortby,
+.block_ucla_my_sites .sortselector input {
+    margin-right: 4px;
+}
+.block_ucla_my_sites .sortselector .radio {
+    margin-right: 1em;
 }
 
-.block_ucla_my_sites.block .course_title {
-    font-size: 15px;
-}
-
-.block_ucla_my_sites.block .overview {
-    margin-left: 12px;
-}
-
-.block_ucla_my_sites.block .name {
-    margin-left: -11px;
-}
-
-.block_ucla_my_sites.block .name:before {
-    content: "• ";
-}
-
-.block_ucla_my_sites.block .box.info {
-    margin-left: 12px;
-}
-
-.block_ucla_my_sites.block .course_divider {
+/* Site listing styles. */
+.block_ucla_my_sites .course_divider {
     border-width: 1px 0px 0px;
     border-color: #ccc;
     margin-right: 25%;
 }
-
-.block_ucla_my_sites.block .sortselector button.transparent {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    visiblity: hidden;
-    border: none;
-    z-index: 2;
-    background-color: transparent;
-    width: 100%;
-}
-
-.block_ucla_my_sites.block .sortselector fieldset div > * {
-    display: inline-block;
-}
-
-.block_ucla_my_sites.block .sortselector div.title {
-    margin-right: 2%;
-}
-
-.block_ucla_my_sites.block .sortselector {
-    margin-top: -1%;
-}
-
-.block_ucla_my_sites.block .sortselector div.radio {
-    position: relative;
-    margin-right: 1%;
-}
-
-.block_ucla_my_sites.block .sortselector div.radio > label {
-    position: relative;
-    display: block;
-}
-
-.block_ucla_my_sites.block .sortselector div.radio > label > input[type="radio"] {
-    z-index: 1;
-}
-
-.block_ucla_my_sites.block div.collab_sites_container {
+.block_ucla_my_sites div.collab_sites_container {
     margin-left: 1%;
+}
+
+/* Since we removed the header for Dashboard page, the first block needs to be
+   shifted down.  */
+#page-my-index #region-main .card-block:first-child {
+    margin-top: 2rem;
+}
+.block_ucla_my_sites h1 {
+    margin-top: -3rem;  /* Style above also offsets title. */
 }

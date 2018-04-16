@@ -69,7 +69,7 @@ class block_ucla_my_sites_renderer {
             }
             $subjareafull = $this->get_registrar_translation('ucla_reg_subjectarea',
                     $titlereginfo->subj_area, 'subjarea', 'subj_area_full');
-            $title = sprintf('%s<br>%s, %s %s - %s', $subjareafull[1],
+            $title = sprintf('%s %s<br>%s %s - %s', $subjareafull[1],
                     $titlereginfo->coursenum, $titlereginfo->acttype,
                     $titlereginfo->sectnum, $class->fullname);
 
@@ -108,36 +108,30 @@ class block_ucla_my_sites_renderer {
             }
         }
         $content[] = html_writer::end_tag('div');
-        // Add spacing between My sites & Collaboration sites sections.
-        $content[] = '<br><br>';
+
         return implode($content);
     }
 
     /**
      * Construct contents of collab_overview block.
      *
-     * @param array $collaborationsites list of courses in sorted order
      * @param object $cathierarchy hierarchy of all categories for sites
-     * @param string $sortoptstring HTML string for the sort options form
      * @param string $sortorder string param for the sort order of collab sites
      *
      * @return array content to be displayed in ucla_my_sites block
      */
-    public function collab_sites_overview($collaborationsites, $cathierarchy, $sortoptstring, $sortorder) {
+    public function collab_sites_overview($cathierarchy, $sortorder) {
         $content = array();
 
-        $content[] = html_writer::tag('h3', get_string('collaborationsites',
-                'block_ucla_my_sites'), array('class' => 'mysitesdivider'));
+        // Traverse the simplified category hierarchy and add the categories and 
+        // collab sites to $content.
+        foreach (array_values($cathierarchy->children) as $index => $category) {
+            $content[] = html_writer::tag('h4', $category->name);
+            $content[] = html_writer::start_div("collab_sites_container");
+            $this->display_collab_sites($category->collabsites, $content, $sortorder);
+            $content[] = html_writer::end_div();
+        }
 
-        // Add the form string to the $content array.
-        $content[] = $sortoptstring;
-        $content[] = html_writer::start_tag('div', array('class' => 'collab_sites_div'));
-
-        // Traverse the simplified category hierarchy and add the categories and collab sites to
-        // $content.
-        self::visit_top_categories($cathierarchy, $content, $sortorder);
-
-        $content[] = html_writer::end_tag('div');
         return implode($content);
     }
 
@@ -213,22 +207,5 @@ class block_ucla_my_sites_renderer {
         // Format result nicely, not in all caps.
         return array($target,
                 ucla_format_name($this->reg_trans[$table][$target], true));
-    }
-
-    /**
-     * Visits each of the top-level categories from the simplified hierarchy and
-     * display their collaboration sites.
-     *
-     * @param stdClass $cathierarchy   The simplified hierarchy of the collab sites
-     * @param array $content   The content array to which HTML strings are added
-     * @param string $sortorder   The sortorder of the collab sites
-     */
-    public function visit_top_categories($cathierarchy, &$content, $sortorder) {
-        foreach (array_values($cathierarchy->children) as $index => $category) {
-            $content[] = html_writer::tag('h4', $category->name);
-            $content[] = html_writer::start_div("collab_sites_container");
-            self::display_collab_sites($category->collabsites, $content, $sortorder);
-            $content[] = html_writer::end_div();
-        }
     }
 }

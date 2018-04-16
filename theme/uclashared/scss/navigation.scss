@@ -5,9 +5,9 @@
 /* stylelint-disable declaration-no-important */
 /* stylelint-disable max-line-length */
 
-// Hide course shortname link via CSS because it is added after
+// Hide following navigation nodes via CSS because it is added after
 // local_ucla_extend_navigation is called.
-[data-key="coursehome"] {
+[data-key="coursehome"], [data-key="myhome"] {
     display: none;
 }
 
@@ -102,4 +102,11 @@
 
 .header-editing-button.edit-mode .btn:before {
     content: "\f00c";
+}
+
+/* Used by Browseby and Mysites */
+.registrar-link {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
 }
