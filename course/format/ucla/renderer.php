@@ -83,15 +83,6 @@ class format_ucla_renderer extends format_topics_renderer {
         // Save context object.
         $this->context =& $page->context;
 
-        // CCLE-2800 - cache strings for JIT links.
-        $this->jitlinks = array('file' => get_string('file', 'format_ucla'));
-        if (has_capability('mod/turnitintooltwo:addinstance', context_system::instance())) {
-            $this->jitlinks += array('turnitin' => get_string('turnitin', 'format_ucla'));
-        }
-        $this->jitlinks += array('link' => get_string('link', 'format_ucla'),
-                                  'text' => get_string('text', 'format_ucla'),
-                                  'subheading' => get_string('subheading', 'format_ucla'));
-
         // Use the public/private renderer.  This will permit us to override the
         // way we render course modules.
         $this->courserenderer = $this->page->get_renderer('local_publicprivate');
@@ -169,26 +160,7 @@ class format_ucla_renderer extends format_topics_renderer {
     }
 
     /**
-     * We override this function to replace 'Edit' with 'Edit section'.
-     *
-     * @param array $controls The edit control items from section_edit_control_items
-     * @param stdClass $course The course entry from DB
-     * @param stdClass $section The course_section entry from DB
-     * @return string HTML to output.
-     */
-    protected function section_edit_control_menu($controls, $course, $section) {
-        $html = parent::section_edit_control_menu($controls, $course, $section);
-        // Only replace first instance of 'Edit'.
-        $pos = strpos($html, get_string('edit'));
-        if ($pos) {
-            return substr_replace($html, get_string('editsection'), $pos, strlen(get_string('edit')));
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Output the meta information about the course in the main course header part. 
+     * Output the meta information about the course in the main course header part.
      */
     public function print_site_meta_text() {
         global $CFG;
@@ -493,20 +465,6 @@ class format_ucla_renderer extends format_topics_renderer {
                     $innards, null, $linkoptions)),
                 array('class' => 'editbutton'));
 
-            // Add Turnitin Assignment.
-            $turnitin = get_string('turnitin', 'format_ucla');
-            $turnitinurloptions = array(
-                'add' => 'turnitintooltwo',
-                'course' => $this->course->id,
-                'section' => 0
-            );
-
-            $turnitinlinkoptions = array('title' => $turnitin, 'class' => 'edit_course_summary');
-            $turnitinmoodleurl = new moodle_url('modedit.php', $turnitinurloptions);
-            $centercontent .= html_writer::tag('span',
-                $OUTPUT->render(new action_link($turnitinmoodleurl,
-                    null, null, $turnitinlinkoptions)),
-                array('class' => 'editbutton'));
         }
 
         $centercontent .= html_writer::start_tag('div', array('class' => 'summary'));
@@ -721,10 +679,6 @@ class format_ucla_renderer extends format_topics_renderer {
             $o .= html_writer::end_tag('div');
             // End section header.
 
-            if ($PAGE->user_is_editing()) {
-                $o .= $this->get_jit_links($section->section);
-            }
-
             $o .= html_writer::start_tag('div', array('class' => 'summary'));
             $o .= $this->format_summary_text($section);
 
@@ -746,36 +700,6 @@ class format_ucla_renderer extends format_topics_renderer {
     protected function start_section_list() {
         $classes = 'ucla-format';
         return html_writer::start_tag('ul', array('class' => $classes));
-    }
-
-    /**
-     * Generates JIT links for given section.
-     *
-     * @param int $section  Section we are on
-     *
-     * @return string       Returns JIT link html
-     */
-    private function get_jit_links($section) {
-        $retval = html_writer::start_tag('div',
-                array('class' => 'jit-links '));
-
-        foreach ($this->jitlinks as $jittype => $jitstring) {
-            if ($jittype == 'turnitin') {
-                $link = new moodle_url('/course/modedit.php',
-                        array('add' => 'turnitintooltwo',
-                              'course' => $this->course->id,
-                              'section' => $section));
-            } else {
-                $link = new moodle_url('/blocks/ucla_easyupload/upload.php',
-                        array('course_id' => $this->course->id,
-                              'type' => $jittype,
-                              'section' => $section));
-            }
-            $retval .= html_writer::link($link, $jitstring, array('class' => ''));
-        }
-
-        $retval .= html_writer::end_tag('div');
-        return $retval;
     }
 
     /**
@@ -833,4 +757,138 @@ class format_ucla_renderer extends format_topics_renderer {
         $this->term = $theterm; // Save term for course being displayed.
     }
 
+    /**
+     * Generate the edit control items of a section
+     *
+     * @param stdClass $course The course entry from DB
+     * @param stdClass $section The course_section entry from DB
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return array of edit control items
+     */
+    protected function section_edit_control_items($course, $section, $onsectionpage = false) {
+        global $PAGE;
+        
+        if (!$PAGE->user_is_editing()) {
+            return array();
+        }
+
+        $controls = parent::section_edit_control_items($course, $section, $onsectionpage);
+        
+        // Removing moveup/movedown and highlight items from section link menu.
+        unset($controls['moveup']);
+        unset($controls['movedown']);
+        unset($controls['highlight']);
+        
+        // Adding new menu items to section link menu.
+        $newcontrols = array();
+
+        $newcontrols['header_add'] = array('name' => get_string('add', 'format_'.$course->format));
+
+        // Adding file to section links menu.
+        $url = new moodle_url('/blocks/ucla_easyupload/upload.php', array(
+            'course_id' => $course->id,
+            'type' => 'file',
+            'section' => $section->section
+        ));
+        $newcontrols['file'] = array(
+            'url' => $url,
+            'icon' => '',
+            'name' => get_string('file', 'format_'.$course->format),
+            'attr' => array('class' => 'center-action-link')
+        );
+
+        // Adding link to section links menu.
+        $url = new moodle_url('/blocks/ucla_easyupload/upload.php', array(
+            'course_id' => $course->id,
+            'type' => 'link',
+            'section' => $section->section
+        ));
+        $newcontrols['link'] = array(
+            'url' => $url,
+            'icon' => '',
+            'name' => get_string('link', 'format_'.$course->format),
+            'attr' => array('class' => 'center-action-link')
+        );
+
+        // Adding label link to section links menu.
+        $url = new moodle_url('/blocks/ucla_easyupload/upload.php', array(
+            'course_id' => $course->id,
+            'type' => 'text',
+            'section' => $section->section
+        ));
+        $newcontrols['label'] = array(
+            'url' => $url,
+            'icon' => '',
+            'name' => get_string('label', 'format_'.$course->format),
+            'attr' => array('class' => 'center-action-link')
+        );
+
+        // Adding Activity / Resource link to section links menu.
+        if (course_ajax_enabled($course) && $course->id == $PAGE->course->id) {
+            $newcontrols['activity'] = array(
+                'name' => get_string('activity', 'format_'.$course->format),
+                'icon' => '',
+                'textattr' => array('class' => 'section-modchooser-text center-action-link'),
+                'linkattr' => array('class' => 'section-modchooser-link')
+            );
+        }
+
+        $newcontrols['header_manage'] = array('name' => get_string('manage', 'format_'.$course->format));
+
+        // Reordering menu items.
+        $sectionlinkmenu = $newcontrols + $controls;
+
+        return $sectionlinkmenu;
+    }
+
+    /**
+     * Generate the edit control action menu
+     *
+     * @param array $controls The edit control items from section_edit_control_items
+     * @param stdClass $course The course entry from DB
+     * @param stdClass $section The course_section entry from DB
+     * @return string HTML to output.
+     */
+    protected function section_edit_control_menu($controls, $course, $section) {
+        $o = "";
+        if (!empty($controls)) {
+            $menu = new action_menu();
+            $menu->set_menu_trigger(get_string('sectiontools', 'format_'.$course->format));
+            $menu->attributes['class'] .= ' section-actions';
+            foreach ($controls as $key => $value) {
+                $url = empty($value['url']) ? '' : $value['url'];
+                $name = empty($value['name']) ? '' : $value['name'];
+                $attr = empty($value['attr']) ? array() : $value['attr'];
+                $class = empty($value['pixattr']['class']) ? '' : $value['pixattr']['class'];
+                $alt = empty($value['pixattr']['alt']) ? '' : $value['pixattr']['alt'];
+                // Rewriting $icon, not all menu items have an icon.
+                $icon = empty($value['icon']) ? null : new pix_icon($value['icon'], $alt, null, array('class' => "smallicon " . $class));
+
+                if ($key == 'header_add' || $key == 'header_manage') {
+                    // Created new action_menu_header object to handle subheaders.
+                    $al = new theme_uclashared\action_menu_header($name);
+                } else if ($key == 'activity') {
+                    // Activity link needs to be handled differently from other links.
+                    $textattr = empty($value['textattr']) ? array() : $value['textattr'];
+                    $linkattr = empty($value['linkattr']) ? array() : $value['linkattr'];
+
+                    $span = html_writer::tag('span', $name, $textattr);
+                    $al = html_writer::tag('span', $span, $linkattr);
+                } else {
+                    $al = new action_menu_link_secondary(
+                        new moodle_url($url),
+                        $icon,
+                        $name,
+                        $attr
+                    );
+                }
+                $menu->add($al);
+            }
+
+            $o .= html_writer::div($this->render($menu), 'section_action_menu',
+                array('data-sectionid' => $section->id));
+        }
+
+        return $o;
+    }
 }

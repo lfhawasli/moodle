@@ -17,6 +17,7 @@
 namespace theme_uclashared\output;
 
 use html_writer;
+use action_menu;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -155,6 +156,29 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::end_div();
         $html .= html_writer::end_tag('header');
         return $html;
+    }
+
+    /**
+     * Renders an action menu component.
+     *
+     * @param action_menu $menu
+     * @return string HTML
+     */
+    public function render_action_menu(action_menu $menu) {
+
+        // We don't want the class icon there!
+        foreach ($menu->get_secondary_actions() as $action) {
+            if ($action instanceof \action_menu_link && $action->has_class('icon')) {
+                $action->attributes['class'] = preg_replace('/(^|\s+)icon(\s+|$)/i', '', $action->attributes['class']);
+            }
+        }
+
+        if ($menu->is_empty()) {
+            return '';
+        }
+        $context = $menu->export_for_template($this);
+
+        return $this->render_from_template('theme_uclashared/action_menu', $context);
     }
 
     /**
