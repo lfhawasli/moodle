@@ -29,7 +29,7 @@ if ($ADMIN->fulltree) {
             'block_ucla_media/library_source_url',
             get_string('headerlibraryurl', 'block_ucla_media'),
             get_string('desclibraryurl', 'block_ucla_media'),
-            'https://webservices-test.library.ucla.edu/music/v2/classes',
+            'https://webservices.library.ucla.edu/music/v2/classes',
             PARAM_URL
         ));
     $settings->add(new admin_setting_configtext(

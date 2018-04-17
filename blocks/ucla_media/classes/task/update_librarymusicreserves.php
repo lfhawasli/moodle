@@ -83,6 +83,37 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                     $entry->metadata = "Note1: " . $work->noteOne .
                             "<br />Note2: " . $work->noteTwo;
                     $entry->workid = $work->workID;
+                    
+                    // Does this entry have an embedURL, if so, then ignore items.
+                    if (!empty($work->embedURL)) {
+                        $entry->embedurl = $work->embedURL;
+                        $entry->title = $work->title;
+
+                        // Unique key to find duplicate entries.
+                        $key = $entry->term . '-' . $entry->srs . '-' . $entry->workid;
+
+                        if (isset($existingmedia[$key])) {
+                            // Entry exists, so update.
+                            $entry->id = $existingmedia[$key];
+                            $DB->update_record('ucla_library_music_reserves', $entry);
+                            unset($existingmedia[$key]);
+                            ++$numupdated;
+                        } else {
+                            // Does not exist, so add.
+                            try {
+                                $DB->insert_record('ucla_library_music_reserves', $entry);
+                                ++$numinserted;
+                            } catch (\Exception $ex) {
+                                // It is a duplicate entry, so ignore it.
+                                mtrace("\n" . get_string('founddupentry',
+                                        'tool_ucladatasourcesync', $key));
+                            }
+                        }       
+
+                        // Skip over items.
+                        continue;
+                    }
+                    
                     foreach ($work->items as $item) {
                         if (empty($item->trackTitle) || $item->trackTitle == 'N/A') {
                             // If track doesn't have title, just use work title.
@@ -163,15 +194,19 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
         $retval = array();
 
         $records = $DB->get_records('ucla_library_music_reserves', array(),
-                null, 'id,term,srs,workid,volume,disc,side,tracknumber');
+                null, 'id,term,srs,workid,volume,disc,side,tracknumber,embedurl');
         if (empty($records)) {
             return $retval;
         }
 
         foreach ($records as $record) {
-            $key = $record->term . '-' . $record->srs . '-' . $record->workid
-                     . '-' . $record->volume . '-' . $record->disc . '-' . 
-                    $record->side . '-' . $record->tracknumber;
+            if (!empty($record->embedurl)) {
+                $key = $record->term . '-' . $record->srs . '-' . $record->workid;
+            } else {
+                $key = $record->term . '-' . $record->srs . '-' . $record->workid
+                         . '-' . $record->volume . '-' . $record->disc . '-' .
+                        $record->side . '-' . $record->tracknumber;
+            }
             $retval[$key] = $record->id;
         }
         return $retval;
