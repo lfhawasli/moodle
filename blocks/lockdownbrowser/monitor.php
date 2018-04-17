@@ -1,25 +1,25 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 // production flags
 // - should all default to false or 0
 // - change only for exceptional environments
-$lockdownbrowser_ignore_https_login = false; // set true to ignore $CFG->loginhttps
-$lockdownbrowser_script_time_limit = 0; // set > 0 to override default set in php.ini
+define("LOCKDOWNBROWSER_IGNORE_HTTPS_LOGIN", false); // set true to ignore $CFG->loginhttps
+define("LOCKDOWNBROWSER_SCRIPT_TIME_LIMIT", 0); // set > 0 to override default set in php.ini
 
 // debug-only flags
 // - should always be false for production environments
-$lockdownbrowser_disable_callbacks = false; // set true to always skip login security callbacks
-$lockdownbrowser_optional_callbacks = false; // set true to skip callbacks only if no token is provided
-$lockdownbrowser_monitor_enable_log = false; // set true to enable logging to temp file
-$lockdownbrowser_monitor_enable_phpinfo = false; // set true to enable PHPInfo reporting
+$GLOBALS["lockdownbrowser_disable_callbacks"] = false; // set true to always skip login security callbacks
+define("LOCKDOWNBROWSER_OPTIONAL_CALLBACKS", false); // set true to skip callbacks only if no token is provided
+define("LOCKDOWNBROWSER_MONITOR_ENABLE_LOG", false); // set true to enable logging to temp file
+define("LOCKDOWNBROWSER_MONITOR_ENABLE_PHPINFO", false); // set true to enable PHPInfo reporting
 
 // local options
-define ("LOCKDOWNBROWSER_MONITOR_REDEEMURL",
+define("LOCKDOWNBROWSER_MONITOR_REDEEMURL",
     "https://smc-service-cloud.respondus2.com/MONServer/lms/redeemtoken.do");
-define ("LOCKDOWNBROWSER_MONITOR_LOG", "ldb_monitor.log");
+define("LOCKDOWNBROWSER_MONITOR_LOG", "ldb_monitor.log");
 
 // Moodle options
 define("NO_DEBUG_DISPLAY", true);
@@ -39,6 +39,23 @@ if (is_readable($lockdownbrowser_gradelib_file)) {
     lockdownbrowser_monitorserviceerror(2030, "Moodle gradelib.php not found");
 }
 
+// Trac #4179
+$lockdownbrowser_grouplib_file = "$CFG->libdir/grouplib.php";
+if (is_readable($lockdownbrowser_grouplib_file)) {
+    require_once($lockdownbrowser_grouplib_file);
+} else {
+    lockdownbrowser_monitorserviceerror(2057, "Moodle grouplib.php not found");
+}
+
+// Trac #3884
+$lockdownbrowser_blowfish_file =
+    "$CFG->dirroot/blocks/lockdownbrowser/blowfish.php";
+if (is_readable($lockdownbrowser_blowfish_file)) {
+    require_once($lockdownbrowser_blowfish_file);
+} else {
+    lockdownbrowser_monitorserviceerror(2056, "blowfish.php not found");
+}
+
 $lockdownbrowser_locklib_file =
     "$CFG->dirroot/blocks/lockdownbrowser/locklib.php";
 if (is_readable($lockdownbrowser_locklib_file)) {
@@ -55,13 +72,13 @@ if (!empty($CFG->maintenance_enabled)
 
 raise_memory_limit(MEMORY_EXTRA);
 
-if ($lockdownbrowser_script_time_limit > 0) {
+if (LOCKDOWNBROWSER_SCRIPT_TIME_LIMIT > 0) {
     if ($CFG->version >= 2014051200) {
         // Moodle 2.7.0+.
-        core_php_time_limit::raise($lockdownbrowser_script_time_limit);
+        core_php_time_limit::raise(LOCKDOWNBROWSER_SCRIPT_TIME_LIMIT);
     } else {
         // Prior to Moodle 2.7.0.
-        set_time_limit($lockdownbrowser_script_time_limit);
+        set_time_limit(LOCKDOWNBROWSER_SCRIPT_TIME_LIMIT);
     }
 }
 
@@ -70,6 +87,133 @@ set_exception_handler("lockdownbrowser_monitorexceptionhandler");
 lockdownbrowser_monitorservicerequest();
 
 exit;
+
+// Trac #3740
+function lockdownbrowser_utf8encode($input, $encoding = "") {
+
+    if (strlen($input) == 0) {
+        return $input; // nothing to convert
+    } else if ($encoding == 'UTF-8') {
+        return $input; // assume no need to convert (might not be true if incorrect data)
+    } else if (lockdownbrowser_isvalidutf8($input)) {
+        return $input; // assume no need to convert (might not be true for some encodings)
+    } else if (strlen($encoding) == 0) {
+        if (function_exists('mb_detect_encoding')) {
+            // mb_detect_encoding mostly fails, or is easily fooled, but apparently no better solution exists
+            $detected = mb_detect_encoding($input, mb_detect_order(), true);
+            if ($detected === false) {
+                if (function_exists('mb_check_encoding')) {
+                    if (mb_check_encoding($input, 'ISO-8859-1')) {
+                        return utf8_encode($input); // assume ISO-8859-1 (might not be true for some encodings)
+                    } else {
+                        return $input; // can't convert
+                    }
+                } else {
+                    return utf8_encode($input); // fallback, assume ISO-8859-1
+                }
+            } else {
+                return mb_convert_encoding($input, 'UTF-8', $detected);
+            }
+        } else {
+            return utf8_encode($input); // fallback, assume ISO-8859-1
+        }
+    } else if ($encoding == 'ISO-8859-1') {
+        return utf8_encode($input);
+    } else if (function_exists('mb_convert_encoding')) {
+        return mb_convert_encoding($input, 'UTF-8', $encoding);
+    } else {
+        return $input; // can't convert
+    }
+}
+
+// Trac #3740
+function lockdownbrowser_isvalidutf8($string) {
+
+    $len = strlen($string);
+
+     if($len == 0) {
+        return true;
+    } else if (function_exists('mb_check_encoding')) {
+        return  mb_check_encoding($string, 'UTF-8');
+    } else {
+        // fall back to using local test
+    }
+    $i = 0;
+
+    while ($i < $len) {
+
+        // max sequence is 4 bytes
+        $c0 = ord($string[$i]);
+        if ($i + 1 < $len) {
+            $c1 = ord($string[$i + 1]);
+        }
+        if ($i + 2 < $len) {
+            $c2 = ord($string[$i + 2]);
+        }
+        if ($i + 3 < $len) {
+            $c3 = ord($string[$i + 3]);
+        }
+        // ASCII
+        if ($c0 >= 0x00 && $c0 <= 0x7e) {
+            // Non-overlong 2-byte.
+            $i++;
+        } else if ($i + 1 < $len
+            && $c0 >= 0xc2 && $c0 <= 0xdf
+            && $c1 >= 0x80 && $c1 <= 0xbf
+        ) {
+            // Excluding overlongs.
+            $i += 2;
+        } else if ($i + 2 < $len
+            && $c0 == 0xe0
+            && $c1 >= 0xa0 && $c1 <= 0xbf
+            && $c2 >= 0x80 && $c2 <= 0xbf
+        ) {
+            // Straight 3-byte.
+            $i += 3;
+        } else if ($i + 2 < $len
+            && (($c0 >= 0xe1 && $c0 <= 0xec) || $c0 == 0xee || $c0 == 0xef)
+            && $c1 >= 0x80 && $c1 <= 0xbf
+            && $c2 >= 0x80 && $c2 <= 0xbf
+        ) {
+            // Excluding surrogates.
+            $i += 3;
+        } else if ($i + 2 < $len
+            && $c0 == 0xed
+            && $c1 >= 0x80 && $c1 <= 0x9f
+            && $c2 >= 0x80 && $c2 <= 0xbf
+        ) {
+            // Planes 1-3.
+            $i += 3;
+        } else if ($i + 3 < $len
+            && $c0 == 0xf0
+            && $c1 >= 0x90 && $c1 <= 0xbf
+            && $c2 >= 0x80 && $c2 <= 0xbf
+            && $c3 >= 0x80 && $c3 <= 0xbf
+        ) {
+            // Planes 4-15.
+            $i += 4;
+        } else if ($i + 3 < $len
+            && $c0 >= 0xf1 && $c0 <= 0xf3
+            && $c1 >= 0x80 && $c1 <= 0xbf
+            && $c2 >= 0x80 && $c2 <= 0xbf
+            && $c3 >= 0x80 && $c3 <= 0xbf
+        ) {
+            // Plane 16.
+            $i += 4;
+        } else if ($i + 3 < $len
+            && $c0 == 0xf4
+            && $c1 >= 0x80 && $c1 <= 0x8f
+            && $c2 >= 0x80 && $c2 <= 0xbf
+            && $c3 >= 0x80 && $c3 <= 0xbf
+        ) {
+            // Invalid utf-8.
+            $i += 4;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
 
 function lockdownbrowser_monitorserviceerror($code = "", $message = "", $encrypt = true) {
 
@@ -82,14 +226,14 @@ function lockdownbrowser_monitorserviceerror($code = "", $message = "", $encrypt
     $body .= "<service_error>\r\n";
 
     $body .= "\t<code>";
-    $body .= utf8_encode(htmlspecialchars(trim($code)));
+    $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($code)));
     $body .= "</code>\r\n";
 
     if (empty($message)) {
         $body .= "\t<message />\r\n";
     } else {
         $body .= "\t<message>";
-        $body .= utf8_encode(htmlspecialchars(trim($message)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($message)));
         $body .= "</message>\r\n";
     }
 
@@ -109,14 +253,14 @@ function lockdownbrowser_monitorservicestatus($code = "", $message = "") {
     $body .= "<service_status>\r\n";
 
     $body .= "\t<code>";
-    $body .= utf8_encode(htmlspecialchars(trim($code)));
+    $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($code)));
     $body .= "</code>\r\n";
 
     if (empty($message)) {
         $body .= "\t<message />\r\n";
     } else {
         $body .= "\t<message>";
-        $body .= utf8_encode(htmlspecialchars(trim($message)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($message)));
         $body .= "</message>\r\n";
     }
 
@@ -175,15 +319,15 @@ function lockdownbrowser_monitorcourselistresponse($courses) {
         $body .= "\t<course>\r\n";
 
         $body .= "\t\t<courseRefId>";
-        $body .= utf8_encode(htmlspecialchars(trim($c->id)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($c->id)));
         $body .= "</courseRefId>\r\n";
 
         $body .= "\t\t<courseId>";
-        $body .= utf8_encode(htmlspecialchars(trim($c->shortname)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($c->shortname)));
         $body .= "</courseId>\r\n";
 
         $body .= "\t\t<courseDescription>";
-        $body .= utf8_encode(htmlspecialchars(trim($c->fullname)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($c->fullname)));
         $body .= "</courseDescription>\r\n";
 
         $body .= "\t</course>\r\n";
@@ -239,9 +383,7 @@ function lockdownbrowser_monitortemppath() {
 
 function lockdownbrowser_monitorlog($msg) {
 
-    global $lockdownbrowser_monitor_enable_log;
-
-    if ($lockdownbrowser_monitor_enable_log) {
+    if (LOCKDOWNBROWSER_MONITOR_ENABLE_LOG) {
         $entry  = date("m-d-Y H:i:s") . " - " . $msg . "\r\n";
         $path   = lockdownbrowser_monitortemppath()
             . "/" . LOCKDOWNBROWSER_MONITOR_LOG;
@@ -277,9 +419,6 @@ function lockdownbrowser_monitorexceptionhandler($ex) {
 
 function lockdownbrowser_monitorrequestparameters() {
 
-    global $lockdownbrowser_monitor_enable_log;
-    global $lockdownbrowser_monitor_enable_phpinfo;
-
     $parameters     = array();
     $request_method = $_SERVER["REQUEST_METHOD"];
 
@@ -294,7 +433,7 @@ function lockdownbrowser_monitorrequestparameters() {
             lockdownbrowser_monitorserviceresponse("text/plain", "OK", false, false);
         }
         if ($cleaned == "log") { // get debug log contents
-            if ($lockdownbrowser_monitor_enable_log) {
+            if (LOCKDOWNBROWSER_MONITOR_ENABLE_LOG) {
                 $path = lockdownbrowser_monitortemppath() . "/" . LOCKDOWNBROWSER_MONITOR_LOG;
                 $log = file_get_contents($path);
                 if ($log === false) {
@@ -304,7 +443,7 @@ function lockdownbrowser_monitorrequestparameters() {
             }
         }
         if ($cleaned == "phpinfo") { // get PHP info
-            if ($lockdownbrowser_monitor_enable_phpinfo) {
+            if (LOCKDOWNBROWSER_MONITOR_ENABLE_PHPINFO) {
                 phpinfo();
                 exit;
             }
@@ -323,7 +462,7 @@ function lockdownbrowser_monitorrequestparameters() {
                 lockdownbrowser_monitorserviceresponse("text/plain", "OK", false, false);
             }
             if ($cleaned == "log") { // get debug log contents
-                if ($lockdownbrowser_monitor_enable_log) {
+                if (LOCKDOWNBROWSER_MONITOR_ENABLE_LOG) {
                     $path = lockdownbrowser_monitortemppath() . "/" . LOCKDOWNBROWSER_MONITOR_LOG;
                     $log = file_get_contents($path);
                     if ($log === false) {
@@ -351,7 +490,7 @@ function lockdownbrowser_monitorrequestparameters() {
                 lockdownbrowser_monitorserviceresponse("text/plain", "OK", false, false);
             }
             if ($cleaned == "log") { // get debug log contents
-                if ($lockdownbrowser_monitor_enable_log) {
+                if (LOCKDOWNBROWSER_MONITOR_ENABLE_LOG) {
                     $path = lockdownbrowser_monitortemppath() . "/" . LOCKDOWNBROWSER_MONITOR_LOG;
                     $log = file_get_contents($path);
                     if ($log === false) {
@@ -466,20 +605,13 @@ function lockdownbrowser_monitorgeneratemac2($input, $style) {
 
 function lockdownbrowser_monitorbase64encrypt($input, $silent) {
 
-    if (!extension_loaded("mcrypt")) {
-        if ($silent === false) {
-            lockdownbrowser_monitorserviceerror(2008, "The mcrypt library is not loaded", false);
-        } else {
-            return null;
-        }
-    }
-
     $secret = lockdownbrowser_monitorsharedsecret($silent);
     if (is_null($secret)) {
         return null;
     }
 
-    $encrypted   = mcrypt_encrypt(MCRYPT_BLOWFISH, $secret, $input, MCRYPT_MODE_ECB);
+    $encrypted = Blowfish::encrypt($input, $secret, Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO);
+
     $b64_encoded = base64_encode($encrypted);
 
     return $b64_encoded;
@@ -496,20 +628,14 @@ function lockdownbrowser_monitorbase64decrypt($input, $silent) {
             return null;
         }
     }
-    if (!extension_loaded("mcrypt")) {
-        if ($silent === false) {
-            lockdownbrowser_monitorserviceerror(2008, "The mcrypt library is not loaded");
-        } else {
-            return null;
-        }
-    }
 
     $secret = lockdownbrowser_monitorsharedsecret($silent);
     if (is_null($secret)) {
         return null;
     }
 
-    $decrypted = mcrypt_decrypt(MCRYPT_BLOWFISH, $secret, $b64_decoded, MCRYPT_MODE_ECB);
+    $decrypted = Blowfish::decrypt($b64_decoded, $secret, Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO);
+
     return trim($decrypted);
 }
 
@@ -604,15 +730,13 @@ function lockdownbrowser_monitorredeemtoken($parameters) {
 function lockdownbrowser_monitoractionlogin($parameters) {
 
     global $CFG;
-    global $lockdownbrowser_ignore_https_login;
     global $lockdownbrowser_disable_callbacks;
-    global $lockdownbrowser_optional_callbacks;
 
     if (isloggedin()) {
         lockdownbrowser_monitorserviceerror(2015, "Session is already logged in");
     }
 
-    if ($lockdownbrowser_optional_callbacks) {
+    if (LOCKDOWNBROWSER_OPTIONAL_CALLBACKS) {
         if (!isset($parameters["token"]) || strlen($parameters["token"]) == 0) {
             $lockdownbrowser_disable_callbacks = true;
         }
@@ -621,7 +745,7 @@ function lockdownbrowser_monitoractionlogin($parameters) {
         lockdownbrowser_monitorredeemtoken($parameters);
     }
 
-    if (!$lockdownbrowser_ignore_https_login) {
+    if (!LOCKDOWNBROWSER_IGNORE_HTTPS_LOGIN) {
         if ($CFG->loginhttps && !$CFG->sslproxy) {
             if (!isset($_SERVER["HTTPS"])
                 || empty($_SERVER["HTTPS"])
@@ -658,7 +782,6 @@ function lockdownbrowser_monitoractionlogin($parameters) {
 function lockdownbrowser_monitoractionuserlogin($parameters) {
 
     global $CFG;
-    global $lockdownbrowser_ignore_https_login;
 
     if (isloggedin()) {
         lockdownbrowser_monitorserviceerror(2015, "Session is already logged in");
@@ -673,7 +796,7 @@ function lockdownbrowser_monitoractionuserlogin($parameters) {
     $username = $parameters["username"];
     $password = $parameters["password"];
 
-    if (!$lockdownbrowser_ignore_https_login) {
+    if (!LOCKDOWNBROWSER_IGNORE_HTTPS_LOGIN) {
         if ($CFG->loginhttps && !$CFG->sslproxy) {
             if (!isset($_SERVER["HTTPS"])
                 || empty($_SERVER["HTTPS"])
@@ -784,9 +907,12 @@ function lockdownbrowser_monitoractionchangesettings($parameters) {
     //   popup (0=none, 1=full screen pop-up with some JavaScript security)
     // Moodle 2.2.0+ (quiz module 2011100600+)
     //   browsersecurity ('-', 'securewindow', 'safebrowser')
-    // if this setting is not disabled, it will interfere with the LDB integration
+    // if these settings are not managed, it will interfere with the LDB integration
     if ($enable_ldb) {
-        $quiz->popup           = 0;
+        $quiz->popup = 0;
+        $quiz->browsersecurity = get_string("browsersecuritychoicekey", "block_lockdownbrowser");
+    }
+    else {
         $quiz->browsersecurity = "-";
     }
 
@@ -858,6 +984,12 @@ function lockdownbrowser_monitoractionexamroster($parameters) {
     if (!isset($parameters["examId"]) || strlen($parameters["examId"]) == 0) {
         lockdownbrowser_monitorserviceerror(2026, "No examId parameter was specified");
     }
+    // Trac #4179
+    $username = "";
+    if (isset($parameters["userId"]) && strlen($parameters["userId"]) > 0) {
+        $username = $parameters["userId"]; // actually user login name
+        lockdownbrowser_monitorlog("examroster username: " . $username);
+    }
 
     $course_id = intval($parameters["courseRefId"]);
     $exam_id   = intval($parameters["examId"]);
@@ -883,12 +1015,71 @@ function lockdownbrowser_monitoractionexamroster($parameters) {
     if ($roles === false || count($roles) == 0) {
         lockdownbrowser_monitorserviceerror(2029, "The role archetype 'student' was not found");
     }
-
     $students = array();
     foreach ($roles as $role) {
         $users = get_role_users($role->id, $context);
         if ($users !== false && count($users) > 0) {
             $students = array_merge($students, $users);
+        }
+    }
+    // Trac #4179
+    if (!empty($username)) {
+        // check for non-editing teacher
+        $teacher_id = 0;
+        $teachers = array();
+        $roles = $DB->get_records("role", array("archetype" => "teacher")); // non-editing
+        if ($roles === false || count($roles) == 0) {
+            lockdownbrowser_monitorserviceerror(2048, "The role archetype 'teacher' was not found");
+        }
+        foreach ($roles as $role) {
+            $users = get_role_users($role->id, $context);
+            if ($users !== false && count($users) > 0) {
+                $teachers = array_merge($teachers, $users);
+            }
+        }
+        if (count($teachers) > 0) {
+            foreach ($teachers as $t) {
+                if (strcasecmp($username, $t->username) == 0) {
+                    $teacher_id = $t->id;
+                    lockdownbrowser_monitorlog("examroster teacher id: " . $teacher_id);
+                    break;
+                }
+            }
+        }
+        // get teacher groups
+        $ok = ($teacher_id != 0);
+        $teacher_groups = array();
+        if ($ok) {
+            $teacher_groups = groups_get_all_groups($course_id, $teacher_id);
+            $ok = ($teacher_groups !== false && count($teacher_groups) > 0);
+        } else {
+            // roster will not be filtered
+            lockdownbrowser_monitorlog("examroster username is not a non-editing teacher");
+        }
+        // get students sharing any group with teacher
+        $filtered_students = array();
+        if ($ok) {
+            foreach ($teacher_groups as $group) {
+                $group_students = array();
+                foreach ($students as $student) {
+                    if(groups_is_member($group->id, $student->id)){
+                        $group_students[] = $student;
+                    }
+                }
+                $filtered_students = array_merge($filtered_students, $group_students);
+            }
+            $ok = ($filtered_students !== false && count($filtered_students) > 0);
+        } else {
+            // roster will not be filtered
+            lockdownbrowser_monitorlog("examroster no groups found in course for teacher id");
+        }
+        if ($ok) {
+            // at least one student shares membership with teacher in at least one group
+            $students = $filtered_students;
+            lockdownbrowser_monitorlog("examroster will be filtered based on teacher/student group memberships");
+        } else {
+            // roster will not be filtered
+            lockdownbrowser_monitorlog("examroster no students in course share any group membership with teacher id");
         }
     }
 
@@ -905,15 +1096,15 @@ function lockdownbrowser_monitoractionexamroster($parameters) {
         $body .= "\t<student>\r\n";
 
         $body .= "\t\t<userName>";
-        $body .= utf8_encode(htmlspecialchars(trim($s->username)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($s->username)));
         $body .= "</userName>\r\n";
 
         $body .= "\t\t<firstName>";
-        $body .= utf8_encode(htmlspecialchars(trim($s->firstname)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($s->firstname)));
         $body .= "</firstName>\r\n";
 
         $body .= "\t\t<lastName>";
-        $body .= utf8_encode(htmlspecialchars(trim($s->lastname)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($s->lastname)));
         $body .= "</lastName>\r\n";
 
         $grade_info = grade_get_grades(
@@ -927,7 +1118,7 @@ function lockdownbrowser_monitoractionexamroster($parameters) {
         ) {
             $grade = $grade_info->items[0]->grades[$s->id]->str_grade;
             $body .= "\t\t<grade>";
-            $body .= utf8_encode(htmlspecialchars(trim($grade)));
+            $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($grade)));
             $body .= "</grade>\r\n";
         }
 
@@ -1079,11 +1270,11 @@ function lockdownbrowser_monitoractionexamsync($parameters) {
         $body .= "\t<assessment>\r\n";
 
         $body .= "\t\t<id>";
-        $body .= utf8_encode(htmlspecialchars(trim($cm->id)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($cm->id)));
         $body .= "</id>\r\n";
 
         $body .= "\t\t<title>";
-        $body .= utf8_encode(htmlspecialchars(trim($cm->name)));
+        $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($cm->name)));
         $body .= "</title>\r\n";
 
         $settings = lockdownbrowser_get_quiz_options($cm->instance);
@@ -1100,7 +1291,7 @@ function lockdownbrowser_monitoractionexamsync($parameters) {
             && strlen($settings->password) > 0
         ) {
             $body .= "\t\t<exitPassword>";
-            $body .= utf8_encode(htmlspecialchars($settings->password));
+            $body .= lockdownbrowser_utf8encode(htmlspecialchars($settings->password));
             $body .= "</exitPassword>\r\n";
         }
 
@@ -1111,29 +1302,26 @@ function lockdownbrowser_monitoractionexamsync($parameters) {
         ) {
             $body .= "\t\t<monitorEnabled>true</monitorEnabled>\r\n";
             $body .= "\t\t<extendedData>";
-            $body .= utf8_encode(htmlspecialchars($settings->monitor));
+            $body .= lockdownbrowser_utf8encode(htmlspecialchars($settings->monitor));
             $body .= "</extendedData>\r\n";
         } else {
             $body .= "\t\t<monitorEnabled>false</monitorEnabled>\r\n";
         }
 
-        // Moodle browser security
-        //   popup (0=none, 1=full screen pop-up with some JavaScript security)
-        // Moodle 2.2.0+ (quiz module 2011100600+)
-        //   browsersecurity ('-', 'securewindow', 'safebrowser')
-        // if this setting is not disabled, it will interfere with the LDB integration
+        // Moodle browser security;
+        // see lockdownbrowser_monitoractionchangesettings
         if (isset($quiz->browsersecurity)) {
-            if ($quiz->browsersecurity != "-") {
-                $launch_in_new_window = true;
-            } else {
-                $launch_in_new_window = false;
-            }
+            $body .= "\t\t<browserSecurity>";
+            $body .= lockdownbrowser_utf8encode(htmlspecialchars($quiz->browsersecurity));
+            $body .=  "</browserSecurity>\r\n";
         } else {
-            if ($quiz->popup != 0) {
-                $launch_in_new_window = true;
-            } else {
-                $launch_in_new_window = false;
-            }
+            $body .= "\t\t<browserSecurity>-</browserSecurity>\r\n";
+        }
+
+        if ($quiz->popup != 0) {
+            $launch_in_new_window = true;
+        } else {
+            $launch_in_new_window = false;
         }
 
         if ($launch_in_new_window) {
@@ -1347,15 +1535,15 @@ function lockdownbrowser_monitoractionretrievecourse($parameters) {
     $body .= "\t<course>\r\n";
 
     $body .= "\t\t<courseRefId>";
-    $body .= utf8_encode(htmlspecialchars(trim($record->id)));
+    $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($record->id)));
     $body .= "</courseRefId>\r\n";
 
     $body .= "\t\t<courseId>";
-    $body .= utf8_encode(htmlspecialchars(trim($record->shortname)));
+    $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($record->shortname)));
     $body .= "</courseId>\r\n";
 
     $body .= "\t\t<courseDescription>";
-    $body .= utf8_encode(htmlspecialchars(trim($record->fullname)));
+    $body .= lockdownbrowser_utf8encode(htmlspecialchars(trim($record->fullname)));
     $body .= "</courseDescription>\r\n";
 
     $body .= "\t</course>\r\n";
@@ -1376,6 +1564,11 @@ function lockdownbrowser_monitoractiontestintegration($parameters) {
     }
 
     // currently no parameters are required; note that this call needs to remain context-free
+
+    $result = lockdownbrowser_check_plugin_dependencies(0);
+    if ($result !== false){
+        lockdownbrowser_monitorserviceerror(2055, $result);
+    }
 
     // currently no other testing is performed
 
@@ -1420,13 +1613,101 @@ function lockdownbrowser_monitoractionvalidateuserrole($parameters) {
 
     $body = "NOT_AUTHORIZED";
 
-    if ( has_capability('moodle/course:manageactivities', $context) )
+    if ( has_capability('moodle/course:manageactivities', $context)
+       || has_capability('moodle/course:viewhiddenactivities', $context) // Trac #3595
+      ) {
         $body = "AUTHORIZED";
-
+    }
     $encrypted = lockdownbrowser_monitorbase64encrypt($body, true);
 
     header("Location: " . $callback . "?key=" . $key . "&r=" . $encrypted );
     die();
+}
+
+function lockdownbrowser_monitoractionquestionmapping($parameters) {
+
+    global $DB;
+
+    if (!isloggedin()) {
+        lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
+    }
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
+        lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
+    }
+    if (!isset($parameters["data"])) {
+        lockdownbrowser_monitorserviceerror(2052, "No data parameter was specified");
+    }
+
+    $body = "";
+
+    $data_elements = explode(",", $parameters["data"]);
+    foreach ($data_elements as $data_element) {
+
+        $tokens = explode( ":", $data_element);
+        if ( count($tokens) != 2 )
+            lockdownbrowser_monitorserviceerror(2053, "Invalid format for question mapping data element");
+
+        $questionusageid = $tokens[0];
+        $slot = $tokens[1];
+
+        $question_attempt = $DB->get_record("question_attempts", array("questionusageid" => $questionusageid, "slot" => $slot ), "questionid");
+         if ( $question_attempt ) {
+
+            $question = $DB->get_record("question", array("id" => $question_attempt->questionid), "name");
+            if ( $question ) {
+
+                if (strlen($body) > 0)
+                    $body .= ",";
+
+                $body .= urlencode( $data_element );
+                $body .= ":";
+                $body .= $question_attempt->questionid;
+                $body .= ":";
+                $body .= urlencode( $question->name );
+            }
+        }
+    }
+
+       lockdownbrowser_monitorserviceresponse("text/plain", $body, true);
+}
+
+function lockdownbrowser_monitoractionquestiondata($parameters) {
+
+    global $DB;
+
+    if (!isloggedin()) {
+        lockdownbrowser_monitorserviceerror(2004, "Must be logged in to perform the requested action");
+    }
+// START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
+//    if (!is_siteadmin()) {
+    if (!lockdownbrowser_is_monitor_user()) {
+// END UCLA MOD: CCLE-4027
+        lockdownbrowser_monitorserviceerror(2024, "Must be logged in as admin to perform the requested action");
+    }
+    if (!isset($parameters["qid"])) {
+        lockdownbrowser_monitorserviceerror(2054, "No qid parameter was specified");
+    }
+
+    $qid = $parameters["qid"];
+    $body = "";
+
+    $question = $DB->get_record("question", array("id" => $qid), "name,questiontext,qtype");
+    if ( $question ) {
+
+        $question_answers = $DB->get_records("question_answers", array("question" => $qid));
+
+        $body = json_encode( array(
+            "name" => $question->name,
+            "questiontext" => $question->questiontext,
+            "qtype" => $question->qtype,
+            "answers" => $question_answers
+        ));
+    }
+
+       lockdownbrowser_monitorserviceresponse("application/json", $body, true);
 }
 
 function lockdownbrowser_monitorservicerequest() {
@@ -1466,6 +1747,10 @@ function lockdownbrowser_monitorservicerequest() {
         lockdownbrowser_monitoractiontestintegration($parameters);
     } else if ($action == "validateuserrole") {
         lockdownbrowser_monitoractionvalidateuserrole($parameters);
+    } else if ($action == "questionmapping") {
+        lockdownbrowser_monitoractionquestionmapping($parameters);
+    } else if ($action == "questiondata") {
+        lockdownbrowser_monitoractionquestiondata($parameters);
     } else {
         lockdownbrowser_monitorserviceerror(2006, "Unrecognized service action: $action");
     }

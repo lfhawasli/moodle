@@ -1,10 +1,10 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 if (!isset($CFG)) {
-    require_once("../../config.php");
+    require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
 }
 
 require_once("$CFG->dirroot/blocks/lockdownbrowser/locklib.php");
@@ -48,7 +48,7 @@ $settings->add(
     new admin_setting_heading(
         "lockdown_blockversionheader",
         lockdownbrowser_getsettingsstring("blockversionheader"),
-        $lockdownbrowser_version //. " (internal release for Q/A)"
+        $lockdownbrowser_version // . " (internal release for Q/A)"
     )
 );
 
@@ -134,6 +134,12 @@ $settings->add(
 
 // status string
 $lockdownbrowser_ist = "";
+$result = lockdownbrowser_check_plugin_dependencies(1);
+if ($result !== false){
+    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
+    $lockdownbrowser_ist .= $result;
+    $lockdownbrowser_ist .= "</div>";
+}
 $lockdownbrowser_quiz_count = $DB->count_records("block_lockdownbrowser_sett");
 if ($lockdownbrowser_quiz_count >= 50000) { // Trac #2315
     $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
@@ -143,18 +149,6 @@ if ($lockdownbrowser_quiz_count >= 50000) { // Trac #2315
 if (!isset($_COOKIE[$CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie])) {
     $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
     $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('session_cookie_not_set');
-    $lockdownbrowser_ist .= "</div>";
-}
-if (!isset($CFG->customscripts)) {
-    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
-    $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('customscripts_not_set');
-    $lockdownbrowser_ist .= "</div>";
-} else if (!file_exists("$CFG->customscripts/mod/quiz/attempt.php")
-  || !file_exists("$CFG->customscripts/mod/quiz/view.php")
-  || !file_exists("$CFG->customscripts/mod/quiz/review.php")
-) {
-    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
-    $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('customscripts_not_found', $CFG->customscripts);
     $lockdownbrowser_ist .= "</div>";
 }
 if (!during_initial_install() && empty($CFG->upgraderunning)) {

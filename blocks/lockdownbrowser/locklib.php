@@ -1,14 +1,18 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 // Set true to require per-session locking for access to unused token records;
 // requires Moodle 2.7+.
-$lockdownbrowser_require_db_locking = false;
-$lockdownbrowser_max_db_lock_time = 10; // seconds
+define("LOCKDOWNBROWSER_REQUIRE_DB_LOCKING", false);
+define("LOCKDOWNBROWSER_MAX_DB_LOCK_TIME", 10); // seconds
 
+if (!isset($CFG)) {
+    require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
+}
 require_once(dirname(__FILE__) . "/locklibcfg.php");
+require_once(dirname(__FILE__) . "/blowfish.php"); // Trac #3884
 
 function lockdownbrowser_set_settings($quizid, $reqquiz, $reqreview, $exitpass, $monitor) {
 
@@ -28,7 +32,8 @@ function lockdownbrowser_get_quiz_options($quizid) {
         $quiz = $DB->get_record("quiz", array("id" => $quizid));
         if ($quiz === false || $quiz->course != $ldbopt->course) {
             // this will catch some orphans (deleted quizzes) and some false
-            // positives (orphans that are false matches due to backup/restore)
+            // positives (orphans that are false matches due to backup/restore);
+            // also see quizaccess_lockdownbrowser::delete_settings
             try {
                 lockdownbrowser_delete_options($quizid);
             } catch (Exception $ex) {
@@ -127,7 +132,8 @@ function lockdownbrowser_purge_settings() {
 
     // remove any orphaned records from our settings table;
     // orphans occur whenever a quiz is deleted without first removing the LDB
-    // requirement in our dashboard
+    // requirement in our dashboard;
+    // also see quizaccess_lockdownbrowser::delete_settings
     $records = $DB->get_records('block_lockdownbrowser_sett');
     if (count($records) > 0) {
         foreach ($records as $settings) {
@@ -402,7 +408,9 @@ function lockdownbrowser_generate_tokens_debug($purge_sessions) {
     $fk2          = $CFG->block_lockdownbrowser_ldb_serversecret . $CFG->block_lockdownbrowser_ldb_tserver_bkey;
     $fk2          = substr($fk2, 0, 16);
     $resp_b64     = base64_decode($resp);
-    $decoderesp   = mcrypt_decrypt(MCRYPT_BLOWFISH, $fk2, $resp_b64, MCRYPT_MODE_ECB, "01234567");
+
+    $decoderesp = Blowfish::decrypt($resp_b64, $fk2, Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO, "01234567");
+
     $resp_len     = strlen($decoderesp);
     $expected_len = ($CFG->block_lockdownbrowser_ldb_tserver_set * $CFG->block_lockdownbrowser_ldb_tserver_rec);
 
@@ -492,7 +500,9 @@ function lockdownbrowser_generate_tokens($purge_sessions) {
 
     $fk2        = substr($fk2, 0, 16);
     $resp_b64   = base64_decode($resp);
-    $decoderesp = mcrypt_decrypt(MCRYPT_BLOWFISH, $fk2, $resp_b64, MCRYPT_MODE_ECB, "01234567");
+
+    $decoderesp = Blowfish::decrypt($resp_b64, $fk2, Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO, "01234567");
+
     if (strlen($decoderesp) !=
       ($CFG->block_lockdownbrowser_ldb_tserver_set * $CFG->block_lockdownbrowser_ldb_tserver_rec)) {
         lockdownbrowser_ldblog("bad response len strlen = " . strlen($decoderesp)); // DEBUG
@@ -517,13 +527,17 @@ function lockdownbrowser_generate_tokens($purge_sessions) {
     return $ok;
 }
 
-function lockdownbrowser_check_for_lock() {
+function lockdownbrowser_check_for_lock($quizobj) {
 
+    // returns false if access should be allowed;
+    // returns a message string if access should be prevented;
+    // also see quizaccess_lockdownbrowser::prevent_access
     global $CFG, $DB;
 
     $id      = optional_param('id', 0, PARAM_INT); // Course Module ID
     $q       = optional_param('q', 0, PARAM_INT); // or quiz ID
     $attempt = optional_param('attempt', 0, PARAM_INT); // A particular attempt ID for review
+    $cmid      = optional_param('cmid', 0, PARAM_INT); // Some pages use this for course Module ID
 
     $script = substr(strrchr($_SERVER['SCRIPT_NAME'], "/"), 1);
     $discriminator = "";
@@ -533,17 +547,15 @@ function lockdownbrowser_check_for_lock() {
         $discriminator = $q;
     } else if ($id) {
         $discriminator = $id;
+    } else if ($cmid) {
+        $discriminator = $cmid;
     }
 
     if (isset($_SESSION['LOCKDOWNBROWSER_CONTEXT'])) {
-        if ("attempt.php" == $script
-          && ($script . "NONE" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT']
-          || $script . "VALID" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT'])) {
-            return 1;
-        } else if ("review.php" == $script
-          && ($script . "NONE" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT']
-          || $script . "VALID" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT'])) {
-            return 1;
+        if ($script . "NONE" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT']
+          || $script . "VALID" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT']
+          ) {
+            return false;
         }
     }
 
@@ -553,38 +565,49 @@ function lockdownbrowser_check_for_lock() {
     if ($id) {
 
         if (!$cm = get_coursemodule_from_id('quiz', $id)) {
-            print_error(errcmid, "block_lockdownbrowser", "", $id);
+            print_error("errcmid", "block_lockdownbrowser", "", $id);
         }
         if (!$course = $DB->get_record("course", array("id" => $cm->course))) {
-            print_error(errcourse, "block_lockdownbrowser");
+            print_error("errcourse", "block_lockdownbrowser");
         }
         if (!$quiz = $DB->get_record("quiz", array("id" => $cm->instance))) {
-            print_error(errnoquiz1, "block_lockdownbrowser", "", $cm);
+            print_error("errnoquiz1", "block_lockdownbrowser", "", $cm);
+        }
+    } else if ($cmid) {
+
+        if (!$cm = get_coursemodule_from_id('quiz', $cmid)) {
+            print_error("errcmid", "block_lockdownbrowser", "", $cmid);
+        }
+        if (!$course = $DB->get_record("course", array("id" => $cm->course))) {
+            print_error("errcourse", "block_lockdownbrowser");
+        }
+        if (!$quiz = $DB->get_record("quiz", array("id" => $cm->instance))) {
+            print_error("errnoquiz1", "block_lockdownbrowser", "", $cm);
         }
     } else if ($q) {
 
         if (!$quiz = $DB->get_record("quiz", array("id" => $q))) {
-            print_error(errquizid, "block_lockdownbrowser", "", $q);
+            print_error("errquizid", "block_lockdownbrowser", "", $q);
         }
         if (!$course = $DB->get_record("course", array("id" => $quiz->course))) {
-            print_error(errnocourse, "block_lockdownbrowser", "", $quiz);
+            print_error("errnocourse", "block_lockdownbrowser", "", $quiz);
         }
         if (!$cm = get_coursemodule_from_instance("quiz", $quiz->id, $course->id)) {
-            print_error(errnocm, "block_lockdownbrowser", "", $q);
+            print_error("errnocm", "block_lockdownbrowser", "", $q);
         }
     } else if ($attempt) {
 
         if (!$attempt = $DB->get_record("quiz_attempts", array("id" => $attempt))) {
-            print_error(errattempt, "block_lockdownbrowser");
+            print_error("errattempt", "block_lockdownbrowser");
         }
         if (!$quiz = $DB->get_record("quiz", array("id" => $attempt->quiz))) {
-            print_error(errnoquiz2, "block_lockdownbrowser", "", $attempt);
+            print_error("errnoquiz2", "block_lockdownbrowser", "", $attempt);
         }
         if (!$course = $DB->get_record("course", array("id" => $quiz->course))) {
-            print_error(errnocourse, "block_lockdownbrowser", "", $quiz);
+            print_error("errnocourse", "block_lockdownbrowser", "", $quiz);
         }
         if (!$cm = get_coursemodule_from_instance("quiz", $quiz->id, $course->id)) {
-            print_error(errnocm, "block_lockdownbrowser", "", $quiz->id);
+            print_error("errnocm", "block_lockdownbrowser", "", $quiz->id);
         }
     } else {
 
@@ -597,6 +620,7 @@ function lockdownbrowser_check_for_lock() {
     if (!$ldbopt) {
 
         $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "NONE" . $discriminator;
+        return false;
 
     } else {
 
@@ -609,11 +633,13 @@ function lockdownbrowser_check_for_lock() {
         }
 
         if (has_capability('mod/quiz:manage', $context)
+          || has_capability('mod/quiz:grade', $context) // Trac #3595
           || !has_capability('mod/quiz:view', $context)
-          || !has_capability('mod/quiz:attempt', $context)) {
-
+          || !has_capability('mod/quiz:attempt', $context)
+          ) {
             // May want to change this - see Trac #2341
             $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "NONE" . $discriminator;
+            return false;
 
         } else {
 
@@ -697,12 +723,12 @@ function lockdownbrowser_check_for_lock() {
             if ($ok) {
 
                 $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "VALID" . $discriminator;
+                return false;
 
             } else {
 
                 $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "INVALID" . $discriminator;
-                echo $myerror;
-                die;
+                return $myerror;
             }
         }
     }
@@ -711,19 +737,17 @@ function lockdownbrowser_check_for_lock() {
 function lockdownbrowser_db_locking_required() {
 
     global $CFG;
-    global $lockdownbrowser_require_db_locking;
 
     if ($CFG->version < 2014051200) {
         // Prior to Moodle 2.7.0
         return false;
     }
-    return $lockdownbrowser_require_db_locking;
+    return LOCKDOWNBROWSER_REQUIRE_DB_LOCKING;
 }
 
 function lockdownbrowser_update_unused_token_record_with_locking($sesskey, $timeused) {
 
     global $DB;
-    global $lockdownbrowser_max_db_lock_time;
 
     if (!lockdownbrowser_db_locking_required()) {
         return get_string('errdblocksupport', 'block_lockdownbrowser');
@@ -735,7 +759,7 @@ function lockdownbrowser_update_unused_token_record_with_locking($sesskey, $time
     $locktype = "block_lockdownbrowser_db";
     $resource = "unused_token_records";
     $lockfactory = new $lockclass($locktype);
-    $lock = $lockfactory->get_lock($resource, $lockdownbrowser_max_db_lock_time);
+    $lock = $lockfactory->get_lock($resource, LOCKDOWNBROWSER_MAX_DB_LOCK_TIME);
     if ($lock === false) {
         return get_string('errdbgetlock', 'block_lockdownbrowser');
     }
@@ -765,6 +789,87 @@ function lockdownbrowser_update_unused_token_record_with_locking($sesskey, $time
     return $obj1;
 }
 
+function lockdownbrowser_check_plugin_dependencies($resultstyle) {
+    // return false if dependencies are valid, or:
+    // resultstyle = 0, return an error string
+    // resultstyle = 1, return an error object
+    // resultstyle = 2, throw an exception
+    global $CFG;
+    $blockversion = lockdownbrowser_get_block_version();
+    if ($blockversion !== false) {
+        $ruleversion = lockdownbrowser_get_rule_version();
+        if ($ruleversion !== false) {
+            if (lockdownbrowser_compare_plugin_versions($ruleversion, $blockversion) === true) {
+                return false;
+            } else {
+                $identifier = "invalidversion";
+            }
+        } else {
+            $identifier = "noruleversion";
+        }
+    } else {
+        $identifier = "noblockversion";
+    }
+    $component = "block_lockdownbrowser";
+    if ($resultstyle == 1
+      && $CFG->version >= 2012062500 // Moodle 2.3.0+.
+      ) {
+        return new lang_string($identifier, $component);
+    } else if ($resultstyle == 2) {
+        print_error($identifier, $component);
+    } else {
+        return get_string($identifier, $component);
+    }
+}
+
+function lockdownbrowser_get_rule_version() {
+    global $CFG;
+    $plugin = new stdClass;
+    $version_file = $CFG->dirroot . '/mod/quiz/accessrule/lockdownbrowser/version.php';
+    if (is_readable($version_file)) {
+        include($version_file);
+    }
+    $version = false;
+    if (isset($plugin)) {
+        if (!empty($plugin->version)) {
+            $version = $plugin->version;
+        }
+    }
+    return $version;
+}
+
+function lockdownbrowser_get_block_version() {
+    global $CFG;
+    $plugin = new stdClass;
+    $version_file = $CFG->dirroot . '/blocks/lockdownbrowser/version.php';
+    if (is_readable($version_file)) {
+        include($version_file);
+    }
+    $version = false;
+    if (isset($plugin)) {
+        if (!empty($plugin->version)) {
+            $version = $plugin->version;
+        }
+    }
+    return $version;
+}
+
+function lockdownbrowser_compare_plugin_versions($ruleversion, $blockversion) {
+    // return true if the specified plugin versions are considered equal for
+    // the purposes of dependency checking, else return false
+    $comparelength = 8; // yyyymmddxx, but only consider first 8 digits
+    if (strlen($ruleversion) < $comparelength
+      || strlen($blockversion) < $comparelength ) {
+        return false;
+    }
+    if(substr($ruleversion, 0, $comparelength)
+      == substr($blockversion, 0, $comparelength)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
 /**
  * Checks if the currently logged in user is the Respondus Monitor user.
@@ -773,7 +878,6 @@ function lockdownbrowser_update_unused_token_record_with_locking($sesskey, $time
  */
 function lockdownbrowser_is_monitor_user() {
     global $CFG, $USER;
-
     return $CFG->block_lockdownbrowser_monitor_username == $USER->username;
 }
 // END UCLA MOD: CCLE-4027

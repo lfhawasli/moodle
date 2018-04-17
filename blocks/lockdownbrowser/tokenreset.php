@@ -1,12 +1,12 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 if (ini_get('zlib.output_compression')) {
     @ini_set('zlib.output_compression', 'Off');
 }
-require_once('../../config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
 require_once($CFG->libdir . '/adminlib.php');
 
 require_login();
