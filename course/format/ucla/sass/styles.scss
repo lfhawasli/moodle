@@ -1,11 +1,13 @@
 @import "topics";   // Include the topics css as a base.
-@import "course";
 
 // Import theme files.
 @import "../../../../theme/uclashared/scss/variables";
 @import "../../../../theme/boost/scss/bootstrap/variables";
 @import "../../../../theme/boost/scss/bootstrap/mixins";
 @import "../../../../theme/boost/scss/bootstrap/tags";
+
+@import "course";
+@import "editing";
 
 .format-ucla {
     // The section name.
