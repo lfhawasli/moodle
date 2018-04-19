@@ -48,15 +48,13 @@ class block_ucla_media extends block_base {
     /**
      * Hook into UCLA Site menu block.
      *
-     * @param object $course
+     * @param integer $courseid
      *
      * @return array
      */
-    public static function get_navigation_nodes($course) {
+    public static function get_navigation_nodes($courseid) {
         global $DB;
         $nodes = array();
-
-        $courseid = $course['course']->id;
 
         // Make sure user is logged in.
         $context = context_course::instance($courseid);
