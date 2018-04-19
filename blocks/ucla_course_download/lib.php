@@ -110,3 +110,19 @@ function block_ucla_course_download_ucla_format_notices($course) {
 
     return true;
 }
+
+/**
+ * Adds download course materials link to admin panel.
+ *
+ * @param navigation_node $navigation The navigation node to extend.
+ * @param stdClass        $course     The course object for the tool.
+ * @param context         $context    The context of the course.
+ */
+function block_ucla_course_download_extend_navigation_course($navigation, $course, $context) {
+    if (has_capability('block/ucla_course_download:requestzip', $context)) {
+        $setting = navigation_node::create(get_string('coursedownload', 'block_ucla_course_download'),
+                new moodle_url('/blocks/ucla_course_download/view.php',
+                        array('courseid' => $course->id)), navigation_node::TYPE_SETTING);
+        $navigation->add_node($setting);
+    }
+};

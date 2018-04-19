@@ -65,27 +65,5 @@ class block_ucla_copyright_status extends block_base {
             'text' => $text);
     }
 
-    /**
-     * Adding link to copyright management in control panel, in "Other tools".
-     *
-     * @global type $CFG
-     * @param object $course
-     * @param object $context
-     */
-    static function ucla_cp_hook($course, $context) {
-        global $CFG;
-
-        $result = array();
-        $result[] = array(
-                'item_name' => 'manage_copyright',
-                'tags' => array('ucla_cp_mod_other'),
-                'action' => new moodle_url('/blocks/ucla_copyright_status/view.php',
-                    array('courseid' => $course->id)),
-                'required_cap' => 'moodle/course:manageactivities'
-            );
-
-        return $result;
-    }
-
 }
 

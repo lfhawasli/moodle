@@ -35,10 +35,6 @@ $string['instruction_text1'] = 'Be sure to click the "Save changes" button at th
 $string['javascriptdisabled'] = 'Javascript is disabled on your browser. Please enable it to ensure the page function correctly.';
 $string['withselected'] = ' With selected: ';
 
-// These are for the link into control panel.
-$string['manage_copyright'] = 'Manage copyright status';
-$string['manage_copyright_post'] = 'View and edit the copyright status for uploaded files.';
-
 // Strings for alert notice.
 $string['alert_msg'] = 'Your site has {$a} piece(s) of content without a copyright status assigned. Would you like to assign copyright status now?';
 $string['alert_yes'] = 'Yes';
@@ -54,3 +50,6 @@ $string['aria_copyright_badge'] = ' items without copyright status.';
 
 // Strings for events.
 $string['eventcopyright_status_updated'] = 'Updated copyright status';
+
+// Admin panel strings.
+$string['managecopyright'] = 'Manage copyright';

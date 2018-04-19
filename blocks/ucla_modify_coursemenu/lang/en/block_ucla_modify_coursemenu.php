@@ -24,10 +24,6 @@
 
 $string['pluginname'] = 'Modify sections';
 
-// Control panel hook text display.
-$string['modify_course_sections'] = 'Modify site menu sections';
-$string['modify_course_sections_post'] = '';
-
 $string['addnewsection'] = 'Add new section';
 $string['deletingcontents'] = 'Delete content';
 
@@ -69,3 +65,6 @@ $string['enablelandingpagebydates'] = 'Enable landing page by dates.';
 // Cache string for "Landing Page by Dates".
 $string['cachedef_landingpagebydatesdb'] = 'Cache to store revision times of Landing Page by Dates database data.';
 $string['cachedef_landingpagebydatesdisplay'] = 'Cache to store revision times of Landing Page by Dates display data.';
+
+// Admin panel strings.
+$string['modifysections'] = 'Modify site sections';
