@@ -77,7 +77,7 @@ class modify_navigation {
      * Adds the auto-generated Activities/Resources section.
      */
     private function add_activityresources() {
-        global $CFG, $COURSE, $PAGE;
+        global $CFG, $COURSE;
 
         // See if we should show Activities/Resources section.
         $format = course_get_format($COURSE);
@@ -162,6 +162,111 @@ class modify_navigation {
 
         // Make activities collapsible.
         $this->collapsenodesforjs[] = 'themeuclasharedactivities';
+    }
+
+    /**
+     * Add More section.
+     */
+    private function add_more() {
+        global $CFG, $COURSE;
+
+        // See if we should show More section.
+        $format = course_get_format($COURSE);
+        if (($format->get_format() != 'ucla')) {
+            return;
+        }
+
+        // Create More Section node. Flat node so it.
+        $morenode = \navigation_node::create(get_string('moresection', 'theme_uclashared'),
+                new \moodle_url('/course/view.php', array('id' => $COURSE->id)), // We have to add a URL to the course node,
+                                                                                // otherwise the node wouldn't be added to
+                                                                                // the flat navigation by Boost.
+                                                                                // There is no better choice than the course
+                                                                                // home page.
+                \global_navigation::TYPE_CUSTOM,
+                null,
+                'themeuclasharedmore',
+                null);
+        // Prevent that the more section node is marked as active and added to the breadcrumb when showing the
+        // course home page.
+        $morenode->make_inactive();
+        $morenode->isexpandable = true;
+
+        // Get the user preference for the collapse state of the more section node and set the collapse and hidden
+        // node attributes of the more section node accordingly. At the same time, reallocate the parent of the
+        // existing section nodes.
+        $userprefmorenode = get_user_preferences('theme_uclashared-collapse_'.
+                'themeuclasharedmorenode', 1);
+        if ($userprefmorenode == 1) {
+            $morenode->collapse = true;
+        } else {
+            $morenode->collapse = false;
+        }
+
+        // Add the more section node.
+        $this->coursenode->add_node($morenode);
+
+        // $params is used as a parameter to send to the blocks which generate the nav nodes
+        $params['course'] = $COURSE;
+
+        // Add library reserve guide node.
+        $librarynode = block_method_result('ucla_library_portal', 'get_navigation_nodes', $params);
+        if (!empty($librarynode)) {
+            // The node is wrapped in an array returned by get_navigation_nodes().
+
+            if ($userprefmorenode == 1) {
+                $librarynode->hidden = true;
+            } else {
+                $librarynode->hidden = false;
+            }
+
+            // Add the library node to the coursehome node.
+            $this->coursenode->add_node($librarynode);
+
+            // Need to set parent only after adding it.
+            $librarynode->set_parent($morenode);
+        }
+
+        // Add subject area nodes.
+        $subjectlinks = block_method_result('ucla_subject_links', 'get_navigation_nodes', $params);
+        if (!empty($subjectlinks)) {
+            // Iterate the array if multiple subject links are to be displayed
+            foreach ($subjectlinks as $subjectlinknode) {
+                if ($userprefmorenode == 1) {
+                    $subjectlinknode->hidden = true;
+                } else {
+                    $subjectlinknode->hidden = false;
+                }
+
+                // Add the library node to the coursehome node.
+                $this->coursenode->add_node($subjectlinknode);
+
+                // Need to set parent only after adding it.
+                $subjectlinknode->set_parent($morenode);
+            }
+        }
+
+        // Add MyEngineering node.
+        $myengineeringnode = block_method_result('ucla_myengineer', 'get_navigation_nodes', $params);
+        if (!empty($myengineeringnode)) {
+            // The node is wrapped in an array returned by get_navigation_nodes().
+            $myengineeringnode = $myengineeringnode[0];
+
+            if ($userprefmorenode == 1) {
+                $myengineeringnode->hidden = true;
+            } else {
+                $myengineeringnode->hidden = false;
+            }
+
+            // Add the library node to the coursehome node.
+            $this->coursenode->add_node($myengineeringnode);
+
+            // Need to set parent only after adding it.
+            $myengineeringnode->set_parent($morenode);
+        }
+
+        // Make more section collapsible.
+        $this->collapsenodesforjs[] = 'themeuclasharedmore';
     }
 
     /**
@@ -432,6 +537,7 @@ class modify_navigation {
             $this->add_syllabus();
             $this->add_show_all();
             $this->add_activityresources();
+            $this->add_more();
             $this->add_editingmode();
             $this->add_courseadmin();
         }

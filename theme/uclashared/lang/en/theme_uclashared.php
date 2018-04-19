@@ -26,6 +26,9 @@ $string['pluginname'] = 'UCLA theme';
 $string['region-side-pre'] = 'Right';   // Boost no longer has left region.
 $string['choosereadme'] = 'The theme from University of California, Los Angeles.';
 
+// CCLE-7346 - Add More section to nav drawer
+$string['moresection'] = 'More...';
+
 $string['control_panel'] = 'Control Panel';
 
 $string['help_n_feedback'] = 'Need Help';
