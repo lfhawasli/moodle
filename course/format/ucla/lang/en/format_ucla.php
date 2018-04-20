@@ -87,3 +87,6 @@ $string['label'] = 'Label';
 $string['activity'] = 'Activity/Resource';
 $string['add'] = 'ADD';
 $string['manage'] = 'MANAGE';
+
+// Admin panel strings.
+$string['adminpanel'] = 'Admin panel';

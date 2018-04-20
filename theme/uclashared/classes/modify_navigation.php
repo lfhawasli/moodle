@@ -181,15 +181,15 @@ class modify_navigation {
     }
 
     /**
-     * Add link to new Control Panel/Site administration page, see CCLE-7193.
+     * Add link to Admin panel page, see CCLE-7193.
      */
     private function add_courseadmin() {
         global $PAGE;
 
         if (is_enrolled($PAGE->context) || has_capability('moodle/course:view', $PAGE->context)) {
-            $adminurl = new \moodle_url('/course/admin.php',
+            $adminurl = new \moodle_url('/course/format/ucla/admin_panel.php',
                     array('courseid' => $PAGE->course->id));
-            $courseadmin = \navigation_node::create(get_string('courseadministration'),
+            $courseadmin = \navigation_node::create(get_string('adminpanel', 'format_ucla'),
                         $adminurl, \navigation_node::TYPE_SETTING,
                         null, 'courseadministration', new \pix_icon('i/settings', ''));
 
