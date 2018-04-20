@@ -58,6 +58,13 @@ class modify_navigation {
     private $navigation = null;
 
     /**
+     * Flag to track whether divider is displayed after course sections.
+     *
+     * @var boolean
+     */
+    private $showdividercalled = false;
+
+    /**
      * Magic getter.
      *
      * @param string $name
@@ -130,9 +137,13 @@ class modify_navigation {
         }
 
         // Add the activities node to the end of the course navigation.
-        $flatnode = new \flat_navigation_node($activitiesnode, 0);
-        $flatnode->set_showdivider(true);
-        $activitiesnode = $this->coursenode->add_node($flatnode);
+        // If activities node is to be displayed as a new flat nav block
+        if ($this->showdividercalled === false) {
+            $activitiesnode = new \flat_navigation_node($activitiesnode, 0);
+            $activitiesnode->set_showdivider(true);
+            $this->showdividercalled = true;
+        }
+        $activitiesnode = $this->coursenode->add_node($activitiesnode);
 
         // Create an activity course node for each activity type.
         foreach ($modnamesused as $mod => $name) {
@@ -162,6 +173,28 @@ class modify_navigation {
 
         // Make activities collapsible.
         $this->collapsenodesforjs[] = 'themeuclasharedactivities';
+    }
+
+    /**
+     * Add link to media resources
+     */
+    private function add_mediaresources() {
+        global $CFG, $PAGE;
+
+        require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
+        require_once($CFG->dirroot . '/blocks/ucla_media/block_ucla_media.php');
+        $mediaresourcenode = \block_ucla_media::get_navigation_nodes($PAGE->course->id);
+        if (!empty($mediaresourcenode)) {
+            // The node is wrapped in an array returned by get_navigation_nodes().
+            $mediaresourcenode = $mediaresourcenode[0];
+            // If media resources node is to be displayed as a new flat nav block
+            if ($this->showdividercalled === false) {
+                $mediaresourcenode = new \flat_navigation_node($mediaresourcenode, 0);
+                $mediaresourcenode->set_showdivider(true);
+                $this->showdividercalled = true;
+            }
+            $this->coursenode->add_node($mediaresourcenode);
+        }
     }
 
     /**
@@ -431,6 +464,7 @@ class modify_navigation {
         if ($PAGE->course->id != SITEID) {
             $this->add_syllabus();
             $this->add_show_all();
+            $this->add_mediaresources();
             $this->add_activityresources();
             $this->add_editingmode();
             $this->add_courseadmin();
