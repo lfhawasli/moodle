@@ -198,6 +198,32 @@ class modify_navigation {
     }
 
     /**
+     * Add link to Library reserves.
+     */
+    private function add_libraryreserves() {
+        global $CFG, $COURSE;
+
+        // $params is used as a parameter to send to the blocks which generate the nav nodes
+        $params['course'] = $COURSE;
+
+        require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
+        require_once($CFG->dirroot . '/blocks/ucla_library_reserves/block_ucla_library_reserves.php');
+        $libraryreserves = \block_ucla_library_reserves::get_navigation_nodes($params);
+        if (!empty($libraryreserves)) {
+            // Iterate the array if multiple library reserves are to be displayed.
+            foreach ($libraryreserves as $libraryreservenode) {
+                // If library reserve node is to be displayed as a new flat nav block
+                if ($this->showdividercalled === false) {
+                    $libraryreservenode = new \flat_navigation_node($libraryreservenode, 0);
+                    $libraryreservenode->set_showdivider(true);
+                    $this->showdividercalled = true;
+                }
+                $this->coursenode->add_node($libraryreservenode);
+            }
+        }
+    }
+
+    /**
      * Check if the page is editable and the user has editing permissions.
      * If button is to be displayed for the conditions, return true, otherwise false.
      * Currently checks if the page is grader page, course section page or syllabus section page.
@@ -464,6 +490,7 @@ class modify_navigation {
         if ($PAGE->course->id != SITEID) {
             $this->add_syllabus();
             $this->add_show_all();
+            $this->add_libraryreserves();
             $this->add_mediaresources();
             $this->add_activityresources();
             $this->add_editingmode();
