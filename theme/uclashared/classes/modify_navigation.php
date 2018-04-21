@@ -176,19 +176,16 @@ class modify_navigation {
     }
 
     /**
-<<<<<<< HEAD
-     * Add link to media resources
+     * Add link to media resources.
      */
     private function add_mediaresources() {
-        global $CFG, $PAGE;
+        global $COURSE;
 
-        require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
-        require_once($CFG->dirroot . '/blocks/ucla_media/block_ucla_media.php');
-        $mediaresourcenode = \block_ucla_media::get_navigation_nodes($PAGE->course->id);
+        $params['course'] = $COURSE;
+
+        $mediaresourcenode = block_method_result('ucla_media', 'get_navigation_nodes', $params);
         if (!empty($mediaresourcenode)) {
-            // The node is wrapped in an array returned by get_navigation_nodes().
-            $mediaresourcenode = $mediaresourcenode[0];
-            // If media resources node is to be displayed as a new flat nav block
+            // If media resources node is to be displayed as a new flat nav block.
             if ($this->showdividercalled === false) {
                 $mediaresourcenode = new \flat_navigation_node($mediaresourcenode, 0);
                 $mediaresourcenode->set_showdivider(true);
@@ -202,18 +199,15 @@ class modify_navigation {
      * Add link to Library reserves.
      */
     private function add_libraryreserves() {
-        global $CFG, $COURSE;
+        global $COURSE;
 
-        // $params is used as a parameter to send to the blocks which generate the nav nodes
         $params['course'] = $COURSE;
 
-        require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
-        require_once($CFG->dirroot . '/blocks/ucla_library_reserves/block_ucla_library_reserves.php');
-        $libraryreserves = \block_ucla_library_reserves::get_navigation_nodes($params);
+        $libraryreserves = block_method_result('ucla_library_reserves', 'get_navigation_nodes', $params);
         if (!empty($libraryreserves)) {
             // Iterate the array if multiple library reserves are to be displayed.
             foreach ($libraryreserves as $libraryreservenode) {
-                // If library reserve node is to be displayed as a new flat nav block
+                // If library reserve node is to be displayed as a new flat nav block.
                 if ($this->showdividercalled === false) {
                     $libraryreservenode = new \flat_navigation_node($libraryreservenode, 0);
                     $libraryreservenode->set_showdivider(true);
