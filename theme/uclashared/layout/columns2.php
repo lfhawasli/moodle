@@ -48,7 +48,9 @@ $templatecontext = [
     'bodyattributes' => $bodyattributes,
     'navdraweropen' => $navdraweropen,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
-    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu)
+    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
+    'system_link' => get_config('theme_uclashared', 'system_link'),
+    'system_name' => get_config('theme_uclashared', 'system_name')
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;

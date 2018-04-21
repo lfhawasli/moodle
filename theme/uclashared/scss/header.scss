@@ -1,0 +1,335 @@
+//
+// UCLA / Header
+//
+
+
+
+//
+// Header styles for CCLE banner.
+//
+// This defines a two part header.  
+//  1. Logo + user buttons
+//  2. System + weeks display
+
+header {
+
+    width: 100%;
+    margin-bottom: 8px;
+    
+    .nav-toggle {
+        margin-left: 15px;
+        margin-top: 4px;
+        .btn {
+            line-height: 1rem;
+            padding: .2rem .3rem;
+            margin-top: 4px;
+        }
+    }
+    
+    .wrapper .header-top {
+        background-color: $ccle-light-blue;
+        margin-top: -8px;
+        width: 100%;
+        z-index: 3;
+        height: 25px;
+        padding: 0 1em;
+        
+        .ucla-url {
+            margin-top: 2px;
+            color: $link-hover-color;
+        }
+        .weeks-display {
+            color: $link-hover-color;
+            background-color: initial;
+            clear: right;
+            float: right;
+            display: inline-block;
+            padding: 2px 4px;
+
+            .week {
+                &:before {
+                    content: " - ";
+                }
+            }
+        }
+        
+    }
+    
+    .header-main {
+        background-color: $header-color-prod; //2c5e91
+        position: absolute;
+        width: 100%;
+        z-index: 3;
+        height: $header-height;
+    
+        // System environment colors
+        .env-behat & {
+            background-image: none;
+            background-color: $header-color-dev;
+        }
+        .env-dev & {
+            background-image: none;
+            background-color: $header-color-dev;
+        }
+        .env-test & {
+            background-image: none;
+            background-color: $header-color-test;
+        }
+        .env-stage & {
+            background-image: none;
+            background-color: $header-color-stage;
+        }
+ 
+    }
+    
+    .header-border {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        background-color: $header-color-prod;
+    }
+
+    .help-dropdown-menu {
+        background-color: white;
+        margin: 0;
+        min-width: 143px;
+        opacity: 0.97;
+        position: absolute;
+        top: 40px;
+        z-index: 99999;
+        
+        &.hidden {
+            display: none;
+            visibility: hidden;
+        }
+        li {
+            list-style: none;
+            
+            .arrow-up {
+                position: absolute;
+                left: 5%;
+                top: -5px;
+                border-bottom-color: white;
+            }
+            
+            a {
+                font-size: 1.3rem;
+                display: inline-block;
+                padding: 8px 10px;
+                width: 100%;
+                color: #333;
+                
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+            
+            &:nth-child(2n) {
+                background-color: #efefef;
+            }
+            &:hover {
+                background-color: #444;
+
+                a {
+                    color: #eee;
+                }
+            }
+        }
+
+    }
+    
+}
+
+// Defines how header logo area looks
+.header-logo {
+    text-align: left;
+    display: inline;
+    
+    // Remove the hover decoration on the logo
+    a, a:hover {
+        text-decoration: none;
+    }
+    
+    // UCLA Logo
+    .icon {
+        width: 60px;
+        height: 20px;
+        display: inline;
+        margin-left: .5rem;
+        margin-bottom: 0.9rem;
+        margin-right: -.3rem;
+    }
+
+    // CCLE text
+    .logo-ccle {
+        color: $ccle-color-logo;
+        font-weight: bold;
+
+        font-size: 1.8rem;
+        margin-right: 4px;
+        margin-left: 4px;
+        &:hover {text-decoration: none;}
+
+        .env-dev &, .env-test &, .env-stage & {
+            color: white;
+        }
+    }
+
+    .logo-system-name,
+    .logo-system-name-vertical-bar {
+        color: white;
+        font-weight: 150; 
+    }
+
+    .logo-system-name {
+        font-size: 1.45rem;
+    }
+
+    .logo-system-name-vertical-bar {
+        position: relative;
+        bottom: 2px;
+        font-size: 1.5rem;
+    }
+    
+    .logo-system-name:hover, 
+    .logo-system-name:active {
+        text-decoration: underline;
+    }
+
+    
+}
+
+.header-login {
+    float: right;
+    margin-right: 15px;
+    margin-top: -4px;
+    
+    .header-btn-group {
+        float: right;
+        color: white;
+        
+        .btn-header {
+          background-color: $ccle-color-logo;
+          padding: 10px 12px;
+          color: white;
+          display: inline-block;
+          font-weight: 300;
+          height: 40px;
+          -webkit-transition-property: background-color, color;
+          transition-property: background-color, color;
+          -webkit-transition-duration: 0.25s;
+          transition-duration: 0.25s;
+          -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+        }
+        .btn-header:hover {
+          background-color: #3e91cc;
+          text-decoration: none;
+        }
+        .btn-header.real-user {
+          padding-right: 24px;
+        }
+        .btn-header.real-user:after {
+          content: "]";
+        }
+        .btn-header.real-user:before {
+          content: "[";
+        }
+        .btn-header i {
+          margin-left: 4px;
+        }
+        a.btn-header {
+          color: white;
+        }
+        .btn-header-text {
+          font-size: 1.2rem;
+          padding: 10px 12px;
+          color: white !important;
+          display: inline-block;
+          font-weight: 300;
+          height: auto;
+        }
+
+
+    }
+    .header-btn-group .role-name {
+        padding-left: 8px;
+        font-size: 1.0rem;
+        color: #cbe2f2;
+    }
+    .header-btn-group .role-name:after {
+        content: ")";
+    }
+    .header-btn-group .role-name:before {
+        content: "(";
+    }
+    .header-btn-group .login-as {
+        font-size: 1.1rem;
+        margin-left: -20px;
+    }
+}
+
+// Help button
+.btn-help-feedback {
+    background-color: $ccle-color-logo;
+
+    &:hover {
+        background-color: $ccle-color-logo;
+    }
+    &:focus {
+        background-color: $ccle-color-logo;
+        border: 2px solid white;
+    }
+}
+
+a.btn-help-feedback {
+    color: black;
+    i {
+        margin-left: 2px;
+    }
+}
+
+.usermenu .moodle-actionmenu .toggle-display .userbutton
+.usertext{
+    font-weight: 300;
+    padding-bottom: 3px;
+}
+
+.usermenu .moodle-actionmenu:hover .toggle-display .userbutton .usertext {
+    color: white;
+}
+
+.usermenu .moodle-actionmenu .toggle-display {
+    padding: 0px;
+}
+
+.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .caret {
+    margin-top: 10px;
+}
+
+.caret {
+    border-top: 4px solid white;
+}
+
+a.dropdown-toggle, a.dropdown-toggle:hover {
+    color: #f5f8f9;
+}
+
+a:focus .caret, a:hover .caret {
+    border-top-color: white;
+}
+
+.usermenu {
+    margin-left: 10px;
+    .login a {
+        color: #f5f8f9;
+    }
+}
+.navbar {
+    .popover-region {
+        float: left;
+        margin-top: 7px;
+    }
+}
+

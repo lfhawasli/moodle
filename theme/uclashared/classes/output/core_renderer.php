@@ -17,7 +17,14 @@
 namespace theme_uclashared\output;
 
 use html_writer;
+use moodle_url;
+use custom_menu_item;
+use custom_menu;
+use action_link;
 use action_menu;
+use help_icon;
+use pix_icon;
+use block_contents;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -57,6 +64,23 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $c;
     }
 
+     /**
+     * Attempts to get a feature of another block to generate special text or
+     * link to put into the theme.
+     *
+     * @param string $blockname
+     * @param string $functionname
+     * @return string
+     */
+    public function call_separate_block_function($blockname, $functionname) {
+        if (during_initial_install()) {
+            return '';
+        }
+
+        return block_method_result($blockname, $functionname,
+                $this->page->course);
+    }
+
     /**
      * Returns copyright information used in footer.
      *
@@ -72,7 +96,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return string
      */
     public function footer_links() {
-
         $links = array(
             'contact_ccle',
             'about_ccle',
@@ -110,6 +133,110 @@ class core_renderer extends \theme_boost\output\core_renderer {
             }
         }
         return $footerstring;
+    }
+
+    /**
+     * Returns the HTML button for the help and feedback with a
+     * dropdown menu when available.
+     *
+     * @return string
+     */
+    public function help_feedback_link() {
+        $helplocale = $this->call_separate_block_function(
+                'ucla_help', 'get_action_link'
+        );
+
+        if (!$helplocale) {
+            return false;
+        }
+
+        // Main Help & Feedback link.
+        $hflinktext = html_writer::span(get_string('help_n_feedback', 'theme_uclashared'), '');
+        $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
+        $outlink = html_writer::link($helplocale, $hflinktext . $icon, array('class' => 'btn-header btn-help-feedback'));
+
+        // Show dropdown menu.
+        $menu = $this->custom_menu();
+
+        // Return full menu with link.
+        return html_writer::span($outlink . $menu, 'help-dropdown');
+    }
+
+    /**
+     * Renders the Help & Feedback dropdown menu using Moodle's own config.
+     * The menu items can be modified in Appearance > Themes > Theme settings.
+     *
+     * @see $CFG->custommenuitems
+     * @param custom_menu $menu
+     * @return string HTML output
+     */
+    protected function render_custom_menu(custom_menu $menu) {
+        if (!$menu->has_children()) {
+            return '';
+        }
+
+        $items = array();
+        foreach ($menu->get_children() as $k => $child) {
+
+            // Show an arrow above first item.
+            $arrow = $k === 0 ? html_writer::span('', 'arrow-up') : '';
+            $url = $child->get_url();
+
+            // For help requests, get URL with courseid.
+            // Assume this link is the first item in the menu.
+            if ($k === 0) {
+                $url = $this->call_separate_block_function('ucla_help', 'get_action_link');
+            }
+
+            $items[] = html_writer::tag('li',
+                html_writer::link($url, $arrow . $child->get_text())
+            );
+        }
+
+        $menu = html_writer::tag('ul', implode('', $items),
+            array('class' => 'help-dropdown-menu hidden', 'role' => 'menu')
+        );
+
+        return $menu;
+    }
+
+    /**
+     * This code renders the navbar button to control the display of the custom menu
+     * on smaller screens.
+     *
+     * Do not display the button if the menu is empty.
+     *
+     * @return string HTML fragment
+     */
+    public function navbar_button() {
+        global $CFG;
+
+        if (empty($CFG->custommenuitems) && $this->lang_menu() == '') {
+            return '';
+        }
+
+        $iconbar = html_writer::tag('span', '', array('class' => 'icon-bar'));
+        $button = html_writer::tag('a', $iconbar . "\n" . $iconbar. "\n" . $iconbar, array(
+            'class'       => 'btn btn-navbar',
+            'data-toggle' => 'collapse',
+            'data-target' => '.nav-collapse'
+        ));
+        return $button;
+    }
+
+    /**
+     * Calls the hook public function that will return the current week we are on.
+     */
+    public function weeks_display() {
+        $weekstext = $this->call_separate_block_function(
+                'ucla_weeksdisplay', 'get_week_display'
+        );
+
+        if (!$weekstext) {
+            return false;
+        }
+
+        return $weekstext;
     }
 
     /**

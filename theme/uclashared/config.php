@@ -57,3 +57,6 @@ $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
 
 // Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';
+
+// Add javascript files.
+$THEME->javascripts[] = 'help_feedback';

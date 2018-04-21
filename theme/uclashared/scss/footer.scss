@@ -3,7 +3,7 @@
 }
 #page-footer {
        
-    background: #2c5e91 url([[pix:theme|footer-bg]]) repeat-x bottom;
+    background: $header-color-prod url([[pix:theme|footer-bg]]) repeat-x bottom;
     border-top: 1px solid #17244c;
     color: white;
     min-height: 55px;

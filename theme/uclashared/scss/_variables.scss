@@ -72,6 +72,8 @@ $link-hover-color: $brand-primary;
 // UCLA colors.
 $ucla-color-blue:   #3284bf !default;
 $ucla-color-gold:   #ffe800 !default;
+$ccle-color-logo:   #ffbc00 !default;
+$ccle-light-blue:   #bfefff !default;
 
 // Colors.
 $btn-color-editing: #f29644;
@@ -104,7 +106,7 @@ $session-summer-color: black;
  * @type Color
  * @group header
  */
-$header-color-prod:     $ucla-color-blue !default;
+$header-color-prod:     #2c5e91 !default;
 
 /**
  * Header color for TEST header
@@ -145,3 +147,11 @@ $header-color-system-background: #fff !default;
  * @group header
 */
 $header-color-system-text:   $header-color-prod;
+
+/**
+ * Header height.  All elements in the header must have this height or smaller.
+ * 
+ * @type Number in px
+ * @group header 
+ */
+$header-height: 40px;
