@@ -57,7 +57,7 @@ class course_edit_form extends moodleform {
 //            $mform->addElement('static', 'indicator', 
 //                    get_string('type', 'tool_uclasiteindicator'), 
 //                    get_string('site_registrar', 'tool_uclasiteindicator'));
-        } else {
+        } else if (course_get_format($course)->get_format() == 'ucla') {
             // user can assign site type if they have the capability at site, 
             // category, or course level
             $can_edit_sitetype = false;
