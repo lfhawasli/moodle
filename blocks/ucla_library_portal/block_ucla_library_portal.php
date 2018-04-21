@@ -60,13 +60,12 @@ class block_ucla_library_portal extends block_base {
      */
     public static function get_navigation_nodes($courseinfo) {
         $course = $courseinfo['course'];
-        $retval = array();
 
         $libraryurl = get_config('block_ucla_library_portal', 'url');
 
         // Check to see if course is non-srs.
         if (is_collab_site($course) || empty($libraryurl)) {
-            return $retval;
+            return null;
         }
 
         $params = array();
@@ -96,10 +95,10 @@ class block_ucla_library_portal extends block_base {
         $libraryurl .= '?'.http_build_query($coursedetails, 'c');        
         
         $urlobj = new moodle_url($libraryurl, $params);
-        $node = navigation_node::create(get_string('portalname', 'block_ucla_library_portal'), $urlobj);
+        $node = navigation_node::create(get_string('portalname', 'block_ucla_library_portal'), 
+                $urlobj, global_navigation::TYPE_CUSTOM, null, null, new pix_icon('spacer', ''));
         $node->add_class('library-research-portal');
-        $retval[] = $node;
-        return $retval;
+        return $node;
     }
 
     /**
