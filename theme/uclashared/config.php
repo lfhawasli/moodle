@@ -26,6 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// Include Boost config so that we can override layouts.
+require_once(__DIR__ . '/../boost/config.php');
+
 $THEME->name = 'uclashared';
 
 // Parent theme.
@@ -55,8 +58,10 @@ $THEME->requiredblocks = '';
 // region into the page when editing is enabled and it takes up too much room.
 $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
 
+// Override Boost configs for layouts.
+$THEME->layouts['mydashboard']['options']['noheader'] = true;
+
 // Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';
-
 // Add javascript files.
 $THEME->javascripts[] = 'help_feedback';

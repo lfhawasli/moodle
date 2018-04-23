@@ -1,0 +1,67 @@
+{{!
+    This file is part of the UCLA My sites plugin for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_ucla_my_sites/mysites
+
+    Displays My sites page.
+
+    Example context (json):
+    {
+        "alerts": "Alerts html",
+        "nolisting": false,
+        "content": [
+            {
+                "id": "tabclass",
+                "name": "Class",
+                "listing": "Class listing html",
+                "active": "active",
+                "ariaexpanded": "true",
+                "selector": "Selector html"
+            },
+            {
+                "id": "tabcollab",
+                "name": "Collaboration",
+                "listing": "Collaboration listing html",
+                "active": "false",
+                "ariaexpanded": "false",
+                "selector": "Selector html"
+            }]
+    }
+}}
+
+<h1>{{#str}}pluginname, block_ucla_my_sites{{/str}}</h1>
+
+{{{alerts}}}
+
+{{^nolisting}}
+    <div id="filter-tabs-tabgroup-listing" class="filter-tabs-bootstrap boots-tabs">
+        <ul id="filter-tabs-titlegroup-1" class="nav nav-tabs" role="tablist">
+            {{#content}}
+                {{> block_ucla_my_sites/tab }}
+            {{/content}}
+        </ul>
+        <div id="filter-tabs-content-1" class="tab-content">
+            {{#content}}
+                {{> block_ucla_my_sites/listing }}
+            {{/content}}
+        </div>
+    </div>
+{{/nolisting}}
+
+{{#nolisting}}
+    {{#str}}noclasssitesatall, block_ucla_my_sites{{/str}}
+{{/nolisting}}

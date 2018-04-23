@@ -28,8 +28,7 @@ M.block_ucla_my_sites.usagelog = {
         Y.log('Loading tool usage log', 'info', 'block_ucla_my_sites');
 
         Y.one('.ucla-support-tools-mysites-favorites').delegate('click', function (e) {
-            var toolId =
-                    e.currentTarget.ancestor('.ucla-support-tool').getData('id');
+            var toolId = e.currentTarget.ancestor('.ucla-support-tool').getData('id');
             Y.io(M.cfg.wwwroot + '/local/ucla_support_tools/rest.php', {
                 method: 'POST',
                 data: {

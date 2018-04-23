@@ -537,17 +537,11 @@ class modify_navigation {
      * Remove items we do not want.
      */
     private function remove_nodes() {
-        global $COURSE;
         $nodestoremove = array('badgesview' => \global_navigation::TYPE_SETTING,
             'competencies' => \global_navigation::TYPE_SETTING,
             'home' => \global_navigation::TYPE_ROOTNODE,
-            'privatefiles' => \global_navigation::TYPE_SETTING);
-
-        // Some nodes we want on My sites.
-        if ($COURSE->id != SITEID) {
-            $this->navigation->showinflatnavigation = false;
-            $nodestoremove['calendar'] = \global_navigation::TYPE_CUSTOM;
-        }
+            'privatefiles' => \global_navigation::TYPE_SETTING,
+            'calendar' => \global_navigation::TYPE_CUSTOM);
 
         foreach ($nodestoremove as $name => $type) {
             if ($node = $this->navigation->find($name, $type)) {

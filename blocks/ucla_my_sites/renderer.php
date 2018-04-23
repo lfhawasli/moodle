@@ -35,10 +35,9 @@ class block_ucla_my_sites_renderer {
      * Construct contents of course_overview block
      *
      * @param array $classsites List of courses in sorted order
-     * @param array $overviews  List of course overviews
      * @return array content to be displayed in ucla_my_sites block
      */
-    public function class_sites_overview($classsites, $overviews) {
+    public function class_sites_overview($classsites) {
         global $PAGE;
         $content = array();
         $PAGE->requires->jquery();
@@ -70,10 +69,9 @@ class block_ucla_my_sites_renderer {
             }
             $subjareafull = $this->get_registrar_translation('ucla_reg_subjectarea',
                     $titlereginfo->subj_area, 'subjarea', 'subj_area_full');
-            $title = sprintf('%s<br>%s, %s %s - %s', $subjareafull[1],
+            $title = sprintf('%s %s<br>%s %s - %s', $subjareafull[1],
                     $titlereginfo->coursenum, $titlereginfo->acttype,
                     $titlereginfo->sectnum, $class->fullname);
-
 
             // Add link.
             if (!empty($class->url)) {
@@ -102,22 +100,6 @@ class block_ucla_my_sites_renderer {
                     );
                 }
             }
-            // Add Activity Log under each course if notifications exist.
-            if (property_exists($class, 'id') && isset($overviews[$class->id])) {
-                $alerts = count($overviews[$class->id]);
-                // Create Notification Icon with number of alerts.
-                $classlink .= html_writer::tag('a', $alerts, array(
-                        'href' => '#/', 'class' => 'alertCount',
-                        'id' => 'expand_course', 'style' => 'background-image: url("'.
-                        new moodle_url('/blocks/ucla_my_sites/img/message.png').'")',
-                        'title' => get_string('clicktohideshow')));
-
-                // Add activity display inside div so it can be expanded/collapsed
-                // by above icon.
-                $classlink .= html_writer::tag('div', $this->activity_display_opt
-                        ($class->id, $overviews[$class->id], true),
-                        array('class' => 'course_div'));
-            }
 
             $classlink .= '<br>';
             $content[] = $classlink;
@@ -126,75 +108,31 @@ class block_ucla_my_sites_renderer {
             }
         }
         $content[] = html_writer::end_tag('div');
-        // Add spacing between My sites & Collaboration sites sections.
-        $content[] = '<br><br>';
+
         return implode($content);
     }
 
     /**
-     * Construct contents of course_overview block
+     * Construct contents of collab_overview block.
      *
-     * @param array     $courses list of courses in sorted order
-     * @param array     $overviews list of course overviews
-     * @param stdClass  $cathierarchy hierarchy of all categories for sites
-     * @param string    $sortopstring HTML string for the sort options form
-     * @param string    $sortorder string param for the sort order of collab sites
+     * @param object $cathierarchy hierarchy of all categories for sites
+     * @param string $sortorder string param for the sort order of collab sites
+     *
      * @return array content to be displayed in ucla_my_sites block
      */
-    public function collab_sites_overview($collaborationsites, $overviews, $cathierarchy, $sortoptstring, $sortorder) {
-        global $USER, $CFG, $OUTPUT, $PAGE;
+    public function collab_sites_overview($cathierarchy, $sortorder) {
         $content = array();
 
-        $collapser = '';
-        // Add a collapse/expand icon if any class sites have notifications.
-        foreach ($overviews as $id => $value) {
-            foreach ($collaborationsites as $collabsite) {
-                if ($collabsite->id == $id) {
-                    $collapser = 'T';
-                    break;
-                }
-            }
-            if ($collapser == 'T') {
-                break;
-            }
-        }
-        if ($collapser == 'T') {
-            $collapser = html_writer::tag('a', html_writer::tag('img', '', array('src'
-                    => new moodle_url('/blocks/ucla_my_sites/img/expanded.svg'),
-                    'class' => 'collab_course_expand')), array('href' => '#/'));
-        }
-
-        $content[] = html_writer::tag('h3', get_string('collaborationsites',
-                'block_ucla_my_sites').$collapser, array('class' => 'mysitesdivider'));
-
-        // Add the form string to the $content array.
-        $content[] = $sortoptstring;
-        $content[] = html_writer::start_tag('div', array('class' => 'collab_sites_div'));
-
-        // Traverse the simplified category hierarchy and add the categories and collab sites to
-        // $content.
-        self::visit_top_categories($overviews, $cathierarchy, $content, $sortorder);
-
-        $content[] = html_writer::end_tag('div');
-        return implode($content);
-    }
-
-    /**
-     * Visits each of the top-level categories from the simplified hierarchy and
-     * display their collaboration sites.
-     * 
-     * @param array $overviews  The overviews for the collab sites
-     * @param stdClass $cathierarchy   The simplified hierarchy of the collab sites
-     * @param array $content   The content array to which HTML strings are added
-     * @param string $sortorder   The sortorder of the collab sites
-     */
-    public function visit_top_categories($overviews, $cathierarchy, &$content, $sortorder) {
+        // Traverse the simplified category hierarchy and add the categories and 
+        // collab sites to $content.
         foreach (array_values($cathierarchy->children) as $index => $category) {
             $content[] = html_writer::tag('h4', $category->name);
             $content[] = html_writer::start_div("collab_sites_container");
-            self::display_collab_sites($category->collabsites, $overviews, $content, $sortorder);
+            $this->display_collab_sites($category->collabsites, $content, $sortorder);
             $content[] = html_writer::end_div();
         }
+
+        return implode($content);
     }
 
     /**
@@ -202,11 +140,10 @@ class block_ucla_my_sites_renderer {
      * content array
      *
      * @param array $collaborationsites Contains stdClass with collab sites.
-     * @param array $overviews Contains overviews of the collab sites.
      * @param array $content The content array to which HTML elements should be added.
      * @param string    $sortorder string param for the sort order of collab sites
      */
-    public function display_collab_sites($collaborationsites, $overviews, &$content, $sortorder) {
+    public function display_collab_sites($collaborationsites, &$content, $sortorder) {
         // Sort the collaboration sites now.
         usort($collaborationsites, function($a, $b) use ($sortorder) {
             if ($sortorder === 'sitename') {
@@ -220,76 +157,12 @@ class block_ucla_my_sites_renderer {
                     array('id' => ($collab->id))), $collab->fullname,
                     array('class' => 'course_title'));
 
-            // Add Activity Log under each course if notifications exist.
-            if (property_exists($collab, 'id') && isset($overviews[$collab->id])) {
-                $alerts = count($overviews[$collab->id]);
-                // Create Notification Icon with number of alerts.
-                $collablink .= html_writer::tag('a', $alerts, array(
-                        'href' => '#/', 'class' => 'alertCount',
-                        'id' => 'expand_course', 'style' => 'background-image: url("'.
-                        new moodle_url('/blocks/ucla_my_sites/img/message.png').'")',
-                        'title' => get_string('clicktohideshow')));
-                // Add activity display inside div so it can be expanded/collapsed
-                // by above icon.
-                $collablink .= html_writer::tag('div', $this->activity_display_opt($collab->id,
-                        $overviews[$collab->id], true), array('class' => 'course_div'));
-            }
             $collablink .= '<br>';
             $content[] = $collablink;
             if ($x < count($collaborationsites)) {
                 $content[] = '<hr class="course_divider">';
             }
         }
-    }
-
-    /**
-     * Construct activities overview for a course.
-     *
-     * @param int $cid course id
-     * @param array $overview overview of activities in course
-     * @param bool $default initial collapsed state to use if the user_preference it not set.
-     * @return string html of activities overview
-     */
-    protected function activity_display_opt($cid, $overview, $default) {
-        $output = html_writer::start_tag('div', array('class' => 'activity_info'));
-        foreach (array_keys($overview) as $module) {
-            $output .= html_writer::start_tag('div', array('class' => 'activity_overview'));
-            $url = new moodle_url("/mod/$module/index.php", array('id' => $cid));
-            $modulename = get_string('modulename', $module);
-            $icontext = html_writer::link($url, $this->output->pix_icon('icon',
-                    $modulename, 'mod_'.$module, array('class' => 'iconlarge')));
-            if (get_string_manager()->string_exists("activityoverview", $module)) {
-                $icontext .= get_string("activityoverview", $module);
-            } else {
-                $icontext .= get_string("activityoverview", 'block_course_overview', $modulename);
-            }
-
-            // Add collapsible region with overview text in it.
-            $output .= $this->collapsible_region($overview[$module], '', 'region_'.$cid.'_'.$module, $icontext, '', $default);
-
-            $output .= html_writer::end_tag('div');
-        }
-        $output .= html_writer::end_tag('div');
-        return $output;
-    }
-    /**
-     * Print (or return) the start of a collapsible region
-     *
-     * The collapsibleregion has a caption that can be clicked to expand or collapse the region.
-     * If JavaScript is off, then the region will always be expanded.
-     *
-     * @param string $classes class names added to the div that is output.
-     * @param string $id id added to the div that is output. Must not be blank.
-     * @param string $caption text displayed at the top. Clicking on this will cause the region to expand or contract.
-     * @param string $userpref the name of the user preference that stores the user's preferred default state.
-     *      (May be blank if you do not wish the state to be persisted.
-     * @param boolean $default Initial collapsed state to use if the user_preference it not set.
-     * @return string returns a string of HTML.
-     */
-    protected function collapsible_region_start($classes, $id, $caption, $userpref = '', $default = false) {
-        // Expand by default.
-        $expand = false;
-        return print_collapsible_region_start($classes, $id, $caption, $userpref, $default, true);
     }
 
     /**
@@ -304,7 +177,7 @@ class block_ucla_my_sites_renderer {
      * @param string $target       The string we are translating.
      * @param string $fromfield   The field that we are using to search if the
      *                             target exists.
-     * @param string $to_field     The field that we are going to return if we
+     * @param string $tofield     The field that we are going to return if we
      *                             find the target entry.
      * @return An array containing both the short and long name of the target.
      *         If a long name was not found, will return the short name again.

@@ -247,6 +247,12 @@ class core_renderer extends \theme_boost\output\core_renderer {
     public function full_header() {
         global $PAGE, $COURSE;
 
+        if (!empty($PAGE->layout_options['noheader']) &&
+                $PAGE->url->get_path() !== '/my/indexsys.php') {
+            // We still need header when customizing Dashboard.
+            return '';
+        }
+
         if ($COURSE->format !== 'ucla') {
             return parent::full_header();
         }

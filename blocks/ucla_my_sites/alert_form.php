@@ -15,10 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * my_sites alert form definition.
+ * Alert form definition.
  *
- * @package    blocks
- * @subpackage ucla_my_sites
+ * @package    block_ucla_my_sites
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir . '/formslib.php');
 
 /**
- * my_sites form class.
+ * Form class.
  *
  * Used to create a form for dismissing the notification
  * regarding an alternate email.
