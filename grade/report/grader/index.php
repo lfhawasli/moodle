@@ -239,15 +239,4 @@ $event = \gradereport_grader\event\grade_report_viewed::create(
 );
 $event->trigger();
 
-// START UCLA MOD: CCLE-4168 - General gradebook improvements.
-if (local_ucla_core_edit::using_ucla_theme()) {
-    // Render a help sidebar.
-    echo ucla_sidebar::help(array(
-        new sidebar_file('/blocks/ucla_help/topics/gradebook/color_legend.php'),
-        new sidebar_docs('Gradebook'),
-        new sidebar_feedback()
-    ));
-}
-// END UCLA MOD: CCLE-4168
-
 echo $OUTPUT->footer();
