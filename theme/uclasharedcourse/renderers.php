@@ -24,7 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 
-
 /**
  * Theme version info
  *
@@ -32,7 +31,7 @@ require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
  * @copyright  UC Regents 2017
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_renderer {
+class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_renderer {
 
     /**
      * Public course theme.
@@ -40,12 +39,14 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
      * @var bool
      */
     public $coursetheme = true;
+
     /**
      * Public header class.
      *
      * @var array
      */
     public $headerclasses = array();
+
     /**
      * Public theme name.
      *
@@ -58,11 +59,13 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
      * @var string
      */
     private $theme = 'theme';
+
     /**
      * Component.
      * @var string
      */
     private $component = 'theme_uclasharedcourse';
+
     /**
      * Course Logo.
      * @var string
@@ -78,7 +81,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
      * @param moodle_url $address
      * @return string
      */
-    public function logo($pix, $pixloc, $address=null) {
+    public function logo($pix, $pixloc, $address = null) {
         global $CFG, $COURSE, $DB;
 
         $category = $DB->get_record('course_categories', array('id' => $COURSE->category));
@@ -158,9 +161,8 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
         global $COURSE;
         $context = context_course::instance($COURSE->id);
 
-        file_save_draft_area_files($data->logo_attachments,
-            $context->id, $this->component, $this->filearea,
-            $COURSE->id, $this->course_logo_config());
+        file_save_draft_area_files($data->logo_attachments, $context->id,
+                $this->component, $this->filearea, $COURSE->id, $this->course_logo_config());
         return;
     }
 
@@ -187,7 +189,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
     /**
      * Retrieve logo images for a course.
      *
-     * @return stored_file[] array of stored_files indexed by pathanmehash
+     * @return stored_file[] array of stored_files indexed by pathnamehash
      */
     private function course_logo_images() {
         global $COURSE;
@@ -199,11 +201,11 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
         $context = context_course::instance($COURSE->id);
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, $this->component,
-                $this->filearea, $COURSE->id, '', false);
+        $files = $fs->get_area_files($context->id, $this->component, $this->filearea, $COURSE->id, '', false);
 
         return $files;
     }
+
     /**
      * Render HTML code for course logos.
      *
@@ -238,7 +240,6 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
 
                 $div = html_writer::tag('div', $img, array('class' => 'uclashared-course-logo'));
                 $out .= $div;
-
             }
         }
 
@@ -256,8 +257,9 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
     public function edit_form_filepicker(&$mform, $courseid, $contextid) {
 
         // Add a file manager.
-        $mform->addElement('filemanager', 'logo_attachments', get_string('additional_logos', 'theme_uclasharedcourse'),
-                null, $this->course_logo_config());
+        $mform->addElement('filemanager', 'logo_attachments',
+                get_string('additional_logos', 'theme_uclasharedcourse'), null,
+                $this->course_logo_config());
 
         // Show logo guide.
         $pixurl = $this->image_url('guide', 'theme');
@@ -267,13 +269,12 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared_core_rendere
         // Check if we already have images.
         $draftitemid = file_get_submitted_draft_itemid('logo_attachments');
 
-        file_prepare_draft_area($draftitemid,
-                $contextid,
-                $this->component, $this->filearea, $courseid,
-                $this->course_logo_config());
+        file_prepare_draft_area($draftitemid, $contextid, $this->component,
+                $this->filearea, $courseid, $this->course_logo_config());
 
         $data['logo_attachments'] = $draftitemid;
 
         return $data;
     }
+
 }
