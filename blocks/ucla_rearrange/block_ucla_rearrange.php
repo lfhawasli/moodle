@@ -157,11 +157,11 @@ class block_ucla_rearrange extends block_base {
 
         $rootnodes = modnode::build($nodes);
 
-        // Add a pseudo-node that is required for section-to-section movement
-        // of modules.
-        $rootnodes = array_merge(array(
-                new modnode($section . "-" . 0, '', 0, true)
-            ), $rootnodes);
+//        // Add a pseudo-node that is required for section-to-section movement
+//        // of modules.
+//        $rootnodes = array_merge(array(
+//                new modnode($section . "-" . 0, '', 0, true)
+//            ), $rootnodes);
 
         return $rootnodes;
     }
@@ -376,7 +376,7 @@ class block_ucla_rearrange extends block_base {
             $ordersections=array()) {
         global $DB, $COURSE;
 
-        // Split the arrary of oldsections with new modules into
+        // Split the array of oldsections with new modules into
         // an array of section sequences, and module indents?
         $coursemodules = array();
         $sections = array();
@@ -574,10 +574,11 @@ class modnode {
                     array('class' => block_ucla_rearrange::HIDDENCLASS));
         }
 
-        $self = html_writer::tag('li', $this->modtext . $ishiddentext .
-                $childrender, array('id' => 'ele-' . $this->modid,
-                                    'class' => $class
-        ));
+        $current = html_writer::tag('div', $this->modtext . $ishiddentext);
+        $self = html_writer::tag('li', $current . $childrender,
+                array('id' => 'ele-' . $this->modid,
+                      'class' => $class)
+        );
 
         return $self;
     }

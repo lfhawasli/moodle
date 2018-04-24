@@ -1,15 +1,9 @@
 /** CSS for Rearrange **/
 
-.ns-list-class .ns-invisible {
-    height: 0;
-    border: 0 solid white;
-}
-
 .sectiontitle {
-    background: transparent url([[pix:theme|bgFormHdr]]) top left repeat;
+    background: transparent linear-gradient(#FEDE91, #FBECC3);
     font-weight: bold;
     position: relative;
-    display: block;
     border-bottom: 1px solid #989fad;
     padding: 0 8px 0px 8px;
 }
@@ -19,11 +13,13 @@
     list-style: none;
 }
 
+li > div {
+    cursor: move;
+}
+
 .ns-list-class {
     margin: 0 2.0em;
     padding: 0;
-    cursor: move;
-    list-style: none;
     min-height: 14px;
 }
 
@@ -33,18 +29,16 @@
     margin: 2px;
     padding-left: 4px;
     background-color: white;
-    list-style: none;
     color: black;
 }
 
-.ns-helper {
+ul:not(.s-list-class) > .placeholder {
     border: 1px dashed magenta;
 }
 
 .s-list-class {
     padding: 1px;
     margin: 8px;
-    list-style: none;
 }
 
 .section-item {
@@ -52,16 +46,7 @@
     margin: 4px;
     background-color: #fefcf6;
     padding: 0 0px 4px 0px;
-    list-style: none;
     color: #113a93;
-}
-
-.s-list-item {
-    cursor: move;
-}
-
-.s-helper {
-    list-style: none;
 }
 
 .expand-button {
