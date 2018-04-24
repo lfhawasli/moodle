@@ -257,6 +257,13 @@ class modify_navigation {
             $morenode->collapse = false;
         }
 
+        // If More Section node is to be displayed as a new flat nav block.
+        if ($this->showdividercalled === false) {
+            $morenode = new \flat_navigation_node($morenode, 0);
+            $morenode->set_showdivider(true);
+            $this->showdividercalled = true;
+        }
+
         // Add the more section node.
         $this->coursenode->add_node($morenode);
 
@@ -266,8 +273,6 @@ class modify_navigation {
         // Add library reserve guide node.
         $librarynode = block_method_result('ucla_library_portal', 'get_navigation_nodes', $params);
         if (!empty($librarynode)) {
-            // The node is wrapped in an array returned by get_navigation_nodes().
-
             if ($userprefmorenode == 1) {
                 $librarynode->hidden = true;
             } else {
@@ -303,9 +308,6 @@ class modify_navigation {
         // Add MyEngineering node.
         $myengineeringnode = block_method_result('ucla_myengineer', 'get_navigation_nodes', $params);
         if (!empty($myengineeringnode)) {
-            // The node is wrapped in an array returned by get_navigation_nodes().
-            $myengineeringnode = $myengineeringnode[0];
-
             if ($userprefmorenode == 1) {
                 $myengineeringnode->hidden = true;
             } else {
@@ -321,6 +323,10 @@ class modify_navigation {
 
         // Make more section collapsible.
         $this->collapsenodesforjs[] = 'themeuclasharedmore';
+
+        if (empty($librarynode) && empty($subjectlinks) && empty($myengineeringnode)) {
+            $morenode->remove();
+        }
     }
 
     /**
