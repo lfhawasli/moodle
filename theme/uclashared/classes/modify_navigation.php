@@ -487,6 +487,32 @@ class modify_navigation {
     }
 
     /**
+     * Add link to parent page if TA site.
+     */
+    private function add_tasiteparent() {
+        global $PAGE;
+        // Add node parent class home.
+        $tasiteenrol = block_method_result('ucla_tasites', 'get_tasite_enrol_meta_instance', $PAGE->course->id);
+        if (!empty($tasiteenrol)) {
+            $tasiteparentnode = \navigation_node::create(get_string('parentcourse', 'block_ucla_course_menu'),
+                                new \moodle_url('/course/view.php', array(
+                                    'id' => $tasiteenrol->customint1
+                                )),
+                                \navigation_node::TYPE_SECTION);
+            $siteinfonode = null;
+            $children = $this->coursenode->get_children_key_list();
+            // Find 1st child that is an integer.
+            foreach ($children as $child) {
+                if (intval($child) !== 0) {
+                    $siteinfonode = $child;
+                    break;
+                }
+            }
+            $this->coursenode->add_node($tasiteparentnode, $siteinfonode);
+        }
+    }
+
+    /**
      * Changes or removes icons for certain nodes.
      */
     private function change_icons() {
@@ -583,6 +609,7 @@ class modify_navigation {
         // Add nodes if on course.
         if ($PAGE->course->id != SITEID) {
             $this->add_syllabus();
+            $this->add_tasiteparent();
             $this->add_show_all();
             $this->add_libraryreserves();
             $this->add_mediaresources();
