@@ -7,7 +7,7 @@
 
 // Hide following navigation nodes via CSS because it is added after
 // local_ucla_extend_navigation is called.
-[data-key="coursehome"], [data-key="myhome"] {
+[data-key="coursehome"], [data-key="myhome"], [data-key="home"] {
     display: none;
 }
 
