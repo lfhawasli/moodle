@@ -45,6 +45,34 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
 
 if ($node) {
+    // Delete nodes.
+    $nodestoremove = array('otherusers' => navigation_node::TYPE_SETTING,
+            'unenrolself' => navigation_node::TYPE_SETTING,
+            'publish' => navigation_node::TYPE_SETTING,
+            'categories' => navigation_node::TYPE_SETTING,
+            'export' => navigation_node::TYPE_SETTING);
+
+    foreach ($nodestoremove as $name => $type) {
+        $ntr = $node->find($name, $type);
+        $ntr->remove();
+    }
+
+    $questionnode = $node->find('questionbank', navigation_node::TYPE_CONTAINER);
+    $importnode = $questionnode->find('import', navigation_node::TYPE_SETTING);
+    $importnode->remove();
+
+    // Rename "Enrolled users" to "Participants".
+    $ntr = $node->find('review', navigation_node::TYPE_SETTING);
+    $ntr->text = get_string('participants', 'format_ucla');
+
+    // Rename "Gradebook Setup" to "Grades Setup".
+    $ntr = $node->find('gradebooksetup', navigation_node::TYPE_SETTING);
+    $ntr->text = get_string('gradessetup', 'format_ucla');
+
+    // Rename "Dates" to "Review/edit dates".
+    $ntr = $node->find('editdates', navigation_node::TYPE_SETTING);
+    $ntr->text = get_string('revieweditdates', 'format_ucla');
+
     echo $OUTPUT->render_from_template('core/settings_link_page', ['node' => $node]);
 }
 
