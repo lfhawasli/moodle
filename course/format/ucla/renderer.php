@@ -773,11 +773,13 @@ class format_ucla_renderer extends format_topics_renderer {
         }
 
         $controls = parent::section_edit_control_items($course, $section, $onsectionpage);
-        
+
         // Removing moveup/movedown and highlight items from section link menu.
         unset($controls['moveup']);
         unset($controls['movedown']);
         unset($controls['highlight']);
+        
+        $sectionreturn = $onsectionpage ? $section->section : null;
         
         // Adding new menu items to section link menu.
         $newcontrols = array();
@@ -785,10 +787,12 @@ class format_ucla_renderer extends format_topics_renderer {
         $newcontrols['header_add'] = array('name' => get_string('add', 'format_'.$course->format));
 
         // Adding file to section links menu.
-        $url = new moodle_url('/blocks/ucla_easyupload/upload.php', array(
-            'course_id' => $course->id,
-            'type' => 'file',
-            'section' => $section->section
+        $url = new moodle_url('modedit.php', array(
+            'add' => 'resource',
+            'course' => $course->id,
+            'section' => $section->section,
+            'return'=> 0,
+            'sr'=> $sectionreturn
         ));
         $newcontrols['file'] = array(
             'url' => $url,
@@ -798,10 +802,12 @@ class format_ucla_renderer extends format_topics_renderer {
         );
 
         // Adding link to section links menu.
-        $url = new moodle_url('/blocks/ucla_easyupload/upload.php', array(
-            'course_id' => $course->id,
-            'type' => 'link',
-            'section' => $section->section
+        $url = new moodle_url('modedit.php', array(
+            'add' => 'url',
+            'course' => $course->id,
+            'section' => $section->section,
+            'return'=> 0,
+            'sr'=> $sectionreturn
         ));
         $newcontrols['link'] = array(
             'url' => $url,
@@ -811,10 +817,12 @@ class format_ucla_renderer extends format_topics_renderer {
         );
 
         // Adding label link to section links menu.
-        $url = new moodle_url('/blocks/ucla_easyupload/upload.php', array(
-            'course_id' => $course->id,
-            'type' => 'text',
-            'section' => $section->section
+        $url = new moodle_url('modedit.php', array(
+            'add' => 'label',
+            'course' => $course->id,
+            'section' => $section->section,
+            'return'=> 0,
+            'sr'=> $sectionreturn
         ));
         $newcontrols['label'] = array(
             'url' => $url,
