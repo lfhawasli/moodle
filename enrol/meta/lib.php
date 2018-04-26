@@ -459,32 +459,6 @@ class enrol_meta_plugin extends enrol_plugin {
 
     // START UCLA MOD: CCLE-2386 - TA Site Creator
     /**
-     * Adds link to TA site in navigation.
-     *
-     * API call - lib/enrollib.php.
-     *
-     * @param stdClass $instancesnode
-     * @param stdClass $instance
-     */
-    public function add_course_navigation($instancesnode, stdClass $instance) {
-        global $PAGE;
-        // This is technically a hack, $instancenode provides us
-        // the node from settings_navigation, not global_navigation
-        if (!empty($instance->customint1)) {
-            $pcourseid = $instance->customint1;
-            $courseid = $instance->courseid;
-            $pcoursenode = $PAGE->navigation->find($pcourseid,
-                    navigation_node::TYPE_COURSE);
-            if (empty($pcoursenode)) {
-                return;
-            }
-            $coursenode = $PAGE->navigation->find($courseid,
-                    navigation_node::TYPE_COURSE);
-            $pcoursenode->set_parent($coursenode->parent);
-            $coursenode->set_parent($pcoursenode);
-        }
-    }
-    /**
      * Returns what the promoted role should be.
      *
      * @param stdClass $ra  Expecting object with keys: tasiteowners, idnumber,
