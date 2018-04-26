@@ -1,0 +1,80 @@
+@import "../../uclashared/scss/variables";
+@import "../../boost/scss/bootstrap/variables";
+@import "../../boost/scss/bootstrap/mixins/breakpoints";
+
+header.header-custom-logo {
+    // Remove white spacing at top with light blue header removed.
+    margin-top: -8px;
+
+    // Custom logos have no margins, they should be aligned from top-left corner.
+    .header-logo {
+        margin: 0;
+        margin-top: -4px;
+    }
+
+    &.tanms {
+        // Override blue background.
+        .header-main {
+            background-color: #eee;
+        }
+        .header-login {
+            background-color: $header-color-prod;
+            margin-right: 0;
+            padding-left: 1.0em;
+        }
+
+        // Clip the tanms logo for smaller screens.
+        .header-logo {
+            width: 180px;
+            overflow: hidden;
+            float: left;
+
+            @include media-breakpoint-up(md) {
+                width: auto;
+            }
+            @include media-breakpoint-up(xs) {
+                display: block;
+                img {
+                    max-width: inherit;
+                }
+            }
+        }
+    }
+
+    &.teaching_heritage_languages {
+        // Logo uses old blue background.
+        .header-main {
+            background-color: #3284bf;
+        }
+        .header-logo {
+            img {
+                margin-top: -4px;
+            }
+        }
+    }
+
+    &.executive_education_program {
+        .header-logo {
+            img {
+                margin-top: -4px;
+            }
+        }
+        // Show bottom banner.
+        .header-bottom {
+            background-color: #eee;
+            height: 20px;
+            margin: 40px -1rem 0 -1rem;
+        }
+        @include media-breakpoint-down(xs) {
+            // Clip the sublogo.
+            .header-main {
+                height: 40px;
+                overflow: hidden;
+            }
+            // Hide bottom banner.
+            .header-bottom {
+                display: none;
+            }
+        }
+    }
+}

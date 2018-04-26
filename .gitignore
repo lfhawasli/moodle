@@ -39,4 +39,4 @@ composer.phar
 atlassian-ide-plugin.xml
 /node_modules/
 # UCLA Modifications.
-styles.css.map
+*.css.map

@@ -15,37 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Theme version info
+ * Core renderer.
  *
  * @package     theme_uclasharedcourse
  * @copyright  UC Regents 2017
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
 
 /**
- * Theme version info
+ * Core renderer class.
  *
- * @package     theme_uclasharedcourse
+ * @package    theme_uclasharedcourse
  * @copyright  UC Regents 2017
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_renderer {
 
     /**
-     * Public course theme.
+     * Enables additional header logos to show up in Edit settings.
      *
      * @var bool
      */
     public $coursetheme = true;
 
     /**
-     * Public header class.
+     * Contains header classes.
      *
-     * @var array
+     * @var string
      */
-    public $headerclasses = array();
+    public $headerclasses = 'header-custom-logo';
+
+    /**
+     * Logo html.
+     *
+     * @var string
+     */
+    public $logo = '';
 
     /**
      * Public theme name.
@@ -53,12 +59,6 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
      * @var string
      */
     public $themename = 'uclasharedcourse';
-
-    /**
-     * Theme.
-     * @var string
-     */
-    private $theme = 'theme';
 
     /**
      * Component.
@@ -73,6 +73,16 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
     private $filearea = 'course_logos';
 
     /**
+     * Sets logo and returns classes to use in header.
+     *
+     * @return string
+     */
+    public function get_headerclasses() {
+        $this->logo = $this->get_logo();
+        return $this->headerclasses;
+    }
+
+    /**
      * Display a custom category level logo + course logos, this overrides
      * the standard CCLE logo
      *
@@ -81,8 +91,8 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
      * @param moodle_url $address
      * @return string
      */
-    public function logo($pix, $pixloc, $address = null) {
-        global $CFG, $COURSE, $DB;
+    public function get_logo() {
+        global $CFG, $COURSE, $DB, $OUTPUT;
 
         $category = $DB->get_record('course_categories', array('id' => $COURSE->category));
         $category->name = strtolower(str_replace(' ', '_', trim($category->name)));
@@ -95,28 +105,30 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
             $pix = $category->name . '/logo';
             $address = new moodle_url($CFG->wwwroot . '/course/view.php?id=' . $COURSE->id);
 
-            $pixurl = $this->image_url($pix, $this->theme);
+            $pixurl = $this->image_url($pix, 'theme');
             $logoalt = $COURSE->fullname;
             $logoimg = html_writer::img($pixurl, $logoalt);
             $alternativelogo = html_writer::link($address, $logoimg);
 
             // Save the category and course short name as CSS classes.
-            $categoryname = str_replace(' ', '-', $category->name);
-            $categoryname = str_replace('_', '-', $categoryname);
-            $coursename = str_replace(' ', '-', $COURSE->shortname);
-            $coursename = str_replace('_', '-', $coursename);
+            $categoryname = str_replace(array(' ', '-'), '-', $category->name);
+            $coursename = str_replace(array(' ', '-'), '-', $COURSE->shortname);
 
-            $this->headerclasses[] = $categoryname;
-            $this->headerclasses[] = $coursename;
+            $this->headerclasses .= ' ' . $categoryname;
+            $this->headerclasses .= ' ' . $coursename;
         }
 
         // If main logo is overridden, then return that html.
         if (!empty($alternativelogo)) {
-            $this->headerclasses[] = 'header-custom-logo';
             return $alternativelogo;
         } else {
             // Use default logo as a fallback.
-            return parent::logo($pix, $pixloc);
+            $context = [
+                'output' => $OUTPUT,
+                'system_link' => get_config('theme_uclashared', 'system_link'),
+                'system_name' => get_config('theme_uclashared', 'system_name')
+            ];
+            return $this->render_from_template('theme_uclashared/header_logo', $context);            
         }
     }
 
