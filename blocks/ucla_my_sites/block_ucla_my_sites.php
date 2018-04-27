@@ -395,7 +395,7 @@ class block_ucla_my_sites extends block_base {
                     array('class' => 'sortselector'));
 
             $template['listing'] = $renderer->collab_sites_overview($collaborationsites,
-                    $sortoptstring, $params['sortorder']);
+                    $params['sortorder']);
             $template['id'] = 'tabcollab';
             $template['name'] = get_string('tabcollabtext', 'block_ucla_my_sites');
 
@@ -546,8 +546,8 @@ class block_ucla_my_sites extends block_base {
      */
     public function make_sort_form($sortorder) {
         global $PAGE;
-        $sortarrs = array('startdate' => array('type' => 'radio'),
-            'sitename' => array('type' => 'radio'));
+        $sortarrs = array('startdate' => array('type' => 'radio', 'name' => 'sortorder', 'value' => 'startdate', 'onclick' => 'this.form.submit();'),
+            'sitename' => array('type' => 'radio', 'name' => 'sortorder', 'value' => 'sitename', 'onclick' => 'this.form.submit();'));
         // Get the term parameter if it exists.
         $term = optional_param('term', false, PARAM_ALPHANUM);
         $extraparams = '';
@@ -567,29 +567,14 @@ class block_ucla_my_sites extends block_base {
         $radiobuttons = html_writer::div(
                 html_writer::div(get_string('sortby', 'block_ucla_my_sites') .
                         ': ', '', array('class' => 'sortby')) .
+                html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'viewmy', 'value' => 'collab')) .
                 html_writer::start_div('radio') .
                 html_writer::tag('label',
-                        html_writer::tag(
-                                'button', '', array(
-                                    'class' => 'transparent',
-                                    'name' => 'sortorder',
-                                    'value' => 'sitename',
-                                    'type' => 'submit'
-                                )
-                        ) .
                         html_writer::tag('input', '', $sortarrs['sitename'])
                         . get_string('sitename', 'block_ucla_my_sites')) .
                 html_writer::end_div() .
                 html_writer::start_div('radio') .
                 html_writer::tag('label',
-                        html_writer::tag(
-                                'button', '', array(
-                                    'class' => 'transparent',
-                                    'name' => 'sortorder',
-                                    'value' => 'startdate',
-                                    'type' => 'submit'
-                                )
-                        ) .
                         html_writer::tag('input', '', $sortarrs['startdate'])
                         . get_string('startdate', 'block_ucla_my_sites')) .
                 html_writer::end_div()
