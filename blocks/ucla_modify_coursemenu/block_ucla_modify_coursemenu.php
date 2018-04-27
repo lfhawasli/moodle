@@ -210,31 +210,6 @@ class block_ucla_modify_coursemenu extends block_base {
     }
 
     /**
-     * Return information for displaying this block in the control panel.
-     *
-     * @param stdClass $course
-     * @param context $context
-     * @return array of "modules", where each "module" is
-     * an array of (variable name => value) to initialize a ucla_cp_module.
-     */
-    public static function ucla_cp_hook($course, $context) {
-        $section = optional_param('section', null, PARAM_INT);
-        $params = array('courseid' => $course->id);
-        if (!is_null($section)) {
-            $params['section'] = $section;
-        }
-        return array(array(
-            'item_name' => 'modify_course_sections',
-            'action' => new moodle_url(
-                    '/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
-                    $params
-                ),
-            'tags' => array('ucla_cp_mod_common'),
-            'required_cap' => 'moodle/course:update'
-        ));
-    }
-
-    /**
      * Called by moodle.
      * @return array mapping format strinvgs to booleans.
      */

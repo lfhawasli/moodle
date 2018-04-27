@@ -476,34 +476,6 @@ class block_ucla_rearrange extends block_base {
         $text = get_string('pluginname', 'block_ucla_rearrange');
         return array('icon' => $icon, 'link' => $link->out(false), 'text' => $text);
     }
-
-    /**
-     * Return information for displaying this block in the control panel.
-     *
-     * @param stdClass $course
-     * @param context $context
-     * @return array of "modules", where each "module" is
-     * an array of (variable name => value) to initialize a ucla_cp_module
-     */
-    public static function ucla_cp_hook($course, $context) {
-        $thispath = '/blocks/ucla_rearrange/rearrange.php';
-
-        $section = optional_param('section', null, PARAM_INT);
-        $params = array('courseid' => $course->id);
-        if (!is_null($section)) {
-            $params['section'] = $section;
-        }
-
-        $allmods = array();
-        $allmods[] = array(
-            'item_name' => 'rearrange',
-            'tags' => array('ucla_cp_mod_common'),
-            'action' => new moodle_url($thispath, $params),
-            'required_cap' => 'moodle/course:update'
-        );
-
-        return $allmods;
-    }
 }
 
 /**

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   block_ucla_admin_panel
+ * @package   format_ucla
  * @copyright 2018 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ $courseid = required_param('courseid', PARAM_INT);
 $section = optional_param('section', 0, PARAM_INT);
 
 $PAGE->set_url('/course/format/ucla/admin_panel.php',
-        array('courseid' => $courseid));
+        array('courseid' => $courseid, 'section' => $section));
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 

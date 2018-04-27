@@ -40,14 +40,14 @@ $string['error_module_consistency'] = 'There was a module inconsistency, none of
 $string['success'] = 'Success!';
 $string['rearrange_success'] = 'Your change has been applied.';
 
-$string['rearrange'] = 'Rearrange course materials';
-$string['rearrange_post'] = '';
-
 $string['returntosite'] = 'Return to site';
 $string['rearrangemore'] = 'Rearrange more materials';
 
 $string['eventrearrange'] = 'Rearranged course materials';
 
 $string['hidden'] = 'hidden';
+
+// Admin panel strings.
+$string['rearrangematerials'] = 'Rearrange course materials';
 
 // EOF.

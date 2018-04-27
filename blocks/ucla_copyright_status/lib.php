@@ -457,3 +457,18 @@ function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
     return true;
 }
 
+/**
+ * Adds manage copyright link to admin panel.
+ *
+ * @param navigation_node $navigation The navigation node to extend.
+ * @param stdClass        $course     The course object for the tool.
+ * @param context         $context    The context of the course.
+ */
+function block_ucla_copyright_status_extend_navigation_course($navigation, $course, $context) {
+    if (has_capability('moodle/course:manageactivities', $context)) {
+        $setting = navigation_node::create(get_string('managecopyright', 'block_ucla_copyright_status'),
+                new moodle_url('/blocks/ucla_copyright_status/view.php',
+                        array('courseid' => $course->id)), navigation_node::TYPE_SETTING);
+        $navigation->add_node($setting);
+    }
+};

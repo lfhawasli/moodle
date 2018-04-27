@@ -38,31 +38,6 @@ class block_ucla_office_hours extends block_base {
     }
 
     /**
-     * Adds link to control panel.
-     *
-     * @param mixed $course
-     * @param mixed $context
-     * @return type
-     */
-    public static function ucla_cp_hook($course, $context) {
-        global $USER;
-
-        // display office hours link if user has ability to edit office hours
-        if (block_ucla_office_hours::allow_editing($context, $USER->id)) {
-            return array(array(
-                'item_name' => 'edit_office_hours',
-                'action' => new moodle_url(
-                        '/blocks/ucla_office_hours/officehours.php',
-                        array('courseid' => $course->id, 'editid' => $USER->id)
-                    ),
-                'tags' => array('ucla_cp_mod_common', 'ucla_cp_mod_other'),
-                'required_cap' => null,
-                'options' => array('post' => true)
-            ));
-        }
-    }
-
-    /**
     * Makes sure that $edit_user is an instructing role for $course. Also makes
     * sure that user initializing editing has the ability to edit office hours.
     *
