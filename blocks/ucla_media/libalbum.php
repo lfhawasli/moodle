@@ -106,15 +106,20 @@ function display_page_album($course, $albumid) {
     $output = array();
     foreach ($reserves as $reserve) {
         $outputstr = '';
-        if ($reserve->isvideo == 0) {
+        if (!empty($reserve->embedurl)) {
+            $outputstr = $reserve->embedurl;
+        } else if ($reserve->isvideo == 0) {
             $outputstr = html_writer::link('#anchor', $reserve->title, array('id' => $reserve->id, 'class' => 'button audio'));
         } else {
             $outputstr = html_writer::link('#anchor', $reserve->title, array('id' => $reserve->id, 'class' => 'button video'));
         }
-        $output[] = $outputstr;
-        
+        $output[] = $outputstr;        
     }
-    echo html_writer::alist($output, array(), 'ul');
+    if (count($output) > 1) {
+        echo html_writer::alist($output, array(), 'ul');
+    } else {
+        echo array_pop($output);
+    }
     echo html_writer::end_div('div');
 }
 
