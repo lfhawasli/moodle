@@ -279,7 +279,12 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                 }
                 $requestvalue=$value;
                 if ($value == 0) {
+                    // START UCLA MOD: CCLE-7095 - Dateselector adds hours/minutes.
+                    /*
                     $value = time();
+                    */
+                    $value = strtotime('today');
+                    // END UCLA MOD: CCLE-7095.
                 }
                 if (!is_array($value)) {
                     // START UCLA MOD: CCLE-6917 - Revamp date picker.
@@ -414,6 +419,8 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
             // Silently set value to default if it failed validation.
             if (empty($value) || $mincheck || $maxcheck) {
                 $value = null;
+            } else {
+                $value = strtotime(date("Y-m-d", $value)); // (CCLE-7095) Make sure it is rounded to nearest date.
             }
             // END UCLA MOD: CCLE-6917.
             return $this->_prepareValue($value, $assoc);
