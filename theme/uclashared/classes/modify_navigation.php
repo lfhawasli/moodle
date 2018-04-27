@@ -368,6 +368,33 @@ class modify_navigation {
     }
 
     /**
+     * Add Un/Enrol me button to navigation drawer.
+     */
+    private function add_enrolme() {
+        global $COURSE;
+
+        // add enrol nodes
+        enrol_add_course_navigation($this->coursenode, $COURSE);
+        // If editing button and courseadmin are not displayed, un/enrolment becomes a new tree parent.
+        if (!($this->coursenode->find('editingmode', \navigation_node::TYPE_SETTING)) &&
+                !($this->coursenode->find('courseadministration', \navigation_node::TYPE_SETTING))) {
+            // Try fetching Enrol me button.
+            $enrolnode = $this->coursenode->find('enrolself', \navigation_node::TYPE_SETTING);
+            // Try fetching Unenrol me button if Enrol me does not exist.
+            if (!$enrolnode) {
+                $enrolnode = $this->coursenode->find('unenrolself', \navigation_node::TYPE_SETTING);
+            }
+            // Create flatnav only if self enrol button is displayed.
+            if ($enrolnode) {
+                $enrolnode->remove();
+                $enrolnode = new \flat_navigation_node($enrolnode, 0);
+                $enrolnode->set_showdivider(true);
+                $this->coursenode->add_node($enrolnode);
+            }
+        }
+    }
+
+    /**
      * Add Turn editing on/off.
      */
     private function add_editingmode() {
@@ -623,6 +650,7 @@ class modify_navigation {
             $this->add_more();
             $this->add_editingmode();
             $this->add_courseadmin();
+            $this->add_enrolme();
         }
 
         // Rearrange items.
