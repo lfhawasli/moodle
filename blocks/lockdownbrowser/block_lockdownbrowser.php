@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 class block_lockdownbrowser extends block_base {
 
@@ -33,8 +33,9 @@ class block_lockdownbrowser extends block_base {
             $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         }
 
-        if (has_capability('moodle/course:manageactivities', $context)) {
-
+        if (has_capability('moodle/course:manageactivities', $context)
+          || has_capability('moodle/course:viewhiddenactivities', $context) // Trac #3595
+           ) {
             $this->content->footer = '<a href="' . $CFG->wwwroot . '/blocks/lockdownbrowser/dashboard.php?course=' .
                 $COURSE->id . '">' . get_string('dashboard', 'block_lockdownbrowser') . ' ...</a>';
         } else {

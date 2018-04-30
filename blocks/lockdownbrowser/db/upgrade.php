@@ -1,9 +1,9 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
-// upgrade module database structure
+// upgrade block database structure
 function xmldb_block_lockdownbrowser_upgrade($oldversion = 0) {
 
     global $DB;
@@ -84,6 +84,28 @@ function xmldb_block_lockdownbrowser_upgrade($oldversion = 0) {
         $dbman->add_key($table, $key);
 
         upgrade_block_savepoint(true, 2015063000, "lockdownbrowser");
+    }
+    if ($oldversion < 2017020700) {
+
+        // change to using quiz access rule (Trac #3111)
+        $ldb_settings = $DB->get_records("block_lockdownbrowser_sett");
+        foreach ($ldb_settings as $settings) {
+            $quiz = $DB->get_record("quiz", array("id" => $settings->quizid));
+            if ($quiz === false) {
+                try {
+                    // remove any orphaned block settings records for which no quiz record exists
+                    $DB->delete_records('block_lockdownbrowser_sett', array('quizid' => $settings->quizid));
+                } catch (Exception $e) {
+                    // ignore
+                }
+            } else {
+                // update quiz record for new access rule
+                $quiz->popup = 0;
+                $quiz->browsersecurity = 'lockdownbrowser';
+                $DB->update_record("quiz", $quiz);
+            }
+        }
+        upgrade_block_savepoint(true, 2017020700, "lockdownbrowser");
     }
     return true;
 }

@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 $lockdownbrowser_stepslib_file =
     "$CFG->dirroot/blocks/lockdownbrowser/backup/moodle2/backup_lockdownbrowser_stepslib.php";
