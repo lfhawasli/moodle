@@ -1,9 +1,11 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 function xmldb_block_lockdownbrowser_install() {
+
+    // called immediately after the DB schema associated with the block is created
 
     global $DB;
     global $CFG;
@@ -22,6 +24,8 @@ function xmldb_block_lockdownbrowser_install() {
 
     $quiz_table          = "quiz";
     $quiz_file           = "$CFG->dirroot/mod/quiz/attempt.php";
+
+    $browser_security_choice_key = "lockdownbrowser"; // must match browsersecuritychoicekey string
 
     $debug_info        = "* start: " . date("m-d-Y H:i:s") . "\r\n";
     $exception_msg     = "";
@@ -75,6 +79,13 @@ function xmldb_block_lockdownbrowser_install() {
                 $ok               = $DB->insert_record($block_settings_table, $blkset);
                 if (!$ok) {
                     $debug_info .= "* error: could not insert record into table $block_settings_table\r\n";
+                    break;
+                }
+                $quiz->popup = 0;
+                $quiz->browsersecurity = $browser_security_choice_key;
+                $ok = $DB->update_record($quiz_table, $quiz);
+                if (!$ok) {
+                    $debug_info .= "* error: could not update quiz record for block settings record\r\n";
                     break;
                 }
             }
@@ -164,3 +175,7 @@ function xmldb_block_lockdownbrowser_install() {
     }
 }
 
+function xmldb_block_lockdownbrowser_uninstall() {
+
+    //  executed when the block is uninstalled, before dropping its DB schema
+}

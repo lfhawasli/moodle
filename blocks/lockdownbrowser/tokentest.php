@@ -1,12 +1,12 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 if (ini_get('zlib.output_compression')) {
     @ini_set('zlib.output_compression', 'Off');
 }
-require_once('../../config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
 require_once($CFG->libdir . '/adminlib.php');
 require_login();
 if (bccomp($CFG->version, 2013111800, 2) >= 0) {
@@ -27,8 +27,6 @@ $lockdownbrowser_rf = $DB->count_records('block_lockdownbrowser_toke');
 $lockdownbrowser_tf = $lockdownbrowser_rf - $DB->count_records('block_lockdownbrowser_sess');
 if (!extension_loaded("curl")) {
     echo '<p>' . get_string('curlerror', 'block_lockdownbrowser') . '</p>';
-} else if (!extension_loaded("mcrypt")) {
-    echo '<p>' . get_string('mcrypterror', 'block_lockdownbrowser') . '</p>';
 } else if ($lockdownbrowser_tf >= 10000) { // Trac #2315
     echo '<p>' . get_string('token_limit_error', 'block_lockdownbrowser') . '</p>';
 } else {

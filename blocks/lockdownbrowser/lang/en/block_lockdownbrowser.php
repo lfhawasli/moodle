@@ -1,10 +1,11 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 $string['pluginname']      = 'Respondus LockDown Browser';
 $string['lockdownbrowser'] = 'Respondus LockDown Browser';
+$string['lockdownbrowser:addinstance'] = 'Add a new lockdownbrowser block';
 
 // admin settings page
 $string["blockdescheader"]     = "Description";
@@ -67,8 +68,6 @@ $string['ldb_required']      = 'Respondus LockDown Browser is required for this 
 $string['click']             = 'Click';
 $string['here']              = 'here';
 $string['todownload']        = ' to download the installer.';
-$string['requires_ldb']      = '- Requires Respondus LockDown Browser';
-$string['requires_webcam']   = '- Requires Respondus LockDown Browser + Webcam';
 $string['test_server']       = 'Test the server by requesting more tokens';
 $string['clear_tokens']      = 'Clear all sessions and tokens for the block'; // Trac #2544
 $string['tokens_free']       = 'Authentication tokens free';
@@ -80,9 +79,8 @@ $string['added']             = 'Added';
 $string['tokensok']          = 'tokens, token server working';
 $string['resetok']           = 'Token and session tables successfully cleared.';
 $string['curlerror']         = 'extension_loaded claims curl is not loaded.  Giving up.';
-$string['mcrypterror']       = 'extension_loaded claims mcrypt is not loaded.  Giving up.';
 $string['token_limit_error'] = '10,000 or more free tokens already exist. No more can be requested. Please try again later.';
-$string['zero_tokens_free']  = '0 (is mcrypt enabled?)';
+$string['zero_tokens_free']  = '0 (is curl enabled?)';
 
 $string['block_status_unknown'] = 'Block status is not currently available.';
 
@@ -91,12 +89,7 @@ $string['module_installed_error']  =
 
 $string['tokenerror'] =
     "No tokens added, possible causes are: locklibcfg.php settings incorrect,
-    lib mcrypt not enabled, database problem, proxy/firewall blocking access to token server";
-
-$string['customscripts_not_set'] = 'Warning: $CFG->customscripts is not set.';
-
-$string['customscripts_not_found']
-    = 'Warning: $CFG->customscripts is set, ({$a}), but the lockdownbrowser scripts were not found.';
+    curl not enabled, database problem, proxy/firewall blocking access to token server";
 
 $string['session_cookie_not_set'] = 'Warning: Moodle session cookie check failed.';
 
@@ -122,3 +115,15 @@ $string['errattempt'] = 'No such attempt ID exists';
 $string['errnoquiz1'] = 'The quiz with id {$a->instance} corresponding to this coursemodule {$a->id} is missing';
 $string['errnoquiz2'] = 'The quiz with id {$a->quiz} belonging to attempt {$a->id} is missing';
 
+$string['noblockversion'] = 'The Respondus LockDown Browser Extension for Moodle is not properly installed. The block plugin is either missing or the version cannot be determined.';
+$string['noruleversion'] = 'The Respondus LockDown Browser Extension for Moodle is not properly installed. The quiz access rule plugin is either missing or the version cannot be determined.';
+$string['invalidversion'] = 'The Respondus LockDown Browser Extension for Moodle is not properly installed. The block plugin version does not match the quiz access rule plugin version.';
+
+// don't translate anything below this line
+
+// quiz title decorations; must match what clients expect
+$string['requires_ldb']      = '- Requires Respondus LockDown Browser';
+$string['requires_webcam']   = '- Requires Respondus LockDown Browser + Webcam';
+
+// quiz browser security setting option key; must match same string in LDB quiz access rule
+$string['browsersecuritychoicekey'] = 'lockdownbrowser';

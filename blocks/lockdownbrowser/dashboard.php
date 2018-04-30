@@ -1,14 +1,16 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2016 Respondus, Inc.  All Rights Reserved.
-// Date: May 13, 2016.
+// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
+// Date: March 13, 2018.
 
 define ("LOCKDOWNBROWSER_DASHBOARD_IFRAMEURL",
     "https://smc-service-cloud.respondus2.com/MONServer/lms/dashboard.do");
 
-require_once("../../config.php");
+require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
 require_once("$CFG->dirroot/course/lib.php");
 require_once("$CFG->dirroot/blocks/lockdownbrowser/locklib.php");
+
+lockdownbrowser_check_plugin_dependencies(2);
 
 $lockdownbrowser_urlcourse = required_param('course', PARAM_INT);
 
@@ -20,7 +22,9 @@ if (bccomp($CFG->version, 2013111800, 2) >= 0) {
     $lockdownbrowser_context = get_context_instance(CONTEXT_COURSE, $lockdownbrowser_urlcourse);
 }
 
-if (!has_capability('moodle/course:manageactivities', $lockdownbrowser_context)) {
+if (!has_capability('moodle/course:manageactivities', $lockdownbrowser_context)
+  && !has_capability('moodle/course:viewhiddenactivities', $lockdownbrowser_context) // Trac #3595
+  ) {
     redirect($CFG->wwwroot . '/index.php');
     die;
 }
@@ -39,7 +43,7 @@ $PAGE->set_url("$CFG->wwwroot/blocks/lockdownbrowser/dashboard.php",
 require_login($lockdownbrowser_course);
 
 $PAGE->set_title(get_string('course') . ': '
-. $lockdownbrowser_course->fullname . " - Dashboard");
+  . $lockdownbrowser_course->fullname . " - Dashboard");
 $PAGE->set_heading('Respondus LockDown Browser');
 
 echo $OUTPUT->header();
@@ -47,20 +51,22 @@ echo $OUTPUT->header();
 lockdownbrowser_purge_settings();
 lockdownbrowser_generate_tokens_instructor();
 
-$lockdownbrowser_institution_id = $CFG->block_lockdownbrowser_ldb_serverid;
-$lockdownbrowser_server_name    = $CFG->block_lockdownbrowser_ldb_servername;
-$lockdownbrowser_course_id      = $lockdownbrowser_urlcourse;
-$lockdownbrowser_instructor_id  = $USER->username;
+$lockdownbrowser_institution_id   = $CFG->block_lockdownbrowser_ldb_serverid;
+$lockdownbrowser_server_name      = $CFG->block_lockdownbrowser_ldb_servername;
+$lockdownbrowser_course_id        = $lockdownbrowser_urlcourse;
+$lockdownbrowser_instructor_id    = $USER->username;
 // START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
 // $lockdownbrowser_is_admin       = is_siteadmin() ? "true" : "false";
 $lockdownbrowser_is_admin       = lockdownbrowser_is_monitor_user() ? "true" : "false";
 // END UCLA MOD: CCLE-4027
-$lockdownbrowser_time           = strval(time()) . "000";
+$lockdownbrowser_disable_settings = has_capability('moodle/course:manageactivities', $lockdownbrowser_context) ? "false" : "true"; // Trac #3595
+$lockdownbrowser_time             = strval(time()) . "000";
 
 $lockdownbrowser_mac = lockdownbrowser_dashboardgeneratemac2(
     $lockdownbrowser_institution_id . $lockdownbrowser_server_name
     . $lockdownbrowser_course_id . $lockdownbrowser_instructor_id
-    . $lockdownbrowser_is_admin . $lockdownbrowser_time
+    . $lockdownbrowser_is_admin . $lockdownbrowser_disable_settings // Trac #3595
+    . $lockdownbrowser_time
 );
 
 $lockdownbrowser_iframe_url = LOCKDOWNBROWSER_DASHBOARD_IFRAMEURL
@@ -69,6 +75,7 @@ $lockdownbrowser_iframe_url = LOCKDOWNBROWSER_DASHBOARD_IFRAMEURL
     . "&courseId=" . urlencode($lockdownbrowser_course_id)
     . "&instructorId=" . urlencode($lockdownbrowser_instructor_id)
     . "&isAdmin=" . urlencode($lockdownbrowser_is_admin)
+    . "&disableSettings=" . urlencode($lockdownbrowser_disable_settings) // Trac #3595
     . "&time=" . urlencode($lockdownbrowser_time)
     . "&mac=" . urlencode($lockdownbrowser_mac);
 
