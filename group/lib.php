@@ -162,6 +162,17 @@ function groups_remove_member_allowed($grouporid, $userorid) {
         return true;
     }
 
+    // START UCLA MOD: CCLE-7295 - Prevent removal from Course Members group.
+    // Get courseid from groupid.
+    $courseid = $DB->get_field('groups', 'courseid', array('id' => $groupid), IGNORE_MISSING);
+    // Build PublicPrivate_Course object to test whether group is public/private.
+    $course = new PublicPrivate_Course($courseid);
+    // If current group is public/private group, disallow removal.
+    if ($groupid == $course->get_group()) {
+        return false;
+    }
+    // END UCLA MOD: CCLE-7295.
+
     // If the entry does not have a component value, they can remove it
     if (empty($entry->component)) {
         return true;
