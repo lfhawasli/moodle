@@ -90,3 +90,8 @@ $string['manage'] = 'MANAGE';
 
 // Admin panel strings.
 $string['adminpanel'] = 'Admin panel';
+
+// CCLE-7387 - Remove/rename links in Admin panel
+$string['participants'] = 'Participants';
+$string['gradessetup'] = 'Grades Setup';
+$string['revieweditdates'] = 'Review/edit dates';
