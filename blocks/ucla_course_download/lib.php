@@ -121,8 +121,9 @@ function block_ucla_course_download_ucla_format_notices($course) {
 function block_ucla_course_download_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('block/ucla_course_download:requestzip', $context)) {
         $setting = navigation_node::create(get_string('coursedownload', 'block_ucla_course_download'),
-                new moodle_url('/blocks/ucla_course_download/view.php',
-                        array('courseid' => $course->id)), navigation_node::TYPE_SETTING);
+                new moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
+                navigation_node::TYPE_SETTING, null, 'coursedownload');
+
         $navigation->add_node($setting);
     }
 };

@@ -34,9 +34,11 @@ function block_ucla_modify_coursemenu_extend_navigation_course($navigation, $cou
         if (!is_null($section)) {
             $params['section'] = $section;
         }
+
         $setting = navigation_node::create(get_string('modifysections', 'block_ucla_modify_coursemenu'),
                 new moodle_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php', $params),
-                navigation_node::TYPE_SETTING);
+                navigation_node::TYPE_SETTING, null, 'modifysections');
+
         $navigation->add_node($setting);
     }
 };

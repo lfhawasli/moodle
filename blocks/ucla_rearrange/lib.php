@@ -34,9 +34,11 @@ function block_ucla_rearrange_extend_navigation_course($navigation, $course, $co
         if (!is_null($section)) {
             $params['section'] = $section;
         }
-        $setting = navigation_node::create(get_string('rearrangematerials', 'block_ucla_rearrange'),
+
+        $setting = navigation_node::create(get_string('rearrangematerial', 'block_ucla_rearrange'),
                 new moodle_url('/blocks/ucla_rearrange/rearrange.php', $params),
-                navigation_node::TYPE_SETTING);
+                navigation_node::TYPE_SETTING, null, 'rearrangematerial');
+
         $navigation->add_node($setting);
     }
 };
