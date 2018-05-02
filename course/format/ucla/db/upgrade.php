@@ -143,5 +143,13 @@ function xmldb_format_ucla_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018021300, 'format', 'ucla');
     }
 
+    if ($oldversion < 2018050100) {
+        // During upgrade to Moodle 3.3 it could happen that general section (section 0) became 'invisible'.
+        // It should always be visible.
+        $DB->execute("UPDATE {course_sections} SET visible=1 WHERE visible=0 AND section=0 AND course IN
+        (SELECT id FROM {course} WHERE format=?)", ['ucla']);
+        upgrade_plugin_savepoint(true, 2018050100, 'format', 'ucla');
+    }
+
     return true;
 }
