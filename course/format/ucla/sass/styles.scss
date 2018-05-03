@@ -86,5 +86,10 @@
             }
         }
     }
+    
+    // Hide "access restriction" element
+    .availabilitypopup.hide {
+        display:none;
+    }
 }
 
