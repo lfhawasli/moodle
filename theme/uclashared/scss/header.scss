@@ -251,6 +251,24 @@ header {
           height: auto;
         }
 
+        // Help button
+        .btn-help-feedback {
+            background-color: $ccle-color-logo;
+
+            &:hover {
+                background-color: $ccle-color-logo;
+            }
+            &:focus {
+                background-color: $ccle-color-logo;
+                border: 2px solid white;
+            }
+        }
+        a.btn-help-feedback {
+            color: black;
+            i {
+                margin-left: 2px;
+            }
+        }
 
     }
     .header-btn-group .role-name {
@@ -267,26 +285,6 @@ header {
     .header-btn-group .login-as {
         font-size: 1.1rem;
         margin-left: -20px;
-    }
-}
-
-// Help button
-.btn-help-feedback {
-    background-color: $ccle-color-logo;
-
-    &:hover {
-        background-color: $ccle-color-logo;
-    }
-    &:focus {
-        background-color: $ccle-color-logo;
-        border: 2px solid white;
-    }
-}
-
-a.btn-help-feedback {
-    color: black;
-    i {
-        margin-left: 2px;
     }
 }
 
@@ -322,14 +320,19 @@ a:focus .caret, a:hover .caret {
 
 .usermenu {
     margin-left: 10px;
-    .login a {
-        color: #f5f8f9;
-    }
-}
+    margin-top: .18rem;
+    .login {
+        line-height: 3rem;
+        a, a:hover, a:visited {
+            color: #f5f8f9;
+            text-decoration: underline;
+        }
+     }
+ }
 .navbar {
     .popover-region {
         float: left;
-        margin-top: 7px;
+        margin-top: 8px;
     }
 }
 
