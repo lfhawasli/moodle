@@ -53,13 +53,16 @@ if ($node) {
             'export' => navigation_node::TYPE_SETTING);
 
     foreach ($nodestoremove as $name => $type) {
-        $ntr = $node->find($name, $type);
-        $ntr->remove();
+        if ($ntr = $node->find($name, $type)){
+            $ntr->remove();
+        }
     }
 
-    $questionnode = $node->find('questionbank', navigation_node::TYPE_CONTAINER);
-    $importnode = $questionnode->find('import', navigation_node::TYPE_SETTING);
-    $importnode->remove();
+    if ($questionnode = $node->find('questionbank', navigation_node::TYPE_CONTAINER)) {
+        if ($importnode = $questionnode->find('import', navigation_node::TYPE_SETTING)) {
+            $importnode->remove();
+        }
+    }
 
     // Rename "Enrolled users" to "Participants".
     $ntr = $node->find('review', navigation_node::TYPE_SETTING);
