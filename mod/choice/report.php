@@ -264,10 +264,16 @@
     }
     $results = prepare_choice_show_results($choice, $course, $cm, $users);
     $renderer = $PAGE->get_renderer('mod_choice');
-    echo $renderer->display_result($results, true);
+    // START UCLA MOD: CCLE-7791 - Choice: Anonymous not truly anonymous
+    if ($results->publish == CHOICE_PUBLISH_ANONYMOUS_TO_ALL) {
+        echo $renderer->display_result($results);
+    } else {
+        echo $renderer->display_result($results, has_capability('mod/choice:readresponses', $context));
+    }
 
    //now give links for downloading spreadsheets.
-    if (!empty($users) && has_capability('mod/choice:downloadresponses',$context)) {
+    if (!empty($users) && has_capability('mod/choice:downloadresponses', $context) && $results->publish == CHOICE_PUBLISH_NAMES) {
+    // END UCLA MOD: CCLE-7791
         $downloadoptions = array();
         $options = array();
         $options["id"] = "$cm->id";

@@ -127,7 +127,12 @@ $allresponses = choice_get_response_data($choice, $cm, $groupmode, $onlyactive);
 
 
 if (has_capability('mod/choice:readresponses', $context)) {
-    choice_show_reportlink($allresponses, $cm);
+    // START UCLA MOD: CCLE-7791 - Choice: Anonymous not truly anonymous
+    $results = prepare_choice_show_results($choice, $course, $cm, $allresponses);
+    if ($results->publish != CHOICE_PUBLISH_ANONYMOUS_TO_ALL) {
+        choice_show_reportlink($allresponses, $cm);
+    }
+    // END UCLA MOD: CCLE-7791
 }
 
 echo '<div class="clearer"></div>';

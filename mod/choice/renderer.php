@@ -112,18 +112,25 @@ class mod_choice_renderer extends plugin_renderer_base {
      * @param bool $forcepublish
      * @return string
      */
-    public function display_result($choices, $forcepublish = false) {
+    // START UCLA MOD: CCLE-7791 - Choice: Anonymous not truly anonymous
+    public function display_result($choices, $forcepublish = CHOICE_PUBLISH_ANONYMOUS) {
+    // END UCLA MOD: CCLE-7791
         if (empty($forcepublish)) { //allow the publish setting to be overridden
             $forcepublish = $choices->publish;
         }
 
         $displaylayout = $choices->display;
 
-        if ($forcepublish) {  //CHOICE_PUBLISH_NAMES
+        // START UCLA MOD: CCLE-7791 - Choice: Anonymous not truly anonymous
+        if ($forcepublish == CHOICE_PUBLISH_NAMES) {
             return $this->display_publish_name_vertical($choices);
-        } else {
-            return $this->display_publish_anonymous($choices, $displaylayout);
+        } else { // CHOICE_PUBLISH_ANONYMOUS_TO_ALL, CHOICE_PUBLISH_ANONYMOUS.
+            if ($displaylayout == DISPLAY_HORIZONTAL_LAYOUT) {
+                return $this->display_publish_anonymous_horizontal($choices);
+            }
+            return $this->display_publish_anonymous_vertical($choices);
         }
+        // END UCLA MOD: CCLE-7791
     }
 
     /**
