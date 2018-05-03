@@ -222,14 +222,7 @@ class format_ucla_renderer extends format_topics_renderer {
      * public/private message if user is not logged in.
      */
     public function print_header() {
-        global $CFG, $OUTPUT;
-
-        // Check if this site has a custom course logo.  If so, then the title
-        // will be rendered by the theme.
-        $courselogos = null;
-        if (method_exists($OUTPUT, 'course_logo')) {
-            $courselogos = $OUTPUT->course_logo();
-        }
+        global $OUTPUT;
 
         // Display page header.
         // Handle cancelled classes.

@@ -192,7 +192,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
             'subdirs' => 0,
             'maxbytes' => $maxbytes,
             'maxfiles' => 2,
-            'accepted_types' => array('*.png')
+            'accepted_types' => array('web_image')
         );
 
         return $config;
@@ -219,11 +219,11 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
     }
 
     /**
-     * Render HTML code for course logos.
+     * Render HTML code for course logos, if any.
      *
      * @return string
      */
-    public function course_logo() {
+    public function course_header() {
         global $CFG, $COURSE;
         $logos = $this->course_logo_images($COURSE->id);
 
