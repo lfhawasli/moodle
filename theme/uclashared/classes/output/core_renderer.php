@@ -352,4 +352,31 @@ class core_renderer extends \theme_boost\output\core_renderer {
             return $this->render($edit_button);
         }
     }
+
+    /**
+     * This renders the navbar.
+     * Uses bootstrap compatible html.
+     */
+    public function navbar() {
+        $originalnavbar = $this->page->navbar->get_items();
+        $originalnavbarsize = count($originalnavbar);
+        // If the original navbar has 'Course'/'My courses' and there are
+        // nodes further ahead in the breadcrumb, then create a new navbar.
+        if ($originalnavbarsize > 2 &&
+                ($originalnavbar[1]->text == get_string('mycourses', 'core') ||
+                $originalnavbar[1]->text == get_string('courses', 'core'))) {
+            $newnavbar = new \navbar($this->page);
+            // Clear out previously created navbar, created by constructor.
+            $newnavbar->ignore_active();
+            // Create new navbar excluding the 'Course'/'My courses' node.
+            for ($i = 2; $i < $originalnavbarsize; $i++) {
+                $node = $originalnavbar[$i];
+                $newnavbar->add($node->text, $node->action, $node->type,
+                        $node->shorttext, $node->key, $node->icon);
+            }
+        } else {
+            $newnavbar = $this->page->navbar;
+        }
+        return $this->render_from_template('core/navbar', $newnavbar);
+    }
 }
