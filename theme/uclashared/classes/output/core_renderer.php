@@ -276,10 +276,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar pull-xs-right');
         }
         $html .= html_writer::div($this->context_header_settings_menu(), 'pull-xs-right context-header-settings-menu');
+        $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
         $html .= html_writer::start_div('pull-xs-left');
         $html .= $this->context_header();
         $html .= html_writer::end_div();
-        $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
             $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix w-100 pull-xs-left');

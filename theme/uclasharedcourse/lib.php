@@ -24,6 +24,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
+require_once($CFG->dirroot . '/theme/uclashared/lib.php');
+
+/**
+ * Callback to add head elements.
+ *
+ * @return str valid html head content
+ */
+function theme_uclasharedcourse_before_standard_html_head() {
+    return theme_uclashared_before_standard_html_head();
+}
 
 /**
  * Call same method as parent theme in inject preprocessing.
@@ -31,8 +41,6 @@ require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
  * @param moodle_page $page
  */
 function theme_uclasharedcourse_page_init(moodle_page $page) {
-    global $CFG;
-    require_once($CFG->dirroot . '/theme/uclashared/lib.php');
     theme_uclashared_page_init($page);
 }
 

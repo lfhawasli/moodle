@@ -24,6 +24,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Callback to add head elements.
+ *
+ * @return str valid html head content
+ */
+function theme_uclashared_before_standard_html_head() {
+    // Add link to Google Font for Lato.
+    return '<link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,900" rel="stylesheet" type="text/css">';
+}
+
+/**
  * Pulls random image for homepage background and saves it to session cache.
  *
  * @return $image.

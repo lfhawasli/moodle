@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Configuration for UCLA's Shared Server theme.
  *
@@ -22,9 +23,8 @@
  * @copyright 2017 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['additional_logos'] = 'Additional header logos';
+$string['choosereadme'] = 'The course theme from University of California, Los Angeles.';
 $string['pluginname'] = 'UCLA course theme';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
-$string['choosereadme'] = 'The course theme from University of California, Los Angeles.';
-
-$string['additional_logos'] = 'Additional header logos';

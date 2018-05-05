@@ -1901,7 +1901,13 @@ function ucla_get_user_enrolled_course($courseid, $userid) {
  * @param global_navigation $navigation
  */
 function local_ucla_extend_navigation(global_navigation $navigation) {
+    global $COURSE;
+    // Make sure we are using UCLA theme.
     if (local_ucla_core_edit::using_ucla_theme()) {
+        // If in course, make sure we are using UCLA format.
+        if ($COURSE->id !== SITEID && $COURSE->format !== 'ucla') {
+            return;
+        }
         $modify = new theme_uclashared\modify_navigation();
         $modify->run($navigation);
     }
