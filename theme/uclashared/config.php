@@ -60,6 +60,9 @@ $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
 
 // Override Boost configs for layouts.
 $THEME->layouts['mydashboard']['options']['noheader'] = true;
+// To prevent blocks from being displayed on non-section course pages.
+$THEME->layouts['incourse']['regions'] = array();
+$THEME->layouts['report']['regions'] = array();
 
 // Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';
