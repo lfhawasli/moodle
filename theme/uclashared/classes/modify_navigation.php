@@ -364,7 +364,8 @@ class modify_navigation {
         $params = array('courseid' => $PAGE->course->id,
                 $sectiontype => $sectionvalue);
 
-        if (is_enrolled($PAGE->context) || has_capability('moodle/course:view', $PAGE->context)) {
+        $pagecontext = \context_course::instance($course->id);
+        if (is_enrolled($pagecontext) || has_capability('moodle/course:view', $pagecontext)) {
             $adminurl = new \moodle_url('/course/format/ucla/admin_panel.php', $params);
             $courseadmin = \navigation_node::create(get_string('adminpanel', 'format_ucla'),
                         $adminurl, \navigation_node::TYPE_SETTING,
