@@ -86,10 +86,15 @@
             }
         }
     }
-    
+
     .sectionheader {
         border-bottom: 1px solid #ccc;
         padding-bottom: 1em;
+    }
+    
+    // Hide "access restriction" element
+    .availabilitypopup.hide {
+        display:none;
     }
 }
 

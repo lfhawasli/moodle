@@ -206,7 +206,7 @@ class local_publicprivate_renderer extends core_course_renderer {
 
         $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
         $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
-        if (empty($availabilityhtml)) {
+        if ($ppstate == 'public' || empty($availabilityhtml)) {
             $classes .= ' hide';
         }
         $availabilitypopup = html_writer::span($link, $classes, array(
