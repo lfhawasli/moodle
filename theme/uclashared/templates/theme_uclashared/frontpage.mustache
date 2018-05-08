@@ -1,0 +1,26 @@
+{{{ output.doctype }}}
+<html {{{ output.htmlattributes }}}>
+<head>
+    <title>{{{ output.page_title }}}</title>
+    <link rel="shortcut icon" href="{{{ output.favicon }}}" />
+    {{{ output.standard_head_html }}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="theme/uclashared/style/frontpage.css"/>
+</head>
+<body>
+  {{{ output.standard_top_of_body_html }}}
+  <div class="bg-img"></div>
+  <div class="container-fluid">
+    <div class="row">
+      {{> theme_uclashared/frontpage_header}}
+      <div id="sidebar">
+        {{{ output.main_content }}}
+      </div>
+      <div class="col-12" id="main-area">
+        {{> theme_uclashared/greeting }}
+      </div>
+    </div>
+  </div>
+  {{> theme_uclashared/footer }}
+</body>
+</html>

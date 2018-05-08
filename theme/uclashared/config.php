@@ -45,7 +45,7 @@ $THEME->enable_dock = false;
 // YUI CSS we want to include (we don't want any!).
 $THEME->yuicssmodules = array();
 
-// Most themes will use this rendererfactory as this is the one that allows the 
+// Most themes will use this rendererfactory as this is the one that allows the
 // theme to override any other renderer.
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 
@@ -66,5 +66,10 @@ $THEME->layouts['report']['regions'] = array();
 
 // Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';
+
 // Add javascript files.
 $THEME->javascripts[] = 'help_feedback';
+
+$THEME->layouts['frontpage'] = array(
+  'file' => 'frontpage.php',
+);
