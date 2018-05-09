@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['activitiesresources'] = 'Activities/Resources';
+$string['addsections'] = 'Add section';
 $string['pluginname'] = 'UCLA theme';
 $string['region-side-pre'] = 'Right';   // Boost no longer has left region.
 $string['choosereadme'] = 'The theme from University of California, Los Angeles.';

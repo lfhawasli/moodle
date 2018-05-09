@@ -503,6 +503,32 @@ class modify_navigation {
 
         $this->coursenode->add_node($showall);
     }
+    
+    /**
+     * Add 'Add Section' node if using UCLA format.
+     */
+    private function add_new_section() {
+        global $COURSE, $PAGE;
+
+        // See if we should show "Add Section" option.
+        $format = course_get_format($COURSE);
+        if (($format->get_format() != 'ucla') || !$PAGE->user_is_editing()) {
+            return;
+        }
+
+        $straddsections = get_string('addsections', 'theme_uclashared');
+        $url = new \moodle_url('/course/changenumsections.php',
+                array('courseid' => $PAGE->course->id, 'insertsection' => 0, 'sesskey' => sesskey(), 'sectionreturn' => 1));
+        $icon = new \pix_icon('t/add', $straddsections);
+
+        $addsections = \navigation_node::create($straddsections,
+                    $url, \navigation_node::TYPE_SECTION,
+                    null, 'addsection', $icon);
+
+        $addsections->addsectionclass = 'add-sections';
+        $addsections->dataaddsections = $straddsections;
+        $this->coursenode->add_node($addsections);
+    }
 
     /**
      * Adds link to UCLA syllabus if on a course type that supports it.
@@ -656,6 +682,7 @@ class modify_navigation {
             $this->add_syllabus();
             $this->add_tasiteparent();
             $this->add_show_all();
+            $this->add_new_section();
             $this->add_libraryreserves();
             $this->add_mediaresources();
             $this->add_activityresources();
