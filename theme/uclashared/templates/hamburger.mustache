@@ -1,0 +1,19 @@
+<button aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}"
+  aria-controls="nav-drawer"
+  type="button"
+  class="btn pull-xs-left m-r-1 btn-secondary"
+  id="hamburger-wrapper"
+  data-action="toggle-drawer"
+  data-side="left"
+  onclick="changeHamburger()"
+  data-preference="drawer-open-nav">
+  <div id="hamburger-icon">
+    <div id="hamburger-icon-bg"></div>
+    <div class="hamburger-icon-bar hamburger-icon-bar1"></div>
+    <div class="hamburger-icon-bar hamburger-icon-bar3"></div>
+    <div class="hamburger-icon-bar hamburger-icon-bar2"></div>
+  </div>
+  <span class="sr-only">
+    {{#str}}sidepanel, core{{/str}}
+  </span>
+</button>

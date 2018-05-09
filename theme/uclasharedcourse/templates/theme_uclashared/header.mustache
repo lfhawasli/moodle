@@ -22,7 +22,7 @@
         navbar-static-top moodle-has-zindex {{output.get_headerclasses}}">
     <div class="header-main row headroom headroom--top">
         <div class="nav-toggle" data-region="drawer-toggle">
-            <button aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}" aria-controls="nav-drawer" type="button" class="btn pull-xs-left m-r-1 btn-secondary" data-action="toggle-drawer" data-side="left" data-preference="drawer-open-nav">{{#pix}}i/menubars{{/pix}}<span class="sr-only">{{#str}}sidepanel, core{{/str}}</span></button>
+            {{> theme_uclashared/hamburger }}
         </div>
         <div class="header-logo">
             {{! Override to provide custom logos }}
