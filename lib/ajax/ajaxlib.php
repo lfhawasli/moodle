@@ -74,9 +74,7 @@ function ajax_check_captured_output() {
                 var_export($output, true);
         if ($CFG->debugdeveloper && !empty($output)) {
             // Only throw an error if the site is in debugdeveloper.
-            // START UCLA MOD: CCLE-6343 - Site administration dropdown fails on Dev instances
-            //throw new coding_exception($message);
-            // END UCLA MOD: CCLE-6343
+            throw new coding_exception($message);
         }
         error_log('Potential coding error: ' . $message);
     }
