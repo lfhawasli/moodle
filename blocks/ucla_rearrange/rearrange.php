@@ -115,10 +115,9 @@ foreach ($sectionnodeshtml as $section => $snh) {
 
     $sectnum = $sectnums[$section];
 
-    if ($sectnum != 0) {
-        $siattr['class'] .= ' ' . block_ucla_rearrange::SECTIONITEM;
-    } else {
+    if ($sectnum == 0) {
         $sectionzero = $section;
+        $siattr['class'] .= ' ' . block_ucla_rearrange::SECTIONZERO;
     }
 
     $ishiddentext = '';

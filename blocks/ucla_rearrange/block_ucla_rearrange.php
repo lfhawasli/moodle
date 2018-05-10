@@ -78,10 +78,10 @@ class block_ucla_rearrange extends block_base {
     const SECTIONLISTCLASS = 's-list-class';
 
     /**
-     * This is the LI class.
+     * This is the id of LI for section zero.
      * @var string
      */
-    const SECTIONITEM = 's-list-item';
+    const SECTIONZERO = 'section-zero';
 
     /**
      * Non-nesting class.
