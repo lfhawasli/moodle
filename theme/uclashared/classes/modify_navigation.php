@@ -539,7 +539,7 @@ class modify_navigation {
         // Add node parent class home.
         $tasiteenrol = block_method_result('ucla_tasites', 'get_tasite_enrol_meta_instance', $PAGE->course->id);
         if (!empty($tasiteenrol)) {
-            $tasiteparentnode = \navigation_node::create(get_string('parentcourse', 'block_ucla_course_menu'),
+            $tasiteparentnode = \navigation_node::create(get_string('returntocourse', 'block_ucla_tasites'),
                                 new \moodle_url('/course/view.php', array(
                                     'id' => $tasiteenrol->customint1
                                 )),
