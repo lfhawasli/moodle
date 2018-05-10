@@ -106,8 +106,14 @@ $requestor-table-color-border-tut: #80dbdb;
 }
 
 #ucrgeneraloptions {
+    label {
+        margin: 0;
+        padding: 0;
+    }
     span.label {
         padding: 4px 12px 4px 4px;
+        color: black;
+        font-size: 0.9em;
         
         &.ugrad {
             background-color: $requestor-table-color-bg-ugrad;
@@ -124,4 +130,8 @@ $requestor-table-color-border-tut: #80dbdb;
             border-left: 12px solid $requestor-table-color-border-tut;
         }
     }
+}
+
+table.generaltable#ucrgeneraloptions {
+    width: auto;
 }
