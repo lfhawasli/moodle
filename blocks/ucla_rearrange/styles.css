@@ -13,7 +13,7 @@
     list-style: none;
 }
 
-li > div {
+li:not(.section-zero) > div {
     cursor: move;
 }
 

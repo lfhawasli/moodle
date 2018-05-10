@@ -1,4 +1,6 @@
 define(['jquery', 'block_ucla_rearrange/jquery.mjs.nestedSortable'], function($) {
+    var siteInfoSelector = '.section-zero';
+
     var initNestedSortable = function() {
         // TODO remove all nonnesting/invisible
         $('#s-list').nestedSortable({
@@ -7,14 +9,16 @@ define(['jquery', 'block_ucla_rearrange/jquery.mjs.nestedSortable'], function($)
             listType: 'ul',
             toleranceElement: '> div',
 
-            // TODO site info selector
-            // TODO allow sorting within site info
-            cancel: '#s-list > li:first-child()',
+            cancel: siteInfoSelector + ' > div',
             doNotClear: true,
             isAllowed: function(placeholder, parent, current) {
-                var isSectionItem = current.hasClass('s-list-item');
-                var isBeforeSiteInfo = placeholder.nextAll('#s-section-1901').length > 0;
-                return !(isSectionItem && isBeforeSiteInfo);
+                // Don't allow any section to be moved before site info.
+                if (current.is('.section-item:not(.section-zero)')) {
+                    var isBeforeSiteInfo = placeholder.nextAll(siteInfoSelector).length > 0;
+                    return !isBeforeSiteInfo;
+                }
+
+                return true;
             },
             protectRoot: true,
 
@@ -32,7 +36,7 @@ define(['jquery', 'block_ucla_rearrange/jquery.mjs.nestedSortable'], function($)
     };
 
     var updateSerialized = function() {
-        serialized = JSON.stringify($('#s-list').nestedSortable('toHierarchy'));
+        var serialized = JSON.stringify($('#s-list').nestedSortable('toHierarchy'));
         $('#serialized').val(serialized);
     };
 
