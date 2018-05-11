@@ -470,39 +470,63 @@ if ($processrequests) {
 
         if (!$allcoursesbuilt) {
             // Add options for global email to contact.
-            $requestor = html_writer::tag('label', get_string(
+            $requestorlabel = html_writer::tag('label', get_string(
                 'requestorglobal', $rucr), array(
                     'for' => 'requestorglobal'
                 ));
 
-            $requestor .= html_writer::tag('input', '', array(
-                    'type' => 'text',
+            $requestorinput = html_writer::tag('input', '', array(
+                    'type' => 'email',
                     'value' => $requestorglobal,
-                    'name' => 'requestorglobal'
+                    'name' => 'requestorglobal',
+                    'class' => 'form-control'
                 ));
 
-            $globaloptions[][] = $requestor;
+            $requestor = array($requestorlabel, $requestorinput);
+            $globaloptions[] = $requestor;
 
             // We can only provide course filters if there is a type.
             if ($anycoursehastype) {
                 // Add option to email instructors.
-                $globaloptions[][] = html_writer::checkbox('', 'mailinst',
-                        get_config('tool_uclacourserequestor', 'mailinst_default'),
-                        get_string('mailinsttoggle', 'tool_uclacourserequestor'),
-                        array('class' => 'check-all check-all-instructors'));
+                $emailinstructorlabel = html_writer::tag('label', get_string(
+                    'mailinsttoggle', $rucr), array(
+                        'for' => 'emailinstructor',
+                        'class' => 'form-check-label'
+                    ));
+
+                // Create array for attributes of checkbox element.
+                $emailinstructorcheckboxattributes = array(
+                        'type' => 'checkbox',
+                        'value' => 'mailinst',
+                        'id' => 'emailinstructor',
+                        'class' => 'form-check-input check-all check-all-instructors',
+                );
+
+                // Use default checked value from config file.
+                if (get_config('tool_uclacourserequestor', 'mailinst_default')) {
+                    $emailinstructorcheckboxattributes['checked'] = 'checked';
+                }
+
+                // Write the HTML for checkbox element.
+                $emailinstructorinput = html_writer::tag('input', '', $emailinstructorcheckboxattributes);
+
+                $emailinstructor = array($emailinstructorlabel, $emailinstructorinput);
+                $globaloptions[] = $emailinstructor;
 
                 // Add build filter options.
-                $filters = get_string('buildfilters', 'tool_uclacourserequestor');
-                $filters .= html_writer::tag('span',
+                $filterslabel = html_writer::tag('label', get_string(
+                    'buildfilters', $rucr));
+                $filterstoggles = html_writer::tag('span',
                         html_writer::checkbox('', 'ugrad', true, 'ugrad', array('class' => 'check-all')),
                         array('class' => 'label ugrad'));
-                $filters .= html_writer::tag('span',
+                $filterstoggles .= html_writer::tag('span',
                         html_writer::checkbox('', 'grad', true, 'grad', array('class' => 'check-all')),
                         array('class' => 'label grad'));
-                $filters .= html_writer::tag('span',
+                $filterstoggles .= html_writer::tag('span',
                         html_writer::checkbox('', 'tut', true, 'tut', array('class' => 'check-all')),
                         array('class' => 'label tut'));
-                $globaloptions[][] = $filters;
+                $filters = array($filterslabel, $filterstoggles);
+                $globaloptions[] = $filters;
             }
         }
     }
@@ -658,6 +682,7 @@ if (!empty($requeststable->data)) {
         $globaloptionstable = new html_table();
         $globaloptionstable->id = 'ucrgeneraloptions';
         $globaloptionstable->head = array(get_string('optionsforall', $rucr));
+        $globaloptionstable->headspan = array(2);
         $globaloptionstable->data = $globaloptions;
         echo html_writer::table($globaloptionstable);
     }
