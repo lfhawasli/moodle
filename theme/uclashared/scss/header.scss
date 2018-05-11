@@ -302,22 +302,6 @@ header {
     padding: 0px;
 }
 
-.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .caret {
-    margin-top: 10px;
-}
-
-.caret {
-    border-top: 4px solid white;
-}
-
-a.dropdown-toggle, a.dropdown-toggle:hover {
-    color: #f5f8f9;
-}
-
-a:focus .caret, a:hover .caret {
-    border-top-color: white;
-}
-
 .usermenu {
     margin-left: 10px;
     margin-top: .18rem;
@@ -327,8 +311,21 @@ a:focus .caret, a:hover .caret {
             color: #f5f8f9;
             text-decoration: underline;
         }
-     }
+    }
+    .jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .caret {
+        margin-top: 10px;
+    }
+    .caret {
+        border-top: 4px solid white;
+    }
+    a:focus .caret, a:hover .caret {
+        border-top-color: white;
+    }
+    a.dropdown-toggle, a.dropdown-toggle:hover {
+        color: #f5f8f9;
+    }
  }
+ 
 .navbar {
     .popover-region {
         float: left;
