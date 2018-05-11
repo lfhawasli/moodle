@@ -40,7 +40,6 @@ $node = $PAGE->settingsnav->find('courseadmin', navigation_node::TYPE_COURSE);
 
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
-$PAGE->navbar->add($title);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
 
