@@ -85,4 +85,4 @@ $string['viewtasites'] = 'Existing TA sites';
 $string['viewtasitesec'] = 'Sec {$a}';
 
 // Admin panel strings.
-$string['managetasites'] = 'Manage TA Sites';
+$string['managetasites'] = 'Manage TA sites';
