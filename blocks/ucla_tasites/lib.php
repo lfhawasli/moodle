@@ -31,7 +31,7 @@ require_once(__DIR__ . '/block_ucla_tasites.php');
  */
 function block_ucla_tasites_extend_navigation_course($navigation, $course, $context) {
     $courseid = $course->id;
-    
+
     $accessible = false;
     try {
         if (block_ucla_tasites::check_access($courseid) && !block_ucla_tasites::is_tasite($courseid)) {
@@ -43,11 +43,12 @@ function block_ucla_tasites_extend_navigation_course($navigation, $course, $cont
         // Do nothing.
         $accessible = false;
     }
-    
+
     if ($accessible) {
         $setting = navigation_node::create(get_string('managetasites', 'block_ucla_tasites'),
-                new moodle_url('/blocks/ucla_tasites/index.php',
-                        array('courseid' => $courseid)), navigation_node::TYPE_SETTING);
+                new moodle_url('/blocks/ucla_tasites/index.php', array('courseid' => $courseid)),
+                navigation_node::TYPE_SETTING, null, 'managetasites');
+
         $navigation->add_node($setting);
     }
 };

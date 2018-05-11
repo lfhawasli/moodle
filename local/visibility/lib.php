@@ -43,7 +43,7 @@ function local_visibility_extend_navigation_course(navigation_node $navigation, 
                                             $path,
                                             navigation_node::TYPE_SETTING,
                                             null,
-                                            null,
+                                            'coursevisibility',
                                             new pix_icon($course->visible ? 'i/hide' : 'i/show', ''));
     if (isset($settingsnode)) {
         $navigation->add_node($settingsnode, 'users');

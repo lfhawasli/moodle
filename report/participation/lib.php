@@ -36,7 +36,10 @@ function report_participation_extend_navigation_course($navigation, $course, $co
     global $CFG, $OUTPUT;
     if (has_capability('report/participation:view', $context)) {
         $url = new moodle_url('/report/participation/index.php', array('id'=>$course->id));
-        $navigation->add(get_string('pluginname', 'report_participation'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+        // START UCLA MOD: CCLE-7411 - Rearrange links in Admin panel
+        //$navigation->add(get_string('pluginname', 'report_participation'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+        $navigation->add(get_string('pluginname', 'report_participation'), $url, navigation_node::TYPE_SETTING, null, 'report_participation', new pix_icon('i/report', ''));
+        // END UCLA MOD: CCLE-7411
     }
 }
 

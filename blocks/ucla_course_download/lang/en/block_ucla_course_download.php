@@ -89,4 +89,4 @@ $string['ucla_course_download:myaddinstance'] = 'Add a new UCLA course download 
 $string['ucla_course_download:requestzip'] = 'Request/download a course download zip file';
 
 // Admin panel strings.
-$string['coursedownload'] = 'Download course materials';
+$string['coursedownload'] = 'Download course material';

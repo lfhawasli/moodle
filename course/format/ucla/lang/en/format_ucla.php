@@ -90,8 +90,18 @@ $string['manage'] = 'MANAGE';
 
 // Admin panel strings.
 $string['adminpanel'] = 'Admin panel';
-
-// CCLE-7387 - Remove/rename links in Admin panel
-$string['participants'] = 'Participants';
-$string['gradessetup'] = 'Grades Setup';
+$string['managematerial'] = 'Manage material';
+$string['settingsandbackup'] = 'Settings & backup';
+$string['usersandgroups'] = 'Users & groups';
+$string['logsandreports'] = 'Logs & reports';
+$string['additionalsettings'] = 'Additional';
 $string['revieweditdates'] = 'Review/edit dates';
+$string['participants'] = 'Participants';
+$string['inviteusers'] = 'Invite users';
+$string['gradessetup'] = 'Grades setup';
+$string['enrollmentmethods'] = 'Enrollment methods';
+$string['competency'] = 'Competency';
+$string['questionbank'] = 'Question bank';
+$string['mediasitesettings'] = 'Mediasite settings';
+$string['mediagallery'] = 'Media gallery';
+$string['newbadge'] = 'Add a badge';

@@ -33,7 +33,7 @@ function tool_myucla_url_extend_navigation_course($navigation, $course, $context
     if (!empty($courseinfo) && has_capability('moodle/course:viewparticipants',
             $context)) {
         $container = navigation_node::create(get_string('myucla', 'tool_myucla_url'),
-                null, navigation_node::TYPE_CONTAINER);
+                null, navigation_node::TYPE_CONTAINER, null, 'myucla');
 
         foreach ($courseinfo as $singlecourseinfo) {
             $courseterm = $singlecourseinfo->term;

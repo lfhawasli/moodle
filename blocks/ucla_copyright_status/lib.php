@@ -467,8 +467,9 @@ function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
 function block_ucla_copyright_status_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('moodle/course:manageactivities', $context)) {
         $setting = navigation_node::create(get_string('managecopyright', 'block_ucla_copyright_status'),
-                new moodle_url('/blocks/ucla_copyright_status/view.php',
-                        array('courseid' => $course->id)), navigation_node::TYPE_SETTING);
+                new moodle_url('/blocks/ucla_copyright_status/view.php', array('courseid' => $course->id)),
+                navigation_node::TYPE_SETTING, null, 'managecopyright');
+
         $navigation->add_node($setting);
     }
 };

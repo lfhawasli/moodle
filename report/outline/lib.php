@@ -35,7 +35,10 @@ defined('MOODLE_INTERNAL') || die;
 function report_outline_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('report/outline:view', $context)) {
         $url = new moodle_url('/report/outline/index.php', array('id'=>$course->id));
-        $navigation->add(get_string('pluginname', 'report_outline'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+        // START UCLA MOD: CCLE-7411 - Rearrange links in Admin panel
+        //$navigation->add(get_string('pluginname', 'report_outline'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+        $navigation->add(get_string('pluginname', 'report_outline'), $url, navigation_node::TYPE_SETTING, null, 'report_outline', new pix_icon('i/report', ''));
+        // END UCLA MOD: CCLE-7411
     }
 }
 

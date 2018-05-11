@@ -48,6 +48,6 @@ $string['eventrearrange'] = 'Rearranged course materials';
 $string['hidden'] = 'hidden';
 
 // Admin panel strings.
-$string['rearrangematerials'] = 'Rearrange course materials';
+$string['rearrangematerial'] = 'Rearrange course material';
 
 // EOF.
