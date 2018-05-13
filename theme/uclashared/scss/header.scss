@@ -2,8 +2,6 @@
 // UCLA / Header
 //
 
-
-
 //
 // Header styles for CCLE banner.
 //
@@ -88,57 +86,7 @@ header {
         width: 100%;
         height: 40px;
         background-color: $header-color-prod;
-    }
-
-    .help-dropdown-menu {
-        background-color: white;
-        margin: 0;
-        min-width: 143px;
-        opacity: 0.97;
-        position: absolute;
-        top: 40px;
-        z-index: 99999;
-        
-        &.hidden {
-            display: none;
-            visibility: hidden;
-        }
-        li {
-            list-style: none;
-            
-            .arrow-up {
-                position: absolute;
-                left: 5%;
-                top: -5px;
-                border-bottom-color: white;
-            }
-            
-            a {
-                font-size: 1.3rem;
-                display: inline-block;
-                padding: 8px 10px;
-                width: 100%;
-                color: #333;
-                
-                &:hover {
-                    text-decoration: none;
-                }
-            }
-            
-            &:nth-child(2n) {
-                background-color: #efefef;
-            }
-            &:hover {
-                background-color: #444;
-
-                a {
-                    color: #eee;
-                }
-            }
-        }
-
-    }
-    
+    }    
 }
 
 // Defines how header logo area looks
@@ -195,9 +143,7 @@ header {
     .logo-system-name:hover, 
     .logo-system-name:active {
         text-decoration: underline;
-    }
-
-    
+    }    
 }
 
 .header-login {
@@ -254,22 +200,13 @@ header {
         // Help button
         .btn-help-feedback {
             background-color: $ccle-color-logo;
-
             &:hover {
-                background-color: $ccle-color-logo;
+                background-color: lighten($ccle-color-logo, 10%);
             }
-            &:focus {
-                background-color: $ccle-color-logo;
-                border: 2px solid white;
-            }
-        }
-        a.btn-help-feedback {
-            color: black;
-            i {
-                margin-left: 2px;
+            a {
+                color: black;
             }
         }
-
     }
     .header-btn-group .role-name {
         padding-left: 8px;
@@ -285,6 +222,31 @@ header {
     .header-btn-group .login-as {
         font-size: 1.1rem;
         margin-left: -20px;
+    }
+}
+
+// Help button
+.btn-help-feedback {
+    background-color: $ccle-color-logo;
+
+    &:hover {
+        background-color: $ccle-color-logo;
+    }
+    &:focus {
+        background-color: $ccle-color-logo;
+        border: 2px solid white;
+    }
+
+    // Needed to hide the extra dropdown-toggle icon from action menu.
+    .dropdown-toggle::after {
+        display: none;
+    }
+}
+
+a.btn-help-feedback {
+    color: black;
+    i {
+        margin-left: 2px;
     }
 }
 
@@ -332,4 +294,3 @@ header {
         margin-top: 8px;
     }
 }
-

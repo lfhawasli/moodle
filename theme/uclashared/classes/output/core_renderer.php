@@ -21,12 +21,16 @@ use moodle_url;
 use custom_menu_item;
 use custom_menu;
 use action_link;
+use action_menu_filler;
+use action_menu_link_secondary;
 use action_menu;
 use help_icon;
 use pix_icon;
 use block_contents;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
+include_once($CFG->dirroot.'/user/lib.php');
 
 /**
  * UCLA specific renderers and overrides Boost renders.
@@ -142,6 +146,8 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return string
      */
     public function help_feedback_link() {
+        global $CFG;
+
         $helplocale = $this->call_separate_block_function(
                 'ucla_help', 'get_action_link'
         );
@@ -153,16 +159,78 @@ class core_renderer extends \theme_boost\output\core_renderer {
         // Main Help & Feedback link.
         $hflinktext = html_writer::span(get_string('help_n_feedback', 'theme_uclashared'), '');
         $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
-        $outlink = html_writer::link($helplocale, $hflinktext . $icon, array('class' => 'btn-header btn-help-feedback'));
 
-        // Show dropdown menu.
-        $menu = $this->custom_menu();
+        $opts = new stdClass();
+        $opts->navitems = array();
 
-        // Return full menu with link.
-        return html_writer::span($outlink . $menu, 'help-dropdown');
+        // Custom-defined items.
+        $customitems = \user_convert_text_to_menu_items($CFG->custommenuitems, $this->page);
+        foreach ($customitems as $item) {
+            $opts->navitems[] = $item;
+        }
+
+        // Create a divider (well, a filler).
+        $divider = new action_menu_filler();
+        $divider->primary = false;
+
+        $am = new action_menu();
+        $am->set_menu_trigger($hflinktext . $icon);
+
+        $am->set_alignment(action_menu::TR, action_menu::BR);
+        $am->set_nowrap_on_items();
+        $navitemcount = count($opts->navitems);
+        $idx = 0;
+        foreach ($opts->navitems as $key => $value) {
+
+            switch ($value->itemtype) {
+                case 'divider':
+                    // If the nav item is a divider, add one and skip link processing.
+                    $am->add($divider);
+                    break;
+
+                case 'invalid':
+                    // Silently skip invalid entries (should we post a notification?).
+                    break;
+
+                case 'link':
+                    // Process this as a link item.
+                    $pix = null;
+                    if (isset($value->pix) && !empty($value->pix)) {
+                        $pix = new pix_icon($value->pix, $value->title, null, array('class' => 'iconsmall'));
+                    } else if (isset($value->imgsrc) && !empty($value->imgsrc)) {
+                        $value->title = html_writer::img(
+                            $value->imgsrc,
+                            $value->title,
+                            array('class' => 'iconsmall')
+                        ) . $value->title;
+                    }
+
+                    $al = new action_menu_link_secondary(
+                        $value->url,
+                        $pix,
+                        $value->title,
+                        array('class' => 'icon')
+                    );
+                    if (!empty($value->titleidentifier)) {
+                        $al->attributes['data-title'] = $value->titleidentifier;
+                    }
+                    $am->add($al);
+                    break;
+            }
+
+            $idx++;
+
+            // Add dividers after the first item and before the last item.
+            if ($idx == 1 || $idx == $navitemcount - 1) {
+                $am->add($divider);
+            }
+        }
+
+        return html_writer::div($this->render($am), 'btn-header btn-help-feedback');
+
     }
 
-    /**
+     /**
      * Renders the Help & Feedback dropdown menu using Moodle's own config.
      * The menu items can be modified in Appearance > Themes > Theme settings.
      *

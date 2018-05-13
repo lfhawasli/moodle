@@ -33,6 +33,10 @@ $string['moresection'] = 'More...';
 $string['control_panel'] = 'Control Panel';
 
 $string['help_n_feedback'] = 'Need Help';
+$string['helprequest'] = 'Submit a help request';
+$string['selfhelp'] = 'View self help articles';
+$string['tipsupdates'] = 'Read tips & updates';
+$string['requestsite'] = 'Request a site';
 
 $string['copyright_information'] = '&copy; {$a} UC Regents';
 
