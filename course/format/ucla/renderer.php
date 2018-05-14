@@ -517,9 +517,12 @@ class format_ucla_renderer extends format_topics_renderer {
                             // enroll the user rather than have them land on
                             // the enroll index page.
                             '_qf__'.$instance->id.'_enrol_self_enrol_form' => 1));
-                    $enrolmebtn = new enrol_user_button($url, $enrolmestr);
+                    $enrollmebtn = new enrol_user_button($url, $enrolmestr);
+                    $enrollmebtn->class = 'text-xs-center';
                     $renderer = $PAGE->get_renderer('enrol');
-                    return $OUTPUT->box($renderer->render($enrolmebtn), 'text-center');
+                    $enrollalert = get_string('enrollmealert', 'format_ucla');
+                    $enrollalert .= $renderer->render($enrollmebtn);
+                    return $OUTPUT->box($enrollalert, 'alert alert-warning');
                 }
             }
         }
