@@ -44,6 +44,10 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
 
 if ($node) {
+    $tabcontainer = navigation_node::create(get_string('courseadmin', 'format_ucla'), null, navigation_node::TYPE_CONTAINER);
+    $tabcontainer->courseadmin = true;
+    $rowcontainer = navigation_node::create('row1', null, navigation_node::TYPE_CONTAINER);
+
     // Manage material.
     $settings = array(
             'modifysections'    => navigation_node::TYPE_SETTING,
@@ -65,7 +69,7 @@ if ($node) {
         }
     }
 
-    $node->add_node($container);
+    $rowcontainer->add_node($container);
 
     // Settings and backup.
     $settings = array(
@@ -87,13 +91,7 @@ if ($node) {
         }
     }
 
-    $node->add_node($container);
-
-    // MyUCLA.
-    if ($container = $node->find('myucla', navigation_node::TYPE_CONTAINER)) {
-        $container->remove();
-        $node->add_node($container);
-    }
+    $rowcontainer->add_node($container);
 
     // Users and groups.
     $container = navigation_node::create(get_string('usersandgroups', 'format_ucla'),
@@ -136,7 +134,10 @@ if ($node) {
         $container->add(get_string('permissions', 'role'), $url, navigation_node::TYPE_SETTING);
     }
 
-    $node->add_node($container);
+    $rowcontainer->add_node($container);
+    $tabcontainer->add_node($rowcontainer);
+
+    $rowcontainer = navigation_node::create('row2', null, navigation_node::TYPE_CONTAINER);
 
     // Logs and reports.
     $settings = array(
@@ -158,7 +159,7 @@ if ($node) {
         }
     }
 
-    $node->add_node($container);
+    $rowcontainer->add_node($container);
 
     // Additional settings.
     $settings = array(
@@ -184,7 +185,22 @@ if ($node) {
         }
     }
 
-    $node->add_node($container);
+    $rowcontainer->add_node($container);
+    $tabcontainer->add_node($rowcontainer);
+    $node->add_node($tabcontainer);
+
+    // MyUCLA.
+    $tabcontainer = navigation_node::create(get_string('myucla', 'format_ucla'), null, navigation_node::TYPE_CONTAINER, null, 'myuclatab');
+    $tabcontainer->tab = true;
+    $tabcontainer->tabtext = get_string('myucla', 'format_ucla');
+    $rowcontainer = navigation_node::create('', null, navigation_node::TYPE_CONTAINER);
+
+    if ($container = $node->find('myucla', navigation_node::TYPE_CONTAINER)) {
+        $container->remove();
+        $rowcontainer->add_node($container);
+        $tabcontainer->add_node($rowcontainer);
+        $node->add_node($tabcontainer);
+    }
 
     // Remove leftover settings.
     $settings = array(
@@ -234,7 +250,7 @@ if ($node) {
     }
 
     // Render admin panel.
-    echo $OUTPUT->render_from_template('core/settings_link_page', ['node' => $node]);
+    echo $OUTPUT->render_from_template('format_ucla/admin_panel', ['node' => $node]);
 }
 
 echo $OUTPUT->footer();
