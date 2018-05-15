@@ -102,4 +102,3 @@ $string['foodis_disability'] = 'Disability';
 $string['foolin_disability'] = 'http://www.cae.ucla.edu/';
 $string['foodis_caps'] = 'Couns/PsychSvc (CAPS)';
 $string['foolin_caps'] = 'http://www.counseling.ucla.edu/';
-$string['ucla'] = "UCLA.edu";

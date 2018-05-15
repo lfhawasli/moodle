@@ -28,3 +28,31 @@
     background-color: $session-summer-background-color;
     color: $session-summer-color;
 }
+
+.navbar-light {
+    padding-top: 0px;
+}
+
+/**
+* Weeks display.
+*/
+.weeks-display {
+    width: auto;
+    margin-right: 15px;
+    margin-top: -6px;
+    margin-bottom: 4px;
+    text-align: right;
+    float: right;
+    padding: 1.5px 4px;
+    clear: right;
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 300;
+    white-space: nowrap;
+    .week {
+        &:before {
+            content: " - ";
+        }
+        font-weight: bold;
+    }
+}

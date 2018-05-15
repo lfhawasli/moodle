@@ -34,12 +34,3 @@
 .block_ucla_my_sites div.collab_sites_container {
     margin-left: 1%;
 }
-
-/* Since we removed the header for Dashboard page, the first block needs to be
-   shifted down.  */
-#page-my-index #region-main .card-block:first-child {
-    margin-top: 2rem;
-}
-.block_ucla_my_sites h1 {
-    margin-top: -3rem;  /* Style above also offsets title. */
-}
