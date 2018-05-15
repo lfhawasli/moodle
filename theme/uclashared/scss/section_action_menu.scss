@@ -24,6 +24,10 @@
         .dropdown-item{
             border: none;
         }
+        div.dropdown-item{
+            text-align: center;
+            cursor: pointer;
+        }
     }
     
     .center-action-link{

@@ -95,16 +95,22 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @param baseselector The selector to limit scope to
      */
     _setup_for_section: function(section) {
-        var chooserspan = section.one(CSS.SECTIONMODCHOOSER);
+        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
+        //var chooserspan = section.one(CSS.SECTIONMODCHOOSER);
+        var chooserspan = section.all(CSS.SECTIONMODCHOOSER);
+        // END UCLA MOD: CCLE-7487.
         if (!chooserspan) {
             return;
         }
-        var chooserlink = Y.Node.create("<a href='#' />");
+        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
+        /*var chooserlink = Y.Node.create("<a href='#' />");
         chooserspan.get('children').each(function(node) {
             chooserlink.appendChild(node);
         });
         chooserspan.insertBefore(chooserlink);
-        chooserlink.on('click', this.display_mod_chooser, this);
+        chooserlink.on('click', this.display_mod_chooser, this);*/
+        chooserspan.on('click', this.display_mod_chooser, this);
+        // END UCLA MOD: CCLE-7487.
     },
     /**
      * Display the module chooser
