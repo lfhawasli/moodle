@@ -23,7 +23,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot . '/blocks/ucla_browseby/db/install.php');
 
 /**
  * Upgrader.
@@ -32,18 +31,13 @@ require_once($CFG->dirroot . '/blocks/ucla_browseby/db/install.php');
  * @return boolean
  */
 function xmldb_block_ucla_browseby_upgrade($oldversion = 0) {
-    global $CFG, $PAGE, $SITE, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
 
     $result = true;
 
-    if ($result && $oldversion < 2012032703) {
-        xmldb_block_ucla_browseby_install();
-    }
-
     if ($oldversion < 2016111800) {
-
         // Define index uid (unique) to be added to ucla_browseall_instrinfo.
         $table = new xmldb_table('ucla_browseall_instrinfo');
         $index = new xmldb_index('uid', XMLDB_INDEX_NOTUNIQUE, array('uid'));
@@ -57,9 +51,22 @@ function xmldb_block_ucla_browseby_upgrade($oldversion = 0) {
         upgrade_block_savepoint(true, 2016111800, 'ucla_browseby');
     }
 
-    // This adds an instance of this block to the site page if it
-    // doesn't already exist.
-    block_ucla_browseby::add_to_frontpage();
+    if ($oldversion < 2018051700) {
+        // Delete block instances since we are displaying contents directly in
+        // lefthand nav and frontpage.
+        $blockinstances = $DB->get_recordset('block_instances',
+                array('blockname' => 'ucla_browseby',));
+        // If atleast one block instance exists, delete them.
+        if ($blockinstances->valid()) {
+            foreach($blockinstances as $blockinstance) {
+                blocks_delete_instance($blockinstance);
+            }
+        }
+        $blockinstances->close();
+
+        // Ucla_browseby savepoint reached.
+        upgrade_block_savepoint(true, 2018051700, 'ucla_browseby');
+    }
 
     return $result;
 }

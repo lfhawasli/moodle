@@ -155,3 +155,10 @@ $header-color-system-text:   $header-color-prod;
  * @group header 
  */
 $header-height: 40px;
+
+/**
+ * Override Boost secondary button color so it matches what Boostrap 4 has.
+ */
+$btn-secondary-color:            $gray-dark !default;
+$btn-secondary-bg:               $gray-lighter !default;
+$btn-secondary-border:           #d0d5d8 !default;

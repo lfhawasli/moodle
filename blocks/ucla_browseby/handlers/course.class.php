@@ -146,8 +146,7 @@ class course_handler extends browseby_handler {
             $subjareapretty = ucla_format_name(
                 $this->get_pretty_subjarea($subjarea));
 
-            $t = get_string('coursesinsubjarea', 'block_ucla_browseby',
-                $subjareapretty);
+            $t = $subjareapretty;
 
             // Get all courses in this subject area from our browseall tables.
             $sql = self::BROWSEALL_SQL_HELPER . "

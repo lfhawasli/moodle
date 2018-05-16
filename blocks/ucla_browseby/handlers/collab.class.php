@@ -160,9 +160,9 @@ class collab_handler extends browseby_handler {
                     }
 
                     $context = context_course::instance($course->id);
-
-                    $viewroles = $this->get_role_users($roleids, $context,
-                        false, 'u.id, u.firstname, u.lastname, r.shortname');
+                    $allnames = get_all_user_name_fields(true, 'u');
+                    $viewroles = get_role_users($roleids, $context,
+                        false, 'ra.id, r.shortname,u.id,' . $allnames);
 
                     $courseroles = array();
                     foreach ($viewroles as $viewrole) {
@@ -339,19 +339,6 @@ class collab_handler extends browseby_handler {
         }
 
         return false;
-    }
-
-    /**
-     *  Some more decoupled functions...
-     *
-     * @param array $roles
-     * @param string $context
-     * @param string $parent
-     * @param array $fields
-     **/
-    protected function get_role_users($roles, $context, $parent=false,
-                                      $fields='') {
-        return get_role_users($roles, $context, $parent, $fields);
     }
 
     /**

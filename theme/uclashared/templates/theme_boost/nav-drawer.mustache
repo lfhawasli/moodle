@@ -31,5 +31,12 @@
             </div>
         {{/editingon}}
     {{/incourse}}
+    {{^incourse}}
+        <nav class="list-group">
+            <div class="list-group-item">
+                {{{browseby}}}
+            </div>
+        </nav>
+    {{/incourse}}
     {{> theme_boost/flat_navigation }}
 </div>

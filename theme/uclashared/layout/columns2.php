@@ -80,4 +80,10 @@ if ($PAGE->user_allowed_editing() && $PAGE->user_is_editing()) {
 }
 $PAGE->requires->jquery();
 
+// Displaying BrowseBy block if we are not in a course.
+if ($COURSE->id === SITEID) {
+    $b = block_instance('ucla_browseby');
+    $templatecontext['browseby'] = $b->get_content()->text;
+}
+
 echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);
