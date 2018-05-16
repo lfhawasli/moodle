@@ -3,9 +3,6 @@
 @import "../../boost/scss/bootstrap/mixins/breakpoints";
 
 header.header-custom-logo {
-    // Remove white spacing at top with light blue header removed.
-    margin-top: -8px;
-
     // Custom logos have no margins, they should be aligned from top-left corner.
     .header-logo {
         margin: 0;
