@@ -68,7 +68,7 @@ $THEME->layouts['report']['regions'] = array();
 $THEME->scss = 'moodle';
 
 // Add javascript files.
-$THEME->javascripts[] = 'help_feedback';
+$THEME->javascripts = ['help_feedback', 'hamburger_icon'];
 
 $THEME->layouts['frontpage'] = array(
   'file' => 'frontpage.php',

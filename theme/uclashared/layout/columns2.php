@@ -78,6 +78,6 @@ if ($PAGE->user_allowed_editing() && $PAGE->user_is_editing()) {
         $templatecontext['managecopyright'] = block_ucla_copyright_status::get_editing_link($params);
     }
 }
+$PAGE->requires->jquery();
 
 echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);
-
