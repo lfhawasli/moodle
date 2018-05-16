@@ -449,7 +449,9 @@ class PublicPrivate_Course {
      * @return boolean
      */
     public function is_activated() {
-        return $this->_course->grouppublicprivate > 0;
+        return $this->_course->enablepublicprivate > 0 &&
+                $this->_course->grouppublicprivate > 0 &&
+                $this->_course->groupingpublicprivate > 0;
     }
 
     /**

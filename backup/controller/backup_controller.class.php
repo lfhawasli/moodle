@@ -23,19 +23,6 @@
  */
 
 /**
- * Include the Backup_PublicPrivate_Course_Task object as this controller may
- * need to serialize this object rather than construct it through the
- * Backup_Factory, which is the other place where it is included.
- *
- * @see Backup_PublicPrivate_Course_Task
- * @author ebollens
- * @version 20110719
- */
-if(file_exists($CFG->dirroot.'/local/publicprivate/lib/backup_publicprivate_course_task.class.php')) {
-    include_once($CFG->dirroot.'/local/publicprivate/lib/backup_publicprivate_course_task.class.php');
-}
-
-/**
  * Class implementing the controller of any backup process
  *
  * This final class is in charge of controlling all the backup architecture, for any

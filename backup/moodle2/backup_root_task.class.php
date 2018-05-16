@@ -160,8 +160,6 @@ class backup_root_task extends backup_task {
         $questionbank->set_ui(new backup_setting_ui_checkbox($questionbank, get_string('rootsettingquestionbank', 'backup')));
         $this->add_setting($questionbank);
 
-        // START UCLA MOD: SSC-3689/CCLE-6748 - Hide include groups and groupings option.
-        /*
         $groups = new backup_groups_setting('groups', base_setting::IS_BOOLEAN, true);
         $groups->set_ui(new backup_setting_ui_checkbox($groups, get_string('rootsettinggroups', 'backup')));
         $this->add_setting($groups);
@@ -170,16 +168,5 @@ class backup_root_task extends backup_task {
         $competencies = new backup_competencies_setting();
         $competencies->set_ui(new backup_setting_ui_checkbox($competencies, get_string('rootsettingcompetencies', 'backup')));
         $this->add_setting($competencies);
-        */
-
-        // Define competencies inclusion setting if competencies are enabled.
-        $competencies = new backup_competencies_setting();
-        $competencies->set_ui(new backup_setting_ui_checkbox($competencies, get_string('rootsettingcompetencies', 'backup')));
-        $this->add_setting($competencies);
-
-        $groups = new backup_groups_setting('groups', base_setting::IS_BOOLEAN, true);
-        $groups->set_ui(new backup_setting_ui_checkbox($groups, null, null, array('hidden')));
-        $this->add_setting($groups);
-        // END UCLA MOD: SSC-3689/CCLE-6748.
     }
 }
