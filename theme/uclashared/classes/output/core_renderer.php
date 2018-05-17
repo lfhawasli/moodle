@@ -308,6 +308,22 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
+      * Calls weeks display function and returns an array with current week and quarter
+      * @return array Current week and quarter strings separated into an array
+      */
+    public function parsed_weeks_display() {
+      $parsed = array();
+      $weeksdata = self::weeks_display();
+      $weekpos = strpos($weeksdata, '<span class="week">');
+      $quarter = substr($weeksdata, 0, $weekpos);
+      $quarter = strip_tags($quarter);
+      $week = substr($weeksdata, $weekpos);
+      $week = strip_tags($week);
+      array_push($parsed, $quarter, $week);
+      return $parsed;
+    }
+
+    /**
      * Wrapper for header elements.
      *
      * @return string HTML to display the main header.
