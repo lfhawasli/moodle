@@ -9,7 +9,7 @@
 </head>
 <body>
   {{{ output.standard_top_of_body_html }}}
-  <div class="bg-img"></div>
+  <div class="bg-img" style="background-image: url('{{{ bgimage }}}')"></div>
   <div class="container-fluid">
     <div class="row">
       {{> theme_uclashared/frontpage_header}}
@@ -18,6 +18,7 @@
       </div>
       <div class="col-12" id="main-area">
         {{> theme_uclashared/greeting }}
+        {{> theme_uclashared/image_credits }}
       </div>
     </div>
   </div>

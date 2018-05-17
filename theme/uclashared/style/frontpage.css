@@ -9,7 +9,6 @@ h1, h2, h3, h4, h5, h6, p {
 /* The background image */
 .bg-img {
   position: absolute;
-  background-image: url("../pix/frontpageimages/Bruin Day By Owen Weitzel.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: right;
@@ -146,6 +145,23 @@ h1, h2, h3, h4, h5, h6, p {
 
 @media (max-width: 992px) {
   #greeting-wrapper {
+    display: none;
+  }
+}
+
+/* Concerned with image credits */
+#image-credits {
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+  color: rgba(255,255,255,.65);
+}
+#image-credits:hover {
+  color: #eee;
+}
+
+@media (max-width: 992px) {
+  #image-credits {
     display: none;
   }
 }

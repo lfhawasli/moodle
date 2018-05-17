@@ -34,24 +34,25 @@ function theme_uclashared_before_standard_html_head() {
 }
 
 /**
- * Pulls random image for homepage background and saves it to session cache.
+ * Pulls random image for homepage background.
  *
- * @return $image.
+ * @return array    Image URL and caption.
  */
 function theme_uclashared_frontpageimage() {
-    global $CFG;
-    $frontpageimagecache = cache::make('theme_uclashared', 'frontpageimage');
-    if (!($frontpageimagecache->get('image'))) {
-        $imagedir = $CFG->dirroot . "/theme/uclashared/pix/frontpageimages";
-        $files = glob($imagedir . '/*.*');
-        $file = array_rand($files);
-        $filename = basename($files[$file]);
-        $image = $imagedir . "/" . $filename;
-        $frontpageimagecache->set('image', $image);
-    } else {
-        $image = $frontpageimagecache->get('image');
-    }
-    return $image;
+    global $CFG, $OUTPUT;
+    $retval = array();
+    $imagedir = $CFG->dirroot . '/theme/uclashared/pix/frontpageimages';
+    $files = glob($imagedir . '/*.*');
+    $file = array_rand($files);
+    $filename = basename($files[$file]);
+
+    // Get caption.
+    $retval['credits'] = explode(".", $filename)[0];
+
+    // Get image url.
+    $retval['image'] = $CFG->wwwroot . '/theme/uclashared/pix/frontpageimages/' . $filename;
+
+    return $retval;
 }
 
 /**
