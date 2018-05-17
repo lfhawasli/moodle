@@ -64,10 +64,6 @@ class collab_handler extends browseby_handler {
     public function handle($args) {
         global $CFG, $PAGE;
 
-        // Load search.
-        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init',
-                array(array('name' => 'course-search')));
-
         $navbar =& $PAGE->navbar;
 
         $collablibfile = $CFG->dirroot . '/' . $CFG->admin
@@ -79,7 +75,6 @@ class collab_handler extends browseby_handler {
         $s = '';
 
         if (file_exists($collablibfile)) {
-
             require_once($collablibfile);
 
             $s .= block_ucla_search::search_form('collab-search');

@@ -84,6 +84,9 @@ $PAGE->requires->jquery();
 if ($COURSE->id === SITEID) {
     $b = block_instance('ucla_browseby');
     $templatecontext['browseby'] = $b->get_content()->text;
+
+    $s = block_instance('ucla_search');
+    $templatecontext['search'] = $s::search_form();
 }
 
 echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);

@@ -1,81 +1,46 @@
-@import "compass";
-
 .ucla-search {
-    display: inline-block;
-
-    // YUI styles override
-    .yui3-aclist {
-        position: relative;
+    fieldset div {
         display: inline-block;
-
-        #browsebymain & {
-            position: absolute;
-        }
+        width: 3.25rem;
     }
 
-    .yui3-aclist-list {
-        border: 1px solid #eee;
-        border-top: 0;
-        border-bottom: 0;
-        text-align: left;
+    // Remove extra padding that Boost theme puts in.
+    .form-check-label {
+        padding-left: 0;
+        font-weight: 300;
     }
 
+    .search-options {
+        background-color: #eceeef;
+        padding-left: .75rem;
+        border-radius: .25rem;
+        border: 1px solid #d0d5d8;
+    }
+
+    // Remove ugly shadow around search results.
     .yui3-aclist-content {
         box-shadow: 0 0 0;
-        border: 0;
+        border: 1px solid #d0d5d8;
     }
 
-    .input-group {
-        margin-top: 4px;
-    }
-
-    // Browseby overrides
-    #browsebymain & {
-        width: 100%;
-        padding: 0 15%;
-    }
-
-    // Front page layout overrides
-    &.course-search,
-    .pagelayout-frontpage & {
-        width: 100%;
-        text-align: center;
-
-        label {
-            font-weight: 300;
+    // Search results formatting.
+    .search-result {
+        text-align: left;
+        .shortname {
+            font-weight: bold;
         }
-    }
-
-    fieldset + .well {
-        margin-top: 4px;
-        margin-bottom: 4px;
+        .fullname {
+            color: #666;
+        }
     }
 }
 
-// Input box
-#ucla-search,
-#ucla-search-block {
-    width: 100%;
-    margin-top: 4px;
-    
-    @include border-radius(0);
+// Add spacing before term selector.
+#browsebymain .ucla-search {
+    margin-top: 1rem;
 }
-
-// Search results formatting
-.search-result {
-    .shortname {
-        font-weight: bold;
-
-        .yui3-aclist-item-active.yui3-aclist-item-hover & {
-            color: #444;
-        }
-    }
-
-    .fullname {
-        color: #666;
-
-        .yui3-aclist-item-active:not(.yui3-aclist-item-hover) & {
-            color: #eee;
-        }
-    }
+#region-main .ucla-search {
+    margin-left: 15%;
+    margin-right: 15%;
+    text-align: center;
 }
