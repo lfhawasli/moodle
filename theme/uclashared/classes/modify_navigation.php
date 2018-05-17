@@ -664,6 +664,23 @@ class modify_navigation {
     }
 
     /**
+     * Change link location for the grades node if set in course settings.
+     */
+    private function redirectgradelink() {
+        global $PAGE;
+
+        $courseid = $PAGE->course->id;
+        $formatoptions = course_get_format($courseid)->get_format_options();
+        if (empty($formatoptions['myuclagradelinkredirect'])) {
+            return;
+        }
+        $gradelinknode = $this->navigation->find('grades', \global_navigation::TYPE_SETTING);
+        if ($gradelinknode && $formatoptions['myuclagradelinkredirect']) {
+            $gradelinknode->action = new \moodle_url('https://be.my.ucla.edu');
+        }
+    }
+
+    /**
      * Modifies Moodle navigation tree.
      *
      * Called from local/ucla/lib.php: local_ucla_extend_navigation().
@@ -698,6 +715,9 @@ class modify_navigation {
 
         // Change icons for nodes.
         $this->change_icons();
+
+        // Redirect grade link to MyUCLA if configured.
+        $this->redirectgradelink();
 
         // If at least one section needs to be collapsed.
         if (!empty($this->collapsenodesforjs)) {

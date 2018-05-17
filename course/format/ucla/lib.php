@@ -344,6 +344,10 @@ class format_ucla extends format_topics {
                     'default' => true,
                     'type' => PARAM_BOOL
                 );
+                $uclaoptions['myuclagradelinkredirect'] = array(
+                    'default' => false,
+                    'type' => PARAM_BOOL
+                );
             }
         }
 
@@ -398,6 +402,17 @@ class format_ucla extends format_topics {
                         array(
                             1 => get_string('yes'),
                             0 => get_string('no')
+                        )
+                    )
+                );
+                $uclaoptionsedit['myuclagradelinkredirect'] = array(
+                    'label' => get_string('myuclagradelinkredirect', 'format_ucla'),
+                    'help' => 'myuclagradelinkredirect',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            1 => get_string('gradebookmyucla', 'format_ucla'),
+                            0 => get_string('gradebookccle', 'format_ucla')
                         )
                     )
                 );
