@@ -115,6 +115,21 @@ header {
     .logo-system-name:active {
         text-decoration: underline;
     }    
+
+    @media only screen and (max-width: 320px) {
+        .icon {
+            display: none;
+        }
+    }
+
+    @include media-breakpoint-down(sm) {
+        .logo-system-name {
+            display: none;
+        }
+        .logo-system-name-vertical-bar {
+            display: none;
+        }
+    }
 }
 
 .header-login {
@@ -221,6 +236,45 @@ a.btn-help-feedback {
     }
 }
 
+@include media-breakpoint-down(xs) {
+    .header-main .header-login .btn-help-feedback {
+        background-color: transparent;
+        &:hover {
+            background-color: transparent;
+        }
+        .need_help {
+            display: none;
+        }
+        .fa-question-circle, .fa-question-circle:before {
+            display: none;
+        }
+        .fa-caret-down, .fa-caret-down:before {
+            display: none;
+        }
+        .caret:before {
+            background-image: url("[[pix:theme|questionmark]]");
+            background-size: 30px 30px;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            content: "";
+            margin-top: -5px;
+            margin-right: -10px;
+            background-repeat: no-repeat;
+        }
+    }
+    .userpicture {
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        margin-top: 3px;
+    }
+    .usermenu {
+        margin-left: 8px;
+        margin-top: .30rem;
+    }
+}
+
 .usermenu .moodle-actionmenu .toggle-display .userbutton
 .usertext{
     font-weight: 300;
@@ -263,5 +317,6 @@ a.btn-help-feedback {
     .popover-region {
         float: left;
         margin-top: 8px;
+        margin-right: 0;
     }
 }

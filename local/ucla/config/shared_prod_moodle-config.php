@@ -534,6 +534,7 @@ $CFG->cronclionly = true;
 // Site administration > Security > HTTP security
 $CFG->loginhttps = true;
 $CFG->cookiesecure = true;
+$CFG->allowframembedding = 1;
 
 // Site administration > Security > Anti-Virus
 $CFG->runclamonupload = true;
