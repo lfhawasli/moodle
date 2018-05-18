@@ -44,3 +44,10 @@
         margin-top: -80px!important; // important required because base css uses !important.
     }
 }
+
+/* The admin panel link on the course page. */
+.admin-panel-link {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+}

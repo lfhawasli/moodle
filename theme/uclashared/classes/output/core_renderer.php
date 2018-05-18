@@ -382,7 +382,14 @@ class core_renderer extends \theme_boost\output\core_renderer {
         } else if ($pageheadingbutton) {
             $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar pull-xs-right');
         }
-        $html .= html_writer::div($this->context_header_settings_menu(), 'pull-xs-right context-header-settings-menu');
+
+        $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
+        $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($COURSE)->figure_section($COURSE));
+        $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
+        $html .= html_writer::link($adminlink, $adminicon . get_string('adminpanel', 'format_ucla'),
+                array('class' => 'admin-panel-link hidden-sm-down pull-xs-right'
+                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
+
         $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
         $html .= html_writer::start_div('pull-xs-left');
         $html .= $this->context_header();
