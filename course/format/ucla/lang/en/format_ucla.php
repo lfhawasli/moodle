@@ -97,6 +97,7 @@ $string['gradebookccle'] = 'CCLE Grades';
 
 // Admin panel strings.
 $string['adminpanel'] = 'Admin panel';
+$string['courseadmin'] = 'Course administration';
 $string['managematerial'] = 'Manage material';
 $string['settingsandbackup'] = 'Settings & backup';
 $string['usersandgroups'] = 'Users & groups';
@@ -112,3 +113,4 @@ $string['questionbank'] = 'Question bank';
 $string['mediasitesettings'] = 'Mediasite settings';
 $string['mediagallery'] = 'Media gallery';
 $string['newbadge'] = 'Add a badge';
+$string['myucla'] = 'MyUCLA';

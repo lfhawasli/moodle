@@ -1,0 +1,46 @@
+/**
+ * Styles related to UCLA Admin Panel.
+ */
+
+/* General Admin Panel Styles. */
+.admin-panel {
+    h4 {
+        color: rgb(42, 41, 41);
+        font-size: 1.35rem;
+    }
+
+    a {
+        color: rgb(41, 111, 178);
+    }
+
+    /* Remove border from body of Admin Panel. */
+    .card {
+        border: none;
+    }
+}
+
+/* Admin Panel Layout Spacing Styles. */
+.admin-panel {
+    .admin-module {
+        li:first-child {
+            margin-top: 11px;
+        }
+
+        li {
+            margin-top: 15px;
+        }
+    }
+
+    .admin-panel-row:first-child {
+        margin-top: 3px;
+    }
+
+    .admin-panel-row:not(:first-child) {
+        margin-top: 40px;
+    }
+
+    /* Fix strange spacing issue between nav tab bar and modules for all tabs other than the first one. */
+    .tab-pane:target {
+        margin-top: -80px!important; // important required because base css uses !important.
+    }
+}
