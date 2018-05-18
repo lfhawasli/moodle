@@ -54,6 +54,7 @@ $string['editofficehours'] = 'Update';
 $string['movealt'] = 'Click and drag to move';
 $string['markthistopic'] = 'Highlight section';
 $string['markedthistopic'] = 'Section is highlighted';
+$string['enrollmealert'] = 'You need to be enrolled in this site to view the contents. Enroll yourself in this site by clicking the "Enroll me" button below';
 
 // Registrar description strings.
 $string['collapsedshow'] = 'Show registrar description';
