@@ -26,12 +26,18 @@ defined('MOODLE_INTERNAL') || die();
 
 $weeksarr = $OUTPUT->parsed_weeks_display();
 
+$imagearr = theme_uclashared_frontpageimage();
+
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'loginlink' => get_login_url(),
     'week' => $weeksarr[1],
-    'quarter' => $weeksarr[0]
+    'quarter' => $weeksarr[0],
+    'bgimage' => $imagearr['image'],
+    'imagecredits' => $imagearr['credits'],
 ];
+
+$PAGE->requires->jquery();
 
 echo $OUTPUT->render_from_template('theme_uclashared/frontpage', $templatecontext);
