@@ -611,7 +611,7 @@ class block_ucla_my_sites extends block_base {
         if (!$defaultfound) {
             $default = false;
         }
-        return new url_select($urls, $default);
+        return new url_select($urls, $default, null);
     }
 
     /**
