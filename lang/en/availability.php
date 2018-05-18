@@ -61,6 +61,7 @@ $string['listheader_multi_or'] = 'any';
 $string['manageplugins'] = 'Manage restrictions';
 $string['missingplugin'] = 'Missing restriction plugin';
 $string['or'] = 'or';
+$string['privacy:metadata'] = 'The Access restriction subsystem does not store any personal data.';
 $string['restrictaccess'] = 'Restrict access';
 // START UCLA MOD: CCLE-6774 - Add legend explaining visibility conditions in "Access restrictions" section.
 $string['restrictaccess_help'] = 'If the eye is **SHUT** then students who do not meet that part of the condition will not see the activity at all.
