@@ -1237,13 +1237,15 @@ EDITOR.prototype = {
      * @method expandCollapseComments
      */
     expandCollapseComments: function() {
+        var comments = Y.all('.commentdrawable');
+
         if (this.collapsecomments) {
             this.collapsecomments = false;
+            comments.removeClass('commentcollapsed');
         } else {
             this.collapsecomments = true;
+            comments.addClass('commentcollapsed');
         }
-
-        this.redraw();
     },
 
     /**
