@@ -88,6 +88,13 @@ $string['activity'] = 'Activity/Resource';
 $string['add'] = 'ADD';
 $string['manage'] = 'MANAGE';
 
+// CCLE-7298 - Grades link redirectable to MyUCLA.
+$string['myuclagradelinkredirect'] = 'Direct Grades link to';
+$string['myuclagradelinkredirect_help'] = 'Specifies where the "Grades" link '
+        . 'in the side navigation drawer directs users to.';
+$string['gradebookmyucla'] = 'MyUCLA Gradebook';
+$string['gradebookccle'] = 'CCLE Grades';
+
 // Admin panel strings.
 $string['adminpanel'] = 'Admin panel';
 $string['managematerial'] = 'Manage material';
