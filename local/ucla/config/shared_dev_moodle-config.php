@@ -560,6 +560,9 @@ $CFG->minpassworddigits = 0;
 $CFG->minpasswordupper = 0;
 $CFG->minpasswordnonalphanum = 0;
 
+// Site administration > Security > HTTP security
+$CFG->allowframembedding = 1;
+
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';
 

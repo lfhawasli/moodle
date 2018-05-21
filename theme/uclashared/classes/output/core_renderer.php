@@ -157,7 +157,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         // Main Help & Feedback link.
-        $hflinktext = html_writer::span(get_string('help_n_feedback', 'theme_uclashared'), '');
+        $hflinktext = html_writer::span(get_string('help_n_feedback', 'theme_uclashared'), 'need_help');
         $icon = html_writer::tag('i', '', array('class' => 'fa fa-question-circle fa-fw'));
 
         $opts = new stdClass();
@@ -230,7 +230,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
 
     }
 
-     /**
+    /**
      * Renders the Help & Feedback dropdown menu using Moodle's own config.
      * The menu items can be modified in Appearance > Themes > Theme settings.
      *
