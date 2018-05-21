@@ -1,15 +1,39 @@
 <?php
+// This file is part of the UCLA Search block for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['pluginname'] = 'Search sites';
-$string['placeholder'] = 'Search...';
-$string['more_results'] = 'View more results...';
-$string['no_results'] = 'No results.';
+/**
+ * UCLA search language file.
+ *
+ * @package     block_ucla_search
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   2018 UC Regents
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['bydescription'] = 'Description';
+$string['bytitle'] = 'Title';
 $string['collab'] = 'Collab';
 $string['course'] = 'Course';
-$string['bytitle'] = 'Title';
-$string['bydescription'] = 'Description';
-$string['show'] = 'Show:';
-$string['filterby'] = 'Filter by:';
-
-$string['ucla_search:addinstance'] = 'Add Advanced search block';
-$string['ucla_search:myaddinstance'] = 'Add Advanced search to My home';
+$string['filterby'] = 'Search:';
+$string['more_results'] = 'View more results...';
+$string['no_results'] = 'No results.';
+$string['pluginname'] = 'UCLA search sites';
+$string['placeholder'] = 'Search...';
+$string['show'] = 'Type:';
+$string['title'] = 'Find a site';
+$string['ucla_search:addinstance'] = 'Add UCLA search sites block';
+$string['ucla_search:myaddinstance'] = 'Add UCLA search sites to My home';

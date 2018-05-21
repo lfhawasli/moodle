@@ -223,10 +223,10 @@ class block_ucla_browseby_renderer extends plugin_renderer_base {
                                    $sqlparams=null) {
         global $OUTPUT;
 
-        $contents = get_string('term', 'local_ucla') . ':'
+        $contents = get_string('term', 'local_ucla') . ': '
             . $OUTPUT->render(self::terms_selector($defaultterm,
                 $sql, $sqlparams));
-        return html_writer::tag('div', $contents, array('class' => 'term_selector'));
+        return html_writer::tag('div', $contents, array('class' => 'termselector'));
     }
 
     /**

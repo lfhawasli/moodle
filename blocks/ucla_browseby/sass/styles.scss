@@ -32,10 +32,6 @@
     float: left;
 }
 
-#browsebymain .urlselect {
-    margin-bottom: 8px;
-}
-
 #browsebymain .browsebylist {
     /*min-width: 590px;*/
     width: 100%;
@@ -74,11 +70,6 @@
 #browsebymain h3 {
     padding: 4px 0 4px 0;
     clear: both;
-}
-
-#browsebymain .term_selector .urlselect,
-#browsebymain .term_selector .urlselect form {
-    display: inline-block;
 }
 
 .block_ucla_browseby.block_ucla_course_menu .header {

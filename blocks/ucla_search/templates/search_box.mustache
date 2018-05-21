@@ -1,0 +1,90 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_ucla_search/search_box
+
+    Display the search block.
+
+    Requires the YUI module to be loaded.
+
+    Context variables required for this template:
+    * displaytitle - boolean
+    * type - string
+    * searchparams - array
+      * collab - boolean
+      * course - boolean
+      * bytitle - boolean
+      * bydescription - boolean
+    * searchterm - string
+    * formurl - string
+
+    Example context (json):
+    {
+        "displaytitle": true,
+        "type": "course-search",
+        "checkcollab": false,
+        "checkcourse": true,
+        "checkbytitle": true,
+        "checkbydescription": true,
+        "searchterm": "",
+        "formurl": "http://localhost:8000/course/search.php"
+    }
+}}
+
+<div class="ucla-search {{type}}">
+    {{#displaytitle}}
+    <h5>{{#str}}title, block_ucla_search{{/str}}</h5>
+    {{/displaytitle}}
+    <form action="{{formurl}}">
+        <div>
+            <input id="ucla-search-{{type}}" type="text" class="form-control ucla-search-input" name="search" placeholder="{{#str}}placeholder, block_ucla_search{{/str}}" value="{{searchterm}}">
+        </div>
+        <div class="search-options">
+            <fieldset>
+                <div>{{#str}}show, block_ucla_search{{/str}}</div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="1" id="collab-{{type}}" name="collab"{{#checkcollab}} checked="checked"{{/checkcollab}}>
+                    <label class="form-check-label" for="collab-{{type}}">
+                        {{#str}}collab, block_ucla_search{{/str}}
+                    </label>
+                </div>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="1" id="course-{{type}}" name="course"{{#checkcourse}} checked="checked"{{/checkcourse}}>
+                    <label class="form-check-label" for="course-{{type}}">
+                        {{#str}}course, block_ucla_search{{/str}}
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <div>{{#str}}filterby, block_ucla_search{{/str}}</div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="1" id="bytitle-{{type}}" name="bytitle"{{#checkbytitle}} checked="checked"{{/checkbytitle}}>
+                    <label class="form-check-label" for="bytitle-{{type}}">
+                        {{#str}}bytitle, block_ucla_search{{/str}}
+                    </label>
+                </div>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="1" id="bydescription-{{type}}" name="bydescription"{{#checkbydescription}} checked="checked"{{/checkbydescription}}>
+                    <label class="form-check-label" for="bydescription-{{type}}">
+                        {{#str}}bydescription, block_ucla_search{{/str}}
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+</div>

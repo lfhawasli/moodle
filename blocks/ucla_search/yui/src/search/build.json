@@ -1,0 +1,10 @@
+{
+  "name": "moodle-block_ucla_search-search",
+  "builds": {
+    "moodle-block_ucla_search-search": {
+      "jsfiles": [
+        "search.js"
+      ]
+    }
+  }
+}

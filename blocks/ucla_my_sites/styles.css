@@ -4,12 +4,7 @@
 }
 
 /* Selector styles. */
-.block_ucla_my_sites .selector {
-    color: #536895;
-    margin-bottom: 0.5em;
-    font-size: 90%;
-}
-.block_ucla_my_sites .termselector .urlselect,
+.termselector .urlselect,
 .block_ucla_my_sites.block .sortselector fieldset div > * {
     display: inline-block;
 }
