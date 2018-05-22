@@ -319,4 +319,13 @@ a.btn-help-feedback {
         margin-top: 8px;
         margin-right: 0;
     }
+    // For hiding the extra dropdown-toggle icon from action menu.
+    .popover-region-toggle {
+        &::before {
+            display: none;
+        }
+        &::after {
+            display: none;
+        }
+    }
 }
