@@ -570,7 +570,7 @@ class modify_navigation {
                                 new \moodle_url('/course/view.php', array(
                                     'id' => $tasiteenrol->customint1
                                 )),
-                                \navigation_node::TYPE_SECTION);
+                                \navigation_node::TYPE_SECTION, null, 'parentsitehome', null);
             $siteinfonode = null;
             $children = $this->coursenode->get_children_key_list();
             // Find 1st child that is an integer.
@@ -681,6 +681,26 @@ class modify_navigation {
     }
 
     /**
+     * Apply custom CSS class selectors to course sections if TA site.
+     */
+    private function tasite_theme() {
+        global $PAGE;
+
+        // Check if TA site, indirectly by checking for TA parent site backlink.
+        $tasitenode = $this->coursenode->find('parentsitehome' ,\navigation_node::TYPE_SECTION);
+        if ($tasitenode) {
+            $children = $this->coursenode->get_children_key_list();
+            // For each node above and including the showall node, set the tasite parameter.
+            foreach ($children as $child) {
+                $this->coursenode->find($child ,\navigation_node::TYPE_SECTION)->tasite = 'tasite';
+                if ($child == 'showall') {
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * Modifies Moodle navigation tree.
      *
      * Called from local/ucla/lib.php: local_ucla_extend_navigation().
@@ -712,6 +732,9 @@ class modify_navigation {
 
         // Rearrange items.
         $this->rearrange_nodes();
+
+        // Color the nodes if TA site.
+        $this->tasite_theme();
 
         // Change icons for nodes.
         $this->change_icons();

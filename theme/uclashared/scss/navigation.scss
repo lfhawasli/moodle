@@ -114,3 +114,13 @@
 #nav-drawer {
     top: 40px;
 }
+
+/* Color styles for TA site navigation drawer */
+.list-group-item.tasite {
+    &[data-isactive='0'] {
+        background-color: $ta-site-color;
+    }
+    &:hover {
+        background-color: $ta-site-hover-color;
+    }
+}
