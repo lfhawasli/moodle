@@ -6,15 +6,20 @@
     {{{ output.standard_head_html }}}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="theme/uclashared/style/frontpage.css"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 </head>
 <body>
   {{{ output.standard_top_of_body_html }}}
   <div class="bg-img" style="background-image: url('{{{ bgimage }}}')"></div>
   <div class="container-fluid">
     <div class="row">
-      {{> theme_uclashared/frontpage_header}}
+      {{> theme_uclashared/frontpage_header }}
       <div id="sidebar">
         {{{ output.main_content }}}
+        <div id="sidebar-card-container">
+          {{> theme_uclashared/browse_by_block }}
+          <div class="sidebar-card">TEST BLOCK<br/>TEST BLOCK</br>TEST BLOCK</div>
+        </div>
       </div>
       <div class="col-12" id="main-area">
         {{> theme_uclashared/greeting }}
