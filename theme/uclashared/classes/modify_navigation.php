@@ -386,6 +386,9 @@ class modify_navigation {
     private function add_enrolme() {
         global $COURSE;
 
+        if (is_role_switched($COURSE->id)) {
+            return;
+        }
         // add enrol nodes
         enrol_add_course_navigation($this->coursenode, $COURSE);
         // If editing button and courseadmin are not displayed, un/enrolment becomes a new tree parent.
@@ -681,6 +684,99 @@ class modify_navigation {
     }
 
     /**
+     * Show the roles that a user can switch to.
+     */
+    private function add_changerole() {
+        global $PAGE;
+
+        $courseid = $PAGE->course->id;
+        $returnurl = $PAGE->url->out_as_local_url(false);
+        $sessionkey = sesskey();
+
+        // If role is already switched, display "Return to normal role".
+        if (is_role_switched($courseid)) {
+            $rolereturnurl = new \moodle_url('/course/switchrole.php', array(
+                'id' => $courseid,
+                'sesskey' => $sessionkey,
+                'switchrole' => 0,
+                'returnurl' => $returnurl
+            ));
+
+            $rolereturn = \navigation_node::create(get_string('switchrolereturn'),
+                        $rolereturnurl, \navigation_node::TYPE_SETTING,
+                        null, 'themeuclasharedswitchrole', new \pix_icon('a/logout', 'normalrole'));
+            $this->coursenode->add_node($rolereturn);
+        } else {
+            // Otherwise display blocks to switch to available roles.
+            $pagecontext = \context_course::instance($courseid);
+            $roles = get_switchable_roles($pagecontext);
+            // Check if there are any roles user can switch to.
+            if (is_array($roles) && (count($roles) > 0)) {
+                // Create main dropdown node "Switch role to".
+                $switchrolenode = \navigation_node::create(get_string('switchroleto'),
+                        new \moodle_url('/course/view.php', array('id' => $courseid)), // We have to add a URL to the course node,
+                                                                                // otherwise the node wouldn't be added to
+                                                                                // the flat navigation by Boost.
+                                                                                // There is no better choice than the course
+                                                                                // home page.
+                        \global_navigation::TYPE_CUSTOM,
+                        null,
+                        'themeuclasharedswitchrole',
+                        new \pix_icon('i/switchrole', 'switchrole'));
+                // Prevent that the switch role node is marked as active and added to the breadcrumb when showing the
+                // course home page.
+                $switchrolenode->make_inactive();
+                $switchrolenode->isexpandable = true;
+
+                // Get the user preference for the collapse state of the switch role node and set the collapse and hidden
+                // node attributes of the more section node accordingly. At the same time, reallocate the parent of the
+                // existing section nodes.
+                $userprefswitchrolenode = get_user_preferences('theme_uclashared-collapse_'.
+                        'themeuclasharedswitchrole', 1);
+                if ($userprefswitchrolenode == 1) {
+                    $switchrolenode->collapse = true;
+                } else {
+                    $switchrolenode->collapse = false;
+                }
+
+                // Add the switch role node to the coursehome node.
+                $this->coursenode->add_node($switchrolenode);
+
+                // For each role, create new node and add it to "Switch role" node.
+                foreach ($roles as $key => $role) {
+                    $roleurl = new \moodle_url('/course/switchrole.php', array(
+                        'id' => $courseid,
+                        'switchrole' => $key,
+                        'sesskey' => $sessionkey,
+                        'returnurl' => $returnurl
+                    ));
+                    $rolenode = \navigation_node::create($role,
+                            $roleurl,
+                            \navigation_node::TYPE_ACTIVITY,
+                            null,
+                            $key,
+                            new \pix_icon('spacer', ''));
+
+                    if ($userprefswitchrolenode == 1) {
+                        $rolenode->hidden = true;
+                    } else {
+                        $rolenode->hidden = false;
+                    }
+
+                    // Add the role node to the coursehome node.
+                    $this->coursenode->add_node($rolenode);
+
+                    // Need to set parent only after adding it.
+                    $rolenode->set_parent($switchrolenode);
+                  }
+
+                // Make switch role node collapsible.
+                $this->collapsenodesforjs[] = 'themeuclasharedswitchrole';
+            }
+        }
+    }
+
+    /**
      * Modifies Moodle navigation tree.
      *
      * Called from local/ucla/lib.php: local_ucla_extend_navigation().
@@ -707,6 +803,7 @@ class modify_navigation {
             $this->add_more();
             $this->add_editingmode();
             $this->add_courseadmin();
+            $this->add_changerole();
             $this->add_enrolme();
         }
 
