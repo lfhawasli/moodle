@@ -503,7 +503,7 @@ $CFG->clamfailureonupload = 'donothing';
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
-$CFG->themelist = "snap,uclashared,uclasharedcourse";
+$CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "helprequest,theme_uclashared|/blocks/ucla_help/index.php|helprequest
     selfhelp,theme_uclashared|https://moodle2.sscnet.ucla.edu/docs/Main_Page|selfhelp

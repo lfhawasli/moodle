@@ -567,7 +567,7 @@ $CFG->allowframembedding = 1;
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
-$CFG->themelist = "snap,uclashared,uclasharedcourse";
+$CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->themedesignermode = 0;
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "helprequest,theme_uclashared|/blocks/ucla_help/index.php|helprequest
