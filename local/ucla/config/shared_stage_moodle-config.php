@@ -237,6 +237,7 @@ $CFG->forced_plugin_settings['restore']['restore_general_users'] = 0;
 // Site administration > Grades > General settings
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
+$CFG->gradepointmax = 300;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
