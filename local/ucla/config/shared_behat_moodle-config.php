@@ -198,6 +198,7 @@ $CFG->enablecourserequests = 1;
 
 // Site administration > Grades > General settings
 $CFG->recovergradesdefault = 1;
+$CFG->gradepointmax = 300;
 
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
