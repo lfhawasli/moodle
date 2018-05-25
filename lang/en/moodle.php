@@ -1322,7 +1322,10 @@ $string['mustchangepassword'] = 'The new password must be different than the cur
 $string['mycourses'] = 'My courses';
 $string['myfiles'] = 'My private files';
 $string['myfilesmanage'] = 'Manage my private files';
-$string['myhome'] = 'Dashboard';
+// START UCLA MOD: CCLE-7602 - Rename Dashboard to My sites
+//$string['myhome'] = 'Dashboard';
+$string['myhome'] = 'My sites';
+// END UCLA MOD: CCLE-7602
 $string['mymoodledashboard'] = 'My Moodle dashboard';
 $string['myprofile'] = 'My profile';
 $string['name'] = 'Name';
