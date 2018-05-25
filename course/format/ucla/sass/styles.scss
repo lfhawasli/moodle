@@ -52,6 +52,11 @@
             margin-right: 6px;
             margin-left: 4px;
         }
+
+        // Remove extra spacing at top of section.
+        .single-section {
+            margin-top: 0;
+        }
     }
 
     // Use the editing color for the 'Edit' link.
@@ -90,7 +95,6 @@
 
     .sectionheader {
         border-bottom: 1px solid #ccc;
-        padding-bottom: 1em;
     }
     
     // Hide "access restriction" element
