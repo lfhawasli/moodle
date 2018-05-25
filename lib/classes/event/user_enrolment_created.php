@@ -105,7 +105,7 @@ class user_enrolment_created extends base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'enrol', '../enrol/users.php?id=' . $this->courseid, $this->courseid);
+        return array($this->courseid, 'course', 'enrol', '../user/index.php?id=' . $this->courseid, $this->courseid);
     }
 
     /**
