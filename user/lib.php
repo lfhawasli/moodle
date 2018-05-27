@@ -961,6 +961,12 @@ function user_get_user_navigation_info($user, $page, $options = array()) {
             $rolereturn->title = get_string('switchrolereturn');
             $rolereturn->titleidentifier = 'switchrolereturn,moodle';
             $returnobject->navitems[] = $rolereturn;
+            // START UCLA MOD: CCLE-7597 - Move "Switch Role to" navigation drawer.
+            // Remove the "Return to normal role" node if using UCLA theme.
+            if (local_ucla_core_edit::using_ucla_theme()) {
+                array_pop($returnobject->navitems);
+            }
+            // END UCLA MOD: CCLE-7597.
 
             $returnobject->metadata['asotherrole'] = true;
             $returnobject->metadata['rolename'] = role_get_name($role, $context);
@@ -981,6 +987,12 @@ function user_get_user_navigation_info($user, $page, $options = array()) {
             $switchrole->title = get_string('switchroleto');
             $switchrole->titleidentifier = 'switchroleto,moodle';
             $returnobject->navitems[] = $switchrole;
+            // START UCLA MOD: CCLE-7597 - Move "Switch Role to" navigation drawer.
+            // Remove "Switch Role To" node if using UCLA theme.
+            if (local_ucla_core_edit::using_ucla_theme()) {
+                array_pop($returnobject->navitems);
+            }
+            // END UCLA MOD: CCLE-7597.
         }
     }
 
