@@ -329,3 +329,8 @@ a.btn-help-feedback {
         }
     }
 }
+
+// Removes extra spacing at top and bottom of Need help and User menu.
+.dropdown-menu {
+    padding: 0px;
+}
