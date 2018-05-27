@@ -235,6 +235,8 @@ $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 2147483648;  // 2GB
 // CCLE-2903 - Don't set completion tracking to be course default
 $CFG->forced_plugin_settings['moodlecourse']['enablecompletion'] = 0;
+// CCLE-7325 - Disable "Course end date enabled by default"
+$CFG->forced_plugin_settings['moodlecourse']['courseenddateenabled'] = 0;
 
 // Site administration > Courses > Course request
 $CFG->enablecourserequests = 1;
