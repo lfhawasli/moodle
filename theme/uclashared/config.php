@@ -61,14 +61,34 @@ $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
 // Override Boost configs for layouts.
 $THEME->layouts['mydashboard']['options']['noheader'] = true;
 // To prevent blocks from being displayed on non-section course pages.
-$THEME->layouts['incourse']['regions'] = array();
 $THEME->layouts['report']['regions'] = array();
+$THEME->layouts['admin']['regions'] = array();
+// The incourse layout is the default for modules and some modules place content
+// in the block region.
+global $PAGE;
+switch ($PAGE->pagetype) {
+    // All these pages call add_fake_block().
+    case 'mod-book-delete':
+    case 'mod-book-edit':
+    case 'mod-book-view':
+    case 'mod-lesson-continue':
+    case 'mod-lesson-view':
+    case 'mod-oublog-allposts':
+    case 'mod-oublog-view':
+    case 'mod-quiz-attempt':
+    case 'mod-quiz-review':
+    case 'mod-quiz-summary':
+        $THEME->layouts['incourse']['regions'] = array('side-pre');
+        break;
+    default:
+        $THEME->layouts['incourse']['regions'] = array();
+}
 
 // Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';
 
 // Add javascript files.
-$THEME->javascripts = ['help_feedback', 'hamburger_icon', 'frontpage'];
+$THEME->javascripts = ['hamburger_icon', 'frontpage'];
 
 $THEME->layouts['frontpage'] = array(
   'file' => 'frontpage.php',

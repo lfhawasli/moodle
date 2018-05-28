@@ -87,8 +87,7 @@ $courseviewurl = new moodle_url('/course/view.php', array('id' => $courseid, 'se
 // Set up the page.
 $PAGE->set_context($context);
 
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 $params = array('courseid' => $courseid, 'section' => $sectionnum, 'show_all' => $showall);
 $PAGE->set_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
         $params);

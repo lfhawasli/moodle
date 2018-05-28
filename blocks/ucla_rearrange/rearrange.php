@@ -53,8 +53,7 @@ $sectionnum = $format->figure_section();
 // Set up the page.
 $PAGE->set_context($context);
 
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 
 $PAGE->set_url('/blocks/ucla_rearrange/rearrange.php',
         array('courseid' => $courseid, 'section' => $sectionnum));

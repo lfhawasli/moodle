@@ -26,8 +26,7 @@ $editusername = $edituser->firstname . ' ' . $edituser->lastname;
 
 $context = context_course::instance($courseid);
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 $PAGE->set_url('/blocks/ucla_office_hours/officehours.php',
         array('courseid' => $courseid, 'editid' => $editid));
 

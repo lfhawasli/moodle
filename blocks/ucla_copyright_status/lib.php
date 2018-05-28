@@ -42,8 +42,7 @@ function init_copyright_page($course, $courseid, $context) {
 
     $PAGE->set_heading($course->fullname);
 
-    $PAGE->set_pagelayout('course');
-    $PAGE->set_pagetype('course-view-' . $course->format);
+    $PAGE->set_pagelayout('base');
 }
 
 /*
