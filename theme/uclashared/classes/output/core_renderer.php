@@ -42,6 +42,29 @@ include_once($CFG->dirroot.'/user/lib.php');
 
 class core_renderer extends \theme_boost\output\core_renderer {
     /**
+     * Shows sitewide 'alert' banner.
+     *
+     * @return string HTML
+     */
+    public function alert_banner() {
+        global $CFG;
+
+        $out = '';
+        if (!during_initial_install() && get_config('block_ucla_alert', 'alert_sitewide')) {
+            if (!class_exists('ucla_alert_banner_site')) {
+                $file = $CFG->dirroot . '/blocks/ucla_alert/locallib.php';
+                require_once($file);
+            }
+
+            // Display banner.
+            $banner = new \ucla_alert_banner(SITEID);
+            $out = $banner->render();
+        }
+
+        return $out;
+    }
+
+    /**
      * Wrapper to get_config to prevent crashes during initial install.
      *
      * @param string $plugin
