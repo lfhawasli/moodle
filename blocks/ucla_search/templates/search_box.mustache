@@ -50,7 +50,8 @@
     <h5>{{#str}}title, block_ucla_search{{/str}}</h5>
     {{/displaytitle}}
     <form action="{{formurl}}">
-        <div>
+        <div class="search-wrapper">
+            <span class="fa fa-search"></span>
             <input id="ucla-search-{{type}}" type="text" class="form-control ucla-search-input" name="search" placeholder="{{#str}}placeholder, block_ucla_search{{/str}}" value="{{searchterm}}">
         </div>
         <div class="search-options">

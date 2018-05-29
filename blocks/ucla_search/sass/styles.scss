@@ -33,6 +33,14 @@
             color: #666;
         }
     }
+    .search-wrapper {
+      position: relative;
+    }
+    .fa-search {
+      position: absolute;
+      right: 10px;
+      top: 9px;
+    }
 }
 
 // Add spacing before term selector.

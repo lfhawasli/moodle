@@ -95,7 +95,7 @@ h1, h2, h3, h4, h5, h6, p {
   background-repeat: no-repeat;
   background-position: left;
   width: 700px;
-  position: fixed;
+  position: absolute;
 }
 @media (max-width: 992px) {
   #sidebar {
@@ -104,6 +104,96 @@ h1, h2, h3, h4, h5, h6, p {
     background-size: cover;
     background-position: center;
     width: 100%;
+  }
+}
+
+/* Concerned with the sidebar site directory block */
+.frontpage-site-directory h5 {
+  display: none;
+}
+#frontpage-browseby-btns-wrapper {
+  margin-top: 10px;
+}
+#frontpage-browseby-btns-wrapper a {
+  display: inline;
+  border: 0;
+  font-size: 11px;
+  margin-top: 30px;
+  background-color: rgb(44,94,145);
+  color: #fff;
+}
+#frontpage-browseby-btns-wrapper a:hover {
+  background-color: rgb(220,220,220);
+  color: black;
+}
+#frontpage-search-wrapper .search-options {
+  background-color: rgb(245,245,245);
+  margin-top: 10px;
+  border: 0;
+  font-size: 12px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+#frontpage-search-wrapper .ucla-search-input:focus {
+  background-color: rgba(44,94,145,0.7);
+  color: #fff;
+}
+#frontpage-search-wrapper .ucla-search-input {
+  border-width: 0;
+  background-color: rgba(44,94,145,0.3);
+  color: #fff;
+}
+#frontpage-search-wrapper .ucla-search-input::placeholder {
+  color: #fff;
+}
+#frontpage-search-wrapper .search-wrapper .fa-search {
+  color: #fff;
+}
+/* YUI3 CSS necessary for styling the real time search results in Site Directory's search functionality */
+.yui3-aclist-item {
+  background-color: #fff;
+}
+.yui3-aclist-item-hover {
+  background-color: #bfdaff;
+}
+#sidebar-card-container {
+  width: 58%;
+  margin: 65px 30px;
+  overflow: scroll;
+  height: 85vh;
+  margin-bottom: 0;
+}
+#sidebar-card-container::-webkit-scrollbar {
+  width: 0;
+}
+.sidebar-card {
+  margin-bottom: 15px;
+  width: 100%;
+  border-left-width: 5px;
+  border-left-color: #ddd;
+  border-left-style: solid;
+  padding: 20px;
+  padding-top: 15px;
+  background-color: white;
+  box-shadow: 3px 5px 5px rgba(0,0,0,0.23);
+}
+.sidebar-card h1, h2, h3, h4, h5, h6, p {
+  transform: skewX(0deg);
+}
+#site-directory-text {
+  text-align: center;
+  margin-bottom: 10px;
+}
+@media (max-width: 992px) {
+  #sidebar-card-container {
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 140px;
+    height: 70vh;
+  }
+  #frontpage-browseby-btns-wrapper a {
+    margin-top: 7px;
+    display: block;
   }
 }
 
