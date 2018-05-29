@@ -1,5 +1,14 @@
 /** CSS for Rearrange **/
 
+/* When the JavaScript loads, js-show will be shown and js-hide will be hidden. */
+.js-show {
+    display: none;
+}
+
+.js-hide {
+    display: initial;
+}
+
 .sectiontitle {
     background: transparent linear-gradient(#FEDE91, #FBECC3);
     font-weight: bold;

@@ -78,12 +78,15 @@ define(['jquery', 'block_ucla_rearrange/jquery.mjs.nestedSortable'], function($)
 
     return {
         init: function(topicNumber, secId) {
-        // "JavaScript required" warning?
-//            $('#major-ns-container').html(sections);
-
             initNestedSortable();
 
-            // expand/collapse
+            // Replace JavaScript warning with list of sections.
+            $('.js-show').show();
+            $('.js-hide').hide();
+            // Enable submit buttons.
+            $('.btn-submit input').prop('disabled', false);
+
+            // Event listeners for expand/collapse.
             $('.expand-button').click(function() {
                 toggleSection($(this));
             });

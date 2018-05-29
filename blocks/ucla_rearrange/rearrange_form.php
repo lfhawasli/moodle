@@ -60,7 +60,8 @@ class ucla_rearrange_form extends moodleform {
         // First set of submit and cancel buttons. Initially disabled.
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton1',
-                get_string('savechanges'), array('disabled' => 'disabled'));
+                get_string('savechanges'),
+                array('class' => 'btn-submit', 'disabled' => 'disabled'));
         $buttonarray[] = $mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar1', '', ' ', false);
 
@@ -73,16 +74,19 @@ class ucla_rearrange_form extends moodleform {
 
         $mform->addElement('html', html_writer::tag('input', '', $classset1));
 
+        $jsnotice = html_writer::tag('div',
+            get_string('javascriptrequired', 'group'),
+            array('class' => 'js-hide'));
         $mform->addElement('html', html_writer::tag('div',
-//            get_string('javascriptrequired', 'group'),
-            $sectionshtml,
+            $jsnotice . $sectionshtml,
             array('id' => block_ucla_rearrange::PRIMARY_DOMNODE)));
 
         // CCLE-3930 - Rearrange erases modules in sections when javascript is turned off or not fully loaded.
         // Second set of submit and cancel buttons. Initially disabled.
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton2',
-                get_string('savechanges')/*, array('disabled' => 'disabled')*/);
+                get_string('savechanges'),
+                array('class' => 'btn-submit', 'disabled' => 'disabled'));
         $buttonarray[] = $mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar2', '', ' ', false);
     }

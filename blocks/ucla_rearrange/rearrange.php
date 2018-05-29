@@ -93,7 +93,7 @@ $sectionlist = block_ucla_rearrange::SECTIONLIST;
 $sectionshtml = html_writer::start_tag(
                 'ul',
                 array(
-                    'class' => block_ucla_rearrange::SECTIONLISTCLASS,
+                    'class' => block_ucla_rearrange::SECTIONLISTCLASS . ' js-show',
                     'id' => $sectionlist
                 )
 );
@@ -181,32 +181,37 @@ if ($data = $rearrangeform->get_data()) {
     // document?
     $sectiondata = json_decode($data->serialized, true);
 
-    $sectioncontents = array();
-    $sectionorder = array();
-    foreach ($sectiondata as $index => $section) {
-        $id = $section['id'];
-        $sectioncontents[$id] = empty($section['children']) ? array() : modnode::flatten($section['children']);
-        $sectionorder[$id] = $index;
+    // If the form was submitted before JavaScript loaded, ignore the submission.
+    if (empty($sectiondata)) {
+        $data = null;
+    } else {
+        $sectioncontents = array();
+        $sectionorder = array();
+        foreach ($sectiondata as $index => $section) {
+            $id = $section['id'];
+            $sectioncontents[$id] = empty($section['children']) ? array() : modnode::flatten($section['children']);
+            $sectionorder[$id] = $index;
+        }
+
+        // Redirect eventually?
+
+        // Section id to redirect to after moving the sections around.
+        $sectionid = $DB->get_field('course_sections', 'id', array('course' => $course->id, 'section' => $sectionnum));
+
+        // We're going to skip the API calls because it uses too many DBQ's.
+        block_ucla_rearrange::move_modules_section_bulk($sectioncontents,
+                $sectionorder);
+
+        // Set the section correct value after moving sections around.
+        if ( !$sectionredirect = $DB->get_field('course_sections', 'section', array('id' => $sectionid)) ) {
+            // If no field is found, then the section we were on was either 'Site info' or 'Show all'.
+            $sectionredirect = $sectionnum;
+        }
+        $_POST['section'] = $sectionredirect;
+
+        // Now we need to swap all the contents in each section...
+        rebuild_course_cache($courseid);
     }
-
-    // Redirect eventually?
-
-    // Section id to redirect to after moving the sections around.
-    $sectionid = $DB->get_field('course_sections', 'id', array('course' => $course->id, 'section' => $sectionnum));
-
-    // We're going to skip the API calls because it uses too many DBQ's.
-    block_ucla_rearrange::move_modules_section_bulk($sectioncontents,
-            $sectionorder);
-
-    // Set the section correct value after moving sections around.
-    if ( !$sectionredirect = $DB->get_field('course_sections', 'section', array('id' => $sectionid)) ) {
-        // If no field is found, then the section we were on was either 'Site info' or 'Show all'.
-        $sectionredirect = $sectionnum;
-    }
-    $_POST['section'] = $sectionredirect;
-
-    // Now we need to swap all the contents in each section...
-    rebuild_course_cache($courseid);
 }
 
 $restr = get_string('rearrange_sections', 'block_ucla_rearrange');
