@@ -27,7 +27,7 @@ $string['dismiss'] = 'Dismiss';
 $string['dismissed'] = 'You have successfully dismissed the notification.';
 $string['loginrequired'] = 'Please login to view My sites';
 $string['noclasssitesatall'] = 'You are currently not assigned to any sites on this system.';
-$string['notenrolled'] = 'You are currently not assigned to any courses or collaboration sites on this system.';
+$string['noclassforterm'] = 'You are not enrolled in any class sites for {$a}';
 $string['pluginname'] = 'My sites';
 $string['shared_server_archive_notice'] = 'Starting June 16, 2012 any courses from Spring 2012 or earlier that were previously hosted at <a target="_blank" href="https://ccle.ucla.edu">https://ccle.ucla.edu</a> have been moved to our archive server (<a target="_blank" href="https://archive.ccle.ucla.edu">https://archive.ccle.ucla.edu</a>)';
 $string['sitename'] = 'Site name';
