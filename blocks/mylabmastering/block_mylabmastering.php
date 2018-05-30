@@ -23,7 +23,13 @@ class block_mylabmastering extends block_base {
 	   	$this->content->text = '';
 	   	$this->content->footer = '';
 	   	$strHTML = '';
-	   	
+
+            // START UCLA MOD: CCLE-7159 - "Sorry, but you do not currently have permissions to do that ([[mylabmastering:view]])".
+            if (!has_capability('block/mylabmastering:view', context_course::instance($COURSE->id))) {
+                return '';
+            }
+            // END UCLA MOD: CCLE-7159.
+
 	   	// check capabilities and throw error if needed
 	   	require_capability('block/mylabmastering:view', context_course::instance($COURSE->id));
 	   	
