@@ -44,8 +44,7 @@ $page_title = $course->shortname . ': ' . get_string('pluginname',
 $PAGE->set_context($context);
 $PAGE->set_title($page_title);
 $PAGE->set_heading($page_title);
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 
 // Get plugin renderer.
 /** var $output block_ucla_course_download_renderer */

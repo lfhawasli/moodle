@@ -33,7 +33,7 @@ $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 require_login($course);
 $coursecontext = context_course::instance($course->id);
 
-$PAGE->set_pagelayout('incourse');
+$PAGE->set_pagelayout('base');
 
 $title = get_string('adminpanel', 'format_ucla');
 $node = $PAGE->settingsnav->find('courseadmin', navigation_node::TYPE_COURSE);

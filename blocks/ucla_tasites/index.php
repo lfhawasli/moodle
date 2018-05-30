@@ -48,8 +48,7 @@ $PAGE->set_url(new moodle_url(
 $PAGE->set_course($course);
 $PAGE->set_title(get_string('pluginname', 'block_ucla_tasites'));
 $PAGE->set_heading($course->fullname);
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 $PAGE->requires->js('/blocks/ucla_tasites/tasites_form.js');
 $PAGE->requires->jquery();
 

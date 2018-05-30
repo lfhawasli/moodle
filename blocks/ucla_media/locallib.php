@@ -284,7 +284,7 @@ function init_page($course, $context, $url, $mode = null, $title = null) {
 
     $PAGE->set_heading($course->fullname);
 
-    $PAGE->set_pagelayout('incourse');
+    $PAGE->set_pagelayout('base');
     $PAGE->set_pagetype('course-view-' . $course->format);
 
     // Reset breadcrumbs and make it start with course and Media resources.

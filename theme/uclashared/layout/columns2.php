@@ -62,21 +62,25 @@ if ($PAGE->user_allowed_editing() && $PAGE->user_is_editing()) {
     $templatecontext['editingon'] = true;
 
     // Prepare editing quick links.
-    if (class_exists('block_ucla_modify_coursemenu')) {
-        // Get section user is viewing.
-        $displaysection = 0;
-        $format = course_get_format($COURSE);
-        if (($format->get_format() === 'ucla')) {
-            $displaysection = $format->figure_section();
-        }
-
-        $params['course'] = $COURSE;
-        $params['section'] = $displaysection;
-
-        $templatecontext['modifysections'] = block_ucla_modify_coursemenu::get_editing_link($params);
-        $templatecontext['rearrangematerials'] = block_ucla_rearrange::get_editing_link($params);
-        $templatecontext['managecopyright'] = block_ucla_copyright_status::get_editing_link($params);
+    $blocks = array('ucla_modify_coursemenu', 'ucla_rearrange',
+        'ucla_copyright_status');
+    foreach ($blocks as $block) {
+        block_load_class($block);
     }
+
+    // Get section user is viewing.
+    $displaysection = 0;
+    $format = course_get_format($COURSE);
+    if (($format->get_format() === 'ucla')) {
+        $displaysection = $format->figure_section();
+    }
+
+    $params['course'] = $COURSE;
+    $params['section'] = $displaysection;
+
+    $templatecontext['modifysections'] = block_ucla_modify_coursemenu::get_editing_link($params);
+    $templatecontext['rearrangematerials'] = block_ucla_rearrange::get_editing_link($params);
+    $templatecontext['managecopyright'] = block_ucla_copyright_status::get_editing_link($params);
 }
 $PAGE->requires->jquery();
 
@@ -85,8 +89,8 @@ if ($COURSE->id === SITEID) {
     $b = block_instance('ucla_browseby');
     $templatecontext['browseby'] = $b->get_content()->text;
 
-    $s = block_instance('ucla_search');
-    $templatecontext['search'] = $s::search_form();
+    block_load_class('ucla_search');
+    $templatecontext['search'] = block_ucla_search::search_form();
 }
 
 echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);
