@@ -12,7 +12,7 @@ M.block_mylabmastering.init = function(Y, courseId, userId, localCode) {
             var data = o.responseText;
             console.log(data);
 
-            if (data !== '' && data.indexOf("code") > 0 && data.indexOf("no update") < 0 && data.indexOf("error") < 0) {
+            if (data !== '' && data.indexOf("code") > 0 && data.indexOf("no update") < 0 && data.indexOf("error") && data.indexOf("block_mylabmastering") > 0) {
                 if (localCode !== 'unmapped') {
                     // Reload the page
                     window.location.reload();
