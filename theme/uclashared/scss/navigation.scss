@@ -120,3 +120,12 @@
 #nav-drawer {
     top: 40px;
 }
+
+/* Navigation drawer colors */
+[data-region="drawer"] {
+    background-color: inherit;
+}
+
+.list-group-item[data-isactive='1'] {
+    background: $gray-lighter;
+}
