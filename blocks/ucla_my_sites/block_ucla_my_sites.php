@@ -65,14 +65,16 @@ class block_ucla_my_sites extends block_base {
     }
 
     /**
+     * Get user's classes.
      *
      * @param array $classsites
+     * @param array $availableterms
      * @param string $paramterm
      *
      * @return array    Returns an array of $classsites and $availableterms.
      */
     private function get_classes($classsites, $availableterms, $paramterm) {
-        global $USER;
+        global $CFG, $USER;
 
         // Append the list of sites from our stored procedure.
         if (empty($USER->idnumber)) {
@@ -158,6 +160,12 @@ class block_ucla_my_sites extends block_base {
                 unset($classsites[$k]);
                 continue;
             }
+        }
+
+        // If $availableterms is not empty, but current term is not there add it
+        // so users can switch to the term they have access to.
+        if (!empty($availableterms) && !isset($availableterms[$CFG->currentterm])) {
+            $availableterms[$CFG->currentterm] = $CFG->currentterm;
         }
 
         return array($classsites, $availableterms);
@@ -273,7 +281,7 @@ class block_ucla_my_sites extends block_base {
      * @return object
      */
     public function get_content() {
-        global $USER, $CFG, $OUTPUT, $PAGE, $DB;
+        global $USER, $CFG, $OUTPUT, $PAGE;
 
         if ($this->content !== null) {
             return $this->content;
@@ -351,31 +359,37 @@ class block_ucla_my_sites extends block_base {
         }
 
         $renderer = $PAGE->get_renderer('block_ucla_my_sites');
-        if (!empty($classsites)) {
+        if (!empty($availableterms)) {
             $template = array();
-
-            // We want to sort things.
-            usort($classsites, array(get_class(), 'registrar_course_sort'));
-
-            // If viewing courses from 12S or earlier, give notice about archive
-            // server. Only display this info if 'archiveserver' config is set.
-            if ((term_cmp_fn($params['term'], '12S') == -1) &&
-                    (get_config('local_ucla', 'archiveserver'))) {
-                $content[] = $OUTPUT->notification(get_string('shared_server_archive_notice',
-                    'block_ucla_my_sites'), 'notifymessage');
-            }
 
             // Display term selector.
             $termoptstr = '';
             // Sort them descending.
-            $availableterms = array_reverse(terms_arr_sort($availableterms));
+            $availableterms = terms_arr_sort($availableterms, true);
             $termoptstr = get_string('term', 'local_ucla') . ': '
                     . $OUTPUT->render($this->make_terms_selector(
                         $availableterms, $params['term']));
             $template['selector'] = html_writer::tag('div', $termoptstr,
                     array('class' => 'termselector'));
 
-            $template['listing'] = $renderer->class_sites_overview($classsites);
+            if (!empty($classsites)) {
+                // We want to sort things.
+                usort($classsites, array(get_class(), 'registrar_course_sort'));
+
+                // If viewing courses from 12S or earlier, give notice about archive
+                // server. Only display this info if 'archiveserver' config is set.
+                if ((term_cmp_fn($params['term'], '12S') == -1) &&
+                        (get_config('local_ucla', 'archiveserver'))) {
+                    $content[] = $OUTPUT->notification(get_string('shared_server_archive_notice',
+                        'block_ucla_my_sites'), 'notifymessage');
+                }
+
+                $template['listing'] = $renderer->class_sites_overview($classsites);
+            } else {
+                $template['listing'] = get_string('noclassforterm', 'block_ucla_my_sites',
+                        ucla_term_to_text($params['term']));
+            }
+
             $template['id'] = 'tabclass';
             $template['name'] = get_string('tabclasstext', 'block_ucla_my_sites');
 
@@ -457,7 +471,7 @@ class block_ucla_my_sites extends block_base {
      *                  terms.
      */
     private function get_sites($courses, $params) {
-        global $CFG, $USER;
+        global $CFG;
 
         $classsites = $availableterms = array();
         $collaborationsites = $categoryids = array();
