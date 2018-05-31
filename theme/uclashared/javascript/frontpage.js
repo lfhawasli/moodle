@@ -12,5 +12,9 @@ $(document).ready(function(){
         $("#sidebar").fadeIn();
         $("#header").fadeIn();
     });
-
+    $(".frontpage-alert-wrapper .alert-header-default").parent().css("border-left-color", "#88b851");
+    $(".frontpage-alert-wrapper .alert-header-blue").parent().css("border-left-color", "#389998");
+    $(".frontpage-alert-wrapper .alert-header-red").parent().css("border-left-color", "#d64f33");
+    $(".frontpage-alert-wrapper .alert-header-yellow").parent().css("border-left-color", "#edb83d");
+    $(".frontpage-alert-wrapper .box-text").append("<br/>");
 });
