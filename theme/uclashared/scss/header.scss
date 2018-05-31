@@ -329,6 +329,10 @@ a.btn-help-feedback {
             display: none;
         }
     }
+    // Make notification text readable.
+    .popover-region-content-container {
+        color: $body-color;
+    }
 }
 
 // Removes extra spacing at top and bottom of Need help and User menu.
