@@ -129,3 +129,13 @@
 .list-group-item[data-isactive='1'] {
     background: $gray-lighter;
 }
+
+/* Color styles for TA site navigation drawer */
+.list-group-item.tasite {
+    &[data-isactive='0'] {
+        background-color: $ta-site-color;
+    }
+    &:hover {
+        background-color: $ta-site-hover-color;
+    }
+}
