@@ -586,8 +586,8 @@ if ($syllabusdata->can_host_syllabi) {
     $syllabusdata->section = UCLA_FORMAT_DISPLAY_SYLLABUS;
 }
 
-$PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery-1.3.2.min.js');
-$PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery.tablednd_0_5.js');
+$PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery-3.3.1.min.js');
+$PAGE->requires->js('/blocks/ucla_modify_coursemenu/js/jquery.tablednd.js');
 $PAGE->requires->yui_module('moodle-core-formchangechecker',
         'M.core_formchangechecker.init', array(array(
             'formid' => 'tableform'
