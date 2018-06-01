@@ -103,7 +103,7 @@ class user_enrolment_deleted extends base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'unenrol', '../enrol/users.php?id=' . $this->courseid, $this->courseid);
+        return array($this->courseid, 'course', 'unenrol', '../user/index.php?id=' . $this->courseid, $this->courseid);
     }
 
     /**
