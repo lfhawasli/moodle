@@ -106,6 +106,28 @@ h1, h2, h3, h4, h5, h6, p {
     width: 100%;
   }
 }
+/* Concerned with the sidebar block container */
+#sidebar-card-container {
+  width: 58%;
+  margin: 65px 30px;
+  overflow: scroll;
+  height: 85vh;
+  margin-bottom: 0;
+}
+#sidebar-card-container::-webkit-scrollbar {
+  width: 0;
+}
+.sidebar h1, h2, h3, h4, h5, h6, p {
+  transform: skewX(0deg);
+}
+@media (max-width: 992px) {
+  #sidebar-card-container {
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 140px;
+    height: 70vh;
+  }
+}
 
 /* Concerned with the sidebar site directory block */
 .frontpage-site-directory h5 {
@@ -156,41 +178,35 @@ h1, h2, h3, h4, h5, h6, p {
 .yui3-aclist-item-hover {
   background-color: #bfdaff;
 }
-#sidebar-card-container {
-  width: 58%;
-  margin: 65px 30px;
-  overflow: scroll;
-  height: 85vh;
-  margin-bottom: 0;
-}
-#sidebar-card-container::-webkit-scrollbar {
-  width: 0;
-}
-.sidebar-card {
+
+/* Concerned with the styling of individual cards AKA blocks */
+.sidebar-card, .frontpage-alert-wrapper > div {
   margin-bottom: 15px;
   width: 100%;
   border-left-width: 5px;
   border-left-color: #ddd;
   border-left-style: solid;
-  padding: 20px;
-  padding-top: 15px;
+  padding: 15px 20px;
   background-color: white;
   box-shadow: 3px 5px 5px rgba(0,0,0,0.23);
 }
-.sidebar-card h1, h2, h3, h4, h5, h6, p {
-  transform: skewX(0deg);
+.frontpage-alert-wrapper .header-title, .frontpage-alert-wrapper .box-section-title {
+  font-size: 20px;
+  font-weight: bolder;
+}
+.frontpage-alert-wrapper .box-title {
+  font-size: 15px;
+  font-weight: bold;
+}
+.frontpage-alert-wrapper .box-text {
+  font-size: 13px;
+  /*font-style: italic;*/
 }
 #site-directory-text {
   text-align: center;
   margin-bottom: 10px;
 }
 @media (max-width: 992px) {
-  #sidebar-card-container {
-    width: 95%;
-    margin: 0 auto;
-    margin-top: 140px;
-    height: 70vh;
-  }
   #frontpage-browseby-btns-wrapper a {
     margin-top: 7px;
     display: block;

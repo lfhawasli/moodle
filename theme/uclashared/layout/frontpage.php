@@ -44,5 +44,7 @@ $b = block_instance('ucla_browseby');
 $templatecontext['browseby'] = $b->get_content()->text;
 $s = block_instance('ucla_search');
 $templatecontext['search'] = $s::search_form();
+$a = block_instance('ucla_alert');
+$templatecontext['alert'] = $a->get_content()->text;
 
 echo $OUTPUT->render_from_template('theme_uclashared/frontpage', $templatecontext);
