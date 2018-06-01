@@ -1,0 +1,15 @@
+li[role=presentation].atto_menuentry{
+    height: auto;
+
+    a[role=menuitem] {
+        margin: 0;
+
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0 10px 10px 10px;
+        }
+
+        pre, p {
+            margin: 0 10px;
+        }
+    }
+}
