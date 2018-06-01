@@ -70,6 +70,7 @@ if (isset($mapping->code) && $mapping->code !== 'unmapped') {
         $local_config->code = $mapping->code;
         $local_config->platform = $mapping->platform;
         $local_config->description = '<p>Pearson MyLab & Mastering course pairing: ' . $mapping->platform . '</p>';
+        $local_config->plugin_name = 'block_mylabmastering';
 
         mylabmastering_update_course_config($local_config);
     }
@@ -89,5 +90,5 @@ if ($updated_mapping) {
     rebuild_course_cache($course_id);
     echo(json_encode($local_config));
 } else {
-    echo(json_encode(array("code" => "no update")));
+    echo(json_encode(array("code" => "no update", "plugin_name" => "block_mylabmastering")));
 }
