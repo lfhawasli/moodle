@@ -1,0 +1,8 @@
+/**
+ * File for form styles.
+ */
+
+// Hides underline for required icon.
+abbr[title], abbr[data-original-title] {
+    border-bottom: none;
+}
