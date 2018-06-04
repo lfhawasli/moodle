@@ -58,7 +58,7 @@ function tool_myucla_url_extend_navigation_course($navigation, $course, $context
 
             if (count($courseinfo) > 1) {
                 $coursecontainer = navigation_node::create(
-                        $singlecourseinfo->subj_area . ' ' . $singlecourseinfo->coursenum,
+                        $singlecourseinfo->subj_area . ' ' . $singlecourseinfo->coursenum . '-' . $singlecourseinfo->sectnum,
                         null, navigation_node::TYPE_CONTAINER);
                 $coursecontainer->add_node($gradebook);
                 $coursecontainer->add_node($emailroster);

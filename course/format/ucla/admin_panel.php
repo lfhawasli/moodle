@@ -191,20 +191,44 @@ if ($node) {
     $node->add_node($tabcontainer);
 
     // MyUCLA.
-    $tabcontainer = navigation_node::create(get_string('myucla', 'format_ucla'), null, navigation_node::TYPE_CONTAINER, null, 'myuclatab');
-    $tabcontainer->tab = true;
+    $tabcontainer = navigation_node::create(get_string('myucla', 'format_ucla'),
+            null, navigation_node::TYPE_CONTAINER, null, 'myuclatab');
+    $tabcontainer->myuclatab = true;
     $tabcontainer->tabtext = get_string('myucla', 'format_ucla');
     $rowcontainer = navigation_node::create('', null, navigation_node::TYPE_CONTAINER);
 
     if ($container = $node->find('myucla', navigation_node::TYPE_CONTAINER)) {
+        $tabcontainer->row = array();
+        
+        // Check to see if this is a crosslisted course.
+        if ($DB->count_records('ucla_request_classes', array('courseid' => $courseid)) > 1) {
+            foreach ($container->children as $key => $crosscourse) {
+                $tmprow = new stdClass();
+                $tmprow->column = array();
+                $tmprow->firstcolumn = $crosscourse;
+                foreach ($crosscourse->children as $key => $column) {
+                    $tmprow->column[] = $column;
+                }
+                $tabcontainer->row[] = $tmprow;
+            }
+        } else {
+            $tmprow = new stdClass();
+            $tmprow->column = array();
+            foreach ($container->children as $key => $column) {
+                $tmprow->column[] = $column;
+            }
+            $tabcontainer->row[] = $tmprow;
+        }
+
         $container->remove();
         $rowcontainer->add_node($container);
         $tabcontainer->add_node($rowcontainer);
+
         $node->add_node($tabcontainer);
     }
 
     // Support.
-    if ($crosslistedcourses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
+    if ($courses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
         $tabcontainer = navigation_node::create(get_string('support', 'format_ucla'),
                 null, navigation_node::TYPE_CONTAINER, null, 'supporttab');
         $tabcontainer->tab = true;
@@ -239,8 +263,10 @@ if ($node) {
 
         $rowcontainer->add_node($container);
 
-        foreach ($crosslistedcourses as $clcourse) {
-            $coursecode = $clcourse->department . " " . $clcourse->course;
+        foreach ($courses as $course) {
+            $coursecode = $course->department . " " . $course->course;
+            $courseterm = $course->term;
+            $coursesrs = $course->srs;
 
             $rowcontainer = navigation_node::create('row2', null, navigation_node::TYPE_CONTAINER);
 
@@ -248,8 +274,8 @@ if ($node) {
 
             $linkarguments = array(
                 'console' => 'ccle_courseinstructorsget',
-                'term'    => $clcourse->term,
-                'srs'     => $clcourse->srs
+                'term'    => $courseterm,
+                'srs'     => $coursesrs
             );
             $url = new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
                     $linkarguments);
@@ -259,8 +285,8 @@ if ($node) {
 
             $linkarguments = array(
                 'console' => 'ccle_roster_class',
-                'term'    => $clcourse->term,
-                'srs'     => $clcourse->srs
+                'term'    => $courseterm,
+                'srs'     => $coursesrs
             );
             $url = new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
                     $linkarguments);

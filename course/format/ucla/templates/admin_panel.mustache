@@ -63,6 +63,16 @@
                     {{/is_short_branch}}
                 {{/display}}
             {{/tab}}
+
+            {{#myuclatab}}
+                {{#display}}
+                    {{^is_short_branch}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#link{{key}}" data-toggle="tab" role="tab">{{tabtext}}</a>
+                        </li>
+                    {{/is_short_branch}}
+                {{/display}}
+            {{/myuclatab}}
         {{/node.children}}
     </ul>
 
@@ -112,6 +122,33 @@
                     </div>
                 {{/children.count}}
             {{/tab}}
+        {{/node.children}}
+
+        {{#node.children}}
+            {{#myuclatab}}
+                <div class="tab-pane" id="link{{key}}" role="tabpanel">
+                    <div class="card">
+                        <div class="card-block">
+                            <table class="table table-striped">
+                                <tbody>
+                                    {{#row}}
+                                        <tr>
+                                        <th scope="row">
+                                            {{#firstcolumn}}
+                                                <a href="{{{action}}}">{{text}}</a>
+                                            {{/firstcolumn}}
+                                        </th>
+                                        {{#column}}
+                                            <td><a href="{{{action}}}">{{text}}</a></td>
+                                        {{/column}}
+                                        </tr>
+                                    {{/row}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {{/myuclatab}}
         {{/node.children}}
     </div>
 </div>
