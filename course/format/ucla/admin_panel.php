@@ -78,7 +78,8 @@ if ($node) {
             'import'           => navigation_node::TYPE_SETTING,
             'filters'          => navigation_node::TYPE_SETTING,
             'backup'           => navigation_node::TYPE_SETTING,
-            'restore'          => navigation_node::TYPE_SETTING
+            'restore'          => navigation_node::TYPE_SETTING,
+            'reset'            => navigation_node::TYPE_SETTING
     );
 
     $container = navigation_node::create(get_string('settingsandbackup', 'format_ucla'),
@@ -209,7 +210,6 @@ if ($node) {
             'coursereports'    => navigation_node::TYPE_CONTAINER,
             'coursebadges'     => navigation_node::TYPE_CONTAINER,
             'publish'          => navigation_node::TYPE_SETTING,
-            'reset'            => navigation_node::TYPE_SETTING,
             'questionbank'     => navigation_node::TYPE_CONTAINER,
             'users'            => navigation_node::TYPE_CONTAINER
     );
