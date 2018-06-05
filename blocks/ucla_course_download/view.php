@@ -38,12 +38,11 @@ if (!has_capability('moodle/course:manageactivities', $context)) {
 $PAGE->set_url('/blocks/ucla_course_download/view.php',
             array('courseid' => $courseid));
 
-$page_title = $course->shortname . ': ' . get_string('pluginname',
-                    'block_ucla_course_download');
+$pagetitle = get_string('coursedownload', 'block_ucla_course_download');
 
 $PAGE->set_context($context);
-$PAGE->set_title($page_title);
-$PAGE->set_heading($page_title);
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($pagetitle);
 $PAGE->set_pagelayout('base');
 
 // Get plugin renderer.
@@ -85,7 +84,12 @@ foreach ($downloadoptions as $downloadoption) {
 
 // Start output screen.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'block_ucla_course_download'), 2, 'headingblock');
+
+// Notify admin if students do not have access to this tool.
+if (!student_zip_requestable($course)) {
+    echo $OUTPUT->notification(get_string('studentaccessdisabled', 'block_ucla_course_download'), 'info');
+}
+
 echo $body;
 echo $OUTPUT->footer();
 

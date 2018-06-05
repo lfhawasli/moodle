@@ -119,7 +119,17 @@ function block_ucla_course_download_ucla_format_notices($course) {
  * @param context         $context    The context of the course.
  */
 function block_ucla_course_download_extend_navigation_course($navigation, $course, $context) {
+    global $CFG;
     if (has_capability('block/ucla_course_download:requestzip', $context)) {
+        require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
+
+        // Check if this is a student that can download the archive.
+        $isinstructor = has_capability('moodle/course:manageactivities', $context);
+        if (!$isinstructor && !student_zip_requestable($course)) {
+            // Student does not have access.
+            return;
+        }
+
         $setting = navigation_node::create(get_string('coursedownload', 'block_ucla_course_download'),
                 new moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
                 navigation_node::TYPE_SETTING, null, 'coursedownload');

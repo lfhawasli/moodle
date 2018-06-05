@@ -67,6 +67,7 @@ $string['ziplifetime_desc'] = 'This specifies how long to keep zip files ' .
         'the zip file and request will be deleted.';
 $string['maxfilesize'] = 'Maximum file size in MB';
 $string['maxfilesize_desc'] = 'Files over this size will be excluded from the zip file.';
+$string['studentaccessdisabled'] = 'Students do not have access to this feature. To enable this feature for students please enable the "Download course materials" option in the course settings.';
 
 // Instructor view of files
 $string['instructorfilewarning'] = 'Files included are ones that are already visible ' .
