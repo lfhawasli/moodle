@@ -1,0 +1,56 @@
+#region-main-settings-menu, #region-main {
+    &.has-blocks {
+        width: calc(100% - #{$blocks-main-region-width});
+        @include media-breakpoint-down(lg) {
+           width: 100%;
+        }
+    }
+}
+
+#page.container-fluid {
+    padding: 0 1.04rem 0 0;
+    @include media-breakpoint-down(sm) {
+        padding: 0 1.04rem 0 $small-spacer;
+    }
+    
+    header{
+        &#page-header {
+            .page-context-header-container {
+                width: calc(100% - 140px);
+            }
+            .p-a-1 {
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+
+                .card {
+                    margin-bottom: 0px;
+                }
+            }
+        }
+    }
+    
+    &.left-gutter {
+        padding-left: $small-spacer;
+        transition-timing-function: ease;
+    }
+}
+
+.block {
+    &.m-b-1 {
+        margin-bottom: $small-spacer !important;
+    }
+}
+
+.breadcrumb-nav .breadcrumb {
+    padding-top: 0px;
+}
+
+.admin-panel-link {
+    position: static;
+}
+
+.course-content {
+    ul.ucla-format {
+        padding-left: 0rem;
+    }
+}

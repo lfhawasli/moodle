@@ -86,6 +86,7 @@
         border-color: $btn-color-editing;
         position: relative;
         padding: 0.5rem 0.5rem 0.5rem 2rem;
+        margin-bottom: 0.75rem;
     }
     .btn:hover {
         color: white;
@@ -119,6 +120,14 @@
 
 #nav-drawer {
     top: 40px;
+    height: calc(100% - 40px);
+    padding: $small-spacer;
+    
+    nav {
+        &.m-t-1 {
+            margin-top: $small-spacer !important;
+        }
+    }
 }
 
 /* Navigation drawer colors */

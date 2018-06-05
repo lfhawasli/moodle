@@ -361,7 +361,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         if ($COURSE->format !== 'ucla') {
-            return parent::full_header();
+            return self::full_header_orig_with_week();
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
@@ -372,16 +372,23 @@ class core_renderer extends \theme_boost\output\core_renderer {
         if (empty($PAGE->layout_options['nonavbar'])) {
             $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
+            $html .= self::weeks_display();
+            $html .= html_writer::end_div();
+
             // If the page is a course page or a section of a course, then display the editing button
             if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE) ||
                     $PAGE->url->compare(new \moodle_url('/local/ucla_syllabus/index.php'), URL_MATCH_BASE)) {
-                $html .= html_writer::div($this->header_editing_mode_button(), 'breadcrumb-button pull-xs-right header-editing-button');
+                $html .= html_writer::div($this->header_editing_mode_button(), 'pull-xs-right header-editing-button');
             }
-            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button pull-xs-right');
-            $html .= html_writer::end_div();
+            $html .= html_writer::div($pageheadingbutton, 'pull-xs-right');
         } else if ($pageheadingbutton) {
-            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar pull-xs-right');
+            $html .= html_writer::div($pageheadingbutton, 'nonavbar pull-xs-right');
         }
+
+        $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
+        $html .= html_writer::start_div('page-context-header-container pull-xs-left');
+        $html .= $this->context_header();
+        $html .= html_writer::end_div();
 
         $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
         $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($COURSE)->figure_section($COURSE));
@@ -390,10 +397,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 array('class' => 'admin-panel-link hidden-sm-down pull-xs-right'
                 . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
 
-        $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
-        $html .= html_writer::start_div('pull-xs-left');
-        $html .= $this->context_header();
-        $html .= html_writer::end_div();
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
             $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix w-100 pull-xs-left');
@@ -405,6 +408,44 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $html;
     }
 
+    /**
+     * Wrapper for header elements.
+     *
+     * @return string HTML to display the main header.
+     */
+    public function full_header_orig_with_week() {
+        global $PAGE;
+
+        $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
+        $html .= html_writer::start_div('col-xs-12 p-a-1');
+        $html .= html_writer::start_div('card');
+        $html .= html_writer::start_div('card-block');
+        $html .= html_writer::div($this->context_header_settings_menu(), 'pull-xs-right context-header-settings-menu');
+        // Adding weeks display to original parent full_header code.
+        $html .= html_writer::start_div('clearfix w-100 pull-xs-left');
+        $html .= self::weeks_display();
+        $html .= html_writer::start_div('pull-xs-left');
+        $html .= $this->context_header();
+        $html .= html_writer::end_div();
+        $html .= html_writer::end_div();
+        // End weeks display.
+        $pageheadingbutton = $this->page_heading_button();
+        if (empty($PAGE->layout_options['nonavbar'])) {
+            $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
+            $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
+            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button pull-xs-right');
+            $html .= html_writer::end_div();
+        } else if ($pageheadingbutton) {
+            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar pull-xs-right');
+        }
+        $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
+        $html .= html_writer::end_div();
+        $html .= html_writer::end_div();
+        $html .= html_writer::end_div();
+        $html .= html_writer::end_tag('header');
+        return $html;
+    }
+    
     /**
      * Renders an action menu component.
      *
