@@ -91,10 +91,7 @@ $sectionlist = block_ucla_rearrange::SECTIONLIST;
 // Consolidate into a single thingee.
 $sectionshtml = html_writer::start_tag(
                 'ul',
-                array(
-                    'class' => block_ucla_rearrange::SECTIONLISTCLASS . ' js-show',
-                    'id' => $sectionlist
-                )
+                array('class' => 'js-show', 'id' => $sectionlist)
 );
 
 // Make the expand/collapse button.
@@ -143,21 +140,6 @@ if ($sectionzero === false) {
 
 $sectionshtml .= html_writer::end_tag('ul');
 
-//   // Here is the primary setup for sortables.
-//   $customvars = array(
-//       'containerjq' => '#' . block_ucla_rearrange::PRIMARY_DOMNODE,
-//       'expandtext' => $expandtext,
-//       'collapsetext' => $collaptext,
-//       'expandalltext' => get_string('allexpand', 'block_ucla_rearrange'),
-//       'collapsealltext' => get_string('allcollapse', 'block_ucla_rearrange'),
-//       'expandalljq' => '.expandall'
-//   );
-//   
-//   // This enables nested sortables for all objects in the page with the class
-//   // of "nested-sortables".
-//   block_ucla_rearrange::setup_nested_sortable_js($sectionshtml,
-//           '.' . block_ucla_rearrange::PAGELISTCLASS, $customvars);
-
 // Used later to determine which section to redirect to after successful form submit.
 $sectionredirect = $sectionnum;
 
@@ -177,7 +159,7 @@ $rearrangeform = new ucla_rearrange_form(
 );
 
 if ($data = $rearrangeform->get_data()) {
-    // document?
+    // The JavaScript sets the 'serialized' hidden field to a JSON representation of the list.
     $sectiondata = json_decode($data->serialized, true);
 
     // If the form was submitted before JavaScript loaded, ignore the submission.
@@ -191,8 +173,6 @@ if ($data = $rearrangeform->get_data()) {
             $sectioncontents[$id] = empty($section['children']) ? array() : modnode::flatten($section['children']);
             $sectionorder[$id] = $index;
         }
-
-        // Redirect eventually?
 
         // Section id to redirect to after moving the sections around.
         $sectionid = $DB->get_field('course_sections', 'id', array('course' => $course->id, 'section' => $sectionnum));
@@ -220,7 +200,6 @@ $PAGE->set_title($restrc);
 $PAGE->set_heading($restrc);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($restr, 2, 'headingblock');
 
 if ($data != false) {
     $message = html_writer::tag('h3', get_string('success', 'block_ucla_rearrange'));
@@ -262,9 +241,6 @@ if ($data != false) {
 
     $rearrangeform->display();
     $PAGE->requires->js_call_amd('block_ucla_rearrange/rearrange', 'init', array($sectionnum, $secid));
-//    $PAGE->requires->js_init_code(
-//            "M.block_ucla_rearrange.initialize_rearrange_tool('$sectionnum', '$secid')"
-//    );
 }
 
 echo $OUTPUT->footer();

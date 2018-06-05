@@ -41,11 +41,11 @@ li:not(.section-zero) > div {
     color: black;
 }
 
-ul:not(.s-list-class) > .placeholder {
+ul:not(#s-list) > .placeholder {
     border: 1px dashed magenta;
 }
 
-.s-list-class {
+#s-list {
     padding: 1px;
     margin: 8px;
 }
