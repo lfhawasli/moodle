@@ -123,7 +123,7 @@
 
 /* Navigation drawer colors */
 [data-region="drawer"] {
-    background-color: inherit;
+    background-color: $body-bg;
 }
 
 .list-group-item[data-isactive='1'] {
