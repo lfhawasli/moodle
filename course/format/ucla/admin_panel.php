@@ -203,6 +203,78 @@ if ($node) {
         $node->add_node($tabcontainer);
     }
 
+    // Support.
+    if ($crosslistedcourses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
+        $tabcontainer = navigation_node::create(get_string('support', 'format_ucla'),
+                null, navigation_node::TYPE_CONTAINER, null, 'supporttab');
+        $tabcontainer->tab = true;
+        $tabcontainer->tabtext = get_string('support', 'format_ucla');
+
+        $rowcontainer = navigation_node::create('row1', null, navigation_node::TYPE_CONTAINER);
+
+        $container = navigation_node::create(get_string('tools', 'format_ucla'),
+                null, navigation_node::TYPE_CONTAINER, null, 'logsandreports');
+
+        $linkarguments = array(
+            'console' => 'prepoprun',
+            'courseid'    => $courseid
+        );
+        $url = new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
+                $linkarguments);
+        $setting = navigation_node::create(get_string('runprepop', 'format_ucla'),
+                $url, navigation_node::TYPE_SETTING);
+        $container->add_node($setting);
+
+        $linkarguments = array(
+            'console' => 'pushgrades',
+            'courseid'    => $courseid
+        );
+        $url = new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
+                $linkarguments);
+        $setting = navigation_node::create(get_string('pushgrades', 'format_ucla'),
+                $url, navigation_node::TYPE_SETTING);
+        $container->add_node($setting);
+
+        $tabcontainer->add_node($rowcontainer);
+
+        $rowcontainer->add_node($container);
+
+        foreach ($crosslistedcourses as $clcourse) {
+            $coursecode = $clcourse->department . " " . $clcourse->course;
+
+            $rowcontainer = navigation_node::create('row2', null, navigation_node::TYPE_CONTAINER);
+
+            $container = navigation_node::create($coursecode, null, navigation_node::TYPE_CONTAINER, null);
+
+            $linkarguments = array(
+                'console' => 'ccle_courseinstructorsget',
+                'term'    => $clcourse->term,
+                'srs'     => $clcourse->srs
+            );
+            $url = new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
+                    $linkarguments);
+            $setting = navigation_node::create(get_string('getinsts', 'format_ucla'),
+                    $url, navigation_node::TYPE_SETTING);
+            $container->add_node($setting);
+
+            $linkarguments = array(
+                'console' => 'ccle_roster_class',
+                'term'    => $clcourse->term,
+                'srs'     => $clcourse->srs
+            );
+            $url = new moodle_url($CFG->wwwroot. '/admin/tool/uclasupportconsole/index.php',
+                    $linkarguments);
+            $setting = navigation_node::create(get_string('getstdroster', 'format_ucla'),
+                    $url, navigation_node::TYPE_SETTING);
+            $container->add_node($setting);
+
+            $rowcontainer->add_node($container);
+
+            $tabcontainer->add_node($rowcontainer);
+        }
+        $node->add_node($tabcontainer);
+    }
+
     // Remove leftover settings.
     $settings = array(
             'turneditingonoff' => navigation_node::TYPE_SETTING,
@@ -236,7 +308,7 @@ if ($node) {
     if ($setting = $node->find('questions', navigation_node::TYPE_SETTING)) {
         $setting->text = get_string('questionbank', 'format_ucla');
     }
-    
+
     if ($setting = $node->find('mediasite_course_settings', navigation_node::TYPE_SETTING)) {
         $setting->text = get_string('mediasitesettings', 'format_ucla');
     }
@@ -244,7 +316,7 @@ if ($node) {
     if ($setting = $node->find('kalturamediagallery-settings', navigation_node::NODETYPE_LEAF)) {
         $setting->text = get_string('mediagallery', 'format_ucla');
     }
-    
+
     if ($setting = $node->find('newbadge', navigation_node::TYPE_SETTING)) {
         $setting->text = get_string('newbadge', 'format_ucla');
     }
