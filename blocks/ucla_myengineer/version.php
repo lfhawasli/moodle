@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2016072600;  // YYYYMMDDHH (year, month, day, 24-hr time).
+$plugin->version = 2018060500;  // YYYYMMDDHH (year, month, day, 24-hr time).
 $plugin->requires = 2011120500; // YYYYMMDDHH (This is the release version for Moodle 2.0).
 
 $plugin->dependencies = array('local_ucla' => 2014052000);
