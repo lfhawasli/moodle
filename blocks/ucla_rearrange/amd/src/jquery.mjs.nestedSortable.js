@@ -18,8 +18,8 @@
 		// AMD. Register as an anonymous module.
 		define([
 			"jquery",
-                        // REPLACED
-//			"jquery-ui/ui/sortable"
+                        // We want to use the Moodle-provided jqueryui module.
+			// "jquery-ui/ui/sortable"
 			"jqueryui"
 		], factory );
 	} else {

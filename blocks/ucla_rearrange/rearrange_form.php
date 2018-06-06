@@ -62,7 +62,7 @@ class ucla_rearrange_form extends moodleform {
         $buttonarray[] = $mform->createElement('submit', 'submitbutton1',
                 get_string('savechanges'),
                 array('class' => 'btn-submit', 'disabled' => 'disabled'));
-        $buttonarray[] = $mform->createElement('cancel');
+        $buttonarray[] = $mform->createElement('cancel', 'cancelbutton1');
         $mform->addGroup($buttonarray, 'buttonar1', '', ' ', false);
 
         $mform->addElement('header', 'header', get_string('sections'));
@@ -87,7 +87,7 @@ class ucla_rearrange_form extends moodleform {
         $buttonarray[] = $mform->createElement('submit', 'submitbutton2',
                 get_string('savechanges'),
                 array('class' => 'btn-submit', 'disabled' => 'disabled'));
-        $buttonarray[] = $mform->createElement('cancel');
+        $buttonarray[] = $mform->createElement('cancel', 'cancelbutton2');
         $mform->addGroup($buttonarray, 'buttonar2', '', ' ', false);
     }
 
