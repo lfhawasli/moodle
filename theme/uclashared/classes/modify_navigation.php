@@ -625,6 +625,7 @@ class modify_navigation {
      */
     private function rearrange_nodes() {
         $nodestomove = array('grades' => \global_navigation::TYPE_SETTING,
+            'coursedownload' => \global_navigation::TYPE_SECTION,
             'participants' => \global_navigation::TYPE_CONTAINER);
         foreach ($nodestomove as $name => $type) {
             if ($node = $this->navigation->find($name, $type)) {
@@ -795,6 +796,31 @@ class modify_navigation {
     }
 
     /**
+     * Add Download Course Material link if student.
+     */
+    private function add_download_course_material() {
+        global $CFG, $COURSE;
+
+        // Check if this is a student that can download the archive.
+        $coursecontext = \context_course::instance($COURSE->id);
+        $isinstructor = has_capability('moodle/course:manageactivities', $coursecontext);
+        $canrequest = has_capability('block/ucla_course_download:requestzip', $coursecontext);
+        require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
+
+        if ($isinstructor || !$canrequest || !student_zip_requestable($COURSE)) {
+            return;
+        }
+
+        // Create the node and add to navigation drawer.
+        $coursedownloadnode = \navigation_node::create(get_string('coursedownload', 'block_ucla_course_download'),
+                    new \moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $COURSE->id)),
+                    \navigation_node::TYPE_SECTION,
+                    null, 'coursedownload', new \pix_icon('t/download', ''));
+
+        $this->coursenode->add_node($coursedownloadnode);
+    }
+
+    /**
      * Modifies Moodle navigation tree.
      *
      * Called from local/ucla/lib.php: local_ucla_extend_navigation().
@@ -821,6 +847,7 @@ class modify_navigation {
             $this->add_more();
             $this->add_editingmode();
             $this->add_courseadmin();
+            $this->add_download_course_material();
             $this->add_changerole();
             $this->add_enrolme();
         }
