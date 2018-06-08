@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2016062800;  // YYYYMMDDXX.
+$plugin->version = 2018060700;  // YYYYMMDDXX.
 $plugin->requires = 2010112400; // YYYYMMDDHH (This is the release version for Moodle 2.0)
 $plugin->cron = 0;          // TODO: Turn off cron until we get schedule tasks in Moodle 2.7.
 $plugin->component = 'block_ucla_course_download';
