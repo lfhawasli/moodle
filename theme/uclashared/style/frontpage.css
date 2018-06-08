@@ -110,7 +110,7 @@ h1, h2, h3, h4, h5, h6, p {
 #sidebar-card-container {
   width: 58%;
   margin: 65px 30px;
-  overflow: scroll;
+  overflow: auto;
   height: 85vh;
   margin-bottom: 0;
 }
