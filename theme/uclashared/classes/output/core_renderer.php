@@ -374,12 +374,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
             $html .= self::weeks_display();
             $html .= html_writer::end_div();
-
-            // If the page is a course page or a section of a course, then display the editing button
-            if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE) ||
-                    $PAGE->url->compare(new \moodle_url('/local/ucla_syllabus/index.php'), URL_MATCH_BASE)) {
-                $html .= html_writer::div($this->header_editing_mode_button(), 'pull-xs-right header-editing-button');
-            }
+            
             $html .= html_writer::div($pageheadingbutton, 'pull-xs-right');
         } else if ($pageheadingbutton) {
             $html .= html_writer::div($pageheadingbutton, 'nonavbar pull-xs-right');
@@ -390,17 +385,25 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= $this->context_header();
         $html .= html_writer::end_div();
 
-        $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
-        $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($COURSE)->figure_section($COURSE));
-        $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
-        $html .= html_writer::link($adminlink, $adminicon . get_string('adminpanel', 'format_ucla'),
-                array('class' => 'admin-panel-link hidden-sm-down pull-xs-right'
-                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
-
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
-            $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix w-100 pull-xs-left');
+            if(!empty($renderer->print_site_meta_text())){
+                $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix pull-xs-left course-details');
+            }
         }
+
+        $html .= html_writer::start_div('hidden-sm-down pull-xs-right'); 
+        $html .= self::admin_panel();
+
+        if (empty($PAGE->layout_options['nonavbar'])) {
+             // If the page is a course page or a section of a course, then display the editing button.
+            if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE) ||
+                    $PAGE->url->compare(new \moodle_url('/local/ucla_syllabus/index.php'), URL_MATCH_BASE)) {
+                $html .= html_writer::div($this->header_editing_mode_button(), 'pull-xs-right header-editing-button');
+            }
+        }
+        $html .= html_writer::end_div();
+
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
@@ -445,7 +448,22 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::end_tag('header');
         return $html;
     }
-    
+
+    public function admin_panel() {
+        global $PAGE, $COURSE;
+
+        $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
+        $adminbutton = html_writer::div($adminicon .' '. get_string('adminpanel', 'format_ucla'), 'btn btn-secondary header-admin-panel-button');
+
+        $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($COURSE)->figure_section($COURSE));
+        $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
+        $html = html_writer::link($adminlink, $adminbutton,
+                array('class' => 'admin-panel-link pull-xs-right'
+                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));      
+
+        return $html;
+    }
+
     /**
      * Renders an action menu component.
      *

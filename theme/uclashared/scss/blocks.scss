@@ -12,12 +12,9 @@
     @include media-breakpoint-down(sm) {
         padding: 0 1.04rem 0 $small-spacer;
     }
-    
+
     header{
         &#page-header {
-            .page-context-header-container {
-                width: calc(100% - 140px);
-            }
             .p-a-1 {
                 padding-top: 0px !important;
                 padding-bottom: 0px !important;
@@ -28,7 +25,7 @@
             }
         }
     }
-    
+
     &.left-gutter {
         padding-left: $small-spacer;
         transition-timing-function: ease;
@@ -45,8 +42,21 @@
     padding-top: 0px;
 }
 
+.course-details {
+    clear:both;
+}
+
 .admin-panel-link {
     position: static;
+}
+
+.header-editing-button {
+    form {
+        margin-bottom: 0px;
+        button {
+            margin-bottom: 0px !important;
+        }
+    }
 }
 
 .course-content {

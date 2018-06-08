@@ -111,6 +111,27 @@
     content: "\f00c";
 }
 
+.header-admin-panel-button {
+    background-color: $ccle-color-logo;
+    border-color: $ccle-color-logo;
+    color: black;
+    padding: 0.5rem;
+    margin-left: 0.75rem;
+    display: inline-block;
+    -webkit-transition-property: background-color, color;
+    transition-property: background-color, color;
+    -webkit-transition-duration: 0.25s;
+    transition-duration: 0.25s;
+    -webkit-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+
+    &:hover {
+        background-color: lighten($ccle-color-logo, 10%);
+        border-color: lighten($ccle-color-logo, 10%);
+        text-decoration: none;
+    }
+}
+
 /* Used by Browseby and Mysites */
 .registrar-link {
     font-size: 10px;
