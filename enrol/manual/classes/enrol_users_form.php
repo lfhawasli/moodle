@@ -120,8 +120,10 @@ class enrol_manual_enrol_users_form extends moodleform {
                 $mform->addElement('cohort', 'cohortlist', get_string('selectcohorts', 'enrol_manual'), $options);
             }
         }
-
-        $roles = get_assignable_roles($context);
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        //$roles = get_assignable_roles($context);
+        $roles = $manager->get_assignable_roles(false, true);
+        // END UCLA MOD: CCLE-6809.
         $mform->addElement('select', 'roletoassign', get_string('assignrole', 'enrol_manual'), $roles);
         $mform->setDefault('roletoassign', $instance->roleid);
 
