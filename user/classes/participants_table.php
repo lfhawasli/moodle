@@ -255,7 +255,15 @@ class participants_table extends \table_sql {
         }
         $this->allroles = role_fix_names(get_all_roles($this->context), $this->context);
         $this->allroleassignments = get_users_roles($this->context, [], true, 'c.contextlevel DESC, r.sortorder ASC');
-        $this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        //$this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
+        $untrimmedroles = \uclaroles_manager::get_assignable_roles_by_courseid($this->course, true);
+        foreach ($untrimmedroles as $role) {
+            $assignableroles[$role->id] = $role->name;
+        }
+        $this->assignableroles = $assignableroles;
+        // END UCLA MOD: CCLE-6809.
         $this->profileroles = get_profile_roles($this->context);
     }
 
