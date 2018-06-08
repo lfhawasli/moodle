@@ -56,6 +56,19 @@ function theme_uclashared_frontpageimage() {
 }
 
 /**
+ * Adds or overrides icon mapping for fontawesome icons.
+ *
+ * @return array
+ */
+function theme_uclashared_get_fontawesome_icon_map() {
+     return [
+         'core:e/styleprops' => 'fa-paragraph',
+         'core:e/text_highlight_picker' => 'fa-tint',
+         'core:e/text_highlight' => 'fa-tint',
+     ];
+ }
+
+/**
  * Called before theme outputs anything.
  *
  * @param moodle_page $page

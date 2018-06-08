@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2018013000;
+$plugin->version   = 2018060800;
 $plugin->requires  = 2017110800;
 $plugin->component = 'theme_uclashared';
 
