@@ -77,12 +77,13 @@ class invitation_form extends moodleform {
         foreach ($siteroles as $roletype => $roles) {
             $roletypestring = html_writer::tag('div',
                     get_string($roletype, 'tool_uclaroles'),
-                    array('class' => 'label-bstp label-primary'));
+                    array('class' => 'tag tag-primary'));
             $rolegroup[] = &$mform->createElement('static', 'role_type_header',
                     '', $roletypestring);
 
             foreach ($roles as $role) {
                 $rolestring = $this->format_role_string($role);
+                
                 $rolegroup[] = &$mform->createElement('radio', 'roleid', '',
                         $rolestring, $role->id);
             }
@@ -93,7 +94,7 @@ class invitation_form extends moodleform {
             // Create Temporary Roles group.
             $roletypestring = html_writer::tag('div',
                     get_string('tempgroup', 'enrol_invitation'),
-                    array('class' => 'label-bstp label-warning'));
+                    array('class' => 'tag tag-warning'));
             $rolegroup[] = &$mform->createElement('static', 'role_type_header',
                     '', $roletypestring);
 
@@ -122,12 +123,12 @@ class invitation_form extends moodleform {
             1 => get_string('expires_after_certain_days', 'enrol_invitation'));
         // Create dropdown for choosing wether to set an expiration date.
         $ifroleexpiredropdown = &$mform->createElement('select',
-                'ifroleexpires', '', $ifroleexpires);
+                'ifroleexpires', '', $ifroleexpires, array('class' => 'custom-select'));
         $ifroleexpirestring = html_writer::tag('span', $ifroleexpiredropdown->toHtml(), array('class' => 'ifroleexpire_string'));
         $mform->addElement('static', 'ifroleexpire_string', get_string('role_expiration', 'enrol_invitation'), $ifroleexpirestring);
         // Create dropdown for choosing day expiration.
         $daysexpiredropdown = &$mform->createElement('select',
-                'daysexpire', '', self::$daysexpireoptions);
+                'daysexpire', '', self::$daysexpireoptions, array('class' => 'custom-select'));
         $daysexpirestring = html_writer::tag('span',
                 get_string('daysexpire_string', 'enrol_invitation',
                         $daysexpiredropdown->toHtml()),
