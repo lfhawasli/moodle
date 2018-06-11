@@ -53,13 +53,10 @@ $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 // navigate built into the theme.
 $THEME->requiredblocks = '';
 
-// This is a feature that tells the blocks library not to use the "Add a block"
-// block. We don't want this in boost based themes because it forces a block
-// region into the page when editing is enabled and it takes up too much room.
+// Puts "Add a block" in side region, where people are used to it.
 $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
 
 // Override Boost configs for layouts.
-$THEME->layouts['mydashboard']['options']['noheader'] = true;
 // To prevent blocks from being displayed on non-section course pages.
 $THEME->layouts['report']['regions'] = array();
 $THEME->layouts['admin']['regions'] = array();

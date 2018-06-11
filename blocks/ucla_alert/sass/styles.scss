@@ -146,3 +146,12 @@ $alert-colors: (
         }
     }
 }
+
+// Make alert block display better in Boost theme.
+.block_ucla_alert .card-block {
+    padding: 0;
+    .box-boundary {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}

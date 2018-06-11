@@ -29,3 +29,15 @@
 .block_ucla_my_sites div.collab_sites_container {
     margin-left: 1%;
 }
+
+/* Remove extra spacing & profile image from header on My sites */
+#page-my-index #page-header .userpicture {
+    display: none;
+}
+#page-my-index #page-header .card-block {
+    padding-left: 0;
+}
+#page-my-index #region-main .card.card-block {
+    padding-top: 0;
+    padding-left: 0;
+}
