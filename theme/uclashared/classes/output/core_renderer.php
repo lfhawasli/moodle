@@ -354,12 +354,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
     public function full_header() {
         global $PAGE, $COURSE;
 
-        if (!empty($PAGE->layout_options['noheader']) &&
-                $PAGE->url->get_path() !== '/my/indexsys.php') {
-            // We still need header when customizing Dashboard.
-            return '';
-        }
-
         if ($COURSE->format !== 'ucla') {
             return self::full_header_orig_with_week();
         }
@@ -417,7 +411,13 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return string HTML to display the main header.
      */
     public function full_header_orig_with_week() {
-        global $PAGE;
+        global $PAGE, $USER;
+
+        // On My sites, fix fullname in header to be firstname, lastname.
+        $headerinfo = array();
+        if ($PAGE->pagetype == 'my-index') {
+            $headerinfo['heading'] = $USER->firstname . ' ' . $USER->lastname;
+        }       
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
         $html .= html_writer::start_div('col-xs-12 p-a-1');
@@ -428,7 +428,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::start_div('clearfix w-100 pull-xs-left');
         $html .= self::weeks_display();
         $html .= html_writer::start_div('pull-xs-left');
-        $html .= $this->context_header();
+        $html .= $this->context_header($headerinfo);
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         // End weeks display.
