@@ -972,7 +972,10 @@ $string['help'] = 'Help';
 $string['helpprefix2'] = 'Help with {$a}';
 $string['helpwiththis'] = 'Help with this';
 $string['hiddenassign'] = 'Hidden assignment';
-$string['hiddenfromstudents'] = 'Hidden from students';
+// START UCLA MOD: CCLE-7671 - Change "Hidden from students" to "Hidden".
+//string['hiddenfromstudents'] = 'Hidden from students';
+$string['hiddenfromstudents'] = 'Hidden';
+//END UCLA MOD: CCLE-7671.
 $string['hiddenoncoursepage'] = 'Available but not shown on course page';
 $string['hiddensections'] = 'Hidden sections';
 $string['hiddensections_help'] = 'This setting determines whether hidden sections are displayed to students in collapsed form (perhaps for a course in weekly format to indicate holidays) or are completely hidden.';
