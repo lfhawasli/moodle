@@ -197,7 +197,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $divider->primary = false;
 
         $am = new action_menu();
-        $am->initialise_js($this->page);
         $am->set_menu_trigger($hflinktext . $icon);
 
         $am->set_alignment(action_menu::TR, action_menu::BR);
