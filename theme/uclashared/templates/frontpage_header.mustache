@@ -7,10 +7,15 @@ also the log in status
   <div class="container-fluid">
     <div class="row">
       <div id="header-logo"></div>
-      <div id="login-wrapper" class="header-btn-group logininfo col-lg-4 col-xs-12">
-        <div class="btn btn-header" id="btn-need-help" >{{{output.help_feedback_link}}}</div>
-        <button class="btn btn-header" id="btn-login-status">{{# str }} loggedinnot {{/ str }}</button>
-        <a href={{loginlink}}><button class="btn btn-header" id="btn-login">{{# str }} login {{/ str }}</button></a>
+      <div id="login-wrapper">
+          <div class="header-login">
+              <div class="header-btn-group">
+                <!-- help_feedback_link -->
+                {{{ output.help_feedback_link }}}
+                <button class="btn btn-header" id="btn-login-status">{{# str }} loggedinnot {{/ str }}</button>
+                <a href={{loginlink}}><button class="btn btn-header" id="btn-login">{{# str }} login {{/ str }}</button></a>
+              </div>
+          </div>
       </div>
     </div>
   </div>

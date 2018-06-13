@@ -50,14 +50,14 @@ h1, h2, h3, h4, h5, h6, p {
   border-width: 0;
   border-radius: 0px;
   padding: 10px 5%;
+  margin-top: -5px;
 }
 #btn-login {
   color: black;
-  background-color: rgba(255,172,6,0.9);
+  background-color: #ffbc00;
 }
-#btn-need-help {
-  color: black;
-  background-color: rgba(255,172,6,1.0);
+#btn-login:hover {
+    background-color: #ffc933;
 }
 #btn-login-status {
   color: #fff;
@@ -81,9 +81,15 @@ h1, h2, h3, h4, h5, h6, p {
     display: block;
     width: 100%;
   }
+}
+@media (max-width: 480px) {
+  .header-login, .header-login .header-btn-group {
+    float: none;
+    margin: 0;
+  }
   .btn-header {
     width: 100%;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 }
 
@@ -124,17 +130,22 @@ h1, h2, h3, h4, h5, h6, p {
   #sidebar-card-container {
     width: 95%;
     margin: 0 auto;
-    margin-top: 140px;
     height: 70vh;
+  }
+}
+@media (max-width: 480px) {
+  #sidebar-card-container {
+    margin-top: 100px;
   }
 }
 
 /* Concerned with the sidebar site directory block */
-.frontpage-site-directory h5 {
+.frontpage-site-directory h5, .sitetopic {
   display: none;
 }
 #frontpage-browseby-btns-wrapper {
   margin-top: 10px;
+  text-align: center;
 }
 #frontpage-browseby-btns-wrapper a {
   display: inline;
@@ -200,16 +211,20 @@ h1, h2, h3, h4, h5, h6, p {
 }
 .frontpage-alert-wrapper .box-text {
   font-size: 13px;
-  /*font-style: italic;*/
 }
 #site-directory-text {
   text-align: center;
   margin-bottom: 10px;
 }
-@media (max-width: 992px) {
+@media (max-width: 480px) {
   #frontpage-browseby-btns-wrapper a {
     margin-top: 7px;
     display: block;
+  }
+}
+@media (max-width: 992px) {
+  #frontpage-browseby-btns-wrapper a, #frontpage-search-wrapper .search-options {
+    font-size: 1.0em;
   }
 }
 

@@ -185,6 +185,7 @@ header {
 
         // Help button
         .btn-help-feedback {
+            text-align: center;
             background-color: $ccle-color-logo;
             &:hover {
                 background-color: lighten($ccle-color-logo, 10%);
