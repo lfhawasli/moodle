@@ -27,7 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Include Boost config so that we can override layouts.
-require_once(__DIR__ . '/../boost/config.php');
+// NOTE: Need require, rather than require_once so Boost config is always loaded.
+require(__DIR__ . '/../boost/config.php');
 
 $THEME->name = 'uclashared';
 
