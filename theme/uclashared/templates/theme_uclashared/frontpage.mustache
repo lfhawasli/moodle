@@ -10,11 +10,11 @@
 </head>
 <body>
   {{{ output.standard_top_of_body_html }}}
-  <div class="bg-img" style="background-image: url('{{{ bgimage }}}')"></div>
-  <div class="container-fluid">
-    <div class="row">
+  <div class="container-fluid bg-img" style="background-image: url('{{{ bgimage }}}')">
+    <div class="subcontainer row">
       {{> theme_uclashared/frontpage_header }}
       <div id="sidebar">
+        <div id="header-logo"></div>
         {{{ output.main_content }}}
         <div id="sidebar-card-container">
           {{> theme_uclashared/browse_by_block }}
