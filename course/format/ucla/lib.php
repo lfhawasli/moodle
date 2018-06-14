@@ -59,14 +59,11 @@ class format_ucla extends format_topics {
     const UCLA_FORMAT_SITE_INFO = 0;
 
     /**
-     *  Figures out the section to display. Specific only to the UCLA course format.
-     *  Uses a $_GET or $_POST param to figure out what's going on.
+     * Figures out the section to display.
      *
-     * @param stdClass $course course the user is viewing
-     * @param array $courseprefs course preferences
      * @return int       Returns section number that user is viewing
      */
-    public function figure_section($course = null, $courseprefs = null) {
+    public function figure_section() {
 
         $course = $this->get_course();
 
@@ -111,7 +108,7 @@ class format_ucla extends format_topics {
             $landingpage = $course->marker;
         }
 
-        return $landingpage;
+        return (int)$landingpage;
     }
 
     /**

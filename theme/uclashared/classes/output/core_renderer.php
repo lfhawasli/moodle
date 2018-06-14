@@ -449,13 +449,18 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $html;
     }
 
+    /**
+     * Generates "Admin panel" button.
+     *
+     * @return string   HTML for admin panel.
+     */
     public function admin_panel() {
-        global $PAGE, $COURSE;
+        global $PAGE;
 
         $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
         $adminbutton = html_writer::div($adminicon .' '. get_string('adminpanel', 'format_ucla'), 'btn btn-secondary header-admin-panel-button');
 
-        $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($COURSE)->figure_section($COURSE));
+        $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($PAGE->course)->figure_section());
         $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
         $html = html_writer::link($adminlink, $adminbutton,
                 array('class' => 'admin-panel-link pull-xs-right'
