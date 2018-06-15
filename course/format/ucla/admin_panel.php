@@ -32,6 +32,7 @@ $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
 require_login($course);
 $coursecontext = context_course::instance($course->id);
+require_capability('format/ucla:viewadminpanel', $coursecontext);
 
 $PAGE->set_pagelayout('base');
 

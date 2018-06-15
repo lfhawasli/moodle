@@ -32,7 +32,7 @@ $string['request_unavailable'] = 'There are no <strong>{$a}</strong> available f
 $string['noaccess'] = 'You do not have access to view this page';
 
 /* alert notice */
-$string['alert_msg'] = 'You can visit the Admin panel or click "Download course materials" below to request a zip file of your course materials. Files are subject to change without notice.';
+$string['alert_msg'] = 'You can click "Download course materials" below to request a zip file of your course materials. Files are subject to change without notice.';
 $string['alert_download'] = 'Download course materials';
 $string['alert_dismiss'] = 'Dismiss';
 $string['alert_dismiss_message'] = 'You will no longer be prompted to download course material. ' .

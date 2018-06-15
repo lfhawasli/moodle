@@ -368,16 +368,15 @@ class modify_navigation {
 
     /**
      * Check if the page is editable and the user has editing permissions.
-     * If button is to be displayed for the conditions, return true, otherwise false.
-     * Currently checks if the page is grader page, course section page or syllabus section page.
-     *
-     * @return boolean
+     * 
+     * @return boolean If button is to be displayed return true, otherwise false.
      */
     public function is_editing_button_displayed() {
         global $PAGE;
-
-        return (!($PAGE->url->compare(new \moodle_url('/grade/report/grader/index.php'), URL_MATCH_BASE)) &&
-                !($PAGE->user_allowed_editing() &&
+        // Currently checks if the page is grader page, course section page or 
+        // syllabus section page.
+        return (($PAGE->url->compare(new \moodle_url('/grade/report/grader/index.php'), URL_MATCH_BASE)) ||
+                ($PAGE->user_allowed_editing() &&
                 ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE) ||
                 $PAGE->url->compare(new \moodle_url('/local/ucla_syllabus/index.php'), URL_MATCH_BASE))));
     }
@@ -385,7 +384,7 @@ class modify_navigation {
     /**
      * Add link to Admin panel page, see CCLE-7193.
      */
-    private function add_courseadmin() {
+    private function add_adminpanel() {
         global $PAGE;
 
         $section = $this->format->figure_section();
@@ -400,15 +399,14 @@ class modify_navigation {
         $params = array('courseid' => $PAGE->course->id,
                 $sectiontype => $sectionvalue);
 
-        $pagecontext = \context_course::instance($PAGE->course->id);
-        if (is_enrolled($pagecontext) || has_capability('moodle/course:view', $pagecontext)) {
+        if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
             $adminurl = new \moodle_url('/course/format/ucla/admin_panel.php', $params);
             $courseadmin = \navigation_node::create(get_string('adminpanel', 'format_ucla'),
                         $adminurl, \navigation_node::TYPE_SETTING,
                         null, 'courseadministration', new \pix_icon('i/settings', ''));
 
             // If editing button is not displayed, courseadmin becomes a new tree parent
-            if ($this->is_editing_button_displayed()) {
+            if (!$this->is_editing_button_displayed()) {
                 $courseadmin = new \flat_navigation_node($courseadmin, 0);
                 $courseadmin->set_showdivider(true);
             }
@@ -453,7 +451,7 @@ class modify_navigation {
         global $PAGE, $USER;
 
         // Exit function if not on an editable page or if does not have permission to edit
-        if ($this->is_editing_button_displayed()) {
+        if (!$this->is_editing_button_displayed()) {
             return;
         }
 
@@ -653,12 +651,23 @@ class modify_navigation {
      * Rearrange nodes.
      */
     private function rearrange_nodes() {
+        global $PAGE;
+        
         $nodestomove = array('grades' => \navigation_node::TYPE_SETTING,
             'coursedownload' => \navigation_node::TYPE_SECTION,
             'participants' => \navigation_node::TYPE_CONTAINER);
         foreach ($nodestomove as $name => $type) {
             if ($node = $this->navigation->find($name, $type)) {
                 $node->remove();
+                
+                // If Admin panel is not displayed, then need to set Grades to
+                // have a divider.
+                if ($name === 'grades' &&
+                        !has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
+                    $node = new \flat_navigation_node($node, 0);
+                    $node->set_showdivider(true);             
+                }
+                
                 $this->coursenode->add_node($node);
             }
         }
@@ -883,7 +892,7 @@ class modify_navigation {
             $this->add_activityresources();
             $this->add_more();
             $this->add_editingmode();
-            $this->add_courseadmin();
+            $this->add_adminpanel();
             $this->add_download_course_material();
             $this->add_changerole();
             $this->add_enrolme();
