@@ -9,13 +9,19 @@ function extern_server_course($course) {
     global $CFG, $PAGE;
     
     //CCLE-3685 - Redirect to syllabus if the syllabus is the landing page
-    require_once($CFG->dirroot.'/course/format/ucla/lib.php');
+//    require_once($CFG->dirroot.'/course/format/ucla/lib.php');
     
     /* @var $format format_ucla */
     $format = course_get_format($course);
-    
+
     if ($format->get_format() === 'ucla') {
         if ($format->figure_section() == $format::UCLA_FORMAT_DISPLAY_SYLLABUS) {
+            // If on syllabus page, ignore redirect else edit on/off will not work.
+            $editmode = optional_param('edit', -1, PARAM_BOOL);
+            if ($editmode !== -1) {
+                return;
+            }
+
             $syllabusurl = $CFG->wwwroot . '/local/ucla_syllabus/index.php?id=' . $course->id;
             redirect($syllabusurl);
         }
