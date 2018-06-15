@@ -8,27 +8,34 @@ h1, h2, h3, h4, h5, h6, p {
 
 /* The background image */
 .bg-img {
-  position: absolute;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: right;
-  z-index: -1000;
-  width: 100%;
-  height: 100vh;
 }
 @media (max-width: 992px) {
   .bg-img {
-    height: 100vh;
     background-position: center;
   }
+}
+
+.subcontainer {
+  position: relative;
 }
 
 /* Concerned with top logo, login/need help, buttons */
 #header {
   position: absolute;
-  width: 100%;
+  display: inline-block;
+  right: 0;
   height: 100px;
   z-index: 1000;
+}
+#header #header-logo {
+  display: none;
+  background-position: center;
+  height: 70px;
+  width: 100%;
+  margin-left: 0;
 }
 #header-logo {
   position: relative;
@@ -44,7 +51,6 @@ h1, h2, h3, h4, h5, h6, p {
 #login-wrapper {
   float: right;
   margin-top: 30px;
-  width: 450px;
 }
 .btn-header {
   border-width: 0;
@@ -67,6 +73,7 @@ h1, h2, h3, h4, h5, h6, p {
   #header {
     background-color: rgba(44,94,145,0.8);
     height: 70px;
+    position: static;
     display: block;
   }
   #login-wrapper {
@@ -75,11 +82,8 @@ h1, h2, h3, h4, h5, h6, p {
     width: 95%;
     padding: 0;
   }
-  #header-logo {
-    background-position: center;
-    height: 70px;
+  #header #header-logo {
     display: block;
-    width: 100%;
   }
 }
 @media (max-width: 480px) {
@@ -95,29 +99,35 @@ h1, h2, h3, h4, h5, h6, p {
 
 /* Concerned with the sidebar, which is the CCLE alerts wrapper */
 #sidebar {
-  height: 100vh;
+  min-height: 100vh;
   background-image: url("../pix/blue-backdrop.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: left;
   width: 700px;
-  position: absolute;
+  position: static;
+  float: left;
+}
+#sidebar #header-logo {
+    display: block;
 }
 @media (max-width: 992px) {
   #sidebar {
     background-image: url("../pix/blue-backdrop-rotated.png");
-    margin-top: 100px;
     background-size: cover;
     background-position: center;
     width: 100%;
+    margin-top: 20px;
+  }
+  #sidebar #header-logo {
+    display: none;
   }
 }
 /* Concerned with the sidebar block container */
 #sidebar-card-container {
   width: 58%;
   margin: 65px 30px;
-  overflow: auto;
-  height: 85vh;
+  min-height: 85vh;
   margin-bottom: 0;
 }
 #sidebar-card-container::-webkit-scrollbar {
@@ -130,7 +140,7 @@ h1, h2, h3, h4, h5, h6, p {
   #sidebar-card-container {
     width: 95%;
     margin: 0 auto;
-    height: 70vh;
+    min-height: 70vh;
   }
 }
 @media (max-width: 480px) {
