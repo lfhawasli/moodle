@@ -151,5 +151,21 @@ function xmldb_format_ucla_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018050100, 'format', 'ucla');
     }
 
+    if ($oldversion < 2018061500) {
+        // Allow only certain roles access to Admin panel. 
+        $roles = array('manager', 'editinginstructor', 'supervising_instructor', 
+                'ta_instructor', 'ta_admin', 'projectlead', 'projectcontributor', 
+                'instructional_assistant', 'grader', 'editor', 
+                'studentfacilitator', 'coursesitemanager');
+        $context = context_system::instance();
+        foreach ($roles as $role) {
+            $roleid = $DB->get_field('role', 'id', array('shortname' => $role));
+            if (!empty($roleid)) {
+                role_change_permission($roleid, $context, 'format/ucla:viewadminpanel', CAP_ALLOW);                
+            }
+        }
+        upgrade_plugin_savepoint(true, 2018061500, 'format', 'ucla');
+    }
+
     return true;
 }

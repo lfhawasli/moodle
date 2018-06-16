@@ -15,16 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Capability definitions for this module.
  *
  * @package    format_ucla
- * @subpackage ucla
- * @copyright 2012 UC Regents
+ * @copyright  2018 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018061500;       // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017111300;       // Requires this Moodle version.
-$plugin->component = 'format_ucla';    // Full name of the plugin (used for diagnostics).
+$capabilities = array(
+    'format/ucla:viewadminpanel' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW
+        )
+    )
+);

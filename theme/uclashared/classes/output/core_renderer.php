@@ -387,7 +387,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html .= html_writer::start_div('hidden-sm-down pull-xs-right'); 
-        $html .= self::admin_panel();
+
+        if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
+            $html .= self::admin_panel();
+        }
 
         if (empty($PAGE->layout_options['nonavbar'])) {
              // If the page is a course page or a section of a course, then display the editing button.
