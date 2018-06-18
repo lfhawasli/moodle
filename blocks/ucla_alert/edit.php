@@ -28,11 +28,12 @@ if($courseid == SITEID) {
     $PAGE->set_pagetype('course-view-' . $course->format);
 }
 
-
-// Keep the site 'edit' button
-$go_back_url = new moodle_url('/course/view.php',
-                array('id' => $courseid));
-set_editing_mode_button($go_back_url);
+if ($courseid != SITEID) {
+    // Keep the site 'edit' button.
+    $gobackurl = new moodle_url('/course/view.php', array('id' => $courseid));
+    $buttons = $OUTPUT->edit_button($gobackurl);
+    $PAGE->set_button($buttons);
+}
 
 $PAGE->set_title(get_string('edit_alert_heading', 'block_ucla_alert'));
 $PAGE->navbar->add(get_string('edit_alert_heading', 'block_ucla_alert'));

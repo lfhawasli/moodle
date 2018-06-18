@@ -638,7 +638,8 @@ block_ucla_modify_coursemenu::js_init_code_helper(
 
 $PAGE->requires->js_init_code('M.block_ucla_modify_coursemenu.initialize()');
 
-set_editing_mode_button($courseviewurl);
+$buttons = $OUTPUT->edit_button($courseviewurl);
+$PAGE->set_button($buttons);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($restr, 2, 'headingblock');

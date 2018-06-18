@@ -30,7 +30,7 @@ require_once($CFG->libdir . '/licenselib.php');
  * Initializes all $PAGE variables.
  */
 function init_copyright_page($course, $courseid, $context) {
-    global $PAGE;
+    global $OUTPUT, $PAGE;
     $PAGE->set_url('/blocks/ucla_copyright_status/view.php',
         array('courseid' => $courseid));
 
@@ -43,6 +43,12 @@ function init_copyright_page($course, $courseid, $context) {
     $PAGE->set_heading($course->fullname);
 
     $PAGE->set_pagelayout('base');
+
+    // Set editing button.
+    $PAGE->set_other_editing_capability('moodle/course:manageactivities');
+    $gobackurl = new moodle_url('/course/view.php', array('id' => $courseid));
+    $buttons = $OUTPUT->edit_button($gobackurl);
+    $PAGE->set_button($buttons);
 }
 
 /*

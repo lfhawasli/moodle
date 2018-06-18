@@ -103,12 +103,11 @@
 }
 
 /* Style to choose which icon to show for the editing button */
-.header-editing-button.non-edit-mode .btn:before {
-    content: "\f040";
-}
-
-.header-editing-button.edit-mode .btn:before {
+.editing .header-editing-button .singlebutton .btn:before {
     content: "\f00c";
+}
+.header-editing-button .singlebutton .btn:before {
+    content: "\f040";
 }
 
 .header-admin-panel-button {
