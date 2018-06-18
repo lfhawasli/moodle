@@ -51,14 +51,13 @@ if (isset($cancelled)) {
     redirect(new moodle_url('/course/view.php', array('id' => $courseid)));
 }
 
-// Since set_editing_mode_button() depends on the data, we update the data before it is called.
+// Since editing button depends on the data, we update the data before it is called.
 if (isset($action)) {
     $data = data_submitted();
     update_copyright_status($data);
 }
 
 init_copyright_page($course, $courseid, $context);
-set_editing_mode_button();
 setup_js_tablesorter('copyright_status_table', array('textExtraction:uclaCopyrightTextExtraction'));
 $PAGE->requires->yui_module('moodle-core-formchangechecker', 'M.core_formchangechecker.init', array(array(
         'formid' => 'block_ucla_copyright_status_form_copyright_status_list')));

@@ -61,7 +61,8 @@ $PAGE->set_url('/blocks/ucla_rearrange/rearrange.php',
 // Set editing url to be section or default page.
 $gobackurl = new moodle_url('/course/view.php',
                 array('id' => $courseid, 'section' => $sectionnum));
-set_editing_mode_button($gobackurl);
+$buttons = $OUTPUT->edit_button($gobackurl);
+$PAGE->set_button($buttons);
 
 $sections = $format->get_sections();
 

@@ -90,6 +90,19 @@ if (has_capability('moodle/grade:edit', $context)) {
         $USER->gradeediting[$course->id] = 0;
     }
 
+    // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button.
+    // Grader report sets editing mode using $USER->gradeediting[$courseid]
+    // not $USER->editing, so editing button never changes.
+    // So set $USER->editing to be same as $USER->gradeediting and vice versa.
+    if ($edit == -1) {
+        // No editing mode set, so use course editing mode.
+        $USER->gradeediting[$course->id] = $USER->editing;
+    } else {
+        // User turned on/off grader report, so set course editing mode.
+        $USER->editing = $USER->gradeediting[$course->id];
+    }
+    // END UCLA MOD: CCLE-7336.
+
     // page params for the turn editting on
     $options = $gpr->get_options();
     $options['sesskey'] = sesskey();
@@ -97,21 +110,12 @@ if (has_capability('moodle/grade:edit', $context)) {
     if ($USER->gradeediting[$course->id]) {
         $options['edit'] = 0;
         $string = get_string('turneditingoff');
-        // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button
-        $editmodeclass = 'edit-mode';
-        // END UCLA MOD: CCLE-7336
     } else {
         $options['edit'] = 1;
         $string = get_string('turneditingon');
-        // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button
-        $editmodeclass = 'non-edit-mode';
-        // END UCLA MOD: CCLE-7336
     }
 
     $buttons = new single_button(new moodle_url('index.php', $options), $string, 'get');
-    // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button
-    $buttons->class = 'header-editing-button ' . $editmodeclass;
-    // END UCLA MOD: CCLE-7336
 } else {
     $USER->gradeediting[$course->id] = 0;
     $buttons = '';

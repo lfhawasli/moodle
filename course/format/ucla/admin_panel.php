@@ -36,6 +36,12 @@ require_capability('format/ucla:viewadminpanel', $coursecontext);
 
 $PAGE->set_pagelayout('base');
 
+// Set editing mode button if user has access to edit on course page.
+$PAGE->set_other_editing_capability('moodle/course:manageactivities');
+$gobackurl = new moodle_url('/course/view.php', array('id' => $courseid));
+$buttons = $OUTPUT->edit_button($gobackurl);
+$PAGE->set_button($buttons);
+
 $title = get_string('adminpanel', 'format_ucla');
 $node = $PAGE->settingsnav->find('courseadmin', navigation_node::TYPE_COURSE);
 
