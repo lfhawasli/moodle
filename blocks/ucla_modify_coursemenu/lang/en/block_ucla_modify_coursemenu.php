@@ -67,4 +67,4 @@ $string['cachedef_landingpagebydatesdb'] = 'Cache to store revision times of Lan
 $string['cachedef_landingpagebydatesdisplay'] = 'Cache to store revision times of Landing Page by Dates display data.';
 
 // Admin panel strings.
-$string['modifysections'] = 'Modify site sections';
+$string['modifysections'] = 'Modify sections';
