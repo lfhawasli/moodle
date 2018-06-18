@@ -10,3 +10,8 @@ abbr[title], abbr[data-original-title] {
 #id_cancelbutton1, #id_cancelbutton2 {
     @extend .btn-secondary;
 }
+
+// Accomodates for &nbsp at beginning of flatpickr div.
+.flatpickr {
+    margin-left: -0.39em;
+}
