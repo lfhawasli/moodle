@@ -376,7 +376,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
       */
     public function parsed_weeks_display() {
       $parsed = array();
-      $weeksdata = self::weeks_display();
+      $weeksdata = $this->weeks_display();
       $weekpos = strpos($weeksdata, '<span class="week">');
       $quarter = substr($weeksdata, 0, $weekpos);
       $quarter = strip_tags($quarter);
@@ -405,7 +405,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         if (empty($PAGE->layout_options['nonavbar'])) {
             $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
-            $html .= self::weeks_display();
+            $html .= $this->weeks_display();
             $html .= html_writer::end_div();
         }
 
@@ -464,7 +464,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::div($this->context_header_settings_menu(), 'pull-xs-right context-header-settings-menu');
         // Adding weeks display to original parent full_header code.
         $html .= html_writer::start_div('clearfix w-100 pull-xs-left');
-        $html .= self::weeks_display();
+        $html .= $this->weeks_display();
         $html .= html_writer::start_div('pull-xs-left');
         $html .= $this->context_header($headerinfo);
         $html .= html_writer::end_div();
