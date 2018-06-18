@@ -24,16 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/blocks/navigation/renderer.php');
-
 /**
- *  To be honest, i don't know why i called it "block_" ucla_browseby_renderer
+ * Browseby renderer.
  *
  * @package    block_ucla_browseby
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
-class block_ucla_browseby_renderer extends block_navigation_renderer {
+ */
+class block_ucla_browseby_renderer extends plugin_renderer_base {
     /**
      * @var BROWSEBYTABLEID set to browse by courses list.
      */
@@ -101,15 +99,15 @@ class block_ucla_browseby_renderer extends block_navigation_renderer {
      * Renders the giant list of courses.
      *
      * @param array $courses
-     *      Array (
-     *          Object {
-     *              url => url of course
-     *              dispname => displayed for link
-     *              instructors => Array ( Instructor names )
-     *              fullname => the fullname of the course
-     *          }
-     *      )
-     **/
+     *     Array (
+     *         Object {
+     *             url => url of course
+     *             dispname => displayed for link
+     *             instructors => Array ( Instructor names )
+     *             fullname => the fullname of the course
+     *         }
+     *     )
+     */
     static public function ucla_browseby_courses_list($courses) {
         global $CFG;
 
@@ -214,31 +212,31 @@ class block_ucla_browseby_renderer extends block_navigation_renderer {
     }
 
     /**
-     *  Convenience function for drawing a terms-drop down
+     * Convenience function for drawing a terms-drop down
      *
      * @param boolean $defaultterm
      * @param boolean $sql
      * @param array $sqlparams
-     **/
+     */
     static public function render_terms_selector($defaultterm=false,
                                    $sql=false,
                                    $sqlparams=null) {
         global $OUTPUT;
 
-        $contents = get_string('term', 'local_ucla') . ':'
+        $contents = get_string('term', 'local_ucla') . ': '
             . $OUTPUT->render(self::terms_selector($defaultterm,
                 $sql, $sqlparams));
-        return html_writer::tag('div', $contents, array('class' => 'term_selector'));
+        return html_writer::tag('div', $contents, array('class' => 'termselector'));
     }
 
     /**
-     *  Builds a automatic-redirecting drop down menu, populated
-     *  with terms. Returns a thing you $OUTPUT->render()
+     * Builds a automatic-redirecting drop down menu, populated
+     * with terms. Returns a thing you $OUTPUT->render()
      *
      * @param boolean $defaultterm
      * @param boolean $sql
      * @param array $sqlparams
-     **/
+     */
     static public function terms_selector($defaultterm=false,
             $sql=false, $sqlparams=null) {
         global $DB, $PAGE;
@@ -254,8 +252,7 @@ class block_ucla_browseby_renderer extends block_navigation_renderer {
             $terms[] = $term->term;
         }
 
-        $terms = terms_arr_sort($terms);
-        $terms = array_reverse($terms);
+        $terms = terms_arr_sort($terms, true);
 
         // CCLE-3526 - Dynamic selection of archive server notice.
         $precutoffterm = term_get_prev(
@@ -292,28 +289,9 @@ class block_ucla_browseby_renderer extends block_navigation_renderer {
             }
         }
 
-        $selects = new url_select($urls, $default);
+        $selects = new url_select($urls, $default, null);
 
         return $selects;
     }
-
-    /**
-     *  Calls block_navigation_renderer's protected function.
-     *
-     * Ignore "Possible useless method overriding detected", because this makes
-     * a protected method callable as a public method.
-     *
-     * @param navigation_node[] $i
-     * @param array $a
-     * @param int $e
-     * @param array $o
-     * @param int $d
-     * @return string
-     **/
-    public function navigation_node($i, $a=array(), $e=null,
-            array $o=array(), $d=1) {
-        return parent::navigation_node($i, $a, $e, $o, $d);
-    }
-
 }
 

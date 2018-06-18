@@ -1,0 +1,22 @@
+// Variables.
+@import "variables";
+
+// Import Boost SASS.
+@import "../../boost/scss/moodle";
+@import "boostdefault";
+
+// Module styles.
+@import "mod_forum";
+@import "mod_label";
+
+// General look and feel styles.
+@import "term_display";
+@import "footer";
+@import "navigation";
+@import "section_action_menu";
+@import "progress-bars";
+@import "header";
+@import "hamburger_icon";
+@import "editor";
+@import "form";
+@import "blocks";

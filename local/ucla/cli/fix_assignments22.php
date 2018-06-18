@@ -121,6 +121,7 @@ $nonexistentsections = $DB->get_records_sql($sql);
 $trace->output(sprintf('Found %d assignments in nonexistent sections',
         count($nonexistentsections)));
 
+// TODO need to fix numsections?
 if (!empty($nonexistentsections)) {
     $coursecache = array(); // Indexed by courseid => section number.
     foreach ($nonexistentsections as $nonexistentsection) {

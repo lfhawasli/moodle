@@ -56,7 +56,7 @@ $PAGE->requires->yui_module('moodle-gradereport_grader-gradereporttable', 'Y.M.g
 
 // basic access checks
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('nocourseid');
+    print_error('invalidcourseid');
 }
 require_login($course);
 $context = context_course::instance($course->id);
@@ -89,6 +89,19 @@ if (has_capability('moodle/grade:edit', $context)) {
     } else if (($edit == 0) and confirm_sesskey()) {
         $USER->gradeediting[$course->id] = 0;
     }
+
+    // START UCLA MOD: CCLE-7336 - Add and style "Turn editing on/off" button.
+    // Grader report sets editing mode using $USER->gradeediting[$courseid]
+    // not $USER->editing, so editing button never changes.
+    // So set $USER->editing to be same as $USER->gradeediting and vice versa.
+    if ($edit == -1) {
+        // No editing mode set, so use course editing mode.
+        $USER->gradeediting[$course->id] = $USER->editing;
+    } else {
+        // User turned on/off grader report, so set course editing mode.
+        $USER->editing = $USER->gradeediting[$course->id];
+    }
+    // END UCLA MOD: CCLE-7336.
 
     // page params for the turn editting on
     $options = $gpr->get_options();
@@ -210,7 +223,8 @@ if ($USER->gradeediting[$course->id] && ($report->get_pref('showquickfeedback') 
     echo '<input type="hidden" value="grader" name="report"/>';
     echo '<input type="hidden" value="'.$page.'" name="page"/>';
     echo $reporthtml;
-    echo '<div class="submit"><input type="submit" id="gradersubmit" value="'.s(get_string('savechanges')).'" /></div>';
+    echo '<div class="submit"><input type="submit" id="gradersubmit" class="btn btn-primary"
+        value="'.s(get_string('savechanges')).'" /></div>';
     echo '</div></form>';
 } else {
     echo $reporthtml;
@@ -228,16 +242,5 @@ $event = \gradereport_grader\event\grade_report_viewed::create(
     )
 );
 $event->trigger();
-
-// START UCLA MOD: CCLE-4168 - General gradebook improvements.
-if (local_ucla_core_edit::using_ucla_theme()) {
-    // Render a help sidebar.
-    echo ucla_sidebar::help(array(
-        new sidebar_file('/blocks/ucla_help/topics/gradebook/color_legend.php'),
-        new sidebar_docs('Gradebook'),
-        new sidebar_feedback()
-    ));
-}
-// END UCLA MOD: CCLE-4168
 
 echo $OUTPUT->footer();

@@ -42,16 +42,6 @@ class block_ucla_rearrange extends block_base {
      * @var string
      */
     const PRIMARY_DOMNODE = 'major-ns-container';
-    /**
-     * @var string
-     */
-    const DEFAULT_TARGETJQ = '.ns-primary';
-
-    /**
-     * This is the id of top UL.
-     * @var string
-     */
-    const PAGELIST = 'ns-list';
 
     /**
      * This the class of UL.
@@ -72,25 +62,13 @@ class block_ucla_rearrange extends block_base {
     const SECTIONLIST = 's-list';
 
     /**
-     * This the class of UL.
+     * This is the class of LI for section zero.
      * @var string
      */
-    const SECTIONLISTCLASS = 's-list-class';
+    const SECTIONZERO = 'section-zero';
 
     /**
-     * This is the LI class.
-     * @var string
-     */
-    const SECTIONITEM = 's-list-item';
-
-    /**
-     * Non-nesting class.
-     * @var string
-     */
-    const NONNESTING = 'ns-invisible';
-
-    /**
-     * Style "hidden" indicator for non-visisble sections/modules.
+     * Style "hidden" indicator for non-visible sections/modules.
      * @var string
      */
     const HIDDENCLASS = 'ucla_rearrange_hidden';
@@ -150,19 +128,11 @@ class block_ucla_rearrange extends block_base {
                     true, $courseid);
                 $ishidden = !$modinfo->cms[$modid]->visible;
 
-                $nodes[] = new modnode($modid, $displaytext, $cm->indent,
-                        false, $ishidden);
+                $nodes[] = new modnode($modid, $displaytext, $cm->indent, $ishidden);
             }
         }
 
         $rootnodes = modnode::build($nodes);
-
-        // Add a pseudo-node that is required for section-to-section movement
-        // of modules.
-        $rootnodes = array_merge(array(
-                new modnode($section . "-" . 0, '', 0, true)
-            ), $rootnodes);
-
         return $rootnodes;
     }
 
@@ -199,8 +169,7 @@ class block_ucla_rearrange extends block_base {
         $rendered = array();
         foreach ($setmodnodes as $index => $modnodes) {
             $local = html_writer::start_tag('ul',
-                array('class' => self::PAGELISTCLASS,
-                    'id' => self::PAGELIST . '-' . $index));
+                array('class' => self::PAGELISTCLASS));
 
             foreach ($modnodes as $modnode) {
                 $local .= $modnode->render();
@@ -231,139 +200,6 @@ class block_ucla_rearrange extends block_base {
     }
 
     /**
-     * Adds the required javascript files.
-     * This is the actual jQuery scripts along with the nestedsortable
-     * javascript files.
-     **/
-    public static function javascript_requires() {
-        global $CFG, $PAGE;
-
-        $jspath = '/blocks/ucla_rearrange/javascript/';
-
-        $PAGE->requires->js($jspath . 'jquery-1.6.2.min.js');
-        $PAGE->requires->js($jspath . 'interface-1.2.min.js');
-        if (debugging()) {
-            $PAGE->requires->js($jspath . 'inestedsortable-1.0.1.js');
-        } else {
-            $PAGE->requires->js($jspath . 'inestedsortable-1.0.1.pack.js');
-        }
-    }
-
-    /**
-     * Convenience function to generate a variable assignment
-     * statement in JavaScript.
-     * @param string $var
-     * @param string $val
-     * @param boolean $quote
-     **/
-    public static function js_variable_code($var, $val, $quote = true) {
-        if ($quote) {
-            $val = '"' . addslashes($val) . '"';
-        }
-
-        return 'M.block_ucla_rearrange.' . $var . ' = ' . $val;
-    }
-
-    /**
-     * Adds all the javascript code for the global PAGE object.
-     * This does not add any of the functionality calls, it just
-     * makes the NestedSortable API available to all those who dare
-     * to attempt to use it.
-     *
-     * @param string $sectionslist
-     * @param string $targetobj
-     * @param array $customvars
-     **/
-    public static function setup_nested_sortable_js($sectionslist, $targetobj=null,
-            $customvars=array()) {
-        global $PAGE;
-
-        // Include all the jQuery, interface and nestedSortable files.
-        self::javascript_requires();
-
-        // This file contains all the library functions that we need.
-        $PAGE->requires->js('/blocks/ucla_rearrange'
-            . '/javascript/block_ucla_rearrange.js');
-        $PAGE->requires->js('/blocks/ucla_rearrange/yui/unload.js');
-
-        // These are all the sections, neatly split by section.
-        $PAGE->requires->js_init_code(self::js_variable_code(
-            'sections', json_encode($sectionslist), false));
-
-        // This is the jQuery query used to find the object to
-        // run NestedSortable upon.
-        $PAGE->requires->js_init_code(self::js_variable_code(
-            'targetjq', $targetobj));
-
-        // This is a list of customizable variables, non-essential
-        // Hooray for lack of convention, so I have to link each
-        // of the PHP variables to its JavaScript variable!
-        // Note to self: Try to stick with convention.
-        $othervars = array(
-            'sortableitem' => self::SECTIONITEM,
-            'nestedsortableitem' => self::PAGEITEM,
-            'nonnesting' => self::NONNESTING
-        );
-
-        // This API has some variables.
-        foreach ($othervars as $variable => $default) {
-            $rhs = $default;
-            if (isset($customvars[$variable])) {
-                $rhs = $customvars[$variable];
-            }
-
-            $PAGE->requires->js_init_code(
-                self::js_variable_code($variable, $rhs)
-            );
-        }
-
-        // And what the hell you can spec out some of your own variables.
-        foreach ($customvars as $variable => $custom) {
-            if (!isset($othervars[$variable])) {
-                $PAGE->requires->js_init_code(
-                    self::js_variable_code($variable, $custom)
-                );
-            }
-        }
-        $PAGE->requires->js_init_call('M.block_ucla_rearrange.init', array());
-        $PAGE->requires->js_init_code(
-            'M.block_ucla_rearrange.build_ns_config();'
-        );
-    }
-
-    /**
-     * Wraps around PHP native function parse_str();
-     *
-     * @param string $serializedstr
-     * @return array
-     */
-    public static function parse_serial($serializedstr) {
-        parse_str($serializedstr, $returner);
-
-        return $returner;
-    }
-
-    /**
-     * Cleans section order
-     * @param array $sections
-     * @return array array of cleaned sections
-     */
-    public static function clean_section_order($sections) {
-        if (empty($sections)) {
-            return array();
-        }
-
-        $clean = array();
-        foreach ($sections as $sectionold => $sectiontext) {
-            // Accounting for the unavailablity of section 0.
-            $text = explode('-', $sectiontext);
-            $clean[$sectionold] = end($text);
-        }
-
-        return $clean;
-    }
-
-    /**
      * Moves a bunch of course modules to a different section
      * There should already be a function for this, but there is not.
      * @param array $sectionmodules
@@ -376,7 +212,7 @@ class block_ucla_rearrange extends block_base {
             $ordersections=array()) {
         global $DB, $COURSE;
 
-        // Split the arrary of oldsections with new modules into
+        // Split the array of oldsections with new modules into
         // an array of section sequences, and module indents?
         $coursemodules = array();
         $sections = array();
@@ -470,44 +306,11 @@ class block_ucla_rearrange extends block_base {
      * @return array   Returns link to tool.
      */
     public static function get_editing_link($params) {
-        $link = html_writer::link(
-                    new moodle_url('/blocks/ucla_rearrange/rearrange.php',
-                        array('courseid' => $params['course']->id,
-                              'section' => $params['section'])),
-                    get_string('pluginname', 'block_ucla_rearrange')
-        );
-
-        // Site menu block arranges editing links by key, make sure this is the
-        // 2nd link.
-        return array(2 => $link);
-    }
-
-    /**
-     * Return information for displaying this block in the control panel.
-     *
-     * @param stdClass $course
-     * @param context $context
-     * @return array of "modules", where each "module" is
-     * an array of (variable name => value) to initialize a ucla_cp_module
-     */
-    public static function ucla_cp_hook($course, $context) {
-        $thispath = '/blocks/ucla_rearrange/rearrange.php';
-
-        $section = optional_param('section', null, PARAM_INT);
-        $params = array('courseid' => $course->id);
-        if (!is_null($section)) {
-            $params['section'] = $section;
-        }
-
-        $allmods = array();
-        $allmods[] = array(
-            'item_name' => 'rearrange',
-            'tags' => array('ucla_cp_mod_common'),
-            'action' => new moodle_url($thispath, $params),
-            'required_cap' => 'moodle/course:update'
-        );
-
-        return $allmods;
+        $icon = 'fa-arrows';    // Fontawesome icon.
+        $link = new moodle_url('/blocks/ucla_rearrange/rearrange.php',
+                array('courseid' => $params['course']->id, 'section' => $params['section']));
+        $text = get_string('pluginname', 'block_ucla_rearrange');
+        return array('icon' => $icon, 'link' => $link->out(false), 'text' => $text);
     }
 }
 
@@ -533,11 +336,6 @@ class modnode {
      */
     public $modindent;
     /**
-     * Makes node invisible
-     * @var bool
-     */
-    public $invis = false;
-    /**
      * Makes node hidden
      * @var bool
      */
@@ -555,15 +353,13 @@ class modnode {
      * @param string $id          ID of module
      * @param string $text        Text to display for node
      * @param int $indent      How far to indent node
-     * @param boolean $invis       If true, then applies invisible class for node
      * @param boolean $ishidden   If true, then adds in text to indicate if given
      *                          node/module if hidden
      */
-    public function __construct($id, $text, $indent, $invis=false, $ishidden=false) {
+    public function __construct($id, $text, $indent, $ishidden=false) {
         $this->modid = $id;
         $this->modtext = $text;
         $this->modindent = $indent;
-        $this->invis = $invis;
         $this->ishidden = $ishidden;
     }
 
@@ -595,10 +391,6 @@ class modnode {
         }
 
         $class = block_ucla_rearrange::PAGEITEM;
-        if ($this->invis) {
-            $class .= ' ' . block_ucla_rearrange::NONNESTING;
-
-        }
 
         $ishiddentext = '';
         if ($this->ishidden) {
@@ -607,10 +399,11 @@ class modnode {
                     array('class' => block_ucla_rearrange::HIDDENCLASS));
         }
 
-        $self = html_writer::tag('li', $this->modtext . $ishiddentext .
-                $childrender, array('id' => 'ele-' . $this->modid,
-                                    'class' => $class
-        ));
+        $current = html_writer::tag('div', $this->modtext . $ishiddentext);
+        $self = html_writer::tag('li', $current . $childrender,
+                array('id' => 'ele-' . $this->modid,
+                      'class' => $class)
+        );
 
         return $self;
     }

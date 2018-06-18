@@ -29,6 +29,7 @@ require_once($CFG->libdir . '/xhprof/xhprof_lib/utils/xhprof_runs.php');
 // Need some stuff from moodle.
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->libdir . '/setuplib.php');
+require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/phpunit/classes/util.php');
 require_once($CFG->dirroot . '/backup/util/xml/xml_writer.class.php');
 require_once($CFG->dirroot . '/backup/util/xml/output/xml_output.class.php');
@@ -63,13 +64,28 @@ function profiling_is_saved($value = null) {
 }
 
 /**
+ * Whether PHP profiling is available.
+ *
+ * This check ensures that one of the available PHP Profiling extensions is available.
+ *
+ * @return  bool
+ */
+function profiling_available() {
+    $hasextension = extension_loaded('tideways_xhprof');
+    $hasextension = $hasextension || extension_loaded('tideways');
+    $hasextension = $hasextension || extension_loaded('xhprof');
+
+    return $hasextension;
+}
+
+/**
  * Start profiling observing all the configuration
  */
 function profiling_start() {
     global $CFG, $SESSION, $SCRIPT;
 
     // If profiling isn't available, nothing to start
-    if (!extension_loaded('xhprof') && !extension_loaded('tideways')) {
+    if (!profiling_available()) {
         return false;
     }
 
@@ -146,7 +162,9 @@ function profiling_start() {
 
     // Arrived here, the script is going to be profiled, let's do it
     $ignore = array('call_user_func', 'call_user_func_array');
-    if (extension_loaded('tideways')) {
+    if (extension_loaded('tideways_xhprof')) {
+        tideways_xhprof_enable(TIDEWAYS_XHPROF_FLAGS_CPU + TIDEWAYS_XHPROF_FLAGS_MEMORY);
+    } else if (extension_loaded('tideways')) {
         tideways_enable(TIDEWAYS_FLAGS_CPU + TIDEWAYS_FLAGS_MEMORY, array('ignored_functions' =>  $ignore));
     } else {
         xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY, array('ignored_functions' => $ignore));
@@ -164,7 +182,7 @@ function profiling_stop() {
     global $CFG, $DB, $SCRIPT;
 
     // If profiling isn't available, nothing to stop
-    if (!extension_loaded('xhprof') && !extension_loaded('tideways')) {
+    if (!profiling_available()) {
         return false;
     }
 
@@ -183,7 +201,9 @@ function profiling_stop() {
 
     // Arrived here, profiling is running, stop and save everything
     profiling_is_running(false);
-    if (extension_loaded('tideways')) {
+    if (extension_loaded('tideways_xhprof')) {
+        $data = tideways_xhprof_disable();
+    } else if (extension_loaded('tideways')) {
         $data = tideways_disable();
     } else {
         $data = xhprof_disable();
@@ -586,6 +606,9 @@ function profiling_import_runs($file, $commentprefix = '') {
             $runarr['data'] = clean_param($rdom->getElementsByTagName('data')->item(0)->nodeValue, PARAM_CLEAN);
             // If the runid does not exist, insert it.
             if (!$DB->record_exists('profiling', array('runid' => $runarr['runid']))) {
+                if (@gzuncompress(base64_decode($runarr['data'])) === false) {
+                    $runarr['data'] = base64_encode(gzcompress(base64_decode($runarr['data'])));
+                }
                 $DB->insert_record('profiling', $runarr);
             } else {
                 return false;
@@ -608,6 +631,13 @@ function profiling_import_runs($file, $commentprefix = '') {
  */
 function profiling_export_generate(array $runids, $tmpdir) {
     global $CFG, $DB;
+
+    if (empty($CFG->release) || empty($CFG->version)) {
+        // Some scripts may not have included version.php.
+        include($CFG->dirroot.'/version.php');
+        $CFG->release = $release;
+        $CFG->version = $version;
+    }
 
     // Calculate the header information to be sent to moodle_profiling_runs.xml.
     $release = $CFG->release;
@@ -818,7 +848,12 @@ class moodle_xhprofrun implements iXHProfRuns {
 
         $run_desc = $this->url . ($rec->runreference ? ' (R) ' : ' ') . ' - ' . s($rec->runcomment);
 
-        return unserialize(base64_decode($rec->data));
+        // Handle historical runs that aren't compressed.
+        if (@gzuncompress(base64_decode($rec->data)) === false) {
+            return unserialize(base64_decode($rec->data));
+        } else {
+            return unserialize(gzuncompress(base64_decode($rec->data)));
+        }
     }
 
     /**
@@ -828,7 +863,7 @@ class moodle_xhprofrun implements iXHProfRuns {
      * Note that $type is completely ignored
      */
     public function save_run($xhprof_data, $type, $run_id = null) {
-        global $DB;
+        global $DB, $CFG;
 
         if (is_null($this->url)) {
             xhprof_error("Warning: You must use the prepare_run() method before saving it");
@@ -847,7 +882,7 @@ class moodle_xhprofrun implements iXHProfRuns {
         $rec = new stdClass();
         $rec->runid = $this->runid;
         $rec->url = $this->url;
-        $rec->data = base64_encode(serialize($xhprof_data));
+        $rec->data = base64_encode(gzcompress(serialize($xhprof_data), 9));
         $rec->totalexecutiontime = $this->totalexecutiontime;
         $rec->totalcputime = $this->totalcputime;
         $rec->totalcalls = $this->totalcalls;
@@ -855,6 +890,21 @@ class moodle_xhprofrun implements iXHProfRuns {
         $rec->timecreated = $this->timecreated;
 
         $DB->insert_record('profiling', $rec);
+
+        if (PHPUNIT_TEST) {
+            // Calculate export variables.
+            $tempdir = 'profiling';
+            make_temp_directory($tempdir);
+            $runids = array($this->runid);
+            $filename = $this->runid . '.mpr';
+            $filepath = $CFG->tempdir . '/' . $tempdir . '/' . $filename;
+
+            // Generate the mpr file and send it.
+            if (profiling_export_runs($runids, $filepath)) {
+                fprintf(STDERR, "Profiling data saved to: ".$filepath."\n");
+            }
+        }
+
         return $this->runid;
     }
 

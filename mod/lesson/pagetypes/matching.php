@@ -118,6 +118,16 @@ class lesson_page_type_matching extends lesson_page {
         $cm = get_coursemodule_from_instance('lesson', $this->lesson->id, $this->lesson->course);
         $context = context_module::instance($cm->id);
 
+        // Check for duplicate response format.
+        $duplicateresponse = array();
+        if (is_array($properties->response_editor) &&             // If there are response_editors to iterate.
+                is_array(reset($properties->response_editor))) {  // And they come split into text & format array.
+            foreach ($properties->response_editor as $response) { // Iterate over all them.
+                $duplicateresponse[] = $response['text'];         // Picking the text only. This pagetype is that way.
+            }
+            $properties->response_editor = $duplicateresponse;
+        }
+
         $answers = array();
 
         // need to add two to offset correct response and wrong response
@@ -171,7 +181,9 @@ class lesson_page_type_matching extends lesson_page {
         require_sesskey();
 
         if (!$data) {
-            redirect(new moodle_url('/mod/lesson/view.php', array('id'=>$PAGE->cm->id, 'pageid'=>$this->properties->id)));
+            $result->inmediatejump = true;
+            $result->newpageid = $this->properties->id;
+            return $result;
         }
 
         $response = $data->response;
@@ -246,9 +258,9 @@ class lesson_page_type_matching extends lesson_page {
                 if ($answer->answer != null) {
                     $cells = array();
                     if ($n == 0) {
-                        $cells[] = "<span class=\"label\">".get_string("correctresponse", "lesson").'</span>';
+                        $cells[] = '<label>' . get_string('correctresponse', 'lesson') . '</label>';
                     } else {
-                        $cells[] = "<span class=\"label\">".get_string("wrongresponse", "lesson").'</span>';
+                        $cells[] = '<label>' . get_string('wrongresponse', 'lesson') . '</label>';
                     }
                     $cells[] = format_text($answer->answer, $answer->answerformat, $options);
                     $table->data[] = new html_table_row($cells);
@@ -256,22 +268,22 @@ class lesson_page_type_matching extends lesson_page {
 
                 if ($n == 0) {
                     $cells = array();
-                    $cells[] = '<span class="label">'.get_string("correctanswerscore", "lesson")."</span>: ";
+                    $cells[] = '<label>' . get_string('correctanswerscore', 'lesson') . '</label>: ';
                     $cells[] = $answer->score;
                     $table->data[] = new html_table_row($cells);
 
                     $cells = array();
-                    $cells[] = '<span class="label">'.get_string("correctanswerjump", "lesson")."</span>: ";
+                    $cells[] = '<label>' . get_string('correctanswerjump', 'lesson') . '</label>: ';
                     $cells[] = $this->get_jump_name($answer->jumpto);
                     $table->data[] = new html_table_row($cells);
                 } elseif ($n == 1) {
                     $cells = array();
-                    $cells[] = '<span class="label">'.get_string("wronganswerscore", "lesson")."</span>: ";
+                    $cells[] = '<label>' . get_string('wronganswerscore', 'lesson') . '</label>: ';
                     $cells[] = $answer->score;
                     $table->data[] = new html_table_row($cells);
 
                     $cells = array();
-                    $cells[] = '<span class="label">'.get_string("wronganswerjump", "lesson")."</span>: ";
+                    $cells[] = '<label>' . get_string('wronganswerjump', 'lesson') . '</label>: ';
                     $cells[] = $this->get_jump_name($answer->jumpto);
                     $table->data[] = new html_table_row($cells);
                 }
@@ -285,19 +297,19 @@ class lesson_page_type_matching extends lesson_page {
                 $cells = array();
                 if ($this->lesson->custom && $answer->score > 0) {
                     // if the score is > 0, then it is correct
-                    $cells[] = '<span class="labelcorrect">'.get_string("answer", "lesson")." $i</span>: \n";
+                    $cells[] = '<label class="correct">' . get_string('answer', 'lesson') . " {$i}</label>: \n";
                 } else if ($this->lesson->custom) {
-                    $cells[] = '<span class="label">'.get_string("answer", "lesson")." $i</span>: \n";
+                    $cells[] = '<label>' . get_string('answer', 'lesson') . " {$i}</label>: \n";
                 } else if ($this->lesson->jumpto_is_correct($this->properties->id, $answer->jumpto)) {
-                    $cells[] = '<span class="labelcorrect">'.get_string("answer", "lesson")." $i</span>: \n";
+                    $cells[] = '<label class="correct">' . get_string('answer', 'lesson') . " {$i}</label>: \n";
                 } else {
-                    $cells[] = '<span class="label">'.get_string("answer", "lesson")." $i</span>: \n";
+                    $cells[] = '<label>' . get_string('answer', 'lesson') . " {$i}</label>: \n";
                 }
                 $cells[] = format_text($answer->answer, $answer->answerformat, $options);
                 $table->data[] = new html_table_row($cells);
 
                 $cells = array();
-                $cells[] = '<span class="label">'.get_string("matchesanswer", "lesson")." $i</span>: ";
+                $cells[] = '<label>' . get_string('matchesanswer', 'lesson') . " {$i}</label>: \n";
                 $cells[] = format_text($answer->response, $answer->responseformat, $options);
                 $table->data[] = new html_table_row($cells);
             }
@@ -433,14 +445,16 @@ class lesson_page_type_matching extends lesson_page {
                 if ($useranswer != null) {
                     $userresponse = explode(",", $useranswer->useranswer);
                     $data .= '<label class="accesshide" for="stu_answer_response_' . $n . '">' . get_string('matchesanswer', 'lesson') . '</label>';
-                    $data .= "<select id=\"stu_answer_response_" . $n . "\" disabled=\"disabled\"><option selected=\"selected\">";
+                    $data .= "<select class=\"custom-select\" id=\"stu_answer_response_" . $n . "\" " .
+                             "disabled=\"disabled\"><option selected=\"selected\">";
                     if (array_key_exists($i, $userresponse)) {
                         $data .= $userresponse[$i];
                     }
                     $data .= "</option></select>";
                 } else {
                     $data .= '<label class="accesshide" for="answer_response_' . $n . '">' . get_string('matchesanswer', 'lesson') . '</label>';
-                    $data .= "<select id=\"answer_response_" . $n . "\" disabled=\"disabled\"><option selected=\"selected\">".strip_tags(format_string($answer->response))."</option></select>";
+                    $data .= "<select class=\"custom-select\" id=\"answer_response_" . $n . "\" " .
+                             "disabled=\"disabled\"><option selected=\"selected\">".strip_tags(format_string($answer->response))."</option></select>";
                 }
 
                 if ($n == 2) {

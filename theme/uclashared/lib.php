@@ -22,13 +22,58 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Callback to add head elements.
+ *
+ * @return str valid html head content
+ */
+function theme_uclashared_before_standard_html_head() {
+    // Add link to Google Font for Lato.
+    return '<link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,900" rel="stylesheet" type="text/css">';
+}
+
+/**
+ * Pulls random image for homepage background.
+ *
+ * @return array    Image URL and caption.
+ */
+function theme_uclashared_frontpageimage() {
+    global $CFG, $OUTPUT;
+    $retval = array();
+    $imagedir = $CFG->dirroot . '/theme/uclashared/pix/frontpageimages';
+    $files = glob($imagedir . '/*.*');
+    $file = array_rand($files);
+    $filename = basename($files[$file]);
+
+    // Get caption.
+    $retval['credits'] = explode(".", $filename)[0];
+
+    // Get image url.
+    $retval['image'] = $CFG->wwwroot . '/theme/uclashared/pix/frontpageimages/' . $filename;
+
+    return $retval;
+}
+
+/**
+ * Adds or overrides icon mapping for fontawesome icons.
+ *
+ * @return array
+ */
+function theme_uclashared_get_fontawesome_icon_map() {
+     return [
+         'core:e/styleprops' => 'fa-paragraph',
+         'core:e/text_highlight_picker' => 'fa-tint',
+         'core:e/text_highlight' => 'fa-tint',
+     ];
+ }
+
 /**
  * Called before theme outputs anything.
  *
  * @param moodle_page $page
  */
 function theme_uclashared_page_init(moodle_page $page) {
-    global $USER;
     $context = $page->context;
     $url = $page->url;
     // Need to check for redirect layout or else we will end up in an infinite
@@ -45,27 +90,4 @@ function theme_uclashared_page_init(moodle_page $page) {
         // Try to auto-login if not logged in.
         local_ucla_autologin::detect();
     }
-}
-
-/**
- * Pulls random image for homepage background
- * and saves it to session cache.
- *
- * @return $image.
- */
-function theme_uclashared_frontpageimage() {
-        global $CFG;
-        $frontpageimagecache = cache::make('theme_uclashared', 'frontpageimage');
-
-    if (!($frontpageimagecache->get('image'))) {
-            $imagedir = $CFG->dirroot . "/theme/uclashared/pix/frontpageimages";
-            $files = glob($imagedir . '/*.*');
-            $file = array_rand($files);
-            $filename = basename($files[$file]);
-            $image = $imagedir . "/" . $filename;
-            $frontpageimagecache->set('image', $image);
-    } else {
-        $image = $frontpageimagecache->get('image');
-    }
-        return $image;
 }

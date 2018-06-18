@@ -30,7 +30,7 @@ require_once($CFG->libdir . '/licenselib.php');
  * Initializes all $PAGE variables.
  */
 function init_copyright_page($course, $courseid, $context) {
-    global $PAGE;
+    global $OUTPUT, $PAGE;
     $PAGE->set_url('/blocks/ucla_copyright_status/view.php',
         array('courseid' => $courseid));
 
@@ -42,8 +42,13 @@ function init_copyright_page($course, $courseid, $context) {
 
     $PAGE->set_heading($course->fullname);
 
-    $PAGE->set_pagelayout('course');
-    $PAGE->set_pagetype('course-view-' . $course->format);
+    $PAGE->set_pagelayout('base');
+
+    // Set editing button.
+    $PAGE->set_other_editing_capability('moodle/course:manageactivities');
+    $gobackurl = new moodle_url('/course/view.php', array('id' => $courseid));
+    $buttons = $OUTPUT->edit_button($gobackurl);
+    $PAGE->set_button($buttons);
 }
 
 /*
@@ -451,9 +456,25 @@ function block_ucla_copyright_status_ucla_format_notices($course, $courseinfo) {
     // Now we can display the alert.
     $alert_form = new copyright_alert_form(new moodle_url('/blocks/ucla_copyright_status/alert.php',
             array('id' => $course->id)), $a, 'post', '',
-            array('class' => 'ucla-format-notice-box'));
+            array('class' => 'alert alert-info'));
 
     $alert_form->display();    
     return true;
 }
 
+/**
+ * Adds manage copyright link to admin panel.
+ *
+ * @param navigation_node $navigation The navigation node to extend.
+ * @param stdClass        $course     The course object for the tool.
+ * @param context         $context    The context of the course.
+ */
+function block_ucla_copyright_status_extend_navigation_course($navigation, $course, $context) {
+    if (has_capability('moodle/course:manageactivities', $context)) {
+        $setting = navigation_node::create(get_string('managecopyright', 'block_ucla_copyright_status'),
+                new moodle_url('/blocks/ucla_copyright_status/view.php', array('courseid' => $course->id)),
+                navigation_node::TYPE_SETTING, null, 'managecopyright');
+
+        $navigation->add_node($setting);
+    }
+};

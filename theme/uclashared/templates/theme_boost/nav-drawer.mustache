@@ -1,0 +1,44 @@
+{{!
+    @template theme_boost/nav-drawer
+
+
+    Example context (json): {}
+}}
+<div id="nav-drawer" data-region="drawer" class="hidden-print moodle-has-zindex {{^navdraweropen}}closed{{/navdraweropen}}" aria-hidden="{{#navdraweropen}}false{{/navdraweropen}}{{^navdraweropen}}true{{/navdraweropen}}" tabindex="-1">
+    {{#incourse}}
+        {{#editingon}}
+            {{! Bootstrap is 12 columns so to have 3 columns of even width set
+                them to 4 columns each. }}
+            <div id="nav-drawer-quicklinks" class="row text-center">
+                <div class="col-md-4">
+                    <a href="{{modifysections.link}}">
+                        <i class="fa {{modifysections.icon}} fa-3" aria-hidden="true"></i>
+                        {{modifysections.text}}
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{{rearrangematerials.link}}">
+                        <i class="fa {{rearrangematerials.icon}} fa-3" aria-hidden="true"></i>
+                        {{rearrangematerials.text}}
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{{managecopyright.link}}">
+                        <i class="fa {{managecopyright.icon}} fa-3" aria-hidden="true"></i>
+                        {{managecopyright.text}}
+                    </a>
+                </div>
+            </div>
+        {{/editingon}}
+    {{/incourse}}
+    {{^incourse}}
+        <nav class="list-group">
+            <div class="list-group-item p-x-1">
+                {{{search}}}
+                <div class="m-t-1"></div>
+                {{{browseby}}}
+            </div>
+        </nav>
+    {{/incourse}}
+    {{> theme_boost/flat_navigation }}
+</div>

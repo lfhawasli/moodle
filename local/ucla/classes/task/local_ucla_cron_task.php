@@ -37,7 +37,7 @@ class local_ucla_cron_task extends \core\task\scheduled_task {
     /**
      * Executes the task.
      *
-     * @throws Exception on error
+     * @throws \Exception on error
      */
     public function execute() {
         global $CFG;
@@ -66,7 +66,7 @@ class local_ucla_cron_task extends \core\task\scheduled_task {
 
             if (!$result) {
                 // Retry task with exception.
-                throw new Exception("Error: $cn returned false.  Will retry local_ucla_cron_task.");
+                throw new \Exception("Error: $cn returned false.  Will retry local_ucla_cron_task.");
             }
         }
     }

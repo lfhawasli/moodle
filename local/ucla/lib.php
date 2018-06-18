@@ -1243,51 +1243,6 @@ function has_role_in_context($shortname, context $context) {
 }
 
 /**
- * Sets the editing button in the $PAGE element to be the url passed in.
- *
- * Code copied from fragments of code in course/view.php to set the "Turn
- * editing on/off" button.
- *
- * @param moodle_url $url   Expecting moodle_url object. If null, then defaults
- *                          redirecting user to $PAGE->url.
- */
-function set_editing_mode_button($url=null) {
-    global $OUTPUT, $PAGE, $USER;
-
-    if (empty($url)) {
-        $url = $PAGE->url;
-    }
-
-    // See if user is trying to turn editing on/off
-    // copied from course/view.php:line 12, 104-128, 153-155, 205-206
-    // (at the time of Moodle 2.2.2).
-    $edit = optional_param('edit', -1, PARAM_BOOL);
-    if (!isset($USER->editing)) {
-        $USER->editing = 0;
-    }
-    if ($PAGE->user_allowed_editing()) {
-        if (($edit == 1) and confirm_sesskey()) {
-            $USER->editing = 1;
-            // Edited to use url specified in function.
-            redirect($url);
-        } else if (($edit == 0) and confirm_sesskey()) {
-            $USER->editing = 0;
-            if (!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
-                $USER->activitycopy       = false;
-                $USER->activitycopycourse = null;
-            }
-            // Edited to use url specified in function.
-            redirect($url);
-        }
-        // Edited to use url specified in function.
-        $buttons = $OUTPUT->edit_button($url);
-        $PAGE->set_button($buttons);
-    } else {
-        $USER->editing = 0;
-    }
-}
-
-/**
  * Gets the FriendlyURL version of a course link.
  *
  * @param object $course
@@ -1888,4 +1843,27 @@ function ucla_get_user_enrolled_course($courseid, $userid) {
             array('userid' => $userid, 'term' => $term));
 
     return $enrolledcourses;
+}
+
+/**
+ * Modify Moodle's global navigation by leveraging Moodle's
+ * *_extend_navigation() hook.
+ *
+ * Neat trick learned from: https://moodle.org/plugins/local_boostnavigation
+ *
+ * The hook only works for local plugins as well as modules and reports.
+ *
+ * @param global_navigation $navigation
+ */
+function local_ucla_extend_navigation(global_navigation $navigation) {
+    global $COURSE;
+    // Make sure we are using UCLA theme.
+    if (local_ucla_core_edit::using_ucla_theme()) {
+        // If in course, make sure we are using UCLA format.
+        if ($COURSE->id !== SITEID && $COURSE->format !== 'ucla') {
+            return;
+        }
+        $modify = new theme_uclashared\modify_navigation();
+        $modify->run($navigation);
+    }
 }

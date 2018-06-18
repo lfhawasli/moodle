@@ -47,11 +47,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 methodname: 'tool_lp_search_cohorts',
                 args: {
                     query: query,
-                    context: { contextid: contextid },
+                    context: {contextid: contextid},
                     includes: includes
                 }
             }]);
-
             promise[0].then(function(results) {
                 var promises = [],
                     i = 0;
@@ -69,9 +68,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                         i++;
                     });
                     success(results.cohorts);
+                    return;
                 });
 
-            }, failure);
+            }).catch(failure);
         }
 
     };

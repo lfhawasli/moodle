@@ -206,24 +206,12 @@ class local_publicprivate_renderer extends core_course_renderer {
 
         $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
         $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
-        if (empty($availabilityhtml)) {
+        if ($ppstate == 'public' || empty($availabilityhtml)) {
             $classes .= ' hide';
         }
         $availabilitypopup = html_writer::span($link, $classes, array(
             'data-availabilityconditions' => $availabilityhtml,
             'data-ppstate' => $ppstate
-        ));
-
-        // Create hidden label.
-        $hiddenstatus = true;
-        $hiddenlabellink = html_writer::span(get_string('hidden', 'local_ucla'));
-        $hiddenlabelclasses = 'groupinglabel hiddenlabel'; // CSS classes for hidden label.
-        if($mod->uservisible && $mod->visible){
-            $hiddenlabelclasses .= ' hide'; // Hide the label if the course is not hidden.
-            $hiddenstatus = false;
-        }
-        $hiddenlabel = html_writer::span($hiddenlabellink, $hiddenlabelclasses, array(
-            'data-hiddenstatus' => $hiddenstatus
         ));
 
         if (!empty($cmname)) {
@@ -237,7 +225,6 @@ class local_publicprivate_renderer extends core_course_renderer {
 
             // CCLE-5989
             $output .= $availabilitypopup;
-            $output .= $hiddenlabel;
 
             // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
             $output .= html_writer::end_tag('div'); // .activityinstance
@@ -255,7 +242,6 @@ class local_publicprivate_renderer extends core_course_renderer {
             $output .= $contentpart;
             // CCLE-5989
             $output .= $availabilitypopup;
-            $output .= $hiddenlabel;
         }
 
         $modicons = '';

@@ -133,9 +133,6 @@ $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
 $CFG->cachejs = false;
 
-// Newly created courses for ucla formats should only have the course menu block.
-$CFG->defaultblocks_ucla = 'ucla_course_menu';
-
 // Enable conditional activities.
 $CFG->enableavailability = true;
 $CFG->enablecompletion = true;  // Needs to be enabled so that completion
@@ -190,6 +187,8 @@ $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 2147483648;  // 2GB
 // CCLE-2903 - Don't set completion tracking to be course default
 $CFG->forced_plugin_settings['moodlecourse']['enablecompletion'] = 0;
+// CCLE-7325 - Disable "Course end date enabled by default"
+$CFG->forced_plugin_settings['moodlecourse']['courseenddateenabled'] = 0;
 
 // Site administration > Courses > Course request
 $CFG->enablecourserequests = 1;
@@ -201,6 +200,7 @@ $CFG->enablecourserequests = 1;
 
 // Site administration > Grades > General settings
 $CFG->recovergradesdefault = 1;
+$CFG->gradepointmax = 300;
 
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;
@@ -283,11 +283,6 @@ $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['quiet_mode'] = 1;
 
-// Site administration > Plugins > Blocks > UCLA bruinmedia
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['quiet_mode'] = 1;
-
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'https://webservices.library.ucla.edu/reserves';
 
@@ -327,6 +322,9 @@ $CFG->forced_plugin_settings['filter_mathjaxloader']['mathjaxconfig'] = '
         skipStartupTypeset: true,
         messageStyle: "none"
     });';
+
+// Site administration > Plugins > Filters > Tabs
+$CFG->forced_plugin_settings['filter_tabs']['enablebootstrap'] = 2; // Bootstrap 4 tabs.
 
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files

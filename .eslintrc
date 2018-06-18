@@ -1,4 +1,7 @@
 {
+  'plugins': [
+    'promise',
+  ],
   'env': {
     'browser': true,
     'amd': true
@@ -13,6 +16,7 @@
 
     // === Possible Errors ===
     'comma-dangle': 'off',
+    'no-compare-neg-zero': 'error',
     'no-cond-assign': 'error',
     'no-console': 'error',
     'no-constant-condition': 'error',
@@ -31,7 +35,6 @@
     'no-inner-declarations': 'error',
     'no-invalid-regexp': 'error',
     'no-irregular-whitespace': 'error',
-    'no-negated-in-lhs': 'error',
     'no-obj-calls': 'error',
     'no-prototype-builtins': 'off',
     'no-regex-spaces': 'error',
@@ -39,6 +42,7 @@
     'no-unexpected-multiline': 'error',
     'no-unreachable': 'warn',
     'no-unsafe-finally': 'error',
+    'no-unsafe-negation': 'error',
     'use-isnan': 'error',
     'valid-jsdoc': ['warn', { 'requireReturn': false, 'requireParamDescription': false, 'requireReturnDescription': false }],
     'valid-typeof': 'error',
@@ -63,7 +67,7 @@
     'no-extra-bind': 'warn',
     'no-fallthrough': 'error',
     'no-floating-decimal': 'warn',
-    // Enabled by grunt for AMD modules: 'no-implicit-globals': 'error',
+    'no-global-assign': 'warn',
     'no-implied-eval': 'error',
     'no-invalid-this': 'error',
     'no-iterator': 'error',
@@ -71,7 +75,6 @@
     'no-loop-func': 'error',
     'no-multi-spaces': 'warn',
     'no-multi-str': 'error',
-    'no-native-reassign': 'warn',
     'no-new-func': 'error',
     'no-new-wrappers': 'error',
     'no-octal': 'error',
@@ -103,11 +106,13 @@
     'block-spacing': 'warn',
     'brace-style': ['warn', '1tbs'],
     'camelcase': 'warn',
+    'capitalized-comments': ['warn', 'always', { 'ignoreConsecutiveComments': true }],
     'comma-spacing': ['warn', { 'before': false, 'after': true }],
     'comma-style': ['warn', 'last'],
     'computed-property-spacing': 'error',
     'consistent-this': 'off',
     'eol-last': 'off',
+    'func-call-spacing': ['warn', 'never'],
     'func-names': 'off',
     'func-style': 'off',
     // indent currently not doing well with our wrapping style, so disabled.
@@ -140,7 +145,7 @@
     'no-nested-ternary': 'warn',
     'no-new-object': 'off',
     'no-plusplus': 'off',
-    'no-spaced-func': 'warn',
+    'no-tabs': 'error',
     'no-ternary': 'off',
     'no-trailing-spaces': 'error',
     'no-underscore-dangle': 'off',
@@ -168,5 +173,42 @@
     'spaced-comment': 'warn',
     'unicode-bom': 'error',
     'wrap-regex': 'off',
-  }
+
+    // === Promises ===
+    'promise/always-return': 'warn',
+    'promise/no-return-wrap': 'warn',
+    'promise/param-names': 'warn',
+    'promise/catch-or-return': ['warn', {terminationMethod: ['catch', 'fail']}],
+    'promise/no-native': 'warn',
+    'promise/no-promise-in-callback': 'warn',
+    'promise/no-callback-in-promise': 'warn',
+    'promise/avoid-new': 'warn',
+
+    // === Deprecations ===
+    "no-restricted-properties": ['warn', {
+        'object': 'M',
+        'property': 'str',
+        'message': 'Use AMD module "core/str" or M.util.get_string()'
+    }],
+
+  },
+  overrides: [
+    {
+      files: ["**/yui/src/**/*.js"],
+      // Disable some rules which we can't safely define for YUI rollups.
+      rules: {
+        'no-undef': 'off',
+        'no-unused-vars': 'off',
+        'no-unused-expressions': 'off'
+      }
+    },
+    {
+      files: ["**/amd/src/*.js"],
+      // Check AMD with some slightly stricter rules.
+      rules: {
+        'no-unused-vars': 'error',
+        'no-implicit-globals': 'error'
+      }
+    }
+  ]
 }

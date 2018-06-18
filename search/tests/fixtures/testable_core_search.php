@@ -80,10 +80,10 @@ class testable_core_search extends \core_search\manager {
      * Adds an enabled search component to the search areas list.
      *
      * @param string $areaid
-     * @param \core_search\area\base $searcharea
+     * @param \core_search\base $searcharea
      * @return void
      */
-    public function add_search_area($areaid, \core_search\area\base $searcharea) {
+    public function add_search_area($areaid, \core_search\base $searcharea) {
        self::$enabledsearchareas[$areaid] = $searcharea;
        self::$allsearchareas[$areaid] = $searcharea;
     }
@@ -106,5 +106,16 @@ class testable_core_search extends \core_search\manager {
      */
     public static function is_search_area($classname) {
         return parent::is_search_area($classname);
+    }
+
+    /**
+     * Fakes the current time for PHPunit. Turns off faking time if called with default parameter.
+     *
+     * Note: This should be replaced with core functionality once possible (see MDL-60644).
+     *
+     * @param float $faketime Current time
+     */
+    public static function fake_current_time($faketime = 0.0) {
+        static::$phpunitfaketime = $faketime;
     }
 }

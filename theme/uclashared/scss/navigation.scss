@@ -1,0 +1,170 @@
+/**
+ * File for navigation styles.
+ */
+
+/* stylelint-disable declaration-no-important */
+/* stylelint-disable max-line-length */
+
+// Hide following navigation nodes via CSS because it is added after
+// local_ucla_extend_navigation is called.
+[data-key="coursehome"], [data-key="myhome"], [data-key="home"] {
+    display: none;
+}
+
+/* Collapse nodes feature.
+   This feature is currently only possible for the mycourses, the coursesections and the activities node which are directly
+   supported by this plugin as well as the custom nodes which can be added with this plugin.
+   In a future version of this plugin, this might be done in a more general and lighter way. */
+/* Show all second-level nav drawer items which have the attribute not hidden. */
+.list-group-item[data-key="themeuclasharedactivities"][data-isexpandable="1"] ~ .list-group-item[data-parent-key="themeuclasharedactivities"][data-hidden="0"],
+.list-group-item[data-key="themeuclasharedmore"][data-isexpandable="1"] ~ .list-group-item[data-parent-key="themeuclasharedmore"][data-hidden="0"],
+.list-group-item[data-key="themeuclasharedswitchrole"][data-isexpandable="1"] ~ .list-group-item[data-parent-key="themeuclasharedswitchrole"][data-hidden="0"] {
+    display: block;
+}
+/* Hide all second-level nav drawer items which have the attribute hidden. */
+.list-group-item[data-key="themeuclasharedactivities"][data-isexpandable="1"] ~ .list-group-item[data-parent-key="themeuclasharedactivities"][data-hidden="1"],
+.list-group-item[data-key="themeuclasharedmore"][data-isexpandable="1"] ~ .list-group-item[data-parent-key="themeuclasharedmore"][data-hidden="1"],
+.list-group-item[data-key="themeuclasharedswitchrole"][data-isexpandable="1"] ~ .list-group-item[data-parent-key="themeuclasharedswitchrole"][data-hidden="1"] {
+    display: none;
+}
+/* Add the icon for the expanded node state. */
+.jsenabled .list-group-item[data-key="themeuclasharedactivities"][data-isexpandable="1"][data-collapse="0"] > div::after,
+.jsenabled .list-group-item[data-key="themeuclasharedmore"][data-isexpandable="1"][data-collapse="0"] > div::after,
+.jsenabled .list-group-item[data-key="themeuclasharedswitchrole"][data-isexpandable="1"][data-collapse="0"] > div::after {
+    content: url([[pix:i/dropdown]]);
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}
+/* Add the icon for the collapsed node state. */
+.jsenabled .list-group-item[data-key="themeuclasharedactivities"][data-isexpandable="1"][data-collapse="1"] > div::after,
+.jsenabled .list-group-item[data-key="themeuclasharedmore"][data-isexpandable="1"][data-collapse="1"] > div::after,
+.jsenabled .list-group-item[data-key="themeuclasharedswitchrole"][data-isexpandable="1"][data-collapse="1"] > div::after {
+    content: url([[pix:t/collapsed]]);
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}
+/* Make sure that the icon does not overlap with the node text. */
+.jsenabled .list-group-item[data-key="themeuclasharedactivities"][data-isexpandable="1"] > div,
+.jsenabled .list-group-item[data-key="themeuclasharedmore"][data-isexpandable="1"] > div,
+.jsenabled .list-group-item[data-key="themeuclasharedswitchrole"][data-isexpandable="1"] > div {
+    padding-right: 1rem;
+}
+/* Set the cursor for the collapsible nodes. */
+.jsenabled .list-group-item[data-key="themeuclasharedactivities"][data-isexpandable="1"],
+.jsenabled .list-group-item[data-key="themeuclasharedmore"][data-isexpandable="1"],
+.jsenabled .list-group-item[data-key="themeuclasharedswitchrole"][data-isexpandable="1"] {
+    cursor: pointer;
+}
+
+/* Style quick links section. */
+#nav-drawer-quicklinks {
+    .col-md-4 {
+        text-align: center;
+        padding-bottom: 0.5em;
+        .fa {
+            color: $btn-color-editing;
+            display: block;
+            font-size: larger;
+        }
+    }
+    a, a:active, a:visited {
+        color: inherit;
+        text-decoration: none;
+    }
+    a:hover {
+        color: darken($btn-color-editing, 10%);
+    }
+}
+
+/* Style the turn editing on/off button */
+.header-editing-button {
+    .btn {
+        color: white;
+        background-color: $btn-color-editing;
+        border-color: $btn-color-editing;
+        position: relative;
+        padding: 0.5rem 0.5rem 0.5rem 2rem;
+        margin-bottom: 0.75rem;
+    }
+    .btn:hover {
+        color: white;
+        background-color: darken($btn-color-editing, 10%);
+        border-color: darken($btn-color-editing, 10%);
+    }
+    /* Style for adding the pencil button */
+    .btn:before {
+        font-family: FontAwesome;
+        left: -0.5rem;
+        margin-left: 1rem;
+        position: absolute;
+    }
+}
+
+/* Style to choose which icon to show for the editing button */
+.editing .header-editing-button .singlebutton .btn:before {
+    content: "\f00c";
+}
+.header-editing-button .singlebutton .btn:before {
+    content: "\f040";
+}
+
+.header-admin-panel-button {
+    background-color: $ccle-color-logo;
+    border-color: $ccle-color-logo;
+    color: black;
+    padding: 0.5rem;
+    margin-left: 0.75rem;
+    display: inline-block;
+    -webkit-transition-property: background-color, color;
+    transition-property: background-color, color;
+    -webkit-transition-duration: 0.25s;
+    transition-duration: 0.25s;
+    -webkit-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+
+    &:hover {
+        background-color: lighten($ccle-color-logo, 10%);
+        border-color: lighten($ccle-color-logo, 10%);
+        text-decoration: none;
+    }
+}
+
+/* Used by Browseby and Mysites */
+.registrar-link {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#nav-drawer {
+    top: 40px;
+    height: calc(100% - 40px);
+    padding: $small-spacer;
+    
+    nav {
+        &.m-t-1 {
+            margin-top: $small-spacer !important;
+        }
+    }
+}
+
+/* Navigation drawer colors */
+[data-region="drawer"] {
+    background-color: $body-bg;
+}
+
+.list-group-item[data-isactive='1'] {
+    background: $gray-lighter;
+}
+
+/* Color styles for TA site navigation drawer */
+.list-group-item.tasite {
+    &[data-isactive='0'] {
+        background-color: $ta-site-color;
+    }
+    &:hover {
+        background-color: $ta-site-hover-color;
+    }
+}

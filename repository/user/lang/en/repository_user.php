@@ -29,3 +29,4 @@ $string['emptyfilelist'] = 'There are no files to show';
 $string['configplugin'] = 'Configuration for user private files repository';
 $string['pluginname'] = 'Private files';
 $string['user:view'] = 'View user private files';
+$string['privacy:metadata'] = 'The Private files repository plugin does not store or transmit any personal data.';

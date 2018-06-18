@@ -753,11 +753,11 @@ abstract class ucla_syllabus {
         // Displays correct icon if file is of PDF or DOC/DOCX type
         // Displays the default icon if file is of any other type.
         if ($filetype == 'pdf') {
-            $iconurl = $output->pix_url('f/pdf-24');
+            $iconurl = $output->image_url('f/pdf-24');
         } else if ($filetype == 'doc' || $filetype == 'docx') {
-            $iconurl = $output->pix_url('f/document-24');
+            $iconurl = $output->image_url('f/document-24');
         } else {
-            $iconurl = $output->pix_url('icon', 'resource');
+            $iconurl = $output->image_url('icon', 'resource');
         }
 
         $string = html_writer::empty_tag('img', array('src' => $iconurl,

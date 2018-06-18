@@ -40,7 +40,7 @@ $string['cliinstallheader'] = 'Moodle {$a} komando-lerro bidezko instalaziorako 
 $string['databasehost'] = 'Datu-basearen ostalaria';
 $string['databasename'] = 'Datu-basearen izena';
 $string['databasetypehead'] = 'Aukeratu datu-base kontrolatzailea';
-$string['dataroot'] = 'Datuen karpeta';
+$string['dataroot'] = 'Datu-direktorioa';
 $string['datarootpermission'] = 'Datu-direktorioen baimena';
 $string['dbprefix'] = 'Taulen aurrizkia';
 $string['dirroot'] = 'Moodle direktorioa';
@@ -85,11 +85,11 @@ $string['pathsunsecuredataroot'] = 'Dataroot-en kokapena ez da segurua';
 $string['pathswrongadmindir'] = 'Admin direktorioa ez da existitzen';
 $string['phpextension'] = '{$a} PHP luzapena';
 $string['phpversion'] = 'PHP bertsioa';
-$string['phpversionhelp'] = '<p>Moodle-k gutxienez PHP 5.4.4 bertsioa behar du (7.x bertsioak muga batzuk ditu). </p>
+$string['phpversionhelp'] = '<p>Moodle-k PHP 5.6.5 edo 7.1 bertsioetako bat behar du (7.0.x bertsioek muga batzuk dituzte). </p>
 <p>Zure bertsioa: {$a}</p>
-<p>PHP eguneratu edo PHP bertsio berriagoa duen zerbitzari batera jo</p>';
+<p>PHP eguneratu edo PHP bertsio berriagoa duen zerbitzari batera jo.</p>';
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';
-$string['welcomep20'] = 'Orri hau ikusten baduzu <strong>{$a->packname} {$a->packversion}</strong> paketea zure ordenagailuan arrakastaz instalatu ahal izan duzu. Zorionak!';
+$string['welcomep20'] = 'Orri hau ikusten baduzu <strong>{$a->packname} {$a->packversion}</strong> paketea zure ordenagailuan instalatu ahal izan duzu. Zorionak!';
 $string['welcomep30'] = '<strong>{$a->installername}</strong>ren bertsio honek <strong>Moodle</strong>k
     zure ordenadorean funtzionatzeko behar diren aplikazioak dauzka,
     bereziki:';

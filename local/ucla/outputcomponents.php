@@ -48,7 +48,9 @@ class ucla_html_writer extends html_writer {
                 $attr['class'] .= ' ';
             }
 
-            $attr['class'] .= 'external-link';
+            // Add external link icon after text.
+            $text .= ' <i class="fa fa-external-link" aria-hidden="true"></i>';
+            
             $attr['title'] = get_string('external-link', 'local_ucla');
             $attr['target'] = '_blank';
         }

@@ -303,14 +303,10 @@ $string['eventsyncenrolmentsfinished'] = 'Enrol sync finished';
 
 // CCLE-5989 - Activity availability conditions popup.
 $string['availabilityconditions'] = 'Access restrictions';
-$string['hidden'] = 'Hidden';
 
 // SSC-2050 - Include associated courses in subject header of forum emails.
 $string['limitcrosslistemailname'] = 'Cross Listed Course Limit';
 $string['limitcrosslistemaildesc'] = 'Limit of short course names appearing on email subject.';
-
-// CCLE-6369 - Improve user experience when viewing activity they don't have access to.
-$string['contactinstructors'] = 'Please contact your instructor or TA if you have any questions.';
 
 // CCLE-6760 - Rename Miscellaneous to Site Activity.
 $string['siteactivity'] = 'Site activity';

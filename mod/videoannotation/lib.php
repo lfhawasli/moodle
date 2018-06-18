@@ -29,7 +29,9 @@
  *     actions across all modules.
  */
 
-require_once('locallib.php');
+defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->dirroot . '/mod/videoannotation/locallib.php');
 
 define('VIDEOANNOTATION_GROUPMODE_USER_USER', 3);
 define('VIDEOANNOTATION_GROUPMODE_GROUP_USER', 2);

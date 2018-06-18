@@ -42,15 +42,15 @@ class quiz_last_responses_table extends quiz_attempts_report_table {
      * @param context $context
      * @param string $qmsubselect
      * @param quiz_responses_options $options
-     * @param array $groupstudents
-     * @param array $students
+     * @param \core\dml\sql_join $groupstudentsjoins
+     * @param \core\dml\sql_join $studentsjoins
      * @param array $questions
      * @param moodle_url $reporturl
      */
     public function __construct($quiz, $context, $qmsubselect, quiz_responses_options $options,
-            $groupstudents, $students, $questions, $reporturl) {
+            \core\dml\sql_join $groupstudentsjoins, \core\dml\sql_join $studentsjoins, $questions, $reporturl) {
         parent::__construct('mod-quiz-report-responses-report', $quiz, $context,
-                $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
+                $qmsubselect, $options, $groupstudentsjoins, $studentsjoins, $questions, $reporturl);
     }
 
     public function build_table() {
@@ -90,7 +90,7 @@ class quiz_last_responses_table extends quiz_attempts_report_table {
             $summary = trim($value);
         }
 
-        if ($this->is_downloading() && $this->is_downloading() != 'xhtml') {
+        if ($this->is_downloading() && $this->is_downloading() != 'html') {
             return $summary;
         }
         $summary = s($summary);

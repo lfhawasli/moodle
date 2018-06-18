@@ -19,6 +19,16 @@ abstract class AbstractReader implements ReaderInterface
     /** @var \Box\Spout\Common\Helper\GlobalFunctionsHelper Helper to work with global functions */
     protected $globalFunctionsHelper;
 
+    /** @var \Box\Spout\Reader\Common\ReaderOptions Reader's customized options */
+    protected $options;
+
+    /**
+     * Returns the reader's current options
+     *
+     * @return \Box\Spout\Reader\Common\ReaderOptions
+     */
+    abstract protected function getOptions();
+
     /**
      * Returns whether stream wrappers are supported
      *
@@ -39,7 +49,7 @@ abstract class AbstractReader implements ReaderInterface
      *
      * @return \Iterator To iterate over sheets
      */
-    abstract public function getConcreteSheetIterator();
+    abstract protected function getConcreteSheetIterator();
 
     /**
      * Closes the reader. To be used after reading the file.
@@ -49,12 +59,38 @@ abstract class AbstractReader implements ReaderInterface
     abstract protected function closeReader();
 
     /**
-     * @param $globalFunctionsHelper
+     * @param \Box\Spout\Common\Helper\GlobalFunctionsHelper $globalFunctionsHelper
      * @return AbstractReader
      */
     public function setGlobalFunctionsHelper($globalFunctionsHelper)
     {
         $this->globalFunctionsHelper = $globalFunctionsHelper;
+        return $this;
+    }
+
+    /**
+     * Sets whether date/time values should be returned as PHP objects or be formatted as strings.
+     *
+     * @api
+     * @param bool $shouldFormatDates
+     * @return AbstractReader
+     */
+    public function setShouldFormatDates($shouldFormatDates)
+    {
+        $this->getOptions()->setShouldFormatDates($shouldFormatDates);
+        return $this;
+    }
+
+    /**
+     * Sets whether empty rows should be returned or skipped.
+     *
+     * @api
+     * @param bool $shouldPreserveEmptyRows
+     * @return AbstractReader
+     */
+    public function setShouldPreserveEmptyRows($shouldPreserveEmptyRows)
+    {
+        $this->getOptions()->setShouldPreserveEmptyRows($shouldPreserveEmptyRows);
         return $this;
     }
 

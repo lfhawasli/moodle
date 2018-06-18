@@ -23,7 +23,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require(__DIR__.'/../../config.php');
 require_once($CFG->dirroot.'/mod/forum/lib.php');
 require_once($CFG->dirroot.'/rating/lib.php');
 require_once($CFG->dirroot.'/user/lib.php');
@@ -135,8 +135,7 @@ if (empty($result->posts)) {
     // In either case we need to decide whether we can show personal information
     // about the requested user to the current user so we will execute some checks
 
-    // TODO - Remove extra cap check once MDL-59172 is resolved.
-    $canviewuser = user_can_view_profile($user, null, $usercontext) || has_capability('moodle/user:viewalldetails', $usercontext);
+    $canviewuser = user_can_view_profile($user, null, $usercontext);
 
     // Prepare the page title
     $pagetitle = get_string('noposts', 'mod_forum');

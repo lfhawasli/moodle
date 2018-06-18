@@ -34,15 +34,6 @@ function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Moodle v2.8.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v2.9.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Moodle v3.0.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2016021600) {
 
         // Define table assignfeedback_editpdf_queue to be created.
@@ -68,7 +59,10 @@ function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2016052301) {
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017022700) {
 
         // Get orphaned, duplicate files and delete them.
         $fs = get_file_storage();
@@ -81,8 +75,14 @@ function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
         }
 
         // Editpdf savepoint reached.
-        upgrade_plugin_savepoint(true, 2016052301, 'assignfeedback', 'editpdf');
+        upgrade_plugin_savepoint(true, 2017022700, 'assignfeedback', 'editpdf');
     }
+
+    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.4.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 }

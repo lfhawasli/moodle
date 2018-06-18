@@ -115,7 +115,7 @@ define(['jquery',
             children = this._tree.getChildren(this._competency.id),
             context,
             config = {
-                base: { points: 2 },
+                base: {points: 2},
                 competencies: []
             };
 
@@ -126,6 +126,7 @@ define(['jquery',
             try {
                 config = JSON.parse(self._competency.ruleconfig);
             } catch (e) {
+                // eslint-disable-line no-empty
             }
         }
 
@@ -165,6 +166,7 @@ define(['jquery',
             // We're done, let's trigger a change.
             self._templateLoaded = true;
             self._triggerChange();
+            return;
         });
     };
 

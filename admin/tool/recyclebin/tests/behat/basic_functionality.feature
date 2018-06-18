@@ -9,6 +9,7 @@ Feature: Basic recycle bin functionality
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher@asd.com |
       | student1 | Student | 1 | student@asd.com |
+      | student2 | Student | 2 | student2@asd.com |
     And the following "courses" exist:
       | fullname | shortname |
       | Course 1 | C1 |
@@ -16,6 +17,23 @@ Feature: Basic recycle bin functionality
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
+      | teacher1 | C2 | editingteacher |
+      | student1 | C2 | student |
+      | student2 | C2 | student |
+    And the following "groups" exist:
+      | name | course | idnumber |
+      | Group A | C2 | G1 |
+      | Group B | C2 | G2 |
+      | Group C | C2 | G3 |
+    And the following "group members" exist:
+      | user | group |
+      | teacher1 | G1 |
+      | teacher1 | G2 |
+      | student1 | G1 |
+      | student2 | G1 |
+      | student2 | G2 |
     And the following config values are set as admin:
       | coursebinenable | 1 | tool_recyclebin |
       | categorybinenable | 1 | tool_recyclebin |
@@ -25,20 +43,18 @@ Feature: Basic recycle bin functionality
 
   Scenario: Restore a deleted assignment
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assign |
       | Description | Test |
     And I delete "Test assign" activity
-    When I follow "Recycle bin"
+    When I navigate to "Recycle bin" node in "Course administration"
     Then I should see "Test assign"
     And I should see "Contents will be permanently deleted after 7 days"
-    And I follow "Restore"
+    And I click on "Restore" "link" in the "region-main" "region"
     And I should see "'Test assign' has been restored"
     And I wait to be redirected
-    And I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Test assign" in the "Topic 1" "section"
 
   Scenario: Restore a deleted course
@@ -49,27 +65,34 @@ Feature: Basic recycle bin functionality
     And I should see "Deleting C2"
     And I should see "C2 has been completely deleted"
     And I press "Continue"
-    And I go to the courses management page
-    And I should not see "Course 2" in the "#course-listing" "css_element"
-    When I follow "Recycle bin"
+    And I am on course index
+    And I should see "Course 1"
+    And I should not see "Course 2"
+    When I navigate to "Recycle bin" in current page administration
     Then I should see "Course 2"
     And I should see "Contents will be permanently deleted after 14 days"
-    And I follow "Restore"
+    And I click on "Restore" "link" in the "region-main" "region"
     And I should see "'Course 2' has been restored"
     And I wait to be redirected
     And I go to the courses management page
     And I should see "Course 2" in the "#course-listing" "css_element"
+    And I am on "Course 2" course homepage
+    And I navigate to "Groups" node in "Course administration > Users"
+    And I follow "Overview"
+    And "Student 1" "text" should exist in the "Group A" "table_row"
+    And "Student 2" "text" should exist in the "Group A" "table_row"
+    And "Student 2" "text" should exist in the "Group B" "table_row"
 
   @javascript
   Scenario: Deleting a single item from the recycle bin
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assign |
       | Description | Test |
     And I delete "Test assign" activity
-    And I follow "Recycle bin"
+    And I run all adhoc tasks
+    And I navigate to "Recycle bin" node in "Course administration"
     When I click on "Delete" "link"
     Then I should see "Are you sure you want to delete the selected item from the recycle bin?"
     And I press "Cancel"
@@ -82,8 +105,7 @@ Feature: Basic recycle bin functionality
   @javascript
   Scenario: Deleting all the items from the recycle bin
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name | Test assign 1 |
       | Description | Test 1 |
@@ -92,7 +114,8 @@ Feature: Basic recycle bin functionality
       | Description | Test 2 |
     And I delete "Test assign 1" activity
     And I delete "Test assign 2" activity
-    And I follow "Recycle bin"
+    And I run all adhoc tasks
+    And I navigate to "Recycle bin" node in "Course administration"
     And I should see "Test assign 1"
     And I should see "Test assign 2"
     When I click on "Delete all" "link"

@@ -29,8 +29,8 @@ M.block_ucla_modify_coursemenu.catchHidden = function(section_id) {
  **/
 M.block_ucla_modify_coursemenu.make_dnd_table = function() {
     $('#' + M.block_ucla_modify_coursemenu.table_id).tableDnD({
-        dragHandle: M.block_ucla_modify_coursemenu.drag_handle,
-        onDragClass: "always-row-dragging",
+        dragHandle: "." + M.block_ucla_modify_coursemenu.drag_handle,
+        onDragClass: ".always-row-dragging",
         onDragStart: function (table, cell) {
             // Handle special colors.
             var tabrow = $(cell).parent();
@@ -438,7 +438,7 @@ M.block_ucla_modify_coursemenu.start = function() {
     }
 
     // Initialize logic.
-    bumc.make_dnd_table(thetableid);
+    bumc.make_dnd_table();
 
     // Initialize "Landing Page by Dates".
     bumc.initialize_landing_page_by_dates();
@@ -478,11 +478,11 @@ M.block_ucla_modify_coursemenu.start = function() {
             ).join());
 
         // Maybe use a more useful algorithm?
-        $('#' + mbumc.sectionsorder_id).val(
+        /*$('#' + mbumc.sectionsorder_id).val(
             $('#' + mbumc.table_id + ' tbody').attr(
                     'id', mbumc.sectionsorder_id
                 ).tableDnDSerialize()
-        );
+        );*/
 
         $('#' + mbumc.landingpage_id).val(
                 mbumc.parse_sectionid($('[name=landingpageradios]:checked'), 2)
@@ -529,7 +529,7 @@ M.block_ucla_modify_coursemenu.start = function() {
                 return 1;
             }
 
-            M.block_ucla_modify_coursemenu.savedata;
+           /* M.block_ucla_modify_coursemenu.savedata;
             var newdata = $('#' + M.block_ucla_modify_coursemenu.table_id + ' tbody').tableDnDSerialize();
             var savesplit = M.block_ucla_modify_coursemenu.savedata.split("&");
             var newsplit = newdata.split("&");
@@ -544,7 +544,7 @@ M.block_ucla_modify_coursemenu.start = function() {
                 if (savestr !== newstr) {
                     return 1;
                 }
-            }
+            }*/
 
             // If a field has been focused and changed, but still has focus then the browser won't fire the
             // onChange event. We check for this eventuality here.

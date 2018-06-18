@@ -57,7 +57,6 @@ $string['selectinstructorletter'] = "Please select a letter to view instructors.
 
 // Instructors -> courses.
 $string['coursesbyinstr'] = 'Courses taught by {$a}';
-$string['coursesinsubjarea'] = 'Courses in {$a}';
 
 // Collaborations.
 $string['collab_notfound'] = 'No collaboration sites found.';

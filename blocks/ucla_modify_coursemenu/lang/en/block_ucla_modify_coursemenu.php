@@ -24,10 +24,6 @@
 
 $string['pluginname'] = 'Modify sections';
 
-// Control panel hook text display.
-$string['modify_course_sections'] = 'Modify site menu sections';
-$string['modify_course_sections_post'] = '';
-
 $string['addnewsection'] = 'Add new section';
 $string['deletingcontents'] = 'Delete content';
 
@@ -53,15 +49,6 @@ $string['successmodify'] = 'Your change has been applied.';
 $string['failuremodify'] = 'There was an error writing records to the database. Your modifications were not saved.';
 $string['modifymore'] = 'Modify more sections';
 
-// Alert for section mismatch.
-$string['alertnumsections'] = 'Below are sections that are not being displayed:' .
-        '<blockquote>{$a}</blockquote>If you would like to display the missing ' .
-        'sections, click on the button below to increase the number of sections ' .
-        'available for display.';
-$string['successnumsections'] = 'Successfully increased the number of sections for the course.';
-$string['failurenumsections'] = 'There was a problem in adjusting the number of sections for the course. Please contact system administrator.';
-$string['buttonnumsections'] = 'Increase number of sections';
-
 // Modify course menu event log handler.
 $string['coursemenu_modified'] = 'Modified site menu';
 
@@ -78,3 +65,6 @@ $string['enablelandingpagebydates'] = 'Enable landing page by dates.';
 // Cache string for "Landing Page by Dates".
 $string['cachedef_landingpagebydatesdb'] = 'Cache to store revision times of Landing Page by Dates database data.';
 $string['cachedef_landingpagebydatesdisplay'] = 'Cache to store revision times of Landing Page by Dates display data.';
+
+// Admin panel strings.
+$string['modifysections'] = 'Modify site sections';

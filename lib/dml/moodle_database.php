@@ -124,6 +124,9 @@ abstract class moodle_database {
     /** @var cache_application for column info */
     protected $metacache;
 
+    /** @var cache_request for column info on temp tables */
+    protected $metacachetemp;
+
     /** @var bool flag marking database instance as disposed */
     protected $disposed;
 
@@ -332,13 +335,14 @@ abstract class moodle_database {
     /**
      * Handle the creation and caching of the databasemeta information for all databases.
      *
-     * TODO MDL-53267 impelement caching of cache::make() results when it's safe to do so.
-     *
      * @return cache_application The databasemeta cachestore to complete operations on.
      */
     protected function get_metacache() {
-        $properties = array('dbfamily' => $this->get_dbfamily(), 'settings' => $this->get_settings_hash());
-        return cache::make('core', 'databasemeta', $properties);
+        if (!isset($this->metacache)) {
+            $properties = array('dbfamily' => $this->get_dbfamily(), 'settings' => $this->get_settings_hash());
+            $this->metacache = cache::make('core', 'databasemeta', $properties);
+        }
+        return $this->metacache;
     }
 
     /**
@@ -347,9 +351,12 @@ abstract class moodle_database {
      * @return cache_application The temp_tables cachestore to complete operations on.
      */
     protected function get_temp_tables_cache() {
-        // Using connection data to prevent collisions when using the same temp table name with different db connections.
-        $properties = array('dbfamily' => $this->get_dbfamily(), 'settings' => $this->get_settings_hash());
-        return cache::make('core', 'temp_tables', $properties);
+        if (!isset($this->metacachetemp)) {
+            // Using connection data to prevent collisions when using the same temp table name with different db connections.
+            $properties = array('dbfamily' => $this->get_dbfamily(), 'settings' => $this->get_settings_hash());
+            $this->metacachetemp = cache::make('core', 'temp_tables', $properties);
+        }
+        return $this->metacachetemp;
     }
 
     /**
@@ -587,19 +594,29 @@ abstract class moodle_database {
             return;
         }
         if (CLI_SCRIPT) {
-            echo "--------------------------------\n";
-            echo $sql."\n";
+            $separator = "--------------------------------\n";
+            echo $separator;
+            echo "{$sql}\n";
             if (!is_null($params)) {
-                echo "[".var_export($params, true)."]\n";
+                echo "[" . var_export($params, true) . "]\n";
             }
-            echo "--------------------------------\n";
+            echo $separator;
+        } else if (AJAX_SCRIPT) {
+            $separator = "--------------------------------";
+            error_log($separator);
+            error_log($sql);
+            if (!is_null($params)) {
+                error_log("[" . var_export($params, true) . "]");
+            }
+            error_log($separator);
         } else {
-            echo "<hr />\n";
-            echo s($sql)."\n";
+            $separator = "<hr />\n";
+            echo $separator;
+            echo s($sql) . "\n";
             if (!is_null($params)) {
-                echo "[".s(var_export($params, true))."]\n";
+                echo "[" . s(var_export($params, true)) . "]\n";
             }
-            echo "<hr />\n";
+            echo $separator;
         }
     }
 
@@ -616,6 +633,9 @@ abstract class moodle_database {
         if (CLI_SCRIPT) {
             echo $message;
             echo "--------------------------------\n";
+        } else if (AJAX_SCRIPT) {
+            error_log($message);
+            error_log("--------------------------------");
         } else {
             echo s($message);
             echo "<hr />\n";
@@ -2075,6 +2095,33 @@ abstract class moodle_database {
     }
 
     /**
+     * Returns an equal (=) or not equal (<>) part of a query.
+     *
+     * Note the use of this method may lead to slower queries (full scans) so
+     * use it only when needed and against already reduced data sets.
+     *
+     * @since Moodle 3.2
+     *
+     * @param string $fieldname Usually the name of the table column.
+     * @param string $param Usually the bound query parameter (?, :named).
+     * @param bool $casesensitive Use case sensitive search when set to true (default).
+     * @param bool $accentsensitive Use accent sensitive search when set to true (default). (not all databases support accent insensitive)
+     * @param bool $notequal True means not equal (<>)
+     * @return string The SQL code fragment.
+     */
+    public function sql_equal($fieldname, $param, $casesensitive = true, $accentsensitive = true, $notequal = false) {
+        // Note that, by default, it's assumed that the correct sql equal operations are
+        // case sensitive. Only databases not observing this behavior must override the method.
+        // Also, accent sensitiveness only will be handled by databases supporting it.
+        $equalop = $notequal ? '<>' : '=';
+        if ($casesensitive) {
+            return "$fieldname $equalop $param";
+        } else {
+            return "LOWER($fieldname) $equalop LOWER($param)";
+        }
+    }
+
+    /**
      * Returns 'LIKE' part of a query.
      *
      * @param string $fieldname Usually the name of the table column.
@@ -2294,10 +2341,12 @@ abstract class moodle_database {
     /**
      * Returns the driver specific syntax (SQL part) for matching regex positively or negatively (inverted matching).
      * Eg: 'REGEXP':'NOT REGEXP' or '~*' : '!~*'
+     *
      * @param bool $positivematch
+     * @param bool $casesensitive
      * @return string or empty if not supported
      */
-    public function sql_regex($positivematch=true) {
+    public function sql_regex($positivematch = true, $casesensitive = false) {
         return '';
     }
 
@@ -2351,22 +2400,27 @@ abstract class moodle_database {
         // NOTE: override this methods if following standard compliant SQL
         //       does not work for your driver.
 
-        $columnname = $column->name;
+        // Enclose the column name by the proper quotes if it's a reserved word.
+        $columnname = $this->get_manager()->generator->getEncQuoted($column->name);
+
+        $searchsql = $this->sql_like($columnname, '?');
+        $searchparam = '%'.$this->sql_like_escape($search).'%';
+
         $sql = "UPDATE {".$table."}
                        SET $columnname = REPLACE($columnname, ?, ?)
-                     WHERE $columnname IS NOT NULL";
+                     WHERE $searchsql";
 
         if ($column->meta_type === 'X') {
-            $this->execute($sql, array($search, $replace));
+            $this->execute($sql, array($search, $replace, $searchparam));
 
         } else if ($column->meta_type === 'C') {
             if (core_text::strlen($search) < core_text::strlen($replace)) {
                 $colsize = $column->max_length;
                 $sql = "UPDATE {".$table."}
                        SET $columnname = " . $this->sql_substr("REPLACE(" . $columnname . ", ?, ?)", 1, $colsize) . "
-                     WHERE $columnname IS NOT NULL";
+                     WHERE $searchsql";
             }
-            $this->execute($sql, array($search, $replace));
+            $this->execute($sql, array($search, $replace, $searchparam));
         }
     }
 

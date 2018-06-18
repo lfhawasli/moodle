@@ -36,7 +36,10 @@ defined('MOODLE_INTERNAL') || die;
 function report_log_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('report/log:view', $context)) {
         $url = new moodle_url('/report/log/index.php', array('id'=>$course->id));
-        $navigation->add(get_string('pluginname', 'report_log'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+        // START UCLA MOD: CCLE-7411 - Rearrange links in Admin admin_panel
+        //$navigation->add(get_string('pluginname', 'report_log'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+        $navigation->add(get_string('pluginname', 'report_log'), $url, navigation_node::TYPE_SETTING, null, 'report_log', new pix_icon('i/report', ''));
+        // END UCLA MOD: CCLE-7411
     }
 }
 
@@ -107,10 +110,10 @@ function report_log_can_access_user_report($user, $course) {
     $today = false;
     $all = false;
 
-    if (has_capability('report/log:view', $coursecontext)) {
+    if (has_capability('report/log:viewtoday', $coursecontext)) {
         $today = true;
     }
-    if (has_capability('report/log:viewtoday', $coursecontext)) {
+    if (has_capability('report/log:view', $coursecontext)) {
         $all = true;
     }
 

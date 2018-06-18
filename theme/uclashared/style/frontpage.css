@@ -1,0 +1,298 @@
+/* Global Stuff */
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  transform: skewX(-5deg);
+}
+
+/* The background image */
+.bg-img {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: right;
+}
+@media (max-width: 992px) {
+  .bg-img {
+    background-position: center;
+  }
+}
+
+.subcontainer {
+  position: relative;
+}
+
+/* Concerned with top logo, login/need help, buttons */
+#header {
+  position: absolute;
+  display: inline-block;
+  right: 0;
+  height: 100px;
+  z-index: 1000;
+}
+#header #header-logo {
+  display: none;
+  background-position: center;
+  height: 70px;
+  width: 100%;
+  margin-left: 0;
+}
+#header-logo {
+  position: relative;
+  margin: 5px 0 5px 20px;
+  width: 400px;
+  height: 80px;
+  float: left;
+  background-image: url("../pix/ucla-ccle-logo-01.png");
+  background-position: left;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+#login-wrapper {
+  float: right;
+  margin-top: 30px;
+}
+.btn-header {
+  border-width: 0;
+  border-radius: 0px;
+  padding: 10px 5%;
+  margin-top: -5px;
+}
+#btn-login {
+  color: black;
+  background-color: #ffbc00;
+}
+#btn-login:hover {
+    background-color: #ffc933;
+}
+#btn-login-status {
+  color: #fff;
+  background-color: rgba(44,94,145,0.9);
+}
+@media (max-width: 992px) {
+  #header {
+    background-color: rgba(44,94,145,0.8);
+    height: 70px;
+    position: static;
+    display: block;
+  }
+  #login-wrapper {
+    float: none;
+    margin: 0 auto;
+    width: 95%;
+    padding: 0;
+  }
+  #header #header-logo {
+    display: block;
+  }
+}
+@media (max-width: 480px) {
+  .header-login, .header-login .header-btn-group {
+    float: none;
+    margin: 0;
+  }
+  .btn-header {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+/* Concerned with the sidebar, which is the CCLE alerts wrapper */
+#sidebar {
+  min-height: 100vh;
+  background-image: url("../pix/blue-backdrop.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: left;
+  width: 700px;
+  position: static;
+  float: left;
+}
+#sidebar #header-logo {
+    display: block;
+}
+@media (max-width: 992px) {
+  #sidebar {
+    background-image: url("../pix/blue-backdrop-rotated.png");
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    margin-top: 20px;
+  }
+  #sidebar #header-logo {
+    display: none;
+  }
+}
+/* Concerned with the sidebar block container */
+#sidebar-card-container {
+  width: 58%;
+  margin: 65px 30px;
+  min-height: 85vh;
+  margin-bottom: 0;
+}
+#sidebar-card-container::-webkit-scrollbar {
+  width: 0;
+}
+.sidebar h1, h2, h3, h4, h5, h6, p {
+  transform: skewX(0deg);
+}
+@media (max-width: 992px) {
+  #sidebar-card-container {
+    width: 95%;
+    margin: 0 auto;
+    min-height: 70vh;
+  }
+}
+@media (max-width: 480px) {
+  #sidebar-card-container {
+    margin-top: 100px;
+  }
+}
+
+/* Concerned with the sidebar site directory block */
+.frontpage-site-directory h5, .sitetopic {
+  display: none;
+}
+#frontpage-browseby-btns-wrapper {
+  margin-top: 10px;
+  text-align: center;
+}
+#frontpage-browseby-btns-wrapper a {
+  display: inline;
+  border: 0;
+  font-size: 11px;
+  margin-top: 30px;
+  background-color: rgb(44,94,145);
+  color: #fff;
+}
+#frontpage-browseby-btns-wrapper a:hover {
+  background-color: rgb(220,220,220);
+  color: black;
+}
+#frontpage-search-wrapper .search-options {
+  background-color: rgb(245,245,245);
+  margin-top: 10px;
+  border: 0;
+  font-size: 12px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+#frontpage-search-wrapper .ucla-search-input:focus {
+  background-color: rgba(44,94,145,0.7);
+  color: #fff;
+}
+#frontpage-search-wrapper .ucla-search-input {
+  border-width: 0;
+  background-color: rgba(44,94,145,0.3);
+  color: #fff;
+}
+#frontpage-search-wrapper .ucla-search-input::placeholder {
+  color: #fff;
+}
+#frontpage-search-wrapper .search-wrapper .fa-search {
+  color: #fff;
+}
+/* YUI3 CSS necessary for styling the real time search results in Site Directory's search functionality */
+.yui3-aclist-item {
+  background-color: #fff;
+}
+.yui3-aclist-item-hover {
+  background-color: #bfdaff;
+}
+
+/* Concerned with the styling of individual cards AKA blocks */
+.sidebar-card, .frontpage-alert-wrapper > div {
+  margin-bottom: 15px;
+  width: 100%;
+  border-left-width: 5px;
+  border-left-color: #ddd;
+  border-left-style: solid;
+  padding: 15px 20px;
+  background-color: white;
+  box-shadow: 3px 5px 5px rgba(0,0,0,0.23);
+}
+.frontpage-alert-wrapper .header-title, .frontpage-alert-wrapper .box-section-title {
+  font-size: 20px;
+  font-weight: bolder;
+}
+.frontpage-alert-wrapper .box-title {
+  font-size: 15px;
+  font-weight: bold;
+}
+.frontpage-alert-wrapper .box-text {
+  font-size: 13px;
+}
+#site-directory-text {
+  text-align: center;
+  margin-bottom: 10px;
+}
+@media (max-width: 480px) {
+  #frontpage-browseby-btns-wrapper a {
+    margin-top: 7px;
+    display: block;
+  }
+}
+@media (max-width: 992px) {
+  #frontpage-browseby-btns-wrapper a, #frontpage-search-wrapper .search-options {
+    font-size: 1.0em;
+  }
+}
+
+/* Concerned with the Greeting section that displays week and quarter */
+#main-area {
+  height: 100vh;
+}
+
+#greeting-wrapper {
+  position: absolute;
+  left: 50vw;
+  top: calc(100vh / 3);
+}
+
+#greeting-week {
+  padding: 10px 30px;
+  text-align: center;
+  background-color: rgba(44,94,145,0.9);
+}
+
+#greeting-quarter {
+  padding: 7px 18px;
+  margin-top: 10px;
+  margin-left: 30px;
+  display: inline-block;
+  text-align: left;
+  background-color: rgba(255,172,6,0.9);
+  background: linear-gradient(to right, rgba(255,172,6,0.9), rgba(253,187,44,0.9));
+}
+
+#greeting-header-text {
+  font-size: 6vw;
+  color: white;
+}
+
+#greeting-subtext {
+  font-size: 2vw;
+}
+
+@media (max-width: 992px) {
+  #greeting-wrapper {
+    display: none;
+  }
+}
+
+/* Concerned with image credits */
+#image-credits {
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+  color: rgba(255,255,255,.65);
+}
+#image-credits:hover {
+  color: #eee;
+}
+
+@media (max-width: 992px) {
+  #image-credits {
+    display: none;
+  }
+}

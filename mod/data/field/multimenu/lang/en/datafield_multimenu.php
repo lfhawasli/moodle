@@ -25,3 +25,5 @@
  */
 
 $string['pluginname'] = 'Multimenu';
+$string['fieldtypelabel'] = 'Multiple-selection menu field';
+$string['privacy:metadata'] = 'The Multiple-selection menu field component does not store any personal data, it uses tables defined in mod_data.';

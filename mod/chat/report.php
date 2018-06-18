@@ -222,6 +222,8 @@ $completesessions  = 0;
 
 $messagesleft = count($messages);
 
+echo '<div class="list-group">';
+
 foreach ($messages as $message) {  // We are walking BACKWARDS through the messages.
 
     $messagesleft --;              // Countdown.
@@ -233,7 +235,7 @@ foreach ($messages as $message) {  // We are walking BACKWARDS through the messa
         $sessionend = $message->timestamp;
     }
     if ((($lasttime - $message->timestamp) < $sessiongap) and $messagesleft) {  // Same session.
-        if ($message->userid and !$message->system) {       // Remember user and count messages.
+        if ($message->userid and !$message->issystem) {     // Remember user and count messages.
             if (empty($sessionusers[$message->userid])) {
                 $sessionusers[$message->userid] = 1;
             } else {
@@ -246,7 +248,8 @@ foreach ($messages as $message) {  // We are walking BACKWARDS through the messa
         $iscomplete = ($sessionend - $sessionstart > 60 and count($sessionusers) > 1);
         if ($showall or $iscomplete) {
 
-            echo '<p align="center">'.userdate($sessionstart).' --> '. userdate($sessionend).'</p>';
+            echo '<div class="list-group-item">';
+            echo '<p>'.userdate($sessionstart).' --> '. userdate($sessionend).'</p>';
 
             echo $OUTPUT->box_start();
 
@@ -283,6 +286,7 @@ foreach ($messages as $message) {  // We are walking BACKWARDS through the messa
             }
             echo '</p>';
             echo $OUTPUT->box_end();
+            echo '</div>';
         }
         if ($iscomplete) {
             $completesessions++;
@@ -294,6 +298,7 @@ foreach ($messages as $message) {  // We are walking BACKWARDS through the messa
     }
     $lasttime = $message->timestamp;
 }
+echo '</div>';
 
 if (!empty($CFG->enableportfolios) && $canexportsess) {
     require_once($CFG->libdir . '/portfoliolib.php');

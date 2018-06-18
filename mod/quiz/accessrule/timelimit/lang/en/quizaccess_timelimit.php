@@ -54,4 +54,5 @@ $string['confirmstartsafenolimit'] = '<i class="fa fa-arrow-right" aria-hidden="
  Are you sure that you wish to start now?';
 // END UCLA MOD CCLE-6042 AND CCLE-5699 Fixed Quiz Confirmation.
 $string['pluginname'] = 'Time limit quiz access rule';
+$string['privacy:metadata'] = 'The Time limit quiz access rule plugin does not store any personal data.';
 $string['quiztimelimit'] = 'Time limit: {$a}';

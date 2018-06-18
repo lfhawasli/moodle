@@ -64,10 +64,6 @@ class collab_handler extends browseby_handler {
     public function handle($args) {
         global $CFG, $PAGE;
 
-        // Load search.
-        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init',
-                array(array('name' => 'course-search')));
-
         $navbar =& $PAGE->navbar;
 
         $collablibfile = $CFG->dirroot . '/' . $CFG->admin
@@ -79,7 +75,6 @@ class collab_handler extends browseby_handler {
         $s = '';
 
         if (file_exists($collablibfile)) {
-
             require_once($collablibfile);
 
             $s .= block_ucla_search::search_form('collab-search');
@@ -160,9 +155,9 @@ class collab_handler extends browseby_handler {
                     }
 
                     $context = context_course::instance($course->id);
-
-                    $viewroles = $this->get_role_users($roleids, $context,
-                        false, 'u.id, u.firstname, u.lastname, r.shortname');
+                    $allnames = get_all_user_name_fields(true, 'u');
+                    $viewroles = get_role_users($roleids, $context,
+                        false, 'ra.id, r.shortname,u.id,' . $allnames);
 
                     $courseroles = array();
                     foreach ($viewroles as $viewrole) {
@@ -339,19 +334,6 @@ class collab_handler extends browseby_handler {
         }
 
         return false;
-    }
-
-    /**
-     *  Some more decoupled functions...
-     *
-     * @param array $roles
-     * @param string $context
-     * @param string $parent
-     * @param array $fields
-     **/
-    protected function get_role_users($roles, $context, $parent=false,
-                                      $fields='') {
-        return get_role_users($roles, $context, $parent, $fields);
     }
 
     /**

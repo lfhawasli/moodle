@@ -8,10 +8,10 @@
 }
 
 #sections-table thead .header {
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#FFB300, endColorstr=#FDDF96); /* for IE */
-    background-image: -webkit-linear-gradient(top, rgba(254,187,54,0.7), rgba(253,223,150,0.7)); /* for webkit browsers */
-    background-image: -moz-linear-gradient(top, rgba(254,187,54,0.7), rgba(253,223,150,0.7)); /* for firefox 3.6+ */
-    background-image: -o-linear-gradient(top, rgba(254,187,54,0.7), rgba(253,223,150,0.7)); /* for opera */
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ffb300, endColorstr=#fddf96); /* for IE */
+    background-image: -webkit-linear-gradient(top, rgba(254, 187, 54, 0.7), rgba(253, 223, 150, 0.7)); /* for webkit browsers */
+    background-image: -moz-linear-gradient(top, rgba(254, 187, 54, 0.7), rgba(253, 223, 150, 0.7)); /* for firefox 3.6+ */
+    background-image: -o-linear-gradient(top, rgba(254, 187, 54, 0.7), rgba(253, 223, 150, 0.7)); /* for opera */
     font-size: larger;
     border: 0;
     padding-top: 3px;
@@ -36,7 +36,7 @@
 }
 
 #sections-table tr {
-    border-bottom: solid 1px #EEE;
+    border-bottom: solid 1px #eee;
 }
 
 #sections-table tr.hidden-section {
@@ -44,25 +44,25 @@
 }
 
 #sections-table tr.new-section {
-    background-color: #FEE98A;
+    background-color: #fee98a;
 }
 
 #sections-table tr.new-section-dragging {
-    background-color: #FEDE91;
+    background-color: #fede91;
 }
 
 /** This one must come AFTER hidden-section **/
 #sections-table tr.delete-section td {
-    background-color: #FFA6A6;
+    background-color: #ffa6a6;
 }
 
 #sections-table tr.delete-section-dragging {
-    background-color: #FF6161;
+    background-color: #ff6161;
 }
 
 /** This one should come last **/
 #sections-table tr.regular-row-dragging {
-    background-color: #F5F5F5;
+    background-color: #f5f5f5;
 }
 
 #sections-table tr td img.hidden-handle {

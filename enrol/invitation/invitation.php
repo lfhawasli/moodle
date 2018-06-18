@@ -45,7 +45,7 @@ if (!has_capability('enrol/invitation:enrol', $context)) {
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/enrol/invitation/invitation.php',
         array('courseid' => $courseid)));
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('base');
 $PAGE->set_course($course);
 $pagetitle = get_string('inviteusers', 'enrol_invitation');
 $PAGE->set_heading($pagetitle);

@@ -30,10 +30,6 @@ CVS
 phpunit.xml
 # Composer support. Do not ignore composer.json, or composer.lock. These should be shipped by us.
 composer.phar
-# START UCLA MOD: CCLE-5855 - Merge Moodle 3.1
-# Since we are adding components to composer.json, we need to compile our own.
-composer.lock
-# END UCLA MOD: CCLE-5855
 /vendor/
 /behat.yml
 */yui/build/*/*-coverage.js
@@ -42,3 +38,5 @@ composer.lock
 /lib/yuilib/*/*/*-coverage.js
 atlassian-ide-plugin.xml
 /node_modules/
+# UCLA Modifications.
+*.css.map

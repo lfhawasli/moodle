@@ -24,19 +24,29 @@ Feature: Users can flag tags and manager can reset flags
       | moodle/user:viewdetails      | Allow      |
     And I log out
     And I log in as "user2"
-    And I navigate to "Participants" node in "Site pages"
+    And I press "Customise this page"
+    # TODO MDL-57120 site "Tags" link not accessible without navigation block.
+    And I add the "Navigation" block if not present
+    And I navigate to "Tags" node in "Site pages"
+    And I follow "Nicetag"
     And I follow "User 1"
     And I follow "Badtag"
     And I follow "Flag as inappropriate"
     And I should see "The person responsible will be notified"
-    And I navigate to "Participants" node in "Site pages"
+    And I am on homepage
+    And I navigate to "Tags" node in "Site pages"
+    And I follow "Nicetag"
     And I follow "User 1"
     And I follow "Sweartag"
     And I follow "Flag as inappropriate"
     And I should see "The person responsible will be notified"
     And I log out
     And I log in as "user3"
-    And I navigate to "Participants" node in "Site pages"
+    And I press "Customise this page"
+    # TODO MDL-57120 site "Tags" link not accessible without navigation block.
+    And I add the "Navigation" block if not present
+    And I navigate to "Tags" node in "Site pages"
+    And I follow "Nicetag"
     And I follow "User 1"
     And I follow "Sweartag"
     And I follow "Flag as inappropriate"

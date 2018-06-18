@@ -78,9 +78,9 @@ $string['pathsunsecuredataroot'] = 'Dataroot plassering er ikke sikker';
 $string['pathswrongadmindir'] = 'Adminkatalog finnes ikke';
 $string['phpextension'] = '{$a} PHP-tillegg';
 $string['phpversion'] = 'PHP versjon';
-$string['phpversionhelp'] = '<p>Moodle trenger en PHP versjon minst 4.3.0 eller 5.1.0 (5.0.x har rekke kjente problem).</p>
+$string['phpversionhelp'] = '<p>Moodle trenger en PHP versjon minst 5.6.5 eller 7.1.0 (7.0.x har noen begrensninger).</p>
 <Du kjører nå versjon {$a}</p>
-<p>Du må oppgradere PHP eller flytte til en server med en nyere versjon av PHP!<br /> (I forhold til 5.0.x kan du også nedgradere til versjon 4.4.x)</p>';
+<p>Du må oppgradere PHP eller flytte til en server med en nyere versjon av PHP!</p>';
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';
 $string['welcomep20'] = 'Du ser denne siden fordi du nå har fullført installeringen og kjøringen av pakken <strong>{$a->packname} {$a->packversion}</strong> på datamaskinen din. Gratulerer!';
 $string['welcomep30'] = 'Denne versjonen av <strong>{$a->installername}</strong> inneholder programmer for å lage et miljø som <strong>Moodle</strong> jobber i, nemlig:';

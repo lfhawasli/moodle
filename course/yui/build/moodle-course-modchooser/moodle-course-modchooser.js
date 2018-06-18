@@ -7,11 +7,11 @@ YUI.add('moodle-course-modchooser', function (Y, NAME) {
  */
 
 var CSS = {
-    PAGECONTENT : 'body',
+    PAGECONTENT: 'body',
     SECTION: null,
-    SECTIONMODCHOOSER : 'span.section-modchooser-link',
-    SITEMENU : 'div.block_site_main_menu',
-    SITETOPIC : 'div.sitetopic'
+    SECTIONMODCHOOSER: 'span.section-modchooser-link',
+    SITEMENU: '.block_site_main_menu',
+    SITETOPIC: 'div.sitetopic'
 };
 
 var MODCHOOSERNAME = 'course-modchooser';
@@ -36,52 +36,14 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @type Number
      * @default null
      */
-    sectionid : null,
-
-    // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-    /**
-     * The user preferences for pinned tools.
-     *
-     * @property userpinnedtools
-     * @private
-     * @type array
-     * @default empty array
-     */
-    userpinnedtools : [],
-    // END UCLA MOD: CCLE-6379
-
-    // START UCLA MOD: CCLE-6398 - Have top modules be configurable
-    /**
-     * Default top tools.
-     *
-     * @property defaulttools
-     * @private
-     * @type string
-     * @default empty string
-     */
-    defaulttools : '',
-    // END UCLA MOD: CCLE-6398
-
-    // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
-    /**
-     * Config for whether or not to use new modchooser
-     *
-     * @property newmodchooser
-     * @private
-     * @type int
-     * @default 0
-     */
-    newmodchooser : 0,
-    // END UCLA MOD: CCLE-6385
+    sectionid: null,
 
     /**
      * Set up the activity chooser.
      *
      * @method initializer
      */
-    // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-    initializer : function(config) {
-    // END UCLA MOD: CCLE-6379
+    initializer: function() {
         var sectionclass = M.course.format.get_sectionwrapperclass();
         if (sectionclass) {
             CSS.SECTION = '.' + sectionclass;
@@ -94,30 +56,6 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         // Initialize existing sections and register for dynamically created sections
         this.setup_for_section();
         M.course.coursebase.register_module(this);
-
-        // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-        // Save preferences for pinned tools
-        if (config.userpinnedtools) {
-            this.userpinnedtools = config.userpinnedtools.split(",");
-        }
-        // END UCLA MOD: CCLE-6379
-
-        // START UCLA MOD: CCLE-6398 - Have top modules be configurable
-        // Save default tools
-        if (config.defaulttools) {
-            this.defaulttools = config.defaulttools;
-        }
-        // END UCLA MOD: CCLE-6398
-
-        // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
-        // Save default tools
-        if (config.newmodchooser) {
-            this.newmodchooser = config.newmodchooser;
-        }
-        // END UCLA MOD: CCLE-6385
-
-        // Catch the page toggle
-        Y.all('.block_settings #settingsnav .type_course .modchoosertoggle a').on('click', this.toggle_mod_chooser, this);
     },
 
     /**
@@ -127,7 +65,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @method setup_for_section
      * @param baseselector The selector to limit scope to
      */
-    setup_for_section : function(baseselector) {
+    setup_for_section: function(baseselector) {
         if (!baseselector) {
             baseselector = CSS.PAGECONTENT;
         }
@@ -158,17 +96,12 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @private
      * @param baseselector The selector to limit scope to
      */
-    _setup_for_section : function(section) {
-        var chooserspan = section.one(CSS.SECTIONMODCHOOSER);
+    _setup_for_section: function(section) {
+        var chooserspan = section.all(CSS.SECTIONMODCHOOSER);
         if (!chooserspan) {
             return;
         }
-        var chooserlink = Y.Node.create("<a href='#' />");
-        chooserspan.get('children').each(function(node) {
-            chooserlink.appendChild(node);
-        });
-        chooserspan.insertBefore(chooserlink);
-        chooserlink.on('click', this.display_mod_chooser, this);
+        chooserspan.on('click', this.display_mod_chooser, this);
     },
     /**
      * Display the module chooser
@@ -176,7 +109,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @method display_mod_chooser
      * @param {EventFacade} e Triggering Event
      */
-    display_mod_chooser : function (e) {
+    display_mod_chooser: function(e) {
         // Set the section for this version of the dialogue
         if (e.target.ancestor(CSS.SITETOPIC)) {
             // The site topic has a sectionid of 1
@@ -189,204 +122,6 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             this.sectionid = 0;
         }
         this.display_chooser(e);
-
-        // START UCLA MOD: CCLE-6385 - Ability to display new activity chosoer as user preference option
-        if (this.newmodchooser) {
-            // START UCLA MOD: CCLE-6378 - Show only top tools / CCLE-6380 - Combine activity/resource listing
-
-            // Toggle between top activities or all activities.
-            var thisevent = this.container.delegate('click', function(e) {
-                // Show/hide unpinned tools.
-                this.container.all(".tool:not(.pinned)").each(function(tool) {
-                    tool.toggleView();
-                });
-
-                // Show/hide favorite stars. Only display links when in view all mode.
-                this.container.all("i").each(function(link) {
-                    link.toggleView();
-                });
-
-                // Show/hide reset tools link. Only display when in view all mode.
-                this.container.all(".resettools").toggleView();
-
-                var showtoptools = M.util.get_string('showcategory', 'moodle', 'favorite tools');
-                var showalltools = M.util.get_string('setfavoritetools', 'moodle');
-                Y.all(".tooltoggle").each(function(tooltoggle) {
-                    // Change link text to show all activities or show top activities.
-                    if (tooltoggle.getContent() === showtoptools) {
-                        tooltoggle.setContent(showalltools);
-                    } else {
-                        tooltoggle.setContent(showtoptools);
-                    }
-                });
-                e.preventDefault();
-            }, '.tooltoggle', this);
-            this.listenevents.push(thisevent);
-            // END UCLA MOD: CCLE-6378 / CCLE-6380
-
-            // START UCLA MOD: CCLE-6379 - Add ability to pin tools
-            // Create variable for click callback functions to access.
-            var pinnedtools = this.userpinnedtools;
-
-            // Listen to pin links.
-            thisevent = this.container.delegate('click', function(e) {
-                // Stop link redirection and any further propagation.
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                // Get module details.
-                var module = this.ancestor('.tool');
-                var moduleid = this.ancestor().previous('input').getAttribute('id').split("module_")[1];
-
-                // Add module to pinned tools preference.
-                pinnedtools.push(moduleid);
-
-                // Update user preferences.
-                M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
-
-                // Add pinned class.
-                module.addClass('pinned');
-
-                // Change empty star to filled star.
-                this.removeClass('fa-star-o');
-                this.addClass('fa-star');
-                this.setStyle('color', '#f29644');
-                this.setStyle('font-size', '103%');
-                this.setAttribute('title', M.util.get_string('removetool', 'moodle'));
-            }, '.fa-star-o');
-            this.listenevents.push(thisevent);
-
-            // Listen to unpin links.
-            thisevent = this.container.delegate('click', function (e) {
-                // Stop link redirection and any further propagation.
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                // Get module details.
-                var module = this.ancestor('.pinned');
-                var moduleid = this.ancestor().previous('input').getAttribute('id').split("module_")[1];
-
-                // Remove module from pinned tools preference.
-                pinnedtools = pinnedtools.filter(function(tool) {
-                    return tool !== moduleid;
-                });
-
-                // Update user preferences.
-                M.util.set_user_preference('pinnedtools', pinnedtools.join(','));
-
-                // Remove pinned class.
-                module.removeClass('pinned');
-
-                // Change filled star to empty star.
-                this.removeClass('fa-star');
-                this.addClass('fa-star-o');
-                this.setStyle('color', '#555');
-                this.setStyle('font-size', '100%');
-                this.setAttribute('title', M.util.get_string('addtool', 'moodle'));
-            }, '.fa-star');
-            this.listenevents.push(thisevent);
-
-            // Listen to reset tools link.
-            var defaulttools = this.defaulttools;
-            thisevent = this.container.delegate('click', function (e) {
-                // Stop link redirection and any further propagation.
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                // Update user preferences to defaults.
-                M.util.set_user_preference('pinnedtools', defaulttools);
-
-                var defaultarray = defaulttools.split(',');
-                // Pin/show default tools. Unpin nondefault tools.
-                Y.all(".tool").each(function(tool) {
-                    var moduleid = tool.one('input').getAttribute('id').split("module_")[1];
-                    var link;
-                    if (defaultarray.indexOf(moduleid) !== -1) {
-                        // Pin default tool.
-                        tool.addClass('pinned');
-                        tool.show();
-
-                        // Change empty star to filled star.
-                        link = tool.one('i');
-                        link.removeClass('fa-star-o');
-                        link.addClass('fa-star');
-                        link.setStyle('color', '#f29644');
-                        link.setStyle('font-size', '103%');
-                        link.setAttribute('title', M.util.get_string('removetool', 'moodle'));
-                    } else {
-                        // Unpin nondefault tool.
-                        tool.removeClass('pinned');
-
-                        // Change filled star to empty star.
-                        link = tool.one('i');
-                        link.removeClass('fa-star');
-                        link.addClass('fa-star-o');
-                        link.setStyle('color', '#555');
-                        link.setStyle('font-size', '100%');
-                        link.setAttribute('title', M.util.get_string('addtool', 'moodle'));
-                    }
-                });
-            }, '.resettools');
-            this.listenevents.push(thisevent);
-            // END UCLA MOD: CCLE-6379
-        }
-        // END UCLA MOD: CCLE-6385
-    },
-
-    /**
-     * Toggle availability of the activity chooser.
-     *
-     * @method toggle_mod_chooser
-     * @param {EventFacade} e
-     */
-    toggle_mod_chooser : function(e) {
-        // Get the add section link
-        var modchooserlinks = Y.all('div.addresourcemodchooser');
-
-        // Get the dropdowns
-        var dropdowns = Y.all('div.addresourcedropdown');
-
-        if (modchooserlinks.size() === 0) {
-            // Continue with non-js action if there are no modchoosers to add
-            return;
-        }
-
-        // We need to update the text and link
-        var togglelink = Y.one('.block_settings #settingsnav .type_course .modchoosertoggle a');
-
-        // The actual text is in the last child
-        var toggletext = togglelink.get('lastChild');
-
-        var usemodchooser;
-        // Determine whether they're currently hidden
-        if (modchooserlinks.item(0).hasClass('visibleifjs')) {
-            // The modchooser is currently visible, hide it
-            usemodchooser = 0;
-            modchooserlinks
-                .removeClass('visibleifjs')
-                .addClass('hiddenifjs');
-            dropdowns
-                .addClass('visibleifjs')
-                .removeClass('hiddenifjs');
-            toggletext.set('data', M.util.get_string('modchooserenable', 'moodle'));
-            togglelink.set('href', togglelink.get('href').replace('off', 'on'));
-        } else {
-            // The modchooser is currently not visible, show it
-            usemodchooser = 1;
-            modchooserlinks
-                .addClass('visibleifjs')
-                .removeClass('hiddenifjs');
-            dropdowns
-                .removeClass('visibleifjs')
-                .addClass('hiddenifjs');
-            toggletext.set('data', M.util.get_string('modchooserdisable', 'moodle'));
-            togglelink.set('href', togglelink.get('href').replace('on', 'off'));
-        }
-
-        M.util.set_user_preference('usemodchooser', usemodchooser);
-
-        // Prevent the page from reloading
-        e.preventDefault();
     },
 
     /**
@@ -397,7 +132,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @param {String} thisoption The selected option value
      * @private
      */
-    option_selected : function(thisoption) {
+    option_selected: function(thisoption) {
         // Add the sectionid to the URL.
         this.hiddenRadioValue.setAttrs({
             name: 'jump',
@@ -406,8 +141,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
     }
 },
 {
-    NAME : MODCHOOSERNAME,
-    ATTRS : {
+    NAME: MODCHOOSERNAME,
+    ATTRS: {
         /**
          * The maximum height (in pixels) of the activity chooser.
          *
@@ -415,8 +150,8 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
          * @type Number
          * @default 800
          */
-        maxheight : {
-            value : 800
+        maxheight: {
+            value: 800
         }
     }
 });
@@ -424,6 +159,5 @@ M.course = M.course || {};
 M.course.init_chooser = function(config) {
     return new MODCHOOSER(config);
 };
-
 
 }, '@VERSION@', {"requires": ["moodle-core-chooserdialogue", "moodle-course-coursebase"]});

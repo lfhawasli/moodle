@@ -117,21 +117,24 @@ if (empty($searchcriteria)) {
         $searchform = $courserenderer->course_search_form($search, 'navbar');
     }
     $PAGE->set_button($searchform);
+
+    // Trigger event, courses searched.
+    $eventparams = array('context' => $PAGE->context, 'other' => array('query' => $search));
+    $event = \core\event\courses_searched::create($eventparams);
+    $event->trigger();
 }
 
 $PAGE->set_heading($site->fullname);
 
 echo $OUTPUT->header();
 // BEGIN UCLA MOD: CCLE-3948
-// Old line: echo $courserenderer->search_courses($searchcriteria);
-$ucla_search = $CFG->dirroot . '/blocks/ucla_search/block_ucla_search.php';
+//echo $courserenderer->search_courses($searchcriteria);
+$uclasearch = $CFG->dirroot . '/blocks/ucla_search/block_ucla_search.php';
 // BEGIN UCLA MOD: CCLE-6540 -  Incorrect results for course list of block
-if (file_exists($ucla_search) && empty($modulelist) && empty($blocklist)) {
+if (file_exists($uclasearch) && empty($modulelist) && empty($blocklist)) {
 // END UCLA MOD: CCLE-6540
     // Load and display the advanced search bar.
-    require_once($ucla_search);
-    $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init', 
-                        array(array('name' => 'course-search')));
+    require_once($uclasearch);
                        
     echo block_ucla_search::search_form('course-search', $searchcriteria + $searchtype);
 

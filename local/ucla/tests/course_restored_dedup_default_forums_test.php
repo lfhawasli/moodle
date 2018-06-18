@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/ucla/eventslib.php');
 
 /**
  * PHPunit testcase class.

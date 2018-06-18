@@ -110,15 +110,16 @@ define(['jquery',
      * Callback to render the region template.
      *
      * @param {Object} context The context for the template.
+     * @return {Promise}
      */
     PlanActions.prototype._renderView = function(context) {
         var self = this;
-        templates.render(self._template, context)
-            .done(function(newhtml, newjs) {
+        return templates.render(self._template, context)
+            .then(function(newhtml, newjs) {
                 $(self._region).replaceWith(newhtml);
                 templates.runTemplateJS(newjs);
-            }.bind(self))
-            .fail(notification.exception);
+                return;
+            });
     };
 
     /**
@@ -129,19 +130,26 @@ define(['jquery',
      * @return {Promise}
      */
     PlanActions.prototype._callAndRefresh = function(calls, planData) {
-        var self = this;
+        // Because this function causes a refresh, we must track the JS completion from start to finish to prevent
+        // stale reference issues in Behat.
+        var callKey = 'tool_lp/planactions:_callAndRefresh-' + Math.floor(Math.random() * Math.floor(1000));
+        M.util.js_pending(callKey);
 
+        var self = this;
         calls.push({
             methodname: self._contextMethod,
             args: self._getContextArgs(planData)
         });
 
         // Apply all the promises, and refresh when the last one is resolved.
-        return $.when.apply($.when, ajax.call(calls))
+        return $.when.apply($, ajax.call(calls))
             .then(function() {
-                self._renderView.call(self, arguments[arguments.length - 1]);
+                return self._renderView(arguments[arguments.length - 1]);
             })
-            .fail(notification.exception);
+            .fail(notification.exception)
+            .always(function() {
+                return M.util.js_complete(callKey);
+            });
     };
 
     /**
@@ -153,7 +161,7 @@ define(['jquery',
         var self = this,
             calls = [{
                 methodname: 'core_competency_delete_plan',
-                args: { id: planData.id }
+                args: {id: planData.id}
             }];
         self._callAndRefresh(calls, planData);
     };
@@ -169,16 +177,16 @@ define(['jquery',
 
         requests = ajax.call([{
             methodname: 'core_competency_read_plan',
-            args: { id: planData.id }
+            args: {id: planData.id}
         }]);
 
         requests[0].done(function(plan) {
             str.get_strings([
-                { key: 'confirm', component: 'moodle' },
-                { key: 'deleteplan', component: 'tool_lp', param: plan.name },
-                { key: 'delete', component: 'moodle' },
-                { key: 'cancel', component: 'moodle' }
-            ]).done(function (strings) {
+                {key: 'confirm', component: 'moodle'},
+                {key: 'deleteplan', component: 'tool_lp', param: plan.name},
+                {key: 'delete', component: 'moodle'},
+                {key: 'cancel', component: 'moodle'}
+            ]).done(function(strings) {
                 notification.confirm(
                     strings[0], // Confirm.
                     strings[1], // Delete plan X?
@@ -186,7 +194,7 @@ define(['jquery',
                     strings[3], // Cancel.
                     function() {
                         self._doDelete(planData);
-                    }.bind(self)
+                    }
                 );
             }).fail(notification.exception);
         }).fail(notification.exception);
@@ -202,7 +210,7 @@ define(['jquery',
         var self = this,
             calls = [{
                 methodname: 'core_competency_reopen_plan',
-                args: { planid: planData.id}
+                args: {planid: planData.id}
             }];
         self._callAndRefresh(calls, planData);
     };
@@ -216,24 +224,24 @@ define(['jquery',
         var self = this,
             requests = ajax.call([{
                 methodname: 'core_competency_read_plan',
-                args: { id: planData.id }
+                args: {id: planData.id}
             }]);
 
         requests[0].done(function(plan) {
             str.get_strings([
-                { key: 'confirm', component: 'moodle' },
-                { key: 'reopenplanconfirm', component: 'tool_lp', param: plan.name },
-                { key: 'reopenplan', component: 'tool_lp' },
-                { key: 'cancel', component: 'moodle' }
-            ]).done(function (strings) {
+                {key: 'confirm', component: 'moodle'},
+                {key: 'reopenplanconfirm', component: 'tool_lp', param: plan.name},
+                {key: 'reopenplan', component: 'tool_lp'},
+                {key: 'cancel', component: 'moodle'}
+            ]).done(function(strings) {
                 notification.confirm(
                     strings[0], // Confirm.
                     strings[1], // Reopen plan X?
-                    strings[2], // reopen.
+                    strings[2], // Reopen.
                     strings[3], // Cancel.
                     function() {
                         self._doReopenPlan(planData);
-                    }.bind(self)
+                    }
                 );
             }).fail(notification.exception);
         }).fail(notification.exception);
@@ -249,7 +257,7 @@ define(['jquery',
         var self = this,
             calls = [{
                 methodname: 'core_competency_complete_plan',
-                args: { planid: planData.id}
+                args: {planid: planData.id}
             }];
         self._callAndRefresh(calls, planData);
     };
@@ -263,16 +271,16 @@ define(['jquery',
         var self = this,
             requests = ajax.call([{
                 methodname: 'core_competency_read_plan',
-                args: { id: planData.id }
+                args: {id: planData.id}
             }]);
 
         requests[0].done(function(plan) {
             str.get_strings([
-                { key: 'confirm', component: 'moodle' },
-                { key: 'completeplanconfirm', component: 'tool_lp', param: plan.name },
-                { key: 'completeplan', component: 'tool_lp' },
-                { key: 'cancel', component: 'moodle' }
-            ]).done(function (strings) {
+                {key: 'confirm', component: 'moodle'},
+                {key: 'completeplanconfirm', component: 'tool_lp', param: plan.name},
+                {key: 'completeplan', component: 'tool_lp'},
+                {key: 'cancel', component: 'moodle'}
+            ]).done(function(strings) {
                 notification.confirm(
                     strings[0], // Confirm.
                     strings[1], // Complete plan X?
@@ -280,7 +288,7 @@ define(['jquery',
                     strings[3], // Cancel.
                     function() {
                         self._doCompletePlan(planData);
-                    }.bind(self)
+                    }
                 );
             }).fail(notification.exception);
         }).fail(notification.exception);
@@ -295,7 +303,7 @@ define(['jquery',
         var self = this,
             calls = [{
                 methodname: 'core_competency_unlink_plan_from_template',
-                args: { planid: planData.id}
+                args: {planid: planData.id}
             }];
         self._callAndRefresh(calls, planData);
     };
@@ -309,16 +317,16 @@ define(['jquery',
         var self = this,
             requests = ajax.call([{
                 methodname: 'core_competency_read_plan',
-                args: { id: planData.id }
+                args: {id: planData.id}
             }]);
 
         requests[0].done(function(plan) {
             str.get_strings([
-                { key: 'confirm', component: 'moodle' },
-                { key: 'unlinkplantemplateconfirm', component: 'tool_lp', param: plan.name },
-                { key: 'unlinkplantemplate', component: 'tool_lp' },
-                { key: 'cancel', component: 'moodle' }
-            ]).done(function (strings) {
+                {key: 'confirm', component: 'moodle'},
+                {key: 'unlinkplantemplateconfirm', component: 'tool_lp', param: plan.name},
+                {key: 'unlinkplantemplate', component: 'tool_lp'},
+                {key: 'cancel', component: 'moodle'}
+            ]).done(function(strings) {
                 notification.confirm(
                     strings[0], // Confirm.
                     strings[1], // Unlink plan X?
@@ -326,7 +334,7 @@ define(['jquery',
                     strings[3], // Cancel.
                     function() {
                         self._doUnlinkPlan(planData);
-                    }.bind(self)
+                    }
                 );
             }).fail(notification.exception);
         }).fail(notification.exception);
@@ -499,7 +507,7 @@ define(['jquery',
         var competencyid = $(e.target).data('id');
         var requests = ajax.call([{
             methodname: 'tool_lp_list_courses_using_competency',
-            args: { id: competencyid }
+            args: {id: competencyid}
         }]);
 
         requests[0].done(function(courses) {
@@ -507,7 +515,7 @@ define(['jquery',
                 courses: courses
             };
             templates.render('tool_lp/linked_courses_summary', context).done(function(html) {
-                str.get_string('linkedcourses', 'tool_lp').done(function (linkedcourses) {
+                str.get_string('linkedcourses', 'tool_lp').done(function(linkedcourses) {
                     new Dialogue(
                         linkedcourses, // Title.
                         html // The linked courses.

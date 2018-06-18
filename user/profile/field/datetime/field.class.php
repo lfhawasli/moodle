@@ -81,7 +81,8 @@ class profile_field_datetime extends profile_field_base {
         }
 
         if (is_numeric($datetime)) {
-            $datetime = userdate($datetime, '%Y-%m-%d-%H-%M-%S');
+            $gregoriancalendar = \core_calendar\type_factory::get_calendar_instance('gregorian');
+            $datetime = $gregoriancalendar->timestamp_to_date_string($datetime, '%Y-%m-%d-%H-%M-%S', 99, true, true);
         }
 
         $datetime = explode('-', $datetime);
@@ -121,5 +122,16 @@ class profile_field_datetime extends profile_field_base {
      */
     public function is_empty() {
         return empty($this->data);
+    }
+
+    /**
+     * Return the field type and null properties.
+     * This will be used for validating the data submitted by a user.
+     *
+     * @return array the param type and null property
+     * @since Moodle 3.2
+     */
+    public function get_field_properties() {
+        return array(PARAM_INT, NULL_NOT_ALLOWED);
     }
 }

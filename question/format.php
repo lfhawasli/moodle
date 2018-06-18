@@ -621,9 +621,6 @@ class qformat_default {
         $question->questiontextformat = FORMAT_MOODLE;
         $question->generalfeedback = '';
         $question->generalfeedbackformat = FORMAT_MOODLE;
-        $question->correctfeedback = '';
-        $question->partiallycorrectfeedback = '';
-        $question->incorrectfeedback = '';
         $question->answernumbering = 'abc';
         $question->penalty = 0.3333333;
         $question->length = 1;
@@ -632,6 +629,8 @@ class qformat_default {
         // to know where the data came from
         $question->export_process = true;
         $question->import_process = true;
+
+        $this->add_blank_combined_feedback($question);
 
         return $question;
     }
@@ -673,15 +672,21 @@ class qformat_default {
      * @return object question
      */
     protected function add_blank_combined_feedback($question) {
-        $question->correctfeedback['text'] = '';
-        $question->correctfeedback['format'] = $question->questiontextformat;
-        $question->correctfeedback['files'] = array();
-        $question->partiallycorrectfeedback['text'] = '';
-        $question->partiallycorrectfeedback['format'] = $question->questiontextformat;
-        $question->partiallycorrectfeedback['files'] = array();
-        $question->incorrectfeedback['text'] = '';
-        $question->incorrectfeedback['format'] = $question->questiontextformat;
-        $question->incorrectfeedback['files'] = array();
+        $question->correctfeedback = [
+            'text' => '',
+            'format' => $question->questiontextformat,
+            'files' => []
+        ];
+        $question->partiallycorrectfeedback = [
+            'text' => '',
+            'format' => $question->questiontextformat,
+            'files' => []
+        ];
+        $question->incorrectfeedback = [
+            'text' => '',
+            'format' => $question->questiontextformat,
+            'files' => []
+        ];
         return $question;
     }
 
@@ -754,11 +759,13 @@ class qformat_default {
     }
 
     /**
-     * Do the export
-     * For most types this should not need to be overrided
-     * @return stored_file
+     * Perform the export.
+     * For most types this should not need to be overrided.
+     *
+     * @param   bool    $checkcapabilities Whether to check capabilities when exporting the questions.
+     * @return  string  The content of the export.
      */
-    public function exportprocess() {
+    public function exportprocess($checkcapabilities = true) {
         global $CFG, $OUTPUT, $DB, $USER;
 
         // get the questions (from database) in this category
@@ -818,7 +825,7 @@ class qformat_default {
             // export the question displaying message
             $count++;
 
-            if (question_has_capability_on($question, 'view', $question->category)) {
+            if (!$checkcapabilities || question_has_capability_on($question, 'view', $question->category)) {
                 $expout .= $this->writequestion($question, $contextid) . "\n";
             }
         }

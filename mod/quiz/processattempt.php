@@ -28,7 +28,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
 // Remember the current time as the time any responses were submitted
@@ -44,8 +44,9 @@ $next          = optional_param('next',          false, PARAM_BOOL);
 $finishattempt = optional_param('finishattempt', false, PARAM_BOOL);
 $timeup        = optional_param('timeup',        0,      PARAM_BOOL); // True if form was submitted by timer.
 $scrollpos     = optional_param('scrollpos',     '',     PARAM_RAW);
+$cmid          = optional_param('cmid', null, PARAM_INT);
 
-$attemptobj = quiz_attempt::create($attemptid);
+$attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Set $nexturl now.
 if ($next) {

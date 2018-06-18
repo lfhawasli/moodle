@@ -24,15 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../moodleblock.class.php');
+require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
-require_once($CFG->dirroot . '/blocks/ucla_browseby/renderer.php');
 require_once($CFG->dirroot . '/blocks/ucla_browseby/'
     . 'browseby_handler_factory.class.php');
 require_once($CFG->dirroot . '/' . $CFG->admin
     . '/tool/uclacoursecreator/uclacoursecreator.class.php');
-require_once($CFG->dirroot . '/blocks/navigation/renderer.php');
-require_once($CFG->dirroot . '/blocks/navigation/block_navigation.php');
 
 /**
  * Class for BrowseBy.
@@ -41,7 +38,7 @@ require_once($CFG->dirroot . '/blocks/navigation/block_navigation.php');
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_ucla_browseby extends block_navigation {
+class block_ucla_browseby extends block_base {
     /**
      * @var $termslist List of terms.
      */
@@ -56,37 +53,50 @@ class block_ucla_browseby extends block_navigation {
     }
 
     /**
-     *  This is called in the course where the block has been added to.
-     **/
+     * Returns browseby links.
+     */
     public function get_content() {
-        global $CFG;
+        global $PAGE;
 
-        if (is_null($this->content)) {
-            $this->content = new stdClass();
+        if ($this->content !== null) {
+            return $this->content;
         }
 
+        $this->content = new stdClass;
+        $this->content->text = '';
+        $this->content->footer = '';
+       
         $linktypes = browseby_handler_factory::get_available_types();
-
         $blockconfig = get_config('block_ucla_browseby');
-
-        $elements = array();
-
+        $templatecontext = array();
+        $skipactivecheck = false;   // There will only be at most 1 active link.
         foreach ($linktypes as $linktype) {
             if (empty($blockconfig->{'disable_' . $linktype})) {
-                $elements[] = navigation_node::create(
-                    get_string('link_' . $linktype, 'block_ucla_browseby'),
-                    new moodle_url(
-                        $CFG->wwwroot . '/blocks/ucla_browseby/view.php',
-                        array('type' => $linktype)
-                    ), navigation_node::TYPE_SECTION
-                );
+                $element = array();
+                $element['link'] = new moodle_url('/blocks/ucla_browseby/view.php',
+                        array('type' => $linktype));
+                $element['name'] = get_string('link_' . $linktype, 'block_ucla_browseby');
+
+                // See if we are on the page we are linking to.
+                if (!$skipactivecheck && $PAGE->url->compare($element['link'], URL_MATCH_BASE)) {
+                    // We are in BrowseBy change. Check type param.
+                    $type = $PAGE->url->get_param('type');
+                    if ($type == $linktype ||
+                            ($linktype == 'subjarea' && $type == 'course')) {
+                        $element['active'] = true;
+                        $skipactivecheck = true;
+                    }
+                } else {
+                   $skipactivecheck = true; // We are not on BrowseBy.
+                }
+
+                $templatecontext['links'][] = $element;
             }
         }
 
-        $renderer = $this->page->get_renderer('block_ucla_browseby');
-
-        $this->content->text = $renderer->navigation_node($elements,
-            array('class' => 'block_tree list'));
+        $renderer = $PAGE->get_renderer('block_ucla_browseby');
+        $this->content->text = $renderer->render_from_template(
+                'block_ucla_browseby/block_content', $templatecontext);
 
         return $this->content;
     }
@@ -119,24 +129,8 @@ class block_ucla_browseby extends block_navigation {
     }
 
     /**
-     * This allows us to borrow navigation block's stylesheets.
-     *
-     * Returns the attributes to set for this block.
-     *
-     * This function returns an array of HTML attributes for this block including
-     * the defaults.
-     *
-     * @return array An array of HTML attributes
+     * Returns the applicable places that this block can be added.
      */
-    public function html_attributes() {
-        $orig = parent::html_attributes();
-        $orig['class'] .= ' block_ucla_course_menu block_navigation';
-
-        return $orig;
-    }
-    /**
-     *  Returns the applicable places that this block can be added.
-     **/
     public function applicable_formats() {
         return array(
             'site-index' => true,
@@ -146,9 +140,9 @@ class block_ucla_browseby extends block_navigation {
     }
 
     /**
-     *  Determines the terms to run the cron job for if there were no
-     *  specifics provided.
-     **/
+     * Determines the terms to run the cron job for if there were no
+     * specifics provided.
+     */
     public function guess_terms() {
         global $CFG;
 
@@ -166,8 +160,8 @@ class block_ucla_browseby extends block_navigation {
     }
 
     /**
-     *  Figures out terms and run sync.
-     **/
+     * Figures out terms and run sync.
+     */
     public function run_sync() {
         $this->guess_terms();
 
@@ -202,13 +196,15 @@ class block_ucla_browseby extends block_navigation {
      * @return boolean
      */
     public function sync($terms, $subjareas=null) {
+        global $DB;
         // Don't run during unit tests. Can be triggered via
         // course_creator_finished event.
         if (defined('PHPUNIT_TEST') and PHPUNIT_TEST) {
             return true;
         }
 
-        self::ucla_require_registrar();
+        ucla_require_registrar();
+        ucla_require_db_helper();
 
         if (empty($terms)) {
             echo 'no terms specified for browseby cron' . "\n";
@@ -217,17 +213,17 @@ class block_ucla_browseby extends block_navigation {
 
         echo "\n";
 
-        list($sqlin, $params) = $this->get_in_or_equal($terms);
+        list($sqlin, $params) = $DB->get_in_or_equal($terms);
         $where = 'term ' . $sqlin;
 
         $records = array();
         if (empty($subjareas)) {
             // No subject area passed, so get list of subject areas from built courses.
-            $records = $this->get_recordset_select('ucla_reg_classinfo',
+            $records = $DB->get_recordset_select('ucla_reg_classinfo',
                 $where, $params, '', 'DISTINCT CONCAT(term, subj_area), term, '
                     . 'subj_area AS subjarea');
             // Check that there are records.
-            if (!($records && $records->valid())) {
+            if (!$records->valid()) {
                 return true;
             }
         } else {
@@ -252,7 +248,7 @@ class block_ucla_browseby extends block_navigation {
             $thisreg = array('term' => $term,
                 'subjarea' => $subjarea);
 
-            $courseinfo = $this->run_registrar_query(
+            $courseinfo = registrar_query::run_registrar_query(
                 'ccle_coursegetall', $thisreg);
 
             if ($courseinfo) {
@@ -264,7 +260,7 @@ class block_ucla_browseby extends block_navigation {
                 echo "no course data...";
             }
 
-            $instrinfo = $this->run_registrar_query(
+            $instrinfo = registrar_query::run_registrar_query(
                 'ccle_getinstrinfo', $thisreg);
 
             if ($instrinfo) {
@@ -283,7 +279,7 @@ class block_ucla_browseby extends block_navigation {
             // We need to update the existing entries, and remove
             // non-existing ones.
             echo "sync classinfo ";
-            $res = $this->partial_sync_table('ucla_browseall_classinfo', $courseinfo,
+            $res = db_helper::partial_sync_table('ucla_browseall_classinfo', $courseinfo,
                 array('term', 'srs'), $where, $params);
 
             // Denote + inserted records.
@@ -292,7 +288,7 @@ class block_ucla_browseby extends block_navigation {
             echo '+' . count($res[0]) . ' =' . count($res[1]) . ' -' . count($res[2]) . '...';
 
             echo "sync instrinfo ";
-            $res = $this->partial_sync_table('ucla_browseall_instrinfo', $instrinfo,
+            $res = db_helper::partial_sync_table('ucla_browseall_instrinfo', $instrinfo,
                 array('term', 'srs', 'uid'), $where, $params);
 
             echo '+' . count($res[0]) . ' =' . count($res[1]) . ' -' . count($res[2]) . '...';
@@ -317,109 +313,9 @@ class block_ucla_browseby extends block_navigation {
     public function get_all_terms() {
         global $DB;
 
-        $termobjs = $this->get_records('ucla_request_classes', null, '',
-            'DISTINCT term');
-
-        $terms = array();
-        foreach ($termobjs as $termobj) {
-            $terms[] = $termobj->term;
-        }
+        $terms = $DB->get_fieldset_select('ucla_request_classes', 'DISTINCT term', '');
 
         return $terms;
     }
 
-    /**
-     * Adds block to frontpage.
-     */
-    public static function add_to_frontpage() {
-        global $SITE;
-        $fakepage = new moodle_page();
-        $fakepage->set_course($SITE);
-        $fakepage->set_pagelayout('frontpage');
-        $fakepage->set_pagetype('site-index');
-        $bm =& $fakepage->blocks;
-        $bm->load_blocks();
-        $bm->create_all_block_instances();
-        if (!$bm->is_block_present('ucla_browseby')) {
-            $bm->add_block('ucla_browseby', BLOCK_POS_LEFT, 0, false);
-            // There's no API to guarantee that this was successful :D.
-        }
-    }
-
-    /**
-     *  Decoupled function.
-     **/
-    protected static function ucla_require_registrar() {
-        ucla_require_registrar();
-    }
-
-    /**
-     * Decoupled function.
-     *
-     * @param string $table
-     * @param object $tabledata
-     * @param array $syncfields
-     * @param string $partialwhere
-     * @param array $partialparams
-     */
-    protected function partial_sync_table($table, $tabledata, $syncfields,
-            $partialwhere=null, $partialparams=null) {
-        ucla_require_db_helper();
-
-        return db_helper::partial_sync_table($table, $tabledata, $syncfields,
-            $partialwhere, $partialparams);
-    }
-
-    /**
-     * Decoupled function.
-     *
-     * @param array $vars
-     */
-    protected function get_in_or_equal($vars) {
-        global $DB;
-
-        return $DB->get_in_or_equal($vars);
-    }
-
-    /**
-     * Decoupled function.
-     *
-     * @param string $t
-     * @param string $w
-     * @param string $p
-     * @param string $s
-     * @param string $l
-     */
-    protected function get_recordset_select($t, $w, $p, $s, $l) {
-        global $DB;
-
-        return $DB->get_recordset_select($t, $w, $p, $s, $l);
-    }
-
-    /**
-     * Decoupled function.
-     *
-     * @param string $q
-     * @param string $d
-     */
-    protected function run_registrar_query($q, $d) {
-        return registrar_query::run_registrar_query($q, $d);
-    }
-
-    /**
-     * Decoupled function.
-     *
-     * @param string $t
-     * @param string $p
-     * @param string $o
-     * @param string $s
-     */
-    protected function get_records($t, $p, $o, $s) {
-        global $DB;
-
-        return $DB->get_records($t, $p, $o, $s);
-    }
-
 }
-
-// End of file.

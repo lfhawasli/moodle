@@ -23,6 +23,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['bynameondate'] = 'by {$a->name} - {$a->date}';
 $string['contentheader'] = 'Content';
 $string['dnduploadmakefolder'] = 'Unzip files and create folder';
 $string['downloadfolder'] = 'Download folder';
@@ -32,6 +33,10 @@ $string['folder:addinstance'] = 'Add a new folder';
 $string['folder:managefiles'] = 'Manage files in folder module';
 $string['folder:view'] = 'View folder content';
 $string['foldercontent'] = 'Files and subfolders';
+$string['indicator:cognitivedepth'] = 'Folder cognitive';
+$string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a Folder resource.';
+$string['indicator:socialbreadth'] = 'Folder social';
+$string['indicator:socialbreadth_help'] = 'This indicator is based on the social breadth reached by the student in a Folder resource.';
 $string['modulename'] = 'Folder';
 $string['modulename_help'] = 'The folder module enables a teacher to display a number of related files inside a single folder, reducing scrolling on the course page. A zipped folder may be uploaded and unzipped for display, or an empty folder created and files uploaded into it.
 
@@ -41,8 +46,10 @@ A folder may be used
 * To provide a shared uploading space for teachers on the course page (keeping the folder hidden so that only teachers can see it)';
 $string['modulename_link'] = 'mod/folder/view';
 $string['modulenameplural'] = 'Folders';
+$string['newfoldercontent'] = 'New folder content';
 $string['page-mod-folder-x'] = 'Any folder module page';
 $string['page-mod-folder-view'] = 'Folder module main page';
+$string['privacy:metadata'] = 'The mod_folder plugin does not store any personal data.';
 $string['pluginadministration'] = 'Folder administration';
 $string['pluginname'] = 'Folder';
 $string['display'] = 'Display folder contents';
@@ -59,6 +66,3 @@ $string['showexpanded'] = 'Show subfolders expanded';
 $string['showexpanded_help'] = 'If set to \'yes\', subfolders are shown expanded by default; otherwise they are shown collapsed.';
 $string['maxsizetodownload'] = 'Maximum folder download size (MB)';
 $string['maxsizetodownload_help'] = 'The maximum size of folder that can be downloaded as a zip file. If set to zero, the folder size is unlimited.';
-
-
-

@@ -1,6 +1,11 @@
 // Hides and show different options when different roles are selected.
 
 $(function () {
+    // Remove extra &nbsp between the radio options.
+    $("div.col-md-9.form-inline.felement").contents().filter(function () {
+        return this.nodeType === Node.TEXT_NODE;
+    }).remove();
+
     $("#fitem_id_daysexpire_string").hide();
     $("#fitem_id_daysexpire_string .fitemtitle").hide();
     $("#fitem_id_ifroleexpire_string select").val(0);
@@ -28,7 +33,7 @@ $(function () {
     });
     // If choose temporary participants. Hide ifroleexpire option and default that to true.
     // Also set deault of daysexpire to 3.
-    $("span:contains('Temporary Participant')").click(function (e) {
+    $("label:contains('Temporary Participant')").click(function (e) {
         $("#fitem_id_ifroleexpire_string select").val(1);
         $("#fitem_id_ifroleexpire_string").hide();
         $("#fitem_id_daysexpire_string").show();

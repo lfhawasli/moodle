@@ -338,6 +338,7 @@ class quiz {
         if ($page) {
             $url .= '&page=' . $page;
         }
+        $url .= '&cmid=' . $this->get_cmid();
         return $url;
     }
 
@@ -357,7 +358,7 @@ class quiz {
      * @return string the URL of the review of that attempt.
      */
     public function review_url($attemptid) {
-        return new moodle_url('/mod/quiz/review.php', array('attempt' => $attemptid));
+        return new moodle_url('/mod/quiz/review.php', array('attempt' => $attemptid, 'cmid' => $this->get_cmid()));
     }
 
     /**
@@ -365,7 +366,7 @@ class quiz {
      * @return string the URL of the review of that attempt.
      */
     public function summary_url($attemptid) {
-        return new moodle_url('/mod/quiz/summary.php', array('attempt' => $attemptid));
+        return new moodle_url('/mod/quiz/summary.php', array('attempt' => $attemptid, 'cmid' => $this->get_cmid()));
     }
 
     // Bits of content =========================================================
@@ -1094,6 +1095,18 @@ class quiz_attempt {
     }
 
     /**
+     * Helper method for unit tests. Get the underlying question usage object.
+     * @return question_usage_by_activity the usage.
+     */
+    public function get_question_usage() {
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('get_question_usage is only for use in unit tests. ' .
+                    'For other operations, use the quiz_attempt api, or extend it properly.');
+        }
+        return $this->quba;
+    }
+
+    /**
      * Get the question_attempt object for a particular question in this attempt.
      * @param int $slot the number used to identify this question within this attempt.
      * @return question_attempt
@@ -1386,7 +1399,7 @@ class quiz_attempt {
      * @return string the URL of this quiz's summary page.
      */
     public function summary_url() {
-        return new moodle_url('/mod/quiz/summary.php', array('attempt' => $this->attempt->id));
+        return new moodle_url('/mod/quiz/summary.php', array('attempt' => $this->attempt->id, 'cmid' => $this->get_cmid()));
     }
 
     /**
@@ -2088,7 +2101,7 @@ class quiz_attempt {
 
         } else {
             $url = new moodle_url('/mod/quiz/' . $script . '.php' . $fragment,
-                    array('attempt' => $this->attempt->id));
+                    array('attempt' => $this->attempt->id, 'cmid' => $this->get_cmid()));
             if ($page == 0 && $showall != $defaultshowall) {
                 $url->param('showall', (int) $showall);
             } else if ($page > 0) {
@@ -2318,6 +2331,25 @@ class quiz_attempt {
         $event = \mod_quiz\event\attempt_reviewed::create($params);
         $event->add_record_snapshot('quiz_attempts', $this->get_attempt());
         $event->trigger();
+    }
+
+    /**
+     * Update the timemodifiedoffline attempt field.
+     * This function should be used only when web services are being used.
+     *
+     * @param int $time time stamp
+     * @return boolean false if the field is not updated because web services aren't being used.
+     * @since Moodle 3.2
+     */
+    public function set_offline_modified_time($time) {
+        global $DB;
+
+        // Update the timemodifiedoffline field only if web services are being used.
+        if (WS_SERVER) {
+            $this->attempt->timemodifiedoffline = $time;
+            return true;
+        }
+        return false;
     }
 
 }

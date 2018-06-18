@@ -78,10 +78,11 @@ $string['tasitefullname'] = 'TA site ({$a->text}): {$a->fullname}';
 $string['tasitegroupingname'] = 'TA Section Materials';
 $string['togglegroupingcourse'] = 'Make site accessible to entire course';
 $string['togglegroupingsection'] = 'Make site accessible only to section';
-$string['ucla_make_tasites'] = 'TA sites';
-$string['ucla_make_tasites_post'] = 'Create or view existing TA sites.';
 $string['unavaibletas'] = 'Cannot create any more TA sites by TA, because all TAs already have a TA site assigned to them. Choose "By section" to create more.';
 $string['view_tadesc'] = '{$a->fullname}';
 $string['viewtasite'] = 'View site';
 $string['viewtasites'] = 'Existing TA sites';
 $string['viewtasitesec'] = 'Sec {$a}';
+
+// Admin panel strings.
+$string['managetasites'] = 'Manage TA sites';

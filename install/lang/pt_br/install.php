@@ -37,9 +37,9 @@ $string['chooselanguagesub'] = 'Por favor, escolha o idioma para a instalação.
 $string['clialreadyconfigured'] = 'Arquivo config.php já existe. Por favor, use admin/cli/install_database.php para instalar o Moodle neste site.';
 $string['clialreadyinstalled'] = 'Arquivo config.php já existe. Por favor use admin/cli/install_database.php para atualizar o Moodle neste site.';
 $string['cliinstallheader'] = 'Programa de instalação por linha de comando do Moodle {$a}';
-$string['databasehost'] = 'Host da base de dados';
-$string['databasename'] = 'Nome da base de dados';
-$string['databasetypehead'] = 'Escolha o driver da base de dados';
+$string['databasehost'] = 'Host do banco de dados';
+$string['databasename'] = 'Nome do banco de dados';
+$string['databasetypehead'] = 'Escolha o driver do banco de dados';
 $string['dataroot'] = 'Diretório de dados';
 $string['datarootpermission'] = 'Permissões nos diretórios de dados';
 $string['dbprefix'] = 'Prefixo das tabelas';
@@ -82,10 +82,9 @@ $string['pathsunsecuredataroot'] = 'A localização da pasta de dados não é se
 $string['pathswrongadmindir'] = 'Diretório Admin não existe';
 $string['phpextension'] = 'Extensão PHP {$a}';
 $string['phpversion'] = 'Versão do PHP';
-$string['phpversionhelp'] = '<p>Moodle requer a versão 4.3.0 de PHP ou posterior.</p>
-<p>A sua versão é  a {$a}</p>
-<p>Atualize a versão do PHP!</p>
-(atenção, a versão 5.0.x tem muitos problemas - use a versão 5.1.0 ou a 4.4)';
+$string['phpversionhelp'] = '<p>O Moodle requer uma versão PHP de pelo menos 5.6.5 ou 7.1 (o 7.0.x tem algumas limitações do motor). </p>
+<p>Atualmente você está executando a versão {$a}. </p>
+<p>Você deve atualizar o PHP ou migrar para um host com uma versão mais recente do PHP. </p>';
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';
 $string['welcomep20'] = 'Você está vendo esa página pois instalou com sucesso o pacote<strong>{$a->packname} {$a->packversion}</strong>. Parabéns!';
 $string['welcomep30'] = 'Esta versão do <strong>{$a->installername}</strong> inclui as aplicações para a criação de um ambiente em que <strong>Moodle</strong> possa operar:';

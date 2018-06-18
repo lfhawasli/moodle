@@ -23,19 +23,6 @@
  */
 
 /**
- * Include the Restore_PublicPrivate_Course_Task object as this controller may
- * need to serialize this object rather than construct it through the
- * Restore_Factory, which is the other place where it is included.
- *
- * @see Restore_PublicPrivate_Course_Task
- * @author ebollens
- * @version 20110719
- */
-if(file_exists($CFG->dirroot.'/local/publicprivate/lib/restore_publicprivate_course_task.class.php')) {
-    include_once($CFG->dirroot.'/local/publicprivate/lib/restore_publicprivate_course_task.class.php');
-}
-
-/**
  * Class implementing the controller of any restore process
  *
  * This final class is in charge of controlling all the restore architecture, for any
@@ -63,6 +50,7 @@ class restore_controller extends base_controller {
     protected $precheck;    // Results of the execution of restore prechecks
 
     protected $info;   // Information retrieved from backup contents
+    /** @var restore_plan */
     protected $plan;   // Restore execution plan
 
     protected $execution;     // inmediate/delayed
@@ -153,6 +141,9 @@ class restore_controller extends base_controller {
         } else {
             // Load plan
             $this->load_plan();
+
+            // Apply all default settings (based on type/format/mode).
+            $this->apply_defaults();
 
             // Perform all initial security checks and apply (2nd param) them to settings automatically
             restore_check::check_security($this, true);
@@ -521,6 +512,15 @@ class restore_controller extends base_controller {
         $this->plan = new restore_plan($this);
         $this->plan->build(); // Build plan for this controller
         $this->set_status(backup::STATUS_PLANNED);
+    }
+
+    /**
+     * Apply defaults from the global admin settings
+     */
+    protected function apply_defaults() {
+        $this->log('applying restore defaults', backup::LOG_DEBUG);
+        restore_controller_dbops::apply_config_defaults($this);
+        $this->set_status(backup::STATUS_CONFIGURED);
     }
 }
 

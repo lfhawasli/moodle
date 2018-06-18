@@ -25,236 +25,69 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+// Include Boost config so that we can override layouts.
+// NOTE: Need require, rather than require_once so Boost config is always loaded.
+require(__DIR__ . '/../boost/config.php');
+
 $THEME->name = 'uclashared';
-$tn = 'theme_' . $THEME->name;
 
-
-// Parent themes.
-
-$THEME->parents = array('base', 'bootstrapbase');
+// Parent theme.
+$THEME->parents = array('boost');
 
 // Style sheets from our current theme.
 $THEME->sheets = array(
-    'base',
-    'core',
-    'general',
-    'ucla',
-    'moodle',
-    'components',
     'flatpickr.min'
 );
 
-// Style sheets from parent themes that we want to exclude.
-$THEME->parents_exclude_sheets = array(
-    'base' => array(
-        'blocks',
-        'dock'
-    ),
-    'bootstrapbase' => array(
-        'moodle',
-        'editor'
-    )
-);
+// Boost does not support dock, so neither will we.
+$THEME->enable_dock = false;
 
-// YUI CSS we want to include.  (we don't want any!).
+// YUI CSS we want to include (we don't want any!).
 $THEME->yuicssmodules = array();
 
-$tfgeneral     = 'course.php';
-$tfcourse      = 'course.php';
-$tfembedded    = 'embedded.php';
-$tffrontpage   = 'frontpage.php';
-$tfreport      = 'report.php';
-
-$noconfigs = during_initial_install();
-
-if ($noconfigs) {
-    $disablepostblocks = true;
-} else {
-    $disablepostblocks = get_config($tn, 'disable_post_blocks');
-}
-
-$defaultregion = 'side-post';
-$enabledregions = array('side-pre');
-
-if ($disablepostblocks) {
-    $defaultregion = 'side-pre';
-} else {
-    $enabledregions[] = 'side-post';
-}
-
-
- // CCLE-2882 - Control panel missing for some course pages.
- // Going to use global $COURSE object and if it isn't the SITEID, then will
- // enable the control panel for certain layouts that can exist in or out of courses.
-
-
-global $COURSE;
-// For most cases, user will usually be on course.
-if (SITEID == $COURSE->id) {
-    $displaycontrolpanel = false;
-} else {
-    // CCLE-4941 - If the course format is something other than UCLA, then remove the Control Panel button.
-    include_once("$CFG->dirroot/course/format/lib.php");
-    $format = course_get_format($COURSE);
-    if ($format->get_format() == 'ucla') {
-        $displaycontrolpanel = true;
-    } else {
-        $displaycontrolpanel = false;
-    }
-}
-
-$THEME->layouts = array(
-    // Most backwards compatible layout without the blocks.
-    // - this is the layout used by default.
-    'base' => array(
-        'file' => $tfgeneral,
-        'regions' => array(),
-        'options' => array(
-            'controlpanel' => $displaycontrolpanel
-        )
-    ),
-    // Standard layout with blocks, this is recommended for most.
-    // pages with general information.
-    'standard' => array(
-        'file' => $tfgeneral,
-        'regions' => $enabledregions,
-        'defaultregion' => $defaultregion,
-        'options' => array(
-            'controlpanel' => $displaycontrolpanel
-        )
-    ),
-    // Main course page.
-    'course' => array(
-        'file' => $tfcourse,
-        'regions' => $enabledregions,
-        'defaultregion' => $defaultregion,
-        'options' => array(
-            'controlpanel' => $displaycontrolpanel
-        )
-    ),
-    'coursecategory' => array(
-        'file' => $tfgeneral,
-        'regions' => $enabledregions,
-        'defaultregion' => $defaultregion,
-    ),
-    // Part of course, typical for modules - default page layout if.
-    // $cm specified in require_login().
-    'incourse' => array(
-        'file' => $tfcourse,
-        'regions' => array('side-pre'),
-        'defaultregion' => 'side-pre',
-        'options' => array(
-            'controlpanel' => $displaycontrolpanel
-        )
-    ),
-    // The site home page.
-    'frontpage' => array(
-        'file' => $tffrontpage,
-        'regions' => array('side-pre', 'side-post'),
-        'defaultregion' => $defaultregion,
-        'options' => array(
-            'controlpanel' => false,
-        ),
-    ),
-    // Server administration scripts.
-    'admin' => array(
-        'file' => $tfgeneral,
-        'regions' => array('side-pre'),
-        'defaultregion' => 'side-pre',
-        'options' => array(
-            'controlpanel' => $displaycontrolpanel
-        )
-    ),
-    // My dashboard page.
-    'mydashboard' => array(
-        'file' => $tfgeneral,
-        'regions' => $enabledregions,
-        'defaultregion' => $defaultregion,
-        'options' => array(),
-    ),
-    // My public page.
-    'mypublic' => array(
-        'file' => $tfgeneral,
-        'regions' => $enabledregions,
-        'defaultregion' => $defaultregion,
-    ),
-    'login' => array(
-        'file' => $tfgeneral,
-        'regions' => array(),
-        'options' => array(),
-    ),
-
-    // Pages that appear in pop-up windows - no navigation.
-    // no blocks, no header.
-    'popup' => array(
-        'file' => $tfgeneral,
-        'regions' => array(),
-        'options' => array(
-            'nofooter' => true,
-            'nonavbar' => true,
-            'nocustommenu' => true,
-            'nologininfo' => true
-        ),
-    ),
-    // No blocks and minimal footer - used for legacy frame layouts only!
-    'frametop' => array(
-        'file' => $tfgeneral,
-        'regions' => array(),
-        'options' => array(
-            'nofooter' => true,
-            'controlpanel' => $displaycontrolpanel
-        ),
-    ),
-    // Embeded pages, like iframe/object embeded in moodleform.
-    // - it needs as much space as possible.
-    'embedded' => array(
-        'file' => $tfembedded,
-        'regions' => array(),
-        'options' => array(
-            'nofooter' => true,
-            'nonavbar' => true,
-            'nocustommenu' => true
-        ),
-    ),
-    // Should display the content and basic headers only.
-    'print' => array(
-        'file' => $tfgeneral,
-        'regions' => array(),
-        'options' => array(
-            'noblocks' => true,
-            'nofooter' => true,
-            'nonavbar' => false,
-            'nocustommenu' => true,
-            'nologininfo' => true
-        ),
-    ),
-    // The pagelayout used when a redirection is occuring.
-    'redirect' => array(
-        'file' => $tfembedded,
-        'regions' => array(),
-        'options' => array(
-            'nofooter' => true,
-            'nonavbar' => true,
-            'nocustommenu' => true
-        ),
-    ),
-    // The pagelayout used for reports.
-    'report' => array(
-        'file' => $tfreport,
-        'regions' => array('side-pre'),
-        'defaultregion' => 'side-pre',
-        'options' => array(
-            'controlpanel' => $displaycontrolpanel
-        )
-    ),
-);
-
+// Most themes will use this rendererfactory as this is the one that allows the
+// theme to override any other renderer.
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->enable_dock = false;
-$THEME->csspostprocess = 'uclashared_process_css';
-$THEME->javascripts[] = 'shared_server_dropdown';
-$THEME->javascripts[] = 'help_feedback';
-$THEME->javascripts[] = 'headroom.min';
 
-// CCLE-4807 - Atto Chemistry: Overriding plugin styles.
-$THEME->plugins_exclude_sheets = array('atto' => array('chemistry'));
+// Boost does not require any nav blocks because it provides other ways to
+// navigate built into the theme.
+$THEME->requiredblocks = '';
+
+// Puts "Add a block" in side region, where people are used to it.
+$THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
+
+// Override Boost configs for layouts.
+// To prevent blocks from being displayed on non-section course pages.
+$THEME->layouts['report']['regions'] = array();
+$THEME->layouts['admin']['regions'] = array();
+// The incourse layout is the default for modules and some modules place content
+// in the block region.
+global $PAGE;
+switch ($PAGE->pagetype) {
+    // All these pages call add_fake_block().
+    case 'mod-book-delete':
+    case 'mod-book-edit':
+    case 'mod-book-view':
+    case 'mod-lesson-continue':
+    case 'mod-lesson-view':
+    case 'mod-oublog-allposts':
+    case 'mod-oublog-view':
+    case 'mod-quiz-attempt':
+    case 'mod-quiz-review':
+    case 'mod-quiz-summary':
+        $THEME->layouts['incourse']['regions'] = array('side-pre');
+        break;
+    default:
+        $THEME->layouts['incourse']['regions'] = array();
+}
+
+// Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
+$THEME->scss = 'moodle';
+
+// Add javascript files.
+$THEME->javascripts = ['hamburger_icon', 'frontpage'];
+
+$THEME->layouts['frontpage'] = array(
+  'file' => 'frontpage.php',
+);

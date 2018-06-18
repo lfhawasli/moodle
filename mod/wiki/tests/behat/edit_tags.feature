@@ -17,8 +17,7 @@ Feature: Edited wiki pages handle tags correctly
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
-    And I turn editing mode on
+    And I am on "Course 1" course homepage with editing mode on
     And I add a "Wiki" to section "1" and I fill the form with:
       | Wiki name | Test wiki name |
       | Description | Test wiki description |
@@ -28,7 +27,7 @@ Feature: Edited wiki pages handle tags correctly
 
   Scenario: Wiki page edition of custom tags works as expected
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I press "Create page"
     When I set the following fields to these values:
@@ -47,19 +46,17 @@ Feature: Edited wiki pages handle tags correctly
   @javascript
   Scenario: Wiki page edition of standard tags works as expected
     Given I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Appearance" node
-    And I follow "Manage tags"
+    And I navigate to "Appearance > Manage tags" in site administration
     And I follow "Default collection"
     And I follow "Add standard tags"
     And I set the field "Enter comma-separated list of new tags" to "OT1, OT2, OT3"
     And I press "Continue"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test wiki name"
     And I press "Create page"
-    And I click on ".form-autocomplete-downarrow" "css_element"
+    And I open the autocomplete suggestions list
     And I should see "OT1" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "OT2" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "OT3" in the ".form-autocomplete-suggestions" "css_element"

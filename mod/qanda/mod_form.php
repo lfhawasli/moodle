@@ -24,7 +24,7 @@ class mod_qanda_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(true);
+        $this->standard_intro_elements();
 
         $mform->addElement('text', 'entbypage', get_string('entbypage', 'qanda'));
         $mform->setType('entbypage', PARAM_INT); 

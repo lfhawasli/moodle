@@ -79,7 +79,8 @@ if (!empty($manualsyllabusid)) {
 if ($canmanagesyllabus) {
     $url = new moodle_url('/local/ucla_syllabus/index.php',
                     array('id' => $course->id));
-    set_editing_mode_button($url);
+    $buttons = $OUTPUT->edit_button($url);
+    $PAGE->set_button($buttons);
 
     // Set up form.
     $syllabusform = new syllabus_form(null,

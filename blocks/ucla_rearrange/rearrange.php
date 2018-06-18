@@ -53,8 +53,7 @@ $sectionnum = $format->figure_section();
 // Set up the page.
 $PAGE->set_context($context);
 
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 
 $PAGE->set_url('/blocks/ucla_rearrange/rearrange.php',
         array('courseid' => $courseid, 'section' => $sectionnum));
@@ -62,21 +61,15 @@ $PAGE->set_url('/blocks/ucla_rearrange/rearrange.php',
 // Set editing url to be section or default page.
 $gobackurl = new moodle_url('/course/view.php',
                 array('id' => $courseid, 'section' => $sectionnum));
-set_editing_mode_button($gobackurl);
+$buttons = $OUTPUT->edit_button($gobackurl);
+$PAGE->set_button($buttons);
 
 $sections = $format->get_sections();
-$numsections = $format->get_course()->numsections;
 
 $sectnums = array();
 $sectionnames = array();
 $sectionvisibility = array();
 foreach ($sections as $section) {
-    // CCLE-2930:rearrange tool now shows correct sections by limitimg it
-    // with the course numsections.
-    if ($section->section > $numsections) {
-        unset($sections[$section->section]);
-        continue;
-    }
     $sid = $section->id;
     $sectids[$sid] = $sid;
     $sectnums[$sid] = $section->section;
@@ -99,10 +92,7 @@ $sectionlist = block_ucla_rearrange::SECTIONLIST;
 // Consolidate into a single thingee.
 $sectionshtml = html_writer::start_tag(
                 'ul',
-                array(
-                    'class' => block_ucla_rearrange::SECTIONLISTCLASS,
-                    'id' => $sectionlist
-                )
+                array('class' => 'js-show', 'id' => $sectionlist)
 );
 
 // Make the expand/collapse button.
@@ -122,10 +112,9 @@ foreach ($sectionnodeshtml as $section => $snh) {
 
     $sectnum = $sectnums[$section];
 
-    if ($sectnum != 0) {
-        $siattr['class'] .= ' ' . block_ucla_rearrange::SECTIONITEM;
-    } else {
+    if ($sectnum == 0) {
         $sectionzero = $section;
+        $siattr['class'] .= ' ' . block_ucla_rearrange::SECTIONZERO;
     }
 
     $ishiddentext = '';
@@ -138,15 +127,11 @@ foreach ($sectionnodeshtml as $section => $snh) {
     $sectionshtml .= html_writer::tag(
                     'li',
                     html_writer::tag(
-                            'div',
-                            html_writer::tag('span',
-                                    $sectionnames[$section] . $ishiddentext .
-                                    $expandbutton,
-                                    array(
-                                'class' => 'sectiontitle'
-                                    )
-                            ) . $snh, array('class' => 'sub-container')
-                    ), $siattr
+                        'div',
+                        $sectionnames[$section] . $ishiddentext . $expandbutton,
+                        array('class' => 'sectiontitle')
+                    ) . $snh,
+                    $siattr
     );
 }
 
@@ -155,21 +140,6 @@ if ($sectionzero === false) {
 }
 
 $sectionshtml .= html_writer::end_tag('ul');
-
-// Here is the primary setup for sortables.
-$customvars = array(
-    'containerjq' => '#' . block_ucla_rearrange::PRIMARY_DOMNODE,
-    'expandtext' => $expandtext,
-    'collapsetext' => $collaptext,
-    'expandalltext' => get_string('allexpand', 'block_ucla_rearrange'),
-    'collapsealltext' => get_string('allcollapse', 'block_ucla_rearrange'),
-    'expandalljq' => '.expandall'
-);
-
-// This enables nested sortables for all objects in the page with the class
-// of "nested-sortables".
-block_ucla_rearrange::setup_nested_sortable_js($sectionshtml,
-        '.' . block_ucla_rearrange::PAGELISTCLASS, $customvars);
 
 // Used later to determine which section to redirect to after successful form submit.
 $sectionredirect = $sectionnum;
@@ -181,8 +151,8 @@ $rearrangeform = new ucla_rearrange_form(
                 null,
                 array(
                     'courseid' => $courseid,
-                    'sections' => $sectids,
-                    'section' => $sectionnum
+                    'section' => $sectionnum,
+                    'sectionshtml' => $sectionshtml
                 ),
                 'post',
                 '',
@@ -190,84 +160,38 @@ $rearrangeform = new ucla_rearrange_form(
 );
 
 if ($data = $rearrangeform->get_data()) {
-    $sectionnodes = array();
+    // The JavaScript sets the 'serialized' hidden field to a JSON representation of the list.
+    $sectiondata = json_decode($data->serialized, true);
 
-    // Split and sort the input data.
-    foreach ($sectids as $section) {
-        $field = 'serialized-section-' . $section;
-
-        if (isset($data->$field)) {
-            $sectionnodes[$section] = block_ucla_rearrange::parse_serial(
-                            $data->$field
-            );
-        } else {
-            print_error(get_string('error_missing_section',
-                            'block_ucla_rearrange'));
-        }
-    }
-
-    // Get the ordering of the sections.
-    if (isset($data->serialized)) {
-        $uncleansectionorder
-                = block_ucla_rearrange::parse_serial($data->serialized);
-
-        $sectionorder
-                = block_ucla_rearrange::clean_section_order(
-                        reset($uncleansectionorder)
-        );
-
-        // Here reset the 0th.
-        $sectionorder = array_merge(array("$sectionzero"), $sectionorder);
-
-        // Flip the keys.
-        $sectiontranslation = array();
-        foreach ($sectionorder as $sectnum => $sectid) {
-            $sectiontranslation[$sectid] = $sectnum;
-        }
-
-        unset($sectionorder);
+    // If the form was submitted before JavaScript loaded, ignore the submission.
+    if (empty($sectiondata)) {
+        $data = null;
     } else {
-        print_error(get_string('error_missing_section_ordering',
-                        'block_ucla_rearrange'));
-    }
-
-    // Redirect eventually?
-    $sectioncontents = array();
-
-    // TODO maybe integrate this loop with the one above?
-    foreach ($sectionnodes as $section => $nodes) {
-        $flattened = array();
-
-        if (!empty($nodes)) {
-            // We cannot use [0] notation because we need the first and only.
-            if (count($nodes) != 1) {
-                // We need to send an error report here.
-                print_error(get_string('error_multiple_nodes',
-                                'block_ucla_rearrange'));
-            }
-
-            $flattened = modnode::flatten(reset($nodes));
+        $sectioncontents = array();
+        $sectionorder = array();
+        foreach ($sectiondata as $index => $section) {
+            $id = $section['id'];
+            $sectioncontents[$id] = empty($section['children']) ? array() : modnode::flatten($section['children']);
+            $sectionorder[$id] = $index;
         }
 
-        $sectioncontents[$section] = $flattened;
+        // Section id to redirect to after moving the sections around.
+        $sectionid = $DB->get_field('course_sections', 'id', array('course' => $course->id, 'section' => $sectionnum));
+
+        // We're going to skip the API calls because it uses too many DBQ's.
+        block_ucla_rearrange::move_modules_section_bulk($sectioncontents,
+                $sectionorder);
+
+        // Set the section correct value after moving sections around.
+        if ( !$sectionredirect = $DB->get_field('course_sections', 'section', array('id' => $sectionid)) ) {
+            // If no field is found, then the section we were on was either 'Site info' or 'Show all'.
+            $sectionredirect = $sectionnum;
+        }
+        $_POST['section'] = $sectionredirect;
+
+        // Now we need to swap all the contents in each section...
+        rebuild_course_cache($courseid);
     }
-
-    // Section id to redirect to after moving the sections around.
-    $sectionid = $DB->get_field('course_sections', 'id', array('course' => $course->id, 'section' => $sectionnum));
-
-    // We're going to skip the API calls because it uses too many DBQ's.
-    block_ucla_rearrange::move_modules_section_bulk($sectioncontents,
-            $sectiontranslation);
-
-    // Set the section correct value after moving sections around.
-    if ( !$sectionredirect = $DB->get_field('course_sections', 'section', array('id' => $sectionid)) ) {
-        // If no field is found, then the section we were on was either 'Site info' or 'Show all'.
-        $sectionredirect = $sectionnum;
-    }
-    $_POST['section'] = $sectionredirect;
-
-    // Now we need to swap all the contents in each section...
-    rebuild_course_cache($courseid);
 }
 
 $restr = get_string('rearrange_sections', 'block_ucla_rearrange');
@@ -277,7 +201,6 @@ $PAGE->set_title($restrc);
 $PAGE->set_heading($restrc);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($restr, 2, 'headingblock');
 
 if ($data != false) {
     $message = html_writer::tag('h3', get_string('success', 'block_ucla_rearrange'));
@@ -318,9 +241,7 @@ if ($data != false) {
     }
 
     $rearrangeform->display();
-    $PAGE->requires->js_init_code(
-            "M.block_ucla_rearrange.initialize_rearrange_tool('$sectionnum', '$secid')"
-    );
+    $PAGE->requires->js_call_amd('block_ucla_rearrange/rearrange', 'init', array($sectionnum, $secid));
 }
 
 echo $OUTPUT->footer();

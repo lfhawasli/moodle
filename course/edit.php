@@ -157,8 +157,10 @@ if ($editform->is_cancelled()) {
         $course = create_course($data, $editoroptions);
 
         // START UCLA MOD CCLE-2389 - update site indicator
-        $data->id = $course->id; // new course was created
-        siteindicator_manager::update_site($data);
+        if ($course->format == ' ucla') {
+            $data->id = $course->id; // New course was created.
+            siteindicator_manager::update_site($data);
+        }
         // END UCLA MOD CCLE-2389 
 
         // Get the context of the newly created course.
@@ -180,7 +182,7 @@ if ($editform->is_cancelled()) {
                 if ($plugin = enrol_get_plugin($instance->enrol)) {
                     if ($plugin->get_manual_enrol_link($instance)) {
                         // We know that the ajax enrol UI will have an option to enrol.
-                        $courseurl = new moodle_url('/enrol/users.php', array('id' => $course->id, 'newcourse' => 1));
+                        $courseurl = new moodle_url('/user/index.php', array('id' => $course->id, 'newcourse' => 1));
                         break;
                     }
                 }

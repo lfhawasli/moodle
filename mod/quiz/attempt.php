@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
 // Look for old-style URLs, such as may be in the logs, and redirect them to startattemtp.php.
@@ -39,8 +39,9 @@ if ($id = optional_param('id', 0, PARAM_INT)) {
 // Get submitted parameters.
 $attemptid = required_param('attempt', PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);
+$cmid = optional_param('cmid', null, PARAM_INT);
 
-$attemptobj = quiz_attempt::create($attemptid);
+$attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 $page = $attemptobj->force_page_number_into_range($page);
 $PAGE->set_url($attemptobj->attempt_url(null, $page));
 

@@ -145,9 +145,6 @@ $CFG->forced_plugin_settings['theme_uclashared']['system_name'] = 'Shared System
 // Prevent blocks from docking
 $CFG->allowblockstodock = false;
 
-// Newly created courses for ucla formats should only have the course menu block
-$CFG->defaultblocks_ucla = 'ucla_course_menu';
-
 // Enable conditional activities
 $CFG->enableavailability = true;
 $CFG->enablecompletion = true;  // needs to be enabled so that completion
@@ -209,6 +206,8 @@ $CFG->messagingallowemailoverride = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 $CFG->enableplagiarism = 1;
+// CCLE-7144 - Enable stealth activities
+$CFG->allowstealth = 1;
 
 // Site administration > Users > Accounts > User default preferences
 $CFG->defaultpreference_autosubscribe = 0;
@@ -224,19 +223,23 @@ $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 2147483648;  // 2GB
 // CCLE-2903 - Don't set completion tracking to be course default
 $CFG->forced_plugin_settings['moodlecourse']['enablecompletion'] = 0;
+// CCLE-7325 - Disable "Course end date enabled by default"
+$CFG->forced_plugin_settings['moodlecourse']['courseenddateenabled'] = 0;
 
 // Site administration > Courses > Course request
 $CFG->enablecourserequests = 1;
 
 // Site administration > Courses > Backups > General backup defaults
-// Commenting this out until following tracker issue is resolved:
-// MDL-27886 - backup_general_users forbids all users to backup user data
-//$CFG->forced_plugin_settings['backup']['backup_general_users'] = 0;
+$CFG->forced_plugin_settings['backup']['backup_general_users'] = 0;
 $CFG->forced_plugin_settings['backup']['backup_general_groups'] = 0;
+
+// Site administration > Courses > Backups > General restore defaults
+$CFG->forced_plugin_settings['restore']['restore_general_users'] = 0;
 
 // Site administration > Grades > General settings
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
+$CFG->gradepointmax = 300;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
@@ -381,10 +384,6 @@ $CFG->forced_plugin_settings['enrol_self']['sendcoursewelcomemessage'] = 0;
 $CFG->forced_plugin_settings['block_ucla_bruincast']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bcastlinks/';
 $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
 
-// Site administration > Plugins > Blocks > UCLA bruinmedia
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['source_url'] = 'http://www2.oid.ucla.edu/help/info/bmedialinks.csv';
-$CFG->forced_plugin_settings['block_ucla_bruinmedia']['errornotify_email'] = 'ccle-operations@lists.ucla.edu';
-
 // Site administration > Plugins > Blocks > UCLA course download
 $CFG->forced_plugin_settings['block_ucla_course_download']['student_access_begins_week'] = 9;
 // CCLE-5582 - Decrease maxfile size to 250
@@ -452,6 +451,9 @@ $CFG->filter_oidwowza_enable_mp4 = 1;
 // Site administration > Plugins > Filters > PoodLL Filter
 $CFG->filter_poodll_download_media_ok = '1';
 $CFG->filter_poodll_miccanpause = '1';
+
+// Site administration > Plugins > Filters > Tabs
+$CFG->forced_plugin_settings['filter_tabs']['enablebootstrap'] = 2; // Bootstrap 4 tabs.
 
 // Site administration > Plugins > Repositories > Common repository settings
 $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course files
@@ -537,6 +539,10 @@ $CFG->forced_plugin_settings['local_ucla']['showallgraderviewactions'] = 1;
 // Site administration > Plugins > Message outputs > Email
 $CFG->emailonlyfromnoreplyaddress = 1;
 
+// Site administration > Plugins > Message outputs > Default message outputs
+$CFG->forced_plugin_settings['message']['email_provider_mod_forum_posts_permitted'] = 'forced';
+$CFG->forced_plugin_settings['message']['email_provider_mod_forum_digests_permitted'] = 'forced';
+
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
 
@@ -544,6 +550,7 @@ $CFG->enablemobilewebservice = 1;
 $CFG->forceloginforprofiles = true;
 $CFG->forceloginforprofileimage = true; // temporary until "CCLE-2368 - PIX.PHP security fix" is done
 $CFG->allowobjectembed = 1;
+$CFG->enabletrusttext = 1;
 $CFG->maxeditingtime = 900; // 15 minutes
 $CFG->fullnamedisplay = 'lastname, firstname';
 $CFG->cronclionly = true;
@@ -551,6 +558,7 @@ $CFG->cronclionly = true;
 // Site administration > Security > HTTP security
 $CFG->loginhttps = true;
 $CFG->cookiesecure = true;
+$CFG->allowframembedding = 1;
 
 // Site administration > Security > Anti-Virus
 $CFG->runclamonupload = true;
@@ -563,12 +571,12 @@ $CFG->clamfailureonupload = 'donothing';
 $CFG->theme = 'uclashared';
 
 // Site administration > Appearance > Themes > Theme settings
-$CFG->themelist = "snap,uclashared,uclasharedcourse";
+$CFG->themelist = "uclashared,uclasharedcourse";
 $CFG->allowcoursethemes = 1;
-$CFG->custommenuitems = "Submit a help request|/blocks/ucla_help/index.php
-    View self help articles|https://docs.ccle.ucla.edu/
-    Read tips & updates|https://docs.ccle.ucla.edu/w/Tips_and_Updates
-    Request a site|/course/request.php";
+$CFG->custommenuitems = "helprequest,theme_uclashared|/blocks/ucla_help/index.php|helprequest
+    selfhelp,theme_uclashared|https://docs.ccle.ucla.edu/|selfhelp
+    tipsupdates,theme_uclashared|https://docs.ccle.ucla.edu/w/Tips_and_Updates|tipsupdates
+    requestsite,theme_uclashared|/course/request.php|requestsite";
 $CFG->customusermenuitems = "grades,grades|/grade/report/mygrades.php|grades
 preferences,moodle|/user/preferences.php|preferences";
 
@@ -641,6 +649,9 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_course_creator'] = 
 // Enable customscripts for Respondus and other UCLA custom changes.
 // NOTE: config is in local/ucla/configs, even though it is linked in root.
 $CFG->customscripts = $_dirroot_ . "/local/ucla/customscripts";
+
+// CCLE-7309 - Modify Footer
+$CFG->forced_plugin_settings['tool_mobile']['setuplink'] = '';
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');

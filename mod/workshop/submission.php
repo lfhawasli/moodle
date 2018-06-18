@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,8 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/locallib.php');
 
 $cmid = required_param('cmid', PARAM_INT); // Course module id.
 $id = optional_param('id', 0, PARAM_INT); // Submission id.
@@ -52,19 +51,6 @@ if ($edit) {
 
 if ($id) { // submission is specified
     $submission = $workshop->get_submission_by_id($id);
-
-    $params = array(
-        'objectid' => $submission->id,
-        'context' => $workshop->context,
-        'courseid' => $workshop->course->id,
-        'relateduserid' => $submission->authorid,
-        'other' => array(
-            'workshopid' => $workshop->id
-        )
-    );
-
-    $event = \mod_workshop\event\submission_viewed::create($params);
-    $event->trigger();
 
 } else { // no submission specified
     if (!$submission = $workshop->get_submission_by_author($USER->id)) {
@@ -102,32 +88,9 @@ if ($submission->id and !$workshop->modifying_submission_allowed($USER->id)) {
     $editable = false;
 }
 
-if ($canviewall) {
-    // check this flag against the group membership yet
-    if (groups_get_activity_groupmode($workshop->cm) == SEPARATEGROUPS) {
-        // user must have accessallgroups or share at least one group with the submission author
-        if (!has_capability('moodle/site:accessallgroups', $workshop->context)) {
-            $usersgroups = groups_get_activity_allowed_groups($workshop->cm);
-            $authorsgroups = groups_get_all_groups($workshop->course->id, $submission->authorid, $workshop->cm->groupingid, 'g.id');
-            $sharedgroups = array_intersect_key($usersgroups, $authorsgroups);
-            if (empty($sharedgroups)) {
-                $canviewall = false;
-            }
-        }
-    }
-}
+$canviewall = $canviewall && $workshop->check_group_membership($submission->authorid);
 
-if ($editable and $workshop->useexamples and $workshop->examplesmode == workshop::EXAMPLES_BEFORE_SUBMISSION
-        and !has_capability('mod/workshop:manageexamples', $workshop->context)) {
-    // check that all required examples have been assessed by the user
-    $examples = $workshop->get_examples_for_reviewer($USER->id);
-    foreach ($examples as $exampleid => $example) {
-        if (is_null($example->grade)) {
-            $editable = false;
-            break;
-        }
-    }
-}
+$editable = ($editable && $workshop->check_examples_assessed_before_submission($USER->id));
 $edit = ($editable and $edit);
 
 if (!$candeleteall and $ownsubmission and $editable) {
@@ -142,20 +105,6 @@ if (!$candeleteall and $ownsubmission and $editable) {
 if ($submission->id and $delete and $confirm and $deletable) {
     require_sesskey();
     $workshop->delete_submission($submission);
-
-    // Event information.
-    $params = array(
-        'context' => $workshop->context,
-        'courseid' => $workshop->course->id,
-        'relateduserid' => $submission->authorid,
-        'other' => array(
-            'submissiontitle' => $submission->title
-        )
-    );
-    $params['objectid'] = $submission->id;
-    $event = \mod_workshop\event\submission_deleted::create($params);
-    $event->add_record_snapshot('workshop', $workshoprecord);
-    $event->trigger();
 
     redirect($workshop->view_url());
 }
@@ -173,6 +122,11 @@ if ($submission->id and ($ownsubmission or $canviewall or $isreviewer)) {
     print_error('nopermissions', 'error', $workshop->view_url(), 'view or create submission');
 }
 
+if ($submission->id) {
+    // Trigger submission viewed event.
+    $workshop->set_submission_viewed($submission);
+}
+
 if ($assess and $submission->id and !$isreviewer and $canallocate and $workshop->assessing_allowed($USER->id)) {
     require_sesskey();
     $assessmentid = $workshop->add_allocation($submission, $USER->id);
@@ -180,7 +134,7 @@ if ($assess and $submission->id and !$isreviewer and $canallocate and $workshop-
 }
 
 if ($edit) {
-    require_once(dirname(__FILE__).'/submission_form.php');
+    require_once(__DIR__.'/submission_form.php');
 
     $submission = file_prepare_standard_editor($submission, 'content', $workshop->submission_content_options(),
         $workshop->context, 'mod_workshop', 'submission_content', $submission->id);
@@ -195,83 +149,12 @@ if ($edit) {
         redirect($workshop->view_url());
 
     } elseif ($cansubmit and $formdata = $mform->get_data()) {
-        if ($formdata->example == 0) {
-            // this was used just for validation, it must be set to zero when dealing with normal submissions
-            unset($formdata->example);
-        } else {
-            throw new coding_exception('Invalid submission form data value: example');
-        }
-        $timenow = time();
-        if (is_null($submission->id)) {
-            $formdata->workshopid     = $workshop->id;
-            $formdata->example        = 0;
-            $formdata->authorid       = $USER->id;
-            $formdata->timecreated    = $timenow;
-            $formdata->feedbackauthorformat = editors_get_preferred_format();
-        }
-        $formdata->timemodified       = $timenow;
-        $formdata->title              = trim($formdata->title);
-        $formdata->content            = '';          // updated later
-        $formdata->contentformat      = FORMAT_HTML; // updated later
-        $formdata->contenttrust       = 0;           // updated later
-        $formdata->late               = 0x0;         // bit mask
-        if (!empty($workshop->submissionend) and ($workshop->submissionend < time())) {
-            $formdata->late = $formdata->late | 0x1;
-        }
-        if ($workshop->phase == workshop::PHASE_ASSESSMENT) {
-            $formdata->late = $formdata->late | 0x2;
-        }
 
-        // Event information.
-        $params = array(
-            'context' => $workshop->context,
-            'courseid' => $workshop->course->id,
-            'other' => array(
-                'submissiontitle' => $formdata->title
-            )
-        );
-        $logdata = null;
-        if (is_null($submission->id)) {
-            $submission->id = $formdata->id = $DB->insert_record('workshop_submissions', $formdata);
-            $params['objectid'] = $submission->id;
-            $event = \mod_workshop\event\submission_created::create($params);
-            $event->trigger();
-        } else {
-            if (empty($formdata->id) or empty($submission->id) or ($formdata->id != $submission->id)) {
-                throw new moodle_exception('err_submissionid', 'workshop');
-            }
-        }
-        $params['objectid'] = $submission->id;
+        $formdata->id = $submission->id;
+        // Creates or updates submission.
+        $submission->id = $workshop->edit_submission($formdata);
 
-        // Save and relink embedded images and save attachments.
-        $formdata = file_postupdate_standard_editor($formdata, 'content', $workshop->submission_content_options(),
-            $workshop->context, 'mod_workshop', 'submission_content', $submission->id);
-
-        $formdata = file_postupdate_standard_filemanager($formdata, 'attachment', $workshop->submission_attachment_options(),
-            $workshop->context, 'mod_workshop', 'submission_attachment', $submission->id);
-
-        if (empty($formdata->attachment)) {
-            // explicit cast to zero integer
-            $formdata->attachment = 0;
-        }
-        // store the updated values or re-save the new submission (re-saving needed because URLs are now rewritten)
-        $DB->update_record('workshop_submissions', $formdata);
-        $event = \mod_workshop\event\submission_updated::create($params);
-        $event->add_record_snapshot('workshop', $workshoprecord);
-        $event->trigger();
-
-        // send submitted content for plagiarism detection
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($workshop->context->id, 'mod_workshop', 'submission_attachment', $submission->id);
-
-        $params['other']['content'] = $formdata->content;
-        $params['other']['pathnamehashes'] = array_keys($files);
-
-        $event = \mod_workshop\event\assessable_uploaded::create($params);
-        $event->set_legacy_logdata($logdata);
-        $event->trigger();
-
-        redirect($workshop->submission_url($formdata->id));
+        redirect($workshop->submission_url($submission->id));
     }
 }
 
@@ -283,19 +166,7 @@ if (!$edit and ($canoverride or $canpublish)) {
         'overridablegrade' => $canoverride);
     $feedbackform = $workshop->get_feedbackauthor_form($PAGE->url, $submission, $options);
     if ($data = $feedbackform->get_data()) {
-        $data = file_postupdate_standard_editor($data, 'feedbackauthor', array(), $workshop->context);
-        $record = new stdclass();
-        $record->id = $submission->id;
-        if ($canoverride) {
-            $record->gradeover = $workshop->raw_grade_value($data->gradeover, $workshop->grade);
-            $record->gradeoverby = $USER->id;
-            $record->feedbackauthor = $data->feedbackauthor;
-            $record->feedbackauthorformat = $data->feedbackauthorformat;
-        }
-        if ($canpublish) {
-            $record->published = !empty($data->published);
-        }
-        $DB->update_record('workshop_submissions', $record);
+        $workshop->evaluate_submission($submission, $data, $canpublish, $canoverride);
         redirect($workshop->view_url());
     }
 }
@@ -366,6 +237,7 @@ if ($submission->id) {
 
 // If not at removal confirmation screen, some action buttons can be displayed.
 if (!$delete) {
+    // Display create/edit button.
     if ($editable) {
         if ($submission->id) {
             $btnurl = new moodle_url($PAGE->url, array('edit' => 'on', 'id' => $submission->id));
@@ -377,11 +249,13 @@ if (!$delete) {
         echo $output->single_button($btnurl, $btntxt, 'get');
     }
 
+    // Display delete button.
     if ($submission->id and $deletable) {
         $url = new moodle_url($PAGE->url, array('delete' => 1));
         echo $output->single_button($url, get_string('deletesubmission', 'workshop'), 'get');
     }
 
+    // Display assess button.
     if ($submission->id and !$edit and !$isreviewer and $canallocate and $workshop->assessing_allowed($USER->id)) {
         $url = new moodle_url($PAGE->url, array('assess' => 1));
         echo $output->single_button($url, get_string('assess', 'workshop'), 'post');
@@ -467,6 +341,26 @@ if (has_capability('mod/workshop:viewallassessments', $workshop->context) or ($o
 if (!$edit and $canoverride) {
     // display a form to override the submission grade
     $feedbackform->display();
+}
+
+// If portfolios are enabled and we are not on the edit/removal confirmation screen, display a button to export this page.
+// The export is not offered if the submission is seen as a published one (it has no relation to the current user.
+if (!empty($CFG->enableportfolios)) {
+    if (!$delete and !$edit and !$seenaspublished and $submission->id and ($ownsubmission or $canviewall or $isreviewer)) {
+        if (has_capability('mod/workshop:exportsubmissions', $workshop->context)) {
+            require_once($CFG->libdir.'/portfoliolib.php');
+
+            $button = new portfolio_add_button();
+            $button->set_callback_options('mod_workshop_portfolio_caller', array(
+                'id' => $workshop->cm->id,
+                'submissionid' => $submission->id,
+            ), 'mod_workshop');
+            $button->set_formats(PORTFOLIO_FORMAT_RICHHTML);
+            echo html_writer::start_tag('div', array('class' => 'singlebutton'));
+            echo $button->to_html(PORTFOLIO_ADD_FULL_FORM, get_string('exportsubmission', 'workshop'));
+            echo html_writer::end_tag('div');
+        }
+    }
 }
 
 echo $output->footer();

@@ -432,11 +432,7 @@ function get_reserve_data($table) {
             $item->stop_date = userdate($item->stop_date, $timeformat);
 
             // Create source column.
-            if ($item->filename === '') {
-                $item->source = 'BruinMedia';
-            } else {
-                $item->source = 'Wowza';
-            }
+            $item->source = 'Wowza';
 
             // Reorder $item properties to render source before video_url.
             $temp = (object) array('courseid' => $item->courseid,

@@ -22,4 +22,5 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Popup notification';
+$string['pluginname'] = 'Web';
+$string['privacy:metadata'] = 'The messaging Web plugin does not store any personal data.';

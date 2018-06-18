@@ -104,9 +104,36 @@ function block_ucla_course_download_ucla_format_notices($course) {
     // Render the alert.
     $alertform = new course_download_alert_form(new moodle_url('/blocks/ucla_course_download/alert.php',
                 array('id' => $course->id)), null, 'post', '',
-                array('class' => 'ucla-format-notice-box'));
+                array('class' => 'alert alert-info'));
 
     $alertform->display();
 
     return true;
 }
+
+/**
+ * Adds download course materials link to admin panel.
+ *
+ * @param navigation_node $navigation The navigation node to extend.
+ * @param stdClass        $course     The course object for the tool.
+ * @param context         $context    The context of the course.
+ */
+function block_ucla_course_download_extend_navigation_course($navigation, $course, $context) {
+    global $CFG;
+    if (has_capability('block/ucla_course_download:requestzip', $context)) {
+        require_once($CFG->dirroot . '/blocks/ucla_course_download/locallib.php');
+
+        // Check if this is a student that can download the archive.
+        $isinstructor = has_capability('moodle/course:manageactivities', $context);
+        if (!$isinstructor && !student_zip_requestable($course)) {
+            // Student does not have access.
+            return;
+        }
+
+        $setting = navigation_node::create(get_string('coursedownload', 'block_ucla_course_download'),
+                new moodle_url('/blocks/ucla_course_download/view.php', array('courseid' => $course->id)),
+                navigation_node::TYPE_SETTING, null, 'coursedownload');
+
+        $navigation->add_node($setting);
+    }
+};

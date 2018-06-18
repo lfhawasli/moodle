@@ -161,7 +161,7 @@ class report_log_table_log extends table_sql {
     public function col_time($event) {
 
         if (empty($this->download)) {
-            $dateformat = get_string('strftimerecent', 'core_langconfig');
+            $dateformat = get_string('strftimedatetime', 'core_langconfig');
         } else {
             $dateformat = get_string('strftimedatetimeshort', 'core_langconfig');
         }
@@ -503,6 +503,21 @@ class report_log_table_log extends table_sql {
                 \core\event\base::LEVEL_PARTICIPATING, \core\event\base::LEVEL_TEACHING), SQL_PARAMS_NAMED, 'edulevel');
             $joins[] = "edulevel ".$edulevelsql;
             $params = array_merge($params, $edulevelparams);
+        }
+
+        // Origin.
+        if (isset($this->filterparams->origin) && ($this->filterparams->origin != '')) {
+            if ($this->filterparams->origin !== '---') {
+                // Filter by a single origin.
+                $joins[] = "origin = :origin";
+                $params['origin'] = $this->filterparams->origin;
+            } else {
+                // Filter by everything else.
+                list($originsql, $originparams) = $DB->get_in_or_equal(array('cli', 'restore', 'ws', 'web'),
+                    SQL_PARAMS_NAMED, 'origin', false);
+                $joins[] = "origin " . $originsql;
+                $params = array_merge($params, $originparams);
+            }
         }
 
         if (!($this->filterparams->logreader instanceof logstore_legacy\log\store)) {

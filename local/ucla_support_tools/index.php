@@ -46,8 +46,9 @@ $PAGE->set_title(get_string('pluginname', 'local_ucla_support_tools'));
 if (has_capability('local/ucla_support_tools:edit', $context)) {
     // Editing mode button.
     $supporttoolurl = new moodle_url($thisfile);
-    set_editing_mode_button($supporttoolurl);
-
+    $buttons = $OUTPUT->edit_button($supporttoolurl);
+    $PAGE->set_button($buttons);
+    
     if ($PAGE->user_is_editing()) {
         $PAGE->requires->yui_module('moodle-local_ucla_support_tools-categoryorganizer', 'M.local_ucla_support_tools.categoryorganizer.init', array());
         $PAGE->requires->yui_module('moodle-local_ucla_support_tools-toolorganizer', 'M.local_ucla_support_tools.toolorganizer.init', array());

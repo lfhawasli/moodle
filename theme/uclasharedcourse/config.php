@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Configuration for UCLA's Shared Server theme.
  *
@@ -24,19 +25,10 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../uclashared/config.php');
 
 $THEME->name = 'uclasharedcourse';
-$tn = 'theme_' . $THEME->name;
 
-$THEME->parents = array(
-    'uclashared',
-    'base',
-);
+$THEME->parents = array('uclashared' ,'boost');
 
-$THEME->sheets = array(
-    'uclasharedcourse',
-);
-
-$THEME->csspostprocess = 'uclashared_process_css';
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->enable_dock = true;
+$THEME->sheets[] = 'uclasharedcourse';

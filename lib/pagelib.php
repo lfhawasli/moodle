@@ -232,6 +232,9 @@ class moodle_page {
      */
     protected $_requires = null;
 
+    /** @var page_requirements_manager Saves the requirement manager object used before switching to to fragments one. */
+    protected $savedrequires = null;
+
     /**
      * @var string The capability required by the user in order to edit blocks
      * and block settings on this page.
@@ -287,6 +290,11 @@ class moodle_page {
     protected $_settingsnav = null;
 
     /**
+     * @var flat_navigation Contains a list of nav nodes, most closely related to the current page.
+     */
+    protected $_flatnav = null;
+
+    /**
      * @var navbar Contains the navbar structure.
      */
     protected $_navbar = null;
@@ -338,6 +346,33 @@ class moodle_page {
      * such as upgrading or completing a quiz.
      */
     protected $_popup_notification_allowed = true;
+
+    /**
+     * @var bool Is the settings menu being forced to display on this page (activities / resources only).
+     * This is only used by themes that use the settings menu.
+     */
+    protected $_forcesettingsmenu = false;
+
+    /**
+     * Force the settings menu to be displayed on this page. This will only force the
+     * settings menu on an activity / resource page that is being displayed on a theme that
+     * uses a settings menu.
+     *
+     * @param bool $forced default of true, can be sent false to turn off the force.
+     */
+    public function force_settings_menu($forced = true) {
+        $this->_forcesettingsmenu = $forced;
+    }
+
+    /**
+     * Check to see if the settings menu is forced to display on this activity / resource page.
+     * This only applies to themes that use the settings menu.
+     *
+     * @return bool True if the settings menu is forced to display.
+     */
+    public function is_settings_menu_forced() {
+        return $this->_forcesettingsmenu;
+    }
 
     // Magic getter methods =============================================================
     // Due to the __get magic below, you normally do not call these as $PAGE->magic_get_x
@@ -727,6 +762,18 @@ class moodle_page {
     }
 
     /**
+     * Returns the flat navigation object
+     * @return flat_navigation
+     */
+    protected function magic_get_flatnav() {
+        if ($this->_flatnav === null) {
+            $this->_flatnav = new flat_navigation($this);
+            $this->_flatnav->initialise();
+        }
+        return $this->_flatnav;
+    }
+
+    /**
      * Returns request IP address.
      *
      * @return string IP address or null if unknown
@@ -846,10 +893,22 @@ class moodle_page {
         // JavaScript for the fragment to be collected. _wherethemewasinitialised is set when header() is called.
         if (!empty($this->_wherethemewasinitialised)) {
             // Change the current requirements manager over to the fragment manager to capture JS.
+            $this->savedrequires = $this->_requires;
             $this->_requires = new fragment_requirements_manager();
         } else {
             throw new coding_exception('$OUTPUT->header() needs to be called before collecting JavaScript requirements.');
         }
+    }
+
+    /**
+     * Switches back from collecting fragment JS requirement to the original requirement manager
+     */
+    public function end_collecting_javascript_requirements() {
+        if ($this->savedrequires === null) {
+            throw new coding_exception('JavaScript collection has not been started.');
+        }
+        $this->_requires = $this->savedrequires;
+        $this->savedrequires = null;
     }
 
     /**
@@ -1246,8 +1305,8 @@ class moodle_page {
 
         if (is_string($url) && strpos($url, 'http') !== 0) {
             if (strpos($url, '/') === 0) {
-                // We have to use httpswwwroot here, because of loginhttps pages.
-                $url = $CFG->httpswwwroot . $url;
+                // Add the wwwroot to the relative url.
+                $url = $CFG->wwwroot . $url;
             } else {
                 throw new coding_exception('Invalid parameter $url, has to be full url or in shortened form starting with /.');
             }
@@ -1256,10 +1315,10 @@ class moodle_page {
         $this->_url = new moodle_url($url, $params);
 
         $fullurl = $this->_url->out_omit_querystring();
-        if (strpos($fullurl, "$CFG->httpswwwroot/") !== 0) {
-            debugging('Most probably incorrect set_page() url argument, it does not match the httpswwwroot!');
+        if (strpos($fullurl, "$CFG->wwwroot/") !== 0) {
+            debugging('Most probably incorrect set_page() url argument, it does not match the wwwroot!');
         }
-        $shorturl = str_replace("$CFG->httpswwwroot/", '', $fullurl);
+        $shorturl = str_replace("$CFG->wwwroot/", '', $fullurl);
 
         if (is_null($this->_pagetype)) {
             $this->initialise_default_pagetype($shorturl);
@@ -1406,71 +1465,28 @@ class moodle_page {
 
     /**
      * This function indicates that current page requires the https when $CFG->loginhttps enabled.
+     * Since loginhttps was removed this is no longer required or functional.
      *
-     * By using this function properly, we can ensure 100% https-ized pages
-     * at our entire discretion (login, forgot_password, change_password)
+     * @deprecated since Moodle 3.4 MDL-42834 - please do not use this function any more.
+     * @todo MDL-46267 This will be deleted in Moodle 3.8
      *
-     * @return void
      * @throws coding_exception
      */
     public function https_required() {
-        global $CFG;
-
-        if (!is_null($this->_url)) {
-            throw new coding_exception('https_required() must be used before setting page url!');
-        }
-
-        $this->ensure_theme_not_set();
-
-        $this->_https_login_required = true;
-
-        if (!empty($CFG->loginhttps)) {
-            $CFG->httpswwwroot = str_replace('http:', 'https:', $CFG->wwwroot);
-        } else {
-            $CFG->httpswwwroot = $CFG->wwwroot;
-        }
+        debugging('https_required() has been deprecated. It no longer needs to be called.', DEBUG_DEVELOPER);
     }
 
     /**
      * Makes sure that page previously marked with https_required() is really using https://, if not it redirects to https://
+     * Since loginhttps was removed this is no longer required or functional.
      *
-     * @return void (may redirect to https://self)
+     * @deprecated since Moodle 3.4 MDL-42834 - please do not use this function any more.
+     * @todo MDL-46267 This will be deleted in Moodle 3.8
+     *
      * @throws coding_exception
      */
     public function verify_https_required() {
-        global $CFG, $FULLME;
-
-        if (is_null($this->_url)) {
-            throw new coding_exception('verify_https_required() must be called after setting page url!');
-        }
-
-        if (!$this->_https_login_required) {
-            throw new coding_exception('verify_https_required() must be called only after https_required()!');
-        }
-
-        if (empty($CFG->loginhttps)) {
-            // Https not required, so stop checking.
-            return;
-        }
-
-        if (strpos($this->_url, 'https://')) {
-            // Detect if incorrect PAGE->set_url() used, it is recommended to use root-relative paths there.
-            throw new coding_exception('Invalid page url. It must start with https:// for pages that set https_required()!');
-        }
-
-        if (!empty($CFG->sslproxy)) {
-            // It does not make much sense to use sslproxy and loginhttps at the same time.
-            return;
-        }
-
-        // Now the real test and redirect!
-        // NOTE: do NOT use this test for detection of https on current page because this code is not compatible with SSL proxies,
-        //       instead use is_https().
-        if (strpos($FULLME, 'https:') !== 0) {
-            // This may lead to infinite redirect on an incorrectly configured site.
-            // In that case set $CFG->loginhttps=0; within /config.php.
-            redirect($this->_url);
-        }
+        debugging('verify_https_required() has been deprecated. It no longer needs to be called.', DEBUG_DEVELOPER);
     }
 
     // Initialisation methods =====================================================
@@ -1505,9 +1521,6 @@ class moodle_page {
                 $title .= ' - ';
             }
             $this->set_title($title . get_string('maintenancemode', 'admin'));
-        } else {
-            // Show the messaging popup if there are messages.
-            message_popup_window();
         }
 
         $this->initialise_standard_body_classes();
@@ -1560,6 +1573,11 @@ class moodle_page {
                 $target = RENDERER_TARGET_MAINTENANCE;
             }
             $OUTPUT = $this->get_renderer('core', null, $target);
+        }
+
+        if (!during_initial_install()) {
+            $filtermanager = filter_manager::instance();
+            $filtermanager->setup_page_for_globally_available_filters($this);
         }
 
         $this->_wherethemewasinitialised = debug_backtrace();

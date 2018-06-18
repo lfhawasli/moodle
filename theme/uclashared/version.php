@@ -24,6 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2016082900;
-$plugin->requires  = 2014050800;
+$plugin->version   = 2018060800;
+$plugin->requires  = 2017110800;
 $plugin->component = 'theme_uclashared';
+
+// This is a list of plugins, this plugin depends on (and their versions).
+$plugin->dependencies = [
+    'theme_boost' => '2017111300'
+];

@@ -1,0 +1,9 @@
+{
+  "moodle-block_ucla_search-search": {
+    "requires": [
+        "autocomplete",
+        "autocomplete-highlighters",
+        "autocomplete-filters"
+    ]
+  }
+}

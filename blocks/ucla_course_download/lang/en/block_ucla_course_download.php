@@ -32,11 +32,11 @@ $string['request_unavailable'] = 'There are no <strong>{$a}</strong> available f
 $string['noaccess'] = 'You do not have access to view this page';
 
 /* alert notice */
-$string['alert_msg'] = 'You can visit the Control Panel or click "Download course materials" below to request a zip file of your course materials. Files are subject to change without notice.';
+$string['alert_msg'] = 'You can click "Download course materials" below to request a zip file of your course materials. Files are subject to change without notice.';
 $string['alert_download'] = 'Download course materials';
 $string['alert_dismiss'] = 'Dismiss';
 $string['alert_dismiss_message'] = 'You will no longer be prompted to download course material. ' .
-        'Use the "Download course materials" link in the Control Panel to request a zip file later.';
+        'Use the "Download course materials" link in the Admin panel to request a zip file later.';
 
 /* Email strings */
 $string['emailsubject'] = 'Your {$a->shortname} {$a->type} are ready';
@@ -56,8 +56,8 @@ $string['emailcopyright'] = 'This zip file may contain copyrighted material. '
 $string['settingsdisable'] = 'Disable feature for students';
 $string['allowstudentaccess'] = 'Allow students';
 $string['allowstudentaccess_desc'] = 'If enabled, will display alert and give ' .
-        'students a link to "Download course materials" page in their Control ' .
-        'Panel. They will get access as soon as the site is available. ' .
+        'students a link to "Download course materials" page in their Admin ' .
+        'panel. They will get access as soon as the site is available. ' .
         'Students will continue to have access to the "Download course ' .
         'materials" page until the course is hidden or they lose access to ' .
         'the course site.';
@@ -67,6 +67,7 @@ $string['ziplifetime_desc'] = 'This specifies how long to keep zip files ' .
         'the zip file and request will be deleted.';
 $string['maxfilesize'] = 'Maximum file size in MB';
 $string['maxfilesize_desc'] = 'Files over this size will be excluded from the zip file.';
+$string['studentaccessdisabled'] = 'Students do not have access to this feature. To enable this feature for students please enable the "Download course materials" option in the course settings.';
 
 // Instructor view of files
 $string['instructorfilewarning'] = 'Files included are ones that are already visible ' .
@@ -87,3 +88,6 @@ $string['eventfilelistviewed'] = 'Course download status page viewed';
 $string['ucla_course_download:addinstance'] = 'Add a new UCLA course download block';
 $string['ucla_course_download:myaddinstance'] = 'Add a new UCLA course download block to My home';
 $string['ucla_course_download:requestzip'] = 'Request/download a course download zip file';
+
+// Admin panel strings.
+$string['coursedownload'] = 'Download course material';

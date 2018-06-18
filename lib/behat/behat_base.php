@@ -28,7 +28,8 @@
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
-use Behat\Mink\Exception\ExpectationException as ExpectationException,
+use Behat\Mink\Exception\DriverException,
+    Behat\Mink\Exception\ExpectationException as ExpectationException,
     Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException,
     Behat\Mink\Element\NodeElement as NodeElement;
 
@@ -335,8 +336,6 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                 if (!$exception) {
                     $exception = $e;
                 }
-                // We wait until no exception is thrown or timeout expires.
-                continue;
             }
 
             if ($this->running_javascript()) {
@@ -574,6 +573,41 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     }
 
     /**
+     * Ensures that the provided node has a attribute value set. This step can be used to check if specific
+     * JS has finished modifying the node.
+     *
+     * @throws ExpectationException
+     * @param NodeElement $node
+     * @param string $attribute attribute name
+     * @param string $attributevalue attribute value to check.
+     * @return void Throws an exception if it times out without the element being visible
+     */
+    protected function ensure_node_attribute_is_set($node, $attribute, $attributevalue) {
+
+        if (!$this->running_javascript()) {
+            return;
+        }
+
+        // Exception if it timesout and the element is still there.
+        $msg = 'The "' . $node->getXPath() . '" xpath node is not visible and it should be visible';
+        $exception = new ExpectationException($msg, $this->getSession());
+
+        // It will stop spinning once the $args[1]) == $args[2], and method returns true.
+        $this->spin(
+            function($context, $args) {
+                if ($args[0]->getAttribute($args[1]) == $args[2]) {
+                    return true;
+                }
+                return false;
+            },
+            array($node, $attribute, $attributevalue),
+            self::EXTENDED_TIMEOUT,
+            $exception,
+            true
+        );
+    }
+
+    /**
      * Ensures that the provided element is visible and we can interact with it.
      *
      * Returns the node in case other actions are interested in using it.
@@ -692,7 +726,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             $pending = '';
             try {
                 $jscode = '
-                    return function() {
+                    return (function() {
                         if (typeof M === "undefined") {
                             if (document.readyState === "complete") {
                                 return "";
@@ -706,7 +740,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                         } else {
                             return "incomplete"
                         }
-                    }();';
+                    }());';
                 $pending = $this->getSession()->evaluateScript($jscode);
             } catch (NoSuchWindow $nsw) {
                 // We catch an exception here, in case we just closed the window we were interacting with.
@@ -783,6 +817,10 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
 
                 // Getting the debugging info and the backtrace.
                 $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.alert-error');
+                // If errorinfoboxes is empty, try find alert-danger (bootstrap4) class.
+                if (empty($errorinfoboxes)) {
+                    $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.alert-danger');
+                }
                 // If errorinfoboxes is empty, try find notifytiny (original) class.
                 if (empty($errorinfoboxes)) {
                     $errorinfoboxes = $this->getSession()->getPage()->findAll('css', 'div.notifytiny');
@@ -844,6 +882,8 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
 
         } catch (NoSuchWindow $e) {
             // If we were interacting with a popup window it will not exists after closing it.
+        } catch (DriverException $e) {
+            // Same reason as above.
         }
     }
 
@@ -894,6 +934,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
      */
     protected function get_session_user() {
         global $DB;
+
         $sid = $this->getSession()->getCookie('MoodleSession');
         if (empty($sid)) {
             throw new coding_exception('failed to get moodle session');
@@ -903,5 +944,28 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
             throw new coding_exception('failed to get user from seession id '.$sid);
         }
         return $DB->get_record('user', ['id' => $userid]);
+    }
+
+    /**
+     * Trigger click on node via javascript instead of actually clicking on it via pointer.
+     *
+     * This function resolves the issue of nested elements with click listeners or links - in these cases clicking via
+     * the pointer may accidentally cause a click on the wrong element.
+     * Example of issue: clicking to expand navigation nodes when the config value linkadmincategories is enabled.
+     * @param NodeElement $node
+     */
+    protected function js_trigger_click($node) {
+        if (!$this->running_javascript()) {
+            $node->click();
+        }
+        $this->ensure_node_is_visible($node); // Ensures hidden elements can't be clicked.
+        $xpath = $node->getXpath();
+        $driver = $this->getSession()->getDriver();
+        if ($driver instanceof \Moodle\BehatExtension\Driver\MoodleSelenium2Driver) {
+            $script = "Syn.click({{ELEMENT}})";
+            $driver->triggerSynScript($xpath, $script);
+        } else {
+            $driver->click($xpath);
+        }
     }
 }

@@ -133,5 +133,39 @@ function xmldb_format_ucla_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014110500, 'format', 'ucla');
     }
 
+    // Remove numsections (CCLE-7121), based on MDL-57769.
+    if ($oldversion < 2018021300) {
+        require_once($CFG->dirroot . '/course/format/ucla/db/upgradelib.php');
+
+        // Remove 'numsections' option. Handle orphaned and to-be-created sections.
+        format_ucla_upgrade_remove_numsections();
+
+        upgrade_plugin_savepoint(true, 2018021300, 'format', 'ucla');
+    }
+
+    if ($oldversion < 2018050100) {
+        // During upgrade to Moodle 3.3 it could happen that general section (section 0) became 'invisible'.
+        // It should always be visible.
+        $DB->execute("UPDATE {course_sections} SET visible=1 WHERE visible=0 AND section=0 AND course IN
+        (SELECT id FROM {course} WHERE format=?)", ['ucla']);
+        upgrade_plugin_savepoint(true, 2018050100, 'format', 'ucla');
+    }
+
+    if ($oldversion < 2018061500) {
+        // Allow only certain roles access to Admin panel. 
+        $roles = array('manager', 'editinginstructor', 'supervising_instructor', 
+                'ta_instructor', 'ta_admin', 'projectlead', 'projectcontributor', 
+                'instructional_assistant', 'grader', 'editor', 
+                'studentfacilitator', 'coursesitemanager');
+        $context = context_system::instance();
+        foreach ($roles as $role) {
+            $roleid = $DB->get_field('role', 'id', array('shortname' => $role));
+            if (!empty($roleid)) {
+                role_change_permission($roleid, $context, 'format/ucla:viewadminpanel', CAP_ALLOW);                
+            }
+        }
+        upgrade_plugin_savepoint(true, 2018061500, 'format', 'ucla');
+    }
+
     return true;
 }

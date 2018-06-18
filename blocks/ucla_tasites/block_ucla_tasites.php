@@ -1053,50 +1053,6 @@ class block_ucla_tasites extends block_base {
     }
 
     /**
-     * Adds link to block in Control Panel.
-     *
-     * @param stdClass $course
-     * @param context_course $context
-     *
-     * @return mixed    Returns array that can be parsed into Control Panel link
-     *                  or returns false if user cannot access TA sites.
-     */
-    public static function ucla_cp_hook($course, $context) {
-        $courseid = $course->id;
-        $cpmodule = false;
-
-        $accessible = false;
-        try {
-            // Can create a TA site if there are TAs or course has sections.
-            if (self::check_access($courseid) && !self::is_tasite($courseid)) {
-                $mapping = self::get_tasection_mapping($courseid);
-                $accessible = self::get_tasite_users($courseid) ||
-                        (isset($mapping['bysection']) && !isset($mapping['bysection']['all']));
-            }
-        } catch (moodle_exception $e) {
-            // Do nothing.
-            $accessible = false;
-        }
-
-        // User can access TA sites, so provide link.
-        if ($accessible) {
-            $cpmodule = array(
-                array(
-                    'item_name' => 'ucla_make_tasites',
-                    'action' => new moodle_url(
-                            '/blocks/ucla_tasites/index.php', array(
-                        'courseid' => $course->id
-                            )
-                    ),
-                    'tags' => array('ucla_cp_mod_other')
-                )
-            );
-        }
-
-        return $cpmodule;
-    }
-
-    /**
      * Checks that enrol_meta is enabled, and then enables the plugin
      * if possible.
      *

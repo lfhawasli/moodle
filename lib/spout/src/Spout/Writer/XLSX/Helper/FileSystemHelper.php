@@ -94,7 +94,7 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper
      */
     protected function createRootFolder()
     {
-        $this->rootFolder = $this->createFolder($this->baseFolderPath, uniqid('xlsx', true));
+        $this->rootFolder = $this->createFolder($this->baseFolderRealPath, uniqid('xlsx', true));
         return $this;
     }
 
@@ -284,7 +284,7 @@ EOD;
 EOD;
 
         /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-        $escaper = new \Box\Spout\Common\Escaper\XLSX();
+        $escaper = \Box\Spout\Common\Escaper\XLSX::getInstance();
 
         /** @var Worksheet $worksheet */
         foreach ($worksheets as $worksheet) {

@@ -5,6 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/local/ucla/registrar/registrar_query.base.php');
+require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclacourserequestor/lib.php');
 
 class block_ucla_office_hours extends block_base {
     const DISPLAYKEY_PREG = '/([0-9]+[_])(.*)/';
@@ -34,31 +35,6 @@ class block_ucla_office_hours extends block_base {
             'block-ucla_office_hours' => false,
             'not-really-applicable' => true
         );
-    }
-
-    /**
-     * Adds link to control panel.
-     *
-     * @param mixed $course
-     * @param mixed $context
-     * @return type
-     */
-    public static function ucla_cp_hook($course, $context) {
-        global $USER;
-
-        // display office hours link if user has ability to edit office hours
-        if (block_ucla_office_hours::allow_editing($context, $USER->id)) {
-            return array(array(
-                'item_name' => 'edit_office_hours',
-                'action' => new moodle_url(
-                        '/blocks/ucla_office_hours/officehours.php',
-                        array('courseid' => $course->id, 'editid' => $USER->id)
-                    ),
-                'tags' => array('ucla_cp_mod_common', 'ucla_cp_mod_other'),
-                'required_cap' => null,
-                'options' => array('post' => true)
-            ));
-        }
     }
 
     /**
@@ -690,6 +666,27 @@ class block_ucla_office_hours extends block_base {
                     'srs' => $termsrs->srs
                 )
             ));
+        }
+
+        // If no sections found, then see if course is crosslisted.
+        if (empty($tasections)) {
+            if (count($termsrses) > 1) {
+                $termsrs = reset($termsrses);
+                $results = get_crosslisted_courses($termsrs->term, $termsrs->srs);
+                // Make sure course is not officially cross-listed. We only want
+                // to show sections for unofficial crosslists, because then it
+                // makes sense to show which section a TA is associated with.
+                if (empty($results)) {
+                    foreach ($termsrses as $termsrs) {
+                        $tasection = array();
+                        $result = ucla_get_reg_classinfo($termsrs->term, $termsrs->srs);
+                        $tasection['sect_no'] = sprintf('%s %s-%s',
+                                $result->subj_area, $result->coursenum, $result->sectnum);
+                        $tasection['srs_crs_no'] = $termsrs->srs;
+                        $tasections[] = $tasection;
+                    }
+                }
+            }
         }
 
         $sections = array();

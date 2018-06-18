@@ -89,7 +89,7 @@ class invitation_manager {
 
             // Display an icon with requested (css can be changed in stylesheet).
             if ($withicon) {
-                $inviteicon = html_writer::img($OUTPUT->pix_url('invite', 'enrol_invitation'), "invitation",
+                $inviteicon = html_writer::img($OUTPUT->pix_icon('invite', 'enrol_invitation'), "invitation",
                         array('class' => "enrol_invitation_item_icon",
                               'title' => "invitation"));
             }
@@ -337,7 +337,7 @@ class invitation_manager {
             $emailinfo = prepare_notice_object($invitation);
             $emailinfo->userfullname = trim($USER->firstname . ' ' . $USER->lastname);
             $emailinfo->useremail = $USER->email;
-            $courseenrolledusersurl = new moodle_url('/enrol/users.php', array('id' => $invitation->courseid));
+            $courseenrolledusersurl = new moodle_url('/user/index.php', array('id' => $invitation->courseid));
             $emailinfo->courseenrolledusersurl = $courseenrolledusersurl->out(false);
             $invitehistoryurl = new moodle_url('/enrol/invitation/history.php', array('courseid' => $invitation->courseid));
             $emailinfo->invitehistoryurl = $invitehistoryurl->out(false);

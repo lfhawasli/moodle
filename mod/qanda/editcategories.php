@@ -243,8 +243,8 @@ if ( $action ) {
                </td>
                <td style="width:19%" align="center" class="action">
                <?php
-                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=delete&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" . get_string("delete") . "\"src=\"" . $OUTPUT->pix_url('t/delete') . "\" class=\"iconsmall\" /></a> ";
-                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=edit&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" . get_string("edit") . "\" src=\"" . $OUTPUT->pix_url('t/edit') . "\" class=\"iconsmall\" /></a>";
+                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=delete&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" . get_string("delete") . "\"src=\"" . $OUTPUT->image_url('t/delete') . "\" class=\"iconsmall\" /></a> ";
+                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=edit&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" . get_string("edit") . "\" src=\"" . $OUTPUT->image_url('t/edit') . "\" class=\"iconsmall\" /></a>";
                ?>
                </td>
              </tr>

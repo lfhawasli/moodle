@@ -1,0 +1,12 @@
+/**
+ * File for form styles.
+ */
+
+// Hides underline for required icon.
+abbr[title], abbr[data-original-title] {
+    border-bottom: none;
+}
+
+#id_cancelbutton1, #id_cancelbutton2 {
+    @extend .btn-secondary;
+}

@@ -52,7 +52,7 @@ class core_question_renderer extends plugin_renderer_base {
     public function question_preview_link($questionid, context $context, $showlabel) {
         if ($showlabel) {
             $alt = '';
-            $label = ' ' . get_string('preview');
+            $label = get_string('preview');
             $attributes = array();
         } else {
             $alt = get_string('preview');
@@ -328,7 +328,7 @@ class core_question_renderer extends plugin_renderer_base {
             $alt = get_string('notflagged', 'question');
         }
         $attributes = array(
-            'src' => $this->pix_url($icon),
+            'src' => $this->image_url($icon),
             'alt' => $alt,
         );
         if ($id) {

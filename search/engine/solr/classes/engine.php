@@ -231,7 +231,9 @@ class engine extends \core_search\engine {
         } else if (isset($response->response->numFound)) {
             // Get the number of results for standard queries.
             $found = $response->response->numFound;
-            $included = count($response->response->docs);
+            if ($found > 0 && is_array($response->response->docs)) {
+                $included = count($response->response->docs);
+            }
         }
 
         return array($included, $found);
@@ -1001,7 +1003,7 @@ class engine extends \core_search\engine {
      *
      * Return false to prevent the search area completed time and stats from being updated.
      *
-     * @param \core_search\area\base $searcharea The search area that was complete
+     * @param \core_search\base $searcharea The search area that was complete
      * @param int $numdocs The number of documents that were added to the index
      * @param bool $fullindex True if a full index is being performed
      * @return bool True means that data is considered indexed
@@ -1144,6 +1146,7 @@ class engine extends \core_search\engine {
      * @return \SolrClient
      */
     protected function get_search_client($triggerexception = true) {
+        global $CFG;
 
         // Type comparison as it is set to false if not available.
         if ($this->client !== null) {
@@ -1164,6 +1167,15 @@ class engine extends \core_search\engine {
             'ssl_capath' => !empty($this->config->ssl_capath) ? $this->config->ssl_capath : '',
             'timeout' => !empty($this->config->server_timeout) ? $this->config->server_timeout : '30'
         );
+
+        if ($CFG->proxyhost && !is_proxybypass('http://' . $this->config->server_hostname . '/')) {
+            $options['proxy_host'] = $CFG->proxyhost;
+            $options['proxy_port'] = $CFG->proxyport;
+        }
+
+        if (!class_exists('\SolrClient')) {
+            throw new \core_search\engine_exception('enginenotinstalled', 'search', '', 'solr');
+        }
 
         $client = new \SolrClient($options);
 
@@ -1188,7 +1200,8 @@ class engine extends \core_search\engine {
             return $this->curl;
         }
 
-        $this->curl = new \curl();
+        // Connection to Solr is allowed to use 'localhost' and other potentially blocked hosts/ports.
+        $this->curl = new \curl(['ignoresecurity' => true]);
 
         $options = array();
         // Build the SSL options. Based on pecl-solr and general testing.
@@ -1215,6 +1228,9 @@ class engine extends \core_search\engine {
                 $options['CURLOPT_CAPATH'] = $this->config->ssl_capath;
             }
         }
+
+        // Set timeout as for Solr client.
+        $options['CURLOPT_TIMEOUT'] = !empty($this->config->server_timeout) ? $this->config->server_timeout : '30';
 
         $this->curl->setopt($options);
 

@@ -202,37 +202,11 @@ class block_ucla_modify_coursemenu extends block_base {
      * @return array   Returns link to tool.
      */
     public static function get_editing_link($params) {
-        $link = html_writer::link(
-                new moodle_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
-                array('courseid' => $params['course']->id, 'section' => $params['section'])),
-                get_string('pluginname', 'block_ucla_modify_coursemenu'));
-        // Site menu block arranges editing links by key, make sure this is the first link.
-        return array(1 => $link);
-    }
-
-    /**
-     * Return information for displaying this block in the control panel.
-     *
-     * @param stdClass $course
-     * @param context $context
-     * @return array of "modules", where each "module" is
-     * an array of (variable name => value) to initialize a ucla_cp_module.
-     */
-    public static function ucla_cp_hook($course, $context) {
-        $section = optional_param('section', null, PARAM_INT);
-        $params = array('courseid' => $course->id);
-        if (!is_null($section)) {
-            $params['section'] = $section;
-        }
-        return array(array(
-            'item_name' => 'modify_course_sections',
-            'action' => new moodle_url(
-                    '/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
-                    $params
-                ),
-            'tags' => array('ucla_cp_mod_common'),
-            'required_cap' => 'moodle/course:update'
-        ));
+        $icon = 'fa-pencil';    // Fontawesome icon.
+        $link = new moodle_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
+                array('courseid' => $params['course']->id, 'section' => $params['section']));
+        $text = get_string('pluginname', 'block_ucla_modify_coursemenu');
+        return array('icon' => $icon, 'link' => $link->out(false), 'text' => $text);
     }
 
     /**

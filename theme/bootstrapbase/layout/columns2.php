@@ -22,14 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Set default (LTR) layout mark-up for a two column page (side-pre-only).
 $regionmain = 'span9 pull-right';
 $sidepre = 'span3 desktop-first-column';
-// Reset layout mark-up for RTL languages.
-if (right_to_left()) {
-    $regionmain = 'span9 desktop-first-column';
-    $sidepre = 'span3 pull-right';
-}
 
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
@@ -81,6 +75,9 @@ echo $OUTPUT->doctype() ?>
         <p class="helplink"><?php echo $OUTPUT->page_doc_link(); ?></p>
         <?php
         echo $OUTPUT->login_info();
+        ?>
+        <div class="tool_usertours-resettourcontainer"></div>
+        <?php
         echo $OUTPUT->home_link();
         echo $OUTPUT->standard_footer_html();
         ?>

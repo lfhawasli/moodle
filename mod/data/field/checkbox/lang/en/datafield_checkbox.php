@@ -25,3 +25,5 @@
  */
 
 $string['pluginname'] = 'Checkbox';
+$string['fieldtypelabel'] = 'Checkbox field';
+$string['privacy:metadata'] = 'The Checkbox field component does not store any personal data itself, it uses tables defined in mod_data.';

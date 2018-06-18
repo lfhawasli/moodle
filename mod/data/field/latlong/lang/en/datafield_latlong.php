@@ -25,3 +25,5 @@
  */
 
 $string['pluginname'] = 'Latlong';
+$string['fieldtypelabel'] = 'Latitude/longitude field';
+$string['privacy:metadata'] = 'The Latitude/longitude field component does not store any personal data, it uses tables defined in mod_data.';

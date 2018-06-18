@@ -55,18 +55,6 @@ $string['bccrosslistmedia'] = 'Crosslisting media';
 $string['bccrosslistentries'] = 'Crosslisting {$a->course1} with {$a->course2}';
 $string['bcfoundupdatedentry'] = 'Already updated {$a}';
 
-// Strings for bruinmedia_dbsync.
-// Error messages.
-$string['errbmmsglocation'] = "ERROR: No location set for BruinMedia data.";
-$string['errbmmsgemail'] = "ERROR: No email set for BruinMedia error notification.";
-$string['errbmmsgquiet'] = "ERROR: Cannot access configuration option quiet_mode.";
-$string['errbminsert'] = "ERROR: Problem writing to the database.";
-$string['errbminvalidrowlen'] = "ERROR: Invalid row length in provided BruinMedia data.";
-// Notification messages.
-$string['bmstartnoti'] = "Starting BruinMedia DB update:";
-$string['bmsuccessnoti'] = '... {$a} records successfully inserted.';
-$string['bmnoentries'] = 'No BruinMedia entries found.';
-
 // Strings for libraryreserves_dbsync.
 // Error messages.
 $string['errlrmsglocation'] = "ERROR: No location set for library reserves data.";
@@ -76,8 +64,8 @@ $string['warnnonexistentsrs'] = 'WARNING: Found non-existent srs {$a->term} {$a-
 $string['noticediscussionsrs'] = 'NOTICE: Found discussion srs {$a->srs}, using primary {$a->primary_srs}';
 $string['noticefoundaltcourseid'] = 'NOTICE: Found courseid {$a->courseid} by using term/subject/cat_num: {$a->term}-{$a->subject_area}-{$a->cat_num}-{$a->sec_num}';
 // Notification messages.
-$string['lrstartnoti'] = "Starting digitial audio DB update:";
-$string['lrnoentries'] = 'No digitial audio reserve entries found.';
+$string['lrstartnoti'] = "Starting library reserves DB update:";
+$string['lrnoentries'] = 'No library reserves entries found.';
 
 // Strings for videoreserves_dbsync.
 // Error messages.

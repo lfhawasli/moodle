@@ -1,0 +1,173 @@
+/**
+ * Variables to use in theme.
+ *
+ * Use this file to override any variables from Boost. Or to add variables
+ * for use in the UCLA theme.
+ *
+ * NOTE: In SCSS any variables must be defined first before they can be used.
+ */
+
+// Boost variables.
+
+// Colors
+$gray-dark:                 #373a3c !default;
+$gray:                      #55595c !default;
+$gray-light:                #818a91 !default;
+$gray-lighter:              #eceeef !default;
+$gray-lightest:             #f7f7f9 !default;
+
+$brand-primary:             #0072b1 !default;   // CCLE Blue.
+$brand-info:                $gray !default;
+$brand-success:             #77b300 !default;
+$brand-warning:             #ff8800 !default;
+$brand-danger:              #ff4136 !default;
+$brand-inverse:             $gray-dark !default;
+$navbar-height:             50px !default;
+
+// Spacing
+$spacer:   1rem !default;
+$spacer-x: $spacer !default;
+$spacer-y: $spacer !default;
+$border-width: 1px !default;
+$small-spacer: 0.7rem !default;
+
+// Body
+$body-bg:    #f4f4f4 !default;
+$body-color: #262626 !default;
+
+// Blocks
+$blocks-column-width: 250px !default;
+$blocks-main-region-width: $blocks-column-width + 10px;
+
+// Typography
+$font-family-sans-serif: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-size-root: 14px !default;
+
+// Tables
+$table-bg:                      transparent !default;
+$table-bg-accent:               #fafafa !default;
+$table-bg-hover:                #f5f5f5 !default;
+$table-bg-active:               $table-bg-hover !default;
+$table-border-color:            #f4f4f4 !default;
+
+// Dropdowns
+$dropdown-border-color:          #e2e2e2 !default;
+$dropdown-link-color:            $body-color;
+
+// Navbar
+$navbar-light-color:                rgba(0, 0, 0, .535) !default;
+$navbar-light-hover-color:          $brand-primary !default;
+$navbar-light-active-color:         $brand-primary !default;
+
+// Cards
+$card-border-radius:       0 !default;
+$card-border-color:        rgba(238, 238, 238, 1) !default;
+
+// Breadcrumbs
+$breadcrumb-bg:                 transparent !default;
+$breadcrumb-padding-x:          0 !default;
+$breadcrumb-divider: "/" !default;
+$breadcrumb-divider-rtl: "/" !default;
+
+// Override Boost variables.
+$link-hover-color: $brand-primary;
+
+// UCLA Variables.
+
+// UCLA colors.
+$ucla-color-blue:   #3284bf !default;
+$ucla-color-gold:   #ffe800 !default;
+$ccle-color-logo:   #ffbc00 !default;
+$ccle-light-blue:   #bfefff !default;
+
+// Colors.
+$btn-color-editing: #f29644;
+$link-color-editing: #ff4500;
+
+// TA site colors.
+$ta-site-color: #fff5cb;
+$ta-site-hover-color: #fffae5;
+
+/*// Used by course format.
+$ccle-light-blue:               #d1dbef;
+$ccle-lighter-blue:             #dfe7f4;
+$ccle-border-blue:              #afc5f0;
+$ccle-dark-blue:                #394a6e;*/
+
+// Session colors
+$session-fall-background-color: #ec8539 !default;
+$session-fall-color: black;
+
+$session-spring-background-color: #99cb52 !default;
+$session-spring-color: black;
+
+$session-winter-background-color: #11bcfb !default;
+$session-winter-color: black;
+
+$session-summer-background-color: #f4ec35 !default;
+$session-summer-color: black;
+
+// Header variables
+
+/**
+ * Header color for PROD header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-prod:     #2c5e91 !default;
+
+/**
+ * Header color for TEST header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-test:     #DA9C31 !default;
+
+/**
+ * Header color for STAGE header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-stage:    #5749A7 !default;
+
+/**
+ * Header color for development environment header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-dev:      #8fb33e !default;
+
+/**
+ * System indicator (right below header) background color
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-system-background: #fff !default;
+
+/**
+ * System indicator text color
+ *
+ * @type Color
+ * @group header
+*/
+$header-color-system-text:   $header-color-prod;
+
+/**
+ * Header height.  All elements in the header must have this height or smaller.
+ * 
+ * @type Number in px
+ * @group header 
+ */
+$header-height: 40px;
+
+/**
+ * Override Boost secondary button color so it matches what Boostrap 4 has.
+ */
+$btn-secondary-color:            $gray-dark !default;
+$btn-secondary-bg:               $gray-lighter !default;
+$btn-secondary-border:           #d0d5d8 !default;

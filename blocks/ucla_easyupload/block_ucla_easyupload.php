@@ -150,59 +150,6 @@ class block_ucla_easyupload extends block_base {
     }
 
     /**
-     * The hook callback for the block.
-     *
-     * @param stdClass $course
-     * @param context_course $context
-     * @return array
-     */
-    public static function ucla_cp_hook($course, $context) {
-        global $CFG;
-
-        $thispath = '/blocks/ucla_easyupload/upload.php';
-
-        $commoncomponents = array('file', 'link');
-        $othercomponents = array('activity', 'resource', 'subheading',
-            'text');
-
-        // Give proper section.
-        $section = course_get_format($course)->figure_section($course);
-        $sectiontype = 'section';
-        $sectionvalue = $section;
-        // Handle special case for show_all.
-        if ($section == UCLA_FORMAT_DISPLAY_ALL) {
-            $sectiontype = 'show_all';
-            $sectionvalue = 1;
-        }
-
-        $allmods = array();
-
-        foreach ($commoncomponents as $common) {
-            $allmods[] = array(
-                'item_name' => 'add_' . $common,
-                'tags' => array('ucla_cp_mod_common'),
-                'action' => new moodle_url($thispath,
-                    array('course_id' => $course->id, 'type' => $common,
-                        $sectiontype => $sectionvalue)),
-                'required_cap' => 'moodle/course:manageactivities'
-            );
-        }
-
-        foreach ($othercomponents as $common) {
-            $allmods[] = array(
-                'item_name' => 'add_' . $common,
-                'tags' => array('ucla_cp_mod_other'),
-                'action' => new moodle_url($thispath,
-                    array('course_id' => $course->id, 'type' => $common,
-                        $sectiontype => $sectionvalue)),
-                'required_cap' => 'moodle/course:manageactivities'
-            );
-        }
-
-        return $allmods;
-    }
-
-    /**
      *  Do not allow block to be added anywhere
      */
     public function applicable_formats() {

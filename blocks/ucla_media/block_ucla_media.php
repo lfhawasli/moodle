@@ -48,20 +48,20 @@ class block_ucla_media extends block_base {
     /**
      * Hook into UCLA Site menu block.
      *
-     * @param object $course
+     * @param array $course
      *
      * @return array
      */
     public static function get_navigation_nodes($course) {
         global $DB;
-        $nodes = array();
+        $retval = null;
 
         $courseid = $course['course']->id;
 
         // Make sure user is logged in.
         $context = context_course::instance($courseid);
         if (!is_enrolled($context) && !has_capability('moodle/course:view', $context)) {
-            return $nodes;
+            return $retval;
         }
         
         $bruincastfound = $DB->record_exists('ucla_bruincast',
@@ -71,7 +71,7 @@ class block_ucla_media extends block_base {
                     'block_ucla_media'), new moodle_url('/blocks/ucla_media/bcast.php',
                             array('courseid' => $courseid)));
             $node->add_class('video-reserves-link');
-            $nodes[] = $node;
+            $retval = $node;
         } else {
             $videoreservesfound = $DB->record_exists('ucla_video_reserves',
                 array('courseid' => $courseid));
@@ -80,7 +80,7 @@ class block_ucla_media extends block_base {
                         'block_ucla_media'), new moodle_url('/blocks/ucla_media/videoreserves.php',
                                 array('courseid' => $courseid)));
                 $node->add_class('video-reserves-link');
-                $nodes[] = $node;
+                $retval = $node;
             } else {
                 $libraryreservesfound = $DB->get_records('ucla_library_music_reserves',
                         array('courseid' => $courseid));
@@ -89,12 +89,12 @@ class block_ucla_media extends block_base {
                             'block_ucla_media'), new moodle_url('/blocks/ucla_media/libreserves.php',
                                     array('courseid' => $courseid)));
                     $node->add_class('video-reserves-link');
-                    $nodes[] = $node;
+                    $retval = $node;
                 }
             }
         }
 
-        return $nodes;
+        return $retval;
     }
 
     /**

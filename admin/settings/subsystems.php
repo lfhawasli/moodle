@@ -54,4 +54,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableglobalsearch', new lang_string('enableglobalsearch', 'admin'),
         new lang_string('enableglobalsearch_desc', 'admin'), 0, 1, 0));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox('allowstealth', new lang_string('allowstealthmodules'),
+        new lang_string('allowstealthmodules_help'), 0, 1, 0));
 }

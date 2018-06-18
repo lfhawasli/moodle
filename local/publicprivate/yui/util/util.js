@@ -13,7 +13,7 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
         GROUPMODEFILLER : 'span.filler',
         SPINNERCOMMANDDIV : 'div.commands',
         MODULEIDPREFIX : 'module-',
-        PUBLICPRIVATEIMG : 'a.publicprivate img',
+        PUBLICPRIVATEIMG : 'a.publicprivate i',
         PUBLICPRIVATETEXT : 'a.publicprivate span.menu-action-text'
     };
     
@@ -47,11 +47,13 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             var next = (current == 'public') ? 'private' : 'public';
 
             // Swap icon.
-            mod.one(CSS.PUBLICPRIVATEIMG).setAttrs({
-                // After we toggle, the activity's state will be 'next'. So the 'src' uses next.
-                'src' : M.util.image_url(this.get(next + 'pix'), this.get('component')),
-                // The text will allow the user to toggle again, which will bring the state back to 'current'.
-                'alt' : M.util.get_string('publicprivatemake' + current, 'local_publicprivate')
+            var imageObject = mod.one(CSS.PUBLICPRIVATEIMG);
+            imageObject.addClass(this.get(current + 'pix'));
+            imageObject.removeClass(this.get(next + 'pix'));
+                
+            imageObject.setAttrs({
+                'title' : M.util.get_string('publicprivatemake' + current, 'local_publicprivate'),
+                'aria-label' : M.util.get_string('publicprivatemake' + current, 'local_publicprivate')
             });
 
             // Change text: after this toggle (to 'next'), the following toggle makes the state 'current'.
@@ -173,10 +175,10 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
                 'value' : 'core'
             },
             privatepix : {
-                'value' : 't/locked'
+                'value' : 'fa-unlock'
             },
             publicpix : {
-                'value' : 't/lock'
+                'value' : 'fa-lock'
             }
         }
     });

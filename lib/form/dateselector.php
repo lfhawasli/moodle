@@ -94,7 +94,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         // Note: flatpickr does not support non-gregorian calendar.
         $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
                 'defaulttime' => 0, 'timezone' => 99, 'step' => 5, 'optional' => false, 'clear' => false,
-                'placeholder' => 'Select date...', 'locale' => current_language());
+                'placeholder' => get_string('selectadate'), 'locale' => current_language());
         // END UCLA MOD: CCLE-6917.
         // TODO MDL-52313 Replace with the call to parent::__construct().
         HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes);
@@ -164,8 +164,9 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
      * @access private
      */
     function _createElements() {
-        // START UCLA MOD: CCLE-6917 - Revamp date picker.
-        global $OUTPUT, $PAGE;
+        global $OUTPUT;
+        // START UCLA MOD: CCLE-6917 - Revamp date picker.        
+        global $PAGE;
         $PAGE->requires->js('/lib/flatpickr/flatpickr.min.js');
         // Custom CSS for flatpickr is added in theme/uclashared/styles/.
 
@@ -180,7 +181,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         }
 
         $inputname = $this->getName();
-        $placeholder = (isset($this->_options['placeholder'])) ? $this->_options['placeholder'] : 'Select date...';
+        $placeholder = (isset($this->_options['placeholder'])) ? $this->_options['placeholder'] : get_string('selectadate');
         // For compatibility with names that characters like [] created by moodleform functions such
         // as repeat_elements, we use getElementsByName instead of getElementsbyId, since HTML ids cannot contain [].
         $flatpickrdefinition = '
@@ -196,11 +197,12 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                     fp.altInput.name = "'.$inputname .'_flatpickr_display";
                 }
             });';
-        $this->_elements[] = @MoodleQuickForm::createElement('static', 'flatpickrdiv', '', '
-            <div style="display: inline; margin-right: 10px;" class="flatpickr" name ="'. $inputname .'_flatpickr">');
-        $this->_elements[] = @MoodleQuickForm::createElement('text', 'date_selector', '',
+        $this->_elements[] = $this->createFormElement('static', 'flatpickrdiv', '',
+                '<div style="display: inline; margin-right: 10px;"
+                class="flatpickr" name ="'. $inputname .'_flatpickr">');
+        $this->_elements[] = $this->createFormElement('text', 'date_selector', '',
                 array('data-input' => 'data-input', 'placeholder' => $placeholder));
-        $this->_elements[] = @MoodleQuickForm::createElement('static', 'flatpickrscript', '',
+        $this->_elements[] = $this->createFormElement('static', 'flatpickrscript', '',
             '<a style="text-decoration: none;" class="input-button" title="Calendar" data-toggle>
                 <i class="fa fa-calendar" aria-hidden="true"></i>
             </a>' .
@@ -231,12 +233,12 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         }
         foreach ($dateformat as $key => $value) {
             // E_STRICT creating elements without forms is nasty because it internally uses $this
-            $this->_elements[] = @MoodleQuickForm::createElement('select', $key, get_string($key, 'form'), $value, $this->getAttributes(), true);
+            $this->_elements[] = $this->createFormElement('select', $key, get_string($key, 'form'), $value, $this->getAttributes(), true);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
             $image = $OUTPUT->pix_icon('i/calendar', get_string('calendar', 'calendar'), 'moodle');
-            $this->_elements[] = @MoodleQuickForm::createElement('link', 'calendar',
+            $this->_elements[] = $this->createFormElement('link', 'calendar',
                     null, '#', $image,
                     array('class' => 'visibleifjs'));
         }
@@ -244,7 +246,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         // END UCLA MOD: CCLE-6917.
         // If optional we add a checkbox which the user can use to turn if on
         if ($this->_options['optional']) {
-            $this->_elements[] = @MoodleQuickForm::createElement('checkbox', 'enabled', null, get_string('enable'), $this->getAttributes(), true);
+            $this->_elements[] = $this->createFormElement('checkbox', 'enabled', null, get_string('enable'), $this->getAttributes(), true);
         }
         foreach ($this->_elements as $element){
             if (method_exists($element, 'setHiddenLabel')){
@@ -263,6 +265,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
      * @return bool
      */
     function onQuickFormEvent($event, $arg, &$caller) {
+        $this->setMoodleForm($caller);
         switch ($event) {
             case 'updateValue':
                 // Constant values override both default and submitted ones
@@ -328,7 +331,7 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                 */
                 // When using the function addElement, rather than createElement, we still
                 // enter this case, making this check necessary.
-                if (!empty($arg[2]['optional']) && !empty($arg[0])) {
+                if (isset($arg[2]['optional']) && $arg[2]['optional'] && !$this->_usedcreateelement) {
                     $caller->disabledIf($arg[0] . '[date_selector]', $arg[0] . '[enabled]');
                     $caller->disabledIf($arg[0] . '_flatpickr_display', $arg[0] . '[enabled]');
                 }
@@ -392,7 +395,10 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
                 $valuearray += $thisexport;
             }
         }
-        if (count($valuearray)){
+        // START UCLA MOD: CCLE-6917 - Revamp date picker.
+        //if (count($valuearray) && isset($valuearray['year'])) {
+        if (count($valuearray)) {
+        // END UCLA MOD: CCLE-6917.
             if($this->_options['optional']) {
                 // If checkbox is on, the value is zero, so go no further
                 if(empty($valuearray['enabled'])) {

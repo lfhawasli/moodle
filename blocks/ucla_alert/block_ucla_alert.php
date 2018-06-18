@@ -23,7 +23,8 @@ class block_ucla_alert extends block_base {
         $this->content = new stdClass;
 
         // If the alert banner is displaying, we don't want to display block
-        if(get_config('block_ucla_alert', 'alert_sitewide') && $COURSE->id === SITEID) {
+        if(get_config('block_ucla_alert', 'alert_sitewide') && $COURSE->id === SITEID &&
+                $PAGE->pagelayout !== 'frontpage') {
             $this->content->text = '';
             
         } else {

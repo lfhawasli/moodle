@@ -481,8 +481,8 @@ class mssql_native_moodle_database extends moodle_database {
                                quotename(table_name)), column_name, 'IsIdentity') AS auto_increment,
                            column_default AS default_value
                       FROM tempdb.INFORMATION_SCHEMA.COLUMNS
-                      JOIN tempdb..sysobjects ON name = table_name
-                     WHERE id = object_id('tempdb..{" . $table . "}')
+                      JOIN tempdb.sys.objects ON name = table_name
+                     WHERE object_id = object_id('tempdb..{" . $table . "}')
                   ORDER BY ordinal_position";
         }
 
@@ -1225,6 +1225,24 @@ class mssql_native_moodle_database extends moodle_database {
         }
 
         return $this->collation;
+    }
+
+    public function sql_equal($fieldname, $param, $casesensitive = true, $accentsensitive = true, $notequal = false) {
+        $equalop = $notequal ? '<>' : '=';
+        $collation = $this->get_collation();
+
+        if ($casesensitive) {
+            $collation = str_replace('_CI', '_CS', $collation);
+        } else {
+            $collation = str_replace('_CS', '_CI', $collation);
+        }
+        if ($accentsensitive) {
+            $collation = str_replace('_AI', '_AS', $collation);
+        } else {
+            $collation = str_replace('_AS', '_AI', $collation);
+        }
+
+        return "$fieldname COLLATE $collation $equalop $param";
     }
 
     /**

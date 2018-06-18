@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/lib.php');
 require_once($CFG->dirroot .'/lib/formslib.php');
 require_once($CFG->libdir.'/gradelib.php');
 
@@ -56,10 +56,9 @@ if ($id) {
 require_login($course, true, $cm);
 $PAGE->set_url('/mod/videoannotation/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($videoannotation->name));
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('incourse');
 $PAGE->set_pagetype('course');
 $PAGE->set_heading($course->fullname);
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'videoannotation'));
 echo $OUTPUT->header();
 // SSC-829
 // The user must have mod/videoannotation:view capability to view this page.
@@ -233,7 +232,9 @@ switch ($videoannotation->clipselect) {
 }
 
 // Get start position for clip.
-$starttime = $clip->playabletimestart;
+if ($clip) {
+    $starttime = $clip->playabletimestart;
+}
 
 // If the URL is a TNA permalink,
 // Use the web service to translate it into a RTMP link.

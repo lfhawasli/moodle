@@ -6,9 +6,12 @@
     border-top: 1px solid #ddd;
 }
 
-#hue-dial, .sliders, .color {
+#hue-dial,
+.sliders,
+.color {
     display: inline-block;
-    zoom: 1; *display: inline;
+    zoom: 1;
+    *display: inline;
     vertical-align: middle;
 }
 
@@ -24,9 +27,11 @@
     font-weight: 600;
     display: block;
 }
+
 .sliders strong span {
     font-weight: 300;
 }
+
 .sliders div + div {
     margin-top: 1em;
 }

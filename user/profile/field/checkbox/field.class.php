@@ -31,39 +31,6 @@
 class profile_field_checkbox extends profile_field_base {
 
     /**
-     * Constructor method.
-     * Pulls out the options for the checkbox from the database and sets the
-     * the corresponding key for the data if it exists
-     *
-     * @param int $fieldid
-     * @param int $userid
-     */
-    public function __construct($fieldid=0, $userid=0) {
-        global $DB;
-        // First call parent constructor.
-        parent::__construct($fieldid, $userid);
-
-        if (!empty($this->field)) {
-            $datafield = $DB->get_field('user_info_data', 'data', array('userid' => $this->userid, 'fieldid' => $this->fieldid));
-            if ($datafield !== false) {
-                $this->data = $datafield;
-            } else {
-                $this->data = $this->field->defaultdata;
-            }
-        }
-    }
-
-    /**
-     * Old syntax of class constructor. Deprecated in PHP7.
-     *
-     * @deprecated since Moodle 3.1
-     */
-    public function profile_field_checkbox($fieldid=0, $userid=0) {
-        debugging('Use of class name as constructor is deprecated', DEBUG_DEVELOPER);
-        self::__construct($fieldid, $userid);
-    }
-
-    /**
      * Add elements for editing the profile field value.
      * @param moodleform $mform
      */
@@ -91,6 +58,16 @@ class profile_field_checkbox extends profile_field_base {
         return '<input disabled="disabled" type="checkbox" name="'.$this->inputname.'" '.$checked.' />';
     }
 
+    /**
+     * Return the field type and null properties.
+     * This will be used for validating the data submitted by a user.
+     *
+     * @return array the param type and null property
+     * @since Moodle 3.2
+     */
+    public function get_field_properties() {
+        return array(PARAM_BOOL, NULL_NOT_ALLOWED);
+    }
 }
 
 

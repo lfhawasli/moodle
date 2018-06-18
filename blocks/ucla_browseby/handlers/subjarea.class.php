@@ -75,10 +75,6 @@ class subjarea_handler extends browseby_handler {
     public function handle($args) {
         global $OUTPUT, $PAGE;
 
-        // Load search.
-        $PAGE->requires->yui_module('moodle-block_ucla_search-search', 'M.ucla_search.init',
-                array(array('name' => 'course-search')));
-
         $division = false;
         if (isset($args['division'])) {
             $division = $args['division'];

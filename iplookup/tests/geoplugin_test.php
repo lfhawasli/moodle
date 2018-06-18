@@ -46,7 +46,7 @@ class core_iplookup_geoplugin_testcase extends advanced_testcase {
         $CFG->geoipfile = '';
     }
 
-    public function test_geoip_ipv4() {
+    public function test_ipv4() {
         $result = iplookup_find_location('192.30.255.112');
 
         $this->assertEquals('array', gettype($result));
@@ -58,4 +58,12 @@ class core_iplookup_geoplugin_testcase extends advanced_testcase {
         $this->assertEquals('San Francisco', $result['title'][0]);
         $this->assertEquals('United States', $result['title'][1]);
     }
+
+    public function test_geoip_ipv6() {
+        $result = iplookup_find_location('2a01:8900:2:3:8c6c:c0db:3d33:9ce6');
+
+        $this->assertNotNull($result['error']);
+        $this->assertEquals($result['error'], get_string('invalidipformat', 'error'));
+    }
 }
+

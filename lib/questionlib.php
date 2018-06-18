@@ -984,7 +984,8 @@ function question_category_select_menu($contexts, $top = false, $currentcat = 0,
         $options[] = array($group => $opts);
     }
     echo html_writer::label(get_string('questioncategory', 'core_question'), 'id_movetocategory', false, array('class' => 'accesshide'));
-    echo html_writer::select($options, 'category', $selected, $choose, array('id' => 'id_movetocategory'));
+    $attrs = array('id' => 'id_movetocategory', 'class' => 'custom-select');
+    echo html_writer::select($options, 'category', $selected, $choose, $attrs);
 }
 
 /**
@@ -1788,7 +1789,7 @@ function question_pluginfile($course, $context, $component, $filearea, $args, $f
         }
 
         // export data to moodle file pool
-        if (!$content = $qformat->exportprocess(true)) {
+        if (!$content = $qformat->exportprocess()) {
             send_file_not_found();
         }
 
@@ -1915,7 +1916,7 @@ function core_question_question_preview_pluginfile($previewcontext, $questionid,
 function question_make_export_url($contextid, $categoryid, $format, $withcategories,
         $withcontexts, $filename) {
     global $CFG;
-    $urlbase = "$CFG->httpswwwroot/pluginfile.php";
+    $urlbase = "$CFG->wwwroot/pluginfile.php";
     return moodle_url::make_file_url($urlbase,
             "/$contextid/question/export/{$categoryid}/{$format}/{$withcategories}" .
             "/{$withcontexts}/{$filename}", true);

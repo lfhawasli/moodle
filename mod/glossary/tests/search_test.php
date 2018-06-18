@@ -67,10 +67,10 @@ class mod_glossary_search_testcase extends advanced_testcase {
         // Enabled by default once global search is enabled.
         $this->assertTrue($searcharea->is_enabled());
 
-        set_config($varname . '_enabled', false, $componentname);
+        set_config($varname . '_enabled', 0, $componentname);
         $this->assertFalse($searcharea->is_enabled());
 
-        set_config($varname . '_enabled', true, $componentname);
+        set_config($varname . '_enabled', 1, $componentname);
         $this->assertTrue($searcharea->is_enabled());
     }
 
@@ -132,6 +132,21 @@ class mod_glossary_search_testcase extends advanced_testcase {
         // No new records.
         $this->assertFalse($recordset->valid());
         $recordset->close();
+
+        // Create a second glossary with one entry.
+        $glossary2 = self::getDataGenerator()->create_module('glossary', ['course' => $course1->id]);
+        self::getDataGenerator()->get_plugin_generator('mod_glossary')->create_content($glossary2);
+
+        // Test indexing with each activity then combined course context.
+        $rs = $searcharea->get_document_recordset(0, context_module::instance($glossary1->cmid));
+        $this->assertEquals(2, iterator_count($rs));
+        $rs->close();
+        $rs = $searcharea->get_document_recordset(0, context_module::instance($glossary2->cmid));
+        $this->assertEquals(1, iterator_count($rs));
+        $rs->close();
+        $rs = $searcharea->get_document_recordset(0, context_course::instance($course1->id));
+        $this->assertEquals(3, iterator_count($rs));
+        $rs->close();
     }
 
     /**

@@ -77,7 +77,7 @@ class schedule_form extends moodleform {
         foreach ($this->visibilityschedule as $index => $range) {
             // This is used to delete the range.
             $table->rowclasses[$index] = 'visibility-session range' . $range->id;
-            $deletebutton = '<img src="' . $OUTPUT->pix_url('t/delete', '') .
+            $deletebutton = '<img src="' . $OUTPUT->image_url('t/delete', '') .
                     '" style="cursor:pointer;" class="rangedeletebutton"'.
                     'data-course="'. $this->course->id .'" data-id="'. $range->id .'";/>';
 

@@ -202,6 +202,7 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
 function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
     global $CFG, $USER;
     require_once($CFG->dirroot . '/local/ucla_syllabus/alert_form.php');
+    require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 
     // Ignore any old terms or if term is not set (meaning it is a collab site).
     if (!isset($courseinfo->term) ||
@@ -236,7 +237,7 @@ function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
                 $alertform = new alert_form(new moodle_url('/local/ucla_syllabus/alert.php',
                         array('id' => $course->id)),
                         array('manualsyllabus' => $syllabus), 'post', '',
-                        array('class' => 'ucla-format-notice-box'));
+                        array('class' => 'alert alert-info'));
                 // Only want one alert to be shown.
                 break;
             }
@@ -261,7 +262,7 @@ function local_ucla_syllabus_ucla_format_notices($course, $courseinfo) {
         // Now we can display the alert.
         $alertform = new alert_form(new moodle_url('/local/ucla_syllabus/alert.php',
                 array('id' => $course->id)), null, 'post', '',
-                array('class' => 'ucla-format-notice-box'));
+                array('class' => 'alert alert-info'));
     }
 
     $alertform->display();

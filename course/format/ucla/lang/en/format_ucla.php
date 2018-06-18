@@ -54,19 +54,13 @@ $string['editofficehours'] = 'Update';
 $string['movealt'] = 'Click and drag to move';
 $string['markthistopic'] = 'Highlight section';
 $string['markedthistopic'] = 'Section is highlighted';
+$string['enrollmealert'] = 'You need to be enrolled in this site to view the contents. Enroll yourself in this site by clicking the "Enroll me" button below';
 
 // Registrar description strings.
 $string['collapsedshow'] = 'Show registrar description';
 $string['collapsedhide'] = 'Hide registrar description';
 $string['coursedescription'] = 'Course description';
 $string['classdescription'] = 'Class description';
-
-// JIT strings.
-$string['file'] = 'Upload file';
-$string['link'] = 'Add link';
-$string['text'] = 'Add text';
-$string['subheading'] = 'Add subheading';
-$string['turnitin'] = 'Add Turnitin Assignment';
 
 // CCLE-5098 - Download course content configurable.
 $string['coursedownload'] = 'Enable download course materials';
@@ -86,3 +80,46 @@ $string['createtasite_help'] = 'TA site creation is enabled by default. '
         . 'If you do not want the TAs to be able to create the TA sites, '
         . 'click "No". This feature is available for TAs';
 
+// CCLE-7310 - Convert JIT links to Section Tools.
+$string['sectiontools'] = 'Section tools';
+$string['file'] = 'File';
+$string['link'] = 'Link';
+$string['label'] = 'Label';
+$string['activity'] = 'Activity/Resource';
+$string['add'] = 'ADD';
+$string['manage'] = 'MANAGE';
+
+// CCLE-7298 - Grades link redirectable to MyUCLA.
+$string['myuclagradelinkredirect'] = 'Direct Grades link to';
+$string['myuclagradelinkredirect_help'] = 'Specifies where the "Grades" link '
+        . 'in the side navigation drawer directs users to.';
+$string['gradebookmyucla'] = 'MyUCLA Gradebook';
+$string['gradebookccle'] = 'CCLE Grades';
+
+// Admin panel strings.
+$string['adminpanel'] = 'Admin panel';
+$string['ucla:viewadminpanel'] = 'View Admin panel';
+$string['courseadmin'] = 'Course administration';
+$string['managematerial'] = 'Manage material';
+$string['settingsandbackup'] = 'Settings & backup';
+$string['usersandgroups'] = 'Users & groups';
+$string['logsandreports'] = 'Logs & reports';
+$string['additionalsettings'] = 'Additional';
+$string['revieweditdates'] = 'Review/edit dates';
+$string['participants'] = 'Participants';
+$string['inviteusers'] = 'Invite users';
+$string['gradessetup'] = 'Grades setup';
+$string['enrollmentmethods'] = 'Enrollment methods';
+$string['competency'] = 'Competency';
+$string['questionbank'] = 'Question bank';
+$string['mediasitesettings'] = 'Mediasite settings';
+$string['mediagallery'] = 'Media gallery';
+$string['newbadge'] = 'Add a badge';
+$string['myucla'] = 'MyUCLA';
+$string['support'] = 'Support';
+$string['runprepop'] = 'Run prepop';
+$string['pushgrades'] = 'Push grades';
+$string['classinfo'] = 'Class Info';
+$string['tools'] = 'Tools';
+$string['getinsts'] = 'Get instructors';
+$string['getstdroster'] = 'Get student roster';

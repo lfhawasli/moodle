@@ -1,12 +1,20 @@
 #ucla-alert-edit {
-    border: 1px solid #CDCDCD;
+    border: 1px solid #cdcdcd;
     padding: 10px;
     margin: 10px;
     zoom: 1;
 }
-#ucla-alert-edit:after { display: block; clear: both; visibility: hidden; content: '.'; height: 0;}
+
+#ucla-alert-edit:after {
+    display: block;
+    clear: both;
+    visibility: hidden;
+    content: '.';
+    height: 0;
+}
+
 #ucla-alert-edit ul {
-    border: 1px solid #CDCDCD;
+    border: 1px solid #cdcdcd;
     margin: 5px;
     width: 200px;
     min-height: 200px;
@@ -17,6 +25,7 @@
     padding-top: 30px;
     border-radius: 4px 4px 4px 4px;
 }
+
 #ucla-alert-edit ul li {
     background-image: none;
     list-style-type: none;
@@ -30,32 +39,36 @@
 
 .alert-edit-section ul li.list1,
 #ucla-alert-edit ul li.list1 {
-    background-color: #8DD5E7;
-    border:1px solid #004C6D;
+    background-color: #8dd5e7;
+    border: 1px solid #004c6d;
 }
+
 #ucla-alert-edit ul li.list2 {
-    background-color: #EDFF9F;
-    border:1px solid #CDCDCD;
+    background-color: #edff9f;
+    border: 1px solid #cdcdcd;
 }
 
 // ALERT EDIT STYLES 
 .alert-edit-header,
 .alert-edit-section {
-    border: 1px solid #CDCDCD;
+    border: 1px solid #cdcdcd;
     display: block;
     float: left;
     width: auto;
     margin: 10px;
 }
+
 .alert-edit-header {
     margin: 0;
     border: 0;
-    border-right: 1px solid #CDCDCD;
+    border-right: 1px solid #cdcdcd;
     min-height: 600px;
 }
+
 .alert-edit-header .header-box {
     margin: 5px;
 }
+
 #ucla-alert-edit .block-ucla-alert .box-section-title {
     border-top: 0;
     padding: 4px 8px 0 8px;
@@ -63,14 +76,14 @@
 
 .alert-edit-header ul li.alert-edit-item,
 .alert-edit-section ul li.alert-edit-item {
-    background-color: #FAFAF8;
-    border:1px dashed gray;
+    background-color: #fafaf8;
+    border: 1px dashed gray;
     margin: 5px;
 }
 
 #ucla-alert-edit ul:after {
-    background-color: #F5F5F5;
-    border: 1px solid #DDDDDD;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
     border-radius: 4px 0 4px 0;
     content: "Section content";
     left: -1px;
@@ -79,7 +92,7 @@
     top: -1px;
     font-weight: bold;
     font-size: .9em;
-    color: #9DA0A4;
+    color: #9da0a4;
 }
 
 // ITEM EDIT TEXT BOX 
@@ -89,10 +102,12 @@
     background-color: white;
     display: none;
 }
+
 .alert-edit-textarea {
     border: 0;
     width: 100%;
 }
+
 .alert-edit-button-box {
     border-top: 1px solid #cdcdcd;
     padding: 5px;
@@ -110,9 +125,9 @@
     text-align: right;
     border-top: 1px solid #ddd;
     padding: 10px;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
     box-sizing: border-box;
-    -moz-box-sizing: border-box; 
+    -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 }
 
@@ -123,33 +138,36 @@
     display: block;
     clear: left;
 }
+
 .alert-edit-add {
     width: 100%;
 }
 
 // Block editing button 
 .alert-block-edit-on-btn {
-    width:80%;
+    width: 80%;
 }
+
 .region-content .ucla-alert .content .box-boundary.alert-block-edit-on-box {
     text-align: center;
-    border-top: 1px solid #EBEBE2; 
-    padding-bottom: 0; 
+    border-top: 1px solid #ebebe2;
+    padding-bottom: 0;
     padding-top: 4px;
 }
 
 // Tutorial 
 
 .edit-alert-tutorial {
-    width: 100%; 
-    padding: 8px; 
-    border-top: 1px solid #DDDDDD; 
+    width: 100%;
+    padding: 8px;
+    border-top: 1px solid #ddd;
     display: block;
     float: left;
     box-sizing: border-box;
-    -moz-box-sizing: border-box; 
+    -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 }
+
 .edit-alert-tutorial h1 {
     margin-bottom: 4px;
 }
@@ -159,8 +177,8 @@
 }
 
 .edit-alert-tutorial .edit-alert-tutorial-summary span {
-    background-color: #F5F5F5;
-    border: 1px solid #DDDDDD;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
     padding: 0 6px;
     border-radius: 4px 4px 4px 4px;
 }
@@ -168,7 +186,7 @@
 .edit-alert-tutorial div.box-boundary {
     width: 200px;
     float: left;
-    border: 1px solid #DDDDDD;
+    border: 1px solid #ddd;
     margin: 5px;
     padding: 4px;
     position: relative;
@@ -177,10 +195,10 @@
 }
 
 .edit-alert-tutorial div.box-boundary:after {
-    background-color: #F5F5F5;
-    border: 1px solid #DDDDDD;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
     border-radius: 4px 0 4px 0;
-    color: #9DA0A4;
+    color: #9da0a4;
     content: "Tutorial";
     font-size: 0.9em;
     font-weight: bold;
@@ -191,47 +209,49 @@
 }
 
 #ucla-alert-edit {
-    
     .alert-edit-header 
-        .header-box {
-        
+    .header-box {
         font-weight: 300;
         min-height: 30px;
         padding: 4px 0;
         text-align: center;
-        
+
         .header-title {
             font-size: 2rem;
         }
-        
+
         &:hover {
             background-color: #f9f9f9;
         }
-        
+
         &.alert-header-default {
             background-color: #dcf3d8;
             border-bottom: 4px solid $alert-green;
         }
+
         &.alert-header-blue {
             background-color: #d8f2f2;
             border-bottom: 4px solid $alert-blue;
         }
+
         &.alert-header-red {
             background-color: $alert-red;
             border-bottom: 4px solid $alert-red;
             color: white;
         }
+
         &.alert-header-yellow {
             background-color: #f8f7dd;
             border-bottom: 4px solid $alert-yellow;
         }
+
         &.alert-header-empty {
-            border: 1px solid #ddd;;
+            border: 1px solid #ddd;
         }
-        
+
         &.header-selected {
             border: 4px solid black;
- 
+
             &:before {
                 color: black;
                 content: '✔ selected';

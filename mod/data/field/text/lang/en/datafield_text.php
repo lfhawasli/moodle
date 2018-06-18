@@ -25,3 +25,5 @@
  */
 
 $string['pluginname'] = 'Text input';
+$string['fieldtypelabel'] = 'Text field';
+$string['privacy:metadata'] = 'The Text field component does not store any personal data, it uses tables defined in mod_data.';

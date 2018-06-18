@@ -26,8 +26,7 @@ $editusername = $edituser->firstname . ' ' . $edituser->lastname;
 
 $context = context_course::instance($courseid);
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('course');
-$PAGE->set_pagetype('course-view-' . $course->format);
+$PAGE->set_pagelayout('base');
 $PAGE->set_url('/blocks/ucla_office_hours/officehours.php',
         array('courseid' => $courseid, 'editid' => $editid));
 
@@ -35,14 +34,16 @@ $pagetitle = get_string('header', 'block_ucla_office_hours', $editusername);
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($pagetitle);
 
-set_editing_mode_button();
-
 $PAGE->navbar->add($pagetitle);
 
 // Make sure that entry can be edited.
 if (!block_ucla_office_hours::allow_editing($context, $edituser->id)) {
     print_error('cannotedit', 'block_ucla_office_hours');
 }
+
+$gobackurl = new moodle_url('/course/view.php', array('id' => $courseid));
+$buttons = $OUTPUT->edit_button($gobackurl);
+$PAGE->set_button($buttons);
 
 // Get office hours entry, if any.
 $officehoursentry = $DB->get_record('ucla_officehours',

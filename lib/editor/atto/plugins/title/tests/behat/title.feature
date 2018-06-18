@@ -15,9 +15,5 @@ Feature: Atto title
     And I follow "Editor preferences"
     And I set the field "Text editor" to "Plain text area"
     And I press "Save changes"
-    And I follow "Edit profile"
-    # START UCLA MOD: CCLE-4612 Improve Attos
-    # Then I should see "<h3>How The Rock"
-    Then I should see "<h1>How The Rock"
-    # END UCLA MOD: CCLE-4612 Improve Attos
-
+    And I click on "Edit profile" "link" in the "region-main" "region"
+    Then I should see "<h3>How The Rock"

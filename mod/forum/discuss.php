@@ -219,7 +219,7 @@ if (! $post = forum_get_post_full($parent)) {
     print_error("notexists", 'forum', "$CFG->wwwroot/mod/forum/view.php?f=$forum->id");
 }
 
-if (!forum_user_can_see_post($forum, $discussion, $post, null, $cm)) {
+if (!forum_user_can_see_post($forum, $discussion, $post, null, $cm, false)) {
     print_error('noviewdiscussionspermission', 'forum', "$CFG->wwwroot/mod/forum/view.php?id=$forum->id");
 }
 
@@ -294,7 +294,7 @@ $neighbourlinks = $renderer->neighbouring_discussion_navigation($neighbours['pre
 echo $neighbourlinks;
 
 /// Print the controls across the top
-echo '<div class="discussioncontrols clearfix"><div class="controlscontainer">';
+echo '<div class="discussioncontrols clearfix"><div class="controlscontainer m-b-1">';
 
 if (!empty($CFG->enableportfolios) && has_capability('mod/forum:exportdiscussion', $modcontext)) {
     require_once($CFG->libdir.'/portfoliolib.php');
@@ -371,6 +371,11 @@ if (has_capability('mod/forum:pindiscussions', $modcontext)) {
 
 
 echo "</div></div>";
+
+if (forum_discussion_is_locked($forum, $discussion)) {
+    echo $OUTPUT->notification(get_string('discussionlocked', 'forum'),
+        \core\output\notification::NOTIFY_INFO . ' discussionlocked');
+}
 
 if (!empty($forum->blockafter) && !empty($forum->blockperiod)) {
     $a = new stdClass();

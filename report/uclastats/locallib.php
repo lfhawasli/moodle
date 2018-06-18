@@ -220,7 +220,7 @@ abstract class uclastats_base implements renderable {
 
         // right now, only supporting xls
         $xls_string = get_string('application/vnd.ms-excel', 'mimetypes');
-        $icon = html_writer::img($OUTPUT->pix_url('f/spreadsheet'), $xls_string, array('title' => $xls_string));
+        $icon = html_writer::img($OUTPUT->image_icon('f/spreadsheet'), $xls_string, array('title' => $xls_string));
         $export_options .= html_writer::link(
                 new moodle_url('/report/uclastats/view.php',
                         array('report' => get_class($this),

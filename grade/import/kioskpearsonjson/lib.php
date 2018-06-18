@@ -69,12 +69,11 @@ function import_kioskpearsonjson_grades($items, $course, &$error) {
 					if (!$gradeUser = $DB->get_record('user', array('id' => $newImportGrade->userId))) {                        
                         //increment for reporting
                         $resultStats->numUnfoundUsers++;
-
+                        
                         $status = false;
-                        // START UCLA MOD: CCLE-5867 - Upgrade Pearson MyLabMastering for Moodle 3.0
-                        //break 3;
-                        break 2;
-                        // END UCLA MOD: CCLE-5867
+
+						//TPLMS-5655 remove break 3
+                        continue;
                     }
 
 					//1. Check to see if grade exists, if not, create it... if it does, check other things					

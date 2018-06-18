@@ -181,9 +181,6 @@
 [submodule "filter/tabs"]
 	path = filter/tabs
 	url = https://github.com/JosePFs/moodle-filter_tabs.git
-[submodule "local/mediaconversion/libraries/KalturaGeneratedAPIClientsPHP"]
-	path = local/mediaconversion/libraries/KalturaGeneratedAPIClientsPHP
+[submodule "local/kaltura/API"]
+	path = local/kaltura/API
 	url = https://github.com/kaltura/KalturaGeneratedAPIClientsPHP.git
-[submodule "theme/snap"]
-	path = theme/snap
-	url = https://github.com/ccle/moodle-theme_snap

@@ -1,0 +1,56 @@
+{{{ output.doctype }}}
+<html {{{ output.htmlattributes }}}>
+<head>
+    <title>{{{ output.page_title }}}</title>
+    <link rel="shortcut icon" href="{{{ output.favicon }}}" />
+    {{{ output.standard_head_html }}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body {{{ bodyattributes }}}>
+
+<div id="page-wrapper">
+
+    {{{ output.standard_top_of_body_html }}}
+
+    {{> theme_uclashared/header }}
+    <div id="page" class="container-fluid">
+        {{{ output.alert_banner }}}
+        {{{ output.full_header }}}
+        <div id="page-content" class="row">
+            <div id="region-main-box" class="col-xs-12">
+                {{#hasregionmainsettingsmenu}}
+                <div id="region-main-settings-menu" class="hidden-print {{#hasblocks}}has-blocks{{/hasblocks}}">
+                    <div> {{{ output.region_main_settings_menu }}} </div>
+                </div>
+                {{/hasregionmainsettingsmenu}}
+                <section id="region-main" {{#hasblocks}}class="has-blocks"{{/hasblocks}}>
+                    <div class="card card-block">
+                    {{#hasregionmainsettingsmenu}}
+                        <div class="region_main_settings_menu_proxy"></div>
+                    {{/hasregionmainsettingsmenu}}
+                    {{{ output.course_content_header }}}
+                    {{{ output.main_content }}}
+                    {{{ output.activity_navigation }}}
+                    {{{ output.course_content_footer }}}
+                    </div>
+                </section>
+                {{#hasblocks}}
+                <section data-region="blocks-column" class="hidden-print">
+                    {{{ sidepreblocks }}}
+                </section>
+                {{/hasblocks}}
+            </div>
+        </div>
+    </div>
+    {{> theme_boost/nav-drawer }}
+</div>
+{{> theme_uclashared/footer }}
+</body>
+</html>
+{{#js}}
+require(['theme_boost/loader']);
+require(['theme_boost/drawer'], function(mod) {
+    mod.init();
+});
+{{/js}}

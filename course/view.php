@@ -17,7 +17,6 @@
     $move        = optional_param('move', 0, PARAM_INT);
     $marker      = optional_param('marker',-1 , PARAM_INT);
     $switchrole  = optional_param('switchrole',-1, PARAM_INT); // Deprecated, use course/switchrole.php instead.
-    $modchooser  = optional_param('modchooser', -1, PARAM_BOOL);
     $return      = optional_param('return', 0, PARAM_LOCALURL);
 
     $params = array();
@@ -135,23 +134,18 @@
 
         // Check user is allowed to see it.
         if (!$coursesections->uservisible) {
-            // Note: We actually already know they don't have this capability
-            // or uservisible would have been true; this is just to get the
-            // correct error message shown.
-
-            // START UCLA MOD: SSC-2155 CCLE-5329 - Update error messages for hidden sections
-            if (!empty($coursesections->availableinfo)) {
-                echo $OUTPUT->header();
-                $formattedinfo = \core_availability\info::format_info(
-                        $coursesections->availableinfo, $course);
-                echo html_writer::tag('div', $formattedinfo, array('class' => 'availabilityinfo'));
+            // Check if coursesection has conditions affecting availability and if
+            // so, output availability info.
+            if ($coursesections->visible && $coursesections->availableinfo) {
+                $sectionname     = get_section_name($course, $coursesections);
+                $message = get_string('notavailablecourse', '', $sectionname);
+                redirect(course_get_url($course), $message, null, \core\output\notification::NOTIFY_ERROR);
+            } else {
+                // Note: We actually already know they don't have this capability
+                // or uservisible would have been true; this is just to get the
+                // correct error message shown.
+                require_capability('moodle/course:viewhiddensections', $context);
             }
-            // END UCLA MOD: SSC-2155 CCLE-5329
-
-            // START UCLA MOD: CCLE-6369 - Improve user experience when viewing activity they don't have access to
-            // require_capability('moodle/course:viewhiddensections', $context);
-            require_capability('moodle/course:viewhiddensections', $context, null, true, 'contactinstructors', 'local_ucla');
-            // END UCLA MOD: CCLE-6369
         }
     }
 
@@ -214,11 +208,6 @@
                 redirect($PAGE->url);
             }
         }
-        if (($modchooser == 1) && confirm_sesskey()) {
-            set_user_preference('usemodchooser', $modchooser);
-        } else if (($modchooser == 0) && confirm_sesskey()) {
-            set_user_preference('usemodchooser', $modchooser);
-        }
 
         if (has_capability('moodle/course:sectionvisibility', $context)) {
             if ($hide && confirm_sesskey()) {
@@ -259,8 +248,6 @@
 
     $completion = new completion_info($course);
     if ($completion->is_enabled()) {
-        $PAGE->requires->string_for_js('completion-title-manual-y', 'completion');
-        $PAGE->requires->string_for_js('completion-title-manual-n', 'completion');
         $PAGE->requires->string_for_js('completion-alt-manual-y', 'completion');
         $PAGE->requires->string_for_js('completion-alt-manual-n', 'completion');
 
