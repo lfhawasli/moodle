@@ -57,6 +57,7 @@ h1, h2, h3, h4, h5, h6, p {
   border-radius: 0px;
   padding: 10px 5%;
   margin-top: -5px;
+  margin-right: 10px;
 }
 #btn-login {
   color: black;
@@ -145,7 +146,7 @@ h1, h2, h3, h4, h5, h6, p {
 }
 @media (max-width: 480px) {
   #sidebar-card-container {
-    margin-top: 100px;
+    margin-top: 55px;
   }
 }
 
