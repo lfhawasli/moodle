@@ -349,12 +349,12 @@ class block_ucla_my_sites extends block_base {
                 $this->get_sites($courses, $params);
 
         // Setup tabs (sanity check on tabs).
-        if (empty($classsites) && empty($collaborationsites)) {
+        if (empty($availableterms) && empty($collaborationsites)) {
             // Nothing to show.
             $templatecontext['nolisting'] = true;
-        } elseif (empty($classsites) && !empty($collaborationsites)) {
+        } else if (empty($availableterms) && !empty($collaborationsites)) {
             $params['viewmy'] = 'collab';
-        } elseif (!empty($classsites) && empty($collaborationsites)) {
+        } else if (!empty($availableterms) && empty($collaborationsites)) {
             $params['viewmy'] = 'class';
         }
 
