@@ -82,6 +82,11 @@ class modify_navigation {
         if ($name == 'coursenode') {
             if (!isset($this->_coursenode)) {
                 $this->_coursenode = $this->navigation->find($COURSE->id, \navigation_node::TYPE_COURSE);
+                if (empty($this->_coursenode)) {
+                    // Course must be hidden and user does not have access.
+                    // Create fake node.
+                    $this->_coursenode = \navigation_node::create('coursenode');
+                }
             }
             return $this->_coursenode;
         }
