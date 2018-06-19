@@ -27,6 +27,10 @@ $string['pluginname'] = 'UCLA theme';
 $string['region-side-pre'] = 'Right';   // Boost no longer has left region.
 $string['choosereadme'] = 'The theme from University of California, Los Angeles.';
 
+// CCLE-7628 - Add hidden and empty text to sections.
+$string['emptysectiontext'] = ' (empty)';
+$string['hiddensectiontext'] = ' (hidden)';
+
 // CCLE-7346 - Add More section to nav drawer
 $string['moresection'] = 'More...';
 

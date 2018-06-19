@@ -159,6 +159,11 @@
     background: $gray-lighter;
 }
 
+// Hidden section navigation drawer color.
+.list-group-item.hidden-node {
+    color: $gray-light;
+}
+
 /* Color styles for TA site navigation drawer */
 .list-group-item.tasite {
     &[data-isactive='0'] {

@@ -856,6 +856,45 @@ class modify_navigation {
 
         $this->coursenode->add_node($coursedownloadnode);
     }
+    
+    /**
+     * Adds text for empty sections and text and color for hidden sections.
+     */
+    private function add_empty_hidden_text() {
+        global $COURSE, $PAGE;
+        $sections = get_fast_modinfo($COURSE)->get_section_info_all();
+        $emptysectionIDs = array();
+        $hiddensectionIDs = array();
+        $viewcapability = has_capability('moodle/course:viewhiddensections', $PAGE->context);
+        
+        foreach ($sections as $section) {
+            if (empty($section->sequence) && empty($section->summary)) {
+                $emptysectionIDs[$section->id] = null;
+            }
+            if (!$section->visible) {
+                $hiddensectionIDs[$section->id] = null;
+            }
+        }
+        
+        $emptysectiontext = get_string('emptysectiontext', 'theme_uclashared');
+        $hiddensectiontext = get_string('hiddensectiontext', 'theme_uclashared');
+        
+        $nodes = $this->navigation->find_all_of_type(\navigation_node::TYPE_SECTION);
+        foreach ($nodes as $node) {
+            if (array_key_exists($node->key, $emptysectionIDs)) {
+                if ($viewcapability) {
+                    $node->text .= $emptysectiontext;
+                } else {
+                    $node->remove();
+                    continue;
+                }
+            }
+            if (array_key_exists($node->key, $hiddensectionIDs)) {
+                $node->text .= $hiddensectiontext;
+                $node->add_class('hidden-node');
+            }
+        }
+    }
 
     /**
      * Modifies Moodle navigation tree.
@@ -908,6 +947,9 @@ class modify_navigation {
 
             // Highlight nodes.
             $this->higlight_nodes();
+            
+            // Modifies display for empty or hidden sections.
+            $this->add_empty_hidden_text();
         }
 
         // Change icons for nodes.
