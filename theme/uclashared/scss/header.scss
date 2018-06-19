@@ -116,7 +116,7 @@ header {
         text-decoration: underline;
     }    
 
-    @media only screen and (max-width: 320px) {
+    @media only screen and (max-width: 340px) {
         .icon {
             display: none;
         }
@@ -144,7 +144,8 @@ header {
         .btn-header {
           background-color: $ccle-color-logo;
           padding: 10px 12px;
-          color: white;
+          color: black;
+          border-radius: 0px; // Keeps button borders sharp.
           display: inline-block;
           font-weight: 300;
           height: 40px;
@@ -311,6 +312,15 @@ a.btn-help-feedback {
     }
     a.dropdown-toggle, a.dropdown-toggle:hover {
         color: #f5f8f9;
+    }
+    #btn-login {
+        color: black;
+        margin-top: -.7rem;
+        margin-left: 3px;
+        background-color: $ccle-color-logo;
+    }
+    #btn-login:hover {
+        background-color: lighten($ccle-color-logo, 10%);
     }
  }
  
