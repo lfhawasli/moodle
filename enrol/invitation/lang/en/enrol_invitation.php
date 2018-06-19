@@ -63,7 +63,7 @@ $string['htmlemailmsgtxt'] = <<<'EOD'
         Helvetica, Arial ,sans-serif;font-weight: 500;">
 	<h2 style="font-weight: 500;font-size: 30;">Site invitation</h2>
         {$a->instructormessage}
-        You have been invited to access <a href="#">{$a->fullname}.</a>
+        You have been invited to access <a href="{$a->courseurl}">{$a->fullname}.</a>
         <div style="padding-top: 4%; padding-bottom: 2%">
             <a href="{$a->inviteurl}" class="button-link"
             style="margin-left: 15%; margin-top: 15%; padding: 10px 15px;background: #4479BA;color: white;

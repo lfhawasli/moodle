@@ -205,7 +205,8 @@ class invitation_manager {
                             $data->message);
                     $invitation->message = $data->message;
                 }
-
+                $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
+                $messageparams->courseurl = $courseurl->out(false);
                 $messageparams->fullname = sprintf(
                     '%s: %s', $course->shortname, $course->fullname
                 );
