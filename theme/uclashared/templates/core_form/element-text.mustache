@@ -1,0 +1,26 @@
+{{!
+    Overriding Boost template to fix: CCLE-7700.
+
+    Boost adds disabled attirbute to frozen elements, causing them to not be
+    included in the submitted form.
+
+    We are just removing the disabled attribute.
+}}
+
+{{< core_form/element-template }}
+    {{$element}}
+        <input type="text"
+                class="form-control {{#error}}form-control-danger{{/error}}"
+                name="{{element.name}}"
+        {{#element.frozen}}
+                readonly
+        {{/element.frozen}}
+                id="{{element.id}}"
+                value="{{element.value}}"
+                size="{{element.size}}"
+                {{#error}}
+                    autofocus aria-describedby="id_error_{{element.name}}"
+                {{/error}}
+                {{{element.attributes}}} >
+    {{/element}}
+{{/ core_form/element-template }}
