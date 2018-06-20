@@ -78,6 +78,7 @@ $string['validationpositivenum'] = 'This must be a non-negative number.';
 $string['validationpositiveint'] = 'This must be a non-negative integer.';
 $string['mustbelessthan'] = 'must be less than';
 
+$string['videoannotation:addinstance'] = 'Add a new video annotation activity';
 $string['videoannotation:grade'] = 'Grade video annotations';
 $string['videoannotation:view'] = 'View video annotation';
 $string['videoannotation:add'] = 'Add video annotation';
