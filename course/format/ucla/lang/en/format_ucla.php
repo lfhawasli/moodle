@@ -108,7 +108,6 @@ $string['additionalsettings'] = 'Additional';
 $string['revieweditdates'] = 'Review/edit dates';
 $string['participants'] = 'Participants';
 $string['inviteusers'] = 'Invite users';
-$string['gradessetup'] = 'Grades setup';
 $string['enrollmentmethods'] = 'Enrollment methods';
 $string['competency'] = 'Competency';
 $string['questionbank'] = 'Question bank';
