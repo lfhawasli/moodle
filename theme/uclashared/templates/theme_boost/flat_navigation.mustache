@@ -67,7 +67,8 @@
     {{#addsectionclass}}
     <div id="changenumsections">
     {{/addsectionclass}}
-    <a class="list-group-item list-group-item-action {{tasite}} {{addsectionclass}}" href="{{{action}}}" data-key="{{key}}" data-isexpandable="{{isexpandable}}" data-indent="{{get_indent}}" data-showdivider="{{showdivider}}" data-type="{{type}}" data-nodetype="{{nodetype}}" data-collapse="{{collapse}}" data-forceopen="{{forceopen}}" data-isactive="{{isactive}}" data-hidden="{{hidden}}" data-preceedwithhr="{{preceedwithhr}}" {{#parent.key}}data-parent-key="{{.}}"{{/parent.key}} {{#dataaddsections}}data-add-sections="{{dataaddsections}}"{{/dataaddsections}}>
+    {{! Added classes tag to utilize navigationlib's add_class method. }}
+    <a class="list-group-item list-group-item-action {{tasite}} {{addsectionclass}} {{#classes}}{{.}} {{/classes}}" href="{{{action}}}" data-key="{{key}}" data-isexpandable="{{isexpandable}}" data-indent="{{get_indent}}" data-showdivider="{{showdivider}}" data-type="{{type}}" data-nodetype="{{nodetype}}" data-collapse="{{collapse}}" data-forceopen="{{forceopen}}" data-isactive="{{isactive}}" data-hidden="{{hidden}}" data-preceedwithhr="{{preceedwithhr}}" {{#parent.key}}data-parent-key="{{.}}"{{/parent.key}} {{#dataaddsections}}data-add-sections="{{dataaddsections}}"{{/dataaddsections}}>
         <div class="m-l-{{get_indent}}">
             <div class="media">
             {{#icon.pix}}
@@ -84,7 +85,8 @@
     {{/addsectionclass}}
     {{/action}}
     {{^action}}
-    <div class="list-group-item {{tasite}}" data-key="{{key}}" data-isexpandable="{{isexpandable}}" data-indent="{{get_indent}}" data-showdivider="{{showdivider}}" data-type="{{type}}" data-nodetype="{{nodetype}}" data-collapse="{{collapse}}" data-forceopen="{{forceopen}}" data-isactive="{{isactive}}" data-hidden="{{hidden}}" data-preceedwithhr="{{preceedwithhr}}" {{#parent.key}}data-parent-key="{{.}}"{{/parent.key}}>
+    {{! Added classes tag to utilize navigationlib's add_class method. }}
+    <div class="list-group-item {{tasite}} {{#classes}}{{.}} {{/classes}}" data-key="{{key}}" data-isexpandable="{{isexpandable}}" data-indent="{{get_indent}}" data-showdivider="{{showdivider}}" data-type="{{type}}" data-nodetype="{{nodetype}}" data-collapse="{{collapse}}" data-forceopen="{{forceopen}}" data-isactive="{{isactive}}" data-hidden="{{hidden}}" data-preceedwithhr="{{preceedwithhr}}" {{#parent.key}}data-parent-key="{{.}}"{{/parent.key}}>
         <div class="m-l-{{get_indent}}">
             <div class="media">
                 {{#icon.pix}}
