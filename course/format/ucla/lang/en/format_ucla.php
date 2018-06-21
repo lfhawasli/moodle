@@ -117,6 +117,7 @@ $string['mediagallery'] = 'Media gallery';
 $string['newbadge'] = 'Add a badge';
 $string['myucla'] = 'MyUCLA';
 $string['support'] = 'Support';
+$string['ucla:viewsupport'] = 'View Support tab';
 $string['runprepop'] = 'Run prepop';
 $string['pushgrades'] = 'Push grades';
 $string['classinfo'] = 'Class Info';

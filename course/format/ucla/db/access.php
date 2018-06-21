@@ -32,5 +32,10 @@ $capabilities = array(
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW
         )
+    ),
+    'format/ucla:viewsupport' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE
     )
 );
