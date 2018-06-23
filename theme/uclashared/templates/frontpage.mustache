@@ -1,0 +1,63 @@
+{{{ output.doctype }}}
+<html {{{ output.htmlattributes }}}>
+    <head>
+        <title>{{{ output.page_title }}}</title>
+        <link rel="shortcut icon" href="{{{ output.favicon }}}" />
+        {{{ output.standard_head_html }}}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    </head>
+    <body>
+        {{{ output.standard_top_of_body_html }}}
+        <div class="container-fluid bg-img" style="background-image: url('{{{ bgimage }}}')">
+            <div class="subcontainer row">
+                {{! Header }}
+                <div id="header">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div id="header-logo"></div>
+                            <div id="login-wrapper">
+                                <div class="header-login">
+                                    <div class="header-btn-group">
+                                        <!-- help_feedback_link -->
+                                        {{{ output.help_feedback_link }}}
+                                        <a href={{loginlink}}><button class="btn btn-header" id="btn-login">{{# str }} login {{/ str }}</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="sidebar">
+                    <div id="header-logo"></div>
+                    {{{ output.main_content }}}
+                    <div id="sidebar-card-container">
+                        {{> theme_uclashared/browse_by_block }}
+                        {{> theme_uclashared/alert_block }}
+                    </div>
+                </div>
+                <div class="col-12" id="main-area">
+                    {{! Greeting }}
+                    <div id="greeting-wrapper">
+                        <div id="greeting-week">
+                            <h1 id="greeting-header-text">{{{ week }}}</h1>
+                        </div>
+                        {{# quarter }}
+                        <div id="greeting-quarter">
+                            <h3 id="greeting-subtext">{{{ quarter }}}</h3>
+                        </div>
+                        {{/ quarter }}
+                    </div>
+                    {{! Image credits }}
+                    <div id="image-credits">
+                        <h6>{{{imagecredits}}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{> theme_uclashared/footer }}
+    </body>
+</html>
+{{#js}}
+require(['theme_boost/loader']);
+{{/js}}

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the UCLA shared theme for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -46,11 +45,7 @@ class action_menu_header extends \action_link implements \renderable {
     /**
      * Constructs the object.
      *
-     * @param moodle_url $url The URL for the action.
      * @param string $text The text to represent the action.
-     * @param bool $primary Whether this is a primary action or not.
-     * @param array $attributes Any attributes associated with the action.
-     * @param pix_icon $icon The icon to represent the action.
      */
     public function __construct($text) {
         parent::__construct(new \moodle_url(''), $text, null, array(), null);
