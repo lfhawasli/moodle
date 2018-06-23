@@ -240,7 +240,8 @@ if ($node) {
     }
 
     // Support.
-    if ($courses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
+    $viewsupport = has_capability('format/ucla:viewsupport', $PAGE->context);
+    if ($viewsupport && $courses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
         $tabcontainer = navigation_node::create(get_string('support', 'format_ucla'),
                 null, navigation_node::TYPE_CONTAINER, null, 'supporttab');
         $tabcontainer->tab = true;

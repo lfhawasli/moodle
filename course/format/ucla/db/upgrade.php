@@ -161,10 +161,23 @@ function xmldb_format_ucla_upgrade($oldversion) {
         foreach ($roles as $role) {
             $roleid = $DB->get_field('role', 'id', array('shortname' => $role));
             if (!empty($roleid)) {
-                role_change_permission($roleid, $context, 'format/ucla:viewadminpanel', CAP_ALLOW);                
+                role_change_permission($roleid, $context, 'format/ucla:viewadminpanel', CAP_ALLOW);
             }
         }
         upgrade_plugin_savepoint(true, 2018061500, 'format', 'ucla');
+    }
+    
+    if ($oldversion < 2018062200) {
+        // Let only certain roles view support. 
+        $permissibleroles = array('manager', 'coursesitemanager');
+        $context = context_system::instance();
+        $records = $DB->get_records_list('role', 'shortname', $permissibleroles, '', 'id');
+        foreach ($records as $record) {
+            if (!empty($record->id)) {
+                role_change_permission($record->id, $context, 'format/ucla:viewsupport', CAP_ALLOW);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2018062200, 'format', 'ucla');
     }
 
     return true;
