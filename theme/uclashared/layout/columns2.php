@@ -17,7 +17,7 @@
 /**
  * Override the two column layout from the boost theme.
  *
- * @package   theme_boost
+ * @package   theme_uclashared
  * @copyright 2018 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

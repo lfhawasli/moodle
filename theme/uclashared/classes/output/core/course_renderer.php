@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * UCLA course renderer and overrides Boost course_renderer.
+ *
+ * @package    theme_uclashared
+ * @copyright  2018 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace theme_uclashared\output\core;
 defined('MOODLE_INTERNAL') || die();
 
@@ -23,15 +31,14 @@ use cm_info;
 require_once($CFG->dirroot . '/course/renderer.php');
 
 /**
- * UCLA specific renderers and overrides Boost renders.
+ * UCLA course renderer and overrides Boost course_renderer.
  *
  * @package    theme_uclashared
  * @copyright  2018 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class course_renderer extends \theme_boost\output\core\course_renderer{
-    
+
     /**
      * Returns the CSS classes for the activity name/content
      *
@@ -45,7 +52,7 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
             $conditionalhidden = $this->is_cm_conditionally_hidden($mod);
             $accessiblebutdim = (!$mod->visible || $conditionalhidden) &&
                 has_capability('moodle/course:viewhiddenactivities', $mod->context);
-            // Lines 50-59 restructured from original method to add dimmed class 
+            // Lines 50-59 restructured from original method to add dimmed class
             // only to hidden section items.
             if (!$mod->visible) {
                 $linkclasses .= ' dimmed';

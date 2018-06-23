@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * UCLA core renderer and overrides Boost core_renderer.
+ *
+ * @package    theme_uclashared
+ * @copyright  2018 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace theme_uclashared\output;
 
 use html_writer;
@@ -30,16 +38,15 @@ use block_contents;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
-include_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/user/lib.php');
 
 /**
- * UCLA specific renderers and overrides Boost renders.
+ * UCLA core renderer and overrides Boost core_renderer.
  *
  * @package    theme_uclashared
  * @copyright  2018 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class core_renderer extends \theme_boost\output\core_renderer {
     /**
      * Shows sitewide 'alert' banner.
@@ -91,7 +98,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $c;
     }
 
-     /**
+    /**
      * Attempts to get a feature of another block to generate special text or
      * link to put into the theme.
      *
@@ -127,7 +134,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
      */
     public function edit_button(moodle_url $url = null) {
         global $PAGE;
- 
+
         if (empty($url)) {
             $url = $PAGE->url;
         }
@@ -570,19 +577,20 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
-      * Calls weeks display function and returns an array with current week and quarter
-      * @return array Current week and quarter strings separated into an array
-      */
+     * Calls weeks display function and returns an array with current week and quarter.
+     *
+     * @return array Current week and quarter strings separated into an array.
+     */
     public function parsed_weeks_display() {
-      $parsed = array();
-      $weeksdata = $this->weeks_display();
-      $weekpos = strpos($weeksdata, '<span class="week">');
-      $quarter = substr($weeksdata, 0, $weekpos);
-      $quarter = strip_tags($quarter);
-      $week = substr($weeksdata, $weekpos);
-      $week = strip_tags($week);
-      array_push($parsed, $quarter, $week);
-      return $parsed;
+        $parsed = array();
+        $weeksdata = $this->weeks_display();
+        $weekpos = strpos($weeksdata, '<span class="week">');
+        $quarter = substr($weeksdata, 0, $weekpos);
+        $quarter = strip_tags($quarter);
+        $week = substr($weeksdata, $weekpos);
+        $week = strip_tags($week);
+        array_push($parsed, $quarter, $week);
+        return $parsed;
     }
 
     /**
@@ -615,12 +623,12 @@ class core_renderer extends \theme_boost\output\core_renderer {
 
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
-            if(!empty($renderer->print_site_meta_text())){
+            if (!empty($renderer->print_site_meta_text())) {
                 $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix pull-xs-left course-details');
             }
         }
 
-        $html .= html_writer::start_div('hidden-sm-down pull-xs-right'); 
+        $html .= html_writer::start_div('hidden-sm-down pull-xs-right');
 
         if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
             $html .= self::admin_panel();
@@ -654,7 +662,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $headerinfo = array();
         if ($PAGE->pagetype == 'my-index') {
             $headerinfo['heading'] = $USER->firstname . ' ' . $USER->lastname;
-        }       
+        }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
         $html .= html_writer::start_div('col-xs-12 p-a-1');
@@ -695,13 +703,14 @@ class core_renderer extends \theme_boost\output\core_renderer {
         global $PAGE;
 
         $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
-        $adminbutton = html_writer::div($adminicon .' '. get_string('adminpanel', 'format_ucla'), 'btn btn-secondary header-admin-panel-button');
+        $adminbutton = html_writer::div($adminicon .' '. get_string('adminpanel', 'format_ucla'),
+                'btn btn-secondary header-admin-panel-button');
 
         $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($PAGE->course)->figure_section());
         $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
         $html = html_writer::link($adminlink, $adminbutton,
                 array('class' => 'admin-panel-link pull-xs-right'
-                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));      
+                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
 
         return $html;
     }
@@ -746,7 +755,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $newnavbar->ignore_active();
             // Remove last navbar node if it is duplicated in the end.
             if ($originalnavbarsize > 3 &&
-                    $originalnavbar[$originalnavbarsize-2]->action == $originalnavbar[$originalnavbarsize-1]->action) {
+                    $originalnavbar[$originalnavbarsize - 2]->action == $originalnavbar[$originalnavbarsize - 1]->action) {
                 $originalnavbarsize--;
             }
             // Create new navbar excluding the 'Course'/'My courses' node.

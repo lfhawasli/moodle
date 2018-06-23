@@ -26,6 +26,9 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+
+require_login();
+
 $page = required_param('page', PARAM_ALPHA);
 
 $PAGE->set_url('/theme/uclashared/view.php', array('page' => $page));
