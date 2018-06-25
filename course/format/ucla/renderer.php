@@ -83,9 +83,7 @@ class format_ucla_renderer extends format_topics_renderer {
         // Save context object.
         $this->context =& $page->context;
 
-        // Use the public/private renderer.  This will permit us to override the
-        // way we render course modules.
-        $this->courserenderer = $this->page->get_renderer('local_publicprivate');
+        $this->courserenderer = $this->page->get_renderer('core', 'course');
     }
 
     /**
@@ -769,7 +767,7 @@ class format_ucla_renderer extends format_topics_renderer {
      */
     protected function section_edit_control_items($course, $section, $onsectionpage = false) {
         global $PAGE;
-        
+
         if (!$PAGE->user_is_editing()) {
             return array();
         }
@@ -780,9 +778,9 @@ class format_ucla_renderer extends format_topics_renderer {
         unset($controls['moveup']);
         unset($controls['movedown']);
         unset($controls['highlight']);
-        
+
         $sectionreturn = $onsectionpage ? $section->section : null;
-        
+
         // Adding new menu items to section link menu.
         $newcontrols = array();
 
@@ -793,8 +791,8 @@ class format_ucla_renderer extends format_topics_renderer {
             'add' => 'resource',
             'course' => $course->id,
             'section' => $section->section,
-            'return'=> 0,
-            'sr'=> $sectionreturn
+            'return' => 0,
+            'sr' => $sectionreturn
         ));
         $newcontrols['file'] = array(
             'url' => $url,
@@ -808,8 +806,8 @@ class format_ucla_renderer extends format_topics_renderer {
             'add' => 'url',
             'course' => $course->id,
             'section' => $section->section,
-            'return'=> 0,
-            'sr'=> $sectionreturn
+            'return' => 0,
+            'sr' => $sectionreturn
         ));
         $newcontrols['link'] = array(
             'url' => $url,
@@ -823,8 +821,8 @@ class format_ucla_renderer extends format_topics_renderer {
             'add' => 'label',
             'course' => $course->id,
             'section' => $section->section,
-            'return'=> 0,
-            'sr'=> $sectionreturn
+            'return' => 0,
+            'sr' => $sectionreturn
         ));
         $newcontrols['label'] = array(
             'url' => $url,
@@ -872,7 +870,8 @@ class format_ucla_renderer extends format_topics_renderer {
                 $class = empty($value['pixattr']['class']) ? '' : $value['pixattr']['class'];
                 $alt = empty($value['pixattr']['alt']) ? '' : $value['pixattr']['alt'];
                 // Rewriting $icon, not all menu items have an icon.
-                $icon = empty($value['icon']) ? null : new pix_icon($value['icon'], $alt, null, array('class' => "smallicon " . $class));
+                $icon = empty($value['icon']) ? null : new pix_icon($value['icon'],
+                        $alt, null, array('class' => "smallicon " . $class));
 
                 if ($key == 'header_add' || $key == 'header_manage') {
                     // Created new action_menu_header object to handle subheaders.
