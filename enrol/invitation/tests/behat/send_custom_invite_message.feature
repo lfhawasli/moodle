@@ -20,8 +20,8 @@ Feature: Custom email invite message
       | role |
       | <inviterole> |
     When I log in as "sender"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     And I follow "Invite users"
     And I set the following fields to these values:
       | role_group[roleid] | <roleid> |

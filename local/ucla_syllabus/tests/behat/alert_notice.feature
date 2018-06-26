@@ -16,7 +16,7 @@ Background:
        | user | course | role |
        | teacher1 | C1 | editingteacher |
    When I log in as "teacher1"
-   And I follow "Course 1"
+   And I am on "Course 1" course homepage
    Then I should see "A syllabus has not been added to your site, would you like to add one now?" in the ".ucla-format-notice-box" "css_element"
 
 Scenario: "Yes"

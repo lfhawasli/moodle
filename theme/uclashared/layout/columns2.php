@@ -47,6 +47,10 @@ $templatecontext = [
     'running_environment' => get_config('theme_uclashared', 'running_environment')
 ];
 
+// For Behat tests we need to show logout link in footer.
+$templatecontext['behatrunning'] = (defined('BEHAT_SITE_RUNNING') || 
+        defined('BEHAT_TEST') || defined('BEHAT_UTIL'));
+
 $templatecontext['flatnavigation'] = $PAGE->flatnav;
 
 // Adding in if we are in a course and if we have editing turned on.

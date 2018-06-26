@@ -23,7 +23,7 @@ Feature: Conditional restricted activity lists conditions required
   Scenario: See list of conditions required for a conditional activity
     Given I am in a ucla environment
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow "Week 1"
     And I add a "Quiz" to section "1" and I fill the form with:
@@ -44,7 +44,7 @@ Feature: Conditional restricted activity lists conditions required
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Week 2"
     And I follow "Access restrictions"
     Then I should see "Not available unless: You get an appropriate score in quiz1" in the ".availabilityinfo" "css_element"

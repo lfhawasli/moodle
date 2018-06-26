@@ -20,7 +20,7 @@ Feature: Revoke an invite
       | editor |
     And I log in as "teacher1"
     And I browse to site "C1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     And I follow "Invite users"
     And I set the following fields to these values:
       | role_group[roleid] | 9 |

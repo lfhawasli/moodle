@@ -21,8 +21,8 @@ Feature: Invitation form
       | <role2> |
 
     When I log in as "testuser"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     And I follow "Invite users"
     Then I should see <roledescrip1>
     And I should see <roledescrip2>
@@ -48,8 +48,8 @@ Feature: Invitation form
       | testuser |
       | grader   |
     When I log in as "testuser"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     And I follow "Invite users"
     And I set the following fields to these values:
       | Grader | 1 |

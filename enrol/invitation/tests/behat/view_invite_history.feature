@@ -23,8 +23,8 @@ Feature: Invite history
       | <inviterole1> |
       | <inviterole2> |
     When I log in as "sender"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     And I follow "Invite users"
     And I set the following fields to these values:
       | <rolename1> | 1 |
@@ -45,8 +45,8 @@ Feature: Invite history
     And I press "Accept invitation"
     And I log out
     And I log in as "sender"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     And I follow "Invite users"
     And I follow "Invite history"
     And I should see <rolestring1> in the "receiv1@asd.com" "table_row"

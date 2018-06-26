@@ -21,7 +21,7 @@ Feature: Setting a landing page
   @javascript @local_ucla_syllabus
   Scenario: Set syllabus as a landing page
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds
@@ -30,19 +30,19 @@ Feature: Setting a landing page
     And I should see "Success!"
     And I log out
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     Then I should see "Syllabus manager"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I should see "Syllabus is not available yet"
 
   @javascript
   Scenario: Setting landing page and turning editing mode on/off 
             stays on correct section
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds
@@ -53,7 +53,7 @@ Feature: Setting a landing page
     And I press "Return to site"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     # Must be redirected to new landing page
     Then I should be on section "Week 4"
     And I turn editing mode on
