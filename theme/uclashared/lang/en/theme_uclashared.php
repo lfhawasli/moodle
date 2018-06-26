@@ -31,7 +31,7 @@ $string['choosereadme'] = 'The theme from University of California, Los Angeles.
 $string['emptysectiontext'] = ' (empty)';
 $string['hiddensectiontext'] = ' (hidden)';
 
-// CCLE-7346 - Add More section to nav drawer
+// CCLE-7346 - Add More section to nav drawer.
 $string['moresection'] = 'More...';
 
 $string['control_panel'] = 'Control Panel';

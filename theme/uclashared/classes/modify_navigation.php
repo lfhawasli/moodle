@@ -53,7 +53,7 @@ class modify_navigation {
     /**
      * Stores course format object.
      *
-     * @var format_base 
+     * @var format_base
      */
     private $format = null;
 
@@ -145,7 +145,7 @@ class modify_navigation {
         }
 
         // Add the activities node to the end of the course navigation.
-        // If activities node is to be displayed as a new flat nav block
+        // If activities node is to be displayed as a new flat nav block.
         if ($this->showdividercalled === false) {
             $activitiesnode = new \flat_navigation_node($activitiesnode, 0);
             $activitiesnode->set_showdivider(true);
@@ -269,7 +269,7 @@ class modify_navigation {
         // Add the more section node.
         $this->coursenode->add_node($morenode);
 
-        // $params is used as a parameter to send to the blocks which generate the nav nodes
+        // Parameter $params is used to send to the blocks which generate the nav nodes.
         $params['course'] = $COURSE;
 
         // Add library reserve guide node.
@@ -291,7 +291,7 @@ class modify_navigation {
         // Add subject area nodes.
         $subjectlinks = block_method_result('ucla_subject_links', 'get_navigation_nodes', $params);
         if (!empty($subjectlinks)) {
-            // Iterate the array if multiple subject links are to be displayed
+            // Iterate the array if multiple subject links are to be displayed.
             foreach ($subjectlinks as $subjectlinknode) {
                 if ($userprefmorenode == 1) {
                     $subjectlinknode->hidden = true;
@@ -335,7 +335,7 @@ class modify_navigation {
      * There are certain nodes that do not highlight in the lefthand nav, either
      * because of core bugs, or our messing around with the navigation API, or
      * because the URL in the node do not match the actual URL users end up on.
-     * 
+     *
      * See ticket CCLE-7646.
      */
     public function higlight_nodes() {
@@ -343,12 +343,12 @@ class modify_navigation {
 
         $url = $PAGE->url;
 
-        if ($url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {            
+        if ($url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {
             // Setting a landing page does not highlight a section, because the
-            // section is not in the URL, so need to find and highlight it 
+            // section is not in the URL, so need to find and highlight it
             // ourselves.
             $section = $this->format->figure_section();
-            
+
             // Site info does not get highlighted, because Moodle highlights the
             // course node on section 0.
             if (empty($url->get_param('section')) || $section === 0) {
@@ -373,12 +373,12 @@ class modify_navigation {
 
     /**
      * Check if the page is editable and the user has editing permissions.
-     * 
+     *
      * @return boolean If button is to be displayed return true, otherwise false.
      */
     public function is_editing_button_displayed() {
         global $PAGE;
-        // Currently checks if the page is grader page, course section page or 
+        // Currently checks if the page is grader page, course section page or
         // syllabus section page.
         return (($PAGE->url->compare(new \moodle_url('/grade/report/grader/index.php'), URL_MATCH_BASE)) ||
                 ($PAGE->user_allowed_editing() &&
@@ -410,7 +410,7 @@ class modify_navigation {
                         $adminurl, \navigation_node::TYPE_SETTING,
                         null, 'courseadministration', new \pix_icon('i/settings', ''));
 
-            // If editing button is not displayed, courseadmin becomes a new tree parent
+            // If editing button is not displayed, courseadmin becomes a new tree parent.
             if (!$this->is_editing_button_displayed()) {
                 $courseadmin = new \flat_navigation_node($courseadmin, 0);
                 $courseadmin->set_showdivider(true);
@@ -428,7 +428,7 @@ class modify_navigation {
         if (is_role_switched($COURSE->id)) {
             return;
         }
-        // add enrol nodes
+        // Add enrol nodes.
         enrol_add_course_navigation($this->coursenode, $COURSE);
         // If editing button and courseadmin are not displayed, un/enrolment becomes a new tree parent.
         if (!($this->coursenode->find('editingmode', \navigation_node::TYPE_SETTING)) &&
@@ -455,21 +455,22 @@ class modify_navigation {
     private function add_editingmode() {
         global $PAGE, $USER;
 
-        // Exit function if not on an editable page or if does not have permission to edit
+        // Exit function if not on an editable page or if does not have permission to edit.
         if (!$this->is_editing_button_displayed()) {
             return;
         }
 
-        // If on grader page, editing button should mirror for grader
+        // If on grader page, editing button should mirror for grader.
         if ($PAGE->url->compare(new \moodle_url('/grade/report/grader/index.php'), URL_MATCH_BASE)) {
-            // Code below is copied from /grade/report/grader/index.php
-            // Lines 32, 67-68, 93-109
+            // Code below is copied from /grade/report/grader/index.php.
+            // Lines 32, 67-68, 93-109.
 
-            $page = optional_param('page', 0, PARAM_INT);   // active page
-            // return tracking object
-            $gpr = new \grade_plugin_return(array('type'=>'report', 'plugin'=>'grader', 'courseid'=>$PAGE->course->id, 'page'=>$page));
+            $page = optional_param('page', 0, PARAM_INT);   // Active page.
+            // Return tracking object.
+            $gpr = new \grade_plugin_return(array('type' => 'report', 'plugin' => 'grader',
+                'courseid' => $PAGE->course->id, 'page' => $page));
 
-            // page params for the turn editing on
+            // Page params for the turn editing on.
             $options = $gpr->get_options();
             $options['sesskey'] = sesskey();
 
@@ -483,7 +484,7 @@ class modify_navigation {
             $editurl = new \moodle_url('index.php', $options);
 
         } else {
-            // If user can edit the page
+            // If user can edit the page.
             if ($PAGE->user_allowed_editing()) {
                 // Add the turn on/off settings.
                 if ($PAGE->url->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)) {
@@ -509,7 +510,7 @@ class modify_navigation {
             }
         }
 
-        // Set button label and icon depending on editing mode
+        // Set button label and icon depending on editing mode.
         if ($editingmode === true) {
             $editstring = get_string('turneditingoff');
             $editicon = 'e/tick';
@@ -540,7 +541,7 @@ class modify_navigation {
 
         $this->coursenode->add_node($showall);
     }
-    
+
     /**
      * Add 'Add Section' node if using UCLA format.
      */
@@ -578,7 +579,7 @@ class modify_navigation {
             $uclasyllabusmanager = new \ucla_syllabus_manager($COURSE);
             $syllabusnode = $uclasyllabusmanager->get_navigation_nodes();
             if (!empty($syllabusnode)) {
-                // Found node, so add to course before first section.               
+                // Found node, so add to course before first section.
                 $siteinfonode = null;
                 $children = $this->coursenode->get_children_key_list();
                 // Find 1st child that is an integer.
@@ -657,22 +658,22 @@ class modify_navigation {
      */
     private function rearrange_nodes() {
         global $PAGE;
-        
+
         $nodestomove = array('grades' => \navigation_node::TYPE_SETTING,
             'coursedownload' => \navigation_node::TYPE_SECTION,
             'participants' => \navigation_node::TYPE_CONTAINER);
         foreach ($nodestomove as $name => $type) {
             if ($node = $this->navigation->find($name, $type)) {
                 $node->remove();
-                
+
                 // If Admin panel is not displayed, then need to set Grades to
                 // have a divider.
                 if ($name === 'grades' &&
                         !has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
                     $node = new \flat_navigation_node($node, 0);
-                    $node->set_showdivider(true);             
+                    $node->set_showdivider(true);
                 }
-                
+
                 $this->coursenode->add_node($node);
             }
         }
@@ -811,7 +812,7 @@ class modify_navigation {
 
                     // Need to set parent only after adding it.
                     $rolenode->set_parent($switchrolenode);
-                  }
+                }
 
                 // Make switch role node collapsible.
                 $this->collapsenodesforjs[] = 'themeuclasharedswitchrole';
@@ -824,12 +825,12 @@ class modify_navigation {
      */
     private function tasite_theme() {
         // Check if TA site, indirectly by checking for TA parent site backlink.
-        $tasitenode = $this->coursenode->find('parentsitehome' ,\navigation_node::TYPE_SECTION);
+        $tasitenode = $this->coursenode->find('parentsitehome', \navigation_node::TYPE_SECTION);
         if ($tasitenode) {
             $children = $this->coursenode->get_children_key_list();
             // For each node above and including the showall node, set the tasite parameter.
             foreach ($children as $child) {
-                $this->coursenode->find($child ,\navigation_node::TYPE_SECTION)->tasite = 'tasite';
+                $this->coursenode->find($child, \navigation_node::TYPE_SECTION)->tasite = 'tasite';
                 if ($child == 'showall') {
                     break;
                 }
@@ -861,32 +862,32 @@ class modify_navigation {
 
         $this->coursenode->add_node($coursedownloadnode);
     }
-    
+
     /**
      * Adds text for empty sections and text and color for hidden sections.
      */
     private function add_empty_hidden_text() {
         global $COURSE, $PAGE;
         $sections = get_fast_modinfo($COURSE)->get_section_info_all();
-        $emptysectionIDs = array();
-        $hiddensectionIDs = array();
+        $emptysectionids = array();
+        $hiddensectionids = array();
         $viewcapability = has_capability('moodle/course:viewhiddensections', $PAGE->context);
-        
+
         foreach ($sections as $section) {
             if (empty($section->sequence) && empty($section->summary)) {
-                $emptysectionIDs[$section->id] = null;
+                $emptysectionids[$section->id] = null;
             }
             if (!$section->visible) {
-                $hiddensectionIDs[$section->id] = null;
+                $hiddensectionids[$section->id] = null;
             }
         }
-        
+
         $emptysectiontext = get_string('emptysectiontext', 'theme_uclashared');
         $hiddensectiontext = get_string('hiddensectiontext', 'theme_uclashared');
-        
+
         $nodes = $this->navigation->find_all_of_type(\navigation_node::TYPE_SECTION);
         foreach ($nodes as $node) {
-            if (array_key_exists($node->key, $emptysectionIDs)) {
+            if (array_key_exists($node->key, $emptysectionids)) {
                 if ($viewcapability) {
                     $node->text .= $emptysectiontext;
                 } else {
@@ -894,7 +895,7 @@ class modify_navigation {
                     continue;
                 }
             }
-            if (array_key_exists($node->key, $hiddensectionIDs)) {
+            if (array_key_exists($node->key, $hiddensectionids)) {
                 $node->text .= $hiddensectiontext;
                 $node->add_class('hidden-node');
             }
@@ -952,7 +953,7 @@ class modify_navigation {
 
             // Highlight nodes.
             $this->higlight_nodes();
-            
+
             // Modifies display for empty or hidden sections.
             $this->add_empty_hidden_text();
         }

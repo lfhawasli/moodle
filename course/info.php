@@ -51,18 +51,18 @@
     if (!$course->visible and !has_capability('moodle/course:viewhiddencourses', $context)) {
         // START UCLA MOD: CCLE-3786 - Preventing past course access for students
         //print_error('coursehidden', '', $CFG->wwwroot .'/');
-        $config_week = get_config('local_ucla', 'student_access_ends_week');
-        $alt_msg_shown = false;
-        if (!empty($config_week)) {
+        $configweek = get_config('local_ucla', 'student_access_ends_week');
+        $altmsgshown = false;
+        if (!empty($configweek)) {
             // need to give different message if user is viewing a past
             // hidden site
             require_once($CFG->dirroot . '/local/ucla/lib.php');
             if (is_past_course($course)) {
                 print_error('coursehidden', 'local_ucla', $CFG->wwwroot .'/');
-                $alt_msg_shown = true;
+                $altmsgshown = true;
             }
         }
-        if (empty($alt_msg_shown)) {
+        if (empty($altmsgshown)) {
             print_error('coursehidden', '', $CFG->wwwroot .'/');
         }
         // END UCLA MOD: CCLE-3786

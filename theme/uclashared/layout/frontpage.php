@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Override the two column layout from the boost theme.
+ * Displays the frontpage.
+ *
+ * Uses its own css in style/frontpage.css so it is not included in the main
+ * site css file.
  *
  * @package   theme_uclashared
  * @copyright 2018 UC Regents
@@ -39,6 +42,8 @@ $templatecontext = [
 ];
 
 $PAGE->requires->jquery();
+$PAGE->requires->js('/theme/uclashared/javascript/frontpage.js');
+$PAGE->requires->css('/theme/uclashared/style/frontpage.css');
 
 $b = block_instance('ucla_browseby');
 $templatecontext['browseby'] = $b->get_content()->text;

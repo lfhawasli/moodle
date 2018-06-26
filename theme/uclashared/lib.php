@@ -66,7 +66,7 @@ function theme_uclashared_get_fontawesome_icon_map() {
          'core:e/text_highlight_picker' => 'fa-tint',
          'core:e/text_highlight' => 'fa-tint',
      ];
- }
+}
 
 /**
  * Called before theme outputs anything.

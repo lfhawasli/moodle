@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * UCLA core renderer and overrides Boost core_renderer.
+ *
+ * @package    theme_uclashared
+ * @copyright  2018 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace theme_uclashared\output;
 
 use html_writer;
@@ -30,16 +38,15 @@ use block_contents;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
-include_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/user/lib.php');
 
 /**
- * UCLA specific renderers and overrides Boost renders.
+ * UCLA core renderer and overrides Boost core_renderer.
  *
  * @package    theme_uclashared
  * @copyright  2018 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class core_renderer extends \theme_boost\output\core_renderer {
     /**
      * Shows sitewide 'alert' banner.
@@ -91,7 +98,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $c;
     }
 
-     /**
+    /**
      * Attempts to get a feature of another block to generate special text or
      * link to put into the theme.
      *
@@ -127,7 +134,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
      */
     public function edit_button(moodle_url $url = null) {
         global $PAGE;
- 
+
         if (empty($url)) {
             $url = $PAGE->url;
         }
@@ -332,6 +339,205 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
+     * Construct a user menu, returning HTML that can be echoed out by a
+     * layout file.
+     *
+     * @param stdClass $user A user object, usually $USER.
+     * @param bool $withlinks true if a dropdown should be built.
+     * @return string HTML fragment.
+     */
+    public function user_menu($user = null, $withlinks = null) {
+        global $USER, $CFG;
+        require_once($CFG->dirroot . '/user/lib.php');
+
+        if (is_null($user)) {
+            $user = $USER;
+        }
+
+        // Note: this behaviour is intended to match that of core_renderer::login_info,
+        // but should not be considered to be good practice; layout options are
+        // intended to be theme-specific. Please don't copy this snippet anywhere else.
+        if (is_null($withlinks)) {
+            $withlinks = empty($this->page->layout_options['nologinlinks']);
+        }
+
+        // Add a class for when $withlinks is false.
+        $usermenuclasses = 'usermenu';
+        if (!$withlinks) {
+            $usermenuclasses .= ' withoutlinks';
+        }
+
+        $returnstr = "";
+
+        // If during initial install, return the empty return string.
+        if (during_initial_install()) {
+            return $returnstr;
+        }
+
+        $loginpage = $this->is_login_page();
+        $loginurl = get_login_url();
+        // If not logged in, show the login button.
+        if (!isloggedin()) {
+            if (!$loginpage) {
+                // Removed 'You are not logged in." text and converted login link to login button.
+                $loginstr = get_string('login');
+                $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
+            }
+
+            return html_writer::div(
+                html_writer::span(
+                    $returnstr,
+                    'login'
+                ),
+                $usermenuclasses
+            );
+
+        }
+
+        // If logged in as a guest user, show a string to that effect.
+        if (isguestuser()) {
+            if (!$loginpage && $withlinks) {
+                // Removed 'You are currently logged as guest." text and converted login link to login button.
+                $loginstr = get_string('login');
+                $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
+            }
+
+            return html_writer::div(
+                html_writer::span(
+                    $returnstr,
+                    'login'
+                ),
+                $usermenuclasses
+            );
+        }
+
+        // Get some navigation opts.
+        $opts = user_get_user_navigation_info($user, $this->page);
+
+        $avatarclasses = "avatars";
+        $avatarcontents = html_writer::span($opts->metadata['useravatar'], 'avatar current');
+        $usertextcontents = $opts->metadata['userfullname'];
+
+        // Other user.
+        if (!empty($opts->metadata['asotheruser'])) {
+            $avatarcontents .= html_writer::span(
+                $opts->metadata['realuseravatar'],
+                'avatar realuser'
+            );
+            $usertextcontents = $opts->metadata['realuserfullname'];
+            $usertextcontents .= html_writer::tag(
+                'span',
+                get_string(
+                    'loggedinas',
+                    'moodle',
+                    html_writer::span(
+                        $opts->metadata['userfullname'],
+                        'value'
+                    )
+                ),
+                array('class' => 'meta viewingas')
+            );
+        }
+
+        // Role.
+        if (!empty($opts->metadata['asotherrole'])) {
+            $role = \core_text::strtolower(preg_replace('#[ ]+#', '-', trim($opts->metadata['rolename'])));
+            $usertextcontents .= html_writer::span(
+                $opts->metadata['rolename'],
+                'meta role role-' . $role
+            );
+        }
+
+        // User login failures.
+        if (!empty($opts->metadata['userloginfail'])) {
+            $usertextcontents .= html_writer::span(
+                $opts->metadata['userloginfail'],
+                'meta loginfailures'
+            );
+        }
+
+        // MNet.
+        if (!empty($opts->metadata['asmnetuser'])) {
+            $mnet = strtolower(preg_replace('#[ ]+#', '-', trim($opts->metadata['mnetidprovidername'])));
+            $usertextcontents .= html_writer::span(
+                $opts->metadata['mnetidprovidername'],
+                'meta mnet mnet-' . $mnet
+            );
+        }
+
+        $returnstr .= html_writer::span(
+            html_writer::span($usertextcontents, 'usertext') .
+            html_writer::span($avatarcontents, $avatarclasses),
+            'userbutton'
+        );
+
+        // Create a divider (well, a filler).
+        $divider = new action_menu_filler();
+        $divider->primary = false;
+
+        $am = new action_menu();
+        $am->set_menu_trigger(
+            $returnstr
+        );
+        $am->set_alignment(action_menu::TR, action_menu::BR);
+        $am->set_nowrap_on_items();
+        if ($withlinks) {
+            $navitemcount = count($opts->navitems);
+            $idx = 0;
+            foreach ($opts->navitems as $key => $value) {
+
+                switch ($value->itemtype) {
+                    case 'divider':
+                        // If the nav item is a divider, add one and skip link processing.
+                        $am->add($divider);
+                        break;
+
+                    case 'invalid':
+                        // Silently skip invalid entries (should we post a notification?).
+                        break;
+
+                    case 'link':
+                        // Process this as a link item.
+                        $pix = null;
+                        if (isset($value->pix) && !empty($value->pix)) {
+                            $pix = new pix_icon($value->pix, $value->title, null, array('class' => 'iconsmall'));
+                        } else if (isset($value->imgsrc) && !empty($value->imgsrc)) {
+                            $value->title = html_writer::img(
+                                $value->imgsrc,
+                                $value->title,
+                                array('class' => 'iconsmall')
+                            ) . $value->title;
+                        }
+
+                        $al = new action_menu_link_secondary(
+                            $value->url,
+                            $pix,
+                            $value->title,
+                            array('class' => 'icon')
+                        );
+                        if (!empty($value->titleidentifier)) {
+                            $al->attributes['data-title'] = $value->titleidentifier;
+                        }
+                        $am->add($al);
+                        break;
+                }
+
+                $idx++;
+
+                // Add dividers after the first item and before the last item.
+                if ($idx == 1 || $idx == $navitemcount - 1) {
+                    $am->add($divider);
+                }
+            }
+        }
+
+        return html_writer::div(
+            $this->render($am),
+            $usermenuclasses
+        );
+    }
+
+    /**
      * This code renders the navbar button to control the display of the custom menu
      * on smaller screens.
      *
@@ -371,19 +577,20 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
     /**
-      * Calls weeks display function and returns an array with current week and quarter
-      * @return array Current week and quarter strings separated into an array
-      */
+     * Calls weeks display function and returns an array with current week and quarter.
+     *
+     * @return array Current week and quarter strings separated into an array.
+     */
     public function parsed_weeks_display() {
-      $parsed = array();
-      $weeksdata = $this->weeks_display();
-      $weekpos = strpos($weeksdata, '<span class="week">');
-      $quarter = substr($weeksdata, 0, $weekpos);
-      $quarter = strip_tags($quarter);
-      $week = substr($weeksdata, $weekpos);
-      $week = strip_tags($week);
-      array_push($parsed, $quarter, $week);
-      return $parsed;
+        $parsed = array();
+        $weeksdata = $this->weeks_display();
+        $weekpos = strpos($weeksdata, '<span class="week">');
+        $quarter = substr($weeksdata, 0, $weekpos);
+        $quarter = strip_tags($quarter);
+        $week = substr($weeksdata, $weekpos);
+        $week = strip_tags($week);
+        array_push($parsed, $quarter, $week);
+        return $parsed;
     }
 
     /**
@@ -416,12 +623,12 @@ class core_renderer extends \theme_boost\output\core_renderer {
 
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
-            if(!empty($renderer->print_site_meta_text())){
+            if (!empty($renderer->print_site_meta_text())) {
                 $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix pull-xs-left course-details');
             }
         }
 
-        $html .= html_writer::start_div('hidden-sm-down pull-xs-right'); 
+        $html .= html_writer::start_div('hidden-sm-down pull-xs-right');
 
         if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
             $html .= self::admin_panel();
@@ -455,7 +662,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $headerinfo = array();
         if ($PAGE->pagetype == 'my-index') {
             $headerinfo['heading'] = $USER->firstname . ' ' . $USER->lastname;
-        }       
+        }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
         $html .= html_writer::start_div('col-xs-12 p-a-1');
@@ -496,13 +703,14 @@ class core_renderer extends \theme_boost\output\core_renderer {
         global $PAGE;
 
         $adminicon = html_writer::tag('i', '', array('class' => 'fa fa-cog fa-fw'));
-        $adminbutton = html_writer::div($adminicon .' '. get_string('adminpanel', 'format_ucla'), 'btn btn-secondary header-admin-panel-button');
+        $adminbutton = html_writer::div($adminicon .' '. get_string('adminpanel', 'format_ucla'),
+                'btn btn-secondary header-admin-panel-button');
 
         $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($PAGE->course)->figure_section());
         $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
         $html = html_writer::link($adminlink, $adminbutton,
                 array('class' => 'admin-panel-link pull-xs-right'
-                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));      
+                . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
 
         return $html;
     }
@@ -547,7 +755,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $newnavbar->ignore_active();
             // Remove last navbar node if it is duplicated in the end.
             if ($originalnavbarsize > 3 &&
-                    $originalnavbar[$originalnavbarsize-2]->action == $originalnavbar[$originalnavbarsize-1]->action) {
+                    $originalnavbar[$originalnavbarsize - 2]->action == $originalnavbar[$originalnavbarsize - 1]->action) {
                 $originalnavbarsize--;
             }
             // Create new navbar excluding the 'Course'/'My courses' node.

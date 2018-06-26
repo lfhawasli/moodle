@@ -122,9 +122,14 @@ if ($node) {
         }
     }
 
-    if ($setting = $node->find('gradebooksetup', navigation_node::TYPE_SETTING)) {
-        $setting->remove();
-        $container->add_node($setting);
+    if (has_capability('moodle/grade:viewall', $coursecontext)) {
+        $formatoptions = course_get_format($courseid)->get_format_options();
+        if (empty($formatoptions['myuclagradelinkredirect'])) {
+            $url = new moodle_url('/grade/report/index.php', array('id'=>$course->id));
+        } else {
+            $url = new moodle_url('https://be.my.ucla.edu');
+        }
+        $container->add(get_string('grades'), $url, navigation_node::TYPE_SETTING);
     }
 
     if (($course->groupmode || !$course->groupmodeforce) && has_capability('moodle/course:managegroups', $coursecontext)) {
@@ -235,7 +240,8 @@ if ($node) {
     }
 
     // Support.
-    if ($courses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
+    $viewsupport = has_capability('format/ucla:viewsupport', $PAGE->context);
+    if ($viewsupport && $courses = $DB->get_records('ucla_request_classes', array('courseid' => $courseid))) {
         $tabcontainer = navigation_node::create(get_string('support', 'format_ucla'),
                 null, navigation_node::TYPE_CONTAINER, null, 'supporttab');
         $tabcontainer->tab = true;
@@ -313,6 +319,7 @@ if ($node) {
             'turneditingonoff' => navigation_node::TYPE_SETTING,
             'unenrolself'      => navigation_node::TYPE_SETTING,
             'coursereports'    => navigation_node::TYPE_CONTAINER,
+            'gradebooksetup'   => navigation_node::TYPE_SETTING,
             'coursebadges'     => navigation_node::TYPE_CONTAINER,
             'publish'          => navigation_node::TYPE_SETTING,
             'questionbank'     => navigation_node::TYPE_CONTAINER,
@@ -328,10 +335,6 @@ if ($node) {
     // Rename settings.
     if ($setting = $node->find('editdates', navigation_node::TYPE_SETTING)) {
         $setting->text = get_string('revieweditdates', 'format_ucla');
-    }
-
-    if ($setting = $node->find('gradebooksetup', navigation_node::TYPE_SETTING)) {
-        $setting->text = get_string('gradessetup', 'format_ucla');
     }
 
     if ($setting = $node->find('report_competency', navigation_node::TYPE_SETTING)) {
