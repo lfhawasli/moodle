@@ -352,7 +352,7 @@ class block_ucla_my_sites extends block_base {
         if (empty($availableterms) && empty($collaborationsites)) {
             // Nothing to show.
             $templatecontext['nolisting'] = true;
-        } else if (empty($availableterms) && !empty($collaborationsites)) {
+        } else if (empty($classsites) && !empty($collaborationsites)) {
             $params['viewmy'] = 'collab';
         } else if (!empty($availableterms) && empty($collaborationsites)) {
             $params['viewmy'] = 'class';
