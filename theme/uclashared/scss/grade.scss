@@ -1,0 +1,7 @@
+// Prevents the dropdown menu from changing positions depending on the selection.
+.path-grade-report #maincontent + .urlselect {
+	left: auto;
+	display: block;
+	position: inherit;
+	margin-bottom: 7px;
+}
