@@ -21,6 +21,11 @@
  * @copyright   2015 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
+
+use core_availability\info_module;
+
 global $CFG;
 require_once($CFG->dirroot . '/local/publicprivate/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_group_manager/lib.php');
@@ -56,6 +61,46 @@ class user_enrolment_updated_testcase extends advanced_testcase {
         $creqarr = $this->gen->get_plugin_generator('local_ucla')->create_class(array(array()));
         $this->class = reset($creqarr);
         $this->setAdminUser();
+    }
+
+    /**
+     * When a user is enrolled/unenrolled to a course make sure they do or do
+     * not have access to private course material.
+     */
+    public function test_access() {
+        global $DB;
+        $user = $this->getDataGenerator()->create_user();
+        $student = $DB->get_record('role', array('shortname' => 'student'));
+
+        // Create private material.
+        $resourcegen = $this->getDataGenerator()->get_plugin_generator('mod_resource');
+        $file = $resourcegen->create_instance(array('course' => $this->class->courseid));
+        $ppfile = PublicPrivate_Module::build($file->cmid);
+        $this->assertTrue($ppfile->is_private());
+
+        // Set student as current user to test availability conditions.
+        $this->setUser($user);
+
+        // User should not have access if not enrolled.
+        $information = '';
+        $modinfo = get_fast_modinfo($this->class->courseid);
+        $cm = $modinfo->get_cm($file->cmid);
+        $info = new info_module($cm);
+        $this->assertFalse($info->is_available($information));
+
+        // Enroll user and should have access now.
+        $this->getDataGenerator()->enrol_user($user->id, $this->class->courseid, $student->id, 'manual');
+        get_fast_modinfo($this->class->courseid, $user->id, true);  // Get fresh modinfo.
+        $info->is_available($information);
+        $this->assertTrue($info->is_available($information));
+
+        // Unrenroll user and should not have access again.
+        $enrol = enrol_get_plugin('manual');
+        $enrolinstance = $DB->get_record('enrol', array('courseid' => $this->class->courseid,
+            'enrol' => 'manual'), '*', MUST_EXIST);
+        get_fast_modinfo($this->class->courseid, $user->id, true);  // Get fresh modinfo.
+        $enrol->unenrol_user($enrolinstance, $user->id);
+        $this->assertFalse($info->is_available($information));
     }
 
     /** 
