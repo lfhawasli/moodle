@@ -39,6 +39,7 @@ $templatecontext = [
     'quarter' => $weeksarr[0],
     'bgimage' => $imagearr['image'],
     'imagecredits' => $imagearr['credits'],
+    'running_environment' => get_config('theme_uclashared', 'running_environment')
 ];
 
 $PAGE->requires->jquery();

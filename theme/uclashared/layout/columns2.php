@@ -43,7 +43,8 @@ $templatecontext = [
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'system_link' => get_config('theme_uclashared', 'system_link'),
-    'system_name' => get_config('theme_uclashared', 'system_name')
+    'system_name' => get_config('theme_uclashared', 'system_name'),
+    'running_environment' => get_config('theme_uclashared', 'running_environment')
 ];
 
 $templatecontext['flatnavigation'] = $PAGE->flatnav;

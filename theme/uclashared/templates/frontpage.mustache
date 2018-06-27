@@ -39,8 +39,10 @@
                 <div class="col-12" id="main-area">
                     {{! Greeting }}
                     <div id="greeting-wrapper">
-                        <div id="greeting-week">
-                            <h1 id="greeting-header-text">{{{ week }}}</h1>
+                        <div class="env-{{ running_environment }}">
+                            <div id="greeting-week">
+                                <h1 id="greeting-header-text">{{{ week }}}</h1>
+                            </div>
                         </div>
                         {{# quarter }}
                         <div id="greeting-quarter">
