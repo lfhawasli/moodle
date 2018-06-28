@@ -1,9 +1,0 @@
-{
-    "moodle-local_ucla_support_tools-filter": {
-        "requires": [
-            "autocomplete-base",
-            "autocomplete-filters",
-            "node-event-simulate"
-        ]
-    }
-}

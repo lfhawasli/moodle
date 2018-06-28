@@ -35,17 +35,6 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2014050700) {
-        // Remove 'Show 100 most recent MyUCLA grade log entries' report.
-        $data = $DB->get_record('ucla_support_tools',
-                array('name' => 'Show 100 most recent MyUCLA grade log entries'));
-        if (!empty($data)) {
-            $tool = \local_ucla_support_tools_tool::fetch($data);
-            $tool->delete();
-        }
-
-        upgrade_plugin_savepoint(true, 2014050700, 'tool', 'uclasupportconsole');
-    }
 
     // Create uclaieiclasses table and import 12F-13S IEI data.
     if ($oldversion < 2015051200) {
@@ -91,56 +80,6 @@ function xmldb_tool_uclasupportconsole_upgrade($oldversion) {
 
         // Savepoint reached.
         upgrade_plugin_savepoint(true, 2015101600, 'tool', 'uclasupportconsole');
-    }
-
-    if ($oldversion < 2016021900) {
-        // Add modulespertacourse to Module Data category.
-        $modulecat = null;
-
-        // Find it.
-        $categories = \local_ucla_support_tools_category::fetch_all();
-        foreach ($categories as $category) {
-            if (core_text::strtoupper($category->name) == 'MODULE DATA') {
-                $modulecat = $category;
-                break;
-            }
-        }
-
-        if (!empty($modulecat)) {
-            $data = array('url' => '/' . $CFG->admin . '/tool/uclasupportconsole/index.php#modulespertacourse',
-                'name' => get_string('modulespertacourse', 'tool_uclasupportconsole'));
-            $tool = \local_ucla_support_tools_tool::create($data);
-            $modulecat->add_tool($tool);
-        }
-
-        upgrade_plugin_savepoint(true, 2016021900, 'tool', 'uclasupportconsole');
-    }
-
-    if ($oldversion < 2016030600) {
-        // Add SP ccle_ta_sections to support tools.
-        $modulecat = null;
-
-        // Find it.
-        $categories = \local_ucla_support_tools_category::fetch_all();
-        foreach ($categories as $category) {
-            if (core_text::strtoupper($category->name) == 'COURSE DATA') {
-                $modulecat = $category;
-                break;
-            }
-        }
-
-        if (!empty($modulecat)) {
-            $data = array('url' => '/' . $CFG->admin . '/tool/uclasupportconsole/index.php#ccle_ta_sections',
-                'name' => get_string('ccle_ta_sections', 'tool_uclasupportconsole'));            
-            try {
-                $tool = \local_ucla_support_tools_tool::create($data);
-                $modulecat->add_tool($tool);
-            } catch (Exception $ex) {
-                // Tool was already created.
-            }
-        }
-
-        upgrade_plugin_savepoint(true, 2016030600, 'tool', 'uclasupportconsole');
     }
 
     return true;
