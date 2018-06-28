@@ -225,8 +225,11 @@ class participants_table extends \table_sql {
         $this->define_columns($columns);
         $this->define_headers($headers);
 
+        // Start UCLA MOD: CCLE-7760 - Alphebtize participants by last name ascending
         // Make this table sorted by first name by default.
-        $this->sortable(true, 'firstname');
+        // $this->sortable(true, 'firstname');
+        $this->sortable(true, 'surname');
+        // END UCLA MOD: CCLE-7760
 
         $this->no_sorting('select');
         $this->no_sorting('roles');
