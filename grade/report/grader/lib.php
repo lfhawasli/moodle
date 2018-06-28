@@ -1044,6 +1044,10 @@ class grade_report_grader extends grade_report {
                 if ($grade->is_overridden()) {
                     $itemcell->attributes['class'] .= ' overridden';
                     $itemcell->attributes['aria-label'] = get_string('overriddengrade', 'gradereport_grader');
+                    // START UCLA MOD: CCLE-7421 - Improve UI for Grader report.
+                    // Shows tooltips for overridden grades.
+                    $itemcell->attributes['title'] = get_string('overriddengrade', 'gradereport_grader');
+                    // END UCLA MOD: CCLE-7421.
                 }
 
                 if (!empty($grade->feedback)) {

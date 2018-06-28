@@ -1,0 +1,12 @@
+// Shows states for toggle icons in Grader report.
+.gradereport-grader-table th.c1.lastcol {
+    a .icon.fa-plus,
+    a .icon.fa-minus,
+    a .icon.fa-square-o {
+        color: $gray-lighter;
+    }
+    a.selected .icon {
+        font-weight: bold;
+        color: $body-color;
+    }
+}
