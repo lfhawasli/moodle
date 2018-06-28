@@ -512,7 +512,13 @@ FloatingHeaders.prototype = {
             }
         }
 
+        // START UCLA MOD: CCLE-7728 - Header covers grader report top rows.
+
+        // We change this code because CCLE uses a div for their main header.
+        // Moodle uses <header> and <navbar> tags which don't work for CCLE.
+
         // Check whether a header is present and whether it is floating.
+        /*
         var header = Y.one('header');
         this.pageHeaderHeight = 0;
         if (header) {
@@ -520,13 +526,20 @@ FloatingHeaders.prototype = {
                 this.pageHeaderHeight = header.get(OFFSETHEIGHT);
             } else {
                 var navbar = Y.one('.navbar');
-
                 if (navbar && navbar.getComputedStyle('position') === 'fixed') {
                     // If the navbar exists and isn't fixed, we need to offset the page header to accommodate for it.
                     this.pageHeaderHeight = navbar.get(OFFSETHEIGHT);
                 }
             }
         }
+        */
+
+        // Find the height of the CCLE main header, this is the y-coordinate that we want to start the floating header.
+        // The following line should only return the main header of the page.
+        var mainHeader = document.getElementsByClassName('header-main');
+        this.pageHeaderHeight = mainHeader[0].offsetHeight;
+
+        // END UCLA MOD: CCLE-7728.
     },
 
     /**
