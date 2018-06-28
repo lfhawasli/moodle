@@ -178,6 +178,7 @@ div.editor_atto_content:hover .atto_control {
     direction: ltr;
 }
 
+/* START UCLA MOD: CCLE-7726 - Improve autosave.
 .editor_atto_notification {
     position: absolute;
     bottom: -1.5em;
@@ -185,6 +186,7 @@ div.editor_atto_content:hover .atto_control {
     margin-top: 1px;
     cursor: pointer;
 }
+END UCLA MOD: CCLE-7726. */
 
 .editor_atto_notification .atto_info,
 .editor_atto_notification .atto_warning {

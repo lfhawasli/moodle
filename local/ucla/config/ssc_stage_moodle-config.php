@@ -441,6 +441,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     align = align, table, bsgrid
     insert = computing, equation, poodll, charmap, clear
     accessibility = accessibilitychecker, accessibilityhelper';
+$CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
