@@ -18,25 +18,27 @@
     Page header.
 }}
 
-<header role="banner" class="pos-f-t navbar navbar-full navbar-light bg-faded navbar-static-top moodle-has-zindex">
-    <div class="header-border visible-xs"></div>
-    <div class="header-main row headroom headroom--top">
-        <div class="nav-toggle" data-region="drawer-toggle">
-            {{> theme_uclashared/hamburger }}
-        </div>
-        <div class="header-logo">
-            {{> theme_uclashared/header_logo }}
-        </div>
-        <div class="header-login">
-            <div class="header-btn-group logininfo" >
-                <!-- navbar_plugin_output -->
-                {{{ output.navbar_plugin_output }}}
-                <!-- help_feedback_link -->
-                {{{ output.help_feedback_link }}}
-                <!-- user_menu -->
-                {{{ output.user_menu }}}
+<div class="env-{{ running_environment }}">
+    <header role="banner" class="pos-f-t navbar navbar-full navbar-light bg-faded navbar-static-top moodle-has-zindex">
+        <div class="header-border visible-xs"></div>
+        <div class="header-main row headroom headroom--top">
+            <div class="nav-toggle" data-region="drawer-toggle">
+                {{> theme_uclashared/hamburger }}
+            </div>
+            <div class="header-logo">
+                {{> theme_uclashared/header_logo }}
+            </div>
+            <div class="header-login">
+                <div class="header-btn-group logininfo" >
+                    <!-- navbar_plugin_output -->
+                    {{{ output.navbar_plugin_output }}}
+                    <!-- help_feedback_link -->
+                    {{{ output.help_feedback_link }}}
+                    <!-- user_menu -->
+                    {{{ output.user_menu }}}
+                </div>
             </div>
         </div>
-    </div>
 
-</header>
+    </header>
+</div>

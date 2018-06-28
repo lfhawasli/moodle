@@ -252,7 +252,6 @@ h1, h2, h3, h4, h5, h6, p {
 #greeting-week {
   padding: 10px 30px;
   text-align: center;
-  background-color: rgba(44,94,145,0.9);
 }
 
 #greeting-quarter {
@@ -295,4 +294,26 @@ h1, h2, h3, h4, h5, h6, p {
   #image-credits {
     display: none;
   }
+}
+
+/* Concerned with running environment color */
+.env-behat {
+  background-image: none;
+  background-color: rgba(144,179,62,0.9);
+}
+.env-dev {
+  background-image: none;
+  background-color: rgba(144,179,62,0.9);
+}
+.env-test {
+  background-image: none;
+  background-color: rgba(255,172,6,0.9);
+}
+.env-stage {
+  background-image: none;
+  background-color: rgba(87,73,167,0.9);
+}
+.env-prod {
+  background-image: none;
+  background-color: rgba(44,94,145,0.9);
 }
