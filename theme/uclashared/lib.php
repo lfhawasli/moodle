@@ -76,6 +76,7 @@ function theme_uclashared_get_fontawesome_icon_map() {
 function theme_uclashared_page_init(moodle_page $page) {
     $context = $page->context;
     $url = $page->url;
+
     // Need to check for redirect layout or else we will end up in an infinite
     // loop, since the redirect() function calls page init again.
     if ($page->pagelayout != 'redirect' && isset($context) && isset($url)) {
@@ -89,5 +90,11 @@ function theme_uclashared_page_init(moodle_page $page) {
 
         // Try to auto-login if not logged in.
         local_ucla_autologin::detect();
+    }
+
+    // Need to check for the context of the page to render the activity menu.
+    // See CCLE-7736 for additional notes.
+    if ($context->contextlevel == CONTEXT_MODULE) {
+        $page->force_settings_menu();
     }
 }
