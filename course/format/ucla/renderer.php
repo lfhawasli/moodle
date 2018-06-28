@@ -492,6 +492,12 @@ class format_ucla_renderer extends format_topics_renderer {
      */
     private function print_self_enrollment_button() {
         global $OUTPUT, $PAGE;
+
+        // Ignore is user is not logged in.
+        if (!isloggedin() || isguestuser()) {
+            return;
+        }
+
         $retval = '';
         // Check if course has "self-enrollment" plugin enabled and user is not
         // enrolled.

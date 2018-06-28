@@ -580,11 +580,7 @@ class PublicPrivate_Course {
          */
 
         try {
-            $member = new stdClass();
-            $member->groupid = $this->_course->grouppublicprivate;
-            $member->userid = $userid;
-            $member->timeadded = time();
-            $DB->insert_record('groups_members', $member);
+            groups_add_member($this->_course->grouppublicprivate, $userid, 'local_publicprivate');
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to add user to public/private group.', 503, $e);
         }
@@ -628,7 +624,7 @@ class PublicPrivate_Course {
          */
 
         try {
-            $DB->delete_records('groups_members', array('groupid' => $this->_course->grouppublicprivate, 'userid' => $userid));
+            groups_remove_member($this->_course->grouppublicprivate, $userid);
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to add user to public/private group.', 602, $e);
         }
