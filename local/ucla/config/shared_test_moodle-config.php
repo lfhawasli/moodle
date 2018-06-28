@@ -372,6 +372,11 @@ $CFG->forced_plugin_settings['tool_recyclebin']['coursebinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
+// Site administration > Plugins > Antivirus plugins > ClamAV antivirus
+$CFG->forced_plugin_settings['antivirus_clamav']['pathtoclam'] = '/usr/bin/clamscan';
+$CFG->forced_plugin_settings['antivirus_clamav']['quarantinedir'] = '/usr/local/clamquarantine';
+$CFG->forced_plugin_settings['antivirus_clamav']['clamfailureonupload'] = 'donothing';
+
 // Site administration > Plugins > Enrollments > UCLA registrar
 $CFG->forced_plugin_settings['local_ucla']['overrideenroldatabase'] = 1;
 
@@ -567,13 +572,6 @@ $CFG->cronclionly = true;
 $CFG->loginhttps = true;
 $CFG->cookiesecure = true;
 $CFG->allowframembedding = 1;
-
-// Site administration > Security > Anti-Virus
-$CFG->runclamonupload = true;
-$CFG->pathtoclam = '/usr/bin/clamscan';
-$CFG->clamscan = '/usr/bin/clamscan';
-$CFG->quarantinedir = '/usr/local/clamquarantine';
-$CFG->clamfailureonupload = 'donothing';
 
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';
