@@ -56,7 +56,7 @@ $string['setting_default_system_name'] = 'Shared System';
 
 $string['setting_title_system_link'] = 'System link';
 $string['setting_desc_system_link'] = 'The link associated with the system name.';
-$string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=924';
+$string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle';
 
 // CCLE-6512 - Profile Course details doesn't match My page Class sites.
 $string['setting_title_alternative_sharedsystem_name'] = 'Alternative Shared System name';

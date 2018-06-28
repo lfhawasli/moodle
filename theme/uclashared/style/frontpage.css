@@ -29,23 +29,59 @@ h1, h2, h3, h4, h5, h6, p {
   height: 100px;
   z-index: 1000;
 }
-#header #header-logo {
-  display: none;
-  background-position: center;
-  height: 70px;
-  width: 100%;
-  margin-left: 0;
-}
-#header-logo {
-  position: relative;
-  margin: 5px 0 5px 20px;
-  width: 400px;
-  height: 80px;
+.header-logo {
+  text-align: left;
+  display: inline;
+  margin: 20px 0 0 20px;
   float: left;
-  background-image: url("../pix/ucla-ccle-logo-01.png");
-  background-position: left;
-  background-repeat: no-repeat;
-  background-size: contain;
+}
+#header .header-logo {
+  display: none;
+}
+.header-logo a,
+.header-logo a:hover {
+  text-decoration:none;
+}
+.header-logo .icon {
+  width: 80px;
+  height: 26px;
+  display: inline;
+  margin-left: .5rem;
+  margin-bottom: 1.35rem;
+  margin-right:-.3rem;
+}
+.header-logo .logo-ccle {
+  color: #ffbc00; /* $ccle-color-logo */
+  font-weight: bold;
+  font-size: 2.5rem;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+.header-logo .logo-ccle:hover {
+  text-decoration: none;
+}
+.env-dev .header-logo .logo-ccle,
+.env-test .header-logo .logo-ccle,
+.env-stage .header-logo .logo-ccle {
+  color: white;
+}
+.header-logo .logo-system-name,
+.header-logo .logo-system-name-vertical-bar {
+  color: white;
+  font-weight: 150;
+  position: relative;
+}
+.header-logo .logo-system-name {
+  font-size: 1.75rem;
+  bottom: 3px;
+}
+.header-logo .logo-system-name-vertical-bar {
+  bottom: 2px;
+  font-size: 2.5rem;
+}
+.header-logo .logo-system-name:hover,
+.header-logo .logo-system-name:active {
+  text-decoration: underline; 
 }
 #login-wrapper {
   float: right;
@@ -82,8 +118,13 @@ h1, h2, h3, h4, h5, h6, p {
     width: 95%;
     padding: 0;
   }
-  #header #header-logo {
-    display: block;
+  #header .header-logo, 
+  #header .header-logo .logo-system-name-vertical-bar,
+  #header .header-logo .logo-system-name {
+    display: inline;
+    text-align: center;
+    width: 100%;
+    margin: 11px 0;
   }
 }
 @media (max-width: 480px) {
@@ -94,6 +135,18 @@ h1, h2, h3, h4, h5, h6, p {
   .btn-header {
     width: 100%;
     margin-bottom: 10px;
+  }
+  .header-logo .icon {
+    display: none;
+  }
+  #header .header-logo {
+    margin-bottom: 20px;
+  }
+}
+@media (max-width: 370px) {
+  #header .header-logo .logo-system-name,
+  #header .header-logo .logo-system-name-vertical-bar {
+    display: none;
   }
 }
 
@@ -108,9 +161,6 @@ h1, h2, h3, h4, h5, h6, p {
   position: static;
   float: left;
 }
-#sidebar #header-logo {
-    display: block;
-}
 @media (max-width: 992px) {
   #sidebar {
     background-image: url("../pix/blue-backdrop-rotated.png");
@@ -119,7 +169,7 @@ h1, h2, h3, h4, h5, h6, p {
     width: 100%;
     margin-top: 20px;
   }
-  #sidebar #header-logo {
+  #sidebar .header-logo {
     display: none;
   }
 }
