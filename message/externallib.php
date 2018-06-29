@@ -2189,11 +2189,16 @@ class core_message_external extends external_api {
     public static function message_processor_config_form($userid, $name, $formvalues) {
         global $USER, $CFG;
 
+        // START UCLA MOD: CCLE-7707 - Re-add Alternate email option in Messaging settings.
+        // Removes condition that messaging must be enabled to configure alternate email settings.
+        /* 
         // Check if messaging is enabled.
         if (empty($CFG->messaging)) {
             throw new moodle_exception('disabled', 'message');
         }
-
+        */
+        // END UCLA MOD: CCLE-7707.
+        
         $params = self::validate_parameters(
             self::message_processor_config_form_parameters(),
             array(
