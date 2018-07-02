@@ -48,8 +48,8 @@ $PAGE->set_url(new moodle_url('/enrol/invitation/invitation.php',
 $PAGE->set_pagelayout('base');
 $PAGE->set_course($course);
 $pagetitle = get_string('inviteusers', 'enrol_invitation');
-$PAGE->set_heading($pagetitle);
-$PAGE->set_title($pagetitle);
+$PAGE->set_heading($course->fullname);
+$PAGE->set_title("$course->shortname: $pagetitle");
 $PAGE->navbar->add($pagetitle);
 $jspath = '/enrol/invitation/';
 $PAGE->requires->jquery();

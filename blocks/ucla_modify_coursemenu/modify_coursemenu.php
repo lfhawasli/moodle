@@ -88,7 +88,7 @@ $courseviewurl = new moodle_url('/course/view.php', array('id' => $courseid, 'se
 $PAGE->set_context($context);
 
 $PAGE->set_pagelayout('base');
-$params = array('courseid' => $courseid, 'section' => $sectionnum, 'show_all' => $showall);
+$params = array('courseid' => $courseid, 'section' => $sectionnum);
 $PAGE->set_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
         $params);
 
@@ -100,10 +100,9 @@ $confirmationurl = new moodle_url($PAGE->url,
         ));
 
 $restr = get_string('pluginname', 'block_ucla_modify_coursemenu');
-$restrc = "$restr: {$course->shortname}";
 
-$PAGE->set_title($restrc);
-$PAGE->set_heading($restrc);
+$PAGE->set_title("$course->shortname: $restr");
+$PAGE->set_heading($course->fullname);
 
 // If we're just showing the success message, exit immediately afterward.
 if ($justshowsuccessmessage) {

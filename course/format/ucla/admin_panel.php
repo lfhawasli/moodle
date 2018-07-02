@@ -45,7 +45,7 @@ $PAGE->set_button($buttons);
 $title = get_string('adminpanel', 'format_ucla');
 $node = $PAGE->settingsnav->find('courseadmin', navigation_node::TYPE_COURSE);
 
-$PAGE->set_title($title);
+$PAGE->set_title("$course->shortname: $title");
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
