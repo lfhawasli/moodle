@@ -27,9 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 
 use moodle_url;
 use cm_info;
+use html_writer;
 
 require_once($CFG->dirroot . '/course/renderer.php');
 require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+require_once($CFG->dirroot . '/local/publicprivate/lib.php');
 
 /**
  * UCLA course renderer and overrides Boost course_renderer.
@@ -129,12 +131,12 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         if ($mod->url) {
             if ($content) {
                 // If specified, display extra content after link.
-                $output = \html_writer::tag('div', $content, array('class' =>
+                $output = html_writer::tag('div', $content, array('class' =>
                         trim('contentafterlink ' . $textclasses)));
             }
         } else {
             // No link, so display only content.
-            $output = \html_writer::tag('div', $accesstext . $content,
+            $output = html_writer::tag('div', $accesstext . $content,
                     array('class' => 'contentwithoutlink ' . $textclasses));
         }
         return $output;
@@ -178,19 +180,19 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
             }
         }
 
-        $output .= \html_writer::start_tag('div');
+        $output .= html_writer::start_tag('div');
 
         if ($this->page->user_is_editing()) {
             $output .= course_get_cm_move($mod, $sectionreturn);
         }
 
-        $output .= \html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
+        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
         // This div is used to indent the content.
-        $output .= \html_writer::div('', $indentclasses);
+        $output .= html_writer::div('', $indentclasses);
 
         // Start a wrapper for the actual content to keep the indentation consistent.
-        $output .= \html_writer::start_tag('div');
+        $output .= html_writer::start_tag('div');
 
         // Display the link to the module (or do nothing if module has no url).
         $cmname = $this->course_section_cm_name($mod, $displayoptions);
@@ -202,19 +204,19 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         $ppmodule = \PublicPrivate_Module::build($mod);
         $ppstate = $ppmodule->is_private() ? 'private' : 'public';
 
-        $link = \html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
+        $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
         $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
         if ($ppstate == 'public' || empty($availabilityhtml)) {
             $classes .= ' hide';
         }
-        $availabilitypopup = \html_writer::span($link, $classes, array(
+        $availabilitypopup = html_writer::span($link, $classes, array(
             'data-availabilityconditions' => $availabilityhtml,
             'data-ppstate' => $ppstate
         ));
 
         if (!empty($cmname)) {
             // Start the div for the activity title, excluding the edit icons.
-            $output .= \html_writer::start_tag('div', array('class' => 'activityinstance'));
+            $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
             $output .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
             $output .= $cmname;
 
@@ -226,7 +228,7 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
 
             // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
             // For .activityinstance.
-            $output .= \html_writer::end_tag('div');
+            $output .= html_writer::end_tag('div');
         }
 
         // If there is content but NO link (eg label), then display the content here (BEFORE any icons). In this case cons must be
@@ -248,7 +250,7 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         }
 
         if (!empty($modicons)) {
-            $output .= \html_writer::span($modicons, 'actions');
+            $output .= html_writer::span($modicons, 'actions');
         }
 
         // If there is content AND a link, then display the content here (AFTER any icons). Otherwise it was displayed before.
@@ -257,12 +259,12 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         }
 
         // For $indentclasses.
-        $output .= \html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
 
         // End of indentation div.
-        $output .= \html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
 
-        $output .= \html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
         return $output;
     }
 
