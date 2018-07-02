@@ -56,7 +56,7 @@ $string['setting_default_system_name'] = 'Shared System';
 
 $string['setting_title_system_link'] = 'System link';
 $string['setting_desc_system_link'] = 'The link associated with the system name.';
-$string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=924';
+$string['setting_default_system_link'] = 'https://ccle.ucla.edu/course/view/aboutccle';
 
 // CCLE-6512 - Profile Course details doesn't match My page Class sites.
 $string['setting_title_alternative_sharedsystem_name'] = 'Alternative Shared System name';
@@ -90,7 +90,7 @@ $string['cachedef_frontpageimage'] = 'Frontpage image';
 $string['foodis_contact_ccle'] = 'Contact';
 $string['foolin_contact_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=926';
 $string['foodis_about_ccle'] = 'About';
-$string['foolin_about_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?section=0';
+$string['foolin_about_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle';
 $string['foodis_privacy'] = 'Privacy';
 $string['foolin_privacy'] = $CFG->wwwroot . '/theme/uclashared/view.php?page=privacy';
 $string['foodis_copyright'] = 'Copyright';

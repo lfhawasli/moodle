@@ -52,3 +52,9 @@
     margin-right: 15%;
     text-align: center;
 }
+
+@media (max-width: 480px) {
+    #region-main #browsebymain .ucla-search {
+      text-align: left;
+    } 
+}

@@ -344,6 +344,11 @@ $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '304890652;904106809;304555952';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
+// Site administration > Plugins > Antivirus plugins > ClamAV antivirus
+$CFG->forced_plugin_settings['antivirus_clamav']['pathtoclam'] = '/usr/bin/clamscan';
+$CFG->forced_plugin_settings['antivirus_clamav']['quarantinedir'] = '/usr/local/clamquarantine';
+$CFG->forced_plugin_settings['antivirus_clamav']['clamfailureonupload'] = 'donothing';
+
 // Site administration > Plugins > Enrollments > UCLA registrar
 $CFG->forced_plugin_settings['local_ucla']['overrideenroldatabase'] = 1;
 
@@ -453,6 +458,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     align = align, table, bsgrid
     insert = chemrender, chemistry, computing, equation, poodll, charmap, clear
     accessibility = accessibilitychecker, accessibilityhelper';
+$CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
@@ -539,13 +545,6 @@ $CFG->cronclionly = true;
 $CFG->loginhttps = true;
 $CFG->cookiesecure = true;
 $CFG->allowframembedding = 1;
-
-// Site administration > Security > Anti-Virus
-$CFG->runclamonupload = true;
-$CFG->pathtoclam = '/usr/bin/clamscan';
-$CFG->clamscan = '/usr/bin/clamscan';
-$CFG->quarantinedir = '/usr/local/clamquarantine';
-$CFG->clamfailureonupload = 'donothing';
 
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';

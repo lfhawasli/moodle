@@ -452,6 +452,20 @@ class core_enrol_external extends external_api {
                                                $params['page'],
                                                $params['perpage']);
 
+        // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+        $separatedwords = explode(' ', $params['search']);
+        $reversedwords = array_reverse($separatedwords);
+        $reversesearch = implode(' ', $reversedwords);
+        $additionalusers = $manager->get_potential_users($params['enrolid'],
+                                                         $reversesearch,
+                                                         $params['searchanywhere'],
+                                                         $params['page'],
+                                                         $params['perpage']);
+
+        $users['users'] += $additionalusers['users'];
+        $users['users'] = array_slice($users['users'], 0, $params['perpage'] * 2);
+        // END UCLA MOD: CCLE-7719.
+
         $results = array();
         // Add also extra user fields.
         $requiredfields = array_merge(

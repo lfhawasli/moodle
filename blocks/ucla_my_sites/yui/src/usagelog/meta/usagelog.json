@@ -1,8 +1,0 @@
-{
-    "moodle-block_ucla_my_sites-usagelog": {
-        "requires": [
-            "base",
-            "node"
-        ]
-    }
-}

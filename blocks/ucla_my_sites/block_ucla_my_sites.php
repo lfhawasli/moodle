@@ -326,19 +326,6 @@ class block_ucla_my_sites extends block_base {
             }
         }
 
-        // Uncomment when following ticket is fixed:
-        // CCLE-7380 - Fix UCLA support tools.
-//        // Render favorite UCLA support tools.
-//        if (has_capability('local/ucla_support_tools:view', context_system::instance())) {
-//            $render = $PAGE->get_renderer('local_ucla_support_tools');
-//            $content[] = $render->mysites_favorites();
-//            $content[] = $OUTPUT->single_button
-//                    (new moodle_url('/local/ucla_support_tools'),
-//                    get_string('mysiteslink', 'local_ucla_support_tools'));
-//            // Logging.
-//            $PAGE->requires->yui_module('moodle-block_ucla_my_sites-usagelog', 'M.block_ucla_my_sites.usagelog.init', array());
-//        }
-
         $params = $this->get_params();
 
         // Get Moodle courses enrolled in.
