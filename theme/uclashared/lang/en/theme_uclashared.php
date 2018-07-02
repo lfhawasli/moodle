@@ -90,7 +90,7 @@ $string['cachedef_frontpageimage'] = 'Frontpage image';
 $string['foodis_contact_ccle'] = 'Contact';
 $string['foolin_contact_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?sectionid=926';
 $string['foodis_about_ccle'] = 'About';
-$string['foolin_about_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle?section=0';
+$string['foolin_about_ccle'] = 'https://ccle.ucla.edu/course/view/aboutccle';
 $string['foodis_privacy'] = 'Privacy';
 $string['foolin_privacy'] = $CFG->wwwroot . '/theme/uclashared/view.php?page=privacy';
 $string['foodis_copyright'] = 'Copyright';
