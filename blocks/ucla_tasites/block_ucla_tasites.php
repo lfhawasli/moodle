@@ -327,6 +327,9 @@ class block_ucla_tasites extends block_base {
         // Remove course description, because it doesn't make sense for tasites.
         unset($course->summary);
 
+        $courseconfig = get_config('moodlecourse');
+        $course->numsections = $courseconfig->numsections;
+        
         $newcourse = create_course($course);
 
         // Tag site as TA site.
