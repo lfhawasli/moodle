@@ -684,7 +684,11 @@ class page_requirements_manager {
      * @param moodle_url|string $url full moodle url, or shortened path to script
      * @return moodle_url
      */
-    protected function js_fix_url($url) {
+    // START UCLA MOD: CCLE-7789 - Calendar pop up does not work in modal windows.
+    // Need to be able to access this function from other files so that we can get the versioned URL for JS files.
+    public function js_fix_url($url) {
+    // protected function js_fix_url($url) {
+    // END UCLA MOD: CCLE-7789.
         global $CFG;
 
         if ($url instanceof moodle_url) {
