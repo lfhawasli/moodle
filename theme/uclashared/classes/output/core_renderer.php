@@ -347,7 +347,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return string HTML fragment.
      */
     public function user_menu($user = null, $withlinks = null) {
-        global $USER, $CFG;
+        global $CFG, $PAGE, $USER;
         require_once($CFG->dirroot . '/user/lib.php');
 
         if (is_null($user)) {
@@ -367,6 +367,9 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $usermenuclasses .= ' withoutlinks';
         }
 
+        // Are we on the frontpage?
+        $onfrontpage = $PAGE->pagelayout == 'frontpage';
+
         $returnstr = "";
 
         // If during initial install, return the empty return string.
@@ -384,14 +387,18 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
             }
 
-            return html_writer::div(
-                html_writer::span(
-                    $returnstr,
-                    'login'
-                ),
-                $usermenuclasses
-            );
-
+            // If user is on the front page, return button without usermenu classes.
+            if ($onfrontpage) {
+                return $returnstr;
+            } else {
+                return html_writer::div(
+                    html_writer::span(
+                        $returnstr,
+                        'login'
+                    ),
+                    $usermenuclasses
+                );
+            }
         }
 
         // If logged in as a guest user, show a string to that effect.
@@ -402,13 +409,23 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
             }
 
-            return html_writer::div(
-                html_writer::span(
-                    $returnstr,
-                    'login'
-                ),
-                $usermenuclasses
-            );
+            // If user is on the front page, always return the button without usermenu classes.
+            if ($onfrontpage) {
+                return "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
+            } else {
+                return html_writer::div(
+                    html_writer::span(
+                        $returnstr,
+                        'login'
+                    ),
+                    $usermenuclasses
+                );
+            }
+        }
+        
+        // If logged in and on the front page, hide the login button.
+        if (isloggedin() && $onfrontpage) {
+            return "";
         }
 
         // Get some navigation opts.
