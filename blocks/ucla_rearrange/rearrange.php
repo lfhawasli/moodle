@@ -195,12 +195,12 @@ if ($data = $rearrangeform->get_data()) {
 }
 
 $restr = get_string('rearrange_sections', 'block_ucla_rearrange');
-$restrc = "$restr: {$course->shortname}";
 
-$PAGE->set_title($restrc);
-$PAGE->set_heading($restrc);
+$PAGE->set_title("$course->shortname: $restr");
+$PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
+echo $OUTPUT->heading($restr);
 
 if ($data != false) {
     $message = html_writer::tag('h3', get_string('success', 'block_ucla_rearrange'));

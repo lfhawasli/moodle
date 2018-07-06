@@ -39,7 +39,7 @@ $PAGE->set_url('/local/visibility/schedule.php', array('id' => $courseid));
 $PAGE->set_context($coursecontext);
 $PAGE->set_course($course);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('coursevisibilityheader', 'local_visibility'));
+$PAGE->set_title("$course->shortname: ".get_string('coursevisibilityheader', 'local_visibility'));
 $PAGE->set_heading($course->fullname);
 $baseurl = new moodle_url('schedule.php', array('id' => $courseid));
 

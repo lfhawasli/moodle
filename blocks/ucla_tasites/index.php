@@ -46,7 +46,7 @@ $PAGE->set_url(new moodle_url(
         array('courseid' => $courseid)
     ));
 $PAGE->set_course($course);
-$PAGE->set_title(get_string('pluginname', 'block_ucla_tasites'));
+$PAGE->set_title("$course->shortname: ".get_string('pluginname', 'block_ucla_tasites'));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('base');
 $PAGE->requires->js('/blocks/ucla_tasites/tasites_form.js');

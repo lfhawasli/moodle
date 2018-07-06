@@ -41,8 +41,8 @@ $PAGE->set_url('/blocks/ucla_course_download/view.php',
 $pagetitle = get_string('coursedownload', 'block_ucla_course_download');
 
 $PAGE->set_context($context);
-$PAGE->set_title($pagetitle);
-$PAGE->set_heading($pagetitle);
+$PAGE->set_title("$course->shortname: $pagetitle");
+$PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('base');
 
 // Get plugin renderer.
@@ -84,6 +84,7 @@ foreach ($downloadoptions as $downloadoption) {
 
 // Start output screen.
 echo $OUTPUT->header();
+echo $OUTPUT->heading($pagetitle);
 
 // Notify admin if students do not have access to this tool.
 if (!student_zip_requestable($course)) {
