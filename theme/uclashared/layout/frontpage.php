@@ -46,7 +46,11 @@ $templatecontext = [
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/theme/uclashared/javascript/frontpage.js');
-$PAGE->requires->css('/theme/uclashared/style/frontpage.css');
+
+// Use plugin version number to ensure frontpage.css is always newest one.
+$plugin = new stdClass();
+require($CFG->dirroot . '/theme/uclashared/version.php');
+$PAGE->requires->css('/theme/uclashared/style/frontpage.css?v=' . $plugin->version);
 
 $b = block_instance('ucla_browseby');
 $templatecontext['browseby'] = $b->get_content()->text;
