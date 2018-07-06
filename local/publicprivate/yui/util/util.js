@@ -132,38 +132,6 @@ YUI.add('moodle-local_publicprivate-util', function(Y) {
             // Send the request.
             Y.io(uri, config);
             return responsetext;
-        },
-        setup_for_resource : function(newnode) {
-            // Get the module number.
-            var modnumber = (newnode.getAttribute('id')).replace(CSS.MODULEIDPREFIX,'');
-            // Create href for the new node.
-            var href = M.cfg.wwwroot + 
-                    '/local/publicprivate/mod.php?' + 
-                    M.cfg.sesskey + '&public=' + 
-                    modnumber;
-
-            // Generate publicprivate icon node after duplicate node.
-            // NOTE: because we delegate events, we don't need to attach a handler.
-            newnode.one('.menu ' + CSS.DUPLICATE).insert(
-                Y.Node.create(
-                    '<li role="presentation"> ' +
-                        '<a class="editing_makepublic publicprivate menu-action cm-edit-action" ' +
-                            'href="' + href + '"' +
-                            'role="menuitem">' +
-                            '<img class="iconsmall" ' +
-                                'src="' + M.util.image_url(this.get('privatepix'), this.get('component')) + '"' +
-                                'alt="' + M.util.get_string('publicprivatemakepublic', 'local_publicprivate') + '"/>' +
-                            '<span class="menu-action-text">' +
-                                M.util.get_string('publicprivatemakepublic', 'local_publicprivate') +
-                            '</span>' +
-                        '</a>' +
-                    '</li>'
-                ), 'after'
-            );
-            // Remove Assign roles.
-            newnode.one(".menu " + CSS.ASSIGNROLES).remove();
-            // Remove filler node for groupmode.
-            newnode.one(CSS.GROUPMODEFILLER).remove();
         }
     }, {
         NAME : 'course-publicprivate-toolbox',
