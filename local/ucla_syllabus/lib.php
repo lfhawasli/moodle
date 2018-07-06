@@ -290,7 +290,7 @@ function local_ucla_syllabus_extend_navigation_category_settings($navigation, $c
         get_string('bulkdownloadsyllabi', 'local_ucla_syllabus'),
         $url,
         navigation_node::NODETYPE_LEAF,
-        null, null, new pix_icon('i/restore', '')
+        null, null, new pix_icon('i/backup', '')
     );
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
