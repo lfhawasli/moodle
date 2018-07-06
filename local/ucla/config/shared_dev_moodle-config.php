@@ -597,6 +597,9 @@ $CFG->courselistshortnames = 1;
 // Site administration > Server > Session handling
 $CFG->dbsessions = false;
 
+// Site administration > Server > Email > Outgoing mail configuration
+$CFG->noreplyaddress = 'noreply@localhost.com';
+
 // Site administration > Development > Experimental > Experimental settings
 $CFG->dndallowtextandlinks = 1;
 $CFG->enabletgzbackups = 1;
