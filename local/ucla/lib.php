@@ -1295,7 +1295,7 @@ function has_shared_context($targetid, $viewerid=null) {
  *
  * @return array           Returns an array of terms
  */
-function get_active_terms($descending = 'false') {
+function get_active_terms($descending = false) {
     $retval = array();
 
     $terms = get_config('local_ucla', 'active_terms');
