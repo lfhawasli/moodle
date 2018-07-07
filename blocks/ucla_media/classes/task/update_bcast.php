@@ -352,6 +352,13 @@ class update_bcast extends \core\task\scheduled_task {
                     continue;
                 }
 
+                // Skip content already crosslisted from another course.
+                // Looking if text similar to shortname appears like 
+                // 181A-COMSCI32-1 and 17F-COMSCI31-1 at the start of the title.
+                if (preg_match("/^[0-9]{2}[FWS1][AC]?-.+-.{1,3}\s/U", $record->title) == 1) {
+                    continue;
+                }
+
                 // Make sure that we haven't already prepended the course
                 // shortname before from a previous crosslisting.
                 if (strpos($record->title, $course1['shortname']) === false) {
