@@ -48,11 +48,6 @@ class block_ucla_modify_coursemenu extends block_base {
      */
     const NEWNODES_DOMNODE = 'new-sections';
     /**
-     * Sections order domnode.
-     * @var string
-     */
-    const SECTIONSORDER_DOMNODE = 'sections-order';
-    /**
      * Landing page domnode.
      * @var string
      */

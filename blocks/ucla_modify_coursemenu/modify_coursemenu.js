@@ -477,13 +477,6 @@ M.block_ucla_modify_coursemenu.start = function() {
                 '.new-section'
             ).join());
 
-        // Maybe use a more useful algorithm?
-        /*$('#' + mbumc.sectionsorder_id).val(
-            $('#' + mbumc.table_id + ' tbody').attr(
-                    'id', mbumc.sectionsorder_id
-                ).tableDnDSerialize()
-        );*/
-
         $('#' + mbumc.landingpage_id).val(
                 mbumc.parse_sectionid($('[name=landingpageradios]:checked'), 2)
             );
