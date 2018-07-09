@@ -24,9 +24,10 @@ require_once(__DIR__ . '/../../../config.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 $section = optional_param('section', 0, PARAM_INT);
+$myuclatab = optional_param('tab', 0, PARAM_INT);
 
 $PAGE->set_url('/course/format/ucla/admin_panel.php',
-        array('courseid' => $courseid, 'section' => $section));
+        array('courseid' => $courseid, 'section' => $section, 'tab' => $myuclatab));
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
@@ -46,13 +47,22 @@ $title = get_string('adminpanel', 'format_ucla');
 $node = $PAGE->settingsnav->find('courseadmin', navigation_node::TYPE_COURSE);
 
 $PAGE->set_title("$course->shortname: $title");
-$PAGE->set_heading($course->fullname);
+
+$myuclaactive = '';
+$adminactive = 'active';
+if ($myuclatab) {
+    $myuclaactive = 'active';
+    $adminactive = '';
+}
+$node->active = $adminactive;
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
 
 if ($node) {
     $tabcontainer = navigation_node::create(get_string('courseadmin', 'format_ucla'), null, navigation_node::TYPE_CONTAINER);
     $tabcontainer->courseadmin = true;
+    $tabcontainer->active = $adminactive;
     $rowcontainer = navigation_node::create('row1', null, navigation_node::TYPE_CONTAINER);
 
     // Manage material.
@@ -127,7 +137,7 @@ if ($node) {
         if (empty($formatoptions['myuclagradelinkredirect'])) {
             $url = new moodle_url('/grade/report/index.php', array('id'=>$course->id));
         } else {
-            $url = new moodle_url('https://be.my.ucla.edu');
+            $url = \theme_uclashared\modify_navigation::findgradelink();
         }
         $container->add(get_string('grades'), $url, navigation_node::TYPE_SETTING);
     }
@@ -206,6 +216,7 @@ if ($node) {
     $tabcontainer = navigation_node::create(get_string('myucla', 'format_ucla'),
             null, navigation_node::TYPE_CONTAINER, null, 'myuclatab');
     $tabcontainer->myuclatab = true;
+    $tabcontainer->active = $myuclaactive;
     $tabcontainer->tabtext = get_string('myucla', 'format_ucla');
     $rowcontainer = navigation_node::create('', null, navigation_node::TYPE_CONTAINER);
 

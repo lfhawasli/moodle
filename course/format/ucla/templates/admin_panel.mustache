@@ -49,7 +49,7 @@
     <ul class="nav nav-tabs" Arole="tablist">
         <!-- Display name of first tab, set in admin_panel.php. -->
         <li class="nav-item">
-            <a class="nav-link active" href="#link{{node.key}}" data-toggle="tab" role="tab">{{node.text}}</a>
+            <a class="nav-link {{node.active}}" href="#link{{node.key}}" data-toggle="tab" role="tab">{{node.text}}</a>
         </li>
         <!-- Delve into other tabs and retrieve title for nav-links. -->
         {{#node.children}}
@@ -68,7 +68,7 @@
                 {{#display}}
                     {{^is_short_branch}}
                         <li class="nav-item">
-                            <a class="nav-link" href="#link{{key}}" data-toggle="tab" role="tab">{{tabtext}}</a>
+                            <a class="nav-link {{active}}" href="#link{{key}}" data-toggle="tab" role="tab">{{tabtext}}</a>
                         </li>
                     {{/is_short_branch}}
                 {{/display}}
@@ -81,7 +81,7 @@
         {{#node.children}}
             {{#courseadmin}}
                 {{#children.count}}
-                    <div class="tab-pane active" id="link{{node.key}}" role="tabpanel">
+                    <div class="tab-pane {{active}}" id="link{{node.key}}" role="tabpanel">
                         <div class="card">
                             <div class="card-block">
                                 <div class="container">
@@ -126,7 +126,7 @@
 
         {{#node.children}}
             {{#myuclatab}}
-                <div class="tab-pane" id="link{{key}}" role="tabpanel">
+                <div class="tab-pane {{active}}" id="link{{key}}" role="tabpanel">
                     <div class="card">
                         <div class="card-block">
                             <table class="table table-striped">

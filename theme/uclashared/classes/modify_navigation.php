@@ -25,6 +25,9 @@
 namespace theme_uclashared;
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/local/ucla/lib.php');
+
 /**
  * Adds/remove/rearranges nodes in navigation drawer.
  *
@@ -715,15 +718,13 @@ class modify_navigation {
      * Change link location for the grades node if set in course settings.
      */
     private function redirectgradelink() {
-        global $PAGE;
-
         $formatoptions = $this->format->get_format_options();
         if (empty($formatoptions['myuclagradelinkredirect'])) {
             return;
         }
         $gradelinknode = $this->navigation->find('grades', \navigation_node::TYPE_SETTING);
         if ($gradelinknode && $formatoptions['myuclagradelinkredirect']) {
-            $gradelinknode->action = new \moodle_url('https://be.my.ucla.edu');
+            $gradelinknode->action = $this->findgradelink();
         }
     }
 
@@ -900,6 +901,63 @@ class modify_navigation {
                 $node->add_class('hidden-node');
             }
         }
+    }
+
+    /**
+     * Retrieve the proper link location for the grades node is set in course settings.
+     */
+    public static function findgradelink() {
+        global $PAGE, $USER, $DB;
+
+        $courseinfo = ucla_get_course_info($PAGE->course->id);
+        $redirectlink = new \moodle_url('https://be.my.ucla.edu');
+
+        if (!empty($courseinfo)) {
+            $courseterm = $courseinfo[0]->term;
+            $coursesrs = $courseinfo[0]->srs;
+            $redirectlink = new \moodle_url('https://be.my.ucla.edu/login/directLink.aspx', 
+                                            array('featureID' => 75, 'term' => $courseterm, 'srs' => $coursesrs));
+
+            // If a course is crosslisted...
+            if (count($courseinfo) > 1) {
+                $srslist = array_map(function($o) { return $o->srs; }, $courseinfo);
+                list($srssql, $params) = $DB->get_in_or_equal($srslist, SQL_PARAMS_NAMED, 'srs');
+                $params['userid'] = $USER->id;
+                $params['term'] = $courseterm;
+                    
+                $sql = "SELECT urc.srs
+                          FROM {ccle_roster_class_cache} crcc,
+                               {ucla_reg_classinfo} urc,
+                               {user} u
+                         WHERE u.id = :userid AND
+                               u.idnumber = crcc.stu_id AND
+                               urc.term = crcc.param_term AND
+                               urc.srs = crcc.param_srs AND
+                               crcc.param_term = :term AND
+                               crcc.param_srs $srssql";
+
+                $coursesrs = $DB->get_records_sql($sql, $params);
+
+                // If we get multiple records might be an enrollment problem.
+                // Treat this case as if there is only one matching record.
+                if (count($coursesrs) > 1) {
+                    mtrace(sprintf('...WARNING: Multiple records returned for user %d in course %s: %s',
+                           $params['userid'], $params['term'], implode(", ", $srslist)));
+                }
+
+                // If an instructor is crosslisted, redirect them to the MyUCLA tab in the Admin Panel.
+                $coursecontext = \context_course::instance($PAGE->course->id);
+                if (has_capability('format/ucla:viewadminpanel', $coursecontext, null, true)) {
+                    $redirectlink = new \moodle_url('/course/format/ucla/admin_panel.php', 
+                                                    array('courseid' => $PAGE->course->id, 'section' => 0, 'tab' => 1));
+                } else if (!empty($coursesrs)) {
+                    $coursesrs = $coursesrs[0];
+                    $redirectlink = new \moodle_url('https://be.my.ucla.edu/login/directLink.aspx', 
+                                                    array('featureID' => 75, 'term' => $courseterm, 'srs' => $coursesrs));
+                }
+            } 
+        }
+        return $redirectlink;
     }
 
     /**
