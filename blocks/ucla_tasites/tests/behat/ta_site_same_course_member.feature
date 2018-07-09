@@ -29,14 +29,14 @@ Scenario: Check participants on TA Site
         | 111222000 | 16S  | 123456789 |
     And I log in as "ta1"
     And I follow "Test course 1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     When I follow "TA sites"
     And I click on "#id_confirmation" "css_element"
     And I press "id_submitbutton"
     And I should see "Successfully created TA site"
     And I follow the "Site info" section in the ucla site menu
     And I follow "View site"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     And I follow "View participants"
     Then I should see "1, Student"
     And I should see "1, Teacher"

@@ -17,7 +17,7 @@ Background:
         | teacher1 | C1     | editingteacher |
         | student1 | C1     | student        |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
 
 Scenario: Require students to sign waiver for LTI.
     Given I turn editing mode on
@@ -26,7 +26,7 @@ Scenario: Require students to sign waiver for LTI.
         | Launch/cartridge URL | http://lti.tools/test/tp.php |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "LTI"
     Then I should see "Privacy Waiver"
     And I should see "By continuing to LTI, you will be sharing"
@@ -42,7 +42,7 @@ Scenario: Require students to sign waiver for LTI for resources that open in new
         | Launch container     | New window                   |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "LTI"
     And I switch to "lti" window
     Then I should see "Privacy Waiver"
@@ -56,7 +56,7 @@ Scenario: Allow students to not agree.
         | Activity name | LTI |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "LTI"
     Then I should see "Privacy Waiver"
     And I should see "By continuing to LTI, you will be sharing"
@@ -79,7 +79,7 @@ Scenario: Do not provide waiver for UCLA LTI resources.
         | Launch/cartridge URL | https://d3.sscnet.ucla.edu/ |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "LTI"
     Then I should not see "Privacy Waiver"
     And I should not see "By continuing to LTI, you will be sharing"
@@ -98,14 +98,14 @@ Scenario: Do not provide waiver for site configured LTI resources.
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "External tool" to section "0" and I fill the form with:
         | Activity name        | Site LTI                     |
         | Launch/cartridge URL | http://lti.tools/test/tp.php |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Site LTI"
     Then I should not see "Privacy Waiver"
     And I should not see "By continuing to Site LTI, you will be sharing"
@@ -125,14 +125,14 @@ Scenario: Do not provide waiver for site pre-configured LTI resources.
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "External tool" to section "0" and I fill the form with:
         | Activity name      | Site LTI            |
         | Preconfigured tool | Site configured LTI |
     And I log out
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Site LTI"
     Then I should not see "Privacy Waiver"
     And I should not see "By continuing to Site LTI, you will be sharing"

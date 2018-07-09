@@ -15,7 +15,7 @@ Feature: Changing site type
         | user          | course  | role    |
         | course_editor | C1      | manager |
     And I log in as "course_editor" 
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
 
   Scenario: Changing site type from Private to Instruction (non-degree-related)

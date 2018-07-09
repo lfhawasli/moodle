@@ -19,7 +19,7 @@ Background:
   @javascript
   Scenario: Convert syllabus from public to private and vice versa
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow "Syllabus (empty)"
     And I follow "Add syllabus"

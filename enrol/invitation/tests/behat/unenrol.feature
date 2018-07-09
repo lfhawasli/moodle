@@ -20,8 +20,8 @@ Feature: Site invitations
       | role |
       | <inviterole> |
     And I log in as "sender"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     And I follow "Invite users"
     And I set the following fields to these values:
       | <rolename> | 1 |
@@ -35,7 +35,7 @@ Feature: Site invitations
     And I press "Accept invitation"
     And I log out
     And I log in as "sender"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I expand "Users" node
     And I follow "Participants"
     And I should see "Receiver"

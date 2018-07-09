@@ -15,7 +15,7 @@ Scenario: Use "Add an announcement" wording
         | user     | course | role           |
         | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Announcements"
     When I press "Add an announcement"
     Then I should see "Your new announcement"

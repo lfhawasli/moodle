@@ -20,7 +20,7 @@ Background: Specifying URL as a syllabus
 
 Scenario: Check warning for unsecure urls
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
@@ -39,7 +39,7 @@ Scenario: Check warning for unsecure urls
 
 Scenario: Viewing URL as a student
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"
@@ -50,7 +50,7 @@ Scenario: Viewing URL as a student
     Given I press "Continue"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And  I follow the "Syllabus" section in the ucla site menu
     Then I should see "Syllabus" in the "region-main" "region"
     And I should see "http://ucla.edu" in the "region-main" "region"
@@ -58,7 +58,7 @@ Scenario: Viewing URL as a student
     And "//*[contains(@id, 'resourceobject')]" "xpath_element" should not exist
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow the "Syllabus" section in the ucla site menu
     When I follow "Edit"
@@ -75,7 +75,7 @@ Scenario: Viewing URL as a student
 
 Scenario: Viewing URL as an instructor
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"

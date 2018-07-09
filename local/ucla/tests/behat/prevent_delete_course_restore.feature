@@ -21,7 +21,7 @@ Background:
     Given I am in a ucla environment
     And I log in as "admin"
     And I follow "Courses"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     When I follow the "Show all" section in the ucla site menu
     And I add a "File" to section "1"

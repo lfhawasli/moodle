@@ -26,7 +26,7 @@ Background:
 Scenario: Build TA site as TA
     Given I log in as "ta1"
     And I follow "Test course 1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     When I follow "TA sites"
     And I press "Create TA site"
     And I click on "#id_confirmation" "css_element"
@@ -36,7 +36,7 @@ Scenario: Build TA site as TA
 Scenario: Build TA site as TA Admin   
     Given I log in as "ta2"
     And I follow "Test course 1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     When I follow "TA sites"
     And I click on "#id_confirmation" "css_element"
     And I press "id_submitbutton"

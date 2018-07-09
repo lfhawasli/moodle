@@ -26,7 +26,7 @@ Feature: Search and filter by instructor in the Import Course Search feature.
   Scenario: Search for classes in import by course instructor.
     Given I log in as "admin"
     And I browse to site "C1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     And I follow "Import Moodle course data"
     And I set the field "search" to "Course"
     And I press "Search"

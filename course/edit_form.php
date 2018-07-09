@@ -545,15 +545,10 @@ class course_edit_form extends moodleform {
                 !has_capability('local/ucla:editadvancedcoursesettings', $context)) {
                 $lockdown = array('format', 'lang', 'maxbytes');
                 foreach ($lockdown as $elementname) {
-                    $element = $mform->getElement($elementname);
-                    // Unfortunately, if an element cannot be found, it doesn't
-                    // throw an exception. Instead, QuickForm will print
-                    // debugging messages and return an HTML_QuickForm_Error
-                    // object.
-                    if (get_class($element) == 'HTML_QuickForm_Error') {
-                        continue;
+                    if ($mform->elementExists($elementname)) {
+                        $element = $mform->getElement($elementname);
+                        $element->freeze();
                     }
-                    $element->freeze();
                 }
             }
 
@@ -564,11 +559,10 @@ class course_edit_form extends moodleform {
                 $editcoursetheme = true;
             }
             if (!$editcoursetheme) {
-                $element = $mform->getElement('theme');
-                $element->freeze();
-            } else {
-                $element = $mform->getElement('theme');
-                
+                if ($mform->elementExists('theme')) {
+                    $element = $mform->getElement('theme');
+                    $element->freeze();
+                }
             }
         }
         // END UCLA MOD: CCLE-4230

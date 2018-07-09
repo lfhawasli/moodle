@@ -35,7 +35,7 @@ Feature: Course section hyperlink in breadcrumbs
   Scenario: Click on course section in breadcrumbs as student user
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow the "Week 1" section in the ucla site menu
     And I follow "Test page name"
     And I follow "Week 1"

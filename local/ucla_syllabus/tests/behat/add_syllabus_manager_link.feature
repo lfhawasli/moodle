@@ -1,7 +1,7 @@
 @ucla @local_ucla_syllabus
-Feature: Add syllabus manager link in Control Panel
+Feature: Add syllabus manager link in Admin panel
   As an instructor
-  I want to be able to upload a public or private syllabus to my course via Control Panel
+  I want to be able to upload a public or private syllabus to my course via Admin panel
   So that the appropiate audience can view the course syllabus
 
 Background:
@@ -18,14 +18,14 @@ Background:
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
-    And I press "Control Panel"
+    And I follow "Admin panel"
     And I follow "Manage syllabus"
     Then I should see "Syllabus manager" in the "region-main" "region"
 
   @javascript
-  Scenario: Upload a public syllabus through the syllabus manager link in Control Panel
+  Scenario: Upload a public syllabus through the syllabus manager link in Admin panel
     And I follow "Add syllabus"
     And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I set the field "Display name" to "Public Syllabus"
@@ -38,7 +38,7 @@ Background:
     Then I should see "Public Syllabus" in the "region-main" "region"
 
   @javascript
-  Scenario: Upload a private syllabus through the syllabus manager link in Control Panel
+  Scenario: Upload a private syllabus through the syllabus manager link in Admin panel
     Given I follow "Add restricted syllabus"
     And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I set the field "Display name" to "Private Syllabus"

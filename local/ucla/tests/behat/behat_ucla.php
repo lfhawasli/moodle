@@ -437,4 +437,87 @@ class behat_ucla extends behat_files {
         set_config($config, $value);
     }
 
+    /**
+     * Shortcut for clicking links in the left hand navigation.
+     *
+     * @When I follow the :section section in the ucla site menu
+     *
+     * @param string $section
+     */
+    public function i_follow_site_menu_section($section) {
+        return array(
+            new When('I click on "' . $section . '" "link" in the "#nav-drawer" "css_element"')
+        );
+    }
+
+    /**
+     * Checks that section is highlighted in the left hand navigation.
+     *
+     * @Then /^I should see "([^"]*)" highlighted in the ucla site menu$/
+     *
+     * @param string $section
+     * @return array
+     */
+    public function i_should_see_higlighted($section) {
+        // Note, for some reason this step is failing for "Site info".
+        return array(
+            new Then('I should see "' . $section . '" in the ".list-group-item[data-isactive=\'1\']" "css_element"')
+        );
+    }
+    /**
+     * Checks that section exists in the left hand navigation.
+     *
+     * @Then /^I should see "([^"]*)" in the ucla site menu$/
+     *
+     * @param string $section
+     * @return array
+     */
+    public function i_should_see_in_site_menu($section) {
+        return array(
+            new Then('I should see "' . $section . '" in the "#nav-drawer" "css_element"')
+        );
+    }
+    /**
+     * Checks that section does not exist in the left hand navigation.
+     *
+     * @Then /^I should not see "([^"]*)" in the ucla site menu$/
+     *
+     * @param string $section
+     * @return array
+     */
+    public function i_should_not_see_in_site_menu($section) {
+        return array(
+            new Then('I should not see "' . $section . '" in the "#nav-drawer" "css_element"')
+        );
+    }
+    /**
+     * Checks if a site menu section contains the 'hidden' label.
+     *
+     * @Given /^the "([^"]*)" section in the ucla site menu is hidden$/
+     * @param string $section
+     */
+    public function the_site_menu_section_hidden($section) {
+        // Find the hidden section containing the section name text.
+        $xpath = "//*[contains(@class, 'block_ucla_course_menu_hidden')]/*[contains(.,'$section')]";
+        $hiddensections = $this->find('xpath', $xpath);
+        if (empty($hiddensections)) {
+            throw new ExpectationException('The section "' . $section . '" does not have the "hidden" label.', $this->getSession());
+        }
+    }
+    /**
+     * Checks that a site menu section does NOT have a 'hidden' label.
+     *
+     * @Given /^the "([^"]*)" section in the ucla site menu is visible$/
+     * @param string $section
+     */
+    public function the_site_menu_section_visible($section) {
+        try {
+            $this->the_site_menu_section_hidden($section);
+        } catch (Exception $e) {
+            // This is good.
+            return;
+        }
+        throw new ExpectationException('The section "' . $section . '" has a "hidden" label.', $this->getSession());
+    }
+
 }

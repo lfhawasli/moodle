@@ -12,16 +12,16 @@ Feature: Show files that may be included in zip
       | student1 | Student | 1 | student1@asd.com |
     And the following ucla "sites" exist:
         | fullname | shortname | type |
-        | course 1 | C1 | srs |
+        | Course 1 | C1 | srs |
     And the following ucla "enrollments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
 
   @javascript
-  Scenario: Adding multiple files into sections. hidding individual files and sections, then verifying instructor can see the visibility markers.
+  Scenario: Adding multiple files into sections. hiding individual files and sections, then verifying instructor can see the visibility markers.
     Given I log in as "teacher1"
-    And I follow "course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow the "Week 1" section in the ucla site menu
     And I upload the "blocks/ucla_course_download/tests/fixtures/smallfile.file" file as "Small file" to section "1"
@@ -33,9 +33,9 @@ Feature: Show files that may be included in zip
     And I follow the "Week 3" section in the ucla site menu
     And I upload the "lib/tests/fixtures/empty.txt" file as "Empty file" to section "3"
     And I hide section "3"
-    And I press "Control Panel"
-    When I follow "Download course materials"
-    # Small file should be marked visible 
+    And I follow "Admin panel"
+    When I follow "Download course material"
+    # Small file should be marked visible
     Then I should see "Small file9.8KB" in the ".zip-contents ul:nth-of-type(1) li" "css_element"
     # Medium file should be marked hidden
     And I should see "Medium file97.7KB" in the ".zip-contents ul:nth-of-type(1) li.omitted" "css_element"
@@ -49,12 +49,12 @@ Feature: Show files that may be included in zip
     And I should see "Files over 1MB will be excluded"
     # Large file should be hidden now
     And I should see "Large file1.4MB" in the ".zip-contents ul:nth-of-type(2) li.omitted" "css_element"
-    
+
     # Check that student cannot view file list.
     And I log out
     Given it is "9th" week
     And I log in as "student1"
-    And I follow "course 1"
-    And I press "Control Panel"
-    When I follow "Download course materials"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
+    When I follow "Download course material"
     Then I should not see "Files included are ones that are already visible to students on your site."

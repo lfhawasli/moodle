@@ -1,9 +1,9 @@
 [submodule "blocks/ucla_subject_links/content"]
 	path = blocks/ucla_subject_links/content
-	url = git@github.com:ccle/ccle_subject_area_links.git
+	url = https://github.com/ccle/ccle_subject_area_links.git
 [submodule "blocks/quickmail"]
 	path = blocks/quickmail
-	url = git@github.com:ccle/quickmail.git
+	url = https://github.com/ccle/quickmail.git
 [submodule "local/moodlecheck"]
 	path = local/moodlecheck
 	url = https://github.com/moodlehq/moodle-local_moodlecheck.git
@@ -18,16 +18,16 @@
 	url = git://github.com/moodleou/moodle-tool_editrolesbycap
 [submodule "report/editdates"]
 	path = report/editdates
-	url = git@github.com:ccle/moodle-report_editdates.git
+	url = https://github.com/ccle/moodle-report_editdates.git
 [submodule "mod/questionnaire"]
 	path = mod/questionnaire
-	url = git@github.com:ccle/moodle-mod_questionnaire.git
+	url = https://github.com/ccle/moodle-mod_questionnaire.git
 [submodule "admin/tool/behatui"]
 	path = admin/tool/behatui
 	url = https://github.com/marinaglancy/moodle-tool_behatui
 [submodule "mod/hotpot"]
 	path = mod/hotpot
-	url = git@github.com:gbateson/moodle-mod_hotpot.git
+	url = https://github.com/gbateson/moodle-mod_hotpot.git
 [submodule "question/format/hotpot"]
 	path = question/format/hotpot
 	url = https://github.com/gbateson/moodle-qformat_hotpot.git
@@ -36,10 +36,10 @@
 	url = https://github.com/ccle/moodle-local_googleanalytics.git
 [submodule "lib/editor/atto/plugins/chemistry"]
 	path = lib/editor/atto/plugins/chemistry
-	url = git@github.com:geoffrowland/moodle-editor_atto-chemistry.git
+	url = https://github.com/geoffrowland/moodle-editor_atto-chemistry.git
 [submodule "lib/editor/atto/plugins/computing"]
 	path = lib/editor/atto/plugins/computing
-	url = git@github.com:geoffrowland/moodle-editor_atto-computing.git
+	url = https://github.com/geoffrowland/moodle-editor_atto-computing.git
 [submodule "blocks/attendance"]
 	path = blocks/attendance
 	url = https://github.com/ccle/moodle-block_attendance.git
@@ -48,16 +48,16 @@
 	url = https://github.com/ccle/moodle-mod_attendance.git
 [submodule "lib/editor/atto/plugins/fullscreen"]
 	path = lib/editor/atto/plugins/fullscreen
-	url = git@github.com:dthies/moodle-atto_fullscreen.git
+	url = https://github.com/dthies/moodle-atto_fullscreen.git
 [submodule "local/metagroups"]
 	path = local/metagroups
-	url = git@github.com:ccle/moodle-local_metagroups.git
+	url = https://github.com/ccle/moodle-local_metagroups.git
 [submodule "filter/poodll"]
 	path = filter/poodll
-	url = git@github.com:ccle/moodle-filter_poodll.git
+	url = https://github.com/ccle/moodle-filter_poodll.git
 [submodule "question/type/poodllrecording"]
 	path = question/type/poodllrecording
-	url = git@github.com:justinhunt/moodle-qtype_poodllrecording.git
+	url = https://github.com/justinhunt/moodle-qtype_poodllrecording.git
 [submodule "lib/editor/atto/plugins/poodll"]
 	path = lib/editor/atto/plugins/poodll
 	url = https://github.com/justinhunt/moodle-atto_poodll.git
@@ -66,7 +66,7 @@
 	url = https://github.com/jinhofer/pastespecial
 [submodule "blocks/iclicker"]
 	path = blocks/iclicker
-	url = git@github.com:ccle/iclicker-moodle2-integrate.git
+	url = https://github.com/ccle/iclicker-moodle2-integrate.git
 [submodule "mod/oublog"]
 	path = mod/oublog
 	url = https://github.com/ccle/moodle-mod_oublog
@@ -75,25 +75,25 @@
 	url = https://github.com/ccle/moodle-mod_scheduler.git
 [submodule "lib/editor/atto/plugins/fontfamily"]
 	path = lib/editor/atto/plugins/fontfamily
-	url = git@github.com:projectestac/moodle-atto_fontfamily.git
+	url = https://github.com/projectestac/moodle-atto_fontfamily.git
 [submodule "lib/editor/atto/plugins/htmlplus"]
 	path = lib/editor/atto/plugins/htmlplus
 	url = https://github.com/andrewnicols/moodle-atto_htmlplus.git
 [submodule "mod/assign/submission/onlinepoodll"]
 	path = mod/assign/submission/onlinepoodll
-	url = git@github.com:ccle/moodle-assign_submission_onlinepoodll.git
+	url = https://github.com/ccle/moodle-assign_submission_onlinepoodll.git
 [submodule "mod/zoom"]
 	path = mod/zoom
-	url = git@github.com:ucla/moodle-mod_zoom.git
+	url = https://github.com/ucla/moodle-mod_zoom.git
 [submodule "blocks/massaction"]
 	path = blocks/massaction
-	url = git@github.com:ccle/moodle-block_massaction.git
+	url = https://github.com/ccle/moodle-block_massaction.git
 [submodule "mod/turnitintool"]
 	path = mod/turnitintool
-	url = git@github.com:ccle/moodle-mod_turnitintool.git
+	url = https://github.com/ccle/moodle-mod_turnitintool.git
 [submodule "mod/mediagallery"]
 	path = mod/mediagallery
-	url = git@github.com:ccle/moodle-mod_mediagallery.git
+	url = https://github.com/ccle/moodle-mod_mediagallery.git
 [submodule "lib/editor/atto/plugins/mediagallery"]
 	path = lib/editor/atto/plugins/mediagallery
 	url = https://github.com/netspotau/moodle-atto_mediagallery.git
@@ -111,61 +111,61 @@
 	url = https://github.com/netspotau/moodle-filter_mediagallery.git
 [submodule "lib/editor/atto/plugins/bsgrid"]
  	path = lib/editor/atto/plugins/bsgrid
-	url = git@github.com:academic-moodle-cooperation/moodle-atto_bsgrid.git
+	url = https://github.com/academic-moodle-cooperation/moodle-atto_bsgrid.git
 [submodule "lib/editor/tinymce/plugins/poodll"]
 	path = lib/editor/tinymce/plugins/poodll
 	url = https://github.com/justinhunt/moodle-tinymce_poodll.git
 [submodule "filter/collapsible"]
 	path = filter/collapsible
-	url = git@github.com:ccle/moodle-filter_collapsible.git
+	url = https://github.com/ccle/moodle-filter_collapsible.git
 [submodule "mod/turnitintooltwo"]
 	path = mod/turnitintooltwo
-	url = git@github.com:ccle/moodle-mod_turnitintooltwo.git
+	url = https://github.com/ccle/moodle-mod_turnitintooltwo.git
 [submodule "blocks/turnitin"]
 	path = blocks/turnitin
-	url = git@github.com:ccle/moodle-block_turnitin.git
+	url = https://github.com/ccle/moodle-block_turnitin.git
 [submodule "plagiarism/turnitin"]
 	path = plagiarism/turnitin
-	url = git@github.com:ccle/moodle-plagiarism_turnitin.git
+	url = https://github.com/ccle/moodle-plagiarism_turnitin.git
 [submodule "mod/certificate"]
 	path = mod/certificate
-	url = git@github.com:ccle/moodle-mod_certificate.git
+	url = https://github.com/ccle/moodle-mod_certificate.git
 [submodule "local/mobile"]
 	path = local/mobile
-	url = git@github.com:jleyva/moodle-local_mobile.git
+	url = https://github.com/jleyva/moodle-local_mobile.git
 [submodule "lib/editor/atto/plugins/chemrender"]
 	path = lib/editor/atto/plugins/chemrender
-	url = git@github.com:ucla/moodle-atto_chemrender.git
+	url = https://github.com/ucla/moodle-atto_chemrender.git
 [submodule "filter/chemrender"]
 	path = filter/chemrender
-	url = git@github.com:ucla/moodle-filter-chemrender.git
+	url = https://github.com/ucla/moodle-filter-chemrender.git
 [submodule "mod/casa"]
 	path = mod/casa
-	url = git@github.com:ucla/moodle-mod_casa.git
+	url = https://github.com/ucla/moodle-mod_casa.git
 [submodule "question/type/ordering"]
 	path = question/type/ordering
 	url = https://github.com/gbateson/moodle-qtype_ordering.git
 [submodule "mod/data/field/poodll"]
 	path = mod/data/field/poodll
-	url = git@github.com:justinhunt/moodle-mod_data_field_poodll.git
+	url = https://github.com/justinhunt/moodle-mod_data_field_poodll.git
 [submodule "repository/poodll"]
 	path = repository/poodll
-	url = git@github.com:justinhunt/moodle-repository_poodll.git
+	url = https://github.com/justinhunt/moodle-repository_poodll.git
 [submodule "mod/assign/feedback/poodll"]
 	path = mod/assign/feedback/poodll
-	url = git@github.com:ccle/moodle-assignfeedback_poodll.git
+	url = https://github.com/ccle/moodle-assignfeedback_poodll.git
 [submodule "lib/editor/atto/plugins/count"]
 	path = lib/editor/atto/plugins/count
-	url = git@github.com:damyon/moodle-atto_count.git
+	url = https://github.com/damyon/moodle-atto_count.git
 [submodule "mod/hvp"]
         path = mod/hvp
-        url = git@github.com:ccle/h5p-moodle-plugin.git
+        url = https://github.com/ccle/h5p-moodle-plugin.git
 [submodule "mod/choicegroup"]
 	path = mod/choicegroup
 	url = https://github.com/ndunand/moodle-mod_choicegroup.git
 [submodule "blocks/panopto"]
 	path = blocks/panopto
-	url = git@github.com:ccle/Moodle-2.0-plugin-for-Panopto.git
+	url = https://github.com/ccle/Moodle-2.0-plugin-for-Panopto.git
 [submodule "lib/editor/tinymce/plugins/panoptobutton"]
 	path = lib/editor/tinymce/plugins/panoptobutton
 	url = https://github.com/Panopto/Add-Panopto-Video--button-for-moodle-tinyMCE-editor.git

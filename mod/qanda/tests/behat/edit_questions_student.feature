@@ -17,14 +17,14 @@ Feature: Edit unanswered questions
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Q&A" to section "1" and I fill the form with:
       | Name | Q&A test |
       | Description | Description |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Ask a question"
     And I set the following fields to these values:
@@ -36,7 +36,7 @@ Feature: Edit unanswered questions
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Questions Pending (2)"
     And I follow "Answer"
@@ -47,7 +47,7 @@ Feature: Edit unanswered questions
 
     # Make sure that students can edit an unanswered question
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Edit"
     And I set the following fields to these values:

@@ -32,7 +32,8 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
  * @return boolean
  */
 function seniorscholar_has_access($user) {
-    if (stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) === false && !is_siteadmin()) {
+    if (!isset($user->idnumber) ||
+            stripos(get_config('tool_uclaseniorscholar', 'seniorscholaradministrator'), $user->idnumber) === false && !is_siteadmin()) {
         return false;
     } else {
         return true;

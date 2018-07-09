@@ -17,7 +17,7 @@ Feature: Import/Export existing Q&As
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Q&A" to section "0" and I fill the form with:
       | Name | Q&A test |

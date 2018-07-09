@@ -17,10 +17,10 @@ Feature: Encourage use of Syllabus tool in Easy File Upload
         | teacher1 | C1 | editingteacher |
 
   @javascript
-  Scenario: Upload a syllabus using Easy File Upload via Control Panel    
+  Scenario: Upload a syllabus using Easy File Upload via Admin panel    
     Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I press "Control Panel"
+    And I am on "Course 1" course homepage
+    And I follow "Admin panel"
     When I follow "Upload a file"
     And I set the field "Name" to "syllabus"
     # Public/private changes to public if syllabus is detected.

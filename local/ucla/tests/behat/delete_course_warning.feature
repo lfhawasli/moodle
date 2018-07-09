@@ -30,7 +30,7 @@ Feature: Deleting a course with additional course content
     When I follow "Courses"
     And I follow "Category 1"
     And I follow "Category 2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I press "Turn editing on"
     And I reload the page
     And I add the "Calendar" block
@@ -79,7 +79,7 @@ Feature: Deleting a course with additional course content
   Scenario: Deleting a course with default forum activity in UCLA format.
     Given I log out
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I add a new discussion to "Discussion forum" forum with:
       | Subject | Test Subject |
       | Message | Test Message |
@@ -99,7 +99,7 @@ Feature: Deleting a course with additional course content
     # UCLA format.
     Given I log out
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I press "Turn editing on"
     And I add a "Quiz" to section "0" and I fill the form with:
       | Name | Test Quiz |

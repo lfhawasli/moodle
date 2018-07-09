@@ -40,7 +40,7 @@ Feature: Uploading content to sections
     Then section "11" should be hidden
 
     # Upload content to hidden section.
-    When I press "Control Panel"
+    When I press "Admin panel"
     And I follow "Upload a file"
     And I wait "5" seconds
     And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
@@ -62,7 +62,7 @@ Feature: Uploading content to sections
     # Upload content to visible section.
     Given I log in as "teacher1"
     And I follow "course1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     And I follow "Upload a file"
     And I wait "5" seconds
     And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
