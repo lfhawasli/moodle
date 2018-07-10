@@ -82,9 +82,14 @@ class assign_submission_onlinetext extends assign_submission_plugin {
         $mform->addHelpButton('assignsubmission_onlinetext_wordlimit_group',
                               'wordlimit',
                               'assignsubmission_onlinetext');
+        // START UCLA MOD: CCLE-7189 - Converted js functionality to Jquery for simplify assignment settings
         $mform->disabledIf('assignsubmission_onlinetext_wordlimit',
                            'assignsubmission_onlinetext_wordlimit_enabled',
                            'notchecked');
+        $mform->hideIf('assignsubmission_onlinetext_wordlimit',
+                       'assignsubmission_onlinetext_enabled',
+                       'notchecked');
+        // END UCLA MOD: CCLE-7189
 
         // Add numeric rule to text field.
         $wordlimitgrprules = array();
@@ -95,9 +100,14 @@ class assign_submission_onlinetext extends assign_submission_plugin {
         $mform->setDefault('assignsubmission_onlinetext_wordlimit', $defaultwordlimit);
         $mform->setDefault('assignsubmission_onlinetext_wordlimit_enabled', $defaultwordlimitenabled);
         $mform->setType('assignsubmission_onlinetext_wordlimit', PARAM_INT);
-        $mform->disabledIf('assignsubmission_onlinetext_wordlimit_group',
-                           'assignsubmission_onlinetext_enabled',
-                           'notchecked');
+        // START UCLA MOD: CCLE-7189 - Converted js functionality to Jquery for simplify assignment settings
+        // $mform->disabledIf('assignsubmission_onlinetext_wordlimit_group',
+        //                   'assignsubmission_onlinetext_enabled',
+        //                   'notchecked');
+        $mform->hideIf('assignsubmission_onlinetext_wordlimit_group',
+                       'assignsubmission_onlinetext_enabled',
+                       'notchecked');
+        // END UCLA MOD: CCLE-7189
     }
 
     /**

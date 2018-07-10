@@ -20,7 +20,7 @@ Background:
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow "Syllabus (empty)"
 
@@ -34,7 +34,7 @@ Background:
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     And I log out
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Syllabus"
     Then I should see "Test Syllabus" in the "region-main" "region"
     And I should see "Download: Test Syllabus" in the "region-main" "region"
@@ -48,7 +48,7 @@ Background:
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     And I log out
     Given I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test Syllabus"
     Then I should see "Test Syllabus" in the "region-main" "region"
     And I should see "Download: Test Syllabus" in the "region-main" "region"

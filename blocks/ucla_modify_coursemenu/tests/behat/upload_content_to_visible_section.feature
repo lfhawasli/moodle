@@ -19,7 +19,7 @@ Feature: Uploading content to sections
     # Uploading content
     And I log in as "teacher1"
     And I follow "course1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
     And I follow "Upload a file"
     And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
     And I set the field "Name" to "visible_file"

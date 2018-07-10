@@ -46,7 +46,6 @@ $type = optional_param('type', null, PARAM_ALPHA);
 // Set up page.
 $PAGE->set_course($course);
 $PAGE->set_url('/local/ucla_syllabus/index.php', array('id' => $id));
-$PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($coursecontext);
 $PAGE->set_pagelayout('incourse');
@@ -149,7 +148,9 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
                 'type' => $type
             ));
             // If they cancel, go to $viewcourseurl.
-            display_header(get_string('syllabus_manager', 'local_ucla_syllabus'));
+            $title = get_string('syllabus_manager', 'local_ucla_syllabus');
+            $PAGE->set_title(format_string($course->shortname).": $title");
+            display_header($title);
             echo $OUTPUT->confirm(get_string('confirm_insecure_url', 'local_ucla_syllabus', $data->syllabus_url),
                     $continueurl, $viewcourseurl);
             echo $OUTPUT->footer();
@@ -244,7 +245,9 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         }
     }
 
-    display_header(get_string('syllabus_manager', 'local_ucla_syllabus'));
+    $title = get_string('syllabus_manager', 'local_ucla_syllabus');
+    $PAGE->set_title(format_string($course->shortname).": $title");
+    display_header($title);
     $syllabusform->display();
 
 } else {
@@ -355,6 +358,8 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         ));
         $event->trigger();
     }
+
+    $PAGE->set_title(format_string($course->shortname).": $title");
 
     // Now display content.
     display_header($title);

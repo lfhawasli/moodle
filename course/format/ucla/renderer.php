@@ -685,8 +685,7 @@ class format_ucla_renderer extends format_topics_renderer {
             $o .= html_writer::end_tag('div');
 
             $context = context_course::instance($course->id);
-            $o .= $this->section_availability_message($section,
-                    has_capability('moodle/course:viewhiddensections', $context));
+            $o .= $this->section_availability($section);
         }
 
         return $o;
@@ -774,9 +773,7 @@ class format_ucla_renderer extends format_topics_renderer {
 
         $controls = parent::section_edit_control_items($course, $section, $onsectionpage);
 
-        // Removing moveup/movedown and highlight items from section link menu.
-        unset($controls['moveup']);
-        unset($controls['movedown']);
+        // Remove highlight items from section link menu.
         unset($controls['highlight']);
 
         $sectionreturn = $onsectionpage ? $section->section : null;

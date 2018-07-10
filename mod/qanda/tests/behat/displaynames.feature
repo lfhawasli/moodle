@@ -21,14 +21,14 @@ Scenario: Make sure that only instructors can see posts names/emails
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Q&A" to section "1" and I fill the form with:
       | Name | Q&A test |
       | Description | Description |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Ask a question"
     And I set the following fields to these values:
@@ -38,7 +38,7 @@ Scenario: Make sure that only instructors can see posts names/emails
 
     # Make sure that instructor can see names/emails.
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Questions Pending (1)"
     Then I should see "Posted by: Student S1 (student1@asd.com)"
@@ -51,12 +51,12 @@ Scenario: Make sure that only instructors can see posts names/emails
 
     # Make sure that students cannot see names/emails.
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     Then I should not see "Posted by: Student S1 (student1@asd.com)"
     And I log out
     When I log in as "student2"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     Then I should not see "Posted by: Student S1 (student1@asd.com)"
 

@@ -23,7 +23,7 @@ Feature: Restrict invitable roles depending on site type
          | participant |
          | visitor |
       And I log in as "instructor"
-      And I follow "Course 1"
+      And I am on "Course 1" course homepage
       And I expand "Users" node
       And I follow "Participants"
       When I press "Invite user"
@@ -56,7 +56,7 @@ Feature: Restrict invitable roles depending on site type
          | projectviewer |
          | tempparticipant |
       And I log in as "projectlead"
-      And I follow "Course 1"
+      And I am on "Course 1" course homepage
       And I expand "Users" node
       And I follow "Participants"
       When I press "Invite user"

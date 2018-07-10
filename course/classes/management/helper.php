@@ -307,6 +307,25 @@ class helper {
             );
         }
 
+        // START UCLA MOD: CCLE-7637 - Link to Bulk Download Syllabi missing.
+        // Let plugins hook into category settings navigation.
+        $nodecontainer = new \navigation_node('');
+        $pluginsfunction = get_plugins_with_function('extend_navigation_category_settings', 'lib.php');
+        foreach ($pluginsfunction as $plugintype => $plugins) {
+            foreach ($plugins as $pluginfunction) {
+                $pluginfunction($nodecontainer, $category->get_context());
+            }
+        }
+        if ($nodecontainer->has_children()) {
+            foreach ($nodecontainer->children as $child) {
+                $actions[$child->key] = array(
+                    'url' => $child->action,
+                    'icon' => $child->icon,
+                    'string' => $child->text
+                );
+            }
+        }
+        // END UCLA MOD: CCLE-7637.
         return $actions;
     }
 

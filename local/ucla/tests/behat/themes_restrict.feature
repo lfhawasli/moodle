@@ -17,7 +17,7 @@ Feature: Restrict theme for collab site
       | user | course | role |
       | manager1 | C1 | manager |
     And I log in as "manager1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Edit settings"
     And I expand all fieldsets
     Then I should see "UCLA course theme" in the "Force theme" "select"

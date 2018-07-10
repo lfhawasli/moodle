@@ -31,7 +31,7 @@ Background:
 @CCLE-5317
 Scenario: Show number of displayed users.
     Given I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Participants" node in "Course administration > Users"
     Then I should see "Participants: 4" in the "#page" "css_element"
     When I set the field "Role" to "Instructor"
@@ -46,7 +46,7 @@ Scenario: Show number of displayed users.
 Scenario: Limited views.
     # Instructor.
     Given I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Participants" node in "Course administration > Users"
     Then I should see "Activity" in the "userenrolment" "table"
     And I should not see "Log in as" in the "userenrolment" "table"
@@ -56,7 +56,7 @@ Scenario: Limited views.
     And I log out
     # Manager.
     When I log in as "manager"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Participants" node in "Course administration > Users"
     Then I should see "Activity" in the "userenrolment" "table"
     And I should see "Log in as" in the "userenrolment" "table"
@@ -66,7 +66,7 @@ Scenario: Limited views.
     And I log out
     # Project participant.
     When I log in as "projpart"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Participants" node in "Course administration > Users"
     Then I should see "Last access to course" in the "userenrolment" "table"
     And I should not see "Activity" in the "userenrolment" "table"
@@ -79,5 +79,5 @@ Scenario: Limited views.
     And I log out
     # Student.
     When I log in as "student"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should not see "Users"

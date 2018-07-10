@@ -35,7 +35,7 @@ Feature: Different roles for hidden sites
       And I set the following fields to these values:
          | Visible | Hide |
       And I press "Save and display"
-      And I press "Control Panel"
+      And I follow "Admin panel"
       And I follow "Invite users"
       Then I should see "Instructional Assistant"
       And I should see "Editor"
@@ -68,7 +68,7 @@ Feature: Different roles for hidden sites
       And I set the following fields to these values:
          | Visible | Hide |
       And I press "Save and display"
-      And I press "Control Panel"
+      And I follow "Admin panel"
       And I follow "Invite users"
       Then I should see "Instructional Assistant"
       And I should see "Editor"
@@ -100,7 +100,7 @@ Feature: Different roles for hidden sites
       And I set the following fields to these values:
          | Visible | Hide |
       And I press "Save and display"
-      And I press "Control Panel"
+      And I follow "Admin panel"
       And I follow "Invite users"
       Then I should see "Project Lead"
       And I should see "Project Contributor"
@@ -135,7 +135,7 @@ Feature: Different roles for hidden sites
          | tempparticipant |
       And I log in as "ta2"
       And I follow "Test course 1"
-      And I press "Control Panel"
+      And I follow "Admin panel"
       And I follow "TA sites"
       And I click on "#id_confirmation" "css_element"
       And I press "id_submitbutton"
@@ -144,7 +144,7 @@ Feature: Different roles for hidden sites
       And I set the following fields to these values:
          | Visible | Hide |
       And I press "Save and display"
-      And I press "Control Panel"
+      And I follow "Admin panel"
       And I follow "Invite users"
       Then I should see "Instructional Assistant"
       And I should see "Editor"

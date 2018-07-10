@@ -34,7 +34,7 @@ Feature: Filter content visibility by groups
           | user     | group |
           | student1 | G1    |
         And I log in as "teacher1"
-        And I follow "Course 1"
+        And I am on "Course 1" course homepage
         And I turn editing mode on
         And I add a "<Activity>" to section "1" 
         And I set the following fields to these values:
@@ -48,11 +48,11 @@ Feature: Filter content visibility by groups
         Then I should see "Grouping 1"
         And I log out
         And I log in as "student1"
-        And I follow "Course 1"
+        And I am on "Course 1" course homepage
         Then I should see "Test <Activity> name"
         And I log out
         And I log in as "student2"
-        And I follow "Course 1"
+        And I am on "Course 1" course homepage
         Then I should see "Grouping 1"
         Examples:
           | Activity            | Name field               | Description field |

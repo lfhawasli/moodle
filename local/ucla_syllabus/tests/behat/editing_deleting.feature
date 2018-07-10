@@ -18,7 +18,7 @@ Background:
         | teacher1 | C1 | editingteacher |
         | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow the "Syllabus (empty)" section in the ucla site menu
     And I follow "Add syllabus"

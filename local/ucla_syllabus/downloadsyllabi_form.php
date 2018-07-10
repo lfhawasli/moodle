@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 require_once("$CFG->libdir/formslib.php");
+require_once($CFG->dirroot.'/local/ucla/lib.php');
 
 /**
  * Form used to download syllabi for a selected category and term in a zip file.

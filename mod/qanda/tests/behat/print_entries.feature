@@ -17,14 +17,14 @@ Feature: Print Q&A entries, link to Q&A entries
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Q&A" to section "1" and I fill the form with:
       | Name | Q&A test |
       | Description | Description |
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Ask a question"
     And I set the following fields to these values:
@@ -36,7 +36,7 @@ Feature: Print Q&A entries, link to Q&A entries
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Questions Pending (2)"
     And I follow "Answer"
@@ -47,7 +47,7 @@ Feature: Print Q&A entries, link to Q&A entries
 
   Scenario: Print all Q&A entries
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Printer-friendly version"
     Then I should see "What is the answer to life, the universe, and everything?"
@@ -57,7 +57,7 @@ Feature: Print Q&A entries, link to Q&A entries
  @javascript
   Scenario: Print a particular Q&A entry by using Permalink
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Permalink"
     Then I should see "What is my name?"

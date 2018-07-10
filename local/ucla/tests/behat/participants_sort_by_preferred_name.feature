@@ -28,7 +28,7 @@ Background:
 
 Scenario: Show number of displayed users.
     Given I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     When I navigate to "Participants" node in "Course administration > Users"
     Then I follow "First name"
     And "1th" "table_row" should appear before "2nd" "table_row"

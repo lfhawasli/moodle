@@ -178,9 +178,9 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
     function _createElements() {
         // START UCLA MOD: CCLE-6868 - Revamp date picker.
         global $OUTPUT, $PAGE;
-        $PAGE->requires->js('/lib/flatpickr/flatpickr.min.js');
-        $PAGE->requires->js('/lib/flatpickr/plugins/confirmDate/confirmDate.js');
-        $PAGE->requires->js('/lib/flatpickr/plugins/displayTimezone/displayTimezone.js');        
+        $flatpickr = $PAGE->requires->js_fix_url('/lib/flatpickr/flatpickr.min.js');
+        $confirmdate = $PAGE->requires->js_fix_url('/lib/flatpickr/plugins/confirmDate/confirmDate.js');
+        $displaytimezone = $PAGE->requires->js_fix_url('/lib/flatpickr/plugins/displayTimezone/displayTimezone.js');
         // Custom CSS for flatpickr is added in theme/uclashared/styles/.
 
         // Support different locales.
@@ -240,9 +240,15 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                 <i class="fa fa-eraser" aria-hidden="true"></i>
             </a>' : '') . '
             </div>
+            <script src="' . $flatpickr . '" async></script>
+            <script src="' . $confirmdate . '" async></script>
+            <script src="' . $displaytimezone . '" async></script>
             <script>
                 if (window.addEventListener) {
                     window.addEventListener("load", function(){'. $flatpickrdefinition .'});
+                    if(document.readyState == "complete") {
+                        window.dispatchEvent(new Event(\'load\'));
+                    }
                 } else {
                     // Handle IE8 and below.
                     window.attachEvent("onload", function(){'. $flatpickrdefinition .'});

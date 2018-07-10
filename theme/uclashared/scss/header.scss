@@ -237,6 +237,17 @@ a.btn-help-feedback {
         margin-left: 2px;
     }
 }
+.btn-help-feedback .need_help {
+    position: relative;
+  }
+.btn-help-feedback .need_help:after {
+  content: "";
+  position: absolute;
+  left: -15px;
+  right: -35px;
+  padding: 8px 25px 35px 0px;
+  bottom: -12px;
+}
 
 @include media-breakpoint-down(xs) {
     .header-main .header-login .btn-help-feedback {

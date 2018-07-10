@@ -1,6 +1,6 @@
 @ucla @format_ucla
 Feature: JIT links
-   In order to gain quick access to the Control Panel tools
+   In order to gain quick access to the Admin panel tools
    As an instructor
    I want to be able to access those tools in a section
   

@@ -105,6 +105,17 @@ h1, h2, h3, h4, h5, h6, p {
   color: #fff;
   background-color: rgba(44,94,145,0.9);
 }
+.btn-help-feedback .need_help {
+    position: relative;
+  }
+.btn-help-feedback .need_help:after {
+  content: "";
+  position: absolute;
+  left: -15px;
+  right: -35px;
+  padding: 8px 25px 35px 0px;
+  bottom: -12px;
+}
 @media (max-width: 992px) {
   #header {
     background-color: rgba(44,94,145,0.8);
@@ -142,6 +153,17 @@ h1, h2, h3, h4, h5, h6, p {
   #header .header-logo {
     margin-bottom: 20px;
   }
+  .btn-help-feedback .need_help {
+    position: relative;
+  }
+  .btn-help-feedback .need_help:after {
+    content: "";
+    position: absolute;
+    left: -185px;
+    right: -208px;
+    padding: 8px 80px 35px 0px;
+    bottom: -12px;
+   }
 }
 @media (max-width: 370px) {
   #header .header-logo .logo-system-name,

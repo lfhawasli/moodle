@@ -15,7 +15,7 @@ Feature: Accessing scales
       | user | course | role |
       | teacher | course1 | editingteacher |
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Grades" node in "Course administration"
     And I navigate to "Scales" node in "Grade administration"
     Then I should see "Course scales"

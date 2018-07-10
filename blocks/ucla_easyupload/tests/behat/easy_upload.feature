@@ -17,10 +17,10 @@ Feature: Easy Upload
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
     And I follow "course 1"
-    And I press "Control Panel"
+    And I follow "Admin panel"
 
   @javascript
-  Scenario: Upload a file to the Site Info section via Control Panel
+  Scenario: Upload a file to the Site Info section via Admin panel
     When I follow "Upload a file"
     And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
     And I set the field "Name" to "testupload1"
@@ -30,7 +30,7 @@ Feature: Easy Upload
     Then I should see "testupload1" in the "region-main" "region"
 
   @javascript
-  Scenario: Upload a file to a specific Week section via Control Panel
+  Scenario: Upload a file to a specific Week section via Admin panel
     When I follow "Upload a file"
     And I upload "lib/tests/fixtures/empty.txt" file to "Select file" filemanager
     And I set the field "Name" to "testupload2"
@@ -44,7 +44,7 @@ Feature: Easy Upload
     Then I should not see "testupload2" in the "region-main" "region"
 
   @javascript
-  Scenario: Add a link via Control Panel
+  Scenario: Add a link via Admin panel
     When I follow "Add a link"
     And I set the field "Enter link URL" to "www.ucla.edu"
     And I set the field "Name" to "UCLA homepage"
@@ -55,13 +55,13 @@ Feature: Easy Upload
     When I follow "UCLA homepage"
     Then I should see "UCLA"
 
-  Scenario: Add an activity via Control Panel
+  Scenario: Add an activity via Admin panel
     When I follow "Add an activity"
     And I set the field "Activity" to "Wiki"
     And I press "Save changes"
     Then I should see "Adding a new Wiki" in the "region-main" "region"
 
-  Scenario: Add a resource via Control Panel
+  Scenario: Add a resource via Admin panel
     When I follow "Add a resource"
     And I set the field "Resource" to "File"
     And I press "Save changes"

@@ -21,7 +21,7 @@ Feature: Backup and restore Q&A
       | teacher1 | C3 | editingteacher |
       | student1 | C1 | student |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Q&A" to section "1" and I fill the form with:
       | Name | Q&A test |
@@ -51,7 +51,7 @@ Feature: Backup and restore Q&A
     Then I should see "Description"
     # Restore from a local file
     When I am on homepage
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Q&A test"
     And I follow "Restore"
     And I upload "mod/qanda/tests/fixtures/qanda_backup.mbz" file to "Files" filemanager

@@ -388,6 +388,10 @@ $CFG->allowframembedding = 1; // CCLE-3021 - enabled because some collab sites n
 // Site administration > Appearance > Themes > Theme settings
 $CFG->themedesignermode = 0;    // Need to be fast.
 $CFG->allowcoursethemes = 1;
+$CFG->custommenuitems = "helprequest,theme_uclashared|/blocks/ucla_help/index.php|helprequest
+    selfhelp,theme_uclashared|https://docs.ccle.ucla.edu/|selfhelp
+    tipsupdates,theme_uclashared|https://docs.ccle.ucla.edu/w/Tips_and_Updates|tipsupdates
+    requestsite,theme_uclashared|/course/request.php|requestsite";
 
 // Site administration > Appearance > Navigation
 //$CFG->defaulthomepage = 1;    // user's home page should be "My Moodle" (HOMEPAGE_MY)
@@ -419,7 +423,8 @@ $CFG->behat_extraallowedsettings = array(
     'forcedefaultmymoodle',                 // Experimental
     'debug',
     'debugdisplay',
-    'customscripts'
+    'customscripts',
+    'custommenuitems'
 );
 
 // If you want to have un-revisioned configuration data, place in config_private

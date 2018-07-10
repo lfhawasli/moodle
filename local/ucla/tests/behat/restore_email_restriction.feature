@@ -23,7 +23,7 @@ Feature: Remove email restriction from restore/import
     # Add content as teacher.
     Given I log in as "admin"
     And I follow "Courses"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
@@ -37,7 +37,7 @@ Feature: Remove email restriction from restore/import
     And I log out
     # Add course content as a student: reply to a discussion.
     Given I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I reply "Discussion 1" post from "Test forum name" forum with:
       | Subject | Reply 2 to discussion 1 |
       | Message | Discussion contents 2, third message |
@@ -45,7 +45,7 @@ Feature: Remove email restriction from restore/import
     # Backup the course.
     Given I log in as "admin"
     And I follow "Courses"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
     # Change the teacher and student's emails.
@@ -67,7 +67,7 @@ Feature: Remove email restriction from restore/import
     # Restore the course.
     When I am on homepage
     And I follow "Courses"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I follow "Restore"
     And I restore "test_backup.mbz" backup into a new course using this options:
