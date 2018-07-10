@@ -101,5 +101,15 @@
     .availabilitypopup.hide {
         display:none;
     }
+    .section-modchooser-text {
+        position: relative;
+    }
+    .section-modchooser-text:after {
+        content: "";
+        position: absolute;
+        left: -15px;
+        right: -35px;
+        padding: 8px 25px 35px 0px;
+        bottom: -12px;
+    }
 }
-
