@@ -258,6 +258,8 @@ class format_ucla_renderer extends format_topics_renderer {
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
         global $PAGE;
 
+        $modinfo = get_fast_modinfo($course);
+
         $context = context_course::instance($course->id);
         // Title with completion help icon.
         $completioninfo = new completion_info($course);
@@ -294,7 +296,7 @@ class format_ucla_renderer extends format_topics_renderer {
                     $thissection = $sections[$section];
                 } else {
                     // This will create a course section if it doesn't exist.
-                    $thissection = get_fast_modinfo($course->id)->get_section_info($section);
+                    $thissection = $modinfo->get_section_info($section);
 
                     // The returned section is only a bare database object rather than
                     // a section_info object - we will need at least the uservisible
@@ -330,7 +332,6 @@ class format_ucla_renderer extends format_topics_renderer {
 
         if ($PAGE->user_is_editing()) {
             // Print stealth sections if present.
-            $modinfo = get_fast_modinfo($course);
             foreach ($sections as $section => $thissection) {
                 if (empty($modinfo->sections[$section])) {
                     continue;
@@ -549,20 +550,11 @@ class format_ucla_renderer extends format_topics_renderer {
         $modinfo = get_fast_modinfo($course);
 
         // Can we view the section in question?
-        if (!($sectioninfo = $modinfo->get_section_info($displaysection))) {
-            // This section doesn't exist.
-            print_error('unknowncoursesection', 'error', null, $course->fullname);
-            return;
-        }
-
-        if (!$sectioninfo->uservisible) {
-            if (!$course->hiddensections) {
-                echo $this->start_section_list();
-                echo $this->section_hidden($displaysection);
-                echo $this->end_section_list();
-            }
-            // Can't view this section.
-            return;
+        if (!($sectioninfo = $modinfo->get_section_info($displaysection)) || !$sectioninfo->uservisible) {
+            // This section doesn't exist or is not available for the user.
+            // We actually already check this in course/view.php but just in case exit from this function as well.
+            print_error('unknowncoursesection', 'error', course_get_url($course),
+                format_string($course->fullname));
         }
 
         // Copy activity clipboard.
@@ -680,8 +672,12 @@ class format_ucla_renderer extends format_topics_renderer {
             // End section header.
 
             $o .= html_writer::start_tag('div', array('class' => 'summary'));
-            $o .= $this->format_summary_text($section);
-
+            if ($section->uservisible || $section->visible) {
+                // Show summary if section is available or has availability restriction information.
+                // Do not show summary if section is hidden but we still display it because of course setting
+                // "Hidden sections are shown in collapsed form".
+                $o .= $this->format_summary_text($section);
+            }
             $o .= html_writer::end_tag('div');
 
             $context = context_course::instance($course->id);

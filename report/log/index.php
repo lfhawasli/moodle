@@ -166,10 +166,6 @@ if (empty($readers)) {
             $userinfo = get_string('allparticipants');
             $dateinfo = get_string('alldays');
 
-            if ($hostcourse) {
-                echo $OUTPUT->notification(get_string('mnetlogwarning', 'report_log'));
-            }
-
             if ($user) {
                 $u = $DB->get_record('user', array('id' => $user, 'deleted' => 0), '*', MUST_EXIST);
                 $userinfo = fullname($u, has_capability('moodle/site:viewfullnames', $context));
@@ -189,9 +185,6 @@ if (empty($readers)) {
     } else {
         echo $output->header();
         echo $output->heading(get_string('chooselogs') .':');
-        if ($hostcourse) {
-            echo $OUTPUT->notification(get_string('mnetlogwarning', 'report_log'));
-        }
         echo $output->render($reportlog);
     }
 }

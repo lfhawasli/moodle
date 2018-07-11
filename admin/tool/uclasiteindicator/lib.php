@@ -485,7 +485,12 @@ class siteindicator_manager {
             $newrole->shortname = $this->_role_remap[$rolegroup][$role];
             $record = $DB->get_record('role', 
                     array('shortname' => $newrole->shortname));
-            $newrole->id = $record->id;
+            if (empty($record)) {
+                debugging('No remapped roleid found for ' . $newrole->shortname);
+                $newrole = null;
+            } else {
+                $newrole->id = $record->id;
+            }
         }
         
         return $newrole;

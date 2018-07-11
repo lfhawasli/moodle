@@ -257,7 +257,15 @@ class participants_table extends \table_sql {
             $this->groups = groups_get_all_groups($courseid, 0, 0, 'g.*', true);
         }
         $this->allroles = role_fix_names(get_all_roles($this->context), $this->context);
-        $this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        //$this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
+        $untrimmedroles = \uclaroles_manager::get_assignable_roles_by_courseid($this->course, true);
+        foreach ($untrimmedroles as $role) {
+            $assignableroles[$role->id] = $role->name;
+        }
+        $this->assignableroles = $assignableroles;
+        // END UCLA MOD: CCLE-6809.
         $this->profileroles = get_profile_roles($this->context);
     }
 
@@ -507,7 +515,10 @@ class participants_table extends \table_sql {
             $sort = 'ORDER BY ' . $sort;
         }
 
-        $rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        //$rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        $rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->currentgrouping, $this->accesssince,
+        // END UCLA MOD: CCLE-5686.
             $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams, $sort, $this->get_page_start(),
             $this->get_page_size());
         $this->rawdata = [];
