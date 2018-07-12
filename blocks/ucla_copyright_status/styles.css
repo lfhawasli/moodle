@@ -54,3 +54,12 @@ span#block_ucla_copyright_status_t1 {
 .fp-setlicense select {
     width: 100%;
 }
+
+/* CCLE-7689 Fix UI for Manage Copyright */
+.btn.btn-primary {
+    margin-right: 2px;
+}
+
+legend {
+    padding-left: 5rem;
+}
