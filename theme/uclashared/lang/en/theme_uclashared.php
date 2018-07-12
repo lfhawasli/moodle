@@ -43,6 +43,8 @@ $string['tipsupdates'] = 'Read tips & updates';
 $string['requestsite'] = 'Request a site';
 $string['sitedirectory'] = 'Site Directory';
 
+// CCLE-7731 - Missing Instructor Column for Import.
+$string['instructorcourse'] = 'Instructor';
 $string['copyright_information'] = '&copy; {$a} UC Regents';
 
 // Settings titles, descriptions and defaults.
