@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/ucla/lib.php');
+require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
 /**
  * Block definition file for UCLA Media
@@ -66,7 +67,7 @@ class block_ucla_media extends block_base {
         
         $bruincastfound = $DB->record_exists('ucla_bruincast',
                 array('courseid' => $courseid));
-        if ($bruincastfound) {
+        if ($bruincastfound || can_request_media($courseid)) {
             $node = navigation_node::create(get_string('title',
                     'block_ucla_media'), new moodle_url('/blocks/ucla_media/bcast.php',
                             array('courseid' => $courseid)));

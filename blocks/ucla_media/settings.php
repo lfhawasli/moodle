@@ -89,4 +89,8 @@ if ($ADMIN->fulltree) {
             'block_ucla_media/bruincast_crosslists',
             get_string('bruincastcrosslists', 'block_ucla_media'),
             get_string('bruincastcrosslistsdesc', 'block_ucla_media'), ''));
+    $settings->add(new admin_setting_configcheckbox(
+            'block_ucla_media/media_resource_requests',
+            get_string('mrrequest', 'block_ucla_media'),
+            get_string('mediarequestdesc', 'block_ucla_media'), 1));
 }

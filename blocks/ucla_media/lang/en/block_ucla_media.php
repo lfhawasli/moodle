@@ -64,7 +64,9 @@ $string['wowzaurl_desc'] = 'The address and port for the Wowza streaming server.
 $string['bcast_tab'] = 'Bruincast ({$a})';
 $string['vidreserves_tab'] = 'Video reserves ({$a})';
 $string['libraryreserves_tab'] = 'Digital audio reserves ({$a})';
-$string['mediaresnotavailable'] = "There are no media resources for this course.";
+$string['bcnotavailable'] = "There are no BruinCast recordings for this course.";
+$string['vresourcesnotavailable'] = "There are no Video reserves for this course.";
+$string['mlreservesnotavailable'] = "There are no Digital audio reserves for this course.";
 
 $string['titlebcast'] = 'Bruincast';
 $string['headerbruincastloginurl'] = 'Bruincast Login Source URL';
@@ -101,3 +103,10 @@ $string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are 
 
 $string['videoreservesipwarning'] = 'You are accessing this content from off-campus. If the content does not load, you will need to use the UCLA VPN to obtain an on-campus internet address.</br>
 BOL VPN instructions: <a target="_blank" href="https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients">https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients</a>.';
+
+// Strings for Media resources requests.
+$string['mediarequestdesc'] = 'Display media resource request links';
+$string['mrrequest'] = 'Request media resources';
+$string['bcrequest'] = 'Request BruinCast';
+$string['vrrequest'] = 'Request Video reserves';
+$string['mlrequest'] = 'Request Digital audio reserves';
