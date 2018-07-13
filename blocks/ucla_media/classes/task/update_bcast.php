@@ -25,7 +25,6 @@
 namespace block_ucla_media\task;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
-require_once($CFG->dirroot . '/enrol/externallib.php');
 
 /**
  * Class file.
@@ -129,6 +128,9 @@ class update_bcast extends \core\task\scheduled_task {
 
             // Only processing next part if the result was non-empty.
             if (array_key_exists('item', $cleanedresult)) {
+                // To get session data for the term.
+                $query = \registrar_query::run_registrar_query('ucla_getterms', array($term), true);
+                $sessiondata = \block_ucla_weeksdisplay_session::create($query);
 
                 // The below if statement is a workaround for an XML parsing
                 // problem. When only one item is retrieved in a query the array
@@ -227,6 +229,7 @@ class update_bcast extends \core\task\scheduled_task {
                         }
 
                         $entry->date = $date;
+                        $entry->week = $sessiondata->get_week(new \DateTime(date('Y-m-d H:i:s', $date)));
 
                         // See if we need to update or add.
                         if (isset($existingmedia[$term][$srs][$date][$entry->title][$entry->courseid][$entry->video_files][$entry->audio_files])) {
@@ -391,9 +394,9 @@ class update_bcast extends \core\task\scheduled_task {
 
                 // Make sure that entry does not already exist for same file.
                 // Sometimes BruinCast already crossposted data.
-                if (!empty($existingmedia[$record->term][$record->srs][$record->date][$record->title])) {
+                if (!empty($existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files])) {
                     // Exists, so update.
-                    $record->id = $existingmedia[$record->term][$record->srs][$record->date][$record->title];
+                    $record->id = $existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files];
                     try {
                         $DB->update_record('ucla_bruincast', $record);
                         ++$numupdated;
@@ -421,8 +424,8 @@ class update_bcast extends \core\task\scheduled_task {
                 }
 
                 // Make existing entry false so it is not deleted.
-                if (isset($existingmedia[$record->term][$record->srs][$record->date][$record->title])) {
-                    $existingmedia[$record->term][$record->srs][$record->date][$record->title] = false;
+                if (isset($existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files])) {
+                    $existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files] = false;
                 }
             }
         }

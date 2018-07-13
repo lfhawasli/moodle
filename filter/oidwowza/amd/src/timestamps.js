@@ -28,7 +28,7 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
             } else {
                 playerinstance.setup({
                     'autostart': true,
-                    'image': M.cfg.wwwroot + '/theme/uclashared/pix/ucla-logo.png',
+                    'image': M.cfg.wwwroot + '/filter/oidwowza/pix/audio-only.png',
                     'sources': [
                         {'file': rtmpurl},
                         {'file': httpurl}

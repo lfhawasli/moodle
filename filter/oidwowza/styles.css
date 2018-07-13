@@ -4,6 +4,10 @@
     width: 100px;
 }
 
+.jw-flag-media-audio .jw-preview {
+    background: #0072b1 no-repeat 50% 50%; /* $brand-primary */
+}
+
 .jw-svg-icon-settings path,
 .jw-svg-icon-rewind path { 
     display: none; 
@@ -13,8 +17,6 @@
 .jw-svg-icon-rewind {
     background-size: contain;
     background-repeat: no-repeat; 
-    -webkit-filter: invert(100%); 
-    filter: invert(100%);
 }
 
 .jw-svg-icon-settings { 

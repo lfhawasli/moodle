@@ -75,7 +75,7 @@ echo $OUTPUT->footer();
  * Outputs Bruincast content for given course.
  *
  * @param object $course
- * @param int $sort by course date
+ * @param string $sort by course date
  * @param array $pageparams
  */
 function display_all($course, $sort, $pageparams) {
@@ -95,17 +95,24 @@ function display_all($course, $sort, $pageparams) {
     echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
 
     $bccontent = $sort ? get_bccontent($course->id, 'DESC') : get_bccontent($course->id);
-    $timestamps = json_decode(get_user_preferences('jwtimestamp_'.$course->id, '', $USER), true);
-    $timestamps = $timestamps ? $timestamps : [];
 
     $table = new html_table();
     $sorticon = $sort ? 'fa fa-sort-desc' : 'fa fa-sort-asc';
     $icontag = html_writer::empty_tag('i', array('class' => $sorticon));
     $bcdatecell = new html_table_cell(html_writer::tag('a', get_string('bccoursedate', 'block_ucla_media').$icontag,
             array('href' => new moodle_url('/blocks/ucla_media/bcast.php', $pageparams))));
-    $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')));
-    $table->size = array('25%', '75%');
+    $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')), 
+            new html_table_cell(get_string('bcmetadata', 'block_ucla_media')));
+    $table->size = array('0%', '0%', '100%');
     $table->id = 'bruincast-content-table';
+
+    // Check if the course has any media with Titles or Comments.
+    $hasmetadata = false;
+
+    // Get data for the session duration.
+    $courseinfo = ucla_get_course_info($course->id);
+    $session = $courseinfo[0]->term;
+    $prevweek = null;
 
     foreach ($bccontent as $media) {
         // Each video entry will have two rows. One row for Course date and
@@ -113,7 +120,25 @@ function display_all($course, $sort, $pageparams) {
 
         // Create Course date and Media row.
         $datecell = date('D, m/d/Y', $media->date);
+        $week = $media->week;
 
+        // Display the week for the BruinCast content if it is not a summer session.
+        if ($courseinfo[0]->session == 'RG' && $week != $prevweek) {
+            $prevweek = $week;
+            if ($week == 11) {
+                $row = new html_table_row(
+                        [html_writer::tag('b', get_string('finals_week', 'block_ucla_weeksdisplay')), "", ""]);
+            } else if ($week > -1) {
+                $row = new html_table_row(
+                        [html_writer::tag('b', get_string('week', 'block_ucla_weeksdisplay', $week)), "", ""]);
+            } else {
+                $row = new html_table_row(
+                        [html_writer::tag('b', get_string('bcother', 'block_ucla_media')), "", ""]);
+            }
+            $row->attributes['class'] = "week-row";
+            $table->data[] = $row;
+        }
+        
         $mediacell = '';
 
         $hasmultivideos = false;
@@ -206,31 +231,30 @@ function display_all($course, $sort, $pageparams) {
             }
         }
 
-        // Create Title and Comments row.
-        $titlecommentstring = '';
+        // Create Metadata column.
+        $metadatacell = '';
         if (!empty($media->title)) {
-            $titlecommentstring .= html_writer::tag('strong',
+            $metadatacell .= html_writer::tag('strong',
                     get_string('bctitle', 'block_ucla_media') . ':') . ' ' .
                     $media->title . '<br />';
+                    $hasmetadata = true;
         }
         if (!empty($media->comments)) {
-            $titlecommentstring .= html_writer::tag('strong',
+            $metadatacell .= html_writer::tag('strong',
                     get_string('bccomments', 'block_ucla_media') . ':') . ' ' .
-                    $media->comments;
+                    strip_tags(format_string($media->comments, FORMAT_PLAIN));
+                    $hasmetadata = true;
         }
-        if (!empty($mediacell)) {
-            // Add spacing if there are media buttons.
-            $mediacell .= '<br><br>';
-        }
-        $mediacell .= $titlecommentstring;
 
-        // Make date cell v align middle and font size larger.
-        $datecellclass = new html_table_cell($datecell);
-        $datecellclass->style = "vertical-align: middle; font-size: larger";
-
-        $cells = array($datecellclass, $mediacell);
+        $cells = array($datecell, $mediacell, $metadatacell);
         $row = new html_table_row($cells);
         $table->data[] = $row;
+    }
+
+    // Only have two columns if there is no metadata.
+    if (!$hasmetadata) {
+        $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')));
+        $table->size = array('0%', '100%');
     }
 
     echo html_writer::table($table);
@@ -241,7 +265,7 @@ function display_all($course, $sort, $pageparams) {
  * Returns Bruincast content for course.
  *
  * @param int $courseid
- * @param int $sort by course date
+ * @param string $sort by course date
  * @return array
  */
 function get_bccontent($courseid, $sort = 'ASC') {
