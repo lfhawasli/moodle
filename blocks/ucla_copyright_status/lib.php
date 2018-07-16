@@ -393,7 +393,7 @@ function display_copyright_status_contents($courseid, $filter) {
                                            'name' => 'action_edit',
                                            'type' => 'submit'));
         $cancelbtn = html_writer::tag('button', get_string('cancel'),
-                                      array('class' => 'btn-cancel',
+                                      array('class' => 'btn btn-secondary',
                                             'name' => 'action_cancel',
                                             'type' => 'submit'));
         echo html_writer::tag('div', $selectall . $selectnone . $label . $bulkassign . $savebtn . $cancelbtn,

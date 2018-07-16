@@ -227,6 +227,15 @@ $string['deletecoursecontentwarning'] = '<p>You are about to delete the content 
         . '<p>{$a->shortname} ({$a->fullname})</p>'
         . '<p>To ensure that your content is saved, first <a href="{$a->backuplink}">create a backup.</a>  If you are sure you want to delete the content, press "Continue".';
 
+// CCLE-7187 - Reimplement-CCLE-4416 Prompt overwriting warning.
+$string['deleterestoretitle'] = "Delete the contents of the course and then restore";
+$string['deletewarning'] = 'WARNING';
+$string['deleterestorewarning'] = 'You are about to delete a course for which content has been added.<br />';
+$string['deleterestoresafe'] = 'You are about to delete a course for which no content has been added.<br />';
+$string['backuprestore'] = 'If you want back up this course now to ensure your course content is saved, click "Backup."<br />';
+$string['deleterestore'] = 'If you are absolutely sure you want to delete this course and all the data it contains, click "Continue."';
+$string['deletecurrentcourse'] = 'Delete the contents of the course and then restore';
+
 // CCLE-3843 - Single file recovery.
 $string['logfiledeleted'] = 'Deleted file';
 

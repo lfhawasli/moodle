@@ -3261,6 +3261,7 @@ class global_navigation_for_ajax extends global_navigation {
                 foreach ($categories as $category){
                     $coursesubcategories = array_merge($coursesubcategories, explode('/', trim($category->path, "/")));
                 }
+                $categories->close();
                 $coursesubcategories = array_unique($coursesubcategories);
 
                 // Only add a subcategory if it is part of the path to user's course and
@@ -3986,6 +3987,7 @@ class settings_navigation extends navigation_node {
         if ($context->contextlevel == CONTEXT_BLOCK) {
             $this->load_block_settings();
             $context = $context->get_parent_context();
+            $this->context = $context;
         }
         switch ($context->contextlevel) {
             case CONTEXT_SYSTEM:

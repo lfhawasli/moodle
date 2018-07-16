@@ -356,7 +356,7 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
                 $event->add_record_snapshot('forum_discussions', $discussion);
                 $event->trigger();
 
-                redirect("view.php?f=$discussion->forum");
+                redirect(new moodle_url('/mod/forum/view.php', ['f' => $discussion->forum]));
 
             } else if (forum_delete_post($post, has_capability('mod/forum:deleteanypost', $modcontext),
                 $course, $cm, $forum)) {
@@ -866,7 +866,7 @@ if ($mform_post->is_cancelled()) {
 
     } else { // Adding a new discussion.
         // The location to redirect to after successfully posting.
-        $redirectto = new moodle_url('view.php', array('f' => $fromform->forum));
+        $redirectto = new moodle_url('/mod/forum/view.php', array('f' => $fromform->forum));
 
         if (!forum_user_can_post_discussion($forum, $fromform->groupid, -1, $cm, $modcontext)) {
             print_error('cannotcreatediscussion', 'forum');

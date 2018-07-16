@@ -437,6 +437,7 @@ class view {
         $questions = $DB->get_recordset_sql($this->loadsql, $this->sqlparams, $page * $perpage, $perpage);
         if (!$questions->valid()) {
             // No questions on this page. Reset to page 0.
+            $questions->close();
             $questions = $DB->get_recordset_sql($this->loadsql, $this->sqlparams, 0, $perpage);
         }
         return $questions;
@@ -737,6 +738,7 @@ class view {
             $this->print_table_row($question, $rowcount);
             $rowcount += 1;
         }
+        $questions->close();
         $this->end_table();
         echo "</div>\n";
 

@@ -56,12 +56,6 @@ class ucla_modify_coursemenu_form extends moodleform {
             array('id' => block_ucla_modify_coursemenu::NEWNODES_DOMNODE));
         $mform->setType('newsections', PARAM_TEXT);
 
-        $mform->addElement('hidden', 'sectionsorder', '',
-            array(
-                'id' => block_ucla_modify_coursemenu::SECTIONSORDER_DOMNODE
-            ));
-        $mform->setType('sectionsorder', PARAM_TEXT);
-
         $mform->addElement('hidden', 'landingpage', $landingpage,
             array(
                 'id' => block_ucla_modify_coursemenu::LANDINGPAGE_DOMNODE

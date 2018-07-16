@@ -1323,7 +1323,10 @@ function user_get_participants_sql($courseid, $groupid = 0, $groupingid = 0, $ac
             $wheres[] = user_get_user_lastaccess_sql($accesssince);
         }
     } else {
-        $select = "SELECT $userfieldssql, COALESCE(ul.timeaccess, 0) AS lastaccess";
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        //$select = "SELECT $userfieldssql, COALESCE(ul.timeaccess, 0) AS lastaccess";
+        $select = "SELECT DISTINCT $userfieldssql, COALESCE(ul.timeaccess, 0) AS lastaccess";
+        // END UCLA MOD: CCLE-5686.
         $joins[] = "JOIN ($esql) e ON e.id = u.id"; // Course enrolled users only.
         // Not everybody has accessed the course yet.
         $joins[] = 'LEFT JOIN {user_lastaccess} ul ON (ul.userid = u.id AND ul.courseid = :courseid)';
@@ -1472,7 +1475,10 @@ function user_get_total_participants($courseid, $groupid = 0, $groupingid = 0, $
     // END UCLA MOD: CCLE-5686.
         $statusid, $search, $additionalwhere, $additionalparams);
 
-    return $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
+    // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+    //return $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
+    return $DB->count_records_sql("SELECT COUNT(DISTINCT u.id) $from $where", $params);
+    // END UCLA MOD: CCLE-5686.
 }
 
 /**

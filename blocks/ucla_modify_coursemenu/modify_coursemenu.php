@@ -190,24 +190,6 @@ if ($modifycoursemenuform->is_cancelled()) {
 } else if ($data = $modifycoursemenuform->get_data()) {
     // TODO see if some of the fields can be parsed from within the MForm.
     parse_str($data->serialized, $unserialized);
-    parse_str($data->sectionsorder, $sectionorderparsed);
-
-    // TODO make it consistent IN CODE how section id's are generated.
-    $sectionorder = array();
-    foreach ($sectionorderparsed['sections-order'] as $k => $sectionid) {
-        $sectnum = str_replace('section-', '', $sectionid);
-        if ($sectnum == UCLA_FORMAT_DISPLAY_ALL
-                || $sectnum == '0') {
-            continue;
-        }
-
-        // Subtract 1 since we have to compensate for the pseudo-show-all section.
-        if (is_int($k)) {
-            $k--;
-        }
-
-        $sectionorder[$k] = $sectnum;
-    }
 
     // TODO make it consistent IN CODE how all these fields are generated.
     $sectiondata = array();
@@ -618,7 +600,6 @@ block_ucla_modify_coursemenu::many_js_init_code_helpers(array(
         'primary_id'     => block_ucla_modify_coursemenu::PRIMARY_DOMNODE,
         'newsections_id' => block_ucla_modify_coursemenu::NEWNODES_DOMNODE,
         'landingpage_id' => block_ucla_modify_coursemenu::LANDINGPAGE_DOMNODE,
-        'sectionsorder_id' => block_ucla_modify_coursemenu::SECTIONSORDER_DOMNODE,
         'serialized_id' => block_ucla_modify_coursemenu::SERIALIZED_DOMNODE,
         'daterange_id' => block_ucla_modify_coursemenu::DATERANGE_DOMNODE,
         'sectiondata' => $sections,

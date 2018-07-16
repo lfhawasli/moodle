@@ -28,6 +28,7 @@ require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
 $pageparams = array();
 $courseid = required_param('courseid', PARAM_INT);
+$sort = optional_param('sort', 0, PARAM_INT);
 
 if (!$course = get_course($courseid)) {
     print_error('coursemisconf');
@@ -54,7 +55,7 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         print_media_page_tabs(get_string('headerbcast', 'block_ucla_media'), $course->id);
 
         // Show all videos.
-        display_all($course);
+        display_all($course, $sort, $pageparams);
 
         $event = \block_ucla_media\event\bruincast_index_viewed::create(
             array('context' => $context, 'other' => array(
@@ -74,9 +75,13 @@ echo $OUTPUT->footer();
  * Outputs Bruincast content for given course.
  *
  * @param object $course
+ * @param string $sort by course date
+ * @param array $pageparams
  */
-function display_all($course) {
+function display_all($course, $sort, $pageparams) {
     global $OUTPUT;
+
+    $pageparams['sort'] = !$sort;
 
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
     echo $OUTPUT->heading(get_string('headerbcast', 'block_ucla_media') .
@@ -89,12 +94,15 @@ function display_all($course) {
 
     echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
 
-    $bccontent = get_bccontent($course->id);
+    $bccontent = $sort ? get_bccontent($course->id, 'DESC') : get_bccontent($course->id);
 
     $table = new html_table();
-    $table->head = array(get_string('bccoursedate', 'block_ucla_media'),
-        get_string('bcmedia', 'block_ucla_media'));
-    $table->size = array('20%', '80%');
+    $sorticon = $sort ? 'fa fa-sort-desc' : 'fa fa-sort-asc';
+    $icontag = html_writer::empty_tag('i', array('class' => $sorticon));
+    $bcdatecell = new html_table_cell(html_writer::tag('a', get_string('bccoursedate', 'block_ucla_media').$icontag,
+            array('href' => new moodle_url('/blocks/ucla_media/bcast.php', $pageparams))));
+    $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')));
+    $table->size = array('25%', '75%');
     $table->id = 'bruincast-content-table';
 
     foreach ($bccontent as $media) {
@@ -193,9 +201,10 @@ function display_all($course) {
  * Returns Bruincast content for course.
  *
  * @param int $courseid
+ * @param string $sort by course date
  * @return array
  */
-function get_bccontent($courseid) {
+function get_bccontent($courseid, $sort = 'ASC') {
     global $DB;
-    return $DB->get_records('ucla_bruincast', array('courseid' => $courseid), 'date ASC');
+    return $DB->get_records('ucla_bruincast', array('courseid' => $courseid), 'date '.$sort);
 }
