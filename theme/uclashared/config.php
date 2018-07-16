@@ -86,7 +86,7 @@ switch ($PAGE->pagetype) {
 $THEME->scss = 'moodle';
 
 // Add javascript files.
-$THEME->javascripts = ['hamburger_icon', 'frontpage'];
+$THEME->javascripts = ['frontpage'];
 
 $THEME->layouts['frontpage'] = array(
   'file' => 'frontpage.php',
