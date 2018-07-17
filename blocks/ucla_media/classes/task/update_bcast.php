@@ -25,6 +25,7 @@
 namespace block_ucla_media\task;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
+require_once($CFG->dirroot . '/enrol/externallib.php');
 
 /**
  * Class file.
@@ -228,7 +229,7 @@ class update_bcast extends \core\task\scheduled_task {
                         $entry->date = $date;
 
                         // See if we need to update or add.
-                        if (isset($existingmedia[$term][$srs][$date][$entry->title])) {
+                        if (isset($existingmedia[$term][$srs][$date][$entry->title][$entry->courseid][$entry->video_files][$entry->audio_files])) {
                             // Exists, so update.
 
                             // Bruincast data sometimes has duplicate entries
@@ -236,10 +237,10 @@ class update_bcast extends \core\task\scheduled_task {
                             // times due to user error. We handle this by
                             // not unsetting entry in $existingmedia, instead
                             // we set it to false meaning we already updated it.
-                            if (!empty($existingmedia[$term][$srs][$date][$entry->title])) {
-                                $entry->id = $existingmedia[$term][$srs][$date][$entry->title];
+                            if (!empty($existingmedia[$term][$srs][$date][$entry->title][$entry->courseid][$entry->video_files][$entry->audio_files])) {
+                                $entry->id = $existingmedia[$term][$srs][$date][$entry->title][$entry->courseid][$entry->video_files][$entry->audio_files];
                                 $DB->update_record('ucla_bruincast', $entry);
-                                $existingmedia[$term][$srs][$date][$entry->title] = false;
+                                $existingmedia[$term][$srs][$date][$entry->title][$entry->courseid][$entry->video_files][$entry->audio_files] = false;
                                 ++$numupdated;
                             } else {
                                 // Ignore other entries, because newest entry is
@@ -279,12 +280,35 @@ class update_bcast extends \core\task\scheduled_task {
         foreach ($existingmedia as $srses) {
             foreach ($srses as $dates) {
                 foreach ($dates as $titles) {
-                    foreach ($titles as $deleteid) {
-                        if (!empty($deleteid)) {
-                            // Found record that was not updated, so delete.
-                            $DB->delete_records('ucla_bruincast',
-                                    array('id' => $deleteid));
-                            ++$numdeleted;
+                    foreach ($titles as $courseids) {
+                        foreach ($courseids as $videofiles) {
+                            foreach ($videofiles as $audiofiles) {
+                                foreach ($audiofiles as $deleteid) {
+                                    if (!empty($deleteid)) {
+                                        // Delete timestamps from the database if the Bruincast entry is deleted.
+                                        $videos = explode(',', key($videofiles));
+                                        $videos = array_map('trim', $videos);
+                                        $audio = explode(',', key($audiofiles));
+                                        $audio = array_map('trim', $audio);
+                                        $media = array_merge($videos, $audio);
+                                        foreach ($media as $filename) {
+                                            if (empty($filename)) {
+                                                continue;
+                                            }
+                                            $records = $DB->get_records('user_preferences', 
+                                                    array('name' => 'jwtimestamp_'.key($courseids).'_'.$filename), '', 'userid');
+                                            foreach ($records as $record) {
+                                                unset_user_preference('jwtimestamp_'.key($courseids).'_'.$filename, $record->userid);
+                                            }
+                                        }
+
+                                        // Found record that was not updated, so delete.
+                                        $DB->delete_records('ucla_bruincast',
+                                                array('id' => $deleteid));
+                                        ++$numdeleted;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -427,13 +451,13 @@ class update_bcast extends \core\task\scheduled_task {
         $retval = array();
 
         $records = $DB->get_records('ucla_bruincast', array('term' => $term),
-                null, 'id,term,srs,date,title');
+                null, 'id,term,srs,date,title,courseid,video_files,audio_files');
         if (empty($records)) {
             return $retval;
         }
 
         foreach ($records as $record) {
-            $retval[$record->term][$record->srs][$record->date][$record->title]
+            $retval[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files]
                     = $record->id;
         }
         return $retval;

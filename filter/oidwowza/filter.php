@@ -140,6 +140,8 @@ class filter_oidwowza extends moodle_text_filter {
  * @return string       HTML fragment to display video player.
  */
 function oidwowza_filter_mp4_bruincast_callback($link) {
+    global $PAGE, $USER;
+
     $title   = clean_param($link[1], PARAM_NOTAGS);
     $httpurl = clean_param($link[2], PARAM_TEXT);
     $rtmpurl = clean_param($link[3], PARAM_TEXT);
@@ -153,45 +155,23 @@ function oidwowza_filter_mp4_bruincast_callback($link) {
     }
 
     $playerid = uniqid();
-    if ($isvideo == 1) {
-        return "
-            <div id='player-$playerid'></div>
-            <script type='text/javascript'>
-            jwplayer('player-$playerid').setup({
-                autostart: true,
-                width: '100%',
-                aspectratio: '3:2',
-                playlist: [{
-                    sources :
-                        [
-                            {file: '$httpurl'},
-                            {file: '$rtmpurl'}
-                        ]
-                    }],
-                primary: 'html5'
-            });
-            </script>";
-    } else {
-        return "
-            <div id='player-$playerid'></div>
-            <script type='text/javascript'>
-            jwplayer('player-$playerid').setup({
-                autostart: true,
-                sources: [
-                        {file: '$rtmpurl'},
-                        {file: '$httpurl'}
-                ],
-                    rtmp: {
-                            bufferlength: 3
-                    },
-                modes: [
-                    { type: 'html5' },
-                    { type: 'flash' }
-                ],
-                height: 30
-            });
-            </script>";
-    }
+
+    // We need to define jwplayer because jwplayer does not define a module for require.js.
+    $requirejs = 'require.config({ paths: {\'jwplayer\': \'https://content.jwplatform.com/libraries/q3GUgsN9\'}})';
+    $PAGE->requires->js_amd_inline($requirejs);
+
+    // Get the filename by parsing the video url.
+    $parts = parse_url($rtmpurl);
+    $filename = basename($parts['path']);
+    $filename = substr($filename, strpos($filename, ':') + 1);
+
+    // Create the JWPlayer and allow it to update user preferences.
+    $preferencename = 'jwtimestamp_'.$PAGE->course->id.'_'.$filename;
+    user_preference_allow_ajax_update($preferencename, PARAM_TEXT);
+    $PAGE->requires->js_call_amd('filter_oidwowza/timestamps', 'init', 
+            array($preferencename, $playerid, $httpurl, $rtmpurl, $isvideo));    
+
+    return "<div id='player-$playerid'></div>";
 }
 
 /**

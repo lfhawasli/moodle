@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 $mediaid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
 $filename = optional_param('filename', null, PARAM_FILE);
+$offset = optional_param('offset', 0, PARAM_INT);
 $title = '';    // To be set later.
 
 // Try to find corresponding course for given video.
@@ -59,7 +60,7 @@ $context = context_course::instance($media->courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename)),
+                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename, 'offset' => $offset)),
                 $mode, $title);
 echo $OUTPUT->header();
 
