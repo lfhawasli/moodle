@@ -33,45 +33,6 @@ require_once($CFG->dirroot . '/course/lib.php');
 class local_ucla_course_section_fixer {
 
     /**
-     * Check if course has sections that are larger than numsections and have
-     * an empty sequence and either empty null name or has a default name,
-     * meaning that they should be safe to delete.
-     *
-     * @param stdClass $course
-     * @return boolean          Returns false if it found an extra section,
-     *                          otherwise false.
-     */
-    static public function check_extra_sections(stdClass $course) {
-        global $DB;
-
-        $sections = $DB->get_records('course_sections',
-                array('course' => $course->id));
-
-        $numsections = $DB->get_field('course_format_options', 'value',
-                array('courseid' => $course->id, 'name' => 'numsections'));
-        if (empty($numsections)) {
-            return true;
-        }
-        foreach ($sections as $section) {
-            if ($section->section > $numsections) {
-                if (empty($section->sequence) && empty($section->summary)) {
-                    // Make sure section name is also something not user
-                    // modified. "Week" is something the UCLA format adds and
-                    // "New section" is the default name the Modify sections
-                    // tool uses.
-                    if (empty($section->name) ||
-                            strpos($section->name, 'Week ') === 0 ||
-                            $section->name === 'New section') {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Checks if the order of sections in the DB is sequential.
      *
      * @param stdClass $course
@@ -128,76 +89,6 @@ class local_ucla_course_section_fixer {
     }
 
     /**
-     * Counts the number of sections a course has and compares it against the
-     * format's numsections value. Then will either just detect or fix the
-     * number to match the database depending on the $adjustnum parameter.
-     *
-     * This method is defined differently than the other check/handle methods
-     * because a user might not always want the numsection to equal the number
-     * in the database. A use case of this is to add content to that section
-     * and then reduce the number of sections so that the content is accessible
-     * via links, but does not show up in the site menu block.
-     *
-     * @param stdClass $course
-     * @param boolean $adjustnum    Default false. If true, will adjust
-     *                              numsections value to match the number of
-     *                              sections in the database.
-     *
-     * @return boolean|array        If $adjustnum is false and if numsections is
-     *                              less than the number of sections in the
-     *                              database, then will return an array of
-     *                              sections that exist, but are not shown.
-     *                              Otherwise returns false.
-     *                              If $adjustnum is true, then will return
-     *                              false on an error, otherwise returns true.
-     */
-    static public function detect_numsections(stdClass $course, $adjustnum = false) {
-        global $DB;
-
-        if (!isset(course_get_format($course)->get_course()->numsections)) {
-            return false;
-        }
-        $numsections = course_get_format($course)->get_course()->numsections;
-        $actualcount = $DB->count_records('course_sections', array('course' => $course->id));
-
-        // Adding 1 to $numsections, because it does not include Site info (0).
-        if ($actualcount > ($numsections + 1)) {
-            // Course has more sections than specified in $numsections.
-            if ($adjustnum) {
-                // Fix problem. Again, remember that $numsections does not
-                // include Site info (0).
-                $newnumsections = ($actualcount - 1);
-
-                // Do a slight sanity check to make sure we aren't setting this
-                // to a crazy high value.
-                $maxsections = get_config('moodlecourse', 'maxsections');
-                if ($newnumsections > $maxsections) {
-                    $newnumsections = $maxsections;
-                }
-
-                $data = array('numsections' => $newnumsections);
-                course_get_format($course)->update_course_format_options($data);
-                return true;
-            } else {
-                // Return an array of sections that are not being displayed.
-                $retval = array();
-                $sections = $DB->get_records_select('course_sections',
-                        'course=:course AND section>:numsection',
-                        array('course' => $course->id, 'numsection' => $numsections),
-                        'section', 'section,name');
-                foreach ($sections as $section) {
-                    if ($section->section > $numsections) {
-                        $retval[] = $section->name;
-                    }
-                }
-                return $retval;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Find and fix any problems with a course's sections.
      *
      * If any problems were found and fixed, will rebuild the course cache.
@@ -234,51 +125,6 @@ class local_ucla_course_section_fixer {
     }
 
     /**
-     * Delete the extra sections a course might have if they are larger than
-     * numsections and have an empty sequence, empty summary and either empty
-     * null name or has a default name, meaning that they should be safe to
-     * delete.
-     *
-     * @param stdClass $course
-     *
-     * @return array            Returns an array of number of sections that were
-     *                          added, deleted, or updated.
-     */
-    static public function handle_extra_sections(stdClass $course) {
-        global $DB;
-        $retval = array('added' => 0, 'deleted' => 0, 'updated' => 0);
-
-        $sections = $DB->get_records('course_sections',
-                array('course' => $course->id));
-        $numsections = $DB->get_field('course_format_options', 'value',
-                array('courseid' => $course->id, 'name' => 'numsections'));
-        if (empty($numsections)) {
-            return $retval;
-        }
-
-        foreach ($sections as $section) {
-            if ($section->section > $numsections) {
-                if (empty($section->sequence) && empty($section->summary)) {
-                    // Make sure section name is also something not user
-                    // modified. "Week <n>" is something the UCLA format adds
-                    // and "New section" is the default name the Modify sections
-                    // tool uses.
-                    if (empty($section->name) ||
-                            preg_match('/^Week \d+$/', $section->name) === 1 ||
-                            $section->name === 'New section') {
-                        // Safe to delete.
-                        $DB->delete_records('course_sections',
-                                array('id' => $section->id));
-                        ++$retval['deleted'];
-                    }
-                }
-            }
-        }
-
-        return $retval;
-    }
-
-    /**
      * Renumbers course sections so that they are sequential.
      *
      * @param stdClass $course
@@ -303,8 +149,6 @@ class local_ucla_course_section_fixer {
             }
             ++$current;
         }
-
-        // Do we need to adjust numsections?
 
         return $retval;
     }
