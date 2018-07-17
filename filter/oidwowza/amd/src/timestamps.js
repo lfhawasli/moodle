@@ -17,7 +17,10 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
                             {'file': rtmpurl}
                         ]
                     }],
-                    'primary': 'html5'
+                    'primary': 'html5',
+                    'localization': {
+                        'settings': 'Playback Rates'
+                    }
                 });
             } else {
                 playerinstance.setup({
@@ -34,7 +37,10 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
                         { 'type': 'html5' },
                         { 'type': 'flash' }
                     ],
-                    'height': 200
+                    'height': 200,
+                    'localization': {
+                        'settings': 'Playback Rates'
+                    }
                 });
             }
 

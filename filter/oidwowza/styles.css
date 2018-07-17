@@ -3,3 +3,15 @@
 .jwplayer .jw-controls .jw-settings-menu {
     width: 100px;
 }
+
+.jw-svg-icon-settings path { 
+    display: none; 
+} 
+
+.jw-svg-icon-settings { 
+    background-image: url([[pix:filter_oidwowza|playback-rate]]); 
+    background-size: contain;
+    background-repeat: no-repeat; 
+    -webkit-filter: invert(100%); 
+    filter: invert(100%); 
+}
