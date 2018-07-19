@@ -66,7 +66,16 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                     )));
         $event->trigger();
     } else {
-        echo get_string('mediaresnotavailable', 'block_ucla_media');
+        // Display request link.
+        if (can_request_media($courseid)) {
+            print_media_page_tabs(get_string('headerlibres', 'block_ucla_media'), $course->id);
+            echo get_string('mlreservesnotavailable', 'block_ucla_media');
+            echo html_writer::empty_tag('br');
+            echo html_writer::link('mailto:lib_mus-circ@library.ucla.edu?subject=Requesting Digital music library reserves for '.
+                $course->shortname, get_string('mlrequest', 'block_ucla_media'));
+        } else {
+            echo get_string('mlreservesnotavailable', 'block_ucla_media');
+        }
     }
 } else {
     echo get_string('guestsarenotallowed', 'error');

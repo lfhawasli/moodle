@@ -21,6 +21,7 @@
  */
 
 require_once(__DIR__ . '/../../../config.php');
+require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 $section = optional_param('section', 0, PARAM_INT);
@@ -86,8 +87,13 @@ if ($node) {
         }
     }
 
-    $rowcontainer->add_node($container);
+    if (can_request_media($courseid)) {
+        $setting = navigation_node::create(get_string('mrrequest', 'block_ucla_media'),
+            new moodle_url('/blocks/ucla_media/bcast.php', array('courseid' => $courseid)));
+        $container->add_node($setting, 'tool_recyclebin');
+    }
 
+    $rowcontainer->add_node($container);
     // Settings and backup.
     $settings = array(
             'editsettings'     => navigation_node::TYPE_SETTING,

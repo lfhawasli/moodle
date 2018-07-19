@@ -372,8 +372,9 @@ function print_video_list($videolist, $headertitle) {
 function print_media_page_tabs($activetab, $courseid) {
     global $DB;
     $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
+    $can_request = can_request_media($courseid);
     $count = count($videos);
-    if ($count != 0) {
+    if ($count != 0 || $can_request) {
         $tabs[] = new tabobject(get_string('headerbcast', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/bcast.php',
                                 array('courseid' => $courseid)),
@@ -390,7 +391,7 @@ function print_media_page_tabs($activetab, $courseid) {
     if (!empty($videos['future'])) {
         $count = $count + count($videos['future']);
     }
-    if ($count != 0) {
+    if ($count != 0 || $can_request) {
         $tabs[] = new tabobject(get_string('headervidres', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/videoreserves.php',
                                 array('courseid' => $courseid)),
@@ -399,7 +400,7 @@ function print_media_page_tabs($activetab, $courseid) {
     $videos = $DB->get_records_sql('SELECT DISTINCT albumtitle FROM '
             . '{ucla_library_music_reserves} WHERE courseid=?', array($courseid));
     $count = count($videos);
-    if ($count != 0) {
+    if ($count != 0 || $can_request) {
         $tabs[] = new tabobject(get_string('headerlibres', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/libreserves.php',
                                 array('courseid' => $courseid)),
@@ -407,4 +408,39 @@ function print_media_page_tabs($activetab, $courseid) {
     }
     // Display tabs here.
     print_tabs(array($tabs), $activetab);
+}
+
+/**
+ * Determines if course can request media resources.
+ *
+ * @param int $courseid
+ * @return bool
+ */
+function can_request_media(int $courseid) {
+    global $CFG;
+
+    // Config setting to show media resource requests.
+    $setting = get_config('block_ucla_media', 'media_resource_requests');
+    if (!$setting) {
+        return false;
+    }
+    // User has instructor privileges. 
+    $context = context_course::instance($courseid, MUST_EXIST);
+    $isinstructor = has_capability('format/ucla:viewadminpanel', $context);
+    if (!$isinstructor) {
+        return false;
+    }
+    // Course has a srs number.
+    $courseinfo = ucla_get_course_info($courseid);
+    $hassrs = !empty($courseinfo[0]->srs);
+    if (!$hassrs) {
+        return false;
+    }
+    // Course is for a current or future term.
+    $courseterm = $courseinfo ? $courseinfo[0]->term : false;
+    if (term_cmp_fn($courseterm, $CFG->currentterm) < 0) {
+        return false;
+    }
+
+    return true;
 }

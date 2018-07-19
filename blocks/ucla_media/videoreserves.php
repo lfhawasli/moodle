@@ -42,6 +42,7 @@ echo $OUTPUT->header();
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     $videos = $DB->get_records('ucla_video_reserves', array('courseid' => $courseid));
     if (!empty($videos)) {
+        print_media_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
         display_video_reserves($course);
 
         // Log that user viewed index.
@@ -52,7 +53,16 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
                         )));
         $event->trigger();
     } else {
-        echo get_string('mediaresnotavailable', 'block_ucla_media');
+        // Display request link.
+        if (can_request_media($courseid)) {
+            print_media_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
+            echo get_string('vresourcesnotavailable', 'block_ucla_media');
+            echo html_writer::empty_tag('br');
+            echo html_writer::link('https://oid.ucla.edu/imcs/requesting-access-online-materials',
+                get_string('vrrequest', 'block_ucla_media'));
+        } else {
+            echo get_string('vresourcesnotavailable', 'block_ucla_media');
+        }
     }
 } else {
     echo get_string('guestsarenotallowed', 'error');
