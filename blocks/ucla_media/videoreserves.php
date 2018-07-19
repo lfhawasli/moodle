@@ -42,7 +42,6 @@ echo $OUTPUT->header();
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
     $videos = $DB->get_records('ucla_video_reserves', array('courseid' => $courseid));
     if (!empty($videos)) {
-        print_media_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
         display_video_reserves($course);
 
         // Log that user viewed index.
