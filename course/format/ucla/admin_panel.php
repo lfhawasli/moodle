@@ -21,6 +21,8 @@
  */
 
 require_once(__DIR__ . '/../../../config.php');
+require_once(dirname(__FILE__) . '/lib.php');
+require_once($CFG->dirroot . '/course/format/ucla/locallib.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 $section = optional_param('section', 0, PARAM_INT);
@@ -155,7 +157,9 @@ if ($node) {
     if (has_capability('moodle/role:review', $coursecontext)) {
         $url = new moodle_url('/admin/roles/permissions.php', array('contextid'=>$coursecontext->id));
         $container->add(get_string('permissions', 'role'), $url, navigation_node::TYPE_SETTING);
-    }
+    } 
+
+    email_students($course, $container);
 
     $rowcontainer->add_node($container);
     $tabcontainer->add_node($rowcontainer);

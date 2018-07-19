@@ -332,3 +332,8 @@ $string['groupsandgroupings'] = 'Group /<br />Grouping';
 $string['incompleteimportstart'] = 'User mapping error: Could not find users with id numbers:';
 $string['incompleteimportstatus'] = 'Incomplete import. All input UID\'s except those above were imported correctly.
         Please fix the entries for only UID\'s displayed above.';
+
+// CCLE-7791 - Add "E-mail Students (via Announcements Forum)" into Admin Panel.
+$string['announcementshidden'] = 'The Announcements forum is currently hidden: Emails will NOT be sent out to students.';
+$string['unhidelink'] = 'Click here to unhide';
+$string['askinstructortounhide'] = 'Please ask the instructor to unhide this forum.';

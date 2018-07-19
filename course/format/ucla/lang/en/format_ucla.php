@@ -123,3 +123,5 @@ $string['classinfo'] = 'Class Info';
 $string['tools'] = 'Tools';
 $string['getinsts'] = 'Get instructors';
 $string['getstdroster'] = 'Get student roster';
+$string['emailstudents'] = 'E-mail Students (via Announcements Forum)';
+$string['emailstudents_hidden'] = 'E-mail Students is disabled when Announcements Forum is hidden.';

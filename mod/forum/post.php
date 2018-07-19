@@ -1102,6 +1102,29 @@ if (isset($postid)) {
     $mform_post->set_data($data);
 }
 
+// START UCLA MOD: CCLE-7791 - Add "E-mail Students (via Announcements Forum)" into Admin Panel.
+$unhide = optional_param('unhide', 0, PARAM_INT);
+if($unhide == 1 && has_capability('moodle/course:manageactivities', $coursecontext)) {
+    $DB->set_field('course_modules', 'visible', 1, array('id' => $cm->id));
+    rebuild_course_cache($course->id);
+}
+
+if ($forum->type == 'news' && !instance_is_visible('forum', $forum)) {
+
+    // If the user has permission to hide/unhide the forum, show the link
+    if(has_capability('moodle/course:manageactivities', $coursecontext)) {
+        $url = new moodle_url('/mod/forum/post.php',
+                array('forum' => $forum->id, 'sesskey' => sesskey(), 'unhide' => 1));
+        $link = html_writer::link($url, get_string('unhidelink', 'local_ucla'));
+        $warninghtml = get_string('announcementshidden', 'local_ucla') . ' ' . $link;
+    } else {
+        $warninghtml = get_string('askinstructortounhide', 'local_ucla');
+    }
+
+    echo html_writer::div($warninghtml, 'alert alert-danger');
+}
+// END UCLA MOD: CCLE-7791.
+
 $mform_post->display();
 
 echo $OUTPUT->footer();
