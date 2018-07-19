@@ -118,7 +118,10 @@ $string['privacy:metadata:message_contacts:contactid'] = 'The ID of the user who
 $string['privacy:metadata:message_contacts:userid'] = 'The ID of the user whose contact list we are viewing';
 $string['privacy:metadata:preference:core_message_settings'] = 'Settings related to messaging';
 $string['privacy:request:preference:set'] = 'The value of the setting \'{$a->name}\' was \'{$a->value}\'';
-$string['processorsettings'] = 'Processor settings';
+// START UCLA MOD: CCLE-7707 - Re-add Alternative email option in Messaging settings.
+//$string['processorsettings'] = 'Processor settings';
+$string['processorsettings'] = 'Advanced email settings';
+// END UCLA MOD: CCLE-7707.
 $string['removecontact'] = 'Remove contact';
 $string['removecoursefilter'] = 'Remove filter for course {$a}';
 $string['removefromyourcontacts'] = 'Remove from your contacts';
