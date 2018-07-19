@@ -2145,7 +2145,10 @@ $string['userdescription'] = 'Description';
 $string['userdescription_help'] = 'This box enables you to enter some text about yourself which will then be displayed on your profile page for others to view.';
 $string['userdetails'] = 'User details';
 $string['userfiles'] = 'User files';
-$string['userfilterplaceholder'] = 'Search keyword or select filter';
+// START UCLA MOD: CCLE-7601 - Improve UI of the Participants list filtering.
+// $string['userfilterplaceholder'] = 'Search keyword or select filter';
+$string['userfilterplaceholder'] = 'Search keyword or select filters by role, group, grouping or status';
+// END UCLA MOD: CCLE-7601
 $string['userlist'] = 'User list';
 $string['usermenu'] = 'User menu';
 $string['username'] = 'Username';
