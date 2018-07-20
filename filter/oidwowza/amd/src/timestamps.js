@@ -5,6 +5,8 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
             // We need the id of the jwplayer on the page.
             var id = 'player-' + playerid;
             var playerinstance = jwplayer(id);
+            var playbackrates = M.util.get_string('playbackrates', 'filter_oidwowza');
+            var rewind = M.util.get_string('rewind', 'filter_oidwowza');
 
             if (isvideo === 1) {
                 playerinstance.setup({
@@ -19,7 +21,8 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
                     }],
                     'primary': 'html5',
                     'localization': {
-                        'settings': 'Playback Rates'
+                        'settings': playbackrates,
+                        'rewind': rewind
                     }
                 });
             } else {
@@ -39,14 +42,32 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
                     ],
                     'height': 200,
                     'localization': {
-                        'settings': 'Playback Rates'
+                        'settings': playbackrates,
+                        'rewind': rewind
                     }
                 });
             }
 
             var offset = 0;
             var shouldPlay = false;
+            var movedbuttons = false;
             var audioSeeked = false;
+
+            // Add button to skip ahead 10 seconds.
+            var forward_10_callback = function() {
+                playerinstance.seek(playerinstance.getPosition() + 10);
+            };
+            var skipstring = M.util.get_string('skipahead', 'filter_oidwowza');
+            playerinstance.addButton(M.cfg.wwwroot + '/filter/oidwowza/pix/fast-forward.svg', skipstring,
+                    forward_10_callback, 'jw-btn-fastforward', 'jw-fastforward');
+
+            playerinstance.on('beforePlay', function() {
+                if (!movedbuttons) {
+                    $('.jw-fastforward.jw-icon-inline').insertAfter('.jw-icon-playback');
+                    $('.jw-icon-rewind.jw-icon-inline').insertBefore('.jw-icon-playback');
+                    movedbuttons = true;
+                }
+            });
 
             // Resume previous playback if the Resume button was clicked.
             var params = (new URL(window.location)).searchParams;

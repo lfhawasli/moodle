@@ -159,6 +159,8 @@ function oidwowza_filter_mp4_bruincast_callback($link) {
     // We need to define jwplayer because jwplayer does not define a module for require.js.
     $requirejs = 'require.config({ paths: {\'jwplayer\': \'https://content.jwplatform.com/libraries/q3GUgsN9\'}})';
     $PAGE->requires->js_amd_inline($requirejs);
+    $stringsforjs = array('skipahead', 'playbackrates', 'rewind');
+    $PAGE->requires->strings_for_js($stringsforjs, 'filter_oidwowza');
 
     // Get the filename by parsing the video url.
     $parts = parse_url($rtmpurl);
