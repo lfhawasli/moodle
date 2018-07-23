@@ -182,7 +182,7 @@ function display_all($course, $sort, $pageparams) {
                         '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
                         $buttontextplay . '</button>';
                 $audiolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
-                        array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'filename' => $filename)),
+                        array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'filename' => $filename, 'offset' => 0)),
                         $buttontextplay);
                 $mediacell .= $audiolinkplay . ' ';
 

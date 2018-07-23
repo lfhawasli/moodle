@@ -1,1 +1,10 @@
 .oidwowzafilter-timeline{font-family:helvetica; font-size:12px; height:150px; overflow:auto}
+
+.jwplayer .jw-controls .jw-settings-menu {
+    width: 100px;
+}
+
+.jw-flag-media-audio .jw-preview {
+    background: #0072b1 no-repeat 50% 50%; /* $brand-primary */
+    background-size: contain;
+}
