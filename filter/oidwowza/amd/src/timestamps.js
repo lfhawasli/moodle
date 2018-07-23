@@ -22,6 +22,7 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
             } else {
                 playerinstance.setup({
                     'autostart': true,
+                    'image': M.cfg.wwwroot + '/theme/uclashared/pix/ucla-logo.png',
                     'sources': [
                         {'file': rtmpurl},
                         {'file': httpurl}
@@ -33,7 +34,7 @@ define(['jquery', 'jwplayer'], function($, jwplayer) {
                         { 'type': 'html5' },
                         { 'type': 'flash' }
                     ],
-                    'height': 30
+                    'height': 200
                 });
             }
 

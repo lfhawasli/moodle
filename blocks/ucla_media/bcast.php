@@ -95,6 +95,8 @@ function display_all($course, $sort, $pageparams) {
     echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
 
     $bccontent = $sort ? get_bccontent($course->id, 'DESC') : get_bccontent($course->id);
+    $timestamps = json_decode(get_user_preferences('jwtimestamp_'.$course->id, '', $USER), true);
+    $timestamps = $timestamps ? $timestamps : [];
 
     $table = new html_table();
     $sorticon = $sort ? 'fa fa-sort-desc' : 'fa fa-sort-asc';
