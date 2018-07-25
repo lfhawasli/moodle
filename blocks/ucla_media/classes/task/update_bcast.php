@@ -256,14 +256,14 @@ class update_bcast extends \core\task\scheduled_task {
                             }
 
                         } else {
-                            // Add new entry.
+                            // Add new entry.                           
                             try {
                                 $DB->insert_record('ucla_bruincast', $entry);
                                 ++$numinserted;
                             } catch (\dml_write_exception $ex) {
                                 // It is a duplicate entry, so ignore it.
                                 mtrace(get_string('founddupentry',
-                                        'tool_ucladatasourcesync',
+                                        'tool_ucladatasourcesync',                                  
                                         "$term $srs " .
                                         $this->format_date($date) .
                                         " $entry->title"));
@@ -275,33 +275,41 @@ class update_bcast extends \core\task\scheduled_task {
         }
 
         // Crosslist courses.
-        list($countinserted, $countupdated) = $this->perform_crosslisting($existingmedia);
+        list($countinserted, $countupdated, $countdeleted) = $this->perform_crosslisting();
         $numinserted += $countinserted;
         $numupdated += $countupdated;
+        $numdeleted += $countdeleted;
 
         // Finished processing, so delete entries that no longer exists.
         foreach ($existingmedia as $srses) {
             foreach ($srses as $dates) {
                 foreach ($dates as $titles) {
                     foreach ($titles as $courseids) {
-                        foreach ($courseids as $videofiles) {
-                            foreach ($videofiles as $audiofiles) {
-                                foreach ($audiofiles as $deleteid) {
+                        foreach ($courseids as $keycourseids => $videofiles) {
+                            foreach ($videofiles as $keyvideofiles => $audiofiles) {
+                                foreach ($audiofiles as $keyaudiofiles => $deleteid) {
                                     if (!empty($deleteid)) {
                                         // Delete timestamps from the database if the Bruincast entry is deleted.
-                                        $videos = explode(',', key($videofiles));
-                                        $videos = array_map('trim', $videos);
-                                        $audio = explode(',', key($audiofiles));
-                                        $audio = array_map('trim', $audio);
-                                        $media = array_merge($videos, $audio);
+                                        $vidarray = array_map('trim', explode(',', $keyvideofiles));
+                                        $audarray = array_map('trim', explode(',', $keyaudiofiles));
+                                        $media = array_merge($vidarray, $audarray);
+
+                                        // Check if there are any crosslisted courses using this content.
+                                        $allcourseids = $DB->get_fieldset_select('ucla_bruincast_crosslist', 'courseid', 
+                                                'contentid = :contentid', array('contentid' => $deleteid));
+                                        $allcourseids[] = $keycourseids;
+
                                         foreach ($media as $filename) {
                                             if (empty($filename)) {
                                                 continue;
                                             }
-                                            $records = $DB->get_records('user_preferences', 
-                                                    array('name' => 'jwtimestamp_'.key($courseids).'_'.$filename), '', 'userid');
-                                            foreach ($records as $record) {
-                                                unset_user_preference('jwtimestamp_'.key($courseids).'_'.$filename, $record->userid);
+
+                                            foreach ($allcourseids as $deletecourseid) {
+                                                $records = $DB->get_records('user_preferences', 
+                                                        array('name' => 'jwtimestamp_'.$deletecourseid.'_'.$filename), '', 'userid');
+                                                foreach ($records as $record) {
+                                                    unset_user_preference('jwtimestamp_'.$deletecourseid.'_'.$filename, $record->userid);
+                                                }
                                             }
                                         }
 
@@ -356,49 +364,40 @@ class update_bcast extends \core\task\scheduled_task {
      * @param array $course2    Array with shortname, courseid and srs.
      * @param array $existingmedia  Passed by reference.
      *
-     * @return array  Number of records added and updated.
+     * @return array  Number of records added, updated, and deleted.
      */
-    private function copy_entries($course1, $course2, &$existingmedia) {
+    private function copy_entries($course1, $course2, &$existingcrosslists) {
         global $DB;
-        $numinserted = $numupdated = 0;
+        $numinserted = $numupdated = $numdeleted = 0;
         $records = $DB->get_records('ucla_bruincast',
                 array('courseid' => $course1['courseid']));
+
         if (!empty($records)) {
             $a = new \stdClass();
             $a->course1 = $course1['shortname'];
             $a->course2 = $course2['shortname'];
             mtrace(get_string('bccrosslistentries', 'tool_ucladatasourcesync', $a));
             foreach ($records as $record) {
-                unset($record->id);   // Want to create new entry.
-                // Change courseid and srs to course2.
-                $record->courseid = $course2['courseid'];
-                $record->srs = $course2['srs'];
+                $newrecord = new \stdClass();
+                $newrecord->contentid = $record->id;
+                $newrecord->courseid = $course2['courseid'];
 
-                // Don't copy any content from course1 that course2 already had.
-                if (strpos($record->title, $course2['shortname']) !== false) {
-                    continue;
-                }
-
-                // Skip content already crosslisted from another course.
+                // Delete content previously crosslisted from another course.
                 // Looking if text similar to shortname appears like 
                 // 181A-COMSCI32-1 and 17F-COMSCI31-1 at the start of the title.
                 if (preg_match("/^[0-9]{2}[FWS1][AC]?-.+-.{1,3}\s/U", $record->title) == 1) {
+                    $DB->delete_records('ucla_bruincast', array('id' => $record->id));
+                    ++$numdeleted;
                     continue;
-                }
-
-                // Make sure that we haven't already prepended the course
-                // shortname before from a previous crosslisting.
-                if (strpos($record->title, $course1['shortname']) === false) {
-                    $record->title = $course1['shortname'] . ' ' . $record->title;
                 }
 
                 // Make sure that entry does not already exist for same file.
                 // Sometimes BruinCast already crossposted data.
-                if (!empty($existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files])) {
+                if (!empty($existingcrosslists[$newrecord->courseid][$newrecord->contentid])) {
                     // Exists, so update.
-                    $record->id = $existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files];
+                    $newrecord->id = $existingcrosslists[$newrecord->courseid][$newrecord->contentid];
                     try {
-                        $DB->update_record('ucla_bruincast', $record);
+                        $DB->update_record('ucla_bruincast_crosslist', $newrecord);
                         ++$numupdated;
                     } catch (\dml_write_exception $ex) {
                         // It is a duplicate entry, so ignore it.
@@ -411,7 +410,7 @@ class update_bcast extends \core\task\scheduled_task {
                 } else {
                     // Add new entry.
                     try {
-                        $DB->insert_record('ucla_bruincast', $record);
+                        $DB->insert_record('ucla_bruincast_crosslist', $newrecord);
                         ++$numinserted;
                     } catch (\dml_write_exception $ex) {
                         // It is a duplicate entry, so ignore it.
@@ -424,12 +423,12 @@ class update_bcast extends \core\task\scheduled_task {
                 }
 
                 // Make existing entry false so it is not deleted.
-                if (isset($existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files])) {
-                    $existingmedia[$record->term][$record->srs][$record->date][$record->title][$record->courseid][$record->video_files][$record->audio_files] = false;
+                if (isset($existingcrosslists[$newrecord->courseid][$newrecord->contentid])) {
+                    $existingcrosslists[$newrecord->courseid][$newrecord->contentid] = false;
                 }
             }
         }
-        return array($numinserted, $numupdated);
+        return array($numinserted, $numupdated, $numdeleted);
     }
 
     /**
@@ -466,6 +465,26 @@ class update_bcast extends \core\task\scheduled_task {
         return $retval;
     }
 
+  /**
+     * Returns existing crosslists in following format:
+     *  [courseid][contentid] = crosslist id
+     *
+     * @return array
+     */
+    public function get_existingcrosslists() {
+        global $DB;
+        $retval = array();
+
+        $records = $DB->get_records('ucla_bruincast_crosslist');
+        if (empty($records)) {
+            return $retval;
+        }
+        foreach ($records as $record) {
+            $retval[$record->courseid][$record->contentid] = $record->id;
+        }
+        return $retval;
+    }
+
     /**
      * Returns task name.
      *
@@ -479,10 +498,9 @@ class update_bcast extends \core\task\scheduled_task {
      * Finds courses that should have their media cross-listed and copies data
      * both ways (if there is any).
      *
-     * @param array $existingmedia  Passed by reference.
-     * @return array  Number of records added and updated.
+     * @return array  Number of records added, updated, and deleted.
      */
-    public function perform_crosslisting(&$existingmedia) {
+    public function perform_crosslisting() {
         global $DB;
         mtrace(get_string('bccrosslistmedia', 'tool_ucladatasourcesync'));
 
@@ -494,10 +512,11 @@ class update_bcast extends \core\task\scheduled_task {
             return;
         }
 
+        $existingcrosslists = $this->get_existingcrosslists();
         $crosslists = explode("\n", $crosslistsconfig);
         $crosslists = array_map('trim', $crosslists);
 
-        $numinserted = $numupdated = 0;
+        $numinserted = $numupdated = $numdeleted = 0;
         foreach ($crosslists as $crosslist) {
             // Split by "=".
             $shortnames = explode('=', $crosslist);
@@ -534,16 +553,51 @@ class update_bcast extends \core\task\scheduled_task {
                 continue;
             }
 
-            // Everything is good to go, so let's copy data in ucla_bruincast.
-            list($countinserted, $countupdated) = $this->copy_entries($courses[0],
-                    $courses[1], $existingmedia);
+            // Everything is good to go, so let's copy data in ucla_bruincast_crosslist.
+            list($countinserted, $countupdated, $countdeleted) = $this->copy_entries($courses[0],
+                    $courses[1], $existingcrosslists);
             $numinserted += $countinserted;
             $numupdated += $countupdated;
-            list($countinserted, $countupdated) = $this->copy_entries($courses[1],
-                    $courses[0], $existingmedia);
+            $numdeleted += $countdeleted;
+            list($countinserted, $countupdated, $countdeleted) = $this->copy_entries($courses[1],
+                    $courses[0], $existingcrosslists);
             $numinserted += $countinserted;
             $numupdated += $countupdated;
+            $numdeleted += $countdeleted;
         }
-        return array($numinserted, $numupdated);
+
+        // Delete the non-existing entries.
+        foreach ($existingcrosslists as $keycourseid => $course) {
+            foreach ($course as $keydeleteid => $deleteid) {
+                // Delete timestamps from the database if the crosslist entry is deleted.
+                $deletecourse = $DB->get_record('ucla_bruincast', array('id' => $keydeleteid));
+                
+                // We only need to delete timestamps if the crosslist is deleted
+                // but the content is still in the Bruincast table.
+                if (!empty($deletecourse)) {
+                    $vidarray = array_map('trim', explode(',', $deletecourse->video_files));
+                    $audarray = array_map('trim', explode(',', $deletecourse->audio_files));
+                    $media = array_merge($vidarray, $audarray);
+
+                    foreach ($media as $filename) {
+                        if (empty($filename)) {
+                            continue;
+                        }
+
+                        $records = $DB->get_records('user_preferences', 
+                                array('name' => 'jwtimestamp_'.$keycourseid.'_'.$filename), '', 'userid');
+                        foreach ($records as $record) {
+                            unset_user_preference('jwtimestamp_'.$keycourseid.'_'.$filename, $record->userid);
+                        }
+                    }
+                }
+
+                $DB->delete_records('ucla_bruincast_crosslist', array('id' => $deleteid));
+                ++$numdeleted;
+            }
+        }
+        
+        $numdeleted += $countdeleted;
+        return array($numinserted, $numupdated, $numdeleted);
     }
 }

@@ -371,14 +371,14 @@ function print_video_list($videolist, $headertitle) {
  */
 function print_media_page_tabs($activetab, $courseid) {
     global $DB;
-    $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
     $can_request = can_request_media($courseid);
-    $count = count($videos);
-    if ($count != 0 || $can_request) {
+    $videos = $DB->count_records('ucla_bruincast', array('courseid' => $courseid));
+    $xvideos = $DB->count_records('ucla_bruincast_crosslist', array('courseid' => $courseid));
+    if ($videos != 0 || $xvideos != 0 || $can_request) {
         $tabs[] = new tabobject(get_string('headerbcast', 'block_ucla_media'),
                         new moodle_url('/blocks/ucla_media/bcast.php',
                                 array('courseid' => $courseid)),
-                                    get_string('bcast_tab', 'block_ucla_media', $count));
+                                    get_string('bcast_tab', 'block_ucla_media', $videos + $xvideos));
     }
     $videos = get_video_data($courseid);
     $count = 0;
@@ -443,4 +443,19 @@ function can_request_media(int $courseid) {
     }
 
     return true;
+}
+
+/** 
+ * Returns crosslisted courses with BruinCast content for a particular course.
+ * 
+ * @param int $courseid
+ * @return array
+ */
+function get_bccrosslisted_courses($courseid) {
+    global $DB;
+    $sql = 'SELECT DISTINCT bc.courseid
+                       FROM {ucla_bruincast} AS bc, {ucla_bruincast_crosslist} AS xlist 
+                      WHERE bc.id = xlist.contentid 
+                        AND xlist.courseid = :courseid';
+    return $DB->get_records_sql($sql, array('courseid'=>$courseid));
 }

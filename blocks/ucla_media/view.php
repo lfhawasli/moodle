@@ -28,6 +28,7 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 
 $mediaid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
+$courseid = required_param('courseid', PARAM_INT);
 $filename = optional_param('filename', null, PARAM_FILE);
 $offset = optional_param('offset', 0, PARAM_INT);
 $title = '';    // To be set later.
@@ -37,7 +38,7 @@ if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
     $media = $DB->get_record('ucla_bruincast', array('id' => $mediaid));
     if (empty($media)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
-    } else if (empty($media->courseid) || !$course = get_course($media->courseid)) {
+    } else if (empty($media->courseid) || !$course = get_course($courseid)) {
         print_error('coursemisconf');
     }
 
@@ -58,14 +59,22 @@ if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
 require_login($course);
 $context = context_course::instance($media->courseid, MUST_EXIST);
 
+// Checks if the source course is crosslisted with media course.
+$crosslistings = get_bccrosslisted_courses($courseid);
+foreach ($crosslistings as $xcourse) {
+    if ($xcourse->courseid == $media->courseid) {
+        $iscrosslist = true;
+    }
+}
+
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename, 'offset' => $offset)),
-                $mode, $title);
+                array('id' => $mediaid, 'courseid' => $course->id, 'mode' => $mode, 'filename' => $filename, 
+                'offset' => $offset)), $mode, $title);
 echo $OUTPUT->header();
 
 // Are we allowed to display this page?
-if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
+if (is_enrolled($context) || has_capability('moodle/course:view', $context) || !empty($iscrosslist)) {
 
     if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
         echo html_writer::nonempty_tag('h2', $title, 
