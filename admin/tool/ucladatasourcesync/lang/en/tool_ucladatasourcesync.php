@@ -28,6 +28,8 @@ $string['pluginname'] = 'UCLA data source synchronization';
 $string['errcannotinsert'] = 'Cannot insert record: {$a}';
 $string['successnotice'] = 'Inserted: {$a->inserted}, Updated: {$a->updated}, Deleted: {$a->deleted} records.';
 $string['founddupentry'] = 'Found duplicate entry {$a}';
+$string['strftimedatefullshort'] = '%D';
+$string['bcunassociated'] = 'Unassociated content';
 
 // Event messages.
 $string['eventbcread'] = "Bruincast read error.";
