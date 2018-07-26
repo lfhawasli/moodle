@@ -68,7 +68,8 @@ echo $OUTPUT->header();
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
     if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
-        echo $OUTPUT->heading($title, 2, 'headingblock');
+        echo html_writer::nonempty_tag('h2', $title, 
+                array('class' => 'headingblock', 'id' =>'top'));
         if (!empty($media->comments)) {
             echo html_writer::tag('p', $media->comments);
         }

@@ -75,7 +75,7 @@ echo $OUTPUT->footer();
  * Outputs Bruincast content for given course.
  *
  * @param object $course
- * @param string $sort by course date
+ * @param int $sort by course date
  * @param array $pageparams
  */
 function display_all($course, $sort, $pageparams) {
@@ -137,7 +137,7 @@ function display_all($course, $sort, $pageparams) {
                 $buttontextplay = '<button type="button" class="btn btn-primary">' .
                         '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
                         $buttontextplay . '</button>';
-                $videolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                $videolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
                         array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'filename' => $filename)),
                         $buttontextplay);
                 $mediacell .= $videolinkplay . ' ';
@@ -152,7 +152,7 @@ function display_all($course, $sort, $pageparams) {
                     }
                     $buttontextresume = '<button type="button" class="btn btn-default">' .
                             $buttontextresume . '</button>';
-                    $videolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                    $videolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
                             array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 
                             'filename' => $filename, 'offset' =>  $jwtimestamp)), $buttontextresume);
                     $mediacell .= $videolinkresume . ' ';
@@ -241,7 +241,7 @@ function display_all($course, $sort, $pageparams) {
  * Returns Bruincast content for course.
  *
  * @param int $courseid
- * @param string $sort by course date
+ * @param int $sort by course date
  * @return array
  */
 function get_bccontent($courseid, $sort = 'ASC') {
