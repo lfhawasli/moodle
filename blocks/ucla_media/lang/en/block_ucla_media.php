@@ -93,10 +93,12 @@ $string['erraddingindex'] = 'Error adding unique_recording index, truncating tab
 // Strings for Bruincast display.
 $string['bccoursedate'] = 'Course date';
 $string['bcmedia'] = 'Media';
+$string['bcmetadata'] = 'Metadata';
 $string['bctitle'] = 'Title';
 $string['bccomments'] = 'Comments';
-$string['bcvideo'] = 'Video';
-$string['bcaudio'] = 'Audio';
+$string['bcmediaplay'] = 'Play';
+$string['bcmediaresume'] = 'Resume';
+$string['bcother'] = 'Other';
 $string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are '
         . 'available. For help regarding BruinCast content please read our '
         . '<a href="https://docs.ccle.ucla.edu/w/BruinCast">help document</a>.';

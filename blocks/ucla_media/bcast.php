@@ -88,7 +88,7 @@ echo $OUTPUT->footer();
  * @param array $pageparams
  */
 function display_all($course, $sort, $pageparams) {
-    global $OUTPUT;
+    global $OUTPUT, $USER;
 
     $pageparams['sort'] = !$sort;
 
@@ -110,9 +110,18 @@ function display_all($course, $sort, $pageparams) {
     $icontag = html_writer::empty_tag('i', array('class' => $sorticon));
     $bcdatecell = new html_table_cell(html_writer::tag('a', get_string('bccoursedate', 'block_ucla_media').$icontag,
             array('href' => new moodle_url('/blocks/ucla_media/bcast.php', $pageparams))));
-    $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')));
-    $table->size = array('25%', '75%');
+    $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')), 
+            new html_table_cell(get_string('bcmetadata', 'block_ucla_media')));
+    $table->size = array('0%', '0%', '100%');
     $table->id = 'bruincast-content-table';
+
+    // Check if the course has any media with Titles or Comments.
+    $hasmetadata = false;
+
+    // Get data for the session duration.
+    $courseinfo = ucla_get_course_info($course->id);
+    $session = $courseinfo[0]->term;
+    $prevweek = null;
 
     foreach ($bccontent as $media) {
         // Each video entry will have two rows. One row for Course date and
@@ -120,10 +129,30 @@ function display_all($course, $sort, $pageparams) {
 
         // Create Course date and Media row.
         $datecell = date('D, m/d/Y', $media->date);
+        $week = $media->week;
 
+        // Display the week for the BruinCast content if it is not a summer session.
+        if ($courseinfo[0]->session == 'RG' && $week != $prevweek) {
+            $prevweek = $week;
+            if ($week == 11) {
+                $row = new html_table_row(
+                        [html_writer::tag('b', get_string('finals_week', 'block_ucla_weeksdisplay')), "", ""]);
+            } else if ($week > -1) {
+                $row = new html_table_row(
+                        [html_writer::tag('b', get_string('week', 'block_ucla_weeksdisplay', $week)), "", ""]);
+            } else {
+                $row = new html_table_row(
+                        [html_writer::tag('b', get_string('bcother', 'block_ucla_media')), "", ""]);
+            }
+            $row->attributes['class'] = "week-row";
+            $table->data[] = $row;
+        }
+        
         $mediacell = '';
 
         $hasmultivideos = false;
+        $textplay = get_string('bcmediaplay', 'block_ucla_media');
+        $textresume = get_string('bcmediaresume', 'block_ucla_media');
         if (!empty($media->video_files)) {
             // There might be multiple video files, separated by comma.
             $videos = explode(',', $media->video_files);
@@ -131,19 +160,37 @@ function display_all($course, $sort, $pageparams) {
 
             $hasmultivideos = count($videos) > 1;
             foreach ($videos as $index => $filename) {
-                $buttontext = get_string('bcvideo', 'block_ucla_media');
+                $buttontextplay = $textplay;
+                $buttontextresume = $textresume;
                 if ($hasmultivideos) {
                     // If there are multiple videos, then append number.
-                    $buttontext .= ' ' . ($index + 1);
+                    $buttontextplay .= ' ' . ($index + 1);
+                    $buttontextresume .= ' ' . ($index + 1);
                 }
 
-                $buttontext = '<button type="button" class="btn btn-default">' .
+                $buttontextplay = '<button type="button" class="btn btn-primary">' .
                         '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
-                        $buttontext . '</button>';
-                $videolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                        $buttontextplay . '</button>';
+                $videolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
                         array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'filename' => $filename)),
-                        $buttontext);
-                $mediacell .= $videolink . ' ';
+                        $buttontextplay);
+                $mediacell .= $videolinkplay . ' ';
+
+                $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, NULL, $USER);
+                if ($jwtimestamp !== NULL) {
+                    if ($jwtimestamp === 'FINISHED') {
+                        $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> Finished';
+                        $jwtimestamp = 0;
+                    } else {
+                        $buttontextresume .= ' from ' . gmdate('H:i:s', $jwtimestamp);
+                    }
+                    $buttontextresume = '<button type="button" class="btn btn-default">' .
+                            $buttontextresume . '</button>';
+                    $videolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
+                            array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 
+                            'filename' => $filename, 'offset' =>  $jwtimestamp)), $buttontextresume);
+                    $mediacell .= $videolinkresume . ' ';
+                }
             }
         }
 
@@ -159,47 +206,64 @@ function display_all($course, $sort, $pageparams) {
 
             $hasmultiaudio = count($audio) > 1;
             foreach ($audio as $index => $filename) {
-                $buttontext = get_string('bcaudio', 'block_ucla_media');
+                $buttontextplay = $textplay;
+                $buttontextresume = $textresume;
                 if ($hasmultiaudio) {
                     // If there are multiple audio, then append number.
-                    $buttontext .= ' ' . ($index + 1);
+                    $buttontextplay .= ' ' . ($index + 1);
+                    $buttontextresume .= ' ' . ($index + 1);
                 }
 
-                $buttontext = ' <button type="button" class="btn btn-default">' .
+                $buttontextplay = ' <button type="button" class="btn btn-primary">' .
                         '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
-                        $buttontext . '</button>';
-                $audiolink = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                        $buttontextplay . '</button>';
+                $audiolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
                         array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'filename' => $filename)),
-                        $buttontext);
-                $mediacell .= $audiolink . '';
+                        $buttontextplay);
+                $mediacell .= $audiolinkplay . ' ';
+
+                $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, NULL, $USER);
+                if ($jwtimestamp !== NULL) {
+                    if ($jwtimestamp === 'FINISHED') {
+                        $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> Finished';
+                        $jwtimestamp = 0;
+                    } else {
+                        $buttontextresume .= ' from ' . gmdate('H:i:s', $jwtimestamp);
+                    }
+                    $buttontextresume = '<button type="button" class="btn btn-default">' .
+                            $buttontextresume . '</button>';
+                    $audiolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
+                            array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 
+                            'filename' => $filename, 'offset' =>  $jwtimestamp)), $buttontextresume);
+                    $mediacell .= $audiolinkresume . ' ';
+                }
             }
         }
 
-        // Create Title and Comments row.
-        $titlecommentstring = '';
+        // Create Metadata column.
+        $metadatacell = '';
         if (!empty($media->title)) {
-            $titlecommentstring .= html_writer::tag('strong',
+            $metadatacell .= html_writer::tag('strong',
                     get_string('bctitle', 'block_ucla_media') . ':') . ' ' .
                     $media->title . '<br />';
+                    $hasmetadata = true;
         }
         if (!empty($media->comments)) {
-            $titlecommentstring .= html_writer::tag('strong',
+            $metadatacell .= html_writer::tag('strong',
                     get_string('bccomments', 'block_ucla_media') . ':') . ' ' .
-                    $media->comments;
+                    strip_tags(format_string($media->comments, FORMAT_PLAIN));
+                    $hasmetadata = true;
         }
-        if (!empty($mediacell)) {
-            // Add spacing if there are media buttons.
-            $mediacell .= '<br><br>';
-        }
-        $mediacell .= $titlecommentstring;
 
-        // Make date cell v align middle and font size larger.
-        $datecellclass = new html_table_cell($datecell);
-        $datecellclass->style = "vertical-align: middle; font-size: larger";
-
-        $cells = array($datecellclass, $mediacell);
+        $cells = array($datecell, $mediacell, $metadatacell);
         $row = new html_table_row($cells);
         $table->data[] = $row;
+    }
+
+    // Only have two columns if there is no metadata.
+    if (!$hasmetadata) {
+        $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')));
+        $table->size = array('0%', '100%');
     }
 
     echo html_writer::table($table);

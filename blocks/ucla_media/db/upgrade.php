@@ -282,5 +282,20 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2018030700, 'ucla_media');
     }
 
+    if ($oldversion < 2018071700) {
+
+        // Define field week to be added to ucla_bruincast.
+        $table = new xmldb_table('ucla_bruincast');
+        $field = new xmldb_field('week', XMLDB_TYPE_INTEGER, '2', null, null, null, '-1', 'comments');
+
+        // Conditionally launch add field week.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ucla_media savepoint reached.
+        upgrade_block_savepoint(true, 2018071700, 'ucla_media');
+    }
+
     return true;
 }

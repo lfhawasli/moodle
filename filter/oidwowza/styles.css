@@ -1,1 +1,32 @@
 .oidwowzafilter-timeline{font-family:helvetica; font-size:12px; height:150px; overflow:auto}
+
+.jwplayer .jw-controls .jw-settings-menu {
+    width: 100px;
+}
+
+.jw-flag-media-audio .jw-preview {
+    background: #0072b1 no-repeat 50% 50%; /* $brand-primary */
+}
+
+.jw-svg-icon-settings path,
+.jw-svg-icon-rewind path { 
+    display: none; 
+} 
+
+.jw-svg-icon-settings,
+.jw-svg-icon-rewind {
+    background-size: contain;
+    background-repeat: no-repeat; 
+}
+
+.jw-svg-icon-settings { 
+    background-image: url([[pix:filter_oidwowza|playback-rate]]); 
+}
+
+.jw-svg-icon-rewind {
+    background-image: url([[pix:filter_oidwowza|rewind]]); 
+}
+
+.jw-flag-audio-player .jw-controlbar .jw-button-container .jw-fastforward {
+    display: flex;
+}

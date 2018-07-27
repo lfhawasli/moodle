@@ -471,4 +471,42 @@ abstract class block_ucla_weeksdisplay_session {
         set_config('terms', $termstring, 'tool_uclacourserequestor');
         set_config('terms', $termstring, 'tool_uclacoursecreator');
     }
+
+    /**
+    * Returns a formatted string for the corresponding week in a RG for the given date, ex: 'Week 1'.
+    * If it is finals week will return 'Finals week'.  
+    * If there is an error condition or is between sessions, it will return an empty string.
+    * 
+    * @param DateTime $date
+    * @return int
+    */
+    public function get_week(DateTime $date) {
+        if ($date == null) {
+            return -1;
+        }
+
+        $totalweeks = $this->weeks_in_session() - 1;
+        $week = 1;
+        $start = new DateTime($this->session->instruction_start);
+        $end = (new DateTime($this->session->instruction_start))->modify('+' . $totalweeks . ' week');
+
+        // Fall quarter begins on Week 0.
+        if ($this->quarter == self::FALL) {
+            $start->modify('-3 day');
+            $end->modify('+3 day');
+            $week--;
+        }
+        
+        if ($date >= $start && $date < $end) {
+            while ($week <= $totalweeks) {
+                if ($date >= $start && $date < $start->modify('+1 week')) {
+                    return $week;
+                }
+                $week++;
+            }
+        } else if ($date >= $end && $date < $end->modify('+1 week')) {
+            return 11;
+        }
+        return -1;
+    }
 }

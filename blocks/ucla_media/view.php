@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 $mediaid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
 $filename = optional_param('filename', null, PARAM_FILE);
+$offset = optional_param('offset', 0, PARAM_INT);
 $title = '';    // To be set later.
 
 // Try to find corresponding course for given video.
@@ -59,7 +60,7 @@ $context = context_course::instance($media->courseid, MUST_EXIST);
 
 init_page($course, $context,
         new moodle_url('/blocks/ucla_media/view.php',
-                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename)),
+                array('id' => $mediaid, 'mode' => $mode, 'filename' => $filename, 'offset' => $offset)),
                 $mode, $title);
 echo $OUTPUT->header();
 
@@ -67,7 +68,8 @@ echo $OUTPUT->header();
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
 
     if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
-        echo $OUTPUT->heading($title, 2, 'headingblock');
+        echo html_writer::nonempty_tag('h2', $title, 
+                array('class' => 'headingblock', 'id' =>'top'));
         if (!empty($media->comments)) {
             echo html_writer::tag('p', $media->comments);
         }
