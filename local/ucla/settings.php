@@ -70,7 +70,8 @@ if ($hassiteconfig) {
             get_string('localsettingesb', 'local_ucla'), 'moodle/site:config');
 
     // Test connection if it is setup and user is on the settings page.
-    // NOTE: Cannot seem to use $PAGE->url because admin/search.php did not call PAGE->set_url().
+    // NOTE: Cannot seem to use $PAGE->url because admin/search.php did not call
+    // PAGE->set_url().
     if (!CLI_SCRIPT && strpos($_SERVER['REQUEST_URI'], '/settings.php?section=localsettingesb') !== false) {
         $tester = new \local_ucla\esb\tester();
         $notifyclass = $message = '';
