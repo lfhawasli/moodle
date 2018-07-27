@@ -71,4 +71,8 @@ $observers = array(
         'eventname'   => '\core\event\role_unassigned',
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
+    array(
+        'eventname'   => '\core\event\course_restored',
+        'callback'    => 'local_ucla_turnitintwo::sync_assignments',
+    ),
 );
