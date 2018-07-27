@@ -99,6 +99,9 @@ class enrol_manual_enrol_users_form extends moodleform {
             'multiple' => true,
             'courseid' => $course->id,
             'enrolid' => $instance->id
+            // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+            ,'allowcommas' => true
+            // END UCLA MOD: CCLE-7719.
         );
         $mform->addElement('autocomplete', 'userlist', get_string('selectusers', 'enrol_manual'), array(), $options);
 

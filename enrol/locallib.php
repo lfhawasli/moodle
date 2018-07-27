@@ -406,11 +406,22 @@ class course_enrolment_manager {
                 $conditions[] = 'u.'.$field;
             }
             $conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
-            if ($searchanywhere) {
+            // START UCLA MOD: CCLE-7799 - Improve enroll users functionality.
+            /*if ($searchanywhere) {
                 $searchparam = '%' . $search . '%';
             } else {
                 $searchparam = $search . '%';
+            }*/
+            $splitsearches = explode(' ', $search);
+            if ($searchanywhere) {
+                $searchparam = '%';
+            } else {
+                $searchparam = '';
             }
+            foreach ($splitsearches as $splitsearch) {
+                $searchparam .= $splitsearch . '%';
+            }
+            // END UCLA MOD: CCLE-7799.
             $i = 0;
             foreach ($conditions as $key => $condition) {
                 $conditions[$key] = $DB->sql_like($condition, ":con{$i}00", false);
