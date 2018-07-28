@@ -97,6 +97,10 @@ class local_ucla_turnitintwo {
                 // We cannot check if user used to be able to grade TurnItInTwo
                 // so we need to sychronize all assignments.
                 break;
+            case '\core\event\course_restored':
+                // Restored event does not tell us what modules got restored,
+                // so we need to sychronize all assignments.
+                break;
             default:
                 // Ignore any other events.
                 return;
