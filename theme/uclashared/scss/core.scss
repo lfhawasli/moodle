@@ -5,3 +5,30 @@ ul {
 #page-course-management .category-listing .dropdown .dropdown-toggle:after {
     display:none;
 }
+
+// Make action menu links clickable anywhere in the row.
+.dropdown-item a {
+    position: relative;
+
+    &:after {
+        content: "";
+        position: absolute;
+        left: -20px;
+        right: -20px;
+        padding: 8px 25px 35px 0px;
+        bottom: -12px;
+    }
+}
+
+.dropdown-item .m-l-1 {
+    position: relative;
+
+    &:after {
+        content: "";
+        position: absolute;
+        left: -35px;
+        right: -5px;
+        padding: 8px 25px 35px 0px;
+        bottom: -12px;
+    }
+}
