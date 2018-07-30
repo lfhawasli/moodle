@@ -44,4 +44,16 @@ $definitions = array(
         'mode' => cache_store::MODE_REQUEST,
         'persistent' => true,
     ),
+    // Stores the token to be used in Enterprise Service Bus (ESB) calls.
+    'esbtoken' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        // Tokens have lifetime of 24 hours, but we are using 23 hours just to
+        // be safe that we aren't going to be using an expired token in the next
+        // web service call.
+        'ttl' => 82800,
+    ),
 );

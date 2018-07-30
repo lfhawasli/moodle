@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) {
+    $ADMIN->add('localplugins', new admin_category('localucla', new lang_string('localucla', 'local_ucla')));
+
     $settings = new admin_settingpage('localsettingucla',
             get_string('pluginname', 'local_ucla'), 'moodle/site:config');
 
@@ -61,7 +63,59 @@ if ($hassiteconfig) {
         get_string('limitcrosslistemaildesc', 'local_ucla'),
         2, PARAM_INT));
 
-    $ADMIN->add('localplugins', $settings);
+    $ADMIN->add('localucla', $settings);
+
+    // CCLE-6644 - Registrar web service connection settings.
+    $esbsettings = new admin_settingpage('localsettingesb',
+            get_string('localsettingesb', 'local_ucla'), 'moodle/site:config');
+
+    // Test connection if it is setup and user is on the settings page.
+    // NOTE: Cannot seem to use $PAGE->url because admin/search.php did not call
+    // PAGE->set_url().
+    if (!CLI_SCRIPT && strpos($_SERVER['REQUEST_URI'], '/settings.php?section=localsettingesb') !== false) {
+        $tester = new \local_ucla\esb\tester();
+        $notifyclass = $message = '';
+        try {
+            $message = $tester->run();
+            $notifyclass = 'success';
+        } catch (Exception $e) {
+            $message = $tester->lasthttpcode . ': ' . $tester->lastmessage;
+            $notifyclass = 'error';
+        }
+        $statusmessage = $OUTPUT->notification(get_string('esbstatus', 'local_ucla') .
+                ' - ' . $message, $notifyclass);
+        $connectionstatus = new admin_setting_heading('local_ucla/esbconnectionstatus',
+                $statusmessage, '');
+        $esbsettings->add($connectionstatus);
+    }
+
+    $esbsettings->add(new admin_setting_configtext(
+            'local_ucla/esburl',
+            get_string('esburl', 'local_ucla'),
+            get_string('esburlhelp', 'local_ucla'),
+            'https://webservicesqa.it.ucla.edu', PARAM_URL));
+    $esbsettings->add(new admin_setting_configtext(
+            'local_ucla/esbusername',
+            get_string('esbusername', 'local_ucla'),
+            get_string('esbusernamehelp', 'local_ucla'),
+            '', PARAM_ALPHANUMEXT));
+    $esbsettings->add(new admin_setting_configpasswordunmask(
+            'local_ucla/esbpassword',
+            get_string('esbpassword', 'local_ucla'),
+            get_string('esbpasswordhelp', 'local_ucla'),
+            ''));
+    $esbsettings->add(new admin_setting_configtext(
+            'local_ucla/esbcert',
+            get_string('esbcert', 'local_ucla'),
+            get_string('esbcerthelp', 'local_ucla'),
+            '', PARAM_PATH));
+    $esbsettings->add(new admin_setting_configtext(
+            'local_ucla/esbprivatekey',
+            get_string('esbprivatekey', 'local_ucla'),
+            get_string('esbprivatekeyhelp', 'local_ucla'),
+            '', PARAM_PATH));
+
+    $ADMIN->add('localucla', $esbsettings);
 
     // Inject setting to turn on UCLA edits for enrol_database into
     // Site administration > Plugins > Enrolments > UCLA registrar.

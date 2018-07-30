@@ -36,3 +36,6 @@ $string['filter_oidwowza_sharedsecret'] = 'Video reserves shared secret';
 $string['filter_oidwowza_sharedsecret_desc'] = 'Used to generate SecureToken for Video reserves Wowza. Must match same token on Video reserves Wowza server.';
 $string['headerwowzaurl'] = 'Source URL';
 $string['descwowzaurl'] = 'Source website for wowza server';
+$string['skipahead'] = 'Skip ahead 10s';
+$string['playbackrates'] = 'Playback Rates';
+$string['rewind'] = 'Rewind 10s';

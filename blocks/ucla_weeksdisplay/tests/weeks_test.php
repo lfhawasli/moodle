@@ -170,12 +170,14 @@ class ucla_weeksdisplay_test extends advanced_testcase {
 
         // Check for week 0.
         $this->assertEquals(0, $fallsession->current_week());
+        $this->assertEquals(0, $fallsession->get_week($today));
 
         // Should have error if we check day before.
         $today->modify('-1 day');
         $fallsession->set_today($today);
         $this->assertEquals(\block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION, $fallsession->current_week());
-
+        $this->assertEquals(-1, $fallsession->get_week($today));
+        
         $this->assertEquals(false, $fallsession->in_session());
         $this->assertEquals(false, $fallsession->session_started());
 
@@ -183,33 +185,39 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today->modify('2014-11-02');
         $fallsession->set_today($today);
         $this->assertEquals(4, $fallsession->current_week());
+        $this->assertEquals(4, $fallsession->get_week($today));
 
         // Check following monday, should be week 5.
         $today->modify('+1 day');
         $fallsession->set_today($today);
         $this->assertEquals(5, $fallsession->current_week());
+        $this->assertEquals(5, $fallsession->get_week($today));
 
         // Start back at week 0, then check week 1.
         $today->modify('2014-09-29');
         $today->modify('+1 week');
         $fallsession->set_today($today);
         $this->assertEquals(1, $fallsession->current_week());
+        $this->assertEquals(1, $fallsession->get_week($today));
 
         // Check 10th week.
         $today->modify('+9 weeks');
         $fallsession->set_today($today);
         $this->assertEquals(10, $fallsession->current_week());
+        $this->assertEquals(10, $fallsession->get_week($today));
 
         // Check final's week.
         $today->modify('+1 week');
         $fallsession->set_today($today);
         $this->assertEquals(true, $fallsession->in_session());
         $this->assertEquals(\block_ucla_weeksdisplay_session::WEEK_FINALS, $fallsession->current_week());
+        $this->assertEquals(11, $fallsession->get_week($today));
 
         // Check that we are no longer in session a week after finals.
         $today->modify('+1 week');
         $fallsession->set_today($today);
         $this->assertEquals(\block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION, $fallsession->current_week());
+        $this->assertEquals(-1, $fallsession->get_week($today));
         $this->assertEquals(false, $fallsession->in_session());
         $this->assertEquals(false, $fallsession->term_ended());
 
@@ -222,6 +230,7 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today->modify('+1 week');
         $fallsession->set_today($today);
         $this->assertEquals(\block_ucla_weeksdisplay_session::WEEK_ERR, $fallsession->current_week());
+        $this->assertEquals(-1, $fallsession->get_week($today));
 
         // Skip to winter.
         $nextterm = $fallsession->next_term();
@@ -236,16 +245,19 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today->modify('2014-09-29');
         $winter->set_today($today);
         $this->assertEquals(\block_ucla_weeksdisplay_session::WEEK_ERR, $winter->current_week());
+        $this->assertEquals(-1, $winter->get_week($today));
 
         // First day of Winter instruction.
         $today->modify($query[0]['instruction_start']);
         $winter->set_today($today);
         $this->assertEquals(1, $winter->current_week());
+        $this->assertEquals(1, $winter->get_week($today));
 
         // Finals week.
         $today->modify('+10 weeks');
         $winter->set_today($today);
         $this->assertEquals(\block_ucla_weeksdisplay_session::WEEK_FINALS, $winter->current_week());
+        $this->assertEquals(11, $winter->get_week($today));
 
         // Two tests for CCLE-5588.
         // 16W, Week 10 Monday.
@@ -256,6 +268,7 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today->modify('2016-03-07');
         $winter->set_today($today);
         $this->assertEquals(10, $winter->current_week());
+        $this->assertEquals(10, $winter->get_week($today));
 
         // 16S, Week 10 Monday.
         $query = $this->registrar_query('16S');
@@ -265,6 +278,7 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today->modify('2016-05-30');
         $spring->set_today($today);
         $this->assertEquals(10, $spring->current_week());
+        $this->assertEquals(10, $spring->get_week($today));
     }
 
     /**
@@ -498,18 +512,22 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today = new DateTime('2014-09-29');
         $fall->set_today($today);
         $this->assertEquals(0, $fall->current_week());
+        $this->assertEquals(0, $fall->get_week($today));
 
         $today = new DateTime('2014-10-05');
         $fall->set_today($today);
         $this->assertEquals(0, $fall->current_week());
+        $this->assertEquals(0, $fall->get_week($today));
 
         $today->modify('+1 day');
         $fall->set_today($today);
         $this->assertEquals(1, $fall->current_week());
+        $this->assertEquals(1, $fall->get_week($today));
 
         $today->modify('+6 days');
         $fall->set_today($today);
         $this->assertEquals(1, $fall->current_week());
+        $this->assertEquals(1, $fall->get_week($today));
 
         // Get winter.
         $query = $this->registrar_query('15W');
@@ -519,11 +537,13 @@ class ucla_weeksdisplay_test extends advanced_testcase {
         $today = new DateTime('2015-01-05');
         $winter->set_today($today);
         $this->assertEquals(1, $winter->current_week());
+        $this->assertEquals(1, $winter->get_week($today));
 
         // Check on Sunday of week 1.
         $today = new DateTime('2015-01-11');
         $winter->set_today($today);
         $this->assertEquals(1, $winter->current_week());
+        $this->assertEquals(1, $winter->get_week($today));
 
     }
 

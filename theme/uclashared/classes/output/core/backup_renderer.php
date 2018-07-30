@@ -232,7 +232,7 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
                 html_writer::empty_tag('input', array('type'=>'radio', 'name'=>'importid', 'value'=>$course->id)),
                 format_string($course->shortname, true, array('context' => context_course::instance($course->id))),
                 format_string($course->fullname, true, array('context' => context_course::instance($course->id))),
-                format_string($course->lastname.', '.$course->firstname, true, array('context'=>context_course::instance($course->id)))
+                format_string($course->professors, true, array('context'=>context_course::instance($course->id)))
             );
             $table->data[] = $row;
         }

@@ -93,6 +93,15 @@
     }
 }
 
+#page #region-main .form-autocomplete-selection + input.form-control {
+    width: 440px;
+}
+@media (max-width: 480px) {
+    #page #region-main .form-autocomplete-selection + input.form-control {
+        width: 275px;
+    }
+}
+
 /**
  * Blocks.
  */

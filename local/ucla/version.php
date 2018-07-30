@@ -25,6 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Version            YYYYMMDDVV.
-$plugin->version    = 2017090705;
+$plugin->version    = 2018072700;
 $plugin->requires   = 2014051200;   // Requires Moodle 2.7 or later.
 $plugin->component  = 'local_ucla';

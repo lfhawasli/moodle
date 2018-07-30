@@ -210,6 +210,7 @@ $string['all_groupings'] = 'All';
 $string['cachedef_rolemappings'] = 'UCLA role mapping';
 $string['cachedef_urcmappings'] = 'UCLA ucla_request_classes to Moodle courses';
 $string['cachedef_usermappings'] = 'UCLA user idnumber/username to Moodle users';
+$string['cachedef_esbtoken'] = 'Stores the active ESB token';
 
 // CCLE-6512 - Profile Course details doesn't match My page Class sites.
 $string['cantfindcourse'] = '* Can\'t find your course or collaboration site? Check {$a->altsystemname} or {$a->myucla}.';
@@ -332,3 +333,19 @@ $string['groupsandgroupings'] = 'Group /<br />Grouping';
 $string['incompleteimportstart'] = 'User mapping error: Could not find users with id numbers:';
 $string['incompleteimportstatus'] = 'Incomplete import. All input UID\'s except those above were imported correctly.
         Please fix the entries for only UID\'s displayed above.';
+
+// CCLE-6644 - Registrar web service connection settings.
+$string['localucla'] = 'UCLA';
+$string['localsettingesb'] = 'Enterprise service bus (ESB)';
+$string['esbstatus'] = 'ESB status';
+$string['esbtoken'] = 'ESB token is {$a}';
+$string['esburl'] = 'Web service URL';
+$string['esburlhelp'] = 'URL to make ESB web service calls to. Can be QA or PROD versions.';
+$string['esbusername'] = 'Username';
+$string['esbusernamehelp'] = 'Username to connect to the ESB.';
+$string['esbpassword'] = 'Password';
+$string['esbpasswordhelp'] = 'Password to connect to the ESB.';
+$string['esbcert'] = 'CERT file';
+$string['esbcerthelp'] = 'Path on the server to the CERT file. Must not be publically accessible.';
+$string['esbprivatekey'] = 'Private key file';
+$string['esbprivatekeyhelp'] = 'Path on the server to the Private Key file. Must not be publically accessible.';
