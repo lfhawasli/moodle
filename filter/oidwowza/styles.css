@@ -6,6 +6,7 @@
 
 .jw-flag-media-audio .jw-preview {
     background: #0072b1 no-repeat 50% 50%; /* $brand-primary */
+    background-size: contain;
 }
 
 .jw-svg-icon-settings path,
