@@ -283,7 +283,13 @@ class grade_report_overview extends grade_report {
 
                 $coursename = format_string(get_course_display_name_for_list($course), true, array('context' => $coursecontext));
                 // Link to the activity report version of the user grade report.
-                if ($activitylink) {
+                // START UCLA MOD: CCLE-7811 - Link grades links in user menu to MyUCLA.
+                // if ($activitylink) {
+                $formatoptions = course_get_format($course->id)->get_format_options();
+                if (!empty($formatoptions['myuclagradelinkredirect'])) {
+                    $courselink = html_writer::link(\theme_uclashared\modify_navigation::findgradelink($course->id), $coursename);
+                } else if ($activitylink) {
+                // END UCLA MOD: CCLE-7811.
                     $courselink = html_writer::link(new moodle_url('/course/user.php', array('mode' => 'grade', 'id' => $course->id,
                         'user' => $this->user->id)), $coursename);
                 } else {
@@ -339,7 +345,15 @@ class grade_report_overview extends grade_report {
         $table->head = array(get_string('coursename', 'grades'));
         $table->data = null;
         foreach ($this->teachercourses as $courseid => $course) {
-            $url = new moodle_url('/grade/report/index.php', array('id' => $courseid));
+            // START UCLA MOD: CCLE-7811 - Link grades links in user menu to MyUCLA.
+            // $url = new moodle_url('/grade/report/index.php', array('id' => $courseid));
+            $formatoptions = course_get_format($courseid)->get_format_options();
+            if (empty($formatoptions['myuclagradelinkredirect'])) {
+                $url = new moodle_url('/grade/report/index.php', array('id' => $courseid));
+            } else {
+                $url = \theme_uclashared\modify_navigation::findgradelink($courseid);
+            }
+            // END UCLA MOD: CCLE-7811.
             $table->data[] = array(html_writer::link($url, $course->fullname));
         }
         echo html_writer::table($table);
