@@ -905,11 +905,18 @@ class modify_navigation {
 
     /**
      * Retrieve the proper link location for the grades node is set in course settings.
+     * 
+     * @param string $courseid  Default value is the page's courseid
+     * @return moodle_url
      */
-    public static function findgradelink() {
+    public static function findgradelink($courseid = '') {
         global $PAGE, $USER, $DB;
 
-        $courseinfo = ucla_get_course_info($PAGE->course->id);
+        if (empty($courseid)) {
+            $courseid = $PAGE->course->id;
+        }
+
+        $courseinfo = ucla_get_course_info($courseid);
         $redirectlink = new \moodle_url('https://be.my.ucla.edu');
 
         if (!empty($courseinfo)) {
@@ -946,10 +953,10 @@ class modify_navigation {
                 }
 
                 // If an instructor is crosslisted, redirect them to the MyUCLA tab in the Admin Panel.
-                $coursecontext = \context_course::instance($PAGE->course->id);
+                $coursecontext = \context_course::instance($courseid);
                 if (has_capability('format/ucla:viewadminpanel', $coursecontext, null, true)) {
                     $redirectlink = new \moodle_url('/course/format/ucla/admin_panel.php', 
-                                                    array('courseid' => $PAGE->course->id, 'section' => 0, 'tab' => 1));
+                                                    array('courseid' => $courseid, 'section' => 0, 'tab' => 1));
                 } else if (!empty($coursesrs)) {
                     $coursesrs = $coursesrs[0];
                     $redirectlink = new \moodle_url('https://be.my.ucla.edu/login/directLink.aspx', 
