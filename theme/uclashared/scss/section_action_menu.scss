@@ -3,9 +3,9 @@
     .dropdown .dropdown-toggle{
         @extend .btn;
         
-        background: white;
+        background: $btn-color-editing;
         border-color: $btn-color-editing;
-        color: $btn-color-editing;
+        color: white;
         font-size: 1rem;
         width:160px;
         &::after{
@@ -14,8 +14,8 @@
     }
     
     .dropdown.open .dropdown-toggle, .dropdown .dropdown-toggle:hover{
-        background: $btn-color-editing;
-        border-color: $btn-color-editing;
+        background: darken($btn-color-editing, 10%);
+        border-color: darken($btn-color-editing, 10%);
         color: white;
     }
     
@@ -60,7 +60,7 @@
         &.editing_showhide{
             color: black !important;
         }
-        
+
     }
     
 }

@@ -666,8 +666,9 @@ class format_ucla_renderer extends format_topics_renderer {
             $o .= $this->output->heading($this->section_title($section, $course), 3, 'sectionname');
 
             $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
+            // CCLE-7792 - Improve style for "Section tools" button.
             $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side',
-                    'style' => 'position: relative; top: -40px;'));
+                    'style' => 'position: relative; top: -52px;'));
             $o .= html_writer::end_tag('div');
             // End section header.
 
