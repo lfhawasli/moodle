@@ -958,7 +958,7 @@ class modify_navigation {
                     $redirectlink = new \moodle_url('/course/format/ucla/admin_panel.php', 
                                                     array('courseid' => $courseid, 'section' => 0, 'tab' => 1));
                 } else if (!empty($coursesrs)) {
-                    $coursesrs = $coursesrs[0];
+                    $coursesrs = array_values($coursesrs)[0]->srs;
                     $redirectlink = new \moodle_url('https://be.my.ucla.edu/login/directLink.aspx', 
                                                     array('featureID' => 75, 'term' => $courseterm, 'srs' => $coursesrs));
                 }
