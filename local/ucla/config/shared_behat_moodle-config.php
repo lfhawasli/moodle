@@ -208,9 +208,6 @@ $CFG->langstringcache = false;
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
 
-// Site administration > Plugins > Activity modules > Blackboard Collaborate Session
-$CFG->elluminate_max_talkers = 2;
-
 // Site administration > Plugins > Activity modules > Folder
 $CFG->forced_plugin_settings['folder']['requiremodintro'] = 0;
 
