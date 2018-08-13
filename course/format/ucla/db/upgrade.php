@@ -179,6 +179,16 @@ function xmldb_format_ucla_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2018062200, 'format', 'ucla');
     }
+    
+    if ($oldversion < 2018080800) {
+        // Add capability to view Admin panel to teaching assistant role. 
+        $context = context_system::instance();
+        $roleid = $DB->get_field('role', 'id', array('shortname' => 'ta'));
+        if (!empty($roleid)) {
+            role_change_permission($roleid, $context, 'format/ucla:viewadminpanel', CAP_ALLOW);
+        }
+        upgrade_plugin_savepoint(true, 2018080800, 'format', 'ucla');
+    }
 
     return true;
 }

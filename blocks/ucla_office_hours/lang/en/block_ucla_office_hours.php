@@ -2,9 +2,8 @@
 
 $string['pluginname'] = 'UCLA office hours';
 
-// control panel strings
-$string['edit_office_hours'] = 'Update office hours & contact info';
-$string['edit_office_hours_post'] = 'Update your office hours, office location and phone number.';
+// Admin panel strings.
+$string['editofficehours'] = 'Update office hours';
 
 // Office hours and contact information heading displays
 $string['officelocation'] = 'Office';
