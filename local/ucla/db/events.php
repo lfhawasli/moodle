@@ -75,4 +75,8 @@ $observers = array(
         'eventname'   => '\core\event\course_restored',
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
+    array(
+        'eventname'   => 'core\event\user_loggedin',
+        'callback'    => 'local_ucla_observer::open_nav_drawer'
+    )
 );

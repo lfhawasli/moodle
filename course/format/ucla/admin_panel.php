@@ -21,6 +21,8 @@
  */
 
 require_once(__DIR__ . '/../../../config.php');
+require_once(dirname(__FILE__) . '/lib.php');
+require_once($CFG->dirroot . '/course/format/ucla/locallib.php');
 require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
 $courseid = required_param('courseid', PARAM_INT);
@@ -102,7 +104,8 @@ if ($node) {
             'filters'          => navigation_node::TYPE_SETTING,
             'backup'           => navigation_node::TYPE_SETTING,
             'restore'          => navigation_node::TYPE_SETTING,
-            'reset'            => navigation_node::TYPE_SETTING
+            'reset'            => navigation_node::TYPE_SETTING,
+            'editofficehours'  => navigation_node::TYPE_SETTING
     );
 
     $container = navigation_node::create(get_string('settingsandbackup', 'format_ucla'),
@@ -161,7 +164,9 @@ if ($node) {
     if (has_capability('moodle/role:review', $coursecontext)) {
         $url = new moodle_url('/admin/roles/permissions.php', array('contextid'=>$coursecontext->id));
         $container->add(get_string('permissions', 'role'), $url, navigation_node::TYPE_SETTING);
-    }
+    } 
+
+    email_students($course, $container);
 
     $rowcontainer->add_node($container);
     $tabcontainer->add_node($rowcontainer);
@@ -187,6 +192,10 @@ if ($node) {
             $container->add_node($setting);
         }
     }
+
+    $setting = navigation_node::create(get_string('managecompetency', 'format_ucla'),
+        new moodle_url("/admin/tool/lp/coursecompetencies.php", array('courseid' => $course->id)));
+    $container->add_node($setting, 'report_competency');
 
     $rowcontainer->add_node($container);
 

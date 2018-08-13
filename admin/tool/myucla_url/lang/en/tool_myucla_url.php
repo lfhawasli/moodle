@@ -9,7 +9,7 @@ $string['alwayssend'] = 'Forced update';
 
 // Admin panel strings.
 $string['myucla'] = 'MyUCLA';
-$string['gradebook'] = 'MyUCLA Gradebook';
+$string['gradebook'] = 'Gradebook';
 $string['emailroster'] = 'Email roster';
 $string['downloadroster'] = 'Download roster';
 $string['photoroster'] = 'Photo roster';

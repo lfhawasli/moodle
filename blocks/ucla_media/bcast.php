@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 $pageparams = array();
 $courseid = required_param('courseid', PARAM_INT);
 $sort = optional_param('sort', 0, PARAM_INT);
+$tab = optional_param('tab', $courseid, PARAM_INT);
 
 if (!$course = get_course($courseid)) {
     print_error('coursemisconf');
@@ -49,13 +50,13 @@ echo $OUTPUT->header();
 
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
-    $videos = $DB->get_records('ucla_bruincast', array('courseid' => $courseid));
-    $count = count($videos);
-    if ($count != 0) {
+    $videos = $DB->count_records('ucla_bruincast', array('courseid' => $courseid));
+    $xvideos = $DB->count_records('ucla_bruincast_crosslist', array('courseid' => $courseid));
+    if ($videos != 0 || $xvideos != 0) {
         print_media_page_tabs(get_string('headerbcast', 'block_ucla_media'), $course->id);
 
         // Show all videos.
-        display_all($course, $sort, $pageparams);
+        display_all($course, $sort, $tab, $pageparams);
 
         $event = \block_ucla_media\event\bruincast_index_viewed::create(
             array('context' => $context, 'other' => array(
@@ -85,12 +86,14 @@ echo $OUTPUT->footer();
  *
  * @param object $course
  * @param string $sort by course date
+ * @param int    $tab 
  * @param array $pageparams
  */
-function display_all($course, $sort, $pageparams) {
+function display_all($course, $sort, $tab, $pageparams) {
     global $OUTPUT, $USER;
 
     $pageparams['sort'] = !$sort;
+    $pageparams['tab'] = $tab;
 
     echo html_writer::start_tag('div', array('id' => 'vidreserves-wrapper'));
     echo $OUTPUT->heading(get_string('headerbcast', 'block_ucla_media') .
@@ -103,7 +106,24 @@ function display_all($course, $sort, $pageparams) {
 
     echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
 
-    $bccontent = $sort ? get_bccontent($course->id, 'DESC') : get_bccontent($course->id);
+    // Print BruinCast tabs.
+    $courseinfo = get_course($tab);
+    $shortname = $courseinfo->shortname;
+    $firstxtab = print_bcast_tabs($shortname, $course->id);
+
+    // Retrieve tab content.
+    // Original course content tab.
+    if ($tab == $course->id && !$firstxtab) {
+        $bccontent = $sort ? get_bccontent($course->id, 'DESC') : get_bccontent($course->id);
+    // No original course content - use first crosslisted content.
+    } else if ($firstxtab) {
+        $bccontent = $sort ? get_bccrosslistcontent($course->id, $firstxtab, 'DESC') : 
+                get_bccrosslistcontent($course->id, $firstxtab);
+    // Use specified crosslisted course content.
+    } else {
+        $bccontent = $sort ? get_bccrosslistcontent($course->id, $tab, 'DESC') : 
+                get_bccrosslistcontent($course->id, $tab);
+    }
 
     $table = new html_table();
     $sorticon = $sort ? 'fa fa-sort-desc' : 'fa fa-sort-asc';
@@ -118,12 +138,11 @@ function display_all($course, $sort, $pageparams) {
     // Check if the course has any media with Titles or Comments.
     $hasmetadata = false;
 
-    // Get data for the session duration.
-    $courseinfo = ucla_get_course_info($course->id);
-    $session = $courseinfo[0]->term;
     $prevweek = null;
-
     foreach ($bccontent as $media) {
+        // Get data for the media content.
+        $courseinfo = ucla_get_course_info($media->courseid);
+
         // Each video entry will have two rows. One row for Course date and
         // Media, then another row for Title and Comments.
 
@@ -172,8 +191,8 @@ function display_all($course, $sort, $pageparams) {
                         '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
                         $buttontextplay . '</button>';
                 $videolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
-                        array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'filename' => $filename)),
-                        $buttontextplay);
+                        array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'courseid' => $course->id, 
+                        'filename' => $filename)), $buttontextplay);
                 $mediacell .= $videolinkplay . ' ';
 
                 $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, NULL, $USER);
@@ -187,7 +206,7 @@ function display_all($course, $sort, $pageparams) {
                     $buttontextresume = '<button type="button" class="btn btn-default">' .
                             $buttontextresume . '</button>';
                     $videolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
-                            array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 
+                            array('mode' => MEDIA_BCAST_VIDEO, 'id' => $media->id, 'courseid' => $course->id,
                             'filename' => $filename, 'offset' =>  $jwtimestamp)), $buttontextresume);
                     $mediacell .= $videolinkresume . ' ';
                 }
@@ -218,8 +237,8 @@ function display_all($course, $sort, $pageparams) {
                         '<i class="fa fa-microphone" aria-hidden="true"></i> ' .
                         $buttontextplay . '</button>';
                 $audiolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
-                        array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'filename' => $filename, 'offset' => 0)),
-                        $buttontextplay);
+                        array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'courseid' => $course->id,
+                        'filename' => $filename, 'offset' => 0)), $buttontextplay);
                 $mediacell .= $audiolinkplay . ' ';
 
                 $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, NULL, $USER);
@@ -233,7 +252,7 @@ function display_all($course, $sort, $pageparams) {
                     $buttontextresume = '<button type="button" class="btn btn-default">' .
                             $buttontextresume . '</button>';
                     $audiolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php',
-                            array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 
+                            array('mode' => MEDIA_BCAST_AUDIO, 'id' => $media->id, 'courseid' => $course->id,
                             'filename' => $filename, 'offset' =>  $jwtimestamp)), $buttontextresume);
                     $mediacell .= $audiolinkresume . ' ';
                 }
@@ -280,4 +299,64 @@ function display_all($course, $sort, $pageparams) {
 function get_bccontent($courseid, $sort = 'ASC') {
     global $DB;
     return $DB->get_records('ucla_bruincast', array('courseid' => $courseid), 'date '.$sort);
+}
+
+/**
+ * Returns crosslisted Bruincast content from course2 for course1.
+ *
+ * @param int $courseid1
+ * @param int $courseid2
+ * @param string $sort by course date
+ * @return array
+ */
+function get_bccrosslistcontent($courseid1, $courseid2, $sort = 'ASC') {
+    global $DB;
+    $sql = 'SELECT bc.id, bc.courseid, term, srs, video_files, audio_files, date, title, comments, week
+              FROM {ucla_bruincast} AS bc, {ucla_bruincast_crosslist} AS xlist 
+             WHERE bc.id = xlist.contentid 
+                   AND xlist.courseid = :courseid1 
+                   AND bc.courseid = :courseid2
+          ORDER BY date '.$sort;
+    return $DB->get_records_sql($sql, array('courseid1'=>$courseid1, 'courseid2'=>$courseid2));
+}
+
+/**
+ * Prints tabs for course Bruincast content.
+ * 
+ * @param string $activetab
+ * @param int $courseid
+ * @return int courseid of the active tab
+ */
+function print_bcast_tabs($activetab, $courseid) {
+    // Print out the primary course tab.
+    $courseinfo = get_course($courseid);
+    $bcshortname = $courseinfo->shortname;
+    $bccount = count(get_bccontent($courseid));
+    if ($bccount != 0) {
+        $tabs[] = new tabobject($bcshortname,new moodle_url('/blocks/ucla_media/bcast.php', 
+                array('courseid' => $courseid)), $bcshortname.' ('.$bccount.')');
+    }
+
+    // Print out the secondary course tabs.
+    // Get crosslisted courses.
+    $firstxtab = NULL;
+    $crosslisted = get_bccrosslisted_courses($courseid);
+    if (!empty($crosslisted)) {
+        foreach ($crosslisted as $xcourse) {
+            $courseinfo = get_course($xcourse->courseid);
+            $shortname = $courseinfo->shortname;
+            $xcount = count(get_bccrosslistcontent($courseid, $xcourse->courseid));
+            if ($xcount != 0) {
+                $tabs[] = new tabobject($shortname,new moodle_url('/blocks/ucla_media/bcast.php', 
+                        array('courseid' => $courseid, 'tab'=> $xcourse->courseid)), $shortname.' ('.$xcount.')');
+            }
+            // Make the first crosslisted tab the landing page if there's no original content.
+            if ($bccount == 0 && $activetab == $bcshortname) {
+                $activetab = $shortname;
+                $firstxtab = $xcourse->courseid;
+            }
+        }
+        print_tabs(array($tabs), $activetab);
+        return $firstxtab;
+    }
 }
