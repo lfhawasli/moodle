@@ -67,7 +67,9 @@ class block_ucla_media extends block_base {
         
         $bruincastfound = $DB->record_exists('ucla_bruincast',
                 array('courseid' => $courseid));
-        if ($bruincastfound || can_request_media($courseid)) {
+        $crosslistfound = $DB->record_exists('ucla_bruincast_crosslist',
+                array('courseid' => $courseid));
+        if ($bruincastfound || $crosslistfound || can_request_media($courseid)) {
             $node = navigation_node::create(get_string('title',
                     'block_ucla_media'), new moodle_url('/blocks/ucla_media/bcast.php',
                             array('courseid' => $courseid)));

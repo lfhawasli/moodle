@@ -297,5 +297,27 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2018071700, 'ucla_media');
     }
 
+    if ($oldversion < 2018072500) {
+
+        // Define table ucla_bruincast_crosslist to be created.
+        $table = new xmldb_table('ucla_bruincast_crosslist');
+
+        // Adding fields to table ucla_bruincast_crosslist.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('contentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table ucla_bruincast_crosslist.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for ucla_bruincast_crosslist.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Ucla_media savepoint reached.
+        upgrade_block_savepoint(true, 2018072500, 'ucla_media');
+    }
+
     return true;
 }
