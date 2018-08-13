@@ -334,6 +334,10 @@ $string['incompleteimportstart'] = 'User mapping error: Could not find users wit
 $string['incompleteimportstatus'] = 'Incomplete import. All input UID\'s except those above were imported correctly.
         Please fix the entries for only UID\'s displayed above.';
 
+// CCLE-7791 - Add "E-mail Students (via Announcements Forum)" into Admin Panel.
+$string['announcementshidden'] = 'The Announcements forum is currently hidden: Emails will NOT be sent out to students.';
+$string['unhidelink'] = 'Click here to unhide';
+$string['askinstructortounhide'] = 'Please ask the instructor to unhide this forum.';
 // CCLE-6644 - Registrar web service connection settings.
 $string['localucla'] = 'UCLA';
 $string['localsettingesb'] = 'Enterprise service bus (ESB)';
