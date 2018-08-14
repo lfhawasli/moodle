@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/filter/oidwowza/filter.php');
 
 $mediaid = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_INT);
-$courseid = required_param('courseid', PARAM_INT);
+$courseid = optional_param('courseid', null, PARAM_INT);
 $filename = optional_param('filename', null, PARAM_FILE);
 $offset = optional_param('offset', 0, PARAM_INT);
 $title = '';    // To be set later.
@@ -38,7 +38,7 @@ if ($mode == MEDIA_BCAST_VIDEO || $mode == MEDIA_BCAST_AUDIO) {
     $media = $DB->get_record('ucla_bruincast', array('id' => $mediaid));
     if (empty($media)) {
         print_error('errorinvalidvideo', 'block_ucla_media');
-    } else if (empty($media->courseid) || !$course = get_course($courseid)) {
+    } else if (empty($media->courseid) || !$courseid || !$course = get_course($courseid)) {
         print_error('coursemisconf');
     }
 
