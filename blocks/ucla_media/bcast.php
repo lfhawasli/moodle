@@ -25,6 +25,7 @@
 
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
+$PAGE->requires->js('/blocks/ucla_media/bcast_table.js', true);
 
 $pageparams = array();
 $courseid = required_param('courseid', PARAM_INT);
@@ -90,7 +91,7 @@ echo $OUTPUT->footer();
  * @param array $pageparams
  */
 function display_all($course, $sort, $tab, $pageparams) {
-    global $OUTPUT, $USER;
+    global $OUTPUT, $USER, $DB;
 
     $pageparams['sort'] = !$sort;
     $pageparams['tab'] = $tab;
@@ -153,16 +154,21 @@ function display_all($course, $sort, $tab, $pageparams) {
         // Display the week for the BruinCast content if it is not a summer session.
         if ($courseinfo[0]->session == 'RG' && $week != $prevweek) {
             $prevweek = $week;
+            $icon = html_writer::tag('i','',array('class' => 'fa fa-chevron-up'));
             if ($week == 11) {
                 $row = new html_table_row(
-                        [html_writer::tag('b', get_string('finals_week', 'block_ucla_weeksdisplay')), "", ""]);
+                        [$icon.html_writer::tag('b', get_string('finals_week', 'block_ucla_weeksdisplay')), "", ""]);
             } else if ($week > -1) {
                 $row = new html_table_row(
-                        [html_writer::tag('b', get_string('week', 'block_ucla_weeksdisplay', $week)), "", ""]);
+                        [$icon.html_writer::tag('b', get_string('week', 'block_ucla_weeksdisplay', $week)), "", ""]);
             } else {
                 $row = new html_table_row(
-                        [html_writer::tag('b', get_string('bcother', 'block_ucla_media')), "", ""]);
+                        [$icon.html_writer::tag('b', get_string('bcother', 'block_ucla_media')), "", ""]);
             }
+
+            // Count the number of rows to collapse for week.
+            $row->attributes['num'] = 
+                    $DB->count_records('ucla_bruincast', array('courseid'=> $media->courseid, 'week' => $week));
             $row->attributes['class'] = "week-row";
             $table->data[] = $row;
         }
@@ -276,6 +282,7 @@ function display_all($course, $sort, $tab, $pageparams) {
 
         $cells = array($datecell, $mediacell, $metadatacell);
         $row = new html_table_row($cells);
+        $row->attributes['class'] = 'fold open';
         $table->data[] = $row;
     }
 
