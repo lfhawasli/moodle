@@ -186,4 +186,4 @@
 	url = https://github.com/kaltura/KalturaGeneratedAPIClientsPHP.git
 [submodule "mod/englishcentral"]
 	path = mod/englishcentral
-	url = https://github.com/gbateson/moodle-mod_englishcentral.git
+	url = https://github.com/ccle/moodle-mod_englishcentral.git
