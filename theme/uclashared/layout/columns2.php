@@ -33,6 +33,16 @@ if (isloggedin()) {
     $navdraweropen = false;
 }
 $extraclasses = [];
+$hidenavigation = false;
+$hidehamburgericon = false;
+// Made navdraweropen true on every page load except for quiz attempt and preview page.
+if ('mod-quiz-attempt' == $PAGE->pagetype || 'mod-quiz-review' == $PAGE->pagetype || 'mod-quiz-summary' == $PAGE->pagetype) {
+    if(($PAGE->cm->context) && !has_any_capability(array('mod/quiz:viewreports', 'mod/quiz:grade'), $PAGE->cm->context)) {
+        $navdraweropen = false;
+        $hidenavigation = true;
+        $hidehamburgericon = true;
+    }
+}
 if ($navdraweropen) {
     $extraclasses[] = 'drawer-open-left';
 }
@@ -47,6 +57,7 @@ $templatecontext = [
     'hasblocks' => $hasblocks,
     'bodyattributes' => $bodyattributes,
     'navdraweropen' => $navdraweropen,
+    'hidenavigation' => $hidenavigation,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'system_link' => get_config('theme_uclashared', 'system_link'),

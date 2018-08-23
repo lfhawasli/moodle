@@ -21,9 +21,11 @@
 <header role="banner" class="pos-f-t navbar navbar-full navbar-light bg-faded 
         navbar-static-top moodle-has-zindex {{output.get_headerclasses}}">
     <div class="header-main row headroom headroom--top">
-        <div class="nav-toggle" data-region="drawer-toggle">
-            {{> theme_uclashared/hamburger }}
-        </div>
+        {{^hidenavigation}}
+            <div class="nav-toggle" data-region="drawer-toggle">
+                {{> theme_uclashared/hamburger }}
+            </div>
+        {{/hidenavigation}}
         <div class="header-logo">
             {{! Override to provide custom logos }}
             {{{ output.logo }}}
