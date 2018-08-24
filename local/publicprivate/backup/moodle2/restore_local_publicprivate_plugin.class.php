@@ -46,7 +46,7 @@ class restore_local_publicprivate_plugin extends restore_local_plugin {
 
     /**
      * Executes after the course module is restored.
-     * 
+     *
      * Ensures module is public or private.
      */
     public function after_restore_module() {
@@ -65,6 +65,9 @@ class restore_local_publicprivate_plugin extends restore_local_plugin {
                 self::$ppenabled = false;
                 return; // Public/private is disabled on course level.
             }
+            // Make sure group/groupings exists.
+            $ppcourse->detect_problems(true);
+
             self::$ppenabled = true;    // Passed all checks.
         }
 
