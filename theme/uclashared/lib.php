@@ -98,3 +98,45 @@ function theme_uclashared_page_init(moodle_page $page) {
         $page->force_settings_menu();
     }
 }
+
+    /**
+     * Calls weeks display function and returns an array with current week and quarter.
+     *
+     * @return array Current week and quarter strings separated into an array.
+     */
+    function theme_uclashared_parsed_weeks_display() {
+        $parsed = array();
+        $weeksdata = get_config('local_ucla', 'current_week_display');
+        // Fix front page quarter and week display for summer.
+        // Case when there is a session overlap for summer.
+        if (stripos($weeksdata, 'summer') !== false) {
+            $weeksdata = trim(strip_tags($weeksdata));
+            if(strpos($weeksdata, '|') !== false) {
+                list($session1, $session2) = explode('|', $weeksdata);
+                list($quarter, $week1) = explode('-', $session1);
+                $week1 = substr_replace($week1, ' - ', 10, 0);
+                // Case when there is a session overlap for summer.
+                if($session2) {
+                    list($quarter, $week2) = explode('-', $session2);
+                    $week2 = $week2 ? "<br/>" . substr_replace($week2, ' - ', 10, 0) : '';
+                }
+                $week = $week1 . $week2;
+            } else {
+                // Case when there is no session overlap for summer.
+                $session = explode('|', $weeksdata);
+                list($quarter, $week) = explode('-', $session[0]);
+                $week = substr_replace($week, ' - ', 10, 0);
+                $week = strip_tags($week);
+            }
+        } else {
+            // Case for regular session.
+            $weekpos = strpos($weeksdata, '<span class="week">');
+            $quarter = substr($weeksdata, 0, $weekpos);
+            $week = substr($weeksdata, $weekpos);
+            $week = strip_tags($week);
+        }
+        $quarter = trim(strip_tags($quarter));
+        $week = trim($week);
+        array_push($parsed, $quarter, $week);
+        return $parsed;
+    }
