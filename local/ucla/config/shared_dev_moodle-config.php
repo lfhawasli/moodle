@@ -245,6 +245,9 @@ $CFG->enablecourserequests = 1;
 $CFG->forced_plugin_settings['backup']['backup_general_users'] = 0;
 $CFG->forced_plugin_settings['backup']['backup_general_groups'] = 0;
 
+// Site administration > Courses > Backups > General import defaults
+$CFG->forced_plugin_settings['backup']['backup_import_groups'] = 0;
+
 // Site administration > Courses > Backups > General restore defaults
 $CFG->forced_plugin_settings['restore']['restore_general_users'] = 0;
 
