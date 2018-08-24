@@ -358,8 +358,8 @@ function validate_field($type, $field, $minsize=0, $maxsize=100) {
 /**
  * Comparison function for the terms and class titles.
  *  
- * @param object    $a Contains term and class or srs 
- * @param object    $b Contains term and class or srs
+ * @param object $a Contains term and class or srs 
+ * @param object $b Contains term and class or srs
  * @return int      More recent term is larger. If terms match, then alphabetic
  *                  order by class, if exists. Else order by srs, if exists.
  */
@@ -389,16 +389,204 @@ function term_title_cmp_fn($a, $b) {
 }
 
 /**
+ * Comparison function for the terms, courseids, and dates for Bruincasts.
+ *  
+ * @param object $a Contains term, courseid, srs, date, and shortname is optional
+ * @param object $b Contains term, courseid, srs, date, and shortname is optional
+ * @return int      More recent term is smaller. Sorts the array in opposite order of
+ *                  what we want. 
+ *                  If terms match a shortname is not set, put the unset Bruincast second.
+ *                  If terms match and both shortnames are not set, check by srs and then week.
+ *                  If terms match and both shortnames are the same, then check week.
+ *                  If terms match and not other condition is met, check shortnames.
+ *                  Otherwise, check term.
+ */
+function term_courseid_srs_cmp_fn($a, $b) {
+    // Variables $a and $b are switched such that the sort order is recent terms 
+    // first and older ones last.
+    $termcmp = term_cmp_fn($b->term, $a->term);
+    if ($termcmp === 0) {
+        if (!isset($a->shortname) && !isset($b->shortname)) {
+            if ($a->srs === $b->srs) {
+                return $a->date - $b->date;
+            }
+            return strnatcmp($a->srs, $b->srs);
+        } else if ($a->shortname === $b->shortname) {
+            return $a->date - $b->date;
+        }
+        return strnatcmp($a->shortname, $b->shortname);              
+    }
+    return $termcmp;
+}
+
+/**
+ * Retrieves all necessary Bruincast data and arranges it into an array.
+ * The array is formatted to become an accordion table.
+ * 
+ * @param array $options    Optional options to filter the data by.
+ * @return array
+ */
+function get_bruincast_data($options) {
+    global $DB;
+
+    // Get the header rows.
+    $headersql = "SELECT bc.id, bc.courseid, bc.term, shortname
+                    FROM {ucla_bruincast} bc LEFT JOIN {course} c
+                         ON c.id = bc.courseid,
+                         {ucla_request_classes} rc
+                   WHERE bc.courseid != 0
+                        AND rc.courseid = bc.courseid";
+
+    // Get crosslisted header rows.
+    // The id field for the crosslisted data must be manually set
+    // so that id's do not conflict with the non-crosslisted data.
+    $idinc = $DB->get_field('ucla_bruincast', 'MAX(id)', array()) + 1;
+    $xlistheadersql = "SELECT (@num := @num + 1) id, xlist.courseid, rc.term, c.shortname
+                         FROM {ucla_bruincast} bc RIGHT JOIN {ucla_bruincast_crosslist} xlist
+                              ON xlist.contentid = bc.id,
+                              {course} c, {ucla_request_classes} rc, (SELECT @num := $idinc) a
+                        WHERE rc.courseid = xlist.courseid
+                              AND c.id = xlist.courseid";
+
+    // Display results according to filters.
+    if (!empty($options['term'])) {
+        $headersql .= " AND bc.term = " . "'" . $options['term'] . "'";
+        $xlistheadersql .= " AND rc.term = " . "'" . $options['term'] . "'";
+    }
+    if (!empty($options['subjarea'])) {
+        $headersql .= " AND rc.department = " . "'" . $options['subjarea'] . "'";
+        $xlistheadersql .= " AND rc.department = " . "'" . $options['subjarea'] . "'";
+    }
+    $headersql .= " GROUP BY bc.courseid";
+    $xlistheadersql .= " GROUP BY xlist.courseid";
+    $result = array_merge($DB->get_records_sql($headersql), 
+            $DB->get_records_sql($xlistheadersql));
+
+    // Get the last id in the array to insert subject specific header rows for SSC content.
+    end($result);
+    $idinc = key($result) + 1;
+    reset($result);
+    $unassociatedsql = "SELECT (@num := @num + 1) id, bc.courseid, 
+                               bc.term, bac.subjarea shortname
+                          FROM {ucla_bruincast} bc, {ucla_browseall_classinfo} bac, 
+                               (SELECT @num := $idinc) a
+                         WHERE bac.term = bc.term 
+                               AND bac.srs = bc.srs
+                               AND bc.courseid = 0";
+    if (!empty($options['term'])) {
+        $unassociatedsql .= " AND bc.term = " . "'" . $options['term'] . "'";
+    }
+    if (!empty($options['subjarea'])) {
+        $unassociatedsql .= " AND bac.subjarea = " . "'" . $options['subjarea'] . "'";
+    }
+    $unassociatedsql .= " GROUP BY bac.term, shortname";
+    $result = array_merge($result, $DB->get_records_sql($unassociatedsql));
+
+    // There are some Bruincast content with srses that are not in 
+    // the table containing all courses on CCLE and SSC, so we must
+    // add an extra header for those.
+    $activeterms = empty($options['term']) ? get_active_terms() : array($options['term']);
+    $ustring = get_string('bcunassociated', 'tool_ucladatasourcesync');
+    if (empty($options['subjarea']) || $options['subjarea'] === 'Unassociated') {
+        foreach ($activeterms as $term) {
+            $existssql = "SELECT srs 
+                            FROM {ucla_bruincast} bc
+                           WHERE courseid = :courseid
+                                 AND term = :term
+                                 AND NOT EXISTS (
+                                     SELECT srs 
+                                       FROM {ucla_browseall_classinfo} bac
+                                      WHERE bc.term = bac.term
+                                            AND bc.srs = bac.srs)";
+            if ($DB->record_exists_sql($existssql, array('courseid' => 0, 'term' => $term))) {
+                $unassociated = new stdClass();
+                $unassociated->courseid = $unassociated->shortname = $ustring;
+                $unassociated->term = $term;
+                $result[] = $unassociated;
+            }
+        }
+    }
+
+    // A course may have crosslisted content and regular content.
+    // We need to merge these rows into one.
+    $result = array_unique(array_map(function($a) { 
+            $a->id = $a->courseid . $a->term . $a->shortname; 
+            return $a; 
+        }, $result), SORT_REGULAR);
+    
+    usort($result, 'term_courseid_srs_cmp_fn');
+
+    $headerint = 1;
+    foreach ($result as $header) {
+        // Get content from the Bruincast table.
+        $params = array('term' => $header->term, 'courseid' => $header->courseid, 
+                'shortname' => $header->shortname);
+        $datasql = "SELECT bc.id, bc.courseid, bc.term, bc.week, bc.date, 
+                           CONCAT_WS(', ',
+                                     IF(LENGTH(bc.video_files), bc.video_files, NULL),
+                                     IF(LENGTH(bc.audio_files), bc.audio_files, NULL)
+                           ) AS filename,
+                           CONCAT_WS(', ',
+                                     IF(LENGTH(bc.video_files), 'Video', NULL),
+                                     IF(LENGTH(bc.audio_files), 'Audio', NULL)
+                           ) AS type,
+                           bc.title, bc.comments, bc.srs
+                      FROM {ucla_bruincast} bc";
+            
+        // Get crosslisted content.
+        $xlistdatasql = $datasql . ", {ucla_bruincast_crosslist} xlist
+                WHERE xlist.contentid = bc.id
+                      AND xlist.courseid = :courseid";
+
+        // Bruincast content not in CCLE will be handled under subject
+        // headers or the unassociated header.
+        if ($header->courseid === '0') {
+            // Gets all content for a specific subject area whose courses 
+            // are not on CCLE but in the table with all course info.
+            $datasql .= " JOIN {ucla_browseall_classinfo} bac 
+                            ON bac.srs = bc.srs AND bac.term = bc.term
+                    WHERE bac.subjarea = :shortname AND";
+        } else if ($header->courseid === $ustring) {
+            // Gets all content in the Bruincast table but not in the table 
+            // with all course info.
+            $params['courseid'] = 0;
+            $datasql .= " WHERE NOT EXISTS (
+                                SELECT srs 
+                                  FROM {ucla_browseall_classinfo} bac
+                                 WHERE bac.term = bc.term
+                                       AND bac.srs = bc.srs) 
+                               AND";
+        } else {
+            $datasql .= " WHERE";
+        }
+        $datasql .= " bc.term = :term AND bc.courseid = :courseid";
+        $bcdata = $DB->get_records_sql($datasql, $params);
+        $bcxlistdata = $header->courseid === '0' || $header->courseid === $ustring ? 
+                [] : $DB->get_records_sql($xlistdatasql, $params);
+
+        $subcontent = array_merge($bcdata, $bcxlistdata);
+        $header->num = count($subcontent);
+        usort($subcontent, 'term_courseid_srs_cmp_fn');
+        array_splice($result, $headerint, 0, $subcontent);
+
+        $headerint += $header->num + 1;
+    }
+
+    return $result;
+}
+
+/**
  * Gets table information from database for: bruincast, library reserves, and
  * video reserves.
  *
- * @param string $table The type of table you want to get information for.
- *                      Options: "bruincast", "library_reserves", 
- *                      "video_reserves", "library_music_reserves"
+ * @param string $table     The type of table you want to get information for.
+ *                          Options: "bruincast", "library_reserves", 
+ *                          "video_reserves", "library_music_reserves"
+ * @param array $options    Optional options to filter the data by.
  *
  * @return array
  */
-function get_reserve_data($table) {
+function get_reserve_data($table, $options = array()) {
     global $DB;
 
     // Make sure courseid is the second column.
@@ -409,10 +597,15 @@ function get_reserve_data($table) {
         $columnsreturned[] = $columnname;
     }
 
-    $result = $DB->get_records('ucla_' . $table, null, null,
-            implode(',', $columnsreturned));
+    if ($table === 'bruincast') {
+        $result = get_bruincast_data($options);
+    } else {
+        $result = $DB->get_records('ucla_' . $table, null, null,
+                implode(',', $columnsreturned));
+    }
 
-    $timeformat = get_string('strftimedatefullshort');
+    $ustring = get_string('bcunassociated', 'tool_ucladatasourcesync');
+    $timeformat = get_string('strftimedatefullshort', 'tool_ucladatasourcesync');
     foreach ($result as $index => $item) {
         // Give link to course as first column of table.
         if ($item->courseid != null) {
@@ -421,6 +614,21 @@ function get_reserve_data($table) {
             $courseurl = new moodle_url('/course/view.php',
                     array('id' => ($item->courseid)));
             $shortnamewithlink = html_writer::link ($courseurl, $shortname);
+
+            if ($table === 'bruincast') {
+                $icon = html_writer::tag('i','',array('class' => 'fa fa-chevron-down'));
+                if (isset($item->date)) {
+                    $item->date = userdate($item->date, $timeformat);
+                    $item->filename = implode('<br>', explode(', ', $item->filename));
+                    $item->type = implode('<br>', explode(', ', $item->type));
+                } else if ($item->courseid === '0') {
+                    $shortnamewithlink = $icon . $item->shortname;
+                } else if ($item->courseid === $ustring) {
+                    $shortnamewithlink = $icon . $item->courseid;
+                } else {
+                    $shortnamewithlink = $icon . $shortnamewithlink;
+                }
+            }
 
             $item->courseid = $shortnamewithlink;
         }
@@ -447,9 +655,11 @@ function get_reserve_data($table) {
                                    'video_url' => $item->video_url);
             $result[$index] = $temp;
         }
-
     }
-    usort($result, 'term_title_cmp_fn');
+    
+    if ($table !== 'bruincast') {
+        usort($result, 'term_title_cmp_fn');
+    }
 
     return $result;
 }

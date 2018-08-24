@@ -1,1 +1,27 @@
 .supportconsole.generalbox{padding-top:40px;border-top:1px solid #ddd}.supportconsole label{padding-right:5px;padding-left:5px}#log-action-types{list-style-type:none}#syllabusreoport .c1,#syllabusreoport .c2,#syllabusreoport .c3{text-align:center}.supportconsole .main{margin-bottom:8px}.see-all{margin-top:-16px}
+
+#bruincast p {
+    margin-bottom: 0px;
+}
+
+#bruincast tr.fold {
+    display: none;
+}
+
+#bruincast tr.fold.open {
+    display: table-row;
+}
+
+#bruincast i.fa-chevron-up,
+#bruincast i.fa-chevron-down {
+    cursor: pointer;
+    padding-right: 5px;
+}
+
+label[for=moodlebruincastlist_subject_area_selector] {
+    padding: 0 5px;
+}
+
+label[for=moodlebruincastlist_term_selector] {
+    padding-right: 5px;
+}

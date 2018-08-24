@@ -319,5 +319,29 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2018072500, 'ucla_media');
     }
 
+    if ($oldversion < 2018081500) {
+
+        // Define index courseid (not unique) to be added to ucla_bruincast_crosslist.
+        $table = new xmldb_table('ucla_bruincast_crosslist');
+        $index = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
+
+        // Conditionally launch add index courseid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index courseid (not unique) to be added to ucla_bruincast.
+        $table = new xmldb_table('ucla_bruincast');
+        $index = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
+
+        // Conditionally launch add index courseid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        // Ucla_media savepoint reached.
+        upgrade_block_savepoint(true, 2018081500, 'ucla_media');
+    }
+
     return true;
 }

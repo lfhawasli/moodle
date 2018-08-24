@@ -125,15 +125,34 @@ function get_subject_area_selector($id, $selectedsubjectarea = null) {
     global $DB;  
     static $_subjectareaselectorsubjects;  // To store cached copy of db record.
     $retval = '';
+    $subjareastring = get_string('choose_subject_area', 'tool_uclasupportconsole');
   
     if (!isset($_subjectareaselectorsubjects)) {
         // Generate associative array: subject area => subject area.
-        $sql = 'SELECT DISTINCT subjarea
-                  FROM {reg_subjectarea}
-                 WHERE 1
-              ORDER BY subjarea';
-        $_subjectareaselectorsubjects = $DB->get_records_menu('ucla_reg_subjectarea',
-                null, 'subjarea', 'subjarea, subjarea AS subject_area');
+        if ($id === 'moodlebruincastlist') {
+            $subjareastring = get_string('all_subject_areas', 'tool_uclasupportconsole');
+            $activeterms = implode("','", get_active_terms());
+            $sql = "SELECT department, department AS subject_area   
+                      FROM (
+                           SELECT DISTINCT department 
+                             FROM {ucla_bruincast_crosslist} bcc, 
+                                  {ucla_request_classes} rc 
+                            WHERE rc.term IN ('".$activeterms."')   
+                                  AND rc.courseid = bcc.courseid 
+                            UNION 
+                           SELECT DISTINCT subjarea department
+                             FROM {ucla_bruincast} bc JOIN {ucla_browseall_classinfo} bac 
+                                  ON bac.srs = bc.srs AND bac.term = bc.term
+                            WHERE bc.term IN ('".$activeterms."')   
+                      ) a 
+                  ORDER BY department";
+            $_subjectareaselectorsubjects = $DB->get_records_sql_menu($sql);
+            $_subjectareaselectorsubjects['Unassociated'] = 'Unassociated';
+        } else {
+            $_subjectareaselectorsubjects = $DB->get_records_menu('ucla_reg_subjectarea',
+                    null, 'subjarea', 'subjarea, subjarea AS subject_area');
+        }
+
         if (empty($_subjectareaselectorsubjects)) {
             return '';
         }        
@@ -142,8 +161,7 @@ function get_subject_area_selector($id, $selectedsubjectarea = null) {
     $retval .= html_writer::label(get_string('subject_area',
             'tool_uclasupportconsole'), $id.'_subject_area_selector');
     $retval .= html_writer::select($_subjectareaselectorsubjects,
-            'subjarea', $selectedsubjectarea,
-            get_string('choose_subject_area', 'tool_uclasupportconsole'), 
+            'subjarea', $selectedsubjectarea, $subjareastring, 
             array('id' => $id.'_subject_area_selector'));
         
     return $retval;
@@ -167,7 +185,12 @@ function get_term_selector($id, $selected_term = null) {
         $selected_term = $CFG->currentterm;
     }
 
-    $ret_val .= html_writer::label(get_string('term', 'tool_uclasupportconsole'), $id.'_term_selector');
+    $termstring = get_string('term', 'tool_uclasupportconsole');
+    if ($id === 'moodlebruincastlist') {
+        $termstring .= ' ' . get_string('leave_term_blank', 'tool_uclasupportconsole');
+    }
+
+    $ret_val .= html_writer::label($termstring, $id.'_term_selector');
     $ret_val .= html_writer::empty_tag('input', 
             array('type' => 'text', 'name' => 'term', 'id' => $id.'_term_selector', 
                 'value' => $selected_term, 'maxlength' => 3, 'size' => 3));
@@ -193,15 +216,20 @@ function get_uid_input($id) {
 /**
  *  This function auto-strips 'id' from the data.
  **/
-function html_table_auto_headers($data) {
+function html_table_auto_headers($data, $tabletype = '') {
     $fields = array();
+    $bcastfields = array();
     foreach ($data as $datum) {
         foreach ($datum as $f => $v) {
-            if ($f == 'id') {
+            if ($f == 'id' || $f === 'shortname' || ($tabletype === 'bruincastsub' && $f === 'courseid')) {
                 continue;
             }
+            if (isset($datum->num)) {
+                $bcastfields[$f] = $f;
+            } 
 
             $fields[$f] = $f;
+            
         }
     }
     
@@ -225,7 +253,7 @@ function html_table_auto_headers($data) {
     }
 
     $table = new html_table();
-    $table->head = $fields;
+    $table->head = $tabletype === 'bruincast' ? $bcastfields : $fields;
     $table->data = $paddeddata;
 
     return $table;
@@ -240,31 +268,43 @@ function html_table_auto_headers($data) {
  * @param array $inputs     must be in format of params passed to a moodle_url
  *                              constructor
  * @param string $moreinfo  text to be displayed above the table
+ * @param string $mediatype for specially rendering the bruincast table
  * @return string
  */
 function supportconsole_render_section_shortcut($title, $data, 
-                                                $inputs=array(), $moreinfo=null) {
+                                                $inputs=array(), $moreinfo=null, $mediatype='') {
     global $OUTPUT;
 
     // Check if user wanted an Excel download instead.
     $export = optional_param('export', null, PARAM_ALPHA);
     if ($export == 'xls') {
-        supportconsole_render_section_xls($title, $data, $inputs, $moreinfo);
+        supportconsole_render_section_xls($title, $data, $inputs, $moreinfo, $mediatype);
     }
 
-    $size = 0;
-    if (!empty($data)) {
-        $size = count($data);
+    $size = count($data);
+    // Remove the collapsible header rows from the total count.
+    if ($mediatype === 'bruincast') {
+        foreach ($data as $row => $obj) {
+            if (isset($obj->num)) {
+                $size -= 1;
+            }
+        }
     }
 
     // Display number of results.
+    $totalcount = optional_param('count', null, PARAM_INT);
     if ($size == 0) {
         $pretext = get_string('noresults', 'tool_uclasupportconsole');
     } else if ($size == 1) {
         $pretext = get_string('oneresult', 'tool_uclasupportconsole');
-    } else if (isset($inputs['totalcount']) && $inputs['totalcount'] > $size) {
+    } else if ($totalcount > $size) {
+        // Check if the page param is set, otherwise we are on the first (index 0) page.
+        $pagenum = (null !== optional_param('page', null, PARAM_INT)) ? optional_param('page', null, PARAM_INT) : 0;
+        // Display the current range of entries being displayed on the page.
+        $pagerange1 = $pagenum * $size + 1;
+        $pagerange2 = ($pagenum + 1) * $size;
         $pretext = get_string('paginatedxresults', 'tool_uclasupportconsole',
-            array('pagecount' => $size, 'totalcount' => $inputs['totalcount']));
+                array('pagerange1' => $pagerange1, 'pagerange2' => $pagerange2, 'totalcount' => $totalcount));
     } else {
         $pretext = get_string('xresults', 'tool_uclasupportconsole', $size);
     }
@@ -289,10 +329,10 @@ function supportconsole_render_section_shortcut($title, $data,
         return $OUTPUT->box($pretext) . $export;
     } else if ($moreinfo != null) {
         return $OUTPUT->box($moreinfo) . $OUTPUT->box($pretext) .
-                supportconsole_render_table_shortcut($data) . $export;
+                supportconsole_render_table_shortcut($data, $mediatype) . $export;
     } else {
         return $OUTPUT->box($pretext) .
-                supportconsole_render_table_shortcut($data) . $export;
+                supportconsole_render_table_shortcut($data, $mediatype) . $export;
     }
 }
 
@@ -303,9 +343,10 @@ function supportconsole_render_section_shortcut($title, $data,
  * @param array $data
  * @param array $inputs
  * @param string $moreinfo
+ * @param string $mediatype
  * @return string
  */
-function supportconsole_render_section_xls($title, $data, $inputs=array(), $moreinfo=null) {
+function supportconsole_render_section_xls($title, $data, $inputs=array(), $moreinfo=null, $mediatype = '') {
     global $CFG;
     require_once($CFG->dirroot.'/lib/excellib.class.php');
 
@@ -328,12 +369,28 @@ function supportconsole_render_section_xls($title, $data, $inputs=array(), $more
     ++$row;
 
     // Check if there is moreinfo needed.
-    $moreinfo = clean_param($moreinfo, PARAM_NOTAGS);  // Might have HTML.
-    $worksheet->write_string($row, $col, $moreinfo);
-    ++$row;
+    if ($moreinfo !== null) {
+        $moreinfo = clean_param($moreinfo, PARAM_NOTAGS);  // Might have HTML.
+        $worksheet->write_string($row, $col, $moreinfo);
+        ++$row;
+    }
 
     // Display number of results.
     $size = count($data);
+    // Remove the collapsible header rows from the total count.
+    if ($mediatype === 'bruincast') {
+        foreach ($data as $obj) {
+            unset($obj->shortname);
+            if (isset($obj->num)) {
+                $size -= 1;
+            } else {
+                // Change line breaks into newline characters.
+                $obj->filename = str_replace('<br>', ', ', $obj->filename);
+                $obj->type = str_replace('<br>', ', ', $obj->type);
+            }
+        }
+    }
+
     if ($size == 0) {
         $pretext = get_string('noresults', 'tool_uclasupportconsole');
     } else if ($size == 1) {
@@ -389,18 +446,79 @@ function supportconsole_render_section_xls($title, $data, $inputs=array(), $more
 }
 
 /**
+ * Create accordion table.
+ * 
+ * @param html_table    $table
+ * @param string        $tabletype
+ * @return html_table
+ */
+function get_accordion_table($table, $tabletype) {
+    $result = new html_table();
+    $result->head = $table->head;
+    $result->id = $tabletype;
+    $result->data = [];
+
+    $headerarr = null;
+    $countrows = 0;
+    $subtable = [];
+    foreach ($table->data as $row) {
+        // Create collapsible row.
+        if (!empty($row['num'])) {
+            $headerarr = $row;
+            $countrows = $row['num'];
+            continue;
+        } else {
+            unset($row['num']);
+            $subtable[] = $row;
+            $countrows -= 1;
+        }
+
+        if ($countrows === 0) {
+            $newtable = html_table_auto_headers($subtable, $tabletype . 'sub');
+            $newtable->id = setup_js_tablesorter();
+            unset($newtable->head['num']);
+
+            // Create the toggle-able row.
+            $rowarr = [];
+            foreach ($table->head as $field) {
+                $rowarr[] = $headerarr[$field];
+            }
+            $newrow = new html_table_row($rowarr);
+            $newrow->attributes = array('class' => 'collapse-row');
+            $result->data[] = $newrow;
+
+            // Create the row with the table of bruincasts.
+            $tablecell = new html_table_cell(html_writer::table($newtable));
+            $tablecell->colspan = count($result->head);
+            $tablerow = new html_table_row(array($tablecell));
+            $tablerow->attributes = array('class' => 'fold');
+            $result->data[] = $tablerow;
+
+            $subtable = [];
+            $headerarr = null;
+        }
+    }
+
+    return $result;
+}
+
+/**
  * Converts given $data array into a table.
  * 
  * @param array $data
+ * @param string $tabletype to customize Bruincast table
  * @return string
  */
-function supportconsole_render_table_shortcut($data) {
-    $table = html_table_auto_headers($data);
+function supportconsole_render_table_shortcut($data, $tabletype) {
+    $table = html_table_auto_headers($data, $tabletype);
     $table->id = setup_js_tablesorter();
 
+    // Create the accordion table for Bruincasts.
+    if ($tabletype === 'bruincast') {
+        $table = get_accordion_table($table, $tabletype);
+    }   
     return html_writer::table($table);
-
-}
+}   
 
 function supportconsole_simple_form($title, $contents='', $buttonvalue='Go') {
     global $PAGE;
