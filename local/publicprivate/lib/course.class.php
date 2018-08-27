@@ -240,48 +240,9 @@ class PublicPrivate_Course {
         /*
          * Create new publicprivategroupname group and publicprivategroupingname grouping.
          */
-
-        $data = new stdClass();
-        $data->courseid = $this->_course->id;
-        $data->name = get_string('publicprivategroupname', 'local_publicprivate');
-        $data->description = get_string('publicprivategroupdescription', 'local_publicprivate');
-
-        try {
-            if (!$newgroupid = groups_create_group($data)) {
-                throw new PublicPrivate_Course_Exception('Failed to create public/private group.', 203);
-            }
-        } catch (DML_Exception $e) {
-            throw new PublicPrivate_Course_Exception('Failed to create public/private group.', 203, $e);
-        }
-
-        /*
-         * Create new publicprivategroupingname grouping.
-         */
-
-        $data = new stdClass();
-        $data->courseid = $this->_course->id;
-        $data->name = get_string('publicprivategroupingname', 'local_publicprivate');
-        $data->description = get_string('publicprivategroupingdescription', 'local_publicprivate');
-
-        try {
-            if (!$newgroupingid = groups_create_grouping($data)) {
-                throw new PublicPrivate_Course_Exception('Failed to create public/private grouping.', 204);
-            }
-        } catch (DML_Exception $e) {
-            throw new PublicPrivate_Course_Exception('Failed to create public/private grouping.', 204, $e);
-        }
-
-        /*
-         * Bind public/private group to grouping.
-         */
-
-        try {
-            if (!groups_assign_grouping($newgroupingid, $newgroupid)) {
-                throw new PublicPrivate_Course_Exception('Failed to bind public/private group to grouping.', 205);
-            }
-        } catch (DML_Exception $e) {
-            throw new PublicPrivate_Course_Exception('Failed to bind public/private group to grouping.', 205, $e);
-        }
+        $newgroupid = $this->create_group();
+        $newgroupingid = $this->create_grouping();
+        $this->bind_group_grouping($newgroupid, $newgroupingid);
 
         /*
          * Update course settings for public/private.
@@ -290,7 +251,6 @@ class PublicPrivate_Course {
         $this->_course->enablepublicprivate = 1;
         $this->_course->grouppublicprivate = $newgroupid;
         $this->_course->groupingpublicprivate = $newgroupingid;
-        $this->_course->guest = 1;
         $this->_course->defaultgroupingid = $newgroupingid;
 
         try {
@@ -389,7 +349,7 @@ class PublicPrivate_Course {
         /*
          * Delete public/private group and grouping.
          */
-        
+
         try {
             groups_delete_group($oldgrouppublicprivate);
             groups_delete_grouping($oldgroupingpublicprivate);
@@ -713,5 +673,123 @@ class PublicPrivate_Course {
                 }
             }
         }
+    }
+
+    /**
+     * Bind public/private group to grouping.
+     *
+     * @param int $newgroupid
+     * @param int $newgroupingid
+     */
+    private function bind_group_grouping($newgroupid, $newgroupingid) {
+        try {
+            if (!groups_assign_grouping($newgroupingid, $newgroupid)) {
+                throw new PublicPrivate_Course_Exception('Failed to bind public/private group to grouping.', 205);
+            }
+        } catch (DML_Exception $e) {
+            throw new PublicPrivate_Course_Exception('Failed to bind public/private group to grouping.', 205, $e);
+        }
+    }
+
+    /**
+     * Creates public/private group.
+     *
+     * @param int $groupid      Optional. If passed will attempt to create group using given id.
+     */
+    private function create_group($groupid = null) {
+        global $DB;
+        $data = new stdClass();
+        $data->courseid = $this->_course->id;
+        $data->name = get_string('publicprivategroupname', 'local_publicprivate');
+        $data->description = get_string('publicprivategroupdescription', 'local_publicprivate');
+
+        try {
+            // Need to use insert_record_raw, because we are specifying an id.
+            if (!empty($groupid)) {
+                $data->id = $groupid;
+                $newgroupid = $DB->insert_record_raw('groups', $data, true, false, true);
+            } else {
+                if (!$newgroupid = groups_create_group($data)) {
+                    throw new PublicPrivate_Course_Exception('Failed to create public/private group.', 203);
+                }                
+            }
+        } catch (DML_Exception $e) {
+            throw new PublicPrivate_Course_Exception('Failed to create public/private group.', 203, $e);
+        }
+
+        return $newgroupid;
+    }
+
+    /**
+     * Creates public/private grouping.
+     *
+     * @param int $groupingid   Optional. If passed will attempt to create
+     *                          grouping using given id.
+     * @return int  Grouping id.
+     */
+    private function create_grouping($groupingid = null) {
+        global $DB;
+        $data = new stdClass();
+        $data->courseid = $this->_course->id;
+        $data->name = get_string('publicprivategroupingname', 'local_publicprivate');
+        $data->description = get_string('publicprivategroupingdescription', 'local_publicprivate');
+
+        try {
+            // Need to use insert_record_raw, because we are specifying an id.
+            if (!empty($groupingid)) {
+                $data->id = $groupingid;
+                $newgroupingid = $DB->insert_record_raw('groupings', $data, true, false, true);
+            } else {
+                if (!$newgroupingid = groups_create_grouping($data)) {
+                    throw new PublicPrivate_Course_Exception('Failed to create public/private grouping.', 204);
+                }                
+            }           
+        } catch (DML_Exception $e) {
+            throw new PublicPrivate_Course_Exception('Failed to create public/private grouping.', 204, $e);
+        }
+
+        return $newgroupingid;
+    }
+
+    /**
+     * When restoring a course if the course contents are deleted beforehand,
+     * then can run into problem when trying to make course modules private.
+     *
+     * Try to restore deleted group/groupings.
+     * 
+     * @param boolean $fixthem
+     * @return boolean  Returns false if there are no errors, otherwise true.
+     */
+    public function detect_problems($fixthem = false) {
+        // Checks if active, then see if group/groupings exists.
+        $groupid = $this->get_group();
+        $group = groups_get_group($groupid);
+        if ($group === false) {
+            if (empty($fixthem)) {
+                return true;
+            } else {
+                $this->create_group($groupid);
+            }
+        }
+        $groupingid = $this->get_grouping();
+        $grouping = groups_get_grouping($groupingid);
+        if ($grouping === false) {
+            if (empty($fixthem)) {
+                return true;
+            } else {
+                $this->create_grouping($groupingid);
+            }
+        }
+
+        if (!empty($fixthem)) {
+            // Make sure group belongs to grouping.
+            try {
+                $this->bind_group_grouping($groupid, $groupingid);
+            } catch (Exception $ex) {
+                // Ignore error since record must already exist.
+            }
+        }
+        
+        return false;
     }
 }

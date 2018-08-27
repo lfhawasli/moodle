@@ -34,6 +34,12 @@ require_once($CFG->dirroot . '/enrol/database/lib.php');
 require_once($CFG->dirroot . '/enrol/self/lib.php');
 require_once($CFG->dirroot . '/lib/grouplib.php');
 
+/**
+ * Unit test file.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class user_enrolment_updated_testcase extends advanced_testcase {
 
     /**
@@ -54,7 +60,7 @@ class user_enrolment_updated_testcase extends advanced_testcase {
     public function setUp() {
         $this->resetAfterTest();
 
-        // Create a new course and enable public/private. We pass an array 
+        // Create a new course and enable public/private. We pass an array
         // containing  an empty array so that only one course is generated.
         // (No crosslisting).
         $this->gen = $this->getDataGenerator();
@@ -103,7 +109,7 @@ class user_enrolment_updated_testcase extends advanced_testcase {
         $this->assertFalse($info->is_available($information));
     }
 
-    /** 
+    /**
      * Try combos of plugins.
      *
      * @dataProvider enrolment_plugin_provider
@@ -159,7 +165,7 @@ class user_enrolment_updated_testcase extends advanced_testcase {
         }
     }
 
-    /** 
+    /**
      * Provides combinations of manual, self, and guest plugins.
      */
     public function enrolment_plugin_provider() {
@@ -178,7 +184,7 @@ class user_enrolment_updated_testcase extends advanced_testcase {
         );
     }
 
-    /** 
+    /**
      * Make sure that being suspended from all plugins means that the user is
      * dropped from all course groups.
      */
@@ -211,7 +217,7 @@ class user_enrolment_updated_testcase extends advanced_testcase {
         $this->assertFalse(groups_is_member($groupid, $user->id));
     }
 
-    /** 
+    /**
      * Make sure that when the user has no roles, we don't re-add them to
      * "Course members".
      */
