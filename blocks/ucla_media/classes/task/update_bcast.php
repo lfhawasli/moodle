@@ -271,6 +271,9 @@ class update_bcast extends \core\task\scheduled_task {
                         }
                     }
                 }
+            } else if (!empty($existingmedia[$term])) {
+                // Data sync is empty for an active term while our current DB does, no update.
+                throw new \moodle_exception('bcnoentries', 'tool_ucladatasourcesync');
             }
         }
 
