@@ -209,10 +209,7 @@ abstract class base_moodleform extends moodleform {
             // Then call the add method with the get_element_properties array.
             call_user_func_array(array($this->_form, 'addElement'), $setting->get_ui()->get_element_properties($task, $OUTPUT));
             $this->_form->setType($setting->get_ui_name(), $setting->get_param_validation());
-            // START UCLA MOD: SSC-3969 - Uncheck "Include groups and groupings" by default.
-            // $defaults[$setting->get_ui_name()] = $setting->get_value();
-            $defaults[$setting->get_ui_name()] = ($setting->get_ui_name() === 'setting_root_groups') ? false : $setting->get_value();
-            // END UCLA MOD: SSC-3969.
+            $defaults[$setting->get_ui_name()] = $setting->get_value();
             if ($setting->has_help()) {
                 list($identifier, $component) = $setting->get_help();
                 $this->_form->addHelpButton($setting->get_ui_name(), $identifier, $component);
