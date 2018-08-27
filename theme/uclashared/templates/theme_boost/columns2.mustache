@@ -31,7 +31,9 @@
                     {{/hasregionmainsettingsmenu}}
                     {{{ output.course_content_header }}}
                     {{{ output.main_content }}}
-                    {{{ output.activity_navigation }}}
+                    {{^hidenavigation}}
+                        {{{ output.activity_navigation }}}
+                    {{/hidenavigation}}
                     {{{ output.course_content_footer }}}
                     </div>
                 </section>
