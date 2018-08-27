@@ -26,7 +26,13 @@ require_once($CFG->dirroot . '/local/publicprivate/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_group_manager/lib.php');
 require_once($CFG->dirroot . '/group/externallib.php');
 
-class local_publicprivate_group_sync_testcase extends advanced_testcase {
+/**
+ * Unit test file.
+ *
+ * @copyright  2015 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class group_sync_testcase extends advanced_testcase {
 
     /**
      * Stores mocked version of ucla_group_manager.

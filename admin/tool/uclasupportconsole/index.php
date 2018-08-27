@@ -11,6 +11,8 @@ require_once($CFG->dirroot . $admintooldir . 'uclasupportconsole/lib.php');
 require_once($CFG->dirroot . $admintooldir . 'uclacoursecreator/uclacoursecreator.class.php');
 require_once($CFG->dirroot . '/admin/tool/ucladatasourcesync/lib.php');
 
+$PAGE->requires->js('/admin/tool/uclasupportconsole/table.js', true);
+
 // Force debugging errors 
 error_reporting(E_ALL); 
 ini_set( 'display_errors','1');
@@ -534,19 +536,24 @@ $consoles->push_console_html('logs', $title, $sectionhtml);
 ////////////////////////////////////////////////////////////////////
 $title = "moodlebruincastlist";
 $sectionhtml = '';
+$filters = '';
 
 if ($displayforms) {
     $sectionhtml = supportconsole_simple_form($title);
 } else if ($consolecommand == "$title") {
-    $result = get_reserve_data('bruincast');
-    
-    $sourcelocation = get_config('block_ucla_bruincast', 'source_url');
-    $sourcelink = html_writer::link($sourcelocation, $sourcelocation, array('target' => '_blank'));
-    $sourcefile = get_string('sourcefile', 'tool_uclasupportconsole', $sourcelink);    
-    
-    $sectionhtml = supportconsole_render_section_shortcut($title, $result, array(), $sourcefile);
+    $selected_term = optional_param('term', null, PARAM_ALPHANUM);
+    $selected_subj = optional_param('subjarea', null, PARAM_NOTAGS);
+
+    $filters = get_term_selector($title, $selected_term);
+    $filters .= get_subject_area_selector($title, $selected_subj);
+    $filters = supportconsole_simple_form($title, $filters);
+
+    $result = get_reserve_data('bruincast', array('term' => $selected_term, 'subjarea' => $selected_subj));    
+    $sectionhtml = supportconsole_render_section_shortcut($title, $result, array(), null, 'bruincast');
 }
-$consoles->push_console_html('logs', $title, $sectionhtml);
+
+// Show the menus regardless of whether any rows are returned.
+$consoles->push_console_html('logs', $title, $filters . $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
 $title = "moodledigitalmediareserveslist";

@@ -138,9 +138,11 @@ $string['tool/uclasupportconsole:view'] = 'Access UCLA support console';
 // Form input strings
 $string['choose_term'] = 'Choose term...';
 $string['term'] = 'Term';
+$string['leave_term_blank'] = '(Leave empty to show content from all terms)';
 $string['srs'] = 'SRS';
 $string['subject_area'] = 'Subject area';
 $string['choose_subject_area'] = 'Choose subject area...';
+$string['all_subject_areas'] = 'All subject areas';
 $string['uid'] = 'UID';
 $string['srslookup'] = "SRS number lookup (Registrar)";
 $string['goback'] = 'Go back';

@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2018072500;
+$plugin->version    = 2018081500;
 $plugin->requires   = 2010112400;
 $plugin->component = 'block_ucla_media';
