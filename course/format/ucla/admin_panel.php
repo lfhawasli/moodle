@@ -193,9 +193,15 @@ if ($node) {
         }
     }
 
+    // Manage competencies.
     $setting = navigation_node::create(get_string('managecompetency', 'format_ucla'),
         new moodle_url("/admin/tool/lp/coursecompetencies.php", array('courseid' => $course->id)));
     $container->add_node($setting, 'report_competency');
+
+    // Activity completion.
+    $setting = navigation_node::create(get_string('pluginname', 'report_progress'),
+        new moodle_url("/report/progress/index.php", array('course' => $course->id)));
+    $container->add_node($setting);
 
     $rowcontainer->add_node($container);
 
