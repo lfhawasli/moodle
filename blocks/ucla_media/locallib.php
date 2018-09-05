@@ -229,7 +229,7 @@ function is_on_campus_ip($ip) {
  * @param object $course
  */
 function display_video_reserves($course) {
-      global $OUTPUT;
+    global $OUTPUT;
 
     // Adding GROUP BY to the where clause of the database query ensures no
     // duplicate videos are displayed for crosslisted courses.
@@ -323,44 +323,81 @@ function init_page($course, $context, $url, $mode = null, $title = null) {
  * @param string $headertitle   The header title of the list to be displayed.
  */
 function print_video_list($videolist, $headertitle) {
+    global $USER, $PAGE;
 
     echo html_writer::tag('h3', $headertitle);
     echo html_writer::start_tag('div');
+    
+    $table = new html_table();
 
-    $output = array();
-    foreach ($videolist as $video) {
-        $outputstr = '';
-        if ($headertitle == get_string('pastvideo', 'block_ucla_media')) {
-            $outputstr = $video->video_title . ' (' .
-                    get_string('pastvideo_info', 'block_ucla_media',
-                               userdate($video->stop_date, get_string('strftimedatefullshort'))) . ')';
-        } else if ($headertitle == get_string('futurevideo', 'block_ucla_media')) {
-            $outputstr = $video->video_title . ' (' .
-                    get_string('futurevideo_info', 'block_ucla_media',
-                               userdate($video->start_date, get_string('strftimedatefullshort'))) . ')';
+    // Video reserves table setup.
+    if ($headertitle === get_string('currentvideo', 'block_ucla_media')) {
+        $table->head = array(get_string('vrtitle', 'block_ucla_media'), get_string('vrlinks', 'block_ucla_media'), 
+            get_string('vravailability', 'block_ucla_media'));
+        $table->size = array('25%', '50%', '25%');
+    } else {
+        $table->size = array('50%', '50%');
+        if ($headertitle === get_string('pastvideo', 'block_ucla_media')) {
+            $table->head = array(get_string('vrtitle', 'block_ucla_media'), 
+                    get_string('vrnolongeravailable', 'block_ucla_media'));
         } else {
-            if (!empty($video->filename)) {
-                $outputstr = html_writer::link(
-                        new moodle_url('/blocks/ucla_media/view.php',
-                                array('id' => $video->id, 'mode' => MEDIA_VIDEORESERVES)), $video->video_title);
-            } else {
-                $outputstr = html_writer::link(
-                        new moodle_url($video->video_url), $video->video_title);
-            }
-            // Append available dates to each link.
-            if ($video->start_date != null && $video->stop_date != null) {
-                $start = userdate($video->start_date, get_string('strftimedatefullshort'));
-                $stop = userdate($video->stop_date, get_string('strftimedatefullshort'));
-                $outputstr .= ' (' .
-                        get_string('availability', 'block_ucla_media') .
-                        $start . ' - ' . $stop . ')';
-            }
+            $table->head = array(get_string('vrtitle', 'block_ucla_media'), 
+                    get_string('vrwillbeavailable', 'block_ucla_media'));
         }
-        $output[] = $outputstr;
     }
-    echo html_writer::alist($output);
 
-    echo html_writer::end_tag('div');
+    $textplay = get_string('bcmediaplay', 'block_ucla_media');
+    $textresume = get_string('bcmediaresume', 'block_ucla_media');
+    $timeformat = get_string('strftimedatefullshort', 'tool_ucladatasourcesync');
+    foreach ($videolist as $video) {
+        $titlecell = $video->video_title;
+        
+        $mediacell = '';
+        if ($headertitle === get_string('currentvideo', 'block_ucla_media')) {
+            $start = userdate($video->start_date, $timeformat);
+            $stop = userdate($video->stop_date, $timeformat);
+            $availcell = $start . ' - ' . $stop;
+
+            $buttontextplay = '<button type="button" class="btn btn-primary">' .
+                    '<i class="fa fa-video-camera" aria-hidden="true"></i> ' .
+                    $textplay . '</button>';
+            $videolinkplay = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
+                    array('mode' => MEDIA_VIDEORESERVES, 'id' => $video->id)), 
+                    $buttontextplay);
+            $mediacell .= $videolinkplay . ' ';
+
+            $jwtimestamp = get_user_preferences('jwtimestamp_'.strtoupper($video->video_title), null, $USER);
+            if ($jwtimestamp !== null) {
+                if ($jwtimestamp === 'FINISHED') {
+                    $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> '.
+                            get_string('bcmediafinished', 'block_ucla_media');
+                    $jwtimestamp = 0;
+                } else {
+                    $buttontextresume = $textresume . gmdate('H:i:s', $jwtimestamp);
+                }
+                $buttontextresume = '<button type="button" class="btn btn-default">' .
+                        $buttontextresume . '</button>';
+                $videolinkresume = html_writer::link(new moodle_url('/blocks/ucla_media/view.php#top',
+                        array('mode' => MEDIA_VIDEORESERVES, 'id' => $video->id,
+                        'offset' =>  $jwtimestamp)), $buttontextresume);
+                $mediacell .= $videolinkresume;
+            }
+
+            $cells = array($titlecell, $mediacell, $availcell); 
+        } else {
+            if ($headertitle === get_string('pastvideo', 'block_ucla_media')) {
+                $availcell = userdate($video->stop_date, $timeformat);
+            } else {
+                $availcell = userdate($video->start_date, $timeformat);
+            }
+            $cells = array($titlecell, $availcell); 
+        }
+
+        $row = new html_table_row($cells);
+        $table->data[] = $row;
+    }
+    echo html_writer::table($table);
+    echo html_writer::end_div('div');
 }
 
 /**
@@ -458,4 +495,29 @@ function get_bccrosslisted_courses($courseid) {
                       WHERE bc.id = xlist.contentid 
                         AND xlist.courseid = :courseid';
     return $DB->get_records_sql($sql, array('courseid'=>$courseid));
+}
+
+/**
+ * Deletes media timestamps from user preferences.
+ * 
+ * @param array $prefnames  Array of 'jwtimestamp_[courseid if bruincast]'
+ *                          strings to pre-pend to filenames.
+ * @param array $media      Array of media filenames to be deleted.
+ */
+function delete_timestamps($prefnames, $media) {
+    global $DB;
+
+    foreach ($media as $filename) {
+        if (empty($filename)) {
+            continue;
+        }
+
+        foreach ($prefnames as $prefname) {
+            $records = $DB->get_records('user_preferences', 
+                    array('name' => $prefname.'_'.$filename), '', 'userid');
+            foreach ($records as $record) {
+                unset_user_preference($prefname.'_'.$filename, $record->userid);
+            }
+        }
+    }
 }

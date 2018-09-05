@@ -25,6 +25,7 @@
 namespace block_ucla_media\task;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
+require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
 /**
  * Class file.
@@ -298,23 +299,11 @@ class update_bcast extends \core\task\scheduled_task {
                                         $media = array_merge($vidarray, $audarray);
 
                                         // Check if there are any crosslisted courses using this content.
-                                        $allcourseids = $DB->get_fieldset_select('ucla_bruincast_crosslist', 'courseid', 
+                                        $allcourseids = $DB->get_fieldset_select('ucla_bruincast_crosslist', "CONCAT('jwtimestamp_', courseid)", 
                                                 'contentid = :contentid', array('contentid' => $deleteid));
-                                        $allcourseids[] = $keycourseids;
+                                        $allcourseids[] = 'jwtimestamp_'.$keycourseids;
 
-                                        foreach ($media as $filename) {
-                                            if (empty($filename)) {
-                                                continue;
-                                            }
-
-                                            foreach ($allcourseids as $deletecourseid) {
-                                                $records = $DB->get_records('user_preferences', 
-                                                        array('name' => 'jwtimestamp_'.$deletecourseid.'_'.$filename), '', 'userid');
-                                                foreach ($records as $record) {
-                                                    unset_user_preference('jwtimestamp_'.$deletecourseid.'_'.$filename, $record->userid);
-                                                }
-                                            }
-                                        }
+                                        delete_timestamps($allcourseids, $media);
 
                                         // Found record that was not updated, so delete.
                                         $DB->delete_records('ucla_bruincast',
@@ -582,17 +571,7 @@ class update_bcast extends \core\task\scheduled_task {
                     $audarray = array_map('trim', explode(',', $deletecourse->audio_files));
                     $media = array_merge($vidarray, $audarray);
 
-                    foreach ($media as $filename) {
-                        if (empty($filename)) {
-                            continue;
-                        }
-
-                        $records = $DB->get_records('user_preferences', 
-                                array('name' => 'jwtimestamp_'.$keycourseid.'_'.$filename), '', 'userid');
-                        foreach ($records as $record) {
-                            unset_user_preference('jwtimestamp_'.$keycourseid.'_'.$filename, $record->userid);
-                        }
-                    }
+                    delete_timestamps(array('jwtimestamp_'.$keycourseid), $media);
                 }
 
                 $DB->delete_records('ucla_bruincast_crosslist', array('id' => $deleteid));
