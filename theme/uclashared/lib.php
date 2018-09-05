@@ -94,7 +94,8 @@ function theme_uclashared_page_init(moodle_page $page) {
 
     // Need to check for the context of the page to render the activity menu.
     // See CCLE-7736 for additional notes.
-    if ($context->contextlevel == CONTEXT_MODULE) {
+    // CCLE-7787 Hide activity menu on Quiz attempt and preview pages.
+    if (($context->contextlevel == CONTEXT_MODULE) && !('mod-quiz-attempt' == $page->pagetype || 'mod-quiz-review' == $page->pagetype)) {
         $page->force_settings_menu();
     }
 }
