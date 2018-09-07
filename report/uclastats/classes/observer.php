@@ -23,6 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 /**
  * Event handler class file.
@@ -40,6 +41,11 @@ class report_uclastats_observer {
      */
     public static function run_reports(\block_ucla_weeksdisplay\event\week_changed $event) {
         global $CFG;
+
+        // Don't run during unit tests.
+        if (defined('PHPUNIT_TEST') and PHPUNIT_TEST) {
+            return true;
+        }
 
         $weeknum = $event->other['week'];
         $enabled = get_config('report_uclastats', 'enable');

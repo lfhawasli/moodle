@@ -167,7 +167,7 @@ foreach ($reports as $reportname) {
 if (empty($reportstorun)) {
     $cumulativefilesize = shell_exec("du -s --block-size=1 $CFG->dataroot/filedir/");
     $reportpath = $reportoutputcachedir . '/cumulative_file_size.txt';
-    file_put_contents($reportpath, display_size($cumulativefilesize));
+    file_put_contents($reportpath, display_size((int) $cumulativefilesize));
     $reportfiles['cumulative_file_size.txt'] = $reportpath;
     $output[] = 'Generated cumulative_file_size report';
 }

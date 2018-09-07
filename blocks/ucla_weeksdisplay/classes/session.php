@@ -72,7 +72,7 @@ abstract class block_ucla_weeksdisplay_session {
     protected $session;
     protected $term;
     protected $quarter;
-    private $today;
+    protected $today;
     protected $renderedweek;
 
     public function __construct($session) {
