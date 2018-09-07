@@ -26,8 +26,9 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/theme/uclashared/lib.php');
 
-$weeksarr = $OUTPUT->parsed_weeks_display();
+$weeksarr = theme_uclashared_parsed_weeks_display();
 
 $imagearr = theme_uclashared_frontpageimage();
 
