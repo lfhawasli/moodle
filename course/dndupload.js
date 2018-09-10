@@ -57,6 +57,8 @@ M.course_dndupload = {
     // The selector identifying the list of modules within a section (note changing this may require
     // changes to the get_mods_element function)
     modslistselector: 'ul.section',
+    // Original onbeforeunload event.
+    originalUnloadEvent: null,
 
     /**
      * Initalise the drag and drop upload interface
@@ -764,6 +766,10 @@ M.course_dndupload = {
         // Wait for the AJAX call to complete, then update the
         // dummy element with the returned details
         xhr.onreadystatechange = function() {
+            if (xhr.readyState == 1) {
+                this.originalUnloadEvent = window.onbeforeunload;
+                self.reportUploadDirtyState(true);
+            }
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     var result = JSON.parse(xhr.responseText);
@@ -790,6 +796,7 @@ M.course_dndupload = {
                 } else {
                     new M.core.alert({message: M.util.get_string('servererror', 'moodle')});
                 }
+                self.reportUploadDirtyState(false);
             }
         };
 
@@ -993,6 +1000,10 @@ M.course_dndupload = {
         // Wait for the AJAX call to complete, then update the
         // dummy element with the returned details
         xhr.onreadystatechange = function() {
+            if (xhr.readyState == 1) {
+                this.originalUnloadEvent = window.onbeforeunload;
+                self.reportUploadDirtyState(true);
+            }
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     var result = JSON.parse(xhr.responseText);
@@ -1015,6 +1026,7 @@ M.course_dndupload = {
                 } else {
                     new M.core.alert({message: M.util.get_string('servererror', 'moodle')});
                 }
+                self.reportUploadDirtyState(false);
             }
         };
 
@@ -1047,6 +1059,25 @@ M.course_dndupload = {
         });
         if (M.core.actionmenu && M.core.actionmenu.newDOMNode) {
             M.core.actionmenu.newDOMNode(node);
+        }
+    },
+
+    /**
+     * Set the event to prevent user navigate away when upload progress still running.
+     *
+     * @param {bool} enable true if upload progress is running, false otherwise
+     */
+    reportUploadDirtyState: function(enable) {
+        if (!enable) {
+            window.onbeforeunload = this.originalUnloadEvent;
+        } else {
+            window.onbeforeunload = function(e) {
+                var warningMessage = M.util.get_string('changesmadereallygoaway', 'moodle');
+                if (e) {
+                    e.returnValue = warningMessage;
+                }
+                return warningMessage;
+            };
         }
     }
 };

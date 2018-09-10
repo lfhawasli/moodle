@@ -240,10 +240,11 @@ echo $renderer->unified_filter($course, $context, $filtersapplied, $baseurl);
 
 echo '<div class="userlist">';
 
-// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
-//$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
-$participanttable = new \core_user\participants_table($course->id, $groupid, $groupingid, $lastaccess, $roleid, $enrolid, $status,
-// END UCLA MOD: CCLE-5686.
+// Add filters to the baseurl after creating unified_filter to avoid losing them.
+foreach (array_unique($filtersapplied) as $filterix => $filter) {
+    $baseurl->param('unified-filters[' . $filterix . ']', $filter);
+}
+$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
     $searchkeywords, $bulkoperations, $selectall);
 $participanttable->define_baseurl($baseurl);
 
@@ -263,8 +264,6 @@ if ($bulkoperations) {
 }
 
 echo $participanttablehtml;
-
-$PAGE->requires->js_call_amd('core_user/name_page_filter', 'init');
 
 $perpageurl = clone($baseurl);
 $perpageurl->remove_params('perpage');

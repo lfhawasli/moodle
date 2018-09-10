@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/backup/util/helper/backup_cron_helper.class.php');
+require_once($CFG->dirroot . '/backup/util/interfaces/checksumable.class.php');
+require_once("$CFG->dirroot/backup/backup.class.php");
 
 /**
  * Unit tests for backup cron helper
@@ -333,6 +335,48 @@ class backup_cron_helper_testcase extends advanced_testcase {
         $this->assertArrayHasKey('1000432000', $backupfiles);
         $this->assertEquals('file3.mbz', $backupfiles['1000432000']);
     }
+
+    /**
+     * Test {@link backup_cron_automated_helper::is_course_modified}.
+     */
+    public function test_is_course_modified() {
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        set_config('enabled_stores', 'logstore_standard', 'tool_log');
+        set_config('buffersize', 0, 'logstore_standard');
+        set_config('logguests', 1, 'logstore_standard');
+
+        $course = $this->getDataGenerator()->create_course();
+
+        // New courses should be backed up.
+        $this->assertTrue(testable_backup_cron_automated_helper::testable_is_course_modified($course->id, 0));
+
+        $timepriortobackup = time();
+        $this->waitForSecond();
+        $otherarray = [
+            'format' => backup::FORMAT_MOODLE,
+            'mode' => backup::MODE_GENERAL,
+            'interactive' => backup::INTERACTIVE_YES,
+            'type' => backup::TYPE_1COURSE,
+        ];
+        $event = \core\event\course_backup_created::create([
+            'objectid' => $course->id,
+            'context'  => context_course::instance($course->id),
+            'other'    => $otherarray
+        ]);
+        $event->trigger();
+
+        // If the only action since last backup was a backup then no backup.
+        $this->assertFalse(testable_backup_cron_automated_helper::testable_is_course_modified($course->id, $timepriortobackup));
+
+        $course->groupmode = SEPARATEGROUPS;
+        $course->groupmodeforce = true;
+        update_course($course);
+
+        // Updated courses should be backed up.
+        $this->assertTrue(testable_backup_cron_automated_helper::testable_is_course_modified($course->id, $timepriortobackup));
+    }
 }
 
 /**
@@ -355,10 +399,15 @@ class testable_backup_cron_automated_helper extends backup_cron_automated_helper
     }
 
     /**
-     * Set timezone back to default.
+     * Provides access to protected method get_backups_to_remove.
+     *
+     * @param int $courseid course id to check
+     * @param int $since timestamp, from which to check
+     *
+     * @return bool true if the course was modified, false otherwise. This also returns false if no readers are enabled. This is
+     * intentional, since we cannot reliably determine if any modification was made or not.
      */
-    protected function tearDown() {
-        date_default_timezone_set($this->systemdefaulttimezone);
-        parent::tearDown();
+    public static function testable_is_course_modified($courseid, $since) {
+        return parent::is_course_modified($courseid, $since);
     }
 }
