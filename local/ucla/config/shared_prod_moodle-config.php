@@ -393,7 +393,8 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'
 
 // Site administration > Plugins > Blocks > Panopto
 $CFG->forced_plugin_settings['block_panopto']['instance_name'] = 'CCLE-Shared-PROD';
-$CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'ucla.hosted.panopto.com';
+$CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'dgsom.hosted.panopto.com';
+$CFG->forced_plugin_settings['block_panopto']['folder_name_style'] = 'shortname';
 
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
@@ -464,7 +465,8 @@ $CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
 // Site administration > Plugins > Text editors > Atto HTML editor > Panopto
-$CFG->forced_plugin_settings['atto_panoptobutton']['defaultserver'] = 'ucla.hosted.panopto.com';
+$CFG->forced_plugin_settings['atto_panoptobutton']['defaultserver'] = 'dgsom.hosted.panopto.com';
+
 // Site administration > Plugins > Text editors > Atto HTML editor > Font family setting
 $CFG->forced_plugin_settings['atto_fontfamily']['fontselectlist'] = '
     Default=Lato, Helvetica Neue, Helvetica, Arial, sans-serif;

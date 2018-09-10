@@ -424,7 +424,8 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'
 
 // Site administration > Plugins > Blocks > Panopto
 $CFG->forced_plugin_settings['block_panopto']['instance_name'] = 'CCLE-Shared-TEST';
-$CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'test-ccle-ucla.hosted.panopto.com';
+$CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'dgsomtest.hosted.panopto.com';
+$CFG->forced_plugin_settings['block_panopto']['folder_name_style'] = 'shortname';
 
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
@@ -495,7 +496,8 @@ $CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 $CFG->forced_plugin_settings['atto_collapse']['showgroups'] = 8;
 
 // Site administration > Plugins > Text editors > Atto HTML editor > Panopto
-$CFG->forced_plugin_settings['atto_panoptobutton']['defaultserver'] = 'test-ccle-ucla.hosted.panopto.com';
+$CFG->forced_plugin_settings['atto_panoptobutton']['defaultserver'] = 'dgsomtest.hosted.panopto.com';
+
 // Site administration > Plugins > Text editors > Atto HTML editor > Font family setting
 $CFG->forced_plugin_settings['atto_fontfamily']['fontselectlist'] = '
     Default=Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
@@ -520,7 +522,7 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Add Panopto Video
-$CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'https://test-ccle-ucla.hosted.panopto.com';
+$CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'https://dgsomtest.hosted.panopto.com';
 
 // Site administration > Plugins > Local plugins > Google Analytics
 $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
