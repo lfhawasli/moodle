@@ -550,6 +550,9 @@ $CFG->emailonlyfromnoreplyaddress = 1;
 $CFG->forced_plugin_settings['message']['email_provider_mod_forum_posts_permitted'] = 'forced';
 $CFG->forced_plugin_settings['message']['email_provider_mod_forum_digests_permitted'] = 'forced';
 
+// Site administration > Plugins > Reports > Forum email logs
+$CFG->forced_plugin_settings['report_emaillog']['daysexpire'] = 30;
+
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
 
