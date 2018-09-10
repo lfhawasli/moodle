@@ -3520,6 +3520,10 @@ function duplicate_module($course, $cm) {
         $newcm = get_fast_modinfo($cm->course)->get_cm($newcmid);
         $event = \core\event\course_module_created::create_from_cm($newcm);
         $event->trigger();
+
+        // START UCLA MOD: CCLE-7818 - Add (copy) to duplicates.
+        $DB->set_field($cm->modname, 'name', $newcm->name . ' (copy)', array('id' => $newcm->instance));
+        // END UCLA MOD: CCLE-7818.
     }
 
     return isset($newcm) ? $newcm : null;

@@ -420,10 +420,6 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] =
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
 
-// Site administration > Plugins > Blocks > Panopto
-$CFG->forced_plugin_settings['block_panopto']['instance_name'] = 'CCLE-Shared-DEV';
-$CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'test-ccle-ucla.hosted.panopto.com';
-
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;
 $CFG->block_quickmail_receipt = 1;
@@ -549,6 +545,9 @@ $CFG->emailonlyfromnoreplyaddress = 1;
 // Site administration > Plugins > Message outputs > Default message outputs
 $CFG->forced_plugin_settings['message']['email_provider_mod_forum_posts_permitted'] = 'forced';
 $CFG->forced_plugin_settings['message']['email_provider_mod_forum_digests_permitted'] = 'forced';
+
+// Site administration > Plugins > Reports > Forum email logs
+$CFG->forced_plugin_settings['report_emaillog']['daysexpire'] = 30;
 
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
