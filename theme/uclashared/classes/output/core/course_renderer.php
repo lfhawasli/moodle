@@ -186,13 +186,19 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
             $output .= course_get_cm_move($mod, $sectionreturn);
         }
 
+        if(empty($displayoptions['hidecompletion']) && $course->enablecompletion){
+            $output .= html_writer::start_tag('div', array('class' => 'completion-container'));
+            $output .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
+            $output .= html_writer::end_tag('div');
+        }
+
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
         // This div is used to indent the content.
         $output .= html_writer::div('', $indentclasses);
 
         // Start a wrapper for the actual content to keep the indentation consistent.
-        $output .= html_writer::start_tag('div');
+        $output .= html_writer::start_tag('div', array('class' => 'label-wrapper'));
 
         // Display the link to the module (or do nothing if module has no url).
         $cmname = $this->course_section_cm_name($mod, $displayoptions);
@@ -217,7 +223,6 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         if (!empty($cmname)) {
             // Start the div for the activity title, excluding the edit icons.
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
-            $output .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
             $output .= $cmname;
 
             // Module can put text after the link (e.g. forum unread).
