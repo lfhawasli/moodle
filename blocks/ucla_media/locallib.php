@@ -140,9 +140,10 @@ function get_video_data($courseid) {
     $currentdate = time();
 
     // Adding GROUP BY to the where clause of the database query ensures no
-    // duplicate videos are displayed for crosslisted courses.
+    // duplicate videos are displayed for crosslisted courses if they have the 
+    // same term.
     $videos = $DB->get_records_select('ucla_video_reserves',
-            "courseid = ? GROUP BY video_title", array($courseid));
+            "courseid = ? GROUP BY video_title, term", array($courseid));
 
     // Sort the data chronologically.
     foreach ($videos as $video) {
