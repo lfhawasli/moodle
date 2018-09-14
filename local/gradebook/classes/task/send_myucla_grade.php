@@ -136,7 +136,7 @@ class send_myucla_grade extends send_myucla_base {
                        urc.srs = crcc.param_srs AND
                        crcc.param_term = :term AND
                        crcc.param_srs $srssql AND
-                       (crcc.enrl_stat_cd!='D' AND crcc.enrl_stat_cd!='C')";
+                       crcc.enrl_stat_cd!='D'";
 
         // We should only get one record, but we should handle multiple.
         $enrolledcourses = $DB->get_records_sql($sql, $params);
