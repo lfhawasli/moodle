@@ -744,18 +744,17 @@ function get_student_pseudorole($studentcode) {
 
     switch($code) {
         case 'w':   // Waitlist.
-        case 'h':   // Held (UNEX).
-        case 'p':   // Pending.
+        case 'h':   // Held).
+        case 'p':   // Pending (UNEX).
             $psrole = 'waitlisted';
             break;
         case 'e':   // Enrolled.
-        case 'a':   // Approved (unex).
+        case 'a':   // Approved (UNEX).
+        case 'c':   // Completed (UNEX).
             $psrole = 'student';
             break;
         default:
-            // This includes codes:
-            // d = dropped
-            // c = cancelled
+            // This includes code: d = dropped.
             // If they do not have an explicitly declared role code,
             // then they are considered unenrolled.
             $psrole = false;
