@@ -68,6 +68,11 @@ class status_field implements renderable, templatable {
     /** @var int $timeend The timestamp when the user's enrolment ends. */
     protected $timeend;
 
+    // START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+    /** @var int $timeenrolled The timestamp when the user was enrolled. */
+    protected $timeenrolled;
+    // END UCLA MOD: CCLE-7892.
+
     /** @var user_enrolment_action[] $enrolactions Array of enrol action objects for the given enrolment method. */
     protected $enrolactions;
 
@@ -92,13 +97,19 @@ class status_field implements renderable, templatable {
      * @param user_enrolment_action[] $enrolactions Array of enrol action objects for the given enrolment method.
      */
     public function __construct($enrolinstancename, $coursename, $fullname, $status, $timestart = null, $timeend = null,
-                                $enrolactions = []) {
+                                // START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+                                //$enrolactions = []) {
+                                $timeenrolled, $enrolactions = []) {
+                                // END UCLA MOD: CCLE-7892.
         $this->enrolinstancename = $enrolinstancename;
         $this->coursename = $coursename;
         $this->fullname = $fullname;
         $this->status = $status;
         $this->timestart = $timestart;
         $this->timeend = $timeend;
+        // START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+        $this->timeenrolled = $timeenrolled;
+        // END UCLA MOD: CCLE-7892.
         $this->enrolactions = $enrolactions;
     }
 
@@ -127,6 +138,11 @@ class status_field implements renderable, templatable {
         if ($this->timeend) {
             $data->timeend = userdate($this->timeend);
         }
+        // START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+        if ($this->timeenrolled) {
+            $data->timeenrolled = userdate($this->timeenrolled);
+        }
+        // END UCLA MOD: CCLE-7892.
         $data->enrolactions = [];
 
         foreach ($this->enrolactions as $enrolaction) {

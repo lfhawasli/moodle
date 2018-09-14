@@ -135,6 +135,9 @@ $string['startdatetoday'] = 'Today';
 $string['synced'] = 'Synced';
 $string['testsettings'] = 'Test settings';
 $string['testsettingsheading'] = 'Test enrol settings - {$a}';
+// START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+$string['timeenrolled'] = 'Date enrolled';
+// END UCLA MOD: CCLE-7892.
 $string['totalenrolledusers'] = '{$a} enrolled users';
 $string['totalotherusers'] = '{$a} other users';
 $string['unassignnotpermitted'] = 'You do not have permission to unassign roles in this course';

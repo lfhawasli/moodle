@@ -465,7 +465,10 @@ class participants_table extends \table_sql {
                         break;
                 }
 
-                $statusfield = new status_field($instancename, $coursename, $fullname, $status, $timestart, $timeend, $actions);
+                // START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+                //$statusfield = new status_field($instancename, $coursename, $fullname, $status, $timestart, $timeend, $actions);
+                $statusfield = new status_field($instancename, $coursename, $fullname, $status, $timestart, $timeend, $ue->timecreated, $actions);
+                // END UCLA MOD: CCLE-7892.
                 $statusfielddata = $statusfield->set_status($statusval)->export_for_template($OUTPUT);
                 $enrolstatusoutput .= $OUTPUT->render_from_template('core_user/status_field', $statusfielddata);
             }
