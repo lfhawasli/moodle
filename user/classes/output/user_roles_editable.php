@@ -142,6 +142,10 @@ class user_roles_editable extends \core\output\inplace_editable {
         $courseid = clean_param($courseid, PARAM_INT);
         $userid = clean_param($userid, PARAM_INT);
         $roleids = json_decode($newvalue);
+        // START UCLA MOD: CCLE-7856 - Cannot assign role in course when this should be possible.
+        $course = get_course($courseid);
+        // END UCLA MOD: CCLE-7856.
+
         foreach ($roleids as $index => $roleid) {
             $roleids[$index] = clean_param($roleid, PARAM_INT);
         }
@@ -159,7 +163,14 @@ class user_roles_editable extends \core\output\inplace_editable {
 
         // Check that all the groups belong to the course.
         $allroles = role_fix_names(get_all_roles($context), $context);
-        $assignableroles = get_assignable_roles($context, ROLENAME_ALIAS, false);
+        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        // $assignableroles = get_assignable_roles($context, ROLENAME_ALIAS, false);
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
+        $untrimmedroles = \uclaroles_manager::get_assignable_roles_by_courseid($course, true);
+        foreach ($untrimmedroles as $role) {
+            $assignableroles[$role->id] = $role->name;
+        }
+        // END UCLA MOD: CCLE-6809.
         $userrolesbyid = get_user_roles($context, $userid, true, 'c.contextlevel DESC, r.sortorder ASC');
         $profileroles = get_profile_roles($context);
 

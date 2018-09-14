@@ -80,7 +80,9 @@ $table->set_fields($fields, $OUTPUT);
 $renderer = $PAGE->get_renderer('core_enrol');
 $canassign = has_capability('moodle/role:assign', $manager->get_context());
 $users = $manager->get_other_users_for_display($renderer, $PAGE->url, $table->sort, $table->sortdirection, $table->page, $table->perpage);
-$assignableroles = $manager->get_assignable_roles(true);
+// CCLE-6809 - Expand roles that can be manually enrolled.
+$assignableroles = $manager->get_assignable_roles(false, true);
+// END UCLA MOD: CCLE-6809.
 foreach ($users as $userid=>&$user) {
     $user['picture'] = $OUTPUT->render($user['picture']);
     $user['role'] = $renderer->user_roles_and_actions($userid, $user['roles'], $assignableroles, $canassign, $PAGE->url);
