@@ -203,6 +203,9 @@ define(['core/templates',
                     "statusclass": parentContainer.find('span').attr('class'),
                     "timestart": parentContainer.data('timestart'),
                     "timeend": parentContainer.data('timeend')
+                    // START UCLA MOD: CCLE-7892 - Re-added date added to participants table.
+                    ,"timeenrolled": parentContainer.data('timeenrolled')
+                    // END UCLA MOD: CCLE-7892.
                 };
 
                 // Get default string for the modal and modal type.
