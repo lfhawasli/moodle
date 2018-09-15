@@ -55,7 +55,7 @@ class filter_oidwowza extends moodle_text_filter {
 
         if ($CFG->filter_oidwowza_enable_mp4) {
             // For Video reserves Wowza links.
-            $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
+            $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
             $newtext = preg_replace_callback($search, 'oidwowza_filter_mp4_callback', $newtext);
             // For Bruincast Wowza links.
             $search = '/\{bruincast:jw,"(.*?)",(.*?),(.*?),(.*?)\}/';
@@ -134,6 +134,28 @@ class filter_oidwowza extends moodle_text_filter {
 }
 
 /**
+ * Setup for JWPlayer
+ * 
+ * @param string    $filename
+ * @param array     $options
+ */
+function jwplayer_setup($filename, $options) {
+    global $PAGE;
+
+    // We need to define jwplayer because jwplayer does not define a module for require.js.
+    $requirejs = 'require.config({ paths: {\'jwplayer\': \'https://content.jwplatform.com/libraries/q3GUgsN9\'}})';
+    $PAGE->requires->js_amd_inline($requirejs);
+    $stringsforjs = array('skipahead', 'playbackrates', 'rewind');
+    $PAGE->requires->strings_for_js($stringsforjs, 'filter_oidwowza');
+
+    // Create the JWPlayer and allow it to update user preferences.
+    $preferencename = 'jwtimestamp_'.$filename;
+    user_preference_allow_ajax_update($preferencename, PARAM_TEXT);
+    array_unshift($options, $preferencename);
+    $PAGE->requires->js_call_amd('filter_oidwowza/timestamps', 'init', $options); 
+}
+
+/**
  * Replaces Bruincast Wowza link with media player.
  *
  * @param array $link
@@ -156,22 +178,14 @@ function oidwowza_filter_mp4_bruincast_callback($link) {
 
     $playerid = uniqid();
 
-    // We need to define jwplayer because jwplayer does not define a module for require.js.
-    $requirejs = 'require.config({ paths: {\'jwplayer\': \'https://content.jwplatform.com/libraries/q3GUgsN9\'}})';
-    $PAGE->requires->js_amd_inline($requirejs);
-    $stringsforjs = array('skipahead', 'playbackrates', 'rewind');
-    $PAGE->requires->strings_for_js($stringsforjs, 'filter_oidwowza');
-
     // Get the filename by parsing the video url.
     $parts = parse_url($rtmpurl);
     $filename = basename($parts['path']);
     $filename = substr($filename, strpos($filename, ':') + 1);
 
-    // Create the JWPlayer and allow it to update user preferences.
-    $preferencename = 'jwtimestamp_'.$PAGE->course->id.'_'.$filename;
-    user_preference_allow_ajax_update($preferencename, PARAM_TEXT);
-    $PAGE->requires->js_call_amd('filter_oidwowza/timestamps', 'init', 
-            array($preferencename, $playerid, $httpurl, $rtmpurl, $isvideo));    
+    $options = array($playerid, $httpurl, $isvideo, 
+            'bcast', $rtmpurl, '', '');
+    jwplayer_setup($PAGE->course->id.'_'.$filename, $options);
 
     return "<div id='player-$playerid'></div>";
 }
@@ -191,6 +205,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
     $url    = clean_param($link[2], PARAM_NOTAGS);
     $file   = clean_param($link[3], PARAM_NOTAGS);
     $fallbackurl = clean_param($link[6], PARAM_TEXT);
+    $video_title = clean_param($link[7], PARAM_TEXT);
     if (!empty($fallbackurl)) {
         $fallbackurl = urldecode($fallbackurl);
     }
@@ -226,10 +241,7 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
         case "mbr":
             $file = $title . '-low.' . $extension;
             $filehd = $title . '.' . $extension;
-            $mbrjs = '"hd-2":{
-                "file" : "' . $format . $filehd . '",
-                "state" : "true"
-            },';
+            $mbrjs = $format . $filehd;
             break;
         case "live":
             $format = "";
@@ -334,36 +346,18 @@ function oidwowza_filter_mp4_callback($link, $autostart = false) {
             $index++;
         }
         $timeline .= '</div>';
-
-        $srtjs = ",tracks: [{
-                    file: '$srtpath',
-                    kind: 'captions',
-                    'default': true
-                  }]";
+    } else {
+        $srtpath = '';
     }
 
+    // Video reserves do not have crosslistings, so there is no 
+    // need to include the courseid.
+    $options = array($playerid, $html5path, 1, 
+            'vidres', $rtmppath, $srtpath, $mbrjs);
+    jwplayer_setup(strtoupper($video_title), $options);
+
     // Print out the player output.
-    return "
-        <div id='player-$playerid'></div>
-	<script type='text/javascript'>
-	jwplayer('player-$playerid').setup({
-            autostart: true,
-            width: '100%',
-            aspectratio: '3:2',
-            plugins: {
-                $mbrjs
-                },
-            playlist: [{
-                sources :
-                    [
-                        {file: '$html5path'},
-                        {file: '$rtmppath'}
-                    ]
-                $srtjs
-                }],
-            primary: 'html5'
-        });
-	</script>" . $timeline . $fallbackurl;
+    return "<div id='player-$playerid'></div>" . $timeline . $fallbackurl;
 }
 
 /**
@@ -387,8 +381,9 @@ function oidwowza_filter_mp4_lib_callback($link, $autostart = false) {
     if (!empty($rtmpurl)) {
         $rtmpurl = urldecode($rtmpurl);
     }
-    
+
     $playerid = uniqid();
+
     if ($isvideo == 1) {
         return "
             <div id='player-$playerid'></div>
@@ -418,5 +413,4 @@ function oidwowza_filter_mp4_lib_callback($link, $autostart = false) {
             });
             </script>";
     }
-
 }

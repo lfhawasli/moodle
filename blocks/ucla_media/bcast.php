@@ -201,13 +201,14 @@ function display_all($course, $sort, $tab, $pageparams) {
                         'filename' => $filename)), $buttontextplay);
                 $mediacell .= $videolinkplay . ' ';
 
-                $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, NULL, $USER);
-                if ($jwtimestamp !== NULL) {
+                $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, null, $USER);
+                if ($jwtimestamp !== null) {
                     if ($jwtimestamp === 'FINISHED') {
-                        $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> Finished';
+                        $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> '.
+                                get_string('bcmediafinished', 'block_ucla_media');
                         $jwtimestamp = 0;
                     } else {
-                        $buttontextresume .= ' from ' . gmdate('H:i:s', $jwtimestamp);
+                        $buttontextresume .= gmdate('H:i:s', $jwtimestamp);
                     }
                     $buttontextresume = '<button type="button" class="btn btn-default">' .
                             $buttontextresume . '</button>';
@@ -247,13 +248,14 @@ function display_all($course, $sort, $tab, $pageparams) {
                         'filename' => $filename, 'offset' => 0)), $buttontextplay);
                 $mediacell .= $audiolinkplay . ' ';
 
-                $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, NULL, $USER);
-                if ($jwtimestamp !== NULL) {
+                $jwtimestamp = get_user_preferences('jwtimestamp_'.$course->id.'_'.$filename, null, $USER);
+                if ($jwtimestamp !== null) {
                     if ($jwtimestamp === 'FINISHED') {
-                        $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> Finished';
+                        $buttontextresume = '<i class="fa fa-check-circle" aria-hidden="true"></i> '.
+                                get_string('bcmediafinished', 'block_ucla_media');
                         $jwtimestamp = 0;
                     } else {
-                        $buttontextresume .= ' from ' . gmdate('H:i:s', $jwtimestamp);
+                        $buttontextresume .= gmdate('H:i:s', $jwtimestamp);
                     }
                     $buttontextresume = '<button type="button" class="btn btn-default">' .
                             $buttontextresume . '</button>';
