@@ -118,8 +118,7 @@ class tool_supportconsole_manager {
             }
 
             // Create dropdown with anchor links for each group
-            $dropdownbuttontext = get_string($groupname, 'tool_uclasupportconsole') .
-                    html_writer::tag('i', '', array('class' => 'fa fa-fw fa-caret-down'));
+            $dropdownbuttontext = get_string($groupname, 'tool_uclasupportconsole');
             $dropdownbutton = html_writer::tag('button', $dropdownbuttontext,
                     array(
                         'class' => 'btn btn-default dropdown-toggle',
