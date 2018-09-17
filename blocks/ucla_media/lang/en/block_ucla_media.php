@@ -45,14 +45,12 @@ $string['eventvidreserveindexviewed'] = 'Video reserve index viewed';
 $string['eventvidreserveviewed'] = 'Video reserve viewed';
 $string['fallbackurl'] = 'Click here if experiencing video playback issues';
 $string['futurevideo'] = 'Future videos';
-$string['futurevideo_info'] = 'Will be available on {$a}';
 $string['intro'] = 'Please note that this media is intended for on-campus use only.
     Off-campus use is possible in certain circumstances, but it is not supported, dependable, or
     recommended.';
 
 $string['novideo'] = 'No videos available';
 $string['pastvideo'] = 'Past videos';
-$string['pastvideo_info'] = 'No longer available as of {$a}';
 $string['pluginname'] = 'UCLA media';
 $string['sourceurl'] = 'Source URL';
 $string['sourceurl_desc'] = 'TSV source URL for video reserves data';
@@ -97,11 +95,19 @@ $string['bcmetadata'] = 'Metadata';
 $string['bctitle'] = 'Title';
 $string['bccomments'] = 'Comments';
 $string['bcmediaplay'] = 'Play';
-$string['bcmediaresume'] = 'Resume';
+$string['bcmediaresume'] = 'Resume from ';
+$string['bcmediafinished'] = 'Finished';
 $string['bcother'] = 'Other';
 $string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are '
         . 'available. For help regarding BruinCast content please read our '
         . '<a href="https://docs.ccle.ucla.edu/w/BruinCast">help document</a>.';
+
+// Strings for video reserves display.
+$string['vrtitle'] = 'Title';
+$string['vrlinks'] = 'Links';
+$string['vravailability'] = 'Availability';
+$string['vrwillbeavailable'] = 'Will be available on';
+$string['vrnolongeravailable'] = 'No longer available as of';
 
 $string['videoreservesipwarning'] = 'You are accessing this content from off-campus. If the content does not load, you will need to use the UCLA VPN to obtain an on-campus internet address.</br>
 BOL VPN instructions: <a target="_blank" href="https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients">https://www.it.ucla.edu/bol/services/virtual-private-network-vpn-clients</a>.';

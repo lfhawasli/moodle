@@ -24,6 +24,7 @@
 
 namespace block_ucla_media\task;
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
+require_once($CFG->dirroot . '/blocks/ucla_media/locallib.php');
 
 /**
  * Class file.
@@ -193,6 +194,8 @@ class update_vidreserves extends \core\task\scheduled_task {
         foreach ($existingvideos as $term => $termvideos) {
             foreach ($termvideos as $srs => $srsvideos) {
                 foreach ($srsvideos as $videotitle => $id) {
+                    delete_timestamps(array('jwtimestamp'), array($videotitle));
+
                     $DB->delete_records('ucla_video_reserves', array('id' => $id));
                     $deletedcount++;
                     echo '-';   // Give process bar.

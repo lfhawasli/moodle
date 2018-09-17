@@ -1,52 +1,67 @@
 define(['jquery', 'jwplayer'], function($, jwplayer) {
 
     return {
-        init: function(preferencename, playerid, httpurl, rtmpurl, isvideo) {
+        init: function(preferencename, playerid, httpurl, isvideo, mediatype, rtmpurl, srtpath, mbrjs) {
             // We need the id of the jwplayer on the page.
             var id = 'player-' + playerid;
             var playerinstance = jwplayer(id);
             var playbackrates = M.util.get_string('playbackrates', 'filter_oidwowza');
             var rewind = M.util.get_string('rewind', 'filter_oidwowza');
+            var options = {
+                localization: {
+                    settings: playbackrates,
+                    rewind: rewind
+                }
+            };
 
             if (isvideo === 1) {
-                playerinstance.setup({
-                    'autostart': true,
-                    'width': '100%',
-                    'aspectratio': '3:2',
-                    'playlist': [{
-                        'sources': [
-                            {'file': httpurl},
-                            {'file': rtmpurl}
-                        ]
-                    }],
-                    'primary': 'html5',
-                    'localization': {
-                        'settings': playbackrates,
-                        'rewind': rewind
+                options.autostart = true;
+                options.width = '100%';
+                options.aspectratio = '3:2';
+                options.primary = 'html5';
+                options.playlist = [{
+                    sources: [
+                        { file: httpurl },
+                        { file: rtmpurl }
+                    ]
+                }];
+
+                if (mediatype === 'vidres') {
+                    if (srtpath) {
+                        options.playlist[0].tracks = [{
+                            file: srtpath,
+                            kind: 'captions',
+                            default: true
+                        }];
                     }
-                });
+
+                    if (mbrjs) {
+                        options.plugins = {
+                            'hd-2': {
+                                file: mbrjs,
+                                state: true
+                            }
+                        };
+                    }
+                }
             } else {
-                playerinstance.setup({
-                    'autostart': true,
-                    'image': M.cfg.wwwroot + '/filter/oidwowza/pix/audio-only.png',
-                    'sources': [
-                        {'file': rtmpurl},
-                        {'file': httpurl}
-                    ],
-                    'rtmp': {
-                        'bufferlength': 3
-                    },
-                    'modes': [
-                        { 'type': 'html5' },
-                        { 'type': 'flash' }
-                    ],
-                    'height': 200,
-                    'localization': {
-                        'settings': playbackrates,
-                        'rewind': rewind
-                    }
-                });
+                options.image = M.cfg.wwwroot + '/filter/oidwowza/pix/audio-only.png';
+                options.height = 200;
+                options.autostart = true;
+                options.sources = [
+                    { file: rtmpurl },
+                    { file: httpurl }
+                ];
+                options.rtmp = {
+                    bufferlength: 3
+                };
+                options.modes = [
+                    { type: 'html5' },
+                    { type: 'flash' }
+                ];
             }
+
+            playerinstance.setup(options);
 
             var offset = 0;
             var shouldPlay = false;

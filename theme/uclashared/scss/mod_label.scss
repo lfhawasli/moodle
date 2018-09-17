@@ -9,12 +9,22 @@
         padding-left: 15px;
         padding-right: 15px;
     }
+    .mod-indent-outer {
+        max-width: calc(100% - 65px);
+    }
+    .label-wrapper {
+        display: table-cell;
+    }
+    .contentwithoutlink, .activityinstance {
+        display: inline-block;
+        vertical-align: middle;
+        padding-top: .4rem;
+    }
 }
 
 // Adds spacing between activity labels.
 .section .activity.modtype_label.label {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 5px 10px;
 }
 
 // Makes external media links left aligned.

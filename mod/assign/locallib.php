@@ -275,7 +275,10 @@ class assign {
     public function get_return_params() {
         global $PAGE;
 
-        $params = $PAGE->url->params();
+        $params = array();
+        if (!WS_SERVER) {
+            $params = $PAGE->url->params();
+        }
         unset($params['id']);
         unset($params['action']);
         return $params;
@@ -1333,9 +1336,9 @@ class assign {
             // Now process the event.
             if ($event->id) {
                 $calendarevent = calendar_event::load($event->id);
-                $calendarevent->update($event);
+                $calendarevent->update($event, false);
             } else {
-                calendar_event::create($event);
+                calendar_event::create($event, false);
             }
         } else {
             $DB->delete_records('event', array('modulename' => 'assign', 'instance' => $instance->id,
@@ -1354,9 +1357,9 @@ class assign {
             // Now process the event.
             if ($event->id) {
                 $calendarevent = calendar_event::load($event->id);
-                $calendarevent->update($event);
+                $calendarevent->update($event, false);
             } else {
-                calendar_event::create($event);
+                calendar_event::create($event, false);
             }
         } else {
             $DB->delete_records('event', array('modulename' => 'assign', 'instance' => $instance->id,
@@ -1509,8 +1512,9 @@ class assign {
         } else if ($plugin->is_visible() && $plugin->is_configurable()) {
             $name = $plugin->get_subtype() . '_' . $plugin->get_type() . '_enabled';
             $label = $plugin->get_name();
-            $label .= ' ' . $this->get_renderer()->help_icon('enabled', $plugin->get_subtype() . '_' . $plugin->get_type());
             $pluginsenabled[] = $mform->createElement('checkbox', $name, '', $label);
+            $helpicon = $this->get_renderer()->help_icon('enabled', $plugin->get_subtype() . '_' . $plugin->get_type());
+            $pluginsenabled[] = $mform->createElement('static', '', '', $helpicon);
 
             $default = get_config($plugin->get_subtype() . '_' . $plugin->get_type(), 'default');
             if ($plugin->get_config('enabled') !== false) {
@@ -3310,11 +3314,12 @@ class assign {
     /**
      * Does this user have grade permission for this assignment?
      *
+     * @param int|stdClass $user The object or id of the user who will do the editing (default to current user).
      * @return bool
      */
-    public function can_grade() {
+    public function can_grade($user = null) {
         // Permissions check.
-        if (!has_capability('mod/assign:grade', $this->context)) {
+        if (!has_capability('mod/assign:grade', $this->context, $user)) {
             return false;
         }
 
@@ -4651,10 +4656,10 @@ class assign {
                                                       $this->show_intro(),
                                                       $this->get_course_module()->id,
                                                       $title, '', $postfix));
-        if ($userid == $USER->id) {
-            // We only show this if it their submission.
-            $o .= $this->plagiarism_print_disclosure();
-        }
+
+        // Show plagiarism disclosure for any user submitter.
+        $o .= $this->plagiarism_print_disclosure();
+
         $data = new stdClass();
         $data->userid = $userid;
         if (!$mform) {
