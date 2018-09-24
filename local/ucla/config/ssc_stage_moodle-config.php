@@ -435,16 +435,20 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     collapse = collapse
-    style1 = fontfamily, title, bold, italic, underline, backcolor, fontcolor, count
+    undo = undo
+    other = htmlplus, fullscreen
+    links = link
+    pastespecial = pastespecial, clear
+    style1 = fontfamily, title, bold, italic, underline, backcolor, fontcolor
+    insert1 = charmap, count
     list = unorderedlist, orderedlist
     indent = indent
-    undo = undo
-    links = link
-    files = image, media, managefiles, kalturamedia, mediagallery
-    other = htmlplus, fullscreen
-    style2 = strike, subscript, superscript
     align = align, table, bsgrid
-    insert = computing, equation, poodll, charmap, clear
+    files1 = image, media, managefiles, kalturamedia
+    style2 = strike, subscript, superscript
+    insert2 = chemrender, chemistry, computing, equation
+    files2 = mediagallery, panoptobutton
+    poodll = poodll
     accessibility = accessibilitychecker, accessibilityhelper';
 $CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 
