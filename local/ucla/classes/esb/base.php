@@ -61,6 +61,13 @@ abstract class base {
     public $debugging = false;
 
     /**
+     * Holds debugging messages as a string.
+     *
+     * @var string
+     */
+    public $debugginglog = '';
+
+    /**
      * If there was an error, has the HTTP code of last request stored.
      * @var string
      */
@@ -85,10 +92,22 @@ abstract class base {
     private $password;
 
     /**
+     * Holds profiling data if debugging is enabled.
+     * @var array
+     */
+    private $profiling = [];
+
+    /**
      * Path to SSL private key.
      * @var string
      */
     private $privatekey;
+
+    /**
+     * Start time. Used to build profiling data.
+     * @var float
+     */
+    private $starttime;
 
     /**
      * Cached token.
@@ -112,6 +131,36 @@ abstract class base {
         $this->password     = $configs->esbpassword;
         $this->cert         = $configs->esbcert;
         $this->privatekey   = $configs->esbprivatekey;
+    }
+
+    /**
+     * Used to benchmark API calls.
+     *
+     * Should only be used to benchmark one call at a time.
+     *
+     * @param string $apicall       Name of API to benchmark.
+     * @param string $startstop     Expecting 'start' or 'stop'.
+     */
+    private function build_profile($apicall, $startstop) {
+        if (!$this->debugging) {
+            // Only profile if we are debugging.
+            return;
+        }
+
+        // Initialize.
+        if (empty($this->profiling[$apicall])) {
+            $this->profiling[$apicall]['count'] = 0;
+            $this->profiling[$apicall]['time'] = 0;
+        }
+
+        if ($startstop == 'start') {
+            ++$this->profiling[$apicall]['count'];
+            $this->starttime = microtime(true);
+        } else if ($startstop == 'stop') {
+            $start = $this->starttime;
+            $end = microtime(true);
+            $this->profiling[$apicall]['time'] += $end - $start;
+        }
     }
 
     /**
@@ -142,7 +191,7 @@ abstract class base {
             if (CLI_SCRIPT) {
                 $eol = "\n";
             }
-            mtrace($message, $eol);
+            $this->debugginglog .= $message . $eol;
         }
     }
 
@@ -306,11 +355,17 @@ abstract class base {
         $parts = array_map('rawurlencode', $parts);
         $restapi = implode('/', $parts);
 
+        // For benchmarking, use the first part of the API call as the key.
+        $this->build_profile($parts[0], 'start');
+
         $this->lastquery = $this->baseurl . '/sis/api/v1/' . $restapi . '?' . $parameters;
         $response = $this->get_response($this->lastquery);
         if (is_array($response) && !empty($ignoreextradata)) {
             $response = reset($response);
         }
+
+        $this->build_profile($parts[0], 'stop');
+
         return $response;
     }
 
@@ -330,6 +385,17 @@ abstract class base {
 
         // Close any open cURL handlers.
         $this->close_curl();
+
+        // If debugging, display profiling data.
+        if ($debug) {
+            foreach ($this->profiling as $apicall => $data) {
+                $this->debug(sprintf('API call: %s, time it took: %s, ' .
+                        'times called: %d, average time per call: %.4f',
+                        $apicall, format_time(number_format($data['time'], 2)), $data['count'],
+                        $data['time'] / $data['count']));
+
+            }
+        }
 
         return $results;
     }
