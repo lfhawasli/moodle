@@ -35,6 +35,40 @@ defined('MOODLE_INTERNAL') || die();
  */
 class util {
     /**
+     * Formats courseCatalogNumber to display format:
+     *     0000SSPP -> PP . int(0000) . SS
+     *
+     * @param string catnum
+     *
+     * @return string           Returns formatted string.
+     */
+    public static function format_cat_num($catnum) {
+        $num = intval(substr($catnum, 0, 4));
+
+        if (strlen($catnum) < 5) {
+            $ss = '  ';
+        } else {
+            if (strlen($catnum) < 6) {
+                $ss = $catnum[4] . ' ';
+            } else {
+                $ss = $catnum[4] . $catnum[5];
+            }
+        }
+
+        if (strlen($catnum) < 7) {
+            $pp = '  ';
+        } else {
+            if (strlen($catnum) < 8) {
+                $pp = $catnum[6] . ' ';
+            } else {
+                $pp = $catnum[6] . $catnum[7];
+            }
+        }
+
+        return trim(trim($pp) . $num . trim($ss));
+    }
+
+    /**
      * Returns all available ESB queries
      *
      * @return array        Array of ESB queries available
