@@ -35,12 +35,24 @@ defined('MOODLE_INTERNAL') || die();
  */
 class tester extends base {
     /**
+     * Accepts blank parameters.
+     *
+     * @return array
+     */
+    public function get_parameters() {
+        return [];
+    }
+
+    /**
      * Calls the Infrastructure/VerifyConnectivity web service.
      *
-     * @return array    Returns array with results.
+     * @param array     Expecting empty array since we will set 'anyText'.
+     *
+     * @return mixed    Returns string of connection status.
      */
-    public function run() {
-        $message = $this->query('Infrastructure/VerifyConnectivity', ['anyText' => date('r')]);
+    public function build_result($params) {
+        $params = ['anyText' => date('r')];
+        $message = $this->query('Infrastructure/VerifyConnectivity', $params);
         // Also append message about the token used.
         $message .= '<br/>' . get_string('esbtoken', 'local_ucla', $this->get_token());
         return $message;

@@ -25,6 +25,7 @@
 namespace local_ucla\esb;
 
 defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../../lib.php');   // Include local_ucla lib.php.
 
 /**
  * Class file
@@ -47,6 +48,19 @@ abstract class base {
     private $cert;
 
     /**
+     * The cURL handler.
+     * @var mixed
+     */
+    private $ch;
+
+    /**
+     * If set to true, will output debugging messages.
+     *
+     * @var boolean
+     */
+    public $debugging = false;
+
+    /**
      * If there was an error, has the HTTP code of last request stored.
      * @var string
      */
@@ -59,6 +73,12 @@ abstract class base {
     public $lastmessage;
 
     /**
+     * Saves query used so it can be used for debugging.
+     * @var string
+     */
+    public $lastquery;
+
+    /**
      * Endpoint password credential.
      * @var string
      */
@@ -69,6 +89,12 @@ abstract class base {
      * @var string
      */
     private $privatekey;
+
+    /**
+     * Cached token.
+     * @var string
+     */
+    private $token;
 
     /**
      * Endpoint username credential.
@@ -89,6 +115,38 @@ abstract class base {
     }
 
     /**
+     * Defines what web services to call and what to do with the results.
+     *
+     * @params array $params
+     *
+     * @return mixed
+     */
+    abstract function build_result($params);
+
+    /**
+     * Closes curl connection.
+     */
+    private function close_curl() {
+        if (!empty($this->ch)) {
+            curl_close($this->ch);
+        }
+    }
+
+    /**
+     * If debugging flag for class is set, then will output message.
+     * @param string $message
+     */
+    protected function debug($message) {
+        if ($this->debugging) {
+            $eol = "<br />";
+            if (CLI_SCRIPT) {
+                $eol = "\n";
+            }
+            mtrace($message, $eol);
+        }
+    }
+
+    /**
      * Formats parameters to be used in query string.
      *
      * @param array $params Expecting name => value.
@@ -99,38 +157,54 @@ abstract class base {
         if (empty($params) || !is_array($params)) {
             return '';
         }
-        return http_build_query($params);
+
+        // Make sure to encode spaces as %20.
+        return http_build_query($params, '', '&', PHP_QUERY_RFC3986);
     }
+
+    /**
+     * Returns the array describing the parameters are needed to return data.
+     *
+     * @return array
+     */
+    abstract public function get_parameters();
 
     /**
      * Makes cURL call, parses JSON, and checks for error.
      *
      * Closes the cURL handler, unless specified.
      *
-     * @param resource $ch          Passed by reference. cURL handle.
-     * @param boolean $keepalive    If true, then wouldn't close connection.
+     * @param string $url       Query string.
+     * @param resource $ch      Optional custom cURL handler.
      *
      * @return array
      */
-    final private function get_response(&$ch, $keepalive = false) {
+    final private function get_response($url, &$ch = null) {
+        if (empty($ch)) {
+            $ch = $this->open_curl();
+        }
+        curl_setopt($ch, CURLOPT_URL, $url);
         $response = curl_exec($ch);
         if (!$response) {
             $this->lastmessage = curl_error($ch);
             $this->lasthttpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            throw new \Exception('ESB Error: ' . $this->lastmessage);
+            $this->close_curl();
+            throw new \moodle_exception('esberror', 'local_ucla', null, $this);
         }
 
-        $result = json_decode($response);
+        $result = json_decode($response, true);
 
         // Check if there was an error processing JSON.
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->lastmessage = $response;
             $this->lasthttpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            throw new \Exception('ESB Error: ' . $this->lastmessage);
-        }
+            $this->close_curl();
 
-        if (!$keepalive) {
-            curl_close($ch);
+            // If error was 404, then there were no results.
+            if ($this->lasthttpcode == 404) {
+                return null;
+            }
+            throw new \moodle_exception('esberror', 'local_ucla', null, $this);
         }
 
         return $result;
@@ -144,11 +218,18 @@ abstract class base {
      * @return string
      */
     final protected function get_token() {
+        // Cache token.
+        if (!empty($this->token)) {
+            return $this->token;
+        }
+
         $cache = \cache::make('local_ucla', 'esbtoken');
         $token = $cache->get('token');
 
-        if ($token === false) {
-            $ch = curl_init($this->baseurl . '/oauth2/token');
+        if (empty($token)) {
+            // Use customized cURL handler for obtaining token.
+            $url = $this->baseurl . '/oauth2/token';
+            $ch = curl_init();
             $options = [
                 CURLOPT_PORT => 4443,
                 CURLOPT_RETURNTRANSFER => true,
@@ -166,12 +247,37 @@ abstract class base {
                 ]
             ];
             curl_setopt_array($ch, $options);
-            $response = $this->get_response($ch);
-            $token = $response->access_token;
+            $response = $this->get_response($url, $ch);
+            curl_close($ch);
+            $token = $response['access_token'];
             $cache->set('token', $token);
         }
 
+        $this->token = $token;
+
         return $token;
+    }
+
+    /**
+     * Opens or returns an opened curl connection.
+     *
+     * @return mixed    cURL handler by reference.
+     */
+    private function &open_curl() {
+        if (!empty($this->ch)) {
+            return $this->ch;
+        }
+        $this->ch = curl_init();
+        curl_setopt_array($this->ch, [
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_RETURNTRANSFER => true,
+            // ESB timeout is 2 minutes, so allow time for ESB to give timeout error.
+            CURLOPT_TIMEOUT => 130,
+            CURLOPT_HTTPHEADER => [
+                'esmAuthnClientToken: ' . $this->get_token()
+            ]
+        ]);
+        return $this->ch;
     }
 
     /**
@@ -179,22 +285,85 @@ abstract class base {
      *
      * @param string $restapi
      * @param array $params
+     * @param $ignoreextradata  Queries are returned in an array with first item
+     *                          is the content followed, sometimes, by junk like
+     *                          totalRecords, totalPages, etc. If true, this
+     *                          will return just the content.
+     *
+     * @return array
      */
-    protected function query($restapi, $params = null) {
+    protected function query($restapi, $params = null, $ignoreextradata = false) {
         $parameters = $this->format_parameters($params);
-        $ch = curl_init($this->baseurl . '/sis/api/v1/' . $restapi . '?' . $parameters);
-        curl_setopt_array($ch, [
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                'esmAuthnClientToken: ' . $this->get_token()
-            ]
-        ]);
-        return $this->get_response($ch);
+
+        // Always get all the records.
+        if (!empty($parameters)) {
+            $parameters .= '&';
+        }
+        $parameters .= 'PageSize=0';
+
+        // Make sure $restapi is urlencoded.
+        $parts = explode('/', $restapi);
+        $parts = array_map('rawurlencode', $parts);
+        $restapi = implode('/', $parts);
+
+        $this->lastquery = $this->baseurl . '/sis/api/v1/' . $restapi . '?' . $parameters;
+        $response = $this->get_response($this->lastquery);
+        if (is_array($response) && !empty($ignoreextradata)) {
+            $response = reset($response);
+        }
+        return $response;
     }
 
     /**
-     * Defines what web services to call and what to do with the results.
+     * Validates parameters and then builds results.
+     *
+     * @params array $params
+     * @param boolean $debug    If true, then will output debugging statements.
+     *
+     * @return mixed
      */
-    abstract public function run();
+    public function run($params, $debug = false) {
+        $this->debugging = $debug;
+        $validatedparams = $this->validate_parameters($params);
+        
+        $results = $this->build_result($validatedparams);
+
+        // Close any open cURL handlers.
+        $this->close_curl();
+
+        return $results;
+    }
+
+    /**
+     * Validates parameters against expected parameters.
+     *
+     * Make sure to call this at the start of the run() method.
+     *
+     * @param array $params
+     * @return array
+     */
+    protected function validate_parameters($params) {
+        $expectedparams = $this->get_parameters();
+        if (empty($expectedparams)) {
+            return null;
+        }
+
+        // Validate parameters, expecting every parameter to be checkable via
+        // ucla_validator().
+        $validparameters = [];
+        foreach ($expectedparams as $expectedparam) {
+            if (isset($params[$expectedparam])) {
+                if (ucla_validator($expectedparam, $params[$expectedparam])) {
+                    $validparameters[$expectedparam] = $params[$expectedparam];
+                } else {
+                    throw new \Exception(sprintf('ESB Error: Invalid param %s = %s',
+                            $expectedparam, $params[$expectedparam]));
+                }
+            } else {
+                throw new \Exception('ESB Error: Missing required parameter ' .
+                        $expectedparam);
+            }
+        }
+        return $validparameters;
+    }
 }

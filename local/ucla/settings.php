@@ -76,10 +76,11 @@ if ($hassiteconfig) {
         $tester = new \local_ucla\esb\tester();
         $notifyclass = $message = '';
         try {
-            $message = $tester->run();
+            $message = $tester->run([]);
             $notifyclass = 'success';
         } catch (Exception $e) {
             $message = $tester->lasthttpcode . ': ' . $tester->lastmessage;
+            $message .= '<br/>' . $e->getMessage();
             $notifyclass = 'error';
         }
         $statusmessage = $OUTPUT->notification(get_string('esbstatus', 'local_ucla') .
