@@ -268,13 +268,4 @@ class local_ucla_observer {
 
         return true;
     }
-
-    /**
-     * Opens navigation drawer.
-     *
-     * This function is used as a callback to respond to the user_loggedin event.
-     */
-    public static function open_nav_drawer() {
-        set_user_preference('drawer-open-nav', 'true');
-    }
 }
