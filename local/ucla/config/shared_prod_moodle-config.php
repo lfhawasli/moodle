@@ -247,7 +247,7 @@ $CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
 $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 
 // Site administration > Plugins > Activity modules > Assignment > Submission plugins > Online PoodLL submissions
-$CFG->forced_plugin_settings['assignsubmission_onlinepoodll']['allowedrecorders'] = '0,2';    // Allow only MP3 voice recorder and Video recorder.
+$CFG->forced_plugin_settings['assignsubmission_onlinepoodll']['allowedrecorders'] = '0,2,3,4';    // Allow only MP3 voice recorder, Video recorder, Whiteboard, and Snapshot.
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
