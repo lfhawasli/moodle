@@ -91,9 +91,12 @@ class mod_choice_mod_form extends moodleform_mod {
         $mform->addElement('header', 'resultshdr', get_string('results', 'choice'));
 
         $mform->addElement('select', 'showresults', get_string("publish", "choice"), $CHOICE_SHOWRESULTS);
+        $mform->setDefault('showresults', 1);
+        $mform->addHelpButton('showresults', 'publish', 'choice');
 
         $mform->addElement('select', 'publish', get_string("privacy", "choice"), $CHOICE_PUBLISH);
         $mform->disabledIf('publish', 'showresults', 'eq', 0);
+        $mform->addHelpButton('publish', 'privacy', 'choice');
 
         $mform->addElement('selectyesno', 'showunanswered', get_string("showunanswered", "choice"));
 
