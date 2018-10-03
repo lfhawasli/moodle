@@ -6,17 +6,8 @@
 
 .editing .section {
     .activity {
-        .mod-indent-outer {
-            padding-left: 0px;
-        }
         .editing_move {
             position: inherit;
-        }
-    }
-    .label {
-        .mod-indent-outer {
-            padding-left: 24px;
-            max-width: calc(100% - 65px);
         }
     }
 }

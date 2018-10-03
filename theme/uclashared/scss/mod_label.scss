@@ -10,15 +10,7 @@
         padding-right: 15px;
     }
     .mod-indent-outer {
-        max-width: calc(100% - 65px);
-    }
-    .label-wrapper {
-        display: table-cell;
-    }
-    .contentwithoutlink, .activityinstance {
-        display: inline-block;
-        vertical-align: middle;
-        padding-top: .4rem;
+        width: calc(100% - 65px);
     }
 }
 
