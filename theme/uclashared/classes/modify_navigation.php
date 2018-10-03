@@ -636,24 +636,6 @@ class modify_navigation {
                 $node->icon = $nodeinfo['icon'];
             }
         }
-
-        // The settingsnav is not set if we are purging caches.
-        @$settingsnav = $PAGE->settingsnav; // Supress NOTICE when purging caches.
-        if (empty($settingsnav)) {
-            return;
-        }
-
-        // Add gear icon to Site administration. Treat separately since it is
-        // harder to find.
-        // Code from lib/navigationlib.php:flat_navigation->initialise().
-        $admin = $settingsnav->find('siteadministration', \navigation_node::TYPE_SITE_ADMIN);
-        if (!$admin) {
-            // Try again - crazy nav tree!
-            $admin = $settingsnav->find('root', \navigation_node::TYPE_SITE_ADMIN);
-        }
-        if ($admin) {
-            $admin->icon = new \pix_icon('t/preferences', get_string('administrationsite'));
-        }
     }
 
     /**
