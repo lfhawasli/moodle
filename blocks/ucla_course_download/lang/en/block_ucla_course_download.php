@@ -16,8 +16,7 @@ $string['forums'] = 'Forum posts';
 $string['submissions'] = 'Assignment submissions';
 
 $string['request_available'] = 'Request a zip file containing all available course materials. Files are subject to change without notice.';
-$string['request_submitted'] = 'You have successfully submitted a request to create a zip file of course materials. You will be notified via email when it is available.';
-$string['request_in_progress'] = 'A zip file of all available course materials has been requested. You will be notified via email when it is available.';
+$string['request_in_progress'] = 'You have successfully requested the zip file for this course. It may take 24 hours for you to be notified via email that the file is available.';
 $string['request_completed'] = 'This zip file was last updated on <strong>{$a->timeupdated}</strong>.';
 $string['request_completed_changed'] = 'You downloaded this file on <strong>{$a}</strong>. The available course materials have since changed.';
 $string['request_completed_post'] = 'To be certain that you have all available course materials, you should check back periodically.' .
