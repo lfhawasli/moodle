@@ -202,10 +202,10 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         $url = $component->get_url();
         $output = html_writer::start_tag('div', array('class' => 'import-course-search'));
         $output .= html_writer::start_tag('div', array('class'=>'ics-search'));
-        $output .= html_writer::empty_tag('input', array('type'=>'text', 'name'=>restore_course_search::$VAR_SEARCH, 'value'=>$component->get_search()));
-        $output .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'searchcourses', 'value'=>get_string('search')));
+        $output .= html_writer::empty_tag('input', array('type'=>'text', 'name'=>restore_course_search::$VAR_SEARCH, 'value'=>$component->get_search(), 'class' => 'form-control'));
+        $output .= html_writer::empty_tag('input', array('type'=>'submit', 'name'=>'searchcourses', 'value'=>get_string('search'), 'class' => 'btn btn-secondary'));
         $output .= html_writer::end_tag('div');
-        $output .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'))));
+        $output .= $this->backup_detail_pair('', html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('continue'), 'class' => 'btn btn-primary')));
  
         if ($component->get_count() === 0) {
             $output .= $this->output->notification(get_string('nomatchingcourses', 'backup'));

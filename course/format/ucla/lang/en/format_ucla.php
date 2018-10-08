@@ -126,3 +126,7 @@ $string['getinsts'] = 'Get instructors';
 $string['getstdroster'] = 'Get student roster';
 $string['emailstudents'] = 'E-mail Students (via Announcements Forum)';
 $string['emailstudents_hidden'] = 'E-mail Students is disabled when Announcements Forum is hidden.';
+
+// CCLE-7940 - Add a tipbox inside the Admin Panel.
+$string['tipbox'] = 'Can\'t find what you\'re looking for? Watch this brief video: ';
+$string['tipurl'] = 'Uploading files, editing sections, and What\'s new for CCLE in the Moodle 3.4 Upgrade?';

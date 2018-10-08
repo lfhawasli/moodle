@@ -83,6 +83,7 @@ class ucla_rearrange_form extends moodleform {
 
         // CCLE-3930 - Rearrange erases modules in sections when javascript is turned off or not fully loaded.
         // Second set of submit and cancel buttons. Initially disabled.
+        $mform->closeHeaderBefore('buttonar2');
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton2',
                 get_string('savechanges'),

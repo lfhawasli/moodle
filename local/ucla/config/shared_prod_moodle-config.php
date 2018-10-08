@@ -247,7 +247,7 @@ $CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
 $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 
 // Site administration > Plugins > Activity modules > Assignment > Submission plugins > Online PoodLL submissions
-$CFG->forced_plugin_settings['assignsubmission_onlinepoodll']['allowedrecorders'] = '0,2';    // Allow only MP3 voice recorder and Video recorder.
+$CFG->forced_plugin_settings['assignsubmission_onlinepoodll']['allowedrecorders'] = '0,2,3,4';    // Allow only MP3 voice recorder, Video recorder, Whiteboard, and Snapshot.
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
@@ -279,6 +279,14 @@ $CFG->forced_plugin_settings['resource']['printheading'] = 1;
 
 // Site administration > Plugins > Activity modules > Quiz
 $CFG->forced_plugin_settings['quiz']['overduehandling'] = 'autosubmit';
+$CFG->forced_plugin_settings['quiz']['attempts'] = 1;
+$CFG->forced_plugin_settings['quiz']['reviewattempt'] = 0x10000;
+$CFG->forced_plugin_settings['quiz']['reviewcorrectness'] = 0x00000;
+$CFG->forced_plugin_settings['quiz']['reviewmarks'] = 0x00000;
+$CFG->forced_plugin_settings['quiz']['reviewspecificfeedback'] = 0x00000;
+$CFG->forced_plugin_settings['quiz']['reviewgeneralfeedback'] = 0x00000;
+$CFG->forced_plugin_settings['quiz']['reviewrightanswer'] = 0x00000;
+$CFG->forced_plugin_settings['quiz']['reviewoverallfeedback'] = 0x00000;
 $CFG->forced_plugin_settings['quiz']['autosaveperiod'] = 120;
 
 // Site administration > Plugins > Activity modules > Scheduler

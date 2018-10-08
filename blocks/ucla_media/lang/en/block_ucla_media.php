@@ -90,8 +90,6 @@ $string['erraddingindex'] = 'Error adding unique_recording index, truncating tab
 
 // Strings for Bruincast display.
 $string['bccoursedate'] = 'Course date';
-$string['bcmedia'] = 'Media';
-$string['bcmetadata'] = 'Metadata';
 $string['bctitle'] = 'Title';
 $string['bccomments'] = 'Comments';
 $string['bcmediaplay'] = 'Play';

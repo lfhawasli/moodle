@@ -124,6 +124,10 @@ $string['publishanonymoustoall'] = 'Publish anonymous results, do not show stude
 // END UCLA MOD: CCLE-7191
 $string['publishnames'] = 'Publish full results, showing names and their choices';
 $string['publishnot'] = 'Do not publish results to students';
+// START UCLA MOD: CCLE-7836 - Change default for Choice => Results, Add Help.
+$string['publish_help'] = 'Determine when you want the results to be available to the students, or not at all.';
+$string['privacy_help'] = 'Results may be published with student names or anonymously.';
+// END UCLA MOD: CCLE-7836.
 $string['removemychoice'] = 'Remove my choice';
 $string['removeresponses'] = 'Remove all responses';
 $string['responses'] = 'Responses';
