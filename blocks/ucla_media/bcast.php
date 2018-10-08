@@ -131,8 +131,7 @@ function display_all($course, $sort, $tab, $pageparams) {
     $icontag = html_writer::empty_tag('i', array('class' => $sorticon));
     $bcdatecell = new html_table_cell(html_writer::tag('a', get_string('bccoursedate', 'block_ucla_media').$icontag,
             array('href' => new moodle_url('/blocks/ucla_media/bcast.php', $pageparams))));
-    $table->head = array($bcdatecell, new html_table_cell(get_string('bcmedia', 'block_ucla_media')), 
-            new html_table_cell(get_string('bcmetadata', 'block_ucla_media')));
+    $table->head = array($bcdatecell, new html_table_cell(''), new html_table_cell(''));
     $table->size = array('0%', '0%', '100%');
     $table->id = 'bruincast-content-table';
 
