@@ -230,6 +230,22 @@ if ($node) {
     }
 
     $rowcontainer->add_node($container);
+    
+    // Tipbox.
+    $settings = array(
+            'tipbox'                    => navigation_node::TYPE_SETTING
+            );
+
+    $container = navigation_node::create(get_string('tipbox', 'format_ucla'),
+            null, navigation_node::TYPE_CONTAINER, null, 'tipbox');
+
+    foreach ($settings as $name => $type) {
+        $tipbox = navigation_node::create(get_string('tipurl', 'format_ucla'),
+        new moodle_url("https://www.youtube.com/watch?v=WM_1Blkq1hk&"));
+        $container->add_node($tipbox);
+    }
+
+    $rowcontainer->add_node($container);
     $tabcontainer->add_node($rowcontainer);
     $node->add_node($tabcontainer);
 
