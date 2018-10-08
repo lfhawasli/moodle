@@ -36,11 +36,11 @@ $string['eventbcread'] = "Bruincast read error.";
 $string['eventbcparsing'] = "Bruincast parsing data error.";
 $string['eventlrread'] = "Library reserves read error.";
 $string['eventlrwrite'] = "Library reserves write error.";
-$string['eventlrupdate'] = "Library reserves update error.";
-$string['eventvfparsing'] = "Video reserves parsing data error.";
-$string['eventvfread'] = "Video reserves read error.";
-$string['eventvfwrite'] = "Video reserves write error.";
-$string['eventvfupdate'] = "Video reserves update error.";
+$string['eventlrupdate'] = "Library reserves update.";
+$string['eventvrparsing'] = "Video reserves parsing data error.";
+$string['eventvrread'] = "Video reserves read error.";
+$string['eventvrwrite'] = "Video reserves write error.";
+$string['eventvrupdate'] = "Video reserves update.";
 
 // Strings for bruincast_dbsync.
 // Error messages.
