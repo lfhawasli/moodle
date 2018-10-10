@@ -319,7 +319,7 @@ function supportconsole_render_section_shortcut($title, $data, $inputs=array(), 
     }
 
     $sort = '';
-    if ($title = 'userswithrole') {
+    if ($title == 'userswithrole') {
         if (!empty($inputs)) {
             if (array_key_exists('role', $inputs)) {
                 $role = $inputs['role'];
