@@ -59,4 +59,9 @@ if($hassiteconfig && $ADMIN->fulltree) {
                 PARAM_INT,
                 4
             ));
+    $settings->add(new admin_setting_configcheckbox(
+        'block_ucla_course_download/coursedownloaddefault',
+        get_string('coursedownloaddefault', 'block_ucla_course_download'),
+        get_string('coursedownloaddefault_desc', 'block_ucla_course_download'),
+        1));
 }

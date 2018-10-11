@@ -407,6 +407,8 @@ $CFG->forced_plugin_settings['block_ucla_bruincast']['errornotify_email'] = 'hel
 // Site administration > Plugins > Blocks > UCLA course download
 // CCLE-5582 - Decrease maxfile size to 250
 $CFG->forced_plugin_settings['block_ucla_course_download']['maxfilesize'] = 250;
+// SSC-3881 - Course download default.
+$CFG->forced_plugin_settings['block_ucla_course_download']['coursedownloaddefault'] = 0;
 
 // Site administration > Plugins > Blocks > UCLA library reserves
 $CFG->forced_plugin_settings['block_ucla_library_reserves']['source_url'] = 'https://webservices.library.ucla.edu/reserves';
