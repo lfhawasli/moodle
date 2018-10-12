@@ -753,16 +753,16 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $newnavbar = new \navbar($this->page);
             // Clear out previously created navbar, created by constructor.
             $newnavbar->ignore_active();
-            // Remove last navbar node if it is duplicated in the end.
-            if ($originalnavbarsize > 3 &&
-                    $originalnavbar[$originalnavbarsize - 2]->action == $originalnavbar[$originalnavbarsize - 1]->action) {
-                $originalnavbarsize--;
-            }
+            // Keep track of duplicate nodes.
+            $filter = array();
             // Create new navbar excluding the 'Course'/'My courses' node.
             for ($i = 2; $i < $originalnavbarsize; $i++) {
                 $node = $originalnavbar[$i];
-                $newnavbar->add($node->text, $node->action, $node->type,
-                        $node->shorttext, $node->key, $node->icon);
+                if (!isset($filter[$node->key])) {
+                    $newnavbar->add($node->text, $node->action, $node->type,
+                            $node->shorttext, $node->key, $node->icon);
+                    $filter[$node->key] = 1;
+                }
             }
         } else {
             $newnavbar = $this->page->navbar;
