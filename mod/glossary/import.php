@@ -220,6 +220,9 @@ if ($xml = glossary_read_imported_file($result)) {
             $newentry->definitionformat = $xmlentry['#']['FORMAT'][0]['#'];
             $newentry->timecreated      = time();
             $newentry->timemodified     = time();
+            // START UCLA MOD: CCLE-7951 - XML import failing with glossary.
+            $newentry->definitiontrust  = 1;
+            // END UCLA MOD: CCLE-7951.
 
             // Setting the default values if no values were passed
             if ( isset($xmlentry['#']['USEDYNALINK'][0]['#']) ) {
