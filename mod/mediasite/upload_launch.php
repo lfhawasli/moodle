@@ -22,12 +22,29 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+require_once("../../config.php");
+require_once($CFG->dirroot.'/mod/mediasite/basiclti_locallib.php');
+require_once($CFG->dirroot.'/mod/mediasite/basiclti_mediasite_lib.php');
 
-$plugin->component = 'mod_mediasite';
-$plugin->version = 2018081300;
-$plugin->release = 'v7.0';
-$plugin->requires = 2016052308.00;
-$plugin->maturity = MATURITY_STABLE; // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC or MATURITY_STABLE.
-$plugin->cron = 0;
-$plugin->dependencies = array();
+global $COURSE;
+
+$id = required_param('id', PARAM_INT);
+$siteid = required_param('siteid', PARAM_INT);
+$isassignment = required_param('isassignment', PARAM_BOOL);
+
+$endpoint = $isassignment ? mediasite_endpoint::LTI_ASSIGNMENT_UPLOAD : mediasite_endpoint::LTI_UPLOAD;
+
+require_login($COURSE);
+
+$additionalparams = null;
+if ($isassignment) {
+    $additionalparams = mediasite_get_assignment_details($id);
+} else {
+    $additionalparams = array();
+    array_push($additionalparams,
+    Sonicfoundry\MediasiteAssignmentDetail::withdetails(
+        'is_an_assignment', "false"
+    ));
+}
+
+mediasite_basiclti_mediasite_view($COURSE, $siteid, $endpoint, null, $additionalparams);
