@@ -221,7 +221,7 @@ function html_table_auto_headers($data, $tabletype = '') {
     $bcastfields = array();
     foreach ($data as $datum) {
         foreach ($datum as $f => $v) {
-            if ($f == 'id' || $f === 'shortname' || ($tabletype === 'bruincastsub' && $f === 'courseid')) {
+            if ($f == 'id' || ($tabletype === 'bruincast' && $f === 'shortname') || ($tabletype === 'bruincastsub' && $f === 'courseid')) {
                 continue;
             }
             if (isset($datum->num)) {
