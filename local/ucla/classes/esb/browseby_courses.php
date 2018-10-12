@@ -26,6 +26,8 @@ namespace local_ucla\esb;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/local/ucla/classes/rolling-curl/RollingCurl.php');
+
 /**
  * Class file
  *
@@ -34,6 +36,33 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class browseby_courses extends base {
+
+    /**
+     * Processes the RollingCurl callback.
+     *
+     * @param string $result    JSON data from webservice.
+     * @param mixed $info       Data from curl_getinfo.
+     */
+    protected function multi_query_process($result, $info) {
+        // Ignore extra data.
+        if (is_array($result)) {
+            $result = reset($result);
+        }
+
+        // Processing either ClassDetail or ClassSectionDetail, for section
+        // number ClassDetail uses classNumber and ClassSectionDetail uses
+        // classSectionNumber.
+        $keys = [$result['subjectAreaCode'], $result['courseCatalogNumber']];
+        if (strpos($info['url'], 'ClassDetail')) {
+            $keys[] = $result['classNumber'];
+            $query = 'ClassDetail';
+        } else {
+            $keys[] = $result['classSectionNumber'];
+            $query = 'ClassSectionDetail';
+        }
+        $this->callbackstorage[$this->get_index($keys)][$query] = $result;
+    }
+
     /**
      * Format results in format specified in https://ucla.in/2Nr1uVN.
      *
@@ -56,35 +85,48 @@ class browseby_courses extends base {
                 $classkey = $class['offeredTermCode'] . '/' . $class['subjectAreaCode'] .
                         '/' . $class['courseCatalogNumber'] . '/' . $section['classNumber'];
                 $query = 'Classes/' . $classkey . '/ClassDetail';
-                $classdetail = $this->query($query, null, true);
-                if (empty($classdetail)) {
-                    $this->debug(sprintf('No results for %s; skipping', $query));
-                    continue;
-                }
+
+                $this->multi_query_add($query);
 
                 // Get data from GET ClassSections/{offeredTermCode}/{subjectAreaCode}/{courseCatalogNumber}/{classSectionNumber}/ClassSectionDetail.
                 $query = 'ClassSections/' . $classkey . '/ClassSectionDetail';
-                $classsectiondetail = $this->query($query, null, true);
-                if (empty($classsectiondetail)) {
-                    $this->debug(sprintf('No results for %s; skipping', $query));
-                    continue;
-                }
+
+                $this->multi_query_add($query);
 
                 // Built row.
-                $row['srs'] = $classsectiondetail['classSectionID'];
                 $row['subjarea'] = $class['subjectAreaCode'];
                 $row['course'] = util::format_cat_num($class['courseCatalogNumber']);
-                $row['session'] = $classdetail['classSessionCode'];
-                $row['section'] = $classsectiondetail['classSectionNumberDisplay'];
-                $row['url'] = $classdetail['classWebsite'];
-                $row['coursetitlelong'] = $classdetail['classTitle'];
-                $row['activitytype'] = $classsectiondetail['classSectionActivityCode'];
-                $row['sect_no'] = $classdetail['classNumber'];
                 $row['catlg_no'] = $class['courseCatalogNumber'];
-                $row['sect_enrl_stat_cd'] = $classsectiondetail['classSectionEnrollmentStatusCode'];
+                $row['sect_no'] = $section['classNumber'];
                 $row['ses_grp_cd'] = $class['termSessionGroupCollection'][0]['termsessionGroupCode'];
-                $retval[] = $row;                
+                $retval[] = $row;            
             }
+        }
+
+        // Execute parallel API calls.
+        $this->multi_query_execute();
+
+        // Go through results and build remaining data.
+        foreach ($retval as $i => $row) {
+            // Find record.
+            $index = $this->get_index([$row['subjarea'], $row['catlg_no'], $row['sect_no']]);
+
+            $record = $this->validate_callbackstorage($index, ['ClassSectionDetail', 'ClassDetail']);
+            if ($record === false) {
+                // Entry does not have data from everything, so remove it.
+                unset($retval[$i]);
+                continue;
+            }
+
+            $row['srs'] = $record['ClassSectionDetail']['classSectionID'];
+            $row['session'] = $record['ClassDetail']['classSessionCode'];
+            $row['section'] = $record['ClassSectionDetail']['classSectionNumberDisplay'];
+            $row['url'] = $record['ClassDetail']['classWebsite'];
+            $row['coursetitlelong'] = $record['ClassDetail']['classTitle'];
+            $row['activitytype'] = $record['ClassSectionDetail']['classSectionActivityCode'];
+            $row['sect_enrl_stat_cd'] = $record['ClassSectionDetail']['classSectionEnrollmentStatusCode'];
+
+            $retval[$i] = $row;
         }
 
         return $retval;

@@ -39,7 +39,13 @@ abstract class base {
      * URL to web service endpoint.
      * @var string
      */
-    private $baseurl;
+    protected $baseurl;
+
+    /**
+     * Stores results from RollingCurl callback.
+     * @var array
+     */
+    protected $callbackstorage = array();
 
     /**
      * Path to SSL certificate.
@@ -104,6 +110,12 @@ abstract class base {
     private $privatekey;
 
     /**
+     * Stores RollingCurl object.
+     * @var RollingCurl
+     */
+    private $rc;
+
+    /**
      * Start time. Used to build profiling data.
      * @var float
      */
@@ -122,6 +134,12 @@ abstract class base {
     private $username;
 
     /**
+     * How many simultaneous cURL calls to make.
+     * @var int
+     */
+    private $windowsize = 20;
+
+    /**
      * Sets up class variables.
      */
     public function __construct() {
@@ -131,6 +149,7 @@ abstract class base {
         $this->password     = $configs->esbpassword;
         $this->cert         = $configs->esbcert;
         $this->privatekey   = $configs->esbprivatekey;
+        $this->windowsize   = $configs->esbwindowsize;
     }
 
     /**
@@ -139,9 +158,10 @@ abstract class base {
      * Should only be used to benchmark one call at a time.
      *
      * @param string $apicall       Name of API to benchmark.
-     * @param string $startstop     Expecting 'start' or 'stop'.
+     * @param string $startstop     Expecting 'start', 'stop', or 'time'.
+     * @param int $time             Time for call, used in multi_query.
      */
-    private function build_profile($apicall, $startstop) {
+    protected function build_profile($apicall, $startstop, $time = null) {
         if (!$this->debugging) {
             // Only profile if we are debugging.
             return;
@@ -160,6 +180,9 @@ abstract class base {
             $start = $this->starttime;
             $end = microtime(true);
             $this->profiling[$apicall]['time'] += $end - $start;
+        } else {
+            ++$this->profiling[$apicall]['count'];
+            $this->profiling[$apicall]['time'] += $time;
         }
     }
 
@@ -182,6 +205,36 @@ abstract class base {
     }
 
     /**
+     * Creates query string.
+     *
+     * @param string $restapi
+     * @param array $params     Expecting name => value.
+     * @return string           URL to be used in cURL requests.
+     */
+    private function create_query($restapi, $params) {
+        // Make sure $restapi is urlencoded.
+        $parts = explode('/', $restapi);
+        $parts = array_map('rawurlencode', $parts);
+        $restapi = implode('/', $parts);
+        $restapi = $this->baseurl . '/sis/api/v1/' . $restapi;
+
+        // If empty, then do nothing.
+        if (empty($params) || !is_array($params)) {
+            $parameters = '';
+        } else {
+            // Make sure to encode spaces as %20.
+            $parameters = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        }
+        // Always get all the records.
+        if (!empty($parameters)) {
+            $parameters .= '&';
+        }
+        $parameters .= 'PageSize=0';
+
+        return $restapi . '?' . $parameters;
+    }
+
+    /**
      * If debugging flag for class is set, then will output message.
      * @param string $message
      */
@@ -196,19 +249,14 @@ abstract class base {
     }
 
     /**
-     * Formats parameters to be used in query string.
+     * Helper function to create indexes to be used for looking up data from
+     * $this->callbackstorage.
      *
-     * @param array $params Expecting name => value.
+     * @param array $keys
      * @return string
      */
-    private function format_parameters($params) {
-        // If empty, then do nothing.
-        if (empty($params) || !is_array($params)) {
-            return '';
-        }
-
-        // Make sure to encode spaces as %20.
-        return http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+    protected function get_index(array $keys) {
+        return implode('-', $keys);
     }
 
     /**
@@ -308,6 +356,76 @@ abstract class base {
     }
 
     /**
+     * Adds the web service call to the queue to be processed.
+     *
+     * @param string $restapi
+     * @param array $params
+     */
+    protected function multi_query_add($restapi, $params = null) {
+        $query = $this->create_query($restapi, $params);
+
+        if (empty($this->rc)) {
+            $this->rc = new \RollingCurl(array($this, 'multi_query_callback'));
+        }
+
+        $options = [
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_RETURNTRANSFER => true,
+            // ESB timeout is 2 minutes, so allow time for ESB to give timeout error.
+            CURLOPT_TIMEOUT => 130,
+            CURLOPT_HTTPHEADER => ['esmAuthnClientToken: ' . $this->get_token()]
+            ];
+        $this->rc->get($query, null, $options);
+    }
+
+    /**
+     * Execute parallel API calls.
+     */
+    protected function multi_query_execute() {
+        $this->build_profile('multi_query_execute', 'start');
+        $this->rc->execute($this->windowsize);
+        $this->build_profile('multi_query_execute', 'stop');
+    }
+
+    /**
+     * Method that RollingCurl will callback.
+     *
+     * Should not need to override this. Please override multi_query_process().
+     *
+     * @param string $response  Response from cURL call.
+     * @param mixed $info       Data from curl_getinfo.
+     */
+    public function multi_query_callback($response, $info) {
+        // Store benchmarking data.
+        $this->build_profile('multi_query: ' .
+                basename(strtok($info['url'], '?')), 'time', $info['total_time']);
+
+        $result = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Ignore 404 errors.
+            if ($info['http_code'] == 404) {
+                $this->debug(sprintf('No results for %s; skipping', $info['url']));
+                return;
+            }
+            $this->lastquery = $info['url'];
+            $this->lastmessage = $response;
+            $this->lasthttpcode = $info['http_code'];
+            throw new \moodle_exception('esberror', 'local_ucla', null, $this);
+        }
+
+        $this->multi_query_process($result, $info);
+    }
+
+    /**
+     * Override to provide custom processing of the responses from rollingcurl.
+     *
+     * @param string $result    JSON data from webservice.
+     * @param mixed $info       Data from curl_getinfo.
+     */
+    protected function multi_query_process($result, $info) {
+    }
+
+    /**
      * Opens or returns an opened curl connection.
      *
      * @return mixed    cURL handler by reference.
@@ -342,23 +460,12 @@ abstract class base {
      * @return array
      */
     protected function query($restapi, $params = null, $ignoreextradata = false) {
-        $parameters = $this->format_parameters($params);
-
-        // Always get all the records.
-        if (!empty($parameters)) {
-            $parameters .= '&';
-        }
-        $parameters .= 'PageSize=0';
-
-        // Make sure $restapi is urlencoded.
-        $parts = explode('/', $restapi);
-        $parts = array_map('rawurlencode', $parts);
-        $restapi = implode('/', $parts);
+        $parts = explode('/', $restapi);    // For benchmarking later.
+        $this->lastquery = $this->create_query($restapi, $params);
 
         // For benchmarking, use the first part of the API call as the key.
         $this->build_profile($parts[0], 'start');
 
-        $this->lastquery = $this->baseurl . '/sis/api/v1/' . $restapi . '?' . $parameters;
         $response = $this->get_response($this->lastquery);
         if (is_array($response) && !empty($ignoreextradata)) {
             $response = reset($response);
@@ -398,6 +505,38 @@ abstract class base {
         }
 
         return $results;
+    }
+
+    /**
+     * Checks the callbackstorage for data for given index and makes sure that
+     * all related queries returned data.
+     *
+     * @param string $index
+     * @param array $queries
+     *
+     * @return mixed            If false is returned then remove that data from
+     *                          results being returned.
+     */
+    protected function validate_callbackstorage($index, array $queries) {
+        // Note: we already log when the query returns no data in
+        // multi_query_callback(), so no need to report here again if data is
+        // missing.
+        if (!isset($this->callbackstorage[$index])) {
+            // If no record returned then most likely it is most likely
+            // because the course or entry is not available anymore.
+            return false;
+        }
+
+        $record = $this->callbackstorage[$index];
+
+        // Make sure that we get all data back.
+        foreach ($queries as $query) {
+            if (!isset($record[$query])) {
+                return false;
+            }
+        }
+
+        return $record;
     }
 
     /**

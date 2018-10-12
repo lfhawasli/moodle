@@ -115,6 +115,11 @@ if ($hassiteconfig) {
             get_string('esbprivatekey', 'local_ucla'),
             get_string('esbprivatekeyhelp', 'local_ucla'),
             '', PARAM_PATH));
+    $esbsettings->add(new admin_setting_configtext(
+            'local_ucla/esbwindowsize',
+            get_string('esbwindowsize', 'local_ucla'),
+            get_string('esbwindowsize', 'local_ucla'),
+            20, PARAM_INT));
 
     $ADMIN->add('localucla', $esbsettings);
 
