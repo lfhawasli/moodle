@@ -199,7 +199,7 @@ abstract class base {
      * Closes curl connection.
      */
     private function close_curl() {
-        if (!empty($this->ch)) {
+        if (is_resource($this->ch)) {
             curl_close($this->ch);
         }
     }
@@ -246,6 +246,27 @@ abstract class base {
             }
             $this->debugginglog .= $message . $eol;
         }
+    }
+
+    /**
+     * Returns settings to use when setting up cURL for ESB queries.
+     *
+     * @return array
+     */
+    private function get_curlopt() {
+        return [
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_RETURNTRANSFER => true,
+            // ESB timeout is 2 minutes, so allow time for ESB to give timeout error.
+            CURLOPT_TIMEOUT => 130,
+            CURLOPT_HTTPHEADER => [
+                'esmAuthnClientToken: ' . $this->get_token()
+            ],
+            // These settings suggested by:
+            // https://stackoverflow.com/questions/19467449/how-to-speed-up-curl-in-php.
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+            CURLOPT_ENCODING => ''
+        ];
     }
 
     /**
@@ -361,27 +382,21 @@ abstract class base {
      * @param string $restapi
      * @param array $params
      */
-    protected function multi_query_add($restapi, $params = null) {
+    final protected function multi_query_add($restapi, $params = null) {
         $query = $this->create_query($restapi, $params);
 
         if (empty($this->rc)) {
             $this->rc = new \RollingCurl(array($this, 'multi_query_callback'));
+            $this->rc->options = $this->get_curlopt();
         }
 
-        $options = [
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_RETURNTRANSFER => true,
-            // ESB timeout is 2 minutes, so allow time for ESB to give timeout error.
-            CURLOPT_TIMEOUT => 130,
-            CURLOPT_HTTPHEADER => ['esmAuthnClientToken: ' . $this->get_token()]
-            ];
-        $this->rc->get($query, null, $options);
+        $this->rc->get($query);
     }
 
     /**
      * Execute parallel API calls.
      */
-    protected function multi_query_execute() {
+    final protected function multi_query_execute() {
         $this->build_profile('multi_query_execute', 'start');
         $this->rc->execute($this->windowsize);
         $this->build_profile('multi_query_execute', 'stop');
@@ -390,12 +405,12 @@ abstract class base {
     /**
      * Method that RollingCurl will callback.
      *
-     * Should not need to override this. Please override multi_query_process().
+     * Please override multi_query_process().
      *
      * @param string $response  Response from cURL call.
      * @param mixed $info       Data from curl_getinfo.
      */
-    public function multi_query_callback($response, $info) {
+    final public function multi_query_callback($response, $info) {
         // Store benchmarking data.
         $this->build_profile('multi_query: ' .
                 basename(strtok($info['url'], '?')), 'time', $info['total_time']);
@@ -431,19 +446,11 @@ abstract class base {
      * @return mixed    cURL handler by reference.
      */
     private function &open_curl() {
-        if (!empty($this->ch)) {
+        if (is_resource($this->ch)) {
             return $this->ch;
         }
         $this->ch = curl_init();
-        curl_setopt_array($this->ch, [
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_RETURNTRANSFER => true,
-            // ESB timeout is 2 minutes, so allow time for ESB to give timeout error.
-            CURLOPT_TIMEOUT => 130,
-            CURLOPT_HTTPHEADER => [
-                'esmAuthnClientToken: ' . $this->get_token()
-            ]
-        ]);
+        curl_setopt_array($this->ch, $this->get_curlopt());
         return $this->ch;
     }
 

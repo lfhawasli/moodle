@@ -294,6 +294,7 @@ class RollingCurl {
         $master = curl_multi_init();
 
         // start the first batch of requests
+        $requests = array();
         for ($i = 0; $i < $this->window_size; $i++) {
             $ch = curl_init();
 
@@ -305,6 +306,7 @@ class RollingCurl {
             // Add to our request Maps
             $key = (string) $ch;
             $this->requestMap[$key] = $i;
+            $requests[$key] = $ch;
         }
 
         do {
@@ -333,9 +335,11 @@ class RollingCurl {
                     call_user_func($callback, $output, $info, $request);
                 }
 
-                // start a new request (it's important to do this before removing the old one)
+                curl_multi_remove_handle($master, $done['handle']);
+
+                // start a new request
                 if ($i < sizeof($this->requests) && isset($this->requests[$i]) && $i < count($this->requests)) {
-                    $ch = curl_init();
+                    $ch = $requests[$key];
                     $options = $this->get_options($this->requests[$i]);
                     curl_setopt_array($ch, $options);
                     curl_multi_add_handle($master, $ch);
@@ -345,9 +349,6 @@ class RollingCurl {
                     $this->requestMap[$key] = $i;
                     $i++;
                 }
-
-                // remove the curl handle that just completed
-                curl_multi_remove_handle($master, $done['handle']);
             }
 
             // Block for data in / output; error handling is done by curl_multi_exec
@@ -355,6 +356,10 @@ class RollingCurl {
                 curl_multi_select($master, $this->timeout);
             }
         } while ($running);
+
+        foreach ($requests as $request) {
+            curl_close($request);
+        }
         curl_multi_close($master);
         return true;
     }
