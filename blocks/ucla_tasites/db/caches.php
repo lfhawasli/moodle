@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $definitions = array(
     'tasitemapping' => array(
         'mode' => cache_store::MODE_APPLICATION,
-        'staticacceleration' => true,
-        'ttl' => HOURSECS
+        'staticacceleration' => true
     )
 );

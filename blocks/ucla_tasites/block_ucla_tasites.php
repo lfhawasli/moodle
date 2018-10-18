@@ -689,9 +689,12 @@ class block_ucla_tasites extends block_base {
             }
 
             // Sort the TA names.
-            foreach ($tasitemapping['bysection'] as &$tasection) {
-                if (!empty($tasection['tas'])) {
-                    asort($tasection['tas']);
+            if (isset($tasitemapping['bysection']) &&
+                    is_array($tasitemapping['bysection'])) {
+                foreach ($tasitemapping['bysection'] as &$tasection) {
+                    if (!empty($tasection['tas'])) {
+                        asort($tasection['tas']);
+                    }
                 }
             }
 

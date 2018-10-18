@@ -15,21 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Event handlers.
  *
- * @package    block_ucla_tasites
- * @copyright  2015 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * This file contains the event handlers for the Moodle event API.
+ *
+ * @package block_ucla_tasites
+ * @copyright 2018 UC Regents
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2018101900;
+defined('MOODLE_INTERNAL') || die();
 
-// Add dependency for meta courses, local_ucla (for flash), and site indicator
-// (for tasite type).
-$plugin->dependencies = array(
-    'enrol_meta'  => ANY_VERSION,
-    'local_metagroups' => ANY_VERSION,
-    'local_ucla'  => 2012112800,
-    'tool_uclasiteindicator' => 2013021900
+$observers = array(
+    array(
+        'eventname'  => '\core\event\role_assigned',
+        'callback'    => 'block_ucla_tasites_observer::clear_tasitemapping_cache',
+    ),
+    array(
+        'eventname'  => '\core\event\role_unassigned',
+        'callback'    => 'block_ucla_tasites_observer::clear_tasitemapping_cache',
+    ),
 );
-$plugin->component = 'block_ucla_tasites';
