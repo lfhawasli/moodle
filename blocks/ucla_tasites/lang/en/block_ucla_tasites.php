@@ -49,6 +49,7 @@ $string['errinvalidsetupselected'] = 'Please select a section to create a TA sit
 $string['errisnottasite'] = 'Course is not a TA site.';
 $string['erristasite'] = 'Cannot make TA sites from within a TA site.';
 $string['errsetupenrol'] = 'The enrollment plugin "meta" needs to be enabled system-wide in order to use TA sites.';
+$string['errtacreationwarning'] = 'Did not find matching TAs from the Registrar and local course enrollments. Please run prepop to update enrollments.';
 $string['errtogglegrouping'] = 'Cannot toggle default grouping';
 $string['hidden'] = 'Hide';
 $string['listavailablecourse'] = 'Available to: Entire course';
