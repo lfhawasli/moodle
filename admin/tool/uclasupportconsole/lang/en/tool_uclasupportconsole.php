@@ -8,6 +8,7 @@ $string['logs'] = 'Log tools';
 $string['users'] = 'User tools';
 $string['srdb'] = 'Registrar tools';
 $string['modules'] = 'Module tools';
+$string['esb'] = 'ESB tools';
 
 // System logs
 $string['syslogs'] = 'Last 1000 lines of Moodle cron, Course creator, or Pre-pop logs';
@@ -62,7 +63,6 @@ $string['enrollview'] = 'Enrollment history per UID (<a target="_blank" href="ht
 // The item itself will be there when the SP-object is coded, but there
 // will be no explanation unless the code here is changed (or the SRDB
 // layer is altered to include descriptions within the object).
-$string['ccle_coursegetall'] = 'Get all courses in a subject area for BrowseBy (CCLE <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3305">ccle_coursegetall</a>)';
 $string['ccle_courseinstructorsget'] = 'Instructor list by course per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3306">ccle_courseinstructorsget</a>)';
 $string['ccle_getclasses'] = 'Course info by srs# (description, type, enroll status) (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3308">ccle_getclasses</a>)';
 $string['ccle_getinstrinfo'] = 'Instructors by subject area per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3309">ccle_getinstrinfo</a>)';
@@ -78,6 +78,10 @@ $string['ucla_get_course_srs'] = 'Get srs by term, subject area, unformatted cat
 $string['ccle_ta_sections'] = 'Get list of sections and TAs (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=1008388">ccle_ta_sections</a>)';
 
 $string['unknownstoredprocparam'] = 'This stored procedure has a unknown parameter type. This needs to be changed in code.';
+
+// For each ESB data requestor, provide the name and documentation.
+$string['browseby_courses'] = 'ESB: Get all courses in a subject area for BrowseBy (CCLE <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=2113599">browseby_courses</a>)';
+$string['esb_debugging'] = 'Enable debugging';
 
 $string['courseregistrardifferences'] = 'Courses with changed descriptions';
 $string['showreopenedclasses'] = "Reopened classes per term";

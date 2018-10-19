@@ -768,7 +768,7 @@ function get_student_pseudorole($studentcode) {
  *
  * @throws moodle_exception When the input type is invalid.
  *
- * @param string $type  Type can be 'term', 'srs', 'uid', or 'academicyear'.
+ * @param string $type
  * @param mixed $value
  *
  * @return boolean      True if the value matches the type, false otherwise.
@@ -778,9 +778,11 @@ function ucla_validator($type, $value) {
 
     switch($type) {
         case 'term':
+        case 'offeredTermCode':
             $result = preg_match('/^[0-9]{2}[FWS1]$/', $value);
             break;
         case 'srs':
+        case 'classSectionID':
         case 'uid':
             $result = preg_match('/^[0-9]{9}$/', $value);
             break;
@@ -790,9 +792,20 @@ function ucla_validator($type, $value) {
                 $result = 1;
             }
             break;
+        case 'subjectAreaCode':
+            $result = preg_match('/^[A-Z&\- ]{1,7}$/', $value);
+            break;
+        case 'courseCatalogNumber':
+            // Format is 4 digits, up to 2 characters, and CM at the end if
+            // concurrent (C) or crosslisted (M).
+            $result = preg_match('/^[0-9]{4}[A-Z ]{0,2}[CM]{0,2}$/', $value);
+            break;
+        case 'classNumber':
+            // Format is 3 digits.
+            $result = preg_match('/^[0-9]{3}$/', $value);
+            break;
         default:
             throw new moodle_exception('invalid type', 'ucla_validator');
-            break;
     }
 
     return $result == 1;

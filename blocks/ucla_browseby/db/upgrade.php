@@ -68,5 +68,23 @@ function xmldb_block_ucla_browseby_upgrade($oldversion = 0) {
         upgrade_block_savepoint(true, 2018051700, 'ucla_browseby');
     }
 
+    if ($oldversion < 2018100300) {
+        // Deleting fields no longer needed with move to web services:
+        // See https://ccle.ucla.edu/mod/wiki/view.php?pageid=12798.
+        $table = new xmldb_table('ucla_browseall_classinfo');
+        $fieldstoremove = array('coursetitleshort', 'email', 'name',
+            'sectnoteprtcd', 'sectiontitle');
+        foreach ($fieldstoremove as $fieldname) {
+            $field = new xmldb_field($fieldname);
+            // Conditionally launch drop field sectnoteseq.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        // Ucla_browseby savepoint reached.
+        upgrade_block_savepoint(true, 2018100300, 'ucla_browseby');
+    }
+
     return $result;
 }

@@ -353,3 +353,6 @@ $string['esbcert'] = 'CERT file';
 $string['esbcerthelp'] = 'Path on the server to the CERT file. Must not be publically accessible.';
 $string['esbprivatekey'] = 'Private key file';
 $string['esbprivatekeyhelp'] = 'Path on the server to the Private Key file. Must not be publically accessible.';
+$string['esbwindowsize']  = 'Window size';
+$string['esbwindowsizehelp']  = 'How many simulatenous API calls to make to ESB.';
+$string['esberror'] = 'ESB error ({$a->lasthttpcode}): {$a->lastmessage}. Query = {$a->lastquery}';
