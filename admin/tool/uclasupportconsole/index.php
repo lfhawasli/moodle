@@ -1217,7 +1217,78 @@ if ($displayforms) {
 
 $consoles->push_console_html('srdb', $title, $sectionhtml);
 
-// Dynamic hardcoded (TODO make reqistrar_query return parameter types it expects)
+// Display ESB queries.
+$qs = \local_ucla\esb\util::get_queries();
+foreach ($qs as $query) {
+    $sectionhtml = '';
+    $input_html = '';
+    if ($displayforms) {
+        $classname = "\\local_ucla\\esb\\$query";
+        $esbquery = new $classname();
+
+        $params = $esbquery->get_parameters();
+        foreach ($params as $param) {
+            switch($param) {
+                case 'offeredTermCode':
+                    $input_html .= get_term_selector($query, null, 'offeredTermCode');
+                    break;
+                case 'subjectAreaCode':
+                    $input_html .= get_subject_area_selector($query, null, 'subjectAreaCode');
+                    break;
+                case 'uid':
+                    $input_html .= get_uid_input($query);
+                    break;
+                case 'classSectionID':
+                    $input_html .= get_srs_input($query);
+                    break;
+                case 'courseCatalogNumber':
+                case 'classNumber':
+                    $input_html .= get_generic_input($query, $param);
+                    break;
+                default:
+                    $input_html .= get_string('unknownstoredprocparam',
+                        'tool_uclasupportconsole');
+                    break;
+            }
+        }
+
+        // Add debugging flag for ESB queries.
+        $input_html .= '&nbsp;';
+        $input_html .= html_writer::checkbox('debugging', 1, false,
+                get_string('esb_debugging', 'tool_uclasupportconsole'));
+
+        $sectionhtml .= supportconsole_simple_form($query, $input_html);
+    } else if ($consolecommand == $query) {
+        $classname = "\\local_ucla\\esb\\$query";
+        $esbquery = new $classname();
+        $esbparams = $esbquery->get_parameters();
+
+        $params = [];
+        foreach ($esbparams as $paramname) {
+            if ($paramvalue = optional_param($paramname, '', PARAM_NOTAGS)) {
+                $params[$paramname] = $paramvalue;
+            }
+        }
+
+        $debugging = optional_param('debugging', false, PARAM_BOOL);
+
+        $results = $esbquery->run($params, $debugging);
+
+        $moreinfo = '';
+        if (!empty($debugging)) {
+            // Append debugging data.
+            $moreinfo = '<div class="alert alert-info" role="alert">' .
+                    $esbquery->debugginglog . '</div>';
+        }
+
+        $sectionhtml .= supportconsole_render_section_shortcut($query,
+            $results, $params, $moreinfo);
+    }
+
+    $consoles->push_console_html('esb', $query, $sectionhtml);
+}
+
+// Display Registrar queries.
 ucla_require_registrar();
 $qs = get_all_available_registrar_queries();
 

@@ -23,7 +23,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-use html_writer;
 
 function email_students($course, $container) {
 

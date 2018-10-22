@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2016021700;
+$plugin->version = 2018101900;
 
 // Add dependency for meta courses, local_ucla (for flash), and site indicator
 // (for tasite type).

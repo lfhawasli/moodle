@@ -180,7 +180,7 @@ class update_bcast extends \core\task\scheduled_task {
 
                     if (!is_array($cleanedresult['item'])) {
                         mtrace("ERROR: Invalid result for $term $srs");
-                        continue;
+                        throw new \moodle_exception('eventbcparsing', 'tool_ucladatasourcesync');
                     }
 
                     // If there is more than one resource, then 'item' is an

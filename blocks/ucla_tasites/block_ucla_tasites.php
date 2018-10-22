@@ -327,9 +327,26 @@ class block_ucla_tasites extends block_base {
         // Remove course description, because it doesn't make sense for tasites.
         unset($course->summary);
 
-        $courseconfig = get_config('moodlecourse');
-        $course->numsections = $courseconfig->numsections;
-        
+        // Create sections based on the parent course's term.
+        $courseinfo = ucla_get_course_info($parentcourse->id);
+        $session = $courseinfo[0]->session;
+        switch ($session) {
+            case '6A':
+            case '6C':
+            case 'FP':
+            case 'PC':
+            case 'OC':
+                $course->numsections = 6;
+                break;
+            case '8A':
+                $course->numsections = 8;
+                break;
+            case 'OS':
+                $course->numsections = 12;
+                break;
+            default:
+                $course->numsections = 10;
+        }        
         $newcourse = create_course($course);
 
         // Tag site as TA site.
@@ -672,9 +689,12 @@ class block_ucla_tasites extends block_base {
             }
 
             // Sort the TA names.
-            foreach ($tasitemapping['bysection'] as &$tasection) {
-                if (!empty($tasection['tas'])) {
-                    asort($tasection['tas']);
+            if (isset($tasitemapping['bysection']) &&
+                    is_array($tasitemapping['bysection'])) {
+                foreach ($tasitemapping['bysection'] as &$tasection) {
+                    if (!empty($tasection['tas'])) {
+                        asort($tasection['tas']);
+                    }
                 }
             }
 

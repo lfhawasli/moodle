@@ -35,7 +35,9 @@ $course = get_course($courseid);
 
 // Check access.
 require_login($courseid);
-block_ucla_tasites::check_access($courseid);
+if (!block_ucla_tasites::check_access($courseid)) {
+    throw new block_ucla_tasites_exception('errcantcreatetasite');
+}
 if (block_ucla_tasites::is_tasite($courseid)) {
     throw new block_ucla_tasites_exception('erristasite');
 }
@@ -212,6 +214,8 @@ if ($tasitesform->is_cancelled()) {
     if (block_ucla_tasites::can_make_tasite($USER, $course->id)) {
         // Display form to process.
         $tasitesform->display();
+    } else if (empty($tasites)) {
+        echo $OUTPUT->notification(get_string('errtacreationwarning', 'block_ucla_tasites'), 'info');
     }
 
     $pagebody = ob_get_contents();

@@ -131,11 +131,10 @@ class observers {
      * @param \core\event\role_assigned $event
      */
     public static function role_assigned(\core\event\role_assigned $event) {
-        $context = \context::instance_by_id($event->contextid);
         $userid = $event->relateduserid;
 
-        if ($context->contextlevel == CONTEXT_COURSE) {
-            $pubprivcourse = \PublicPrivate_Course::build($context->instanceid);
+        if ($event->contextlevel == CONTEXT_COURSE) {
+            $pubprivcourse = \PublicPrivate_Course::build($event->contextinstanceid);
             if ($pubprivcourse->is_activated()) {
                 $pubprivcourse->add_user($userid);
             }
@@ -153,13 +152,11 @@ class observers {
         global $DB;
 
         $userid = $event->relateduserid;
-        $contextid = $event->contextid;
-        $context = \context::instance_by_id($contextid);
 
-        if ($context->contextlevel == CONTEXT_COURSE &&
-            !$DB->record_exists('role_assignments',
-                    array('userid' => $userid, 'contextid' => $contextid))) {
-            $ppcourse = \PublicPrivate_Course::build($context->instanceid);
+        if ($event->contextlevel == CONTEXT_COURSE &&
+            !$DB->record_exists('role_assignments', array('userid' => $userid,
+                    'contextid' => $event->contextid))) {
+            $ppcourse = \PublicPrivate_Course::build($event->contextinstanceid);
             if ($ppcourse->is_activated()) {
                 $ppcourse->remove_user($userid);
             }

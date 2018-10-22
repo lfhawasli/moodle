@@ -22,12 +22,25 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+require_once('../../config.php');
+require_once($CFG->dirroot.'/mod/mediasite/basiclti_locallib.php');
+require_once($CFG->dirroot.'/mod/mediasite/basiclti_mediasite_lib.php');
+require_once("$CFG->dirroot/mod/mediasite/locallib.php");
+require_once("$CFG->dirroot/mod/mediasite/mediasiteresource.php");
+require_once("$CFG->dirroot/mod/mediasite/exceptions.php");
 
-$plugin->component = 'mod_mediasite';
-$plugin->version = 2018081300;
-$plugin->release = 'v7.0';
-$plugin->requires = 2016052308.00;
-$plugin->maturity = MATURITY_STABLE; // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC or MATURITY_STABLE.
-$plugin->cron = 0;
-$plugin->dependencies = array();
+global $CFG, $DB;
+
+$siteid = optional_param('siteid', 0, PARAM_INT);
+$id = optional_param('coursecontext', 0, PARAM_INT);
+$courseid = optional_param('course', 0, PARAM_INT);
+$coverplay = optional_param('coverplay', 1, PARAM_BOOL);
+$resourceid = optional_param('resourceid', 0, PARAM_ALPHANUM);
+
+$course = $DB->get_record("course", array("id" => $courseid));
+
+require_login($course);
+
+$endpoint = mediasite_endpoint::LTI_ASSIGNMENTSUBMISSION;
+
+mediasite_basiclti_mediasite_view($course, $siteid, $endpoint, $resourceid);

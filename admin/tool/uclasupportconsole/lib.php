@@ -31,7 +31,7 @@ function display_uclasupportconsole_export_options($params) {
 /**
  * Returns all available registrar queries
  * 
- * @return array        Array of registrar queries avialble 
+ * @return array        Array of registrar queries available
  */
 function get_all_available_registrar_queries() {
     global $CFG;
@@ -102,15 +102,16 @@ function get_generic_input($id, $name) {
  * Generates input field for SRS number
  * 
  * @param string $id        Id to use for label
+ * @param string $paramname Default is 'srs'.
  * 
  * @return string           Returns HTML to render SRS input 
  */
-function get_srs_input($id) {
-    $ret_val = html_writer::label(get_string('srs', 
+function get_srs_input($id, $paramname = 'srs') {
+    $retval = html_writer::label(get_string('srs',
             'tool_uclasupportconsole'), $id.'_srs');
-    $ret_val .= html_writer::empty_tag('input', 
-            array('type' => 'text', 'name' => 'srs', 'id' => $id.'_srs'));        
-    return $ret_val;
+    $retval .= html_writer::empty_tag('input',
+            array('type' => 'text', 'name' => $paramname, 'id' => $id.'_srs'));
+    return $retval;
 }
 
 /**
@@ -118,10 +119,11 @@ function get_srs_input($id) {
  * 
  * @param string $id        Id to use for label.
  * @param string $selectedsubjectarea Default subject area selected.
+ * @param string $paramname Default is 'subjarea'.
  * 
  * @return string           Returns HTML to render subject area dropdown.
  */
-function get_subject_area_selector($id, $selectedsubjectarea = null) {
+function get_subject_area_selector($id, $selectedsubjectarea = null, $paramname = 'subjarea') {
     global $DB;  
     static $_subjectareaselectorsubjects;  // To store cached copy of db record.
     $retval = '';
@@ -161,7 +163,7 @@ function get_subject_area_selector($id, $selectedsubjectarea = null) {
     $retval .= html_writer::label(get_string('subject_area',
             'tool_uclasupportconsole'), $id.'_subject_area_selector');
     $retval .= html_writer::select($_subjectareaselectorsubjects,
-            'subjarea', $selectedsubjectarea, $subjareastring, 
+            $paramname, $selectedsubjectarea, $subjareastring,
             array('id' => $id.'_subject_area_selector'));
         
     return $retval;
@@ -174,10 +176,11 @@ function get_subject_area_selector($id, $selectedsubjectarea = null) {
  * 
  * @param string $id        Id to use for label
  * @param string $selected_term If passed, will be the default term selected
+ * @param string $paramname Default is 'term'.
  * 
  * @return string           Returns HTML to render term dropdown 
  */
-function get_term_selector($id, $selected_term = null) {
+function get_term_selector($id, $selected_term = null, $paramname = 'term') {
     global $CFG, $DB;  
     $ret_val = '';
     
@@ -192,7 +195,7 @@ function get_term_selector($id, $selected_term = null) {
 
     $ret_val .= html_writer::label($termstring, $id.'_term_selector');
     $ret_val .= html_writer::empty_tag('input', 
-            array('type' => 'text', 'name' => 'term', 'id' => $id.'_term_selector', 
+            array('type' => 'text', 'name' => $paramname, 'id' => $id.'_term_selector',
                 'value' => $selected_term, 'maxlength' => 3, 'size' => 3));
     
     return $ret_val;
@@ -221,7 +224,7 @@ function html_table_auto_headers($data, $tabletype = '') {
     $bcastfields = array();
     foreach ($data as $datum) {
         foreach ($datum as $f => $v) {
-            if ($f == 'id' || $f === 'shortname' || ($tabletype === 'bruincastsub' && $f === 'courseid')) {
+            if ($f == 'id' || ($tabletype === 'bruincast' && $f === 'shortname') || ($tabletype === 'bruincastsub' && $f === 'courseid')) {
                 continue;
             }
             if (isset($datum->num)) {
