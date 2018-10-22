@@ -87,6 +87,8 @@ $string['esb_debugging'] = 'Enable debugging';
 $string['courseregistrardifferences'] = 'Courses with changed descriptions';
 $string['showreopenedclasses'] = "Reopened classes per term";
 
+$string['officehoursreport'] = 'Get all office hours of courses in a subject area';
+
 // Module
 $string['assignmentquizzesduesoon'] = 'Show courses with assignments or quizzes due soon';
 $string['assignmentquizzesduesoonmoreinfo'] = 'From {$a->start} to {$a->end} ({$a->days} days)';
