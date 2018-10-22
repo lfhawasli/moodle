@@ -409,6 +409,7 @@ function print_video_list($videolist, $headertitle) {
  */
 function print_media_page_tabs($activetab, $courseid) {
     global $DB;
+    $tabs = [];
     $can_request = can_request_media($courseid);
     $videos = $DB->count_records('ucla_bruincast', array('courseid' => $courseid));
     $xvideos = $DB->count_records('ucla_bruincast_crosslist', array('courseid' => $courseid));
@@ -443,6 +444,14 @@ function print_media_page_tabs($activetab, $courseid) {
                         new moodle_url('/blocks/ucla_media/libreserves.php',
                                 array('courseid' => $courseid)),
                                     get_string('libraryreserves_tab', 'block_ucla_media', $count));
+    }
+    $course = get_course($courseid);
+    $modinfo = get_fast_modinfo($course);
+    if($modinfo->get_instances_of('kalvidres') != '') {
+        $tabs[] = new tabobject(get_string('title','block_ucla_media'),
+                    new moodle_url('/blocks/ucla_media/kalvidres.php',
+                        array('courseid' => $courseid)),
+                            get_string('kalvidres_tab', 'block_ucla_media', $count));
     }
     // Display tabs here.
     print_tabs(array($tabs), $activetab);

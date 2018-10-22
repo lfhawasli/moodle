@@ -93,6 +93,16 @@ class block_ucla_media extends block_base {
                                     array('courseid' => $courseid)));
                     $node->add_class('video-reserves-link');
                     $retval = $node;
+                } else {
+                    $course = get_course($courseid);
+                    $modinfo = get_fast_modinfo($course);
+                    if($modinfo->get_instances_of('kalvidres') != '') {
+                        $node = navigation_node::create(get_string('title',
+                                'block_ucla_media'), new moodle_url('/blocks/ucla_media/kalvidres.php',
+                                        array('courseid' => $courseid)));
+                        $node->add_class('video-reserves-link');
+                        $retval = $node;
+                    }
                 }
             }
         }
