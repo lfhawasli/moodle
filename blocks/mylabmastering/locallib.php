@@ -30,6 +30,45 @@ function mylabmastering_is_global_configured() {
 function mylabmastering_create_highlander_link($id, $url, $title) {
 	global $DB, $CFG, $COURSE;
 	require_once($CFG->dirroot.'/course/lib.php');
+
+        // START UCLA MOD: CCLE-8003 - Pearson MyLab & Mastering block creates LTI links as public.
+        $moduleinfo = new stdClass();
+        // Setup course module information.
+        $moduleinfo->modulename = 'lti';
+        $moduleinfo->course = $COURSE->id;
+        $moduleinfo->section = 0;
+        $moduleinfo->visible = 1;
+        $moduleinfo->introeditor = array(
+            'text' => '',
+            'format' => 1,
+            'itemid' => 0
+        );
+        // Set up LTI module information.
+        $moduleinfo->name = $title;
+        $moduleinfo->typeid= 0;
+        $moduleinfo->toolurl= $url;
+        if (strpos($moduleinfo->toolurl, 'https') === 0) {
+            $moduleinfo->instructorchoicesendname = 1;
+            $moduleinfo->instructorchoicesendemailaddr = 1;
+        } else {
+            $moduleinfo->instructorchoicesendname = 0;
+            $moduleinfo->instructorchoicesendemailaddr = 0;
+        }
+        $moduleinfo->launchcontainer = 2;
+        $moduleinfo->resourcekey = $CFG->mylabmastering_key;
+        $moduleinfo->password = $CFG->mylabmastering_secret;
+        $moduleinfo->debuglaunch = 0;
+        $moduleinfo->showtitlelaunch = 0;
+        $moduleinfo->showdescriptionlaunch = 0;
+        $useicons = $CFG->mylabmastering_use_icons;
+        if ($useicons) {
+            $moduleinfo->icon = $CFG->wwwroot.'/blocks/mylabmastering/pix/icon.jpg';
+        }
+
+        $module = create_module($moduleinfo);
+        return $module->instance;
+        // END UCLA MOD: CCLE-8003.
+
 	$courseid = $COURSE->id;
 	
 	$lti = new stdClass;
