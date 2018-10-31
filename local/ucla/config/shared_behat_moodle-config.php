@@ -378,6 +378,7 @@ $CFG->cronclionly = true;
 
 // Site administration > Security > HTTP security
 $CFG->allowframembedding = 1; // CCLE-3021 - enabled because some collab sites need to be embedded
+$CFG->cookiehttponly = 1;
 
 // Site administration > Appearance > Themes
 //$CFG->theme = 'clean';
