@@ -207,14 +207,15 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         $this->page->requires->yui_module('moodle-local_ucla-availabilityconditions', 'M.local_ucla.init_availabilityconditions');
         $availabilityhtml = $this->course_section_cm_availability($mod, $displayoptions);
 
+        $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
+        $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
+        if (empty($availabilityhtml)) {
+            $classes .= ' hide';
+        }
+
         $ppmodule = \PublicPrivate_Module::build($mod);
         $ppstate = $ppmodule->is_private() ? 'private' : 'public';
 
-        $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
-        $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
-        if ($ppstate == 'public' || empty($availabilityhtml)) {
-            $classes .= ' hide';
-        }
         $availabilitypopup = html_writer::span($link, $classes, array(
             'data-availabilityconditions' => $availabilityhtml,
             'data-ppstate' => $ppstate
