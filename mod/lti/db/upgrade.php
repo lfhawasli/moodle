@@ -162,6 +162,26 @@ function xmldb_lti_upgrade($oldversion) {
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
 
+    // START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
+    if ($oldversion < 2018051401) {
+        $placementstablename = 'lti_course_menu_placements';
+        $table = new xmldb_table($placementstablename);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'course');
+        
+        // Adding keys to table lti_course_menu_placements.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        
+        if (!$dbman->table_exists($placementstablename)) {
+            $dbman->create_table($table);
+        }
+        
+        upgrade_mod_savepoint(true, 2018051401, 'lti');
+    }
+    // END UCLA MOD: CCLE-6955.
+
     return true;
 
 }
