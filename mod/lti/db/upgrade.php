@@ -37,15 +37,14 @@
  *
  * @package mod_lti
  * @copyright  2009 Marc Alier, Jordi Piguillem, Nikolas Galanis
- *  marc.alier@upc.edu
+ *             marc.alier@upc.edu
  * @copyright  2009 Universitat Politecnica de Catalunya http://www.upc.edu
  * @author     Marc Alier
  * @author     Jordi Piguillem
  * @author     Nikolas Galanis
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
- defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * xmldb_lti_upgrade is the function that upgrades
@@ -154,6 +153,28 @@ function xmldb_lti_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2017111301, 'lti');
     }
+
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if ($oldversion < 2017111302) {
+        $table = new xmldb_table('lti_types');
+
+        $fields = [];
+        $fields[] = new xmldb_field('asactivity', XMLDB_TYPE_INTEGER, 1, null, null, null, 1, 'secureicon');
+        $fields[] = new xmldb_field('asassignment', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'asactivity');
+        $fields[] = new xmldb_field('assignmenturl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asassignment');
+        $fields[] = new xmldb_field('asmenulink', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'assignmenturl');
+        $fields[] = new xmldb_field('menulinkurl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asmenulink');
+        $fields[] = new xmldb_field('asrichtexteditorplugin', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'menulinkurl');
+        $fields[] = new xmldb_field('richtexteditorurl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asrichtexteditorplugin');
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2017111302, 'lti');
+    }
+    // END UCLA MOD: CCLE-6956.
 
     return true;
 
