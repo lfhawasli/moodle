@@ -517,7 +517,12 @@ class participants_table extends \table_sql {
         $sort = $this->get_sql_sort();
         if ($sort) {
             $sort = 'ORDER BY ' . $sort;
+        // START UCLA MOD: CCLE-7751 Set default sorting to participants table."
+        // }
+        } else {
+            $sort = 'ORDER BY u.lastname';
         }
+        // ENS UCLA MOD: CCLE-7751
 
         // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
         //$rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
