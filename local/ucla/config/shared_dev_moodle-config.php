@@ -580,6 +580,7 @@ $CFG->minpasswordnonalphanum = 0;
 
 // Site administration > Security > HTTP security
 $CFG->allowframembedding = 1;
+$CFG->cookiehttponly = 1;
 
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';
