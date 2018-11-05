@@ -592,6 +592,7 @@ $CFG->cronclionly = true;
 $CFG->loginhttps = true;
 $CFG->cookiesecure = true;
 $CFG->allowframembedding = 1;
+$CFG->cookiehttponly = 1;
 
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';

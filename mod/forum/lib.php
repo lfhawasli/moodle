@@ -37,6 +37,9 @@ define('FORUM_MODE_NESTED', 3);
 define('FORUM_MODE_PRINT', 4);
 define('FORUM_MODE_EXPORT', 5);
 // END UCLA MOD: CCLE-4882 forum customization
+// START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+define('FORUM_MODE_LASTNAME', 6);
+// END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 
 define('FORUM_CHOOSESUBSCRIBE', 0);
 define('FORUM_FORCESUBSCRIBE', 1);
@@ -81,6 +84,21 @@ define('FORUM_POSTS_ALL_USER_GROUPS', -2);
 
 define('FORUM_DISCUSSION_PINNED', 1);
 define('FORUM_DISCUSSION_UNPINNED', 0);
+
+// START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+define('DISCUSSION_MODE_NAME_ASC', 1);
+define('DISCUSSION_MODE_NAME_DESC', 2);
+define('DISCUSSION_MODE_FIRSTPOST_ASC', 3);
+define('DISCUSSION_MODE_FIRSTPOST_DESC', 4);
+define('DISCUSSION_MODE_GROUP_ASC', 5);
+define('DISCUSSION_MODE_GROUP_DESC', 6);
+define('DISCUSSION_MODE_REPLIES_ASC', 7);
+define('DISCUSSION_MODE_REPLIES_DESC', 8);
+define('DISCUSSION_MODE_UNREAD_ASC', 9);
+define('DISCUSSION_MODE_UNREAD_DESC', 10);
+define('DISCUSSION_MODE_LASTPOST_ASC', 11);
+define('DISCUSSION_MODE_LASTPOST_DESC', 12);
+// END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 
 /// STANDARD FUNCTIONS ///////////////////////////////////////////////////////////
 
@@ -1914,12 +1932,20 @@ function forum_get_all_discussion_posts($discussionid, $sort, $tracking=false) {
 
     $allnames = get_all_user_name_fields(true, 'u');
     $params[] = $discussionid;
-    if (!$posts = $DB->get_records_sql("SELECT p.*, $allnames, u.email, u.picture, u.imagealt $tr_sel
-                                     FROM {forum_posts} p
-                                          LEFT JOIN {user} u ON p.userid = u.id
-                                          $tr_join
-                                    WHERE p.discussion = ?
-                                 ORDER BY $sort", $params)) {
+    // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+    // if (!$posts = $DB->get_records_sql("SELECT p.*, $allnames, u.email, u.picture, u.imagealt $tr_sel
+    //                                  FROM {forum_posts} p
+    //                                       LEFT JOIN {user} u ON p.userid = u.id
+    //                                       $tr_join
+    //                                 WHERE p.discussion = ?
+    //                              ORDER BY $sort", $params)) {
+    if (!$posts = $DB->get_records_sql("SELECT p.*, $allnames, u.email, u.picture, u.imagealt $tr_sel, u.lastname
+                                    FROM {forum_posts} p
+                                        LEFT JOIN {user} u ON p.userid = u.id
+                                        $tr_join
+                                WHERE p.discussion = ?
+                                ORDER BY $sort", $params)) {
+    // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
         return array();
     }
 
@@ -5724,6 +5750,16 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
 // Get all the recent discussions we're allowed to see
 
     $getuserlastmodified = ($displayformat == 'header');
+    // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+    // Reply and unread count is calculated in separated queries.
+    // Don't include their sort options for the discussions query.
+    if ($sort == 'replies ASC' || $sort == 'replies DESC' || $sort == 'unread ASC' || $sort == 'unread DESC') {
+        $forumsort = $sort;
+        $sort = '';
+    } else {
+        $forumsort = '';
+    }
+    // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 
     if (! $discussions = forum_get_discussions($cm, $sort, $fullpost, null, $maxdiscussions, $getuserlastmodified, $page, $perpage) ) {
         echo '<div class="forumnodiscuss">';
@@ -5782,16 +5818,107 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
         echo '<table cellspacing="0" class="forumheaderlist">';
         echo '<thead class="text-left">';
         echo '<tr>';
-        echo '<th class="header topic" scope="col">'.get_string('discussion', 'forum').'</th>';
-        echo '<th class="header author" scope="col">'.get_string('startedby', 'forum').'</th>';
+        // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+        // Include sorting links for each of the headers.
+        // echo '<th class="header topic" scope="col">'.get_string('discussion', 'forum').'</th>';
+        // echo '<th class="header author" scope="col">'.get_string('startedby', 'forum').'</th>';
+        // if ($groupmode > 0) {
+        //     echo '<th class="header group" scope="col">'.get_string('group').'</th>';
+        // }
+        // if (has_capability('mod/forum:viewdiscussion', $context)) {
+        //     echo '<th class="header replies" scope="col">'.get_string('replies', 'forum').'</th>';
+        //     // If the forum can be tracked, display the unread column.
+        //     if ($cantrack) {
+        //         echo '<th class="header replies" scope="col">'.get_string('unread', 'forum');
+        //         if ($forumtracked) {
+        //             echo '<a title="'.get_string('markallread', 'forum').
+        //                  '" href="'.$CFG->wwwroot.'/mod/forum/markposts.php?f='.
+        //                  $forum->id.'&amp;mark=read&amp;returnpage=view.php&amp;sesskey=' . sesskey() . '">'.
+        //                  $OUTPUT->pix_icon('t/markasread', get_string('markallread', 'forum')) . '</a>';
+        //         }
+        //         echo '</th>';
+        //     }
+        // }
+        // echo '<th class="header lastpost" scope="col">'.get_string('lastpost', 'forum').'</th>';
+        echo '<th class="header topic" scope="col">';
+        if ($sort == 'd.name ASC') {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode=' 
+                .DISCUSSION_MODE_NAME_DESC.'">'
+                .get_string('discussion', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
+        } else if ($sort == 'd.name DESC') {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_NAME_ASC.'">'
+                .get_string('discussion', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
+        } else {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_NAME_ASC.'">'
+                .get_string('discussion', 'forum').'</a>';
+        }
+        echo '</th>';
+        echo '<th class="header author" scope="col">';
+        if ($sort == 'd.firstpost ASC') {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_FIRSTPOST_DESC.'">'
+                .get_string('startedby', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
+        } else if ($sort == 'd.firstpost DESC') {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_FIRSTPOST_ASC.'">'
+                .get_string('startedby', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
+        } else {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_FIRSTPOST_ASC.'">'
+                .get_string('startedby', 'forum').'</a>';
+        }
+        echo '</th>';
         if ($groupmode > 0) {
-            echo '<th class="header group" scope="col">'.get_string('group').'</th>';
+            echo '<th class="header group" scope="col">';
+            if ($sort == 'd.groupid ASC') {
+                echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                    .DISCUSSION_MODE_GROUP_DESC.'">'
+                    .get_string('group').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
+            } else if ($sort == 'd.groupid DESC') {
+                echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                    .DISCUSSION_MODE_GROUP_ASC.'">'
+                    .get_string('group').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
+            } else {
+                echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                    .DISCUSSION_MODE_GROUP_ASC.'">'
+                    .get_string('group').'</a>';
+            }
+            echo '</th>';
         }
         if (has_capability('mod/forum:viewdiscussion', $context)) {
-            echo '<th class="header replies" scope="col">'.get_string('replies', 'forum').'</th>';
+            echo '<th class="header replies" scope="col">';
+            if ($forumsort == 'replies ASC') {
+                echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                    .DISCUSSION_MODE_REPLIES_DESC.'">'
+                    .get_string('replies', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
+            } else if ($forumsort == 'replies DESC') {
+                echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                    .DISCUSSION_MODE_REPLIES_ASC.'">'
+                    .get_string('replies', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
+            } else {
+                echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                    .DISCUSSION_MODE_REPLIES_ASC.'">'
+                    .get_string('replies', 'forum').'</a>';
+            }
+            echo '</th>';
             // If the forum can be tracked, display the unread column.
             if ($cantrack) {
-                echo '<th class="header replies" scope="col">'.get_string('unread', 'forum');
+                echo '<th class="header replies" scope="col">';
+                if ($forumsort == 'unread ASC') {
+                    echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                        .DISCUSSION_MODE_UNREAD_DESC.'">'
+                        .get_string('unread', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
+                } else if ($forumsort == 'unread DESC') {
+                    echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                        .DISCUSSION_MODE_UNREAD_ASC.'">'
+                        .get_string('unread', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
+                } else {
+                    echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                        .DISCUSSION_MODE_UNREAD_ASC.'">'
+                        .get_string('unread', 'forum').'</a>';
+                }
                 if ($forumtracked) {
                     echo '<a title="'.get_string('markallread', 'forum').
                          '" href="'.$CFG->wwwroot.'/mod/forum/markposts.php?f='.
@@ -5801,7 +5928,22 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
                 echo '</th>';
             }
         }
-        echo '<th class="header lastpost" scope="col">'.get_string('lastpost', 'forum').'</th>';
+        echo '<th class="header lastpost" scope="col">';
+        if ($sort == 'd.timemodified ASC') {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_LASTPOST_DESC.'">'
+                .get_string('lastpost', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
+        } else if ($sort == 'd.timemodified DESC') {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_LASTPOST_ASC.'">'
+                .get_string('lastpost', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
+        } else {
+            echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
+                .DISCUSSION_MODE_LASTPOST_ASC.'">'
+                .get_string('lastpost', 'forum').'</a>';
+        }
+        echo '</th>';
+        // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
         if ((!is_guest($context, $USER) && isloggedin()) && has_capability('mod/forum:viewdiscussion', $context)) {
             if (\mod_forum\subscriptions::is_subscribable($forum)) {
                 echo '<th class="header discussionsubscription" scope="col">';
@@ -5814,33 +5956,76 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
         echo '<tbody>';
     }
 
+    // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+    // Process replies and unreads into discussions for possible sorting before printing discussions.
     foreach ($discussions as $discussion) {
-        if ($forum->type == 'qanda' && !has_capability('mod/forum:viewqandawithoutposting', $context) &&
-            !forum_user_has_posted($forum->id, $discussion->discussion, $USER->id)) {
-            $canviewparticipants = false;
-        }
-
         if (!empty($replies[$discussion->discussion])) {
             $discussion->replies = $replies[$discussion->discussion]->replies;
             $discussion->lastpostid = $replies[$discussion->discussion]->lastpostid;
         } else {
+            $replies[$discussion->discussion] = '0';
             $discussion->replies = 0;
         }
 
         // SPECIAL CASE: The front page can display a news item post to non-logged in users.
         // All posts are read in this case.
         if (!$forumtracked) {
+            $unreads[$discussion->discussion] = '-';
             $discussion->unread = '-';
         } else if (empty($USER)) {
+            $unreads[$discussion->discussion] = '0';
             $discussion->unread = 0;
         } else {
             if (empty($unreads[$discussion->discussion])) {
+                $unreads[$discussion->discussion] = '0';
                 $discussion->unread = 0;
             } else {
                 $discussion->unread = $unreads[$discussion->discussion];
             }
         }
+    }
 
+    // Sort by the reply or unread count.
+    if ($forumsort == 'replies ASC') {
+        array_multisort(array_column($discussions, "replies"), SORT_ASC, $discussions);
+    } else if ($forumsort == 'replies DESC') {
+        array_multisort(array_column($discussions, "replies"), SORT_DESC, $discussions);
+    } else if ($forumsort == 'unread ASC') {
+        array_multisort(array_column($discussions, "unread"), SORT_ASC, $discussions);
+    } else if ($forumsort == 'unread DESC') {
+        array_multisort(array_column($discussions, "unread"), SORT_DESC, $discussions);
+    }
+    // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+
+    foreach ($discussions as $discussion) {
+        if ($forum->type == 'qanda' && !has_capability('mod/forum:viewqandawithoutposting', $context) &&
+            !forum_user_has_posted($forum->id, $discussion->discussion, $USER->id)) {
+            $canviewparticipants = false;
+        }
+
+        // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+        // No need to re-process replies and unreads.
+        // if (!empty($replies[$discussion->discussion])) {
+        //     $discussion->replies = $replies[$discussion->discussion]->replies;
+        //     $discussion->lastpostid = $replies[$discussion->discussion]->lastpostid;
+        // } else {
+        //     $discussion->replies = 0;
+        // }
+
+        // // SPECIAL CASE: The front page can display a news item post to non-logged in users.
+        // // All posts are read in this case.
+        // if (!$forumtracked) {
+        //     $discussion->unread = '-';
+        // } else if (empty($USER)) {
+        //     $discussion->unread = 0;
+        // } else {
+        //     if (empty($unreads[$discussion->discussion])) {
+        //         $discussion->unread = 0;
+        //     } else {
+        //         $discussion->unread = $unreads[$discussion->discussion];
+        //     }
+        // }
+        // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
         if (isloggedin()) {
             $ownpost = ($discussion->userid == $USER->id);
         } else {
@@ -5947,6 +6132,11 @@ function forum_print_discussion($course, $cm, $forum, $discussion, $post, $mode,
     } else {
         $sort = "p.created ASC";
     }
+    // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+    if ($mode == FORUM_MODE_LASTNAME) {
+        $sort = "u.lastname ASC";
+    }
+    // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 
     $forumtracked = forum_tp_is_tracked($forum);
     $posts = forum_get_all_discussion_posts($discussion->id, $sort, $forumtracked);
@@ -6012,6 +6202,9 @@ function forum_print_discussion($course, $cm, $forum, $discussion, $post, $mode,
         // START UCLA MOD: CCLE-4882 forum customization
         case FORUM_MODE_PRINT:
         // END UCLA MOD: CCLE-4882 forum customization
+        // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+        case FORUM_MODE_LASTNAME:
+        // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
         default:
             forum_print_posts_flat($course, $cm, $forum, $discussion, $post, $mode, $reply, $forumtracked, $posts);
             break;
@@ -7491,9 +7684,28 @@ function forum_reset_course_form_defaults($course) {
 function forum_get_layout_modes() {
     return array (FORUM_MODE_FLATOLDEST => get_string('modeflatoldestfirst', 'forum'),
                   FORUM_MODE_FLATNEWEST => get_string('modeflatnewestfirst', 'forum'),
+                  // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+                  FORUM_MODE_LASTNAME =>   get_string('modeflatlastname', 'forum'),
+                  // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
                   FORUM_MODE_THREADED   => get_string('modethreaded', 'forum'),
                   FORUM_MODE_NESTED     => get_string('modenested', 'forum'));
 }
+
+// START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+/**
+ * Returns array of forum layout modes
+ *
+ * @return array
+ */
+function forum_get_discussion_modes() {
+    return array (DISCUSSION_MODE_NAME      => get_string('modediscussionname', 'forum'),
+                  DISCUSSION_MODE_FIRSTPOST => get_string('modediscussionposter', 'forum'),
+                  DISCUSSION_MODE_GROUP     => get_string('modediscussiongroup', 'forum'),
+                  DISCUSSION_MODE_REPLIES   => get_string('modediscussionreplies', 'forum'),
+                  DISCUSSION_MODE_UNREAD    => get_string('modediscussionunread', 'forum'),
+                  DISCUSSION_MODE_LASTPOST  => get_string('modelastpost', 'forum'));
+}
+// END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 
 /**
  * Returns array of forum types chooseable on the forum editing form

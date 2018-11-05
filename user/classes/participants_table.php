@@ -257,15 +257,15 @@ class participants_table extends \table_sql {
             $this->groups = groups_get_all_groups($courseid, 0, 0, 'g.*', true);
         }
         $this->allroles = role_fix_names(get_all_roles($this->context), $this->context);
-        // START UCLA MOD: CCLE-6809 - Expand roles that can be manually enrolled.
+        // START UCLA MOD: CCLE-7215 - Limit roles that can be assigned to existing users.
         //$this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
         require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
-        $untrimmedroles = \uclaroles_manager::get_assignable_roles_by_courseid($this->course, true);
+        $untrimmedroles = \uclaroles_manager::get_assignable_roles_by_courseid($this->course);
         foreach ($untrimmedroles as $role) {
             $assignableroles[$role->id] = $role->name;
         }
         $this->assignableroles = $assignableroles;
-        // END UCLA MOD: CCLE-6809.
+        // END UCLA MOD: CCLE-7215.
         $this->profileroles = get_profile_roles($this->context);
     }
 
@@ -517,7 +517,12 @@ class participants_table extends \table_sql {
         $sort = $this->get_sql_sort();
         if ($sort) {
             $sort = 'ORDER BY ' . $sort;
+        // START UCLA MOD: CCLE-7751 Set default sorting to participants table."
+        // }
+        } else {
+            $sort = 'ORDER BY u.lastname';
         }
+        // ENS UCLA MOD: CCLE-7751
 
         // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
         //$rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
