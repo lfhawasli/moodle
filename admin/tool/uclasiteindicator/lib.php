@@ -377,6 +377,7 @@ class siteindicator_manager {
             'projectcontributor',
             'projectparticipant',
             'projectviewer',
+            'student'
             );
         
         $this->_roleassignments = array(
@@ -402,7 +403,6 @@ class siteindicator_manager {
                 'instructional_assistant'      => 'projectcontributor',
                 'grader'      => 'projectparticipant',
                 'editor'      => 'projectcontributor',
-                'student'   => 'projectparticipant',                
                 'participant'      => 'projectparticipant',             
                 'visitor'      => 'projectviewer',                
                 'supervising_instructor' => 'projectlead',

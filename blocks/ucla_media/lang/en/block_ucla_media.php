@@ -116,3 +116,6 @@ $string['mrrequest'] = 'Request media resources';
 $string['bcrequest'] = 'Request BruinCast';
 $string['vrrequest'] = 'Request Video reserves';
 $string['mlrequest'] = 'Request Digital audio reserves';
+
+// Strings for Kaltura media gallery
+$string['kalvidres_tab'] = 'Media gallery';
