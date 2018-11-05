@@ -325,6 +325,9 @@ $string['messageprovider:posts'] = 'Subscribed forum posts';
 $string['missingsearchterms'] = 'The following search terms occur only in the HTML markup of this message:';
 $string['modeflatnewestfirst'] = 'Display replies flat, with newest first';
 $string['modeflatoldestfirst'] = 'Display replies flat, with oldest first';
+// START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+$string['modeflatlastname'] = 'Display replies flat, alphabetical by last name';
+// END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 $string['modenested'] = 'Display replies in nested form';
 $string['modethreaded'] = 'Display replies in threaded form';
 $string['modulename'] = 'Forum';

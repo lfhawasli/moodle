@@ -182,6 +182,48 @@
         echo $OUTPUT->notification(get_string('qandanotify','forum'));
     }
 
+    // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+    switch ($mode) {
+        case DISCUSSION_MODE_NAME_ASC:
+            $sort = 'd.name ASC';
+            break;
+        case DISCUSSION_MODE_NAME_DESC:
+            $sort = 'd.name DESC';
+            break;
+        case DISCUSSION_MODE_FIRSTPOST_ASC: 
+            $sort = 'd.firstpost ASC';
+            break;
+        case DISCUSSION_MODE_FIRSTPOST_DESC: 
+            $sort = 'd.firstpost DESC';
+            break;
+        case DISCUSSION_MODE_GROUP_ASC: 
+            $sort = 'd.groupid ASC';
+            break;
+        case DISCUSSION_MODE_GROUP_DESC: 
+            $sort = 'd.groupid DESC';
+            break;
+        case DISCUSSION_MODE_REPLIES_ASC: 
+            $sort = 'replies ASC';
+            break;
+        case DISCUSSION_MODE_REPLIES_DESC: 
+            $sort = 'replies DESC';
+            break;
+        case DISCUSSION_MODE_UNREAD_ASC: 
+            $sort = 'unread ASC';
+            break;
+        case DISCUSSION_MODE_UNREAD_DESC: 
+            $sort = 'unread DESC';
+            break;
+        case DISCUSSION_MODE_LASTPOST_ASC:
+            $sort = 'd.timemodified ASC';
+            break;
+        case DISCUSSION_MODE_LASTPOST_DESC:
+            $sort = 'd.timemodified DESC';
+            break;
+        default:
+            $sort = '';
+    }
+    // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
     switch ($forum->type) {
         case 'single':
             if (!empty($discussions) && count($discussions) > 1) {
@@ -210,39 +252,74 @@
                 echo '&nbsp;';
             }
             echo '</p>';
-            if (!empty($showall)) {
-                forum_print_latest_discussions($course, $forum, 0, 'header', '', -1, -1, -1, 0, $cm);
-            } else {
-                forum_print_latest_discussions($course, $forum, -1, 'header', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
-            }
-            break;
+        // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
+        // Include the sort parameter for sorting headers.
 
-        case 'teacher':
-            if (!empty($showall)) {
-                forum_print_latest_discussions($course, $forum, 0, 'header', '', -1, -1, -1, 0, $cm);
-            } else {
-                forum_print_latest_discussions($course, $forum, -1, 'header', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
-            }
-            break;
+        //     if (!empty($showall)) {
+        //         forum_print_latest_discussions($course, $forum, 0, 'header', '', -1, -1, -1, 0, $cm);
+        //     } else {
+        //         forum_print_latest_discussions($course, $forum, -1, 'header', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+        //     }
+        //     break;
 
-        case 'blog':
-            echo '<br />';
-            if (!empty($showall)) {
-                forum_print_latest_discussions($course, $forum, 0, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, -1, 0, $cm);
-            } else {
-                forum_print_latest_discussions($course, $forum, -1, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, $page,
-                    $CFG->forum_manydiscussions, $cm);
-            }
-            break;
+        // case 'teacher':
+        //     if (!empty($showall)) {
+        //         forum_print_latest_discussions($course, $forum, 0, 'header', '', -1, -1, -1, 0, $cm);
+        //     } else {
+        //         forum_print_latest_discussions($course, $forum, -1, 'header', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+        //     }
+        //     break;
 
-        default:
-            echo '<br />';
-            if (!empty($showall)) {
-                forum_print_latest_discussions($course, $forum, 0, 'header', '', -1, -1, -1, 0, $cm);
-            } else {
-                forum_print_latest_discussions($course, $forum, -1, 'header', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
-            }
+        // case 'blog':
+        //     echo '<br />';
+        //     if (!empty($showall)) {
+        //         forum_print_latest_discussions($course, $forum, 0, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, -1, 0, $cm);
+        //     } else {
+        //         forum_print_latest_discussions($course, $forum, -1, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, $page,
+        //             $CFG->forum_manydiscussions, $cm);
+        //     }
+        //     break;
 
+        // default:
+        //     echo '<br />';
+        //     if (!empty($showall)) {
+        //         forum_print_latest_discussions($course, $forum, 0, 'header', '', -1, -1, -1, 0, $cm);
+        //     } else {
+        //         forum_print_latest_discussions($course, $forum, -1, 'header', '', -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+        //     }
+        if (!empty($showall)) {
+            forum_print_latest_discussions($course, $forum, 0, 'header', $sort, -1, -1, -1, 0, $cm);
+        } else {
+            forum_print_latest_discussions($course, $forum, -1, 'header', $sort, -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+        }
+        break;
+
+    case 'teacher':
+        if (!empty($showall)) {
+            forum_print_latest_discussions($course, $forum, 0, 'header', $sort, -1, -1, -1, 0, $cm);
+        } else {
+            forum_print_latest_discussions($course, $forum, -1, 'header', $sort, -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+        }
+        break;
+
+    case 'blog':
+        echo '<br />';
+        if (!empty($showall)) {
+            forum_print_latest_discussions($course, $forum, 0, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, -1, 0, $cm);
+        } else {
+            forum_print_latest_discussions($course, $forum, -1, 'plain', 'd.pinned DESC, p.created DESC', -1, -1, $page,
+                $CFG->forum_manydiscussions, $cm);
+        }
+        break;
+
+    default:
+        echo '<br />';
+        if (!empty($showall)) {
+            forum_print_latest_discussions($course, $forum, 0, 'header', $sort, -1, -1, -1, 0, $cm);
+        } else {
+            forum_print_latest_discussions($course, $forum, -1, 'header', $sort , -1, -1, $page, $CFG->forum_manydiscussions, $cm);
+        }
+    // END UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
 
             break;
     }
