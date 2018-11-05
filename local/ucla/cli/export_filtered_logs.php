@@ -109,33 +109,21 @@ if (!$classes->valid()) {
 }
 
 mtrace('Exporting logs');
-// Copy over entries from mdl_log that belong to students in registrar courses.
-// This will include some extra log entries, but is much faster than going over
-// each course one by one.
+// Copy over entries from mdl_log that belong to registrar courses.
 $sql = "INSERT INTO export_log (
             SELECT DISTINCT l.*
               FROM {log} l
-              JOIN {ucla_request_classes} urc ON (l.course=urc.courseid)
-              JOIN {role_assignments} ra
-              JOIN {context} cxt ON (ra.contextid=cxt.id)
-             WHERE cxt.contextlevel=50
-               AND cxt.instanceid=urc.courseid
-               AND ra.roleid=:studentid
+              JOIN export_ucla_request_classes urc ON (l.course=urc.courseid)
+             WHERE 1
         )";
 $DB->execute($sql, ['studentid' => $studentid]);
 
-// Copy over entries from mdl_log that belong to students in registrar courses.
-// This will include some extra log entries, but is much faster than going over
-// each course one by one.
+// Copy over entries from mdl_log that belong to registrar courses.
 $sql = "INSERT INTO export_logstore_standard_log (
             SELECT DISTINCT l.*
               FROM {logstore_standard_log} l
-              JOIN {ucla_request_classes} urc ON (l.courseid=urc.courseid)
-              JOIN {role_assignments} ra
-              JOIN {context} cxt ON (ra.contextid=cxt.id)
-             WHERE cxt.contextlevel=50
-               AND cxt.instanceid=urc.courseid
-               AND ra.roleid=:studentid
+              JOIN export_ucla_request_classes urc ON (l.courseid=urc.courseid)
+             WHERE 1
         )";
 $DB->execute($sql, ['studentid' => $studentid]);
 
