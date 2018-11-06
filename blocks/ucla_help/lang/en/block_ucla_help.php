@@ -71,6 +71,11 @@ $string['settings_enablefileuploads'] = 'Enable file uploads';
 $string['settings_enablefileuploads_description'] = 'Enable the file attachement uploads for help ticket.';
 $string['settings_upload_header'] = 'File Upload settings';
 
+$string['settings_recaptcha_header'] = 'reCAPTCHA setting';
+$string['settings_recaptcha_description'] = 'Must have reCAPTCHA key/secret setup in "Site administration > Plugins > Authentication > Manage authentication" in order for setting to show up.';
+$string['settings_enablerecaptcha'] = 'Enable reCAPTCHA';
+$string['settings_enablerecaptcha_description'] = 'If enabled, displays reCAPTCHA form element for help requests from non-logged in users.';
+
 $string['settings_support_contacts_header'] = 'Support contacts';
 $string['settings_support_contacts_description'] = '<p>If a user clicks on a "Help & Feedback" link while in a course, admins ' .
         'can define a support contact based on context levels.</p><p>For example, if a user is in English 1 (shortname=eng1, category=English) ' .

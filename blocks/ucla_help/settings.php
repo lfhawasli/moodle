@@ -65,6 +65,21 @@ if ($ADMIN->fulltree) {
         get_string('settings_enablefileuploads', 'block_ucla_help'),
         get_string('settings_enablefileuploads_description', 'block_ucla_help'), 1));
 
+    // Recaptcha settings.
+    $recaptchaenabled = !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey);
+    $description = '';
+    if (!$recaptchaenabled) {
+        $description = get_string('settings_recaptcha_description', 'block_ucla_help');
+    }
+    $settings->add(new admin_setting_heading('block_ucla_help/recaptcha_header',
+        get_string('settings_recaptcha_header', 'block_ucla_help'),
+        $description));
+    if ($recaptchaenabled) {
+        $settings->add(new admin_setting_configcheckbox('block_ucla_help/enablerecaptcha',
+            get_string('settings_enablerecaptcha', 'block_ucla_help'),
+            get_string('settings_enablerecaptcha_description', 'block_ucla_help'), 0));
+    }
+
     // Point of contact table.
     $settings->add(new admin_setting_heading('block_ucla_help/support_contacts_header',
         get_string('settings_support_contacts_header', 'block_ucla_help'),
