@@ -364,7 +364,6 @@ $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemai
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus
 $CFG->forced_plugin_settings['antivirus_clamav']['pathtoclam'] = '/usr/bin/clamscan';
-$CFG->forced_plugin_settings['antivirus_clamav']['quarantinedir'] = '/usr/local/clamquarantine';
 $CFG->forced_plugin_settings['antivirus_clamav']['clamfailureonupload'] = 'donothing';
 
 // Site administration > Plugins > Enrollments > UCLA registrar

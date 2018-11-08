@@ -384,8 +384,8 @@ $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus
-$CFG->forced_plugin_settings['antivirus_clamav']['pathtoclam'] = '/usr/bin/clamscan';
-$CFG->forced_plugin_settings['antivirus_clamav']['quarantinedir'] = '/usr/local/clamquarantine';
+$CFG->forced_plugin_settings['antivirus_clamav']['runningmethod'] = 'unixsocket';
+$CFG->forced_plugin_settings['antivirus_clamav']['pathtounixsocket'] = '/var/run/clamd.scan/clamd.sock';
 $CFG->forced_plugin_settings['antivirus_clamav']['clamfailureonupload'] = 'donothing';
 
 // Site administration > Plugins > Enrollments > UCLA registrar
