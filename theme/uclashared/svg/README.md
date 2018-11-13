@@ -1,0 +1,1 @@
+Contains SVG files of icons customize made by UCLA.
