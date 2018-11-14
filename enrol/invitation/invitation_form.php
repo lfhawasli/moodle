@@ -216,7 +216,14 @@ class invitation_form extends moodleform {
      * @return string
      */
     protected function format_role_string($role) {
-        $rolestring = html_writer::tag('span', $role->name . ':',
+        $course = $this->_customdata['course'];
+        $coursecontext = context_course::instance($course->id);
+
+        $roleid = $role->id;
+        $rolealias = role_fix_names(array($roleid => $role), $coursecontext, ROLENAME_ALIAS, true);
+        $rolename = $rolealias[$roleid];
+
+        $rolestring = html_writer::tag('span', $rolename . ':',
                 array('class' => 'role-name'));
 
         // Role description has a <hr> tag to separate out info for users
