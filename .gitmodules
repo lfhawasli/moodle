@@ -187,3 +187,6 @@
 [submodule "mod/englishcentral"]
 	path = mod/englishcentral
 	url = https://github.com/ccle/moodle-mod_englishcentral.git
+[submodule "report/benchmark"]
+	path = report/benchmark
+	url = https://github.com/mikasmart/benchmark
