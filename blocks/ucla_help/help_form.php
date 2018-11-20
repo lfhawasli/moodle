@@ -99,6 +99,14 @@ class help_form extends moodleform {
             }
         }
 
+        // Display reCAPTCHA for non-logged in users.
+        if (!isloggedin() || isguestuser()) {
+            if (!empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) &&
+                    get_config('block_ucla_help', 'enablerecaptcha')) {
+                $mform->addElement('recaptcha', 'recaptcha_element');
+            }
+        }
+
         // No point in having a cancel option.
         $this->add_action_buttons(false, get_string('submit_button', 'block_ucla_help'));
 
@@ -122,5 +130,35 @@ class help_form extends moodleform {
 
         // Make description field a required field.
         $mform->addRule('ucla_help_description', get_string('requiredelement', 'form'), 'required');
+    }
+
+    /**
+     * Validate user supplied data on the help form.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
+    public function validation($data, $files) {
+        global $CFG;
+        $errors = parent::validation($data, $files);
+
+        if (!isloggedin() || isguestuser()) {
+            if (!empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) &&
+                    get_config('block_ucla_help', 'enablerecaptcha')) {
+                $recaptchaelement = $this->_form->getElement('recaptcha_element');
+                if (!empty($this->_form->_submitValues['g-recaptcha-response'])) {
+                    $response = $this->_form->_submitValues['g-recaptcha-response'];
+                    if (!$recaptchaelement->verify($response)) {
+                        $errors['recaptcha_element'] = get_string('incorrectpleasetryagain', 'auth');
+                    }
+                } else {
+                    $errors['recaptcha_element'] = get_string('missingrecaptchachallengefield');
+                }
+            }
+        }
+
+        return $errors;
     }
 }

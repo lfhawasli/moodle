@@ -353,8 +353,8 @@ $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrat
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus
-$CFG->forced_plugin_settings['antivirus_clamav']['pathtoclam'] = '/usr/bin/clamscan';
-$CFG->forced_plugin_settings['antivirus_clamav']['quarantinedir'] = '/usr/local/clamquarantine';
+$CFG->forced_plugin_settings['antivirus_clamav']['runningmethod'] = 'unixsocket';
+$CFG->forced_plugin_settings['antivirus_clamav']['pathtounixsocket'] = '/var/run/clamd.scan/clamd.sock';
 $CFG->forced_plugin_settings['antivirus_clamav']['clamfailureonupload'] = 'donothing';
 
 // Site administration > Plugins > Enrollments > UCLA registrar

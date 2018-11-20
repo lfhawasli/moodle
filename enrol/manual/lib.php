@@ -110,7 +110,10 @@ class enrol_manual_plugin extends enrol_plugin {
         $context = context_course::instance($instance->courseid);
 
         $icons = array();
-        if (has_capability('enrol/manual:enrol', $context) or has_capability('enrol/manual:unenrol', $context)) {
+        // START UCLA MOD: CCLE-7962 - Prevent roles with access to the Enrollment methods screen.
+        // if (has_capability('enrol/manual:enrol', $context) or has_capability('enrol/manual:unenrol', $context)) {
+        if (has_capability('enrol/manual:enrol', $context) and has_capability('enrol/manual:unenrol', $context)) {
+        // END UCLA MOD: CCLE-7962.
             $managelink = new moodle_url("/enrol/manual/manage.php", array('enrolid'=>$instance->id));
             $icons[] = $OUTPUT->action_icon($managelink, new pix_icon('t/enrolusers', get_string('enrolusers', 'enrol_manual'), 'core', array('class'=>'iconsmall')));
         }

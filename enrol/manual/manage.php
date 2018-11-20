@@ -41,8 +41,10 @@ $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
 
 // Note: manage capability not used here because it is used for editing
 // of existing enrolments which is not possible here.
-
-if (!$canenrol and !$canunenrol) {
+// START UCLA MOD: CCLE-7962 - Prevent roles with access to the Enrollment methods screen.
+//if (!$canenrol and !$canunenrol) {
+if (!$canenrol or !$canunenrol) {
+// END UCLA MOD: CCLE-7962.
     // No need to invent new error strings here...
     require_capability('enrol/manual:enrol', $context);
     require_capability('enrol/manual:unenrol', $context);
