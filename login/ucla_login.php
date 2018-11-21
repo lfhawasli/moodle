@@ -27,6 +27,8 @@
 require_once(dirname(__FILE__) . "/../config.php");
 
 $loginguest = optional_param('loginguest', 0, PARAM_INT);
+$anchor      = optional_param('anchor', '', PARAM_RAW);      // Used to restore hash anchor to wantsurl.
+$logintoken  = optional_param('logintoken', '', PARAM_RAW);       // Used to validate the request.
 
 /** Modified 20071214 by Jovca
  * If the user got here via standard Moodle login redirect, he'll have the 
@@ -114,6 +116,15 @@ if ($loginguest && !$frm) {
     local_ucla_autologin::clear();
 }
 
+// Restore the #anchor to the original wantsurl. Note that this
+// will only work for internal auth plugins, SSO plugins such as
+// SAML / CAS / OIDC will have to handle this correctly directly.
+if ($anchor && isset($SESSION->wantsurl) && strpos($SESSION->wantsurl, '#') === false) {
+    $wantsurl = new moodle_url($SESSION->wantsurl);
+    $wantsurl->set_anchor(substr($anchor, 1));
+    $SESSION->wantsurl = $wantsurl->out();
+}
+
 if ($frm !== false && isset($frm->username)) {
     $frm->username = trim(core_text::strtolower($frm->username));
 
@@ -122,10 +133,7 @@ if ($frm !== false && isset($frm->username)) {
         $frm = false;
     } else {
         if (empty($errormsg)) {
-            $user = authenticate_user_login(
-                $frm->username,
-                $frm->password
-            );
+            $user = authenticate_user_login($frm->username, $frm->password, false, $errorcode, $logintoken);
         }
     }
 
