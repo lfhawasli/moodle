@@ -731,6 +731,9 @@ class view {
         echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
         echo \html_writer::input_hidden_params($this->baseurl);
 
+        // START UCLA MOD: CCLE-8002 - Add question bank button to the top.
+        $this->display_bottom_controls($totalnumber, $recurse, $category, $catcontext, $addcontexts);
+        // END UCLA MOD: CCLE-8002.
         echo '<div class="categoryquestionscontainer">';
         $this->start_table();
         $rowcount = 0;
