@@ -85,9 +85,6 @@ switch ($PAGE->pagetype) {
 // Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
 $THEME->scss = 'moodle';
 
-// Add javascript files.
-$THEME->javascripts = ['frontpage'];
-
 $THEME->layouts['frontpage'] = array(
   'file' => 'frontpage.php',
 );

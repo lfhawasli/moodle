@@ -7,7 +7,7 @@ $('.competency-edit-list .remove').click(function(){
     $(this).closest('li').detach().appendTo($('#competency-set-'+cat));
 })
 
-$('.region-content form').submit(function(e){
+$('#page-content form').submit(function(e){
     
     e.preventDefault()
     
