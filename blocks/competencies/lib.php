@@ -214,17 +214,20 @@ class block_competencies_db {
     public static function get_item_sets()
     {
         global $DB;
-        
+
         $sets = $DB->get_records(self::TABLE_SETS);
         
         // special "unassigned" set
         $sets[0] = new stdClass;
         $sets[0]->name = 'Other';
         $sets[0]->id = 0;
-        
+
         // add an items array to all set records
-        array_walk($sets, create_function('$set', '$set->items = array(); return $set;'));
-        
+        array_walk($sets, function ($set) {
+            $set->items = array();
+            return $set;
+        });
+
         // add items to set (or unassigned set if no match)
         $items = self::get_items();
         foreach($items as $item){
