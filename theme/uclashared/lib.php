@@ -72,7 +72,6 @@ function theme_uclashared_get_fontawesome_icon_map() {
          'atto_poodll:video' => 'fa-video-camera',
          'atto_poodll:whiteboard' => 'fa-pencil',
          'atto_poodll:snapshot' => 'fa-camera',
-         'atto_count:icon' => 'fa-hashtag',
          'atto_fontfamily:icon' => 'fa-font'
      ];
 }
