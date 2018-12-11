@@ -50,6 +50,7 @@ class course_handler extends browseby_handler {
             ubci.ses_grp_cd AS session_group,
             ubci.session AS session_code,
             ubci.coursetitlelong AS course_title,
+            ubci.sectiontitle AS section_title,
             ubci.sect_enrl_stat_cd AS enrolstat,
             ubci.catlg_no AS course_code,
             ubci.activitytype,
@@ -333,7 +334,10 @@ class course_handler extends browseby_handler {
                         array('class' => 'ucla-cancelled-course')) . ' ';
                 }
 
-                $courseobj->fullname = $cancelledmess . $course->course_title;
+                $courseobj->fullname = $cancelledmess .
+                    uclacoursecreator::make_course_title(
+                        $course->course_title, $course->section_title
+                    );
 
                 // CCLE-3989 - Supervising Instructor Shown On Course List.
                 if (!empty($course->profcode) && $course->profcode != '03') {
