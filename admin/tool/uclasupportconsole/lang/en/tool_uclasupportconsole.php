@@ -63,6 +63,7 @@ $string['enrollview'] = 'Enrollment history per UID (<a target="_blank" href="ht
 // The item itself will be there when the SP-object is coded, but there
 // will be no explanation unless the code here is changed (or the SRDB
 // layer is altered to include descriptions within the object).
+$string['ccle_coursegetall'] = 'Get all courses in a subject area for BrowseBy (CCLE <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3305">ccle_coursegetall</a>)';
 $string['ccle_courseinstructorsget'] = 'Instructor list by course per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3306">ccle_courseinstructorsget</a>)';
 $string['ccle_getclasses'] = 'Course info by srs# (description, type, enroll status) (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3308">ccle_getclasses</a>)';
 $string['ccle_getinstrinfo'] = 'Instructors by subject area per term (<a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=3309">ccle_getinstrinfo</a>)';
