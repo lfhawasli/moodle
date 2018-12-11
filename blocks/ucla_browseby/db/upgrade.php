@@ -68,5 +68,19 @@ function xmldb_block_ucla_browseby_upgrade($oldversion = 0) {
         upgrade_block_savepoint(true, 2018051700, 'ucla_browseby');
     }
 
+    if ($oldversion < 2018121100) {
+        // Add back columns deleted as part of CCLE-8082 - Roll back converted SRDB code.
+        $table = new xmldb_table('ucla_browseall_classinfo');
+        $field = new xmldb_field('sectiontitle', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'coursetitlelong');
+
+        // Conditionally launch add field sectiontitle.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ucla_browseby savepoint reached.
+        upgrade_block_savepoint(true, 2018121100, 'ucla_browseby');
+    }
+
     return $result;
 }
