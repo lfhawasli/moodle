@@ -247,10 +247,9 @@ class block_ucla_browseby extends block_base {
 
             $thisreg = array('term' => $term,
                 'subjarea' => $subjarea);
-            $esbpparam = array('offeredTermCode' => $term, 'subjectAreaCode' => $subjarea);
 
-            $browsebycourses = new \local_ucla\esb\browseby_courses();
-            $courseinfo = $browsebycourses->run($esbpparam);
+            $courseinfo = registrar_query::run_registrar_query(
+                'ccle_coursegetall', $thisreg);
 
             if ($courseinfo) {
                 foreach ($courseinfo as $key => $ci) {
