@@ -565,7 +565,6 @@ abstract class base {
         $validparameters = [];
         foreach ($expectedparams as $expectedparam) {
             if (isset($params[$expectedparam])) {
-                $params[$expectedparam] = trim($params[$expectedparam]);
                 if (ucla_validator($expectedparam, $params[$expectedparam])) {
                     $validparameters[$expectedparam] = $params[$expectedparam];
                 } else {

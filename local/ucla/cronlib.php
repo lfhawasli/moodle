@@ -186,12 +186,12 @@ class ucla_reg_classinfo_cron {
                 $regclass = $DB->get_record('ucla_reg_classinfo',
                         array('term' => $request->term, 'srs' => $request->srs));
                 // Query registrar with reg_classinfo data to see if course still exists.
-                $esbcourse = new \local_ucla\esb\get_course_srs();
-                $coursesrs = $esbcourse->run(array(
-                        'offeredTermCode' => $regclass->term,
-                        'subjectAreaCode' => $regclass->subj_area,
-                        'courseCatalogNumber' => $regclass->crsidx,
-                        'classNumber' => $regclass->secidx,
+                $coursesrs = $this->query_registrar('ucla_get_course_srs',
+                    array(
+                        'term' => $regclass->term,
+                        'subjarea' => $regclass->subj_area,
+                        'crsidx' => $regclass->crsidx,
+                        'secidx' => $regclass->secidx,
                     )
                 );
                 if (!$coursesrs) {
@@ -310,6 +310,7 @@ class ucla_reg_subjectarea_cron {
                 mtrace($e->getMessage());
                 return false;
             }
+
             if ($regdata) {
                 $subjareas = array_merge($subjareas, $regdata);
             }
@@ -344,10 +345,8 @@ class ucla_reg_subjectarea_cron {
         foreach ($subjareas as $sa) {
             $satext = $sa['subjarea'];
             if (empty($selected[$satext])) {
-                // Keep updated the $selected with the newly inserted records list.
-                $obja = new stdClass();
-                $obja->id = $DB->insert_record($ttte, $sa);
-                $selected[$satext] = $obja;
+                $DB->insert_record($ttte, $sa);
+
                 $newsa ++;
             } else {
                 $sa['id'] = $selected[$satext]->id;
