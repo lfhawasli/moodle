@@ -81,6 +81,13 @@
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A description of what this LTI module is."/>
+        <FIELD NAME="asactivity" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an activity?" />
+        <FIELD NAME="asassignment" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an assignment?" />
+        <FIELD NAME="assignmenturl" TYPE="text" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="asmenulink" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an menu link?" />
+        <FIELD NAME="menulinkurl" TYPE="text" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="asrichtexteditorplugin" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as a rich text editor plugin?" />
+        <FIELD NAME="richtexteditorurl" TYPE="text" NOTNULL="false" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
