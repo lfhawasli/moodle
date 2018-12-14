@@ -27,7 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
 require_once($CFG->libdir . '/behat/lib.php');
 
-$navdraweropen = true;  // Make navbar open on every page load.
+$nonavbar = optional_param('nonavbar', null, PARAM_BOOL);
+if (!is_null($nonavbar)) {
+    // User wants navbar closed.
+    $navdraweropen = false;
+} else {
+    // Make navbar open on every page load by default.
+    $navdraweropen = true;
+}
 $extraclasses = [];
 $hidenavigation = false;
 $hidehamburgericon = false;
