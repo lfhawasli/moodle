@@ -508,7 +508,7 @@ $CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'ht
 $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 
 // Site administration > Plugins > Local plugins > Kaltura package libraries
-$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-2.kaf.kaltura.com';
+$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = 'kaf.ccle.ucla.edu';
 
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
