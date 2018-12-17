@@ -469,7 +469,9 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     insert2 = chemrender, chemistry, computing, equation
     files2 = mediagallery, panoptobutton
     poodll = poodll
-    accessibility = accessibilitychecker, accessibilityhelper';
+    accessibility = accessibilitychecker, accessibilityhelper
+    lti = lti
+';
 $CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
@@ -508,7 +510,7 @@ $CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'ht
 $CFG->forced_plugin_settings['local_googleanalytics']['courseshortname'] = 1;
 
 // Site administration > Plugins > Local plugins > Kaltura package libraries
-$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-2.kaf.kaltura.com';
+$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = 'kaf.ccle.ucla.edu';
 
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.

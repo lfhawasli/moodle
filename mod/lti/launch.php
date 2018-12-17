@@ -52,6 +52,9 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 $id = required_param('id', PARAM_INT); // Course Module ID.
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+$placement = optional_param('placement', 'activity', PARAM_RAW);
+// END UCLA MOD: CCLE-6956.
 
 $cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
 $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -77,5 +80,7 @@ if ($triggerview) {
 }
 
 $lti->cmid = $cm->id;
-lti_launch_tool($lti);
-
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+//lti_launch_tool($lti);
+lti_launch_tool($lti, $placement);
+// END UCLA MOD: CCLE-6956.

@@ -349,6 +349,16 @@ along with the consumer key from the tool provider.
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+$string['placements'] = 'Placements';
+$string['placementactivityurl'] = 'Activity URL';
+$string['placementasassignment'] = 'As Assignment';
+$string['placementasmenulink'] = 'As Menu Link';
+$string['placementasrichtexteditorplugin'] = 'As Rich Text Editor Plugin';
+$string['placementassignmenturl'] = 'Assignment URL';
+$string['placementmenulinkurl'] = 'Menu Link URL';
+$string['placementrichtexteditorurl'] = 'Rich Text Editor URL';
+// END UCLA MOD: CCLE-6956.
 $string['pluginadministration'] = 'External tool administration';
 $string['pluginname'] = 'External tool';
 $string['preferheight'] = 'Preferred height';
@@ -425,8 +435,7 @@ $string['return_to_course'] = 'Click <a href="{$a->link}" target="_top">here</a>
 $string['saveallfeedback'] = 'Save all my feedback';
 $string['search:activity'] = 'External tool - activity information';
 $string['secure_icon_url'] = 'Secure icon URL';
-$string['secure_icon_url_help'] = 'Similar to the icon URL, but used if the user accessing Moodle securely through SSL. The main purpose for this field is to prevent
-the browser from warning the user if the underlying page was accessed over SSL, but requesting to show an unsecure image.';
+$string['secure_icon_url_help'] = 'Similar to the icon URL, but used when the site is accessed securely through SSL. This field is to prevent the browser from displaying a warning about an insecure image.';
 $string['secure_launch_url'] = 'Secure tool URL';
 $string['secure_launch_url_help'] = 'Similar to the tool URL, but used instead of the tool URL if high security is required. Moodle will use the secure tool URL instead of the tool URL if the Moodle site is accessed through SSL, or if the tool configuration is set to always launch through SSL.
 
@@ -511,6 +520,10 @@ $string['tooltypenotdeleted'] = 'Could not delete preconfigured tool';
 $string['tooltypeupdated'] = 'Preconfigured tool updated';
 $string['toolurl'] = 'Tool URL';
 $string['toolurlplaceholder'] = 'Tool URL...';
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+$string['toolurl_contentitemselectionrequest'] = 'Content Selection URL';
+$string['toolurl_contentitemselectionrequest_help'] = 'The Content Selection URL will be used to launch the content selection page from the tool provider. If it is empty, the Tool URL will be used';
+// END UCLA MOD: CCLE-6956.
 $string['toolurl_help'] = 'The tool URL is used to match tool URLs to the correct tool configuration. Prefixing the URL with http(s) is optional.
 
 Additionally, the base URL is used as the tool URL if a tool URL is not specified in the external tool instance.

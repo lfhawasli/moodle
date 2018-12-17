@@ -27,6 +27,8 @@ require_once('lib.php');
 
 require_login(null, false);
 
+$perpage = optional_param('perpage', 0, PARAM_INT);
+
 $url = new moodle_url('/admin/tool/dataprivacy/datarequests.php');
 
 $title = get_string('datarequests', 'tool_dataprivacy');
@@ -53,6 +55,7 @@ if (\tool_dataprivacy\api::is_site_dpo($USER->id)) {
 
     $types = [];
     $statuses = [];
+    $creationmethods = [];
     foreach ($filtersapplied as $filter) {
         list($category, $value) = explode(':', $filter);
         switch($category) {
@@ -62,10 +65,20 @@ if (\tool_dataprivacy\api::is_site_dpo($USER->id)) {
             case \tool_dataprivacy\local\helper::FILTER_STATUS:
                 $statuses[] = $value;
                 break;
+            case \tool_dataprivacy\local\helper::FILTER_CREATION:
+                $creationmethods[] = $value;
+                break;
         }
     }
 
-    $table = new \tool_dataprivacy\output\data_requests_table(0, $statuses, $types, true);
+    $table = new \tool_dataprivacy\output\data_requests_table(0, $statuses, $types, $creationmethods, true);
+    if (!empty($perpage)) {
+        set_user_preference(\tool_dataprivacy\local\helper::PREF_REQUEST_PERPAGE, $perpage);
+    } else {
+        $prefperpage = get_user_preferences(\tool_dataprivacy\local\helper::PREF_REQUEST_PERPAGE);
+        $perpage = ($prefperpage) ? $prefperpage : $table->get_requests_per_page_options()[0];
+    }
+    $table->set_requests_per_page($perpage);
     $table->baseurl = $url;
 
     $requestlist = new tool_dataprivacy\output\data_requests_page($table, $filtersapplied);

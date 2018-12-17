@@ -147,6 +147,35 @@ class mod_lti_edit_types_form extends moodleform{
             $mform->disabledIf('lti_contentitem', null);
         }
 
+        // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+        $mform->addElement('text', 'lti_toolurl_ContentItemSelectionRequest', get_string('toolurl_contentitemselectionrequest', 'lti'), array(
+            'size' => '64'
+        ));
+        $mform->setType('lti_toolurl_ContentItemSelectionRequest', PARAM_URL);
+        $mform->setAdvanced('lti_toolurl_ContentItemSelectionRequest');
+        $mform->addHelpButton('lti_toolurl_ContentItemSelectionRequest', 'toolurl_contentitemselectionrequest', 'lti');
+        $mform->disabledIf('lti_toolurl_ContentItemSelectionRequest', 'lti_contentitem', 'notchecked');
+        if ($istool) {
+            $mform->disabledIf('lti_toolurl__ContentItemSelectionRequest', null);
+        }
+        
+        $mform->addElement('checkbox', 'lti_asassignment', get_string('placementasassignment', 'lti'));
+        $mform->addElement('text', 'lti_assignmenturl', get_string('placementassignmenturl', 'lti'), [
+            'size' => '64'
+        ]);
+        $mform->setType('lti_assignmenturl', PARAM_URL);
+        $mform->addElement('checkbox', 'lti_asmenulink', get_string('placementasmenulink', 'lti'));
+        $mform->addElement('text', 'lti_menulinkurl', get_string('placementmenulinkurl', 'lti'), [
+            'size' => '64'
+        ]);
+        $mform->setType('lti_menulinkurl', PARAM_URL);
+        $mform->addElement('checkbox', 'lti_asrichtexteditorplugin', get_string('placementasrichtexteditorplugin', 'lti'));
+        $mform->addElement('text', 'lti_richtexteditorurl', get_string('placementrichtexteditorurl', 'lti'), [
+            'size' => '64'
+        ]);
+        $mform->setType('lti_richtexteditorurl', PARAM_URL);
+        // END UCLA MOD: CCLE-6956.
+
         $mform->addElement('hidden', 'oldicon');
         $mform->setType('oldicon', PARAM_URL);
 
