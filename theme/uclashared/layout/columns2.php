@@ -38,6 +38,11 @@ if (!is_null($nonavbar)) {
 $extraclasses = [];
 $hidenavigation = false;
 $hidehamburgericon = false;
+
+if (!method_exists($OUTPUT, 'region_main_settings_menu')) {
+    echo $OUTPUT->doctype();
+    $OUTPUT = $PAGE->get_renderer('theme_uclasharedcourse', 'core');
+}
 // Made navdraweropen true on every page load except for quiz attempt and preview page.
 if ('mod-quiz-attempt' == $PAGE->pagetype || 'mod-quiz-review' == $PAGE->pagetype || 'mod-quiz-summary' == $PAGE->pagetype) {
     if(($PAGE->cm->context) && !has_any_capability(array('mod/quiz:viewreports', 'mod/quiz:grade'), $PAGE->cm->context)) {
@@ -49,6 +54,7 @@ if ('mod-quiz-attempt' == $PAGE->pagetype || 'mod-quiz-review' == $PAGE->pagetyp
 if ($navdraweropen) {
     $extraclasses[] = 'drawer-open-left';
 }
+
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $blockshtml = $OUTPUT->blocks('side-pre');
 $hasblocks = strpos($blockshtml, 'data-block=') !== false;
@@ -61,7 +67,7 @@ $templatecontext = [
     'bodyattributes' => $bodyattributes,
     'navdraweropen' => $navdraweropen,
     'hidenavigation' => $hidenavigation,
-    'regionmainsettingsmenu' => $regionmainsettingsmenu,
+    'regionmainsettingsmenu' => !empty($regionmainsettingsmenu) ? $regionmainsettingsmenu : '',
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'system_link' => get_config('theme_uclashared', 'system_link'),
     'system_name' => get_config('theme_uclashared', 'system_name'),
