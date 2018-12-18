@@ -197,7 +197,7 @@ $DB->execute($sql, ['studentid' => $studentid]);
 $prefixedexporttables = implode(' ', preg_filter('/^/', 'export_', $exportables));
 $exportfile = $exportdir . '/export_tables.sql';
 mtrace('Exporting into ' . $exportfile);
-exec(sprintf('mysqldump --user=%s --password=%s --host=%s --max_allowed_packet=1073741824 %s %s > %s',
+exec(sprintf('mysqldump --compatible=mssql --user=%s --password=%s --host=%s --max_allowed_packet=1073741824 %s %s > %s',
         $CFG->dbuser, $CFG->dbpass, $CFG->dbhost, $CFG->dbname, $prefixedexporttables, $exportfile),
         $output, $return);
 if ($return !== 0) {
