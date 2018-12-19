@@ -1,16 +1,16 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
-// Set true to require per-session locking for access to unused token records;
-// requires Moodle 2.7+.
-define("LOCKDOWNBROWSER_REQUIRE_DB_LOCKING", false);
-define("LOCKDOWNBROWSER_MAX_DB_LOCK_TIME", 10); // seconds
+define("LOCKDOWNBROWSER_LOCKLIB_ENABLE_LOG", false); // set true to enable logging to temp file
+define("LOCKDOWNBROWSER_LOCKLIB_LOG", "ldb_locklib.log");
 
 if (!isset($CFG)) {
     require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
 }
+require_once("$CFG->libdir/moodlelib.php");
+
 require_once(dirname(__FILE__) . "/locklibcfg.php");
 require_once(dirname(__FILE__) . "/blowfish.php"); // Trac #3884
 
@@ -27,6 +27,7 @@ function lockdownbrowser_set_settings($quizid, $reqquiz, $reqreview, $exitpass, 
 function lockdownbrowser_get_quiz_options($quizid) {
 
     global $DB;
+
     $ldbopt = $DB->get_record('block_lockdownbrowser_sett', array('quizid' => $quizid));
     if ($ldbopt) {
         $quiz = $DB->get_record("quiz", array("id" => $quizid));
@@ -88,9 +89,6 @@ function lockdownbrowser_set_quiz_options($quizid, $ldbopt = null) {
         $ldbopt->quizid = $quizid;
         $ok = $DB->insert_record('block_lockdownbrowser_sett', $ldbopt);
     }
-    if ($ok) {
-        $ok = lockdownbrowser_generate_tokens_settings($newsettings);
-    }
     return $ok;
 }
 
@@ -100,40 +98,14 @@ function lockdownbrowser_delete_options($quizid) {
     $DB->delete_records('block_lockdownbrowser_sett', array('quizid' => $quizid));
 }
 
-function lockdownbrowser_purge_sessions() { // Trac #2315
-
-    global $DB;
-
-    // purge stale records from tokens and sessions tables
-    $all_token_count = $DB->count_records('block_lockdownbrowser_toke');
-    if ($all_token_count < 50000) {
-        return;
-    }
-    $max_session_life = 3600 * 24 * 2; // 2 days
-    $min_session_start =  time() - $max_session_life;
-    $stale_session_count = $DB->count_records_select("block_lockdownbrowser_sess",
-      "timeused < ?", array($min_session_start));
-    if ($stale_session_count < 2000) {
-        return;
-    }
-    try {
-        $DB->delete_records_select("block_lockdownbrowser_sess",
-          "timeused < ?", array($min_session_start));
-        $DB->delete_records_select("block_lockdownbrowser_toke",
-          "timeused > 0 AND timeused < ?", array($min_session_start));
-    } catch (Exception $ex) {
-        // ignore possible multi-session conflicts
-    }
-}
-
 function lockdownbrowser_purge_settings() {
 
     global $DB;
 
     // remove any orphaned records from our settings table;
     // orphans occur whenever a quiz is deleted without first removing the LDB
-    // requirement in our dashboard;
-    // also see quizaccess_lockdownbrowser::delete_settings
+    //   requirement in our dashboard;
+    // also see dashboard.php and quizaccess_lockdownbrowser::delete_settings
     $records = $DB->get_records('block_lockdownbrowser_sett');
     if (count($records) > 0) {
         foreach ($records as $settings) {
@@ -163,375 +135,57 @@ function lockdownbrowser_get_settings($quizid) {
     }
 }
 
-function lockdownbrowser_browser_detected() {
+function lockdownbrowser_browser_standard_detected() {
 
     global $CFG;
-    $detected = false;
-    if (isset($_COOKIE[$CFG->block_lockdownbrowser_ldb_id_cookie])) {
-        if (strcmp($_COOKIE[$CFG->block_lockdownbrowser_ldb_id_cookie], 'y') == 0) {
-            $detected = true;
-        }
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_id_cookie)
+      || strlen($CFG->block_lockdownbrowser_ldb_id_cookie) == 0
+      ) {
+        print_error("errstandardclientidname", "block_lockdownbrowser");
     }
-    return $detected;
-}
+    $clientid_cookie_name = $CFG->block_lockdownbrowser_ldb_id_cookie;
 
-function lockdownbrowser_tokens_free() {
-
-    global $DB;
-    $rf = $DB->count_records('block_lockdownbrowser_toke') - $DB->count_records('block_lockdownbrowser_sess');
-    return $rf;
-}
-
-function lockdownbrowser_allocate_token1($sesskey, $url) {
-
-    global $CFG, $DB;
-
-    lockdownbrowser_generate_tokens_student(); // only adds more if needed
-    $rf = $DB->count_records('block_lockdownbrowser_toke') - $DB->count_records('block_lockdownbrowser_sess');
-    if ($rf < 1) {
-        return get_string('errtokendb', 'block_lockdownbrowser');
+    if (!isset($_COOKIE[$clientid_cookie_name])) {
+        return false;
     }
-    $locking_required = lockdownbrowser_db_locking_required();
-    $timenow      = time();
-    $use_existing = false;
-    $existing     = $DB->get_record('block_lockdownbrowser_sess', array('sesskey' => $sesskey));
-    if ($existing && strcmp($existing->sesskey, $sesskey) == 0) {
-        if ($locking_required) {
-            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('sesskey' => $sesskey));
-        } else {
-            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $existing->id));
-        }
-        if ($existobj1 && strcmp($existobj1->sesskey, $sesskey) == 0) {
-            $obj1         = $existobj1;
-            $use_existing = true;
-        }
-    }
+    $client_cookie_value = $_COOKIE[$clientid_cookie_name];
 
-    if (!$use_existing) {
-        $obj2           = new stdClass;
-        $obj2->sesskey  = $sesskey;
-        $obj2->timeused = $timenow;
-        $ix2            = $DB->insert_record('block_lockdownbrowser_sess', $obj2);
-        if (!$ix2) {
-            return get_string('errsessiondb', 'block_lockdownbrowser');
-        }
-        if ($locking_required) {
-            $obj1 = lockdownbrowser_update_unused_token_record_with_locking($sesskey, $timenow);
-        } else {
-            $obj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $ix2));
-        }
-        if (!$obj1) {
-            return get_string('errdblook', 'block_lockdownbrowser');
-        }
-        if (is_string($obj1)) {
-            return $obj1;
-        }
-        if (!$locking_required) {
-            $obj1->sesskey  = $sesskey;
-            $obj1->timeused = $timenow;
-            $ok             = $DB->update_record('block_lockdownbrowser_toke', $obj1);
-            if (!$ok) {
-                return get_string('errdbupdate', 'block_lockdownbrowser');
-            }
-        }
-    }
-    $msg = '<script> document.location = \'' . $url . '&'
-      . $CFG->block_lockdownbrowser_ldb_token1_cookie . '=' . $obj1->token1 . '\'</script>';
-    echo $msg;
-    return 0;
-}
-
-function lockdownbrowser_validate_token2() {
-
-    global $CFG, $DB;
-    $valid = false;
-    if (isset($_COOKIE[$CFG->block_lockdownbrowser_ldb_token2_cookie])
-      && isset($_COOKIE[$CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie])) {
-        $tcookie2 = $_COOKIE[$CFG->block_lockdownbrowser_ldb_token2_cookie];
-        $sesskey  = $_COOKIE[$CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie];
-        $obj1     = $DB->get_record('block_lockdownbrowser_toke', array('sesskey' => $sesskey));
-        if ($obj1) {
-            if (strcmp($obj1->token2, $tcookie2) == 0) {
-                $valid = true;
-            }
-        }
-    }
-    return $valid;
-}
-
-function lockdownbrowser_generate_tokens_settings($news) {
-
-    global $DB;
-    $rf  = $DB->count_records('block_lockdownbrowser_toke')
-      - $DB->count_records('block_lockdownbrowser_sess');
-    if ($news) {
-        $mkt = ($rf < 10000); // Trac #2315
-    } else {
-        $mkt = ($rf < 2000); // Trac #2315
-    }
-    if ($mkt) {
-        return lockdownbrowser_generate_tokens(true);
+    if (strcmp($client_cookie_value, "y") !== 0) {
+        return false;
     }
     return true;
 }
 
-function lockdownbrowser_generate_tokens_student() {
-    global $DB;
-    $mkt = false;
-    $rf  = $DB->count_records('block_lockdownbrowser_toke')
-      - $DB->count_records('block_lockdownbrowser_sess');
-     // Trac #2315
-    if (($rf < 10) || ($rf < 100 && ($rf % 5 == 0))
-      || ($rf < 250 && ($rf % 20 == 0))) {
-        $mkt = true;
+function lockdownbrowser_browser_sdk2015_detected() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_clientid_cookie)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_clientid_cookie) == 0
+      ) {
+        print_error("errsdk2015clientidname", "block_lockdownbrowser");
     }
-    if ($mkt) {
-        return lockdownbrowser_generate_tokens(false);
+    $clientid_cookie_name = $CFG->block_lockdownbrowser_ldb_sdk2015_clientid_cookie;
+
+    if (!isset($_COOKIE[$clientid_cookie_name])) {
+        return false;
+    }
+    $client_cookie_value = $_COOKIE[$clientid_cookie_name];
+
+    if (strcmp($client_cookie_value, "1") !== 0) {
+        return false;
     }
     return true;
-}
-
-function lockdownbrowser_generate_tokens_instructor() {
-    global $DB;
-    $rf = $DB->count_records('block_lockdownbrowser_toke')
-      - $DB->count_records('block_lockdownbrowser_sess');
-    if ($rf < 5000) { // Trac #2315
-        return lockdownbrowser_generate_tokens(true);
-    }
-    return true;
-}
-
-function lockdownbrowser_ldblog($msg) {
-
-    return;
-
-    /*
-        $file = fopen('c:\\temp\moolog.txt',"a");
-        fwrite($file, date("h:i:s") . " - " . $msg . "\r\n");
-        fclose($file);
-     */
-}
-
-function lockdownbrowser_generate_tokens_debug($purge_sessions) {
-
-    global $CFG, $DB;
-
-    echo "<p>Moodle release: $CFG->release</p>";
-    echo "<p>Moodle version: $CFG->version</p>";
-
-    $plugin = new stdClass;
-
-    $lockdownbrowser_version_file = "$CFG->dirroot/blocks/lockdownbrowser/version.php";
-    if (is_readable($lockdownbrowser_version_file)) {
-        include($lockdownbrowser_version_file);
-    }
-    if (isset($plugin->version)) {
-        echo "<p>Block version: $plugin->version</p>";
-    } else {
-        echo "<p>Could not find block version file</p>";
-    }
-
-    echo "<p>LDB server name: $CFG->block_lockdownbrowser_ldb_servername</p>";
-
-    if ($purge_sessions) {
-        echo "<p>Purging stale sessions...</p>";
-        flush();
-        lockdownbrowser_purge_sessions(); // Trac #2315
-    }
-
-    $ok       = true;
-    $timenow  = time();
-
-    $plain    = $timenow . $CFG->block_lockdownbrowser_ldb_serverid
-      . $CFG->block_lockdownbrowser_ldb_tserver_akey
-      . $CFG->block_lockdownbrowser_ldb_serversecret;
-
-    $auth     = md5($plain);
-
-    $f1       = sprintf($CFG->block_lockdownbrowser_ldb_tserver_form1,
-      $CFG->block_lockdownbrowser_ldb_serverid);
-
-    $f2       = sprintf($CFG->block_lockdownbrowser_ldb_tserver_form2, $auth,
-      $CFG->block_lockdownbrowser_ldb_servername,
-      $CFG->block_lockdownbrowser_ldb_servertype);
-
-    $formdata = $f1 . $timenow . $f2;
-    $url      = $CFG->block_lockdownbrowser_ldb_tserver_1
-      . $CFG->block_lockdownbrowser_ldb_tserver_endpoint;
-
-    echo "<p>Token server url: $url</p>";
-    echo "<p>Token server data: $formdata</p>";
-    echo "<p>Initializing cURL...</p>";
-    flush();
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $formdata);
-
-    // support 302 redirects with re-POST for proxies
-    if ($CFG->block_lockdownbrowser_ldb_proxy_defined == 1) {
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_POSTREDIR, 2);
-        echo "<p>Proxy support enabled</p>";
-    }
-
-    echo "<p>Contacting token server...</p>";
-    flush();
-
-    $resp  = curl_exec($ch);
-    $info  = curl_getinfo($ch);
-    $error = curl_error($ch);
-    curl_close($ch);
-
-    echo "<p>cURL return code: " . $info['http_code'] . "</p>";
-
-    if ($resp === false) {
-        echo "<p>cURL returned an error response, giving up</p>";
-        echo "<p>cURL error: $error</p>";
-        return false;
-    }
-    if ($info['http_code'] != 200) {
-        echo "<p>Unexpected return code, giving up</p>";
-        return false;
-    }
-    if (strlen($resp) < 1000) {
-        echo "<p>cURL response length was less than 1000 characters, giving up</p>";
-        echo "<p>cURL response: $resp</p>";
-        return false;
-    }
-
-    echo "<p>Decrypting token server response...</p>";
-    flush();
-
-    $fk2          = $CFG->block_lockdownbrowser_ldb_serversecret . $CFG->block_lockdownbrowser_ldb_tserver_bkey;
-    $fk2          = substr($fk2, 0, 16);
-    $resp_b64     = base64_decode($resp);
-
-    $decoderesp = Blowfish::decrypt($resp_b64, $fk2, Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO, "01234567");
-
-    $resp_len     = strlen($decoderesp);
-    $expected_len = ($CFG->block_lockdownbrowser_ldb_tserver_set * $CFG->block_lockdownbrowser_ldb_tserver_rec);
-
-    if ($resp_len != $expected_len) {
-        echo "<p>Unexpected response length from token server, giving up</p>";
-        echo "<p>Response length: $resp_len</p>";
-        echo "<p>Expected length: $expected_len</p>";
-        return false;
-    }
-
-    echo "<p>Response length from token server OK</p>";
-    echo "<p>Updating token table in database...</p>";
-    flush();
-
-    $rpos = 0;
-    for ($ix = 0; $ix < $CFG->block_lockdownbrowser_ldb_tserver_set; $ix++) {
-        $tc          = new stdClass;
-        $tc->token1  = "a" . substr($decoderesp, $rpos, $CFG->block_lockdownbrowser_ldb_tserver_t1l);
-
-        $tc->token2  = substr($decoderesp, $rpos + $CFG->block_lockdownbrowser_ldb_tserver_t2p,
-          $CFG->block_lockdownbrowser_ldb_tserver_t2l);
-
-        $tc->sesskey = 0;
-        $id          = $DB->insert_record('block_lockdownbrowser_toke', $tc);
-        if (!$id) {
-            echo "<p>Database insert failure row $ix, giving up</p>";
-            return false;
-        }
-        $rpos += $CFG->block_lockdownbrowser_ldb_tserver_rec;
-    }
-
-    echo "<p>All database inserts succeeded, done</p>";
-
-    return $ok;
-}
-
-function lockdownbrowser_generate_tokens($purge_sessions) {
-
-    global $CFG, $DB;
-
-    if ($purge_sessions)
-        lockdownbrowser_purge_sessions(); // Trac #2315
-
-    $ok       = true;
-    $timenow  = time();
-
-    $plain    = $timenow . $CFG->block_lockdownbrowser_ldb_serverid
-      . $CFG->block_lockdownbrowser_ldb_tserver_akey
-      . $CFG->block_lockdownbrowser_ldb_serversecret;
-
-    $auth     = md5($plain);
-
-    $f1       = sprintf($CFG->block_lockdownbrowser_ldb_tserver_form1,
-      $CFG->block_lockdownbrowser_ldb_serverid);
-
-    $f2       = sprintf($CFG->block_lockdownbrowser_ldb_tserver_form2, $auth,
-      $CFG->block_lockdownbrowser_ldb_servername,
-      $CFG->block_lockdownbrowser_ldb_servertype);
-
-    $formdata = $f1 . $timenow . $f2;
-
-    $url      = $CFG->block_lockdownbrowser_ldb_tserver_1
-      . $CFG->block_lockdownbrowser_ldb_tserver_endpoint;
-
-    $ch       = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $formdata);
-
-    // support 302 redirects with re-POST for proxies
-    if ($CFG->block_lockdownbrowser_ldb_proxy_defined == 1) {
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_POSTREDIR, 2);
-    }
-
-    $resp = curl_exec($ch);
-    $info = curl_getinfo($ch);
-    if ($resp == false || ($info['http_code'] != 200 || strlen($resp) < 1000)) {
-        lockdownbrowser_ldblog("cURL returned: " . $info['http_code']);
-        return false;
-    }
-    curl_close($ch);
-
-    $fk2        = $CFG->block_lockdownbrowser_ldb_serversecret
-      . $CFG->block_lockdownbrowser_ldb_tserver_bkey;
-
-    $fk2        = substr($fk2, 0, 16);
-    $resp_b64   = base64_decode($resp);
-
-    $decoderesp = Blowfish::decrypt($resp_b64, $fk2, Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO, "01234567");
-
-    if (strlen($decoderesp) !=
-      ($CFG->block_lockdownbrowser_ldb_tserver_set * $CFG->block_lockdownbrowser_ldb_tserver_rec)) {
-        lockdownbrowser_ldblog("bad response len strlen = " . strlen($decoderesp)); // DEBUG
-        return false;
-    }
-    $rpos = 0;
-    for ($ix = 0; $ix < $CFG->block_lockdownbrowser_ldb_tserver_set; $ix++) {
-        $tc          = new stdClass;
-        $tc->token1  = "a" . substr($decoderesp, $rpos, $CFG->block_lockdownbrowser_ldb_tserver_t1l);
-
-        $tc->token2  = substr($decoderesp, $rpos + $CFG->block_lockdownbrowser_ldb_tserver_t2p,
-          $CFG->block_lockdownbrowser_ldb_tserver_t2l);
-
-        $tc->sesskey = 0;
-        $id          = $DB->insert_record('block_lockdownbrowser_toke', $tc);
-        if (!$id) {
-            lockdownbrowser_ldblog("insert failure row $ix");
-            return false;
-        }
-        $rpos += $CFG->block_lockdownbrowser_ldb_tserver_rec;
-    }
-    return $ok;
 }
 
 function lockdownbrowser_check_for_lock($quizobj) {
 
+    // called from quizaccess_lockdownbrowser::prevent_access();
+    // $quizobj is an object of class quiz declared in /mod/quiz/attemptlib.php;
+    // not currently using $quizobj here, but it might already contain some of the information we determine below;
     // returns false if access should be allowed;
-    // returns a message string if access should be prevented;
-    // also see quizaccess_lockdownbrowser::prevent_access
+    // returns an html string if access should be prevented
     global $CFG, $DB;
 
     $id      = optional_param('id', 0, PARAM_INT); // Course Module ID
@@ -558,9 +212,6 @@ function lockdownbrowser_check_for_lock($quizobj) {
             return false;
         }
     }
-
-    // debug
-    //echo " DOING LDB CHECK";
 
     if ($id) {
 
@@ -641,43 +292,60 @@ function lockdownbrowser_check_for_lock($quizobj) {
             $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "NONE" . $discriminator;
             return false;
 
-        } else {
+        } else { // student
 
             $ok      = true;
-            $myerror = "Unknown";
+            $myerror = get_string('errunknown', 'block_lockdownbrowser');
 
-            if (!isset($_COOKIE[$CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie])) {
-
-                $myerror = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>Session</div>";
-                $ok      = false;
-            } else {
-                $sesskey = $_COOKIE[$CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie];
+            $lockdownbrowser_session_cookie = lockdownbrowser_get_session_cookie();
+            if ($lockdownbrowser_session_cookie === false) {
+                $errmsg = get_string('errinvalidsession', 'block_lockdownbrowser');
+                $myerror = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>$errmsg</div>";
+                $ok = false;
             }
 
             if ($ok) {
 
-                $ldb_detected = lockdownbrowser_browser_detected();
-                if (!$ldb_detected) {
+                if (lockdownbrowser_browser_sdk2015_detected()) {
+
+                    if ($_SESSION['lockdownbrowser_sdk2015_session']['active'] === true) {
+
+                        if (strcmp($script, "view.php") === 0) {
+                            $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 2); // LDB-exit fragment
+                            $ok = false;
+                        } else if (strcmp($script, "attempt.php") === 0) {
+                            // continue to challenge/response below
+                        } else if (strcmp($script, "summary.php") === 0) {
+                            // continue to challenge/response below
+                        } else if (strcmp($script, "startattempt.php") === 0) {
+                            // continue to challenge/response below
+                        } else { // unexpected script
+                            // continue to challenge/response below
+                        }
+                    } else { // sdk2015 session not active on server
+                        $myerror = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>" .
+                          get_string('errldbsessionnotactive', 'block_lockdownbrowser') . "</div>";
+                        $ok = false;
+                    }
+                } else if (lockdownbrowser_browser_standard_detected()) {
+
+                    // manual launch session
                     $myerror = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>" .
-                        get_string('ldb_required', 'block_lockdownbrowser') . "</div>";
-                    //if (strlen($CFG->block_lockdownbrowser_ldb_download) > 0) {
-                    //    $myerror .= "<div style='font-size: 125%; color:black; text-align: center;'>".
-                    //           get_string('click','block_lockdownbrowser')." <a href='"
-                    //           .$CFG->block_lockdownbrowser_ldb_download."' target='_blank'>"
-                    //           .get_string('here','block_lockdownbrowser')."</a>"
-                    //           .get_string('todownload','block_lockdownbrowser')."</div>";
-                    //}
-                    if (!empty($CFG->block_lockdownbrowser_ldb_download)) {
-                        $myerror .= "<div style='font-size: 125%; color:black; text-align: center;'>"
-                          . get_string('click', 'block_lockdownbrowser')
-                          . " <a href='" . $CFG->block_lockdownbrowser_ldb_download
-                          . "' target='_blank'>" . get_string('here', 'block_lockdownbrowser')
-                          . "</a>" . get_string('todownload', 'block_lockdownbrowser')
-                          . "</div>";
-                    } else {
-                        $myerror .= "<div style='font-size: 125%; color:black; text-align: center;'>"
-                          . get_string('ldb_download_disabled', 'block_lockdownbrowser')
-                          . "</div>";
+                      get_string('nomanuallaunch', 'block_lockdownbrowser') . "</div>";
+                    $ok = false;
+
+                } else { // LDB not detected
+
+                    if (strcmp($script, "view.php") === 0) {
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 1); // LDB-autolaunch fragment
+                    } else if (strcmp($script, "attempt.php") === 0) {
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                    } else if (strcmp($script, "summary.php") === 0) {
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                    } else if (strcmp($script, "startattempt.php") === 0) {
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                    } else { // unexpected script
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
                     }
                     $ok = false;
                 }
@@ -685,38 +353,13 @@ function lockdownbrowser_check_for_lock($quizobj) {
 
             if ($ok) {
 
-                $ldbs = optional_param('ldbs', 0, PARAM_TEXT);
+                if (!lockdownbrowser_prior_challenge_response()) {
 
-                if (!$ldbs) {
-
-                    $use_existing = false;
-                    $existing     = $DB->get_record('block_lockdownbrowser_sess', array('sesskey' => $sesskey));
-
-                    if ($existing && strcmp($existing->sesskey, $sesskey) == 0) {
-                        if (lockdownbrowser_db_locking_required()) {
-                            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('sesskey' => $sesskey));
-                        } else {
-                            $existobj1 = $DB->get_record('block_lockdownbrowser_toke', array('id' => $existing->id));
-                        }
-                        if ($existobj1 && strcmp($existobj1->sesskey, $sesskey) == 0) {
-                            $obj1         = $existobj1;
-                            $use_existing = true;
-                        }
+                    if (!lockdownbrowser_validate_client_response()) {
+                        $errmsg = get_string('errchallengeresponse', 'block_lockdownbrowser');
+                        $myerror = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>$errmsg</div>";
+                        $ok = false;
                     }
-
-                    if (!$use_existing) {
-
-                        $errmsg = lockdownbrowser_allocate_token1($sesskey, me() . "&ldbs=" . $sesskey);
-                        if (is_string($errmsg)) {
-
-                            $myerror = "Database error: " . $errmsg;
-                            $ok      = false;
-                        }
-                    }
-                } else if ($ldbs != $sesskey || !lockdownbrowser_validate_token2()) {
-
-                    $myerror = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>Session</div>";
-                    $ok      = false;
                 }
             }
 
@@ -734,83 +377,654 @@ function lockdownbrowser_check_for_lock($quizobj) {
     }
 }
 
-function lockdownbrowser_db_locking_required() {
+function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type) {
+
+    // $fragment_type
+    //   0 = LDB-required fragment
+    //   1 = LDB-autolaunch fragment
+    //   2 = LDB-exit fragment
 
     global $CFG;
 
-    if ($CFG->version < 2014051200) {
-        // Prior to Moodle 2.7.0
-        return false;
+    if ($fragment_type === 0    // LDB-required fragment
+       || $fragment_type === 1    // LDB-autolaunch fragment
+      ) {
+        $ldbopt = lockdownbrowser_get_quiz_options($quiz->id);
+        if (!$ldbopt) {
+            return false;
+        }
+        if (isset($ldbopt->monitor)
+          && !is_null($ldbopt->monitor)
+          && strlen($ldbopt->monitor) > 0
+          ) {
+            $ldb_message = get_string('monitor_required', 'block_lockdownbrowser');
+            $ldb_quiz_type = lockdownbrowser_get_ldb_examtype_monitor();
+        } else {
+            $ldb_message = get_string('ldb_required', 'block_lockdownbrowser');
+            $ldb_quiz_type = lockdownbrowser_get_ldb_examtype_ldbonly();
+        }
     }
-    return LOCKDOWNBROWSER_REQUIRE_DB_LOCKING;
+    if ($fragment_type === 2) { // LDB-exit fragment
+        $ldb_message = get_string('sessioninprogress', 'block_lockdownbrowser');
+    }
+    // CSS style section
+    $style = "<link rel=\"stylesheet\" type=\"text/css\" href=\"//fonts.googleapis.com/css?family=Open+Sans\" />"
+      . "<link rel=\"stylesheet\" type=\"text/css\" href=\"//fonts.googleapis.com/css?family=Raleway\" />"
+      . "<style type=\"text/css\">"
+      . ".ldb-message-text {"
+      . "  font-family: \"Open Sans\", Helvetica, sans-serif;"
+      . "  font-size: 18px;"
+      . "  font-weight: normal;"
+      . "  font-style: normal;"
+      . "  font-stretch: normal;"
+      . "  line-height: normal;"
+      . "  letter-spacing: normal;"
+      . "  text-align: center;"
+      . "  color: #c10e24;"
+      . "  margin-bottom: 25px;"
+      . "}";
+
+    if ($fragment_type === 0    // LDB-required fragment
+       || $fragment_type === 1    // LDB-autolaunch fragment
+      ) {
+        $style .= ".ldb-links {"
+          . "  font-family: \"Open Sans\", Helvetica, sans-serif;"
+          . "  font-size: 14px;"
+          . "  font-weight: normal;"
+          . "  font-style: normal;"
+          . "  font-stretch: normal;"
+          . "  line-height: normal;"
+          . "  letter-spacing: normal;"
+          . "  text-align: center;"
+          . "  color: #387da6;"
+          . "  margin-bottom: 36px;"
+          . "}"
+          . "div.ldb-links a {"
+          . "  color: #387da6;"
+          . "}";
+    }
+    $style .= ".ldb-button {"
+      . "  width: 222px;"
+      . "  height: 40px;"
+      . "  object-fit: contain;"
+      . "  border-radius: 10px;"
+      . "  background-color: #387da6;"
+      . "  margin-left: auto;"
+      . "  margin-right: auto;"
+      . "  margin-bottom: 36px;"
+      . "  cursor: pointer;"
+      . "}"
+      . ":hover.ldb-button {"
+      . "  background-color: #569FCA;"
+      . "}"
+      . ".ldb-button-text {"
+      . "  object-fit: contain;"
+      . "  font-family: Raleway, Helvetica, sans-serif;"
+      . "  font-size: 14px;"
+      . "  font-weight: bold;"
+      . "  font-style: normal;"
+      . "  font-stretch: normal;"
+      . "  line-height: normal;"
+      . "  letter-spacing: normal;"
+      . "  color: #fafcea;"
+      . "  text-align: center;"
+      . "  line-height: 40px;"
+      . "}"
+      . "</style>";
+    $fragment = $style;
+
+    // LDB message
+    $fragment .= "<div class=\"ldb-message-text\">$ldb_message</div>";
+
+    // LDB links
+    $is_ipad = (isset($_SERVER['HTTP_USER_AGENT'])
+       && stripos($_SERVER['HTTP_USER_AGENT'], "iPad") !== false);
+
+    if ($fragment_type === 0     // LDB-required fragment
+      || $fragment_type === 1    // LDB-autolaunch fragment
+      ) {
+        $ldb_links = "";
+        $download_url = $CFG->block_lockdownbrowser_ldb_download;
+
+        if ($fragment_type === 0) { // LDB-required fragment
+            if (empty($download_url)) {
+                $ldb_links .= get_string('ldb_download_disabled', 'block_lockdownbrowser');
+            } else {
+                $ldb_links .= "<a href=\"$download_url\" target=\"_blank\">"
+                  . get_string('ldbdownlink', 'block_lockdownbrowser')
+                  . "</a>";
+            }
+        }
+        if ($fragment_type === 1) { // LDB-autolaunch fragment
+            if (!empty($download_url)) {
+                $ldb_links .= "<a href=\"$download_url\" target=\"_blank\">"
+                  . get_string('ldbdownlink', 'block_lockdownbrowser')
+                  . "</a>";
+            }
+            if (!empty($download_url) && $is_ipad === false) {
+                $ldb_links .= "&nbsp;&nbsp;|&nbsp;&nbsp;";
+            }
+            if ($is_ipad === false) {
+                $ldb_check_url = lockdownbrowser_autolaunch_check_url($ldb_quiz_type);
+                $ldb_links .= "<a href=\"$ldb_check_url\">"
+                  . get_string('ldbchecklink', 'block_lockdownbrowser')
+                  . "</a>";
+            }
+        }
+        if (strlen($ldb_links) > 0) {
+            $fragment .= "<div class=\"ldb-links\">$ldb_links</div>";
+        }
+    }
+
+    // LDB button
+    if ($fragment_type === 1) { // LDB-autolaunch fragment
+        $launch_url = lockdownbrowser_autolaunch_url_for_quiz($quiz);
+        $script = "<script>";
+        if ($is_ipad === true) {
+            // avoid the servicenotavailable error
+            $login_url = get_login_url();
+            $session_cookie_name = $CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie;
+            $script .= "if (document.cookie.indexOf(\"$session_cookie_name=\") == -1) {"
+              . "    document.location = \"$login_url\";"
+              . "}";
+        }
+        $script .= "function ldbAutoLaunch() {"
+          . "    document.location = \"$launch_url\";"
+          . "}"
+          . "</script>";
+        $fragment .= $script;
+        $launch_button_title = get_string('autolaunchbutton', 'block_lockdownbrowser');
+        $fragment .= "<div class=\"ldb-button\" onclick=\"ldbAutoLaunch();\">"
+          . "<div class=\"ldb-button-text\">$launch_button_title</div>"
+          . "</div>";
+    }
+    if ($fragment_type === 2) { // LDB-exit fragment
+        $sdk2015_command_scheme = lockdownbrowser_get_sdk2015_command_scheme();
+        $sdk2015_command_exitb = lockdownbrowser_get_sdk2015_command_exitb();
+        $sdk2015_exitb_value = "1";
+        $exit_url = $sdk2015_command_scheme
+          . ":" . urlencode($sdk2015_command_exitb)
+          . "=" . urlencode($sdk2015_exitb_value);
+        $script = "<script>"
+          . "function exitBrowser() {"
+          . "    document.location = '$exit_url';"
+          . "}"
+          . "</script>";
+        $fragment .= $script;
+        $exit_button_title = get_string('exitbrowserbutton', 'block_lockdownbrowser');
+        $fragment .= "<div class=\"ldb-button\" onclick=\"exitBrowser();\">"
+          . "<div class=\"ldb-button-text\">$exit_button_title</div>"
+          . "</div>";
+    }
+    return $fragment;
 }
 
-function lockdownbrowser_update_unused_token_record_with_locking($sesskey, $timeused) {
+function lockdownbrowser_get_ldb_examtype_ldbonly() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_examtype_ldbonly)
+      || strlen($CFG->block_lockdownbrowser_ldb_examtype_ldbonly) == 0
+      ) {
+        print_error("errldbexamtypeldbonly", "block_lockdownbrowser");
+    }
+    $examtype_ldbonly = $CFG->block_lockdownbrowser_ldb_examtype_ldbonly;
+
+    return $examtype_ldbonly;
+}
+
+function lockdownbrowser_get_ldb_examtype_monitor() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_examtype_monitor)
+      || strlen($CFG->block_lockdownbrowser_ldb_examtype_monitor) == 0
+      ) {
+        print_error("errldbexamtypemonitor", "block_lockdownbrowser");
+    }
+    $examtype_monitor = $CFG->block_lockdownbrowser_ldb_examtype_monitor;
+
+    return $examtype_monitor;
+}
+
+function lockdownbrowser_get_sdk2015_ldbonly_check() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_ldbonly_check)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_ldbonly_check) == 0
+      ) {
+        print_error("errsdk2015ldbonlycheck", "block_lockdownbrowser");
+    }
+    $ldbonly_check = $CFG->block_lockdownbrowser_ldb_sdk2015_ldbonly_check;
+
+    return $ldbonly_check;
+}
+
+function lockdownbrowser_get_sdk2015_monitor_check() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_monitor_check)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_monitor_check) == 0
+      ) {
+        print_error("errsdk2015monitorcheck", "block_lockdownbrowser");
+    }
+    $monitor_check = $CFG->block_lockdownbrowser_ldb_sdk2015_monitor_check;
+
+    return $monitor_check;
+}
+
+function lockdownbrowser_get_sdk2015_prestart_fn() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_prestart_fn)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_prestart_fn) == 0
+      ) {
+        print_error("errsdk2015prestartfn", "block_lockdownbrowser");
+    }
+    $prestart_fn = $CFG->block_lockdownbrowser_ldb_sdk2015_prestart_fn;
+
+    return $prestart_fn;
+}
+
+function lockdownbrowser_get_sdk2015_ldbcheck_parm() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_ldbcheck_parm)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_ldbcheck_parm) == 0
+      ) {
+        print_error("errsdk2015ldbcheckparm", "block_lockdownbrowser");
+    }
+    $ldbcheck_parm = $CFG->block_lockdownbrowser_ldb_sdk2015_ldbcheck_parm;
+
+    return $ldbcheck_parm;
+}
+
+function lockdownbrowser_get_sdk2015_session_parm() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_session_parm)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_session_parm) == 0
+      ) {
+        print_error("errsdk2015sessionparm", "block_lockdownbrowser");
+    }
+    $sdk2015_session_parm = $CFG->block_lockdownbrowser_ldb_sdk2015_session_parm;
+
+    return $sdk2015_session_parm;
+}
+
+function lockdownbrowser_get_sdk2015_examid_parm() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_examid_parm)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_examid_parm) == 0
+      ) {
+        print_error("errsdk2015examidparm", "block_lockdownbrowser");
+    }
+    $sdk2015_examid_parm = $CFG->block_lockdownbrowser_ldb_sdk2015_examid_parm;
+
+    return $sdk2015_examid_parm;
+}
+
+function lockdownbrowser_get_sdk2015_command_scheme() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_command_scheme)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_command_scheme) == 0
+      ) {
+        print_error("errsdk2015commandscheme", "block_lockdownbrowser");
+    }
+    $sdk2015_command_scheme = $CFG->block_lockdownbrowser_ldb_sdk2015_command_scheme;
+
+    return $sdk2015_command_scheme;
+}
+
+function lockdownbrowser_get_sdk2015_command_exitb() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_command_exitb)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_command_exitb) == 0
+      ) {
+        print_error("errsdk2015commandexitb", "block_lockdownbrowser");
+    }
+    $sdk2015_command_exitb = $CFG->block_lockdownbrowser_ldb_sdk2015_command_exitb;
+
+    return $sdk2015_command_exitb;
+}
+
+function lockdownbrowser_get_challenge_name() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_challenge_cookie)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_challenge_cookie) == 0
+      ) {
+        print_error("errchallengecookiename", "block_lockdownbrowser");
+    }
+    $challenge_name = $CFG->block_lockdownbrowser_ldb_sdk2015_challenge_cookie;
+
+    return $challenge_name;
+}
+
+function lockdownbrowser_get_profile_secret() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_serversecret)
+      || strlen($CFG->block_lockdownbrowser_ldb_serversecret) == 0
+      ) {
+        print_error("errprofilesecret", "block_lockdownbrowser");
+    }
+    $profile_secret = $CFG->block_lockdownbrowser_ldb_serversecret;
+
+    return $profile_secret;
+}
+
+function lockdownbrowser_get_sdk2015_secret1() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_secret1)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_secret1) == 0
+      ) {
+        print_error("errsdk2015secret1", "block_lockdownbrowser");
+    }
+    $sdk2015_secret1 = $CFG->block_lockdownbrowser_ldb_sdk2015_secret1;
+
+    return $sdk2015_secret1;
+}
+
+function lockdownbrowser_get_sdk2015_index() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_index)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_index) == 0
+      ) {
+        print_error("errsdk2015index", "block_lockdownbrowser");
+    }
+    $sdk2015_index = $CFG->block_lockdownbrowser_ldb_sdk2015_index;
+
+    return $sdk2015_index;
+}
+
+function lockdownbrowser_get_sdk2015_secret2() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_secret2)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_secret2) == 0
+      ) {
+        print_error("errsdk2015secret2", "block_lockdownbrowser");
+    }
+    $sdk2015_secret2 = $CFG->block_lockdownbrowser_ldb_sdk2015_secret2;
+
+    return $sdk2015_secret2;
+}
+
+function lockdownbrowser_create_server_challenge() {
+
+    // session not yet available when invoked from autolaunch.php
+
+    $profile_secret = lockdownbrowser_get_profile_secret();
+    $random_key = random_string(15);
+    $timestamp = time();
+
+    $material = md5($profile_secret . $random_key . $timestamp);
+
+    $sdk2015_secret1 = lockdownbrowser_get_sdk2015_secret1();
+    $sdk2015_index = lockdownbrowser_get_sdk2015_index();
+
+    $hash = md5($sdk2015_index . $material . $sdk2015_secret1);
+
+    $challenge = "$material-$sdk2015_index$hash";
+
+    return $challenge;
+}
+
+function lockdownbrowser_get_server_challenge() {
+
+    if (!isset($_SESSION['lockdownbrowser_sdk2015_session']['challenge'])
+      || strlen($_SESSION['lockdownbrowser_sdk2015_session']['challenge']) == 0
+      ) {
+        $challenge = lockdownbrowser_create_server_challenge();
+        $_SESSION['lockdownbrowser_sdk2015_session']['challenge'] = $challenge;
+        unset($_SESSION['lockdownbrowser_sdk2015_session']['response']);
+    } else {
+        $challenge = $_SESSION['lockdownbrowser_sdk2015_session']['challenge'];
+    }
+    return $challenge;
+}
+
+function lockdownbrowser_get_client_response() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_response_cookie)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_response_cookie) == 0
+      ) {
+        print_error("errresponsecookiename", "block_lockdownbrowser");
+    }
+    $response_cookie_name = $CFG->block_lockdownbrowser_ldb_sdk2015_response_cookie;
+    if (!isset($_COOKIE[$response_cookie_name])) {
+        return false;
+    }
+    $response_cookie_value = $_COOKIE[$response_cookie_name];
+
+    return $response_cookie_value;
+}
+
+function lockdownbrowser_prior_challenge_response() {
+
+    $response = lockdownbrowser_get_client_response();
+    if ($response === false) {
+        return false;
+    }
+    if (!isset($_SESSION['lockdownbrowser_sdk2015_session']['response'])
+      || strlen($_SESSION['lockdownbrowser_sdk2015_session']['response']) == 0) {
+        return false;
+    }
+    if (strcmp($response, $_SESSION['lockdownbrowser_sdk2015_session']['response']) !== 0) {
+        return false;
+    }
+    return true;
+}
+
+function lockdownbrowser_validate_client_response() {
+
+    unset($_SESSION['lockdownbrowser_sdk2015_session']['response']);
+
+    $response = lockdownbrowser_get_client_response();
+    if ($response === false) {
+        return false;
+    }
+    $response_parts = explode("-", $response);
+    if (count($response_parts) != 2){
+        return false;
+    }
+    $challenge = lockdownbrowser_get_server_challenge();
+    $challenge_parts = explode("-", $challenge);
+
+    $response_material = $response_parts[0];
+    $challenge_material = $challenge_parts[0];
+    if (strcmp($response_material, $challenge_material) !== 0) {
+        return false;
+    }
+    if (strlen($response_parts[1]) != 34) { // index(2) + hash(32)
+        return false;
+    }
+    $response_index = substr($response_parts[1], 0, 2);
+    $challenge_index = substr($challenge_parts[1], 0, 2);
+    if (strcmp($response_index, $challenge_index) !== 0) {
+        return false;
+    }
+    $profile_secret = lockdownbrowser_get_profile_secret();
+    $sdk2015_secret2 = lockdownbrowser_get_sdk2015_secret2();
+
+    $response_hash = substr($response_parts[1], 2);
+    $validate_hash = md5($challenge_index . $sdk2015_secret2 . $challenge_material . $profile_secret);
+    if (strcmp($response_hash, $validate_hash) !== 0) {
+        return false;
+    }
+    $_SESSION['lockdownbrowser_sdk2015_session']['response'] = $response;
+
+    return true;
+}
+
+function lockdownbrowser_autolaunch_check_url($ldb_quiz_type) {
+
+    global $CFG;
+
+    $examtype_ldbonly = lockdownbrowser_get_ldb_examtype_ldbonly();
+    $examtype_monitor = lockdownbrowser_get_ldb_examtype_monitor();
+
+    if (strcmp($ldb_quiz_type, $examtype_monitor) === 0) {
+        $ldbcheck_value = $examtype_monitor;
+    } else if (strcmp($ldb_quiz_type, $examtype_ldbonly) === 0) {
+        $ldbcheck_value = $examtype_ldbonly;
+    } else {
+        print_error("errinvalidldbquiztype", "block_lockdownbrowser");
+    }
+    $ldbcheck_parm = lockdownbrowser_get_sdk2015_ldbcheck_parm();
+
+    $restart_url = $CFG->wwwroot . "/blocks/lockdownbrowser/autolaunch.php"
+      . "?" . urlencode($ldbcheck_parm) . "=" . urlencode($ldbcheck_value);
+
+    $quiz_title = get_string('ldbchecklink', 'block_lockdownbrowser');
+
+    $xml_payload = "<z>"
+      . "<u>" . htmlspecialchars($restart_url, ENT_XML1, 'UTF-8') . "</u>"
+      . "<ci>1234</ci>"
+      . "<xi>4321</xi>"
+      . "<si>username</si>"
+      . "<sf>Firstname</sf>"
+      . "<sl>Lastname</sl>"
+      . "<tl>" . htmlspecialchars($quiz_title, ENT_XML1, 'UTF-8') . "</tl>"
+      . "</z>";
+
+    $url = lockdownbrowser_autolaunch_url_for_payload($xml_payload);
+
+    return $url;
+}
+
+function lockdownbrowser_get_session_cookie() {
+
+    global $CFG;
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_session_cookie)
+      || strlen($CFG->block_lockdownbrowser_ldb_session_cookie) == 0
+      ) {
+        print_error("errsessioncookiename", "block_lockdownbrowser");
+    }
+    $session_cookie_name = $CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie;
+
+    if (!isset($_COOKIE[$session_cookie_name])) {
+        return false;
+    }
+    $session_cookie_value = $_COOKIE[$session_cookie_name];
+
+    return $session_cookie_value;
+}
+
+function lockdownbrowser_autolaunch_url_for_quiz($quiz) {
 
     global $DB;
+    global $CFG;
+    global $USER;
 
-    if (!lockdownbrowser_db_locking_required()) {
-        return get_string('errdblocksupport', 'block_lockdownbrowser');
+    $session_parm = lockdownbrowser_get_sdk2015_session_parm();
+    $session_cookie = lockdownbrowser_get_session_cookie();
+    if ($session_cookie === false) {
+        print_error("errinvalidsession", "block_lockdownbrowser");
     }
-    $lockclass = "\\core\\lock\\db_record_lock_factory";
-    if (!class_exists($lockclass)) {
-        throw new \coding_exception('Lock factory class does not exist: ' . $lockclass);
+    // exam id is coursmodule id, not quiz id
+    $examid_parm = lockdownbrowser_get_sdk2015_examid_parm();
+    $cm = get_coursemodule_from_instance("quiz", $quiz->id, $quiz->course);
+    if (!$cm) {
+        print_error("errnocm", "block_lockdownbrowser", "", $quiz->id);
     }
-    $locktype = "block_lockdownbrowser_db";
-    $resource = "unused_token_records";
-    $lockfactory = new $lockclass($locktype);
-    $lock = $lockfactory->get_lock($resource, LOCKDOWNBROWSER_MAX_DB_LOCK_TIME);
-    if ($lock === false) {
-        return get_string('errdbgetlock', 'block_lockdownbrowser');
+    $exam_id = $cm->id;
+
+    $restart_url = $CFG->wwwroot . "/blocks/lockdownbrowser/autolaunch.php"
+      . "?" . urlencode($session_parm) . "=" . urlencode($session_cookie)
+      . "&" . urlencode($examid_parm) . "=" . urlencode($exam_id);
+
+    $course_id = $quiz->course;
+
+    $user_name = $USER->username;
+    $first_name = $USER->firstname;
+    $last_name = $USER->lastname;
+
+    $quiz_title = $quiz->name;
+
+    $xml_payload = "<z>"
+      . "<u>" . htmlspecialchars($restart_url, ENT_XML1, 'UTF-8') . "</u>"
+      . "<ci>" . htmlspecialchars($course_id, ENT_XML1, 'UTF-8') . "</ci>"
+      . "<xi>" . htmlspecialchars($exam_id, ENT_XML1, 'UTF-8') . "</xi>"
+      . "<si>" . htmlspecialchars($user_name, ENT_XML1, 'UTF-8') . "</si>"
+      . "<sf>" . htmlspecialchars($first_name, ENT_XML1, 'UTF-8') . "</sf>"
+      . "<sl>" . htmlspecialchars($last_name, ENT_XML1, 'UTF-8') . "</sl>"
+      . "<tl>" . htmlspecialchars($quiz_title, ENT_XML1, 'UTF-8') . "</tl>"
+      . "</z>";
+
+    $url = lockdownbrowser_autolaunch_url_for_payload($xml_payload);
+
+    return $url;
+}
+
+function lockdownbrowser_autolaunch_url_for_payload($payload) {
+
+    global $CFG;
+
+    $sdk2015_secret1 = lockdownbrowser_get_sdk2015_secret1();
+
+    $encrypted_payload = Blowfish::encrypt($payload, $sdk2015_secret1,
+      Blowfish::BLOWFISH_MODE_ECB, Blowfish::BLOWFISH_PADDING_ZERO);
+
+    $base64_payload = base64_encode($encrypted_payload);
+
+    if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_launch_scheme)
+      || strlen($CFG->block_lockdownbrowser_ldb_sdk2015_launch_scheme) == 0
+      ) {
+        print_error("errsdk2015launchscheme", "block_lockdownbrowser");
     }
-    try {
-        $obj1 = $DB->get_records('block_lockdownbrowser_toke', array('timeused' => 0), '', '*', 0, 1);
-    } catch (Exception $ex) {
-        $obj1 = false;
-    }
-    if (count($obj1) > 0) {
-        $obj1 = array_pop($obj1);
-    }
-    if ($obj1) {
-        $obj1->sesskey  = $sesskey;
-        $obj1->timeused = $timeused;
-        try {
-            $ok = $DB->update_record('block_lockdownbrowser_toke', $obj1);
-        } catch (Exception $ex) {
-            $ok = false;
-        }
-        if (!$ok) {
-            $obj1 = get_string('errdbupdate', 'block_lockdownbrowser');
-        }
-    } else {
-        $obj1 = get_string('errdblook', 'block_lockdownbrowser');
-    }
-    $lock->release();
-    return $obj1;
+    $sdk2015_scheme = $CFG->block_lockdownbrowser_ldb_sdk2015_launch_scheme;
+    $sdk2015_index = lockdownbrowser_get_sdk2015_index();
+
+    $url = "$sdk2015_scheme:$sdk2015_index%7B$base64_payload%7D";
+
+    return $url;
 }
 
 function lockdownbrowser_check_plugin_dependencies($resultstyle) {
+
     // return false if dependencies are valid, or:
     // resultstyle = 0, return an error string
     // resultstyle = 1, return an error object
     // resultstyle = 2, throw an exception
     global $CFG;
+
     $blockversion = lockdownbrowser_get_block_version();
-    if ($blockversion !== false) {
-        $ruleversion = lockdownbrowser_get_rule_version();
-        if ($ruleversion !== false) {
-            if (lockdownbrowser_compare_plugin_versions($ruleversion, $blockversion) === true) {
-                return false;
-            } else {
-                $identifier = "invalidversion";
-            }
-        } else {
-            $identifier = "noruleversion";
-        }
-    } else {
+    $ruleversion = lockdownbrowser_get_rule_version();
+
+    if ($blockversion === false) {
         $identifier = "noblockversion";
+    } else if ($ruleversion === false) {
+        $identifier = "noruleversion";
+    } else if (lockdownbrowser_compare_plugin_versions($ruleversion, $blockversion) === false) {
+        $identifier = "invalidversion";
+    } else {
+        return false; // dependencies are valid
     }
     $component = "block_lockdownbrowser";
+
     if ($resultstyle == 1
       && $CFG->version >= 2012062500 // Moodle 2.3.0+.
       ) {
@@ -823,7 +1037,9 @@ function lockdownbrowser_check_plugin_dependencies($resultstyle) {
 }
 
 function lockdownbrowser_get_rule_version() {
+
     global $CFG;
+
     $plugin = new stdClass;
     $version_file = $CFG->dirroot . '/mod/quiz/accessrule/lockdownbrowser/version.php';
     if (is_readable($version_file)) {
@@ -839,7 +1055,9 @@ function lockdownbrowser_get_rule_version() {
 }
 
 function lockdownbrowser_get_block_version() {
+
     global $CFG;
+
     $plugin = new stdClass;
     $version_file = $CFG->dirroot . '/blocks/lockdownbrowser/version.php';
     if (is_readable($version_file)) {
@@ -855,6 +1073,7 @@ function lockdownbrowser_get_block_version() {
 }
 
 function lockdownbrowser_compare_plugin_versions($ruleversion, $blockversion) {
+
     // return true if the specified plugin versions are considered equal for
     // the purposes of dependency checking, else return false
     $comparelength = 8; // yyyymmddxx, but only consider first 8 digits
@@ -867,6 +1086,26 @@ function lockdownbrowser_compare_plugin_versions($ruleversion, $blockversion) {
         return true;
     } else {
         return false;
+    }
+}
+
+function lockdownbrowser_lockliblog($msg) {
+
+    global $CFG;
+
+    if (LOCKDOWNBROWSER_LOCKLIB_ENABLE_LOG) {
+        $entry  = date("m-d-Y H:i:s") . " - " . $msg . "\r\n";
+        if (isset($CFG->tempdir)) {
+            $path = "$CFG->tempdir";
+        } else {
+            $path = "$CFG->dataroot/temp";
+        }
+        $path .= "/" . LOCKDOWNBROWSER_LOCKLIB_LOG;
+        $handle = fopen($path, "ab");
+        if ($handle !== false) {
+            fwrite($handle, $entry, strlen($entry));
+            fclose($handle);
+        }
     }
 }
 
