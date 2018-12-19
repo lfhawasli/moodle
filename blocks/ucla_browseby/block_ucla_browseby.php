@@ -318,4 +318,12 @@ class block_ucla_browseby extends block_base {
         return $terms;
     }
 
+    /**
+     * Display block settings in Site administration.
+     *
+     * @return boolean
+     */
+    public function has_config() {
+        return true;
+    }
 }
