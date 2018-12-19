@@ -300,43 +300,45 @@ class uclaroles_manager {
     /**
      * Returns the list of assignable roles for given course.
      * 
-     * @param object $course    Course record
-     * @param boolean $manual   Is this a manual enrolment page?
+     * @param context_course $context   Course context
+     * @param boolean $manual           Is this a manual enrolment page?
      * 
      * @return array        Returns an array in the following format:
      *                      [shortname] => [name]
      */
-    static function get_assignable_roles_by_courseid($course, $manual = false) {
+    static function get_assignable_roles_by_sitetype($context, $manual = false) {
         global $DB;
-        // first, find out what site type course is
-        $site_type = null;
+
+        $course = get_course($context->instanceid);
+
+        // First, find out what site type course is.
+        $sitetype = null;
         
-        // see if it is a registrar course
+        // See if it is a registrar course.
         $result = ucla_map_courseid_to_termsrses($course->id);
-        if (!empty($result)) {  // found registrar course
-            $site_type = siteindicator_manager::SITE_TYPE_SRS_INSTRUCTION;
+        if (!empty($result)) {  // Found registrar course.
+            $sitetype = siteindicator_manager::SITE_TYPE_SRS_INSTRUCTION;
         } else {
             try {
                 $indicator = new siteindicator_site($course->id);
-                $site_type = $indicator->property->type;            
+                $sitetype = $indicator->property->type;
             } catch (Exception $e) {
-                // throws an exception if no site type found, so just do nothing
-                // and use default below
+                // Throws an exception if no site type found, so just do nothing
+                // and use default below.
             }
         }
         
-        // if site type is null, then default to instructional collab sites
-        if (empty($site_type)) {
-            $site_type =  siteindicator_manager::SITE_TYPE_INSTRUCTION;
+        // If site type is null, then default to instructional collab sites.
+        if (empty($sitetype)) {
+            $sitetype =  siteindicator_manager::SITE_TYPE_INSTRUCTION;
         }
 
-        $assignableroles = self::get_assignable_roles($site_type);
+        $assignableroles = self::get_assignable_roles($sitetype);
 
-        // for hidden sites, only return roles that can access hidden sites
+        // For hidden sites, only return roles that can access hidden sites.
         if ($course->visible == 0) {
             list($needed, $forbidden) = get_roles_with_cap_in_context(
-                    context_course::instance($course->id),
-                    'moodle/course:viewhiddencourses');
+                    $context, 'moodle/course:viewhiddencourses');
             foreach ($assignableroles as $checkrole) {
                 if (!in_array($checkrole->id, $needed) ||
                         in_array($checkrole->id, $forbidden)) {
@@ -344,10 +346,11 @@ class uclaroles_manager {
                 }
             }
         }
-        // If we're manually enrolling users, we want to expand the available roles.
-        if ($manual) {
+
+        // Expand the available roles if user has manual enrol capability.
+        if (has_capability('enrol/manual:enrol', $context)) {
             $shortnames = array('coursesitemanager');
-            switch($site_type){
+            switch($sitetype){
                 case siteindicator_manager::SITE_TYPE_SRS_INSTRUCTION:
                 case siteindicator_manager::SITE_TYPE_PRIVATE:
                     $shortnames[] = 'student';
@@ -359,14 +362,23 @@ class uclaroles_manager {
                     $shortnames[] = 'ta_admin';
                     break;
             }
-            $assignableroles = array_merge(
-                $assignableroles,
+            $assignableroles = array_merge($assignableroles,
                 $DB->get_records_list('role', 'shortname', $shortnames, 'sortorder'));
         }
         // Sort the roles in alphabetical order.
         usort($assignableroles, function($a, $b) {
             return strcmp($a->name, $b->name);
         });
+
+        if ($manual) {
+            // Manual enrollment pages expect results in [id] => [name] format.
+            $roles = array();
+            foreach ($assignableroles as $assignablerole) {
+                $roles[$assignablerole->id] = $assignablerole->name;
+            }
+            return $roles;
+        }
+
         return $assignableroles;
     }
     

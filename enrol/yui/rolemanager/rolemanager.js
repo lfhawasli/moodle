@@ -165,12 +165,7 @@ YUI.add('moodle-enrol-rolemanager', function(Y) {
             var c = this.get(COURSEID), params = {
                 id : this.get(COURSEID),
                 otherusers : (this.get(OTHERUSERS))?'true':'false',
-                // START UCLA MOD: 6009 - Make manual enrollment options match role restrictions for Site type
-                /*
                 action : 'getassignable',
-                */
-                action : 'uclagetassignable',
-                // END UCLA MOD: 6009
                 sesskey : M.cfg.sesskey
             };
             Y.io(M.cfg.wwwroot+'/enrol/ajax.php', {
