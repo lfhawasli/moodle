@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -15,6 +15,9 @@ $string['noruleversion'] = 'The Respondus LockDown Browser Extension for Moodle 
 $string['invalidversion'] = 'The Respondus LockDown Browser Extension for Moodle is not properly installed. The block plugin version does not match the quiz access rule plugin version.';
 $string['errnofunc'] = 'Missing function {$a}';
 $string['errdepend'] = 'Dependency error: {$a}';
+$string['onesessionenabled'] = 'The Block concurrent sessions quiz access rule is enabled for this quiz.  This rule is incompatible with the Respondus LockDown Browser Extension for Moodle.  Block concurrent connections must be unchecked in the quiz settings.';
+// Trac #4402
+$string['privacy:metadata'] = 'The Respondus LockDown Browser Extension for Moodle quiz access rule plugin does not store any personal data.';
 
 // don't translate anything below this line
 

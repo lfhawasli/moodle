@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 // production flags
 // - should all default to false or 0
@@ -1640,8 +1640,12 @@ function lockdownbrowser_monitoractionquestionmapping($parameters) {
     if (!isset($parameters["data"])) {
         lockdownbrowser_monitorserviceerror(2052, "No data parameter was specified");
     }
+    if (!isset($parameters["attemptid"])) {
+        lockdownbrowser_monitorserviceerror(2058, "No attemptid parameter was specified");
+    }
 
     $body = "";
+    $quiz_attempt = $DB->get_record("quiz_attempts", array("id" => $parameters["attemptid"]), "uniqueid");
 
     $data_elements = explode(",", $parameters["data"]);
     foreach ($data_elements as $data_element) {
@@ -1650,13 +1654,12 @@ function lockdownbrowser_monitoractionquestionmapping($parameters) {
         if ( count($tokens) != 2 )
             lockdownbrowser_monitorserviceerror(2053, "Invalid format for question mapping data element");
 
-        $questionusageid = $tokens[0];
         $slot = $tokens[1];
+        $question_attempt = $DB->get_record("question_attempts", array("questionusageid" => $quiz_attempt->uniqueid, "slot" => $slot ), "questionid");
 
-        $question_attempt = $DB->get_record("question_attempts", array("questionusageid" => $questionusageid, "slot" => $slot ), "questionid");
-         if ( $question_attempt ) {
+        if ( $question_attempt ) {
 
-            $question = $DB->get_record("question", array("id" => $question_attempt->questionid), "name");
+            $question = $DB->get_record("question", array("id" => $question_attempt->questionid), "questiontext");
             if ( $question ) {
 
                 if (strlen($body) > 0)
@@ -1666,7 +1669,7 @@ function lockdownbrowser_monitoractionquestionmapping($parameters) {
                 $body .= ":";
                 $body .= $question_attempt->questionid;
                 $body .= ":";
-                $body .= urlencode( $question->name );
+                $body .= urlencode( $question->questiontext );
             }
         }
     }
@@ -1755,4 +1758,3 @@ function lockdownbrowser_monitorservicerequest() {
         lockdownbrowser_monitorserviceerror(2006, "Unrecognized service action: $action");
     }
 }
-

@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 define ("LOCKDOWNBROWSER_DASHBOARD_IFRAMEURL",
     "https://smc-service-cloud.respondus2.com/MONServer/lms/dashboard.do");
@@ -28,7 +28,7 @@ if (!has_capability('moodle/course:manageactivities', $lockdownbrowser_context)
     redirect($CFG->wwwroot . '/index.php');
     die;
 }
-if (!$site = get_site()) {
+if (!get_site()) {
     redirect($CFG->wwwroot . '/' . $CFG->admin . '/index.php');
 }
 if (!($lockdownbrowser_course = $DB->get_record('course',
@@ -49,7 +49,6 @@ $PAGE->set_heading('Respondus LockDown Browser');
 echo $OUTPUT->header();
 
 lockdownbrowser_purge_settings();
-lockdownbrowser_generate_tokens_instructor();
 
 $lockdownbrowser_institution_id   = $CFG->block_lockdownbrowser_ldb_serverid;
 $lockdownbrowser_server_name      = $CFG->block_lockdownbrowser_ldb_servername;
@@ -108,27 +107,23 @@ function lockdownbrowser_dashboardgeneratemac($input) {
 
     // old-style mac;
     // broken for characters > 127 between Respondus clients and servers
-    global $CFG;
-
-    $secret = $CFG->block_lockdownbrowser_ldb_serversecret;
     $chararray = preg_split('//', $input, -1, PREG_SPLIT_NO_EMPTY);
     $strdatavalue = 0;
-
     foreach ($chararray as $char) {
         $strdatavalue += ord($char);
     }
+    $profile_secret = lockdownbrowser_get_profile_secret();
+    $mac = md5($strdatavalue . $profile_secret);
 
-    return md5($strdatavalue . $secret);
+    return $mac;
 }
 
 function lockdownbrowser_dashboardgeneratemac2($input) {
 
     // new-style mac;
     // need leading underscore so server can differentiate from old-style mac
-    global $CFG;
-
-    $secret = $CFG->block_lockdownbrowser_ldb_serversecret;
-    $mac = "_" . md5($input . $secret);
+    $profile_secret = lockdownbrowser_get_profile_secret();
+    $mac = "_" . md5($input . $profile_secret);
 
     return $mac;
 }
