@@ -39,3 +39,5 @@ $string['tabclasstext'] = 'Class';
 $string['tabcollabtext'] = 'Collaboration';
 $string['ucla_my_sites:addinstance'] = 'Add My sites block';
 $string['ucla_my_sites:myaddinstance'] = 'Add My sites to My home';
+$string['uselocalcourses_title'] = 'Use local courses';
+$string['uselocalcourses_desc'] = 'Check box to allow for local courses to override the URL that has been provided by the Registrar.';

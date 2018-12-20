@@ -15,17 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Class file to handle My sites settings.
  *
  * @package    block_ucla_my_sites
- * @copyright  2016 UC Regents
+ * @copyright  2018 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018121900;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2011112900;        // Requires this Moodle version.
-$plugin->component = 'block_ucla_my_sites';
-
-$plugin->dependencies = array('block_ucla_browseby' => 2012041700);
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configcheckbox(
+        'block_ucla_my_sites/uselocalcourses',
+         get_string('uselocalcourses_title', 'block_ucla_my_sites'),
+         get_string('uselocalcourses_desc', 'block_ucla_my_sites'), 0));
+}
