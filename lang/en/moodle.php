@@ -30,6 +30,9 @@ $string['actionsmenu'] = 'Actions menu';
 $string['active'] = 'Active';
 $string['activeusers'] = 'Active users';
 $string['activities'] = 'Activities';
+// START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+$string['activitiesresources'] = 'Activities/Resources';
+// END UCLA MOD: CCLE-7143.
 $string['activities_help'] = 'Activities, such as forums, quizzes and wikis, enable interactive content to be added to the course.';
 $string['activity'] = 'Activity';
 $string['activityclipboard'] = 'Moving this activity: {$a}';
@@ -443,17 +446,12 @@ $string['currentlyselectedusers'] = 'Currently selected users';
 $string['currentpicture'] = 'Current picture';
 $string['currentrelease'] = 'Current release information';
 $string['currentversion'] = 'Current version';
-// BEGIN UCLA MOD: CCLE-6443 - Further improvements to the Activity Chooser
-$string['customizemodchooser'] = '
+// START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+$string['custommodchooserhelp'] = 'New layout - same great tools.
 <br><br>
-Try the customizable Activities/Resources chooser.';
-$string['custommodchooserhelp'] = '
-<br><br>
-New layout - same great tools.
-<br><br>
-Don\'t see what you\'re looking for? Click \'Set favorite tools\' to see more.
-';
-// END UCLA MOD: CCLE-6443
+Don\'t see what you\'re looking for? Click \'Show all tools/Set favorite tools\' to see more.';
+$string['customizemodchooserlink'] = 'Try the customizable Activities/Resources chooser.';
+// END UCLA MOD: CCLE-7143.
 $string['databasechecking'] = 'Upgrading Moodle database from version {$a->oldversion} to {$a->newversion}';
 $string['databaseperformance'] = 'Database performance';
 $string['databasesetup'] = 'Setting up database';
@@ -826,6 +824,9 @@ $string['explanation'] = 'Explanation';
 $string['explanationdigitalminor'] = 'This information is required to determine if your age is over the digital age of consent. This is the age when an individual can consent to terms and conditions and their data being legally stored and processed.';
 $string['extendperiod'] = 'Extended period';
 $string['failedloginattempts'] = '{$a->attempts} failed logins since your last login';
+// START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+$string['favoritetools'] = 'Favorite Tools';
+// END UCLA MOD: CCLE-7143.
 $string['feedback'] = 'Feedback';
 $string['file'] = 'File';
 $string['fileexists'] = 'There is already a file called {$a}';
@@ -1263,6 +1264,17 @@ $string['missingsummary'] = 'Missing summary';
 $string['missingteacher'] = 'Must choose something';
 $string['missingurl'] = 'Missing URL';
 $string['missingusername'] = 'Missing username';
+// START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+$string['modchooser'] = 'Activities/Resources chooser';
+$string['modchooserdefault'] = 'Default favorite tools for the activities/resources chooser';
+$string['modchooserpreferences'] = 'Activities/Resources chooser preferences';
+$string['modchooserpreferencesupdate'] = 'Successfully updated activities/resources chooser preferences.';
+$string['modchoosersetting'] = 'Activities/Resources chooser settings';
+$string['modchoosersetting_str'] = 'Use the customizable activities/resources chooser';
+$string['modchoosersetting_help'] = 'This setting allows you to use the new activity chooser.
+
+The new activity chooser allows you to pin favorite tools and hide infrequently used tools.';
+// END UCLA MOD: CCLE-7143.
 $string['moddoesnotsupporttype'] = 'Module {$a->modname} does not support uploads of type {$a->type}';
 $string['modhide'] = 'Hide';
 $string['modshow'] = 'Show';
@@ -1834,6 +1846,13 @@ $string['selectfiles'] = 'Select files';
 $string['selectmoduletoviewhelp'] = 'Select an activity or resource to view its help.
 
 Double-click on an activity or resource name to quickly add it.';
+// START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+$string['selectmoduletoviewhelpmodchooser'] = 'Select an activity or resource to view its help.
+
+Double-click on an activity or resource name to quickly add it.
+<br><br>
+{$a}';
+// END UCLA MOD: CCLE-7143.
 $string['selectnos'] = 'Select all \'No\'';
 $string['selectperiod'] = 'Select period';
 $string['selectcategorysort'] = 'Which categories would you like to sort?';

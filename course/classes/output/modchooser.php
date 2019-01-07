@@ -46,6 +46,11 @@ class modchooser extends chooser {
     /** @var stdClass The course. */
     public $course;
 
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+    /** @var int Indicates if modchooser is customizable. */
+    public $customizable;
+    // END UCLA MOD: CCLE-7143.
+
     /**
      * Constructor.
      *
@@ -54,38 +59,70 @@ class modchooser extends chooser {
      */
     public function __construct(stdClass $course, array $modules) {
         $this->course = $course;
-
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+        $this->customizable = get_user_preferences('modchoosersetting', 0);
+        // END UCLA MOD: CCLE-7143.
         $sections = [];
         $context = context_course::instance($course->id);
 
-         // Activities.
-        $activities = array_filter($modules, function($mod) {
-            return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);
-        });
-        if (count($activities)) {
-            $sections[] = new chooser_section('activities', new lang_string('activities'),
-                array_map(function($module) use ($context) {
-                    return new modchooser_item($module, $context);
-                }, $activities)
-            );
-        }
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+        if ($this->customizable) {
+            // Combined list of modules.
+            $tools = array_filter($modules, function($mod) {
+                return ($mod->archetype !== MOD_ARCHETYPE_SYSTEM);
+            });
+            if (count($tools)) {
+                $sections[] = new chooser_section('tools', new lang_string('activitiesresources'),
+                    array_map(function($module) use ($context) {
+                        return new modchooser_item($module, $context);
+                    }, $tools)
+                );
+            }
+        } else {
+        // END UCLA MOD: CCLE-7143.    
+            // Activities.
+            $activities = array_filter($modules, function($mod) {
+                return ($mod->archetype !== MOD_ARCHETYPE_RESOURCE && $mod->archetype !== MOD_ARCHETYPE_SYSTEM);
+            });
+            if (count($activities)) {
+                $sections[] = new chooser_section('activities', new lang_string('activities'),
+                    array_map(function($module) use ($context) {
+                        return new modchooser_item($module, $context);
+                    }, $activities)
+                );
+            }
 
-        $resources = array_filter($modules, function($mod) {
-            return ($mod->archetype === MOD_ARCHETYPE_RESOURCE);
-        });
-        if (count($resources)) {
-            $sections[] = new chooser_section('resources', new lang_string('resources'),
-                array_map(function($module) use ($context) {
-                    return new modchooser_item($module, $context);
-                }, $resources)
-            );
+            $resources = array_filter($modules, function($mod) {
+                return ($mod->archetype === MOD_ARCHETYPE_RESOURCE);
+            });
+            if (count($resources)) {
+                $sections[] = new chooser_section('resources', new lang_string('resources'),
+                    array_map(function($module) use ($context) {
+                        return new modchooser_item($module, $context);
+                    }, $resources)
+                );
+            }
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
         }
+        // END UCLA MOD: CCLE-7143.
 
         $actionurl = new moodle_url('/course/jumpto.php');
         $title = new lang_string('addresourceoractivity');
         parent::__construct($actionurl, $title, $sections, 'jumplink');
 
-        $this->set_instructions(new lang_string('selectmoduletoviewhelp'));
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+        if ($this->customizable) {
+        // END UCLA MOD: CCLE-7143.    
+            $this->set_instructions(new lang_string('selectmoduletoviewhelp'));
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
+        } else {
+            // Add link to new modchooser preference option.
+            $modchooserlink = '<a href=' . new moodle_url('/course/modchooser_preferences.php',
+                    array('returnto' => $this->course->id)) . '>' .
+                    get_string('customizemodchooserlink', 'moodle') . '</a>';
+            $this->set_instructions(new lang_string('selectmoduletoviewhelpmodchooser', 'moodle', $modchooserlink));
+        }
+        // END UCLA MOD: CCLE-7143.
         $this->add_param('course', $course->id);
     }
 
@@ -98,6 +135,29 @@ class modchooser extends chooser {
     public function export_for_template(renderer_base $output) {
         $data = parent::export_for_template($output);
         $data->courseid = $this->course->id;
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+        $data->newmodchooser = $this->customizable;
+
+        if ($this->customizable) {
+            $defaulttools = get_config('moodlecourse', 'modchooserdefaults');
+            $userpinnedtools = get_user_preferences('pinnedtools', $defaulttools);
+
+            $data->custommodchooserhelp = get_string('custommodchooserhelp');
+            $data->defaulttools = $defaulttools;
+            $data->userpinnedtools = $userpinnedtools;
+
+            // Mark pinned tools for template.
+            $data->sections = array_map(function($section) use ($userpinnedtools) {
+                $section->items = array_map(function($item) use ($userpinnedtools) {
+                    if (in_array($item->id, explode(',', $userpinnedtools))) {
+                        $item->pinned = 'pinned';
+                    }
+                    return $item;
+                }, $section->items);
+                return $section;
+            }, $data->sections);
+        }
+        // END UCLA MOD: CCLE-7143.
         return $data;
     }
 
