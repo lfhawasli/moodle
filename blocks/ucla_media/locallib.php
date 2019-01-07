@@ -445,14 +445,17 @@ function print_media_page_tabs($activetab, $courseid) {
                                 array('courseid' => $courseid)),
                                     get_string('libraryreserves_tab', 'block_ucla_media', $count));
     }
-    $course = get_course($courseid);
-    $modinfo = get_fast_modinfo($course);
-    if($modinfo->get_instances_of('kalvidres') != '') {
-        $tabs[] = new tabobject(get_string('title','block_ucla_media'),
-                    new moodle_url('/blocks/ucla_media/kalvidres.php',
-                        array('courseid' => $courseid)),
-                            get_string('kalvidres_tab', 'block_ucla_media', $count));
-    }
+    // Commenting out for CCLE-8102 - Turn off current Kaltura Media Gallery.
+    // Change when issues with the Kaltura Media Gallery are resolved with:
+    // CCLE-8101 - Create new Kaltura Media Gallery or
+    // CCLE-8100 - Kaltura upload needs Auto Publish.
+//    $modinfo = get_fast_modinfo($courseid);
+//    if (!empty($modinfo->get_instances_of('kalvidres'))) {
+//        $tabs[] = new tabobject(get_string('title','block_ucla_media'),
+//                    new moodle_url('/blocks/ucla_media/kalvidres.php',
+//                        array('courseid' => $courseid)),
+//                            get_string('kalvidres_tab', 'block_ucla_media', $count));
+//    }
     // Display tabs here.
     print_tabs(array($tabs), $activetab);
 }
