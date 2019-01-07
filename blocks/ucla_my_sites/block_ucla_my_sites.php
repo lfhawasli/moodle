@@ -88,6 +88,8 @@ class block_ucla_my_sites extends block_base {
         }
 
         if ($remotecourses) {
+            $uselocalcourses = get_config('block_ucla_my_sites', 'uselocalcourses');
+
             // In order to translate values returned by get_moodlerole.
             $allroles = get_all_roles();
             foreach ($remotecourses as $remotecourse) {
@@ -143,6 +145,10 @@ class block_ucla_my_sites extends block_base {
                         if ($key == make_idnumber($reginfo)) {
                             $localexists = true;
                             $reginfo->enrolled = 1;
+                            // Prefer url from class links (see CCLE-8018).
+                            if (!empty($rclass->url) && !$uselocalcourses) {
+                                $classsites[$k]->url = $rclass->url;
+                            }
                         }
                     }
                 }
@@ -514,12 +520,12 @@ class block_ucla_my_sites extends block_base {
     }
 
     /**
-     * Disallow the block to have a configuration page.
+     * Display block settings in Site administration.
      *
      * @return boolean
      */
     public function has_config() {
-        return false;
+        return true;
     }
 
     /**

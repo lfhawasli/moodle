@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -17,6 +17,7 @@ if (is_readable($lockdownbrowser_locklib_file)) {
 class quizaccess_lockdownbrowser extends quiz_access_rule_base {
 
     public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
+        // $quizobj is an object of class quiz declared in /mod/quiz/attemptlib.php
         if ($quizobj->get_quiz()->browsersecurity !==
           get_string('browsersecuritychoicekey', 'quizaccess_lockdownbrowser')) {
             return null;
@@ -30,6 +31,9 @@ class quizaccess_lockdownbrowser extends quiz_access_rule_base {
             print_error("errnofunc", "quizaccess_lockdownbrowser", "", $extfunc);
         }
         $result = self::check_plugin_dependencies();
+        if ($result === false) {
+            $result = $this->check_incompatible_rules();
+        }
         if ($result === false) {
             $result = lockdownbrowser_check_for_lock($this->quizobj);
         }
@@ -51,6 +55,20 @@ class quizaccess_lockdownbrowser extends quiz_access_rule_base {
         } catch (Exception $ex) {
             // ignore possible exceptions
         }
+    }
+
+    /**
+     * Whether any incompatible rules are enabled or not.
+     * @return string false if no incompatible rules are detected, a message
+     *      explaining which one(s) if there are.
+     */
+    protected function check_incompatible_rules() {
+        $component = 'quizaccess_lockdownbrowser';
+        // https://moodle.org/plugins/quizaccess_onesession
+        if (!empty($this->quizobj->get_quiz()->onesessionenabled)) {
+            return get_string('onesessionenabled', $component);
+        }
+        return false;
     }
 
     /**

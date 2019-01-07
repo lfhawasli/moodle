@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 if (!isset($CFG)) {
     require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
@@ -136,18 +136,19 @@ $settings->add(
 $lockdownbrowser_ist = "";
 $result = lockdownbrowser_check_plugin_dependencies(1);
 if ($result !== false){
-    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
+    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: left; padding: 30px'>";
     $lockdownbrowser_ist .= $result;
     $lockdownbrowser_ist .= "</div>";
 }
 $lockdownbrowser_quiz_count = $DB->count_records("block_lockdownbrowser_sett");
 if ($lockdownbrowser_quiz_count >= 50000) { // Trac #2315
-    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
+    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: left; padding: 30px'>";
     $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('ldb_quiz_count', $lockdownbrowser_quiz_count);
     $lockdownbrowser_ist .= "</div>";
 }
-if (!isset($_COOKIE[$CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie])) {
-    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
+$lockdownbrowser_session = lockdownbrowser_get_session_cookie();
+if ($lockdownbrowser_session === false) {
+    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: left; padding: 30px'>";
     $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('session_cookie_not_set');
     $lockdownbrowser_ist .= "</div>";
 }
@@ -160,41 +161,14 @@ if (!during_initial_install() && empty($CFG->upgraderunning)) {
           && is_dir($lockdownbrowser_mod_folder));
     }
     if ($lockdownbrowser_mod_installed) {
-        $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
+        $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: left; padding: 30px'>";
         $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('module_installed_error');
         $lockdownbrowser_ist .= "</div>";
     }
 }
-if (!during_initial_install() && empty($CFG->upgraderunning)) {
-    $lockdownbrowser_dbman = $DB->get_manager();
-    $lockdownbrowser_toke_ok = $lockdownbrowser_dbman->table_exists(new xmldb_table("block_lockdownbrowser_toke"));
-    $lockdownbrowser_sess_ok = $lockdownbrowser_dbman->table_exists(new xmldb_table("block_lockdownbrowser_sess"));
-    if ($lockdownbrowser_toke_ok && $lockdownbrowser_sess_ok) {
-        $lockdownbrowser_tf = lockdownbrowser_tokens_free();
-    }
-}
-if (isset($lockdownbrowser_tf)) {
-    $lockdownbrowser_ist .= "<div style='text-align: center'>" . lockdownbrowser_getsettingsstring('tokens_free') . ": ";
-    if ($lockdownbrowser_tf > 0) {
-        $lockdownbrowser_ist .= "$lockdownbrowser_tf";
-    } else {
-        $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('zero_tokens_free');
-    }
-    if ($lockdownbrowser_tf < 10000) { // Trac #2315
-        $lockdownbrowser_ist .= "<br>" . lockdownbrowser_getsettingsstring('test_server')
-          . ": <a href='$CFG->wwwroot/blocks/lockdownbrowser/tokentest.php' target='_blank'>"
-          . "/blocks/lockdownbrowser/tokentest.php</a>";
-    }
-    if ($lockdownbrowser_tf > 0) { // Trac #2544
-        $lockdownbrowser_ist .= "<br>" . lockdownbrowser_getsettingsstring('clear_tokens')
-          . ": <a href='$CFG->wwwroot/blocks/lockdownbrowser/tokenreset.php' target='_blank'>"
-          . "/blocks/lockdownbrowser/tokenreset.php</a>";
-    }
-    $lockdownbrowser_ist .= "</div>";
-}
 if (strlen($lockdownbrowser_ist) == 0) {
-    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:red; text-align: center; padding: 30px'>";
-    $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('block_status_unknown');
+    $lockdownbrowser_ist .= "<div style='font-size: 125%; color:blue; text-align: left; padding: 30px'>";
+    $lockdownbrowser_ist .= lockdownbrowser_getsettingsstring('block_status_ok');
     $lockdownbrowser_ist .= "</div>";
 }
 $settings->add(

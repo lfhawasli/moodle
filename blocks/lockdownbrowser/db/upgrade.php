@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 // upgrade block database structure
 function xmldb_block_lockdownbrowser_upgrade($oldversion = 0) {
@@ -106,6 +106,18 @@ function xmldb_block_lockdownbrowser_upgrade($oldversion = 0) {
             }
         }
         upgrade_block_savepoint(true, 2017020700, "lockdownbrowser");
+    }
+    if ($oldversion < 2018091200) {
+
+        $table = new xmldb_table("block_lockdownbrowser_sess");
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+        $table = new xmldb_table("block_lockdownbrowser_toke");
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+        upgrade_block_savepoint(true, 2018091200, "lockdownbrowser");
     }
     return true;
 }

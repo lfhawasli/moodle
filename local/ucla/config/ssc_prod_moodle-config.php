@@ -199,6 +199,9 @@ $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
 $CFG->hiddenuserfields = 'city,country,timezone,icqnumber,skypeid,yahooid,aimid,msnid';
 
+// Site administration > Users > Privacy and policies > Privacy settings
+$CFG->forced_plugin_settings['tool_dataprivacy']['showdataretentionsummary'] = 0;
+
 // Site administration > Courses > Course default settings
 $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 1572864000;  // 1.5GB

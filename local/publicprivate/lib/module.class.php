@@ -101,20 +101,18 @@ class PublicPrivate_Module {
     }
 
     /**
-     * Finds and removes all grouping conditions.
+     * Finds and removes all group and grouping conditions.
      *
      * @return boolean
      */
-    private function remove_grouping_condition() {
+    private function remove_group_grouping_conditions() {
         global $DB;
         $availability = json_decode($this->_course_module()->availability);
 
-        $ppgrouping = $this->_publicprivate_course()->get_grouping();
         if (!empty($availability) && isset($availability->c)) {
             // This function recurses into subtrees for us.
-            $this->search_grouping_conditions($availability, $ppgrouping, true);
+            $this->search_group_grouping_conditions($availability, true);
 
-            // If there are no more conditions, just set availability to null.
             if (count($availability->c) == 0) {
                 $newavailability = null;
             } else {
@@ -124,7 +122,8 @@ class PublicPrivate_Module {
             return $DB->set_field('course_modules', 'availability', $newavailability,
                     array('id' => $this->_course_module()->id));
         }
-        return false;   // No grouping conditions set.
+
+        return false;   // No group and grouping conditions set.
     }
 
     /**
@@ -138,7 +137,8 @@ class PublicPrivate_Module {
     }
 
     /**
-     * Returns true if the course module does not have grouping restriction.
+     * Returns true if the course module does not have group and grouping
+     * restrictions.
      *
      * @return boolean
      */
@@ -147,25 +147,20 @@ class PublicPrivate_Module {
     }
 
     /**
-     * Returns true if course module is private, meaning that it is restricted
-     * to a grouping.
+     * Returns true if course module is private, meaning that it has group and
+     * grouping restrictions.
      *
      * @return boolean
      */
     public function is_private() {
-        return !empty($this->get_grouping());
-    }
+        $availability = json_decode($this->_course_module()->availability);
+        $private = false;
 
-    /**
-     * Returns true if the course module is restricted to the public/private
-     * grouping.
-     *
-     * @return boolean
-     */
-    public function is_using_ppgrouping() {
-        $ppgrouping = $this->_publicprivate_course()->get_grouping();
-        $cmgrouping = $this->get_grouping();
-        return $ppgrouping == $cmgrouping;
+        if (!empty($availability) && isset($availability->c)) {
+            $private = $this->search_group_grouping_conditions($availability);
+        }
+
+        return $private;
     }
 
     /**
@@ -194,15 +189,14 @@ class PublicPrivate_Module {
 
     /**
      * Disables public/private for course_module:
-     *  - If groupingid matches course's public/private grouping, then remove
-     *    grouping condition. Otherwise keep the current grouping.
+     *  - Removes the current group and grouping conditions.
      *
      * @throws PublicPrivate_Module_Exception
      */
     public function disable() {
         try {
-            if ($this->is_using_ppgrouping()) {
-                $this->remove_grouping_condition();
+            if ($this->is_private()) {
+                $this->remove_group_grouping_conditions();
                 rebuild_course_cache($this->get_course(), true);
 
                 $context = context_module::instance($this->_course_module_obj->id);
@@ -254,41 +248,26 @@ class PublicPrivate_Module {
      * If the public-private grouping condition is found, return its grouping id.
      * Otherwise, return the grouping id of the last grouping condition, or 0 if there are none.
      *
-     * If $delete is true, delete all grouping conditions.
-     *
      * @param object &$availability Non-empty availability tree.
      * @param int $ppgrouping Public-private grouping id.
-     * @param boolean $delete Optional.
      * @return int
      */
-    private function search_grouping_conditions(&$availability, $ppgrouping, $delete = false) {
+    private function search_grouping_conditions($availability, $ppgrouping) {
         $groupingfound = 0;
-        $useshowc = !empty($availability->showc);
 
-        foreach ($availability->c as $index => &$child) {
+        foreach ($availability->c as $index => $child) {
             if (empty($child)) {
                 continue;
             }
 
-            $deletechild = false;
             $temp = $groupingfound;
             if (isset($child->c)) {
                 // $child is a tree.
-                $temp = $this->search_grouping_conditions($child, $ppgrouping, $delete);
-                // Delete the child if it is now empty.
-                $deletechild = (count($child->c) == 0);
+                $temp = $this->search_grouping_conditions($child, $ppgrouping);
             } else {
                 // $child is a condition.
                 if ($child->type == 'grouping') {
                     $temp = $child->id;
-                    // Delete the child if we are deleting all grouping conditions.
-                    $deletechild = $delete;
-                }
-            }
-            if ($deletechild) {
-                unset($availability->c[$index]);
-                if ($useshowc) {
-                    unset($availability->showc[$index]);
                 }
             }
 
@@ -300,12 +279,58 @@ class PublicPrivate_Module {
             }
         }
 
+        return $groupingfound;
+    }
+
+    /**
+     * Check for group and grouping conditions, recursing into subtrees.
+     *
+     * If $delete is true, delete all group and grouping conditions.
+     *
+     * @param object &$availability Non-empty availability tree.
+     * @param boolean $delete Optional.
+     * @return boolean
+     */
+    private function search_group_grouping_conditions(&$availability, $delete = false) {
+        $private = false;
+        $useshowc = !empty($availability->showc);
+
+        foreach ($availability->c as $index => &$child) {
+            if (empty($child)) {
+                continue;
+            }
+
+            $deletechild = false;
+            if (isset($child->c)) {
+                // $child is a tree.
+                $private = $this->search_group_grouping_conditions($child, $delete);
+                // Delete the child if it is now empty.
+                $deletechild = count($child->c) == 0;
+            } else if ($child->type == 'group' || $child->type == 'grouping') {
+                // $child is a condition.
+                $private = true;
+                $deletechild = $delete;
+            }
+
+            if (!$delete && $private) {
+                break;
+            }
+
+            if ($deletechild) {
+                unset($availability->c[$index]);
+                if ($useshowc) {
+                    unset($availability->showc[$index]);
+                }
+            }
+        }
+
+        // Re-index object array.
         $availability->c = array_values($availability->c);
         if ($useshowc) {
             $availability->showc = array_values($availability->showc);
         }
 
-        return $groupingfound;
+        return $private;
     }
 
     /**

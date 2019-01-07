@@ -230,6 +230,9 @@ $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
 $CFG->hiddenuserfields = 'city,country,timezone,icqnumber,skypeid,yahooid,aimid,msnid';
 
+// Site administration > Users > Privacy and policies > Privacy settings
+$CFG->forced_plugin_settings['tool_dataprivacy']['showdataretentionsummary'] = 0;
+
 // Site administration > Courses > Course default settings
 $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 2147483648;  // 2GB
@@ -428,6 +431,9 @@ $CFG->forced_plugin_settings['tool_ucladatasourcesync']['contact_email']='ccle-o
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] = 'ccle-operations@lists.ucla.edu';
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
+
+// Site administration > Plugins > Blocks > My sites
+$CFG->forced_plugin_settings['block_ucla_my_sites']['uselocalcourses'] = 1;
 
 // Site administration > Plugins > Blocks > Quickmail
 $CFG->block_quickmail_allowstudents = -1;

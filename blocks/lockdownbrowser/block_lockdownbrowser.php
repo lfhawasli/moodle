@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 class block_lockdownbrowser extends block_base {
 

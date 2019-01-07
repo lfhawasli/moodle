@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: March 13, 2018.
+// Date: September 12, 2018.
 
 // ----- never edit these
 // START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
@@ -14,72 +14,85 @@ define('LDB_SERVERTYPE', '0');
 define('LDB_DOWNLOAD', 'https://www.respondus.com/lockdown/download.php?id=228644488');
 // to remove link: define('LDB_DOWNLOAD', '');
 
+
 // ----- edit these only if your server is nonstandard
-// editing these will break the module!
-define('LDB_TSERVER_1', 'https://moots1.respondus2.com');
-define('LDB_TSERVER_2', 'https://moots2.respondus2.com');
-define('LDB_TSERVER_ENDPOINT', '/SMServer/moodlews/token.html');
-define('LDB_TSERVER_AKEY', 'myn3r41z');
-define('LDB_TSERVER_BKEY', '1uti3n1yc0p3n3');
-define('LDB_TSERVER_FORM1', 'v=a&i=%s&t=');
-define('LDB_TSERVER_FORM2', '&a=%s&myn=%s&s=%s');
-define('LDB_TSERVER_SET', 500);
-define('LDB_TSERVER_REC', 84);
-define('LDB_TSERVER_T1L', 48);
-define('LDB_TSERVER_T2L', 32);
-define('LDB_TSERVER_T2P', 51);
-define('LDB_TOKEN1_COOKIE', 'mldbt1c');
-define('LDB_TOKEN2_COOKIE', 'mldbc2t');
-define('LDB_EPASS_COOKIE', 'mldbxc');
+// editing these will break the plugin!
+define('LDB_SDK2015_LAUNCH_SCHEME','rldb');
+define('LDB_SDK2015_INDEX', 'co');
+define('LDB_SDK2015_SECRET1', 'PMnAyok2Sa5kgNKS');
+define('LDB_SDK2015_SECRET2', 'gIGHU9zh8vDwUYB9');
+define('LDB_SDK2015_CHALLENGE_COOKIE', 'rldbcv');
+define('LDB_SDK2015_RESPONSE_COOKIE', 'rldbrv');
+define('LDB_SDK2015_CLIENTID_COOKIE', 'rldbci');
+define('LDB_SDK2015_SERVERID_COOKIE', 'rldbsi');
+define('LDB_SDK2015_SECURITY_VHIGH', 'rldbsv');
+define('LDB_SDK2015_SECURITY_MEDIUM', 'rldbsm');
+define('LDB_SDK2015_COMMAND_SCHEME','sbxcmd');
+define('LDB_SDK2015_COMMAND_EXITB', 'rldbxb');
+define('LDB_SDK2015_SESSION_PARM', 'session');
+define('LDB_SDK2015_EXAMID_PARM', 'examid');
+define('LDB_SDK2015_LDBCHECK_PARM', 'ldbcheck');
+define('LDB_SDK2015_LDBONLY_CHECK', 'https://www.respondus.com/services/ldbcheck/ldbcheck.htm');
+define('LDB_SDK2015_MONITOR_CHECK', 'https://www.respondus.com/webcamtest');
+define('LDB_SDK2015_PRESTART_FN', 'rldb_prestart_finished');
 define('LDB_ID_COOKIE', 'mldbz');
 define('LDB_SESSION_COOKIE', 'MoodleSession');
-// if your server needs proxy credentials to make HTTP POST requests
-define('LDB_PROXY_DEFINED', '0'); // '1'=yes
+define('LDB_EXAMTYPE_LDBONLY', 'ldbonly');
+define('LDB_EXAMTYPE_MONITOR', 'monitor');
 
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_1)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_1 = LDB_TSERVER_1;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_launch_scheme)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_launch_scheme = LDB_SDK2015_LAUNCH_SCHEME;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_2)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_2 = LDB_TSERVER_2;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_index)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_index = LDB_SDK2015_INDEX;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_endpoint)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_endpoint = LDB_TSERVER_ENDPOINT;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_secret1)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_secret1 = LDB_SDK2015_SECRET1;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_akey)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_akey = LDB_TSERVER_AKEY;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_secret2)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_secret2 = LDB_SDK2015_SECRET2;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_bkey)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_bkey = LDB_TSERVER_BKEY;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_challenge_cookie)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_challenge_cookie = LDB_SDK2015_CHALLENGE_COOKIE;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_form1)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_form1 = LDB_TSERVER_FORM1;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_response_cookie)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_response_cookie = LDB_SDK2015_RESPONSE_COOKIE;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_form2)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_form2 = LDB_TSERVER_FORM2;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_clientid_cookie)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_clientid_cookie = LDB_SDK2015_CLIENTID_COOKIE;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_set)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_set = LDB_TSERVER_SET;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_serverid_cookie)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_serverid_cookie = LDB_SDK2015_SERVERID_COOKIE;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_rec)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_rec = LDB_TSERVER_REC;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_security_vhigh)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_security_vhigh = LDB_SDK2015_SECURITY_VHIGH;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_t1l)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_t1l = LDB_TSERVER_T1L;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_security_medium)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_security_medium = LDB_SDK2015_SECURITY_MEDIUM;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_t2l)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_t2l = LDB_TSERVER_T2L;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_command_scheme)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_command_scheme = LDB_SDK2015_COMMAND_SCHEME;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_tserver_t2p)) {
-    $CFG->block_lockdownbrowser_ldb_tserver_t2p = LDB_TSERVER_T2P;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_command_exitb)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_command_exitb = LDB_SDK2015_COMMAND_EXITB;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_token1_cookie)) {
-    $CFG->block_lockdownbrowser_ldb_token1_cookie = LDB_TOKEN1_COOKIE;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_session_parm)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_session_parm = LDB_SDK2015_SESSION_PARM;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_token2_cookie)) {
-    $CFG->block_lockdownbrowser_ldb_token2_cookie = LDB_TOKEN2_COOKIE;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_examid_parm)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_examid_parm = LDB_SDK2015_EXAMID_PARM;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_epass_cookie)) {
-    $CFG->block_lockdownbrowser_ldb_epass_cookie = LDB_EPASS_COOKIE;
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_ldbcheck_parm)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_ldbcheck_parm = LDB_SDK2015_LDBCHECK_PARM;
+}
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_ldbonly_check)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_ldbonly_check = LDB_SDK2015_LDBONLY_CHECK;
+}
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_monitor_check)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_monitor_check = LDB_SDK2015_MONITOR_CHECK;
+}
+if (!isset($CFG->block_lockdownbrowser_ldb_sdk2015_prestart_fn)) {
+    $CFG->block_lockdownbrowser_ldb_sdk2015_prestart_fn = LDB_SDK2015_PRESTART_FN;
 }
 if (!isset($CFG->block_lockdownbrowser_ldb_id_cookie)) {
     $CFG->block_lockdownbrowser_ldb_id_cookie = LDB_ID_COOKIE;
@@ -87,8 +100,11 @@ if (!isset($CFG->block_lockdownbrowser_ldb_id_cookie)) {
 if (!isset($CFG->block_lockdownbrowser_ldb_session_cookie)) {
     $CFG->block_lockdownbrowser_ldb_session_cookie = LDB_SESSION_COOKIE;
 }
-if (!isset($CFG->block_lockdownbrowser_ldb_proxy_defined)) {
-    $CFG->block_lockdownbrowser_ldb_proxy_defined = LDB_PROXY_DEFINED;
+if (!isset($CFG->block_lockdownbrowser_ldb_examtype_ldbonly)) {
+    $CFG->block_lockdownbrowser_ldb_examtype_ldbonly = LDB_EXAMTYPE_LDBONLY;
+}
+if (!isset($CFG->block_lockdownbrowser_ldb_examtype_monitor)) {
+    $CFG->block_lockdownbrowser_ldb_examtype_monitor = LDB_EXAMTYPE_MONITOR;
 }
 if (!isset($CFG->block_lockdownbrowser_ldb_servername)) {
     if (isset($CFG->block_lockdownbrowser_LDB_SERVERNAME)) {
