@@ -48,10 +48,13 @@ class qtype_multichoice_edit_form extends question_edit_form {
                 get_string('answerhowmany', 'qtype_multichoice'), $menu);
         $mform->setDefault('single', get_config('qtype_multichoice', 'answerhowmany'));
 
-        $mform->addElement('advcheckbox', 'shuffleanswers',
-                get_string('shuffleanswers', 'qtype_multichoice'), null, null, array(0, 1));
-        $mform->addHelpButton('shuffleanswers', 'shuffleanswers', 'qtype_multichoice');
+        // START UCLA MOD: CCLE-8034 - Conditionally display shuffle option for individual questions.
+        \local_ucla_core_edit::remove_shuffle_option($mform, 'qtype_multichoice');
+        // $mform->addElement('advcheckbox', 'shuffleanswers',
+        //         get_string('shuffleanswers', 'qtype_multichoice'), null, null, array(0, 1));
+        // $mform->addHelpButton('shuffleanswers', 'shuffleanswers', 'qtype_multichoice');
         $mform->setDefault('shuffleanswers', get_config('qtype_multichoice', 'shuffleanswers'));
+        // END UCLA MOD: CCLE-8034.
 
         $mform->addElement('select', 'answernumbering',
                 get_string('answernumbering', 'qtype_multichoice'),

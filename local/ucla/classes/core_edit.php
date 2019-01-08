@@ -450,4 +450,29 @@ class local_ucla_core_edit {
         }
         return false;
     }
+
+    /**
+     * Function removes the option to shuffle answer choices for individual 
+     * questions if the quiz does not allow for it.
+     *
+     * @param object &$mform    the form being built. 
+     * @param object $qtype     type of question
+     */
+    public static function remove_shuffle_option(&$mform, $qtype) {
+        global $DB, $PAGE;
+
+        // Get the course module for the page and retrieve the quiz record.
+        $cm = $PAGE->cm;
+        $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+        $shufflestring = $qtype === 'qtype_match' ? 'shuffle' : 'shuffleanswers';
+        if ($quiz->shuffleanswers === '0') {
+            $mform->addElement('hidden', 'shuffleanswers', 
+                    get_string($shufflestring, $qtype), null, null, array(0, 1));
+            $mform->setType('shuffleanswers', PARAM_INT);
+        } else {
+            $mform->addElement('advcheckbox', 'shuffleanswers',
+                    get_string($shufflestring, $qtype), null, null, array(0, 1));
+            $mform->addHelpButton('shuffleanswers', $shufflestring, $qtype);
+        }
+    }
 }
