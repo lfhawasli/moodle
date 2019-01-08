@@ -94,15 +94,18 @@ class block_ucla_media extends block_base {
                     $node->add_class('video-reserves-link');
                     $retval = $node;
                 } else {
-                    $course = get_course($courseid);
-                    $modinfo = get_fast_modinfo($course);
-                    if($modinfo->get_instances_of('kalvidres') != '') {
-                        $node = navigation_node::create(get_string('title',
-                                'block_ucla_media'), new moodle_url('/blocks/ucla_media/kalvidres.php',
-                                        array('courseid' => $courseid)));
-                        $node->add_class('video-reserves-link');
-                        $retval = $node;
-                    }
+                    // Commenting out for CCLE-8102 - Turn off current Kaltura Media Gallery.
+                    // Change when issues with the Kaltura Media Gallery are resolved with:
+                    // CCLE-8101 - Create new Kaltura Media Gallery or
+                    // CCLE-8100 - Kaltura upload needs Auto Publish.
+//                    $modinfo = get_fast_modinfo($courseid);
+//                    if (!empty($modinfo->get_instances_of('kalvidres'))) {
+//                        $node = navigation_node::create(get_string('title',
+//                                'block_ucla_media'), new moodle_url('/blocks/ucla_media/kalvidres.php',
+//                                        array('courseid' => $courseid)));
+//                        $node->add_class('video-reserves-link');
+//                        $retval = $node;
+//                    }
                 }
             }
         }
