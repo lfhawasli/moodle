@@ -37,7 +37,10 @@
 
 $string['application/epub_zip'] = 'EPUB ebook';
 $string['application/json'] = '{$a->MIMETYPE2} text';
-$string['application/msword'] = 'Word document';
+// START UCLA MOD: CCLE-7997 - Updated Word file type lang strings.
+// $string['application/msword'] = 'Word document';
+$string['application/msword'] = 'Pre-Word 2007 document';
+// END UCLA MOD: CCLE-7997.
 $string['application/pdf'] = 'PDF document';
 $string['application/vnd.moodle.backup'] = 'Moodle backup';
 $string['application/vnd.ms-excel'] = 'Excel spreadsheet';
@@ -52,7 +55,10 @@ $string['application/vnd.openxmlformats-officedocument.presentationml.presentati
 $string['application/vnd.openxmlformats-officedocument.presentationml.slideshow'] = 'Powerpoint 2007 slideshow';
 $string['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] = 'Excel 2007 spreadsheet';
 $string['application/vnd.openxmlformats-officedocument.spreadsheetml.template'] = 'Excel 2007 template';
-$string['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = 'Word 2007 document';
+// START UCLA MOD: CCLE-7997 - Updated Word file type lang strings.
+// $string['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = 'Word 2007 document';
+$string['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = 'Word document';
+// END UCLA MOD: CCLE-7997.
 $string['application/x-iwork-keynote-sffkey'] = 'iWork Keynote presentation';
 $string['application/x-iwork-numbers-sffnumbers'] = 'iWork Numbers spreadsheet';
 $string['application/x-iwork-pages-sffpages'] = 'iWork Pages document';
