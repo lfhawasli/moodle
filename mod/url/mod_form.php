@@ -48,6 +48,9 @@ class mod_url_mod_form extends moodleform_mod {
         $mform->addElement('url', 'externalurl', get_string('externalurl', 'url'), array('size'=>'60'), array('usefilepicker'=>true));
         $mform->setType('externalurl', PARAM_RAW_TRIMMED);
         $mform->addRule('externalurl', null, 'required', null, 'client');
+        // START UCLA MOD: CCLE-8055 - Added https default to URL.
+        $mform->setDefault('externalurl', 'https://');
+        // END UCLA MOD: CCLE-8055.
         $this->standard_intro_elements();
         $element = $mform->getElement('introeditor');
         $attributes = $element->getAttributes();
