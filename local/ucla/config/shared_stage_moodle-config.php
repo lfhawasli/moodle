@@ -620,7 +620,7 @@ $CFG->aspellpath = '/usr/bin/aspell';
 $CFG->dbsessions = false;
 
 // Site administration > Server > Performance
-$CFG->extramemorylimit = '1024M';
+$CFG->extramemorylimit = '4096M';
 
 // Site administration > Server > Update notifications
 $CFG->updateautocheck = 0;
