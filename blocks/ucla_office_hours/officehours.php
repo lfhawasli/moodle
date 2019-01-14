@@ -77,8 +77,8 @@ foreach ($userenrolments as $userenrolment) {
     $enrolledcourse = $DB->get_record_sql($sql, array('id' => $enrol->courseid, 'term' => $currentcourseterm));
     // Don't include TA sites.
     if (!empty($enrolledcourse) && !block_ucla_tasites::is_tasite_enrol_meta_instance($enrol)) {
-        $enrolledcourseids[] = $enrolledcourse->id;
-        $coursenames[] = $enrolledcourse->shortname;
+        $enrolledcourseids[$enrolledcourse->id] = $enrolledcourse->id;
+        $coursenames[$enrolledcourse->shortname] = $enrolledcourse->shortname;
     }
 }
 
