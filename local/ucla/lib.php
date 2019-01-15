@@ -330,16 +330,30 @@ function ucla_get_reg_classinfo($term, $srs) {
  *                         hostcourse value added.
  */
 function ucla_get_course_info($courseid) {
-    $reginfos = array();
-    $termsrses = ucla_map_courseid_to_termsrses($courseid);
-    foreach ($termsrses as $termsrs) {
-        $reginfoobj = ucla_get_reg_classinfo($termsrs->term, $termsrs->srs);
-        if (empty($reginfoobj)) {
-            continue;
-        }
-        $reginfoobj->hostcourse = $termsrs->hostcourse;
-        $reginfos[] = $reginfoobj;
+    global $DB;
+
+    $sql = 'SELECT inf.*, req.hostcourse
+              FROM {ucla_request_classes} req
+        INNER JOIN {ucla_reg_classinfo} inf
+                ON req.srs = inf.srs
+               AND req.term = inf.term
+             WHERE req.courseid = :courseid
+          ORDER BY inf.subj_area, inf.crsidx, inf.classidx
+    ';
+    $params =['courseid' => $courseid];
+    $reginfos = $DB->get_records_sql($sql, $params);
+
+    $registrarurl = get_config('local_ucla', 'registrarurl');
+    foreach($reginfos as $reginfo) {
+        $page = $registrarurl;
+        $page .= '/ro/public/soc/Results?t=' . $reginfo->term;
+        $page .= '&sBy=classidnumber&id=' . $reginfo->srs;
+        $page .= '&btnIsInIndex=btn_inIndex';
+        $reginfo->url = $page;
     }
+
+    // The records that we get from get_records_sql() are indexed by the "id" column of the db table, so we reset the indexes here.
+    $reginfos = array_values($reginfos);
 
     return $reginfos;
 }
