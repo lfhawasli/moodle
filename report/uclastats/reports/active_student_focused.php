@@ -170,8 +170,9 @@ class active_student_focused extends uclastats_base {
                     array('shortname' => 'student'));
         }
 
+        $userfields = 'u.id, ' . get_all_user_name_fields(true, 'u');
         $enrolled = get_role_users($this->studentroleid,
-                context_course::instance($course->id), false, 'u.id', null, false);
+                context_course::instance($course->id), false, $userfields, null, false);
 
         // Return an array of userids.
         foreach ($enrolled as $user) {

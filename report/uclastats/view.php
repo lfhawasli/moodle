@@ -35,7 +35,7 @@ if (!array_key_exists($report, $reports)) {
 $PAGE->set_url(new moodle_url('/report/uclastats/view.php',
         array('report' => $report)));
 
-admin_externalpage_setup('reportuclastats');
+admin_externalpage_setup('uclastats');
 
 // create report object and render it
 require_once($CFG->dirroot . '/report/uclastats/reports/' . $report . '.php');
