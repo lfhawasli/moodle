@@ -588,6 +588,9 @@ $CFG->minpasswordnonalphanum = 0;
 $CFG->allowframembedding = 1;
 $CFG->cookiehttponly = 1;
 
+// Site administration > Security > Site security settings
+$CFG->strictformsrequired = 1;
+
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';
 
