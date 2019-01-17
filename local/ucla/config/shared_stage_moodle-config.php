@@ -568,6 +568,9 @@ $CFG->forced_plugin_settings['message']['email_provider_mod_forum_digests_permit
 // Site administration > Plugins > Reports > Forum email logs
 $CFG->forced_plugin_settings['report_emaillog']['daysexpire'] = 30;
 
+// Site administration > Plugins > Reports > UCLA stats console
+$CFG->forced_plugin_settings['report_uclastats']['notifylist'] = 'astokes@oid.ucla.edu,nthompson@oid.ucla.edu,rex@oid.ucla.edu';
+
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
 

@@ -100,7 +100,8 @@ class topcourses extends uclastats_base {
 
         // First get the enrolled students.
         $context = context_course::instance($courseid);
-        $students = get_role_users($this->studentroleid, $context, false, 'u.id');
+        $userfields = 'u.id, ' . get_all_user_name_fields(true, 'u');
+        $students = get_role_users($this->studentroleid, $context, false, $userfields);
 
         if (empty($students)) {
             return null;

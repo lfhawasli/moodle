@@ -18,7 +18,7 @@ require_capability('report/uclastats:view', $context);
 
 $PAGE->set_url(new moodle_url('/report/uclastats/index.php'));
 
-admin_externalpage_setup('reportuclastats');
+admin_externalpage_setup('uclastats');
 
 $output = $PAGE->get_renderer('report_uclastats');
 

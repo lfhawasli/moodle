@@ -113,7 +113,8 @@ class report_uclastats_renderer extends plugin_renderer_base {
         $bc = new block_contents();
         $bc->content = $content;
         $bc->title = get_string('report_list', 'report_uclastats');
-        $bc->attributes = array('class' => 'block uclastats-report-list');
+        $bc->attributes = array('class' => 'block uclastats-report-list',
+                'data-block' => 'html');
 
         echo $OUTPUT->block($bc, BLOCK_POS_RIGHT);
     }

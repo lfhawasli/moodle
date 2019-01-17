@@ -27,6 +27,11 @@ $string['uclastats:view'] = 'View UCLA stats console cached queries';
 $string['uclastats:query'] = 'Run UCLA stats console queries';
 $string['uclastats:manage'] = 'Manage UCLA stats console cached queries (delete or lock results)';
 
+$string['enable'] = 'Automate reports';
+$string['enable_desc'] = 'If enabled, run reports for previous term when the 1st week of the quarter starts.';
+$string['notifylist'] = 'Notify list';
+$string['notifylist_desc'] = 'Who to email when report/uclastats/cli/run_reports.php or automated report is run. Must be comma-separated list of email addresses.';
+
 $string['parameters'] = 'Parameters: {$a}';
 $string['lastrun'] = 'Last run by {$a->who} on {$a->when}';
 

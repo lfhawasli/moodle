@@ -118,9 +118,9 @@ class course_num_sites extends uclastats_base {
                     GROUP BY urci.division
                     ORDER BY urd.fullname";
 
-            $params['first_week_of_a'] = strtotime('+1 week', $term_info['start_a']);
+            $params['first_week_of_a'] = strtotime('+1 week', $term_info['start_1a']);
             $params['first_week_of_c'] = strtotime('+1 week', $term_info['start_c']);
-            $params['end_a'] = $term_info['end_a'];
+            $params['end_a'] = $term_info['end_1a'];
             $params['end_c'] = $term_info['end_c'];
             $params['guestida'] = $guest_role->id;
             $params['guestidc'] = $guest_role->id;
