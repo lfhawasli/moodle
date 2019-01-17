@@ -74,14 +74,14 @@ if (!$cir->load_csv_content($inputfilecontent, 'utf-8', 'comma')) {
 
 // Verify that email is a column in the file.
 $columns = $cir->get_columns();
-$emailcolumindex = 0;
+$emailcolumindex = false;
 foreach ($columns as $index => $column) {
     if (core_text::strtolower($column) == 'email') {
         $emailcolumindex = $index;
         break;
     }
 }
-if (empty($emailcolumindex)) {
+if ($emailcolumindex === false) {
     cli_error('Cannot find email column in input file:' . $inputfile);
 }
 
