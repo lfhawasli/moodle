@@ -47,6 +47,7 @@ $string['titlecol'] = 'Title';
 $string['placeholder'] = 'e.g. \'Midterm #1\'';
 $string['fromcol'] = 'From';
 $string['untilcol'] = 'Until';
+$string['visibilitytitle'] = 'Visibility';
 $string['visibilitydisabled'] = 'This option is disabled because the course is scheduled to be hidden.';
 $string['visibilitylink'] = 'Click here to modify the course visibility schedule.';
 $string['hideoption'] = 'Hidden from students';

@@ -105,7 +105,7 @@ class schedule_form extends moodleform {
         $choices = array();
         $choices['0'] = get_string('hideoption', 'local_visibility');
         $choices['1'] = get_string('showoption', 'local_visibility');
-        $mform->addElement('select', 'visible', get_string('visible'), $choices);
+        $mform->addElement('select', 'visible', get_string('visibilitytitle', 'local_visibility'), $choices);
         $mform->addHelpButton('visible', 'visible');
         $mform->setDefault('visible', $this->course->visible);
 
