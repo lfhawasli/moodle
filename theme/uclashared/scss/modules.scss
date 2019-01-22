@@ -20,3 +20,16 @@
     vertical-align: top;
     margin-top: 0.4rem;
 }
+
+#quiz-timer {
+    @extend .alert-warning;
+
+    position: fixed;
+    left: 0px;
+    top: 15px;
+    font-size: 20px;
+    width: 100vw;
+    text-align: center;
+    padding: 0px;
+    z-index: 2;
+}
