@@ -5844,11 +5844,11 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
         // }
         // echo '<th class="header lastpost" scope="col">'.get_string('lastpost', 'forum').'</th>';
         echo '<th class="header topic" scope="col">';
-        if ($sort == 'd.name ASC') {
+        if ($sort == 'p.subject ASC') {
             echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode=' 
                 .DISCUSSION_MODE_NAME_DESC.'">'
                 .get_string('discussion', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
-        } else if ($sort == 'd.name DESC') {
+        } else if ($sort == 'p.subject DESC') {
             echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
                 .DISCUSSION_MODE_NAME_ASC.'">'
                 .get_string('discussion', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
@@ -5859,11 +5859,11 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
         }
         echo '</th>';
         echo '<th class="header author" scope="col">';
-        if ($sort == 'd.firstpost ASC') {
+        if ($sort == 'u.lastname ASC') {
             echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
                 .DISCUSSION_MODE_FIRSTPOST_DESC.'">'
                 .get_string('startedby', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
-        } else if ($sort == 'd.firstpost DESC') {
+        } else if ($sort == 'u.lastname DESC') {
             echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
                 .DISCUSSION_MODE_FIRSTPOST_ASC.'">'
                 .get_string('startedby', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
@@ -5932,11 +5932,11 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions = -1, $
             }
         }
         echo '<th class="header lastpost" scope="col">';
-        if ($sort == 'd.timemodified ASC') {
+        if ($sort == 'p.modified ASC') {
             echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
                 .DISCUSSION_MODE_LASTPOST_DESC.'">'
                 .get_string('lastpost', 'forum').$OUTPUT->pix_icon('t/sort_desc','').'</a>';
-        } else if ($sort == 'd.timemodified DESC') {
+        } else if ($sort == 'p.modified DESC') {
             echo '<a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'&mode='
                 .DISCUSSION_MODE_LASTPOST_ASC.'">'
                 .get_string('lastpost', 'forum').$OUTPUT->pix_icon('t/sort_asc','').'</a>';
