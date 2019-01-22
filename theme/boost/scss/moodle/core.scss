@@ -1457,7 +1457,9 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 
         .typename {
             display: inline-block;
-            width: 55%;
+            /* START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser. */
+            width: 50%;
+            /* END UCLA MOD: CCLE-7143. */
         }
     }
 }
@@ -1480,6 +1482,21 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     padding: 0 0 0 0.5em;
 }
 
+/* START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser. */
+.choosercontainer #chooseform .option .typename .star img,
+.choosercontainer #chooseform .nonoption .typename .star img {
+    float: right;
+    margin-right: -25px;
+    cursor: pointer;
+}
+
+.choosercontainer #chooseform .option .typename .star_empty img,
+.choosercontainer #chooseform .nonoption .typename .star_empty img {
+    float: right;
+    margin-right: -25px;
+    cursor: pointer;
+}
+/* END UCLA MOD: CCLE-7143. */
 .choosercontainer #chooseform .modicon + .typename {
     padding-left: 0;
 }
@@ -1531,6 +1548,11 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     overflow-y: auto;
     line-height: 2em;
 }
+/* START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser. */
+.jschooser .choosercontainer #chooseform .instruction .modchooserinstruction {
+    font-style: italic;
+}
+/* END UCLA MOD: CCLE-7143. */
 /* Selected option settings */
 .jschooser .choosercontainer #chooseform .instruction,
 .choosercontainer #chooseform .selected .typesummary {

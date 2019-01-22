@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * Command line script to bulk run and export reports for the end of quarter
  * activity report.
  *
@@ -28,6 +28,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once("$CFG->libdir/clilib.php");
 require_once("$CFG->dirroot/local/ucla/lib.php");
+require_once("$CFG->dirroot/report/uclastats/locallib.php");
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(array('help' => false),
@@ -92,23 +93,7 @@ if (is_dir($reportoutputcachedir)) {
 mkdir($reportoutputcachedir, 0777);
 
 // List of reports to run.
-$reports = array('collab_modules_used', 'course_modules_used',
-                 'collab_block_sites', 'course_block_sites',
-                 'collab_type',
-                 'active_instructor_focused', 'active_student_focused',
-                 'collab_forum_usage', 'course_forum_usage',
-                 'large_collab_sites', 'large_courses',
-                 'most_active_collab_sites', 'most_active_course_sites',
-                 'collab_num_sites', 'course_num_sites',
-                 'repository_usage',
-                 'role_count',
-                 'sites_per_term',
-                 'syllabus_by_division',
-                 'system_size',
-                 'total_downloads',
-                 'unique_logins_per_term',
-                 'users_by_division',
-                 'logins_by_division');
+$reports = array_keys(get_all_reports());
 
 // Check if we want to only run certain reports.
 if (!empty($reportstorun)) {
@@ -136,9 +121,23 @@ foreach ($reports as $reportname) {
     // Create report object.
     $report = new $reportname($admin->id);
 
+    $reportparams = $report->get_parameters();
+    // Run any report that:
+    // 1) Does not have any parameters.
+    // 2) Does not include any parameters other than term and optionaldatepicker.
+    if (!empty($reportparams)) {
+        $fields = array_flip($reportparams);
+        unset($fields['term']);
+        unset($fields['optionaldatepicker']);
+        if (!empty($fields)) {
+            $output[] = 'Skipping report ' . $reportname;
+            continue;
+        }
+    }
+
     // Run report, but see if need to provide term as a parameter.
     $params = array();
-    if (in_array('term', $report->get_parameters())) {
+    if (in_array('term', $reportparams)) {
         $params['term'] = $term;
     }
     $reportid = $report->run($params);
@@ -186,6 +185,38 @@ if ($result) {
     $trace->output("DONE! Report available at:\n" . $reportoutputfile);    
 } else {
     $trace->output("ERROR! Cannot generate zip file.");
+}
+
+// Email a report to the notify list if running all reports.
+$notifylist = get_config('report_uclastats', 'notifylist');
+if (!empty($notifylist) && empty($reportstorun)) {
+    $trace->output('Emailing out notices.');
+
+    $from = get_admin();
+    $subject = 'Ran UCLA stats report for ' . $term;
+    $output[] = '';
+    $output[] = 'Reports attached as zip file and also available in UCLA stats console.';
+    $messagetext = implode("\n", $output);
+
+    // Need to copy zip file to $CFG->tempdir.
+    $attachmentfile = basename($reportoutputfile);
+    $attachmentpath = $CFG->tempdir . DIRECTORY_SEPARATOR . $attachmentfile;
+    copy($reportoutputfile, $attachmentpath);
+
+    $notifylistarray = explode(',', $notifylist);
+    foreach ($notifylistarray as $email) {
+        // There might be multiple users with the same email, but we just pick
+        // the first one.
+        $user = $DB->get_record('user', array('email' => $email), '*', IGNORE_MULTIPLE);
+        if (empty($user)) {
+            // Create our own user using guestid as base.
+            $user = $DB->get_record('user', array('username' => 'guest',
+                'mnethostid' => $CFG->mnet_localhost_id));
+            $user->email = $email;
+        }
+        email_to_user($user, $from, $subject, $messagetext, '', $attachmentpath,
+                $attachmentfile);
+    }    
 }
 
 /**

@@ -196,6 +196,9 @@ class core_course_renderer extends plugin_renderer_base {
         if (!$this->page->requires->should_create_one_time_item_now('core_course_modchooser')) {
             return '';
         }
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+        user_preference_allow_ajax_update('pinnedtools', PARAM_RAW);
+        // END UCLA MOD: CCLE-7143.
         $modchooser = new \core_course\output\modchooser($course, $modules);
         return $this->render($modchooser);
     }

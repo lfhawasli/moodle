@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA local plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 /**
  * Modchooser preferences page.
  *
- * @package     local_ucla
- * @copyright   2014 UC Regents
+ * @package     core_course
+ * @copyright   2016 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(dirname(__FILE__)) . '/config.php');
 require_once('classes/modchooser_preferences_form.php');
 
 $returnto = optional_param('returnto', 0, PARAM_ALPHANUM); // Course to return to. 0 means return to user preferences.
@@ -32,7 +32,7 @@ if ($returnto !== 0) {
     $returnurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $returnto));
 }
 
-$url = new moodle_url('/local/ucla/modchooser_preferences.php');
+$url = new moodle_url('/course/modchooser_preferences.php');
 
 require_login();
 $PAGE->set_context(context_user::instance($USER->id));
@@ -42,7 +42,7 @@ $PAGE->set_pagelayout('standard');
 $args = array(
     'returnto' => $returnto
 );
-$mform = new local_ucla_modchooser_preferences_form(null, $args);
+$mform = new course_modchooser_preferences_form(null, $args);
 $mform->set_data(array('modchoosersetting' => get_user_preferences('modchoosersetting')));
 
 if (!$mform->is_cancelled() && $data = $mform->get_data()) {
@@ -68,7 +68,7 @@ $PAGE->set_title($title);
 $PAGE->set_heading(fullname($USER));
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading("$strmodchooser: $strpreferences", 2);
+echo $OUTPUT->heading($title, 2);
 
 $mform->display();
 

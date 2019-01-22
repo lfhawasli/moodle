@@ -579,6 +579,9 @@ $CFG->forced_plugin_settings['message']['email_provider_mod_forum_digests_permit
 // Site administration > Plugins > Reports > Forum email logs
 $CFG->forced_plugin_settings['report_emaillog']['daysexpire'] = 30;
 
+// Site administration > Plugins > Reports > UCLA stats console
+$CFG->forced_plugin_settings['report_uclastats']['notifylist'] = 'astokes@oid.ucla.edu,nthompson@oid.ucla.edu,rex@oid.ucla.edu';
+
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
 
@@ -596,6 +599,9 @@ $CFG->loginhttps = true;
 $CFG->cookiesecure = true;
 $CFG->allowframembedding = 1;
 $CFG->cookiehttponly = 1;
+
+// Site administration > Security > Site security settings
+$CFG->strictformsrequired = 1;
 
 // Site administration > Appearance > Themes
 $CFG->theme = 'uclashared';
@@ -631,7 +637,7 @@ $CFG->aspellpath = '/usr/bin/aspell';
 $CFG->dbsessions = false;
 
 // Site administration > Server > Performance
-$CFG->extramemorylimit = '1024M';
+$CFG->extramemorylimit = '4096M';
 
 // Site administration > Server > Update notifications
 $CFG->updateautocheck = 0;

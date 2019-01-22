@@ -198,9 +198,14 @@ $string['csvinvalidcols'] = '<b>Invalid CSV file:</b> First line must include "H
 $string['csvinvalidcolsnum'] = 'Invalid CSV file - each line must include 49 or 70 fields';
 $string['csvloaderror'] = 'An error occurred while loading the CSV file: {$a}';
 $string['csvweirdcolumns'] = 'Invalid CSV file format - number of columns is not constant!';
-$string['dbconnectionfailed'] = '<p>Error: Database connection failed</p>
-<p>It is possible that the database is overloaded or otherwise not running properly.</p>
-<p>The site administrator should also check that the database details have been correctly specified in config.php</p>';
+// START UCLA MOD: CCLE-8079 - Better error message when webserver is overloaded.
+//$string['dbconnectionfailed'] = '<p>Error: Database connection failed</p>
+//<p>It is possible that the database is overloaded or otherwise not running properly.</p>
+//<p>The site administrator should also check that the database details have been correctly specified in config.php</p>';
+$string['dbconnectionfailed'] = '<p>The server was unable to complete your request.</p>
+<p>This may be a temporary problem. Please see our <a href="https://docs.ccle.ucla.edu/w/Status">CCLE Status page</a> for more information if this is a persistent issue.</p>
+<p>Please try again later, we apologize for the inconvenience.</p>';
+// END UCLA MOD: CCLE-8079.
 $string['dbdriverproblem'] = '<p>Error: database driver problem detected</p>
 <p>The site administrator should verify server configuration</p><p>{$a}</p>';
 $string['dbsessionbroken'] = 'Serious database session problem detected.<br /><br />Please notify server administrator.';

@@ -5058,6 +5058,14 @@ class settings_navigation extends navigation_node {
             }
         }
 
+        // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+        // Modchooser.
+        if ($currentuser) {
+            $modchoosersetting = $usersetting->add(get_string('editinga', 'moodle', 'options'), null, navigation_node::TYPE_CONTAINER);
+            $url = new moodle_url('/course/modchooser_preferences.php');
+            $modchoosersetting->add(get_string('modchooser'), $url, self::TYPE_SETTING, 'modchooser', 'modchooser');
+        }
+        // END UCLA MOD: CCLE-7143.
         // Let plugins hook into user settings navigation.
         $pluginsfunction = get_plugins_with_function('extend_navigation_user_settings', 'lib.php');
         foreach ($pluginsfunction as $plugintype => $plugins) {

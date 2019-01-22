@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core/chooser
+    @template core/newchooser
 
-    Chooser.
+    New Modchooser.
 
     Example context (json):
     {
@@ -33,7 +33,9 @@
                 "label": "item one",
                 "description": "description one"
             }]
-        }]
+        }],
+        "newmodchooser": "1",
+        "custommodchooserhelp" : "New layout - Same great tools..."
     }
 }}
 <div class="hd choosertitle">
@@ -53,9 +55,11 @@
 
                 <div class="options">
                     <div class="instruction">
-                        {{! START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.}}
-                        {{{instructions}}}
-                        {{! END UCLA MOD: CCLE-7143.}}
+                        {{instructions}}
+                        <div class="modchooserinstruction">
+                            <br>
+                            {{{custommodchooserhelp}}}
+                        </div>
                     </div>
                     <div class="alloptions">
                         {{#sections}}
@@ -64,16 +68,27 @@
                                     <span class="typename">{{label}}</span>
                                 </label>
                             </div>
+                            <div class="nonoption">
+                                <a class="tooltoggle" href="#">{{#str}}setfavoritetools{{/str}}</a>
+                            </div>
                             {{#items}}
-                                {{>core/chooser_item}}
+                                {{> course/modchooser_item }}
                             {{/items}}
                         {{/sections}}
+                        <div class="nonoption">
+                            <a class="tooltoggle" href="#">{{#str}}setfavoritetools{{/str}}</a>
+                        </div>
+                        <div class="nonoption">
+                            <a class="resettools" href="#" hidden="hidden">{{#str}}resetfavoritetools{{/str}}</a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="submitbuttons">
+                    {{! START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.}}
                     <input type="submit" name="submitbutton" class="submitbutton btn btn-primary" value={{#quote}}{{#str}}add{{/str}}{{/quote}}>
                     <input type="submit" name="addcancel" class="addcancel btn btn-secondary" value={{#quote}}{{#str}}cancel{{/str}}{{/quote}}>
+                    {{! END UCLA MOD: CCLE-7143.}}
                 </div>
 
             </form>
