@@ -73,9 +73,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      *
      * @method initializer
      */
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
     initializer: function(config) {
-    // END UCLA MOD: CCLE-7143.
         var sectionclass = M.course.format.get_sectionwrapperclass();
         if (sectionclass) {
             CSS.SECTION = '.' + sectionclass;
@@ -88,6 +86,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         // Initialize existing sections and register for dynamically created sections
         this.setup_for_section();
         M.course.coursebase.register_module(this);
+
         // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
         // Save preferences for pinned tools
         if (config.userpinnedtools) {
@@ -103,7 +102,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         if (config.newmodchooser) {
             this.newmodchooser = config.newmodchooser;
         }
-    // END UCLA MOD: CCLE-7143.
+        // END UCLA MOD: CCLE-7143.
     },
 
     /**
@@ -145,11 +144,22 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @param baseselector The selector to limit scope to
      */
     _setup_for_section: function(section) {
+        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
+        //var chooserspan = section.one(CSS.SECTIONMODCHOOSER);
         var chooserspan = section.all(CSS.SECTIONMODCHOOSER);
+        // END UCLA MOD: CCLE-7487.
         if (!chooserspan) {
             return;
         }
+        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
+        /*var chooserlink = Y.Node.create("<a href='#' />");
+        chooserspan.get('children').each(function(node) {
+            chooserlink.appendChild(node);
+        });
+        chooserspan.insertBefore(chooserlink);
+        chooserlink.on('click', this.display_mod_chooser, this);*/
         chooserspan.on('click', this.display_mod_chooser, this);
+        // END UCLA MOD: CCLE-7487.
     },
     /**
      * Display the module chooser
@@ -169,6 +179,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             // The block site menu has a sectionid of 0
             this.sectionid = 0;
         }
+        
         // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
         // Prevent double click on star from redirecting
         Y.delegate('dblclick', function(e) {
@@ -301,7 +312,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             }, '.resettools');
             this.listenevents.push(thisevent);
         }
-    // END UCLA MOD: CCLE-7143.
+        // END UCLA MOD: CCLE-7143.
     },
 
     /**
@@ -333,7 +344,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         maxheight: {
             value: 800
         }
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
     },
 
     /**
@@ -361,7 +372,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             star.setAttribute('src', M.util.image_url('i/star_empty'));
     // END UCLA MOD: CCLE-7143.
         }
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
     }
     // END UCLA MOD: CCLE-7143.
 });
