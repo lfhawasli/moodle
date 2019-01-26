@@ -57,10 +57,13 @@ class qtype_match_edit_form extends question_edit_form {
      * @param object $mform the form being built.
      */
     protected function definition_inner($mform) {
-        $mform->addElement('advcheckbox', 'shuffleanswers',
-                get_string('shuffle', 'qtype_match'), null, null, array(0, 1));
-        $mform->addHelpButton('shuffleanswers', 'shuffle', 'qtype_match');
+        // START UCLA MOD: CCLE-8034 - Conditionally display shuffle option for individual questions.
+        \local_ucla_core_edit::remove_shuffle_option($mform, 'qtype_match');
+        // $mform->addElement('advcheckbox', 'shuffleanswers',
+        //         get_string('shuffle', 'qtype_match'), null, null, array(0, 1));
+        // $mform->addHelpButton('shuffleanswers', 'shuffle', 'qtype_match');
         $mform->setDefault('shuffleanswers', 1);
+        // END UCLA MOD: CCLE-8034.
 
         $this->add_per_answer_fields($mform, get_string('questionno', 'question', '{no}'), 0);
 
