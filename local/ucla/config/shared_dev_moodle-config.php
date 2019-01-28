@@ -500,7 +500,9 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     insert2 = chemrender, chemistry, computing, equation
     files2 = mediagallery, panoptobutton
     poodll = poodll
-    accessibility = accessibilitychecker, accessibilityhelper';
+    accessibility = accessibilitychecker, accessibilityhelper
+    lti = lti
+';
 $CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor
