@@ -76,7 +76,10 @@ class activity_navigation implements renderable, templatable {
                 'id' => 'prev-activity-link',
                 'title' => $linkname,
             ];
-            $this->prevlink = new \action_link($linkurl, $OUTPUT->larrow() . ' ' . $linkname, null, $attributes);
+            // START UCLA MOD: CCLE-7955 - Move next/previous resource links to bottom of page.
+            // $this->prevlink = new \action_link($linkurl, $OUTPUT->larrow() . ' ' . $linkname, null, $attributes);
+            $this->prevlink = new \action_link($linkurl, $OUTPUT->larrow() . ' ' . shorten_text($linkname), null, $attributes);
+            // END UCLA MOD: CCLE-7955.
         }
 
         // Check if there is a next module to display.
@@ -92,7 +95,10 @@ class activity_navigation implements renderable, templatable {
                 'id' => 'next-activity-link',
                 'title' => $linkname,
             ];
-            $this->nextlink = new \action_link($linkurl, $linkname . ' ' . $OUTPUT->rarrow(), null, $attributes);
+            // START UCLA MOD: CCLE-7955 - Move next/previous resource links to bottom of page.
+            // $this->nextlink = new \action_link($linkurl, $linkname . ' ' . $OUTPUT->rarrow(), null, $attributes);
+            $this->nextlink = new \action_link($linkurl, shorten_text($linkname) . ' ' . $OUTPUT->rarrow(), null, $attributes);
+            // END UCLA MOD: CCLE-7955.
         }
 
         // Render the activity list dropdown menu if available.
