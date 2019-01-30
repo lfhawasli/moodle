@@ -46,10 +46,6 @@ class instructor_handler extends browseby_handler {
      * by local machine.
      **/
     static public function combined_select_sql_helper() {
-        global $CFG;
-
-        ucla_require_db_helper();
-
         $sql = "(
             SELECT
                 us.id       AS userid,
@@ -66,6 +62,9 @@ class instructor_handler extends browseby_handler {
             FROM {user} us
             INNER JOIN {ucla_browseall_instrinfo} ubii
                 ON ubii.uid = us.idnumber
+            WHERE
+                us.suspended = 0
+                AND us.deleted = 0
         )";
 
         return $sql;
@@ -141,8 +140,6 @@ class instructor_handler extends browseby_handler {
         $users = $cache->get('users_' . $cachekey);
 
         if (!$users) {
-            ucla_require_db_helper();
-
             // Show all users form local and browseall tables
             // CCLE-3989 - Supervising Instructor Shown On Course List:
             // Filter out instructors of type '03' (supervising instructor)
@@ -171,7 +168,6 @@ class instructor_handler extends browseby_handler {
                 AND ubi.profcode != '03'
                 ORDER BY ubi.lastname, ubi.firstname
             ";
-
             $users = $this->get_records_sql($sql, $params);
 
             // Cache instructors.
