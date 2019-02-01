@@ -664,6 +664,7 @@ function local_cm_convert_and_get_new_text($modulename, $cmid, $contextid, $user
         mtrace('Successfully replaced ' . $numconverted . '/' . count($filenames)
                 . " embedded $filearea files with Kaltura videos for cm instance "
                 . $cmid);
+        rebuild_course_cache($courseandmodinfo[0]->id, true);
         return $newtext;
     }
     return null;
