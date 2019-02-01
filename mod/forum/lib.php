@@ -856,31 +856,38 @@ function forum_cron() {
                 $courseinfos = ucla_get_course_info($course->id);
                 $displayinfo = array();
                 $limitcrosslistemail = get_config('local_ucla', 'limitcrosslistemail');
-
                 // Store substring of course shortname with term and non-digits/alphas removed.
                 $coursename = $shortname;
+                $crosslisted = (count($courseinfos) > 1) ? 1 : 0;
                 if (($pos = strpos($shortname, '-')) !== false) {
                     $coursename = substr($shortname, $pos + 1);
                     $coursename = preg_replace('/[^A-Za-z0-9]/', '', $coursename);
-                }
 
+                    $shortnamelist = explode('-', $shortname);
+                    $shortnametrimmed = $shortnamelist[0] . '-' . $shortnamelist[1];
+                    $coursenametrimmed = $shortnamelist[1];
+                }
                 foreach ($courseinfos as $key => $courseinfo) {
                     if (count($displayinfo) >= $limitcrosslistemail) {
                         $displayinfo[$key] = '...';
                         break;
                     }
 
-                    $course_text = $courseinfo->subj_area . $courseinfo->coursenum . '-' .
-                            $courseinfo->sectnum;
+                    $course_text = $courseinfo->subj_area . ' ' . $courseinfo->coursenum;
+                    if ($crosslisted) {
+                        $shortname = $shortnametrimmed;
+                    }
 
                     // Prevent duplicate listing of the course shortnames.
-                    if (preg_replace('/[^A-Za-z0-9]/', '', $course_text) !== $coursename) {
+                    if (preg_replace('/[^A-Za-z0-9]/', '', $course_text) !== $coursenametrimmed) {
+                        if (!$crosslisted) {
+                            $course_text = $course_text . '-' . $courseinfo->sectnum;
+                        }
                         $displayinfo[$key] = $course_text;
                     }
                 }
 
                 $regcoursetext = implode(' / ', $displayinfo);
-
                 if ($regcoursetext == "") {
                     $postsubject = html_to_text("$shortname: ".format_string($post->subject, true));
                 } else {
