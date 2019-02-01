@@ -523,6 +523,29 @@ class format_ucla extends format_topics {
     }
 
     /**
+     * Loads all of the course sections into the navigation
+     *
+     * Overriding parent format_topics implementation because it was removing
+     * Site info (aka General section, aka Topic 0) if it was empty.
+     *
+     * @param global_navigation $navigation
+     * @param navigation_node $node The course node within the navigation
+     */
+    public function extend_course_navigation($navigation, navigation_node $node) {
+        global $PAGE;
+        // If section is specified in course/view.php, make sure it is expanded in navigation.
+        if ($navigation->includesectionnum === false) {
+            $selectedsection = optional_param('section', null, PARAM_INT);
+            if ($selectedsection !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
+                    $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+                $navigation->includesectionnum = $selectedsection;
+            }
+        }
+
+        return format_base::extend_course_navigation($navigation, $node);
+    }
+
+    /**
      * SSC-1205 - Landing Page by Dates.
      *
      * Check whether or not a given course has the appropriate set landingpage,
