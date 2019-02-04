@@ -65,6 +65,7 @@ function theme_uclashared_get_fontawesome_icon_map() {
          'core:e/styleprops' => 'fa-paragraph',
          'core:e/text_highlight_picker' => 'fa-tint',
          'core:e/text_highlight' => 'fa-tint',
+         'core:e/insert_edit_video' => 'fa fa-film',
          'atto_chemistry:icon' => 'fa-flask',
          'atto_computing:icon' => 'fa-desktop',
          'atto_bsgrid:ed/iconone' => 'fa-columns',

@@ -185,16 +185,16 @@
     // START UCLA MOD: CCLE-7813 - Reimplement forum sorting options.
     switch ($mode) {
         case DISCUSSION_MODE_NAME_ASC:
-            $sort = 'd.name ASC';
+            $sort = 'p.subject ASC';
             break;
         case DISCUSSION_MODE_NAME_DESC:
-            $sort = 'd.name DESC';
+            $sort = 'p.subject DESC';
             break;
         case DISCUSSION_MODE_FIRSTPOST_ASC: 
-            $sort = 'd.firstpost ASC';
+            $sort = 'u.lastname ASC';
             break;
         case DISCUSSION_MODE_FIRSTPOST_DESC: 
-            $sort = 'd.firstpost DESC';
+            $sort = 'u.lastname DESC';
             break;
         case DISCUSSION_MODE_GROUP_ASC: 
             $sort = 'd.groupid ASC';
@@ -215,10 +215,10 @@
             $sort = 'unread DESC';
             break;
         case DISCUSSION_MODE_LASTPOST_ASC:
-            $sort = 'd.timemodified ASC';
+            $sort = 'p.modified ASC';
             break;
         case DISCUSSION_MODE_LASTPOST_DESC:
-            $sort = 'd.timemodified DESC';
+            $sort = 'p.modified DESC';
             break;
         default:
             $sort = '';

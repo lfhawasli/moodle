@@ -62,10 +62,10 @@ class local_ucla_import_course_search extends import_course_search {
                       LEFT JOIN {user} usr ON usr.id = ra.userid ";
 
 
-        $where   = "      WHERE (r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor')
+        $where   = "      WHERE ((r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor')
                             AND (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). "
                              OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). "
-                             OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). "
+                             OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). ")
                              OR ".$DB->sql_like('c.fullname', ':fullnamesearch', false)."
                              OR ".$DB->sql_like('c.shortname', ':shortnamesearch', false).")
                             AND c.id <> :siteid";

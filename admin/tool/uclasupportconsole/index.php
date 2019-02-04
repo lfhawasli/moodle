@@ -1563,6 +1563,66 @@ if ($displayforms) {
 $consoles->push_console_html('srdb', $title, $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
+$title = "officehoursreport";
+$sectionhtml = '';
+
+if ($displayforms) {
+    $officehoursselectors = get_term_selector($title);
+    $officehoursselectors .= get_subject_area_selector($title);
+    $sectionhtml .= supportconsole_simple_form($title, $officehoursselectors);
+} else if ($consolecommand == "$title") {
+    $selectedterm = required_param('term', PARAM_ALPHANUM);
+    $selectedsubj = required_param('subjarea', PARAM_NOTAGS);
+
+    // We use a dummy row as the first column since get_records_sql will replace
+    // duplicate results with the same values in the first column.
+    $sql = "SELECT (@cnt := @cnt + 1) AS rownumber, c.id AS courseid, c.shortname AS course,
+                   u.lastname AS instlastname, u.firstname AS instfirstname, r.name AS role,
+                   oh.officelocation AS officelocation, oh.officehours AS officehours
+              FROM {ucla_request_classes} req
+              JOIN {ucla_reg_classinfo} reg ON reg.term = req.term AND reg.srs = req.srs,
+                   ({role_assignments} ra
+                    JOIN {user} u ON u.id = ra.userid
+                    JOIN {role} r ON r.id = ra.roleid
+                    JOIN {context} ctx ON ctx.id = ra.contextid
+                    JOIN {course} c ON c.id = ctx.instanceid
+                    JOIN {ucla_officehours} oh ON oh.courseid = c.id AND oh.userid = u.id)
+        CROSS JOIN (SELECT @cnt := 0) AS dummy
+             WHERE req.term = :term
+                   AND req.department = :department
+                   AND req.courseid = c.id
+                   AND req.hostcourse = 1
+                   AND c.visible = 1
+                   AND (r.shortname = 'editinginstructor'
+                        OR r.shortname = 'ta'
+                        OR r.shortname = 'ta_admin'
+                        OR r.shortname = 'ta_instructor'
+                        OR r.shortname = 'studentfacilitator')
+                   AND (oh.officelocation != '' OR oh.officehours != '')
+          ORDER BY reg.term, reg.subj_area, reg.crsidx, reg.classidx, r.name, u.lastname";
+    $params = array();
+    $params['term'] = $selectedterm;
+    $params['department'] = $selectedsubj;
+    $result = $DB->get_records_sql($sql, $params);
+
+    $output = null;
+    foreach ($result as $k => $course) {
+        if (isset($course->courseid)) {
+            $course->courselink = html_writer::link(new moodle_url(
+                    '/course/view.php', array('id' => $course->courseid)), $course->course);
+            $output[$k] = (object) array('courselink' => $course->courselink, 'role' => $course->role,
+                    'instlastname' => $course->instlastname, 'instfirstname' => $course->instfirstname,
+                    'officelocation' => $course->officelocation, 'officehours' => $course->officehours);
+        }
+    }
+
+    $sectionhtml .= supportconsole_render_section_shortcut($title, $output,
+            array('term' => $selectedterm, 'subjarea' => $selectedsubj));
+}
+
+$consoles->push_console_html('srdb', $title, $sectionhtml);
+
+////////////////////////////////////////////////////////////////////
 $title = "assignmentquizzesduesoon";
 $sectionhtml = '';
 

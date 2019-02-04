@@ -272,6 +272,9 @@ $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 // Site administration > Plugins > Activity modules > Assignment > Submission plugins > Online PoodLL submissions
 $CFG->forced_plugin_settings['assignsubmission_onlinepoodll']['allowedrecorders'] = '0,2,3,4';    // Allow only MP3 voice recorder, Video recorder, Whiteboard, and Snapshot.
 
+//  Site administration > Plugins > Text editors > Atto HTML editor > PoodLL Anywhere(Atto)
+$CFG->forced_plugin_settings['atto_poodll']['recorderstoshow'] = 'show_audiomp3,show_video,show_whiteboard,show_snapshot';    // Display only MP3 voice recorder, Video recorder, Whiteboard, and Snapshot.
+
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
 
@@ -492,7 +495,9 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     insert2 = chemrender, chemistry, computing, equation
     files2 = mediagallery, panoptobutton
     poodll = poodll
-    accessibility = accessibilitychecker, accessibilityhelper';
+    accessibility = accessibilitychecker, accessibilityhelper
+    lti = lti
+';
 $CFG->forced_plugin_settings['editor_atto']['autosavefrequency'] = 30;
 
 // CCLE-4849 - Number of groups displayed on first row of Atto HTML Editor

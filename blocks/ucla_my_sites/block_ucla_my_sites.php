@@ -92,7 +92,19 @@ class block_ucla_my_sites extends block_base {
 
             // In order to translate values returned by get_moodlerole.
             $allroles = get_all_roles();
+            $processedcourses = array();
             foreach ($remotecourses as $remotecourse) {
+                // Ignore sub-sections by only taking term, subject area, and
+                // the first 3 digits of section number.
+                $key = implode('-', [$remotecourse['term_int'], $remotecourse['subj_area'],
+                    $remotecourse['catlg_no'], substr($remotecourse['sect_no'], 0, 3)]);
+                if (!in_array($key, $processedcourses)) {
+                    $processedcourses[] = $key;
+                } else {
+                    // Assumption: The main class section is before the subsection.
+                    continue;   // Already processed main course.
+                }
+
                 // Do not use this object after this, this is because
                 // browseby_handler::ignore_course uses an object.
                 $objrc = (object) $remotecourse;
