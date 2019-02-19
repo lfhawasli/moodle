@@ -251,7 +251,7 @@ class invitation_form extends moodleform {
      * @return array            Returns array of roles indexed by role type.
      */
     private function get_appropiate_roles($course) {
-        $roles = uclaroles_manager::get_assignable_roles_by_courseid($course);
+        $roles = uclaroles_manager::get_assignable_roles_by_sitetype($course);
         // Sort roles into type.
         return uclaroles_manager::orderby_role_type($roles);
     }

@@ -163,14 +163,7 @@ class user_roles_editable extends \core\output\inplace_editable {
 
         // Check that all the groups belong to the course.
         $allroles = role_fix_names(get_all_roles($context), $context);
-        // START UCLA MOD: CCLE-7215 - Limit roles that can be assigned to existing users.
-        // $assignableroles = get_assignable_roles($context, ROLENAME_ALIAS, false);
-        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
-        $untrimmedroles = \uclaroles_manager::get_assignable_roles_by_courseid($course);
-        foreach ($untrimmedroles as $role) {
-            $assignableroles[$role->id] = $role->name;
-        }
-        // END UCLA MOD: CCLE-7215.
+        $assignableroles = get_assignable_roles($context, ROLENAME_ALIAS, false);
         $userrolesbyid = get_user_roles($context, $userid, true, 'c.contextlevel DESC, r.sortorder ASC');
         $profileroles = get_profile_roles($context);
 

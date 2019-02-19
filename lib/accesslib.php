@@ -2964,6 +2964,18 @@ function get_assignable_roles(context $context, $rolenamedisplay = ROLENAME_ALIA
           ORDER BY r.sortorder ASC";
     $roles = $DB->get_records_sql($sql, $params);
 
+    // Filter out roles that are not applicable to site type if on course context.
+    if (!is_siteadmin($userid) && $coursecontext) {
+        global $CFG;
+        require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
+        $sitetyperoles = uclaroles_manager::get_assignable_roles_by_sitetype($coursecontext, true);
+        foreach ($roles as $roleid => $role) {
+            if (!array_key_exists($roleid, $sitetyperoles)) {
+                unset($roles[$roleid]);
+            }
+        }
+    }
+
     $rolenames = role_fix_names($roles, $coursecontext, $rolenamedisplay, true);
 
     if (!$withusercounts) {
