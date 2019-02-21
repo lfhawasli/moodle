@@ -457,6 +457,18 @@ abstract class quiz_attempts_report_table extends table_sql {
                 break;
         }
 
+        // START UCLA MOD: CCLE-8080 - Non-enrolled students appear in quiz.
+        $hidesuspended = optional_param('hidesuspended', 0, PARAM_BOOL);
+        if ($hidesuspended) {
+            $susers = get_suspended_userids($this->context);
+            if (!empty($susers)) {
+                list($susql, $suparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_NAMED, 'su', false); // not in ()...
+                $where .= " AND u.id $susql";
+                $params = array_merge($params, $suparams);
+            }
+        }
+        // END UCLA MOD: CCLE-8080.
+
         if ($this->options->states) {
             list($statesql, $stateparams) = $DB->get_in_or_equal($this->options->states,
                     SQL_PARAMS_NAMED, 'state');
