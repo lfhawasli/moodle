@@ -17,7 +17,7 @@ Background:
        | teacher1 | C1 | editingteacher |
    When I log in as "teacher1"
    And I am on "Course 1" course homepage
-   Then I should see "A syllabus has not been added to your site, would you like to add one now?" in the ".ucla-format-notice-box" "css_element"
+   Then I should see "A syllabus has not been added to your site, would you like to add one now?" in the ".alert" "css_element"
 
 Scenario: "Yes"
     When I press "Yes"
@@ -41,4 +41,4 @@ Scenario: Make sure alert only shows up for current term and future terms
     Given it is "Fall 2013" term "4th" week
     When I reload the page
     # If in Fall, but course is in Winter, course is in the future.
-    Then I should see "A syllabus has not been added to your site, would you like to add one now?" in the ".ucla-format-notice-box" "css_element"
+    Then I should see "A syllabus has not been added to your site, would you like to add one now?" in the ".alert" "css_element"

@@ -174,6 +174,9 @@ $CFG->forced_plugin_settings['local_ucla']['admin_email'] = 'ccle-operations@lis
 // CCLE-5959 - Disable Web Installations of Plugins.
 $CFG->disableupdateautodeploy = 1;
 
+// Site administration > Location  > Location settings
+$CFG->timezone = 'America/Los_Angeles'; // Needed for flatpickr to work.
+
 // Site administration > Users > Accounts > User default preferences
 $CFG->defaultpreference_autosubscribe = 0;
 $CFG->defaultpreference_trackforums = 1;
@@ -425,7 +428,8 @@ $CFG->behat_extraallowedsettings = array(
     'debug',
     'debugdisplay',
     'customscripts',
-    'custommenuitems'
+    'custommenuitems',
+    'timezone'
 );
 
 // If you want to have un-revisioned configuration data, place in config_private

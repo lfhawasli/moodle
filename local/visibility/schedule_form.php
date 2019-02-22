@@ -136,13 +136,15 @@ class schedule_form extends moodleform {
         $mform->addElement('html', '<br>');
 
         // Draw the table.
-        $mform->addElement('static', 'hiddenfromtabletitle', get_string('scheduletableheader', 'local_visibility'), null);
-        $mform->addElement('html', html_writer::table($table) . '<br>');
-        $mform->registerNoSubmitButton($deletebuttonname);
+        if (!empty($this->visibilityschedule)) {
+            $mform->addElement('static', 'hiddenfromtabletitle', get_string('scheduletableheader', 'local_visibility'), null);
+            $mform->addElement('html', html_writer::table($table) . '<br>');
+            $mform->registerNoSubmitButton($deletebuttonname);
 
-        // Define a delete all button, which deletes the sessions using ajax.
-        $mform->addElement('button', 'rangedeleteallbutton', get_string("deleteall"),
-                array('data-course' => $this->course->id));
+            // Define a delete all button, which deletes the sessions using ajax.
+            $mform->addElement('button', 'rangedeleteallbutton', get_string("deleteall"),
+                    array('data-course' => $this->course->id));
+        }
     }
 
     /**
@@ -171,7 +173,7 @@ class schedule_form extends moodleform {
         if (empty($data['hidefrom'])) {
             $errors['hidefrom'] = get_string('hideemptyerror', 'local_visibility');
         }
-        if (empty($data['hidefrom'])) {
+        if (empty($data['hideuntil'])) {
             $errors['hideuntil'] = get_string('hideemptyerror', 'local_visibility');
         }
         if (empty($data['hidefrom']) || empty($data['hidefrom'])) {

@@ -75,4 +75,23 @@ class behat_ucla_syllabus extends behat_base {
 
         }
     }
+
+    /**
+     * Step directly view syllabus. Useful for when a course is hidden and
+     * students don't have link to course from their My sites.
+     *
+     * @When /^I view syllabus for "([^"]*)"$/
+     */
+    public function i_view_syllabus($fullname) {
+        print_object($fullname);
+        global $DB;
+        // Try to find course fullname.
+        $course = $DB->get_record('course', array('fullname' => $fullname));
+        if (empty($course)) {
+            throw new ExpectationException('Course not found for fullname ' . $fullname,
+                    $this->getSession());
+        }
+        $url = new moodle_url('/local/ucla_syllabus/index.php', array('id' => $course->id));
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url()));
+    }
 }
