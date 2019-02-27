@@ -143,10 +143,12 @@ if ($course->groupmode != NOGROUPS) {
 }
 
 // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
-$groupingid   = optional_param('grouping', $course->defaultgroupingid, PARAM_INT);
+$groupingid = 0;
+$paramgroupingid   = optional_param('grouping', $course->defaultgroupingid, PARAM_INT);
 // Display default grouping if set.
-if (!$filterwassubmitted && !empty($groupingid)) {
-    $filtersapplied[] = USER_FILTER_GROUPING . ':' . $groupingid;
+if (!$filterwassubmitted && !empty($paramgroupingid)) {
+    $filtersapplied[] = USER_FILTER_GROUPING . ':' . $paramgroupingid;
+    $groupingid = $paramgroupingid;
 }
 // END UCLA MOD: CCLE-5686.
 
