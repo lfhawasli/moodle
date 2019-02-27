@@ -2018,6 +2018,9 @@ $string['summaryof'] = 'Summary of {$a}';
 $string['supplyinfo'] = 'More details';
 $string['suspended'] = 'Suspended';
 $string['suspendedusers'] = 'Suspended users';
+// START UCLA MOD: CCLE-8080 - Non-enrolled students appear in quiz.
+$string['suspendedexclude'] = 'Exclude suspended users';
+// END UCLA MOD: CCLE-8080.
 $string['switchdevicedefault'] = 'Switch to the standard theme';
 $string['switchdevicerecommended'] = 'Switch to the recommended theme for your device';
 $string['switchrolereturn'] = 'Return to my normal role';

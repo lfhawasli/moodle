@@ -102,6 +102,10 @@ abstract class mod_quiz_attempts_report_form extends moodleform {
     protected function standard_preference_fields(MoodleQuickForm $mform) {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
+        // START UCLA MOD: CCLE-8080 - Non-enrolled students appear in quiz.
+        $mform->addElement('checkbox', 'hidesuspended', get_string('suspendedexclude'));
+        $mform->setDefault('hidesuspended', 1);
+        // END UCLA MOD: CCLE-8080.
     }
 
     protected function other_preference_fields(MoodleQuickForm $mform) {
