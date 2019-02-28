@@ -15,18 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Public/Private scheduled tasks.
  *
  * @package    local_publicprivate
  * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_publicprivate\task;
 defined('MOODLE_INTERNAL') || die();
 
-// Version         YYYYMMDDVV.
-$plugin->version = 2019022800;
-$plugin->requires   = 2014051200;   // Requires Moodle 2.7 or later.
-$plugin->component = 'local_publicprivate';
-$plugin->cron = 0;  // Cron is moved to scheduled task.
+$tasks = array(
+    array(
+        // Run once a day at midnight.
+        'classname' => 'local_publicprivate\task\cleanup',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);
