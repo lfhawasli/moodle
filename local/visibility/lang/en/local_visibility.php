@@ -53,9 +53,14 @@ $string['visibilitylink'] = 'Click here to modify the course visibility schedule
 $string['hideoption'] = 'Hidden from students';
 $string['showoption'] = 'Visible to students';
 $string['save'] = 'Save';
+$string['errordeleteschedule'] = 'Could not find scheduled entry to delete';
+$string['successaddedschedule'] = 'Successfully added scheduled course visiblity';
+$string['successcoursehidden'] = 'Course is now hidden from students';
+$string['successcourseunhidden'] = 'Course is now visible to students';
+$string['successdeleteallschedule'] = 'Successfully deleted all scheduled sessions';
+$string['successdeleteschedule'] = 'Successfully deleted schedule';
+$string['successmergeschedule'] = 'Successfully merged scheduled course visiblity';
 $string['coursehidden'] = 'This course is temporarily unavailable to students. It will become available again on <b>{$a->hideuntil}</b>. {$a->title}';
-$string['deleteerror'] = 'Error deleting selected range.';
-$string['deleteallerror'] = 'Error deleting all ranges.';
 $string['deleteall'] = 'Delete all';
 // Logging event handler.
 $string['eventcoursevisibilityhide'] = 'Course visibility - hidden';

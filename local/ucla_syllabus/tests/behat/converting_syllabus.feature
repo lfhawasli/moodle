@@ -29,7 +29,7 @@ Background:
     And I press "Save changes"
     Then I should see "Successfully added syllabus" in the "region-main" "region"
     When I follow "Site info"
-    Then I should see "Test Syllabus" in the "region-pre" "region"
+    Then I should see "Test Syllabus" in the "nav-drawer" "region"
     When I follow "Test Syllabus"
     Then I should see "Syllabus manager" in the "region-main" "region"
     # Convert syllabus from public to private

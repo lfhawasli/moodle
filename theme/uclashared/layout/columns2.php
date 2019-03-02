@@ -39,6 +39,13 @@ $extraclasses = [];
 $hidenavigation = false;
 $hidehamburgericon = false;
 
+// If nav drawer has no nodes, then hide it.
+if (in_array($PAGE->pagelayout, array('course', 'incourse')) && $PAGE->flatnav->count() <= 1) {
+    // Will always have Home node, but we hide that from displaying.
+    $navdraweropen = false;
+    $hidenavigation = true;
+}
+
 if (!method_exists($OUTPUT, 'region_main_settings_menu')) {
     echo $OUTPUT->doctype();
     $OUTPUT = $PAGE->get_renderer('theme_uclasharedcourse', 'core');
