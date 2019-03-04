@@ -102,8 +102,6 @@ class backup_restore_testcase extends advanced_testcase {
         $this->gen = $this->getDataGenerator();
         $creqarr = $this->gen->get_plugin_generator('local_ucla')->create_class(array(array()));
         $this->restoreclass = reset($creqarr);
-
-        $this->setAdminUser();
     }
 
     /**

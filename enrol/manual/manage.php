@@ -53,21 +53,7 @@ if (!$canenrol or !$canunenrol) {
 if ($roleid < 0) {
     $roleid = $instance->roleid;
 }
-// START UCLA MOD: CCLE-6009 - Make manual enrollment options match role restrictions for Site type.
-/*
 $roles = get_assignable_roles($context);
-*/
-if (is_siteadmin()) {
-    $roles = get_assignable_roles($context);
-} else {
-    require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/uclaroles/lib.php');
-    $untrimmedroles = uclaroles_manager::get_assignable_roles_by_courseid($course, true);
-    foreach($untrimmedroles as $role) {
-        $roles[$role->id] = $role->name;
-    }
-}
-// END UCLA MOD: CCLE-6009.
-
 $roles = array('0'=>get_string('none')) + $roles;
 
 if (!isset($roles[$roleid])) {

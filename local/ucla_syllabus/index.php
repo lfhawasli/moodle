@@ -42,6 +42,12 @@ $canmanagesyllabus = $syllabusmanager->can_manage();
 // See if user wants to do an action for a given syllabus type.
 $action = optional_param('action', null, PARAM_ALPHA);
 $type = optional_param('type', null, PARAM_ALPHA);
+$edit = optional_param('edit', -1, PARAM_BOOL);
+
+// See if user is turning editing on.
+if ($canmanagesyllabus && $edit == 1 && confirm_sesskey()) {
+    $USER->editing = 1;
+}
 
 // Set up page.
 $PAGE->set_course($course);
@@ -92,7 +98,7 @@ if ($canmanagesyllabus) {
             '',
             array('class' => 'syllabus_form'));
 
-    // If the cancel button is clicked, return to non-editing mode of syllabus page.
+    // If the cancel button is clicked, return to editing mode of syllabus page.
     if ($syllabusform->is_cancelled()) {
         $url = new moodle_url('/local/ucla_syllabus/index.php',
                 array('id' => $course->id,
@@ -258,8 +264,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
 
     $syllabustodisplay = null;
     if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]) &&
-            $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view() &&
-            $course->visible) {
+            $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view()) {
         // See if logged in user can view private syllabus.
         // Only show private syllabus if course is visible.
         $syllabustodisplay = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE];

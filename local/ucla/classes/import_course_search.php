@@ -55,22 +55,19 @@ class local_ucla_import_course_search extends import_course_search {
             'teacherfullnamesearch' => '%'.$this->get_search().'%',
             'siteid' => SITEID
         );
-        $select = "      SELECT DISTINCT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder, usr.lastname, usr.firstname, GROUP_CONCAT(CONCAT(usr.lastname, ', ', usr.firstname) SEPARATOR '\n') AS professors";
-        $from     = "      FROM {course} c ";
-        $join     = " LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id
-                      LEFT JOIN {role} r ON r.id = ra.roleid
-                      LEFT JOIN {user} usr ON usr.id = ra.userid ";
-
-
-        $where   = "      WHERE ((r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor')
-                            AND (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). "
-                             OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). "
-                             OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). ")
-                             OR ".$DB->sql_like('c.fullname', ':fullnamesearch', false)."
-                             OR ".$DB->sql_like('c.shortname', ':shortnamesearch', false).")
-                            AND c.id <> :siteid";
-        $groupby  = "  GROUP BY c.id";
-        $orderby  = "  ORDER BY c.sortorder";
+        $select = "     SELECT DISTINCT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder, usr.lastname, usr.firstname, GROUP_CONCAT(CONCAT(usr.lastname, ', ', usr.firstname) SEPARATOR '\n') AS professors";
+        $from   = "       FROM {course} c ";
+        $join   = "  LEFT JOIN {role} r ON (r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor')
+                     LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id AND r.id = ra.roleid
+                     LEFT JOIN {user} usr ON usr.id = ra.userid";
+        $where  = "      WHERE (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). "
+                               OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). "
+                               OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). "
+                               OR ".$DB->sql_like('c.fullname', ':fullnamesearch', false)."
+                               OR ".$DB->sql_like('c.shortname', ':shortnamesearch', false).")
+                               AND c.id <> :siteid";
+        $groupby  = " GROUP BY c.id";
+        $orderby  = " ORDER BY c.sortorder";
         if ($this->currentcourseid !== null && !$this->includecurrentcourse) {
             $where .= " AND c.id <> :currentcourseid";
             $params['currentcourseid'] = $this->currentcourseid;

@@ -1715,7 +1715,30 @@ function quiz_print_overview($courses, &$htmlarray) {
  */
 function quiz_num_attempt_summary($quiz, $cm, $returnzero = false, $currentgroup = 0) {
     global $DB, $USER;
-    $numattempts = $DB->count_records('quiz_attempts', array('quiz'=> $quiz->id, 'preview'=>0));
+    // START UCLA MOD: CCLE-8080 - Non-enrolled students appear in quiz.
+    //$numattempts = $DB->count_records('quiz_attempts', array('quiz'=> $quiz->id, 'preview'=>0));
+    $hidesuspended = optional_param('hidesuspended', 0, PARAM_BOOL);
+    if ($hidesuspended) {
+        $context = context_course::instance($cm->course);
+        $susers = get_suspended_userids($context);
+    }
+    if ($hidesuspended && !empty($susers)) {
+        list($enrolledsql, $enrolledparams) = $DB->get_in_or_equal($susers, SQL_PARAMS_QM, null, false); // not in ()...
+        $enrolledsql = ' qa.userid ' . $enrolledsql;
+        $enrolledsqland = ' AND ' . $enrolledsql;
+        $enrolledparams[] = $quiz->id;
+        $sql = "SELECT COUNT(qa.id)
+                FROM {quiz_attempts} qa
+                WHERE $enrolledsql AND quiz = ? AND preview = 0
+                ";
+        $numattempts = $DB->count_records_sql($sql, $enrolledparams);
+    } else {
+        $enrolledparams = array();
+        $enrolledsql = '';
+        $enrolledsqland = '';
+        $numattempts = $DB->count_records('quiz_attempts', array('quiz' => $quiz->id, 'preview' => 0));
+    }
+    // END UCLA MOD: CCLE-8080.
     if ($numattempts || $returnzero) {
         if (groups_get_activity_groupmode($cm)) {
             $a = new stdClass();
@@ -1724,8 +1747,12 @@ function quiz_num_attempt_summary($quiz, $cm, $returnzero = false, $currentgroup
                 $a->group = $DB->count_records_sql('SELECT COUNT(DISTINCT qa.id) FROM ' .
                         '{quiz_attempts} qa JOIN ' .
                         '{groups_members} gm ON qa.userid = gm.userid ' .
-                        'WHERE quiz = ? AND preview = 0 AND groupid = ?',
-                        array($quiz->id, $currentgroup));
+                // START UCLA MOD: CCLE-8080 - Non-enrolled students appear in quiz.
+//                        'WHERE quiz = ? AND preview = 0 AND groupid = ?',
+//                        array($quiz->id, $currentgroup));
+                        'WHERE quiz = ? AND preview = 0 AND groupid = ?' . $enrolledsqland,
+                        array_merge(array($quiz->id, $currentgroup), $enrolledparams));
+                // END UCLA MOD: CCLE-8080.
                 return get_string('attemptsnumthisgroup', 'quiz', $a);
             } else if ($groups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid)) {
                 list($usql, $params) = $DB->get_in_or_equal(array_keys($groups));
@@ -1733,7 +1760,10 @@ function quiz_num_attempt_summary($quiz, $cm, $returnzero = false, $currentgroup
                         '{quiz_attempts} qa JOIN ' .
                         '{groups_members} gm ON qa.userid = gm.userid ' .
                         'WHERE quiz = ? AND preview = 0 AND ' .
-                        "groupid $usql", array_merge(array($quiz->id), $params));
+                // START UCLA MOD: CCLE-8080 - Non-enrolled students appear in quiz.
+//                        "groupid $usql", array_merge(array($quiz->id), $params));
+                        "groupid $usql $enrolledsqland", array_merge(array($quiz->id), $params, $enrolledparams));
+                // END UCLA MOD: CCLE-8080.
                 return get_string('attemptsnumyourgroups', 'quiz', $a);
             }
         }

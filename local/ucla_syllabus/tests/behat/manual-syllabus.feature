@@ -20,7 +20,7 @@ Background:
     And I turn editing mode on
 
 @javascript
-Scenario: Converting files/URLs called "Syllabus"
+Scenario: Converting file called "Syllabus"
     When I follow the "Show all" section in the ucla site menu
     And I add a "File" to section "1"
     And I set the following fields to these values:
@@ -51,7 +51,7 @@ Scenario: Converting files/URLs called "Syllabus"
     Then I should see "Converted manual syllabus"
 
 @javascript
-Scenario: Converting files/URLs called "Syllabus"
+Scenario: Converting URL called "Syllabus"
     When I follow the "Show all" section in the ucla site menu
     And I add a "URL" to section "1"
     And I set the following fields to these values:
@@ -77,19 +77,3 @@ Scenario: Converting files/URLs called "Syllabus"
         | Select a user | 1, Teacher |
     And I press "Get these logs"
     Then I should see "Converted manual syllabus"
-
-@javascript
-Scenario Outline: Adding file/URL when syllabus already exists
-    Given I add a new public syllabus
-    When I follow the "Show all" section in the ucla site menu
-    And I add a "<resourcename>" to section "1"
-    And I set the following fields to these values:
-        | Name | Syllabus |
-        | Description | Syllabus test |
-    And <secondarystep>
-    And I press "Save and return to course"
-    Then I should not see "We found a <resource> that might be a syllabus called \"Syllabus\". Would you like to make this your official syllabus?"
-    Examples:
-        | resource | resourcename | secondarystep |
-        | resource | File         | I upload "lib/tests/fixtures/empty.txt" file to "Select files" filemanager |
-        | url      | URL          | I set the field "External URL" to "https://www.google.com" |

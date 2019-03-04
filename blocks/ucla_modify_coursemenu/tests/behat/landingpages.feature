@@ -25,7 +25,8 @@ Feature: Setting a landing page
     And I turn editing mode on
     And I follow "Modify sections"
     And I wait "2" seconds
-    And I set the field "landing-page-syllabus" to "1"
+    # Syllabus landing page is "-3".
+    And I set the field "landing-page--3" to "1"
     And I press "Save changes"
     And I should see "Success!"
     And I log out
