@@ -2964,6 +2964,7 @@ function get_assignable_roles(context $context, $rolenamedisplay = ROLENAME_ALIA
           ORDER BY r.sortorder ASC";
     $roles = $DB->get_records_sql($sql, $params);
 
+    // START UCLA MOD: CCLE-8063 - Match assignable roles for existing users to manual enrollment role options.
     // Filter out roles that are not applicable to site type if on course context.
     if (!is_siteadmin($userid) && $coursecontext) {
         global $CFG;
@@ -2975,6 +2976,7 @@ function get_assignable_roles(context $context, $rolenamedisplay = ROLENAME_ALIA
             }
         }
     }
+    // END UCLA MOD: CCLE-8063.
 
     $rolenames = role_fix_names($roles, $coursecontext, $rolenamedisplay, true);
 
