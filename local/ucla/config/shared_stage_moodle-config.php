@@ -550,7 +550,7 @@ $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a bro
 // Site administration > Plugins > Local plugins > UCLA customizations.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus_test';
-$CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 1; // CCLE-4521 - Handle "preferred name".
+$CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 0; // CCLE-8086 - Remove (Legal name) from being displayed across the site.
 
 // SSC-2050 - Sets limit to number of crosslisted course displayed in forum email header
 $CFG->forced_plugin_settings['local_ucla']['limitcrosslistemail'] = 2;
