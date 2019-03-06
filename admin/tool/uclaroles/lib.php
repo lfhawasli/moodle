@@ -187,8 +187,8 @@ class uclaroles_manager {
             foreach ($all_roles as $role) {
                 $assignable_roles[$site_type][$role->shortname] = $role->name;
             }
-        }            
-        
+        }
+
         // get all context levels
         $allcontextlevels = array(
             CONTEXT_SYSTEM => get_string('coresystem'),
@@ -347,8 +347,9 @@ class uclaroles_manager {
             }
         }
 
-        // Expand the available roles if user has manual enrol capability.
-        if (has_capability('enrol/manual:enrol', $context)) {
+        // Expand the available roles if user has manual enrol capability and is
+        // on participant page.
+        if ($manual && has_capability('enrol/manual:enrol', $context)) {
             $shortnames = array('coursesitemanager');
             switch($sitetype){
                 case siteindicator_manager::SITE_TYPE_SRS_INSTRUCTION:
