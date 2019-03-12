@@ -25,8 +25,7 @@
 define('CLI_SCRIPT', true);
 
 require(__DIR__.'/../../../config.php');
-require($CFG->dirroot . '/local/ucla/lib.php');
-require($CFG->libdir . '/clilib.php');
+require_once($CFG->libdir . '/clilib.php');
 
 // Support a 'tolerance' param.
 // Will allow admin to set a value threshold for retry count.
@@ -48,55 +47,5 @@ $defaultmaxcount = 30;
 $tolerance = (!empty($extargv['tolerance']) && !empty($unrecog[0])) ? $unrecog[0] : $defaulttolerance;
 $maxcount = (!empty($extargv['maxcount']) && !empty($unrecog[1])) ? $unrecog[1] : $defaultmaxcount;
 
-// Queues to monitor.
-$queues = array('assignfeedback_editpdf_queue' => '\assignfeedback_editpdf\task\convert_submissions',
-    'forum_queue' => '\mod_forum\task\cron_task',
-    'events_queue_handlers' => '\core\task\events_cron_task');
-
-$subject = "Problems with queues: ";
-$message = "";
-foreach ($queues as $queue => $task) {
-    // Find number of records for a given queue.
-    $totalrecords = $DB->count_records($queue);
-    if ($totalrecords > $maxcount) {
-        // Check to see if the task that processes the queue is failing.
-        $alert = $DB->record_exists_select('task_scheduled', 'classname=? AND faildelay>?',
-                array($task, $tolerance * MINSECS));
-        if (!empty($alert)) {
-            $subject .= "$queue ";
-            $message .= "There are $totalrecords pending events in the "
-                . "$queue queue. The task that processes that queue has a "
-                . "faildelay greater than the tolerance of $tolerance minutes.\n\n";
-        }
-    }
-}
-
-// Also check task_adhoc queue, but since there can be many items in the adhoc
-// queue at a time we are mainly interested in if a task has a long faildelay.
-
-// Get the tasks in the queue.
-$tasks = $DB->get_records('task_adhoc', array(), null, 'DISTINCT classname');
-foreach ($tasks as $task) {
-    // See if there is a long fail delay.
-    $alert = $DB->record_exists_select('task_adhoc', 'classname=? AND faildelay>?',
-            array($task->classname, $tolerance * MINSECS));
-    if (!empty($alert)) {
-        $totalrecords = $DB->count_records('task_adhoc', array('classname' => $task->classname));
-        $subject .= $task->classname . " ";
-        $message .= "There are $totalrecords pending events in from $task->classname in the "
-            . "task_adhoc queue. The task that processes that queue has a "
-            . "faildelay greater than the tolerance of $tolerance minutes.\n\n";
-    }
-}
-
-// If we find any queue delays, notify admins.
-if (!empty($message)) {
-    $to = get_config('local_ucla', 'admin_email');
-    if (empty($to)) {
-        // Variable not properly set.
-        cli_error("Event queue check: Error -- you're missing the 'to' email field!");
-    }
-    cli_problem("Event queue check: Event queue has grown too much, email sent");
-    return ucla_send_mail($to, $subject, $message);
-}
-cli_writeln("Event queue check: Successfully ran the script");
+$monitor = new \local_ucla\task\monitor($tolerance, $maxcount);
+$monitor->execute();
