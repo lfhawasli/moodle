@@ -336,7 +336,8 @@ class uclaroles_manager {
         $assignableroles = self::get_assignable_roles($sitetype);
 
         // For hidden sites, only return roles that can access hidden sites.
-        if ($course->visible == 0) {
+        // Only filter if not doing a manual enrollment.
+        if ($course->visible == 0 && !$manual) {
             list($needed, $forbidden) = get_roles_with_cap_in_context(
                     $context, 'moodle/course:viewhiddencourses');
             foreach ($assignableroles as $checkrole) {
