@@ -196,7 +196,7 @@ function get_term_selector($id, $selected_term = null, $paramname = 'term') {
     $ret_val .= html_writer::label($termstring, $id.'_term_selector');
     $ret_val .= html_writer::empty_tag('input', 
             array('type' => 'text', 'name' => $paramname, 'id' => $id.'_term_selector',
-                'value' => $selected_term, 'maxlength' => 3, 'size' => 3));
+                'value' => $selected_term, 'maxlength' => 3, 'size' => 4));
     
     return $ret_val;
 }

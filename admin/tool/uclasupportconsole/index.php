@@ -1147,7 +1147,36 @@ if ($displayforms) {
 $consoles->push_console_html('modules', $title , $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
-// TODO ghost courses in request classes table
+// Recently updated syllabus links at the Registrar's ucla_syllabus table.
+
+$title = "syllabuswebservice";
+$sectionhtml = '';
+if ($displayforms) {
+    $syllabusselectors = get_term_selector($title);
+    $syllabusselectors .= get_subject_area_selector($title);
+
+    $sectionhtml .= supportconsole_simple_form($title, $syllabusselectors);
+} else if ($consolecommand == "$title") {
+    $term = required_param('term', PARAM_ALPHANUM);
+    $subjarea = required_param('subjarea', PARAM_NOTAGS);
+    if (!ucla_validator('offeredTermCode', $term) ||
+            !ucla_validator('subjectAreaCode', $subjarea)) {
+        print_error('invaliddata');
+    }
+
+    $output = null;
+
+    exec("php $CFG->dirroot/local/ucla_syllabus/cli/send_syllabus_webservice.php both $term $subjarea", $output);
+
+    echo html_writer::tag('h1', get_string('syllabuswebservice', 'tool_uclasupportconsole'));
+    echo "<pre>";
+    echo implode("\n", $output);
+    echo "</pre>";
+
+    $consoles->no_finish = true;
+}
+
+$consoles->push_console_html('modules', $title , $sectionhtml);
 
 ////////////////////////////////////////////////////////////////////
 $title = 'moodleusernamesearch';

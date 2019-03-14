@@ -39,14 +39,14 @@ Options:
 -h, --help            Print out this help
 
 Example:
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php TYPE TERM SUBJ_AREA
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php TYPE COURSEID
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli/send_syllabus_webservice.php TYPE TERM SUBJ_AREA
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli/send_syllabus_webservice.php TYPE COURSEID
 
 Where type = {alert|syllabus|both}
 
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php alert 14F MGMT
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php syllabus 141 "A&O SCI"
-\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli_syllabus_webservice.php both 1234
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli/send_syllabus_webservice.php alert 14F MGMT
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli/send_syllabus_webservice.php syllabus 141 "A&O SCI"
+\$sudo -u www-data /usr/bin/php local/ucla_syllabus/cli/send_syllabus_webservice.php both 1234
 
 HELPTEXT;
     cli_error($help);
@@ -94,8 +94,7 @@ if ($type === 'alert' || $type === 'both') {
     $progress->output("Sending course alerts");
 
     // Get all courses from term and subjarea.
-    $sql = "SELECT c.*,
-                   urc.srs
+    $sql = "SELECT DISTINCT c.*
               FROM {course} c
               JOIN {ucla_request_classes} urc ON urc.courseid = c.id
              WHERE $whereclause";
@@ -107,8 +106,7 @@ if ($type === 'alert' || $type === 'both') {
     } else {
         $progress->output(sprintf("...Processing %d courses", count($courses)));
         foreach ($courses as $course) {
-            $progress->output(sprintf("Processing %s (%s)", $course->shortname,
-                    $course->srs), 1);
+            $progress->output(sprintf("Processing %s", $course->shortname), 1);
 
             $task = new \local_ucla_syllabus\task\ucla_course_alert_task();
             $task->set_custom_data(

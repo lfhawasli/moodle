@@ -127,6 +127,7 @@ $string['mediausage'] = 'Media usage';
 $string['mediausage_help'] = 'Lists course with video content for a given term.';
 $string['syllabusrecentlinks'] = 'Recently updated syllabus links at Registrar';
 $string['syllabuslinkslimit'] = 'Get last {$a} results';
+$string['syllabuswebservice'] = 'Manually push syllabus information';
 $string['visiblecontentlist'] = 'List courses with visible content in hidden sections';
 $string['unhiddencourseslist'] = 'List unexpected visiblity of courses';
 $string['unhiddencourseslist_help'] = 'For courses before current term, will display visible courses. For current and future terms, will show courses that are hidden.';
