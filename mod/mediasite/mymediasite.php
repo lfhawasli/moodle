@@ -63,13 +63,13 @@ if (mediasite_has_capability_in_any_context('mod/mediasite:mymediasite')) {
         echo "\n<script type=\"text/javascript\">";
         echo "\n<!--\n";
         echo 'openpopup(null, {"url":"/mod/mediasite/mymediasite_launch.php?id='.$id.'&siteid='.$siteid.'&inpopup=true", '.
-            '"name":"myMediasite", '.'"options":"resizable=1,scrollbars=1,directories=1,location=1,menubar=1,toolbar=1,status=1"});';
+             '"name":"myMediasite","options":"resizable=1,scrollbars=1,directories=1,location=1,menubar=1,toolbar=1,status=1"});';
         echo "\n-->\n";
         echo '</script>';
 
         $link = "<a href=\"$CFG->wwwroot/mod/mediasite/mymediasite_launch.php?inpopup=true&amp;id={$id}&amp;siteid={$siteid}\" ".
-            "onclick=\"this.target='myMediasite'; return openpopup('/mod/mediasite/mymediasite_launch.php?inpopup=true&amp;id={$id}', ".
-            "'myMediasite','resizable=1,scrollbars=1,directories=1,location=1,menubar=1,toolbar=1,status=1');\">".
+                "onclick=\"this.target='myMediasite'; return openpopup('/mod/mediasite/mymediasite_launch.php?inpopup=true&amp;".
+                "id={$id}', 'myMediasite','resizable=1,scrollbars=1,directories=1,location=1,menubar=1,toolbar=1,status=1');\">".
             format_string($typeconfig->my_mediasite_title, true)."</a>";
 
         echo '<div class="popupnotice">';
