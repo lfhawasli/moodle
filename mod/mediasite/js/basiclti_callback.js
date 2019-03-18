@@ -5,7 +5,7 @@
  * @param {object} message
  */
 function MediasiteLtiCallBack(message) {
-    //we should use '==' instead of '===' here, so that we can find both 'null' and 'undefined'.
+    // We should use '==' instead of '===' here, so that we can find both 'null' and 'undefined'.
     if (message.data == null || message.data.Mode == null || message.data.EntityType == null
         || message.data.LaunchUrl == null || message.data.Title == null) {
         return;
@@ -16,7 +16,7 @@ function MediasiteLtiCallBack(message) {
     setFormValue('id_description', message.data.Description);
     setFormValue('id_resourcetype', message.data.EntityType);
     setFormValue('id_resourceid', message.data.ResourceId);
-    setFormValue('id_launchurl', message.data.LaunchURL); 
+    setFormValue('id_launchurl', message.data.LaunchURL);
     setFormValue('id_displaymode', message.data.Mode);
     if (message.data.EntityType === 'Presentation') {
         setFormValue('id_recorddateutc', (new Date(message.data.RecordDateTimeUTC).getTime() / 1000).toFixed(0));

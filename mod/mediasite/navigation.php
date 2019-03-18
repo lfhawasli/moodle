@@ -115,7 +115,7 @@ function mediasite_navigation_extension_mymediasite_placement() {
                 if ($haspermission) {
 
                     $sitepagenode = $PAGE->navigation->add($site->my_mediasite_title, $url, navigation_node::TYPE_CONTAINER);
-                    //$sitepagenode->title("this is title!");
+                    // Comment out: "$sitepagenode->title("this is title!");".
                     $sitepagenode->isexpandable = true;
                     $sitepagenode->showinflatnavigation = true;
 
@@ -162,8 +162,7 @@ function mediasite_navigation_extension_mymediasite_placement() {
     }
 }
 
-function add_inpage_menu($title, $url, $islastmenu)
-{                    
+function add_inpage_menu($title, $url, $islastmenu) {
     global $PAGE;
 
     $menuappend = 0;
@@ -171,14 +170,12 @@ function add_inpage_menu($title, $url, $islastmenu)
     $style = 'class="btn btn-default pull-right"';
     $inlinestyle = ' style="margin-left:5px;"';
     $menu = '<a '.$style.$inlinestyle.' href="'. $url.'">'.$title.' </a>';
-    if($islastmenu)
-    {
-        $menu.='<br><br>';
+    if ($islastmenu) {
+        $menu .= '<br><br>';
     }
 
-    // Easy way to force include on every page (provided that navigation block is present).
     $PAGE->requires->yui_module(['moodle-mod_mediasite-custmenu'],
-        'M.local_xray.custmenu.init',
+        'M.local_mediasite.custmenu.init',
         [[
             'menusearch' => $menusearch,
             'menuappend' => $menuappend,
@@ -260,7 +257,7 @@ function starts_with($haystack, $needle) {
 function mediasite_navigation_extension_courses7_course() {
     global $PAGE, $DB;
     $course = $PAGE->course;
-    $currentTheme = $PAGE->theme->name;
+    $currenttheme = $PAGE->theme->name;
 
     if ($course && $course->id > 1) {
         $context = context_course::instance($course->id);
@@ -279,9 +276,9 @@ function mediasite_navigation_extension_courses7_course() {
                     '/mod/mediasite/courses7.php',
                     array('id' => $course->id, 'siteid' => $courseconfig->mediasite_site)
                 );
-                
-                //for course Catalog, force to show as INPAGE_MENU if current theme is 'snap'
-                if($currentTheme=='snap') {
+
+                // For course Catalog, force to show as INPAGE_MENU if current theme is 'snap'.
+                if ($currenttheme == 'snap') {
                     add_inpage_menu($sitetitle, $url, false);
                 } else {
                     $coursesnode = $coursenode->add($site->get_integration_catalog_title(), $url);

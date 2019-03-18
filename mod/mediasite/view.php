@@ -103,11 +103,11 @@ if ($mediasite->openaspopup == '1' and !$inpopup) {
 
 echo $OUTPUT->footer();
 
-$event = \mod_mediasite\event\course_module_viewed::create(array( 
-    'objectid' => $mediasite->id, 
-    'context' => $context 
-    )); 
-    $event->add_record_snapshot('course_modules', $cm); 
-    $event->add_record_snapshot('course', $course); 
-    $event->add_record_snapshot('mediasite', $mediasite); 
-    $event->trigger(); 
+$event = \mod_mediasite\event\course_module_viewed::create(array(
+    'objectid' => $mediasite->id,
+    'context' => $context
+    ));
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('mediasite', $mediasite);
+    $event->trigger();
