@@ -85,10 +85,8 @@ $params = array(
     'width' => $kalvidres->width,
     'height' => $kalvidres->height
 );
-// START UCLA MOD: CCLE-7644 - Scrollbar in viewing window of Kaltura Media Resources.
-$params['height'] += 100;   // Make iframe larger so no scrollbars appear.
-// END UCLA MOD: CCLE-7644.
 $PAGE->requires->yui_module('moodle-local_kaltura-lticontainer', 'M.local_kaltura.init', array($params), null, true);
+$PAGE->requires->js(new moodle_url('/local/kaltura/js/bse_iframe_resize.js'));
 
 echo $renderer->display_iframe($kalvidres, $course->id);
 
