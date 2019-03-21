@@ -10,10 +10,11 @@
 @import "mod_forum";
 @import "mod_label";
 @import "mod_feedback";
-@import "grade";
 @import "mod_questionnaire";
+@import "mod_kalvidres";
 
 // General look and feel styles.
+@import "grade";
 @import "term_display";
 @import "footer";
 @import "navigation";
