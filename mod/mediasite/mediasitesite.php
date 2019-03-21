@@ -392,8 +392,7 @@ class MediasiteAssignmentDetail {
     /**
      * Get the value of key
      */
-    public function getkey()
-    {
+    public function getkey() {
         return $this->key;
     }
 
@@ -402,8 +401,7 @@ class MediasiteAssignmentDetail {
      *
      * @return  self
      */
-    public function setkey($key)
-    {
+    public function setkey($key) {
         $this->key = $key;
 
         return $this;
@@ -412,8 +410,7 @@ class MediasiteAssignmentDetail {
     /**
      * Get the value of value
      */
-    public function getvalue()
-    {
+    public function getvalue() {
         return $this->value;
     }
 
@@ -422,14 +419,15 @@ class MediasiteAssignmentDetail {
      *
      * @return  self
      */
-    public function setvalue($value)
-    {
+    public function setvalue($value) {
         $this->value = $value;
 
         return $this;
     }
 
-    public function __construct() {}
+    public function __construct() {
+    }
+
     public static function withdetails($key, $value) {
         $instance = new self();
         $instance->key = $key;

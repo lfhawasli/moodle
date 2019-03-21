@@ -906,6 +906,12 @@ function ucla_send_mail($to, $subj, $body = '', $header = '') {
 
     if (!empty($CFG->noemailever)) {
         // We don't want any email sent.
+        debugging('Not sending email due to $CFG->noemailever config setting', DEBUG_NORMAL);
+        return true;
+    }
+
+    if (defined('BEHAT_SITE_RUNNING')) {
+        // Fake email sending in behat.
         return true;
     }
 
@@ -923,8 +929,24 @@ function ucla_send_mail($to, $subj, $body = '', $header = '') {
         // enabled.
         debugging("TO: $to\nSUBJ: $subj\nBODY: $body\nHEADER: $header");
     } else {
-        debugging("Sending real email to " . $to);
-        return @mail($to, $subj, $body, $header);
+        // Support email testing in unit tests.
+        if (PHPUNIT_TEST) {
+            if (!phpunit_util::is_redirecting_phpmailer()) {
+                debugging('Unit tests must not send real emails! Use $this->redirectEmails()');
+                return true;
+            }
+            $mail = new stdClass();
+            $mail->header = $header;
+            $mail->body = $body;
+            $mail->subject = $subj;
+            $mail->from = 'ccle-email-test@lists.ucla.edu';
+            $mail->to = $to;
+            phpunit_util::phpmailer_sent($mail);
+            return true;
+        } else {
+            debugging("Sending real email to " . $to);
+            return @mail($to, $subj, $body, $header);
+        }
     }
 
     return true;

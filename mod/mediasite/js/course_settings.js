@@ -19,6 +19,12 @@ function SiteChange(siteControl, data) {
     });
 }
 
+/**
+* @class updateControl
+* @param {object} controlid
+* @param {object} sitesetting
+* @param {object} labeltext
+*/
 function updateControl(controlid, sitesetting, labeltext) {
     var chkbox = document.getElementById(controlid);
     chkbox.checked = (sitesetting > 1);

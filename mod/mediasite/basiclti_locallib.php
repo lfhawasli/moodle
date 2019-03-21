@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/lib/simplepie/library/SimplePie/Misc.php');
  *
  * $param int $basicltiid       Basic LTI activity id
  */
-function mediasite_basiclti_view($instance, $siteid, $typeconfig, $endpoint, $arrayofenrollments = null, 
+function mediasite_basiclti_view($instance, $siteid, $typeconfig, $endpoint, $arrayofenrollments = null,
     $arrayofcustomparameters = null) {
     global $PAGE, $CFG;
 
@@ -45,7 +45,7 @@ function mediasite_basiclti_view($instance, $siteid, $typeconfig, $endpoint, $ar
     $instance->preferheight = 600;
 
     $course = $PAGE->course;
-    $requestparams = mediasite_basiclti_build_request($instance, $typeconfig, $course, $arrayofenrollments, 
+    $requestparams = mediasite_basiclti_build_request($instance, $typeconfig, $course, $arrayofenrollments,
         $arrayofcustomparameters);
 
     // Make sure we let the tool know what LMS they are being called from.
