@@ -91,12 +91,16 @@ class mod_choice_mod_form extends moodleform_mod {
         $mform->addElement('header', 'resultshdr', get_string('results', 'choice'));
 
         $mform->addElement('select', 'showresults', get_string("publish", "choice"), $CHOICE_SHOWRESULTS);
+        // START UCLA MOD: CCLE-7836 - Change default for Choice => Results, Add Help.
         $mform->setDefault('showresults', 1);
         $mform->addHelpButton('showresults', 'publish', 'choice');
+        // END UCLA MOD: CCLE-7836.
 
         $mform->addElement('select', 'publish', get_string("privacy", "choice"), $CHOICE_PUBLISH);
         $mform->disabledIf('publish', 'showresults', 'eq', 0);
+        // START UCLA MOD: CCLE-7836 - Change default for Choice => Results, Add Help.
         $mform->addHelpButton('publish', 'privacy', 'choice');
+        // END UCLA MOD: CCLE-7836.
 
         $mform->addElement('selectyesno', 'showunanswered', get_string("showunanswered", "choice"));
 

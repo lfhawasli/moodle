@@ -62,24 +62,6 @@ function xmldb_lti_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2016041800) {
-
-        // Define field description to be added to lti_types.
-        $table = new xmldb_table('lti_types');
-        $field = new xmldb_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null, 'timemodified');
-
-        // Conditionally launch add field description.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Lti savepoint reached.
-        upgrade_mod_savepoint(true, 2016041800, 'lti');
-    }
-
-    // Moodle v3.1.0 release upgrade line.
-    // Put any upgrade step following this.
-
     if ($oldversion < 2016052301) {
 
         // Changing type of field value on table lti_types_config to text.
@@ -157,7 +139,7 @@ function xmldb_lti_upgrade($oldversion) {
     // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
     if ($oldversion < 2017111302) {
         $table = new xmldb_table('lti_types');
-
+        
         $fields = [];
         $fields[] = new xmldb_field('asactivity', XMLDB_TYPE_INTEGER, 1, null, null, null, 1, 'secureicon');
         $fields[] = new xmldb_field('asassignment', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'asactivity');
@@ -171,10 +153,13 @@ function xmldb_lti_upgrade($oldversion) {
                 $dbman->add_field($table, $field);
             }
         }
-
+        
         upgrade_mod_savepoint(true, 2017111302, 'lti');
     }
     // END UCLA MOD: CCLE-6956.
+
+    // Automatically generated Moodle v3.5.0 release upgrade line.
+    // Put any upgrade step following this.
 
     return true;
 

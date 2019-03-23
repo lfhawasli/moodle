@@ -135,7 +135,9 @@ class quiz {
      */
     public function preload_questions() {
         $this->questions = question_preload_questions(null,
-                'slot.maxmark, slot.id AS slotid, slot.slot, slot.page',
+                'slot.maxmark, slot.id AS slotid, slot.slot, slot.page,
+                 slot.questioncategoryid AS randomfromcategory,
+                 slot.includingsubcategories AS randomincludingsubcategories',
                 '{quiz_slots} slot ON slot.quizid = :quizid AND q.id = slot.questionid',
                 array('quizid' => $this->quiz->id), 'slot.slot');
     }
@@ -230,6 +232,25 @@ class quiz {
             $this->ispreviewuser = has_capability('mod/quiz:preview', $this->context);
         }
         return $this->ispreviewuser;
+    }
+
+    /**
+     * Checks user enrollment in the current course.
+     *
+     * @param int $userid
+     * @return null|stdClass user record
+     */
+    public function is_participant($userid) {
+        return is_enrolled($this->get_context(), $userid, 'mod/quiz:attempt', $this->show_only_active_users());
+    }
+
+    /**
+     * Check is only active users in course should be shown.
+     *
+     * @return bool true if only active users should be shown.
+     */
+    public function show_only_active_users() {
+        return !has_capability('moodle/course:viewsuspendedusers', $this->get_context());
     }
 
     /**
@@ -567,7 +588,7 @@ class quiz_attempt {
         $this->quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
         $this->slots = $DB->get_records('quiz_slots',
                 array('quizid' => $this->get_quizid()), 'slot',
-                'slot, requireprevious, questionid');
+                'slot, requireprevious, questionid, includingsubcategories');
         $this->sections = array_values($DB->get_records('quiz_sections',
                 array('quizid' => $this->get_quizid()), 'firstslot'));
 
@@ -1872,12 +1893,14 @@ class quiz_attempt {
         if ($questiondata->qtype != 'random') {
             $newqusetionid = $questiondata->id;
         } else {
+            $tagids = quiz_retrieve_slot_tag_ids($this->slots[$slot]->id);
+
             $randomloader = new \core_question\bank\random_question_loader($qubaids, array());
             $newqusetionid = $randomloader->get_next_question_id($questiondata->category,
-                    (bool) $questiondata->questiontext);
+                    (bool) $questiondata->questiontext, $tagids);
             if ($newqusetionid === null) {
                 throw new moodle_exception('notenoughrandomquestions', 'quiz',
-                        $quizobj->view_url(), $questiondata);
+                        $this->quizobj->view_url(), $questiondata);
             }
         }
 

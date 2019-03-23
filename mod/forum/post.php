@@ -696,6 +696,9 @@ if ($mform_post->is_cancelled()) {
     // WARNING: the $fromform->message array has been overwritten, do not use it anymore!
     $fromform->messagetrust  = trusttext_trusted($modcontext);
 
+    // Clean message text.
+    $fromform = trusttext_pre_edit($fromform, 'message', $modcontext);
+
     if ($fromform->edit) {           // Updating a post
         unset($fromform->groupid);
         $fromform->id = $fromform->edit;
@@ -867,10 +870,6 @@ if ($mform_post->is_cancelled()) {
     } else { // Adding a new discussion.
         // The location to redirect to after successfully posting.
         $redirectto = new moodle_url('/mod/forum/view.php', array('f' => $fromform->forum));
-
-        if (!forum_user_can_post_discussion($forum, $fromform->groupid, -1, $cm, $modcontext)) {
-            print_error('cannotcreatediscussion', 'forum');
-        }
 
         $fromform->mailnow = empty($fromform->mailnow) ? 0 : 1;
 

@@ -506,6 +506,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
         // Should be just one, since there's just one category event of the course I am enrolled (course3 - cat2b).
         $this->assertEquals(1, count($events['events']));
         $this->assertEquals($catevent2->id, $events['events'][0]['id']);
+        $this->assertEquals($category2->id, $events['events'][0]['categoryid']);
         $this->assertEquals(0, count($events['warnings']));
 
         // Now get category events but by course (there aren't course events in the course).
@@ -536,7 +537,9 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEquals(2, count($events['events']));
         $this->assertEquals(0, count($events['warnings']));
         $this->assertEquals($catevent1->id, $events['events'][0]['id']);
+        $this->assertEquals($category->id, $events['events'][0]['categoryid']);
         $this->assertEquals($catevent2->id, $events['events'][1]['id']);
+        $this->assertEquals($category2->id, $events['events'][1]['categoryid']);
     }
 
     /**
@@ -932,6 +935,34 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEmpty($result['events']);
         $this->assertNull($result['firstid']);
         $this->assertNull($result['lastid']);
+    }
+
+    /**
+     * Check that it is possible to restrict the calendar events to events where the user is not suspended in the course.
+     */
+    public function test_get_calendar_action_events_by_timesort_suspended_course() {
+        $this->resetAfterTest();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $this->setAdminUser();
+        $lesson = $this->getDataGenerator()->create_module('lesson', [
+                'name' => 'Lesson 1',
+                'course' => $course->id,
+                'available' => time(),
+                'deadline' => (time() + (60 * 60 * 24 * 5))
+            ]
+        );
+        $this->getDataGenerator()->enrol_user($user1->id, $course->id, null, 'manual', 0, 0, ENROL_USER_SUSPENDED);
+        $this->getDataGenerator()->enrol_user($user2->id, $course->id);
+
+        $this->setUser($user1);
+        $result = core_calendar_external::get_calendar_action_events_by_timesort(0, null, 0, 20, true);
+        $this->assertEmpty($result->events);
+        $this->setUser($user2);
+        $result = core_calendar_external::get_calendar_action_events_by_timesort(0, null, 0, 20, true);
+        $this->assertCount(1, $result->events);
+        $this->assertEquals('Lesson 1 closes', $result->events[0]->name);
     }
 
     /**
@@ -2294,7 +2325,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
         $data = external_api::clean_returnvalue(
             core_calendar_external::get_calendar_monthly_view_returns(),
             core_calendar_external::get_calendar_monthly_view($timestart->format('Y'), $timestart->format('n'),
-                                                              $course->id, null, false)
+                                                              $course->id, null, false, true)
         );
         $this->assertEquals($data['courseid'], $course->id);
         // User enrolled in the course can load the course calendar.
@@ -2302,7 +2333,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
         $data = external_api::clean_returnvalue(
             core_calendar_external::get_calendar_monthly_view_returns(),
             core_calendar_external::get_calendar_monthly_view($timestart->format('Y'), $timestart->format('n'),
-                                                              $course->id, null, false)
+                                                              $course->id, null, false, true)
         );
         $this->assertEquals($data['courseid'], $course->id);
         // User not enrolled in the course cannot load the course calendar.
@@ -2311,7 +2342,7 @@ class core_calendar_externallib_testcase extends externallib_advanced_testcase {
         $data = external_api::clean_returnvalue(
             core_calendar_external::get_calendar_monthly_view_returns(),
             core_calendar_external::get_calendar_monthly_view($timestart->format('Y'), $timestart->format('n'),
-                                                              $course->id, null, false)
+                                                              $course->id, null, false, false)
         );
     }
 

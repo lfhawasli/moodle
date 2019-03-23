@@ -190,7 +190,7 @@ Feature: Custom profile fields should be visible and editable by those with the 
     And I should not see "notvisible_field_information"
 
   @javascript
-  Scenario: Users can view and edit custom profile fields except those marked as not visible.
+  Scenario: Users can view but not edit custom profile fields when denied the edit own profile capability.
     Given the following "roles" exist:
       | name                | shortname          | description        | archetype |
       | Deny editownprofile | denyeditownprofile | denyeditownprofile |           |

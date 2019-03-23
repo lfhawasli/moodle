@@ -544,25 +544,31 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
 /**
  * Returns list of courses current $USER is enrolled in and can access
  *
- * - $fields is an array of field names to ADD
- *   so name the fields you really need, which will
- *   be added and uniq'd
+ * The $fields param is a list of field names to ADD so name just the fields you really need,
+ * which will be added and uniq'd.
  *
  * If $allaccessible is true, this will additionally return courses that the current user is not
  * enrolled in, but can access because they are open to the user for other reasons (course view
  * permission, currently viewing course as a guest, or course allows guest access without
  * password).
  *
- * @param string|array $fields
- * @param string $sort
+ * @param string|array $fields Extra fields to be returned (array or comma-separated list).
+ * @param string|null $sort Comma separated list of fields to sort by, defaults to respecting navsortmycoursessort.
  * @param int $limit max number of courses
  * @param array $courseids the list of course ids to filter by
  * @param bool $allaccessible Include courses user is not enrolled in, but can access
  * @return array
  */
-function enrol_get_my_courses($fields = null, $sort = 'visible DESC,sortorder ASC',
-          $limit = 0, $courseids = [], $allaccessible = false) {
+function enrol_get_my_courses($fields = null, $sort = null, $limit = 0, $courseids = [], $allaccessible = false) {
     global $DB, $USER, $CFG;
+
+    if ($sort === null) {
+        if (empty($CFG->navsortmycoursessort)) {
+            $sort = 'visible DESC, sortorder ASC';
+        } else {
+            $sort = 'visible DESC, '.$CFG->navsortmycoursessort.' ASC';
+        }
+    }
 
     // Guest account does not have any enrolled courses.
     if (!$allaccessible && (isguestuser() or !isloggedin())) {
@@ -584,7 +590,7 @@ function enrol_get_my_courses($fields = null, $sort = 'visible DESC,sortorder AS
     } else if (is_array($fields)) {
         $fields = array_unique(array_merge($basefields, $fields));
     } else {
-        throw new coding_exception('Invalid $fileds parameter in enrol_get_my_courses()');
+        throw new coding_exception('Invalid $fields parameter in enrol_get_my_courses()');
     }
     if (in_array('*', $fields)) {
         $fields = array('*');
@@ -788,19 +794,19 @@ function enrol_get_course_description_texts($course) {
 
 /**
  * Returns list of courses user is enrolled into.
- * (Note: use enrol_get_all_users_courses if you want to use the list wihtout any cap checks )
  *
- * - $fields is an array of fieldnames to ADD
- *   so name the fields you really need, which will
- *   be added and uniq'd
+ * Note: Use {@link enrol_get_all_users_courses()} if you need the list without any capability checks.
  *
- * @param int $userid
- * @param bool $onlyactive return only active enrolments in courses user may see
- * @param string|array $fields
- * @param string $sort
+ * The $fields param is a list of field names to ADD so name just the fields you really need,
+ * which will be added and uniq'd.
+ *
+ * @param int $userid User whose courses are returned, defaults to the current user.
+ * @param bool $onlyactive Return only active enrolments in courses user may see.
+ * @param string|array $fields Extra fields to be returned (array or comma-separated list).
+ * @param string|null $sort Comma separated list of fields to sort by, defaults to respecting navsortmycoursessort.
  * @return array
  */
-function enrol_get_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
+function enrol_get_users_courses($userid, $onlyactive = false, $fields = null, $sort = null) {
     global $DB;
 
     $courses = enrol_get_all_users_courses($userid, $onlyactive, $fields, $sort);
@@ -877,19 +883,27 @@ function enrol_user_sees_own_courses($user = null) {
 }
 
 /**
- * Returns list of courses user is enrolled into without any capability checks
- * - $fields is an array of fieldnames to ADD
- *   so name the fields you really need, which will
- *   be added and uniq'd
+ * Returns list of courses user is enrolled into without performing any capability checks.
  *
- * @param int $userid
- * @param bool $onlyactive return only active enrolments in courses user may see
- * @param string|array $fields
- * @param string $sort
+ * The $fields param is a list of field names to ADD so name just the fields you really need,
+ * which will be added and uniq'd.
+ *
+ * @param int $userid User whose courses are returned, defaults to the current user.
+ * @param bool $onlyactive Return only active enrolments in courses user may see.
+ * @param string|array $fields Extra fields to be returned (array or comma-separated list).
+ * @param string|null $sort Comma separated list of fields to sort by, defaults to respecting navsortmycoursessort.
  * @return array
  */
-function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB;
+function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = null, $sort = null) {
+    global $CFG, $DB;
+
+    if ($sort === null) {
+        if (empty($CFG->navsortmycoursessort)) {
+            $sort = 'visible DESC, sortorder ASC';
+        } else {
+            $sort = 'visible DESC, '.$CFG->navsortmycoursessort.' ASC';
+        }
+    }
 
     // Guest account does not have any courses
     if (isguestuser($userid) or empty($userid)) {
@@ -912,7 +926,7 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
     } else if (is_array($fields)) {
         $fields = array_unique(array_merge($basefields, $fields));
     } else {
-        throw new coding_exception('Invalid $fileds parameter in enrol_get_my_courses()');
+        throw new coding_exception('Invalid $fields parameter in enrol_get_all_users_courses()');
     }
     if (in_array('*', $fields)) {
         $fields = array('*');
@@ -1276,7 +1290,7 @@ function is_enrolled(context $context, $user = null, $withcapability = '', $only
  * @param string|array $capability optional, may include a capability name, or array of names.
  *      If an array is provided then this is the equivalent of a logical 'OR',
  *      i.e. the user needs to have one of these capabilities.
- * @param int $group optional, 0 indicates no current group, otherwise the group id
+ * @param int $group optional, 0 indicates no current group and USERSWITHOUTGROUP users without any group; otherwise the group id
  * @param bool $onlyactive consider only active enrolments in enabled plugins and time restrictions
  * @param bool $onlysuspended inverse of onlyactive, consider only suspended enrolments
  * @param int $enrolid The enrolment ID. If not 0, only users enrolled using this enrolment method will be returned.
@@ -1301,9 +1315,12 @@ function get_enrolled_with_capabilities_join(context $context, $prefix = '', $ca
     }
 
     if ($group) {
-        $groupjoin = groups_get_members_join($group, $uid);
+        $groupjoin = groups_get_members_join($group, $uid, $context);
         $joins[] = $groupjoin->joins;
         $params = array_merge($params, $groupjoin->params);
+        if (!empty($groupjoin->wheres)) {
+            $wheres[] = $groupjoin->wheres;
+        }
     }
 
     $joins = implode("\n", $joins);
@@ -1321,7 +1338,7 @@ function get_enrolled_with_capabilities_join(context $context, $prefix = '', $ca
  *
  * @param context $context
  * @param string $withcapability
- * @param int $groupid 0 means ignore groups, any other value limits the result by group id
+ * @param int $groupid 0 means ignore groups, USERSWITHOUTGROUP without any group and any other value limits the result by group id
  * @param bool $onlyactive consider only active enrolments in enabled plugins and time restrictions
  * @param bool $onlysuspended inverse of onlyactive, consider only suspended enrolments
  * @param int $enrolid The enrolment ID. If not 0, only users enrolled using this enrolment method will be returned.
@@ -1447,7 +1464,7 @@ function get_enrolled_join(context $context, $useridcolumn, $onlyactive = false,
  *
  * @param context $context
  * @param string $withcapability
- * @param int $groupid 0 means ignore groups, any other value limits the result by group id
+ * @param int $groupid 0 means ignore groups, USERSWITHOUTGROUP without any group and any other value limits the result by group id
  * @param string $userfields requested user record fields
  * @param string $orderby
  * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).

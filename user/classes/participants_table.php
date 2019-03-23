@@ -141,11 +141,14 @@ class participants_table extends \table_sql {
      */
     protected $profileroles;
 
+    /** @var \stdClass[] $viewableroles */
+    private $viewableroles;
+
     /**
      * Sets up the table.
      *
      * @param int $courseid
-     * @param int|false $currentgroup False if groups not used, int if groups used, 0 for all groups.
+     * @param int|false $currentgroup False if groups not used, int if groups used, 0 all groups, USERSWITHOUTGROUP for no group
      * @param int $accesssince The time the user last accessed the site
      * @param int $roleid The role we are including, 0 means all enrolled users
      * @param int $enrolid The applied filter for the user enrolment ID.
@@ -259,6 +262,7 @@ class participants_table extends \table_sql {
         $this->allroles = role_fix_names(get_all_roles($this->context), $this->context);
         $this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
         $this->profileroles = get_profile_roles($this->context);
+        $this->viewableroles = get_viewable_roles($this->context);
     }
 
     /**
@@ -362,7 +366,8 @@ class participants_table extends \table_sql {
                                                               $this->allroles,
                                                               $this->assignableroles,
                                                               $this->profileroles,
-                                                              $roles);
+                                                              $roles,
+                                                              $this->viewableroles);
 
         return $OUTPUT->render_from_template('core/inplace_editable', $editable->export_for_template($OUTPUT));
     }
@@ -516,10 +521,7 @@ class participants_table extends \table_sql {
         }
         // ENS UCLA MOD: CCLE-7751
 
-        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
-        //$rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
-        $rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->currentgrouping, $this->accesssince,
-        // END UCLA MOD: CCLE-5686.
+        $rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
             $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams, $sort, $this->get_page_start(),
             $this->get_page_size());
         $this->rawdata = [];

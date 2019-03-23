@@ -1612,7 +1612,7 @@ class moodle_page {
         global $CFG, $USER, $SESSION;
 
         if (empty($CFG->themeorder)) {
-            $themeorder = array('course', 'category', 'session', 'user', 'site');
+            $themeorder = array('course', 'category', 'session', 'user', 'cohort', 'site');
         } else {
             $themeorder = $CFG->themeorder;
             // Just in case, make sure we always use the site theme if nothing else matched.
@@ -1667,6 +1667,12 @@ class moodle_page {
                         } else {
                             return $USER->theme;
                         }
+                    }
+                break;
+
+                case 'cohort':
+                    if (!empty($CFG->allowcohortthemes) && !empty($USER->cohorttheme) && !$hascustomdevicetheme) {
+                        return $USER->cohorttheme;
                     }
                 break;
 

@@ -218,7 +218,7 @@ if (!empty($groupid)) {
     }
 }
 
-if ($groupid && ($course->groupmode != SEPARATEGROUPS || $canaccessallgroups)) {
+if ($groupid > 0 && ($course->groupmode != SEPARATEGROUPS || $canaccessallgroups)) {
     $grouprenderer = $PAGE->get_renderer('core_group');
     $groupdetailpage = new \core_group\output\group_details($groupid);
     echo $grouprenderer->group_details($groupdetailpage);
@@ -250,10 +250,7 @@ echo '<div class="userlist">';
 foreach (array_unique($filtersapplied) as $filterix => $filter) {
     $baseurl->param('unified-filters[' . $filterix . ']', $filter);
 }
-// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
-//$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
-$participanttable = new \core_user\participants_table($course->id, $groupid, $groupingid, $lastaccess, $roleid, $enrolid, $status,
-// END UCLA MOD: CCLE-5686.
+$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
     $searchkeywords, $bulkoperations, $selectall);
 $participanttable->define_baseurl($baseurl);
 

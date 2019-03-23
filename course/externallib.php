@@ -745,8 +745,13 @@ class core_course_external extends external_api {
             require_capability('moodle/course:create', $context);
 
             // Make sure lang is valid
-            if (array_key_exists('lang', $course) and empty($availablelangs[$course['lang']])) {
-                throw new moodle_exception('errorinvalidparam', 'webservice', '', 'lang');
+            if (array_key_exists('lang', $course)) {
+                if (empty($availablelangs[$course['lang']])) {
+                    throw new moodle_exception('errorinvalidparam', 'webservice', '', 'lang');
+                }
+                if (!has_capability('moodle/course:setforcedlanguage', $context)) {
+                    unset($course['lang']);
+                }
             }
 
             // Make sure theme is valid
@@ -943,8 +948,11 @@ class core_course_external extends external_api {
                 }
 
                 // Make sure lang is valid.
-                if (array_key_exists('lang', $course) && empty($availablelangs[$course['lang']])) {
-                    throw new moodle_exception('errorinvalidparam', 'webservice', '', 'lang');
+                if (array_key_exists('lang', $course) && ($oldcourse->lang != $course['lang'])) {
+                    require_capability('moodle/course:setforcedlanguage', $context);
+                    if (empty($availablelangs[$course['lang']])) {
+                        throw new moodle_exception('errorinvalidparam', 'webservice', '', 'lang');
+                    }
                 }
 
                 // Make sure theme is valid.
@@ -1742,7 +1750,7 @@ class core_course_external extends external_api {
 
                     $categoryinfo = array();
                     $categoryinfo['id'] = $category->id;
-                    $categoryinfo['name'] = external_format_string($category->name, $context->id);
+                    $categoryinfo['name'] = external_format_string($category->name, $context);
                     list($categoryinfo['description'], $categoryinfo['descriptionformat']) =
                         external_format_text($category->description, $category->descriptionformat,
                                 $context->id, 'coursecat', 'description', null);
@@ -1898,7 +1906,7 @@ class core_course_external extends external_api {
 
             $createdcategories[] = array(
                 'id' => $newcategory->id,
-                'name' => external_format_string($newcategory->name, $context->id),
+                'name' => external_format_string($newcategory->name, $context),
             );
         }
 
@@ -2305,7 +2313,7 @@ class core_course_external extends external_api {
 
         $categoryname = '';
         if (!empty($category)) {
-            $categoryname = external_format_string($category->name, $category->get_context()->id);
+            $categoryname = external_format_string($category->name, $category->get_context());
         }
 
         $displayname = get_course_display_name_for_list($course);
@@ -2490,6 +2498,15 @@ class core_course_external extends external_api {
                         )
                     ),
                     'Course filters', VALUE_OPTIONAL
+                ),
+                'courseformatoptions' => new external_multiple_structure(
+                    new external_single_structure(
+                        array(
+                            'name' => new external_value(PARAM_RAW, 'Course format option name.'),
+                            'value' => new external_value(PARAM_RAW, 'Course format option value.'),
+                        )
+                    ),
+                    'Additional options for particular course format.', VALUE_OPTIONAL
                 ),
             );
             $coursestructure = array_merge($coursestructure, $extra);
@@ -3117,6 +3134,14 @@ class core_course_external extends external_api {
             }
             if (isset($coursesdata[$course->id]['lang'])) {
                 $coursesdata[$course->id]['lang'] = clean_param($coursesdata[$course->id]['lang'], PARAM_LANG);
+            }
+
+            $courseformatoptions = course_get_format($course)->get_config_for_external();
+            foreach ($courseformatoptions as $key => $value) {
+                $coursesdata[$course->id]['courseformatoptions'][] = array(
+                    'name' => $key,
+                    'value' => $value
+                );
             }
         }
 

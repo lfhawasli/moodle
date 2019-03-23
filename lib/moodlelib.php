@@ -2053,7 +2053,11 @@ function get_user_preferences($name = null, $default = null, $user = null) {
     } else if (isset($user->id)) {
         // Is a valid object.
     } else if (is_numeric($user)) {
-        $user = (object)array('id' => (int)$user);
+        if ($USER->id == $user) {
+            $user = $USER;
+        } else {
+            $user = (object)array('id' => (int)$user);
+        }
     } else {
         throw new coding_exception('Invalid $user parameter in get_user_preferences() call');
     }
@@ -2689,6 +2693,13 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
     // Make sure the USER has a sesskey set up. Used for CSRF protection.
     sesskey();
 
+    if (\core\session\manager::is_loggedinas()) {
+        // During a "logged in as" session we should force all content to be cleaned because the
+        // logged in user will be viewing potentially malicious user generated content.
+        // See MDL-63786 for more details.
+        $CFG->forceclean = true;
+    }
+
     // Do not bother admins with any formalities, except for activities pending deletion.
     if (is_siteadmin() && !($cm && $cm->deletioninprogress)) {
         // Set the global $COURSE.
@@ -3054,7 +3065,10 @@ function require_course_login($courseorid, $autologinguest = true, $cm = null, $
             // If $PAGE->course, and hence $PAGE->context, have not already been set up properly, set them up now.
             $PAGE->set_course($PAGE->course);
         }
-        user_accesstime_log(SITEID);
+        // Do not update access time for webservice or ajax requests.
+        if (!WS_SERVER && !AJAX_SCRIPT) {
+            user_accesstime_log(SITEID);
+        }
         return;
 
     } else {
@@ -3722,6 +3736,9 @@ function get_user_field_name($field) {
         case 'msn' : {
             return get_string('msnid');
         }
+        case 'picture' : {
+            return get_string('pictureofuser');
+        }
     }
     // Otherwise just use the same lang string.
     return get_string($field);
@@ -4103,9 +4120,6 @@ function delete_user(stdClass $user) {
     // Delete all grades - backup is kept in grade_grades_history table.
     grade_user_delete($user->id);
 
-    // Move unread messages from this user to read.
-    message_move_userfrom_unread2read($user->id);
-
     // TODO: remove from cohorts using standard API here.
 
     // Remove user tags.
@@ -4473,7 +4487,7 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
  * @return stdClass A {@link $USER} object - BC only, do not use
  */
 function complete_user_login($user) {
-    global $CFG, $USER, $SESSION;
+    global $CFG, $DB, $USER, $SESSION;
 
     \core\session\manager::login_user($user);
 
@@ -4496,6 +4510,16 @@ function complete_user_login($user) {
         )
     );
     $event->trigger();
+
+    // Queue migrating the messaging data, if we need to.
+    if (!get_user_preferences('core_message_migrate_data', false, $USER->id)) {
+        // Check if there are any legacy messages to migrate.
+        if (\core_message\helper::legacy_messages_exist($USER->id)) {
+            \core_message\task\migrate_message_data::queue_task($USER->id);
+        } else {
+            set_user_preference('core_message_migrate_data', true, $USER->id);
+        }
+    }
 
     if (isguestuser()) {
         // No need to continue when user is THE guest.
@@ -4709,9 +4733,23 @@ function get_complete_user_data($field, $value, $mnethostid = null) {
         return false;
     }
 
+    // Change the field to lowercase.
+    $field = core_text::strtolower($field);
+
+    // List of case insensitive fields.
+    //$caseinsensitivefields = ['username'];
+    $caseinsensitivefields = [];
+
     // Build the WHERE clause for an SQL query.
     $params = array('fieldval' => $value);
-    $constraints = "$field = :fieldval AND deleted <> 1";
+
+    // Do a case-insensitive query, if necessary.
+    if (in_array($field, $caseinsensitivefields)) {
+        $fieldselect = $DB->sql_equal($field, ':fieldval', false);
+    } else {
+        $fieldselect = "$field = :fieldval";
+    }
+    $constraints = "$fieldselect AND deleted <> 1";
 
     // If we are loading user data based on anything other than id,
     // we must also restrict our search based on mnet host.
@@ -4759,6 +4797,14 @@ function get_complete_user_data($field, $value, $mnethostid = null) {
                 }
                 $user->groupmember[$group->courseid][$group->id] = $group->id;
             }
+        }
+    }
+
+    // Add cohort theme.
+    if (!empty($CFG->allowcohortthemes)) {
+        require_once($CFG->dirroot . '/cohort/lib.php');
+        if ($cohorttheme = cohort_get_user_cohort_theme($user->id)) {
+            $user->cohorttheme = $cohorttheme;
         }
     }
 
@@ -6386,8 +6432,10 @@ function send_password_change_info($user) {
 function email_is_not_allowed($email) {
     global $CFG;
 
+    // Comparing lowercase domains.
+    $email = strtolower($email);
     if (!empty($CFG->allowemailaddresses)) {
-        $allowed = explode(' ', $CFG->allowemailaddresses);
+        $allowed = explode(' ', strtolower($CFG->allowemailaddresses));
         foreach ($allowed as $allowedpattern) {
             $allowedpattern = trim($allowedpattern);
             if (!$allowedpattern) {
@@ -6406,7 +6454,7 @@ function email_is_not_allowed($email) {
         return get_string('emailonlyallowed', '', $CFG->allowemailaddresses);
 
     } else if (!empty($CFG->denyemailaddresses)) {
-        $denied = explode(' ', $CFG->denyemailaddresses);
+        $denied = explode(' ', strtolower($CFG->denyemailaddresses));
         foreach ($denied as $deniedpattern) {
             $deniedpattern = trim($deniedpattern);
             if (!$deniedpattern) {
@@ -9313,8 +9361,8 @@ function get_performance_info() {
                     $mode = ' <span title="request cache">[r]</span>';
                     break;
             }
-            $html .= '<ul class="cache-definition-stats list-unstyled m-l-1 cache-mode-'.$modeclass.' card d-inline-block">';
-            $html .= '<li class="cache-definition-stats-heading p-t-1 card-header bg-inverse font-weight-bold">' .
+            $html .= '<ul class="cache-definition-stats list-unstyled m-l-1 m-b-1 cache-mode-'.$modeclass.' card d-inline-block">';
+            $html .= '<li class="cache-definition-stats-heading p-t-1 card-header bg-dark bg-inverse font-weight-bold">' .
                 $definition . $mode.'</li>';
             $text .= "$definition {";
             foreach ($details['stores'] as $store => $data) {

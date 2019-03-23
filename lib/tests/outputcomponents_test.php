@@ -437,44 +437,32 @@ EOF;
         $this->assertEquals($expectedb, $pbarb->pagelinks);
     }
 
-    public function test_renderer_method_names() {
-        global $CFG;
-        // Note, here we don't verify autoloading at all, but only that
-        // the renderers call to the correct methods no matter the renderable class
-        // is namespaced or no. Hence we are loading the needed fixtures manually.
-        require_once($CFG->dirroot . '/mod/assign/renderable.php');
-        require_once($CFG->libdir . '/tests/fixtures/namespaced_renderable.php');
+    public function test_pix_icon() {
+        $this->resetAfterTest();
 
-        // Array of renderable widgets to verify that renderers
-        // do call to the expected render method. Indexes are the expected
-        // method and values are the renderable instances.
-        $renderables = array(
-            'render_pix_icon' => new pix_icon('test', 'test'),                                     // A core one.
-            'render_assign_course_index_summary' => new assign_course_index_summary(true, 'test'), // A plugin one.
-            'render_renderable_test' => new \something\largely\namespaced\renderable_test(),       // A namespaced one.
-        );
+        $page = new moodle_page();
 
-        // We are going to test all the renderables agains some different renderers.
-        $renderers = array(
-            'renderer_base',
-            'plugin_renderer_base'
-        );
+        set_config('theme', 'boost');
+        // Need to reset after changing theme.
+        $page->reset_theme_and_output();
+        $renderer = $page->get_renderer('core');
 
-        // Run all combinations.
-        foreach ($renderables as $method => $renderable) {
-            foreach ($renderers as $renderer) {
-                // Create the double with the expected method mocked.
-                $stub = $this->getMockBuilder($renderer)
-                    ->disableOriginalConstructor()
-                    ->setMethods(array($method))
-                    ->getMock();
-                // Expect the method is called once and will return true.
-                $stub->expects($this->once())
-                    ->method($method)
-                    ->will($this->returnValue(true));
-                // Assert the return value and verify the expectation.
-                $this->assertTrue($stub->render($renderable));
-            }
-        }
+        $reason = 'An icon with no alt text is hidden from screenreaders.';
+        $this->assertContains('aria-hidden="true"', $renderer->pix_icon('t/print', ''), $reason);
+
+        $reason = 'An icon with alt text is not hidden from screenreaders.';
+        $this->assertNotContains('aria-hidden="true"', $renderer->pix_icon('t/print', 'Print'), $reason);
+
+        // Test another theme with a different icon system.
+        set_config('theme', 'clean');
+        // Need to reset after changing theme.
+        $page->reset_theme_and_output();
+        $renderer = $page->get_renderer('core');
+
+        $reason = 'An icon with no alt text is hidden from screenreaders.';
+        $this->assertContains('aria-hidden="true"', $renderer->pix_icon('t/print', ''), $reason);
+
+        $reason = 'An icon with alt text is not hidden from screenreaders.';
+        $this->assertNotContains('aria-hidden="true"', $renderer->pix_icon('t/print', 'Print'), $reason);
     }
 }

@@ -208,20 +208,31 @@ class renderer_base {
      * If will then be rendered by a method based upon the classname for the widget.
      * For instance a widget of class `crazywidget` will be rendered by a protected
      * render_crazywidget method of this renderer.
+     * If no render_crazywidget method exists and crazywidget implements templatable,
+     * look for the 'crazywidget' template in the same component and render that.
      *
      * @param renderable $widget instance with renderable interface
      * @return string
      */
     public function render(renderable $widget) {
-        $classname = get_class($widget);
+        $classparts = explode('\\', get_class($widget));
         // Strip namespaces.
-        $classname = preg_replace('/^.*\\\/', '', $classname);
+        $classname = array_pop($classparts);
         // Remove _renderable suffixes
         $classname = preg_replace('/_renderable$/', '', $classname);
 
         $rendermethod = 'render_'.$classname;
         if (method_exists($this, $rendermethod)) {
             return $this->$rendermethod($widget);
+        }
+        if ($widget instanceof templatable) {
+            $component = array_shift($classparts);
+            if (!$component) {
+                $component = 'core';
+            }
+            $template = $component . '/' . $classname;
+            $context = $widget->export_for_template($this);
+            return $this->render_from_template($template, $context);
         }
         throw new coding_exception('Can not render widget, renderer method ('.$rendermethod.') not found.');
     }
@@ -2513,9 +2524,16 @@ class core_renderer extends renderer_base {
 
         $src = $userpicture->get_url($this->page, $this);
 
-        $attributes = array('src'=>$src, 'alt'=>$alt, 'title'=>$alt, 'class'=>$class, 'width'=>$size, 'height'=>$size);
+        $attributes = array('src' => $src, 'class' => $class, 'width' => $size, 'height' => $size);
         if (!$userpicture->visibletoscreenreaders) {
             $attributes['role'] = 'presentation';
+            $alt = '';
+            $attributes['aria-hidden'] = 'true';
+        }
+
+        if (!empty($alt)) {
+            $attributes['alt'] = $alt;
+            $attributes['title'] = $alt;
         }
 
         // get the image html output fisrt
@@ -2648,7 +2666,7 @@ class core_renderer extends renderer_base {
 <div class="filemanager-loading mdl-align" id='filepicker-loading-{$client_id}'>
 $icon_progress
 </div>
-<div id="filepicker-wrapper-{$client_id}" class="mdl-left" style="display:none">
+<div id="filepicker-wrapper-{$client_id}" class="mdl-left w-100" style="display:none">
     <div>
         <input type="button" class="btn btn-secondary fp-btn-choose" id="filepicker-button-{$client_id}" value="{$straddfile}"{$buttonname}/>
         <span> $maxsize </span>
@@ -2818,7 +2836,7 @@ EOD;
             $message .= '<p class="errormessage">' . get_string('installproblem', 'error') . '</p>';
             //It is usually not possible to recover from errors triggered during installation, you may need to create a new database or use a different database prefix for new installation.
         }
-        $output .= $this->box($message, 'errorbox', null, array('data-rel' => 'fatalerror'));
+        $output .= $this->box($message, 'errorbox alert alert-danger', null, array('data-rel' => 'fatalerror'));
 
         if ($CFG->debugdeveloper) {
             if (!empty($debuginfo)) {
@@ -2922,71 +2940,35 @@ EOD;
     }
 
     /**
-     * Output a notification at a particular level - in this case, NOTIFY_PROBLEM.
-     *
-     * @param string $message the message to print out
-     * @return string HTML fragment.
      * @deprecated since Moodle 3.1 MDL-30811 - please do not use this function any more.
-     * @todo MDL-53113 This will be removed in Moodle 3.5.
-     * @see \core\output\notification
      */
-    public function notify_problem($message) {
-        debugging(__FUNCTION__ . ' is deprecated.' .
-            'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
-        $n = new \core\output\notification($message, \core\output\notification::NOTIFY_ERROR);
-        return $this->render($n);
+    public function notify_problem() {
+        throw new coding_exception('core_renderer::notify_problem() can not be used any more, '.
+            'please use \core\notification::add(), or \core\output\notification as required.');
     }
 
     /**
-     * Output a notification at a particular level - in this case, NOTIFY_SUCCESS.
-     *
-     * @param string $message the message to print out
-     * @return string HTML fragment.
      * @deprecated since Moodle 3.1 MDL-30811 - please do not use this function any more.
-     * @todo MDL-53113 This will be removed in Moodle 3.5.
-     * @see \core\output\notification
      */
-    public function notify_success($message) {
-        debugging(__FUNCTION__ . ' is deprecated.' .
-            'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
-        $n = new \core\output\notification($message, \core\output\notification::NOTIFY_SUCCESS);
-        return $this->render($n);
+    public function notify_success() {
+        throw new coding_exception('core_renderer::notify_success() can not be used any more, '.
+            'please use \core\notification::add(), or \core\output\notification as required.');
     }
 
     /**
-     * Output a notification at a particular level - in this case, NOTIFY_MESSAGE.
-     *
-     * @param string $message the message to print out
-     * @return string HTML fragment.
      * @deprecated since Moodle 3.1 MDL-30811 - please do not use this function any more.
-     * @todo MDL-53113 This will be removed in Moodle 3.5.
-     * @see \core\output\notification
      */
-    public function notify_message($message) {
-        debugging(__FUNCTION__ . ' is deprecated.' .
-            'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
-        $n = new \core\output\notification($message, \core\output\notification::NOTIFY_INFO);
-        return $this->render($n);
+    public function notify_message() {
+        throw new coding_exception('core_renderer::notify_message() can not be used any more, '.
+            'please use \core\notification::add(), or \core\output\notification as required.');
     }
 
     /**
-     * Output a notification at a particular level - in this case, NOTIFY_REDIRECT.
-     *
-     * @param string $message the message to print out
-     * @return string HTML fragment.
      * @deprecated since Moodle 3.1 MDL-30811 - please do not use this function any more.
-     * @todo MDL-53113 This will be removed in Moodle 3.5.
-     * @see \core\output\notification
      */
-    public function notify_redirect($message) {
-        debugging(__FUNCTION__ . ' is deprecated.' .
-            'Please use \core\notification::add, or \core\output\notification as required',
-            DEBUG_DEVELOPER);
-        $n = new \core\output\notification($message, \core\output\notification::NOTIFY_INFO);
-        return $this->render($n);
+    public function notify_redirect() {
+        throw new coding_exception('core_renderer::notify_redirect() can not be used any more, '.
+            'please use \core\notification::add(), or \core\output\notification as required.');
     }
 
     /**
@@ -3291,6 +3273,10 @@ EOD;
 
         $contents = html_writer::tag('label', get_string('enteryoursearchquery', 'search'),
             array('for' => 'id_q_' . $id, 'class' => 'accesshide')) . html_writer::tag('input', '', $inputattrs);
+        if ($this->page->context && $this->page->context->contextlevel !== CONTEXT_SYSTEM) {
+            $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
+                    'name' => 'context', 'value' => $this->page->context->id]);
+        }
         $searchinput = html_writer::tag('form', $contents, $formattrs);
 
         return html_writer::tag('div', $searchicon . $searchinput, array('class' => 'search-input-wrapper nav-link', 'id' => $id));
@@ -3442,7 +3428,7 @@ EOD;
         }
 
         $returnstr .= html_writer::span(
-            html_writer::span($usertextcontents, 'usertext') .
+            html_writer::span($usertextcontents, 'usertext mr-1') .
             html_writer::span($avatarcontents, $avatarclasses),
             'userbutton'
         );
@@ -3477,7 +3463,7 @@ EOD;
                         // Process this as a link item.
                         $pix = null;
                         if (isset($value->pix) && !empty($value->pix)) {
-                            $pix = new pix_icon($value->pix, $value->title, null, array('class' => 'iconsmall'));
+                            $pix = new pix_icon($value->pix, '', null, array('class' => 'iconsmall'));
                         } else if (isset($value->imgsrc) && !empty($value->imgsrc)) {
                             $value->title = html_writer::img(
                                 $value->imgsrc,
@@ -3568,6 +3554,9 @@ EOD;
             }
             if ($item->hidden) {
                 $attributes['class'] = 'dimmed_text';
+            }
+            if ($item->is_last()) {
+                $attributes['aria-current'] = 'page';
             }
             $content = html_writer::tag('span', $content, array('itemprop' => 'title'));
             $content = html_writer::link($item->action, $content, $attributes);
@@ -4485,6 +4474,22 @@ EOD;
                     } else {
                         $text = $element->getText();
                     }
+                }
+
+                // Generate the form element wrapper ids and names to pass to the template.
+                // This differs between group and non-group elements.
+                if ($element->getType() === 'group') {
+                    // Group element.
+                    // The id will be something like 'fgroup_id_NAME'. E.g. fgroup_id_mygroup.
+                    $elementcontext['wrapperid'] = $elementcontext['id'];
+
+                    // Ensure group elements pass through the group name as the element name so the id_error_{{element.name}} is
+                    // properly set in the template.
+                    $elementcontext['name'] = $elementcontext['groupname'];
+                } else {
+                    // Non grouped element.
+                    // Creates an id like 'fitem_id_NAME'. E.g. fitem_id_mytextelement.
+                    $elementcontext['wrapperid'] = 'fitem_' . $elementcontext['id'];
                 }
 
                 $context = array(
