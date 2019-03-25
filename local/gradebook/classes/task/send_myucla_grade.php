@@ -157,7 +157,7 @@ class send_myucla_grade extends send_myucla_base {
                 $roles = get_user_roles($context, $gradeinfo->userid);
                 foreach ($roles as $role) {
                     if ($role->shortname == 'student') {
-                        mtrace('...WARNING: Student role found but enrolled via ' .
+                        mtrace('...INFO: Student role found but enrolled via ' .
                                 'Registrar not found for userid ' . $gradeinfo->userid);
                         break;
                     }
