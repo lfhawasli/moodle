@@ -43,7 +43,12 @@ class mediasite_menu_placement {
     const INPAGE_MENU = 2;
 }
 
-function mediasite_basiclti_mediasite_view($instance, $siteid, $endpointtype, $mediasiteid = null, $arrayofcustomparameters = null) {
+function mediasite_basiclti_mediasite_view(
+    $instance,
+    $siteid,
+    $endpointtype,
+    $mediasiteid = null,
+    $arrayofcustomparameters = null) {
     global $USER;
 
     $typeconfig = mediasite_basiclti_get_type_config($siteid);

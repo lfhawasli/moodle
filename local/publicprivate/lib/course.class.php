@@ -409,9 +409,17 @@ class PublicPrivate_Course {
      * @return boolean
      */
     public function is_activated() {
-        return $this->_course->enablepublicprivate > 0 &&
-                $this->_course->grouppublicprivate > 0 &&
-                $this->_course->groupingpublicprivate > 0;
+        // Public/private is enabled if group/grouping exists.
+        if (empty($this->_course->grouppublicprivate) ||
+                empty(groups_get_group($this->_course->grouppublicprivate))) {
+            return false;
+        }
+        if (empty($this->_course->groupingpublicprivate) ||
+                empty(groups_get_grouping($this->_course->groupingpublicprivate))) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -483,8 +491,6 @@ class PublicPrivate_Course {
      * @throws PublicPrivate_Course_Exception
      */
     public function add_user($user) {
-        global $DB;
-
         /*
          * Cannot add enrolled if public/private not activated.
          */
@@ -553,8 +559,6 @@ class PublicPrivate_Course {
      * @throws PublicPrivate_Course_Exception
      */
     public function remove_user($user) {
-        global $DB;
-
         /*
          * Cannot add enrolled if public/private not activated.
          */
@@ -711,7 +715,7 @@ class PublicPrivate_Course {
             } else {
                 if (!$newgroupid = groups_create_group($data)) {
                     throw new PublicPrivate_Course_Exception('Failed to create public/private group.', 203);
-                }                
+                }
             }
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to create public/private group.', 203, $e);
@@ -742,8 +746,8 @@ class PublicPrivate_Course {
             } else {
                 if (!$newgroupingid = groups_create_grouping($data)) {
                     throw new PublicPrivate_Course_Exception('Failed to create public/private grouping.', 204);
-                }                
-            }           
+                }
+            }
         } catch (DML_Exception $e) {
             throw new PublicPrivate_Course_Exception('Failed to create public/private grouping.', 204, $e);
         }
@@ -756,7 +760,7 @@ class PublicPrivate_Course {
      * then can run into problem when trying to make course modules private.
      *
      * Try to restore deleted group/groupings.
-     * 
+     *
      * @param boolean $fixthem
      * @return boolean  Returns false if there are no errors, otherwise true.
      */
@@ -789,7 +793,7 @@ class PublicPrivate_Course {
                 // Ignore error since record must already exist.
             }
         }
-        
+
         return false;
     }
 }

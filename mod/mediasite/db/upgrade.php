@@ -39,14 +39,17 @@ function xmldb_mediasite_upgrade($oldversion = 0) {
     // Upgrade.
     if ($oldversion < 2012032900) {
         $result = \mod_mediasite\db\upgradelib\mediasite_upgrade_from_2012032900($oldversion, $dbman, $plugin);
+        upgrade_mod_savepoint(true, 2012032900, 'mediasite');
     }
 
     if ($oldversion < 2016041803) {
         $result = \mod_mediasite\db\upgradelib\mediasite_upgrade_from_2014042900($oldversion, $dbman, $plugin);
+        upgrade_mod_savepoint(true, 2016041803, 'mediasite');
     }
 
     if ($oldversion < 2017020100) {
         $result = \mod_mediasite\db\upgradelib\mediasite_upgrade_from_2016041803($oldversion, $dbman, $plugin);
+        upgrade_mod_savepoint(true, 2017020100, 'mediasite');
     }
 
     if ($oldversion < 2018062201) {

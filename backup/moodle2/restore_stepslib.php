@@ -4524,7 +4524,6 @@ class restore_create_categories_and_questions extends restore_structure_step {
 
         // With newitemid = 0, let's create the question
         if (!$questionmapping->newitemid) {
-
             if ($data->qtype === 'random') {
                 // Ensure that this newly created question is considered by
                 // \qtype_random\task\remove_unused_questions.

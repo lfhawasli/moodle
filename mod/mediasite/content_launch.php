@@ -75,10 +75,10 @@ if ($resourceid != '') {
     require_login($course);
 
     if ($resourceid == '') {
-        mediasite_basiclti_mediasite_view($course, $mediasite->siteid, $endpoint, 
+        mediasite_basiclti_mediasite_view($course, $mediasite->siteid, $endpoint,
             mediasite_guid_to_muid($mediasite->resourceid, $mediasite->resourcetype));
     } else {
-        mediasite_basiclti_mediasite_view($course, $mediasite->siteid, $endpoint, 
+        mediasite_basiclti_mediasite_view($course, $mediasite->siteid, $endpoint,
             mediasite_guid_to_muid($mediasite->resourceid, $mediasite->resourcetype));
     }
 }

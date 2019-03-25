@@ -80,11 +80,11 @@ function mediasite_has_value($value) {
 
 function mediasite_guid_to_muid($guid, $entitytype) {
     $muid = $guid;
-    if(strpos($guid, "-") > 0) {
+    if (strpos($guid, "-") > 0) {
         $muid = str_replace("-", "", $guid);
-        if($entitytype == "Presentation") {
+        if ($entitytype == "Presentation") {
             $muid .= "1d";
-        } else if($entitytype == "CatalogFolderDetails") {
+        } else if ($entitytype == "CatalogFolderDetails") {
             $muid .= "21";
         }
     }
@@ -122,7 +122,8 @@ function mediasite_has_capability_in_any_context($capability) {
             }
         }
     } catch (Exception $e) {
-        blowup("mod_mediasite could not determine if the user has the '".$capability."' due to the following exception: ".$e->getMessage());
+        blowup("mod_mediasite could not determine if the user has the '".$capability."' due to the following exception: "
+                .$e->getMessage());
         return false;
     }
 }

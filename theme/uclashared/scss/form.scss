@@ -27,3 +27,29 @@ abbr[title], abbr[data-original-title] {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.form-users {
+    position: relative;
+    direction: ltr;
+    display: inline-block;
+    max-width: 100%;
+    width: auto;
+}
+
+#page-course-view-ucla .form-autocomplete-downarrow {
+    color: $body-color;
+    position:absolute;
+    bottom:2px;
+    right:5px;
+    left: initial;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+@media (min-width: 280px) {
+    .form-users .form-control {
+        width: auto;
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
