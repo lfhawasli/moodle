@@ -67,6 +67,7 @@ $string['noticediscussionsrs'] = 'NOTICE: Found discussion srs {$a->srs}, using 
 $string['noticefoundaltcourseid'] = 'NOTICE: Found courseid {$a->courseid} by using term/subject/cat_num: {$a->term}-{$a->subject_area}-{$a->cat_num}-{$a->sec_num}';
 // Notification messages.
 $string['lrstartnoti'] = "Starting library reserves DB update:";
+$string['lrsuccessnoti'] = '{$a} records successfully inserted.';
 $string['lrnoentries'] = 'No library reserves entries found.';
 
 // Strings for videoreserves_dbsync.
