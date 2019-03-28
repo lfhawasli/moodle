@@ -753,7 +753,7 @@ function prepare_requests_for_display($requestinfos, $context) {
         $displayrow = $set[$displaykey];
 
         // Hide MyUCLA url.
-        if (!empty($nourlupdatehide)) {
+        if (!empty($nourlupdatehide) && !$displayrow['nourlupdate']) {
             unset($displayrow['nourlupdate']);
         }
 
