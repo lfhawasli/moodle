@@ -49,7 +49,10 @@ if (\core\session\manager::is_loggedinas()) {
     // Disable access to the user's dashboard for "logged in as" sessions
     // to mitigate risks associated with loading other users' JavaScript.
     // See MDL-63786 for more information.
-    redirect(new moodle_url('/', ['redirect' => 0]), get_string('unabletoaccess', 'core_my'));
+    // START UCLA MOD: CCLE-8231 - My Sites Link Incorrectly Redirects when Logged in as User.
+    // TODO: Make sure this is gone when we upgrade to 3.5.
+    //redirect(new moodle_url('/', ['redirect' => 0]), get_string('unabletoaccess', 'core_my'));
+    // END UCLA MOD: CCLE-8231
 }
 
 $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
