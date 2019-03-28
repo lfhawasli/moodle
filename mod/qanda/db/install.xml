@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="qanda/db" VERSION="20120122" COMMENT="XMLDB file for Moodle mod/qanda"
+<XMLDB PATH="mod/qanda/db" VERSION="20120122" COMMENT="XMLDB file for Moodle mod/qanda"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
