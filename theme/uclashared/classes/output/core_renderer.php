@@ -606,29 +606,29 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
-        $html .= html_writer::start_div('col-xs-12 p-a-1');
+        $html .= html_writer::start_div('col-12 pt-3 pb-3');
         $html .= html_writer::start_div('card');
-        $html .= html_writer::start_div('card-block');
+        $html .= html_writer::start_div('card-body');
         if (empty($PAGE->layout_options['nonavbar'])) {
-            $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
+            $html .= html_writer::start_div('clearfix w-100 float-sm-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
             $html .= $this->weeks_display();
             $html .= html_writer::end_div();
         }
 
         $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
-        $html .= html_writer::start_div('page-context-header-container pull-xs-left');
+        $html .= html_writer::start_div('page-context-header-container float-sm-left');
         $html .= $this->context_header();
         $html .= html_writer::end_div();
 
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
             if (!empty($renderer->print_site_meta_text())) {
-                $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix pull-xs-left course-details');
+                $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix float-sm-left course-details');
             }
         }
 
-        $html .= html_writer::start_div('hidden-sm-down pull-xs-right');
+        $html .= html_writer::start_div('d-none d-md-block float-sm-right');
 
         if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
             $html .= self::admin_panel();
@@ -638,7 +638,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
              // If the page has editing button, then display it.
             $pageeditingbutton = $this->page_heading_button();
             if (!empty($pageeditingbutton)) {
-                $html .= html_writer::div($pageeditingbutton, 'pull-xs-right header-editing-button');
+                $html .= html_writer::div($pageeditingbutton, 'float-sm-right header-editing-button');
             }
         }
         $html .= html_writer::end_div();
@@ -665,26 +665,26 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
-        $html .= html_writer::start_div('col-xs-12 p-a-1');
+        $html .= html_writer::start_div('col-12 pt-3 pb-3');
         $html .= html_writer::start_div('card');
-        $html .= html_writer::start_div('card-block');
-        $html .= html_writer::div($this->context_header_settings_menu(), 'pull-xs-right context-header-settings-menu');
+        $html .= html_writer::start_div('card-body');
+        $html .= html_writer::div($this->context_header_settings_menu(), 'float-sm-right context-header-settings-menu');
         // Adding weeks display to original parent full_header code.
-        $html .= html_writer::start_div('clearfix w-100 pull-xs-left');
+        $html .= html_writer::start_div('clearfix w-100 float-sm-left');
         $html .= $this->weeks_display();
-        $html .= html_writer::start_div('pull-xs-left');
+        $html .= html_writer::start_div('float-sm-left');
         $html .= $this->context_header($headerinfo);
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         // End weeks display.
         $pageheadingbutton = $this->page_heading_button();
         if (empty($PAGE->layout_options['nonavbar'])) {
-            $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
+            $html .= html_writer::start_div('clearfix w-100 float-sm-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
-            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button pull-xs-right');
+            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button float-sm-right');
             $html .= html_writer::end_div();
         } else if ($pageheadingbutton) {
-            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar pull-xs-right');
+            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar float-sm-right');
         }
         $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
         $html .= html_writer::end_div();
@@ -709,7 +709,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($PAGE->course)->figure_section());
         $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
         $html = html_writer::link($adminlink, $adminbutton,
-                array('class' => 'admin-panel-link pull-xs-right'
+                array('class' => 'admin-panel-link float-sm-right'
                 . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
 
         return $html;

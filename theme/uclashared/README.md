@@ -26,11 +26,15 @@ Developing theme SASS:
     
     Add new or change existing SASS files in theme/uclashared/scss directory.
 
-    Moodle includes it's own built-in SASS compiler for themes and it is
-    configured to compile the following main SASS file:
+    Moodle includes it's own built-in SASS compiler for themes.
 
-    theme/uclashared/scss/moodle.scss
+    If you wish to add variables to be used in SASS files, add them to:
+    theme/uclashared/scss/pre.scss
 
-    If you need to add more styles make sure to @import them in this file.
+    If you wish to change SASS files, find the corresponding SASS file in
+    theme/uclashared/scss. Then link the new file to:
+    theme/uclashared/scss/post.scss
+
+    If you need to add more SASS files make sure to @import them in this file.
 
     To reflect your changes be sure to purge the Moodle cache.

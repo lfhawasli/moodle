@@ -83,7 +83,7 @@
 // Inherit bootstrap styles.
 .dndupload-progress-outer {
     @extend .progress;
-    @extend .progress-striped;
+    @extend .progress-bar-striped;
     @extend .active;
     
     margin-top: 8px;
