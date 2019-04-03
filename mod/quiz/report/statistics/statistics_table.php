@@ -244,7 +244,11 @@ class quiz_statistics_table extends flexible_table {
 
 
         if ($this->is_dubious_question($questionstat)) {
-            $name = html_writer::tag('div', $name, array('class' => 'dubious'));
+            // START UCLA MOD:CCLE-8045 - Quiz, Results, Statistics, Legend missing.
+            // $name = html_writer::tag('div', $name, array('class' => 'dubious'));
+            $name = html_writer::tag('div', $name, array('class' => 'dubious', 
+                                                         'title' => get_string('lowefficiencytooltip', 'local_ucla')));
+            // END UCLA MOD:CCLE-8045.
         }
 
         if (!empty($questionstat->minmedianmaxnotice)) {
