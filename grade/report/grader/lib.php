@@ -826,6 +826,10 @@ class grade_report_grader extends grade_report {
         $strexcludedgrades = get_string('excluded', 'grades');
         $strerror = get_string('error');
 
+        // START UCLA MOD:CCLE-8032 - Gradebook, Visual for Hidden items.
+        $strhiddenwithbrackets = get_string('hiddenwithbrackets');
+        // END UCLA MOD:CCLE-8032.  
+
         $viewfullnames = has_capability('moodle/site:viewfullnames', $this->context);
 
         foreach ($this->gtree->get_levels() as $key => $row) {
@@ -903,6 +907,9 @@ class grade_report_grader extends grade_report {
 
                     if ($element['object']->is_hidden()) {
                         $itemcell->attributes['class'] .= ' dimmed_text';
+                        // START UCLA MOD:CCLE-8032 - Gradebook, Visual for Hidden items.
+                        $headerlink .= ' ' . $strhiddenwithbrackets;
+                        // END UCLA MOD:CCLE-8032. 
                     }
 
                     $singleview = '';
