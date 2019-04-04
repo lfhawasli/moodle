@@ -36,3 +36,45 @@ ul {
 .generaltable .ics-course td {
 	white-space: pre;
 }
+
+// Make special class to have fixed headers and first column for tables.
+// Taken from https://jsfiddle.net/RMarsh/bzuasLcz/3/
+table.stickyheader {
+    position: relative;
+    overflow: hidden;
+    border-collapse: collapse;
+}
+table.stickyheader {
+    td, th {
+        border: 1px solid $gray;
+    }
+}
+.stickyheader thead {
+    position: relative;
+    display: block; // Separates the header from the body allowing it to be positioned.
+    overflow: visible;
+}
+.stickyheader th {
+    background-color: $gray-lightest;
+    min-width: 120px;
+    height: 32px;
+}
+// First cell in the header.
+.stickyheader thead th:nth-child(1) {
+    position: relative;
+    background-color: $gray-lightest;
+}
+.stickyheader tbody {
+    position: relative;
+    display: block; // Separates the tbody from the header.
+    overflow: scroll;
+}
+.stickyheader tbody td {
+    min-width: 120px;
+}
+// The first cell in each tr.
+.stickyheader tbody tr td:nth-child(1) {
+    position: relative;
+    display: block; // Separates the first column from the tbody.
+    background: $gray-lightest;
+}
