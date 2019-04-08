@@ -1,8 +1,8 @@
 #coursecat-management #course-category-listings .listing-pagination .yui3-button {
-    background-color: $btn-secondary-bg;
+    background-color: $gray-200;
 
     &.active-page {
-        background-color: inherit;
+        background-color: $gray-700;
     }
 }
 

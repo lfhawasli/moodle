@@ -35,10 +35,8 @@ $THEME->name = 'uclashared';
 // Parent theme.
 $THEME->parents = array('boost');
 
-// Style sheets from our current theme.
-$THEME->sheets = array(
-    'flatpickr.min'
-);
+// Style sheets for date picker.
+$THEME->sheets = array('flatpickr.min');
 
 // Boost does not support dock, so neither will we.
 $THEME->enable_dock = false;
@@ -82,9 +80,12 @@ switch ($PAGE->pagetype) {
         $THEME->layouts['incourse']['regions'] = array();
 }
 
-// Add new SASS styles to an include file in theme/uclashared/scss/moodle.scss.
-$THEME->scss = 'moodle';
-
 $THEME->layouts['frontpage'] = array(
   'file' => 'frontpage.php',
 );
+
+// This is the function that returns the SCSS source for the main file in our theme. We override the boost version because
+// we want to allow presets uploaded to our own theme file area to be selected in the preset list.
+$THEME->scss = function($theme) {
+    return theme_uclashared_get_main_scss_content($theme);
+};
