@@ -50,7 +50,7 @@ class course_edit_form extends moodleform {
         $this->course  = $course;
         $this->context = $context;
         
-        // START UCLAMOD CCLE-2389 - site indicator info display
+        // START UCLA MOD: CCLE-2389 - site indicator info display
         
         if(!empty($course->id) && ucla_map_courseid_to_termsrses($this->course->id)) {
             // is a registrar site
@@ -141,7 +141,7 @@ class course_edit_form extends moodleform {
                 }
             }            
         }
-        // END UCLA MOD CCLE-2389
+        // END UCLA MOD: CCLE-2389
 
         // Form definition with new course defaults.
         $mform->addElement('header','general', get_string('general', 'form'));
@@ -220,6 +220,9 @@ class course_edit_form extends moodleform {
                 $mform->setConstant('visible', $courseconfig->visible);
             }
         }
+        */
+        // END UCLA MOD: CCLE-6987.
+
         $mform->addElement('date_time_selector', 'startdate', get_string('startdate'));
         $mform->addHelpButton('startdate', 'startdate');
         $date = (new DateTime())->setTimestamp(usergetmidnight(time()));
@@ -259,7 +262,7 @@ class course_edit_form extends moodleform {
             }
             $course->idnumber = $idnumber;
         }
-        // END UCLA MOD CCLE-2940
+        // END UCLA MOD: CCLE-2940
 
         // Description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
@@ -333,7 +336,7 @@ class course_edit_form extends moodleform {
                 $data = $OUTPUT->edit_form_filepicker($mform, $course->id, $coursecontext->id);
                 $this->set_data($data);
             }
-            // END UCLA MOD CCLE-2315
+            // END UCLA MOD: CCLE-2315
         }
 
         $languages=array();

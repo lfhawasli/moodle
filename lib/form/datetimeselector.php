@@ -95,6 +95,18 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
         /*
         $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
             'defaulttime' => 0, 'timezone' => 99, 'step' => 1, 'optional' => false);
+        */
+        // Get locale default timeformat and check if it is in 24 or 12 hour format.
+        $timeformat = get_string('strftimetime');
+        $time24hr = true;
+        if (strpos($timeformat, '%p')) {
+            $time24hr = false;
+        }
+        // Note: flatpickr does not support non-gregorian calendar.
+        $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
+                'defaulttime' => time(), 'timezone' => 99, 'step' => 1, 'optional' => false, 'clear' => false,
+                'placeholder' => 'Select date...', 'time24hr' => $time24hr, 'timeformat' => $timeformat, 'locale' => current_language());
+        // END UCLA MOD: CCLE-6868.
 
         // TODO MDL-52313 Replace with the call to parent::__construct().
         HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes);
