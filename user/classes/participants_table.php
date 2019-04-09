@@ -521,7 +521,10 @@ class participants_table extends \table_sql {
         }
         // ENS UCLA MOD: CCLE-7751
 
-        $rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        // START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+        //$rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->accesssince,
+        $rawdata = user_get_participants($this->course->id, $this->currentgroup, $this->currentgrouping, $this->accesssince,
+        // END UCLA MOD: CCLE-5686.
             $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams, $sort, $this->get_page_start(),
             $this->get_page_size());
         $this->rawdata = [];

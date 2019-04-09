@@ -250,7 +250,10 @@ echo '<div class="userlist">';
 foreach (array_unique($filtersapplied) as $filterix => $filter) {
     $baseurl->param('unified-filters[' . $filterix . ']', $filter);
 }
-$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
+// START UCLA MOD: CCLE-5686 - Add grouping filter for participant list.
+//$participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
+$participanttable = new \core_user\participants_table($course->id, $groupid, $groupingid, $lastaccess, $roleid, $enrolid, $status,
+// END UCLA MOD: CCLE-5686.
     $searchkeywords, $bulkoperations, $selectall);
 $participanttable->define_baseurl($baseurl);
 
