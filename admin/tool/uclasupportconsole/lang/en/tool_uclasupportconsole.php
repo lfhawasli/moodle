@@ -169,7 +169,7 @@ $string['uclasupportconsole:view'] = 'Use UCLA support console';
 
 // Sorting headers
 $string['name'] = 'Name';
-$string['cid'] = 'Course ID';
+$string['cid'] = 'Course name';
 $string['timemodified'] = 'Time modified';
 $string['modifierid'] = 'Assigned by';
 $string['lastaccess'] = 'Last access';
