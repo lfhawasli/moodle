@@ -90,7 +90,12 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
         /*
         $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
             'defaulttime' => 0, 'timezone' => 99, 'step' => 1, 'optional' => false);
-        // TODO MDL-52313 Replace with the call to parent::__construct().
+        */
+        // Note: flatpickr does not support non-gregorian calendar.
+        $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
+                'defaulttime' => 0, 'timezone' => 99, 'step' => 1, 'optional' => false, 'clear' => false,
+                'placeholder' => get_string('selectadate'), 'locale' => current_language());
+        // END UCLA MOD: CCLE-6917.
         HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes);
         $this->_persistantFreeze = true;
         $this->_appendName = true;
