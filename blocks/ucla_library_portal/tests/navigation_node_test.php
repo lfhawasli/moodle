@@ -51,15 +51,17 @@ class navigation_node_test extends advanced_testcase {
      */
     function test_nonregcourse() {
         $course = $this->getDataGenerator()->create_course();
-        $nodes = block_ucla_library_portal::get_navigation_nodes(array('course' => $course));
-        $this->assertEquals(0, count($nodes));
+        $node = block_ucla_library_portal::get_navigation_nodes(array('course' => $course));
+        $this->assertNull($node);
     }
 
     /**
-     * Make sure that the default url is returned for a registrar course that
-     * if no url is set in the site config.
+     * Make sure that no nodes are returned for a registrar course that has no
+     * url is set in the site config.
      */
     function test_nourlset() {
+        set_config('url', null, 'block_ucla_library_portal');
+
         $class = $this->getDataGenerator()
                       ->get_plugin_generator('local_ucla')
                       ->create_class(array('term' => '14W'));
@@ -67,13 +69,9 @@ class navigation_node_test extends advanced_testcase {
 
         $course = get_course($requestclass->courseid);
 
-        $nodes = block_ucla_library_portal::get_navigation_nodes(
+        $node = block_ucla_library_portal::get_navigation_nodes(
                 array('course' => $course));
-        $this->assertEquals(1, count($nodes));
-
-        $moodleurl = $nodes[0]->action;
-        $this->assertEquals('http://www.library.ucla.edu/library-research-portal',
-                $moodleurl->out());
+        $this->assertNull($node);
     }
 
     /**
@@ -90,25 +88,25 @@ class navigation_node_test extends advanced_testcase {
 
         $course = get_course($requestclass->courseid);
 
-        $nodes = block_ucla_library_portal::get_navigation_nodes(
+        $node = block_ucla_library_portal::get_navigation_nodes(
                 array('course' => $course));
-        $this->assertEquals(1, count($nodes));
+        $this->assertInstanceOf('navigation_node', $node);
 
-        $moodleurl = $nodes[0]->action;
+        $moodleurl = $node->action;
         $this->assertEquals('http://ucla.edu', $moodleurl->out_omit_querystring());
 
         // Will return variables in $c<num> naming scheme. Each variable should
         // have the following keys: t (term), sub (subject area), cat (catalog
         // number), and sec (section number).
-        parse_str($moodleurl->get_query_string(false));
+        parse_str($moodleurl->get_query_string(false), $results);
 
         $reginfos = ucla_get_course_info($requestclass->courseid);
         $reginfo = array_pop($reginfos);
 
-        $this->assertEquals($reginfo->term, $c0['t']);
-        $this->assertEquals($reginfo->subj_area, $c0['sub']);
-        $this->assertEquals($reginfo->crsidx, $c0['cat']);
-        $this->assertEquals($reginfo->classidx, $c0['sec']);
+        $this->assertEquals($reginfo->term, $results['c0']['t']);
+        $this->assertEquals($reginfo->subj_area, $results['c0']['sub']);
+        $this->assertEquals($reginfo->crsidx, $results['c0']['cat']);
+        $this->assertEquals($reginfo->classidx, $results['c0']['sec']);
     }
 
     /**
@@ -125,11 +123,11 @@ class navigation_node_test extends advanced_testcase {
 
         $course = get_course($requestclass->courseid);
 
-        $nodes = block_ucla_library_portal::get_navigation_nodes(
+        $node = block_ucla_library_portal::get_navigation_nodes(
                 array('course' => $course));
-        $this->assertEquals(1, count($nodes));
+        $this->assertInstanceOf('navigation_node', $node);
 
-        $moodleurl = $nodes[0]->action;
+        $moodleurl = $node->action;
         $this->assertEquals('http://ucla.edu', $moodleurl->out_omit_querystring());
 
         // Will return variables in $c<num> naming scheme. Each variable should
@@ -163,24 +161,24 @@ class navigation_node_test extends advanced_testcase {
 
         $course = get_course($requestclass->courseid);
 
-        $nodes = block_ucla_library_portal::get_navigation_nodes(
+        $node = block_ucla_library_portal::get_navigation_nodes(
                 array('course' => $course));
-        $this->assertEquals(1, count($nodes));
+        $this->assertInstanceOf('navigation_node', $node);
 
         // Count how many records are returned.
-        $moodleurl = $nodes[0]->action;
+        $moodleurl = $node->action;
         parse_str($moodleurl->get_query_string(false), $results);
         $this->assertEquals(4, count($results));
 
         // Now lower the number of records returned.
         set_config('maxrecords', 2, 'block_ucla_library_portal');
 
-        $nodes = block_ucla_library_portal::get_navigation_nodes(
+        $node = block_ucla_library_portal::get_navigation_nodes(
                 array('course' => $course));
-        $this->assertEquals(1, count($nodes));
+        $this->assertInstanceOf('navigation_node', $node);
 
         // Count how many records are returned.
-        $moodleurl = $nodes[0]->action;
+        $moodleurl = $node->action;
         parse_str($moodleurl->get_query_string(false), $results);
         $this->assertEquals(2, count($results));
     }
