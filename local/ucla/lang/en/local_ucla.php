@@ -366,3 +366,6 @@ $string['esbprivatekeyhelp'] = 'Path on the server to the Private Key file. Must
 $string['esbwindowsize']  = 'Window size';
 $string['esbwindowsizehelp']  = 'How many simulatenous API calls to make to ESB.';
 $string['esberror'] = 'ESB error ({$a->lasthttpcode}): {$a->lastmessage}. Query = {$a->lastquery}';
+
+// CCLE-8045 - Add tooltip for low discriminative efficiency into quiz statistics 
+$string['lowefficiencytooltip'] = 'This is a question that may need review because the results are outside the range of expected distribution.';
