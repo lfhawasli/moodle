@@ -154,6 +154,16 @@ $string['notice_course_status_pasttemp'] = 'You have temporary access to a site 
 $string['notice_course_status_hiddentemp'] = 'You have temporary access to a site that is currently unavailable. Your access will expire after {$a}.';
 $string['notice_course_status_pasthiddentemp'] = 'You have temporary access to a site for a course that is no longer in session. Your access will expire after {$a}.';
 
+// SSC-2276 - Create a warning that notifies faculty of visible quizzes.
+$string['notice_quizhidden'] = 'This old course has quizzes that are still visible to students:';
+$string['notice_quizhidden_ask'] = 'Would you like to make all of these quizzes hidden?';
+$string['notice_quizhidden_yes'] = 'Yes';
+$string['notice_quizhidden_no'] = 'No';
+$string['notice_quizhidden_later'] = 'Remind me later';
+$string['notice_quizhidden_yes_redirect'] = 'All visible quizzes on this course are now hidden.';
+$string['notice_quizhidden_no_redirect'] = 'You will no longer be prompted about visible quizzes. To hide quizzes manually, go through each quiz module, click "Edit settings," and toggle the \'Visible\' setting.';
+$string['notice_quizhidden_later_redirect'] = 'Visible quizzes reminder set for 24 hours. After a day, you will be prompted again if you visit this course.';
+
 $string['lti_warning'] = 'There are risks using external tools. Please read ' .
         'this help document for more information: ' .
         '<a target="_blank" href="https://docs.ccle.ucla.edu/w/LTI">https://docs.ccle.ucla.edu/w/LTI</a>';
