@@ -72,7 +72,7 @@ $courseparams = array();
 $termparams = array();
 
 // Process course ID.
-$courselist = explode(',', $options['courseid']);
+$courselist = preg_split('/\s*,\s*/', $options['courseid'], -1, PREG_SPLIT_NO_EMPTY);;
 if (!empty($courselist)) {
     list($coursesql, $courseparams) = $DB->get_in_or_equal($courselist, SQL_PARAMS_NAMED, 'courseid');
     $where .= ' AND e.courseid ' . $coursesql;
@@ -81,7 +81,7 @@ if (!empty($courselist)) {
 // Process term.
 // If no term specified, skip joining ucla_request_classes table and query all meta sites.
 if ($options['term'] || $options['current-term'] && !empty($CFG->currentterm)) {
-    $termlist = explode(',', $options['term']);
+    $termlist = preg_split('/\s*,\s*/', $options['term'], -1, PREG_SPLIT_NO_EMPTY);;
     // If no term option, then current-term must be true.
     if (empty($termlist)) {
         $termlist = array($CFG->currentterm);

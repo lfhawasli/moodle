@@ -64,7 +64,26 @@
         $urlparams['show_all'] = 1;
     }
     // END UCLA MOD: CCLE-3362    
-    
+    // START UCLA MOD: CCLE-6984 - Improve method of optioning in or out of simplified activity chooser.
+    // Ref: https://moodle.org/mod/forum/discuss.php?d=384390#p1552319
+    $custmc = optional_param('custmc', null, PARAM_BOOL);
+     if ($custmc !== null) {
+        set_user_preference('modchoosersetting', $custmc);
+        $PAGE->requires->js_amd_inline(
+            "
+            require(['jquery'], function() {
+                setTimeout(function() {
+                    var element = $('li#section-$section span.section-modchooser-link');
+                        console.log(element);
+                    if (element.length > 0) {
+                        element.get(0).click();
+                    }
+                }, 1000);
+                });
+            "
+        );
+     }
+    // END UCLA MOD: CCLE-6984.
     // Sectionid should get priority over section number
     if ($sectionid) {
         $section = $DB->get_field('course_sections', 'section', array('id' => $sectionid, 'course' => $course->id), MUST_EXIST);

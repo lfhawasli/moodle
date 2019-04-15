@@ -50,6 +50,10 @@ class modchooser extends chooser {
     /** @var int Indicates if modchooser is customizable. */
     public $customizable;
     // END UCLA MOD: CCLE-7143.
+    // START UCLA MOD: CCLE-6984 - Improve method of optioning in or out of simplified activity chooser.
+    // Current display section.
+    public $displaysection;
+    // END UCLA MOD: CCLE-6984.
 
     /**
      * Constructor.
@@ -62,6 +66,14 @@ class modchooser extends chooser {
         // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
         $this->customizable = get_user_preferences('modchoosersetting', 0);
         // END UCLA MOD: CCLE-7143.
+        // START UCLA MOD: CCLE-6984 - Improve method of optioning in or out of simplified activity chooser.
+        /* @var $format format_ucla.*/
+        $format = course_get_format($course);
+        if (property_exists( $format, 'format' ) && ($format->get_format() == 'ucla')) {
+            $this->displaysection = $format->figure_section();
+        }
+        // END UCLA MOD: CCLE-6984.
+
         $sections = [];
         $context = context_course::instance($course->id);
 
@@ -117,10 +129,14 @@ class modchooser extends chooser {
         // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
         } else {
             // Add link to new modchooser preference option.
-            $modchooserlink = '<a href=' . new moodle_url('/course/modchooser_preferences.php',
+            /* $modchooserlink = '<a href=' . new moodle_url('/course/modchooser_preferences.php',
                     array('returnto' => $this->course->id)) . '>' .
                     get_string('customizemodchooserlink', 'moodle') . '</a>';
-            $this->set_instructions(new lang_string('selectmoduletoviewhelpmodchooser', 'moodle', $modchooserlink));
+            $this->set_instructions(new lang_string('selectmoduletoviewhelpmodchooser', 'moodle', $modchooserlink)); */
+            $customizedmclink = '<div class=custmclink><a id=custmc href=' . new moodle_url('/course/view.php',
+                    array('id' => $this->course->id, 'section' => $this->displaysection, 'custmc' => 1)) . '>' .
+                    get_string('customizemodchooserlink', 'moodle') . '</a></div>';
+            $this->set_instructions(new lang_string('selectmoduletoviewhelpmodchooser', 'moodle', $customizedmclink));
         }
         // END UCLA MOD: CCLE-7143.
         $this->add_param('course', $course->id);
@@ -141,8 +157,11 @@ class modchooser extends chooser {
         if ($this->customizable) {
             $defaulttools = get_config('moodlecourse', 'modchooserdefaults');
             $userpinnedtools = get_user_preferences('pinnedtools', $defaulttools);
-
-            $data->custommodchooserhelp = get_string('custommodchooserhelp');
+            // $data->custommodchooserhelp = get_string('custommodchooserhelp');
+            $completemclink = '<a id=custmc href=' . new moodle_url('/course/view.php',
+                    array('id' => $this->course->id, 'section' => $this->displaysection, 'custmc' => 0)) . '>' .
+                    get_string('completemodchooserlink', 'moodle') . '</a>';
+            $data->custommodchooserhelp = get_string('custommodchooserhelp').$completemclink;
             $data->defaulttools = $defaulttools;
             $data->userpinnedtools = $userpinnedtools;
 

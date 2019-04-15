@@ -217,6 +217,7 @@ $CFG->defaultpreference_trackforums = 1;
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
 $CFG->hiddenuserfields = 'city,country,timezone,icqnumber,skypeid,yahooid,aimid,msnid';
+$CFG->maxusersperpage = 125;
 
 // Site administration > Users > Privacy and policies > Privacy settings
 $CFG->forced_plugin_settings['tool_dataprivacy']['showdataretentionsummary'] = 0;
@@ -375,7 +376,7 @@ $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
 // Site administration > Plugins > Admin tools > Manage senior scholars
-$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '304890652;904106809;304555952';
+$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '304890652;904106809;804174318';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus

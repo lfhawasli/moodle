@@ -28,6 +28,9 @@ global $CFG;
 require_once($CFG->dirroot.'/lib/accesslib.php');
 require_once($CFG->dirroot.'/local/ucla/outputcomponents.php');
 require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
+require_once($CFG->dirroot.'/local/ucla/past_course_visible_quiz_notice_form.php');
+
+define('UCLA_PAST_QUIZ_NOTICE_NO_REMINDERS', -1);
 
 /**
  * Function to sort an array of strings in alphabetical order.
@@ -1584,6 +1587,46 @@ function notice_course_status($course) {
     if (!empty($noticestring)) {
         return $OUTPUT->notification(get_string($noticestring, 'local_ucla',
                 $noticeparam), 'notifywarning');
+    }
+}
+
+/**
+ * Notify instructors about quizzes in the course that are not hidden.
+ *
+ * @param object $course
+ * @return string           Returns notice if any is needed.
+ */
+function notice_visible_quiz($course) {
+    global $DB;
+
+    $context = context_course::instance($course->id);
+    $hascapability = has_capability('moodle/course:manageactivities', $context);
+    if ($hascapability) {
+        // Get preferences for past course quiz notices. If they don't exist then set them.
+        $nextnoticetime = (int) get_user_preferences('ucla_quiz_notice_noprompt_' . $course->id);
+        if (is_null($nextnoticetime) || $nextnoticetime == 0) { // Moodle seems to default to either null or 0 for unset preferences.
+            set_user_preference('ucla_quiz_notice_noprompt_' . $course->id, time());
+            $nextnoticetime = (int) get_user_preferences('ucla_quiz_notice_noprompt_' . $course->id);
+        }
+
+        // If we need to show our quiz notice then run sql queries and generate notice.
+        if ($nextnoticetime != 0 && $nextnoticetime != UCLA_PAST_QUIZ_NOTICE_NO_REMINDERS && time() >= $nextnoticetime) {
+            $sql = "SELECT cm.id, cm.instance, q.name
+                    FROM {course_modules} AS cm
+                    JOIN {modules} AS m ON cm.module = m.id
+                    JOIN {quiz} AS q ON cm.instance = q.id AND cm.course = q.course
+                    WHERE cm.course = :cid AND m.name = \"quiz\" AND cm.visible = 1";
+            $result = $DB->get_records_sql($sql, array('cid' => $course->id));
+
+            if (!empty($result)) {
+                // Generate the HTML for the notification.
+                $noticeurl = '/local/ucla/past_course_visible_quiz_notice.php';
+                $noticeform = new past_course_visible_quiz_notice_form(new moodle_url($noticeurl,
+                    array('id' => $course->id)), $result, 'post', '',
+                    array('class' => 'alert alert-warning'));
+                $noticeform->display();
+            }
+        }
     }
 }
 
