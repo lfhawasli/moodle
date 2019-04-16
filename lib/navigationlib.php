@@ -173,10 +173,7 @@ class navigation_node implements renderable {
                 $this->shorttext = $properties['shorttext'];
             }
             if (!array_key_exists('icon', $properties)) {
-                // START UCLA MOD: CCLE-7327 - Remove folder icons for sections.
-                //$properties['icon'] = new pix_icon('i/navigationitem', '');
-                $properties['icon'] = null;
-                // END UCLA MOD: CCLE-7327.
+                $properties['icon'] = new pix_icon('i/navigationitem', '');
             }
             $this->icon = $properties['icon'];
             if ($this->icon instanceof pix_icon) {
