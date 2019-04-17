@@ -79,6 +79,11 @@ require('managetabs.php');
 
 $table = $controller->get_table();
 
+// START UCLA MOD: CCLE-8175 - Freeze header and first column for "Allow" role tables.
+$table->attributes['class'] = 'stickyheader';
+$PAGE->requires->js('/local/ucla/js/stickyheader.js');
+// END UCLA MOD: CCLE-8175.
+
 echo $OUTPUT->box($controller->get_intro_text());
 
 echo '<form action="' . $baseurl . '" method="post">';

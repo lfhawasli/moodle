@@ -446,12 +446,15 @@ $string['currentlyselectedusers'] = 'Currently selected users';
 $string['currentpicture'] = 'Current picture';
 $string['currentrelease'] = 'Current release information';
 $string['currentversion'] = 'Current version';
-// START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
-$string['custommodchooserhelp'] = 'New layout - same great tools.
-<br><br>
-Don\'t see what you\'re looking for? Click \'Show all tools/Set favorite tools\' to see more.';
-$string['customizemodchooserlink'] = 'Try the customizable Activities/Resources chooser.';
-// END UCLA MOD: CCLE-7143.
+// START UCLA MOD: CCLE-6984 - Improve method of optioning in or out of simplified activity chooser.
+// $string['custommodchooserhelp'] = 'New layout - same great tools.
+// <br><br>
+// Don\'t see what you\'re looking for? Click \'Show all tools/Set favorite tools\' to see more.';
+// $string['customizemodchooserlink'] = 'Try the customizable Activities/Resources chooser.';
+$string['completemodchooserlink'] = 'Change back to the complete Activity/Resource chooser.';
+$string['custommodchooserhelp'] = 'Don\'t see what you\'re looking for? <br/>Click \'Show all tools/Set favorite tools\' to see more. <br/>';
+$string['customizemodchooserlink'] = 'Customize Activity/Resource chooser';
+// END UCLA MOD: CCLE-6984.
 $string['databasechecking'] = 'Upgrading Moodle database from version {$a->oldversion} to {$a->newversion}';
 $string['databaseperformance'] = 'Database performance';
 $string['databasesetup'] = 'Setting up database';

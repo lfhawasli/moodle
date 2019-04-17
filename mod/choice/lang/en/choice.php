@@ -148,7 +148,10 @@ $string['showunanswered'] = 'Show column for unanswered';
 $string['spaceleft'] = 'space available';
 $string['spacesleft'] = 'spaces available';
 $string['taken'] = 'Taken';
-$string['viewallresponses'] = 'View {$a} responses';
+//START UCLA MOD: CCLE-7027-Choice administration, Download is a hidden feature
+//$string['viewallresponses'] = 'View {$a} responses';
+$string['viewallresponses'] = 'View or download {$a} responses';
+//END UCLA MOD: CCLE-7027 
 $string['viewchoices'] = 'View choices';
 $string['withselected'] = 'With selected';
 $string['userchoosethisoption'] = 'Users who chose this option';

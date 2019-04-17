@@ -229,6 +229,7 @@ $CFG->defaultpreference_trackforums = 1;
 $CFG->autologinguests = true;
 $CFG->showuseridentity = 'idnumber,email';
 $CFG->hiddenuserfields = 'city,country,timezone,icqnumber,skypeid,yahooid,aimid,msnid';
+$CFG->maxusersperpage = 125;
 
 // Site administration > Users > Privacy and policies > Privacy settings
 $CFG->forced_plugin_settings['tool_dataprivacy']['showdataretentionsummary'] = 0;

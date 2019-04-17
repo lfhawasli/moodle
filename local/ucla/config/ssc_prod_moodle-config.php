@@ -344,7 +344,7 @@ $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
 // Site administration > Plugins > Admin tools > Manage senior scholars
-$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '304890652;904106809;304555952';
+$CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator'] = '304890652;904106809;804174318';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus
@@ -460,7 +460,7 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
     fontselect,fontsizeselect,code,search,replace,wrap,cleanup,removeformat,pastetext,pasteword,wrap,fullscreen';
 
 // Site administration > Plugins > Local plugins > Kaltura package libraries
-$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = '1467031-4.kaf.kaltura.com';
+$CFG->forced_plugin_settings['local_kaltura']['kaf_uri'] = 'kaf.moodle2.sscnet.ucla.edu';
 
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.

@@ -240,6 +240,11 @@ class format_ucla_renderer extends format_topics_renderer {
 
         // CCLE-6557 - Print easy to find "Enroll me" button.
         echo $this->print_self_enrollment_button();
+
+        // SSC-2276 - Display a notification on course page if there are non-hidden quizzes.
+        if (is_past_course($this->course)) {
+            notice_visible_quiz($this->course);
+        }
     }
 
     /**

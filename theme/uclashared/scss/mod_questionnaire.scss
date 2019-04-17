@@ -1,3 +1,29 @@
 #page-mod-questionnaire-questions #region-main .mform #id_allchoices {
     resize: both;
 }
+
+.path-mod-questionnaire {
+    // Fix radio buttons from being cut off.
+    .qn-answer {
+        padding-left: 0.5em;
+    }
+    // Make it easier to see separate questions.
+    .qn-content {
+        border-bottom: 1px solid lightgray;
+        padding-bottom: 5px;
+    }
+    // Remove background color for question number.
+    .qn-info {
+        background-color: inherit;
+    }
+    // Remove background color for question text.
+    .qn-question {
+        background-color: inherit;
+        font-size: larger;
+        font-weight: bold;
+    }
+    // Add period after question number.
+    .qn-number:after {
+        content: ".";
+    }
+}

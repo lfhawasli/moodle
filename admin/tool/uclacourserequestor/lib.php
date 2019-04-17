@@ -415,7 +415,10 @@ function requestor_ignore_entry($data) {
     $num = get_course_num($rawnum);
 
     if ($num > 495) {
-        return true;
+        // CCLE-8234 - Allow courses between 495-500 for EDUC and INF STD.
+        if (!(in_array($subj, ['EDUC', 'INF STD']) && $num < 500)) {
+            return true;
+        }
     }
 
     if ($subj == 'PHYSICS' && $num > 295) {
@@ -753,7 +756,7 @@ function prepare_requests_for_display($requestinfos, $context) {
         $displayrow = $set[$displaykey];
 
         // Hide MyUCLA url.
-        if (!empty($nourlupdatehide)) {
+        if (!empty($nourlupdatehide) && !$displayrow['nourlupdate']) {
             unset($displayrow['nourlupdate']);
         }
 
