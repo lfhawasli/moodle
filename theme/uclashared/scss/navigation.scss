@@ -177,15 +177,3 @@
         background-color: $ta-site-hover-color;
     }
 }
-
-// Site Administration icon.
-.list-group-item[data-key="sitesettings"] .media:before {
-    font-family: FontAwesome;
-    font-size: 1.1rem;
-    content: "\f0ad";
-    color: $body-color;
-    display: table-cell;
-    vertical-align: top;
-    padding-right: 17px;
-    padding-left: 0.6rem;
-}
