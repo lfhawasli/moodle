@@ -229,7 +229,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
         $this->_elements[] = $this->createFormElement('html',
                 '<div style="display: inline; margin-right: 10px;" class="flatpickr" name ="'. $inputname .'_flatpickr">');
         $this->_elements[] = $this->createFormElement('text', 'date_time_selector', '',
-                array('data-input' => 'data-input', 'placeholder' => $placeholder));
+                array('data-input' => 'data-input', 'placeholder' => $placeholder, 'class' => 'd-inline'));
         $this->_elements[] = $this->createFormElement('static', 'flatpickrscript', '',
             '<a style="text-decoration: none;" class="input-button" title="Calendar" data-toggle>
                 <i class="fa fa-calendar" aria-hidden="true"></i>
