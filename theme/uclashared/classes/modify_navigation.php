@@ -636,6 +636,14 @@ class modify_navigation {
                 $node->icon = $nodeinfo['icon'];
             }
         }
+
+        // Remove folder icons for sections. 
+        $iter = $this->coursenode->children->getIterator(); 
+        foreach ($iter as $key=>$node) {
+            if ($node->icon && $node->icon->pix == 'i/section') {
+                $node->icon = null; 
+            }
+        }
     }
 
     /**
