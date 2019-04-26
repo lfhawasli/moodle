@@ -362,7 +362,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         // Add a class for when $withlinks is false.
-        $usermenuclasses = 'usermenu';
+        $usermenuclasses = 'usermenu ml-auto mr-1 navbar-collapse';
         if (!$withlinks) {
             $usermenuclasses .= ' withoutlinks';
         }
@@ -483,7 +483,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $returnstr .= html_writer::span(
-            html_writer::span($usertextcontents, 'usertext') .
+            html_writer::span($usertextcontents, 'usertext mr-1') .
             html_writer::span($avatarcontents, $avatarclasses),
             'userbutton'
         );

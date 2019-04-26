@@ -9,7 +9,7 @@
 //  1. Logo + user buttons
 //  2. System + weeks display
 
-header {
+nav {
 
     margin-bottom: 8px;
     
@@ -23,6 +23,13 @@ header {
         }
     }
     
+    .fixed-top {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+    }
     .header-main {
         background-color: $header-color-prod; //2c5e91
         position: absolute;
@@ -132,9 +139,8 @@ header {
 }
 
 .header-login {
-    float: right;
-    margin-right: 15px;
-    margin-top: -4px;
+    position: relative;
+    display: flex;
     
     .header-btn-group {
         float: right;
@@ -210,6 +216,12 @@ header {
         font-size: 1.1rem;
         margin-left: -20px;
     }
+    @include media-breakpoint-down(sm) {
+        .header-btn-group {
+            display: flex;
+            margin: auto;
+        }
+    }
 }
 
 // Help button
@@ -246,6 +258,22 @@ a.btn-help-feedback {
   right: -35px;
   padding: 8px 25px 35px 0px;
   bottom: -12px;
+}
+
+.usermenu.mr-1, .usermenu.mx-1 {
+    margin-right: .5rem;
+}
+
+.usermenu.navbar-collapse {
+    display: -ms-flexbox;
+    display: inline-grid;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+}
+
+.usermenu.flex-grow-0 {
+    -ms-flex-positive: 0;
+    flex-grow: 0;
 }
 
 @include media-breakpoint-down(xs) {
@@ -332,9 +360,16 @@ a.btn-help-feedback {
     #btn-login:hover {
         background-color: lighten($ccle-color-logo, 10%);
     }
+    img.userpicture {
+        margin-right: .5rem;
+        margin-bottom: .2rem;
+    }
  }
  
 .navbar {
+    
+    display: inherit;
+    
     .popover-region {
         float: left;
         margin-top: 8px;
