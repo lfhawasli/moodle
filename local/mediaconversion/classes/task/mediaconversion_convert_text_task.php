@@ -34,14 +34,17 @@ require_once(__DIR__.'/../../locallib.php');
  * @copyright  2017 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mediaconversion_convert_text_task extends \core\task\adhoc_task {
+class mediaconversion_convert_text_task extends base_adhoc_task {
     /**
      * Executes the task.
-     *
-     * @throws Exception on error
      */
     public function execute() {
         global $DB;
+
+        if ($this->stop_executing()) {
+            return;
+        }
+
         $customdata = $this->get_custom_data();
         $data = $customdata->eventdata;
         try {
