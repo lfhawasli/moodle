@@ -405,24 +405,34 @@ class course_enrolment_manager {
             $conditions = get_extra_user_fields($this->get_context());
             foreach (get_all_user_name_fields() as $field) {
                 $conditions[] = 'u.'.$field;
+            }            
+            // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+            //$conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
+            // Assume user is searching for lastname first.
+            $conditions[] = $DB->sql_fullname('u.lastname', 'u.firstname');
+            if (strpos($search, ',') !== false) {
+                // Remove comma from search.
+                $separatedwords = preg_split('/(,|\s)+/', $search);
+                $search = implode(' ', $separatedwords);
+            } else {
+                // Did not find a comma, see if there is a space.
+                if (strpos($search, ' ') !== false) {
+                    // There is a space, so user must be searching for firstname
+                    // then lastname, so add that condition as well.
+                    $conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
+                }
             }
-            $conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
-            // START UCLA MOD: CCLE-7799 - Improve enroll users functionality.
-            /*if ($searchanywhere) {
+            // END UCLA MOD: CCLE-7719.
+            if ($searchanywhere) {
                 $searchparam = '%' . $search . '%';
             } else {
                 $searchparam = $search . '%';
-            }*/
-            $splitsearches = explode(' ', $search);
-            if ($searchanywhere) {
-                $searchparam = '%';
-            } else {
-                $searchparam = '';
             }
-            foreach ($splitsearches as $splitsearch) {
-                $searchparam .= $splitsearch . '%';
-            }
-            // END UCLA MOD: CCLE-7799.
+            // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+            // Support searching first name or lastname not exact matches.
+            $splitsearches = explode(' ', $searchparam);
+            $searchparam = implode('%', $splitsearches);
+            // END UCLA MOD: CCLE-7719.
             $i = 0;
             foreach ($conditions as $key => $condition) {
                 $conditions[$key] = $DB->sql_like($condition, ":con{$i}00", false);

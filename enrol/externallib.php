@@ -452,9 +452,6 @@ class core_enrol_external extends external_api {
         $manager = new course_enrolment_manager($PAGE, $course);
 
         // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
-        $separatedwords = preg_split('/(,|\s)+/', $params['search']);
-        $reversedwords = array_reverse($separatedwords);
-        $params['search'] = implode(' ', $reversedwords);
         $params['perpage'] *= 2;
         // END UCLA MOD: CCLE-7719.
 
