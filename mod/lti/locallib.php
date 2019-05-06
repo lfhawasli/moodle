@@ -96,7 +96,10 @@ define('LTI_VERSION_2', 'LTI-2p0');
  * @return array the endpoint URL and parameters (including the signature)
  * @since  Moodle 3.0
  */
-function lti_get_launch_data($instance) {
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+//function lti_get_launch_data($instance) {
+function lti_get_launch_data($instance, $placement = 'activity') {
+// END UCLA MOD: CCLE-6956.
     global $PAGE, $CFG, $USER;
 
     if (empty($instance->typeid)) {
@@ -295,18 +298,15 @@ function lti_get_launch_data($instance) {
  * Launch an external tool activity.
  *
  * @param  stdClass $instance the external tool activity settings
- * @param string $placement the name of the placement, either 'activity', 'menulink', or 'richtexteditor'
  * @return string The HTML code containing the javascript code for the launch
  */
 // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
 // Variable $placement is either 'activity', 'menulink', or 'richtexteditor'.
 //function lti_launch_tool($instance) {
+//    list($endpoint, $parms) = lti_get_launch_data($instance);
 function lti_launch_tool($instance, $placement) {
-// END UCLA MOD: CCLE-6956.
-    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
-    //list($endpoint, $parms) = lti_get_launch_data($instance);
     list($endpoint, $parms) = lti_get_launch_data($instance, $placement);
-    // END UCLA MOD: CCLE-6956.
+// END UCLA MOD: CCLE-6956.
     $debuglaunch = ( $instance->debuglaunch == 1 );
 
     $content = lti_post_launch_html($parms, $endpoint, $debuglaunch);
@@ -656,7 +656,10 @@ function lti_build_custom_parameters($toolproxy, $tool, $instance, $params, $cus
  */
 function lti_build_content_item_selection_request($id, $course, moodle_url $returnurl, $title = '', $text = '', $mediatypes = [],
                                                   $presentationtargets = [], $autocreate = false, $multiple = false,
-                                                  $unsigned = false, $canconfirm = false, $copyadvice = false) {
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+                                                  //$unsigned = false, $canconfirm = false, $copyadvice = false) {
+                                                  $unsigned = false, $canconfirm = false, $copyadvice = false, $placement = 'activity') {
+    // END UCLA MOD: CCLE-6956.
     global $USER;
 
     $tool = lti_get_type($id);
@@ -671,14 +674,10 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
         throw new coding_exception('The list of accepted presentation targets should be in an array');
     }
     // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
-    if (!in_array($placement, ['activity', 'assignment', 'menulink', 'richtexteditor',])) {
+    if (!in_array($placement, ['activity', 'assignment', 'menulink', 'richtexteditor'])) {
         throw new Moodle_Exception("Invalid placement type: $placement");
     }
     // END UCLA MOD: CCLE-6956.
-
-    if (!in_array($placement, ['activity', 'assignment', 'menulink', 'richtexteditor', ])) {
-        throw new Moodle_Exception("Invalid placement type: $placement");
-    }
 
     // Check title. If empty, use the tool's name.
     if (empty($title)) {
@@ -714,7 +713,9 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     }
 
     // Set the tool URL.
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
     $placementurlkey = $placement . 'url';
+    // END UCLA MOD: CCLE-6956.
     if (!empty($typeconfig['toolurl_ContentItemSelectionRequest'])) {
         // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
         //$toolurl = new moodle_url($typeconfig['toolurl_ContentItemSelectionRequest']);
@@ -2038,15 +2039,6 @@ function lti_prepare_type_for_save($type, $config) {
     }
 
     // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
-    if (isset($config->lti_toolurl_ContentItemSelectionRequest)) {
-        if (!empty($config->lti_toolurl_ContentItemSelectionRequest)) {
-            $type->toolurl_ContentItemSelectionRequest = $config->lti_toolurl_ContentItemSelectionRequest;
-        } else {
-            $type->toolurl_ContentItemSelectionRequest = '';
-        }
-        $config->lti_toolurl_ContentItemSelectionRequest = $type->toolurl_ContentItemSelectionRequest;
-    }
-
     $type->asassignment = false;
     $type->asmenulink = false;
     $type->asrichtexteditorplugin = false;
