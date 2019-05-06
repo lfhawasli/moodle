@@ -97,6 +97,12 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
             $this->casesensitive = $attributes['casesensitive'] ? true : false;
             unset($attributes['casesensitive']);
         }
+        // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+        if (isset($attributes['allowcommas'])) {
+            $this->allowcommas = $attributes['allowcommas'];
+            unset($attributes['allowcommas']);
+        }
+        // END UCLA MOD: CCLE-7719.
         if (isset($attributes['valuehtmlcallback'])) {
             $this->valuehtmlcallback = $attributes['valuehtmlcallback'];
             unset($attributes['valuehtmlcallback']);
@@ -239,6 +245,9 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
         $context['casesensitive'] = !empty($this->casesensitive);
         $context['showsuggestions'] = !empty($this->showsuggestions);
         $context['noselectionstring'] = $this->noselectionstring;
+        // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+        $context['allowcommas'] = isset($this->allowcommas) ? $this->allowcommas : false;
+        // END UCLA MOD: CCLE-7719.
         if ($this->valuehtmlcallback) {
             foreach ($context['options'] as &$option) {
                 $value = $option['value'];
