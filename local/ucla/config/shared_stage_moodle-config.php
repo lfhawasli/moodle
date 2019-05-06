@@ -224,6 +224,8 @@ $CFG->forced_plugin_settings['tool_dataprivacy']['showdataretentionsummary'] = 0
 
 // Site administration > Courses > Course default settings
 $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
+$CFG->forced_plugin_settings['moodlecourse']['maxsections'] = 200;
+$CFG->forced_plugin_settings['moodlecourse']['numsections'] = 10;
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 2147483648;  // 2GB
 // CCLE-2903 - Don't set completion tracking to be course default
 $CFG->forced_plugin_settings['moodlecourse']['enablecompletion'] = 0;
