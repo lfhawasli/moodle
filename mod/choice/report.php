@@ -264,24 +264,25 @@
     }
     $results = prepare_choice_show_results($choice, $course, $cm, $users);
     $renderer = $PAGE->get_renderer('mod_choice');
-    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
+    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
     //echo $renderer->display_result($results, true);
-    if ($results->publish == CHOICE_PUBLISH_ANONYMOUS_TO_ALL) {
+    if ($results->publish == CHOICE_PUBLISH_ANONYMOUS) {
         echo $renderer->display_result($results);
     } else {
         echo $renderer->display_result($results, has_capability('mod/choice:readresponses', $context));
     }
-    // END UCLA MOD: CCLE-7191
+    // END UCLA MOD: CCLE-7191.
 
    //now give links for downloading spreadsheets.
-    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
-    // Only show showload links if results are not being published or results
+    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+    // Only show download links if results are not being published or results
     // are not anonymous.
     //if (!empty($users) && has_capability('mod/choice:downloadresponses',$context)) {
-    if (!empty($users) && has_capability('mod/choice:downloadresponses', $context) &&
-            ($results->showresults == CHOICE_SHOWRESULTS_NOT ||
-            $results->showresults !=CHOICE_SHOWRESULTS_NOT && $results->publish != CHOICE_PUBLISH_ANONYMOUS_TO_ALL)) {
-    // END UCLA MOD: CCLE-7191
+    $showlinks = $results->showresults == CHOICE_SHOWRESULTS_NOT
+            || ($results->showresults != CHOICE_SHOWRESULTS_NOT
+            && $results->publish != CHOICE_PUBLISH_ANONYMOUS);
+    if (!empty($users) && has_capability('mod/choice:downloadresponses', $context) && $showlinks) {
+    // END UCLA MOD: CCLE-7191.
         $downloadoptions = array();
         $options = array();
         $options["id"] = "$cm->id";

@@ -118,11 +118,10 @@ $string['publish'] = 'Publish results';
 $string['publishafteranswer'] = 'Show results to students after they answer';
 $string['publishafterclose'] = 'Show results to students only after the choice is closed';
 $string['publishalways'] = 'Always show results to students';
-// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
-//$string['publishanonymous'] = 'Publish anonymous results, do not show student names';
-$string['publishanonymous'] = 'Publish anonymous results, do not show student names to students only';
-$string['publishanonymoustoall'] = 'Publish anonymous results, do not show student names';
-// END UCLA MOD: CCLE-7191
+$string['publishanonymous'] = 'Publish anonymous results, do not show student names';
+// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+$string['publishanonymoustostudents'] = 'Publish anonymous results, do not show student names to students only';
+// END UCLA MOD: CCLE-7191.
 $string['publishinfoanonafter'] = 'Anonymous results will be published after you answer.';
 $string['publishinfoanonclose'] = 'Anonymous results will be published after the activity is closed.';
 $string['publishinfofullafter'] = 'Full results, showing everyone\'s choices, will be published after you answer.';
