@@ -126,14 +126,14 @@ class course_edit_form extends moodleform {
                     if (siteindicator_manager::SITE_TYPE_TASITE == $type['shortname']) {
                         continue;
                     }
-                    $descstring = '<strong>' . $type['fullname'] . '</strong> - ' . $type['description'];
+                    $descstring = '<p class="mb-0"><strong>' . $type['fullname'] . '</strong> - ' . $type['description'] . '</p>';
                     $attributes = array(
                         'class' => 'indicator-form',
                         'value' => $type['shortname']
                     );
                     $radioarray[] = $mform->createElement('radio', 'indicator_change', '', $descstring, $type['shortname'], $attributes);
                 }
-                $mform->addGroup($radioarray, 'indicator_type_radios', get_string('change', 'tool_uclasiteindicator'), array('<br/>'), false);
+                $mform->addGroup($radioarray, 'indicator_type_radios', get_string('change', 'tool_uclasiteindicator'), '', false);
                 $mform->addGroupRule('indicator_type_radios', get_string('required'), 'required');
                 
                 if (!empty($indicator)) {

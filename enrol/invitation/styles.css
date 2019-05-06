@@ -16,3 +16,7 @@
 .mform-invite #fitem_id_email_clarification {
     margin-top: -1.0em;
 }
+
+#id_header_role [data-fieldtype="group"] {
+    display: block;
+}
