@@ -2895,9 +2895,11 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
                 $SESSION->wantsurl = qualified_me();
             }
             // START UCLA MOD: CCLE-8056 - Take user to Shibboleth if not logged in.
-            //redirect($CFG->wwwroot .'/enrol/index.php?id='. $course->id);
-            redirect(get_login_url());
+            if (!isloggedin()) {
+                redirect(get_login_url());
+            }
             // END UCLA MOD: CCLE-8056.
+            redirect($CFG->wwwroot .'/enrol/index.php?id='. $course->id);
         }
     }
 
