@@ -40,6 +40,11 @@
     margin-left: 0;
 }
 
+/* add padding for labels */
+.officehours_form .femptylabel {
+    padding-top: 15px;
+}
+
 /* warning red text when changing office hours for all courses */
 .warning-text {
     color: red;
