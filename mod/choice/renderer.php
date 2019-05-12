@@ -112,28 +112,28 @@ class mod_choice_renderer extends plugin_renderer_base {
      * @param bool $forcepublish
      * @return string
      */
-    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
+    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
     //public function display_result($choices, $forcepublish = false) {
     public function display_result($choices, $forcepublish = CHOICE_PUBLISH_ANONYMOUS) {
-    // END UCLA MOD: CCLE-7191
+    // END UCLA MOD: CCLE-7191.
         if (empty($forcepublish)) { //allow the publish setting to be overridden
             $forcepublish = $choices->publish;
         }
 
         $displaylayout = $choices->display;
 
-        // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
-//        if ($forcepublish) {  //CHOICE_PUBLISH_NAMES
-//            return $this->display_publish_name_vertical($choices);
-//        } else {
-//            return $this->display_publish_anonymous($choices, $displaylayout);
-//        }
+        // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+        //if ($forcepublish) {  //CHOICE_PUBLISH_NAMES
+        //    return $this->display_publish_name_vertical($choices);
+        //} else {
+        //    return $this->display_publish_anonymous($choices, $displaylayout);
+        //}
         if ($forcepublish == CHOICE_PUBLISH_NAMES) {
             return $this->display_publish_name_vertical($choices);
-        } else { // CHOICE_PUBLISH_ANONYMOUS_TO_ALL, CHOICE_PUBLISH_ANONYMOUS.
+        } else { // CHOICE_PUBLISH_ANONYMOUS, CHOICE_PUBLISH_ANONYMOUS_TO_STUDENTS.
             return $this->display_publish_anonymous($choices, $displaylayout);
         }
-        // END UCLA MOD: CCLE-7191
+        // END UCLA MOD: CCLE-7191.
     }
 
     /**
