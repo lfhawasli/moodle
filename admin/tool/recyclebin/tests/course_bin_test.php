@@ -60,7 +60,7 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
 
         $this->course = $this->getDataGenerator()->create_course();
         $this->quiz = $this->getDataGenerator()->get_plugin_generator('mod_quiz')->create_instance(array(
-            'course' => $this->course->id
+            'course' => $this->course->id, 'grade' => 100.0, 'sumgrades' => 1
         ));
     }
 
@@ -178,59 +178,147 @@ class tool_recyclebin_course_bin_tests extends advanced_testcase {
         $deletedbook = reset($items);
         $this->assertEquals($book->name, $deletedbook->name);
     }
-    
-    // START UCLA MOD: CCLE-7825 - Recycle bin does not include user data.
+
+    /**
+     * Provider for test_coursemodule_restore_with_userdata() and test_coursemodule_restore_without_userdata()
+     *
+     * Used to verify that recycle bin is immune to various settings. Provides plugin, name, value for
+     * direct usage with set_config()
+     */
+    public function recycle_bin_settings_provider() {
+        return [
+            'backup/backup_auto_storage moodle' => [[
+                (object)['plugin' => 'backup', 'name' => 'backup_auto_storage', 'value' => 0],
+            ]],
+
+            'backup/backup_auto_storage external' => [[
+                (object)['plugin' => 'backup', 'name' => 'backup_auto_storage', 'value' => 1],
+                (object)['plugin' => 'backup', 'name' => 'backup_auto_destination', 'value' => true],
+            ]],
+
+            'backup/backup_auto_storage mixed' => [[
+                (object)['plugin' => 'backup', 'name' => 'backup_auto_storage', 'value' => 2],
+                (object)['plugin' => 'backup', 'name' => 'backup_auto_destination', 'value' => true],
+            ]],
+        ];
+    }
+
     /**
      * Tests that user data is restored when module is restored.
+     *
+     * @dataProvider recycle_bin_settings_provider
+     * @param array $settings array of plugin, name, value stdClass().
      */
-    public function test_userdata_restore() {
-        set_config('backup_general_users', 0, 'backup');
-        set_config('restore_general_users', 0, 'restore');
-        
-        // Create assignment and user submission.
+    public function test_coursemodule_restore_with_userdata($settings) {
+        // Force configuration changes from provider.
+        foreach ($settings as $setting) {
+            // Need to create a directory for backup_auto_destination.
+            if ($setting->plugin === 'backup' && $setting->name === 'backup_auto_destination' && $setting->value === true) {
+                $setting->value = make_request_directory();
+            }
+            set_config($setting->name, $setting->value, $setting->plugin);
+        }
+
         $student = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
-        $instance = $generator->create_instance([
-                'assignsubmission_onlinetext_enabled' => true,
-                'course' => $this->course->id
-            ]);
-        $cm = get_coursemodule_from_instance('assign', $instance->id);
-        $context = context_module::instance($cm->id);        
-        $assign = new mod_assign_testable_assign($context, $cm, $this->course);
-        $this->setUser($student->id);
-        $submission = $assign->get_user_submission($student->id, true);
-        $data = (object) [
-            'onlinetext_editor' => [
-                'itemid' => file_get_unused_draft_itemid(),
-                'text' => 'Submission text',
-                'format' => FORMAT_PLAIN,
-            ],
-        ];
-        $plugin = $assign->get_submission_plugin_by_type('onlinetext');
-        $plugin->save($submission, $data);
-        
-        // Verify that user submission exists.
-        $submission = $assign->get_user_submission($student->id, false);
-        $this->assertNotFalse($submission);
-        
-        // Delete assignment.
+        $this->setUser($student);
+
+        set_config('backup_auto_users', true, 'backup');
+        $this->create_quiz_attempt($this->quiz, $student);
+
+        // Delete quiz.
+        $cm = get_coursemodule_from_instance('quiz', $this->quiz->id);
         course_delete_module($cm->id);
-        phpunit_util::run_all_adhoc_tasks();        
-        
-        // Restore assignment.
+        phpunit_util::run_all_adhoc_tasks();
+        $quizzes = get_coursemodules_in_course('quiz', $this->course->id);
+        $this->assertEquals(0, count($quizzes));
+
+        // Restore quiz.
         $recyclebin = new \tool_recyclebin\course_bin($this->course->id);
         foreach ($recyclebin->get_items() as $item) {
             $recyclebin->restore_item($item);
-        }        
-        
-        // Verify that user submission exists.
-        $assignments = get_coursemodules_in_course('assign', $this->course->id);
-        $this->assertEquals(1, count($assignments));        
-        $cm = array_pop($assignments);
-        $context = context_module::instance($cm->id);     
-        $assign = new mod_assign_testable_assign($context, $cm, $this->course);
-        $submission = $assign->get_user_submission($student->id, false);
-        $this->assertNotFalse($submission);        
+        }
+        $quizzes = get_coursemodules_in_course('quiz', $this->course->id);
+        $this->assertEquals(1, count($quizzes));
+        $cm = array_pop($quizzes);
+
+        // Check if user quiz attempt data is restored.
+        $attempts = quiz_get_user_attempts($cm->instance, $student->id);
+        $this->assertEquals(1, count($attempts));
+        $attempt = array_pop($attempts);
+        $attemptobj = quiz_attempt::create($attempt->id);
+        $this->assertEquals($student->id, $attemptobj->get_userid());
+        $this->assertEquals(true, $attemptobj->is_finished());
     }
-    // END UCLA MOD: CCLE-7825.
+
+    /**
+     * Tests that user data is not restored when module is restored.
+     *
+     * @dataProvider recycle_bin_settings_provider
+     * @param array $settings array of plugin, name, value stdClass().
+     */
+    public function test_coursemodule_restore_without_userdata($settings) {
+        // Force configuration changes from provider.
+        foreach ($settings as $setting) {
+            // Need to create a directory for backup_auto_destination.
+            if ($setting->plugin === 'backup' && $setting->name === 'backup_auto_destination' && $setting->value === true) {
+                $setting->value = make_request_directory();
+            }
+            set_config($setting->name, $setting->value, $setting->plugin);
+        }
+
+        $student = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $this->setUser($student);
+
+        set_config('backup_auto_users', false, 'backup');
+        $this->create_quiz_attempt($this->quiz, $student);
+
+        // Delete quiz.
+        $cm = get_coursemodule_from_instance('quiz', $this->quiz->id);
+        course_delete_module($cm->id);
+        phpunit_util::run_all_adhoc_tasks();
+        $quizzes = get_coursemodules_in_course('quiz', $this->course->id);
+        $this->assertEquals(0, count($quizzes));
+
+        // Restore quiz.
+        $recyclebin = new \tool_recyclebin\course_bin($this->course->id);
+        foreach ($recyclebin->get_items() as $item) {
+            $recyclebin->restore_item($item);
+        }
+        $quizzes = get_coursemodules_in_course('quiz', $this->course->id);
+        $this->assertEquals(1, count($quizzes));
+        $cm = array_pop($quizzes);
+
+        // Check if user quiz attempt data is restored.
+        $attempts = quiz_get_user_attempts($cm->instance, $student->id);
+        $this->assertEquals(0, count($attempts));
+    }
+
+    /**
+     * Add a question to quiz and create a quiz attempt.
+     * @param \stdClass $quiz Quiz
+     * @param \stdClass $student User
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    private function create_quiz_attempt($quiz, $student) {
+        // Add Question.
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
+        $numq = $questiongenerator->create_question('numerical', null, array('category' => $cat->id));
+        quiz_add_quiz_question($numq->id, $quiz);
+
+        // Create quiz attempt.
+        $quizobj = quiz::create($quiz->id, $student->id);
+        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+        $timenow = time();
+        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $student->id);
+        quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
+        quiz_attempt_save_started($quizobj, $quba, $attempt);
+        $attemptobj = quiz_attempt::create($attempt->id);
+        $tosubmit = array(1 => array('answer' => '0'));
+        $attemptobj->process_submitted_actions($timenow, false, $tosubmit);
+        $attemptobj = quiz_attempt::create($attempt->id);
+        $attemptobj->process_finish($timenow, false);
+    }
 }
