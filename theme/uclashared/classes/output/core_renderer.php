@@ -296,7 +296,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
             }
         }
 
-        return html_writer::div($this->render($am), 'btn-header btn-help-feedback');
+        return html_writer::div($this->render($am), 'btn-header btn-help-feedback mr-1');
 
     }
 
