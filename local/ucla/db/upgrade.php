@@ -634,6 +634,33 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         }
         upgrade_plugin_savepoint(true, 2016022300, 'local', 'ucla');
     }
+    
+    // CCLE-8221 - Choice: Anonymous not truly anonymous.
+    if ($oldversion < 2019050600) {
+        $publishanonymoustostudents = $DB->get_recordset('choice', array('publish' => 0), '', 'id, publish');
+        $publishanonymous = $DB->get_recordset('choice', array('publish' => 1), '', 'id, publish');
+        $publishnames = $DB->get_recordset('choice', array('publish' => 2), '', 'id, publish');
+
+        // CHOICE_PUBLISH_ANONYMOUS_TO_STUDENTS constant changed from 0 to 2.
+        foreach ($publishanonymoustostudents as $record) {
+            $record->publish = 2;
+            $DB->update_record('choice', $record);
+        }
+
+        // CHOICE_PUBLISH_ANONYMOUS constant changed from 1 to 0.
+        foreach ($publishanonymous as $record) {
+            $record->publish = 0;
+            $DB->update_record('choice', $record);
+        }
+
+        // CHOICE_PUBLISH_NAMES constant changed from 2 to 1.
+        foreach ($publishnames as $record) {
+            $record->publish = 1;
+            $DB->update_record('choice', $record);
+        }
+        
+        upgrade_plugin_savepoint(true, 2019050600, 'local', 'ucla');
+    }
 
     return $result;
 }
