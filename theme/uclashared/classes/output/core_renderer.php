@@ -452,7 +452,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                         'value'
                     )
                 ),
-                array('class' => 'meta viewingas')
+                array('class' => 'meta viewingas mt-auto')
             );
         }
 
@@ -483,7 +483,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $returnstr .= html_writer::span(
-            html_writer::span($usertextcontents, 'usertext mr-1') .
+            html_writer::span($usertextcontents, 'usertext mr-1 mt-auto') .
             html_writer::span($avatarcontents, $avatarclasses),
             'userbutton'
         );
