@@ -315,14 +315,27 @@ a.btn-help-feedback {
     }
 }
 
-.usermenu .moodle-actionmenu .toggle-display .userbutton
-.usertext{
+.usermenu .moodle-actionmenu .toggle-display .userbutton .usertext {
     font-weight: 300;
     padding-bottom: 3px;
 }
 
+@media (max-width: 940.98px) {
+    .usertext {
+        display: none;
+    }
+}
 .usermenu .moodle-actionmenu:hover .toggle-display .userbutton .usertext {
     color: white;
+}
+
+.usermenu .moodle-actionmenu .userbutton .usertext.mt-auto,
+.usermenu .moodle-actionmenu .userbutton .usertext.my-auto {
+    margin-top: -.15rem!important;
+}
+
+.usermenu .menubar .viewingas.mt-auto, .usermenu .menubar .viewingas.my-auto {
+    margin-top: -.1rem!important;
 }
 
 .usermenu .moodle-actionmenu .toggle-display {
@@ -363,6 +376,10 @@ a.btn-help-feedback {
     img.userpicture {
         margin-right: .5rem;
         margin-bottom: .2rem;
+        margin-left: .2rem;
+    }
+    .dropdown-menu.mt-auto {
+        margin-top: .1rem!important;
     }
  }
  

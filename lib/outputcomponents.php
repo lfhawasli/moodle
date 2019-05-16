@@ -4209,7 +4209,7 @@ class action_menu implements renderable, templatable {
         );
         $this->attributesprimary = array(
             'id' => 'action-menu-'.$this->instance.'-menubar',
-            'class' => 'menubar',
+            'class' => 'menubar d-flex mt-auto',
             'role' => 'menubar'
         );
         $this->attributessecondary = array(
