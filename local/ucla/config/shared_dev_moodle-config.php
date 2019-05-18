@@ -209,7 +209,7 @@ $CFG->forced_plugin_settings['message']['message_provider_moodle_instantmessage_
 $CFG->disableupdateautodeploy = 1;
 
 // Site administration > Advanced features
-$CFG->usetags = 0;
+$CFG->usetags = 1;
 $CFG->enablenotes = 0;
 $CFG->enablewebservices = 1;
 $CFG->bloglevel = 0; // Disable blog system completely
