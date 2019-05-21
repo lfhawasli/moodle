@@ -25,6 +25,8 @@
     Data attributes required for JS:
     * none
 
+    UCLA MOD: Overrode Boost template to add UCLA customizations.
+
     Context variables required for this template:
     * flatnavigation - array of flat_navigation_nodes
       * showdivider - boolean
@@ -89,11 +91,11 @@
     <div class="list-group-item {{tasite}} {{#classes}}{{.}} {{/classes}}" data-key="{{key}}" data-isexpandable="{{isexpandable}}" data-indent="{{get_indent}}" data-showdivider="{{showdivider}}" data-type="{{type}}" data-nodetype="{{nodetype}}" data-collapse="{{collapse}}" data-forceopen="{{forceopen}}" data-isactive="{{isactive}}" data-hidden="{{hidden}}" data-preceedwithhr="{{preceedwithhr}}" {{#parent.key}}data-parent-key="{{.}}"{{/parent.key}}>
         <div class="m-l-{{get_indent}}">
             <div class="media">
-                {{#icon.pix}}
-                    <span class="media-left">
-                        {{#pix}}{{{icon.pix}}}, {{{icon.component}}}, {{{icon.alt}}}{{/pix}}
-                    </span>
-                {{/icon.pix}}
+            {{#icon.pix}}
+                <span class="media-left">
+                    {{#pix}}{{{icon.pix}}}, {{{icon.component}}}, {{{icon.alt}}}{{/pix}}
+                </span>
+            {{/icon.pix}}
                 <span class="media-body">{{{text}}}</span>
             </div>
         </div>
