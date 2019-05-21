@@ -618,3 +618,13 @@ $string['yournewtopic'] = 'Your new discussion topic';
 $string['yourreply'] = 'Your reply';
 $string['forumsubjectdeleted'] = 'This forum post has been removed';
 $string['forumbodydeleted'] = 'The content of this forum post has been removed and can no longer be accessed.';
+// START UCLA MOD: CCLE-4882 forum customization.
+$string['alldiscussionposts'] = 'Show all posts on one page';
+$string['showallpostsby'] = 'Show all posts sorted by: ';
+$string['sortbydiscussionname'] = 'title';
+$string['sortbytime'] = 'time';
+$string['sortbyuser'] = 'user';
+$string['modeprint'] = 'Printer-friendly version';
+$string['modeexport'] = 'Export the entire forum';
+$string['mustprovidediscussionorpostorforum'] = 'You must provide either a forum id, discussion id or post id to export';
+// END UCLA MOD: CCLE-4882 forum customization.
