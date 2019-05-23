@@ -24,8 +24,28 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
 require_once($CFG->libdir . '/behat/lib.php');
+
+$blockshtml = $OUTPUT->blocks('side-pre');
+$hasblocks = strpos($blockshtml, 'data-block=') !== false;
+$regionmainsettingsmenu = $OUTPUT->region_main_settings_menu();
+$templatecontext = [
+    'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
+    'output' => $OUTPUT,
+    'sidepreblocks' => $blockshtml,
+    'hasblocks' => $hasblocks,
+    'regionmainsettingsmenu' => $regionmainsettingsmenu,
+    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
+    'system_link' => get_config('theme_uclashared', 'system_link'),
+    'system_name' => get_config('theme_uclashared', 'system_name'),
+    'running_environment' => get_config('theme_uclashared', 'running_environment')
+];
+
+// For Behat tests we need to show logout link in footer.
+$templatecontext['behatrunning'] = (defined('BEHAT_SITE_RUNNING') ||
+        defined('BEHAT_TEST') || defined('BEHAT_UTIL'));
+
+$templatecontext['flatnavigation'] = $PAGE->flatnav;
 
 $nonavbar = optional_param('nonavbar', null, PARAM_BOOL);
 if (!is_null($nonavbar)) {
@@ -37,7 +57,6 @@ if (!is_null($nonavbar)) {
 }
 $extraclasses = [];
 $hidenavigation = false;
-$hidehamburgericon = false;
 
 // If nav drawer has no nodes, then hide it.
 if (in_array($PAGE->pagelayout, array('course', 'incourse')) && $PAGE->flatnav->count() <= 1) {
@@ -51,11 +70,12 @@ if (!method_exists($OUTPUT, 'region_main_settings_menu')) {
     $OUTPUT = $PAGE->get_renderer('theme_uclasharedcourse', 'core');
 }
 // Made navdraweropen true on every page load except for quiz attempt and preview page.
-if ('mod-quiz-attempt' == $PAGE->pagetype || 'mod-quiz-review' == $PAGE->pagetype || 'mod-quiz-summary' == $PAGE->pagetype) {
-    if(($PAGE->cm->context) && !has_any_capability(array('mod/quiz:viewreports', 'mod/quiz:grade'), $PAGE->cm->context)) {
+if ('mod-quiz-attempt' == $PAGE->pagetype || 'mod-quiz-review' == $PAGE->pagetype
+        || 'mod-quiz-summary' == $PAGE->pagetype) {
+    if (($PAGE->cm->context) && !has_any_capability(array('mod/quiz:viewreports',
+            'mod/quiz:grade'), $PAGE->cm->context)) {
         $navdraweropen = false;
         $hidenavigation = true;
-        $hidehamburgericon = true;
     }
 }
 if ($navdraweropen) {
@@ -63,29 +83,9 @@ if ($navdraweropen) {
 }
 
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
-$blockshtml = $OUTPUT->blocks('side-pre');
-$hasblocks = strpos($blockshtml, 'data-block=') !== false;
-$regionmainsettingsmenu = $OUTPUT->region_main_settings_menu();
-$templatecontext = [
-    'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
-    'output' => $OUTPUT,
-    'sidepreblocks' => $blockshtml,
-    'hasblocks' => $hasblocks,
-    'bodyattributes' => $bodyattributes,
-    'navdraweropen' => $navdraweropen,
-    'hidenavigation' => $hidenavigation,
-    'regionmainsettingsmenu' => !empty($regionmainsettingsmenu) ? $regionmainsettingsmenu : '',
-    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
-    'system_link' => get_config('theme_uclashared', 'system_link'),
-    'system_name' => get_config('theme_uclashared', 'system_name'),
-    'running_environment' => get_config('theme_uclashared', 'running_environment')
-];
-
-// For Behat tests we need to show logout link in footer.
-$templatecontext['behatrunning'] = (defined('BEHAT_SITE_RUNNING') || 
-        defined('BEHAT_TEST') || defined('BEHAT_UTIL'));
-
-$templatecontext['flatnavigation'] = $PAGE->flatnav;
+$templatecontext['bodyattributes'] = $bodyattributes;
+$templatecontext['navdraweropen'] = $navdraweropen;
+$templatecontext['hidenavigation'] = $hidenavigation;
 
 // Adding in if we are in a course and if we have editing turned on.
 $templatecontext['incourse'] = $COURSE->id === SITEID ? false : true;
