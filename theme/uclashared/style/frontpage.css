@@ -87,6 +87,9 @@ h1, h2, h3, h4, h5, h6, p {
   float: right;
   margin-top: 30px;
 }
+.header-login .header-btn-group {
+  display: inline-flex;
+}
 .btn-header {
   border-width: 0;
   border-radius: 0px;
@@ -192,7 +195,7 @@ h1, h2, h3, h4, h5, h6, p {
   background-repeat: no-repeat;
   background-position: left;
   width: 700px;
-  position: static;
+  position: relative;
   float: left;
   z-index: 2;
 }
@@ -344,6 +347,7 @@ h1, h2, h3, h4, h5, h6, p {
   height: 100vh;
   position: absolute;
   z-index: 1;
+  left: 0px;
 }
 
 #greeting-wrapper {
