@@ -258,6 +258,7 @@ $CFG->forced_plugin_settings['backup']['backup_import_groups'] = 0;
 $CFG->forced_plugin_settings['restore']['restore_general_users'] = 0;
 
 // Site administration > Grades > General settings
+$CFG->grade_export_exportfeedback = 1;
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 $CFG->gradepointmax = 300;
