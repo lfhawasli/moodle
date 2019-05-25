@@ -18,8 +18,8 @@ $alert-colors: (
         font-weight: 300;
         text-align: center;
         margin-bottom: 4px;
+        margin-top: -1rem;
         padding-bottom: 2px;
-        /*background-color: #f5f5f5;*/
         padding-top: 2px;
 
         .pagelayout-frontpage & {
@@ -107,7 +107,7 @@ $alert-colors: (
 
 .banner-ucla-alert {
     width: 100%;
-    
+
     .banner-ucla-alert-content {
         border: 1px solid $alert-red;
         background-color: #fafaf8;
@@ -148,7 +148,7 @@ $alert-colors: (
 }
 
 // Make alert block display better in Boost theme.
-.block_ucla_alert .card-block {
+.block_ucla_alert .card-body {
     padding: 0;
     .box-boundary {
         padding-left: 0.5rem;
