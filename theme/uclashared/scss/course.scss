@@ -37,6 +37,16 @@
     border-radius: 15px;
 }
 
+#id_uclasiteindicator [data-fieldtype="group"] {
+    flex-flow: column;
+    align-items: flex-start;
+    
+    input[type="radio"] {
+        align-self: baseline;
+        top: 5px;
+    }
+}
+
 #linkcourseadmin {
     margin-top: 30px;
 }
