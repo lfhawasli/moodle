@@ -23,7 +23,6 @@
  */
 
 $string['continuecomments'] = '... [See full text on class website]';
-$string['deleted'] = 'Deleted'; // Used when we indicate to MyUCLA that a grade is deleted.
 $string['eventgradesexported'] = 'Grades exported ({$a})';
 $string['eventgradesexportviewed'] = 'Grade {$a} export viewed';
 $string['eventgradesviewed'] = 'Gradebook {$a} report viewed';

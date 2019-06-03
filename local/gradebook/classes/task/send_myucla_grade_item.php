@@ -109,8 +109,9 @@ class send_myucla_grade_item extends send_myucla_base {
 
         // Set variables to notify deletion.
         if (!empty($deleted)) {
-            $gradeinfo->comment    = get_string('deleted', 'local_gradebook');
-            $gradeinfo->hidden      = 1;
+            $gradeinfo->isdeleted = 1;
+        } else {
+            $gradeinfo->isdeleted = 0;
         }
 
         return array(
@@ -128,7 +129,8 @@ class send_myucla_grade_item extends send_myucla_base {
                 'itemEditURL'       => $gradeinfo->editurl,
                 'itemComment'       => $gradeinfo->comment,
                 'itemMaxScore'      => $gradeinfo->grademax,
-                'itemDue'           => $gradeinfo->itemdue
+                'itemDue'           => $gradeinfo->itemdue,
+                'isDeleted'         => $gradeinfo->isdeleted
             ),
             'mClassList' => array(
                 array(
