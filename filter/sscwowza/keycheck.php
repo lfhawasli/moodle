@@ -18,18 +18,23 @@
  *  WOWZA streaming media filter plugin key checking.
  *
  * @package    filter_sscwowza
- * @copyright  2013 UC Regents
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once($CFG->dirroot . '/config.php');
 
 // Get global user variable.
 global $USER;
 
 $isvalid = true;
-if (!isset($USER->video_allowed)) {
+if (!isset($USER->ssc_video_allowed) || !$USER->ssc_video_allowed) {
     $isvalid = false;
+}
+
+// Log to php error log to check if keycheck is being called.
+if (debugging()) {
+    error_log(sprintf('Called by %s, returning $isvalid = ', getremoteaddr(), $isvalid));
 }
 
 if (!$isvalid) {

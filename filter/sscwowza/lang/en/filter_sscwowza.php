@@ -18,7 +18,7 @@
  *  Language file.
  *
  * @package    filter_sscwowza
- * @copyright  2013 UC Regents
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
