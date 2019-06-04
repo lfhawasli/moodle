@@ -275,7 +275,7 @@ class theme_uclasharedcourse_core_renderer extends theme_uclashared\output\core_
 
         // Show logo guide.
         $pixurl = $this->image_url('guide', 'theme');
-        $img = html_writer::img($pixurl, null);
+        $img = html_writer::img($pixurl, get_string('logoguide', 'theme_uclasharedcourse'));
         $mform->addElement('static', 'description', '', $img);
 
         // Check if we already have images.
