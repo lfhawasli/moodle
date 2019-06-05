@@ -156,11 +156,13 @@ h1, h2, h3, h4, h5, h6, p {
     float: none;
     margin: 0;
     flex-direction: column;
-    flex-wrap: wrap;
   }
   .btn-header {
     width: 100%;
     margin-bottom: 10px;
+  }
+  .btn-header .menubar .dropdown {
+    margin: 0 auto;
   }
   .header-logo .icon {
     display: none;
