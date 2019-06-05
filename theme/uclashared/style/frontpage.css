@@ -268,6 +268,8 @@ h1, h2, h3, h4, h5, h6, p {
   margin-top: 30px;
   background-color: rgb(44,94,145);
   color: #fff;
+  padding-right: 0.7rem;
+  padding-left: 0.7rem;
 }
 #frontpage-browseby-btns-wrapper a:hover {
   background-color: rgb(220,220,220);
@@ -338,7 +340,7 @@ h1, h2, h3, h4, h5, h6, p {
 }
 @media (max-width: 992px) {
   #frontpage-browseby-btns-wrapper a, #frontpage-search-wrapper .search-options {
-    font-size: 1.0em;
+    font-size: 0.9em;
   }
 }
 
