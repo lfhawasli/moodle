@@ -173,7 +173,10 @@ class navigation_node implements renderable {
                 $this->shorttext = $properties['shorttext'];
             }
             if (!array_key_exists('icon', $properties)) {
-                $properties['icon'] = new pix_icon('i/navigationitem', '');
+                // START UCLA MOD: CCLE-8399 - Remove indent in front of "Show all" and "Syllabus".
+                //$properties['icon'] = new pix_icon('i/navigationitem', '');
+                $properties['icon'] = null;
+                // END UCLA MOD: CCLE-8399.
             }
             $this->icon = $properties['icon'];
             if ($this->icon instanceof pix_icon) {
