@@ -387,18 +387,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
             }
 
-            // If user is on the front page, return button without usermenu classes.
-            if ($onfrontpage) {
-                return $returnstr;
-            } else {
-                return html_writer::div(
-                    html_writer::span(
-                        $returnstr,
-                        'login'
-                    ),
-                    $usermenuclasses
-                );
-            }
+            return $returnstr;
         }
 
         // If logged in as a guest user, show a string to that effect.
@@ -409,18 +398,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
             }
 
-            // If user is on the front page, always return the button without usermenu classes.
-            if ($onfrontpage) {
-                return "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
-            } else {
-                return html_writer::div(
-                    html_writer::span(
-                        $returnstr,
-                        'login'
-                    ),
-                    $usermenuclasses
-                );
-            }
+            return $returnstr;   
         }
         
         // If logged in and on the front page, hide the login button.
