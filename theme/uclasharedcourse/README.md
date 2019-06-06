@@ -17,9 +17,9 @@ To build theme SASS:
     stylelint theme/uclasharedcourse/sass/*.scss --syntax scss
 
     To compile SASS files:
-    sass -t compressed theme/uclasharedcourse/sass/uclasharedcourse.scss theme/uclasharedcourse/style/uclasharedcourse.css
+    sass -s compressed theme/uclasharedcourse/sass/uclasharedcourse.scss theme/uclasharedcourse/style/uclasharedcourse.css
 
     To compile SASS files while you work with them:
-    sass -t compressed --watch theme/uclasharedcourse/sass/uclasharedcourse.scss:theme/uclasharedcourse/style/uclasharedcourse.css
+    sass -s compressed --watch theme/uclasharedcourse/sass/uclasharedcourse.scss:theme/uclasharedcourse/style/uclasharedcourse.css
 
     After you finish your changes you can commit the compiled SASS file.

@@ -24,6 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2018070500;
-$plugin->requires  = 2014050800;
+$plugin->version   = 2019060400;
+$plugin->requires  = 2018050800;
 $plugin->component = 'theme_uclasharedcourse';
+
+// This is a list of plugins, this plugin depends on (and their versions).
+$plugin->dependencies = [
+    'theme_uclashared' => '2019051500'
+];

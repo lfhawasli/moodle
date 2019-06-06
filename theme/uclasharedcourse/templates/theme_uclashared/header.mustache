@@ -18,30 +18,30 @@
     Page header.
 }}
 
-<header role="banner" class="pos-f-t navbar navbar-full navbar-light bg-faded 
-        navbar-static-top moodle-has-zindex {{output.get_headerclasses}}">
-    <div class="header-main row headroom headroom--top">
-        {{^hidenavigation}}
-            <div class="nav-toggle" data-region="drawer-toggle">
-                {{> theme_uclashared/hamburger }}
+<div class="env-{{ running_environment }}">
+    <nav class="fixed-top pos-f-t navbar navbar-full navbar-light bg-faded navbar-static-top moodle-has-zindex {{output.get_headerclasses}}">
+        <div class="header-main row">
+            {{^hidenavigation}}
+                <div class="nav-toggle" data-region="drawer-toggle">
+                    {{> theme_uclashared/hamburger }}
+                </div>
+            {{/hidenavigation}}
+            <div class="header-logo">
+                {{! Override to provide custom logos }}
+                {{{ output.logo }}}
             </div>
-        {{/hidenavigation}}
-        <div class="header-logo">
-            {{! Override to provide custom logos }}
-            {{{ output.logo }}}
-        </div>
-        <div class="header-login">
-            <div class="header-btn-group logininfo" >
-                <!-- navbar_plugin_output -->
-                {{{ output.navbar_plugin_output }}}
-                <!-- help_feedback_link -->
-                {{{ output.help_feedback_link }}}
-                <!-- user_menu -->
-                {{{ output.user_menu }}}
+            <div class="header-login ml-auto mr-3 mb-2">
+                <div class="header-btn-group logininfo d-flex" >
+                    <!-- navbar_plugin_output -->
+                    {{{ output.navbar_plugin_output }}}
+                    <!-- help_feedback_link -->
+                    {{{ output.help_feedback_link }}}
+                    <!-- user_menu -->
+                    {{{ output.user_menu }}}
+                </div>
             </div>
         </div>
-    </div>
-    <div class="header-bottom">        
-    </div>
-</header>
-
+        <div class="header-bottom">        
+        </div>
+    </nav>
+</div>

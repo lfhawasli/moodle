@@ -25,6 +25,7 @@
  */
 $string['additional_logos'] = 'Additional header logos';
 $string['choosereadme'] = 'The course theme from University of California, Los Angeles.';
+$string['logoguide'] = 'Additional header logos will appear in above the course ';
 $string['pluginname'] = 'UCLA course theme';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';

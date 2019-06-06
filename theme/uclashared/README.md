@@ -14,10 +14,10 @@ To build plugins SASS:
     stylelint course/format/ucla/sass/*.scss --syntax scss
 
     To compile SASS files:
-    sass -t compressed course/format/ucla/sass/styles.scss course/format/ucla/styles.css
+    sass -s compressed course/format/ucla/sass/styles.scss course/format/ucla/styles.css
 
     To compile SASS files while you work with them:
-    sass -t compressed --watch course/format/ucla/sass/styles.scss:course/format/ucla/styles.css
+    sass -s compressed --watch course/format/ucla/sass/styles.scss:course/format/ucla/styles.css
 
     After you finish your changes you can commit the compiled SASS file. Change the
     paths to the appropriate plugin you are editing.
