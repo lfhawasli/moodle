@@ -31,13 +31,16 @@
 }
 
 /* Remove extra spacing & profile image from header on My sites */
-#page-my-index #page-header .userpicture {
+#page-my-index #page-header .page-header-image {
     display: none;
 }
-#page-my-index #page-header .card-block {
+#page-my-index #page-header .page-header-headings {
+    padding-left: 1em;
+}
+#page-my-index #page-header .card-body {
     padding-left: 0;
 }
-#page-my-index #region-main .card.card-block {
+#page-my-index #region-main .card .card-body {
     padding-top: 0;
-    padding-left: 0;
+    padding-left: 0.5em;
 }
