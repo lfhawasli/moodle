@@ -141,6 +141,7 @@ h1, h2, h3, h4, h5, h6, p {
     text-align: center;
     width: 100%;
     margin: 11px 0;
+    font-size: 1.5rem;
   }
   .header-login {
     justify-content: flex-end;
@@ -207,7 +208,7 @@ h1, h2, h3, h4, h5, h6, p {
     background-size: cover;
     background-position: center;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 40px;
   }
   #sidebar .header-logo {
     display: none;
