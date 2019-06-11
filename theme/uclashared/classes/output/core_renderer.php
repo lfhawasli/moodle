@@ -218,11 +218,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
     public function help_feedback_link() {
         global $CFG;
 
-        $helplocale = $this->call_separate_block_function(
+        $helplink = $this->call_separate_block_function(
                 'ucla_help', 'get_action_link'
         );
-
-        if (!$helplocale) {
+        if (!$helplink) {
             return false;
         }
 
@@ -236,6 +235,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
         // Custom-defined items.
         $customitems = \user_convert_text_to_menu_items($CFG->custommenuitems, $this->page);
         foreach ($customitems as $item) {
+            // Use special link for "Submit a help request".
+            if ($item->titleidentifier == 'helprequest,theme_uclashared') {
+                $item->url = new moodle_url($helplink);
+            }
             $opts->navitems[] = $item;
         }
 
@@ -298,44 +301,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
 
         return html_writer::div($this->render($am), 'btn-header btn-help-feedback mr-1');
 
-    }
-
-    /**
-     * Renders the Help & Feedback dropdown menu using Moodle's own config.
-     * The menu items can be modified in Appearance > Themes > Theme settings.
-     *
-     * @see $CFG->custommenuitems
-     * @param custom_menu $menu
-     * @return string HTML output
-     */
-    protected function render_custom_menu(custom_menu $menu) {
-        if (!$menu->has_children()) {
-            return '';
-        }
-
-        $items = array();
-        foreach ($menu->get_children() as $k => $child) {
-
-            // Show an arrow above first item.
-            $arrow = $k === 0 ? html_writer::span('', 'arrow-up') : '';
-            $url = $child->get_url();
-
-            // For help requests, get URL with courseid.
-            // Assume this link is the first item in the menu.
-            if ($k === 0) {
-                $url = $this->call_separate_block_function('ucla_help', 'get_action_link');
-            }
-
-            $items[] = html_writer::tag('li',
-                html_writer::link($url, $arrow . $child->get_text())
-            );
-        }
-
-        $menu = html_writer::tag('ul', implode('', $items),
-            array('class' => 'help-dropdown-menu hidden', 'role' => 'menu')
-        );
-
-        return $menu;
     }
 
     /**
