@@ -181,6 +181,7 @@ div.tt_rw_form_item .fitem .fitemtitle {
 }
 /*New Styles*/
 /*By Akhil;10-03-2012; Start*/
+/* START UCLA MOD: CCLE-8422 - Blocks action items have grey background.
 .general_tables{
 background:#FFFFFF;
 width:100% ;
@@ -212,6 +213,7 @@ color:#000000;
 text-decoration:none;
 
 }
+END UCLA MOD: CCLE-8422.*/
 /* .header a{
 color:#000000;
 text-decoration:none;
@@ -221,6 +223,7 @@ text-transform:uppercase;
 text-align:left;
 }
 */
+/* START UCLA MOD: CCLE-8422 - Blocks action items have grey background.
 .cell a{
 color:#000000;
 text-decoration:none;
@@ -247,6 +250,7 @@ border-bottom-width:3px;
 border-bottom-color:#CCCCCC;
 border-bottom-style:solid;
 }
+END UCLA MOD: CCLE-8422.*/
 .device_tables{
 background:#FFFFFF;
 width:90%;
