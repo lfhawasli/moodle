@@ -40,7 +40,10 @@ define(
         PagedContentFactory
     ) {
 
-    var ITEMS_PER_PAGE = 5;
+    // START UCLA MOD: CCLE-8340 - Fix Quiz "Questions Matching This Filter" Bar.
+    //var ITEMS_PER_PAGE = 5;
+    var ITEMS_PER_PAGE = 20;
+    // END UCLA MOD: CCLE-8340.
     var TEMPLATE_NAME = 'mod_quiz/random_question_form_preview_question_list';
     var SELECTORS = {
         LOADING_ICON_CONTAINER: '[data-region="overlay-icon-container"]',
