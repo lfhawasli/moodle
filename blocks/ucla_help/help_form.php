@@ -73,6 +73,14 @@ class help_form extends moodleform {
                     'faculty/staff');
             $mform->addElement('static', '', '', get_string('helpform_alternative', 'block_ucla_help',
                     $changeemail));
+        } else {
+            // Make name field a required field.
+            $mform->addRule('ucla_help_name', get_string('requiredelement', 'form'), 'required');
+
+            // Make email field a required field.
+            $mform->addRule('ucla_help_email', get_string('requiredelement', 'form'), 'required');
+            // If email is present, make sure it is a valid email address.
+            $mform->addRule('ucla_help_email', get_string('err_email', 'form'), 'email');
         }
 
         $mform->addElement('select', 'ucla_help_course',
@@ -119,14 +127,6 @@ class help_form extends moodleform {
         $mform->applyFilter('ucla_help_name', 'trim');
         $mform->applyFilter('ucla_help_email', 'trim');
         $mform->applyFilter('ucla_help_description', 'trim');
-
-        // Make name field a required field.
-        $mform->addRule('ucla_help_name', get_string('requiredelement', 'form'), 'required');
-
-        // Make email field a required field.
-        $mform->addRule('ucla_help_email', get_string('requiredelement', 'form'), 'required');
-        // If email is present, make sure it is a valid email address.
-        $mform->addRule('ucla_help_email', get_string('err_email', 'form'), 'email');
 
         // Make description field a required field.
         $mform->addRule('ucla_help_description', get_string('requiredelement', 'form'), 'required');

@@ -38,7 +38,7 @@ if ($courseid == SITEID) {
     $courseid = 0;
 }
 if ($courseid) {
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $course = get_course($courseid);
     $PAGE->set_course($course);
     $context = $PAGE->context;
 } else {
@@ -111,14 +111,8 @@ if ($courseid != 0) {
 }
 $courses = array();
 $courses[$SITE->id] = get_string('no_course', 'block_ucla_help');
-$maxlength = 40;
 foreach ($usercourses as $crs) {
-    $coursename = $crs->shortname . ' ' . $crs->fullname;
-    if (core_text::strlen($coursename) < $maxlength) {
-        $courses[$crs->id] = $coursename;
-    } else {
-        $courses[$crs->id] = core_text::substr($coursename, 0, $maxlength);
-    }
+    $courses[$crs->id] = $crs->shortname . ' ' . $crs->fullname;
 }
 $usercourses[] = $SITE;    // Include the site default.
 
