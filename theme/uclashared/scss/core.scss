@@ -96,3 +96,8 @@ table.stickyheader {
     display: block; // Separates the first column from the tbody.
     background: $gray-lightest;
 }
+
+// Make pagination bar scrollable when too long
+.pagination {
+    overflow: auto;
+}
