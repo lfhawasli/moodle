@@ -584,7 +584,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
-        $html .= html_writer::start_div('col-12 pt-3 pb-3');
+        $html .= html_writer::start_div('col-12 pb-2');
         $html .= html_writer::start_div('card');
         $html .= html_writer::start_div('card-body');
         if (empty($PAGE->layout_options['nonavbar'])) {
@@ -643,7 +643,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
-        $html .= html_writer::start_div('col-12 pt-3 pb-3');
+        $html .= html_writer::start_div('col-12 pb-2');
         $html .= html_writer::start_div('card');
         $html .= html_writer::start_div('card-body');
         $html .= html_writer::div($this->context_header_settings_menu(), 'float-sm-right context-header-settings-menu');
