@@ -128,7 +128,8 @@ class block_explorancebpi extends block_base {
         // START UCLA MOD: CCLE-7037 - Evaluate Blue Course Evaluation software
 //        // In the end, we append the HTML of the IFRAME in the text parameter.
 //		$this->content->text .= '<div class="userinfoblock"><iframe frameBorder="0" name="name_bpiframe_'.$blockId.'" id="id_bpiframe_'.$blockId.'" src="'.$newUrl.'" style="border: 0px solid #333;background-color:#FFF;" width="100%" height="'.$height.'"></iframe></div>';
-        $response = file_get_contents($newUrl);
+        $ctx = stream_context_create(array('http' => array('timeout' => 3)));
+        $response = file_get_contents($newUrl, false, $ctx);
         if (strpos($response, '  <div>Return Value (when no tasks are returned)</div>') === false &&
                 strpos($response, 'You do not have any tasks to complete at this time') === false) {
             // In the end, we append the HTML of the IFRAME in the text parameter.
