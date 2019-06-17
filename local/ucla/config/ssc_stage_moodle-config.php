@@ -337,6 +337,7 @@ $CFG->tnawebserviceurl = array("http://tvnews.sscnet.ucla.edu/webservice/edge/we
                                "http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
                                "http://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
                                "http://newsscape.library.ucla.edu/util/webservice.php",
+                               "https://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php",
                                "https://tvnews.sscnet.ucla.edu/webservice/edge/webservice.php");
 $CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
                               "http://www.sscnet.ucla.edu/tna/edge/video,",
@@ -344,7 +345,8 @@ $CFG->tnapermalinkurl = array("http://www.sscnet.ucla.edu/tna/setesting/video,",
                               "http://dcl.sscnet.ucla.edu/search/video,",
                               "http://tvnews.library.ucla.edu/video,",
                               "http://newsscape.library.ucla.edu/video,",
-                              "https://tvnews.sscnet.ucla.edu/edge/video,");
+                              "https://tvnews.sscnet.ucla.edu/edge/video,",
+                              "https://tvnews.sscnet.ucla.edu/edge2/video,");
 $CFG->tnastreamerurl = "rtmpt://wowza.library.ucla.edu/csa_edge";
 
 // Site administration > Plugins > Assignment plugins > Submission plugins > File submissions
